@@ -455,7 +455,15 @@ export const caseScores = pgTable(
  .primaryKey()
  .notNull(),
  // Foreign key to users.id; who performed the calculation (nullable to allow on delete set null)
- calculatedBy: integer('calculated_by', caseId: uuid('case_id').notNull(, score: numeric('score', { precision: 5, scale: 2 }).notNull(, riskLevel: caseRiskLevelEnum('risk_level').notNull(, breakdown: jsonb('breakdown').default({}).notNull(, criteria: jsonb('criteria').default({}).notNull(, recommendations: jsonb('recommendations').default([]).notNull().$type<string[]>(, calculatedAt: timestamp('calculated_at', { mode: 'string' }).defaultNow().notNull(, updatedAt: timestamp('updated_at', { mode: 'string' }).defaultNow().notNull(),
+    calculatedBy: integer('calculated_by'),
+    caseId: uuid('case_id').notNull(),
+    score: numeric('score', { precision: 5, scale: 2 }).notNull(),
+    riskLevel: caseRiskLevelEnum('risk_level').notNull(),
+    breakdown: jsonb('breakdown').default({}).notNull(),
+    criteria: jsonb('criteria').default({}).notNull(),
+    recommendations: jsonb('recommendations').default([]).notNull().$type<string[]>(),
+    calculatedAt: timestamp('calculated_at', { mode: 'string' }).defaultNow().notNull(),
+    updatedAt: timestamp('updated_at', { mode: 'string' }).defaultNow().notNull(),
  },
  (table) => [
  foreignKey({
