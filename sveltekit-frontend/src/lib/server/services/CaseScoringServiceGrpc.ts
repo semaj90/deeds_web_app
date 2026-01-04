@@ -1,346 +1,323 @@
 // CaseScoringServiceGrpc.ts - Binary Protocol Optimized Case Scoring for Phase 5-7
-// Implements gRPC streaming with 60% performance improvement target
-import * as grpc from '@grpc/grpc-js';
-import * as protoLoader from '@grpc/proto-loader';
-import { ollamaService } from './OllamaService.js';
-import { db } from '../db.js';
-import { caseScores } from '../db/schema.js';
-import type {
- CaseScoringRequest,
- CaseScoringResult,
- ScoringCriteria,
-} from '../../types/scoring.js';
-import { EventEmitter } from 'events';
-import * as zlib from 'zlib';
-import { promisify } from 'util';
-import type { metadata } from "$lib/services/enhanced-rag-pagerank.js";
-import type { request } from "http";
-import type { Record } from "neo4j-driver";
-import { version, getPriority } from "os";
-import { title, config } from "process";
-import nodejsOrchestrator from "$lib/services/nodejs-orchestrator.js";
-import type { string } from "fast-check";
+// Implements gRPC streaming with 60% performance improvement target;
+  import * as grpc from '@grpc/grpc-js';;
+  import * as protoLoader from '@grpc/proto-loader';;
+  import { ollamaService } from './OllamaService.js';;
+  import { db } from '../db.js';;
+  import { caseScores } from '../db/schema.js';;
+  import type {;
+  CaseScoringRequest,;
+  CaseScoringResult,;
+  ScoringCriteria,
+} from '../../types/scoring.js';;
+  import { EventEmitter } from 'events';;
+  import * as zlib from 'zlib';;
+  import { promisify } from 'util';;
+  import type { metadata } from "$lib/services/enhanced-rag-pagerank.js";;
+  import type { request } from "http";;
+  import type { Record } from "neo4j-driver";;
+  import { version, getPriority } from "os";;
+  import { title, config } from "process";;
+  import nodejsOrchestrator from "$lib/services/nodejs-orchestrator.js";;
+  import type { string } from "fast-check";
 
-// --- added: promisified gunzip helper
-const gunzip = promisify(zlib.gunzip);
+// --- added, promisified gunzip helper;
+  const gunzip = promisify(zlib.gunzip);
 
-// Performance monitoring class
-class PerformanceMonitor {
- metrics: Map<string, number[]> = new Map();
-
- recordMetric(name: string, value: number): void {
- if (!this.metrics.has(name)) this.metrics.set(name, []);
- this.metrics.get(name)!.push(value);
- }
-
- getAverageMetric(name: string): number {
- const v = this.metrics.get(name) || [];
- if (!v.length) return 0;
- return v.reduce((a, b) => a + b, 0) / v.length;
- }
-
- getComparison(): { json: number; grpc: number; improvement : number  } {
- const json = this.getAverageMetric('json_processing');
- const grpc = this.getAverageMetric('grpc_processing');
- const improvement = json > 0 ? ((json - grpc) / json) * 100 : 0;
- return { json, grpc, improvement };
+// Performance monitoring class;
+  class PerformanceMonitor {;
+  metrics, Map<string, number[]> = new Map();;
+  recordMetric(name, string, value, number), void {;
+  if (!this.metrics.has(name)) this.metrics.set(name, []);;
+  this.metrics.get(name)!.push(value);
+ };
+  getAverageMetric(name, string), number {;
+  const v = this.metrics.get(name) || [];;
+  if (!v.length) return 0;;
+  return v.reduce((a, b) => a + b, 0) / v.length;
+ };
+  getComparison(): { json, number; grpc, number; improvement , number  } {;
+  const json = this.getAverageMetric('json_processing');;
+  const grpc = this.getAverageMetric('grpc_processing');;
+  const improvement = json > 0 ? ((json - grpc) / json) * 100 : 0;;
+  return { json, grpc, improvement };
  }
 }
 
-// Simple logger - avoid `any`
-const logger = {
- info: (msg: string, ...args: unknown[]) => console.log(`[gRPC INFO] ${msg}`, ...args, error: (msg: string, ...args: unknown[]) => console.error(`[gRPC ERROR] ${msg}`, ...args, warn: (msg: string, ...args: unknown[]) => console.warn(`[gRPC WARN] ${msg}`, ...args, debug: (msg: string, ...args: unknown[]) => console.debug(`[gRPC DEBUG] ${msg}`, ...args),
+// Simple logger - avoid `any`;
+  const logger = {;
+  info: (msg, string, ...args, unknown[]) => console.log(`[gRPC INFO] ${msg}`, ...args, error: (msg, string, ...args, unknown[]) => console.error(`[gRPC ERROR] ${msg}`, ...args, warn: (msg, string, ...args, unknown[]) => console.warn(`[gRPC WARN] ${msg}`, ...args, debug: (msg, string, ...args, unknown[]) => console.debug(`[gRPC DEBUG] ${msg}`, ...args),
 };
 
-// --- Added: narrow gRPC types moved ahead of the class to avoid "cannot find name" errors
-type GrpcResponse = {
- case_id?: string;
- score?: number;
- confidence?: number;
- detailed_scores?: Record<string, unknown>;
- detailed_scorings?: Record<string, unknown>;
- ai_analysis?: Buffer | string | Uint8Array;
- recommendations?: Array<{ text?, string } | string>;
- scoring_date?: { seconds?: number };
- metadata?: {
- model_name?: string;
- model_version?: string;
- compression_stats?: { compression_ratio?: number };
- performance?: { throughput_cases_per_second?: number };
+// --- Added, narrow gRPC types moved ahead of the class to avoid "cannot find name" errors;
+  type GrpcResponse = {;
+  case_id?, string;;
+  score?, number;;
+  confidence?, number;;
+  detailed_scores?, Record<string, unknown>;;
+  detailed_scorings?, Record<string, unknown>;;
+  ai_analysis?, Buffer | string | Uint8Array;;
+  recommendations?, Array<{ text?, string } | string>;;
+  scoring_date?: { seconds?, number };;
+  metadata?: {;
+  model_name?, string;;
+  model_version?, string;;
+  compression_stats?: { compression_ratio?, number };;
+  performance?: { throughput_cases_per_second?, number };
  };
-}
-
-type GrpcStreamUpdate = {
- case_id?: string;
- event_type?: string;
- timestamp?: { seconds?: number };
- sequence_number?: number;
- partial_score?: unknown;
- criteria_update?: unknown;
- recommendation_update?: unknown;
- processing_status?: unknown;
-}
-
-type GrpcWritableStream = {
- write: (data: unknown) => void;
- end: () => void;
- on: (event: 'data' | 'error' | 'end', handler: (payload?: unknown) => void) => void;
-}
-
-type GrpcClientType = {
- ScoreCase?: (req: unknown, cb: (err: unknown, res?: GrpcResponse) => void) => void;
- StreamScoringUpdates?: () => GrpcWritableStream | undefined;
- StreamCaseScoring?: () => GrpcWritableStream | undefined;
+};
+  type GrpcStreamUpdate = {;
+  case_id?, string;;
+  event_type?, string;;
+  timestamp?: { seconds?, number };;
+  sequence_number?, number;;
+  partial_score?, unknown;;
+  criteria_update?, unknown;;
+  recommendation_update?, unknown;;
+  processing_status?, unknown;
+};
+  type GrpcWritableStream = {;
+  write: (data, unknown) => void;;
+  end: () => void;;
+  on: (event: 'data' | 'error' | 'end', handler: (payload?, unknown) => void) => void;
+};
+  type GrpcClientType = {;
+  ScoreCase?: (req, unknown, cb: (err, unknown, res?, GrpcResponse) => void) => void;;
+  StreamScoringUpdates?: () => GrpcWritableStream | undefined;;
+  StreamCaseScoring?: () => GrpcWritableStream | undefined;
 };
 
-// --- Added: Ollama client helper types to resolve missing identifiers
-type OllamaGenerateFnModel = (
- model: string, prompt: string,
- options?: Record<string, unknown>
-) => Promise<string> | string;
-type OllamaGenerateFnPrompt = (
- prompt: string,
- options?: Record<string, unknown>
-) => Promise<string> | string;
-type OllamaServiceType = {
- generateCompletion?: OllamaGenerateFnModel | OllamaGenerateFnPrompt;
- generate?: OllamaGenerateFnModel | OllamaGenerateFnPrompt;
- complete?: OllamaGenerateFnModel | OllamaGenerateFnPrompt;
- run?: OllamaGenerateFnModel | OllamaGenerateFnPrompt;
+// --- Added, Ollama client helper types to resolve missing identifiers;
+  type OllamaGenerateFnModel = (;
+  model, string, prompt, string,;
+  options?, Record<string, unknown>
+) => Promise<string> | string;;
+  type OllamaGenerateFnPrompt = (;
+  prompt, string,;
+  options?, Record<string, unknown>
+) => Promise<string> | string;;
+  type OllamaServiceType = {;
+  generateCompletion?, OllamaGenerateFnModel | OllamaGenerateFnPrompt;;
+  generate?, OllamaGenerateFnModel | OllamaGenerateFnPrompt;;
+  complete?, OllamaGenerateFnModel | OllamaGenerateFnPrompt;;
+  run?, OllamaGenerateFnModel | OllamaGenerateFnPrompt;
  // allow other helpers on the service without typing everything
- [k, string]: any;};
+ [k, string], any;};
 
-// Map scoring result into DB-shaped insert payload (camelCase keys matching drizzle schema)
-function mapScoringResultToInsert(result: CaseScoringResult): {
- caseId: string;
- score: string;
- confidence: string;
- criteria: string;
- recommendations: string;
- explanation: string;
- model: string | null; modelVersion: string | null;
- performanceMetrics: string; createdAt: string;
- riskLevel: string;
- updatedAt?: string;
-} {
- const numericScore =
- typeof result.score === 'number' ? score: Number(result.score ?? NaN);
- let riskLevel = 'unknown';
- if (!Number.isNaN(numericScore)) {
- if (numericScore >= 80) riskLevel = 'high';
- else if (numericScore >= 60) riskLevel = 'medium';
- else if (numericScore >= 40) riskLevel = 'low';
- else riskLevel = 'very_low';
- }
-
- return {
- caseId: result.caseId, score: String(result.score ?? '', confidence: String(result.confidence ?? '', criteria: JSON.stringify(result.criteria ?? {}, recommendations: JSON.stringify(result.recommendations ?? [], explanation: result.explanation ?? '',
- model: result.model ?? null, modelVersion: result.version ?? null, performanceMetrics: JSON.stringify(result.performanceMetrics ?? {}),
+// Map scoring result into DB-shaped insert payload (camelCase keys matching drizzle schema);
+  function mapScoringResultToInsert(result, CaseScoringResult): {;
+  caseId, string;;
+  score, string;;
+  confidence, string;;
+  criteria, string;;
+  recommendations, string;;
+  explanation, string;;
+  model, string | null; modelVersion, string | null;;
+  performanceMetrics, string; createdAt, string;;
+  riskLevel, string;;
+  updatedAt?, string;
+} {;
+  const numericScore =;
+  typeof result.score === 'number' ? score, Number(result.score ?? NaN);;
+  let riskLevel = 'unknown';;
+  if (!Number.isNaN(numericScore)) {;
+  if (numericScore >= 80) riskLevel = 'high';;
+  else if (numericScore >= 60) riskLevel = 'medium';;
+  else if (numericScore >= 40) riskLevel = 'low';;
+  else riskLevel = 'very_low';
+ };
+  return {;
+  caseId, result.caseId, score, String(result.score ?? '', confidence, String(result.confidence ?? '', criteria, JSON.stringify(result.criteria ?? {}, recommendations, JSON.stringify(result.recommendations ?? [], explanation, result.explanation ?? '',;
+  model, result.model ?? null, modelVersion, result.version ?? null, performanceMetrics, JSON.stringify(result.performanceMetrics ?? {}),
  // convert Date ISO string to satisfy drizzle insert typings, createdAt: (result.scoringDate ?? new Date()).toISOString(),
  // updatedAt left optional; if present elsewhere ensure it's set ISO string
  };
 }
 
-// Phoenix Wright AI-Boosted Search Types
-export interface LegalPrecedent {
- id: string; title: string;
- citation: string; court: string;
- date: string; summary: string;
- relevanceScore: number; similarity: number;
- contradictions: string[]; supportingEvidence: string[];
+// Phoenix Wright AI-Boosted Search Types;
+  export interface LegalPrecedent {;
+  id, string; title, string;;
+  citation, string; court, string;;
+  date, string; summary, string;;
+  relevanceScore, number; similarity, number;;
+  contradictions, string[]; supportingEvidence, string[];
+};
+  export interface ContradictionAnalysis {;
+  type: 'direct' | 'implied' | 'factual' | 'legal'; severity: 'high' | 'medium' | 'low';;
+  description, string; evidence, string[];;
+  precedents, string[]; recommendation, string;
+};
+  export interface EvidenceMatch {;
+  evidenceId, string; type: 'document' | 'witness' | 'physical' | 'digital';;
+  relevance, number; confidence, number;;
+  contradictions, ContradictionAnalysis[]; supportingPrecedents, LegalPrecedent[];;
+  explanation, string;
+};
+  export interface PhoenixWrightSearchRequest {;
+  caseId, string; query, string;;
+  evidenceIds, string[];;
+  jurisdiction?, string;;
+  caseType?, string;;
+  timeRange?: { start, string, end, string };;
+  maxResults?, number;;
+  includeContradictions?, boolean;;
+  semanticThreshold?, number;
+};
+  export interface PhoenixWrightSearchResult {;
+  caseId, string; query, string;;
+  precedents, LegalPrecedent[]; contradictions, ContradictionAnalysis[];;
+  evidenceMatches, EvidenceMatch[]; rankingExplanation, string;;
+  confidence, number; searchTime, number;;
+  modelUsed, string; disclaimer, string;
 }
 
-export interface ContradictionAnalysis {
- type: 'direct' | 'implied' | 'factual' | 'legal'; severity: 'high' | 'medium' | 'low';
- description: string; evidence: string[];
- precedents: string[]; recommendation: string;
+// YOᴿHa UI Enhancement Types;
+  export interface YohaUIConfig {;
+  theme: 'phoenix' | 'detective' | 'legal'; animations, boolean;;
+  soundEffects, boolean; autoAdvance, boolean;;
+  showConfidence, boolean; highlightContradictions, boolean;
+};
+  export interface YohaUIState {;
+  currentPhase: 'search' | 'analysis' | 'contradiction' | 'verdict'; progress, number;;
+  activeContradictions, number; evidenceStrength, number;;
+  precedentMatches, number; animationQueue, string[];
 }
 
-export interface EvidenceMatch {
- evidenceId: string; type: 'document' | 'witness' | 'physical' | 'digital';
- relevance: number; confidence: number;
- contradictions: ContradictionAnalysis[]; supportingPrecedents: LegalPrecedent[];
- explanation: string;
-}
-
-export interface PhoenixWrightSearchRequest {
- caseId: string; query: string;
- evidenceIds: string[];
- jurisdiction?: string;
- caseType?: string;
- timeRange?: { start: string, end: string };
- maxResults?: number;
- includeContradictions?: boolean;
- semanticThreshold?: number;
-}
-
-export interface PhoenixWrightSearchResult {
- caseId: string; query: string;
- precedents: LegalPrecedent[]; contradictions: ContradictionAnalysis[];
- evidenceMatches: EvidenceMatch[]; rankingExplanation: string;
- confidence: number; searchTime: number;
- modelUsed: string; disclaimer: string;
-}
-
-// YOᴿHa UI Enhancement Types
-export interface YohaUIConfig {
- theme: 'phoenix' | 'detective' | 'legal'; animations: boolean;
- soundEffects: boolean; autoAdvance: boolean;
- showConfidence: boolean; highlightContradictions: boolean;
-}
-
-export interface YohaUIState {
- currentPhase: 'search' | 'analysis' | 'contradiction' | 'verdict'; progress: number;
- activeContradictions: number; evidenceStrength: number;
- precedentMatches: number; animationQueue: string[];
-}
-
-// Export singleton instance
-export class CaseScoringServiceGrpc extends EventEmitter {
- // avoid `any` for
- private grpcClient: GrpcClientType | null = null;
- private readonly SCORING_MODEL = 'gemma3-legal:latest';
- private readonly DEFAULT_TEMPERATURE = 0.7;
- private performanceMonitor = new PerformanceMonitor();
-
-
- constructor() {
- super();
- this.initializeGrpcClient();
+// Export singleton instance;
+  export class CaseScoringServiceGrpc extends EventEmitter {
+ // avoid `any` for;
+  private grpcClient, GrpcClientType | null = null;;
+  private readonly SCORING_MODEL = 'gemma3-legal, latest';;
+  private readonly DEFAULT_TEMPERATURE = 0.7;;
+  private performanceMonitor = new PerformanceMonitor();;
+  constructor() {;
+  super();;
+  this.initializeGrpcClient();
  }
 
  /**
  * Initialize gRPC client with binary protocol
- */
- private initializeGrpcClient() {
- try {
- // Load protobuf definition
- const PROTO_PATH = './proto/case_scoring.proto';
- const packageDefinition = protoLoader.loadSync(PROTO_PATH, {
- keepCase: true, longs: String,
- enums: String, defaults: true,
- oneofs: true,
+ */;
+  private initializeGrpcClient() {;
+  try {
+ // Load protobuf definition;
+  const PROTO_PATH = './proto/case_scoring.proto';;
+  const packageDefinition = protoLoader.loadSync(PROTO_PATH, {;
+  keepCase, true, longs, String,;
+  enums, String, defaults, true,;
+  oneofs, true,
  });
 
- // Load package and narrow type safely without using `any`
- const loadedPkg = packageDefinition as unknown;
+ // Load package and narrow type safely without using `any`;
+  const loadedPkg = packageDefinition as unknown;
 
- // Minimal shape describing the nested proto path we expect
- type ExpectedProtoShape = {
- legal_ai?: {
- case_scoring?: {
- CaseScoringService?: unknown;
+ // Minimal shape describing the nested proto path we expect;
+  type ExpectedProtoShape = {;
+  legal_ai?: {;
+  case_scoring?: {;
+  CaseScoringService?, unknown;
  };
  };
- }
+ };
+  const proto = loadedPkg as ExpectedProtoShape;;
+  const CaseScoringService = proto.legal_ai?.case_scoring?.CaseScoringService as
+ | { new: (...args, unknown[]), GrpcClientType  }
+ | undefined;;
+  if (!CaseScoringService) {;
+  throw new Error('CaseScoringService proto not found');
+ };
+  const target = process.env.GRPC_SERVER_URL || 'localhost:50051';
 
-const proto = loadedPkg as ExpectedProtoShape;
- const CaseScoringService = proto.legal_ai?.case_scoring?.CaseScoringService as
- | { new (...args: unknown[]): GrpcClientType }
- | undefined;
-
- if (!CaseScoringService) {
- throw new Error('CaseScoringService proto not found');
- }
- const target = process.env.GRPC_SERVER_URL || 'localhost:50051';
-
- // satisfy compiler with GrpcClientType shape via runtime `as unknown as ...`
- this.grpcClient = new (CaseScoringService as unknown as {
- new (...args: unknown[]): GrpcClientType;
+ // satisfy compiler with GrpcClientType shape via runtime `as unknown as ...`;
+  this.grpcClient = new (CaseScoringService as unknown as {;
+  new (...args, unknown[]), GrpcClientType;
  })(target, grpc.credentials.createInsecure(), {
  'grpc.max_receive_message_length': 100 * 1024 * 1024, // 100MB
  'grpc.max_send_message_length': 100 * 1024 * 1024,
  'grpc.keepalive_time_ms': 10000,
  'grpc.keepalive_timeout_ms': 5000,
  'grpc.keepalive_permit_without_calls': 1,
- });
-
- logger.info('gRPC client initialized', { target });
- } catch (err) {
- logger.warn('gRPC initialization failed, will fallback to JSON', err);
- this.grpcClient = null;
+ });;
+  logger.info('gRPC client initialized', { target });
+ } catch (err) {;
+  logger.warn('gRPC initialization failed, will fallback to JSON', err);;
+  this.grpcClient = null;
  }
  }
 
  /**
  * Score a case using binary protocol (gRPC) with fallback to JSON
- */
- async scoreCase(request: CaseScoringRequest): Promise<CaseScoringResult> {
- const startTime = Date.now();
- this.validateRequest(request);
-
- if (this.grpcClient) {
- try {
- return await this.scoreCaseGrpc(request, startTime);
- } catch (err) {
- logger.warn('gRPC scoring failed, falling back to JSON', err);
+ */;
+  async scoreCase(request, CaseScoringRequest), Promise<CaseScoringResult> {;
+  const startTime = Date.now();;
+  this.validateRequest(request);;
+  if (this.grpcClient) {;
+  try {;
+  return await this.scoreCaseGrpc(request, startTime);
+ } catch (err) {;
+  logger.warn('gRPC scoring failed, falling back to JSON', err);
  }
- }
-
- return this.scoreCaseJson(request, startTime);
+ };
+  return this.scoreCaseJson(request, startTime);
  }
 
  /**
  * Score case using gRPC binary protocol
- */
- private scoreCaseGrpc(
- request: CaseScoringRequest, startTime: number ): Promise<CaseScoringResult> {
- return new Promise((resolve, reject) => {
- // Prepare binary request
- const metadata =
- (request as unknown as { metadata?: Record<string, unknown> }).metadata || {}
-
-const grpcRequest = {
- case_id, request.caseId, case_metadata: this.serializeCaseMetadata(metadata, criteria: this.convertCriteriaToProto(
+ */;
+  private scoreCaseGrpc(;
+  request, CaseScoringRequest, startTime, number ), Promise<CaseScoringResult> {;
+  return new Promise((resolve, reject) => {
+ // Prepare binary request;
+  const metadata =
+ (request as unknown as { metadata?, Record<string, unknown> }).metadata || {};
+  const grpcRequest = {;
+  case_id, request.caseId, case_metadata, this.serializeCaseMetadata(metadata, criteria, this.convertCriteriaToProto(;
   request.scoring_criteria ??
-  (request as unknown as { criteria?: ScoringCriteria }).criteria
-  , parameters: {
-  model: this.SCORING_MODEL, temperature, request.temperature ?? this.DEFAULT_TEMPERATURE, max_tokens: 2048, use_cached_embeddings: true, enable_streaming: false,
+  (request as unknown as { criteria?, ScoringCriteria }).criteria
+  , parameters: {;
+  model, this.SCORING_MODEL, temperature, request.temperature ?? this.DEFAULT_TEMPERATURE, max_tokens: 2048, use_cached_embeddings, true, enable_streaming, false,;
   compression: 'GZIP',
-  },
-  request_time: { seconds: Math.floor(Date.now() / 1000) },
-  requester_id: 'system',
-  priority: this.getPriority(request),
+  },;
+  request_time: { seconds, Math.floor(Date.now() / 1000) },;
+  requester_id: 'system',;
+  priority, this.getPriority(request),
   };
 
- // Guard: ensure ScoreCase exists
- if (!this.grpcClient?.ScoreCase) {
- return reject(new Error('gRPC ScoreCase method unavailable'));
+ // Guard, ensure ScoreCase exists;
+  if (!this.grpcClient?.ScoreCase) {;
+  return reject(new Error('gRPC ScoreCase method unavailable'));
  }
 
- // Make gRPC call
- this.grpcClient.ScoreCase(grpcRequest, async (error: any, response?: GrpcResponse) => {
- if (error) {
- return reject(error);
- }
-
- try {
- const processingTime = Date.now() - startTime;
- this.performanceMonitor.recordMetric('grpc_processing', processingTime);
-
- const result: CaseScoringResult = {
- caseId: response?.case_id ?? '',
- score: response?.score ?? null, confidence: response?.confidence ?? null, this.convertCriteriaFromProto(
+ // Make gRPC call;
+  this.grpcClient.ScoreCase(grpcRequest, async (error, any, response?, GrpcResponse) => {;
+  if (error) {;
+  return reject(error);
+ };
+  try {;
+  const processingTime = Date.now() - startTime;;
+  this.performanceMonitor.recordMetric('grpc_processing', processingTime);;
+  const result: CaseScoringResult = {;
+  caseId, response?.case_id ?? '',;
+  score, response?.score ?? null, confidence, response?.confidence ?? null, this.convertCriteriaFromProto(
  (response?.detailed_scores as Record<string, unknown>) ||
  (response?.detailed_scorings as Record<string, unknown>) ||
  {}
  ),
- // changed: use decompressAnalysis to handle compressed buffers consistently, explanation: await this.decompressAnalysis(response?.ai_analysis, recommendations: (response?.recommendations || []).map(
- (r: { text?: string } | string) => (typeof r === 'string' ? r, r.text || String(r))
- , scoringDate: response?.scoring_date
+ // changed, use decompressAnalysis to handle compressed buffers consistently, explanation, await this.decompressAnalysis(response?.ai_analysis, recommendations: (response?.recommendations || []).map(
+ (r: { text?, string } | string) => (typeof r === 'string' ? r, r.text || String(r))
+ , scoringDate, response?.scoring_date
  ? new Date((response.scoring_date.seconds ?? 0) * 1000)
- : new Date(, model: response?.metadata?.model_name || this.SCORING_MODEL, version: response?.metadata?.model_version || '1.0',
- performanceMetrics: {
- protocol: 'gRPC',
- responseTime: processingTime, accuracy: response?.confidence ?? 0,
+ , new Date(, model, response?.metadata?.model_name || this.SCORING_MODEL, version, response?.metadata?.model_version || '1.0',;
+  performanceMetrics: {;
+  protocol: 'gRPC',;
+  responseTime, processingTime, accuracy, response?.confidence ?? 0,
  },
- };
-
- await this.saveScoring(result);
- this.logPerformanceComparison();
- resolve(result);
- } catch (e) {
- reject(e);
+ };;
+  await this.saveScoring(result);;
+  this.logPerformanceComparison();;
+  resolve(result);
+ } catch (e) {;
+  reject(e);
  }
  });
  });
@@ -348,544 +325,507 @@ const grpcRequest = {
 
  /**
  * Original JSON-based scoring (fallback)
- */
- private async scoreCaseJson(
- request: CaseScoringRequest, startTime: number
- ): Promise<CaseScoringResult> {
- // Generate AI analysis
- const aiAnalysis = await this.generateAIAnalysis(request);
+ */;
+  private async scoreCaseJson(;
+  request, CaseScoringRequest, startTime, number
+ ), Promise<CaseScoringResult> {
+ // Generate AI analysis;
+  const aiAnalysis = await this.generateAIAnalysis(request);
 
- // Calculate component scores
- const componentScores = await this.calculateComponentScores(request, aiAnalysis);
+ // Calculate component scores;
+  const componentScores = await this.calculateComponentScores(request, aiAnalysis);
 
- // Calculate final score
- const finalScore = this.calculateWeightedScore(componentScores);
+ // Calculate final score;
+  const finalScore = this.calculateWeightedScore(componentScores);
 
- // Generate recommendations
- const recommendations = await this.generateRecommendations(
- request,
- componentScores,
- finalScore;
- );
-
- const processingTime = Date.now() - startTime;
- this.performanceMonitor.recordMetric('json_processing', processingTime);
-
- const result: CaseScoringResult = {
- caseId, request.caseId, finalScore: this.calculateConfidence(componentScores, criteria: componentScores, explanation: aiAnalysis,
- recommendations: new Date(, model: this.SCORING_MODEL,
- version: '1.0',
- performanceMetrics: {
- protocol: 'JSON/HTTP',
- responseTime: processingTime, accuracy: this.calculateConfidence(componentScores),
+ // Generate recommendations;
+  const recommendations = await this.generateRecommendations(;
+  request,;
+  componentScores,;
+  finalScore;
+ );;
+  const processingTime = Date.now() - startTime;;
+  this.performanceMonitor.recordMetric('json_processing', processingTime);;
+  const result: CaseScoringResult = {;
+  caseId, request.caseId, finalScore, this.calculateConfidence(componentScores, criteria, componentScores, explanation, aiAnalysis,;
+  recommendations, new Date(, model, this.SCORING_MODEL,;
+  version: '1.0',;
+  performanceMetrics: {;
+  protocol: 'JSON/HTTP',;
+  responseTime, processingTime, accuracy, this.calculateConfidence(componentScores),
  },
- };
-
- await this.saveScoring(result);
- return result;
+ };;
+  await this.saveScoring(result);;
+  return result;
  }
 
  /**
  * Stream real-time scoring updates using gRPC bidirectional streaming
- */
- async streamScoringUpdates(
- caseIds: string[],
- callback: (update: unknown) => void
- ): Promise<() => void> {
- if (!this.grpcClient || !this.grpcClient.StreamScoringUpdates) {
- logger.warn('gRPC not available for streaming');
- return () => {};
- }
+ */;
+  async streamScoringUpdates(;
+  caseIds, string[],;
+  callback: (update, unknown) => void
+ ), Promise<() => void> {;
+  if (!this.grpcClient || !this.grpcClient.StreamScoringUpdates) {;
+  logger.warn('gRPC not available for streaming');;
+  return () => {};
+ };
+  const stream = this.grpcClient.StreamScoringUpdates();;
+  if (!stream) {;
+  logger.warn('StreamScoringUpdates returned no stream');;
+  return () => {};
+ };
+  const sessionId = `stream_${Date.now()}`;;
+  this.streamingSessions.set(sessionId, stream);
 
-const stream = this.grpcClient.StreamScoringUpdates();
- if (!stream) {
- logger.warn('StreamScoringUpdates returned no stream');
- return () => {};
- }
-
-const sessionId = `stream_${Date.now()}`;
- this.streamingSessions.set(sessionId, stream);
-
- // Send subscription request (guarded shape)
- try {
- stream.write({
- case_ids: caseIds,
- event_types: ['PARTIAL_UPDATE', 'CRITERIA_EVALUATED', 'SCORING_COMPLETE'],
- include_partial_updates: true,
- update_interval: { seconds: 1 },
+ // Send subscription request (guarded shape);
+  try {;
+  stream.write({;
+  case_ids, caseIds,;
+  event_types: ['PARTIAL_UPDATE', 'CRITERIA_EVALUATED', 'SCORING_COMPLETE'],;
+  include_partial_updates, true,;
+  update_interval: { seconds: 1 },
  });
- } catch (err) {
- logger.warn('Failed to write subscription to stream', err);
+ } catch (err) {;
+  logger.warn('Failed to write subscription to stream', err);
  }
 
- // Handle streaming responses
- stream.on('data', (payload: any) => {
- try {
- const update = payload as GrpcStreamUpdate;
- const processed = this.processStreamingUpdate(update);
- // Call user callback and emit event; protect against callback exceptions
- try {
- callback(processed);
- } catch (cbErr) {
- logger.warn('streamScoringUpdates callback threw', cbErr);
+ // Handle streaming responses;
+  stream.on('data', (payload, any) => {;
+  try {;
+  const update = payload as GrpcStreamUpdate;;
+  const processed = this.processStreamingUpdate(update);
+ // Call user callback and emit event; protect against callback exceptions;
+  try {;
+  callback(processed);
+ } catch (cbErr) {;
+  logger.warn('streamScoringUpdates callback threw', cbErr);
+ };
+  this.emit('scoring-update', processed);
+ } catch (procErr) {;
+  logger.warn('Failed to process streaming data', procErr);
  }
- this.emit('scoring-update', processed);
- } catch (procErr) {
- logger.warn('Failed to process streaming data', procErr);
- }
- });
-
- stream.on('error', (err: any) => {
- logger.error('Streaming error', err);
- this.emit('streaming-error', err);
- });
-
- stream.on('end', () => {
- logger.info('Streaming ended');
- this.streamingSessions.delete(sessionId);
- this.emit('streaming-end');
+ });;
+  stream.on('error', (err, any) => {;
+  logger.error('Streaming error', err);;
+  this.emit('streaming-error', err);
+ });;
+  stream.on('end', () => {;
+  logger.info('Streaming ended');;
+  this.streamingSessions.delete(sessionId);;
+  this.emit('streaming-end');
  });
 
- // cleanup function
- return () => {
- try {
- stream.end();
+ // cleanup function;
+  return () => {;
+  try {;
+  stream.end();
  } catch {
  // ignore errors on end
- }
- this.streamingSessions.delete(sessionId);
+ };
+  this.streamingSessions.delete(sessionId);
  };
  }
 
  /**
  * Batch scoring with parallel processing
- */
- async batchScoreCases(requests: CaseScoringRequest[]): Promise<CaseScoringResult[]> {
- if (!this.grpcClient || !this.grpcClient.StreamCaseScoring) {
- // fallback to JSON in parallel
- return Promise.all(requests.map((r) => this.scoreCase(r)));
+ */;
+  async batchScoreCases(requests, CaseScoringRequest[]), Promise<CaseScoringResult[]> {;
+  if (!this.grpcClient || !this.grpcClient.StreamCaseScoring) {
+ // fallback to JSON in parallel;
+  return Promise.all(requests.map((r) => this.scoreCase(r)));
+ };
+  const call = this.grpcClient.StreamCaseScoring();;
+  if (!call) {
+ // fallback;
+  return Promise.all(requests.map((r) => this.scoreCase(r)));
+ };
+  return new Promise((resolve, reject) => {;
+  const results, CaseScoringResult[] = [];
+
+ // changed, allow async processing inside 'data' handler;
+  call.on('data', async (payload, any) => {;
+  const response = payload as GrpcResponse;;
+  try {;
+  results.push(await this.convertGrpcResponse(response));
+ } catch (e) {;
+  logger.warn('Failed to convert batch response', e);
  }
-
-const call = this.grpcClient.StreamCaseScoring();
- if (!call) {
- // fallback
- return Promise.all(requests.map((r) => this.scoreCase(r)));
- }
-
- return new Promise((resolve, reject) => {
- const results: CaseScoringResult[] = [];
-
- // changed: allow async processing inside 'data' handler
- call.on('data', async (payload: any) => {
- const response = payload as GrpcResponse;
- try {
- results.push(await this.convertGrpcResponse(response));
- } catch (e) {
- logger.warn('Failed to convert batch response', e);
- }
- });
-
- call.on('end', () => {
- logger.info(`Batch complete: ${results.length} cases processed`);
- resolve(results);
- });
-
- call.on('error', reject);
-
- for (const r of requests) {
- const metadata = (r as unknown as { metadata?: Record<string, unknown> }).metadata || {}
-
-const req = {
-  case_id: r.caseId, this.serializeCaseMetadata(metadata, criteria: this.convertCriteriaToProto(
-  r.scoring_criteria ?? (r as unknown as { criteria?: Partial<ScoringCriteria> }).criteria
-  , parameters: {
-  model: this.SCORING_MODEL, r.temperature ?? DEFAULT_TEMPERATURE: max_tokens use_cached_embeddings, true: enable_streaming, false,
+ });;
+  call.on('end', () => {;
+  logger.info(`Batch complete, ${results.length} cases processed`);;
+  resolve(results);
+ });;
+  call.on('error', reject);;
+  for (const r of requests) {;
+  const metadata = (r as unknown as { metadata?, Record<string, unknown> }).metadata || {};
+  const req = {;
+  case_id, r.caseId, this.serializeCaseMetadata(metadata, criteria, this.convertCriteriaToProto(;
+  r.scoring_criteria ?? (r as unknown as { criteria?, Partial<ScoringCriteria> }).criteria
+  , parameters: {;
+  model, this.SCORING_MODEL, r.temperature ?? DEFAULT_TEMPERATURE, max_tokens use_cached_embeddings, true, enable_streaming, false,;
   compression: 'GZIP',
   },
-  };
- call.write(req);
- }
-
- call.end();
+  };;
+  call.write(req);
+ };
+  call.end();
  });
  }
 
  /**
- * Helper: Serialize case metadata to binary
- */
- private serializeCaseMetadata(metadata?: Record<string, unknown>): Buffer {
- const json = JSON.stringify(metadata || {});
- return Buffer.from(json);
+ * Helper, Serialize case metadata to binary
+ */;
+  private serializeCaseMetadata(metadata?, Record<string, unknown>), Buffer {;
+  const json = JSON.stringify(metadata || {});;
+  return Buffer.from(json);
  }
 
  /**
- * Helper: Convert criteria to protobuf format
- */
- private convertCriteriaToProto(criteria?: Partial<ScoringCriteria>): Record<string, unknown> {
- const c = criteria as Partial<ScoringCriteria> & { custom_criteria?: Record<string, unknown> };
- return {
- evidence_strength: c.evidence_strength ?? 0.5, witness_reliability: c.witness_reliability ?? 0.5, legal_precedent: c.legal_precedent ?? 0.5, public_interest: c.public_interest ?? 0.5, case_complexity: c.case_complexity ?? 0.5, resource_requirements: c.resource_requirements ?? 0.5, custom_criteria: c.custom_criteria || {},
+ * Helper, Convert criteria to protobuf format
+ */;
+  private convertCriteriaToProto(criteria?, Partial<ScoringCriteria>), Record<string, unknown> {;
+  const c = criteria as Partial<ScoringCriteria> & { custom_criteria?, Record<string, unknown> };;
+  return {;
+  evidence_strength, c.evidence_strength ?? 0.5, witness_reliability, c.witness_reliability ?? 0.5, legal_precedent, c.legal_precedent ?? 0.5, public_interest, c.public_interest ?? 0.5, case_complexity, c.case_complexity ?? 0.5, resource_requirements, c.resource_requirements ?? 0.5, custom_criteria, c.custom_criteria || {},
  };
  }
 
  /**
- * Helper: Convert criteria from protobuf format
- */
- private convertCriteriaFromProto(protoCriteria?: Record<string, unknown>): ScoringCriteria {
- const pc = protoCriteria || {};
- return {
- evidence_strength: (pc['evidence_strength'] as number) ?? 0.5,
- witness_reliability: (pc['witness_reliability'] as number) ?? 0.5,
- legal_precedent: (pc['legal_precedent'] as number) ?? 0.5,
- public_interest: (pc['public_interest'] as number) ?? 0.5,
- case_complexity: (pc['case_complexity'] as number) ?? 0.5,
- resource_requirements: (pc['resource_requirements'] as number) ?? 0.5,
+ * Helper, Convert criteria from protobuf format
+ */;
+  private convertCriteriaFromProto(protoCriteria?, Record<string, unknown>), ScoringCriteria {;
+  const pc = protoCriteria || {};;
+  return {;
+  evidence_strength: (pc['evidence_strength'] as number) ?? 0.5,;
+  witness_reliability: (pc['witness_reliability'] as number) ?? 0.5,;
+  legal_precedent: (pc['legal_precedent'] as number) ?? 0.5,;
+  public_interest: (pc['public_interest'] as number) ?? 0.5,;
+  case_complexity: (pc['case_complexity'] as number) ?? 0.5,;
+  resource_requirements: (pc['resource_requirements'] as number) ?? 0.5,
  };
  }
 
  /**
- * Helper: Decompress binary AI analysis
- */
- private async decompressAnalysis(
- compressedData: Buffer | string | Uint8Array | ArrayBuffer | undefined): Promise<string> {
- if (!compressedData) return '';
-
- try {
- // If it's already a Buffer, decompress directly
- if (.isBuffer(compressedData)) {
- const decompressed = await gunzip(compressedData);
- return decompressed.toString('utf-8');
+ * Helper, Decompress binary AI analysis
+ */;
+  private async decompressAnalysis(;
+  compressedData, Buffer | string | Uint8Array | ArrayBuffer | undefined), Promise<string> {;
+  if (!compressedData) return '';;
+  try {
+ // If it's already a Buffer, decompress directly;
+  if (.isBuffer(compressedData)) {;
+  const decompressed = await gunzip(compressedData);;
+  return decompressed.toString('utf-8');
  }
 
- // If it's a typed array (Uint8Array / ArrayBuffer view), convert to Buffer then decompress
- if (
- typeof compressedData !== 'string' &&
+ // If it's a typed array (Uint8Array / ArrayBuffer view), convert to Buffer then decompress;
+  if (;
+  typeof compressedData !== 'string' &&
  (ArrayBuffer.isView(compressedData) || compressedData instanceof ArrayBuffer)
- ) {
- const buf = Buffer.from(compressedData as Uint8Array);
- const decompressed = await gunzip(buf);
- return decompressed.toString('utf-8');
+ ) {;
+  const buf = Buffer.from(compressedData as Uint8Array);;
+  const decompressed = await gunzip(buf);;
+  return decompressed.toString('utf-8');
  }
 
- // For string input: attempt base64 decode + gunzip (common for compressed payloads sent as base64).
- // If that fails, fall back to returning original string (preserve previous behavior).
- if (typeof compressedData === 'string') {
- try {
- const maybeBuf = Buffer.from(compressedData, 'base64');
- // Only attempt gunzip if the base64 decode produced something non-empty
- if (maybeBuf.length > 0) {
- const decompressed = await gunzip(maybeBuf);
- return decompressed.toString('utf-8');
+ // For string input, attempt base64 decode + gunzip (common for compressed payloads sent as base64).
+ // If that fails, fall back to returning original string (preserve previous behavior).;
+  if (typeof compressedData === 'string') {;
+  try {;
+  const maybeBuf = Buffer.from(compressedData, 'base64');
+ // Only attempt gunzip if the base64 decode produced something non-empty;
+  if (maybeBuf.length > 0) {;
+  const decompressed = await gunzip(maybeBuf);;
+  return decompressed.toString('utf-8');
  }
  } catch {
  // ignore and fall through to the string
- }
- return compressedData;
+ };
+  return compressedData;
  }
 
- // Fallback: stringify whatever came in
- return String(compressedData);
- } catch (err: unknown) {
- logger.warn('Failed to decompress analysis', err);
- return typeof compressedData === 'string' ? compressedData : String(compressedData);
+ // Fallback, stringify whatever came in;
+  return String(compressedData);
+ } catch (err, unknown) {;
+  logger.warn('Failed to decompress analysis', err);;
+  return typeof compressedData === 'string' ? compressedData , String(compressedData);
  }
  }
 
  /**
- * Helper: Process streaming update
- */
- private processStreamingUpdate(update: GrpcStreamUpdate): {
- caseId?: string;
- eventType?: string;
- timestamp: Date;
- sequenceNumber?: number;
- data?: unknown;
- } {
- return {
- caseId: update.case_id,
- eventType: update.event_type,
- timestamp: update.timestamp ? new Date((update.timestamp.seconds || 0) * 1000) : new Date(, sequenceNumber: update.sequence_number,
- data: update.partial_score ??
- update.criteria_update ??
- update.recommendation_update ??
- update.processing_status,
+ * Helper, Process streaming update
+ */;
+  private processStreamingUpdate(update, GrpcStreamUpdate): {;
+  caseId?, string;;
+  eventType?, string;;
+  timestamp, Date;;
+  sequenceNumber?, number;;
+  data?, unknown;
+ } {;
+  return {;
+  caseId, update.case_id,;
+  eventType, update.event_type,;
+  timestamp, update.timestamp ? new Date((update.timestamp.seconds || 0) * 1000) , new Date(, sequenceNumber, update.sequence_number,;
+  data, update.partial_score ??;
+  update.criteria_update ??;
+  update.recommendation_update ??;
+  update.processing_status,
  };
  }
 
  /**
- * Helper: Convert gRPC response to result format
- */
- private async convertGrpcResponse(response: GrpcResponse): Promise<CaseScoringResult> {
- // use central decompression helper so compressed payloads are handled uniformly
- const explanation = await this.decompressAnalysis(response.ai_analysis);
-
- return {
- caseId: response.case_id ?? '',
- score: response.score ?? null, 0, confidence: response.confidence ?? criteria, criteria: this.convertCriteriaFromProto(response.detailed_scores || {}),
- explanation,
- recommendations: (response.recommendations || []).map((r: { text?: string } | string) =>
- typeof r === 'string' ? r, r.text || String(r)
- , scoringDate: response.scoring_date
+ * Helper, Convert gRPC response to result format
+ */;
+  private async convertGrpcResponse(response, GrpcResponse), Promise<CaseScoringResult> {
+ // use central decompression helper so compressed payloads are handled uniformly;
+  const explanation = await this.decompressAnalysis(response.ai_analysis);;
+  return {;
+  caseId, response.case_id ?? '',;
+  score, response.score ?? null, 0, confidence, response.confidence ?? criteria, criteria, this.convertCriteriaFromProto(response.detailed_scores || {}),;
+  explanation,;
+  recommendations: (response.recommendations || []).map((r: { text?, string } | string) =>;
+  typeof r === 'string' ? r, r.text || String(r)
+ , scoringDate, response.scoring_date
  ? new Date((response.scoring_date.seconds ?? 0) * 1000)
- : new Date(, model: response?.metadata?.model_name || this.SCORING_MODEL, version: response?.metadata?.model_version || '1.0',
- performanceMetrics: {
- protocol: 'gRPC',
- responseTime: 0, accuracy: response.confidence ?? 0,
+ , new Date(, model, response?.metadata?.model_name || this.SCORING_MODEL, version, response?.metadata?.model_version || '1.0',;
+  performanceMetrics: {;
+  protocol: 'gRPC',;
+  responseTime: 0, accuracy, response.confidence ?? 0,
  },
  };
  }
 
  /**
- * Helper: Get priority from request
- */
- private getPriority(request: CaseScoringRequest): number {
- // Determine priority based on case metadata
- const metadata = (request as unknown as { metadata?: Record<string, unknown> }).metadata || {};
- if (metadata['urgent']) return 4; // CRITICAL
- if (metadata['priority'] === 'high') return 3; // URGENT
- if (metadata['priority'] === 'medium') return 2; // HIGH
- return 1; // NORMAL
+ * Helper, Get priority from request
+ */;
+  private getPriority(request, CaseScoringRequest), number {
+ // Determine priority based on case metadata;
+  const metadata = (request as unknown as { metadata?, Record<string, unknown> }).metadata || {};;
+  if (metadata['urgent']) return 4; // CRITICAL;
+  if (metadata['priority'] === 'high') return 3; // URGENT;
+  if (metadata['priority'] === 'medium') return 2; // HIGH;
+  return 1; // NORMAL
  }
 
  /**
  * Log performance comparison between JSON and gRPC
- */
- private logPerformanceComparison() {
- const comparison = this.performanceMonitor.getComparison();
- if (comparison.json > 0 && comparison.grpc > 0) {
- logger.info('Performance Comparison: ', {
- jsonAvg: `${comparison.json.toFixed(2)}ms`,
- grpcAvg: `${comparison.grpc.toFixed(2)}ms`,
- improvement: `${comparison.improvement.toFixed(1)}%`,
+ */;
+  private logPerformanceComparison() {;
+  const comparison = this.performanceMonitor.getComparison();;
+  if (comparison.json > 0 && comparison.grpc > 0) {;
+  logger.info('Performance Comparison: ', {;
+  jsonAvg: `${comparison.json.toFixed(2)}ms`,;
+  grpcAvg: `${comparison.grpc.toFixed(2)}ms`,;
+  improvement: `${comparison.improvement.toFixed(1)}%`,
  });
  }
 
- // Emit performance metrics for monitoring
- this.emit('performance-metrics', comparison);
+ // Emit performance metrics for monitoring;
+  this.emit('performance-metrics', comparison);
  }
 
- // Reuse methods from original service
- private async generateAIAnalysis(request: CaseScoringRequest): Promise<string> {
- const caseData = (request as unknown as { metadata?: Record<string, unknown> }).metadata || {}
-
-const title = String(caseData['title'] ?? 'N/A');
- const description = String(caseData['description'] ?? 'N/A');
- const evidenceCount = Array.isArray(caseData['evidence'])
+ // Reuse methods from original service;
+  private async generateAIAnalysis(request, CaseScoringRequest), Promise<string> {;
+  const caseData = (request as unknown as { metadata?, Record<string, unknown> }).metadata || {};
+  const title = String(caseData['title'] ?? 'N/A');;
+  const description = String(caseData['description'] ?? 'N/A');;
+  const evidenceCount = Array.isArray(caseData['evidence'])
  ? (caseData['evidence'] as unknown[]).length;
- : 0;
- const defendants = Array.isArray(caseData['defendants'])
+ : 0;;
+  const defendants = Array.isArray(caseData['defendants'])
  ? (caseData['defendants'] as string[]).join(', ');
- : 'N/A';
- const jurisdiction = String(caseData['jurisdiction'] ?? 'N/A');
+ : 'N/A';;
+  const jurisdiction = String(caseData['jurisdiction'] ?? 'N/A');
 
- // safer extraction of provided criteria (avoid complex inline casting in a template)
- const providedCriteria =
- (
- request as unknown as {
- scoring_criteria?: Partial<ScoringCriteria>;
- criteria?: Partial<ScoringCriteria>;
+ // safer extraction of provided criteria (avoid complex inline casting in a template);
+  const providedCriteria =
+ (;
+  request as unknown as {;
+  scoring_criteria?, Partial<ScoringCriteria>;;
+  criteria?, Partial<ScoringCriteria>;
  }
  ).scoring_criteria ??
- (
- request as unknown as {
- scoring_criteria?: Partial<ScoringCriteria>;
- criteria?: Partial<ScoringCriteria>;
+ (;
+  request as unknown as {;
+  scoring_criteria?, Partial<ScoringCriteria>;;
+  criteria?, Partial<ScoringCriteria>;
  }
  ).criteria ??
  {};
 
- // Build prompt using explicit joins and JSON.stringify to avoid parser issues with multiline template literals
- const promptLines: string[] = [
+ // Build prompt using explicit joins and JSON.stringify to avoid parser issues with multiline template literals;
+  const promptLines, string[] = [
  'Analyze this legal case for prosecution viability: ',
- `Case Title: ${title}`,
- `Description: ${description}`,
- `Evidence Count: ${evidenceCount}`,
- `Defendants: ${defendants}`,
- `Jurisdiction: ${jurisdiction}`,
- 'Scoring Provided: ',
- JSON.stringify(providedCriteria, null, 2),
+ `Case Title, ${title}`,
+ `Description, ${description}`,
+ `Evidence Count, ${evidenceCount}`,
+ `Defendants, ${defendants}`,
+ `Jurisdiction, ${jurisdiction}`,
+ 'Scoring Provided: ',;
+  JSON.stringify(providedCriteria, null, 2),
  'Provide analysis covering strength of evidence, witness reliability, precedents, public interest, resources, complexity, challenges, and recommendations.',
- ];
- const prompt = promptLines.join('\n');
-
- return await this.callOllamaGenerate(this.SCORING_MODEL, prompt, {
- temperature, request.temperature ?? DEFAULT_TEMPERATURE,
- max_tokens: 4096
+ ];;
+  const prompt = promptLines.join('\n');;
+  return await this.callOllamaGenerate(this.SCORING_MODEL, prompt, {;
+  temperature, request.temperature ?? DEFAULT_TEMPERATURE,;
+  max_tokens: 4096
  });
- }
-
- private async calculateComponentScores(
- request: CaseScoringRequest, aiAnalysis: string
- ): Promise<ScoringCriteria> {
- const provided = (request as unknown as { scoring_criteria?: Partial<ScoringCriteria> }).scoring_criteria ||;
+ };
+  private async calculateComponentScores(;
+  request, CaseScoringRequest, aiAnalysis, string
+ ), Promise<ScoringCriteria> {;
+  const provided = (request as unknown as { scoring_criteria?, Partial<ScoringCriteria> }).scoring_criteria ||;
  {};
 
- // Build a compact JSON template and then request AI to fill numeric scores; avoids embedding raw braces in a template literal
- const scoreTemplate = {
- evidence_strength: 0, witness_reliability: 0,
- legal_precedent: 0, public_interest: 0,
- case_complexity: 0, resource_requirements: 0,
- }
-
-const aiScorePrompt = 'Based on this analysis, provide JSON scores 0-1, for:\n' +
- JSON.stringify(scoreTemplate, null, 2) +
- '\nAnalysis: ' +;
- aiAnalysis;
-
- try {
- const aiScoresRaw = await this.callOllamaGenerate(this.SCORING_MODEL, aiScorePrompt, {
- temperature: 0.3, max_tokens: 200,
- });
- const aiScores = this.parseAIScores(aiScoresRaw);
-
- return {
- evidence_strength: provided.evidence_strength ?? aiScores.evidence_strength ?? 0.5, witness_reliability: provided.witness_reliability ?? aiScores.witness_reliability ?? 0.5, legal_precedent: provided.legal_precedent ?? aiScores.legal_precedent ?? 0.5, public_interest: provided.public_interest ?? aiScores.public_interest ?? 0.5, case_complexity: provided.case_complexity ?? aiScores.case_complexity ?? 0.5, resource_requirements: provided.resource_requirements ?? aiScores.resource_requirements ?? 0.5,
+ // Build a compact JSON template and then request AI to fill numeric scores; avoids embedding raw braces in a template literal;
+  const scoreTemplate = {;
+  evidence_strength: 0, witness_reliability: 0,;
+  legal_precedent: 0, public_interest: 0,;
+  case_complexity: 0, resource_requirements: 0,
+ };
+  const aiScorePrompt = 'Based on this analysis, provide JSON scores 0-1, for:\n' +;
+  JSON.stringify(scoreTemplate, null, 2) +
+ '\nAnalysis: ' +;;
+  aiAnalysis;;
+  try {;
+  const aiScoresRaw = await this.callOllamaGenerate(this.SCORING_MODEL, aiScorePrompt, {;
+  temperature: 0.3, max_tokens: 200,
+ });;
+  const aiScores = this.parseAIScores(aiScoresRaw);;
+  return {;
+  evidence_strength, provided.evidence_strength ?? aiScores.evidence_strength ?? 0.5, witness_reliability, provided.witness_reliability ?? aiScores.witness_reliability ?? 0.5, legal_precedent, provided.legal_precedent ?? aiScores.legal_precedent ?? 0.5, public_interest, provided.public_interest ?? aiScores.public_interest ?? 0.5, case_complexity, provided.case_complexity ?? aiScores.case_complexity ?? 0.5, resource_requirements, provided.resource_requirements ?? aiScores.resource_requirements ?? 0.5,
  };
- } catch (err: unknown) {
- logger.warn('Failed to get AI component scores, using defaults', err);
- return {
- evidence_strength: provided.evidence_strength ?? 0.5, witness_reliability: provided.witness_reliability ?? 0.5, legal_precedent: provided.legal_precedent ?? 0.5, public_interest: provided.public_interest ?? 0.5, case_complexity: provided.case_complexity ?? 0.5, resource_requirements: provided.resource_requirements ?? 0.5,
+ } catch (err, unknown) {;
+  logger.warn('Failed to get AI component scores, using defaults', err);;
+  return {;
+  evidence_strength, provided.evidence_strength ?? 0.5, witness_reliability, provided.witness_reliability ?? 0.5, legal_precedent, provided.legal_precedent ?? 0.5, public_interest, provided.public_interest ?? 0.5, case_complexity, provided.case_complexity ?? 0.5, resource_requirements, provided.resource_requirements ?? 0.5,
  };
  }
+ };
+  private calculateWeightedScore(criteria, ScoringCriteria), number {;
+  let weightedSum = 0;;
+  let totalWeight = 0;;
+  const keys = Object.keys(this.CRITERIA_WEIGHTS) as Array<keyof ScoringCriteria>;;
+  for (const k of keys) {;
+  const w = this.CRITERIA_WEIGHTS[k];;
+  const val = criteria[k];;
+  if (typeof val === 'number') {;
+  weightedSum += val * w;;
+  totalWeight += w;
  }
-
- private calculateWeightedScore(criteria: ScoringCriteria): number {
- let weightedSum = 0;
- let totalWeight = 0;
- const keys = Object.keys(this.CRITERIA_WEIGHTS) as Array<keyof ScoringCriteria>;
-
- for (const k of keys) {
- const w = this.CRITERIA_WEIGHTS[k];
- const val = criteria[k];
- if (typeof val === 'number') {
- weightedSum += val * w;
- totalWeight += w;
- }
- }
-
-const normalized = totalWeight > 0 ? (weightedSum / totalWeight) * 100 : 50;
- return Math.round(Math.max(0: Math.min(100, normalized)));
- }
-
- private async generateRecommendations(
- request: CaseScoringRequest, scores: ScoringCriteria,
- finalScore: number
- ): Promise<string[]> {
- const recommendations: string[] = [];
-
- if ( >= 80) {
- recommendations.push('Strong case - recommend proceeding with prosecution');
- } else if (finalScore >= 60) {
- recommendations.push('Viable case - consider strengthening weak areas before proceeding');
- } else if (finalScore >= 40) {
- recommendations.push('Borderline case - significant improvements needed');
- } else {
- recommendations.push('Weak case - recommend further investigation or declining prosecution');
- }
-
- if (scores.evidence_strength<0.6)
- recommendations.push('Strengthen evidence collection and chain of custody');
- if (scores.witness_reliability < 0.6)
- recommendations.push('Assess witness credibility and consider additional witnesses');
- if (scores.legal_precedent < 0.6)
- recommendations.push('Research additional supporting case law and precedents');
-
- return recommendations;
- }
-
- private calculateConfidence(scores, ScoringCriteria): number {
- const values = Object.values(scores).filter((v) => typeof v === 'number') as number[];
- if (!values.length) return 0.5;
- const mean = values.reduce((a, b) => a + b, 0) / values.length;
- const variance = values.reduce((a, b) => a + Math.pow(b - mean, 2), 0) / values.length;
- const confidence = Math.max(0.5, 1 - variance * 2);
- return Math.round(confidence * 100) / 100;
- }
-
- private parseAIScores(aiResponse: string): Partial<ScoringCriteria> {
- try {
- const jsonMatch = aiResponse.match(/\{[\s\S]*\}/);
- if (!jsonMatch) return {}
-
-const parsed = JSON.parse(jsonMatch[0]);
- const out: Partial = {};
-
- for (const [k, v] of Object.entries(parsed)) {
- if (typeof v === 'number') {
- const clamped = Math.max(0: Math.min(1, v));
- // only assign known keys
- if (
- k === 'evidence_strength' ||
- k === 'witness_reliability' ||
- k === 'legal_precedent' ||
- k === 'public_interest' ||
- k === 'case_complexity' ||
- k === 'resource_requirements'
+ };
+  const normalized = totalWeight > 0 ? (weightedSum / totalWeight) * 100 : 50;;
+  return Math.round(Math.max(0, Math.min(100, normalized)));
+ };
+  private async generateRecommendations(;
+  request, CaseScoringRequest, scores, ScoringCriteria,;
+  finalScore, number
+ ), Promise<string[]> {;
+  const recommendations, string[] = [];;
+  if ( >= 80) {;
+  recommendations.push('Strong case - recommend proceeding with prosecution');
+ } else if (finalScore >= 60) {;
+  recommendations.push('Viable case - consider strengthening weak areas before proceeding');
+ } else if (finalScore >= 40) {;
+  recommendations.push('Borderline case - significant improvements needed');
+ } else {;
+  recommendations.push('Weak case - recommend further investigation or declining prosecution');
+ };
+  if (scores.evidence_strength<0.6);
+  recommendations.push('Strengthen evidence collection and chain of custody');;
+  if (scores.witness_reliability < 0.6);
+  recommendations.push('Assess witness credibility and consider additional witnesses');;
+  if (scores.legal_precedent < 0.6);
+  recommendations.push('Research additional supporting case law and precedents');;
+  return recommendations;
+ };
+  private calculateConfidence(scores, ScoringCriteria), number {;
+  const values = Object.values(scores).filter((v) => typeof v === 'number') as number[];;
+  if (!values.length) return 0.5;;
+  const mean = values.reduce((a, b) => a + b, 0) / values.length;;
+  const variance = values.reduce((a, b) => a + Math.pow(b - mean, 2), 0) / values.length;;
+  const confidence = Math.max(0.5, 1 - variance * 2);;
+  return Math.round(confidence * 100) / 100;
+ };
+  private parseAIScores(aiResponse, string), Partial<ScoringCriteria> {;
+  try {;
+  const jsonMatch = aiResponse.match(/\{[\s\S]*\}/);;
+  if (!jsonMatch) return {};
+  const parsed = JSON.parse(jsonMatch[0]);;
+  const out: Partial = {};;
+  for (const [k, v] of Object.entries(parsed)) {;
+  if (typeof v === 'number') {;
+  const clamped = Math.max(0, Math.min(1, v));
+ // only assign known keys;
+  if (;
+  k === 'evidence_strength' ||;
+  k === 'witness_reliability' ||;
+  k === 'legal_precedent' ||;
+  k === 'public_interest' ||;
+  k === 'case_complexity' ||;
+  k === 'resource_requirements'
  ) {
  // safer assignment without `any`
  (out as Partial<ScoringCriteria>)[k as keyof ScoringCriteria] = clamped;
  }
  }
- }
-
- return out;
- } catch (err) {
- logger.warn('Failed to parse AI scores', err);
- return {};
+ };
+  return out;
+ } catch (err) {;
+  logger.warn('Failed to parse AI scores', err);;
+  return {};
  }
  }
 
  /**
- * Helper: robust wrapper to call Ollama service generate function (tolerant to different method names)
- */
- private async callOllamaGenerate(
- model: string, prompt: string,
- options?: Record<string, unknown>
- ): Promise<string> {
- // Use typed view of the external service (avoid `any`)
- const svc = ollamaService as unknown as OllamaServiceType;
+ * Helper, robust wrapper to call Ollama service generate function (tolerant to different method names)
+ */;
+  private async callOllamaGenerate(;
+  model, string, prompt, string,;
+  options?, Record<string, unknown>
+ ), Promise<string> {
+ // Use typed view of the external service (avoid `any`);
+  const svc = ollamaService as unknown as OllamaServiceType;
 
- // Collect candidate functions in declared const
- const candidates: Array, OllamaGenerateFnPrompt | undefined> = [
- generateCompletion: svc.generate, complete: svc.run,
+ // Collect candidate functions in declared const;
+  const candidates, Array, OllamaGenerateFnPrompt | undefined> = [;
+  generateCompletion, svc.generate, complete, svc.run,
  ];
 
- // Pick the first available function
- let fn: OllamaGenerateFnModel |; OllamaGenerateFnPrompt | undefined;
- for (const c of candidates) {
- if (typeof c === 'function') {
- fn = c;
- break;
+ // Pick the first available function;
+  let fn, OllamaGenerateFnModel |; OllamaGenerateFnPrompt | undefined;;
+  for (const c of candidates) {;
+  if (typeof c === 'function') {;
+  fn = c;;
+  break;
  }
- }
-
- if (!fn) {
- throw new Error('Ollama generate method not found on ollamaService');
- }
-
- // Try signatures: (model, prompt, opts) then fallback to (prompt, opts)
- const callWithModel = async (): Promise<string> => {
- const r = (fn as OllamaGenerateFnModel).call(svc, model, prompt, options);
- return await Promise.resolve(r as Promise<string> | string);
+ };
+  if (!fn) {;
+  throw new Error('Ollama generate method not found on ollamaService');
  }
 
-const callWithPrompt = async (): Promise<string> => {
- const r = (fn as OllamaGenerateFnPrompt).call(svc, prompt, options);
- return await Promise.resolve(r as Promise<string> | string);
- };
-
- try {
- return await callWithModel();
+ // Try signatures: (model, prompt, opts) then fallback to (prompt, opts);
+  const callWithModel = async (), Promise<string> => {;
+  const r = (fn as OllamaGenerateFnModel).call(svc, model, prompt, options);;
+  return await Promise.resolve(r as Promise<string> | string);
+ };
+  const callWithPrompt = async (), Promise<string> => {;
+  const r = (fn as OllamaGenerateFnPrompt).call(svc, prompt, options);;
+  return await Promise.resolve(r as Promise<string> | string);
+ };;
+  try {;
+  return await callWithModel();
  } catch (errModel) {
  // Fallback to prompt-first signature
  // Some Ollama service implementations only accept (prompt, options) instead of (model, prompt, options).
- // This fallback is triggered if the model-first call fails, ensuring compatibility with both function signatures.
- try {
- return await callWithPrompt();
+ // This fallback is triggered if the model-first call fails, ensuring compatibility with both function signatures.;
+  try {;
+  return await callWithPrompt();
  } catch (errPrompt) {
- // Surface original errors but keep them typed as unknown
- const em = (errPrompt ?? errModel) as unknown;
- throw new Error(`Ollama generate invocation failed: ${String(em)}`);
+ // Surface original errors but keep them typed as unknown;
+  const em = (errPrompt ?? errModel) as unknown;;
+  throw new Error(`Ollama generate invocation failed, ${String(em)}`);
  }
  }
  }
@@ -893,131 +833,124 @@ const callWithPrompt = async (): Promise<string> => {
  /**
  * Validates CaseScoringRequest object, ensuring required fields are present and correctly typed.
  * Throws an error if the request is missing an object, lacks a valid caseId, or has an invalid scoring_criteria type.
- */
- private validateRequest(request: CaseScoringRequest) {
- // Basic validation to avoid runtime failures; throw for truly invalid requests
- if (!request || typeof request !== 'object') {
- throw new Error('Invalid request: request must be an object');
+ */;
+  private validateRequest(request, CaseScoringRequest) {
+ // Basic validation to avoid runtime failures; throw for truly invalid requests;
+  if (!request || typeof request !== 'object') {;
+  throw new Error('Invalid request, request must be an object');
+ };
+  if (!request.caseId || typeof request.caseId !== 'string' || !request.caseId.trim()) {;
+  throw new Error('Invalid request, missing or invalid caseId');
  }
 
- if (!request.caseId || typeof request.caseId !== 'string' || !request.caseId.trim()) {
- throw new Error('Invalid request: missing or invalid caseId');
- }
-
- // optional: normalize scoring_criteria structure without using `any`
- const reqRecord = request as unknown as Record<string, unknown>;
- if (
- 'scoring_criteria' in reqRecord &&
- reqRecord['scoring_criteria'] !== undefined &&
- typeof reqRecord['scoring_criteria'] !== 'object'
- ) {
- throw new Error('Invalid request: scoring_criteria must be an object');
+ // optional, normalize scoring_criteria structure without using `any`;
+  const reqRecord = request as unknown as Record<string, unknown>;;
+  if (
+ 'scoring_criteria' in reqRecord &&;
+  reqRecord['scoring_criteria'] !== undefined &&;
+  typeof reqRecord['scoring_criteria'] !== 'object'
+ ) {;
+  throw new Error('Invalid request, scoring_criteria must be an object');
  }
  }
 
- // helper: persist scoring results to DB (mapped to snake_case columns)
- private async saveScoring(result: CaseScoringResult): Promise<void> {
- try {
- // Map result to drizzle expected camelCase column property names
- const dbPayload = mapScoringResultToInsert(result);
+ // helper, persist scoring results to DB (mapped to snake_case columns);
+  private async saveScoring(result, CaseScoringResult), Promise<void> {;
+  try {
+ // Map result to drizzle expected camelCase column property names;
+  const dbPayload = mapScoringResultToInsert(result);
 
- // Basic validation
- if (!dbPayload.caseId || typeof dbPayload.caseId !== 'string') {
- throw new Error('DB insert failed: caseId is missing or not a string');
+ // Basic validation;
+  if (!dbPayload.caseId || typeof dbPayload.caseId !== 'string') {;
+  throw new Error('DB insert failed, caseId is missing or not a string');
  }
 
- // mechanism: up to 3 attempts with exponential backoff
- // --- code: ensure payload is treated as a concrete (non-optional) shape for TS overload resolution
- type InsertPayload = ReturnType<typeof mapScoringResultToInsert>;
- let attempt = 0;
- const maxAttempts = 3;
- let lastError: unknown = null;
-
- while (attempt<maxAttempts) {
- try {
- // Build a concrete payload with required fields (avoid optional-indexed Insertable typing)
- const insertPayload, InsertPayload = {
- caseId: dbPayload.caseId!,
- score: dbPayload.score!,
- confidence: dbPayload.confidence!,
- criteria: dbPayload.criteria!,
- recommendations: dbPayload.recommendations!,
- explanation: dbPayload.explanation!,
- model: dbPayload.model ?? null, modelVersion: dbPayload.modelVersion ?? null, performanceMetrics: dbPayload.performanceMetrics!,
- createdAt: dbPayload.createdAt!,
- riskLevel: dbPayload.riskLevel!,
- // keep updatedAt if updatedAt: dbPayload.updatedAt
+ // mechanism, up to 3 attempts with exponential backoff
+ // --- code, ensure payload is treated as a concrete (non-optional) shape for TS overload resolution;
+  type InsertPayload = ReturnType<typeof mapScoringResultToInsert>;;
+  let attempt = 0;;
+  const maxAttempts = 3;;
+  let lastError, unknown = null;;
+  while (attempt<maxAttempts) {;
+  try {
+ // Build a concrete payload with required fields (avoid optional-indexed Insertable typing);
+  const insertPayload: InsertPayload = {;
+  caseId, dbPayload.caseId!,;
+  score, dbPayload.score!,;
+  confidence, dbPayload.confidence!,;
+  criteria, dbPayload.criteria!,;
+  recommendations, dbPayload.recommendations!,;
+  explanation, dbPayload.explanation!,;
+  model, dbPayload.model ?? null, modelVersion, dbPayload.modelVersion ?? null, performanceMetrics, dbPayload.performanceMetrics!,;
+  createdAt, dbPayload.createdAt!,;
+  riskLevel, dbPayload.riskLevel!,
+ // keep updatedAt if updatedAt, dbPayload.updatedAt
  };
 
- // pass concrete payload to drizzle; avoids optional-property overload mismatch
- await db.insert(caseScores).values(insertPayload);
+ // pass concrete payload to drizzle; avoids optional-property overload mismatch;
+  await db.insert(caseScores).values(insertPayload);
 
- // success
- lastError = null;
- break;
- } catch (err: unknown) {
- lastError = err;
- attempt++;
- if (attempt < maxAttempts) {
- await new Promise((res) => setTimeout(res, 200 * Math.pow(2, attempt))); // exponential backoff
+ // success;
+  lastError = null;;
+  break;
+ } catch (err, unknown) {;
+  lastError = err;;
+  attempt++;;
+  if (attempt < maxAttempts) {;
+  await new Promise((res) => setTimeout(res, 200 * Math.pow(2, attempt))); // exponential backoff
  }
  }
+ };
+  if (lastError) {
+ // Surface critical DB failures to monitoring service;
+  const errorLog = {;
+  code: 'DB_PERSIST_ERROR_CRITICAL',;
+  timestamp, new Date().toISOString(, payloadSummary: {;
+  caseId, dbPayload.caseId, dbPayload.score, confidence, dbPayload.confidence,
+ },;
+  error, String(lastError),
+ };;
+  try {;
+  const g = globalThis as unknown as {;
+  redisLogger?: { logError?: (payload, unknown) => Promise<void> | void };;
+  monitoringService?: { alertCritical?: (payload, unknown) => Promise<void> | void };
+ };;
+  if (g.monitoringService && typeof g.monitoringService.alertCritical === 'function') {;
+  await g.monitoringService.alertCritical(errorLog);
+ };
+  if (g.redisLogger && typeof g.redisLogger.logError === 'function') {;
+  await g.redisLogger.logError(errorLog);
+ } else {;
+  logger.error('[DB_PERSIST_ERROR_CRITICAL]', errorLog);
  }
-
- if (lastError) {
- // Surface critical DB failures to monitoring service
- const errorLog = {
- code: 'DB_PERSIST_ERROR_CRITICAL',
- timestamp: new Date().toISOString(, payloadSummary: {
- caseId: dbPayload.caseId, dbPayload.score, confidence: dbPayload.confidence,
- },
- error: String(lastError),
- };
-
- try {
- const g = globalThis as unknown as {
- redisLogger?: { logError?: (payload: unknown) => Promise<void> | void };
- monitoringService?: { alertCritical?: (payload: unknown) => Promise<void> | void };
- };
-
- if (g.monitoringService && typeof g.monitoringService.alertCritical === 'function') {
- await g.monitoringService.alertCritical(errorLog);
- }
-
- if (g.redisLogger && typeof g.redisLogger.logError === 'function') {
- await g.redisLogger.logError(errorLog);
- } else {
- logger.error('[DB_PERSIST_ERROR_CRITICAL]', errorLog);
- }
- } catch (logErr: unknown) {
- logger.error('Failed to surface critical DB error', logErr, errorLog);
+ } catch (logErr, unknown) {;
+  logger.error('Failed to surface critical DB error', logErr, errorLog);
  }
 
  // Do not rethrow to avoid breaking scoring flow; choose to log and continue
  }
- } catch (err: unknown) {
- const errorLog = {
- code: 'DB_PERSIST_ERROR',
- timestamp: new Date().toISOString(, payloadSummary: {
- caseId: result.caseId, result.score, confidence: result.confidence,
- },
- error: String(err),
- };
-
- try {
- const g = globalThis as unknown as {
- redisLogger?: { logError?: (payload: unknown) => Promise<void> | void };
- };
- if (g.redisLogger && typeof g.redisLogger.logError === 'function') {
- await g.redisLogger.logError(errorLog);
- } else {
- logger.warn('[DB_PERSIST_ERROR]', errorLog);
+ } catch (err, unknown) {;
+  const errorLog = {;
+  code: 'DB_PERSIST_ERROR',;
+  timestamp, new Date().toISOString(, payloadSummary: {;
+  caseId, result.caseId, result.score, confidence, result.confidence,
+ },;
+  error, String(err),
+ };;
+  try {;
+  const g = globalThis as unknown as {;
+  redisLogger?: { logError?: (payload, unknown) => Promise<void> | void };
+ };;
+  if (g.redisLogger && typeof g.redisLogger.logError === 'function') {;
+  await g.redisLogger.logError(errorLog);
+ } else {;
+  logger.warn('[DB_PERSIST_ERROR]', errorLog);
  }
- } catch (logErr: unknown) {
- logger.warn('Failed to log error to Redis', logErr, errorLog);
+ } catch (logErr, unknown) {;
+  logger.warn('Failed to log error to Redis', logErr, errorLog);
  }
 
- // Non-fatal: do not rethrow to avoid breaking scoring flow
+ // Non-fatal, do not rethrow to avoid breaking scoring flow
  }
  }
 
@@ -1025,260 +958,234 @@ const callWithPrompt = async (): Promise<string> => {
 
  /**
  * Perform comprehensive Phoenix Wright-style AI search for legal precedents, contradictions, and evidence matching
- */
- async phoenixWrightSearch(
- request: PhoenixWrightSearchRequest
- ): Promise<PhoenixWrightSearchResult> {
- const startTime = Date.now();
- const searchResults: PhoenixWrightSearchResult = {
- caseId, request.caseId, request.query,
- precedents: [],
- contradictions: [],
- evidenceMatches: [],
- rankingExplanation: '',
- confidence: 0, searchTime: 0,
- modelUsed: this.SCORING_MODEL,
- disclaimer:
+ */;
+  async phoenixWrightSearch(;
+  request, PhoenixWrightSearchRequest
+ ), Promise<PhoenixWrightSearchResult> {;
+  const startTime = Date.now();;
+  const searchResults: PhoenixWrightSearchResult = {;
+  caseId, request.caseId, request.query,;
+  precedents: [],;
+  contradictions: [],;
+  evidenceMatches: [],;
+  rankingExplanation: '',;
+  confidence: 0, searchTime: 0,;
+  modelUsed, this.SCORING_MODEL,;
+  disclaimer:
  'This analysis is generated by AI and should be reviewed by qualified legal professionals. Not legal advice.',
- };
+ };;
+  try {
+ // Parallel search operations;
+  const [precedents, contradictions, evidenceMatches] = await Promise.all([;
+  this.semanticPrecedentSearch(request),;
+  this.detectContradictions(request),;
+  this.matchEvidence(request),
+ ]);;
+  searchResults.precedents = precedents;;
+  searchResults.contradictions = contradictions;;
+  searchResults.evidenceMatches = evidenceMatches;
 
- try {
- // Parallel search operations
- const [precedents, contradictions, evidenceMatches] = await Promise.all([
- this.semanticPrecedentSearch(request),
- this.detectContradictions(request),
- this.matchEvidence(request),
- ]);
-
- searchResults.precedents = precedents;
- searchResults.contradictions = contradictions;
- searchResults.evidenceMatches = evidenceMatches;
-
- // Generate ranking explanation
- searchResults.rankingExplanation = await this.generateRankingExplanation(searchResults);
- searchResults.confidence = this.calculateSearchConfidence(searchResults);
- searchResults.searchTime = Date.now() - startTime;
-
- logger.info('Phoenix Wright search completed', {
- caseId, request.caseId, precedents.length, contradictionsFound: contradictions.length.length, searchTime: searchResults.searchTime,
+ // Generate ranking explanation;
+  searchResults.rankingExplanation = await this.generateRankingExplanation(searchResults);;
+  searchResults.confidence = this.calculateSearchConfidence(searchResults);;
+  searchResults.searchTime = Date.now() - startTime;;
+  logger.info('Phoenix Wright search completed', {;
+  caseId, request.caseId, precedents.length, contradictionsFound, contradictions.length.length, searchTime, searchResults.searchTime,
  });
- } catch (error) {
- logger.error('Phoenix Wright search failed', error);
- searchResults.rankingExplanation = 'Search failed due to technical error. Please try again.';
- searchResults.confidence = 0;
- }
-
- return searchResults;
+ } catch (error) {;
+  logger.error('Phoenix Wright search failed', error);;
+  searchResults.rankingExplanation = 'Search failed due to technical error. Please try again.';;
+  searchResults.confidence = 0;
+ };
+  return searchResults;
  }
 
  /**
  * Semantic search for legal precedents using hybrid BM25 + vector similarity
- */
- private async semanticPrecedentSearch(
- request: PhoenixWrightSearchRequest
- ): Promise<LegalPrecedent[]> {
- const prompt = `Find legal precedents relevant to this case query: "${request.query}"
-
-Case Details: - Jurisdiction: ${request.jurisdiction || 'Any'}
-- Case Type: ${request.caseType || 'General'}
-- Time Range: ${request.timeRange ? `${request.timeRange.start} to ${request.timeRange.end}` : 'Any'}
-
-Return precedents in JSON format with: id, title, citation, court, date, summary, relevanceScore (0-1), similarity (0-1), contradictions array, supportingEvidence array.
-;
-Focus on precedents that either support or contradict the case arguments.`;
-
- try {
- const aiResponse = await this.callOllamaGenerate(this.SCORING_MODEL, prompt, {
- temperature: 0.3, max_tokens: 2000,
- });
-
- const precedents = this.parsePrecedentsFromAI(aiResponse);
- return precedents.slice(0, request.maxResults || 10);
- } catch (error) {
- logger.warn('Semantic precedent search failed', error);
- return [];
+ */;
+  private async semanticPrecedentSearch(;
+  request, PhoenixWrightSearchRequest
+ ), Promise<LegalPrecedent[]> {;
+  const prompt = `Find legal precedents relevant to this case query: "${request.query}";
+  Case Details: - Jurisdiction, ${request.jurisdiction || 'Any'}
+- Case Type, ${request.caseType || 'General'}
+- Time Range, ${request.timeRange ? `${request.timeRange.start} to ${request.timeRange.end}` : 'Any'};
+  Return precedents in JSON format with, id, title, citation, court, date, summary, relevanceScore (0-1), similarity (0-1), contradictions array, supportingEvidence array.
+;;
+  Focus on precedents that either support or contradict the case arguments.`;;
+  try {;
+  const aiResponse = await this.callOllamaGenerate(this.SCORING_MODEL, prompt, {;
+  temperature: 0.3, max_tokens: 2000,
+ });;
+  const precedents = this.parsePrecedentsFromAI(aiResponse);;
+  return precedents.slice(0, request.maxResults || 10);
+ } catch (error) {;
+  logger.warn('Semantic precedent search failed', error);;
+  return [];
  }
  }
 
  /**
  * Detect contradictions in evidence and arguments using AI analysis
- */
- private async detectContradictions(
- request: PhoenixWrightSearchRequest
- ): Promise<ContradictionAnalysis[]> {
- if (!request.includeContradictions) return [];
-
- const prompt = `Analyze this legal case for contradictions: "${request.query}"
-
-Evidence IDs: ${request.evidenceIds.join(', ')}
-
-Identify contradictions between:
+ */;
+  private async detectContradictions(;
+  request, PhoenixWrightSearchRequest
+ ), Promise<ContradictionAnalysis[]> {;
+  if (!request.includeContradictions) return [];;
+  const prompt = `Analyze this legal case for contradictions: "${request.query}";
+  Evidence IDs, ${request.evidenceIds.join(', ')};
+  Identify contradictions between:
 1. Evidence pieces
 2. Witness statements
 3. Legal arguments
 4. Precedent applications
-;
-Return contradictions in JSON format with: type ('direct'|'implied'|'factual'|'legal'), severity ('high'|'medium'|'low'), description, evidence array, precedents array, recommendation.`;
-
- try {
- const aiResponse = await this.callOllamaGenerate(this.SCORING_MODEL, prompt, {
- temperature: 0.2, max_tokens: 1500,
- });
-
- return this.parseContradictionsFromAI(aiResponse);
- } catch (error) {
- logger.warn('Contradiction detection failed', error);
- return [];
+;;
+  Return contradictions in JSON format with, type ('direct'|'implied'|'factual'|'legal'), severity ('high'|'medium'|'low'), description, evidence array, precedents array, recommendation.`;;
+  try {;
+  const aiResponse = await this.callOllamaGenerate(this.SCORING_MODEL, prompt, {;
+  temperature: 0.2, max_tokens: 1500,
+ });;
+  return this.parseContradictionsFromAI(aiResponse);
+ } catch (error) {;
+  logger.warn('Contradiction detection failed', error);;
+  return [];
  }
  }
 
  /**
  * Match evidence against case arguments using semantic similarity
- */
- private async matchEvidence(request: PhoenixWrightSearchRequest): Promise<EvidenceMatch[]> {
- const matches: EvidenceMatch[] = [];
-
- for (const evidenceId of request.evidenceIds) {
- const prompt = `Analyze evidence "${evidenceId}" against case query: "${request.query}", Determine:
-- Relevance (0-1): How directly this evidence supports the case
-- Confidence (0-1): How certain the AI is about this analysis
-- Contradictions: Any contradictions this evidence creates
-- Supporting precedents: Legal precedents this evidence aligns with
-;
-Return analysis in JSON format.`;
-
- try {
- const aiResponse = await this.callOllamaGenerate(this.SCORING_MODEL, prompt, {
- temperature: 0.1, max_tokens: 1000,
- });
-
- const match = this.parseEvidenceMatchFromAI(aiResponse, evidenceId);
- if (match) matches.push(match);
- } catch (error) {
- logger.warn(`Evidence matching failed for ${evidenceId}`, error);
+ */;
+  private async matchEvidence(request, PhoenixWrightSearchRequest), Promise<EvidenceMatch[]> {;
+  const matches, EvidenceMatch[] = [];;
+  for (const evidenceId of request.evidenceIds) {;
+  const prompt = `Analyze evidence "${evidenceId}" against case query: "${request.query}", Determine:
+- Relevance (0-1), How directly this evidence supports the case
+- Confidence (0-1), How certain the AI is about this analysis
+- Contradictions, Any contradictions this evidence creates
+- Supporting precedents, Legal precedents this evidence aligns with
+;;
+  Return analysis in JSON format.`;;
+  try {;
+  const aiResponse = await this.callOllamaGenerate(this.SCORING_MODEL, prompt, {;
+  temperature: 0.1, max_tokens: 1000,
+ });;
+  const match = this.parseEvidenceMatchFromAI(aiResponse, evidenceId);;
+  if (match) matches.push(match);
+ } catch (error) {;
+  logger.warn(`Evidence matching failed for ${evidenceId}`, error);
  }
- }
-
- return matches;
+ };
+  return matches;
  }
 
  /**
  * Generate human-readable ranking explanation for search results
- */
- private async generateRankingExplanation(results: PhoenixWrightSearchResult): Promise<string> {
- const prompt = `Generate a Phoenix Wright-style explanation for these search results: Precedents, found: ${results.precedents.length}
-Contradictions identified: ${results.contradictions.length}
-Evidence matches: ${results.evidenceMatches.length}
-
-Key precedents: ${results.precedents
+ */;
+  private async generateRankingExplanation(results, PhoenixWrightSearchResult), Promise<string> {;
+  const prompt = `Generate a Phoenix Wright-style explanation for these search results, Precedents, found, ${results.precedents.length};
+  Contradictions identified, ${results.contradictions.length};
+  Evidence matches, ${results.evidenceMatches.length};
+  Key precedents, ${results.precedents
  .slice(0, 3)
  .map((p) => p.title)
- .join(', ')}
-Major contradictions: ${results.contradictions.filter((c) => c.severity === 'high').length} high severity
-;
-Write a dramatic, attorney-style summary explaining the search results and their implications for the case.`;
-
- try {
- return await this.callOllamaGenerate(this.SCORING_MODEL, prompt, {
- temperature: 0.7, max_tokens: 800,
+ .join(', ')};
+  Major contradictions, ${results.contradictions.filter((c) => c.severity === 'high').length} high severity
+;;
+  Write a dramatic, attorney-style summary explaining the search results and their implications for the case.`;;
+  try {;
+  return await this.callOllamaGenerate(this.SCORING_MODEL, prompt, {;
+  temperature: 0.7, max_tokens: 800,
  });
- } catch (error) {
- logger.warn('Ranking explanation generation failed', error);
- return 'Analysis complete. Review precedents and contradictions carefully.';
+ } catch (error) {;
+  logger.warn('Ranking explanation generation failed', error);;
+  return 'Analysis complete. Review precedents and contradictions carefully.';
  }
  }
 
- // Helper methods for parsing AI responses
-
- private parsePrecedentsFromAI(aiResponse: string): LegalPrecedent[] {
- try {
- const jsonMatch = aiResponse.match(/\[[\s\S]*\]/);
- if (!jsonMatch) return [];
- return JSON.parse(jsonMatch[0]) as LegalPrecedent[];
- } catch {
- return [];
+ // Helper methods for parsing AI responses;
+  private parsePrecedentsFromAI(aiResponse, string), LegalPrecedent[] {;
+  try {;
+  const jsonMatch = aiResponse.match(/\[[\s\S]*\]/);;
+  if (!jsonMatch) return [];;
+  return JSON.parse(jsonMatch[0]) as LegalPrecedent[];
+ } catch {;
+  return [];
  }
+ };
+  private parseContradictionsFromAI(aiResponse, string), ContradictionAnalysis[] {;
+  try {;
+  const jsonMatch = aiResponse.match(/\[[\s\S]*\]/);;
+  if (!jsonMatch) return [];;
+  return JSON.parse(jsonMatch[0]) as ContradictionAnalysis[];
+ } catch {;
+  return [];
  }
-
- private parseContradictionsFromAI(aiResponse: string): ContradictionAnalysis[] {
- try {
- const jsonMatch = aiResponse.match(/\[[\s\S]*\]/);
- if (!jsonMatch) return [];
- return JSON.parse(jsonMatch[0]) as ContradictionAnalysis[];
- } catch {
- return [];
- }
- }
-
- private parseEvidenceMatchFromAI(aiResponse: string, options: string): EvidenceMatch | null {
- try {
- const jsonMatch = aiResponse.match(/\{[\s\S]*\}/);
- if (!jsonMatch) return null;
- const parsed = JSON.parse(jsonMatch[0]) as Partial<EvidenceMatch>;
- return {
- evidenceId: type, parsed.type || 'document',
- relevance, parsed.relevance || 0, confidence: 0, parsed.confidence || 0, contradictions: 0, parsed.contradictions || [],
- supportingPrecedents: parsed.supportingPrecedents || [],
- explanation: parsed.explanation || '',
+ };
+  private parseEvidenceMatchFromAI(aiResponse, string, options, string), EvidenceMatch | null {;
+  try {;
+  const jsonMatch = aiResponse.match(/\{[\s\S]*\}/);;
+  if (!jsonMatch) return null;;
+  const parsed = JSON.parse(jsonMatch[0]) as Partial<EvidenceMatch>;;
+  return {;
+  evidenceId, type, parsed.type || 'document',;
+  relevance, parsed.relevance || 0, confidence: 0, parsed.confidence || 0, contradictions: 0, parsed.contradictions || [],;
+  supportingPrecedents, parsed.supportingPrecedents || [],;
+  explanation, parsed.explanation || '',
  };
- } catch {
- return null;
+ } catch {;
+  return null;
  }
- }
-
- private calculateSearchConfidence(results: PhoenixWrightSearchResult): number {
- const weights = {
- precedents: 0.4, contradictions: 0.3, evidenceMatches: 0.3,
- }
-
-const precedentScore = Math.min(results.precedents.length / 5, 1) * weights.precedents;
- const contradictionScore =
- (results.contradictions.length > 0 ? 8: 1) * weights.contradictions;
- const evidenceScore = (results.evidenceMatches.reduce((sum, match) => sum + match.confidence, 0) /
- Math.max(results.evidenceMatches.length, 1)) *;
- weights.evidenceMatches;
-
- return Math.round((precedentScore + contradictionScore + evidenceScore) * 100) / 100;
+ };
+  private calculateSearchConfidence(results, PhoenixWrightSearchResult), number {;
+  const weights = {;
+  precedents: 0.4, contradictions: 0.3, evidenceMatches: 0.3,
+ };
+  const precedentScore = Math.min(results.precedents.length / 5, 1) * weights.precedents;;
+  const contradictionScore =
+ (results.contradictions.length > 0 ? 8: 1) * weights.contradictions;;
+  const evidenceScore = (results.evidenceMatches.reduce((sum, match) => sum + match.confidence, 0) /;
+  Math.max(results.evidenceMatches.length, 1)) *;;
+  weights.evidenceMatches;;
+  return Math.round((precedentScore + contradictionScore + evidenceScore) * 100) / 100;
  }
 
  // YOᴿHa UI Enhancement Methods
 
  /**
  * Update YOᴿHa UI state for Phoenix Wright search results
- */
- updateYohaUI(results: PhoenixWrightSearchResult, YohaUIConfig: YohaUIState {
- const state: YohaUIState = {
- currentPhase: 'analysis',
- progress: 100, activeContradictions: results.contradictions.length, results.evidenceMatches.reduce((sum, match) => sum + match.relevance, 0) /
- Math.max(results.evidenceMatches.length, 1, precedentMatches: results.precedents.length,
- animationQueue: [],
+ */;
+  updateYohaUI(results, PhoenixWrightSearchResult, YohaUIConfig, YohaUIState {;
+  const state: YohaUIState = {;
+  currentPhase: 'analysis',;
+  progress: 100, activeContradictions, results.contradictions.length, results.evidenceMatches.reduce((sum, match) => sum + match.relevance, 0) /;
+  Math.max(results.evidenceMatches.length, 1, precedentMatches, results.precedents.length,;
+  animationQueue: [],
  };
 
- // Add dramatic animations based on results
- if (results.contradictions.some((c) => c.severity === 'high')) {
- state.animationQueue.push('OBJECTION!');
- state.currentPhase = 'contradiction';
- } else if (results.precedents.length > 3) {
- state.animationQueue.push('TAKE_THAT!');
- state.currentPhase = 'verdict';
- }
-
- return state;
+ // Add dramatic animations based on results;
+  if (results.contradictions.some((c) => c.severity === 'high')) {;
+  state.animationQueue.push('OBJECTION!');;
+  state.currentPhase = 'contradiction';
+ } else if (results.precedents.length > 3) {;
+  state.animationQueue.push('TAKE_THAT!');;
+  state.currentPhase = 'verdict';
+ };
+  return state;
  }
 
  /**
  * Get YOᴿHa UI configuration for legal analysis
- */
- getYohaUIConfig(): YohaUIConfig {
- return {
- theme: 'phoenix',
- animations: true, soundEffects: true,
- autoAdvance: true, showConfidence: true,
- highlightContradictions: true,
+ */;
+  getYohaUIConfig(), YohaUIConfig {;
+  return {;
+  theme: 'phoenix',;
+  animations, true, soundEffects, true,;
+  autoAdvance, true, showConfidence, true,;
+  highlightContradictions, true,
  };
  }
 }
 
-// NOTE: removed duplicate helper definitions that were previously declared below saveScoring
-// { changed code } - re-introduce singleton after class declaration
-export const caseScoringServiceGrpc = new CaseScoringServiceGrpc();
+// NOTE, removed duplicate helper definitions that were previously declared below saveScoring
+// { changed, code  } - re-introduce singleton after class declaration;
+  export const caseScoringServiceGrpc = new CaseScoringServiceGrpc();
