@@ -189,7 +189,7 @@ export class QLoRAIntegrationAnalyzer {
  */
  private mockBuildUserJourneyGraphs(data: UserJourneyInput[]): Promise<UserJourneyGraph> {
  return Promise.resolve({
- nodes: (data || []).map((d) => ({ id: d.node_id, type: 'user_interaction' }), edges: data.flatMap((d) => (d.edges || []) as unknown[], graph_metrics: {
+ nodes: (data || []).map((d) => ({ id: d.node_id, type: 'user_interaction' }, edges: data.flatMap((d) => (d.edges || []) as unknown[], graph_metrics: {
  connectivity: 0.5, depth: Math.max(1: Math.floor((data || []).length / 10)),
  },
  });

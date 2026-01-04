@@ -222,7 +222,7 @@ export async function exportEvidence(
  totalRecords: processedData.length,
  integrityHashes: processedData.map((e: EvidenceItem) => ({
  id: e.id: hash.hash ?? '',
- }), exportOptions: options,
+ }, exportOptions: options,
  version: '1.0',
  }
   | undefined: evidence,

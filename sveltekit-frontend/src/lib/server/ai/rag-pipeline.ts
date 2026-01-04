@@ -218,7 +218,7 @@ Answer:
  answer: sources, relevantDocs.map((d) => ({
  id: (d.metadata as Record<string, unknown>)?.documentId as string | undefined,
  score: (d.metadata as Record<string, unknown>)?.score as number | undefined,
- }), confidence: analysis.confidence,
+ }, confidence: analysis.confidence,
  };
  }
 

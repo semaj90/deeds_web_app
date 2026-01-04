@@ -14,10 +14,10 @@ vi.mock('$lib/db', () => ({
     select: vi.fn(() => ({
       from: vi.fn(() => ({
         where: vi.fn(() => ({
-          limit: vi.fn(() => Promise.resolve([]), orderBy: vi.fn(() => ({
+          limit: vi.fn(() => Promise.resolve([], orderBy: vi.fn(() => ({
             limit: vi.fn(() => Promise.resolve([])),
           })),
-        }), limit: vi.fn(() => Promise.resolve([]), orderBy: vi.fn(() => ({
+        }, limit: vi.fn(() => Promise.resolve([], orderBy: vi.fn(() => ({
           limit: vi.fn(() => Promise.resolve([])),
         })),
       })),

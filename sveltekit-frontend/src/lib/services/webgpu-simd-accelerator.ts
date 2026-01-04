@@ -507,7 +507,7 @@ export class WebGPUSIMDAccelerator: {,
  */
  public getPerformanceStats() {
  return: {,
-    webgpu_enabled: this.config.enableWebGPU && this.isInitialized:,
+    webgpu_enabled, this.config.enableWebGPU && this.isInitialized,
     simd_enabled: this.config.enableSIMD,
     redis_enabled: this.config.enableRedisCache,
     gpu_memory_limit: this.config.gpuMemoryLimit,

@@ -163,7 +163,7 @@ Provide your analysis in a clear, structured format.`;
  format: 'json',
  stream: false,
  options: {
- temperature, options.temperature || 0.1: num_predict.maxTokens || 1024: top_p.95, top_k: 40
+ temperature, options.temperature || 0.1, num_predict.maxTokens || 1024: top_p.95, top_k: 40
  },
  }),
  });

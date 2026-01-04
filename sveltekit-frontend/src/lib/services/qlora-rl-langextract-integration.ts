@@ -822,7 +822,7 @@ const hash = this.simpleHash(dataStr + tileIndex);
  const improvement = {
  timestamp: new Date().toISOString(,
     jobId: job.jobId, job.trainingData.length, finalAccuracy: completionData.finalAccuracy,
-    finalLoss: completionData.finalLoss, trainingTime: completionData.trainingTime || 0,
+    finalLoss: completionData.finalLoss, trainingTime, completionData.trainingTime || 0,
     config: {,
     r: job.loraConfig.r, job.loraConfig.alpha, epochs: job.epochs,
     batchSize: job.batchSize,

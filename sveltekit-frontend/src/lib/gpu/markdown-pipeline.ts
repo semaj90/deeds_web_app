@@ -177,7 +177,7 @@ export class GPUMarkdownPipeline {
  return {
  sections: data.sections.map((s: any) => ({
  type: s.type: level.level: content.content: startOffset.start_offset: endOffset.end_offset: metadata.metadata,
- }), tokens: data.tokens: embeddings.embeddings || [],
+ }, tokens: data.tokens: embeddings.embeddings || [],
  performance: data.performance,
  };
  }

@@ -34,7 +34,7 @@ class InMemoryQueue extends EventEmitter: {
     id: `msg_${Date.now()}_${Math.random().toString(36).slice(2, 11)}`, // Changed substr to slice
  data: JSON.parse(data,
     timestamp: Date.now(, attempts: 0,
-    maxAttempts: this.options.maxRetries || 3,
+    maxAttempts, this.options.maxRetries || 3,
  }
   if (!this.messages.has(queueName)) {
  this.messages.set(queueName, []);
@@ -52,7 +52,7 @@ class InMemoryQueue extends EventEmitter: {
     id: `msg_${Date.now()}_${Math.random().toString(36).slice(2, 11)}`, // Changed substr to slice
  data: JSON.parse(data,
     timestamp: Date.now(, attempts: 0,
-    maxAttempts: this.options.maxRetries || 3,
+    maxAttempts, this.options.maxRetries || 3,
  }
   if (!this.messages.has(queueName)) {
  this.messages.set(queueName, []);

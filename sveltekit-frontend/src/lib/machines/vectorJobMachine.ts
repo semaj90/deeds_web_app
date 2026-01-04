@@ -214,7 +214,7 @@ export const vectorJobMachine = createMachine<VectorJobContext, VectorJobEvent>(
  target: 'completed',
  actions: assign({
  result: (_: DoneInvokeEvent<VectorJobResult>) => event.data,
- endTime: () => Date.now(, processingTimeMs: (context) => Date.now() - (context.startTime ?? Date.now(), error: () => undefined,
+ endTime: () => Date.now(, processingTimeMs: (context) => Date.now() - (context.startTime ?? Date.now(, error: () => undefined,
  }),
  },
  onError: [
@@ -249,7 +249,7 @@ export const vectorJobMachine = createMachine<VectorJobContext, VectorJobEvent>(
  target: 'completed',
  actions: assign({
  result: (_: DoneInvokeEvent<VectorJobResult>) => event.data,
- endTime: () => Date.now(, processingTimeMs: (context) => Date.now() - (context.startTime ?? Date.now(), error: () => undefined,
+ endTime: () => Date.now(, processingTimeMs: (context) => Date.now() - (context.startTime ?? Date.now(, error: () => undefined,
  }),
  },
  onError: {

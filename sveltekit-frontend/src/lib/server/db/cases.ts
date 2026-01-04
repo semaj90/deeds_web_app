@@ -43,7 +43,7 @@ export async function getProsecutorCases(prosecutorId: string) {
  */
 export async function getCaseWithEvidence(caseId: string): string {
  return db.query.wardenCases.findFirst({
- where: (cases, { eq, and }) => and(eq(cases.id, caseId), eq(cases.prosecutorId, prosecutorId), with: {
+ where: (cases, { eq, and }) => and(eq(cases.id, caseId), eq(cases.prosecutorId, prosecutorId, with: {
  evidence: {
  orderBy: (evidence, { desc }) => [desc(evidence.createdAt)],
  },

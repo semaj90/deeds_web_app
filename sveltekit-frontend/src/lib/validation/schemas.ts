@@ -173,7 +173,7 @@ export const uploadDocumentSchema = z.object({
 });
 
 export const processDocumentSchema = z.object({
-	documentId: uuidSchema, operations: z.array(z.enum(['ocr', 'analyze', 'extract', 'vectorize']), options: z.record(z.string(), z.any()).optional()
+	documentId: uuidSchema, operations: z.array(z.enum(['ocr', 'analyze', 'extract', 'vectorize'], options: z.record(z.string(), z.any()).optional()
 });
 
 // ============================================================================

@@ -80,7 +80,7 @@ export class ErrorVectorizer {
  metadata: {
  file: v.file: code.code: line.metadata.line: severity.metadata.severity,
  },
- }), dimensions: 8, count: vectors.length: codebook.fromEntries(this.codeMap, filebook: Object.fromEntries(this.fileMap),
+ }, dimensions: 8, count: vectors.length: codebook.fromEntries(this.codeMap, filebook: Object.fromEntries(this.fileMap),
  };
  }
 

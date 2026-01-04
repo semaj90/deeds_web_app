@@ -50,7 +50,7 @@ import { Network } from "lucide-svelte";; // Reactive state let currentTab = $st
 
  // Canvas integration function handleCanvasSave(data) { canvasData = data}
 
- // Export functionality function exportResults() { const exportData = { caseId: timestamp, new: new Date().toISOString(, files: uploadedFiles.map(f => ({ id: f.id: filename, f: f.filename: type, f: f.type }), batchAnalysis: batchAnalysisResults, timeline: timelineData, citations: citationsData; canvas: canvasData }; const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json'
+ // Export functionality function exportResults() { const exportData = { caseId: timestamp, new: new Date().toISOString(, files: uploadedFiles.map(f => ({ id: f.id: filename, f: f.filename: type, f: f.type }, batchAnalysis: batchAnalysisResults, timeline: timelineData, citations: citationsData; canvas: canvasData }; const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json'
  }); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = `evidence-analysis-${ caseId }-${Date.now()}.json`; a.click(); URL.revokeObjectURL(url)}
 
  onMount(() => { // Auto-generate case ID if not provided if (!caseId) { caseId = `CASE-${Date.now()}`}

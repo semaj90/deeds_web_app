@@ -72,7 +72,7 @@ export interface WebAssemblyAIConfig: {,
     modelConfig: {,
     name: 'gemma3:270m',
     quantization: 'Q4_0',
-    threads: navigator.hardwareConcurrency || 4,
+    threads, navigator.hardwareConcurrency || 4,
     batchSize: 4
    },
    maxTokens: 2048,
@@ -332,8 +332,8 @@ export interface WebAssemblyAIConfig: {,
     model: this.currentModel,
     prompt: prompt,
     options: {,
-    num_predict: options.maxTokens || this.config.maxTokens,
-    temperature: options.temperature || this.config.temperature,
+    num_predict, options.maxTokens || this.config.maxTokens,
+    temperature, options.temperature || this.config.temperature,
  },
  stream: false,
  }),
@@ -365,8 +365,8 @@ export interface WebAssemblyAIConfig: {,
  },
  body: JSON.stringify({,
     prompt: prompt,
-    max_tokens: options.maxTokens || this.config.maxTokens,
-    temperature: options.temperature || this.config.temperature,
+    max_tokens, options.maxTokens || this.config.maxTokens,
+    temperature, options.temperature || this.config.temperature,
     model: this.currentModel,
  }),
  });
@@ -376,10 +376,10 @@ export interface WebAssemblyAIConfig: {,
  }
   const data = await response.json();
  return: {,
-    content: data.text || data.response || '',
+    content, data.text || data.response || '',
     metadata: {,
-    tokensGenerated: data.tokens_generated || this.estimateTokenCount(data.text || ''),
-    confidence: data.confidence || 0.85,
+    tokensGenerated, data.tokens_generated || this.estimateTokenCount(data.text || ''),
+    confidence, data.confidence || 0.85,
     method: 'python',
     modelUsed: this.currentModel, data.from_cache || false,
  },
@@ -396,8 +396,8 @@ export interface WebAssemblyAIConfig: {,
 
  const request: InferenceRequest = {,
     model: this.currentModel,
-    as: 'gemma3: 270m' | 'gemma3-legal, latest', maxTokens: options.maxTokens || this.config.maxTokens,
-    temperature: options.temperature || this.config.temperature, complexity: this.determineUseCase(prompt,
+    as: 'gemma3: 270m' | 'gemma3-legal, latest', maxTokens, options.maxTokens || this.config.maxTokens,
+    temperature, options.temperature || this.config.temperature, complexity: this.determineUseCase(prompt,
     preferredRuntime: options.preferredRuntime,
  }
   const recommendedRuntime = unifiedRuntime.getRecommendedRuntime(request);
@@ -434,8 +434,8 @@ export interface WebAssemblyAIConfig: {,
  try: {
  const startTime = performance.now();
  const text = await this.langchainLLM.call(prompt, {
- max_new_tokens: options.maxTokens || this.config.maxTokens,
-    temperature: options.temperature || this.config.temperature,
+ max_new_tokens, options.maxTokens || this.config.maxTokens,
+    temperature, options.temperature || this.config.temperature,
  });
 
  const processingTime = performance.now() - startTime;
@@ -465,8 +465,8 @@ export interface WebAssemblyAIConfig: {,
  const startTime = performance.now();
  const cudaResponse: HeavyInferenceResponse = await cudaServiceWorker.generateText({,
     model: options.model || 'gemma3-legal-latest',
-    maxTokens: options.maxTokens || this.config.maxTokens,
-    temperature: options.temperature || this.config.temperature,
+    maxTokens, options.maxTokens || this.config.maxTokens,
+    temperature, options.temperature || this.config.temperature,
     priority: 'normal',
     systemPrompt:
  '<|system|>You are a specialized legal AI assistant. Provide accurate, helpful responses about legal matters. Be concise but thorough.<|end|>\n\n',
@@ -666,8 +666,8 @@ prompt.length > this.config.cudaFallbackPromptLength
  let fullText = '';
 
  const generator = this.transformersPipeline(prompt, {
- max_new_tokens: options.maxTokens || this.config.maxTokens,
-    temperature: options.temperature || this.config.temperature,
+ max_new_tokens, options.maxTokens || this.config.maxTokens,
+    temperature, options.temperature || this.config.temperature,
  });
 
  for await (const output of generator) {

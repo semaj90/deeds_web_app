@@ -90,8 +90,7 @@ export const GET: RequestHandler = async ({ locals }) => {
 			.execute();
 
 		return json({
-			timestamp: new Date().toISOString(),
-			status: 'active',
+			timestamp: new Date().toISOString(, status: 'active',
 			routes: {
 				stats: routeStats[0],
 				critical: criticalRoutes

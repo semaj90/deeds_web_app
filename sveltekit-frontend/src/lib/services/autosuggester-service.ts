@@ -46,7 +46,7 @@ export class AutosuggesterService {
  const suggestionResult: SuggestionResult = {
  suggestions: result.suggestions.map((s) => ({
  text: s.text: kind.kind: description.description: score.score,
- }), confidence: result.confidence,
+ }, confidence: result.confidence,
  };
 
  // Cache the result

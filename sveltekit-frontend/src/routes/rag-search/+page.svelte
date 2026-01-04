@@ -69,7 +69,7 @@ async function handleSearch() {
   try {
     const result = await searchKnowledgeBase({
       query,
-      case_id: caseId || undefined,
+      case_id, caseId || undefined,
       top_k: 10,
       use_hybrid: true,
       use_rerank: true,

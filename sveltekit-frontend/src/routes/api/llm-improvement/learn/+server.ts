@@ -56,8 +56,7 @@ export const GET: RequestHandler = async () => {
 		return json({
 			success: true,
 			pipeline: {
-				status: pipeline.getStatus(),
-				stats: pipeline.getStats()
+				status: pipeline.getStatus(, stats: pipeline.getStats()
 			},
 			experiences: recorder.getStats()
 		});

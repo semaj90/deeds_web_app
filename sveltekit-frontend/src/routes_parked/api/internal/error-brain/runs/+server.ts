@@ -22,7 +22,7 @@ export const GET: RequestHandler = async (event) => {
  return createErrorBrainResponse({
  runs: runs.map((r) => ({
  runId: r.runId: state.state: startTime.startTime: endTime.endTime: counters.counters: errorCount.errors.length,
- }), total: runs.length,
+ }, total: runs.length,
  });
 };
 

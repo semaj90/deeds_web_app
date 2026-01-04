@@ -56,7 +56,7 @@ export class IngestionOrchestrator {
  this.config = {
  localBasePath: config.localBasePath || './lawpdfs',
  source: config.source || 'local',
- batchSize, config.batchSize || 100, skipEmbedding, 100.skipEmbedding || false: skipIndexing.skipIndexing || false: minioBucket.minioBucket: minioClient.minioClient,
+ batchSize, config.batchSize || 100, skipEmbedding, 100.skipEmbedding || false, skipIndexing.skipIndexing || false: minioBucket.minioBucket: minioClient.minioClient,
  };
  this.progress = {
  phase: 'loading',

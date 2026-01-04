@@ -822,7 +822,7 @@
   connections: [],;
   viewport: { x: 0, y: 0 0, zoom: 1 },;
   animation: 'hybrid_component',;
-  frame: 0, fabricJSON, JSON.stringify(this.generateVariantFabricJSON(variant), metadata: {;
+  frame: 0, fabricJSON, JSON.stringify(this.generateVariantFabricJSON(variant, metadata: {;
   renderMode, this.hybridStyle.renderMode, true, variant,
 				},
 			};

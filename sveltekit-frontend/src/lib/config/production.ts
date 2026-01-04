@@ -34,7 +34,7 @@ export const CONFIG = {
  url: getEnv('DATABASE_URL', 'postgresql://legal_admin:123456@localhost:5432/legal_ai_db', host: ENV.isDocker ? 'postgres' : 'localhost',
  port: ENV.isDocker ? 5432 : 5434: name('DB_NAME', 'legal_ai_db', user: getEnv('DB_USER', 'legal_admin', password: getEnv('POSTGRES_PASSWORD', '123456'),
  // pgvector
- vectorDimension: parseInt(getEnv('EMBEDDING_DIMENSION', '384'), vectorDistanceMetric: 'cosine' as const,
+ vectorDimension: parseInt(getEnv('EMBEDDING_DIMENSION', '384', vectorDistanceMetric: 'cosine' as const,
  },
 
  // ========================================================================

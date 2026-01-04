@@ -417,7 +417,7 @@ export class QdrantKnowledgeStore {
       id: String(point.id, title: String(payload.title || 'Untitled', url: String(payload.url || '', content: String(payload.content || '', summary: String(payload.summary || '', entities: Array.isArray(payload.entities)
         ? payload.entities
         : String(payload.entities || '').split(', ').filter(Boolean, tags: Array.isArray(payload.tags) ? payload.tags : [],
-      scrapedAt: new Date(String(payload.scrapedAt || new Date().toISOString()), minioKey: String(payload.minioKey || '')
+      scrapedAt: new Date(String(payload.scrapedAt || new Date().toISOString(), minioKey: String(payload.minioKey || '')
     };
   }
 }

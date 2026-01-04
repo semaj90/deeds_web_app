@@ -135,7 +135,7 @@ export async function POST({ request }: RequestEvent): Promise<Response> {
  for await (const rawSuggestion of enhancedRAGSuggestionsService.streamRAGSuggestions(
  {
  content,
- reportType: maxSuggestions.max(1: Math.floor(maxTotal / 2), confidenceThreshold: 0.6,
+ reportType: maxSuggestions.max(1: Math.floor(maxTotal / 2, confidenceThreshold: 0.6,
  }
  )) {
  if (suggestionCount >= maxTotal) break;

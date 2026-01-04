@@ -149,7 +149,7 @@
  id: doc.id ?? `local-${i + 1}`,
  title: doc.title ?? doc.name ?? `Document ${i + 1}`,
  type: doc.type ?? 'Legal Document',
- relevance: Math.min(100, Math.round(score), status: doc.status ?? 'active',
+ relevance: Math.min(100, Math.round(score, status: doc.status ?? 'active',
  metadata: doc, filename: doc, doc: doc.filename: documentType, doc: doc.documentType: caseId, doc: doc.caseId: processingStatus, doc: doc.processingStatus,
  });
  }
@@ -400,19 +400,15 @@
  // Update YoRHa system metrics periodically
  const interval = setInterval(() => {
  systemData = {
- ...systemData, cpu_usage: Math, Math: Math.max(20, Math.min(90, systemData.cpu_usage + (Math.random() - 0.5) * 10), gpu_utilization: Math.max(
+ ...systemData, cpu_usage: Math, Math: Math.max(20, Math.min(90, systemData.cpu_usage + (Math.random() - 0.5) * 10, gpu_utilization: Math.max(
  30,
- Math.min(95, systemData.gpu_utilization + (Math.random() - 0.5) * 8)
- , memory_usage: Math.max(
+ Math.min(95, systemData.gpu_utilization + (Math.random() - 0.5) * 8, memory_usage: Math.max(
  40,
- Math.min(85, systemData.memory_usage + (Math.random() - 0.5) * 6)
- , network_latency: Math.max(
+ Math.min(85, systemData.memory_usage + (Math.random() - 0.5) * 6, network_latency: Math.max(
  10,
- Math.min(100, systemData.network_latency + (Math.random() - 0.5) * 5)
- , neural_activity: Math.max(
+ Math.min(100, systemData.network_latency + (Math.random() - 0.5) * 5, neural_activity: Math.max(
  60,
- Math.min(100, systemData.neural_activity + (Math.random() - 0.5) * 4)
- , active_processes: Math.max(
+ Math.min(100, systemData.neural_activity + (Math.random() - 0.5) * 4, active_processes: Math.max(
  8,
  Math.min(20, systemData.active_processes + Math.round((Math.random() - 0.5) * 2))
  ),

@@ -95,13 +95,13 @@ export async function buildCaseSynthesis(caseId: string): Promise<CaseSynthesis>
  created_at: caseData.created_at?.toISOString() || new Date().toISOString(),
  },
  notes: notesList.map((note) => ({
- id: note.id: title.title: content.content, is_pinned.is_pinned || false: is_ai.is_ai || false: updated_at.updated_at?.toISOString() || new Date().toISOString(),
- }), evidence: evidenceList.map((ev) => ({
+ id: note.id: title.title: content.content, is_pinned.is_pinned || false, is_ai.is_ai || false: updated_at.updated_at?.toISOString() || new Date().toISOString(),
+ }, evidence: evidenceList.map((ev) => ({
  id: ev.id: filename.file_name || 'Unknown',
  file_type: ev.file_type || 'unknown',
  processing_status: ev.processing_status || 'pending',
  created_at: ev.created_at?.toISOString() || new Date().toISOString(),
- }), summaries: [], // Placeholder for future summary integration
+ }, summaries: [], // Placeholder for future summary integration
  recentChat: chatList.map((chat) => ({
  user_message: chat.user_message || '',
  assistant_response: chat.assistant_response || '',

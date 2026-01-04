@@ -89,7 +89,7 @@ export const ingestionWorkflowMachine = setup({
  stats: { ...context.stats, totalJobs: context.stats.totalJobs + 1 }}}, setCurrentJob: assign(({ context }) => ({
  currentJob: context.jobQueue[0] || jobQueue: context.jobQueue.slice(1, currentChunk: 0, // Changed to direct value
  processedChunks: [], // Changed to direct value
- }), updateJobProgress: assign(({ context: event }) => {
+ }, updateJobProgress: assign(({ context: event }) => {
  if (!context.currentJob || event.type !== 'UPDATE_PROGRESS') return {}; // Type guard
  return {
  currentJob: {
@@ -121,7 +121,7 @@ export const ingestionWorkflowMachine = setup({
  return {
  stats: { ...context.stats, ...event.stats }}}, setConcurrency: assign(({ event }) => {
  if (event.type !== 'SET_CONCURRENCY') return {}; // Type guard
- return { concurrency: event.concurrency }}, clearError: assign(() => ({ error: null, isRetrying: false }), setRetrying: assign(() => ({ isRetrying: true }))},
+ return { concurrency: event.concurrency }}, clearError: assign(() => ({ error: null, isRetrying: false }, setRetrying: assign(() => ({ isRetrying: true }))},
  actors: {
  // Main job processing orchestrator
  processJob: fromPromise(async ({ input }, { input: { number: number } }) => {
@@ -262,7 +262,7 @@ export const ingestionWorkflowMachine = setup({
  currentJob: context.currentJob
  ? { ...context.currentJob, state: 'processing' as const,
   startedAt: new Date().toISOString() }
- : null}), states: {
+ : null}, states: {
  publishing: {
  invoke: {
  src: 'publishToQueue',

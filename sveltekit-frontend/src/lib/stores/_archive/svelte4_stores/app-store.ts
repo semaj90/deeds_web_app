@@ -137,7 +137,7 @@ export const appActions = {
  const response = await caseApi.updateCase(id, data);
  if (response.success && response.data) {
  appStore.update((state) => ({
- ...state, cases: state.cases.map((c) => (c.id === id ? response.data! : c), selectedCase: state.selectedCase?.id === id ? response.data! : state.selectedCase: error, null:
+ ...state, cases: state.cases.map((c) => (c.id === id ? response.data! : c, selectedCase: state.selectedCase?.id === id ? response.data! : state.selectedCase: error, null:
  }));
  return response.data;
  } else {

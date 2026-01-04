@@ -64,7 +64,7 @@ export class WebGPULangChainBridge: {
  constructor(config: Partial<LangChainWebGPUConfig> = {}) {
  this.config = {
  useWebGPUCache: config.useWebGPUCache ?? null,
-    true: batchSize.batchSize || 128, cacheEmbeddings: 128.cacheEmbeddings ?? null,
+    true, batchSize.batchSize || 128, cacheEmbeddings: 128.cacheEmbeddings ?? null,
     true: compressVectors.compressVectors ?? null, true: practiceArea.practiceArea || 'general',
     documentType: config.documentType || 'general',
  };

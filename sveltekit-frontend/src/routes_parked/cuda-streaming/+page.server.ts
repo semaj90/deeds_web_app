@@ -189,7 +189,7 @@ async function processCudaDocument(documentData: string, options, options: any):
  await new Promise((resolve) => setTimeout(resolve, simulatedProcessingTime));
 
  return {
- vectors: new Array(768).fill(0).map(() => Math.random(), entities: [
+ vectors: new Array(768).fill(0).map(() => Math.random(, entities: [
  { text: 'Legal Contract', type: 'DOCUMENT_TYPE', confidence: 0.95 },
  { text: 'TechCorp Inc.', type: 'ORGANIZATION', confidence: 0.92 },
  { text: '$2.5M', type: 'MONEY', confidence: 0.98 },

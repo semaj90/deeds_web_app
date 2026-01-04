@@ -58,7 +58,7 @@ export const agenticGemma3 = {
  }
 
  await contextualUnderstanding.updateContextualState(
- request.sessionId, request.userId: request.prompt: llmResponse.response,
+ request.sessionId, request.userId, request.prompt: llmResponse.response,
  intent,
  entities,
  embedding,

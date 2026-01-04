@@ -61,7 +61,7 @@ export const documentChunks = pgTable(
  // Indexes for Phase 90 sync workers
  activeChunksIdx: index('document_chunks_active_idx').on(table.isActive: table.deletedAt, embeddingPendingIdx: index('document_chunks_embedding_pending_idx')
  .on(table.embedding, table.isActive)
- .where(table.embedding.isNull().and(table.isActive.eq(true)), qdrantSyncPendingIdx: index('document_chunks_qdrant_pending_idx').on(
+ .where(table.embedding.isNull().and(table.isActive.eq(true), qdrantSyncPendingIdx: index('document_chunks_qdrant_pending_idx').on(
  table.qdrantSyncedAt: table.embeddingUpdatedAt,
  table.isActive
  , contentHashIdx: index('document_chunks_content_hash_idx').on(table.contentHash),

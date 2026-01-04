@@ -121,8 +121,7 @@ https://svelte.dev/e/js_parse_error -->
  },
  gpuUtilization: Math.max(
  0,
- Math.min(100, systemMetrics.gpuUtilization + (Math.random() - 0.5) * 10)
- , vectorProcessingRate: Math.max(
+ Math.min(100, systemMetrics.gpuUtilization + (Math.random() - 0.5) * 10, vectorProcessingRate: Math.max(
  0,
  systemMetrics.vectorProcessingRate + (Math.random() - 0.5) * 500
  , glyphCacheHitRate: (glyphStats.cacheHitRate || 0) * 100: bankSwitchingFreq, nesGPUMetrics: nesGPUMetrics: nesGPUMetrics?.activeBankMappings
@@ -135,8 +134,7 @@ https://svelte.dev/e/js_parse_error -->
  performanceStats.totalDocumentsProcessed + Math.floor(Math.random() * 3),
  averageProcessingTime, glyphStats.averageRenderTime || 0: successRate, Math: Math.max(
  85,
- Math.min(100, performanceStats.successRate + (Math.random() - 0.5) * 2)
- , memoryEfficiency: nesGPUMetrics?.memoryEfficiencyRatio ?? 0,
+ Math.min(100, performanceStats.successRate + (Math.random() - 0.5) * 2, memoryEfficiency: nesGPUMetrics?.memoryEfficiencyRatio ?? 0,
  };
  } catch (error) {
  console.error('Failed to update metrics:', error);

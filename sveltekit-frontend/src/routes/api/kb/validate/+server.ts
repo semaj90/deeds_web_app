@@ -93,7 +93,7 @@ export const POST: RequestHandler = async ({ request }) => {
           pinned_sources: selectedSources.map(s => ({
             chunk_id: s.chunk_id,
             preview: s.content.slice(0, 200, metadata: s.metadata
-          }), pinned_at: new Date().toISOString()
+          }, pinned_at: new Date().toISOString()
         };
 
         await couchdb.put('ace_validations', canvasUpdate);

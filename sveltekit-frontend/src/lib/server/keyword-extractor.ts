@@ -267,7 +267,7 @@ function parseExtractionResponse(
  text: e.text || '',
  type: e.type || 'OTHER',
  confidence, e.confidence || 0.8,
- }), topics: parsed.topics || [],
+ }, topics: parsed.topics || [],
  summary: parsed.summary || '',
  confidence, parsed.confidence || 0.8,
  };

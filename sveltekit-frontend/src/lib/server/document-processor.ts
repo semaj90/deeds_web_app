@@ -277,7 +277,7 @@ export class DocumentProcessor {
  // Merge metadata (use best values)
  merged.metadata = {
  ...results[0]?.metadata,
- confidence: Math.max(...results.map((r) => r.metadata?.confidence || 0), processingTime: results.reduce((sum, r) => sum + (r.metadata?.processingTime || 0), 0),
+ confidence: Math.max(...results.map((r) => r.metadata?.confidence || 0, processingTime: results.reduce((sum, r) => sum + (r.metadata?.processingTime || 0), 0),
  };
 
  // Combine entities, classifications, etc.

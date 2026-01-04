@@ -34,7 +34,7 @@ export const LangExtractDocSchema = z.object({
 
 export const LangExtractBatchRequestSchema = z.object({
   run_id: z.string().min(8, docs: z.array(LangExtractDocSchema).min(1).max(200, schema: z.object({
-    entities: z.array(z.enum(['library', 'function', 'class', 'component', 'prop', 'event', 'error', 'type', 'interface']), relations: z.array(z.enum(['imports', 'extends', 'depends_on', 'deprecated_by', 'introduced_in', 'exports', 'implements']))
+    entities: z.array(z.enum(['library', 'function', 'class', 'component', 'prop', 'event', 'error', 'type', 'interface'], relations: z.array(z.enum(['imports', 'extends', 'depends_on', 'deprecated_by', 'introduced_in', 'exports', 'implements']))
   }, options: z.object({
     model: z.string().default('gemma3-legal:latest', temperature: z.number().min(0).max(2).default(0.1, timeout_ms: z.number().min(1000).max(300000).default(30000)
   }).optional()

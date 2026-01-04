@@ -74,8 +74,7 @@ export const errorCluster = pgTable(
     count: integer('count').default(1).notNull(,
     filePath: varchar('file_path', { length: 255 }, rawLogSnippet: text('raw_log_snippet'),
     // Enhanced columns (added 2025-12-21)
-    title: varchar('title', { length: 255 }), // Human-readable cluster name (e.g., "TS1005: Missing Semicolon"),
-    clusterId: varchar('cluster_id', { length: 255 }, errorCode: varchar('error_code', { length: 100 }, category: varchar('category', { length: 100 }, affectedRoutes: jsonb('affected_routes').default([],
+    title: varchar('title', { length: 255 }), // Human-readable cluster name (e.g., "TS1005: Missing Semicolon", clusterId: varchar('cluster_id', { length: 255 }, errorCode: varchar('error_code', { length: 100 }, category: varchar('category', { length: 100 }, affectedRoutes: jsonb('affected_routes').default([],
     firstSeenAt: timestamp('first_seen_at').defaultNow(, lastSeenAt: timestamp('last_seen_at').defaultNow(,
     updatedAt: timestamp('updated_at').defaultNow(),
     // Timestamps

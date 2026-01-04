@@ -204,16 +204,13 @@ class XStateStoreManager {
  return {
  // User and authentication
  user: derived(appStore, ($app) =>
- appSelectors.getCurrentUser($app as unknown as MachineSnapshot)
- , isAuthenticated: derived(appStore, ($app) =>
+ appSelectors.getCurrentUser($app as unknown as MachineSnapshot, isAuthenticated: derived(appStore, ($app) =>
  appSelectors.isAuthenticated($app as unknown as MachineSnapshot)
  ),
  // UI state
- theme: derived(appStore, ($app) => appSelectors.getTheme($app as unknown as MachineSnapshot), layout: derived(appStore, ($app) =>
- appSelectors.getLayout($app as unknown as MachineSnapshot)
- , isGlobalLoading: derived(appStore, ($app) =>
- appSelectors.isGlobalLoading($app as unknown as MachineSnapshot)
- , loadingMessage: derived(appStore, ($app) =>
+ theme: derived(appStore, ($app) => appSelectors.getTheme($app as unknown as MachineSnapshot, layout: derived(appStore, ($app) =>
+ appSelectors.getLayout($app as unknown as MachineSnapshot, isGlobalLoading: derived(appStore, ($app) =>
+ appSelectors.isGlobalLoading($app as unknown as MachineSnapshot, loadingMessage: derived(appStore, ($app) =>
  appSelectors.getLoadingMessage($app as unknown as MachineSnapshot)
  ),
  // Notifications
@@ -221,25 +218,22 @@ class XStateStoreManager {
  appSelectors.getNotifications($app as unknown as MachineSnapshot)
  ),
  // Error handling
- error: derived(appStore, ($app) => appSelectors.getError($app as unknown as MachineSnapshot), hasError: derived(appStore, ($app) =>
+ error: derived(appStore, ($app) => appSelectors.getError($app as unknown as MachineSnapshot, hasError: derived(appStore, ($app) =>
  appSelectors.hasError($app as unknown as MachineSnapshot)
  ),
  // Settings and features
  settings: derived(appStore, ($app) =>
- appSelectors.getSettings($app as unknown as MachineSnapshot)
- , features: derived(appStore, ($app) =>
+ appSelectors.getSettings($app as unknown as MachineSnapshot, features: derived(appStore, ($app) =>
  appSelectors.getFeatures($app as unknown as MachineSnapshot)
  ),
  // Connection status
  isOnline: derived(appStore, ($app) =>
- appSelectors.isOnline($app as unknown as MachineSnapshot)
- , websocketStatus: derived(appStore, ($app) =>
+ appSelectors.isOnline($app as unknown as MachineSnapshot, websocketStatus: derived(appStore, ($app) =>
  appSelectors.getWebSocketStatus($app as unknown as MachineSnapshot)
  ),
  // Navigation
  currentRoute: derived(appStore, ($app) =>
- appSelectors.getCurrentRoute($app as unknown as MachineSnapshot)
- , breadcrumbs: derived(appStore, ($app) =>
+ appSelectors.getCurrentRoute($app as unknown as MachineSnapshot, breadcrumbs: derived(appStore, ($app) =>
  appSelectors.getBreadcrumbs($app as unknown as MachineSnapshot)
  ),
  };

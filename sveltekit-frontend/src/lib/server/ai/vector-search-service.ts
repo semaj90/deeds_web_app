@@ -299,7 +299,7 @@ export class VectorSearchService {
             }>).map(row => ({
                 id: row.id,
                 content: row.content,
-                similarity: Math.max(0, Math.min(1, row.similarity), metadata: row.metadata,
+                similarity: Math.max(0, Math.min(1, row.similarity, metadata: row.metadata,
                 documentId: row.document_id,
                 timestamp: row.timestamp,
                 source: 'pgvector' as const

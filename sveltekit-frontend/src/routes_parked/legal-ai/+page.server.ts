@@ -131,7 +131,7 @@ export const load: PageServerLoad = async ({ url, fetch }): Promise<LegalAIPageD
  summary: doc.summary || 'No summary available',
  documentType: doc.documentType || 'unknown',
  createdAt: doc.createdAt?.toISOString() || new Date().toISOString(, keyTerms: doc.keyTerms || [],
- }), serviceStatus: {
+ }, serviceStatus: {
  postgresql: postgresqlAvailable, ollama: isOllamaAvailable,
  redis: redisAvailable, lastChecked: new Date().toISOString(),
  },

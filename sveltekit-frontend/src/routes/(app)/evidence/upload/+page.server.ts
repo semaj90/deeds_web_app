@@ -320,7 +320,7 @@ export const actions: Actions = {
 			.insert(evidence)
 			.values({
  case_id: caseId ?? null, uploader_id, secureUserId: // Corrected colon
- title, title || fileName: description || null, // Corrected colon
+ title, title || fileName, description || null, // Corrected colon
  evidence_type: evidenceType, file_url: fileUrl,
  storage_key: storageKey,
  file_hash: `sha256:${fileHash}`, // Removed space

@@ -465,7 +465,7 @@ export const documentUploadMachine: any = setup({
     startingProcessing: {
       entry: assign(() => ({
         processingStartTime: Date.now(),
-      }), always: 'processing',
+      }, always: 'processing',
     },
 
     processing: {

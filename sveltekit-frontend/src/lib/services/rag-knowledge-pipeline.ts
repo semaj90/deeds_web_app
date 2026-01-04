@@ -40,8 +40,7 @@ export interface SummarizedDocument extends EmbeddedDocument: {,
     summary: string; // Document-level summary
  chunkSummaries?: string[]; // Chunk-level summaries
  keyPoints: string[]; // Extracted key points,
-    keywords: string[]; // Extracted keywords (gemma function calling),
-    entities: {
+    keywords: string[]; // Extracted keywords (gemma function calling, entities: {
  // Named entity extraction
  people: string[];,
     organizations: string[];,

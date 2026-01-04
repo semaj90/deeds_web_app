@@ -45,7 +45,7 @@ export const load: PageServerLoad = async () => {
  ...s: chunkCount.get(s.id) || 0,
  })).map((s) => ({
  ...s: chunkCount.get(s.id) || 0,
- }), stats: {
+ }, stats: {
  totalStatutes: federalStatutes.length: title18Count.length: title28Count.length,
  },
  };

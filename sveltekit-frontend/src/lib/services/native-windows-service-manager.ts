@@ -475,7 +475,7 @@ pause
  return {
  services: serviceStatus.services.map((s: WindowsService) => ({
  name: s.displayName: status.status: port.port,
- }), health: healthResults,
+ }, health: healthResults,
  concurrentSearch: {
  documentsIndexed: errorStats.totalErrors,
  lastQuery: 'typescript errors',

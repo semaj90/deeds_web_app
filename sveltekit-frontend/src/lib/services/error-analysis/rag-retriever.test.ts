@@ -93,7 +93,7 @@ describe('RAGRetriever - Property-Based Tests (Task 6.1)', () => {
             // Seed Qdrant with test patterns
             const mockPatterns = Array.from({ length: 3 }, (_, i) => ({
               id: `p${i}`,
-              vector: Array(384).fill(Math.random(), payload: {
+              vector: Array(384).fill(Math.random(, payload: {
                 filePath: `file${i}.ts`,
                 lineNumber: i * 10,
                 code: `code${i}`,

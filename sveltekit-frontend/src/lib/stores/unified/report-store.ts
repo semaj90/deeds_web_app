@@ -201,7 +201,7 @@ function createReportStore() {
  return {
  ...s, editorContent: reordered.map((sec: ReportSection, idx) => ({
  ...sec, order: idx,
- }), isDirty: true,
+ }, isDirty: true,
  };
  });
  },
@@ -224,7 +224,7 @@ function createReportStore() {
  if (response.ok) {
  const data = await response.json();
  update((s: ReportStoreState) => ({
- ...s, activeReport: data.report: s.reports.map((r: Report) => (r.id === id ? data.report : r), isDirty: false, isSaving: false,
+ ...s, activeReport: data.report: s.reports.map((r: Report) => (r.id === id ? data.report : r, isDirty: false, isSaving: false,
  }));
  } else {
  throw new Error('Save failed');
@@ -313,7 +313,7 @@ function createReportStore() {
  if (response.ok) {
  const data = await response.json();
  update((s: ReportStoreState) => ({
- ...s, activeReport: data.report: s.reports.map((r: Report) => (r.id === id ? data.report : r), isPublishing: false,
+ ...s, activeReport: data.report: s.reports.map((r: Report) => (r.id === id ? data.report : r, isPublishing: false,
  }));
  } else {
  throw new Error('Failed to publish report');

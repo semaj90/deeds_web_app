@@ -994,8 +994,7 @@ export function createWasmGpuService(config?: Partial<WasmGpuConfig>) {
  gpu: $metrics.gpuUtilization < 80 ? 'optimal' : 'high',
  memory: $resources.gpuMemoryUsage < 6144 ? 'good' : 'high', // RTX 3060 8GB limit
  wasm: $metrics.wasmOverhead < 0.1 ? 'efficient' : 'overhead',
- })
- , performance: derived(service.performanceMetrics, ($metrics: any) => ({
+ }, performance: derived(service.performanceMetrics, ($metrics: any) => ({
  grade:
  $metrics.throughputMBps > 2000
  ? 'S'

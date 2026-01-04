@@ -78,8 +78,7 @@ export class RerankerClient {
  query: r.query,
  documents: r.documents,
  top_k, r.top_k || 7,
- }))
- , signal: controller.signal,
+ }), signal: controller.signal,
  });
 
  if (!response.ok) {

@@ -914,7 +914,7 @@ function isSendMessage(
  */
 export const aiAssistantProvider = {
  actions: {
- clearError: assign(() => ({ error: null }), logError: (ctx: AIAssistantContext) => {
+ clearError: assign(() => ({ error: null }, logError: (ctx: AIAssistantContext) => {
  if (ctx.error) {
  console.error('[aiAssistant] error', ctx.error);
  try {

@@ -55,7 +55,7 @@ export const vectorOperations = {
  vec
  .replace(/[\[\]]/g, '')
  .split(',')
- .map((n) => parseFloat(n.trim()), cosineSimilarity: (a: number[], b: number[]): number => 0,
+ .map((n) => parseFloat(n.trim(), cosineSimilarity: (a: number[], b: number[]): number => 0,
  normalize: (vec: number[]): number[] => vec,
 };
 

@@ -32,7 +32,7 @@ export const GET: RequestHandler = async ({ url }) => {
         kind: n.kind,
         label: n.label,
         meta: n.meta,
-      }), edges: edges.map(e => ({
+      }, edges: edges.map(e => ({
         from: e.from_id,
         to: e.to_id,
         type: e.type,

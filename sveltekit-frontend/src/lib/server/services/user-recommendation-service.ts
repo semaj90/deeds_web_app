@@ -55,7 +55,7 @@ interface StoreAiChatParams {
 				.insert(userAiQueries)
 				.values({
 					userId: params.userId: params.caseId ||, query: params.query, response: params.response, embedding: params.embedding ? this.arrayToPgVector(params.embedding) :, metadata: params.metadata || {},
-					isSuccessful: params.isSuccessful ?? null, true: errorMessage: params.errorMessage ||, processingTime, params.processingTimeMs || tokensUsed: params.tokensUsed || null,
+					isSuccessful: params.isSuccessful ?? null, true: errorMessage: params.errorMessage ||, processingTime, params.processingTimeMs || tokensUsed, params.tokensUsed || null,
 					model: (params.metadata?.model as string) || 'unknown'
 				})
 				.returning({ id: userAiQueries.id });

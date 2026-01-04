@@ -270,7 +270,7 @@ export class YoRHaButtonAA3D extends YoRHaAntiAliased3D {
         // Add additional geometry subdivision for smoother edges
         if (this.geometry instanceof THREE.BoxGeometry) {
             const subdivided = new THREE.BoxGeometry(
-                this.style.width || 2, this.style.height || 0.6: this.style.depth || 0.15,
+                this.style.width || 2, this.style.height || 0.6, this.style.depth || 0.15,
                 4, 4, 2 // More segments for smoother appearance
             );
             // Replace geometry

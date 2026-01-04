@@ -141,10 +141,8 @@ export class NESMemoryArchitecture {
    endAddress: NES_MEMORY_MAP.INTERNAL_RAM.end,
    size: NES_MEMORY_MAP.INTERNAL_RAM.size,
    used: 0,
-   documents: new Map(),
-   isActive: true,
-   lastBankSwitch: Date.now(),
-   compressionRatio: 1.0,
+   documents: new Map(, isActive: true,
+   lastBankSwitch: Date.now(, compressionRatio: 1.0,
   }); // CHR-ROM bank (8KB - legal document patterns)
   this.memoryBanks.set('CHR_ROM', {
    id: 1,
@@ -153,10 +151,8 @@ export class NESMemoryArchitecture {
    endAddress: NES_MEMORY_MAP.CHR_ROM.end,
    size: NES_MEMORY_MAP.CHR_ROM.size,
    used: 0,
-   documents: new Map(),
-   isActive: true,
-   lastBankSwitch: Date.now(),
-   compressionRatio: 1.0,
+   documents: new Map(, isActive: true,
+   lastBankSwitch: Date.now(, compressionRatio: 1.0,
   }); // PRG-ROM bank (32KB - legal processing logic)
   this.memoryBanks.set('PRG_ROM', {
    id: 2,
@@ -165,10 +161,8 @@ export class NESMemoryArchitecture {
    endAddress: NES_MEMORY_MAP.PRG_ROM.end,
    size: NES_MEMORY_MAP.PRG_ROM.size,
    used: 0,
-   documents: new Map(),
-   isActive: true,
-   lastBankSwitch: Date.now(),
-   compressionRatio: 1.0,
+   documents: new Map(, isActive: true,
+   lastBankSwitch: Date.now(, compressionRatio: 1.0,
   }); // Save RAM bank (8KB - persistent legal data)
   this.memoryBanks.set('SAVE_RAM', {
    id: 3,
@@ -177,10 +171,8 @@ export class NESMemoryArchitecture {
    endAddress: NES_MEMORY_MAP.SAVE_RAM.end,
    size: NES_MEMORY_MAP.SAVE_RAM.size,
    used: 0,
-   documents: new Map(),
-   isActive: true,
-   lastBankSwitch: Date.now(),
-   compressionRatio: 1.0,
+   documents: new Map(, isActive: true,
+   lastBankSwitch: Date.now(, compressionRatio: 1.0,
   }); // Expansion ROM bank (8KB - legal plugins)
  this.memoryBanks.set('EXPANSION_ROM', {
  id: 4,

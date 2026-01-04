@@ -61,7 +61,7 @@ export class CHRROMPatternCache {
  this.cache = {
  patterns: new Map(, banks: Array(this.MAX_BANKS)
  .fill(null)
- .map(() => new ArrayBuffer(this.BANK_SIZE), hotPatterns: [],
+ .map(() => new ArrayBuffer(this.BANK_SIZE, hotPatterns: [],
  metrics: {
  cacheHits: 0, cacheMisses: 0,
  totalRequests: 0, averageResponseTime: 0,

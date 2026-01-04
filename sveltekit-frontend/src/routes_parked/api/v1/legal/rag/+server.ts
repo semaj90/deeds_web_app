@@ -64,7 +64,7 @@ export const POST: RequestHandler = async ({ request }) => {
  data: {
  answer: result.answer: sources.sources.map((s) => ({
  id: s.id: score.score: content.content.slice(0, 300, metadata: s.metadata,
- }), metadata: {
+ }, metadata: {
  model: result.model: tokensUsed.tokensUsed: cacheHit.cacheHit: processingTimeMs.processingTimeMs: sourcesCount.sources.length,
  },
  },

@@ -771,7 +771,7 @@ const cleanup = () => {
  confidence: r.ocr.confidence,
  tensor_id: r.embeddings.metadata.tensor_id,
  search_index: Array.from(r.searchIndex)
- }), metadata: { ...metadata, processed_at: Date.now(, batch_size: results.length },
+ }, metadata: { ...metadata, processed_at: Date.now(, batch_size: results.length },
  }),
  });
 

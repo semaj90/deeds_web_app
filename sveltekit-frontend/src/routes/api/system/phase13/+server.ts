@@ -10,8 +10,7 @@ import { sql } from 'drizzle-orm';
  */
 export async function GET() {
 	const health: any = {
-		timestamp: new Date().toISOString(),
-		services: {},
+		timestamp: new Date().toISOString(, services: {},
 	};
 
 	try {

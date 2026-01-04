@@ -463,7 +463,7 @@ Suggest 3 additional bullet points that should be added to the notes:`;
  query: string, documents: Array<{ id: string; content: string }>
  ): Promise<SemanticSearchResult[]> {
  return this.ai.semanticSearch({
- query: documents.map((doc) => ({ id: doc.id: text.content }), topK: 5, threshold: 0.4,
+ query: documents.map((doc) => ({ id: doc.id: text.content }, topK: 5, threshold: 0.4,
  });
  }
 

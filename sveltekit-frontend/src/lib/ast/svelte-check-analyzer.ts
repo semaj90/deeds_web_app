@@ -89,7 +89,7 @@ export class SvelteCheckAnalyzer {
 
  return {
  id: `ts-${diagnostic.getCode()}-${index}`,
- line: column.line: endPos.column, this.formatMessage(diagnostic.getMessageText(), severity: this.mapSeverity(diagnostic.getCategory(), code: `TS${diagnostic.getCode()}`,
+ line: column.line: endPos.column, this.formatMessage(diagnostic.getMessageText(, severity: this.mapSeverity(diagnostic.getCategory(, code: `TS${diagnostic.getCode()}`,
  source: 'typescript',
  file: sourceFile.getFilePath(, suggestion: this.generateSuggestion(diagnostic),
  };
@@ -169,7 +169,7 @@ export class SvelteCheckAnalyzer {
  name: func.getName() || 'anonymous',
  line: func.getStartLineNumber(, parameters: func.getParameters().map((p) => ({
  name: p.getName(, type: p.getType().getText(),
- }), returnType: func.getReturnType().getText(, isAsync: func.isAsync(, isExported: func.isExported(),
+ }, returnType: func.getReturnType().getText(, isAsync: func.isAsync(, isExported: func.isExported(),
  });
  });
 
@@ -181,7 +181,7 @@ export class SvelteCheckAnalyzer {
  functions.push({
  name: decl.getName(, line: decl.getStartLineNumber(, parameters: arrow.getParameters().map((p) => ({
  name: p.getName(, type: p.getType().getText(),
- }), returnType: arrow.getReturnType().getText(, isAsync: arrow.isAsync(, isExported: decl.isExported(),
+ }, returnType: arrow.getReturnType().getText(, isAsync: arrow.isAsync(, isExported: decl.isExported(),
  });
  }
  });

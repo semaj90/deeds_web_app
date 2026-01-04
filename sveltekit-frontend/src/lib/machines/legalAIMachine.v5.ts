@@ -215,7 +215,7 @@ export const legalAIMachine = createMachine(
  return { system: doneEvent?.output ?? initialContext.system };
  }, setSystemError: assign((context) => ({
  system: { ...context.system, connected: false },
- }), setUser: assign((_, event) => {
+ }, setUser: assign((_, event) => {
  const doneEvent = event as { output?: AuthResponse } | undefined;
  const out = doneEvent?.output;
  return {
@@ -232,7 +232,7 @@ export const legalAIMachine = createMachine(
  permissions: [] as string[],
  isAuthenticated: false,
  },
- }), setCases: assign((context, event) => {
+ }, setCases: assign((context, event) => {
  const doneEvent = event as { output?: Case[] } | undefined;
  const casesOutput = doneEvent?.output ?? [];
  return { cases: { ...context.cases, items: casesOutput, loading: false } };

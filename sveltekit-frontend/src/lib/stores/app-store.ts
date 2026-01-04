@@ -144,7 +144,7 @@ export const appActions = {
       if (response.success && response.data) {
         appStore.update((state) => ({
           ...state,
-          cases: state.cases.map((c) => (c.id === id ? response.data! : c), selectedCase: state.selectedCase?.id === id ? response.data! : state.selectedCase,
+          cases: state.cases.map((c) => (c.id === id ? response.data! : c, selectedCase: state.selectedCase?.id === id ? response.data! : state.selectedCase,
           error: null,
         }));
         return response.data;

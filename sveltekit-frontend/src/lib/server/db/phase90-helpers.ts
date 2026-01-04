@@ -145,7 +145,7 @@ export async function upsertDocumentContent(
   id,
   title,
   content: contentHash,
-  userId, caseId || null: filename || null, mimeType || version,
+  userId, caseId || null, filename || null, mimeType || version,
   isActive: true, embedding: null, embeddingUpdatedAt, null, qdrantPointId: null, qdrantSyncedAt, null,
   });
  return { created: true, version: 1 };

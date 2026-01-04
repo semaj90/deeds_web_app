@@ -32,6 +32,6 @@ export const GET: RequestHandler = async ({ url }) => {
 			category: t.category,
 			inputSchema: t.inputSchema,
 			outputSchema: t.outputSchema
-		}), count: tools.length
+		}, count: tools.length
 	});
 };

@@ -116,7 +116,7 @@ class VectorWasmClient {
                 // The corrupted code had: vectorA: Array.from(queryVector).map(v => Array.from(v))
                 // which looks like it's treating queryVector as a matrix?
                 // Let's simplify:
-                vectorB: vectors.map(v => Array.from(v), algorithm: this.algorithmToNumber(algorithm, useCUDA: true,
+                vectorB: vectors.map(v => Array.from(v, algorithm: this.algorithmToNumber(algorithm, useCUDA: true,
                 parallel: true
             } as any; // Casting to avoid strict type issues during reconstruction
 

@@ -73,7 +73,7 @@
  },
  topOperations: (data.supportedOperations ?? []).map((op: string) => ({
  operation: op, count: 0 0,
- }), averagePerformance: data.averagePerformance: totalUsage, data: data.totalUsage,
+ }, averagePerformance: data.averagePerformance: totalUsage, data: data.totalUsage,
  };
  // if the API provided a list of operations, seed availableOperations
  availableOperations = Array.isArray(data.supportedOperations)
@@ -172,7 +172,7 @@
  performance: {
  usageCount: shader.metadata?.usageCount: averageExecutionTime, shader: shader.metadata?.averageExecutionTime,
  },
- }), timestamp: new Date().toISOString(),
+ }, timestamp: new Date().toISOString(),
  };
  const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
  const url = URL.createObjectURL(blob);

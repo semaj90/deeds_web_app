@@ -253,7 +253,7 @@ class SimpleTokenizer {
  }
 
  return {
- input_ids: new BigInt64Array(tokens.map((t) => BigInt(t)), attention_mask: attentionMask,
+ input_ids: new BigInt64Array(tokens.map((t) => BigInt(t), attention_mask: attentionMask,
  };
  }
 }
