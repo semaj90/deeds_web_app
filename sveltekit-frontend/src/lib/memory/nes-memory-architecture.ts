@@ -114,12 +114,10 @@ export class NESMemoryArchitecture {
  ppu2001: 0, // PPU mask register
  ppu2002: 0, // PPU status register
  oamaddr: 0, // OAM address register
- ppuscroll: { x: 0, y: 0}, // PPU scroll registers
- ppuaddr: 0, // PPU address register
- ppudata: 0, // PPU data register
- } as const;
-
- // Legal AI priority scoring
+  ppuscroll: { x: 0, y: 0 },
+  ppuaddr: 0,
+  ppudata: 0,
+ } as const; // Legal AI priority scoring
  private readonly LEGAL_PRIORITIES = {
  critical: 255, // Active court case documents
  high: 192, // Evidence and contracts under review
@@ -136,34 +134,54 @@ export class NESMemoryArchitecture {
 
  private initializeMemoryBanks() {
  // Internal RAM bank (2KB - most frequently accessed)
- this.memoryBanks.set('INTERNAL_RAM', {
- id: 0,
- type: 'INTERNAL_RAM',
- startAddress: NES_MEMORY_MAP.INTERNAL_RAM.start, endAddress: NES_MEMORY_MAP.INTERNAL_RAM.end, size: NES_MEMORY_MAP.INTERNAL_RAM.size, used: 0, documents: new Map(, isActive: true, lastBankSwitch: Date.now(, compressionRatio: 1.0,
- });
-
- // CHR-ROM bank (8KB - legal document patterns)
- this.memoryBanks.set('CHR_ROM', {
- id: 1,
- type: 'CHR_ROM',
- startAddress: NES_MEMORY_MAP.CHR_ROM.start, endAddress: NES_MEMORY_MAP.CHR_ROM.end, size: NES_MEMORY_MAP.CHR_ROM.size, used: 0, documents: new Map(, isActive: true, lastBankSwitch: Date.now(, compressionRatio: 1.0,
- });
-
- // PRG-ROM bank (32KB - legal processing logic)
- this.memoryBanks.set('PRG_ROM', {
- id: 2,
- type: 'PRG_ROM',
- startAddress: NES_MEMORY_MAP.PRG_ROM.start, endAddress: NES_MEMORY_MAP.PRG_ROM.end, size: NES_MEMORY_MAP.PRG_ROM.size, used: 0, documents: new Map(, isActive: true, lastBankSwitch: Date.now(, compressionRatio: 1.0,
- });
-
- // Save RAM bank (8KB - persistent legal data)
- this.memoryBanks.set('SAVE_RAM', {
- id: 3,
- type: 'SAVE_RAM',
- startAddress: NES_MEMORY_MAP.SAVE_RAM.start, endAddress: NES_MEMORY_MAP.SAVE_RAM.end, size: NES_MEMORY_MAP.SAVE_RAM.size, used: 0, documents: new Map(, isActive: true, lastBankSwitch: Date.now(, compressionRatio: 1.0,
- });
-
- // Expansion ROM bank (8KB - legal plugins)
+  this.memoryBanks.set('INTERNAL_RAM', {
+   id: 0,
+   type: 'INTERNAL_RAM',
+   startAddress: NES_MEMORY_MAP.INTERNAL_RAM.start,
+   endAddress: NES_MEMORY_MAP.INTERNAL_RAM.end,
+   size: NES_MEMORY_MAP.INTERNAL_RAM.size,
+   used: 0,
+   documents: new Map(),
+   isActive: true,
+   lastBankSwitch: Date.now(),
+   compressionRatio: 1.0,
+  }); // CHR-ROM bank (8KB - legal document patterns)
+  this.memoryBanks.set('CHR_ROM', {
+   id: 1,
+   type: 'CHR_ROM',
+   startAddress: NES_MEMORY_MAP.CHR_ROM.start,
+   endAddress: NES_MEMORY_MAP.CHR_ROM.end,
+   size: NES_MEMORY_MAP.CHR_ROM.size,
+   used: 0,
+   documents: new Map(),
+   isActive: true,
+   lastBankSwitch: Date.now(),
+   compressionRatio: 1.0,
+  }); // PRG-ROM bank (32KB - legal processing logic)
+  this.memoryBanks.set('PRG_ROM', {
+   id: 2,
+   type: 'PRG_ROM',
+   startAddress: NES_MEMORY_MAP.PRG_ROM.start,
+   endAddress: NES_MEMORY_MAP.PRG_ROM.end,
+   size: NES_MEMORY_MAP.PRG_ROM.size,
+   used: 0,
+   documents: new Map(),
+   isActive: true,
+   lastBankSwitch: Date.now(),
+   compressionRatio: 1.0,
+  }); // Save RAM bank (8KB - persistent legal data)
+  this.memoryBanks.set('SAVE_RAM', {
+   id: 3,
+   type: 'SAVE_RAM',
+   startAddress: NES_MEMORY_MAP.SAVE_RAM.start,
+   endAddress: NES_MEMORY_MAP.SAVE_RAM.end,
+   size: NES_MEMORY_MAP.SAVE_RAM.size,
+   used: 0,
+   documents: new Map(),
+   isActive: true,
+   lastBankSwitch: Date.now(),
+   compressionRatio: 1.0,
+  }); // Expansion ROM bank (8KB - legal plugins)
  this.memoryBanks.set('EXPANSION_ROM', {
  id: 4,
  type: 'EXPANSION_ROM',

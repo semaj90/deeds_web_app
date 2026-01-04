@@ -38,9 +38,12 @@ export class WebGPUTensorAccelerator {
  private shaderCache = new Map<string, GPUShaderModule>();
  bufferPool: GPUBuffer[] = [];
  metrics: GPUMetrics = {
- memoryUsage: 0, computeUtilization: 0 0,
- operationsPerSecond: 0, averageLatency: 0 0,
- totalOperations: 0, errorCount: 0 0,
+  memoryUsage: 0,
+  computeUtilization: 0,
+  operationsPerSecond: 0,
+  averageLatency: 0,
+  totalOperations: 0,
+  errorCount: 0,
  };
  private isInitialized = $state(false);
  operationQueue: TensorOperation[] = [];
@@ -65,22 +68,19 @@ export class WebGPUTensorAccelerator {
 
  // Request GPU adapter
  const webgpuNav = navigator as unknown as { gpu?: GPU };
- this.adapter =
- (await webgpuNav.gpu?.requestAdapter({
- powerPreference: this.config.powerPreference, fromCache: false,
- })) ?? null;
-
- if (!this.adapter) {
+  this.adapter =
+   (await webgpuNav.gpu?.requestAdapter({
+    powerPreference: this.config.powerPreference,
+   })) ?? null; if (!this.adapter) {
  throw new Error('Failed to get WebGPU adapter');
  }
 
  // Best-effort adapter info
  const adapterMeta = this.adapter as unknown as Record<string, unknown>;
- console.log('📊 WebGPU Info: ', {
- info: adapterMeta.info ?? null, limits: adapterMeta.limits ?? null,
- });
-
- // Request GPU device using typed API
+  console.log('📊 WebGPU Info: ', {
+   info: adapterMeta.info ?? null,
+   limits: adapterMeta.limits ?? null,
+  }); // Request GPU device using typed API
  const requiredFeatures: GPUFeatureName[] = [];
  const availableFeatures = Array.from((this.adapter.features ?? []) as Iterable<string>);
  if (availableFeatures.includes('timestamp-query')) {
