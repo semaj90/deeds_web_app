@@ -27,7 +27,7 @@ export class CitationManagementService {
  /**
  * Save a new citation
  */
- async saveCitation(userId: string, CitationSaveRequest: Promise<SavedCitation> {
+ async saveCitation(userId: string, request: CitationSaveRequest): Promise<SavedCitation> {
  try {
  const result = await db.query(
  `INSERT INTO saved_citations (
@@ -46,8 +46,9 @@ export class CitationManagementService {
  const citation = this.mapRowToCitation(result.rows[0]);
 
  // Log audit event
- await this.auditService.logAction(userId, 'citation_created', {
- citationId: citation.id, citation.statuteCode,
+   await this.auditService.logAction(userId, 'citation_created', {
+    citationId: citation.id,
+    statuteCode: citation.statuteCode,
  });
 
  return citation;
@@ -128,7 +129,7 @@ export class CitationManagementService {
  /**
  * Delete a citation
  */
- async deleteCitation(userId: string, options: string): Promise<void> {
+ async deleteCitation(userId: string, citationId: string): Promise<void> {
  try {
  // Verify ownership
  const ownership = await db.query('SELECT user_id FROM saved_citations WHERE id = $1', [

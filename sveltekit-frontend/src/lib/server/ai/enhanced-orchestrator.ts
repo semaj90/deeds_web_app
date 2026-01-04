@@ -31,24 +31,36 @@ import type { cache } from "sharp";
 
 // ===== DATABASE SCHEMA (Drizzle ORM TypeScript Safe) =====
 export const legalDocuments = pgTable("legal_documents", {
- id: uuid("id").defaultRandom().primaryKey(, content: text("content").notNull(),
- // Keep a text fallback for serialized embeddings for compatibility.
+ id: uuid("id").defaultRandom().primaryKey(),
+ content: text("content").notNull(),
  embedding: text("embedding").notNull(),
- // Add optional pgvector physical column (managed separately via raw SQL)
- // embedding_vector will be created via ensurePgvectorColumn() if pgvector is installed.
- metadata: json("metadata"), // switched to json for structured metadata (pg jsonb semantics)
- documentType: text("document_type", caseId: text("case_id", createdAt: timestamp("created_at").defaultNow(, updatedAt: timestamp("updated_at").defaultNow(),
+ metadata: json("metadata"),
+ documentType: text("document_type"),
+ caseId: text("case_id"),
+ createdAt: timestamp("created_at").defaultNow(),
+ updatedAt: timestamp("updated_at").defaultNow(),
 });
 
 export const autoSolveResults = pgTable("autosolve_results", {
- id: uuid("id").defaultRandom().primaryKey(, query: text("query").notNull(, solution: json("solution"), // switched to json
- confidence: integer("confidence", processingTime: integer("processing_time", serviceUsed: text("service_used", success: boolean("success", createdAt: timestamp("created_at").defaultNow(),
+ id: uuid("id").defaultRandom().primaryKey(),
+ query: text("query").notNull(),
+ solution: json("solution"),
+ confidence: integer("confidence"),
+ processingTime: integer("processing_time"),
+ serviceUsed: text("service_used"),
+ success: boolean("success"),
+ createdAt: timestamp("created_at").defaultNow(),
 });
 
 export const synthesisCache = pgTable("synthesis_cache", {
- id: uuid("id").defaultRandom().primaryKey(, queryHash: text("query_hash").unique().notNull(, result: json("result"), // switched to json
- metadata: json("metadata", hitCount: integer("hit_count").default(0, lastAccessed: timestamp("last_accessed").defaultNow(, createdAt: timestamp("created_at").defaultNow(),
-}); // Corrected closing parenthesis
+ id: uuid("id").defaultRandom().primaryKey(),
+ queryHash: text("query_hash").unique().notNull(),
+ result: json("result"),
+ metadata: json("metadata"),
+ hitCount: integer("hit_count").default(0),
+ lastAccessed: timestamp("last_accessed").defaultNow(),
+ createdAt: timestamp("created_at").defaultNow(),
+});
 
 // Create an explicit schema object for Drizzle to avoid inline typing/inference issues
 export const drizzleSchema = {
@@ -84,10 +96,8 @@ async function initializeDynamicPorts(): Promise<Map<string, number>> {
 }
 
 // Prefer environment overrides for per-service ports, fallback to provided default.
-function getServicePortWithFallback(serviceName: string): number {
- // Corrected function signature
- // map like: "enhanced-rag" -> ENV key ENHANCED_RAG_PORT
- const envKey = `${serviceName.replace(/-/g: "_").toUpperCase()}_PORT`;
+function getServicePortWithFallback(serviceName: string, fallbackPort: number): number {
+ const envKey = `${serviceName.replace(/-/g, "_").toUpperCase()}_PORT`;
  const envVal = process.env[envKey];
  if (envVal) {
  const parsed = parseInt(envVal, 10);
