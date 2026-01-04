@@ -1,5 +1,5 @@
 import db from '$lib/server/db/drizzle.js';
-import { errorClusters, errorSuggestions, routeMetadata } from '$lib/server/db/schema/index.js';
+import { errorClusterTable, errorSuggestionsTable, routeMetadata } from '$lib/server/db/schema/index.js';
 import { error, json } from '@sveltejs/kit';
 import { desc, eq, sql } from 'drizzle-orm';
 import type { RequestHandler } from './$types.js';
@@ -51,17 +51,17 @@ export const GET: RequestHandler = async ({ locals }) => {
 		// 3. Get AI suggestions with their associated routes
 		const suggestions = await db
 			.select({
-				id: errorSuggestions.id,
-				routePath: errorSuggestions.routePath,
-				summary: errorSuggestions.summary,
-				patch: errorSuggestions.patch,
-				riskLevel: errorSuggestions.riskLevel,
-				source: errorSuggestions.source,
-				applied: errorSuggestions.applied,
-				createdAt: errorSuggestions.createdAt
+				id: errorSuggestionsTable.id,
+				routePath: errorSuggestionsTable.routePath,
+				summary: errorSuggestionsTable.summary,
+				patch: errorSuggestionsTable.patch,
+				riskLevel: errorSuggestionsTable.riskLevel,
+				source: errorSuggestionsTable.source,
+				applied: errorSuggestionsTable.applied,
+				createdAt: errorSuggestionsTable.createdAt
 			})
-			.from(errorSuggestions)
-			.orderBy(desc(errorSuggestions.createdAt))
+			.from(errorSuggestionsTable)
+			.orderBy(desc(errorSuggestionsTable.createdAt))
 			.limit(20);
 
 		// 4. Get suggestion quality statistics
@@ -76,7 +76,7 @@ export const GET: RequestHandler = async ({ locals }) => {
 				lowRisk: sql<number>`COUNT(*) FILTER (WHERE risk_level = 'low')::int`,
 				applied: sql<number>`COUNT(*) FILTER (WHERE applied = true)::int`
 			})
-			.from(errorSuggestions)
+			.from(errorSuggestionsTable)
 			.execute();
 
 		// 5. Get error cluster statistics
@@ -86,11 +86,12 @@ export const GET: RequestHandler = async ({ locals }) => {
 				active: sql<number>`COUNT(*) FILTER (WHERE resolved_at IS NULL)::int`,
 				resolved: sql<number>`COUNT(*) FILTER (WHERE resolved_at IS NOT NULL)::int`
 			})
-			.from(errorClusters)
+			.from(errorClusterTable)
 			.execute();
 
 		return json({
-			timestamp: new Date().toISOString(, status: 'active',
+			timestamp: new Date().toISOString(),
+			status: 'active',
 			routes: {
 				stats: routeStats[0],
 				critical: criticalRoutes
@@ -108,9 +109,6 @@ export const GET: RequestHandler = async ({ locals }) => {
 		});
 	} catch (err) {
 		console.error('Phase 78 API Error:', err);
-		return json({
-			message: 'Failed to fetch system status',
-			details: err instanceof Error ? err.message : 'Unknown error'
-		}, { status: 500 });
+		return json({ status: 'error', message: 'Internal Server Error' }, { status: 500 });
 	}
 };

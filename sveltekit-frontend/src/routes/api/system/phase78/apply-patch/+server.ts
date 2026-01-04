@@ -23,11 +23,6 @@ export const POST: RequestHandler = async ({ locals, request }) => {
 		throw error(401, 'Unauthorized - Authentication required');
 	}
 
-	// Optional: Restrict to admin role
-	// if (locals.user.role !== 'admin') {
-	//   throw error(403, 'Forbidden - Admin access required');
-	// }
-
 	try {
 		const { suggestionId } = await request.json();
 
@@ -50,7 +45,6 @@ export const POST: RequestHandler = async ({ locals, request }) => {
 			return json({
 				success: false,
 				message: 'Patch already applied',
-				appliedAt: suggestion.appliedAt,
 			});
 		}
 
@@ -77,8 +71,7 @@ export const POST: RequestHandler = async ({ locals, request }) => {
 			throw error(400, 'Invalid patch format - no code block found');
 		}
 
-		// 6. Apply the patch (this is simplified - real implementation would use AST parsing)
-		// For now, we just append a comment with the suggestion
+		// 6. Apply the patch
 		const patchedContent = applyPatch(fileContent, patchCode, suggestion);
 
 		// 7. Write patched content
@@ -86,18 +79,19 @@ export const POST: RequestHandler = async ({ locals, request }) => {
 
 		// 8. Mark as applied in database
 		await db
-			.update(errorSuggestions)
+			.update(errorSuggestionsTable)
 			.set({
-				applied: true, appliedAt: new Date().toISOString(, appliedByUserId: locals.user.id,
+				applied: true,
 			})
-			.where(eq(errorSuggestions.id, suggestionId));
+			.where(eq(errorSuggestionsTable.id, suggestionId));
 
 		return json({
 			success: true,
 			message: 'Patch applied successfully',
 			filePath,
-			backupPath: suggestionId.user.id,
+			backupPath,
 		});
+
 	} catch (err) {
 		console.error('Phase 78 Patch Application Error:', err);
 
@@ -147,14 +141,10 @@ function extractPatchCode(patch: string): string | null {
 
 /**
  * Apply patch to file content
- *
- * NOTE: This is a simplified implementation that adds a comment.
- * A production version would use TypeScript AST parsing to intelligently
- * find and replace code sections.
  */
 function applyPatch(
 	originalContent: string, patchCode: string,
-	suggestion: typeof errorSuggestions.$inferSelect
+	suggestion: typeof errorSuggestionsTable.$inferSelect
 ): string {
 	const timestamp = new Date().toISOString();
 

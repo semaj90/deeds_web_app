@@ -1,0 +1,109 @@
+import { json, error } from '@sveltejs/kit';
+import type { RequestHandler } from './$types';
+import { getRouteMetadata } from '$lib/server/db/route-metadata';
+import { createHealthEvent, getHealthEvents } from '$lib/server/db/health-events';
+import { broadcastHealthChange } from '$lib/server/sse-service';
+import type { NewRouteHealthEvent } from '$lib/server/db/schema/route-health-events';
+
+// POST /api/routes/[routeId]/health-event
+// Record a new health event for a route
+export const POST: RequestHandler = async ({ params, request }) => {
+  const { routeId } = params;
+
+  if (!routeId) {
+    return error(400, {
+      message: 'Route ID is required',
+    });
+  }
+
+  try {
+    const body = await request.json();
+    const { old_status, new_status, reason } = body;
+
+    if (!new_status && !reason) {
+      return error(400, {
+        message: 'Either new_status or reason is required',
+      });
+    }
+
+    // Validate route exists
+    const route = await getRouteMetadata(routeId);
+    if (!route) {
+      return error(404, {
+        message: `Route ${routeId} not found`,
+      });
+    }
+
+    // Create health event
+    const healthEventData: NewRouteHealthEvent = {
+      routeId,
+      oldStatus: old_status || route.status || 'unknown',
+      newStatus: new_status || null,
+      reason: reason || undefined,
+    };
+
+    const healthEvent = await createHealthEvent(healthEventData);
+
+    // Broadcast to all connected SSE clients (Task 10.2)
+    broadcastHealthChange({
+      routeId,
+      oldStatus: healthEventData.oldStatus,
+      newStatus: healthEventData.newStatus,
+      timestamp: new Date().toISOString(),
+      reason: healthEventData.reason || undefined,
+    });
+
+    return json({
+      success: true,
+      event: healthEvent,
+    });
+  } catch (err) {
+    console.error('[POST /api/routes/:routeId/health-event] Error:', err);
+    return error(500, {
+      message: 'Failed to record health event',
+    });
+  }
+};
+
+// GET /api/routes/[routeId]/health-event
+// Get health event history for a route
+export const GET: RequestHandler = async ({ params, url }) => {
+  const { routeId } = params;
+
+  if (!routeId) {
+    return error(400, {
+      message: 'Route ID is required',
+    });
+  }
+
+  try {
+    const limit = parseInt(url.searchParams.get('limit') || '50');
+    const offset = parseInt(url.searchParams.get('offset') || '0');
+
+    // Validate route exists
+    const route = await getRouteMetadata(routeId);
+    if (!route) {
+      return error(404, {
+        message: `Route ${routeId} not found`,
+      });
+    }
+
+    // Get health events
+    const result = await getHealthEvents(routeId, { limit, offset });
+
+    return json({
+      events: result.events,
+      pagination: {
+        total: result.total,
+        limit: result.limit,
+        offset: result.offset,
+        hasMore: result.offset + result.limit < result.total,
+      },
+    });
+  } catch (err) {
+    console.error('[GET /api/routes/:routeId/health-history] Error:', err);
+    return error(500, {
+      message: 'Failed to fetch health events',
+    });
+  }
+};

@@ -1,4 +1,4 @@
-import db from '$lib/server/db/client';
+import { db } from '$lib/server/db/client';
 import { reports } from '$lib/server/db/schema';
 import { error, json } from '@sveltejs/kit';
 import { and, desc, eq } from 'drizzle-orm';

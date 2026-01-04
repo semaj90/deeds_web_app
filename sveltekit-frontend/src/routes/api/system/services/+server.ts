@@ -1,4 +1,4 @@
-import db from '$lib/server/db/client';
+import { db } from '$lib/server/db/client';
 import { json } from '@sveltejs/kit';
 import { sql } from 'drizzle-orm';
 
@@ -13,13 +13,30 @@ export async function GET() {
   // Redis health
   if (process.env.REDIS_URL) {
     try {
-      const url = new URL(process.env.REDIS_URL);
+      // Attempt to parse REDIS_URL to construct a health check URL
+      // Note: This assumes there is an HTTP endpoint at the Redis port or similar, which is unusual for standard Redis.
+      // Preserving original logic intent but making it safer.
+      let hostname = 'localhost';
+      let port = '6379';
+
+      try {
+        const url = new URL(process.env.REDIS_URL.startsWith('redis://') ? process.env.REDIS_URL : `redis://${process.env.REDIS_URL}`);
+        hostname = url.hostname;
+        port = url.port || '6379';
+      } catch (e) {
+        // ignore parse error
+      }
+
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 5000);
-      const resp = await fetch(`http://${url.hostname}:${url.port || 6379}/ping`, {
+
+      // This fetch is likely to fail for standard Redis, but we'll leave it as "reachable: false" if it fails.
+      const resp = await fetch(`http://${hostname}:${port}/ping`, {
         signal: controller.signal
-      });
+      }).catch(() => null);
+
       clearTimeout(timeoutId);
+
       services.redis = {
         url: process.env.REDIS_URL.substring(0, 30) + '...',
         reachable: resp?.ok || false,
@@ -102,7 +119,8 @@ export async function GET() {
   }
 
   return json({
-    timestamp: new Date().toISOString(, environment: process.env.NODE_ENV || 'development',
+    timestamp: new Date().toISOString(),
+    environment: process.env.NODE_ENV || 'development',
     services,
   });
 }
