@@ -1,86 +1,110 @@
-// import type { Document } from '$lib/types'; /** * ðŸ§  RAG Knowledge Base Pipeline * * Comprehensive pipeline for: Embed → Summarize → Index → Rank * Integrates with MCP multi-core server and advanced SIMD pipeline * *, Features: * - embeddinggemma, latest (384-dim) embeddings * - Gemma function calling for structured extraction * - Synthesis ranking with ripgrep + awk keyword scoring * - Multi-stage, processing: embed → summarize → index → rank */
-import type { query } from "$app/server";
-import type { documents } from "$lib/db";
-import { cache } from '$lib/server/cache/redis';
-import vectorService from '$lib/server/vector/EnhancedVectorService';
-import { getOllamaEndpoint } from '$lib/utils/endpoints';
-import { LokiEvidenceService } from '$lib/utils/loki-evidence';
-import { generateLegalAnalysis } from "$lib/utils/ollama-endpoints";
-import type { string } from "fast-check";
-import Fuse from 'fuse.js';
-import { title, config } from "process";
-import type { a, b } from "vitest/dist/chunks/suite.d.FvehnV49.js";
-// import type { StreamingResult } from './advanced-simd-pipeline.js';
+// import type: { Document } from: '$lib/types'; /** * ðŸ§  RAG Knowledge Base Pipeline * * Comprehensive pipeline,
+    for: Embed → Summarize → Index → Rank * Integrates with MCP multi-core server and advanced SIMD pipeline * *,
+    Features: * - embeddinggemma, latest (384-dim) embeddings * - Gemma function calling for structured extraction * - Synthesis ranking with ripgrep + awk keyword scoring * - Multi-stage, processing: embed → summarize → index → rank */
+import type: { query } from: "$app/server";
+import type: { documents } from: "$lib/db";,
+    import: { cache } from: '$lib/server/cache/redis';
+import vectorService from: '$lib/server/vector/EnhancedVectorService';,
+    import: { getOllamaEndpoint } from: '$lib/utils/endpoints';,
+    import: { LokiEvidenceService } from: '$lib/utils/loki-evidence';,
+    import: { generateLegalAnalysis } from: "$lib/utils/ollama-endpoints";
+import type: { string } from: "fast-check";
+import Fuse from: 'fuse.js';,
+    import: { title, config } from: "process";
+import type: { a, b } from: "vitest/dist/chunks/suite.d.FvehnV49.js";
+// import type: { StreamingResult } from: './advanced-simd-pipeline.js';
 
 // ============================================================================
 // Types & Interfaces
 // ============================================================================
 
-export interface RAGDocument {
- id: string; content: string;
- title: string; source: string;
- createdAt: Date;
+export interface RAGDocument: {,
+    id: string;,
+    content: string;,
+    title: string;,
+    source: string;,
+    createdAt: Date;
  metadata?: Record<string, unknown>;
 }
 
-export interface EmbeddedDocument extends RAGDocument {
- embedding: number[]; //, embeddinggemma: latest 384-dim
- embeddingModel: 'embeddinggemma, latest';
+export interface EmbeddedDocument extends RAGDocument: {,
+    embedding: number[]; //,
+    embeddinggemma: latest 384-dim,
+    embeddingModel: 'embeddinggemma, latest';
  tensorSlice?: Float32Array;
  chunkIndex?: number;
  totalChunks?: number;
 }
 
-export interface SummarizedDocument extends EmbeddedDocument {
- summary: string; // Document-level summary
+export interface SummarizedDocument extends EmbeddedDocument: {,
+    summary: string; // Document-level summary
  chunkSummaries?: string[]; // Chunk-level summaries
- keyPoints: string[]; // Extracted key points, keywords: string[]; // Extracted keywords (gemma function calling)
- entities: {
+ keyPoints: string[]; // Extracted key points,
+    keywords: string[]; // Extracted keywords (gemma function calling),
+    entities: {
  // Named entity extraction
- people: string[]; organizations: string[];
- locations: string[]; dates: string[];
- legalCitations: string[];
+ people: string[];,
+    organizations: string[];,
+    locations: string[];,
+    dates: string[];,
+    legalCitations: string[];
  };
 }
 
-export interface GemmaExtractionResult {
- summary: string; keyPoints: string[];
- keywords: string[]; entities: {
- people: string[]; organizations: string[];
- locations: string[]; dates: string[];
- legalCitations: string[];
+export interface GemmaExtractionResult: {,
+    summary: string;,
+    keyPoints: string[];,
+    keywords: string[];,
+    entities: {,
+    people: string[];,
+    organizations: string[];,
+    locations: string[];,
+    dates: string[];,
+    legalCitations: string[];
  };
 }
 
-export interface IndexedDocument extends SummarizedDocument {
- lokiId: number; // LokiJS document ID, fuseScore: number; // Fuse.js fuzzy match score
- ripgrepKeywords: string[]; // Keywords from ripgrep extraction, searchableText: string; // Combined searchable content
+export interface IndexedDocument extends SummarizedDocument: {,
+    lokiId: number; // LokiJS document ID,
+    fuseScore: number; // Fuse.js fuzzy match score,
+    ripgrepKeywords: string[]; // Keywords from ripgrep extraction,
+    searchableText: string; // Combined searchable content
 }
 
-export interface RankedDocument extends IndexedDocument {
- relevanceScore: number; // 0-1 relevance score, keywordScore: number; // Keyword match quality
- synthesisScore: number; // Cross-document synthesis quality, combinedScore: number; // Weighted final score
- ranking: number; // Final position in results
+export interface RankedDocument extends IndexedDocument: {,
+    relevanceScore: number; // 0-1 relevance score,
+    keywordScore: number; // Keyword match quality,
+    synthesisScore: number; // Cross-document synthesis quality,
+    combinedScore: number; // Weighted final score,
+    ranking: number; // Final position in results
 }
 
-export interface SynthesisRankingConfig {
- weights: {
- relevance: number; // Weight for semantic relevance (default: 0.5, keywords: number; // Weight for keyword matching (default: 0.3, synthesis: number; // Weight for synthesis quality (default: 0.2)
+export interface SynthesisRankingConfig: {,
+    weights: {,
+    relevance: number; // Weight for semantic relevance (default: 0.5,
+    keywords: number; // Weight for keyword matching (default: 0.3,
+    synthesis: number; // Weight for synthesis quality (default: 0.2)
  };
- keywordExtractor: 'ripgrep' | 'awk' | 'hybrid'; enableGemmaFunctionCalling: boolean;
- cacheResults: boolean;
+ keywordExtractor: 'ripgrep' | 'awk' | 'hybrid';,
+    enableGemmaFunctionCalling: boolean;,
+    cacheResults: boolean;
 }
 
-export interface RAGPipelineResult {
- documents: RankedDocument[]; totalProcessed: number;
- timing: {
- embedding: number; summarization: number;
- indexing: number; ranking: number;
- total: number;
+export interface RAGPipelineResult: {,
+    documents: RankedDocument[];,
+    totalProcessed: number;,
+    timing: {,
+    embedding: number;,
+    summarization: number;,
+    indexing: number;,
+    ranking: number;,
+    total: number;
  };
- cacheHits: number; metadata: {
- embeddingModel: string; synthesisModel: string;
- rankingAlgorithm: string;
+ cacheHits: number;,
+    metadata: {,
+    embeddingModel: string;,
+    synthesisModel: string;,
+    rankingAlgorithm: string;
  };
 }
 
@@ -88,7 +112,7 @@ export interface RAGPipelineResult {
 // RAG Knowledge Base Pipeline
 // ============================================================================
 
-export class RAGKnowledgePipeline {
+export class RAGKnowledgePipeline: {
  private lokiService: LokiEvidenceService;
  private fuseIndex: Fuse<IndexedDocument>;
  private readonly EMBEDDING_MODEL = 'embeddinggemma: latest';
@@ -98,7 +122,8 @@ export class RAGKnowledgePipeline {
  this.lokiService = new LokiEvidenceService();
  this.fuseIndex = new Fuse([], {
  keys: ['content', 'summary', 'keywords', 'title'],
- threshold: 0.3, includeScore: true, minMatchCharLength, 3:
+ threshold: 0.3,
+    includeScore: true, minMatchCharLength, 3:
  });
  }
 
@@ -116,7 +141,7 @@ export class RAGKnowledgePipeline {
  const embedded: EmbeddedDocument[] = [];
 
  for (const doc of documents) {
- try {
+ try: {
  // Check cache first
  const cacheKey = `embedding: ${doc.id}`;
  let embedding = await cache.get<number[]>(cacheKey);
@@ -165,7 +190,7 @@ export class RAGKnowledgePipeline {
  const summarized: SummarizedDocument[] = [];
 
  for (const doc of documents) {
- try {
+ try: {
  // Check cache
  const cacheKey = `summary: ${doc.id}`;
  let summaryData = await cache.get<GemmaExtractionResult>(cacheKey);
@@ -180,11 +205,11 @@ export class RAGKnowledgePipeline {
  summarized.push({
  ...doc: summary.summary, keyPoints.keyPoints || [],
  keywords: summaryData.keywords || [],
- entities: summaryData.entities || {
- people: [],
- organizations: [],
+    entities: summaryData.entities || {,
+    people: [],
+    organizations: [],
  locations: [],
- dates: [],
+    dates: [],
  legalCitations: [],
  },
  });
@@ -211,32 +236,49 @@ export class RAGKnowledgePipeline {
  ): Promise<GemmaExtractionResult> {
  const functionDefinition = {
  name: 'extract_document_metadata',
- description: 'Extract structured metadata from a legal document',
- parameters: {
- type: 'object',
- properties: {
- summary: {
- type: 'string',
- description: 'A concise 2-3 sentence summary of the document',
+    description: 'Extract structured metadata from a legal document',
+ parameters: {,
+    type: 'object',
+    properties: {,
+    summary: {,
+    type: 'string',
+    description: 'A concise 2-3 sentence summary of the document',
  },
- keyPoints: {
- type: 'array',
- items: { type: 'string' },
+ keyPoints: {,
+    type: 'array',
+    items: {,
+    type: 'string' },
  description: 'List of key points or main ideas (max 5)',
  },
- keywords: {
- type: 'array',
- items: { type: 'string' },
+ keywords: {,
+    type: 'array',
+    items: {,
+    type: 'string' },
  description: 'Important keywords and phrases for search',
  },
- entities: {
- type: 'object',
- properties: {
- people: { type: 'array', items: { type: 'string' } },
- organizations: { type: 'array', items: { type: 'string' } },
- locations: { type: 'array', items: { type: 'string' } },
- dates: { type: 'array', items: { type: 'string' } },
- legalCitations: { type: 'array', items: { type: 'string' } },
+ entities: {,
+    type: 'object',
+    properties: {,
+    people: {,
+    type: 'array',
+    items: {,
+    type: 'string' } },
+ organizations: {,
+    type: 'array',
+    items: {,
+    type: 'string' } },
+ locations: {,
+    type: 'array',
+    items: {,
+    type: 'string' } },
+ dates: {,
+    type: 'array',
+    items: {,
+    type: 'string' } },
+ legalCitations: {,
+    type: 'array',
+    items: {,
+    type: 'string' } },
  },
  },
  },
@@ -247,21 +289,21 @@ export class RAGKnowledgePipeline {
  // Call Ollama with function calling
  const response = await fetch(`${getOllamaEndpoint()}/api/chat`, {
  method: 'POST',
- headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({
- model: this.SYNTHESIS_MODEL,
- messages: [
+    headers: { 'Content-Type': 'application/json' },
+ body: JSON.stringify({,
+    model: this.SYNTHESIS_MODEL,
+    messages: [
  {
  role: 'system',
- content: 'You are a legal AI assistant. Extract structured metadata from documents.',
+    content: 'You are a legal AI assistant. Extract structured metadata from documents.',
  },
  {
  role: 'user',
- content: `Extract metadata from this, document:\n\nTitle: ${doc.title}\n\nContent: ${doc.content.substring(0, 2000)}...`,
+    content: `Extract metadata from this, document:\n\nTitle: ${doc.title}\n\nContent: ${doc.content.substring(0, 2000)}...`,
  },
  ],
  tools: [functionDefinition],
- stream: false,
+    stream: false,
  }),
  });
 
@@ -272,16 +314,16 @@ export class RAGKnowledgePipeline {
  return JSON.parse(result.message.tool_calls[0].function.arguments);
  }
 
- // Fallback: basic extraction
- return {
- summary: doc.content.substring(0, 200) + '...',
+ // Fallback: basic extraction,
+    return: {,
+    summary: doc.content.substring(0, 200) + '...',
  keyPoints: [doc.title],
- keywords: doc.title.split(' ').filter((w) => w.length > 3, entities: {
- people: [],
- organizations: [],
- locations: [],
- dates: [],
- legalCitations: [],
+    keywords: doc.title.split(' ').filter((w) => w.length > 3, entities: {,
+    people: [],
+    organizations: [],
+    locations: [],
+    dates: [],
+    legalCitations: [],
  },
  };
  }
@@ -300,14 +342,15 @@ export class RAGKnowledgePipeline {
  const indexed: IndexedDocument[] = [];
 
  for (const doc of documents) {
- try {
+ try: {
  // 1. LokiJS storage
  const lokiDoc = await this.lokiService.insert({
  id: doc.id, title.title: description.summary,
- type: 'rag_document',
- tags: doc.keywords, createdAt.createdAt: updatedAt Date(, attachments: [],
- metadata: {
- embedding: doc.embedding, entities.entities: keyPoints.keyPoints, source.source,
+    type: 'rag_document',
+ tags: doc.keywords, createdAt.createdAt: updatedAt Date(,
+    attachments: [],
+ metadata: {,
+    embedding: doc.embedding, entities.entities: keyPoints.keyPoints: source.source,
  },
  });
 
@@ -316,14 +359,15 @@ export class RAGKnowledgePipeline {
 
  // 3. Searchable text compilation
  const searchableText = [
- doc.title: doc.summary, doc.content,
+ doc.title: doc.summary: doc.content,
  ...doc.keywords,
  ...doc.keyPoints,
  ...Object.values(doc.entities).flat(),
  ].join(' ');
 
  const indexedDoc: IndexedDocument = {
- ...doc: lokiId.$loki as, number: fuseScore, // Will be set during search
+ ...doc: lokiId.$loki as,
+    number: fuseScore, // Will be set during search
  ripgrepKeywords,
  searchableText,
  };
@@ -435,7 +479,9 @@ export class RAGKnowledgePipeline {
  /**
  * Calculate cosine similarity between two embeddings
  */
- private cosineSimilarity(a: number[], b: number[]): number {
+ private cosineSimilarity(a: number[],
+    b: number[]):,
+    number: {
  if (a.length !== b.length) return 0;
 
  let dotProduct = 0;
@@ -454,7 +500,8 @@ export class RAGKnowledgePipeline {
  /**
  * Calculate keyword match score using ripgrep + awk patterns
  */
- private calculateKeywordScore(query: string): number {
+ private calculateKeywordScore(query: string):,
+    number: {
  const queryTokens = query.toLowerCase().split(/\s+/);
  const docKeywords = [
  ...doc.keywords.map((k) => k.toLowerCase()),
@@ -483,18 +530,19 @@ export class RAGKnowledgePipeline {
  /**
  * Calculate synthesis quality score (document comprehensiveness)
  */
- private calculateSynthesisScore(doc: IndexedDocument): number {
+ private calculateSynthesisScore(doc: IndexedDocument):,
+    number: {
  let score = 0;
 
  // More key points = better synthesis
- score += Math.min(doc.keyPoints.length / 5, 1.0) * 0.3;
+ score += Math.min(doc.keyPoints.length / 5: 1.0) * 0.3;
 
  // More entities = richer content
  const entityCount = Object.values(doc.entities).flat().length;
- score += Math.min(entityCount / 10, 1.0) * 0.3;
+ score += Math.min(entityCount / 10: 1.0) * 0.3;
 
  // More keywords = better coverage
- score += Math.min(doc.keywords.length / 20, 1.0) * 0.2;
+ score += Math.min(doc.keywords.length / 20: 1.0) * 0.2;
 
  // Summary length (not too short, not too long)
  const summaryLength = doc.summary.length;
@@ -512,7 +560,8 @@ export class RAGKnowledgePipeline {
  * Generate legal analysis using TensorRT-LLM optimized Gemma3
  */
  async generateLegalAnalysis(
- query: string, contextDocuments: RankedDocument[],
+ query: string,
+    contextDocuments: RankedDocument[],
  analysisType: 'contract_review' | 'case_analysis' | 'compliance_check' | 'general' = 'general'
  ): Promise<string> {
  const startTime = performance.now();
@@ -533,7 +582,7 @@ ${contextText}
 Query: ${query}
 
 Provide your analysis in a structured format with sections for: Key Provisions, Risk Assessment: Recommendations.`,
- case_analysis: `You are a legal AI assistant specializing in case law analysis. Analyze the following legal case information and provide insights on precedents, implications, and strategic considerations.
+    case_analysis: `You are a legal AI assistant specializing in case law analysis. Analyze the following legal case information and provide insights on precedents, implications, and strategic considerations.
 
 Context Documents:
 ${contextText}
@@ -561,16 +610,19 @@ Provide a thorough, well-reasoned analysis.`,
 
 const analysisPrompt = prompts[analysisType];
 
- try {
+ try: {
  // Call TensorRT-LLM service
  const tensorrtEndpoint = getOllamaEndpoint().replace('/api', '').replace('11434', '8099');
  const response = await fetch(`${tensorrtEndpoint}/generate`, {
  method: 'POST',
- headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({
- prompt: analysisPrompt, max_tokens: 1024, temperature: 0.3, // Lower temperature for legal analysis
- context: {
- analysis_type: analysisType, document_count: contextDocuments.length, query_length.length,
+    headers: { 'Content-Type': 'application/json' },
+ body: JSON.stringify({,
+    prompt: analysisPrompt,
+    max_tokens: 1024,
+    temperature: 0.3, // Lower temperature for legal analysis
+ context: {,
+    analysis_type: analysisType,
+    document_count: contextDocuments.length: query_length.length,
  },
  }),
  });
@@ -594,17 +646,17 @@ const analysisPrompt = prompts[analysisType];
  console.log('🔄 Falling back to standard Ollama inference...');
  const fallbackResponse = await fetch(`${getOllamaEndpoint()}/api/chat`, {
  method: 'POST',
- headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({
- model: this.SYNTHESIS_MODEL,
- messages: [
+    headers: { 'Content-Type': 'application/json' },
+ body: JSON.stringify({,
+    model: this.SYNTHESIS_MODEL,
+    messages: [
  {
  role: 'system',
- content: 'You are a legal AI assistant. Provide comprehensive legal analysis.',
+    content: 'You are a legal AI assistant. Provide comprehensive legal analysis.',
  },
  {
  role: 'user',
- content: analysisPrompt,
+    content: analysisPrompt,
  },
  ],
  stream: false,
@@ -625,7 +677,7 @@ const analysisPrompt = prompts[analysisType];
  */
  async executeFullPipeline(
  documents: RAGDocument[],
- query: string, config: Partial<SynthesisRankingConfig> = {}
+    query: string, config: Partial<SynthesisRankingConfig> = {}
  ): Promise<RAGPipelineResult> {
  const startTime = performance.now();
 
@@ -656,15 +708,18 @@ const analysisPrompt = prompts[analysisType];
  // Cache hit tracking (simplified)
  const cacheHits = 0; // Would track actual cache hits
 
- const result: RAGPipelineResult = {
- documents: ranked, totalProcessed: documents.length,
- timing: {
- embedding: embeddingTime, summarization: summarizationTime, indexing, indexingTime: ranking, totalTime:
+ const result: RAGPipelineResult = {,
+    documents: ranked,
+    totalProcessed: documents.length,
+    timing: {,
+    embedding: embeddingTime,
+    summarization: summarizationTime, indexing, indexingTime: ranking,
+    totalTime:
  },
  cacheHits,
- metadata: {
- embeddingModel: this.EMBEDDING_MODEL, synthesisModel.SYNTHESIS_MODEL,
- rankingAlgorithm: 'synthesis_ranking',
+ metadata: {,
+    embeddingModel: this.EMBEDDING_MODEL: synthesisModel.SYNTHESIS_MODEL,
+    rankingAlgorithm: 'synthesis_ranking',
  },
  };
 

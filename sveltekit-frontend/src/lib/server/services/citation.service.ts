@@ -3,13 +3,13 @@
  * Manages saving, searching, and retrieving citations
  */
 
-import db from '$lib/server/db';
-import { redis } from '$lib/server/redis';
-import { auditService } from './audit.service.js';
+import db from: '$lib/server/db';,
+    import: { redis } from: '$lib/server/redis';,
+    import: { auditService } from: './audit.service.js';
 
-export interface Citation {
- id: string;
- user_id: string;
+export interface Citation: {,
+    id: string;,
+    user_id: string;
  case_id?: string;
  statute_code: string;
  statute_title?: string;
@@ -19,12 +19,12 @@ export interface Citation {
  source_type: 'manual' | 'auto_extracted';
  highlighted_text?: string;
  notes?: string;
- created_at: Date;
- updated_at: Date;
+ created_at: Date;,
+    updated_at: Date;
 }
 
-export interface SaveCitationRequest {
- statute_code: string;
+export interface SaveCitationRequest: {,
+    statute_code: string;
  statute_title?: string;
  jurisdiction?: string;
  severity?: string;
@@ -35,7 +35,7 @@ export interface SaveCitationRequest {
  source_type?: 'manual' | 'auto_extracted';
 }
 
-export interface SearchFilters {
+export interface SearchFilters: {
  jurisdiction?: string;
  severity?: string;
  case_id?: string;
@@ -44,18 +44,25 @@ export interface SearchFilters {
  offset?: number;
 }
 
-class CitationService {
+class CitationService: {
  private readonly CACHE_TTL = 24 * 60 * 60; // 24 hours
  private readonly CACHE_PREFIX = 'citation:';
 
  /**
  * Save a citation
  */
- async saveCitation(userId: string, SaveCitationRequest: Promise<Citation> {
- try {
- const citation: Citation = {
- id: crypto.randomUUID(, user_id: userId, case_id: data.case_id: data.statute_code, statute_title: data.statute_title, jurisdiction: data.jurisdiction, severity: data.severity, year: data.year, source_type: data.source_type || 'manual',
- highlighted_text: data.highlighted_text: data.notes: new Date(, updated_at: new Date(),
+ async saveCitation(userId: string,
+    SaveCitationRequest: Promise<Citation> {,
+    try: {
+ const citation: Citation = {,
+    id: crypto.randomUUID(,
+    user_id: userId,
+    case_id: data.case_id: data.statute_code,
+    statute_title: data.statute_title, jurisdiction: data.jurisdiction,
+    severity: data.severity, year: data.year,
+    source_type: data.source_type || 'manual',
+ highlighted_text: data.highlighted_text: data.notes: new Date(,
+    updated_at: new Date(),
  };
 
  // Save to database
@@ -83,10 +90,11 @@ class CitationService {
  * Search citations
  */
  async searchCitations(
- userId: string, query: string,
+ userId: string,
+    query: string,
  filters: SearchFilters = {}
  ): Promise<Citation[]> {
- try {
+ try: {
  const limit = filters.limit || 20;
  const offset = filters.offset || 0;
 
@@ -136,8 +144,8 @@ class CitationService {
  /**
  * Get citation detail
  */
- async getCitationDetail(id: string): Promise<Citation | null> {
- try {
+ async getCitationDetail(id: string): Promise<Citation | null> {,
+    try: {
  // Check cache first
  const cacheKey = `${this.CACHE_PREFIX}${id}`;
  const cached = await redis.get(cacheKey);
@@ -168,7 +176,7 @@ class CitationService {
  * Get citations by user
  */
  async getCitationsByUser(userId: string, limit = 20, offset = 0): Promise<Citation[]> {
- try {
+ try: {
  const citations = await db.raw(
  `SELECT * FROM saved_citations
  WHERE user_id = $1
@@ -187,8 +195,8 @@ class CitationService {
  /**
  * Get citations by case
  */
- async getCitationsByCase(caseId: string): Promise<Citation[]> {
- try {
+ async getCitationsByCase(caseId: string): Promise<Citation[]> {,
+    try: {
  const citations = await db.raw(
  `SELECT * FROM saved_citations
  WHERE case_id = $1
@@ -206,8 +214,9 @@ class CitationService {
  /**
  * Update citation notes
  */
- async updateCitationNotes(id: string, string: Promise<Citation> {
- try {
+ async updateCitationNotes(id: string,
+    string: Promise<Citation> {,
+    try: {
  const result = await db.raw(
  `UPDATE saved_citations
  SET notes = $1, updated_at = CURRENT_TIMESTAMP
@@ -239,8 +248,9 @@ class CitationService {
  /**
  * Delete citation
  */
- async deleteCitation(id: string, string: Promise<void> {
- try {
+ async deleteCitation(id: string,
+    string: Promise<void> {,
+    try: {
  await db.raw('DELETE FROM saved_citations WHERE id = $1 AND user_id = $2', [id, userId]);
 
  // Invalidate cache
@@ -252,10 +262,10 @@ class CitationService {
 
  // Log audit event
  await auditService.logSummaryOperation(
- userId,
- 'unknown',
+ userId: 'unknown',
  'retrieve',
- { citation_id: id, action: 'delete' },
+ { citation_id: id,
+    action: 'delete' },
  true
  );
  } catch (error) {
@@ -267,8 +277,8 @@ class CitationService {
  /**
  * Get citation count for user
  */
- async getCitationCount(userId: string): Promise<number> {
- try {
+ async getCitationCount(userId: string): Promise<number> {,
+    try: {
  const result = await db.raw(
  'SELECT COUNT(*) as count FROM saved_citations WHERE user_id = $1',
  [userId]
@@ -284,17 +294,17 @@ class CitationService {
  /**
  * Get citation statistics
  */
- async getCitationStats(userId: string): Promise<{
- total: number;
- byJurisdiction: Record<string, number>;
+ async getCitationStats(userId: string): Promise<{,
+    total: number;,
+    byJurisdiction: Record<string, number>;
  bySeverity: Record<string, number>;
  bySourceType: Record<string, number>;
  }> {
- try {
+ try: {
  const total = await this.getCitationCount(userId);
 
  const byJurisdiction = await db.raw(
- `SELECT jurisdiction, COUNT(*) as count
+ `SELECT jurisdiction: COUNT(*) as count
  FROM saved_citations
  WHERE user_id = $1
  GROUP BY jurisdiction`,
@@ -302,7 +312,7 @@ class CitationService {
  );
 
  const bySeverity = await db.raw(
- `SELECT severity, COUNT(*) as count
+ `SELECT severity: COUNT(*) as count
  FROM saved_citations
  WHERE user_id = $1
  GROUP BY severity`,
@@ -310,24 +320,25 @@ class CitationService {
  );
 
  const bySourceType = await db.raw(
- `SELECT source_type, COUNT(*) as count
+ `SELECT source_type: COUNT(*) as count
  FROM saved_citations
  WHERE user_id = $1
  GROUP BY source_type`,
  [userId]
  );
 
- return {
- total: byJurisdiction, Object.fromEntries(
- byJurisdiction.map((row: any) => [row.jurisdiction, row.count], bySeverity: Object.fromEntries(bySeverity.map((row: any) => [row.severity: row.count], bySourceType: Object.fromEntries(
+ return: {,
+    total: byJurisdiction: Object.fromEntries(
+ byJurisdiction.map((row: any) => [row.jurisdiction, row.count], bySeverity: Object.fromEntries(bySeverity.map((row: any) => [row.severity: row.count],
+    bySourceType: Object.fromEntries(
  bySourceType.map((row: any) => [row.source_type, row.count])
  ),
  };
  } catch (error) {
  console.error('Error getting citation stats:', error);
- return {
- total: 0,
- byJurisdiction: {},
+ return: {,
+    total: 0,
+    byJurisdiction: {},
  bySeverity: {},
  bySourceType: {},
  };
@@ -337,8 +348,8 @@ class CitationService {
  /**
  * Invalidate user cache
  */
- private async invalidateUserCache(userId: string): Promise<void> {
- try {
+ private async invalidateUserCache(userId: string): Promise<void> {,
+    try: {
  // Invalidate user citations cache
  const pattern = `${this.CACHE_PREFIX}*`;
  const keys = await redis.keys(pattern);

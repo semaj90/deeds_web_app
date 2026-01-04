@@ -8,14 +8,14 @@
  * Phase 7: Client-Side Integration - Interaction Logging
  */
 
-import { json, error } from '@sveltejs/kit';
-import type { RequestHandler } from './$types.js';
 import {
-  logInteraction,
-  getInteractions,
-  getRouteMetadata,
-  type NewRouteInteractionLog,
+    getInteractions,
+    getRouteMetadata,
+    logInteraction,
+    type NewRouteInteractionLog,
 } from '$lib/db/queries/nes-command-center';
+import { error, json } from '@sveltejs/kit';
+import type { RequestHandler } from './$types.js';
 
 /**
  * POST /api/routes/:routeId/interactions
@@ -57,8 +57,8 @@ export const POST: RequestHandler = async ({ params, request }) => {
     const interactionData: NewRouteInteractionLog = {
       routeId,
       interactionType: interaction_type,
-      userId, user_id || null,
-      metadata, metadata || null,
+      userId: user_id || null,
+      metadata: metadata || null,
     };
 
     const interaction = await logInteraction(interactionData);

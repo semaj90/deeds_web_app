@@ -8,18 +8,18 @@
  * Phase 10: Real-Time Updates (SSE) - Broadcast integration
  */
 
-import { json, error } from '@sveltejs/kit';
-import type { RequestHandler } from './$types.js';
 import {
-  createErrorCluster,
-  getErrorClusters,
-  getErrorClusterCount,
-  getRouteMetadata,
-  updateRouteMetadata,
-  createHealthEvent,
+    createErrorCluster,
+    createHealthEvent,
+    getErrorClusterCount,
+    getErrorClusters,
+    getRouteMetadata,
+    updateRouteMetadata,
 } from '$lib/db/queries/nes-command-center.js';
 import type { NewErrorCluster } from '$lib/db/schema/nes-command-center.js';
-import { broadcastHealthChange, broadcastErrorCountChange } from '../../events/+server.js';
+import { error, json } from '@sveltejs/kit';
+import { broadcastErrorCountChange, broadcastHealthChange } from '../../events/+server.js';
+import type { RequestHandler } from './$types.js';
 
 /**
  * POST /api/routes/:routeId/errors
@@ -65,9 +65,9 @@ export const POST: RequestHandler = async ({ params, request }) => {
       code: body.code,
       message: body.message,
       severity: body.severity,
-      filePath, body.file_path || body.filePath,
-      rawLogSnippet, body.raw_log_snippet || body.rawLogSnippet,
-      count, body.count || 1,
+      filePath: body.file_path || body.filePath,
+      rawLogSnippet: body.raw_log_snippet || body.rawLogSnippet,
+      count: body.count || 1,
     };
 
     const errorCluster = await createErrorCluster(errorClusterData);
@@ -100,7 +100,8 @@ export const POST: RequestHandler = async ({ params, request }) => {
         routeId,
         oldStatus,
         newStatus,
-        timestamp: new Date().toISOString(, reason: 'error_cluster_created',
+        timestamp: new Date().toISOString(),
+        reason: 'error_cluster_created',
       });
     }
 
