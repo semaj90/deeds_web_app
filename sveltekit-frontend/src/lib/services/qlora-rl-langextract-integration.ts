@@ -20,13 +20,13 @@ type UnknownRecord = Record<string, unknown>;
 function getStringProp(doc: LegalDocument, key: string): string | undefined {
  const r = doc as unknown as UnknownRecord;
  const v = r[key];
- return typeof v === 'string' ? v  | undefined;
+ return typeof v === 'string' ? v : undefined;
 }
 
 function getNumberProp(doc: LegalDocument, key: string): number | undefined {
  const r = doc as unknown as UnknownRecord;
  const v = r[key];
- return typeof v === 'number' ? v  | undefined;
+ return typeof v === 'number' ? v : undefined;
 }
 
 function getRiskLevel(doc: LegalDocument): 'low' | 'medium' | 'high' | 'critical' | undefined {

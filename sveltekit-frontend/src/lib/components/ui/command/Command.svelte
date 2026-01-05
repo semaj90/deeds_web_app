@@ -34,7 +34,7 @@
 	}: Props = $props();
 </script>
 
-<CommandRoot bind:value { onValueChange: onValueChange } class={ className: className }>
+<CommandRoot bind:value { onValueChange } class={ className }>
 	<CommandInput {placeholder} />
 	<CommandList>
 		{#if children}

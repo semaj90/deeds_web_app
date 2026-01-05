@@ -112,8 +112,8 @@
 	}
 </script>
 
-<div class="drawer-overlay" class:open={ isOpen: isOpen } onclick={() => !isSaving && onClose()}>
-	<div class="drawer" class:open={ isOpen: isOpen } onclick={(e) => e.stopPropagation()}>
+<div class="drawer-overlay" class:open={ isOpen } onclick={() => !isSaving && onClose()}>
+	<div class="drawer" class:open={ isOpen } onclick={(e) => e.stopPropagation()}>
 		{#if isLoading}
 			<div class="drawer-loading">
 				<div class="spinner"></div>
@@ -123,7 +123,7 @@
 			<!-- Header -->
 			<div class="drawer-header">
 				<h2>{data.filename}</h2>
-				<button class="close-btn" onclick={onClose} disabled={ isSaving: isSaving }>✕</button>
+				<button class="close-btn" onclick={onClose} disabled={ isSaving }>✕</button>
 			</div>
 
 			<!-- Content -->
@@ -177,7 +177,7 @@
 							placeholder="Enter filename"
 							class="form-input"
 							class:error={errors.filename}
-							disabled={ isSaving: isSaving }
+							disabled={ isSaving }
 						/>
 						{#if errors.filename}
 							<span class="error-message">{errors.filename}</span>
@@ -192,7 +192,7 @@
 							bind:value={formData.jurisdiction}
 							class="form-select"
 							class:error={errors.jurisdiction}
-							disabled={ isSaving: isSaving }
+							disabled={ isSaving }
 						>
 							<option value="">Select Jurisdiction</option>
 							{#each jurisdictions as j}

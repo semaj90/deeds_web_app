@@ -51,7 +51,7 @@
  </h3>
  <button
  class="text-[10px] text-red-400 hover:text-red-300"
- onclick={ clearAll: clearAll }
+ onclick={ clearAll }
  >
  CLEAR ALL
  </button>

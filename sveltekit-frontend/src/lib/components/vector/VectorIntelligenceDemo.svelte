@@ -264,7 +264,7 @@ https://svelte.dev/e/block_unexpected_close -->
  </h3> <div class="flex items-center"> <Badge class={getConfidenceColor((result, as { id?: any; similarity?: any; source?: any; content?: any; highlights?: any; relevanceScore?: any }).similarity)}> {Math.round.similarity * 100)}% </Badge> <Badge class="bits-badge-outline">{(result as { id?: any; similarity?: any; source?: any; content?: any; highlights?: any; relevanceScore?: any }).source}
  </Badge> </div> </div> <p class="text-sm nes-text is-disabled"> {(result as { id?: any; similarity?: any; source?: any; content?: any; highlights?: any; relevanceScore?: any }).content.substring(0, 200)}... </p>
  {#if (result as { id?: any; similarity?: any; source?: any; content?: any; highlights?: any; relevanceScore?: any }).highlights?.length > 0} <div class="space-y-1"> <p class="text-xs">Highlights:</p>
- {#each (result as { id?: any; similarity?: any; source?: any; content?: any; highlights?: any; relevanceScore?: any }).highlights as highlight} <p class="text-xs bg-muted p-2"> <span class="vector-highlight">{ highlight: highlight }
+ {#each (result as { id?: any; similarity?: any; source?: any; content?: any; highlights?: any; relevanceScore?: any }).highlights as highlight} <p class="text-xs bg-muted p-2"> <span class="vector-highlight">{ highlight }
  </span> </p> {/each} {/if} <div class="vector-metadata-grid"> <span>Relevance: {(result as { id?: any; similarity?: any; source?: any; content?: any; highlights?: any; relevanceScore?: any }).relevanceScore.toFixed(2)}
  </span> <span>Similarity: {(result as { id?: any; similarity?: any; source?: any; content?: any; highlights?: any; relevanceScore?: any }).similarity.toFixed(3)}
  </span> <span>Source: {(result as { id?: any; similarity?: any; source?: any; content?: any; highlights?: any; relevanceScore?: any }).source}
@@ -285,7 +285,7 @@ https://svelte.dev/e/block_unexpected_close -->
  </p>
  {#if rec.actionItems} <div class="space-y-2">
  {#if rec.actionItems.immediate?.length > 0} <div> <p class="text-xs font-medium">Immediate Actions:</p>
- {#each Array.isArray(rec.actionItems.immediate) ? rec.actionItems.immediate: [] as action} <div class="flex items-center gap-2"> <CheckCircle class="h-3 w-3" /> { action: action }
+ {#each Array.isArray(rec.actionItems.immediate) ? rec.actionItems.immediate: [] as action} <div class="flex items-center gap-2"> <CheckCircle class="h-3 w-3" /> { action }
  </div> {/each} {/if} {/if} <div class="recommendation-actions"> <span>Impact: {rec.estimatedImpact?.successProbability || 'N/A'}%</span> <span>Time: {rec.estimatedImpact?.timeToComplete || 'N/A'}min</span> <span>Priority: {rec.priority}
  </span> </div> </div> {/each}
  </div> </div> {/if}

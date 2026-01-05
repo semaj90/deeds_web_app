@@ -212,7 +212,7 @@
  return testResults.filter((item) => item.status === filter);
  }
  function formatLatency(ms: number) {
- if (ms < 1000) return `${ ms: ms }ms`;
+ if (ms < 1000) return `${ ms }ms`;
  return `${(ms / 1000).toFixed(1)}s`;
  }
  function statusBadge(status: TestStatus) {
@@ -245,7 +245,7 @@
  <button
  class="rounded-lg border border-amber-500/40 bg-amber-500/10 px-3 py-2 text-amber-200"
  class:animate-spin={autoRefresh}
- onclick={ toggleAutoRefresh: toggleAutoRefresh }
+ onclick={ toggleAutoRefresh }
  title={autoRefresh ? 'Disable auto refresh' : 'Enable auto refresh'}
  >
  <RefreshCw class="h-4" />

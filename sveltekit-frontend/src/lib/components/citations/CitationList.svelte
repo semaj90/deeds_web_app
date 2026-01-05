@@ -79,7 +79,7 @@ import type { CitationSearchResult, SavedCitation } from '$lib/types/citations';
  if (!confirm('Are you sure you want to delete this citation?')) return;
 
  try {
- const response = await fetch(`/api/citations/${ citationId: citationId }`, {
+ const response = await fetch(`/api/citations/${ citationId }`, {
  method: 'DELETE'
  });
 
@@ -114,7 +114,7 @@ import type { CitationSearchResult, SavedCitation } from '$lib/types/citations';
  onkeydown={(e) => e.key === 'Enter' && handleSearch()}
  disabled={isLoading}
  />
- <select bind:value={sourceTypeFilter} onchange={ handleSearch: handleSearch } disabled={isLoading}>
+ <select bind:value={sourceTypeFilter} onchange={ handleSearch } disabled={isLoading}>
  {#each sourceTypes as type}
  <option value={type.value}>{type.label}</option>
  {/each}

@@ -197,7 +197,7 @@ ${analysis.risks.map(r => `• ${r}`).join('\n')}`;
  Jurisdiction
  </label>
  <select
- bind:value={ jurisdiction: jurisdiction }
+ bind:value={ jurisdiction }
  class="w-full bg-slate-800 border border-slate-600 rounded-lg px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-cyan-500"
  >
  <option value="federal">Federal</option>
@@ -291,7 +291,7 @@ ${analysis.risks.map(r => `• ${r}`).join('\n')}`;
  💾
  </button>
  <button
- onclick={ clearAnalysis: clearAnalysis }
+ onclick={ clearAnalysis }
  class="px-3 py-1 bg-slate-700 hover:bg-slate-600 text-slate-300 rounded text-sm"
  title="Clear analysis"
  >

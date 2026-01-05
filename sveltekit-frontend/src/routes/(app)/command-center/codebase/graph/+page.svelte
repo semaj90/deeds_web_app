@@ -7,7 +7,7 @@
 	 * Route: /command-center/codebase/graph
 	 * Purpose: Interactive dependency graph visualization
 	 */
-	import { goto: goto } from '$app/navigation';
+	import { goto } from '$app/navigation';
 	import { NodeDetailPanel, RouteGraph } from '$lib/components/codebase';
 	import { Card, CardContent } from '$lib/components/ui';
 	import { Button } from '$lib/components/ui/button';
@@ -213,7 +213,7 @@
 					<span class="filter-badge">{filters.types.length + (filters.hasErrors ? 1 : 0) + (filters.cluster ? 1 : 0)}</span>
 				{/if}
 			</Button>
-			<Button variant="outline" onclick={ loadGraphData: loadGraphData } disabled={isLoading}>
+			<Button variant="outline" onclick={ loadGraphData } disabled={isLoading}>
 				<RefreshCw class={`h-4 w-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
 				Refresh
 			</Button>
@@ -232,7 +232,7 @@
 								class={`filter-chip ${filters.types.includes(type) ? 'active' : ''} ${getTypeColor(type)}`}
 								onclick={() => toggleTypeFilter(type)}
 							>
-								{ type: type }
+								{ type }
 							</button>
 						{/each}
 					</div>

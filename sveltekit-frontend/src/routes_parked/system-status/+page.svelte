@@ -26,7 +26,7 @@
 </svelte:head>
 
 <div class="center-container">
- <button type="button" class="nes-btn is-primary" onclick={ openDialog: openDialog }>
+ <button type="button" class="nes-btn is-primary" onclick={ openDialog }>
  🎮 View System Status
  </button>
 </div>

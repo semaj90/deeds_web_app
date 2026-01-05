@@ -10,8 +10,8 @@
 </script>
 
 <button
- class="unified-button unified-button--{ variant: variant } unified-button--{ size: size }"
- { disabled: disabled }
+ class="unified-button unified-button--{ variant } unified-button--{ size }"
+ { disabled }
  onclick={onClick}
 >
  {@render children?.()}

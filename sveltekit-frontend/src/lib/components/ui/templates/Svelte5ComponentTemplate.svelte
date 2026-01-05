@@ -131,7 +131,7 @@ function handleKeydown(event: KeyboardEvent) {
 		   {variantClasses} {sizeClasses} {stateClasses} {className}"
 	role="button"
 	tabindex={disabled ? -1 : 0}
-	aria-disabled={ disabled: disabled }
+	aria-disabled={ disabled }
 	onmouseenter={() => isHovered = true}
 	onmouseleave={() => isHovered = false}
 	onfocus={() => isFocused = true}

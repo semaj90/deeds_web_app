@@ -8,5 +8,5 @@
  color === 'green' ? 'bg-green-500/20 text-green-300 border-green-500/50' :
  color === 'yellow' ? 'bg-yellow-500/20 text-yellow-300 border-yellow-500/50' :
  'bg-accent/20 text-accent border-accent/50'}">
- { text: text }
+ { text }
 </span>

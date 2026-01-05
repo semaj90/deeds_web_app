@@ -79,25 +79,25 @@ function handleKeydown(e: KeyboardEvent) {
 
 <label
 	class="inline-flex items-center gap-3 cursor-pointer select-none {className}"
-	class:opacity-50={ disabled: disabled }
-	class:cursor-not-allowed={ disabled: disabled }
+	class:opacity-50={ disabled }
+	class:cursor-not-allowed={ disabled }
 >
 	<!-- Hidden native checkbox -->
 	<input
 		type="checkbox"
 		{id}
-		{ name: name }
-		{ disabled: disabled }
+		{ name }
+		{ disabled }
 		bind:checked
 		class="sr-only peer"
-		onchange={ handleChange: handleChange }
+		onchange={ handleChange }
 	/>
 
 	<!-- Custom switch track -->
 	<button
 		type="button"
 		role="switch"
-		aria-checked={ checked: checked }
+		aria-checked={ checked }
 		aria-labelledby="{id}-label"
 		{disabled}
 		class="relative inline-flex shrink-0 {dimensions.track}

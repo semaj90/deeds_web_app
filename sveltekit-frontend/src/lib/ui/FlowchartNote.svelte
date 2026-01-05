@@ -3,7 +3,7 @@
 		children?: import('svelte').Snippet;
 	}
 
-	let { children: children }: Props = $props();
+	let { children }: Props = $props();
 </script>
 
 <div class="p-4 border-2 border-ink bg-white font-serif text-sm rounded-lg shadow-lg rotate-[-1deg] relative">

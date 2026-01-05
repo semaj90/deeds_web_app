@@ -119,7 +119,7 @@ function handleChange(e: Event) {
 					{#if valueLabel}
 						{@render valueLabel(value)}
 					{:else}
-						{ value: value }
+						{ value }
 					{/if}
 				</span>
 			{/if}
@@ -144,8 +144,8 @@ function handleChange(e: Event) {
 			type="range"
 			{id}
 			{name}
-			{ min: min }
-			{ max: max }
+			{ min }
+			{ max }
 			{step}
 			{disabled}
 			bind:value
@@ -169,11 +169,11 @@ function handleChange(e: Event) {
 				   [&::-moz-range-thumb]:cursor-pointer
 				   focus:outline-none"
 			style="height: {size === 'sm' ? '12px' : size === 'lg' ? '20px' : '16px'}"
-			oninput={ handleInput: handleInput }
-			onchange={ handleChange: handleChange }
+			oninput={ handleInput }
+			onchange={ handleChange }
 			aria-valuemin={min}
 			aria-valuemax={max}
-			aria-valuenow={ value: value }
+			aria-valuenow={ value }
 		/>
 	</div>
 

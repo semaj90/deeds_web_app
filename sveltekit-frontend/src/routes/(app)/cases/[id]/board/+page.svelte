@@ -46,7 +46,7 @@
             {/if}
             <button
                 class="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-medium rounded-md transition-colors disabled:opacity-50 shadow-sm"
-                onclick={ save: save }
+                onclick={ save }
                 disabled={isSaving}
             >
                 {isSaving ? 'Saving...' : 'Save Board'}

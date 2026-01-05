@@ -73,13 +73,13 @@
 </script>
 
 <div
-	class="relative { className: className }"
+	class="relative { className }"
 	data-select-root
 	data-state={open ? 'open' : 'closed'}
 	data-disabled={disabled || undefined}
 >
 	{#if name}
-		<input type="hidden" { name: name } {value} { required: required } />
+		<input type="hidden" { name } {value} { required } />
 	{/if}
 	{#if children}
 		{@render children()}

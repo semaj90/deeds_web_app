@@ -35,7 +35,7 @@
  type="button"
  class="inline-flex items-center gap-1 rounded-full font-medium text-white transition-colors {sizeClasses[size]} {colorMap[cluster.color] ?? 'bg-gray-500 hover:bg-gray-600'}"
  title="Cluster: {cluster.label}"
- onclick={ onclick: onclick }
+ onclick={ onclick }
 >
  <span class={cluster.icon}></span>
  {#if showLabel}

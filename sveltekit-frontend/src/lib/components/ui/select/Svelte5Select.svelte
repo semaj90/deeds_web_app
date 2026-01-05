@@ -130,13 +130,13 @@ function handleBlur() {
 		{name}
 		{id}
 		{required}
-		{ disabled: disabled }
+		{ disabled }
 		class="sr-only"
 		bind:value
 		aria-hidden="true"
 		tabindex="-1"
 	>
-		<option value="">{ placeholder: placeholder }</option>
+		<option value="">{ placeholder }</option>
 		{#each options as opt}
 			<option value={opt.value} disabled={opt.disabled}>{opt.label}</option>
 		{/each}
@@ -148,7 +148,7 @@ function handleBlur() {
 		class="{baseClasses}"
 		class:ring-2={isOpen}
 		class:ring-blue-500={isOpen}
-		{ disabled: disabled }
+		{ disabled }
 		aria-haspopup="listbox"
 		aria-expanded={isOpen}
 		onclick={() => isOpen = !isOpen}

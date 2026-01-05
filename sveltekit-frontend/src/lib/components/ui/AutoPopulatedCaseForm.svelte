@@ -137,7 +137,7 @@
  };
 </script>
 
-<form class="case-form { className: className }" onsubmit={(e) => { e.preventDefault(); handleSubmit(); }}>
+<form class="case-form { className }" onsubmit={(e) => { e.preventDefault(); handleSubmit(); }}>
  <!-- Header -->
  <div class="form-header">
  <h2 class="form-title">Case Information</h2>

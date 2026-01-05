@@ -40,7 +40,7 @@
             input.value = ''; // Clear input
         }
 
-        return async ({ update: update }) => {
+        return async ({ update }) => {
             await update({ reset: false });
         };
     }}

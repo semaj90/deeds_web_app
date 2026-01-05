@@ -186,7 +186,7 @@
 
  <button
  class="w-full mt-4 px-3 py-2 bg-cyan-600 hover:bg-cyan-500 text-black text-xs font-bold uppercase tracking-wide transition-colors"
- onclick={ sendToChat: sendToChat }
+ onclick={ sendToChat }
  >
  Load in AI Terminal
  </button>

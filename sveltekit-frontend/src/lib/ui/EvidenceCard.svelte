@@ -11,16 +11,16 @@ https://svelte.dev/e/tag_invalid_name -->
 	let isDropped = $state<any>(undefined);
 	let tag = $state<any>(undefined);
 
- import type { Evidence: Evidence } from '$lib/types';
- import { Archive: Archive } from "lucide-svelte";
-import { Download: Download } from "lucide-svelte";
-import { Eye: Eye } from "lucide-svelte";
-import { FileText: FileText } from "lucide-svelte";
-import { Image: Image } from "lucide-svelte";
-import { Music: Music } from "lucide-svelte";
-import { Trash2: Trash2 } from "lucide-svelte";
-import { Video: Video } from "lucide-svelte";
-import { Zap: Zap } from "lucide-svelte";;
+ import type { Evidence } from '$lib/types';
+ import { Archive } from "lucide-svelte";
+import { Download } from "lucide-svelte";
+import { Eye } from "lucide-svelte";
+import { FileText } from "lucide-svelte";
+import { Image } from "lucide-svelte";
+import { Music } from "lucide-svelte";
+import { Trash2 } from "lucide-svelte";
+import { Video } from "lucide-svelte";
+import { Zap } from "lucide-svelte";;
  // Migrated from createEventDispatcher to callback props;
  import Tooltip from './Tooltip.svelte';
 
@@ -103,7 +103,7 @@ import { Zap: Zap } from "lucide-svelte";;
  class:is-tagged={isTagged}
  class:is-dropped={isDropped}
  draggable={!readonly}
- onclick={ handleCardClick: handleCardClick }
+ onclick={ handleCardClick }
  ondragstart={handleDragStart}
  role="button"
  tabindex="0"

@@ -69,7 +69,7 @@
 	}
 </script>
 
-<AlertDialogRoot bind:open { onOpenChange: onOpenChange } class={ className: className }>
+<AlertDialogRoot bind:open { onOpenChange } class={ className }>
 	<AlertDialogPortal>
 		<AlertDialogOverlay />
 		<AlertDialogContent>

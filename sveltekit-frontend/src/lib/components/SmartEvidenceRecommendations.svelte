@@ -38,11 +38,11 @@ import { Target } from "lucide-svelte";;
 	}
 
 	function applyRecommendation(recommendationId: string) {
-		dispatch('apply', { recommendationId: recommendationId });
+		dispatch('apply', { recommendationId });
 	}
 
 	function dismissRecommendation(recommendationId: string) {
-		dispatch('dismiss', { recommendationId: recommendationId });
+		dispatch('dismiss', { recommendationId });
 	}
 
 	function getTypeIcon(type: string) {
@@ -86,7 +86,7 @@ import { Target } from "lucide-svelte";;
 		{#if !isLoading}
 			<button
 				class="generate-btn"
-				onclick={ generateRecommendations: generateRecommendations }
+				onclick={ generateRecommendations }
 				disabled={isLoading}
 			>
 				<Brain class="btn-icon" />
@@ -104,7 +104,7 @@ import { Target } from "lucide-svelte";;
 		<div class="error-state">
 			<TriangleAlert class="error-icon" />
 			<p>Failed to generate recommendations: {error}</p>
-			<button class="retry-btn" onclick={ generateRecommendations: generateRecommendations }>
+			<button class="retry-btn" onclick={ generateRecommendations }>
 				Try Again
 			</button>
 		</div>

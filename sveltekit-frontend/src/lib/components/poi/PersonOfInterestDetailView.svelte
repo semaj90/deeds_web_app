@@ -133,7 +133,7 @@
  let threatScore = $derived(poi ? getThreatScore(poi.threatLevel, poi.dangerLevel) : 0);
 </script>
 
-<Dialog bind:open={ open: open } onOpenChange={ onOpenChange: onOpenChange }>
+<Dialog bind:open={ open } onOpenChange={ onOpenChange }>
  <DialogContent class="max-w-6xl max-h-[90vh] overflow-hidden p-0">
  {#if poi}
  <!-- Header with Photo and Basic Info -->

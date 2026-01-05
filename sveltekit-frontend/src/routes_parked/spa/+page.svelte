@@ -7,7 +7,7 @@ https://svelte.dev/e/js_parse_error -->
 <!-- @migration-task Error while migrating Svelte code: The 'type' modifier cannot be used on a named import when 'import type' is used on its import statement.
 https://svelte.dev/e/js_parse_error -->
 <script lang="ts">
- import type { Case: Case } from '$lib/types'; // Svelte 5 runes are auto-imported
+ import type { Case } from '$lib/types'; // Svelte 5 runes are auto-imported
  /**
  * Single Page App Demo Route
  * Full-screen canvas UX with gemma3:legal-latest integration
@@ -252,8 +252,8 @@ https://svelte.dev/e/js_parse_error -->
  <SPACanvasComp
  {legalData}
  {currentView}
- onNavigation={ handleNavigation: handleNavigation }
- onInteraction={ handleInteraction: handleInteraction }
+ onNavigation={ handleNavigation }
+ onInteraction={ handleInteraction }
  />
  <div class="debug-info">
  <p>Current View: {currentView}</p>

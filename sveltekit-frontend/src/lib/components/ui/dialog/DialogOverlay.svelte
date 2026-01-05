@@ -36,8 +36,8 @@
 	<div
 		class="{defaultClass} {className}"
 		transition:fade={{ duration: 150 }}
-		onclick={ handleClick: handleClick }
-		onkeydown={ handleKeydown: handleKeydown }
+		onclick={ handleClick }
+		onkeydown={ handleKeydown }
 		role="button"
 		tabindex="0"
 		aria-label="Close dialog"

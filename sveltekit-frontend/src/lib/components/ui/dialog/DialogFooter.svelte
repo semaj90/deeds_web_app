@@ -14,7 +14,7 @@
 	const defaultClass = 'flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2';
 </script>
 
-<div class="{defaultClass} { className: className }" data-dialog-footer="">
+<div class="{defaultClass} { className }" data-dialog-footer="">
 	{#if children}
 		{@render children()}
 	{/if}

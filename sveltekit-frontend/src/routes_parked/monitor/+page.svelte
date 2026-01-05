@@ -381,7 +381,7 @@
  {#each performanceHistory.memory as value, i}
  <div
  class="bg-yellow-500 rounded-t flex-1 min-w-[4px]"
- style="height: { value: value }%"
+ style="height: { value }%"
  title={`${value.toFixed(1)}%`}
  ></div>
  {/each}

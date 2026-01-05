@@ -441,7 +441,7 @@
 							🚀 Run CUDA Pipeline
 						{/if}
 					</button>
-					<button onclick={ fetchClusters: fetchClusters } class="refresh-btn">
+					<button onclick={ fetchClusters } class="refresh-btn">
 						🔄 Refresh Clusters
 					</button>
 				</div>

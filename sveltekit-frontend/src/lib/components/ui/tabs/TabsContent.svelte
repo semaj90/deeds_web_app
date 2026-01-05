@@ -34,7 +34,7 @@
 		aria-labelledby="tab-{value}"
 		tabindex="0"
 		data-state={isActive ? 'active' : 'inactive'}
-		class="{defaultClass} { className: className }"
+		class="{defaultClass} { className }"
 		transition:fade={{ duration: 150 }}
 		hidden={!isActive && forceMount}
 	>

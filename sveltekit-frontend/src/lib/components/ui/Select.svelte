@@ -16,7 +16,7 @@
 
 <select
 	bind:value
-	class="select { className: className }"
+	class="select { className }"
 	{...restProps}
 >
 	{#if children}

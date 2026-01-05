@@ -179,9 +179,9 @@
  <button
  type="button"
  class="text-xs px-2 py-1 rounded-full border border-green-400 bg-green-400/10 hover:bg-green-400/20 text-green-300 transition-colors"
- onclick={() => useSuggestion(`Show me more evidence about: ${ keyword: keyword }`)}
+ onclick={() => useSuggestion(`Show me more evidence about: ${ keyword }`)}
  >
- #{ keyword: keyword }
+ #{ keyword }
  </button>
  {/each}
  </div>
@@ -234,11 +234,11 @@
  bind:value={currentMessage}
  placeholder="Ask about your case, request evidence analysis, or get legal guidance..."
  class="flex-1 bg-gray-900 border-green-500 text-green-400 placeholder-green-600 focus:border-green-400 focus:ring-green-400 resize-none"
- rows={ 2: 2 }
- onkeydown={ handleKeydown: handleKeydown }
+ rows={ 2 }
+ onkeydown={ handleKeydown }
  />
  <Button
- onclick={ sendMessage: sendMessage }
+ onclick={ sendMessage }
  disabled={!currentMessage.trim() || isTyping}
  class="bg-green-600 hover:bg-green-500 text-black border-green-500 px-6"
  >

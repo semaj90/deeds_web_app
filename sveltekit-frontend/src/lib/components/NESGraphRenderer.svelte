@@ -216,8 +216,8 @@
 <div class="nes-graph-container">
 	<canvas
 		bind:this={canvas}
-		onclick={ handleCanvasClick: handleCanvasClick }
-		onmousemove={ handleCanvasMove: handleCanvasMove }
+		onclick={ handleCanvasClick }
+		onmousemove={ handleCanvasMove }
 		onmouseleave={() => {
 			hoveredNode = null;
 			showTooltip = false;

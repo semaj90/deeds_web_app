@@ -9,7 +9,7 @@
  await fetch(`/api/evidence/${data.caseId}`, {
  method: 'PATCH',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({ items: items }),
+ body: JSON.stringify({ items }),
  });
  console.log('Positions saved');
  } catch (error) {
@@ -25,5 +25,5 @@
 <EvidenceBoard
  items={data.items}
  connections={data.connections}
- onSave={ savePositions: savePositions }
+ onSave={ savePositions }
 />

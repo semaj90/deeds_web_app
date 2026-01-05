@@ -21,8 +21,8 @@
 </script>
 
 <input
- { type: type }
- { placeholder: placeholder }
+ { type }
+ { placeholder }
  bind:value
  {disabled}
  class={`

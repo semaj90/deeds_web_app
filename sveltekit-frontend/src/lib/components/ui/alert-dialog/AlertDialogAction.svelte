@@ -39,8 +39,8 @@
 
 <button
 	type="button"
-	onclick={ handleClick: handleClick }
-	class="{baseClass} {variantClass} { className: className }"
+	onclick={ handleClick }
+	class="{baseClass} {variantClass} { className }"
 >
 	{#if children}
 		{@render children()}

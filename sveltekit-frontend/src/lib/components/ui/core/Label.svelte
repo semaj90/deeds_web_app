@@ -6,9 +6,9 @@
  }>();
 </script>
 
-<label {...forId ? { for: forId } : {}} class={ className: className }>
+<label {...forId ? { for: forId } : {}} class={ className }>
  {#if text}
- { text: text }
+ { text }
  {:else}
  {@render children?.()}
  {/if}

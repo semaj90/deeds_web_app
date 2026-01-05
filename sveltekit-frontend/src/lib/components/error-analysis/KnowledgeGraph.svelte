@@ -123,9 +123,9 @@
 
 	<svg
 		bind:this={svg}
-		{ width: width }
-		{ height: height }
-		viewBox={`0 0 ${ width: width } ${height}`}
+		{ width }
+		{ height }
+		viewBox={`0 0 ${ width } ${height}`}
 		style="transform: scale({zoomLevel})"
 	>
 		<!-- Links -->

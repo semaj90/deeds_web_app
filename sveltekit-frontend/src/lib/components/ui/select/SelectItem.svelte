@@ -49,8 +49,8 @@
 	data-value={value}
 	data-disabled={disabled || undefined}
 	tabindex={disabled ? -1 : 0}
-	onclick={ handleClick: handleClick }
-	onkeydown={ handleKeydown: handleKeydown }
+	onclick={ handleClick }
+	onkeydown={ handleKeydown }
 	class="{defaultClass} {isSelected ? 'bg-accent text-accent-foreground' : 'hover:bg-accent/50'} {className}"
 >
 	<!-- Check icon -->

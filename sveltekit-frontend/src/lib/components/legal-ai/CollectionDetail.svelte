@@ -10,7 +10,7 @@
  created_at: string;
  }
 
- let { collection: collection } = $props<{
+ let { collection } = $props<{
  collection: Collection;
  }>();
 
@@ -54,7 +54,7 @@
 
  try {
  const response = await fetch(
- `/api/citations/collections/${collection.id}/citations/${ citationId: citationId }`,
+ `/api/citations/collections/${collection.id}/citations/${ citationId }`,
  { method: 'DELETE' }
  );
 

@@ -50,9 +50,9 @@
 	role="menuitem"
 	tabindex={disabled ? -1 : 0}
 	data-disabled={disabled || undefined}
-	onclick={ handleClick: handleClick }
-	onkeydown={ handleKeydown: handleKeydown }
-	class="{defaultClass} {variantClass} { className: className }"
+	onclick={ handleClick }
+	onkeydown={ handleKeydown }
+	class="{defaultClass} {variantClass} { className }"
 >
 	{#if children}
 		{@render children()}

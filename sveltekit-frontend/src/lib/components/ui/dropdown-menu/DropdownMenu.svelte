@@ -50,7 +50,7 @@
 	}: Props = $props();
 </script>
 
-<DropdownMenuRoot bind:open { onOpenChange: onOpenChange } class={ className: className }>
+<DropdownMenuRoot bind:open { onOpenChange } class={ className }>
 	<DropdownMenuTrigger class={triggerClass}>
 		{#if triggerContent}
 			{@render triggerContent()}

@@ -7,7 +7,7 @@ https://svelte.dev/e/js_parse_error -->
 <!-- @migration-task Error while migrating Svelte code: Unexpected token
 https://svelte.dev/e/js_parse_error -->
 <script lang="ts">
-import type { Document: Document } from '$lib/types';
+import type { Document } from '$lib/types';
  /**
  * ðŸ§ª Hybrid RAG + SIMD Pipeline Demo
  *

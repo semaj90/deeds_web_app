@@ -111,7 +111,7 @@
  {isGenerating ? 'Generating...' : 'Generate Summary'}
  </button>
  {#if summary}
- <button onclick={ exportPDF: exportPDF } class="btn-secondary">Export PDF</button>
+ <button onclick={ exportPDF } class="btn-secondary">Export PDF</button>
  {/if}
  </div>
  </div>

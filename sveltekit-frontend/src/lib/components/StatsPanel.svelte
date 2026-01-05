@@ -17,7 +17,7 @@
  };
  };
 
- let { stats: stats }: { stats: StatsType } = $props();
+ let { stats }: { stats: StatsType } = $props();
 
  let showDetails = $state(false);
 

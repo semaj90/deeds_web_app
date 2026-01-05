@@ -190,7 +190,7 @@
  <button class="btn-primary" onclick={saveNotes} disabled={isSaving}>
  {isSaving ? 'Saving...' : 'Save'}
  </button>
- <button class="btn-secondary" onclick={ cancelEdit: cancelEdit } disabled={isSaving}>
+ <button class="btn-secondary" onclick={ cancelEdit } disabled={isSaving}>
  Cancel
  </button>
  </div>

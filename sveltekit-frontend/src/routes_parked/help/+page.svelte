@@ -7,25 +7,25 @@ https://svelte.dev/e/element_invalid_closing_tag -->
 <!-- @migration-task Error while migrating Svelte code: `</icon>` attempted to close an element that was not open
 https://svelte.dev/e/element_invalid_closing_tag -->
 <script lang="ts">
-	import { ButtonRoot: ButtonRoot } from 'bits-ui';
+	import { ButtonRoot } from 'bits-ui';
 
  import Button from "$lib/components/ui/enhanced-bits.svelte";
- import { AlertTriangle: AlertTriangle } from "lucide-svelte";
- import { ArrowRight: ArrowRight } from "lucide-svelte";
- import { Book: Book } from "lucide-svelte";
- import { Clock: Clock } from "lucide-svelte";
- import { Download: Download } from "lucide-svelte";
- import { ExternalLink: ExternalLink } from "lucide-svelte";
- import { HelpCircle: HelpCircle } from "lucide-svelte";
+ import { AlertTriangle } from "lucide-svelte";
+ import { ArrowRight } from "lucide-svelte";
+ import { Book } from "lucide-svelte";
+ import { Clock } from "lucide-svelte";
+ import { Download } from "lucide-svelte";
+ import { ExternalLink } from "lucide-svelte";
+ import { HelpCircle } from "lucide-svelte";
  import { Info } from "lucide-svelte";
- import { MessageSquare: MessageSquare } from "lucide-svelte";
+ import { MessageSquare } from "lucide-svelte";
  import { Play } from "lucide-svelte";
- import { Search: Search } from "lucide-svelte";
- import { Star: Star } from "lucide-svelte";
+ import { Search } from "lucide-svelte";
+ import { Star } from "lucide-svelte";
  import { UserIcon } from "lucide-svelte";
- import { Video: Video } from "lucide-svelte";
- import { Sparkles: Sparkles } from "lucide-svelte";
- import { Brain: Brain } from "lucide-svelte";
+ import { Video } from "lucide-svelte";
+ import { Sparkles } from "lucide-svelte";
+ import { Brain } from "lucide-svelte";
 
  interface HelpArticle {
  id: string;
@@ -505,7 +505,7 @@ Build on previous responses:
  bind:value={searchQuery}
  />
  <button
- onclick={ toggleSearchMode: toggleSearchMode }
+ onclick={ toggleSearchMode }
  class="absolute right-2 top-1/2 transform -translate-y-1/2 px-4 py-2 bg-white text-blue-600 rounded-md hover:bg-gray-50 transition flex items-center gap-2 font-medium"
  class:disabled={isSearching}
  disabled={isSearching}

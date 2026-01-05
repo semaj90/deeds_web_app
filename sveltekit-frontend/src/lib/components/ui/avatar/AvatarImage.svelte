@@ -10,11 +10,11 @@
 </script>
 
 <img
- { src: src }
- { alt: alt }
+ { src }
+ { alt }
  class={`
  aspect-square h-full w-full
- ${ className: className }
+ ${ className }
  `}
  {...rest}
 />

@@ -9,7 +9,7 @@
 		selectedPerson: FugitiveDexPerson | null;
 	}
 
-	let { selectedPerson: selectedPerson }: Props = $props();
+	let { selectedPerson }: Props = $props();
 </script>
 
 {#if selectedPerson}
@@ -30,7 +30,7 @@
 					<div class="attribute-row">
 						<span class="text-xs opacity-70 capitalize">{attr}:</span>
 						<div class="attr-bar">
-							<div class="attr-fill" style="width: { value: value }%"></div>
+							<div class="attr-fill" style="width: { value }%"></div>
 						</div>
 						<span class="text-xs font-bold text-green-400">{value}</span>
 					</div>

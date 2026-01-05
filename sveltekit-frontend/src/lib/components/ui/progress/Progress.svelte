@@ -36,13 +36,13 @@
 <div
 	role="progressbar"
 	aria-valuenow={indeterminate ? undefined : value}
-	aria-valuemin={ 0: 0 }
-	aria-valuemax={ max: max }
-	aria-label={ ariaLabel: ariaLabel }
+	aria-valuemin={ 0 }
+	aria-valuemax={ max }
+	aria-label={ ariaLabel }
 	data-state={indeterminate ? 'indeterminate' : value >= max ? 'complete' : 'loading'}
 	data-value={value}
-	data-max={ max: max }
-	class="{trackClass} { className: className }"
+	data-max={ max }
+	class="{trackClass} { className }"
 >
 	<div
 		class="{indicatorClass} {indeterminate ? 'animate-progress-indeterminate' : ''}"

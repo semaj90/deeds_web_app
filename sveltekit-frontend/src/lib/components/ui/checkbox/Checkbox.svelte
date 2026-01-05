@@ -69,10 +69,10 @@
 	type="button"
 	role="checkbox"
 	aria-checked={indeterminate ? 'mixed' : checked}
-	aria-label={ ariaLabel: ariaLabel }
-	{ disabled: disabled }
-	onclick={ handleClick: handleClick }
-	onkeydown={ handleKeydown: handleKeydown }
+	aria-label={ ariaLabel }
+	{ disabled }
+	onclick={ handleClick }
+	onkeydown={ handleKeydown }
 	data-state={state}
 	class="{defaultClass} {checked || indeterminate ? 'bg-primary text-primary-foreground' : 'bg-background'} {className}"
 >

@@ -222,7 +222,7 @@
  />
  <button
  class="search-btn {isSearching ? 'searching' : ''}"
- onclick={ performSearch: performSearch }
+ onclick={ performSearch }
  disabled={isSearching || !searchQuery.trim()}
  >
  {#if isSearching}

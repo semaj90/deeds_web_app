@@ -24,6 +24,6 @@
 	const isPlaceholder = $derived(!selectContext?.value);
 </script>
 
-<span class="{isPlaceholder ? 'text-muted-foreground' : ''} { className: className }">
+<span class="{isPlaceholder ? 'text-muted-foreground' : ''} { className }">
 	{displayValue}
 </span>

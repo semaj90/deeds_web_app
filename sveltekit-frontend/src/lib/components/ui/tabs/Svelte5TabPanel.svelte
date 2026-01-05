@@ -25,10 +25,10 @@ let isActive = $derived(tabContext?.activeTab === value);
 
 {#if isActive}
 	<div
-		id="panel-{ value: value }"
-		class="focus:outline-none { className: className }"
+		id="panel-{ value }"
+		class="focus:outline-none { className }"
 		role="tabpanel"
-		aria-labelledby="tab-{ value: value }"
+		aria-labelledby="tab-{ value }"
 		tabindex="0"
 	>
 		{#if children}

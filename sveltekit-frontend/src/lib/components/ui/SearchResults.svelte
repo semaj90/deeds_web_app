@@ -53,11 +53,11 @@
  }
 </script>
 
-<div class="search-results { className: className }">
+<div class="search-results { className }">
  {#if isLoading}
  <div class="loading-state">
  <div class="spinner"></div>
- <p>Searching for "{ query: query }"...</p>
+ <p>Searching for "{ query }"...</p>
  </div>
  {:else if results.length === 0}
  <div class="empty-state">

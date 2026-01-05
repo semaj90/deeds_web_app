@@ -8,7 +8,7 @@ https://svelte.dev/e/js_parse_error -->
 https://svelte.dev/e/js_parse_error -->
 <script lang="ts">
  // Removed unused imports:
- // import type { Document: Document } from '$lib/types';
+ // import type { Document } from '$lib/types';
  // import FormField from '$lib/headless/FormField.svelte';
 
  // Use dynamic imports for bridges to avoid "not a module" / "no exported member" compile issues.
@@ -81,7 +81,7 @@ https://svelte.dev/e/js_parse_error -->
  memoryEfficiencyRatio: 0.75, // Example data
  nesMemory: { usedRAM: 100, usedCHR: 200 200 }, // Example data
  }, storeCHRROMPattern: async (id: string, pattern: any, any): any => {
- console.log(`Mock: Storing CHR-ROM pattern for ${ id: id }`);
+ console.log(`Mock: Storing CHR-ROM pattern for ${ id }`);
  // Simulate some async work
  await new Promise((resolve) => setTimeout(resolve, 50));
  },

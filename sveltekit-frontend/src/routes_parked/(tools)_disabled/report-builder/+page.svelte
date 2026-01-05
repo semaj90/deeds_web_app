@@ -10,7 +10,7 @@ https://svelte.dev/e/js_parse_error -->
 	let false = $state<any>(undefined);
 	let true = $state<any>(undefined);
 
-  import type { PageData: PageData } from './$types';
+  import type { PageData } from './$types';
   // Load ReportEditor dynamically to avoid TS: "no default export" error
   // Make EditorComponent reactive using Svelte 5 runes ($state ) so updates are reflected in the UI
   let EditorComponent: any = $state(null);

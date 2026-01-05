@@ -79,8 +79,8 @@ let barClasses = $derived({
 		class="w-full bg-slate-700 overflow-hidden {sizeClasses} {variantClasses}"
 		role="progressbar"
 		aria-valuenow={indeterminate ? undefined : value}
-		aria-valuemin={ 0: 0 }
-		aria-valuemax={ max: max }
+		aria-valuemin={ 0 }
+		aria-valuemax={ max }
 		aria-label={label || 'Progress'}
 	>
 		<div

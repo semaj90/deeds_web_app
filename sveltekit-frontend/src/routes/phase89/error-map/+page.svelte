@@ -293,7 +293,7 @@
 					bind:this={canvas}
 					width={width}
 					height={height}
-					onclick={ handleCanvasClick: handleCanvasClick }
+					onclick={ handleCanvasClick }
 					class="graph-canvas"
 				></canvas>
 				<p class="hint">Click nodes to expand • Drag to pan</p>

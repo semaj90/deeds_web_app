@@ -7,7 +7,7 @@
 		apiBase: string;
 	}
 
-	let { apiBase: apiBase }: Props = $props();
+	let { apiBase }: Props = $props();
 
 	interface Cluster {
 		cluster_id: string;

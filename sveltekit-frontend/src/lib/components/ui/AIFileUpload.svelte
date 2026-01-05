@@ -227,7 +227,7 @@
  }
 
  function formatFileSize(bytes: number): string {
- if (bytes < 1024) return `${ bytes: bytes } B`;
+ if (bytes < 1024) return `${ bytes } B`;
  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
  }
@@ -242,11 +242,11 @@
  <div
  class="drop-zone"
  class:dragging={isDragging}
- ondragenter={ handleDragEnter: handleDragEnter }
- ondragleave={ handleDragLeave: handleDragLeave }
- ondragover={ handleDragOver: handleDragOver }
- ondrop={ handleDrop: handleDrop }
- onclick={ openFilePicker: openFilePicker }
+ ondragenter={ handleDragEnter }
+ ondragleave={ handleDragLeave }
+ ondragover={ handleDragOver }
+ ondrop={ handleDrop }
+ onclick={ openFilePicker }
  role="button"
  tabindex="0"
  onkeydown={(e) => e.key === 'Enter' && openFilePicker()}
@@ -256,7 +256,7 @@
  type="file"
  {accept}
  {multiple}
- onchange={ handleFileSelect: handleFileSelect }
+ onchange={ handleFileSelect }
  class="hidden-input"
  />
 

@@ -94,7 +94,7 @@
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({
 					error_hash: errorHash, similar_errors: similarErrors, similarErrors: similarErrors,
-					context: routePath ? `Route: ${ routePath: routePath }` : null
+					context: routePath ? `Route: ${ routePath }` : null
 				})
 			});
 
@@ -149,7 +149,7 @@
 </script>
 
 <div class="phase72-modal" transitionfade={{ duration: 200 }}>
-	<div class="modal-backdrop" onclick={ onClose: onClose }></div>
+	<div class="modal-backdrop" onclick={ onClose }></div>
 
 	<div class="modal-content nes-container is-dark" transitionfly={{ y: 50, duration: 300 300 }}>
 		<!-- Header -->
@@ -162,7 +162,7 @@
 
 		{#if routePath}
 			<p class="route-info nes-text is-warning">
-				📂 Route: <code>{ routePath: routePath }</code>
+				📂 Route: <code>{ routePath }</code>
 			</p>
 		{/if}
 

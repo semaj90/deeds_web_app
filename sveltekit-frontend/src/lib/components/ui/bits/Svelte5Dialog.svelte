@@ -108,7 +108,7 @@ function handleClose() {
 {/if}
 
 <!-- Dialog Portal -->
-<DialogRoot bind:open onOpenChange={ handleOpenChange: handleOpenChange }>
+<DialogRoot bind:open onOpenChange={ handleOpenChange }>
 	<DialogPortal>
 		<!-- Overlay with blur -->
 		<DialogOverlay class={overlayClasses} />

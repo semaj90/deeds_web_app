@@ -15,8 +15,8 @@
 <div class="nier-rich-text-editor">
  <textarea
  bind:value
- { placeholder: placeholder }
- { readonly: readonly }
+ { placeholder }
+ { readonly }
  class="editor-textarea"
  aria-label="Rich text editor for {caseId}"
  ></textarea>

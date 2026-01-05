@@ -239,10 +239,10 @@
 			</div>
 
 			<div class="action-buttons">
-				<button onclick={ stopAgent: stopAgent } disabled={loading} class="stop-btn">
+				<button onclick={ stopAgent } disabled={loading} class="stop-btn">
 					{loading ? '⏳ Stopping...' : '⏹️ Stop Agent'}
 				</button>
-				<button onclick={ clearLogs: clearLogs } class="clear-btn">🗑️ Clear Logs</button>
+				<button onclick={ clearLogs } class="clear-btn">🗑️ Clear Logs</button>
 			</div>
 		</div>
 	{/if}

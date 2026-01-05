@@ -36,7 +36,7 @@
 			type="text"
 			placeholder="SEARCH PERSONS..."
 			class="nes-input w-full"
-			bind:value={ searchQuery: searchQuery }
+			bind:value={ searchQuery }
 		/>
 
 		<!-- Person Matches Count -->

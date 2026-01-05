@@ -7,7 +7,7 @@
  {variant === 'primary' ? 'bg-accent text-white border-accent hover:bg-accent/80' :
  variant === 'secondary' ? 'bg-transparent text-accent border-accent hover:bg-accent/10' :
  'bg-ink text-neon border-frame hover:bg-frame/10'}"
- { disabled: disabled }
+ { disabled }
 >
- { label: label }
+ { label }
 </button>

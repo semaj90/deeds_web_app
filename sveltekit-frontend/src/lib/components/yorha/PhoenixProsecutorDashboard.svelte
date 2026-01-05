@@ -273,7 +273,7 @@
  {isProsecutorMode ? '🔄 Standard Mode' : '⚖️ Prosecutor Mode'}
  </button>
  <button
- onclick={ exportInvestigationReport: exportInvestigationReport }
+ onclick={ exportInvestigationReport }
  class="px-4 py-2 bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500 rounded-lg text-sm font-medium transition-colors"
  >
  📋 Export Report

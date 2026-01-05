@@ -207,10 +207,10 @@
 	<div
 		class="upload-zone"
 		class:drag-active={dragActive}
-		ondragover={ handleDragOver: handleDragOver }
-		ondragleave={ handleDragLeave: handleDragLeave }
-		ondrop={ handleDrop: handleDrop }
-		onclick={ handleClick: handleClick }
+		ondragover={ handleDragOver }
+		ondragleave={ handleDragLeave }
+		ondrop={ handleDrop }
+		onclick={ handleClick }
 		role="button"
 		tabindex="0"
 	>
@@ -224,7 +224,7 @@
 		bind:this={fileInput}
 		type="file"
 		accept=".pdf,.docx,.png,.jpg,.jpeg"
-		onchange={ handleFileSelect: handleFileSelect }
+		onchange={ handleFileSelect }
 		style="display: none"
 	/>
 

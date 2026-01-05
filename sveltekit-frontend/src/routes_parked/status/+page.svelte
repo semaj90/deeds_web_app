@@ -81,7 +81,7 @@
  } catch (error) {
  integrationTests['gpu-cache'] = {
  status: 'error',
- message: `GPU cache integration error: ${ error: error }`,
+ message: `GPU cache integration error: ${ error }`,
  };
  }
  }
@@ -118,7 +118,7 @@
  } catch (error) {
  integrationTests['gaming'] = {
  status: 'error',
- message: `Gaming components error: ${ error: error }`,
+ message: `Gaming components error: ${ error }`,
  };
  }
  }
@@ -166,7 +166,7 @@
  } catch (error) {
  integrationTests['postgresql'] = {
  status: 'error',
- message: `PostgreSQL test error: ${ error: error }`,
+ message: `PostgreSQL test error: ${ error }`,
  };
  }
  }
@@ -196,7 +196,7 @@
  } catch (error) {
  integrationTests['api-endpoints'] = {
  status: 'error',
- message: `API endpoints test error: ${ error: error }`,
+ message: `API endpoints test error: ${ error }`,
  };
  }
  }

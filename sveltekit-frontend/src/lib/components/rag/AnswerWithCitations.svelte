@@ -68,7 +68,7 @@ function getConfidenceColor(confidence: number): string {
 }
 
 function formatTime(ms: number): string {
-  return ms > 1000 ? `${(ms / 1000).toFixed(1)}s` : `${ ms: ms }ms`;
+  return ms > 1000 ? `${(ms / 1000).toFixed(1)}s` : `${ ms }ms`;
 }
 </script>
 

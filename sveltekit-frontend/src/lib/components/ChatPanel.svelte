@@ -128,7 +128,7 @@ import { Send } from "lucide-svelte";;
  <footer class="p-3 border-t border-beige flex items-center gap-2">
  <label class="cursor-pointer opacity-70 hover:opacity-100">
  <Paperclip class="w-5 h-5" />
- <input type="file" class="hidden" onchange={ handleFile: handleFile } />
+ <input type="file" class="hidden" onchange={ handleFile } />
  </label>
 
  <input
@@ -137,7 +137,7 @@ import { Send } from "lucide-svelte";;
  bind:value={text}
  onkeydown={(e)=>e.key==='Enter' && sendMessage()} />
 
- <button class="px-3 py-2 border border-beige text-sm hover:bg-beige hover:text-noir" onclick={ sendMessage: sendMessage }>
+ <button class="px-3 py-2 border border-beige text-sm hover:bg-beige hover:text-noir" onclick={ sendMessage }>
  <Send class="w-4 h-4" />
  </button>
  </footer>

@@ -586,16 +586,16 @@ import { onMount } from 'svelte';
  <h2 class="text-xl font-semibold mb-4">Upload Evidence Document</h2>
  <div
  class="border-2 border-dashed rounded-lg p-8 text-center transition-colors {isDragging ? 'border-blue-500 bg-blue-50' : 'border-gray-300'}"
- ondragover={ handleDragOver: handleDragOver }
- ondragleave={ handleDragLeave: handleDragLeave }
- ondrop={ handleDrop: handleDrop }
+ ondragover={ handleDragOver }
+ ondragleave={ handleDragLeave }
+ ondrop={ handleDrop }
  >
  {#if selectedFile}
  <div class="space-y-2">
  <p class="text-lg font-medium">{selectedFile.name}</p>
  <p class="text-gray-600">Size: {formatFileSize(selectedFile.size)}</p>
  <div class="flex justify-center space-x-2">
- <ButtonRoot onclick={ uploadFile: uploadFile } disabled={workflowStatus.status === 'processing'}>
+ <ButtonRoot onclick={ uploadFile } disabled={workflowStatus.status === 'processing'}>
  {#if workflowStatus.status === 'processing'}
  Uploading...
  {:else}

@@ -461,8 +461,21 @@ git add -A && git commit -m "Applied batch fixes"
 ## 📊 Phase 74: TypeScript/Svelte Error Fixing (2025)
 
 **Current Status (2026-01-05):**
-- Baseline: ~88,300 errors  
-- Post-Phase 72-73: 83,139 errors (-5.8%)  
+- Baseline: ~88,300 errors
+- Post-Phase 72-73: 83,139 errors (-5.8%)
 - Target: <75,000 errors (10%+ total reduction)
 
 **See:** docs/PHASE-74-ERROR-FIXING-GUIDE.md for comprehensive strategies.
+
+## 🧠 WebGPU & LangChain Integration (2025 Best Practices)
+
+**Core Stack:**
+- **LangChain.js 0.3+**: Use `Runnable` interface and `LCEL` for chains.
+- **WebGPU**: Use `@webgpu/types`, ensure `strict: true`.
+- **Module Resolution**: Use `"moduleResolution": "bundler"` in tsconfig.
+
+**Missing Modules (TS2307) Troubleshooting:**
+1. **Check Module Resolution**: Ensure `tsconfig.json` has `"moduleResolution": "bundler"`.
+2. **Verify Path Aliases**: Check `$lib` and `$app` mappings in `.svelte-kit/tsconfig.json`.
+3. **Type Decls**: If missing `@types/foo`, create `src/types/foo.d.ts` with `declare module 'foo';`.
+4. **Svelte-Check**: Use `svelte-check --threshold error` to isolate real blockers.

@@ -322,7 +322,7 @@
 
  {#if showModal}
  <!-- Changed div to button for accessibility and added aria-label -->
- <button type="button" class="modal-backdrop" onclick={ closeModal: closeModal } aria-label="Close modal">
+ <button type="button" class="modal-backdrop" onclick={ closeModal } aria-label="Close modal">
  <!-- Added role="dialog" and aria-modal="true" for accessibility -->
  <div
  class="modal-content {modalVariant} {modalSize}"
@@ -334,7 +334,7 @@
  >
  <h3>Modal Variant: {modalVariant}</h3>
  <p>Size: {modalSize}. This is a placeholder for an enhanced modal component.</p>
- <ButtonAny onclick={ closeModal: closeModal }>Close Modal</ButtonAny>
+ <ButtonAny onclick={ closeModal }>Close Modal</ButtonAny>
  </div>
  </button>
  {/if}

@@ -5,7 +5,7 @@
 		data: PageData;
 	}
 
-	let { data: data }: Props = $props();
+	let { data }: Props = $props();
 </script>
 
 <svelte:head>

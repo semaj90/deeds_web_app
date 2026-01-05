@@ -8,7 +8,7 @@ https://svelte.dev/e/props_duplicate -->
 https://svelte.dev/e/props_duplicate -->
 <script lang="ts">
 	let query = $state<any>(undefined);
-let { onSearch: onSearch } = $props();
+let { onSearch } = $props();
 
  let { query = "" } = $props();
 

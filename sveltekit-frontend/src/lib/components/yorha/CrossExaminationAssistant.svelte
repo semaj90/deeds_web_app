@@ -199,7 +199,7 @@ ${i + 1}. [${q.type.toUpperCase()}] ${q.question}
  Case Context (Optional)
  </label>
  <textarea
- bind:value={ caseContext: caseContext }
+ bind:value={ caseContext }
  placeholder="Additional context about the case, allegations, or specific areas to focus on..."
  class="w-full h-24 bg-slate-800 border border-slate-600 rounded-lg px-3 py-2 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none text-sm"
  ></textarea>
@@ -254,7 +254,7 @@ ${i + 1}. [${q.type.toUpperCase()}] ${q.question}
  💾
  </button>
  <button
- onclick={ clearSession: clearSession }
+ onclick={ clearSession }
  class="px-3 py-1 bg-slate-700 hover:bg-slate-600 text-slate-300 rounded text-sm"
  title="Clear session"
  >

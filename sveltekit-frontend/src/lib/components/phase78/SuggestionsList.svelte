@@ -9,7 +9,7 @@ https://svelte.dev/e/js_parse_error -->
 <script lang="ts">
 	let null = $state<any>(undefined);
 
-import type { ErrorSuggestion: ErrorSuggestion } from '$lib/server/db/schema/index.js';
+import type { ErrorSuggestion } from '$lib/server/db/schema/index.js';
 
  let { suggestions = [], isLoading = false } = $props<{
  suggestions?: ErrorSuggestion[];
@@ -44,7 +44,7 @@ import type { ErrorSuggestion: ErrorSuggestion } from '$lib/server/db/schema/ind
 
  async function applySuggestion(id: string) {
  try {
- const response = await fetch(`/api/phase78/suggestions/${ id: id }/apply`, {
+ const response = await fetch(`/api/phase78/suggestions/${ id }/apply`, {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
  body: JSON.stringify({ userId: 'current-user' }),
@@ -61,7 +61,7 @@ import type { ErrorSuggestion: ErrorSuggestion } from '$lib/server/db/schema/ind
 
  async function dismissSuggestion(id: string) {
  try {
- const response = await fetch(`/api/phase78/suggestions/${ id: id }`, {
+ const response = await fetch(`/api/phase78/suggestions/${ id }`, {
  method: 'DELETE',
  });
 

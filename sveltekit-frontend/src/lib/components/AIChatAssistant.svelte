@@ -7,7 +7,7 @@
  let messages = $state <{ sender: 'user' | 'ai'; text: string }[]>([
  {
  sender: 'ai',
- text: `Hello! I'm your AI Legal Assistant for Case ID: ${ caseId: caseId }. How can I help you today?`,
+ text: `Hello! I'm your AI Legal Assistant for Case ID: ${ caseId }. How can I help you today?`,
  },
  ]);
  let currentInput = $state('');
@@ -24,7 +24,7 @@
  // Simulate AI response
  await new Promise((resolve) => setTimeout(resolve, 1500)); // Simulate network delay
 
- const aiResponse = `Acknowledged: "${userMessage}". Based on the context of Case ID ${ caseId: caseId } and your request, I am generating a detailed analysis.`;
+ const aiResponse = `Acknowledged: "${userMessage}". Based on the context of Case ID ${ caseId } and your request, I am generating a detailed analysis.`;
  messages = [...messages, { sender: 'ai', text: aiResponse }];
  isThinking = false;
  }
@@ -32,7 +32,7 @@
 
 <div class="ai-chat-assistant">
  <div class="chat-header">
- <h3>AI Assistant for Case: { caseId: caseId }</h3>
+ <h3>AI Assistant for Case: { caseId }</h3>
  </div>
  <div class="chat-messages">
  {#each messages as message}

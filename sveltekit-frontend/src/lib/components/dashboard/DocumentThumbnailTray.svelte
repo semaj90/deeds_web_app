@@ -7,10 +7,10 @@ https://svelte.dev/e/attribute_invalid_event_handler -->
 <!-- @migration-task Error while migrating Svelte code: Event attribute must be a JavaScript expression, not a string
 https://svelte.dev/e/attribute_invalid_event_handler -->
 <script lang="ts">
- import type { PageStatus: PageStatus } from '$lib/stores/dashboard/DocumentProgressStore';
- import { pageStatusesArray: pageStatusesArray } from '$lib/stores/dashboard/DocumentProgressStore';
- import { getPageStatusIcon: getPageStatusIcon } from '$lib/stores/dashboard/GrpcStatusAdapter';
- import { onMount: onMount } from 'svelte';
+ import type { PageStatus } from '$lib/stores/dashboard/DocumentProgressStore';
+ import { pageStatusesArray } from '$lib/stores/dashboard/DocumentProgressStore';
+ import { getPageStatusIcon } from '$lib/stores/dashboard/GrpcStatusAdapter';
+ import { onMount } from 'svelte';
 
  let pages: PageStatus[] = [];
  let selectedPage: number | null = null;

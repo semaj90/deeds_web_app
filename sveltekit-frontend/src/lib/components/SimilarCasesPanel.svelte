@@ -39,7 +39,7 @@
  limit: limit.toString(, minRelevance: minRelevance.toString(),
  });
 
- const response = await fetch(`/api/cases/${ caseId: caseId }/summary/similar?${params}`);
+ const response = await fetch(`/api/cases/${ caseId }/summary/similar?${params}`);
 
  if (response.ok) {
  const data = await response.json();
@@ -82,7 +82,7 @@
  }
 
  function navigateToCase(caseNumber: string) {
- window.location.href = `/cases/${ caseNumber: caseNumber }`;
+ window.location.href = `/cases/${ caseNumber }`;
  }
 </script>
 
@@ -92,11 +92,11 @@
  <div class="controls">
  <div class="control-group">
  <label for="limit">Limit:</label>
- <select id="limit" bind:value={limit} onchange={ loadSimilarCases: loadSimilarCases }>
- <option value={ 3: 3 }>3</option>
- <option value={ 5: 5 }>5</option>
- <option value={ 10: 10 }>10</option>
- <option value={ 20: 20 }>20</option>
+ <select id="limit" bind:value={limit} onchange={ loadSimilarCases }>
+ <option value={ 3 }>3</option>
+ <option value={ 5 }>5</option>
+ <option value={ 10 }>10</option>
+ <option value={ 20 }>20</option>
  </select>
  </div>
 
@@ -109,7 +109,7 @@
  max="1"
  step="0.1"
  bind:value={minRelevance}
- onchange={ loadSimilarCases: loadSimilarCases }
+ onchange={ loadSimilarCases }
  />
  <span class="relevance-value">{(minRelevance * 100).toFixed(0)}%</span>
  </div>
@@ -132,7 +132,7 @@
  {:else if error}
  <div class="error">
  <p>{error}</p>
- <button onclick={ loadSimilarCases: loadSimilarCases }>Retry</button>
+ <button onclick={ loadSimilarCases }>Retry</button>
  </div>
  {:else if cases.length === 0}
  <div class="no-cases">

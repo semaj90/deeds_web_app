@@ -97,7 +97,7 @@
 	// Get related files for selected component
 	async function getRelatedFiles(componentId: string): Promise<RelatedFile[]> {
 		try {
-			const res = await fetch(`/api/phase89/related/${ componentId: componentId }`);
+			const res = await fetch(`/api/phase89/related/${ componentId }`);
 			if (res.ok) {
 				const data = await res.json();
 				return data.related || [];
@@ -361,7 +361,7 @@
 						<h3>🔧 Uses (Svelte 5 Runes & APIs)</h3>
 						<div class="use-list">
 							{#each selectedComponent.uses as use}
-								<span class="use-badge" class:rune={use.startsWith('$')}>{ use: use }</span>
+								<span class="use-badge" class:rune={use.startsWith('$')}>{ use }</span>
 							{/each}
 						</div>
 					</div>

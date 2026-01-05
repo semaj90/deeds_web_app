@@ -140,9 +140,9 @@
 			<div class="filter-group">
 				<label>Filter by Category:</label>
 				<select bind:value={selectedCategory}>
-					<option value={ null: null }>All</option>
+					<option value={ null }>All</option>
 					{#each Object.keys(report.byCategory) as category}
-						<option value={ category: category }>{category}</option>
+						<option value={ category }>{category}</option>
 					{/each}
 				</select>
 			</div>

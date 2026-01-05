@@ -7,8 +7,8 @@ https://svelte.dev/e/js_parse_error -->
 <!-- @migration-task Error while migrating Svelte code: Unexpected token
 https://svelte.dev/e/js_parse_error -->
 <script lang="ts">
- import type { Case: Case } from '$lib/types';
- import { onMount: onMount } from 'svelte';;
+ import type { Case } from '$lib/types';
+ import { onMount } from 'svelte';;
  import { get, writable } from 'svelte/store';;
 
  // Dynamically-loaded component (runes-mode $state is available project-wide)
@@ -338,8 +338,8 @@ https://svelte.dev/e/js_parse_error -->
  </div>
 
  <div class="action-buttons">
- <button class="diagnostic-button" onclick={ runSystemDiagnostics: runSystemDiagnostics }>Run Diagnostics</button>
- <button class="clear-logs-button" onclick={ clearLogs: clearLogs }>Clear Logs</button>
+ <button class="diagnostic-button" onclick={ runSystemDiagnostics }>Run Diagnostics</button>
+ <button class="clear-logs-button" onclick={ clearLogs }>Clear Logs</button>
  </div>
  </section>
 

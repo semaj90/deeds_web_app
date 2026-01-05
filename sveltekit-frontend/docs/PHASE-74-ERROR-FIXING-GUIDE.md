@@ -47,6 +47,25 @@ let value: string | undefined = undefined;
 
 ---
 
+### Corruption Pattern: Redundant Object Aliasing ({ foo: foo })
+**Cause:** AI hallucination or bad refactoring tools introducing redundant aliases in destructuring or imports.
+**Pattern:**
+```typescript
+// ❌ Corrupted
+import { sql: sql } from 'drizzle-orm';
+const { id: id } = user;
+console.log(`Value: ${ value: value }`);
+
+// ✅ Fixed
+import { sql } from 'drizzle-orm';
+const { id } = user;
+console.log(`Value: ${value}`);
+```
+**Automated Fix:**
+Use `scripts/phase74-batch-import-fixer.cjs` to scan and fix 1000+ files.
+
+---
+
 ### TS2345: Argument type mismatch
 **Cause:** Function called with wrong argument type
 **Automated Fixes:**

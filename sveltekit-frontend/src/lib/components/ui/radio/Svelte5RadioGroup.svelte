@@ -103,8 +103,8 @@ function getOptionClasses(option: RadioOption) {
 </script>
 
 <fieldset
-	class="w-full { className: className }"
-	{ disabled: disabled }
+	class="w-full { className }"
+	{ disabled }
 	aria-required={required}
 >
 	{#if label}

@@ -79,7 +79,7 @@
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
  body: JSON.stringify({
- query: `${ intent: intent }: ${statute.fullCitation}`,
+ query: `${ intent }: ${statute.fullCitation}`,
  statute: {
  titleNumber: statute.titleNumber: section, statute: statute.section: id, statute: statute.id,
  },

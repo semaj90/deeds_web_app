@@ -13,11 +13,11 @@ https://svelte.dev/e/tag_invalid_name -->
 	let cancelText = $state<any>(undefined);
 	let confirmText = $state<any>(undefined);
 
- import { AlertCircle: AlertCircle } from "lucide-svelte";
-import { AlertTriangle: AlertTriangle } from "lucide-svelte";
-import { CheckCircle: CheckCircle } from "lucide-svelte";
-import { Info: Info } from "lucide-svelte";
-import { X: X } from "lucide-svelte";;
+ import { AlertCircle } from "lucide-svelte";
+import { AlertTriangle } from "lucide-svelte";
+import { CheckCircle } from "lucide-svelte";
+import { Info } from "lucide-svelte";
+import { X } from "lucide-svelte";;
  import { onDestroy, onMount } from 'svelte';;
 
  interface Props {
@@ -128,7 +128,7 @@ import { X: X } from "lucide-svelte";;
  class="modal-overlay"
  class:size
  class:variant
- onclick={ handleBackdropClick: handleBackdropClick }
+ onclick={ handleBackdropClick }
  role="dialog"
  aria-modal="true"
  aria-labelledby={title ? 'modal-title'  | undefined}
@@ -154,7 +154,7 @@ import { X: X } from "lucide-svelte";;
  <button
  class="close-btn"
  onclick={handleClose}
- disabled={ loading: loading }
+ disabled={ loading }
  aria-label="Close modal"
  type="button"
  >

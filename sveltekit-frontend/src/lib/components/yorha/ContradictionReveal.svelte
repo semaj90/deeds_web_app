@@ -73,7 +73,7 @@ https://svelte.dev/e/js_parse_error -->
  <!-- Action Button -->
  <button
  class="bg-yellow-500 hover:bg-yellow-600 text-black font-bold py-3 px-8 rounded-lg transition-colors animate-pulse"
- onclick={ dismiss: dismiss }
+ onclick={ dismiss }
  >
  REVIEW EVIDENCE
  </button>

@@ -109,13 +109,13 @@
  }
 </script>
 
-<svelte:window onmousemove={ handleMouseMove: handleMouseMove } onmouseup={ handleMouseUp: handleMouseUp } />
+<svelte:window onmousemove={ handleMouseMove } onmouseup={ handleMouseUp } />
 
 <!-- Node Element -->
 <div
  bind:this={element}
  class="evidence-node"
- class:selected={ isSelected: isSelected }
+ class:selected={ isSelected }
  class:pending-link-source={isPendingLinkSource}
  class:dragging={isDragging}
  role="button"
@@ -125,7 +125,7 @@
  top: {node.y}px;
  --node-color: {getNodeTypeColor(node.evidenceType)};
  "
- onmousedown={ handleMouseDown: handleMouseDown }
+ onmousedown={ handleMouseDown }
 >
  <!-- Node Header -->
  <div class="node-header">

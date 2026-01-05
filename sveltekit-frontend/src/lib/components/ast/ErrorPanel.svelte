@@ -66,7 +66,7 @@
  </div>
 
  <!-- Error list -->
- <div class="flex-1 overflow-y-auto" style="max-height: { maxHeight: maxHeight }">
+ <div class="flex-1 overflow-y-auto" style="max-height: { maxHeight }">
  {#if errors.length === 0}
  <div class="flex flex-col items-center justify-center py-8 text-gray-500">
  <span class="i-lucide-check-circle text-4xl text-green-500 mb-2"></span>

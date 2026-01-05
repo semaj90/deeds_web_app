@@ -78,21 +78,21 @@ function handleChange(e: Event) {
 
 <label
 	class="inline-flex items-center gap-3 cursor-pointer select-none {className}"
-	class:opacity-50={ disabled: disabled }
-	class:cursor-not-allowed={ disabled: disabled }
+	class:opacity-50={ disabled }
+	class:cursor-not-allowed={ disabled }
 >
 	<div class="relative">
 		<input
 			type="checkbox"
 			{id}
-			{ name: name }
-			{ value: value }
-			{ disabled: disabled }
+			{ name }
+			{ value }
+			{ disabled }
 			{required}
 			bind:checked
 			bind:indeterminate
 			class="peer appearance-none {sizeClasses} {variantClasses} cursor-pointer disabled:cursor-not-allowed"
-			onchange={ handleChange: handleChange }
+			onchange={ handleChange }
 		/>
 
 		<!-- Checkmark icon -->

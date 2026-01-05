@@ -8,9 +8,9 @@
 </script>
 
 <button
- { type: type }
- { disabled: disabled }
- onclick={ onclick: onclick }
+ { type }
+ { disabled }
+ onclick={ onclick }
  class={variant === 'primary'
  ? 'btn-primary'
  : variant === 'secondary'

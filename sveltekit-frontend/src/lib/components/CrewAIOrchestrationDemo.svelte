@@ -50,13 +50,13 @@
  analysis: {
  confidence: Math.random() * 0.4 + 0.6, // 60-100%
  findings: [
- `Finding 1 from ${ agentId: agentId }`,
- `Finding 2 from ${ agentId: agentId }`,
- `Finding 3 from ${ agentId: agentId }`
+ `Finding 1 from ${ agentId }`,
+ `Finding 2 from ${ agentId }`,
+ `Finding 3 from ${ agentId }`
  ],
  recommendations: [
- `Recommendation A from ${ agentId: agentId }`,
- `Recommendation B from ${ agentId: agentId }`
+ `Recommendation A from ${ agentId }`,
+ `Recommendation B from ${ agentId }`
  ]
  },
  completedAt: Date.now()
@@ -89,7 +89,7 @@
  <span>Priority:</span>
  <select bind:value={taskPriority}>
  <option value={1}>Low (1)</option>
- <option value={ 2: 2 }>Medium (2)</option>
+ <option value={ 2 }>Medium (2)</option>
  <option value={3}>High (3)</option>
  </select>
  </label>

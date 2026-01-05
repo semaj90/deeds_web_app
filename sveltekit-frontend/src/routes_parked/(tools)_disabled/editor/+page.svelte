@@ -128,7 +128,7 @@ import { Settings } from "lucide-svelte";;
  <div class="yorha-panel-content">
  <NierRichTextEditor
  bind:value={editorValue}
- onValueChange={ handleEditorChange: handleEditorChange } <!-- Add onValueChange prop to update editorValue -->
+ onValueChange={ handleEditorChange } <!-- Add onValueChange prop to update editorValue -->
  placeholder="Begin your investigation notes or legal document, here..."
  caseId="EDITOR-SESSION"
  readonly={false}

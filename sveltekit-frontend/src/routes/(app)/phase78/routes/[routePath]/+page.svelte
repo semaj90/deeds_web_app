@@ -18,7 +18,7 @@
 </script>
 
 <svelte:head>
- <title>Route Errors: { routePath: routePath }</title>
+ <title>Route Errors: { routePath }</title>
 </svelte:head>
 
 <div class="min-h-screen bg-gray-50">
@@ -30,7 +30,7 @@
  <div class="flex items-center gap-3">
  <h1 class="text-3xl font-bold text-gray-900">Route Error Details</h1>
  </div>
- <p class="text-lg font-mono text-gray-600 mt-2 break-all">{ routePath: routePath }</p>
+ <p class="text-lg font-mono text-gray-600 mt-2 break-all">{ routePath }</p>
 
  {#if health}
  <div class="flex items-center gap-3 mt-4">
@@ -118,7 +118,7 @@
  <p class="text-gray-600 mt-1">This route is running smoothly!</p>
  </div>
  {:else}
- <ErrorEventsList {routePath} { errors: errors } isLoading={ false: false } />
+ <ErrorEventsList {routePath} { errors } isLoading={ false } />
  {/if}
  {:else if tab === 'suggestions'}
  {#if suggestions.length === 0}

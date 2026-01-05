@@ -176,7 +176,7 @@
  <button
  type="button"
  class="text-slate-300 hover:text-white text-sm"
- onclick={ onClose: onClose }
+ onclick={ onClose }
  >
  ✕ Close
  </button>
@@ -295,7 +295,7 @@
  <button
  type="button"
  class="mt-2 w-full text-xs font-semibold rounded bg-emerald-500 hover:bg-emerald-400 text-slate-900 py-1 disabled:bg-slate-600 disabled:text-slate-300"
- onclick={ applySelectedSuggestion: applySelectedSuggestion }
+ onclick={ applySelectedSuggestion }
  disabled={!selectedSuggestionId || applying}
  >
  {#if applying}

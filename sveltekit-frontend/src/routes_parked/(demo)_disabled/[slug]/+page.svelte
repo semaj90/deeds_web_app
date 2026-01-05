@@ -8,7 +8,7 @@
 		data?: unknown;
 	}
 
-	let { data: data }: Props = $props();
+	let { data }: Props = $props();
 
 	// Define a type for a Svelte component constructor
 	type SvelteComponentConstructor = new (...args: unknown[]) => SvelteComponent;
@@ -165,7 +165,7 @@
 			{#if metadata.tags.length > 0}
 				<div class="demo-tags">
 					{#each Array.isArray(metadata.tags) ? metadata.tags : [] as tag}
-						<span class="demo-tag">{ tag: tag }</span>
+						<span class="demo-tag">{ tag }</span>
 					{/each}
 				</div>
 			{/if}
@@ -190,7 +190,7 @@
 			</div>
 		{:else if currentComponent}
 			<div class="demo-wrapper">
-				<currentComponent { data: data } ></currentComponent>
+				<currentComponent { data } ></currentComponent>
 			</div>
 		{:else}
 			<div class="demo-placeholder">

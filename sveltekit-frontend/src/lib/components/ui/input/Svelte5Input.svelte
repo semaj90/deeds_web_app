@@ -180,10 +180,10 @@ function handleBlur() {
 				   disabled:opacity-50 disabled:cursor-not-allowed
 				   {prefix ? 'pl-10' : ''}
 				   {suffix ? 'pr-10' : ''}"
-			oninput={ handleInput: handleInput }
-			onchange={ handleChange: handleChange }
-			onfocus={ handleFocus: handleFocus }
-			onblur={ handleBlur: handleBlur }
+			oninput={ handleInput }
+			onchange={ handleChange }
+			onfocus={ handleFocus }
+			onblur={ handleBlur }
 			aria-invalid={!!error}
 			aria-describedby={error ? `${id}-error`  | undefined}
 		/>

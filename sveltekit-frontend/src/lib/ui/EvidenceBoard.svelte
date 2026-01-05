@@ -178,7 +178,7 @@ https://svelte.dev/e/element_invalid_closing_tag -->
  <span class="i-heroicons-link mr-1" ></span>
  {showConnections ? 'Hide' : 'Show'} Lines
  </Button>
- <Button variant="secondary" onclick={ resetBoard: resetBoard }>
+ <Button variant="secondary" onclick={ resetBoard }>
  <span class="i-heroicons-arrow-path mr-1" ></span>
  Reset
  </Button>

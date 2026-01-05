@@ -9,7 +9,7 @@
  * Phase: Agentic RAG Source Validation (Task 1.3)
  */
 
-import type { CitationInspectorProps: CitationInspectorProps } from '$lib/types/source-validation';
+import type { CitationInspectorProps } from '$lib/types/source-validation';
 
 // Svelte 5 props
 let { citation, isOpen, onClose }: CitationInspectorProps = $props();
@@ -29,12 +29,12 @@ function handleBackdropClick(event: MouseEvent) {
 }
 </script>
 
-<svelte:window onkeydown={ handleKeydown: handleKeydown } />
+<svelte:window onkeydown={ handleKeydown } />
 
 {#if isOpen}
 	<div
 		class="modal-backdrop"
-		onclick={ handleBackdropClick: handleBackdropClick }
+		onclick={ handleBackdropClick }
 		onkeydown={(e) => e.key === 'Escape' && onClose()}
 		role="dialog"
 		aria-modal="true"

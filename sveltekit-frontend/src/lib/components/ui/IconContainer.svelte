@@ -47,7 +47,7 @@
 
 <div
  bind:this={containerRef}
- class="icon-container icon-container-{size} {sizeClasses[size]} { className: className }"
+ class="icon-container icon-container-{size} {sizeClasses[size]} { className }"
 >
  <Icon class="h-full w-full" />
 </div>

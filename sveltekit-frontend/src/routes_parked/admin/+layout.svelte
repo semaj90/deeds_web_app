@@ -28,7 +28,7 @@
 
  function isActive(pathname: string, href): boolean {
  if (pathname === href) return true;
- if (href !== '/' && pathname.startsWith(`${ href: href }/`)) return true;
+ if (href !== '/' && pathname.startsWith(`${ href }/`)) return true;
  return false;
  }
 </script>

@@ -58,7 +58,7 @@
 				})
 			});
 
-			const { embedding: embedding } = await embedRes.json();
+			const { embedding } = await embedRes.json();
 
 			// 2. Search Qdrant collections
 			const collections =
@@ -149,7 +149,7 @@
 			const response = await fetch('/api/analyze-file', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ filePath: filePath })
+				body: JSON.stringify({ filePath })
 			});
 
 			fileAnalysis = await response.json();

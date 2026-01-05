@@ -74,7 +74,7 @@
 	onclick={handleClick}
 	onkeydown={handleKeydown}
 	data-state={checked ? 'checked' : 'unchecked'}
-	class="{trackClass} {checked ? 'bg-primary' : 'bg-input'} { className: className }"
+	class="{trackClass} {checked ? 'bg-primary' : 'bg-input'} { className }"
 >
 	<span
 		class="{thumbClass} {checked ? 'translate-x-5' : 'translate-x-0'}"
@@ -85,7 +85,7 @@
 {#if name}
 	<input
 		type="hidden"
-		{ name: name }
+		{ name }
 		value={checked ? value : ''}
 		{required}
 	/>

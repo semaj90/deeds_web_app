@@ -111,11 +111,11 @@
  <div class="code-area flex-1 relative">
  <textarea
  bind:this={editorRef}
- bind:value={ code: code }
- oninput={ handleInput: handleInput }
- onkeydown={ handleKeyDown: handleKeyDown }
- { readonly: readonly }
- { placeholder: placeholder }
+ bind:value={ code }
+ oninput={ handleInput }
+ onkeydown={ handleKeyDown }
+ { readonly }
+ { placeholder }
  spellcheck="false"
  autocomplete="off"
  autocorrect="off"

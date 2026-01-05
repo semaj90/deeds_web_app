@@ -44,8 +44,8 @@ let { placeholder = 'Search statutes by code or title...', isLoading = false } =
  <input
  type="text"
  bind:value={query}
- { placeholder: placeholder }
- onkeydown={ handleKeydown: handleKeydown }
+ { placeholder }
+ onkeydown={ handleKeydown }
  disabled={isLoading}
  class="search-input"
  />

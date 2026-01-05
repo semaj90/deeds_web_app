@@ -14,14 +14,14 @@
 
 import type { Case } from '$lib/types';
 import type { Document } from '$lib/types'; /** * Legal Report Comparison - PDF Upload & NLP Similarity Analysis *
- * Features: * - PDF report upload with OCR * - WHO/WHAT/WHY/HOW/EVIDENCE extraction * - Person of Interest (POI) tracking * - embeddinggemma vector search * - Qdrant tag-based filtering * - Case similarity recommendations * - gemma3-legal:latest agentic analysis */ import type { toast: toast } from 'svelte-sonner'; import { FileText: FileText } from "lucide-svelte";
-import { Upload: Upload } from "lucide-svelte";
-import { Search: Search } from "lucide-svelte";
-import { Users: Users } from "lucide-svelte";
-import { Scale: Scale } from "lucide-svelte";
-import { FileSearch: FileSearch } from "lucide-svelte";
-import { Sparkles: Sparkles } from "lucide-svelte";
-import { CheckCircle2: CheckCircle2 } from "lucide-svelte";
+ * Features: * - PDF report upload with OCR * - WHO/WHAT/WHY/HOW/EVIDENCE extraction * - Person of Interest (POI) tracking * - embeddinggemma vector search * - Qdrant tag-based filtering * - Case similarity recommendations * - gemma3-legal:latest agentic analysis */ import type { toast } from 'svelte-sonner'; import { FileText } from "lucide-svelte";
+import { Upload } from "lucide-svelte";
+import { Search } from "lucide-svelte";
+import { Users } from "lucide-svelte";
+import { Scale } from "lucide-svelte";
+import { FileSearch } from "lucide-svelte";
+import { Sparkles } from "lucide-svelte";
+import { CheckCircle2 } from "lucide-svelte";
 import { AlertTriangle } from "lucide-svelte";; import Button from '$lib/components/ui/Button.svelte'; import Card, CardContent, CardHeader, CardTitle from "$lib/components/ui/Card.svelte"; // ============================================================================ // Svelte, 5 State Management // ============================================================================ let uploadFile = $state <File: null>(null); let isUploading = $state <boolean>(false); let uploadProgress = $state <number>(0); // Form data let formData = $state ({ title: '', documentType: 'report', as: 'verdict' | 'sentence' | 'contract' | 'evidence' | 'brief' | 'motion' | 'report', jurisdiction: '', // Added colon caseNumber: '', enableComparison: true, // Added colon });
   
  }
@@ -124,7 +124,7 @@ import { AlertTriangle } from "lucide-svelte";; import Button from '$lib/compone
  <Card class="mt-4">
  <CardContent>
  <p class="text-red-500">Error: {analysisError}</p>
- <Button onclick={ resetForm: resetForm } variant="outline">Try Again</Button>
+ <Button onclick={ resetForm } variant="outline">Try Again</Button>
  </CardContent>
  </Card>
  {/if}

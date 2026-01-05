@@ -7,11 +7,11 @@ https://svelte.dev/e/js_parse_error -->
 <!-- @migration-task Error while migrating Svelte code: The 'type' modifier cannot be used on a named import when 'import type' is used on its import statement.
 https://svelte.dev/e/js_parse_error -->
 <script lang="ts">
-import type { Case: Case } from '$lib/types';
-import type { Document: Document } from '$lib/types';
- import type { Snippet: Snippet } from 'svelte';
- import type { afterNavigate: afterNavigate } from '$app/navigation';
- import type { browser: browser } from '$app/environment';
+import type { Case } from '$lib/types';
+import type { Document } from '$lib/types';
+ import type { Snippet } from 'svelte';
+ import type { afterNavigate } from '$app/navigation';
+ import type { browser } from '$app/environment';
  import type { applyConsolePalette, type ConsolePaletteName } from '$lib/themes/retro-console-palettes';
 
  interface Props {

@@ -131,8 +131,8 @@ const tabs = [
 
 						<Svelte5Slider
 							bind:value={sliderValue}
-							min={ 0: 0 }
-							max={ 100: 100 }
+							min={ 0 }
+							max={ 100 }
 							label="Confidence Threshold"
 							showValue
 							color="blue"

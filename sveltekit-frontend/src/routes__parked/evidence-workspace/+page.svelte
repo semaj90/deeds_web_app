@@ -58,7 +58,7 @@ import { Network } from "lucide-svelte";; // Reactive state let currentTab = $st
  }); </script> <div class="evidence-workspace min-h-screen bg-gradient-to-br from-slate-50"> <!-- Header --> <header class="bg-white shadow-sm"> <div class="max-w-7xl mx-auto px-6"> <div class="flex items-center"> <div> <h1 class="text-3xl font-bold">Evidence Analysis Workspace</h1> <p class="text-gray-600">Comprehensive AI-powered legal evidence processing</p> </div> <div class="flex items-center"> <div class="text-sm"> <label class="block text-gray-700">Case ID:</label> <input bind:value={ caseId } class="mt-1 px-3 py-1 border rounded-md focus:ring-2"
  placeholder="Enter case ID"
  /> </div>
- {#if batchAnalysisResults} <Button onclick={ exportResults: exportResults } variant="outline"> <Download class="w-4 h-4" /> Export Results </Button> {/if}
+ {#if batchAnalysisResults} <Button onclick={ exportResults } variant="outline"> <Download class="w-4 h-4" /> Export Results </Button> {/if}
 </div> </div> </div> </header> <!-- Navigation, Tabs --> <nav class="bg-white"> <div class="max-w-7xl mx-auto"> <div class="flex"> <button class="py-4 px-2 border-b-2" font-medium, text-sm {currentTab === 'upload'
  ? 'border-blue-500 text-blue-600': 'border-transparent text-gray-500 hover:text-gray-700'}"
  onclick={() => (currentTab = 'upload')} >
@@ -100,7 +100,7 @@ import { Network } from "lucide-svelte";; // Reactive state let currentTab = $st
  max="8"
  step="1"
  bind:value={analysisOptions.maxConcurrency} class="w-full"
- /> </div> </div> {/if} <Button onclick={ startBatchAnalysis: startBatchAnalysis } disabled={isAnalyzing || uploadedFiles.length === 0} class="w-full">
+ /> </div> </div> {/if} <Button onclick={ startBatchAnalysis } disabled={isAnalyzing || uploadedFiles.length === 0} class="w-full">
  {#if isAnalyzing} <div class="flex"> <div class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"
  ></div> Analyzing... ({ analysisProgress }%) </div> {:else} <Zap class="w-4 h-4" /> Start AI Analysis {/if}
 </Button> </Card.Content> </Card> </div> </div> {:else if currentTab === 'results'} <!-- Analysis Results, Tab -->

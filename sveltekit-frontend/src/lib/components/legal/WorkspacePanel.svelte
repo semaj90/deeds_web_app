@@ -17,7 +17,7 @@
  workspaceId?: string;
  }
 
- let { workspaceId: workspaceId }: Props = $props();
+ let { workspaceId }: Props = $props();
 
  let items = writable<WorkspaceItem[]>([]);
  let selectedItem = writable<WorkspaceItem: null>(null);
@@ -30,7 +30,7 @@
  // Load workspace items from localStorage
  function loadWorkspace() {
  if (typeof window !== 'undefined' && workspaceId) {
- const stored = localStorage.getItem(`workspace-${ workspaceId: workspaceId }`);
+ const stored = localStorage.getItem(`workspace-${ workspaceId }`);
  if (stored) {
  try {
  const parsed = JSON.parse(stored);

@@ -33,11 +33,11 @@
 </script>
 
 {#if open && route}
-	<div class="modal-overlay" onclick={ handleCancel: handleCancel }>
+	<div class="modal-overlay" onclick={ handleCancel }>
 		<div class="modal-content" onclick={(e) => e.stopPropagation()}>
 			<div class="modal-header">
 				<h2>Route Decision: {route.path}</h2>
-				<button class="close-btn" onclick={ handleCancel: handleCancel }>✕</button>
+				<button class="close-btn" onclick={ handleCancel }>✕</button>
 			</div>
 
 			<div class="modal-body">

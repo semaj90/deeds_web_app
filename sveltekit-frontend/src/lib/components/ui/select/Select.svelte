@@ -55,7 +55,7 @@
 	);
 </script>
 
-<SelectRoot bind:value { defaultValue: defaultValue } { onValueChange: onValueChange } {disabled} {required} { name: name } class={ className: className } { placeholder: placeholder }>
+<SelectRoot bind:value { defaultValue } { onValueChange } {disabled} {required} { name } class={ className } { placeholder }>
 	<SelectTrigger>
 		<SelectValue {placeholder} {labels} />
 	</SelectTrigger>

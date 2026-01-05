@@ -25,7 +25,7 @@ https://svelte.dev/e/js_parse_error -->
  const iterations = 50
  let testData: { matrixA: Float32Array;, matrixB: Float32Array } | null = null
  function append(msg: string) {
- log += `[${new Date().toLocaleTimeString()}] ${ msg: msg }\n`}
+ log += `[${new Date().toLocaleTimeString()}] ${ msg }\n`}
  $effect(() => {() => {
  (async () => {
 if (browser) {
@@ -109,7 +109,7 @@ if (browser) {
  generateGemma270MRecommendation();
  progressPercent = 100
  append('ðŸŽ‰ Gemma3 270M performance analysis completed successfully')} catch (error) {
- append(`âŒ Test error: ${ error: error }`);
+ append(`âŒ Test error: ${ error }`);
  console.error('Performance test error:', error);
 '
  } finally {

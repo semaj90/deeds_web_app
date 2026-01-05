@@ -72,7 +72,7 @@
 	function updateRouteHealth(routeId: string, newStatus: string, reason?: string): void {
 		const routeIndex = routes.findIndex((r) => r.id === routeId);
 		if (routeIndex === -1) {
-			console.warn(`[SSE] Route ${ routeId: routeId } not found in routes array`);
+			console.warn(`[SSE] Route ${ routeId } not found in routes array`);
 			return;
 		}
 
@@ -90,7 +90,7 @@
 		// Trigger reactivity
 		routes = routes;
 
-		console.log(`[SSE] Updated route ${ routeId: routeId } health to ${newStatus}`);
+		console.log(`[SSE] Updated route ${ routeId } health to ${newStatus}`);
 	}
 
 	/**
@@ -152,7 +152,7 @@
 				return;
 			}
 
-			console.log(`[Phase 7.1] Logged ${ interactionType: interactionType } interaction for route ${routeId}`);
+			console.log(`[Phase 7.1] Logged ${ interactionType } interaction for route ${routeId}`);
 		} catch (error) {
 			// Don't block UI on logging errors
 			console.error(`[Phase 7.1] Error logging interaction:`, error);
@@ -172,7 +172,7 @@
 	 * Call logInteraction('navigate') when "Visit Page" button clicked
 	 */
 	function handleRouteNavigate(routeId: string, path: string): void {
-		logInteraction(routeId, 'navigate', { path: path });
+		logInteraction(routeId, 'navigate', { path });
   
 		window.location.href = path;
 	}

@@ -96,7 +96,7 @@ import { onMount } from 'svelte';
  })
  });
  if (jobResponse.ok) {
- const { jobId: jobId } = await jobResponse.json();
+ const { jobId } = await jobResponse.json();
  // Wait for job completion
  const resultResponse = await fetch('/api/workers/wait', {
  method: 'PUT',

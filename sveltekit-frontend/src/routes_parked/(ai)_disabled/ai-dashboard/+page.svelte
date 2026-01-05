@@ -7,10 +7,10 @@ https://svelte.dev/e/js_parse_error -->
 <!-- @migration-task Error while migrating Svelte code: Unexpected token
 https://svelte.dev/e/js_parse_error -->
 <script lang="ts">
- import type { User: User } from '$lib/types';
- import type { Case: Case } from '$lib/types';
- import type { Document: Document } from '$lib/types';
- import type { PageData: PageData } from './$types';
+ import type { User } from '$lib/types';
+ import type { Case } from '$lib/types';
+ import type { Document } from '$lib/types';
+ import type { PageData } from './$types';
 
  // Prefer named exports from UI kit (safer for modern kits)
  import type { Card, CardContent, CardHeader, CardTitle } from '$lib/components/ui/card';

@@ -129,7 +129,7 @@
 						id="new-name"
 						type="text"
 						bind:value={newName}
-						onkeydown={ handleKeydown: handleKeydown }
+						onkeydown={ handleKeydown }
 						class="name-input"
 						class:invalid={newName && !isValid}
 						class:valid={isValid}

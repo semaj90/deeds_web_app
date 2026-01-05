@@ -107,14 +107,14 @@
  {#if photos.length > 1}
  <button
  class="absolute left-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full transition-colors"
- onclick={ prevPhoto: prevPhoto }
+ onclick={ prevPhoto }
  disabled={currentIndex === 0}
  >
  <ChevronLeft class="w-6 h-6" />
  </button>
  <button
  class="absolute right-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full transition-colors"
- onclick={ nextPhoto: nextPhoto }
+ onclick={ nextPhoto }
  disabled={currentIndex === photos.length - 1}
  >
  <ChevronRight class="w-6 h-6" />

@@ -43,7 +43,7 @@
 
 		isLoading = true;
 		try {
-			const params = new URLSearchParams({ jurisdiction: jurisdiction });
+			const params = new URLSearchParams({ jurisdiction });
 			if (searchQuery) params.set('search', searchQuery);
 
 			const res = await fetch(`/api/tags?${params}`);
@@ -165,7 +165,7 @@
 							type="text"
 							placeholder="Search tags..."
 							bind:value={searchQuery}
-							oninput={ loadTags: loadTags }
+							oninput={ loadTags }
 						/>
 					</div>
 

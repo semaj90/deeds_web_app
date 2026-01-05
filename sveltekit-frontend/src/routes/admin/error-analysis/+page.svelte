@@ -91,7 +91,7 @@
 			const response = await fetch('/api/phase89/execute-command', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ command: command })
+				body: JSON.stringify({ command })
 			});
 
 			const result = await response.json();

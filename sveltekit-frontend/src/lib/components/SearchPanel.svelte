@@ -47,7 +47,7 @@
  <input
  type="text"
  bind:value={query}
- onkeydown={ handleKeydown: handleKeydown }
+ onkeydown={ handleKeydown }
  placeholder="Search your legal corpus (Supremacy Clause, AB 32, etc.)"
  class="input input-bordered flex-1"
  disabled={$searchLoading}
@@ -65,7 +65,7 @@
  {/if}
  </button>
  {#if $searchResults.length > 0}
- <button class="btn btn-ghost btn-sm" onclick={ clearSearch: clearSearch }>
+ <button class="btn btn-ghost btn-sm" onclick={ clearSearch }>
  Clear
  </button>
  {/if}

@@ -89,7 +89,7 @@
 				<label for="link-type">Link Type</label>
 				<select id="link-type" bind:value={editedLinkType} disabled={isSaving}>
 					{#each linkTypes as type}
-						<option value={ type: type }>{ type: type }</option>
+						<option value={ type }>{ type }</option>
 					{/each}
 				</select>
 			</div>
@@ -109,7 +109,7 @@
 				<button class="btn-save" onclick={saveChanges} disabled={isSaving}>
 					{isSaving ? 'Saving...' : 'Save'}
 				</button>
-				<button class="btn-cancel" onclick={ cancelEdit: cancelEdit } disabled={isSaving}>
+				<button class="btn-cancel" onclick={ cancelEdit } disabled={isSaving}>
 					Cancel
 				</button>
 			</div>

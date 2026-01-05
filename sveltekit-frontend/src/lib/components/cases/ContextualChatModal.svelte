@@ -148,7 +148,7 @@
  <div class="input-area">
  <textarea
  bind:value={inputValue}
- onkeydown={ handleKeydown: handleKeydown }
+ onkeydown={ handleKeydown }
  placeholder="Ask a question about this case... (Shift+Enter for new line)"
  disabled={isLoading}
  class="input-field"

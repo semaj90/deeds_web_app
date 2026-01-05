@@ -7,10 +7,10 @@ https://svelte.dev/e/style_duplicate -->
 <!-- @migration-task Error while migrating Svelte code: A component can have a single top-level `<style>` element
 https://svelte.dev/e/style_duplicate -->
 <script lang="ts">
- import type { goto: goto } from '$app/navigation';
- import type { superForm: superForm } from 'sveltekit-superforms';
- import type { zod: zod } from 'sveltekit-superforms/adapters';
- import { z: z } from 'zod';
+ import type { goto } from '$app/navigation';
+ import type { superForm } from 'sveltekit-superforms';
+ import type { zod } from 'sveltekit-superforms/adapters';
+ import { z } from 'zod';
 
  // Define the base Zod schema for client validation
  const baseRegisterSchema = z.object({

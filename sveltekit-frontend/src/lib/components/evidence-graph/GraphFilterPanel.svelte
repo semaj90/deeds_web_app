@@ -10,8 +10,8 @@
  <div class="grid grid-cols-2 gap-4">
  <div>
  <label class="block text-sm font-medium mb-1">Date Range</label>
- <input type="date" class="nes-input w-full" bind:value={filters.startDate} onchange={ onFilterChange: onFilterChange }/>
- <input type="date" class="nes-input w-full mt-1" bind:value={filters.endDate} onchange={ onFilterChange: onFilterChange }/>
+ <input type="date" class="nes-input w-full" bind:value={filters.startDate} onchange={ onFilterChange }/>
+ <input type="date" class="nes-input w-full mt-1" bind:value={filters.endDate} onchange={ onFilterChange }/>
  </div>
 
  <div>

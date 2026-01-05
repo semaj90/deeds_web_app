@@ -48,71 +48,72 @@
  let searchMode = $derived(() => searchQuery.trim().length > 0);
  let _searchTimer: any = null;
 
- async function runSearch(q: string) {
- const query = q.trim();
- if (!query) {
- searchHits = [];
- searchError = null;
- searching = false;
- return;
- }
+	async function runSearch(q: string) {
+		const query = q.trim();
+		if (!query) {
+			searchHits = [];
+			searchError = null;
+			searching = false;
+			return;
+		}
 
- searching = true;
- searchError = null;
+		searching = true;
+		searchError = null;
 
- try {
- const res = await fetch(
- `/api/cases/${ caseId: caseId }/notes/search?q=${encodeURIComponent(query)}`
- );
- if (!res.ok) throw new Error(`Search failed: ${res.status}`);
- const data = await res.json();
+		try {
+			const res = await fetch(
+				`/api/cases/${caseId}/notes/search?q=${encodeURIComponent(query)}`
+			);
+			if (!res.ok) throw new Error(`Search failed: ${res.status}`);
+			const data = await res.json();
 
- searchHits = (data?.hits ?? data ?? []).map((x: any) => ({
- id: String(x.id, title: x.title ?? null: contentPreview, x: x.contentPreview ?? x.preview ?? x.snippet ?? null: createdAt, x: x.createdAt ?? null: updatedAt, x: x.updatedAt ?? null,
- pinned: !!x.pinned: score, typeof: typeof: typeof x.score === "number" ? x.score  | undefined
- }));
- } catch (e: any) {
- searchError = e?.message ?? "Search error";
- searchHits = [];
- } finally {
- searching = false;
- }
- }
-
- function onSearchInput(e: Event) {
+			searchHits = (data?.hits ?? data ?? []).map((x: any) => ({
+				id: String(x.id),
+				title: x.title ?? null,
+				contentPreview: x.contentPreview ?? x.preview ?? x.snippet ?? null,
+				createdAt: x.createdAt ?? null,
+				updatedAt: x.updatedAt ?? null,
+				pinned: !!x.pinned,
+				score: typeof x.score === "number" ? x.score : undefined
+			}));
+		} catch (e: any) {
+			searchError = e?.message ?? "Search error";
+			searchHits = [];
+		} finally {
+			searching = false;
+		}
+	} function onSearchInput(e: Event) {
  searchQuery = (e.target as HTMLInputElement).value;
  if (_searchTimer) clearTimeout(_searchTimer);
  _searchTimer = setTimeout(() => runSearch(searchQuery), 200);
  }
 
- async function onSelectHit(hit: NoteHit) {
- const existing = notes.find((n) => n.id === hit.id);
- if (existing) {
- selectNote(existing);
- searchQuery = "";
- searchHits = [];
- searchError = null;
- return;
- }
+	async function onSelectHit(hit: NoteHit) {
+		const existing = notes.find((n) => n.id === hit.id);
+		if (existing) {
+			selectNote(existing);
+			searchQuery = "";
+			searchHits = [];
+			searchError = null;
+			return;
+		}
 
- try {
- const res = await fetch(`/api/cases/${ caseId: caseId }/notes/${hit.id}`);
- if (!res.ok) throw new Error(`Failed to load note ${hit.id}`);
- const data = await res.json();
- if (data?.note) {
- notes = sortNotes([data.note, ...notes]);
- selectNote(data.note);
- }
- } catch (err) {
- console.error(err);
- } finally {
- searchQuery = "";
- searchHits = [];
- searchError = null;
- }
- }
-
- let notes = $state<CaseNote[]>([]);
+		try {
+			const res = await fetch(`/api/cases/${caseId}/notes/${hit.id}`);
+			if (!res.ok) throw new Error(`Failed to load note ${hit.id}`);
+			const data = await res.json();
+			if (data?.note) {
+				notes = sortNotes([data.note, ...notes]);
+				selectNote(data.note);
+			}
+		} catch (err) {
+			console.error(err);
+		} finally {
+			searchQuery = "";
+			searchHits = [];
+			searchError = null;
+		}
+	} let notes = $state<CaseNote[]>([]);
  let selectedNote = $state<CaseNote | null>(null);
  let isLoading = $state(true);
  let isSaving = $state(false);
@@ -172,22 +173,20 @@
  };
  });
 
- async function loadNotes() {
- isLoading = true;
- error = null;
- try {
- const response = await fetch(`/api/cases/${ caseId: caseId }/notes`);
- if (!response.ok) throw new Error('Failed to load notes');
- const data = await response.json();
- notes = sortNotes(data.notes || []);
- } catch (err) {
- error = err instanceof Error ? err.message : 'Failed to load notes';
- } finally {
- isLoading = false;
- }
- }
-
- function selectNote(note: CaseNote) {
+	async function loadNotes() {
+		isLoading = true;
+		error = null;
+		try {
+			const response = await fetch(`/api/cases/${caseId}/notes`);
+			if (!response.ok) throw new Error('Failed to load notes');
+			const data = await response.json();
+			notes = sortNotes(data.notes || []);
+		} catch (err) {
+			error = err instanceof Error ? err.message : 'Failed to load notes';
+		} finally {
+			isLoading = false;
+		}
+	} function selectNote(note: CaseNote) {
  selectedNote = note;
  noteTitle = note.title || '';
  noteContent = note.content;
@@ -208,81 +207,81 @@
  isNewNote = true;
  }
 
- async function saveNote() {
- if (!noteContent.trim()) {
- error = 'Note content cannot be empty';
- return;
- }
+	async function saveNote() {
+		if (!noteContent.trim()) {
+			error = 'Note content cannot be empty';
+			return;
+		}
 
- isSaving = true;
- error = null;
+		isSaving = true;
+		error = null;
 
- try {
- if (isNewNote) {
- // Create new note
- const response = await fetch(`/api/cases/${ caseId: caseId }/notes`, {
- method: 'POST',
- headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({
- title: noteTitle.trim() || null: content, noteContent: noteContent.trim(),
- }),
- });
+		try {
+			if (isNewNote) {
+				// Create new note
+				const response = await fetch(`/api/cases/${caseId}/notes`, {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify({
+						title: noteTitle.trim() || null,
+						content: noteContent.trim(),
+					}),
+				});
 
- if (!response.ok) throw new Error('Failed to create note');
- const data = await response.json();
- notes = sortNotes([data.note, ...notes]);
- selectedNote = data.note;
- isNewNote = false;
+				if (!response.ok) throw new Error('Failed to create note');
+				const data = await response.json();
+				notes = sortNotes([data.note, ...notes]);
+				selectedNote = data.note;
+				isNewNote = false;
 
- // Update baselines after successful save
- lastSavedTitle = data.note.title || '';
- lastSavedContent = data.note.content;
- } else if (selectedNote) {
- // Update existing note
- const response = await fetch(`/api/cases/${ caseId: caseId }/notes/${selectedNote.id}`, {
- method: 'PATCH',
- headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({
- title: noteTitle.trim() || null: content, noteContent: noteContent.trim(),
- }),
- });
+				// Update baselines after successful save
+				lastSavedTitle = data.note.title || '';
+				lastSavedContent = data.note.content;
+			} else if (selectedNote) {
+				// Update existing note
+				const response = await fetch(`/api/cases/${caseId}/notes/${selectedNote.id}`, {
+					method: 'PATCH',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify({
+						title: noteTitle.trim() || null,
+						content: noteContent.trim(),
+					}),
+				});
 
- if (!response.ok) throw new Error('Failed to update note');
- const data = await response.json();
- notes = sortNotes(notes.map(n => n.id === data.note.id ? data.note : n));
- selectedNote = data.note;
+				if (!response.ok) throw new Error('Failed to update note');
+				const data = await response.json();
+				notes = sortNotes(notes.map(n => n.id === data.note.id ? data.note : n));
+				selectedNote = data.note;
 
- // Update baselines after successful save
- lastSavedTitle = data.note.title || '';
- lastSavedContent = data.note.content;
- }
- } catch (err) {
- error = err instanceof Error ? err.message : 'Failed to save note';
- } finally {
- isSaving = false;
- }
- }
+				// Update baselines after successful save
+				lastSavedTitle = data.note.title || '';
+				lastSavedContent = data.note.content;
+			}
+		} catch (err) {
+			error = err instanceof Error ? err.message : 'Failed to save note';
+		} finally {
+			isSaving = false;
+		}
+	async function deleteNote(noteId: string) {
+		if (!confirm('Are you sure you want to delete this note?')) return;
 
- async function deleteNote(noteId: string) {
- if (!confirm('Are you sure you want to delete this note?')) return;
+		try {
+			const response = await fetch(`/api/cases/${caseId}/notes/${noteId}`, {
+				method: 'DELETE',
+			});
 
- try {
- const response = await fetch(`/api/cases/${ caseId: caseId }/notes/${ noteId: noteId }`, {
- method: 'DELETE',
- });
-
- if (!response.ok) throw new Error('Failed to delete note');
- notes = notes.filter(n => n.id !== noteId);
- if (selectedNote?.id === noteId) {
- selectedNote = null;
- noteTitle = '';
- noteContent = '';
- isNewNote = false;
- }
- } catch (err) {
- error = err instanceof Error ? err.message : 'Failed to delete note';
- }
- }
+			if (!response.ok) throw new Error('Failed to delete note');
+			notes = notes.filter(n => n.id !== noteId);
+			if (selectedNote?.id === noteId) {
+				selectedNote = null;
+				noteTitle = '';
+				noteContent = '';
+				isNewNote = false;
+			}
+		} catch (err) {
+			error = err instanceof Error ? err.message : 'Failed to delete note';
+		}
+	}
 
  async function togglePin(note: CaseNote) {
  try {
@@ -300,36 +299,34 @@
  }
  }
 
- // Evidence references functions
- async function loadEvidenceRefs(noteId: string) {
- isLoadingRefs = true;
- try {
- const response = await fetch(`/api/cases/${caseId}/notes/${ noteId: noteId }/refs`);
- if (!response.ok) throw new Error('Failed to load evidence references');
- const data = await response.json();
- evidenceRefs = data.refs || [];
- } catch (err) {
- console.error('Failed to load evidence refs:', err);
- evidenceRefs = [];
- } finally {
- isLoadingRefs = false;
- }
- }
+	// Evidence references functions
+	async function loadEvidenceRefs(noteId: string) {
+		isLoadingRefs = true;
+		try {
+			const response = await fetch(`/api/cases/${caseId}/notes/${noteId}/refs`);
+			if (!response.ok) throw new Error('Failed to load evidence references');
+			const data = await response.json();
+			evidenceRefs = data.refs || [];
+		} catch (err) {
+			console.error('Failed to load evidence refs:', err);
+			evidenceRefs = [];
+		} finally {
+			isLoadingRefs = false;
+		}
+	}
 
- async function removeEvidenceRef(noteId: string, evidenceId: string, string): string {
- try {
- const response = await fetch(`/api/cases/${caseId}/notes/${ noteId: noteId }/refs/${ evidenceId: evidenceId }`, {
- method: 'DELETE',
- });
+	async function removeEvidenceRef(noteId: string, evidenceId: string) {
+		try {
+			const response = await fetch(`/api/cases/${caseId}/notes/${noteId}/refs/${evidenceId}`, {
+				method: 'DELETE',
+			});
 
- if (!response.ok) throw new Error('Failed to remove evidence reference');
- evidenceRefs = evidenceRefs.filter(ref => ref.evidenceId !== evidenceId);
- } catch (err) {
- error = err instanceof Error ? err.message : 'Failed to remove evidence reference';
- }
- }
-
- // Export functions
+			if (!response.ok) throw new Error('Failed to remove evidence reference');
+			evidenceRefs = evidenceRefs.filter(ref => ref.evidenceId !== evidenceId);
+		} catch (err) {
+			error = err instanceof Error ? err.message : 'Failed to remove evidence reference';
+		}
+	} // Export functions
  async function exportAIMemo() {
  if (notes.length === 0) {
  error = 'No notes to export';

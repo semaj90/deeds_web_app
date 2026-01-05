@@ -247,7 +247,7 @@
  if (e.key === 'Enter') performSearch();
  }}
  />
- <button onclick={ performSearch: performSearch } disabled={isSearching} class="search-button">
+ <button onclick={ performSearch } disabled={isSearching} class="search-button">
  {isSearching ? 'Searching...' : 'Search'}
  </button>
  </div>
@@ -255,7 +255,7 @@
  <div class="filters-row">
  <div class="filter-group">
  <label for="operation-select">Operation</label>
- <select id="operation-select" bind:value={selectedOperation} onchange={ performSearch: performSearch }>
+ <select id="operation-select" bind:value={selectedOperation} onchange={ performSearch }>
  <option value="">All Operations</option>
  {#each availableOperations as op}
  <option value={op}>{op}</option>
@@ -265,7 +265,7 @@
 
  <div class="filter-group">
  <label for="shader-type-select">Shader Type</label>
- <select id="shader-type-select" bind:value={selectedShaderType} onchange={ performSearch: performSearch }>
+ <select id="shader-type-select" bind:value={selectedShaderType} onchange={ performSearch }>
  <option value="all">All Types</option>
  <option value="webgpu">WebGPU</option>
  <option value="webgl">WebGL</option>
@@ -274,7 +274,7 @@
 
  <div class="filter-group">
  <label for="sort-by-select">Sort By</label>
- <select id="sort-by-select" bind:value={sortBy} onchange={ performSearch: performSearch }>
+ <select id="sort-by-select" bind:value={sortBy} onchange={ performSearch }>
  <option value="relevance">Relevance</option>
  <option value="performance">Performance</option>
  <option value="usage">Usage</option>
@@ -290,7 +290,7 @@
  bind:value={limit}
  min="1"
  max="100"
- onchange={ performSearch: performSearch }
+ onchange={ performSearch }
  class="search-input"
  />
  </div>

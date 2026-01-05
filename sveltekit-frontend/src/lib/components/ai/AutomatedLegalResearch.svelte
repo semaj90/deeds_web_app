@@ -203,7 +203,7 @@ import { createEventDispatcher } from 'svelte';
 			</label>
 			<select
 				id="jurisdiction"
-				bind:value={ jurisdiction: jurisdiction }
+				bind:value={ jurisdiction }
 				class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
 			>
 				<option value="federal">Federal</option>
@@ -239,7 +239,7 @@ import { createEventDispatcher } from 'svelte';
 			</label>
 			<select
 				id="depth"
-				bind:value={ depth: depth }
+				bind:value={ depth }
 				class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
 			>
 				<option value="brief">Brief Overview</option>
@@ -316,7 +316,7 @@ import { createEventDispatcher } from 'svelte';
 
 			<button
 				type="button"
-				onclick={ exportResearch: exportResearch }
+				onclick={ exportResearch }
 				class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500"
 			>
 				Export

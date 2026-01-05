@@ -43,7 +43,7 @@
 		transition:fade={{ duration: 150 }}
 		data-state="open"
 		data-side={side}
-		data-align={ align: align }
+		data-align={ align }
 	>
 		{#if children}
 			{@render children()}

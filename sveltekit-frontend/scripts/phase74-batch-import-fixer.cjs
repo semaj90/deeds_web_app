@@ -11,7 +11,7 @@ const { execSync } = require('child_process');
 console.log('🔍 Phase 74: Scanning for import corruption patterns...\n');
 
 // Find all TypeScript files
-const findCmd = 'powershell -Command "Get-ChildItem -Path src -Recurse -Filter *.ts | ForEach-Object { $_.FullName }"';
+const findCmd = 'powershell -Command "Get-ChildItem -Path src -Recurse -Include *.ts,*.svelte | ForEach-Object { $_.FullName }"';
 let files;
 try {
     files = execSync(findCmd, { encoding: 'utf-8', maxBuffer: 10 * 1024 * 1024 })

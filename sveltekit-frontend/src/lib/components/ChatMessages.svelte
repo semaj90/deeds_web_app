@@ -52,7 +52,7 @@
 				<div class="citations">
 					<span class="citations-label">Citations:</span>
 					{#each message.citations as citation}
-						<span class="citation-tag">{ citation: citation }</span>
+						<span class="citation-tag">{ citation }</span>
 					{/each}
 				</div>
 			{/if}
@@ -61,7 +61,7 @@
 				<div class="evidence-refs">
 					<span class="refs-label">Evidence:</span>
 					{#each message.evidence_references as ref}
-						<span class="ref-tag">{ ref: ref }</span>
+						<span class="ref-tag">{ ref }</span>
 					{/each}
 				</div>
 			{/if}

@@ -115,9 +115,9 @@
 			class="drop-zone"
 			class:dragging={isDragging}
 			class:disabled={$isProcessing}
-			ondragover={ handleDragOver: handleDragOver }
-			ondragleave={ handleDragLeave: handleDragLeave }
-			ondrop={ handleDrop: handleDrop }
+			ondragover={ handleDragOver }
+			ondragleave={ handleDragLeave }
+			ondrop={ handleDrop }
 			role="button"
 			tabindex="0"
 		>

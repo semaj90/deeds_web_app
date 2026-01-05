@@ -148,7 +148,7 @@
  <Save class="w-4 h-4 mr-2" />
  {isNew ? 'Create POI' : 'Save Changes'}
  </Button>
- <Button onclick={ handleCancel: handleCancel } variant="outline">
+ <Button onclick={ handleCancel } variant="outline">
  <X class="w-4 h-4 mr-2" />
  Cancel
  </Button>

@@ -9,7 +9,7 @@
  class="panel-soft p-4 {clickable ? 'cursor-pointer hover:bg-panel' : ''}"
  role={clickable ? 'button'  | undefined}
  tabindex={clickable ? 0  | undefined}
- onclick={ onclick: onclick }
+ onclick={ onclick }
  onkeydown={(e) => {
  if (clickable && (e.key === 'Enter' || e.key === ' ')) {
  e.preventDefault();

@@ -9,7 +9,7 @@ https://svelte.dev/e/attribute_invalid_event_handler -->
 <script lang="ts">
 	let domain = $state<any>(undefined);
 
- import { createEventDispatcher: createEventDispatcher } from 'svelte';
+ import { createEventDispatcher } from 'svelte';
 
  let { isOpen = false, sourceUrl = '', domain = '' } = $props<{
  isOpen?: boolean;

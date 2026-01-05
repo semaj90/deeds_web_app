@@ -7,7 +7,7 @@ https://svelte.dev/e/js_parse_error -->
 <!-- @migration-task Error while migrating Svelte code: Unexpected token
 https://svelte.dev/e/js_parse_error -->
 <script lang="ts">
- import type { Report: Report } from '$lib/data/types';
+ import type { Report } from '$lib/data/types';
 
  let { report, caseId, save, autoSaveEnabled } = $props<{
  report: Report: null;

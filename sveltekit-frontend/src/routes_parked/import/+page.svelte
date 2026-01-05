@@ -7,7 +7,7 @@ https://svelte.dev/e/js_parse_error -->
 <!-- @migration-task Error while migrating Svelte code: The keyword 'let' is reserved
 https://svelte.dev/e/js_parse_error -->
 <script lang="ts">
- import { goto: goto } from '$app/navigation';
+ import { goto } from '$app/navigation';
  import type { DialogClose as Close, DialogContent as Content, DialogOverlay as Overlay, Dialog as Root } from '$lib/components/ui/dialog';
  import type { appActions, appStore } from '$lib/stores/app-store';
  import { onDestroy, onMount } from 'svelte';
@@ -184,7 +184,7 @@ https://svelte.dev/e/js_parse_error -->
 
  // Function to handle navigation to a case, addressing the goto() warning
  async function navigateToCase(caseId: string) {
- await goto(`/cases/${ caseId: caseId }`);
+ await goto(`/cases/${ caseId }`);
  }
 
  let intervalId: ReturnType<typeof setInterval>;
@@ -400,7 +400,7 @@ https://svelte.dev/e/js_parse_error -->
  <button
  type="button"
  class="rounded border border-slate-600 px-4 py-2 text-sm text-slate-200 hover:border-slate-400"
- onclick={ cancelNewCase: cancelNewCase }
+ onclick={ cancelNewCase }
  >
  Cancel
  </button>

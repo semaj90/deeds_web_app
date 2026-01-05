@@ -170,7 +170,7 @@
  {isApproving ? 'Approving...' : 'Approve & Save'}
  </button>
  <button
- onclick={ onReject: onReject }
+ onclick={ onReject }
  class="px-4 py-2 border border-red-300 text-red-600 rounded-lg hover:bg-red-50 font-medium transition"
  >
  Reject

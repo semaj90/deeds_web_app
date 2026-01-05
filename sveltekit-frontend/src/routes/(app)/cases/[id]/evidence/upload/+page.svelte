@@ -161,9 +161,9 @@
 	<div
 		class="drop-zone"
 		class:dragging={isDragging}
-		ondragover={ handleDragOver: handleDragOver }
-		ondragleave={ handleDragLeave: handleDragLeave }
-		ondrop={ handleDrop: handleDrop }
+		ondragover={ handleDragOver }
+		ondragleave={ handleDragLeave }
+		ondrop={ handleDrop }
 	>
 		<div class="drop-content">
 			<div class="drop-icon">📁</div>

@@ -7,7 +7,7 @@ https://svelte.dev/e/css_empty_declaration -->
 <!-- @migration-task Error while migrating Svelte code: Declaration cannot be empty
 https://svelte.dev/e/css_empty_declaration -->
 <script lang="ts">
-	import { onMount: onMount } from 'svelte';
+	import { onMount } from 'svelte';
 
 	let { caseId = '' } = $props<{
 		caseId?: string;
@@ -38,7 +38,7 @@ https://svelte.dev/e/css_empty_declaration -->
 
 		isLoading = true;
 		try {
-			const response = await fetch(`/api/cases/${ caseId: caseId }/timeline`);
+			const response = await fetch(`/api/cases/${ caseId }/timeline`);
 			if (response.ok) {
 				const data = await response.json();
 				events = data.events || [];

@@ -62,7 +62,7 @@
  {sizeStyles[size]}
  transition-transform duration-75
  disabled:opacity-50 disabled:cursor-not-allowed
- { className: className }
+ { className }
  "
  style="
  background-color: {colors.bg};

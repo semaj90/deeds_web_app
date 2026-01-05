@@ -6,7 +6,7 @@ import { Clock } from "lucide-svelte";
 import { Star } from "lucide-svelte";;
 
  // Fallback summary template
- const FALLBACK_SUMMARY = `This legal document: "{ filename: filename }" outlines key provisions, procedural requirements, and compliance standards. Main points: statutory obligations, evidence handling rules, timelines, and recommended next steps.`;
+ const FALLBACK_SUMMARY = `This legal document: "{ filename }" outlines key provisions, procedural requirements, and compliance standards. Main points: statutory obligations, evidence handling rules, timelines, and recommended next steps.`;
 
  // Types
  type FileMetadata = { id: string; name: string; size: number; uploadedAt?: string };
@@ -81,10 +81,10 @@ import { Star } from "lucide-svelte";;
  }
  // fallback if server returns no summary
  console.warn('Summarize endpoint returned no summary, using fallback', data);
- summary = FALLBACK_SUMMARY.replace('{ filename: filename }', selectedFile.name);
+ summary = FALLBACK_SUMMARY.replace('{ filename }', selectedFile.name);
  } catch (err) {
  console.error('Summarization failed:', err);
- summary = FALLBACK_SUMMARY.replace('{ filename: filename }', selectedFile?.name ?? 'document');
+ summary = FALLBACK_SUMMARY.replace('{ filename }', selectedFile?.name ?? 'document');
  } finally {
  isSummarizing = false;
  }
@@ -145,13 +145,13 @@ import { Star } from "lucide-svelte";;
  <span class="animate-spin" aria-hidden="true">⏳</span>
  &nbsp;Summarizing...
  {:else}
- <Brain size={ 16: 16 } />&nbsp;Summarize
+ <Brain size={ 16 } />&nbsp;Summarize
  {/if}
  </button>
 
  <button
  class="nes-btn"
- onclick={ exportSummary: exportSummary }
+ onclick={ exportSummary }
  disabled={!summary}
  aria-disabled={!summary}
  >

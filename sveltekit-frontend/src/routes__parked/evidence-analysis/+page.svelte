@@ -135,7 +135,7 @@ https://svelte.dev/e/element_invalid_closing_tag -->
  <h2 class="text-2xl font-semibold text-gray-900 dark:text-gray-100">
  WebGPU Accelerated Graph Visualization
  </h2>
- <Button onclick={ toggleWebGPUDemo: toggleWebGPUDemo } variant="outline">
+ <Button onclick={ toggleWebGPUDemo } variant="outline">
  {showWebGPUDemo ? 'Hide Demo' : 'Show Demo'}
  </Button>
  </div>

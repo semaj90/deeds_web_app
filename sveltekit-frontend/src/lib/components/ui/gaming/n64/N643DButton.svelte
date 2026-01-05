@@ -70,7 +70,7 @@
  {isPressed ? 'scale-95 translate-y-0.5' : 'scale-100'}
  {isHovered && enableLighting ? 'shadow-lg' : 'shadow-md'}
  disabled:opacity-50 disabled:cursor-not-allowed disabled:scale-100
- { className: className }
+ { className }
  "
  style="
  transform-style: preserve-3d;

@@ -116,7 +116,7 @@ function truncate(text: string, maxLength: number = 200): string {
   <div class="validator-header">
     <h3 class="text-lg font-semibold">Validate Sources</h3>
     <p class="text-sm text-base-content/70">
-      Query: <span class="font-medium">"{ query: query }"</span>
+      Query: <span class="font-medium">"{ query }"</span>
     </p>
     <p class="text-xs text-base-content/50 mt-1">
       Select the sources you want to use for generating an answer.

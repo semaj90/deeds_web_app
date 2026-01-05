@@ -40,7 +40,7 @@
  <button class="text-sm text-gray-500" onclick={closeModal}>Close</button>
  </div>
  <div class="mb-3">
- <p class="text-sm text-gray-600">Case: { caseId: caseId }</p>
+ <p class="text-sm text-gray-600">Case: { caseId }</p>
  </div>
  <textarea
  class="w-full border rounded p-2 mb-3"

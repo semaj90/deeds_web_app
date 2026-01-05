@@ -21,11 +21,11 @@
 
 <CommandCenterShell caseId={data.caseId}>
 	{#if $evidenceCommandCenter.activeView === 'board'}
-		<EvidenceBoardPane { data: data } actionData={ form: form } />
+		<EvidenceBoardPane { data } actionData={ form } />
 	{:else if $evidenceCommandCenter.activeView === 'graph'}
-		<EvidenceGraphPane { data: data } />
+		<EvidenceGraphPane { data } />
 	{:else if $evidenceCommandCenter.activeView === 'chat'}
-		<EvidenceChatPane { data: data } actionData={form} />
+		<EvidenceChatPane { data } actionData={form} />
 	{/if}
 </CommandCenterShell>
 

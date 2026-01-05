@@ -44,12 +44,12 @@
 	type="button"
 	role="tab"
 	aria-selected={isActive}
-	aria-controls="tabpanel-{ value: value }"
+	aria-controls="tabpanel-{ value }"
 	tabindex={isActive ? 0 : -1}
 	data-tabs-trigger={value}
 	data-state={isActive ? 'active' : 'inactive'}
-	{ disabled: disabled }
-	onclick={ handleClick: handleClick }
+	{ disabled }
+	onclick={ handleClick }
 	class="{defaultClass} {isActive ? 'bg-background text-foreground shadow-sm' : ''} {className}"
 >
 	{#if children}

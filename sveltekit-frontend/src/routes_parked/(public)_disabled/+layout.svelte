@@ -18,7 +18,7 @@ https://svelte.dev/e/js_parse_error -->
  children?: Snippet;
  }
 
- let { children: children }: Props = $props ();
+ let { children }: Props = $props ();
 
  // State management for public layout
  let selectedTheme = $state <ConsolePalette>('legal');

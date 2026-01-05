@@ -212,7 +212,7 @@
 						></textarea>
 					</div>
 
-					<button class="execute-btn" onclick={ executeTool: executeTool } disabled={loading}>
+					<button class="execute-btn" onclick={ executeTool } disabled={loading}>
 						{#if loading}
 							⏳ Executing...
 						{:else}

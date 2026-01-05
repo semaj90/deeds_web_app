@@ -150,10 +150,10 @@
 		<input
 			bind:this={inputElement}
 			bind:value={query}
-			oninput={ handleInput: handleInput }
-			onkeydown={ handleKeydown: handleKeydown }
-			onblur={ handleBlur: handleBlur }
-			onfocus={ handleFocus: handleFocus }
+			oninput={ handleInput }
+			onkeydown={ handleKeydown }
+			onblur={ handleBlur }
+			onfocus={ handleFocus }
 			type="text"
 			{placeholder}
 			class="search-input"
@@ -162,7 +162,7 @@
 		{#if isLoading}
 			<Loader2 class="loading-icon h-4 w-4 animate-spin" />
 		{:else if query}
-			<button class="clear-btn" onclick={ clearSearch: clearSearch }>
+			<button class="clear-btn" onclick={ clearSearch }>
 				<X class="h-3 w-3" />
 			</button>
 		{/if}

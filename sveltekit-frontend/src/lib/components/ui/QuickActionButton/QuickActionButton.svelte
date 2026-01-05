@@ -10,7 +10,7 @@
  }>();
 </script>
 
-<button type="button" class={`quick-action ${ variant: variant }`} { disabled: disabled } aria-label={ariaLabel}>
+<button type="button" class={`quick-action ${ variant }`} { disabled } aria-label={ariaLabel}>
  {#if icon}
  <span class={`icon ${icon}`} aria-hidden="true"></span>
  {/if}

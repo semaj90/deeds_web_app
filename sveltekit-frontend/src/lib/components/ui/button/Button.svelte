@@ -33,9 +33,9 @@
  ${size === 'sm' ? 'h-9 rounded-md px-3' : ''}
  ${size === 'lg' ? 'h-11 rounded-md px-8' : ''}
  ${size === 'icon' ? 'h-10 w-10' : ''}
- ${ className: className }
+ ${ className }
  `}
- { disabled: disabled }
+ { disabled }
  {...rest}
 >
  {@render children?.()}

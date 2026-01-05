@@ -41,7 +41,7 @@
 	}: Props = $props();
 </script>
 
-<TabsRoot bind:value { defaultValue: defaultValue } { onValueChange: onValueChange } class={className} { orientation: orientation }>
+<TabsRoot bind:value { defaultValue } { onValueChange } class={className} { orientation }>
 	{#if tabs.length > 0}
 		<TabsList>
 			{#each tabs as tab}

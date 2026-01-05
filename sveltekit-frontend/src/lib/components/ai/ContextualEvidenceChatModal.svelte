@@ -462,7 +462,7 @@
  <label class="checkbox inline">
  <input
  type="checkbox"
- value={ deliverable: deliverable }
+ value={ deliverable }
  checked={reportForm.deliverables.includes(deliverable)}
  onchange={(event) => {
  const checked = (event.target as HTMLInputElement).checked;

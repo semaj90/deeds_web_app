@@ -21,9 +21,9 @@
 </script>
 
 <textarea
- { placeholder: placeholder }
+ { placeholder }
  bind:value
- { disabled: disabled }
+ { disabled }
  {rows}
  class={`
  flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2

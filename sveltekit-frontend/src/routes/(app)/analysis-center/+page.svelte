@@ -102,9 +102,9 @@
  <form
  method="post"
  action="?/analyze"
- use:enhance={({ formData: formData }) => {
+ use:enhance={({ formData }) => {
  isAnalyzing = true;
- return async ({ result: result }) => {
+ return async ({ result }) => {
  isAnalyzing = false;
  if (result.type === 'success' && result.data?.analysis) {
  analysisResults = [result.data.analysis, ...analysisResults];

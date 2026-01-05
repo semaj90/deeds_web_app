@@ -230,7 +230,7 @@
 				<ButtonRoot
 					class="px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-lg
 					       font-medium transition-colors"
-					onclick={ performVectorSearch: performVectorSearch }
+					onclick={ performVectorSearch }
 				>
 					Search
 				</ButtonRoot>

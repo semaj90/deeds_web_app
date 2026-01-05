@@ -109,7 +109,7 @@
  }),
  });
 
- const { forces: forces } = await response.json();
+ const { forces } = await response.json();
 
  // Apply forces to nodes
  nodes.update(current => current.map(node => {

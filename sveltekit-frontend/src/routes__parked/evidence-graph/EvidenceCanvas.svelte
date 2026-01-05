@@ -7,7 +7,7 @@ https://svelte.dev/e/attribute_invalid_event_handler -->
 <!-- @migration-task Error while migrating Svelte code: Event attribute must be a JavaScript expression, not a string
 https://svelte.dev/e/attribute_invalid_event_handler -->
 <script lang="ts">
- import type { EvidenceNode: EvidenceNode } from '$lib/evidence-canvas/case-similarity-service';
+ import type { EvidenceNode } from '$lib/evidence-canvas/case-similarity-service';
  import CaseSuggestionModal from '$lib/evidence-canvas/CaseSuggestionModal.svelte';
  import EvidenceCanvas from '$lib/evidence-canvas/EvidenceCanvas.svelte';
  import GraphControlPanel from '$lib/evidence-canvas/GraphControlPanel.svelte';
@@ -463,9 +463,9 @@ https://svelte.dev/e/attribute_invalid_event_handler -->
  bind:nodeSize
  bind:edgeThreshold
  {stats}
- onlayoutChange={ handleLayoutChange: handleLayoutChange }
- onnodeSizeChange={ handleNodeSizeChange: handleNodeSizeChange }
- onedgeThresholdChange={ handleEdgeThresholdChange: handleEdgeThresholdChange }
+ onlayoutChange={ handleLayoutChange }
+ onnodeSizeChange={ handleNodeSizeChange }
+ onedgeThresholdChange={ handleEdgeThresholdChange }
  />
  </div>
  <!-- Canvas -->
@@ -473,7 +473,7 @@ https://svelte.dev/e/attribute_invalid_event_handler -->
  <!-- @ts-expect-error -->
  <EvidenceCanvas
  bind:this={canvas}
- onnodeSelect={ handleNodeSelect: handleNodeSelect }
+ onnodeSelect={ handleNodeSelect }
  onnodeContext={handleNodeContext}
  />
  </div>
