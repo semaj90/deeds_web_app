@@ -148,7 +148,7 @@ export const patchStatusEnum = pgEnum('patch_status', ['suggested', 'applied', '
 export const users = pgTable('users', {
  id: uuid('id').default(sql`gen_random_uuid()`).primaryKey().notNull(),
  email: varchar('email', { length: 255 }).unique().notNull(),
- passwordHash: varchar('password_hash', { length: 255 }).notNull(),
+ passwordHash: varchar('hashed_password', { length: 255 }).notNull(),
  firstName: varchar('first_name', { length: 255 }),
  lastName: varchar('last_name', { length: 255 }),
  role: userRoleEnum('role').notNull().default('prosecutor'),

@@ -13,7 +13,11 @@ async function checkColumns() {
             FROM information_schema.columns
             WHERE table_name = 'users';
         `);
-        console.log(JSON.stringify(res.rows, null, 2));
+        const names = res.rows.map(r => r.column_name);
+        console.log('Has name:', names.includes('name'));
+        console.log('Has full_name:', names.includes('full_name'));
+        console.log('Has first_name:', names.includes('first_name'));
+        console.log('ALL COLUMNS:', names.join(', '));
     } catch (err) {
         console.error(err);
     } finally {

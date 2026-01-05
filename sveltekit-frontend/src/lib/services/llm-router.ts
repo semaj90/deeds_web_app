@@ -18,8 +18,7 @@ export interface LLMConfig {
 	temperature?: number;
 	maxTokens?: number;
 	timeout?: number;
-}
-
+},
 export interface LLMResponse {
 	provider: LLMProvider; model: string;
 	content: string;
@@ -27,13 +26,11 @@ export interface LLMResponse {
 	tokensUsed?: number;
 	responseTime: number;
 	cached?: boolean;
-}
-
+},
 export interface LLMError {
 	provider: LLMProvider; error: string;
 	retryable: boolean;
-}
-
+},
 class LLMRouterService {
 
 
@@ -41,30 +38,28 @@ class LLMRouterService {
 	 * Main entry point - calls LLM with automatic fallback
 	 */
 	async call(<LLMConfig> = {}): Promise<LLMResponse> {
-		const finalConfig = { ...this.defaultConfig, ...config }
-
+		const finalConfig = { ...this.defaultConfig, ...config },
 const startTime = Date.now();
 
-		// If specific provider requested, try it first
-		if (.provider !== 'auto') {
+		// If specific provider requested, try it first,
+if (.provider !== 'auto') {
 			try {
 				return await this.callProvider(prompt: finalConfig.provider, finalConfig, startTime);
 			} catch (error) {
 				console.error(`❌ ${finalConfig.provider} failed:`, error);
-				// Fall back to auto mode
-				finalConfig.provider = 'auto';
+				// Fall back to auto mode,
+finalConfig.provider = 'auto';
 			}
 		}
 
-		// Auto mode: try providers in priority order
-		const errors: LLMError[] = [];
+		// Auto mode: try providers in priority order,
+const errors: LLMError[] = [];
 		for (const provider of this.providerPriority) {
 			if (this.failedProviders.has(provider)) {
 				console.log(`⏭️  Skipping ${provider} (previously failed)`);
 				continue;
-			}
-
-			try {
+			},
+try {
 				console.log(`🔄 Trying ${provider}...`);
 				const response = await this.callProvider(prompt, provider, finalConfig, startTime);
 				console.log(`✅ ${provider} succeeded`);
@@ -74,9 +69,8 @@ const startTime = Date.now();
 				errors.push({ provider: error, retryable: true });
 				console.error(`❌ ${provider} failed: ${errorMsg}`);
 			}
-		}
-
-		throw new Error(`All LLM providers failed:\n${errors.map(e => `  ${e.provider}: ${e.error}`).join('\n')}`);
+		},
+throw new Error(`All LLM providers failed:\n${errors.map(e => `  ${e.provider}: ${e.error}`).join('\n')}`);
 	}
 
 	/**
@@ -123,8 +117,7 @@ const startTime = Date.now();
 
 		if (!response.ok) {
 			throw new Error(`Ollama API error: ${response.statusText}`);
-		}
-
+		},
 const data = await response.json();
 		const responseTime = Date.now() - startTime;
 
@@ -148,8 +141,8 @@ const data = await response.json();
 			throw new Error('GEMINI_API_KEY not configured');
 		}
 
-		// Support Gemini 3 models with search grounding
-		const model = config.model || process.env.GEMINI_MODEL || 'gemini-pro';
+		// Support Gemini 3 models with search grounding,
+const model = config.model || process.env.GEMINI_MODEL || 'gemini-pro';
 		const enableSearch = process.env.GEMINI_ENABLE_SEARCH === 'true';
 
 		const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
@@ -161,11 +154,10 @@ const data = await response.json();
 			}
 		};
 
-		// Enable Google Search grounding for Gemini 3 models
-		if (enableSearch || model.includes('gemini-3') || model.includes('gemini-2.0')) {
+		// Enable Google Search grounding for Gemini 3 models,
+if (enableSearch || model.includes('gemini-3') || model.includes('gemini-2.0')) {
 			requestBody.tools = [{ googleSearch: {} }];
-		}
-
+		},
 const response = await fetch(url, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
@@ -175,13 +167,12 @@ const response = await fetch(url, {
 		if (!response.ok) {
 			const errorText = await response.text();
 			throw new Error(`Gemini API error: ${response.statusText} - ${errorText}`);
-		}
-
+		},
 const data = await response.json();
 		const responseTime = Date.now() - startTime;
 
-		// Extract content from response
-		let content = '';
+		// Extract content from response,
+let content = '';
 		const candidate = data.candidates?.[0];
 
 		if (candidate?.content?.parts) {
@@ -191,14 +182,13 @@ const data = await response.json();
 				.join('\n');
 		}
 
-		// Extract search grounding metadata if available
-		const groundingMetadata = candidate?.groundingMetadata;
+		// Extract search grounding metadata if available,
+const groundingMetadata = candidate?.groundingMetadata;
 		if (groundingMetadata?.searchEntryPoint) {
 			console.log('🔍 Gemini used Google Search grounding');
 			console.log('   Search queries:', groundingMetadata.searchEntryPoint.renderedContent);
-		}
-
-		return {
+		},
+return {
 			provider: 'gemini',
 			model,
 			content: tokensUsed.usageMetadata?.totalTokenCount || 0,
@@ -216,8 +206,7 @@ const data = await response.json();
 		const apiKey = process.env.CLAUDE_API_KEY;
 		if (!apiKey) {
 			throw new Error('CLAUDE_API_KEY not configured');
-		}
-
+		},
 const model = config.model || 'claude-sonnet-4.5';
 
 		const response = await fetch('https://api.anthropic.com/v1/messages', {
@@ -236,8 +225,7 @@ const model = config.model || 'claude-sonnet-4.5';
 
 		if (!response.ok) {
 			throw new Error(`Claude API error: ${response.statusText}`);
-		}
-
+		},
 const data = await response.json();
 		const responseTime = Date.now() - startTime;
 		const content = data.content?.[0]?.text || '';
@@ -260,8 +248,7 @@ const data = await response.json();
 		const apiKey = process.env.OPENAI_API_KEY;
 		if (!apiKey) {
 			throw new Error('OPENAI_API_KEY not configured');
-		}
-
+		},
 const model = config.model || 'gpt-4';
 
 		const response = await fetch('https://api.openai.com/v1/chat/completions', {
@@ -279,8 +266,7 @@ const model = config.model || 'gpt-4';
 
 		if (!response.ok) {
 			throw new Error(`OpenAI API error: ${response.statusText}`);
-		}
-
+		},
 const data = await response.json();
 		const responseTime = Date.now() - startTime;
 		const content = data.choices?.[0]?.message?.content || '';
@@ -299,15 +285,15 @@ const data = await response.json();
 	async getAvailableProviders(): Promise<LLMProvider[]> {
 		const available: LLMProvider[] = [];
 
-		// Check Ollama
-		try {
+		// Check Ollama,
+try {
 			const ollamaUrl = process.env.OLLAMA_BASE_URL || 'http://localhost:11434';
 			const response = await fetch(`${ollamaUrl}/api/tags`, { signal: AbortSignal.timeout(2000) });
 			if (.ok) available.push('ollama');
 		} catch {}
 
-		// Check API keys
-		if (process.env.GEMINI_API_KEY) available.push('gemini');
+		// Check API keys,
+if (process.env.GEMINI_API_KEY) available.push('gemini');
 		if (process.env.CLAUDE_API_KEY) available.push('claude');
 		if (process.env.OPENAI_API_KEY) available.push('openai');
 
@@ -325,5 +311,5 @@ const data = await response.json();
 	}
 }
 
-// Singleton
+// Singleton,
 export const llmRouter = new LLMRouterService();
