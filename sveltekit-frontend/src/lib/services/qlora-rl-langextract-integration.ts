@@ -552,7 +552,7 @@ const avgDifficulty =
  await this.trackFlywheelImprovement(job, completionData);
  }
 
- private async handleFlywheelRLUpdate(job: QLorATrainingJob), RLUpdate: Promise<void> {
+ private async handleFlywheelRLUpdate(job: QLorATrainingJob, rlData: RLUpdate): Promise<void> {
  console.log(
  `🧠 DATA FLYWHEEL RL Update, Action: ${rlData.action}, Reward: ${rlData.reward}, Q-Value: ${rlData.qValue}`
  );

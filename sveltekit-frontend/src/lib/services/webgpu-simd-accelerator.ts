@@ -242,7 +242,7 @@ export class WebGPUSIMDAccelerator {
  /**
  * Standard parsing fallback
  */
- private async standardParse(jsonString: string), ParseMode: Promise<AccelerationResult> {
+ private async standardParse(jsonString: string, data: ParseMode): Promise<AccelerationResult> {
  const data = JSON.parse(jsonString);
  return {
  data: processing_time_ms
@@ -372,7 +372,7 @@ export class WebGPUSIMDAccelerator {
  /**
  * Check Redis cache for parsed results
  */
- private async checkRedisCache(jsonString: string), ParseMode: Promise<any | null> {
+ private async checkRedisCache(jsonString: string, data: ParseMode): Promise<any | null> {
  try {
  const cacheKey = `webgpu_simd:${mode}:${this.generateCacheKey(jsonString)}`;
  return await (redisOptimized as any).getCachedResult(cacheKey);
@@ -384,7 +384,7 @@ export class WebGPUSIMDAccelerator {
  /**
  * Cache result in Redis
  */
- private async cacheResult(jsonString: string, mode: ParseMode), ParseMode: Promise<void> {
+ private async cacheResult(jsonString: string, mode: ParseMode, data: ParseMode): Promise<void> {
  try {
  const cacheKey = `webgpu_simd:${mode}:${this.generateCacheKey(jsonString)}`;
  const ttl = this.calculateCacheTTL(jsonString.length);

@@ -215,7 +215,7 @@ export class KnowledgeIndexer {
    * Generate AI summary using LLM
    * Requirements: 2.1, 2.2
    */
-  private async generateSummary(content: string): string: Promise<string> {
+  private async generateSummary(content: string, data: string): Promise<string> {
     try {
       const prompt = `Summarize this documentation in 2-3 sentences. Focus on key concepts and technologies.
 
@@ -367,7 +367,7 @@ Summary:`;
     return 0;
   }
 
-  private async storeInMinio(urlHash: string): string: Promise<string> {
+  private async storeInMinio(urlHash: string, data: string): Promise<string> {
     const key = `${this.config.qdrantCollection}/${urlHash}.md`;
     // MinIO storage will be implemented in Task 6.1
     console.log(`📦 MinIO storage pending for: ${key}`);
