@@ -1,9 +1,4 @@
 <script lang="ts">
-	let className = $state<any>(undefined);
-	let name = $state<any>(undefined);
-	let id = $state<any>(undefined);
-	let required = $state<any>(undefined);
-
 /**
  * Svelte 5 Select Component
  * Native HTML select with Svelte 5 runes and accessible dropdown
@@ -176,7 +171,7 @@ function handleBlur() {
 		<ul
 			class={dropdownClasses}
 			role="listbox"
-			aria-activedescendant={focusedIndex >= 0 ? `option-${focusedIndex}`  | undefined}
+			aria-activedescendant={focusedIndex >= 0 ? `option-${focusedIndex}` : undefined}
 		>
 			{#each options as opt, i}
 				<li

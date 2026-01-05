@@ -1,8 +1,4 @@
 <script lang="ts">
-	let className = $state<any>(undefined);
-	let id = $state<any>(undefined);
-	let disabled = $state<any>(undefined);
-
 /**
  * Svelte 5 Switch/Toggle Component
  * Native HTML with Svelte 5 runes and accessible toggle
@@ -25,7 +21,8 @@ let {
 	checked = $bindable(false),
 	disabled = false,
 	name = '',
-	id = crypto.randomUUID(, class: className = '',
+	id = crypto.randomUUID(),
+	class: className = '',
 	variant = 'default',
 	size = 'md',
 	onchange,
