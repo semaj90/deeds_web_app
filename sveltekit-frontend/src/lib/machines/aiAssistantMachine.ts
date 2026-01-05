@@ -880,8 +880,7 @@ export const aiAssistantMachine = createMachine({
  },
  },
 });
-
-// Add: runtime-safe Task / TaskResult definitions used by the worker pool
+  
 type Task = { type: string; data?: Record<string, unknown> };
 type TaskResult = { ok: boolean; result?: unknown; error?: string };
 

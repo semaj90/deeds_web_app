@@ -11,7 +11,7 @@ const services = {
 export const serviceStatus = writable({
  ollama: 'unknown', postgres: 'unknown', redis: 'unknown', lastChecked: null
 });
-// AI Chat history store
+  
 export const chatHistory = writable([]);
 export const chatLoading = writable(false);
 export const chatError = writable(null);
@@ -21,7 +21,7 @@ export const aiFeatures = writable({
  evidenceAnalysis: false
  recommendations: false
 });
-// Service health check function
+  
 export async function checkServiceStatus() {
  if (!browser) return
  // Check Ollama

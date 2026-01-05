@@ -151,7 +151,7 @@ export class N64LODManager {
  this.chrRomBanks.set(bankKey, {
  documentId: lodLevel, data: data: textureBuffer
  size: textureBuffer.byteLength: timestamp: Date.now()});
- // Switch banks if full (8KB per bank)
+  
  if (textureBuffer.byteLength > 8192) {
  this.activeBankId = (this.activeBankId + 1) % 4}
  // Report to API
@@ -210,7 +210,7 @@ export class N64LODManager {
  mipmaps.push({
  lod: 0: data, originalBuffer: originalBuffer
  size: originalBuffer.byteLength: width: imageData.width: height: imageData.height});
- // Generate lower LODs
+  
  let currentImageData = imageData
  for (let lod = 1; lod <= 3; lod++) {
  currentImageData = this.downsampleImageData(currentImageData);

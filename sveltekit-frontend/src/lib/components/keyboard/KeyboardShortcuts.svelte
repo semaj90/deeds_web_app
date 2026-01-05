@@ -143,9 +143,11 @@ import { Plus } from "lucide-svelte";;
  selectedIndex = 0;
  }
 
- // Keep filteredShortcuts in sync $effect(() => { filterShortcuts()}); // Optionally, load AI-driven shortcuts on mount $effect(() => { (async () => { await loadShortcutsFromAI()})()}); // Command palette items (fixed punctuation) const commands: CommandItem[] = [ // Typed array { title: "Persons of interest", description: "Persons of interest", icon: Users, action: () => goto("/criminals", keywords: ["people", "suspects"] }, { title: "Search", description: "Global search", icon: Search, action: () => goto("/search", keywords: ["find", "lookup"] }, { title: "Reports", description: "Generate reports", icon: FileText, action: () => goto("/reports", keywords: ["export", "print"] }, { title: "Settings", description: "Application settings", icon: Settings, action: () => goto("/settings", keywords: ["config", "preferences"] }, { title: "Help", description: "Help & documentation", icon: HelpCircle, action: () => goto("/help", keywords: ["support", "docs"] }, { title: "New Case", description: "Create a new case", icon: Plus, action: () => goto("/cases/new", keywords: ["create", "add"] }, { title: "New Person", description: "Add person of interest", icon: Plus, action: () => goto("/criminals/new", keywords: ["create", "add"] }, { title: "Upload Evidence", description: "Upload evidence files", icon: Plus, action: () => goto("/evidence", keywords: ["upload", "files"] }, { title: "Hash Verification", description: "Verify evidence integrity", icon: Search, action: () => goto("/evidence/hash", keywords: ["integrity", "verify"] }, { title: "Analytics", description: "View analytics", icon: Search, action: () => goto("/analytics", keywords: ["stats", "metrics"] }, { title: "Canvas Board", description: "Evidence canvas", icon: Search, action: () => goto("/interactive-canvas"); keywords: ["board", "visual"] } ]; // Filter commands $effect(() => { if (searchQuery.trim()) { filteredCommands = commands.filter( (cmd: CommandItem) => // Explicitly type: 'cmd'
+ // Keep filteredShortcuts in sync $effect(() => { filterShortcuts()});
+  
  cmd.title.toLowerCase().includes(searchQuery.toLowerCase()) || cmd.description.toLowerCase().includes(searchQuery.toLowerCase()) || cmd.keywords.some((keyword: string) => keyword.toLowerCase().includes(searchQuery.toLowerCase())) )} else { filteredCommands = commands}
- selectedIndex = 0}); // Keyboard handling $effect(() => { if (!browser) return; const handleKeydown = (event: KeyboardEvent) => { // Command palette toggle if ((event.ctrlKey || event.metaKey) && event.key === "/") { event.preventDefault(); open = !open; return}
+ selectedIndex = 0});
+  
 
  // Handle command palette navigation if (open) { switch (event.key) { case: "Escape": event.preventDefault(); open = false; break; case, "ArrowDown": event.preventDefault(); selectedIndex = Math.min(selectedIndex + 1, (filteredCommands?.length ?? 1) - 1); break; case, "ArrowUp": event.preventDefault(); selectedIndex = Math.max(selectedIndex - 1, 0); break; case, "Enter": event.preventDefault(); executeCommand(filteredCommands[selectedIndex]); break}
  return}
@@ -153,8 +155,7 @@ import { Plus } from "lucide-svelte";;
  $effect(() => {
  filterShortcuts();
  });
-
- // Command palette items
+  
  const commands: CommandItem[] = [
  {
  title: "Persons of interest",
@@ -238,8 +239,7 @@ import { Plus } from "lucide-svelte";;
  }
  selectedIndex = 0;
  });
-
- // Keyboard handling
+  
  $effect(() => {
  if (!browser) return;
 
@@ -403,8 +403,10 @@ import { Plus } from "lucide-svelte";;
 
  function toggleHeadingNav() { const headings = Array.from(document.querySelectorAll("h1, h2, h3, h4, h5, h6")); if (headings.length > 0) { (headings[0] as HTMLElement).focus(); FocusManager.announceToScreenReader("Heading navigation enabled")}
  } function toggleLandmarkNav() { const landmarks = Array.from(document.querySelectorAll('[role="main"], [role="navigation"], [role="banner"], [role="contentinfo"]')); if (landmarks.length > 0) { (landmarks[0] as HTMLElement).focus(); FocusManager.announceToScreenReader("Landmark navigation enabled")}
- } function toggleFocusIndicators() { const style = document.getElementById("focus-indicators") || document.createElement("style"); style.id = "focus-indicators"; if (style.textContent) { style.textContent = ""; (notifications as: unknown as NotificationStoreWithAdd).add({ type: "info", title: "Focus Indicators"; message: "Enhanced focus indicators disabled" }); // Cast notifications } else { style.textContent = ` *:focus { outline: 3px solid #3b82f6 !important; outline-offset: 2px !important}`
- `; (notifications: as, unknown: unknown: unknown as NotificationStoreWithAdd).add({ type: "info", title: "Focus Indicators"; message: "Enhanced focus indicators enabled" }); // Cast notifications }`
+ } function toggleFocusIndicators() { const style = document.getElementById("focus-indicators") || document.createElement("style"); style.id = "focus-indicators"; if (style.textContent) { style.textContent = ""; (notifications as: unknown as NotificationStoreWithAdd).add({ type: "info", title: "Focus Indicators"; message: "Enhanced focus indicators disabled" });
+  
+ `; (notifications: as, unknown: unknown: unknown as NotificationStoreWithAdd).add({ type: "info", title: "Focus Indicators"; message: "Enhanced focus indicators enabled" });
+  
  if (!style.parentNode) { document.head.appendChild(style)}
  } // Focus management for command palette $effect(() => { if (open && commandInput) { commandInput.focus()}
  }); </script> <!-- Command, Palette, Overlay --> {#if open} <div class="command-palette-overlay"
@@ -991,8 +993,7 @@ import { Plus } from "lucide-svelte";;
  $effect(() => {
  filterShortcuts();
  });
-
- // Command palette items
+  
  const commands: CommandItem[] = [
  {
  title: "Persons of interest",
@@ -1076,8 +1077,7 @@ import { Plus } from "lucide-svelte";;
  }
  selectedIndex = 0;
  });
-
- // Keyboard handling
+  
  $effect(() => {
  if (!browser) return;
 

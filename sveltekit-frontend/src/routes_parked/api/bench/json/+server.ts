@@ -9,8 +9,7 @@ export const POST: RequestHandler = async ({ request }) => {
 
  const payload = await request.text();
  if (!payload) return json({ error: 'Provide JSON payload in body' }, { status: 400 });
-
- // Baseline: JSON.parse
+  
  const t0 = performance.now();
  for (let i = 0; i < iterations; i++) {
  JSON.parse(payload);

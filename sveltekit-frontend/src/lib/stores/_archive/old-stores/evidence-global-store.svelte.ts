@@ -83,14 +83,12 @@ class EvidenceGlobalStore {
  viewMode: 'network',
  aiProcessing: false,
  });
-
- // Performance tracking
+  
  stats = $state({
  totalNodes: 0, totalConnections: 0,
  aiSuggestionsGenerated: 0, lastSync: 0,
  });
-
- // Derived state using $derived
+  
  currentCase = $derived(this.currentCaseId ? this.cases[this.currentCaseId] : null);
  currentNodes = $derived(this.currentCase?.nodes || []);
  selectedNodes = $derived(
@@ -119,7 +117,9 @@ class EvidenceGlobalStore {
  nodes: [],
  connections: [],
  metadata: {
- dateCreated: Date.now(, lastModified: Date.now(, status: 'active',
+ dateCreated: Date.now(),
+     lastModified: Date.now(),
+     status: 'active',
  priority: 'medium',
  },
  };
@@ -162,7 +162,8 @@ class EvidenceGlobalStore {
  ...nodeData, id: nodeId,
  connections: [],
  metadata: {
- dateCreated: Date.now(, lastModified: Date.now(),
+ dateCreated: Date.now(),
+     lastModified: Date.now(),
  },
  };
  this.currentCase.nodes.push(newNode);
@@ -205,7 +206,7 @@ class EvidenceGlobalStore {
  this.currentCase.nodes.forEach((node) => {
  node.connections = node.connections.filter((id) => id !== nodeId);
  });
- // Remove from selection
+  
  this.ui.selectedNodeIds = this.ui.selectedNodeIds.filter((id) => id !== nodeId);
  this.updateCaseMetadata();
  this.stats.totalNodes--;

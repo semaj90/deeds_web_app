@@ -110,8 +110,7 @@ export class LocalLegalStore {
 		                 this.db.addCollection('documents', {
 			indices: ['id', 'caseId', 'type', 'createdAt']
 		});
-
-		// Update counts
+  
 		this.documentCount = this.documents.count();
 		this.isInitialized = true;
 
@@ -130,7 +129,8 @@ export class LocalLegalStore {
 	 */
 	addDocument(doc: Omit<LegalDoc, 'id' | 'createdAt' | 'updatedAt'>): LegalDoc {
 		const newDoc: LegalDoc = {
-			...doc, id: this.generateId(, createdAt: Date.now(, updatedAt: Date.now()
+			...doc, id: this.generateId(, createdAt: Date.now(),
+     updatedAt: Date.now()
 		};
 
 		this.documents.insert(newDoc);
@@ -193,7 +193,8 @@ export class LocalLegalStore {
 	 */
 	bulkInsert(docs: Omit<LegalDoc, 'id' | 'createdAt' | 'updatedAt'>[]): void {
 		const newDocs = docs.map(doc => ({
-			...doc, id: this.generateId(, createdAt: Date.now(, updatedAt: Date.now()
+			...doc, id: this.generateId(, createdAt: Date.now(),
+     updatedAt: Date.now()
 		}));
 
 		this.documents.insert(newDocs);

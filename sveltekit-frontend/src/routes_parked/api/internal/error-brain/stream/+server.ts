@@ -53,8 +53,7 @@ export const GET: RequestHandler = async (event) => {
  console.error(`SSE send error: ${err}`);
  }
  });
-
- // Heartbeat to keep connection alive
+  
  const heartbeatInterval = setInterval(() => {
  try {
  controller.enqueue(encoder.encode(': heartbeat\n\n'));

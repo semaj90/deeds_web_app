@@ -432,8 +432,7 @@ export const legalAIMachine = createMachine(
 // legalAIActor.subscribe((snapshot) => {
 // legalAIState.set(snapshot);
 // });
-
-// Start the actor - moved to integration service to prevent conflicts
+  
 // legalAIActor.start();
 
 export default legalAIMachine;

@@ -18,8 +18,7 @@ describe('AceAdapter', () => {
         temperature: 0.1, maxTokens: 1000
       },
     });
-
-    // Mock fetch for API calls
+  
     global.fetch = vi.fn();
   });
 

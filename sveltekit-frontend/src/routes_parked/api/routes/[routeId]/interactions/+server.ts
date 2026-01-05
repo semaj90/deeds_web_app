@@ -91,8 +91,7 @@ export const GET: RequestHandler = async ({ params, url }) => {
 
  // Get interaction logs
  const interactions = await getInteractionLogs(routeId, { limit, offset });
-
- // Get total count (approximate - would need separate count query in production)
+  
  const allInteractions = await getInteractionLogs(routeId, { limit: 10000, offset: 0 0 });
  const total = allInteractions.length;
 

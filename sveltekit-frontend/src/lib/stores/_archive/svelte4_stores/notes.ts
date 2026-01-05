@@ -10,8 +10,7 @@ export const noteFilters = writable<NoteFilters>({
  tags: [],
  caseId | undefined,
 });
-
-// Derived stores
+  
 export const filteredNotes = derived([legalNotes, noteFilters], ([$legalNotes, $noteFilters]) => {
  let notes = $legalNotes;
 
@@ -59,8 +58,7 @@ export const noteStats = derived(legalNotes, ($legalNotes) => {
  ),
  };
 });
-
-// Functions
+  
 export async function loadLegalNotes(): Promise<void> {
  // Load notes from localStorage or API
  if (typeof window !== 'undefined') {
@@ -96,8 +94,7 @@ export async function saveLegalNote(note: Omit<LegalNote, 'savedAt' | 'updatedAt
  return [fullNote, ...notes];
  }
  });
-
- // Save to localStorage
+  
  if (typeof window !== 'undefined') {
  legalNotes.subscribe((notes) => {
  localStorage.setItem('legal-notes', JSON.stringify(notes));

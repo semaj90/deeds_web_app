@@ -45,8 +45,7 @@ describe('Legal Tag Extraction', () => {
  result.statutes.forEach((statute) => {
  expect(statute).toMatch(/\b\d+\s+U\.S\.C\.\s§?\s?\d+[a-zA-Z0-9\-]*/);
  });
-
- // Should not have duplicates
+  
  expect(result.statutes).toEqual([...new Set(result.statutes)]);
 
  // All unique statutes we embedded should be found
@@ -85,8 +84,7 @@ describe('Legal Tag Extraction', () => {
  result.cases.forEach((caseRef) => {
  expect(caseRef).toMatch(/\b[A-Z][a-z]+ v\. [A-Z][a-z]+(?: \(\d{4}\))?/);
  });
-
- // Should not have duplicates
+  
  expect(result.cases).toEqual([...new Set(result.cases)]);
  }
  ),
@@ -114,8 +112,7 @@ describe('Legal Tag Extraction', () => {
  result.caCodes.forEach((code) => {
  expect(code).toMatch(/\b(Penal Code|PC)\s§?\s?\d+[a-zA-Z0-9\-]*/i);
  });
-
- // Should not have duplicates
+  
  expect(result.caCodes).toEqual([...new Set(result.caCodes)]);
  }
  ),
@@ -153,8 +150,7 @@ describe('Legal Tag Extraction', () => {
  { numRuns: 100 }
  );
  });
-
- // Unit tests for specific examples
+  
  it('should extract known legal citations correctly', () => {
  const text = `
  This case involves 18 U.S.C. § 1512 witness tampering and

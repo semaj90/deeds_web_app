@@ -226,8 +226,7 @@ https://svelte.dev/e/js_parse_error -->
 
  hideTooltip();
  });
-
- // Add pulsing effect for contradiction nodes
+  
  node.filter((d: any) => d.contradictions && d.contradictions > 0)
  .append('circle')
  .attr('r', (d: any) => d.size * 1.5)
@@ -257,8 +256,7 @@ https://svelte.dev/e/js_parse_error -->
  node
  .attr('transform', (d: any) => `translate(${d.x},${d.y})`);
  });
-
- // Add drag behavior
+  
  node.call(d3.drag<Element, any>()
  .on('start', (event, d) => {
  if (!event.active) simulation.alphaTarget(0.3).restart();
@@ -308,8 +306,7 @@ https://svelte.dev/e/js_parse_error -->
  type: 'contradicts'
  });
  });
-
- // Add timeline links (simplified)
+  
  if (data.timeline && data.timeline.length > 1) {
  for (let i = 0; i < data.timeline.length - 1; i++) {
  const current = data.timeline[i];

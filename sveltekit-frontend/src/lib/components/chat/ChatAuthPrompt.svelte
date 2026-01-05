@@ -62,8 +62,7 @@
 			dismissed = sessionStorage.getItem('chat_prompt_dismissed') === 'true';
 		}
 	});
-
-	// Don't show if: authenticated, dismissed, no unsaved messages, or user disabled
+  
 	const shouldShow = $derived(!isAuthenticated && !dismissed && hasUnsaved && showPrompt);
 </script>
 

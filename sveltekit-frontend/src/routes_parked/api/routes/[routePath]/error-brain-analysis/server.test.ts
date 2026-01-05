@@ -34,8 +34,7 @@ describe('POST /api/routes/:routePath/error-brain-analysis', () => {
  phase: 'suggesting',
  }),
  });
-
- // Note: In real tests, you'd need to set up actual database connection
+  
  // This is a structure example
  expect(request.method).toBe('POST');
  });

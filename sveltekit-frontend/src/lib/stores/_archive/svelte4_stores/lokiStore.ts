@@ -33,8 +33,7 @@ export const lokiStore = writable<{ evidence: Item[]; notes: Item[]; canvasState
  notes: [],
  canvasStates: [],
 });
-
-// --- Helper: create mock data for dev preview --- //
+  
 function createMockData(): { evidence: Item[]; notes: Item[]; canvasStates: Item[] } {
  return {
  evidence: [

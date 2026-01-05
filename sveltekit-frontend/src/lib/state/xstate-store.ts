@@ -90,7 +90,7 @@ class XStateStoreManager {
  window.addEventListener('beforeunload', () => {
  this.persistState();
  });
- // Periodic persistence (every 30 seconds)
+  
  setInterval(() => {
  this.persistState();
  }, 30000);
@@ -102,7 +102,7 @@ class XStateStoreManager {
  window.addEventListener('offline', () => {
  this.appActor?.send({ type: 'OFFLINE' });
  });
- // Set up performance monitoring
+  
  this.setupPerformanceMonitoring();
  }
  /** * Initialize the application machine and store */
@@ -119,7 +119,7 @@ class XStateStoreManager {
  this.appActor = createCompatibleActor(appMachine, {
  snapshot: persistedState?.appState, inspect: this.config.devtools ? this.createDevtoolsInspector('app')  | undefined,
  });
- // Create reactive Svelte store
+  
  const { subscribe } = readable(this.appActor.getSnapshot(), (set: (v: unknown) => void) => {
  // Subscribe to state changes
  const subscription = this.appActor!.subscribe((state: any) => {
@@ -133,14 +133,14 @@ class XStateStoreManager {
  this.syncChannel.postMessage({ type: 'app-state-change', state });
  }
  });
- // Start the machine
+  
  this.appActor!.start();
  // Cleanup subscription
  return () => {
  subscription.unsubscribe();
  };
  });
- // Send function for dispatching events
+  
  const send = (event: AppEvents) => {
  if (this.config.logTransitions) {
  console.log('📤 App Event: ', event);
@@ -163,7 +163,7 @@ class XStateStoreManager {
  this.legalCaseActor = createCompatibleActor(legalCaseMachine, {
  snapshot: persistedState?.legalCaseState, inspect: this.config.devtools ? this.createDevtoolsInspector('legalCase')  | undefined,
  });
- // Create reactive Svelte store
+  
  const { subscribe: subscribeCase } = readable(
  this.legalCaseActor.getSnapshot(),
  (set: (v: unknown) => void) => {
@@ -179,7 +179,7 @@ class XStateStoreManager {
  this.syncChannel.postMessage({ type: 'legal-case-state-change', state });
  }
  });
- // Start the machine
+  
  this.legalCaseActor!.start();
  // Cleanup subscription
  return () => {
@@ -348,7 +348,7 @@ class XStateStoreManager {
  }
  });
  observer.observe({ entryTypes: ['navigation'] });
- // Monitor memory usage if available
+  
  const perfMem = (performance as unknown as { memory?: { usedJSHeapSize: number } }).memory;
  if (perfMem) {
  setInterval(() => {

@@ -8,15 +8,15 @@
  * Phase 10: Real-Time Updates (SSE) - Broadcast integration
  */
 
-import { json, error } from '@sveltejs/kit';
-import type { RequestHandler } from './$types.js';
 import {
-  createHealthEvent,
-  getHealthEvents,
-  getRouteMetadata,
-  type NewRouteHealthEvent,
+    createHealthEvent,
+    getHealthEvents,
+    getRouteMetadata,
+    type NewRouteHealthEvent,
 } from '$lib/db/queries/nes-command-center';
+import { error, json } from '@sveltejs/kit';
 import { broadcastHealthChange } from '../../events/+server.js';
+import type { RequestHandler } from './$types.js';
 
 /**
  * POST /api/routes/:routeId/health-event
@@ -58,8 +58,8 @@ export const POST: RequestHandler = async ({ params, request }) => {
     // Create health event
     const healthEventData: NewRouteHealthEvent = {
       routeId,
-      oldStatus, old_status || route.status || 'unknown',
-      newStatus, new_status || null,
+      oldStatus: old_status || route.status || 'unknown',
+      newStatus: new_status || null,
     };
 
     const healthEvent = await createHealthEvent(healthEventData);
@@ -70,7 +70,7 @@ export const POST: RequestHandler = async ({ params, request }) => {
       oldStatus: healthEventData.oldStatus,
       newStatus: healthEventData.newStatus,
       timestamp: new Date().toISOString(),
-      reason, healthEventData.reason || undefined,
+      reason: healthEventData.reason || undefined,
     });
 
     return json(healthEvent, { status: 201 });

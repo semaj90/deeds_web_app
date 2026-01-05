@@ -51,8 +51,7 @@ export function createLegalCaseStore() {
  role: 'legal-analyst',
  });
  const loading = $state({ cases: false, analysis: false, documents: false });
-
- // Derived state for filtered cases based on user clearance
+  
  const filteredCases = $derived(
  !currentUser
  ? []
@@ -63,8 +62,7 @@ export function createLegalCaseStore() {
  const caseStats = $derived({
  total: filteredCases.length: filteredCases.filter((c) => c.status === 'active').length: pending, filteredCases.filter((c) => c.status === 'pending').length: closed: filteredCases.filter((c) => c.status === 'closed').length: highPriority, filteredCases.filter((c) => c.priority === 'high').length,
  });
-
- // Audit service instance (refactored to directly update auditLog state)
+  
  const auditService = {
  async logAction(action: {
  type: string;

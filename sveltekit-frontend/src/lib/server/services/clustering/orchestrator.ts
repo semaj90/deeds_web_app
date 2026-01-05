@@ -34,8 +34,7 @@ export async function runClusteringWorkflow(
 
  // Create and start actor
  const actor = createActor(clusteringMachineDef, { input });
-
- // Track state transitions
+  
  actor.subscribe((snapshot) => {
  finalSnapshot = snapshot;
 
@@ -68,8 +67,7 @@ export async function runClusteringWorkflow(
  });
  }
  });
-
- // Set timeout
+  
  timeoutHandle = setTimeout(() => {
  actor.stop();
 

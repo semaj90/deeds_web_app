@@ -52,8 +52,7 @@ export async function initQdrantCollection(): Promise<boolean> {
                 },
                 replication_factor: 1
             });
-
-            // Create payload index for fast filtering
+  
             await qdrant.createPayloadIndex(COLLECTION_NAME, {
                 field_name: 'source',
                 field_schema: 'keyword'
@@ -102,8 +101,7 @@ async function syncDocumentToQdrant(doc: KnowledgeDocument): Promise<boolean> {
                 }
             ]
         });
-
-        // Mark as synced in Postgres
+  
         await markDocumentSynced(doc.id, doc.id);
 
         console.log(`✅ Synced document ${doc.id} to Qdrant`);
@@ -321,8 +319,7 @@ export async function fullResync(): Promise<number> {
 
         // Delete collection
         await qdrant.deleteCollection(COLLECTION_NAME).catch(() => {});
-
-        // Recreate collection
+  
         await initQdrantCollection();
 
         // Sync all documents

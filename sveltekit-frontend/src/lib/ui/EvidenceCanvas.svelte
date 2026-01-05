@@ -74,8 +74,7 @@ import { onMount } from 'svelte';
 
  evidencePositions = positions;
  });
-
- // Handle mouse events for panning
+  
  function handleMouseDown(e: MouseEvent) {
  if (e.button !== 0) return; // Only left mouse button
  isDragging = true;
@@ -215,8 +214,7 @@ import { onMount } from 'svelte';
  droppedEvidenceIds = [];
  }
  });
-
- // Mount event listeners
+  
  onMount(() => {
  const handleGlobalMouseUp = () => handleMouseUp();
  const handleGlobalMouseMove = (e: MouseEvent) => handleMouseMove(e);

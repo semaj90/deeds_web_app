@@ -29,8 +29,7 @@ interface RepairSuggestion {
 export const GET: RequestHandler = async ({ url }) => {
  try {
  const qdrant = new QdrantClient({ url: process.env.QDRANT_URL });
-
- // Parse query parameters
+  
  const status = url.searchParams.get('status') || 'pending';
  const limit = parseInt(url.searchParams.get('limit') || '50', 10);
  const minConfidence = parseFloat(url.searchParams.get('min_confidence') || '0.5');
@@ -77,8 +76,7 @@ export const POST: RequestHandler = async ({ request }) => {
  }
 
  const qdrant = new QdrantClient({ url: process.env.QDRANT_URL });
-
- // Update the point payload
+  
  await qdrant.setPayload(COLLECTION_NAME, {
  points: [id],
  payload: {

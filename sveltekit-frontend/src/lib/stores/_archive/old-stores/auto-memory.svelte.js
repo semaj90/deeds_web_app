@@ -31,7 +31,7 @@ const autoMemoryMachine = createMachine({
  on: {
  RETRY: 'idle', CLEAR_ERROR: {
  target: 'idle', actions: assign({ error: null })}}}}});
-// Advanced Auto-Memory Store with Svelte 5 Runes
+  
 function createAutoMemoryStore() {
  const localMemories = $state // TODO: Verify store subscription is correct for Svelte 5([]);
  const userPatterns = $state // TODO: Verify store subscription is correct for Svelte 5({});

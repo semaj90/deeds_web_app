@@ -72,8 +72,7 @@ export class CaseSummaryService {
 				caseId,
 				version: nextVersion,
 			});
-
-			// Invalidate cache
+  
 			await this.invalidateCache(caseId);
 
 			return this.mapToSummary(newSummary);
@@ -203,8 +202,7 @@ export class CaseSummaryService {
 				restoredFromVersion: version,
 				newVersion: restoredSummary.version,
 			});
-
-			// Invalidate cache
+  
 			await this.invalidateCache(caseId);
 
 			return this.mapToSummary(restoredSummary);
@@ -237,8 +235,7 @@ export class CaseSummaryService {
 			await this.logAudit(userId, 'summary_deleted', 'case_reports', summary.id, {
 				caseId,
 			});
-
-			// Invalidate cache
+  
 			await this.invalidateCache(caseId);
 		} catch (error) {
 			console.error('Error deleting summary:', error);

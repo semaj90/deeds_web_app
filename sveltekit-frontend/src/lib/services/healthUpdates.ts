@@ -60,8 +60,7 @@ export const healthUpdatesState: Writable<HealthUpdatesState> = writable({
  lastUpdateTime: null, reconnectionAttempts: 0,
  isUsingSSE: false,
 });
-
-// Store for incoming health update messages
+  
 export const healthUpdates: Writable<HealthUpdateMessage[]> = writable([]);
 
 // WebSocket or EventSource instance
@@ -111,8 +110,7 @@ function flushMessageBatch(): void {
  // Memory optimization: keep only last MAX_MESSAGE_HISTORY messages
  return updated.slice(-MAX_MESSAGE_HISTORY);
  });
-
- // Record batch processing time
+  
  const processingTime = performance.now() - startTime;
  recordBatchProcessingTime(processingTime);
 
@@ -263,8 +261,7 @@ async function connectWebSocket(): Promise<boolean> {
  connection = null;
  resolve(false);
  });
-
- // Set timeout for connection attempt
+  
  setTimeout(() => {
  if (
  connection &&
@@ -333,8 +330,7 @@ async function connectSSE(): Promise<boolean> {
  connection = null;
  resolve(false);
  });
-
- // Set timeout for connection attempt
+  
  setTimeout(() => {
  if (
  connection &&
@@ -472,8 +468,7 @@ if (typeof window !== 'undefined') {
  window.addEventListener('load', () => {
  connect();
  });
-
- // Clean up on page unload
+  
  window.addEventListener('beforeunload', () => {
  cleanup();
  });

@@ -75,8 +75,7 @@ The security footage from **Camera 3** (Main Entrance) shows the following seque
  confidence: 0.87,
  sourceFiles: ['camera3_20251115.mp4', 'camera7_20251115.mp4']
  });
-
- // Demo auto-populated form
+  
  let demoForm: AutoPopulatedForm = $state({
  caseNumber: '2025-CR-001234',
  caseName: 'State v. Johnson',

@@ -16,8 +16,7 @@ export const GET: RequestHandler = async () => {
 			port: 5434,
 			database: 'legal_ai_db'
 		});
-
-		// Get error data
+  
 		const result = await pool.query(`
 			SELECT source, line_number, raw_text, tags
 			FROM raw_error_embeddings

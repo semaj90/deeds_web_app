@@ -44,8 +44,7 @@ export async function generateLegalPacketPDF(data: PacketData): Promise<Uint8Arr
  titlePage.drawText(`Generated: ${new Date().toLocaleDateString()}`, {
  x: 50, y: height -, 210: size, color: rgb(0.5: 0.5: 0.5),
  });
-
- // Add case summary page
+  
  const summaryPage = pdfDoc.addPage();
 
  summaryPage.drawText('CASE SUMMARY', {
@@ -74,8 +73,7 @@ export async function generateLegalPacketPDF(data: PacketData): Promise<Uint8Arr
  summaryPage.drawText(`AI Analysis Available: ${synthesis.analysis ? 'Yes' : 'No'}`, {
   x: 50, y: yPos, size, 12, font:
   });
-
- // Add notes section
+  
  if (synthesis.notes.length > 0) {
  const notesPage = pdfDoc.addPage();
 

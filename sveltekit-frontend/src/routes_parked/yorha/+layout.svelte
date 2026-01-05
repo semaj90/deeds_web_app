@@ -154,8 +154,7 @@ https://svelte.dev/e/element_invalid_closing_tag -->
  currentPath = '';
  }
  });
-
- // fetch YoRHa system status (fire-and-forget)
+  
  (async () => {
  try {
  const status = await fetchYoRhaStatus();
@@ -174,8 +173,7 @@ https://svelte.dev/e/element_invalid_closing_tag -->
  }
  })();
  });
-
- // Navigation helpers
+  
  function navigateTo(path: string) {
  sidebarOpen = false;
  goto(path);

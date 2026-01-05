@@ -41,8 +41,7 @@ export class ChatStore {
     isProcessing = $state(false);
     processingStage = $state<'analyzing' | 'embedding' | 'searching' | 'generating' | 'complete'>('complete');
     processingMetrics = $state({ responseTime: 0, tokenCount: 0, confidenceScore: 0, somCluster: -1, embeddingTime: 0, searchTime: 0, generationTime: 0 });
-
-    // Error handling
+  
     lastError = $state<string | null>(null);
     errorHistory = $state<Array<any>>([]);
 
@@ -52,8 +51,7 @@ export class ChatStore {
 
     // Chat configuration
     chatConfig = $state({ maxMessages: 100, enableAttentionTracking: true, enableWebGPU: true, enableAnalysisPanel: true, autoScroll: true, showTypingIndicators: true, enableRecommendations: true, streamingEnabled: true });
-
-    // Derived values
+  
     messageCount = $derived(this.messages.length);
     lastUserMessage = $derived(this.messages.filter(item => item.role === 'user').slice(-1)[0] || null);
     lastAIResponse = $derived(this.messages.filter(item => item.role === 'assistant').slice(-1)[0] || null);
@@ -223,7 +221,8 @@ export class ChatStore {
 
         // Update attention data
         this.userAttention = {
-            ...this.userAttention, lastActivity: Date.now(, interactionCount: (this.userAttention.interactionCount || 0) + 1
+            ...this.userAttention, lastActivity: Date.now(),
+     interactionCount: (this.userAttention.interactionCount || 0) + 1
         };
     }
 

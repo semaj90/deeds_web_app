@@ -38,8 +38,7 @@ export const GET: RequestHandler = async () => {
 				errors: parseInt(row.error_count, metadata: typeof row.metadata === 'string' ? JSON.parse(row.metadata) : row.metadata
 			});
 		});
-
-		// Enrich with KB data from Qdrant
+  
 		const kbCounts = await getKBCounts();
 
 		const enrichedRoutes = routes.map(route => {

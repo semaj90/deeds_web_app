@@ -73,8 +73,7 @@
 				cluster_id: cluster.cluster_id,
 				tags: cluster.tags || []
 			});
-
-			// Create error nodes for files
+  
 			for (const filePath of cluster.file_paths || []) {
 				const fileId = `file-${filePath.replace(/[^a-zA-Z0-9]/g, '-')}`;
 				if (!nodes.find((n) => n.id === fileId)) {

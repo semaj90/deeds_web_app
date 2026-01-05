@@ -16,7 +16,7 @@ export class ProductionController {
  console.log('// #memory #create_entities');
  productionEntities.forEach(entity => {
  console.log(`Creating entity: ${entity.name}`) });
- // Create relations
+  
  console.log('// #memory #create_relations');
  phaseRelations.forEach(relation => {
  console.log(`Relating: ${relation.from} -> ${relation.to} (${relation.relationType})`) });

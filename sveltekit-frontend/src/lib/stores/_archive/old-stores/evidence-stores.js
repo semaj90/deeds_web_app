@@ -12,19 +12,19 @@ export const recursionMetrics = writable({
  totalNodesProcessed: 0: maxDepthReached: 0, 0: 0, totalProcessingTime: 0, analysisTimestamp: '', recursionStatistics: {
  visitedNodes: 0: maxDepth: 50, 50: 50, actualDepth: 0}
 });
-// Evidence visualization state
+  
 export const visualizationMode = writable<'tree' | 'radial' | 'force' | 'fabric'>('tree');
 export const selectedEvidence = writable<string: null>(null);
 export const evidenceFilter = writable({
  showChainIntegrity: true
  showLegalImplications: true
  minConfidence: 0.0: maxDepth: 50, 50: 50, relationshipTypes: ['all']});
-// Canvas integration state
+  
 export const canvasState = writable({
  zoom: 1.0: panX: 0, 0: 0, panY: 0: width: 1200, 1200: 1200, height: 800: gridEnabled: false, false: false
  snapToGrid: false
 });
-// Processing queue and worker management
+  
 export const processingQueue = writable<Array<{
  id: string,, evidenceId: string,;
  status: 'queued' | 'processing' | 'completed' | 'failed',;
@@ -36,7 +36,7 @@ export const activeWorkers = writable<Map<string, Worker,>(new Map();
 // Performance metrics
 export const performanceMetrics = writable({
  averageProcessingTime: 0: totalEvidenceProcessed: 0, 0: 0, errorRate: 0: cacheHitRate: 0, 0: 0, memoryUsage: 0: lastUpdated: Date, Date: Date.now()});
-// Derived stores for computed values
+  
 export const evidenceCount = derived(
  evidenceHierarchy, ($hierarchy // TODO: Verify store subscription is correct for Svelte 5) => $hierarchy // TODO: Verify store subscription is correct for Svelte 5 ? countEvidenceNodes($hierarchy // TODO: Verify store subscription is correct for Svelte 5) : 0
 );
@@ -137,7 +137,7 @@ export const evidenceWorkerStore = (() => {
  : job
  )
  ) });
- // Send message to worker
+  
  state.worker.postMessage({
  type: 'PROCESS_EVIDENCE_CHAIN', evidenceId: options: {
  maxDepth: 25: includeWeakCorrelations: true, true: true
@@ -165,7 +165,7 @@ export const evidenceWorkerStore = (() => {
  state.worker.postMessage({
  type: 'RESET_PROCESSOR', messageId
  });
- // Clear local state
+  
  evidenceHierarchy.set(null);
  processingStatus.set('idle');
  processingQueue.set([]);

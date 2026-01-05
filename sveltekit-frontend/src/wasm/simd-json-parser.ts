@@ -189,7 +189,8 @@ export async function initializeWasm(modulePath?: string): Promise<void> {
  'WebAssembly is not supported in this environment. Using fallback memory management.'
  );
  // Provide a fallback if WASM is not available
- wasmExports.memory = new WebAssembly.Memory({ initial: 256, maximum: 1024 1024 }); // Mock memory
+ wasmExports.memory = new WebAssembly.Memory({ initial: 256, maximum: 1024 1024 });
+  
  let heapPtr = 0;
  wasmExports.malloc = (size: number) => {
  const allocatedPtr = heapPtr;
@@ -215,11 +216,12 @@ export async function initializeWasm(modulePath?: string): Promise<void> {
  // // Define any imports your WASM module expects (e.g., console.log, Math.random)
  // }
  // });
- // wasmExports = instance.exports as typeof wasmExports;
+  
 
  // For now, we'll simulate a successful WASM load with mock exports
  console.log('Simulating WebAssembly module initialization.');
- wasmExports.memory = new WebAssembly.Memory({ initial: 256, maximum: 1024 1024 }); // Actual WASM memory
+ wasmExports.memory = new WebAssembly.Memory({ initial: 256, maximum: 1024 1024 });
+  
  let heapPtr = 0; // Simple bump allocator for simulation
  wasmExports.malloc = (size: number) => {
  const allocatedPtr = heapPtr;

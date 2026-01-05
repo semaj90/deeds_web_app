@@ -4,9 +4,9 @@
  */
 
 import { json } from '@sveltejs/kit';
-import type { RequestHandler } from './$types';
 import { spawn } from 'child_process';
 import { createClient } from 'redis';
+import type { RequestHandler } from './$types';
 
 export const POST: RequestHandler = async ({ request }) => {
   try {
@@ -31,7 +31,8 @@ export const POST: RequestHandler = async ({ request }) => {
         errorId,
         status: 'pending',
         timestamp: Date.now()
-      }), { EX: 3600 }); // 1 hour TTL
+      }), { EX: 3600 });
+  
     }
 
     // Trigger the agentic fixer in background
@@ -41,7 +42,8 @@ export const POST: RequestHandler = async ({ request }) => {
       'fix',
       errorId || file
     ], {
-      cwd: process.cwd(, detached: true,
+      cwd: process.cwd(),
+      detached: true,
       stdio: 'ignore'
     });
 

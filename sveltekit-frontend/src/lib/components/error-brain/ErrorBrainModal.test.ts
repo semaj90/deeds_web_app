@@ -279,8 +279,7 @@ describe('ErrorBrainModal Component', () => {
  const analysisItem = screen.getByText(/1 suggestions/i);
  expect(analysisItem).toBeDefined();
  });
-
- // Click on analysis item
+  
  const analysisItem = screen.getByText(/1 suggestions/i).closest('button');
  if (analysisItem) {
  fireEvent.click(analysisItem);
@@ -605,8 +604,7 @@ describe('ErrorBrainModal Component', () => {
  routePath: TEST_ROUTE_PATH, onClose: vi.fn(),
  },
  });
-
- // Verify component renders
+  
  expect(container.querySelector('.error-brain-modal')).toBeDefined();
 
  // Verify state updates trigger re-renders
@@ -621,8 +619,7 @@ describe('ErrorBrainModal Component', () => {
  routePath: TEST_ROUTE_PATH, onClose: vi.fn(),
  },
  });
-
- // Verify props are used
+  
  const routeInfo = screen.getByText(new RegExp(TEST_ROUTE_PATH));
  expect(routeInfo).toBeDefined();
  });

@@ -44,6 +44,7 @@ declare interface SimpleRedis {
  keys: (...args: unknown[]) => Promise<string[]>;
  info: (...args: unknown[]) => Promise<unknown>;
  status: unknown;
+ isOpen?: boolean;
  dbsize: (...args: unknown[]) => Promise<number>;
  get: (...args: unknown[]) => Promise<unknown>;
  set: (...args: unknown[]) => Promise<unknown>;

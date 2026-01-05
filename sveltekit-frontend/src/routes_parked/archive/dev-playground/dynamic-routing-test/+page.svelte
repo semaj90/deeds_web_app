@@ -21,8 +21,7 @@ https://svelte.dev/e/js_parse_error -->
 // REMOVED: description: '',
  priority: 'medium',
 // REMOVED: });
-
-// REMOVED: let loading = $state(true);
+  
  let error: string | null = $state(null);
 
  const sections = $state([

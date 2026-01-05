@@ -67,8 +67,7 @@ export async function initCouchDB() {
         }).catch(() => {
             // Database may already exist
         });
-
-        // Create MapReduce design documents
+  
         await createGraphViews();
 
         console.log('✅ CouchDB initialized:', KNOWLEDGE_DB);
@@ -328,8 +327,7 @@ export async function traverseGraph(
         if (!node) continue;
 
         results.push({ node, depth });
-
-        // Add neighbors to queue
+  
         if (depth < maxDepth) {
             const neighbors = await getNeighbors(id);
             for (const neighborId of neighbors) {

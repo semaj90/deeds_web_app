@@ -204,8 +204,7 @@ class QUICClient {
 	private async fetch(path: string, options: RequestInit = {}): Promise<Response> {
 		const url = `${this.baseUrl}${path}`;
 		const headers = new Headers(options.headers ?? {});
-
-		// Add connection hints
+  
 		if (!headers.has('Connection')) headers.set('Connection', 'keep-alive');
 
 		const startTime = performance.now();

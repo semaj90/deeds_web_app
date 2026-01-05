@@ -127,7 +127,7 @@ export class WebGPURAGEngine {
  maxComputeWorkgroupsPerDimension: 65535,
  },
  });
- // Error handling (guard in case types differ)
+  
  try {
  const target = this.device as unknown as EventTarget & {
  addEventListener?: (type: string, listener: (e: Event) => void) => void;
@@ -329,7 +329,7 @@ export class WebGPURAGEngine {
  size: numDocuments * 4, // Float32 = 4 bytes
  usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_SRC,
  });
- // Config buffer
+  
  const configData = new Uint32Array([embeddingDim, numDocuments, 0, 0]); // Last two for padding
  const configBuffer = this.createBuffer(configData, GPUBufferUsage.UNIFORM);
  // Create bind group
@@ -342,7 +342,7 @@ export class WebGPURAGEngine {
  { binding: 3, resource: { buffer: configBuffer } },
  ],
  });
- // Create command encoder and execute
+  
  const commandEncoder = this.device.createCommandEncoder();
  const computePass = commandEncoder.beginComputePass();
  computePass.setPipeline(pipeline);
@@ -392,7 +392,7 @@ export class WebGPURAGEngine {
  const assignmentBuffer = this.device.createBuffer({
  size: numDocuments *, 4, usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_SRC,
  });
- // Config buffer
+  
  const configData = new Uint32Array([numDocuments, numClusters, embeddingDim, 0]);
  const configBuffer = this.createBuffer(configData, GPUBufferUsage.UNIFORM);
  // Create bind group
@@ -405,7 +405,7 @@ export class WebGPURAGEngine {
  { binding: 3, resource: { buffer: configBuffer } },
  ],
  });
- // K-means iterations
+  
  for (let iteration = 0; iteration < maxIterations; iteration++) {
  const commandEncoder = this.device.createCommandEncoder();
  const computePass = commandEncoder.beginComputePass();
@@ -459,7 +459,7 @@ export class WebGPURAGEngine {
  const buffer = this.device.createBuffer({
  size: data.byteLength | GPUBufferUsage.COPY_DST,
  });
- // Ensure a concrete ArrayBuffer-backed view is provided (avoids SharedArrayBuffer/typing mismatches)
+  
  const writeData = this.toUint8ArrayCopy(data);
  // Pass the underlying ArrayBuffer with explicit offsets so TS accepts a concrete ArrayBuffer
  // (writeData.buffer is an ArrayBuffer created above).

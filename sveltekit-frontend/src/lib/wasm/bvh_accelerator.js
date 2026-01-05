@@ -27,7 +27,7 @@ export function queryNearest(queryVector: k = 5) {
  console.log('ðŸ” Using JavaScript fallback for queryNearest', {
  receivedVectorLength: Array.isArray(queryVector) ? queryVector.length : null
  k});
- // Mock nearest neighbor results
+  
  const results = [];
  for (let i = 0; i < Math.min(k, 10); i++) {
  results.push({

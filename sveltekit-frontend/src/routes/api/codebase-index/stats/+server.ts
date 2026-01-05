@@ -70,13 +70,11 @@ export const GET: RequestHandler = async ({ fetch }) => {
 				(p.payload?.surface || []).forEach((s: string) => {
 					surfaceBreakdown[s] = (surfaceBreakdown[s] || 0) + 1;
 				});
-
-				// Tech breakdown
+  
 				(p.payload?.tech || []).forEach((t: string) => {
 					techBreakdown[t] = (techBreakdown[t] || 0) + 1;
 				});
-
-				// Track latest timestamp
+  
 				if (p.payload?.timestamp && (!lastIndexed || p.payload.timestamp > lastIndexed)) {
 					lastIndexed = p.payload.timestamp;
 				}

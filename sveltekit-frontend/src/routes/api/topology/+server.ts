@@ -40,7 +40,9 @@ export const GET: RequestHandler = async () => {
 					path: filePath,
 					errors: 0,
 					complexity: 0,
-					tags: new Set(, error_codes: new Set(, dependencies: new Set()
+					tags: new Set(),
+					error_codes: new Set(),
+					dependencies: new Set()
 				});
 			}
 
@@ -77,7 +79,8 @@ export const GET: RequestHandler = async () => {
 			components,
 			summary: {
 				total_components: components.length,
-				total_errors: components.reduce((sum: number, c: any) => sum + c.errors, 0, high_priority: components.filter((c: any) => c.recommended_action === 'urgent_refactor').length,
+				total_errors: components.reduce((sum: number, c: any) => sum + c.errors, 0),
+				high_priority: components.filter((c: any) => c.recommended_action === 'urgent_refactor').length,
 				avg_complexity: components.reduce((sum: number, c: any) => sum + c.complexity, 0) / components.length
 			}
 		});

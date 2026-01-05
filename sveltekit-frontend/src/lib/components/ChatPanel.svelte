@@ -38,8 +38,7 @@ import { Send } from "lucide-svelte";;
  embeddingStream = null;
  }
  });
-
- // Cleanup after 30 seconds
+  
  setTimeout(() => {
  if (unsubscribe) unsubscribe();
  embeddingStream = null;
@@ -53,8 +52,7 @@ import { Send } from "lucide-svelte";;
  uploading = true;
  pendingFile = file;
  messages.push({ role: 'system', text: `Processing ${file.name}…` });
-
- // Read file content
+  
  const content = await file.text();
 
  // Start embedding stream for file
@@ -75,8 +73,7 @@ import { Send } from "lucide-svelte";;
  embeddingStream = null;
  }
  });
-
- // Cleanup after 60 seconds for files
+  
  setTimeout(() => {
  if (unsubscribe) unsubscribe();
  embeddingStream = null;

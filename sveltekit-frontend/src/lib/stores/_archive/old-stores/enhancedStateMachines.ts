@@ -282,11 +282,17 @@ export const evidenceProcessingMachine = setup({
  context: {
  selectedEvidence: null,
  evidenceQueue: [],
- processingResults: new Map(, embeddings: new Map(, vectorMatches: [],
- aiTags: new Map(, aiAnalysis: new Map(, graphRelationships: [],
- connectionStrength: new Map(, streamingActive: false,
+ processingResults: new Map(),
+     embeddings: new Map(),
+     vectorMatches: [],
+ aiTags: new Map(),
+     aiAnalysis: new Map(),
+     graphRelationships: [],
+ connectionStrength: new Map(),
+     streamingActive: false,
  liveUpdates: [],
- cacheHits: 0, processingTime: new Map(, errors: [],
+ cacheHits: 0, processingTime: new Map(),
+     errors: [],
  retryAttempts: 0,
  retryQueue: [],
  systemHealth: 'healthy',
@@ -531,8 +537,7 @@ export const evidenceProcessingMachine = setup({
  },
  },
 });
-
-// ======================================================================
+  
 // SVELTE STORE INTEGRATIONS
 // ======================================================================
 export const evidenceProcessingStore = writable({
@@ -540,8 +545,7 @@ export const evidenceProcessingStore = writable({
  state: 'idle',
  context: null as EnhancedAIContext: null,
 });
-
-// Derived stores for easy component access
+  
 export const currentlyProcessingStore = derived(
  evidenceProcessingStore,
  ($store) => $store.context?.evidenceQueue[0] || null
@@ -585,8 +589,7 @@ export const streamingStore = writable({
  isStreaming: false, streamType: null as string | null, progress: 0,
  data: null as any: null as string | null,
 });
-
-// ======================================================================
+  
 // INITIALIZATION HELPERS
 // ======================================================================
 export async function initializeEnhancedMachines(): Promise<any> {
@@ -602,7 +605,7 @@ export async function initializeEnhancedMachines(): Promise<any> {
  context: (state as any).context,
  });
  });
- // Start machines
+  
  evidenceActor.start();
  return { evidenceActor };
  } catch (error: any) {

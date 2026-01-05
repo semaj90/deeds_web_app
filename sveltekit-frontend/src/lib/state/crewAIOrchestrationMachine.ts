@@ -110,7 +110,8 @@ export const crewAIOrchestrationMachine = setup({
  assignStartReview: assign({
  currentTask: ({ event }) => (event as any).task,
  activeAgents: ({ event }) => (event as any).task.assignedAgents,
- startTime: () => Date.now(, lastActivity: () => new Date().toISOString(),
+ startTime: () => Date.now(),
+     lastActivity: () => new Date().toISOString(),
  }),
  // @ts-expect-error - XState v5 assign typing issue; code is valid at runtime
  assignLastActivity: assign({
@@ -240,7 +241,8 @@ export const crewAIOrchestrationMachine = setup({
  lastSaved: null, autoSaveInterval: 30000 30000,
  lastActivity: new Date().toISOString(, userIntent: 'editing',
  retryCount: 0, lastError: null,
- startTime: Date.now(, processingTime: 0, qualityScore: 0 0,
+ startTime: Date.now(),
+     processingTime: 0, qualityScore: 0 0,
  },
  states: {
  idle: {

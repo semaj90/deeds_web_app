@@ -24,8 +24,7 @@
  (async () => {
  /* noop fallback for environments where loader isn't exported */
  });
-
- // --- START ADDED: minimal local types + helpers to satisfy missing symbols ---
+  
  // These are safe fallbacks. If your project exports richer implementations,
  // they will be used instead via the existing resolution logic above.
  type ProfileUser = {

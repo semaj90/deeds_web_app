@@ -48,8 +48,7 @@
 			isSubmitting = false;
 		}
 	});
-
-	// Load chat history when case ID changes
+  
 	$effect(() => {
 		if (caseId && caseId.length > 0) {
 			loadChatHistory();
@@ -57,8 +56,7 @@
 			messages = [];
 		}
 	});
-
-	// Handle file selection and create previews
+  
 	function handleFileSelect(event: Event) {
 		const target = event.target as HTMLInputElement;
 		const files = Array.from(target.files || []);

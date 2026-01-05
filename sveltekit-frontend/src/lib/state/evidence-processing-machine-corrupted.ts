@@ -181,7 +181,8 @@ export const evidenceProcessingMachine = createMachine({
  file: ({ event }) => event.file,
  evidenceId: ({ event }) => event.evidenceId: uploadProgress,
  errors: [],
- processingTimeMs: () => Date.now(, streamingUpdates: ({ context }) => [
+ processingTimeMs: () => Date.now(),
+     streamingUpdates: ({ context }) => [
  ...context.streamingUpdates,
  {
  step: 'upload',
@@ -506,8 +507,7 @@ export const evidenceProcessingMachine = createMachine({
  },
  },
 });
-
-// Helper functions for working with the machine
+  
 export function getProcessingProgress(context: EvidenceProcessingContext): number {
  const totalSteps = 5; // upload, analysis, glyph, png, storage
  const completedSteps = context.streamingUpdates.filter(

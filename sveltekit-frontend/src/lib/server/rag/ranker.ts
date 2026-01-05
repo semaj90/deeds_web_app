@@ -48,8 +48,7 @@ export function rerankLegalAware(opts: {
 
  return { ...h, finalScore, explain };
  });
-
- // Sort by final score (highest first)
+  
  out.sort((a, b) => (b.finalScore ?? b.score) - (a.finalScore ?? a.score));
 
  return out;

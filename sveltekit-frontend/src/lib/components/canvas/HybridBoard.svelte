@@ -252,8 +252,7 @@
 		nodes; edges; viewport;
 		if (!readonly) setDirty(true);
 	});
-
-	// ===== Overlay geometry =====
+  
 	function selectedBounds(): { x: number; y: number; w: number; h: number } | null {
 		const ids = [...selected];
 		if (ids.length === 0) return null;

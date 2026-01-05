@@ -257,8 +257,7 @@ export class YoRHaButtonAA3D extends YoRHaAntiAliased3D {
                 }
             `
         });
-
-        // Replace material if we have enhanced material
+  
         if (this.enhancedMaterial) {
             this.enhancedMaterial.dispose();
             this.enhancedMaterial = subpixelMaterial;
@@ -525,8 +524,7 @@ export class YoRHaButtonAA3D extends YoRHaAntiAliased3D {
             roughness: 0.2,
             metalness: 0.3
         });
-
-        // Main ring
+  
         const ring = new THREE.Mesh(ringGeometry, ringMaterial);
         ring.position.z = (this.style.depth || 0.15) / 2 + 0.02;
         this.loadingSpinner.add(ring);
@@ -569,8 +567,7 @@ export class YoRHaButtonAA3D extends YoRHaAntiAliased3D {
                 }
             }
         });
-
-        // Hide other content during loading
+  
         if (this.textMesh) this.textMesh.visible = false;
         if (this.iconMesh) this.iconMesh.visible = false;
     }
@@ -724,8 +721,7 @@ export class YoRHaButtonAA3D extends YoRHaAntiAliased3D {
                 this.mesh.scale.setScalar(1);
             }
         });
-
-        // Add ripple effect
+  
         this.createRippleEffect();
     }
 

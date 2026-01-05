@@ -125,8 +125,7 @@
  mockSessionActions.init(data);
  }
  });
-
- // Mock reactive data with conditionals for session/user demo
+  
  let currentUser = $derived (mockSessionActive ? mockUser : null);
  let authenticated = $derived (mockSessionActive);
 
@@ -179,8 +178,7 @@
  $effect (() => {
  focusReady = true;
  });
-
- // TEMPORARY WORKAROUNDS: The following aliases cast components/functions to 'any' to bypass TypeScript errors in this demo.
+  
  // This should NOT be in production code, as it disables type safety for component props and events.
  // Properly type the components or update their event/function typings for production use.
  // Re-adding temporary 'as any' casts to fix type errors on this preview page.

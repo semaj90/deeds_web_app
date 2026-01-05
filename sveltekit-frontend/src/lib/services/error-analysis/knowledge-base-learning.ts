@@ -144,8 +144,7 @@ export class KnowledgeBaseLearning extends BaseService {
  const scoreB = b.confidence * b.similarity;
  return scoreB - scoreA;
  });
-
- // Return top N fixes
+  
  const results = scoredFixes.slice(0, limit);
 
  this.log('info', `Retrieved ${results.length} fixes for error type ${error.type}`, {

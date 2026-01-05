@@ -55,8 +55,7 @@ export async function initializeQdrantCollections(): Promise<void> {
  size: 768,
  distance: 'Cosine',
  });
-
- // Create law_sections collection
+  
  await createCollection(COLLECTIONS.LAW_SECTIONS, {
  size: 768,
  distance: 'Cosine',

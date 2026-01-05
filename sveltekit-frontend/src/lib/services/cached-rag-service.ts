@@ -193,7 +193,7 @@ export async function ollamaEmbed(
  }
  return {} as EmbeddingResult;
  });
- // ensure same length as inputs - if different, pad/truncate conservatively
+  
  while (mapped.length < texts.length) mapped.push({} as EmbeddingResult);
  return mapped.slice(0, texts.length);
  }

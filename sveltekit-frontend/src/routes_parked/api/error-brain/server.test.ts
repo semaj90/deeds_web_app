@@ -63,8 +63,7 @@ describe('Error-Brain API Endpoints', () => {
  vi.mocked(DataIsolationLayer.checkAccess).mockReturnValue({
  allowed: true,
  });
-
- // Create request
+  
  const request = new Request('http://localhost/api/error-brain/analyze', {
  method: 'POST',
  headers: {
@@ -78,8 +77,7 @@ describe('Error-Brain API Endpoints', () => {
  filePath: 'src/lib/component.svelte',
  }),
  });
-
- // Call endpoint
+  
  const response = await POST({ request } as any);
 
  // Verify response
@@ -117,8 +115,7 @@ describe('Error-Brain API Endpoints', () => {
  method: 'POST',
  body: JSON.stringify({ errorMessage: 'Test error' }),
  });
-
- // Call endpoint
+  
  const response = await POST({ request } as any);
 
  // Verify response
@@ -155,8 +152,7 @@ describe('Error-Brain API Endpoints', () => {
  method: 'POST',
  body: JSON.stringify({ errorMessage: 'Test error' }),
  });
-
- // Call endpoint
+  
  const response = await POST({ request } as any);
 
  // Verify response
@@ -185,8 +181,7 @@ describe('Error-Brain API Endpoints', () => {
  vi.mocked(DataIsolationLayer.checkAccess).mockReturnValue({
  allowed: false,
  });
-
- // Create request
+  
  const request = new Request('http://localhost/api/error-brain/analyze', {
  method: 'POST',
  headers: {
@@ -196,8 +191,7 @@ describe('Error-Brain API Endpoints', () => {
  },
  body: JSON.stringify({ errorMessage: 'Test error' }),
  });
-
- // Call endpoint
+  
  const response = await POST({ request } as any);
 
  // Verify response
@@ -228,8 +222,7 @@ describe('Error-Brain API Endpoints', () => {
  vi.mocked(DataIsolationLayer.checkAccess).mockReturnValue({
  allowed: true,
  });
-
- // Create request
+  
  const request = new Request('http://localhost/api/error-brain/analyze', {
  method: 'POST',
  headers: {
@@ -239,8 +232,7 @@ describe('Error-Brain API Endpoints', () => {
  },
  body: JSON.stringify({}),
  });
-
- // Call endpoint
+  
  const response = await POST({ request } as any);
 
  // Verify response
@@ -254,14 +246,12 @@ describe('Error-Brain API Endpoints', () => {
  vi.mocked(FeatureFlagEnforcer.checkRequest).mockImplementation(() => {
  throw new Error('Test error');
  });
-
- // Create request
+  
  const request = new Request('http://localhost/api/error-brain/analyze', {
  method: 'POST',
  body: JSON.stringify({ errorMessage: 'Test error' }),
  });
-
- // Call endpoint
+  
  const response = await POST({ request } as any);
 
  // Verify response
@@ -294,8 +284,7 @@ describe('Error-Brain API Endpoints', () => {
  vi.mocked(DataIsolationLayer.checkAccess).mockReturnValue({
  allowed: true,
  });
-
- // Create request
+  
  const request = new Request('http://localhost/api/error-brain/patch', {
  method: 'PATCH',
  headers: {
@@ -308,8 +297,7 @@ describe('Error-Brain API Endpoints', () => {
  selectedFix: 0,
  }),
  });
-
- // Call endpoint
+  
  const response = await PATCH({ request } as any);
 
  // Verify response
@@ -352,8 +340,7 @@ describe('Error-Brain API Endpoints', () => {
  vi.mocked(DataIsolationLayer.checkAccess).mockReturnValue({
  allowed: true,
  });
-
- // Create request
+  
  const request = new Request('http://localhost/api/error-brain/patch', {
  method: 'PATCH',
  headers: {
@@ -363,8 +350,7 @@ describe('Error-Brain API Endpoints', () => {
  },
  body: JSON.stringify({ selectedFix: 0 }),
  });
-
- // Call endpoint
+  
  const response = await PATCH({ request } as any);
 
  // Verify response
@@ -397,8 +383,7 @@ describe('Error-Brain API Endpoints', () => {
  vi.mocked(DataIsolationLayer.checkAccess).mockReturnValue({
  allowed: true,
  });
-
- // Create request
+  
  const request = new Request('http://localhost/api/error-brain/history?limit=10&offset=0', {
  method: 'GET',
  headers: {
@@ -406,8 +391,7 @@ describe('Error-Brain API Endpoints', () => {
  'X-User-ID': 'user-123',
  },
  });
-
- // Call endpoint
+  
  const response = await GET({ request } as any);
 
  // Verify response
@@ -450,8 +434,7 @@ describe('Error-Brain API Endpoints', () => {
  vi.mocked(DataIsolationLayer.checkAccess).mockReturnValue({
  allowed: true,
  });
-
- // Create request with custom pagination
+  
  const request = new Request('http://localhost/api/error-brain/history?limit=5&offset=10', {
  method: 'GET',
  headers: {
@@ -459,8 +442,7 @@ describe('Error-Brain API Endpoints', () => {
  'X-User-ID': 'user-123',
  },
  });
-
- // Call endpoint
+  
  const response = await GET({ request } as any);
 
  // Verify response

@@ -41,8 +41,7 @@ data.dimensions || 768
     throw new Error(`Embedding failed: ${error instanceof Error ? error.message : String(error)}`);
   }
 });
-
-// ===== DOCUMENT PROCESSING ACTOR =====
+  
 export interface DocumentProcessingInput {
   documentId: string;
   generateSummary?: boolean;
@@ -120,8 +119,7 @@ riskScore, data.riskScore || 0, riskFactors: data.riskFactors || [],
     );
   }
 });
-
-// ===== RAG SEARCH ACTOR =====
+  
 export interface RAGSearchInput {
   query: string;
   caseId?: string;
@@ -155,8 +153,7 @@ export const ragSearchActor = fromPromise(async ({ input }: { input: RAGSearchIn
     throw new Error(`RAG search failed: ${error instanceof Error ? error.message : String(error)}`);
   }
 });
-
-// ===== ACTOR FACTORY FUNCTIONS =====
+  
 export function createEmbeddingActor(
   input: EmbeddingActorInput
 ): ActorRefFrom<typeof embeddingActor> {

@@ -62,8 +62,7 @@ https://svelte.dev/e/attribute_invalid_event_handler -->
  gpuMemory: '0MB',
  processingTime: '0ms'
  });
-
- // Live update event source
+  
  let eventSource = $state <EventSource: null>(null);
 
  // Control panel state

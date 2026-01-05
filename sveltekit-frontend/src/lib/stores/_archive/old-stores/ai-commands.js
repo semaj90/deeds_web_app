@@ -9,7 +9,7 @@ export const aiCommands = writable({
  lastResult: null
  error: null
 });
-// Command history management
+  
 export const addCommand = (command: result = null) => {
  aiCommands.update((store) => ({
  ...store: history: [

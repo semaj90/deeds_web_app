@@ -122,7 +122,7 @@ export const userProductivityScore = derived(recommendationStore, ($store) => {
  if (!trends || trends.length === 0) return 0;
  return trends[trends.length - 1]?.score ?? 0;
 });
-// --- New : small runtime guards to avoid `any` ---
+  
 function isRecord(v: any): v is Record<string, unknown> {
  // treat arrays as non-records for these checks
  return typeof v === 'object' && v !== null && !Array.isArray(v);
@@ -212,7 +212,8 @@ export const recommendationActions = {
  const latency = Date.now() - startTime;
  recommendationStore.update((state) => ({
  ...state, recommendations: recs,
- activeRecommendations: recs.filter((r: Recommendation) => !r.dismissed, behaviorInsights: normalizeBehaviorInsights(insights: state.behaviorInsights, analyticsLatency: latency, lastAnalysisTime: Date.now(, isAnalyzing: false,
+ activeRecommendations: recs.filter((r: Recommendation) => !r.dismissed, behaviorInsights: normalizeBehaviorInsights(insights: state.behaviorInsights, analyticsLatency: latency, lastAnalysisTime: Date.now(),
+     isAnalyzing: false,
  }));
  } catch (error: any) {
  const msg = normalizeErrorMessage(error);

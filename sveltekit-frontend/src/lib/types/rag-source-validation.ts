@@ -431,8 +431,7 @@ export async function ragWithSourceValidation(
     use_hybrid: true,
     use_rerank: true,
   });
-
-  // Step 2: Human-in-the-loop validation
+  
   const approvedIds = await onCandidates(searchResult.chunks);
 
   const validations = searchResult.chunks.map(chunk => ({
@@ -446,8 +445,7 @@ export async function ragWithSourceValidation(
     validations,
     user_id: userId,
   });
-
-  // Step 3: Generate answer
+  
   const answer = await generateAnswer({
     context_id: context.context_id,
     query,
@@ -455,8 +453,7 @@ export async function ragWithSourceValidation(
     include_citations: true,
     include_todos: true,
   });
-
-  // Step 4: Update knowledge graph (async, don't wait)
+  
   updateKnowledgeGraph(answer.answer_id).catch(console.error);
 
   return answer;

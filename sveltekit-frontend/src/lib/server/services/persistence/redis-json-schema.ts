@@ -116,7 +116,8 @@ export class RedisJSONStore {
 
  if (!stats) {
  stats = {
- hits: 0, lastHit: Date.now(, dayHits: {},
+ hits: 0, lastHit: Date.now(),
+     dayHits: {},
  weekHits: 0, monthHits: 0,
  };
  }

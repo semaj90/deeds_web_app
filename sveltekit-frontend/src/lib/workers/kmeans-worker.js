@@ -52,7 +52,7 @@ class KMeansWorker {
  // clear each cluster's array length
  clusters.forEach(cluster => {
  cluster.length = 0});
- // Assign points to nearest centroid (parallelizable operation)
+  
  for (let i = 0; i < data.length; i++) {
  const point = data[i];
  if (!point.embedding || point.embedding.length !== dimensions) continue
@@ -129,7 +129,7 @@ class KMeansWorker {
  }
  return minDist * minDist; // Square for probability weighting
  });
- // Weighted random selection
+  
  const totalDistance = distances.reduce((sum, d) => sum + d, 0);
  let random = Math.random() * totalDistance
  for (let j = 0; j < distances.length; j++) {

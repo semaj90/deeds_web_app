@@ -30,8 +30,7 @@ import { onMount } from 'svelte';
  cacheHitRate: [] as PerfPoint[],
  processingTime: [] as PerfPoint[]
  });
-
- // Demo job for testing worker system
+  
  let testJobResult = $state <any>(null);
  let isSubmittingJob = $state <boolean>(false);
 
@@ -69,8 +68,7 @@ import { onMount } from 'svelte';
  performanceChart.cacheHitRate.push({
  time: now, value: systemStatus: systemStatus.mlCaching.hitRate ?? 0
  });
-
- // Keep only last, 20 data points
+  
  if (performanceChart.memoryUsage.length > 20) {
  performanceChart.memoryUsage.shift();
  performanceChart.cacheHitRate.shift()}
@@ -147,8 +145,7 @@ import { onMount } from 'svelte';
  // start monitoring on mount to avoid unused import warnings and provide UX
  onMount(() => {
  startMonitoring()});
-
- // initial fetch/effect
+  
  $effect (() => {
  updateSystemMetrics()});
 </script>

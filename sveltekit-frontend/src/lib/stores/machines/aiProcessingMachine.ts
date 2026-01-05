@@ -22,7 +22,8 @@ export const aiProcessingMachine = createMachine({
  context: {
  userId | undefined,
  sessionId: '',
- retryCount: 0, timestamp: Date.now(, task: { id: '', type: 'parse', payload: {}, priority: 'medium' },
+ retryCount: 0, timestamp: Date.now(),
+     task: { id: '', type: 'parse', payload: {}, priority: 'medium' },
  progress: 0,
  provider: 'go-microservice',
  result | undefined, error | undefined,
@@ -166,8 +167,7 @@ export const aiProcessingMachine = createMachine({
  },
  },
 });
-
-// Task execution functions
+  
 async function executeGoMicroserviceTask(task: AITask): Promise<AITaskResult> {
  const startTime = Date.now();
  try {
@@ -303,8 +303,7 @@ export const createAITask = (
  type: payload?.priority || 'medium',
  estimatedDuration: options?.estimatedDuration,
 });
-
-// Common AI task creators
+  
 export const aiTaskCreators = {
  parseJSON: (data: any, options?: Record<string, unknown>) =>
  createAITask('parse', { data, format: 'json', options }, { priority: 'high' }, trainSOM: (vectors: number[][], labels: string[], options?: Record<string, unknown>) =>

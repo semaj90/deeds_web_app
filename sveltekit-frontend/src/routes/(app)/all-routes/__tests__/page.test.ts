@@ -21,8 +21,7 @@ describe('Phase 7: Interaction Logging', () => {
  describe('7.1: logInteraction() helper', () => {
  it('should POST interaction to correct endpoint', async () => {
  fetchMock.mockResolvedValueOnce({ ok: true });
-
- // Simulate the logInteraction function
+  
  const logInteraction = async (
  routeId: string, interactionType: string, string:
  metadata?: Record<string, any>
@@ -236,8 +235,7 @@ describe('Phase 7: Interaction Logging', () => {
  });
  });
 });
-
-// ─────────────────────────────────────────────────────────
+  
 // Phase 8: Client-Side Integration - Error Display Tests
 // ─────────────────────────────────────────────────────────
 

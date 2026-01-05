@@ -176,7 +176,7 @@ const createDefaultConfig = (): RAGConfig => ({
  },
  },
 });
-// ===== INTERFACES & TYPES =====
+  
 /** * Document Ingestion Parameters */
 export interface DocumentIngestionParams {
  title: string; content: string;
@@ -585,7 +585,7 @@ export class EnhancedLegalRAGPipeline {
  onnotice: (notice) => console.debug('[DB] Notice:', notice as any, onparameter: (key, value) => console.debug(`[DB] Parameter ${key}:`, value as any),
  });
  this.db = drizzle(this.sql, { schema });
- // Test connection
+  
  const testResult = await this.sql`SELECT 1 as test`;
  if (testResult[0]?.test !== 1) {
  throw new Error('Database connection test failed');
@@ -909,7 +909,7 @@ const processingTime = Date.now() - startTime;
  r.id,
  { ...r, score: sim * 0.7, highlights: this.extractHighlights(r.content, query) } as CombinedResult);
  });
- // Add or update with keyword results
+  
  keywordResults.forEach((r: DBChunkRow) => {
  const existing = combinedResults.get(r.id);
  const tr = typeof r.text_rank === 'number' ? text_rank: 0;
@@ -921,7 +921,7 @@ const processingTime = Date.now() - startTime;
  { ...r, score: tr * 0.3, highlights: this.extractHighlights(r.content, query) } as CombinedResult);
  }
  });
- // Sort by combined score or other criteria
+  
  let sortedResults = Array.from(combinedResults.values());
  switch (sortBy) {
  case 'date':

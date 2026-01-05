@@ -30,8 +30,7 @@ redis.on('error', (err) => {
 redis.on('connect', () => {
 	console.log('✅ Redis connected for knowledge cache');
 });
-
-// TTL constants (in seconds)
+  
 const TTL = {
 	embeddings: 3600, // 1 hour - embeddings are deterministic
 	search: 1800, // 30 minutes - results may change with new data

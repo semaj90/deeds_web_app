@@ -21,7 +21,8 @@ const REDIS_URL = 'redis://localhost:6379';
 // GET: Health check and stats
 export const GET: RequestHandler = async ({ fetch }) => {
     const stats: Record<string, unknown> = {
-        timestamp: new Date().toISOString(, services: {}
+        timestamp: new Date().toISOString(),
+        services: {}
     };
 
     // 1. Check Qdrant collections
@@ -81,7 +82,8 @@ export const GET: RequestHandler = async ({ fetch }) => {
     const collections = (qdrantStats?.collections || {}) as Record<string, number>;
 
     stats.summary = {
-        totalQdrantPoints: Object.values(collections).reduce((a, b) => a + b, 0, phase90ErrorCards: collections['phase90_error_cards'] || 0,
+        totalQdrantPoints: Object.values(collections).reduce((a, b) => a + b, 0),
+        phase90ErrorCards: collections['phase90_error_cards'] || 0,
         phase90Clusters: collections['phase90_error_clusters'] || 0,
         fileProfiles: collections['fastmcp_file_profiles'] || 0,
         ready: true

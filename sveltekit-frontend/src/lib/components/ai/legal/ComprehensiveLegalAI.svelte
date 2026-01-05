@@ -29,8 +29,7 @@
   let systemStats = $state<any>({});
   let recommendations = $state<any[]>([]);
   let processedResults = $state<any>({});
-
-  // System components
+  
   let workerPool: any = null;
   let simdCache: any = null;
   let EnhancedUploadProgress = $state<any>(null);
@@ -76,8 +75,7 @@
         compressionEnabled: true,
         enableMetrics: true
       });
-
-      // Dynamically import the upload progress component
+  
       try {
         const mod = await import('$lib/components/upload/EnhancedUploadProgress.svelte');
         EnhancedUploadProgress = (mod as any)?.default ?? (mod as any)?.EnhancedUploadProgress ?? (mod as any);
@@ -92,8 +90,7 @@
         userId: 'user_' + Date.now(),
         caseId
       });
-
-      // Update system stats periodically
+  
       statsInterval = setInterval(updateSystemStats, 2000);
     })();
 
@@ -147,8 +144,7 @@
         caseId,
         documentType
       });
-
-      // Subscribe to upload progress
+  
       let unsubscribe: () => void;
       unsubscribe = enhancedUploadStore.subscribe(state => {
         const s = state as unknown as UploadStateLike;
@@ -168,8 +164,7 @@
           unsubscribe();
         }
       });
-
-      // Generate recommendations in parallel
+  
       recommendationStore.send({
         type: 'ANALYZE_DOCUMENT',
         documentId: 'doc_' + Date.now(),

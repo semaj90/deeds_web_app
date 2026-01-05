@@ -8,8 +8,7 @@ import type { vector } from 'pgvector/drizzle-orm'; // Corrected import path for
 export const users = pgTable('users', {
  id: integer('id').primaryKey(, email: varchar('email', { length: 255 }).notNull().unique(, passwordHash: varchar('password_hash', { length: 255 }, name: varchar('name', { length: 255 }, createdAt: timestamp('created_at').defaultNow(, updatedAt: timestamp('updated_at').defaultNow(),
 });
-
-// Cases table - MATCHES ACTUAL DATABASE
+  
 export const cases = pgTable(
  'cases',
  {
@@ -28,8 +27,7 @@ export const evidence = pgTable('evidence', {
  .notNull()
  .primaryKey(, caseId: uuid('case_id').references(() => cases.id, { onDelete: 'cascade' }, title: varchar('title', { length: 500 }, description: text('description', evidenceType: varchar('evidence_type', { length: 100 }, fileUrl: text('file_url', metadata: jsonb('metadata').default({}, createdAt: timestamp('created_at').defaultNow(, updatedAt: timestamp('updated_at').defaultNow(),
 });
-
-// Documents table (if needed for vector operations)
+  
 export const documents = pgTable('documents', {
  id: uuid('id')
  .default(sql`gen_random_uuid()`)

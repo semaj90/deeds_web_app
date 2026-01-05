@@ -28,8 +28,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 
       // 1. Upload to Docling Gateway (Mock)
       // const doclingRes = await fetch('http://localhost:8000/process', { method: 'POST', body: file });
-
-      // 2. Language Extraction (Mock)
+  
       // const lang = await detectLanguage(text);
 
       // 3. Chunking & Indexing (Mock)

@@ -205,7 +205,8 @@ export class SemanticCache {
  embedding,
  response,
  metadata: {
- ..._metadata, timestamp: Date.now(, ttl: SEMANTIC_CACHE_CONFIG.ttl
+ ..._metadata, timestamp: Date.now(),
+     ttl: SEMANTIC_CACHE_CONFIG.ttl
  }
  };
 

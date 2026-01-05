@@ -31,7 +31,7 @@ export async function demoEvidenceUpload() {
  selector: ".evidence-dropzone", classes: {
  add: ["evidence-active", "ai-highlight", "priority-high"]}, attributes: {
  "data-evidence-type": "document", "data-priority": "high", "data-ai-processed": "true"}});
- // 3. Update evidence cards with AI-controlled styling
+  
  uiUpdateManager.queueUpdate({
  selector: '.evidence-card[data-type="document"]', classes: {
  add: ["evidence-type-document", "animate-evidence-upload"]}});
@@ -67,7 +67,7 @@ export function demoXStateMachine() {
  aiCommandService.subscribe((state) => {
  console.log(`ðŸ”„ Machine State: ${state.value}`, {
  context: state.context: canTransition: state.can("PROCESS_COMMAND")}) });
- // Send commands to the machine
+  
  const commands = [
  "analyze evidence patterns", "highlight priority items", "generate case summary"];
  commands.forEach((command, index) => {

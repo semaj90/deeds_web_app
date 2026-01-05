@@ -106,13 +106,11 @@ export async function initializeQdrantMocks(): Promise<void> {
   await mockQdrant.createCollection('codemod_memories', {
     vectors: { size: 384 },
   });
-
-  // Create error_patterns collection (used by rag-retriever)
+  
   await mockQdrant.createCollection('error_patterns', {
     vectors: { size: 384 },
   });
-
-  // Seed with sample data
+  
   await mockQdrant.upsert('codemod_memories', {
     points: [
       {
@@ -222,8 +220,7 @@ export function initializeFetchMocks(): void {
     status: 200,
     data: {}, // Will be populated dynamically
   });
-
-  // Knowledge MCP endpoint
+  
   mockFetch.setResponse('localhost:3004/invoke', {
     status: 200,
     data: {
@@ -236,8 +233,7 @@ export function initializeFetchMocks(): void {
       },
     },
   });
-
-  // ACE MCP endpoint
+  
   mockFetch.setResponse('localhost:3002/function-call', {
     status: 200,
     data: {
@@ -245,16 +241,14 @@ export function initializeFetchMocks(): void {
       warnings: [],
     },
   });
-
-  // A2A Protocol endpoint
+  
   mockFetch.setResponse('localhost:3005/a2a/', {
     status: 200,
     data: {
       agents: [{ id: 'agent1', name: 'Test Agent 1', capabilities: ['search'] }],
     },
   });
-
-  // Ollama endpoints
+  
   // /api/embed endpoint (used by EmbeddingService) - returns { embeddings: [[...]] }
   mockFetch.setResponse('localhost:11434/api/embed', {
     status: 200,
@@ -262,8 +256,7 @@ export function initializeFetchMocks(): void {
       embeddings: [Array(384).fill(0.5)],
     },
   });
-
-  // /api/embeddings endpoint (alternative format) - returns { embedding: [...] }
+  
   mockFetch.setResponse('localhost:11434/api/embeddings', {
     status: 200,
     data: {
@@ -277,8 +270,7 @@ export function initializeFetchMocks(): void {
       response: 'Mock LLM response',
     },
   });
-
-  // Replace global fetch with mock
+  
   global.fetch = mockFetch.getMockFetch();
 }
 

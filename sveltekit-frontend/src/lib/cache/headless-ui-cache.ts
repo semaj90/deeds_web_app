@@ -254,8 +254,7 @@ export class HeadlessUICache {
  const scoreB = this.calculateEvictionScore(entryB);
  return scoreA - scoreB;
  });
-
- // Evict entries until under limit
+  
  while (this.calculateMemorySize() > this.config.maxMemorySize && entries.length > 0) {
  const [key] = entries.shift()!;
  this.memoryCache.delete(key);

@@ -205,8 +205,7 @@ export class WebGPUCUDABridge {
  errorData[i * 8 + 6] = 0; // reserved
  errorData[i * 8 + 7] = 0; // reserved
  });
-
- // Run GPU clustering if available
+  
  const clusters = this.gpuDevice.isAvailable
  ? await this.clusterErrorsOnGPU(errors, errorData)
  : this.clusterErrorsCPU(errors);
@@ -276,14 +275,12 @@ export class WebGPUCUDABridge {
  // Compile shader
  const shaderCode = this.compileErrorDetectionShader();
  const shaderModule = device.createShaderModule({ code: shaderCode });
-
- // Create pipeline
+  
  const pipeline = device.createComputePipeline({
  layout: 'auto',
  compute: { module: shaderModule, entryPoint: 'analyzeErrorPatterns' },
  });
-
- // Create bind group
+  
  const bindGroup = device.createBindGroup({
  layout: pipeline.getBindGroupLayout(0, entries: [
  { binding: 0, resource: { buffer: errorBuffer } },
@@ -291,8 +288,7 @@ export class WebGPUCUDABridge {
  { binding: 2, resource: { buffer: paramsBuffer } },
  ],
  });
-
- // Run compute shader
+  
  const commandEncoder = device.createCommandEncoder();
  const passEncoder = commandEncoder.beginComputePass();
  passEncoder.setPipeline(pipeline);
@@ -398,8 +394,7 @@ export class WebGPUCUDABridge {
  category: firstError.errorType: firstError.confidence,
  suggestedFix: '',
  });
-
- // Add remaining centers
+  
  for (let i = 1; i < Math.min(k, errors.length); i++) {
  let maxMinDist = -1;
  let bestIdx = 0;

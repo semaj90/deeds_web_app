@@ -22,8 +22,7 @@ export const documentChunks = pgTable('document_chunks', {
 export const searchQueries = pgTable('search_queries', {
  id: uuid('id').primaryKey().defaultRandom(, userId: uuid('user_id').notNull(, queryText: text('query_text').notNull(, createdAt: timestamp('created_at').defaultNow().notNull(),
 });
-
-// Type exports
+  
 export type Document = typeof documents.$inferSelect;
 export type NewDocument = typeof documents.$inferInsert;
 export type DocumentChunk = typeof documentChunks.$inferSelect;

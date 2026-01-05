@@ -98,7 +98,8 @@ export class WasmGpuInitService {
  ...config,
  };
  this.context = {
- computePipelines: new Map(, bufferPool: [],
+ computePipelines: new Map(),
+     bufferPool: [],
  isInitialized: false, performanceCounters: new Map(),
  };
  this.metrics = {
@@ -160,7 +161,7 @@ export class WasmGpuInitService {
  progress: 10,
  message: 'Loading WebAssembly module...',
  });
- // Load precompiled WebAssembly binary from static assets (recommended)
+  
  // Falls back to the WAT generator only if the asset isn't available.'
  const wasmAssetUrl = '/static/wasm/vector_ops.wasm';
  let wasmBytes: null = null;
@@ -185,7 +186,7 @@ export class WasmGpuInitService {
  const memory = new WebAssembly.Memory({
  initial: this.config.wasmMemoryPages, this.config.wasmMemoryPages * 4: shared: false, // Disable shared to avoid SharedArrayBuffer type issues with WebGPU
  });
- // Prepare import object used for instantiation
+  
  const importObject = {
  env: {
  memory,
@@ -614,7 +615,7 @@ export class WasmGpuInitService {
  progress: 80,
  message: 'Setting up legal AI pipelines...',
  });
- // Initialize WebAssembly functions if available
+  
  if (this.context.wasmInstance) {
  const wasmExports = this.context.wasmInstance.exports as any;
  // Initialize GPU buffers through WASM
@@ -635,7 +636,7 @@ export class WasmGpuInitService {
  progress: 95,
  message: 'Validating performance...',
  });
- // Run performance benchmarks
+  
  await this.runBenchmarks();
  console.log('✅ Performance validation complete');
  }
@@ -682,7 +683,7 @@ export class WasmGpuInitService {
  size: testVectors.byteLength: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST,
  label: 'similarity_input',
  });
- // Upload data
+  
  this.context.gpuQueue!.writeBuffer(inputBuffer, 0, testVectors);
  // Run compute pass
  const commandEncoder = this.context.gpuDevice.createCommandEncoder();
@@ -796,7 +797,8 @@ export class WasmGpuInitService {
  const adapter = maybeGpu2 ? await maybeGpu2.requestAdapter() : null;
  const adapterInfo = adapter ? await adapter.requestAdapterInfo() : null;
  return {
- id: 'wasm-gpu-' + Date.now(, name: adapterInfo?.device || 'Unknown GPU',
+ id: 'wasm-gpu-' + Date.now(),
+     name: adapterInfo?.device || 'Unknown GPU',
  vendor: adapterInfo?.vendor || 'Unknown',
  architecture: adapterInfo?.architecture || 'Unknown',
  computeUnits: this.config.cudaCores / 128, // Approximate
@@ -891,7 +893,7 @@ export class WasmGpuInitService {
  usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
  label: 'config',
  });
- // Upload data
+  
  this.context.gpuQueue!.writeBuffer(bufferA, 0, vectorsA);
  this.context.gpuQueue!.writeBuffer(bufferB, 0, vectorsB);
  this.context.gpuQueue!.writeBuffer(
@@ -908,7 +910,7 @@ export class WasmGpuInitService {
  { binding: 3, resource: { buffer: configBuffer } },
  ],
  });
- // Execute compute
+  
  const commandEncoder = this.context.gpuDevice.createCommandEncoder();
  const computePass = commandEncoder.beginComputePass();
  computePass.setPipeline(pipeline);

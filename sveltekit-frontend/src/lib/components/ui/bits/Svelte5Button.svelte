@@ -62,8 +62,7 @@ let stateClasses = $derived.by(() => {
 	if (isHovered && !disabled) classes.push('shadow-lg');
 	return classes.join(' ');
 });
-
-// Combined classes for UnoCSS-style output
+  
 let buttonClasses = $derived(
 	[
 		// Base styles (HTML fallback friendly)

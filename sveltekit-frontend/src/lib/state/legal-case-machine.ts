@@ -270,8 +270,7 @@ const hasAIAnalysis = ({ context: _context }: { context: LegalCaseContext }) => 
 // isLoading: false,
 // error: null
 // });
-
-// const assignEvidence = assign({
+  
 // evidence: ({ event }) => event.output ?? [],
 // stats: ({ context, event }) => {
 // const data = event.output;
@@ -282,38 +281,31 @@ const hasAIAnalysis = ({ context: _context }: { context: LegalCaseContext }) => 
 // };
 // }
 // });
-
-// const assignSearchResults = assign({
+  
 // searchResults: ({ event }) => (event.output?.results ?? []) as unknown[],
 // searchQuery: ({ event }) => (event as Extract<LegalCaseEvents, { type: 'SEARCH' }>).query ?? ''
 // });
-
-// const assignError = assign({
+  
 // error: ({ event }) => (event.error?.message ?? String(event.error ?? 'An error occurred')) as string,
 // isLoading: false
 // });
-
-// const setLoading = assign({
+  
 // isLoading: true,
 // error: null
 // });
-
-// const clearError = assign({
+  
 // error: null
 // });
-
-// const updateFormData = assign({
+  
 // formData: ({ context, event }) => ({
 // ...context.formData,
 // caseForm: { ...context.formData.caseForm, ...((event as Extract<LegalCaseEvents, { type: 'UPDATE_CASE_FORM' }>).data ?? {}) }
 // })
 // });
-
-// const switchTab = assign({
+  
 // activeTab: ({ event }) => (event as Extract<LegalCaseEvents, { type: 'SWITCH_TAB' }>).tab
 // });
-
-// const updateWorkflowStage = assign({
+  
 // workflowStage: ({ event }) => (event as Extract<LegalCaseEvents, { type: 'SET_WORKFLOW_STAGE' }>).stage,
 // nextActions: ({ event }) => {
 // const stage = (event as Extract<LegalCaseEvents, { type: 'SET_WORKFLOW_STAGE' }>).stage;
@@ -327,12 +319,10 @@ const hasAIAnalysis = ({ context: _context }: { context: LegalCaseContext }) => 
 // return nextActionsMap[stage] || [];
 // }
 // });
-
-// const assignAIProgress = assign({
+  
 // aiAnalysisProgress: ({ event }) => (event as Extract<LegalCaseEvents, { type: 'AI_ANALYSIS_PROGRESS' }>).progress ?? 0
 // });
-
-// const assignAISummary = assign({
+  
 // aiSummary: ({ event }) => (event.output?.summary ?? null) as string | null,
 // aiAnalysisProgress: 100,
 // stats: ({ context, event }) => ({
@@ -341,21 +331,18 @@ const hasAIAnalysis = ({ context: _context }: { context: LegalCaseContext }) => 
 // processingTime: (event.output?.processingTime ?? context.stats.processingTime)
 // })
 // });
-
-// const assignSimilarCases = assign({
+  
 // similarCases: ({ event }) => (event.output ?? [])
 // });
-
-// const assignEmbedding = assign({
+  
 // lastEmbedding: ({ event }) => (event.output?.embedding ?? null),
 // isLoading: false
 // });
-
-// const assignRelatedEvidence = assign({
+  
 // relatedEvidence: ({ event }) => (event.output ?? []),
 // isLoading: false
 // });
-// === Main state machine ===
+  
 export const legalCaseMachine = setup({
  types: {} as {
  context: LegalCaseContext, events: LegalCaseEvents;

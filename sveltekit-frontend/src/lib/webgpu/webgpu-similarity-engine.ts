@@ -69,8 +69,7 @@ export class WebGPUSimilarityEngine {
  },
  ],
  });
-
- // Create pipeline
+  
  const shaderModule = this.device.createShaderModule({
  code: this.getSimilarityShader(),
  });
@@ -144,8 +143,7 @@ export class WebGPUSimilarityEngine {
  size: numDocs * 4, // float32 per document
  usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_SRC,
  });
-
- // Create bind group
+  
  const bindGroup = this.device.createBindGroup({
  layout: this.bindGroupLayout,
  entries: [
@@ -155,8 +153,7 @@ export class WebGPUSimilarityEngine {
  { binding: 3, resource: { buffer: outputBuffer } },
  ],
  });
-
- // Execute compute shader
+  
  const commandEncoder = this.device.createCommandEncoder();
  const passEncoder = commandEncoder.beginComputePass();
 

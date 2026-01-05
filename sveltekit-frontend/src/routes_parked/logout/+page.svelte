@@ -12,8 +12,7 @@
  'Content-Type': 'application/json',
  },
  });
-
- // Ensure cache invalidation completes before redirecting
+  
  await invalidateAll();
 
  if (!response.ok) {
@@ -26,7 +25,8 @@
  await goto('/', { replaceState: true });
  }
  })(); // Correctly close the IIFE
- }); // Correctly close onMount
+ });
+  
 </script>
 
 <main class="page-repair">

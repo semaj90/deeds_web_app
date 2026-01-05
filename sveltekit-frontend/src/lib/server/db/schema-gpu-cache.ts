@@ -96,8 +96,7 @@ export const shaderDependencies = pgTable('shader_dependencies', {
  coUsageFrequency: real('co_usage_frequency'), // 0-1 how often used together
  lastCoUsed: timestamp('last_co_used', { withTimezone: true }, createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(, updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow(),
 });
-
-// Define valid status values as a union type
+  
 export type ShaderCompilationStatus =
  | 'pending'
  | 'processing'
@@ -140,8 +139,7 @@ export const shaderRecommendationsView = pgTable('shader_recommendations_view', 
  // Performance tracking
  timesRecommended: integer('times_recommended').default(0, timesAccepted: integer('times_accepted').default(0, averageUserSatisfaction: real('average_user_satisfaction'),
 });
-
-// ============================================================================
+  
 // EXPORT TYPES FOR TYPESCRIPT
 // ============================================================================
 export type ShaderCacheEntry = typeof shaderCacheEntries.$inferSelect;

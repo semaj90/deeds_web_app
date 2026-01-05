@@ -67,8 +67,7 @@ class RabbitMQEmbeddingWorker {
                 concurrency: 1, // Lower concurrency for case embeddings (typically larger)
                 prefetchCount: 3, retryAttempts: 3, retryDelay: 5000, autoAck: false
             });
-
-            // Subscribe to bulk embedding queue if configured
+  
             try {
                 await rabbitMQService.subscribe('legal_ai.embedding.bulk', this.handleBulkEmbeddingJob, {
                     concurrency: 1, // Single concurrency for bulk operations

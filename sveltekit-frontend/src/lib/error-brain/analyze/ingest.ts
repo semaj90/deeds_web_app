@@ -51,8 +51,7 @@ export function runTypeScriptCheck(tsconfigPath: string, filterCodes?: number[])
  encoding: 'utf-8',
  stdio: ['ignore', 'pipe', 'pipe'],
  });
-
- // tsc exits 0 on success, non-zero on errors
+  
  // If we reach here, no errors (but could be warnings)
  return [];
  } catch (error: unknown) {

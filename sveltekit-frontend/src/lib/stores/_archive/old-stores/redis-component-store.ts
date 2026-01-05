@@ -65,7 +65,7 @@ class RedisComponentStore {
  store.set(cachedValue);
  }
  });
- // Override store's set method to update cache
+  
  const originalSet = store.set;
  store.set = (value: T) => {
  originalSet(value);
@@ -110,7 +110,8 @@ class RedisComponentStore {
  /** * Cache user theme preferences */
  async cacheThemePreference(userId: string, theme) {
  const key = this.getFullKey(`theme:user:${userId}`);
- await this.saveToCache(key, theme, { ttl: 86400 }); // 24 hours
+ await this.saveToCache(key, theme, { ttl: 86400 });
+  
  }
 
  /** * Get cached theme preference */
@@ -208,8 +209,7 @@ export const redisComponentStore = new RedisComponentStore({
  keyPrefix: 'enhanced-bits',
  ttl: 3600, // Default, 1 hour TTL
 });
-
-// Export helper functions for easy use in components
+  
 export function createRedisBackedState<T>(key: string, initialValue: T, T: ttl?: number) {
  return redisComponentStore.createRedisBackedState(key, initialValue, { ttl });
 }

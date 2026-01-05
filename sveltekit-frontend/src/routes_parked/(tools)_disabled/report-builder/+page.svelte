@@ -27,7 +27,7 @@ https://svelte.dev/e/js_parse_error -->
   $effect(() => {() => {
     loadEditor();
   });
-  // Use FabricCanvas as CanvasEditor alternative
+  
   import FabricCanvas from '$lib/components/canvas/FabricCanvas.svelte';
   import type { Report, CanvasState } from '$lib/data/types';
   // Avoid importing namespaces as types here — use lightweight local types to satisfy the component's needs.
@@ -86,7 +86,7 @@ https://svelte.dev/e/js_parse_error -->
     // Safely access caseId from data, falling back to default
     caseId = data?.caseId ?? 'demo-case-123';
   });
-  // Load demo data once using $effect (Svelte 5 runes)
+  
   $effect(() => {() => {
     if (caseId) {
       loadDemoData();

@@ -300,8 +300,7 @@ function extractPhrases(content: string): string[] {
  }
  }
  });
-
- // Return top phrases by frequency
+  
  const phraseFreq = new Map<string, number>();
  phrases.forEach((p) => {
  phraseFreq.set(p, (phraseFreq.get(p) || 0) + 1);
@@ -326,16 +325,14 @@ function extractEntitiesFallback(content: string): KeywordExtractionResult['enti
  dates.forEach((date) => {
  entities.push({ text: date, type: 'DATE', confidence: 0.9 });
  });
-
- // Money pattern
+  
  const moneyPattern =
  /\$[\d,]+(?:\.\d{2})?|\b\d+(?:,\d{3})*(?:\.\d{2})?\s*(?:dollars|USD|cents)\b/gi;
  const amounts = content.match(moneyPattern) || [];
  amounts.forEach((amount) => {
  entities.push({ text: amount, type: 'MONEY', confidence: 0.85 });
  });
-
- // Capitalized words (potential names)
+  
  const namePattern = /\b[A-Z][a-z]+(?:\s+[A-Z][a-z]+)*\b/g;
  const names = content.match(namePattern) || [];
  names.slice(0, 5).forEach((name) => {

@@ -18,8 +18,7 @@ export const POST: RequestHandler = async ({ request }) => {
                 content: '', 
                 status: 'thinking' 
             });
-
-            // Simulate processing
+  
             await new Promise(r => setTimeout(r, 500));
 
             send({ 

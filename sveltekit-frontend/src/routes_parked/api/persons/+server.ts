@@ -32,8 +32,7 @@ export const GET: RequestHandler = async ({ url }) => {
  sortBy,
  sortOrder,
  });
-
- // Get stats for the current filters
+  
  const stats = await getPersonStats(filters);
 
  return json({

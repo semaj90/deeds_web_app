@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm"
-import { bigint, bigserial, boolean, check, date, doublePrecision, foreignKey, index, inet, integer, interval, jsonb, numeric, pgEnum, pgTable, pgView, primaryKey, real, serial, text, timestamp, unique, uniqueIndex, uuid, varchar, vector } from "drizzle-orm/pg-core"
+import { bigint, boolean, check, doublePrecision, foreignKey, index, inet, integer, interval, jsonb, numeric, pgEnum, pgTable, pgView, primaryKey, real, serial, text, timestamp, unique, uniqueIndex, uuid, varchar, vector } from "drizzle-orm/pg-core"
 
 export const caseStatus = pgEnum("case_status", ['open', 'in_progress', 'pending_review', 'closed', 'archived'])
 export const documentStatus = pgEnum("document_status", ['draft', 'under_review', 'approved', 'rejected', 'archived'])
@@ -149,7 +149,7 @@ export const canvasAnnotations = pgTable("canvas_annotations", {
 	fabricData: jsonb("fabric_data").notNull(),
 	annotationType: varchar("annotation_type", { length: 50 }),
 	coordinates: jsonb(),
-	boundingBox: jsonb("bounding_box")(),
+	boundingBox: jsonb("bounding_box"),
 	color: varchar({ length: 20 }),
 	layerOrder: integer("layer_order").default(0),
 	isVisible: boolean("is_visible").default(true),
@@ -291,7 +291,7 @@ export const evidenceConnections = pgTable("evidence_connections", {
 	index("idx_evidence_connections_strength").using("btree", table.strength.asc().nullsLast().op("numeric_ops")),
 	index("idx_evidence_connections_target").using("btree", table.targetEvidenceId.asc().nullsLast().op("uuid_ops")),
 	index("idx_evidence_connections_type").using("btree", table.connectionType.asc().nullsLast().op("text_ops")),
-	unique("evidence_connections_source_evidence_id_target_evidence_id__key").on(table.sourceEvidenceId: table.targetEvidenceId, table.connectionType),
+	unique("evidence_connections_source_evidence_id_target_evidence_id__key").on(table.sourceEvidenceId, table.targetEvidenceId, table.connectionType),
 	check("evidence_connections_strength_check", sql`(strength >= (0)::numeric) AND (strength <= (1)::numeric)`),
 ]);
 
@@ -348,7 +348,7 @@ export const documentRelationshipsJsonb = pgTable("document_relationships_jsonb"
 	index("idx_relationships_strength").using("btree", table.strength.desc().nullsFirst().op("float4_ops")),
 	index("idx_relationships_target").using("btree", table.targetId.asc().nullsLast().op("uuid_ops")),
 	index("idx_relationships_type").using("btree", table.relationshipType.asc().nullsLast().op("text_ops")),
-	unique("document_relationships_jsonb_source_id_target_id_relationsh_key").on(table.sourceId: table.targetId, table.relationshipType),
+	unique("document_relationships_jsonb_source_id_target_id_relationsh_key").on(table.sourceId, table.targetId, table.relationshipType),
 ]);
 
 export const migrations = pgTable("migrations", {
@@ -741,7 +741,6 @@ export const legalDocuments = pgTable("legal_documents", {
 	index("idx_legal_documents_type").using("btree", table.documentType.asc().nullsLast().op("text_ops")),
 	index("legal_documents_case_id_idx").using("btree", table.caseId.asc().nullsLast().op("uuid_ops")),
 	index("legal_documents_content_embedding_hnsw_idx").using("hnsw", table.contentEmbedding.asc().nullsLast().op("vector_cosine_ops")).with({m: "16",ef_construction: "64"}),
-	index("legal_documents_embedding_384_hnsw_idx").using("hnsw", table.embedding384.asc().nullsLast().op("vector_cosine_ops")),
 	index("legal_documents_practice_area_idx").using("btree", table.practiceArea.asc().nullsLast().op("text_ops")),
 	uniqueIndex("legal_documents_qdrant_id_idx").using("btree", table.qdrantId.asc().nullsLast().op("uuid_ops")),
 	index("legal_documents_status_idx").using("btree", table.status.asc().nullsLast().op("text_ops")),
@@ -968,13 +967,13 @@ export const legalQueries = pgTable("legal_queries", {
 	status: text().default('pending').notNull(),
 	errorMessage: text("error_message"),
 	userIp: text("user_ip"),
-	similarDocsCount: integer("similar_docs_count").default(0)({ mode: 'string' }).default(sql`CURRENT_TIMESTAMP`),
+	similarDocsCount: integer("similar_docs_count").default(0),
 	createdAt: timestamp("created_at", { mode: 'string' }).default(sql`CURRENT_TIMESTAMP`),
 	updatedAt: timestamp("updated_at", { mode: 'string' }).default(sql`CURRENT_TIMESTAMP`),
 }, (table) => [
 	index("idx_legal_queries_model_used").using("btree", table.modelUsed.asc().nullsLast().op("text_ops")),
 	index("idx_legal_queries_status").using("btree", table.status.asc().nullsLast().op("text_ops")),
-	index("idx_legal_queries_timestamp").using("btree", table.timestamp.desc().nullsFirst().op("timestamp_ops")),
+	index("idx_legal_queries_timestamp").using("btree", table.createdAt.desc().nullsFirst().op("timestamp_ops")),
 ]);
 
 export const apiRateLimits = pgTable("api_rate_limits", {
@@ -1395,7 +1394,8 @@ export const messages = pgTable("messages", {
 	id: text().primaryKey().notNull(),
 	sessionId: text("session_id").notNull(),
 	content: text().notNull(),
-	role: text().notNull()({ withTimezone: true, mode: 'string' }).defaultNow().notNull(),
+	role: text().notNull(),
+	createdAt: timestamp("created_at", { withTimezone: true, mode: 'string' }).defaultNow().notNull(),
 	embedding: jsonb(),
 	metadata: jsonb(),
 	model: text().default('gemma3-legal').notNull(),
@@ -1410,260 +1410,14 @@ export const qloraTrainingJobs = pgTable("qlora_training_jobs", {
 	createdAt: timestamp("created_at", { mode: 'string' }).defaultNow(),
 });
 
-export const indexedFiles = pgTable("indexed_files", {
-	id: uuid().defaultRandom().notNull(),
-	filePath: text("file_path").notNull(),
-	content: text(),
-	embedding: real().array(),
-	summary: text(),
-	metadata: jsonb(),
-	indexedAt: timestamp("indexed_at", { mode: 'string' }).defaultNow(),
-});
-
-export const documentVectors = pgTable("document_vectors", {
-	id: uuid().defaultRandom().notNull(),
-	documentId: uuid("document_id").notNull(),
-	chunkIndex: integer("chunk_index").notNull(),
-	content: text().notNull(),
-	embedding: vector({ dimensions: 384 }).notNull(),
-	metadata: jsonb(),
-	createdAt: timestamp("created_at", { mode: 'string' }).defaultNow().notNull(),
-});
-
-export const gpuInferenceSessions = pgTable("gpu_inference_sessions", {
-	id: uuid().defaultRandom().notNull(),
-	sessionName: text("session_name").notNull(),
-	userId: text("user_id"),
-	engineUsed: text("engine_used").notNull(),
-	createdAt: timestamp("created_at", { mode: 'string' }).defaultNow(),
-	updatedAt: timestamp("updated_at", { mode: 'string' }).defaultNow(),
-	metadata: jsonb(),
-	isActive: boolean("is_active").default(true),
-});
-
-export const chatMessages = pgTable("chat_messages", {
-	id: bigserial({ mode: "bigint" }).primaryKey().notNull(),
-	userId: varchar("user_id").notNull(),
-	sessionId: varchar("session_id").notNull(),
-	role: varchar().notNull(),
-	content: text().notNull(),
-	embedding: vector({ dimensions: 768 }),
-	metadata: jsonb().default({}),
-	createdAt: timestamp("created_at", { mode: 'string' }).default(sql`CURRENT_TIMESTAMP`),
-	processedBy: varchar("processed_by").default('unknown').notNull(),
-	tokenCount: integer("token_count").default(0),
-	// You can use { mode: "bigint" } if numbers are exceeding js number limitations
-	processTimeMs: bigint("process_time_ms", { mode: "number" }).default(0),
-	embedding384: vector("embedding_384", { dimensions: 384 }),
-}, (table) => [
-	index("chat_messages_embedding_384_hnsw_idx").using("hnsw", table.embedding384.asc().nullsLast().op("vector_cosine_ops")),
-	index("idx_chat_embeddings_hnsw").using("hnsw", table.embedding.asc().nullsLast().op("vector_cosine_ops")),
-	index("idx_chat_messages_created").using("btree", table.createdAt.desc().nullsFirst().op("timestamp_ops")),
-	index("idx_chat_messages_session").using("btree", table.sessionId.asc().nullsLast().op("text_ops")),
-	index("idx_chat_messages_user").using("btree", table.userId.asc().nullsLast().op("text_ops")),
-	foreignKey({
-			columns: [table.sessionId],
-			foreignColumns: [chatSessions.id],
-			name: "chat_messages_session_id_fkey"
-		}),
-	check("chat_messages_role_check", sql`(role)::text = ANY ((ARRAY['user'::character varying, 'assistant'::character varying])::text[])`),
-]);
-
-export const caseSummaryVectors = pgTable("case_summary_vectors", {
-	id: uuid().defaultRandom().notNull(),
-	caseId: uuid("case_id").notNull(),
-	summary: text().notNull(),
-	embedding: vector({ dimensions: 384 }).notNull(),
-	confidence: real().default(1),
-	lastUpdated: timestamp("last_updated", { mode: 'string' }).defaultNow().notNull(),
-});
-
-export const knowledgeBase = pgTable("knowledge_base", {
-	id: serial().primaryKey().notNull(),
-	chunkId: text("chunk_id").notNull(),
-	content: text().notNull(),
-	embedding: vector({ dimensions: 768 }),
-	metadata: jsonb().default({}),
-	chunkType: varchar("chunk_type", { length: 50 }).notNull(),
-	sourceFile: text("source_file"),
-	createdAt: timestamp("created_at", { mode: 'string' }).defaultNow(),
-	embedding384: vector("embedding_384", { dimensions: 384 }),
-}, (table) => [
-	index("idx_kb_embedding").using("hnsw", table.embedding.asc().nullsLast().op("vector_cosine_ops")),
-	index("idx_kb_embedding_384").using("hnsw", table.embedding384.asc().nullsLast().op("vector_cosine_ops")),
-	index("idx_kb_source").using("btree", table.sourceFile.asc().nullsLast().op("text_ops")),
-	index("idx_kb_type").using("btree", table.chunkType.asc().nullsLast().op("text_ops")),
-	index("knowledge_base_embedding_384_hnsw_idx").using("hnsw", table.embedding384.asc().nullsLast().op("vector_cosine_ops")),
-	unique("knowledge_base_chunk_id_key").on(table.chunkId),
-]);
-
-export const yorhaChatMessages = pgTable("yorha_chat_messages", {
-	id: uuid().defaultRandom().notNull(),
-	sessionId: uuid("session_id").notNull(),
-	role: varchar({ length: 50 }).notNull(),
-	content: text().notNull(),
-	messageType: varchar("message_type", { length: 50 }).default('text'),
-	referencedEvidence: jsonb("referenced_evidence"),
-	modelUsed: varchar("model_used", { length: 100 }),
-	tokensUsed: integer("tokens_used"),
-	createdAt: timestamp("created_at", { withTimezone: true, mode: 'string' }).defaultNow().notNull(),
-	updatedAt: timestamp("updated_at", { withTimezone: true, mode: 'string' }).defaultNow().notNull(),
-}, (table) => [
-	index("yorha_chat_messages_created_at_idx").using("btree", table.createdAt.asc().nullsLast().op("timestamptz_ops")),
-	index("yorha_chat_messages_role_idx").using("btree", table.role.asc().nullsLast().op("text_ops")),
-	index("yorha_chat_messages_session_id_idx").using("btree", table.sessionId.asc().nullsLast().op("uuid_ops")),
-	foreignKey({
-			columns: [table.sessionId],
-			foreignColumns: [yorhaChatSessions.id],
-			name: "yorha_chat_messages_session_id_fkey"
-		}).onDelete("cascade"),
-]);
-
-export const attachmentVerifications = pgTable("attachment_verifications", {
-	id: uuid().defaultRandom().primaryKey().notNull(),
-	attachmentId: uuid("attachment_id").notNull(),
-	verifiedBy: uuid("verified_by").notNull(),
-	verificationStatus: varchar("verification_status", { length: 50 }).default('pending').notNull(),
-	verificationNotes: text("verification_notes"),
-	verifiedAt: timestamp("verified_at", { mode: 'string' }).defaultNow().notNull(),
-	createdAt: timestamp("created_at", { mode: 'string' }).defaultNow().notNull(),
-	updatedAt: timestamp("updated_at", { mode: 'string' }).defaultNow().notNull(),
-});
-
-export const routeErrorPatches = pgTable("route_error_patches", {
-	id: uuid().defaultRandom().notNull(),
-	routePath: varchar("route_path", { length: 255 }).notNull(),
-	routeFile: varchar("route_file", { length: 500 }),
-	errorCode: varchar("error_code", { length: 64 }).notNull(),
-	suggestionTitle: varchar("suggestion_title", { length: 255 }),
-	patchText: text("patch_text").notNull(),
-	patchExplanation: text("patch_explanation"),
-	confidence: numeric().default('0.50').notNull(),
-	hints: text().array(),
-	status: patchStatus().default('suggested').notNull(),
-	source: varchar({ length: 64 }).default('phase78').notNull(),
-	metadata: jsonb().default({}).notNull(),
-	createdBy: uuid("created_by"),
-	appliedAt: timestamp("applied_at", { mode: 'string' }),
-	createdAt: timestamp("created_at", { mode: 'string' }).defaultNow().notNull(),
-	updatedAt: timestamp("updated_at", { mode: 'string' }).defaultNow().notNull(),
-}, (table) => [
-	index("idx_route_patches_error_code").using("btree", table.errorCode.asc().nullsLast().op("text_ops")),
-	index("idx_route_patches_route").using("btree", table.routePath.asc().nullsLast().op("text_ops")),
-	index("idx_route_patches_status").using("btree", table.status.asc().nullsLast().op("enum_ops")),
-	foreignKey({
-			columns: [table.createdBy],
-			foreignColumns: [users.id],
-			name: "route_error_patches_created_by_users_id_fk"
-		}).onDelete("set null"),
-]);
-
-export const gpuPerformanceMetrics = pgTable("gpu_performance_metrics", {
-	id: uuid().defaultRandom().notNull(),
-	sessionId: uuid("session_id"),
-	engineType: text("engine_type").notNull(),
-	requestCount: integer("request_count"),
-	avgResponseTime: real("avg_response_time"),
-	cacheHitRate: real("cache_hit_rate"),
-	tokensPerSecond: real("tokens_per_second"),
-	gpuUtilization: real("gpu_utilization"),
-	memoryUsage: real("memory_usage"),
-	errorCount: integer("error_count"),
-	metadata: jsonb(),
-	measuredAt: timestamp("measured_at", { mode: 'string' }).defaultNow(),
-});
-
-export const yorhaSystemMetrics = pgTable("yorha_system_metrics", {
-	id: serial().notNull(),
-	cpuUsage: integer("cpu_usage"),
-	cpuCores: integer("cpu_cores"),
-	memoryUsage: integer("memory_usage"),
-	memoryTotalGb: integer("memory_total_gb"),
-	memoryUsedGb: integer("memory_used_gb"),
-	gpuUsage: integer("gpu_usage"),
-	gpuMemoryUsage: integer("gpu_memory_usage"),
-	gpuTemperature: integer("gpu_temperature"),
-	diskUsage: integer("disk_usage"),
-	diskTotalGb: integer("disk_total_gb"),
-	diskUsedGb: integer("disk_used_gb"),
-	networkLatencyMs: integer("network_latency_ms"),
-	networkBandwidthMbps: integer("network_bandwidth_mbps"),
-	systemHealth: varchar("system_health", { length: 50 }).default('healthy'),
-	activeCases: integer("active_cases").default(0),
-	activeSessions: integer("active_sessions").default(0),
-	recordedAt: timestamp("recorded_at", { withTimezone: true, mode: 'string' }).defaultNow().notNull(),
-}, (table) => [
-	index("yorha_system_metrics_recorded_at_idx").using("btree", table.recordedAt.asc().nullsLast().op("timestamptz_ops")),
-]);
-
-export const errorFeedback = pgTable("error_feedback", {
-	id: uuid().defaultRandom().notNull(),
-	suggestionId: uuid("suggestion_id").notNull(),
-	routePath: varchar("route_path", { length: 255 }).notNull(),
-	helpful: boolean(),
-	accurate: boolean(),
-	worksSoon: boolean("works_soon"),
-	feedback: text(),
-	createdAt: timestamp("created_at", { mode: 'string' }).defaultNow().notNull(),
-}, (table) => [
-	index("idx_error_feedback_route").using("btree", table.routePath.asc().nullsLast().op("text_ops")),
-	index("idx_error_feedback_suggestion").using("btree", table.suggestionId.asc().nullsLast().op("uuid_ops")),
-	foreignKey({
-			columns: [table.suggestionId],
-			foreignColumns: [errorSuggestions.id],
-			name: "error_feedback_suggestion_id_error_suggestions_id_fk"
-		}).onDelete("cascade"),
-]);
-
-export const errorClusters = pgTable("error_clusters", {
-	id: text().default(sql`gen_random_uuid()::text`).notNull(),
-	severity: text().default('medium').notNull(),
-	errorPattern: text("error_pattern").notNull(),
-	memberCount: integer("member_count").default(1).notNull(),
-	updatedAt: timestamp("updated_at", { mode: 'string' }).defaultNow().notNull(),
-	createdAt: timestamp("created_at", { mode: 'string' }).defaultNow().notNull(),
-	description: text(),
-	centroidVector: text("centroid_vector"),
-	silhouetteScore: text("silhouette_score"),
-	suggestedCategory: text("suggested_category"),
-	suggestedFixApproach: text("suggested_fix_approach"),
-	lastSeenAt: timestamp("last_seen_at", { withTimezone: true, mode: 'string' }),
-	kind: text().default('typing').notNull(),
-}, (table) => [
-	index("idx_error_clusters_severity").using("btree", table.severity.asc().nullsLast().op("text_ops")),
-]);
-
-export const canvasAutosaves = pgTable("canvas_autosaves", {
-	id: uuid().defaultRandom().primaryKey().notNull(),
-	canvasId: uuid("canvas_id").notNull(),
-	userId: uuid("user_id"),
-	snapshot: jsonb().default({}).notNull(),
-	embedding: vector({ dimensions: 384 }),
-	version: integer().default(1).notNull(),
-	createdAt: timestamp("created_at", { mode: 'string' }).defaultNow().notNull(),
-}, (table) => [
-	index("canvas_autosaves_canvas_created_idx").using("btree", table.canvasId.asc().nullsLast().op("uuid_ops"), table.createdAt.asc().nullsLast().op("timestamp_ops")),
-	index("canvas_autosaves_canvas_id_idx").using("btree", table.canvasId.asc().nullsLast().op("uuid_ops")),
-	index("canvas_autosaves_user_id_idx").using("btree", table.userId.asc().nullsLast().op("uuid_ops")),
-	foreignKey({
-			columns: [table.canvasId],
-			foreignColumns: [canvasStates.id],
-			name: "canvas_autosaves_canvas_id_fk"
-		}).onDelete("cascade"),
-	foreignKey({
-			columns: [table.userId],
-			foreignColumns: [users.id],
-			name: "canvas_autosaves_user_id_fk"
-		}).onDelete("set null"),
-]);
-
 export const documentEmbeddings = pgTable("document_embeddings", {
 	id: serial().notNull(),
 	path: text().notNull(),
 	hash: text().notNull(),
 	embeddingModel: text("embedding_model").notNull(),
 	embeddingVector: vector("embedding_vector", { dimensions: 768 }),
-	summary: text()({ withTimezone: true, mode: 'string' }).defaultNow(),
+	summary: text(),
+	timestamp: timestamp("timestamp", { withTimezone: true, mode: 'string' }).defaultNow(),
 	chunkIndex: integer("chunk_index").default(0),
 	totalChunks: integer("total_chunks").default(1),
 }, (table) => [
@@ -1702,7 +1456,7 @@ export const phase72ClusterSummary = pgTable("phase72_cluster_summary", {
 
 export const timelineEvents = pgTable("timeline_events", {
 	id: uuid().defaultRandom().primaryKey().notNull(),
-	caseId: uuid("case_id").notNull()({ mode: 'string' }).notNull(),
+	caseId: uuid("case_id").notNull(),
 	title: text().notNull(),
 	description: text().notNull(),
 	type: timelineEventType().notNull(),
@@ -1713,7 +1467,8 @@ export const timelineEvents = pgTable("timeline_events", {
 	createdBy: text("created_by"),
 }, (table) => [
 	index("idx_timeline_case_id").using("btree", table.caseId.asc().nullsLast().op("uuid_ops")),
-	index("idx_timeline_timestamp").using("btree", table.timestamp.asc().nullsLast().op("timestamp_ops")),
+	index("idx_timeline_timestamp").using("btree", table.createdAt.asc().nullsLast().op("timestamp_ops")),
+	index("idx_timeline_event_type").using("btree", table.type.asc().nullsLast().op("text_ops")),
 ]);
 
 export const evidenceRelationships = pgTable("evidence_relationships", {
@@ -1791,7 +1546,7 @@ export const systemSettings = pgTable("system_settings", {
 	value: jsonb().notNull(),
 	description: text(),
 	category: varchar({ length: 50 }).default('general'),
-	isPublic: boolean("is_public").default(false),
+	isPublic: boolean("is_public").default(false).notNull(),
 	createdAt: timestamp("created_at", { withTimezone: true, mode: 'string' }).defaultNow(),
 	updatedAt: timestamp("updated_at", { withTimezone: true, mode: 'string' }).defaultNow(),
 }, (table) => [
@@ -1962,7 +1717,7 @@ export const legalDocumentsJsonb = pgTable("legal_documents_jsonb", {
 	index("idx_legal_docs_jurisdiction").using("btree", table.jurisdiction.asc().nullsLast().op("text_ops")),
 	index("idx_legal_docs_metadata_gin").using("gin", table.metadata.asc().nullsLast().op("jsonb_ops")),
 	index("idx_legal_docs_practice_area").using("btree", table.practiceArea.asc().nullsLast().op("text_ops")),
-	index("idx_legal_docs_search_vector").using("gin", table.searchVector.asc().nullsLast().op("tsvector_ops")),
+	// index("idx_legal_docs_search_vector").using("gin", table.searchVector.asc().nullsLast().op("tsvector_ops")),
 	index("idx_legal_docs_title_embedding").using("ivfflat", table.titleEmbedding.asc().nullsLast().op("vector_cosine_ops")).with({lists: "100"}),
 ]);
 
@@ -2002,7 +1757,7 @@ export const errorTimeline = pgTable("error_timeline", {
 ]);
 
 export const phase72Error = pgTable("phase72_error", {
-	id: uuid().defaultRandom().notNull(),
+	id: uuid().defaultRandom().primaryKey().notNull(),
 	errorHash: text("error_hash").notNull(),
 	filePath: text("file_path").notNull(),
 	line: integer().notNull(),
@@ -2296,178 +2051,6 @@ export const evidenceChunks = pgTable("evidence_chunks", {
 		}).onDelete("cascade"),
 ]);
 
-export const evidenceTags = pgTable("evidence_tags", {
-	id: uuid().defaultRandom().primaryKey().notNull(),
-	evidenceId: uuid("evidence_id").notNull(),
-	tagId: uuid("tag_id").notNull(),
-	createdAt: timestamp("created_at", { withTimezone: true, mode: 'string' }).defaultNow(),
-}, (table) => [
-	index("idx_evidence_tags_evidence_id").using("btree", table.evidenceId.asc().nullsLast().op("uuid_ops")),
-	index("idx_evidence_tags_tag_id").using("btree", table.tagId.asc().nullsLast().op("uuid_ops")),
-	foreignKey({
-			columns: [table.evidenceId],
-			foreignColumns: [evidenceFiles.id],
-			name: "evidence_tags_evidence_id_fkey"
-		}).onDelete("cascade"),
-	foreignKey({
-			columns: [table.tagId],
-			foreignColumns: [citationTags.id],
-			name: "evidence_tags_tag_id_fkey"
-		}).onDelete("cascade"),
-	unique("evidence_tags_evidence_id_tag_id_key").on(table.evidenceId: table.tagId),
-]);
-
-export const ragIndexMetadata = pgTable("rag_index_metadata", {
-	id: uuid().defaultRandom().primaryKey().notNull(),
-	chunkId: uuid("chunk_id").notNull(),
-	evidenceId: uuid("evidence_id").notNull(),
-	qdrantPointId: text("qdrant_point_id").notNull(),
-	tags: text().array(),
-	jurisdiction: text(),
-	indexedAt: timestamp("indexed_at", { withTimezone: true, mode: 'string' }).defaultNow(),
-	updatedAt: timestamp("updated_at", { withTimezone: true, mode: 'string' }).defaultNow(),
-	tagWeight: real("tag_weight").default(1),
-	embeddingModel: text("embedding_model").default('embeddinggemma:latest'),
-	createdAt: timestamp("created_at", { withTimezone: true, mode: 'string' }).defaultNow(),
-}, (table) => [
-	index("idx_rag_index_metadata_chunk_id").using("btree", table.chunkId.asc().nullsLast().op("uuid_ops")),
-	index("idx_rag_index_metadata_evidence_id").using("btree", table.evidenceId.asc().nullsLast().op("uuid_ops")),
-	index("idx_rag_index_metadata_jurisdiction").using("btree", table.jurisdiction.asc().nullsLast().op("text_ops")),
-	foreignKey({
-			columns: [table.evidenceId],
-			foreignColumns: [evidenceFiles.id],
-			name: "rag_index_metadata_evidence_id_fkey"
-		}).onDelete("cascade"),
-	unique("rag_index_metadata_chunk_id_key").on(table.chunkId),
-]);
-
-export const citationTags = pgTable("citation_tags", {
-	id: uuid().defaultRandom().primaryKey().notNull(),
-	name: text().notNull(),
-	jurisdiction: text(),
-	description: text(),
-	createdAt: timestamp("created_at", { withTimezone: true, mode: 'string' }).defaultNow(),
-	namespace: text().default('general').notNull(),
-	synonyms: text().array().default([""]).notNull(),
-	updatedAt: timestamp("updated_at", { withTimezone: true, mode: 'string' }).defaultNow().notNull(),
-}, (table) => [
-	index("idx_citation_tags_jurisdiction").using("btree", table.jurisdiction.asc().nullsLast().op("text_ops")),
-	index("idx_citation_tags_name_trgm").using("gin", table.name.asc().nullsLast().op("gin_trgm_ops")),
-	index("idx_citation_tags_namespace").using("btree", table.namespace.asc().nullsLast().op("text_ops")),
-	index("idx_citation_tags_synonyms_gin").using("gin", table.synonyms.asc().nullsLast().op("array_ops")),
-	uniqueIndex("idx_citation_tags_unique").using("btree", sql`namespace`, sql`name`, sql`COALESCE(jurisdiction, ''::text)`),
-]);
-
-export const chunkCitations = pgTable("chunk_citations", {
-	id: uuid().defaultRandom().primaryKey().notNull(),
-	chunkId: uuid("chunk_id").notNull(),
-	citeText: text("cite_text").notNull(),
-	citeType: text("cite_type").default('unknown').notNull(),
-	jurisdiction: text(),
-	normalized: text(),
-	createdAt: timestamp("created_at", { withTimezone: true, mode: 'string' }).defaultNow().notNull(),
-}, (table) => [
-	index("idx_chunk_citations_chunk_id").using("btree", table.chunkId.asc().nullsLast().op("uuid_ops")),
-	index("idx_chunk_citations_cite_text_trgm").using("gin", table.citeText.asc().nullsLast().op("gin_trgm_ops")),
-	foreignKey({
-			columns: [table.chunkId],
-			foreignColumns: [evidenceChunks.id],
-			name: "chunk_citations_chunk_id_fkey"
-		}).onDelete("cascade"),
-]);
-
-export const ragChunkIndex = pgTable("rag_chunk_index", {
-	chunkId: uuid("chunk_id").primaryKey().notNull(),
-	collection: text().default('phase72_evidence_embeddings').notNull(),
-	pointId: text("point_id").notNull(),
-	embeddingModel: text("embedding_model").default('embeddinggemma:latest').notNull(),
-	indexedAt: timestamp("indexed_at", { withTimezone: true, mode: 'string' }).defaultNow().notNull(),
-	payloadHash: text("payload_hash"),
-}, (table) => [
-	index("idx_rag_chunk_index_collection").using("btree", table.collection.asc().nullsLast().op("text_ops")),
-	foreignKey({
-			columns: [table.chunkId],
-			foreignColumns: [evidenceChunks.id],
-			name: "rag_chunk_index_chunk_id_fkey"
-		}).onDelete("cascade"),
-	unique("rag_chunk_index_collection_point_id_key").on(table.collection: table.pointId),
-]);
-
-export const errorPatterns = pgTable("error_patterns", {
-	id: serial().notNull(),
-	fingerprint: varchar({ length: 32 }).notNull(),
-	errorCode: varchar("error_code", { length: 50 }),
-	errorMessage: text("error_message").notNull(),
-	normalizedPattern: text("normalized_pattern").notNull(),
-	filePattern: varchar("file_pattern", { length: 500 }),
-	category: varchar({ length: 100 }),
-	severity: varchar({ length: 20 }).default('error'),
-	clusterId: varchar("cluster_id", { length: 50 }),
-	embedding: vector({ dimensions: 768 }),
-	firstSeen: timestamp("first_seen", { withTimezone: true, mode: 'string' }).defaultNow(),
-	lastSeen: timestamp("last_seen", { withTimezone: true, mode: 'string' }).defaultNow(),
-	occurrenceCount: integer("occurrence_count").default(1),
-	metadata: jsonb().default({}),
-}, (table) => [
-	index("idx_error_patterns_category").using("btree", table.category.asc().nullsLast().op("text_ops")),
-	index("idx_error_patterns_cluster").using("btree", table.clusterId.asc().nullsLast().op("text_ops")),
-	index("idx_error_patterns_embedding").using("ivfflat", table.embedding.asc().nullsLast().op("vector_cosine_ops")).with({lists: "100"}),
-]);
-
-export const fixAttempts = pgTable("fix_attempts", {
-	id: serial().notNull(),
-	patternFingerprint: varchar("pattern_fingerprint", { length: 32 }),
-	fixType: varchar("fix_type", { length: 100 }).notNull(),
-	fixDescription: text("fix_description"),
-	fixDiff: text("fix_diff"),
-	appliedAt: timestamp("applied_at", { withTimezone: true, mode: 'string' }).defaultNow(),
-	success: boolean(),
-	verifiedAt: timestamp("verified_at", { withTimezone: true, mode: 'string' }),
-	verificationMethod: varchar("verification_method", { length: 100 }),
-	filesAffected: integer("files_affected").default(1),
-	errorsResolved: integer("errors_resolved").default(0),
-	errorsIntroduced: integer("errors_introduced").default(0),
-	rollbackPerformed: boolean("rollback_performed").default(false),
-	metadata: jsonb().default({}),
-}, (table) => [
-	index("idx_fix_attempts_pattern").using("btree", table.patternFingerprint.asc().nullsLast().op("text_ops")),
-	index("idx_fix_attempts_success").using("btree", table.success.asc().nullsLast().op("bool_ops")).where(sql`(success = true)`),
-	foreignKey({
-			columns: [table.patternFingerprint],
-			foreignColumns: [errorPatterns.fingerprint],
-			name: "fix_attempts_pattern_fingerprint_fkey"
-		}).onDelete("cascade"),
-]);
-
-export const errorResolutionHistory = pgTable("error_resolution_history", {
-	id: serial().notNull(),
-	patternFingerprint: varchar("pattern_fingerprint", { length: 32 }),
-	snapshotDate: date("snapshot_date").default(sql`CURRENT_DATE`),
-	totalOccurrences: integer("total_occurrences").default(0),
-	resolvedCount: integer("resolved_count").default(0),
-	activeCount: integer("active_count").default(0),
-	confidenceScore: doublePrecision("confidence_score").default(0),
-	fixSuccessRate: doublePrecision("fix_success_rate").default(0),
-	metadata: jsonb().default({}),
-}, (table) => [
-	index("idx_resolution_history_date").using("btree", table.snapshotDate.desc().nullsFirst().op("date_ops")),
-	foreignKey({
-			columns: [table.patternFingerprint],
-			foreignColumns: [errorPatterns.fingerprint],
-			name: "error_resolution_history_pattern_fingerprint_fkey"
-		}).onDelete("cascade"),
-]);
-
-export const docReferences = pgTable("doc_references", {
-	id: serial().primaryKey().notNull(),
-	url: text(),
-	minioKey: text("minio_key"),
-	embedding: vector({ dimensions: 768 }),
-}, (table) => [
-	index("idx_doc_references_embedding").using("hnsw", table.embedding.asc().nullsLast().op("vector_cosine_ops")),
-	unique("doc_references_url_key").on(table.url),
-]);
-
 export const evidenceTagLinks = pgTable("evidence_tag_links", {
 	evidenceId: uuid("evidence_id").notNull(),
 	tagId: uuid("tag_id").notNull(),
@@ -2487,7 +2070,7 @@ export const evidenceTagLinks = pgTable("evidence_tag_links", {
 			foreignColumns: [citationTags.id],
 			name: "evidence_tag_links_tag_id_fkey"
 		}).onDelete("cascade"),
-	primaryKey({ columns: [table.evidenceId: table.tagId], name: "evidence_tag_links_pkey"}),
+	primaryKey({ columns: [table.evidenceId, table.tagId], name: "evidence_tag_links_pkey"}),
 ]);
 
 export const chunkTagLinks = pgTable("chunk_tag_links", {
@@ -2509,7 +2092,7 @@ export const chunkTagLinks = pgTable("chunk_tag_links", {
 			foreignColumns: [citationTags.id],
 			name: "chunk_tag_links_tag_id_fkey"
 		}).onDelete("cascade"),
-	primaryKey({ columns: [table.chunkId: table.tagId], name: "chunk_tag_links_pkey"}),
+	primaryKey({ columns: [table.chunkId, table.tagId], name: "chunk_tag_links_pkey"}),
 ]);
 export const vectorIndexStats = pgView("vector_index_stats", {	// TODO: failed to parse database type 'name', schemaname: text("schemaname"),
 	// TODO: failed to parse database type 'name', tablename: text("tablename"),

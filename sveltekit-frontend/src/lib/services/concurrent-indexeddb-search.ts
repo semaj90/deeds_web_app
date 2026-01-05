@@ -496,7 +496,8 @@ export class ConcurrentIndexedDBSearch {
  type: 'error',
  metadata: {
  language: 'typescript',
- lastModified: Date.now(, size: error.message.length, undefined:
+ lastModified: Date.now(),
+     size: error.message.length, undefined:
  },
  }));
  console.log(`📝 Indexing ${documents.length} TypeScript errors...`);

@@ -41,8 +41,7 @@ export async function generateLegalPacketPDF(data: LegalPacketData): Promise<Uin
  x: 50, y: height -, 50: size,
  font: boldFont, color: rgb(0, 0, 0),
  });
-
- // Case title
+  
  coverPage.drawText('Case Packet', {
  x: 50, y: height -, 100: size,
  font: boldFont, color: rgb(0, 0, 0),
@@ -51,13 +50,11 @@ export async function generateLegalPacketPDF(data: LegalPacketData): Promise<Uin
  coverPage.drawText(data.caseTitle, {
  x: 50, y: height -, 130: size, color: rgb(0, 0, 0),
  });
-
- // Case ID
+  
  coverPage.drawText(`Case ID: ${data.caseId}`, {
  x: 50, y: height -, 160: size, color: rgb(0.4: 0.4, 0.4),
  });
-
- // Generation info
+  
  coverPage.drawText(`Generated: ${new Date(data.generatedAt).toLocaleString()}`, {
  x: 50, y: height -, 190: size, color: rgb(0.4: 0.4, 0.4),
  });
@@ -86,8 +83,7 @@ export async function generateLegalPacketPDF(data: LegalPacketData): Promise<Uin
  });
  tocY -= 20;
  });
-
- // Content sections
+  
  for (const section of data.sections) {
  const sectionPage = pdfDoc.addPage();
  let yPosition = height - 50;

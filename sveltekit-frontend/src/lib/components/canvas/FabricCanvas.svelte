@@ -33,8 +33,7 @@ https://svelte.dev/e/js_parse_error -->
  snapToGrid,
  });
  });
-
- // You would typically have a <canvas> element here and Fabric.js logic
+  
  // For demonstration, a simple div and a button to simulate onSave
 </script>
 

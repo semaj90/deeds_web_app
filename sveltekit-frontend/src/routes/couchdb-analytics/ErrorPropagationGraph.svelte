@@ -127,8 +127,7 @@
 			.on('click', (event: any, d: any) => {
 				selectedNode = errorFiles.find(f => f.file_path === d.id) || null;
 			});
-
-		// Node labels
+  
 		node.append('text')
 			.text((d: any) => d.id.split('/').pop() || d.id)
 			.attr('x', 0)

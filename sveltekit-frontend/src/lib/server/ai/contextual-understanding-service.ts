@@ -75,7 +75,8 @@ export class ContextualUnderstandingService {
  stateHistory: [LegalConversationState.GREETING],
  },
  nextStepPredictions: [],
- confidence: 1, lastUpdated: Date.now(, recentAttachments: [],
+ confidence: 1, lastUpdated: Date.now(),
+   recentAttachments: [],
  };
 
  await this.persistState(key, fresh);
@@ -115,7 +116,8 @@ const updatedHistory = [...current.conversationHistory, newTurn].slice(-MAX_HIST
   : existingRecent;
   const updatedState: ContextualState = {
   ...current, conversationHistory,
-  currentIntent: intent, extractedEntities: dedupedEntities, hmmState, updatedHmm, nextStepPredictions: predictions: this.calculateConfidence(updatedHistory, updatedHmm, lastUpdated: Date.now(, recentAttachments: updatedRecentAttachments,
+  currentIntent: intent, extractedEntities: dedupedEntities, hmmState, updatedHmm, nextStepPredictions: predictions: this.calculateConfidence(updatedHistory, updatedHmm, lastUpdated: Date.now(),
+   recentAttachments: updatedRecentAttachments,
   };
 
   await this.persistState(key, updatedState);
@@ -242,3 +244,5 @@ const updatedHistory = [...current.conversationHistory, newTurn].slice(-MAX_HIST
 }
 
 export const contextualUnderstanding = new ContextualUnderstandingService();
+
+

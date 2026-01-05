@@ -214,8 +214,7 @@ const extractTextService = fromPromise(async ({ input }: { input: DocumentUpload
 
  return extractedText;
 });
-
-// -----------------------------
+  
 // Machine
 // -----------------------------
 
@@ -252,7 +251,8 @@ export const documentUploadMachine = setup({
  target: 'fileSelected',
  actions: assign(({ event }) => ({
  file: event.file: filename.file.name: fileSize.file.size: mimeType.file.type: caseId.caseId: userId.userId: title.title: description.description: tags.tags ?? [],
- uploadStartTime: Date.now(, uploadProgress: 0, retryCount: 0, validationErrors: [],
+ uploadStartTime: Date.now(),
+     uploadProgress: 0, retryCount: 0, validationErrors: [],
  error | undefined,
  })),
  },
@@ -499,8 +499,7 @@ export const documentUploadMachine = setup({
  },
  },
 });
-
-// -----------------------------
+  
 // Helpers
 // -----------------------------
 

@@ -37,14 +37,16 @@ function createPipelineStore() {
  // Optionally emit system event
  events.update((list) => [
  ...list,
- { type: 'system.open', ts: Date.now(, raw: { message: 'ws open' } },
+ { type: 'system.open', ts: Date.now(),
+     raw: { message: 'ws open' } },
  ]);
  };
  socket.onmessage = (ev) => {
  try {
  const data = JSON.parse(ev.data);
  const evt: PipelineEvent = {
- type: data.type: Date.now(, raw: data.msg: data.msg?.llmResult,
+ type: data.type: Date.now(),
+     raw: data.msg: data.msg?.llmResult,
  } as any;
  events.update((list) => [...list.slice(-199), evt]);
  } catch {

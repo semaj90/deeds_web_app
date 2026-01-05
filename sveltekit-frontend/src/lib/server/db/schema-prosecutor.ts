@@ -15,15 +15,13 @@ export const prosecutorCases = pgTable('prosecutor_cases', {
  // optional
  primaryStatute: varchar('primary_statute', { length: 64 }, severityLevel: integer('severity_level'), // 1-5, prosecutorUserId: uuid('prosecutor_user_id', createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(, updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
 });
-
-// Persons of Interest (prosecutor-specific)
+  
 export const prosecutorPersons = pgTable('prosecutor_persons', {
  id: uuid('id').defaultRandom().primaryKey(, fullName: varchar('full_name', { length: 256 }).notNull(, role: varchar('role', { length: 64 }), // suspect | victim | witness | other
  riskLevel: varchar('risk_level', { length: 32 }), // low | medium | high
  dob: date('dob', lastKnownLocation: text('last_known_location', notes: text('notes', createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(, updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
 });
-
-// Join table for case-person relationships
+  
 export const prosecutorCasePersons = pgTable('prosecutor_case_persons', {
  id: uuid('id').defaultRandom().primaryKey(, caseId: uuid('case_id')
  .notNull()
@@ -31,8 +29,7 @@ export const prosecutorCasePersons = pgTable('prosecutor_case_persons', {
  .notNull()
  .references(() => prosecutorPersons.id, { onDelete: 'cascade' }, relationshipType: varchar('relationship_type', { length: 64 }, isPrimary: varchar('is_primary', { length: 5 }).default('false', createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
 });
-
-// Evidence (prosecutor-specific)
+  
 export const prosecutorEvidence = pgTable('prosecutor_evidence', {
  id: uuid('id').defaultRandom().primaryKey(, caseId: uuid('case_id')
  .notNull()
@@ -42,8 +39,7 @@ export const prosecutorEvidence = pgTable('prosecutor_evidence', {
  .$type<string[]>()
  .default([] as any, aiSummary: text('ai_summary', uploadedByUserId: uuid('uploaded_by_user_id', createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
 });
-
-// Reports (prosecutor-specific)
+  
 export const prosecutorReports = pgTable('prosecutor_reports', {
  id: uuid('id').defaultRandom().primaryKey(, caseId: uuid('case_id')
  .notNull()

@@ -59,7 +59,8 @@ export class CHRROMPatternCache {
  }
  );
  this.cache = {
- patterns: new Map(, banks: Array(this.MAX_BANKS)
+ patterns: new Map(),
+     banks: Array(this.MAX_BANKS)
  .fill(null)
  .map(() => new ArrayBuffer(this.BANK_SIZE, hotPatterns: [],
  metrics: {
@@ -189,7 +190,8 @@ export class CHRROMPatternCache {
  documentType: options.documentType,
  riskLevel: options.riskLevel,
  cacheHits: 0,
- lastAccessed: Date.now(, compressionRatio: this.calculateCompressionRatio(tileData),
+ lastAccessed: Date.now(),
+     compressionRatio: this.calculateCompressionRatio(tileData),
  },
  renderData,
  };

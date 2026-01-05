@@ -82,7 +82,9 @@ export const GET: RequestHandler = async ({ url }) => {
 				status: t.status,
 				assignedTo: t.assignedTo,
 				createdAt: t.createdAt
-			}, stats: escalation.getStats(, analysis: escalation.analyzeEscalationPatterns()
+			})),
+			stats: escalation.getStats(),
+			analysis: escalation.analyzeEscalationPatterns()
 		});
 	} catch (err) {
 		return json(

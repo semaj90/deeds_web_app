@@ -144,7 +144,7 @@ export const FileSchema = z.object({
 export const LegalContextSchema = z.object({
  practiceArea: z.string().optional(, caseType: z.string().optional(, urgency: z.enum(['low', 'medium', 'high', 'critical']).optional(, jurisdiction: z.string().optional(, clientId: z.string().optional(, matterNumber: z.string().optional(),
 });
-// --- small response types to avoid `any` ---
+  
 type AnalyzeBehaviorResponse = { analytics: UserAnalytics; insights: unknown; score: number };
 type GeneratePromptsResponse = { prompts: ContextualPrompt[] };
 type AnalyzeDocResult = {
@@ -556,7 +556,8 @@ export const comprehensiveUploadAnalyticsMachine = createMachine(
  clickPatterns: [
  ...context.userAnalytics.interactionMetrics.clickPatterns,
  {
- x: event.x, event.y, timestamp: Date.now(, element: event.element, event.legalContext,
+ x: event.x, event.y, timestamp: Date.now(),
+     element: event.element, event.legalContext,
  },
  ],
  },

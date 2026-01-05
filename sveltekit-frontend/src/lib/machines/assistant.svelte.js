@@ -23,7 +23,7 @@ export function createAssistantStore() {
  const subResult = service.subscribe(s => {
  // state object may be wrapped depending on xstate version
  snapshot = s});
- // Start after subscribing
+  
  service.start();
  if (typeof subResult === 'function') {
  unsubscribeFn = subResult} else if (subResult && typeof subResult.unsubscribe === 'function') {

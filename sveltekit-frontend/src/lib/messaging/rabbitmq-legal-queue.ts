@@ -227,18 +227,15 @@ export class RabbitMQLegalQueue {
         this.messageHandlers.set('document.processing', async (message) => {
             await this.handleDocumentProcessing(message);
         });
-
-        // GPU compute handler
+  
         this.messageHandlers.set('gpu.compute', async (message) => {
             await this.handleGPUCompute(message);
         });
-
-        // Memory allocation events handler
+  
         this.messageHandlers.set('memory.allocation', async (message) => {
             await this.handleMemoryAllocation(message);
         });
-
-        // Ranking computation handler
+  
         this.messageHandlers.set('ranking.computation', async (message) => {
             await this.handleRankingComputation(message);
         });
@@ -276,7 +273,8 @@ export class RabbitMQLegalQueue {
                     bankPreference: options.bankPreference,
                     requiresGPU, options.requiresGPU || false
                 },
-                timestamp: Date.now(, retryCount: 0
+                timestamp: Date.now(),
+     retryCount: 0
             };
 
             // Determine target queue based on operation
@@ -354,8 +352,7 @@ export class RabbitMQLegalQueue {
                 gpuUsed,
                 bankId
             });
-
-            // Acknowledge message
+  
             await this.acknowledgeMessage(message.messageId);
         } catch (error: unknown) {
             console.error(`❌ Document processing failed for ${message.documentId}: `, error);

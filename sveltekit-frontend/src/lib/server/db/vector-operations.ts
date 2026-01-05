@@ -221,7 +221,7 @@ export async function hybridSearch(
  metadata: { searchType: 'text' },
  } as SimilarityResult;
  });
- // Combine and deduplicate results
+  
  const combinedResults = [...vectorResults, ...textSearchResults];
  const uniqueResults = Array.from(
  new Map(combinedResults.map((item) => [item.id, item])).values()
@@ -327,7 +327,7 @@ export class GRPMOOrchestrator {
  cacheLayer: 'warm',
  confidence: 0.8, glyphData: this.compressToGlyph(warmResult.data),
  });
- // Predictive enhancement
+  
  const enhanced = await this.enhanceWithPredictiveAnalysis(warmResult.data, queryEmbedding);
  await this.cacheResult(hotCacheKey, enhanced, 'hot');
  return { result: enhanced, thinkingStages: stages, cachePerformance };
@@ -346,7 +346,7 @@ export class GRPMOOrchestrator {
  query,
  userId: caseId,
  });
- // Stage 5: Glyph compression and caching
+  
  const glyphData = this.compressToGlyph(optimizedResults);
  stages.push({
  name: 'Glyph Compression',
@@ -355,7 +355,7 @@ export class GRPMOOrchestrator {
  confidence: 0.9,
  glyphData,
  });
- // Cache at multiple layers
+  
  await this.cacheResult(warmCacheKey, optimizedResults, 'warm');
  await this.cacheResult(hotCacheKey, optimizedResults, 'hot');
  return { result: optimizedResults, thinkingStages: stages, cachePerformance };

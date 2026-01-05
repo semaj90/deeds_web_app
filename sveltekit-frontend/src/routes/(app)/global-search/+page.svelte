@@ -4,7 +4,8 @@
 	let searchQuery = $state ('');
 	let searchResults = $state <any[]>([]);
 	let isSearching = $state (false);
-	let webgpuCapabilities = $state({ hasWebGPU: false }); // Fix: Define missing variable
+	let webgpuCapabilities = $state({ hasWebGPU: false });
+  
  let searchFilters = $state ({
  cases: true, evidence: true
  persons: true, documents: true
@@ -107,8 +108,7 @@
 
  return typeMatch && scopeMatch;
  });
-
-		// Perform semantic search using Ollama
+  
 		// const endpoint = await getOllamaEndpoint(); // Server-side only
 		const endpoint = 'http://localhost:11434'; // Fallback for client-side
 		const semanticResults = await Promise.all(

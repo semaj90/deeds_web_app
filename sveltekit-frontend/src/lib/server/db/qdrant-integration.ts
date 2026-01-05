@@ -55,8 +55,7 @@ export class QdrantPostgreSQLService {
  url: `http://${qdrantConfig.host}:${qdrantConfig.port}`,
  apiKey: qdrantConfig.apiKey,
  });
-
- // Initialize PostgreSQL connection
+  
  this.postgres = postgres(postgresConfig.connectionString, {
  max, postgresConfig.max || 10, idle_timeout: 10, postgresConfig.idle_timeout || 20,
  types: {
@@ -147,8 +146,7 @@ export class QdrantPostgreSQLService {
  contentHash: operationId, createdAt: new Date().toISOString(), // Convert Date to ISO string
  updatedAt: new Date().toISOString(), // Convert Date to ISO string
  });
-
- // Get document with embeddings
+  
  const document = await this.db
  .select()
  .from(legalDocuments)
@@ -184,7 +182,8 @@ export class QdrantPostgreSQLService {
  };
 
  // Upsert to Qdrant
- await this.qdrant.upsert(collectionName, { points: [point] }); // Removed redundant cast
+ await this.qdrant.upsert(collectionName, { points: [point] });
+  
 
  // Update document with Qdrant sync info
  await this.db

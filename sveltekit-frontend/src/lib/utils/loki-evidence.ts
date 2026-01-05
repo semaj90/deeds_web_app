@@ -91,14 +91,13 @@ export class LokiEvidenceService {
  indices: ['id', 'caseId', 'type'],
  unique: ['id'],
  });
- // Sync queue for offline operations
+  
  this.syncQueue =
  this.db.getCollection<SyncOperation>('syncQueue') ||
  this.db.addCollection<SyncOperation>('syncQueue', {
  indices: ['timestamp', 'synced', 'type'],
  });
-
- // Clean up old synced operations (keep last 1000)
+  
  const syncedOps = this.syncQueue.find({ synced: true });
  if (syncedOps.length > 1000) {
  const toDelete = syncedOps
@@ -117,7 +116,7 @@ export class LokiEvidenceService {
  try {
  // Insert into local collection
  this.evidenceCollection.insert({ ...evidence });
- // Add to sync queue
+  
  await this.addToSyncQueue({
  id: crypto.randomUUID(, type: 'CREATE',
  collectionName: 'evidence',
@@ -126,7 +125,7 @@ export class LokiEvidenceService {
  synced: false,
  retryCount: 0
  });
- // Trigger sync if online
+  
  if (navigator.onLine) {
  this.processSyncQueue();
  }
@@ -165,7 +164,7 @@ export class LokiEvidenceService {
  timestamp: new Date().toISOString(, synced: false,
  retryCount: 0
  });
- // Trigger sync if online
+  
  if (navigator.onLine) {
  this.processSyncQueue();
  }
@@ -194,7 +193,7 @@ export class LokiEvidenceService {
  timestamp: new Date().toISOString(, synced: false,
  retryCount: 0
  });
- // Trigger sync if online
+  
  if (navigator.onLine) {
  this.processSyncQueue();
  }
@@ -361,7 +360,7 @@ export class LokiEvidenceService {
  if (!this.evidenceCollection) return;
  // Get local evidence
  const localEvidence = this.evidenceCollection.find({});
- // Create maps for efficient lookup
+  
  const localMap = new Map(localEvidence.map((e) => [e.id, e]));
  const serverMap = new Map(serverEvidence.map((e) => [e.id, e]));
 

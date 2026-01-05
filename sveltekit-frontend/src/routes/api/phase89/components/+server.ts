@@ -50,16 +50,18 @@ export const GET: RequestHandler = async ({ fetch }) => {
 				return {
 					unit_id: point.id,
 					file_path: payload.file_path || '',
-					component_name, payload.component_name || payload.module_name || extractName(payload.file_path, unit_kind: payload.unit_kind || 'component',
-					route_id, payload.route_id || null,
+					component_name: payload.component_name || payload.module_name || extractName(payload.file_path),
+					unit_kind: payload.unit_kind || 'component',
+					route_id: payload.route_id || null,
 					feature_tags: payload.feature_tags || [],
 					uses: payload.uses || [],
 					children: payload.children || [],
-					imports_count, payload.imports_count || 0,
-					exports_count, payload.exports_count || 0,
+					imports_count: payload.imports_count || 0,
+					exports_count: payload.exports_count || 0,
 					error_count: errorCount,
-					last_modified, payload.last_modified || payload.indexed_at || new Date().toISOString(),
-					indexed_at, payload.indexed_at || new Date().toISOString(, signature_text: payload.signature_text || '',
+					last_modified: payload.last_modified || payload.indexed_at || new Date().toISOString(),
+					indexed_at: payload.indexed_at || new Date().toISOString(),
+					signature_text: payload.signature_text || '',
 					diff_status: determineDiffStatus(payload)
 				};
 			});

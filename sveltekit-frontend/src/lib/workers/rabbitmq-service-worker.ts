@@ -61,7 +61,8 @@ export class RabbitMQServiceWorker {
  private isRunning = false;
  private processingStats = {
  messagesProcessed: 0, errors: 0 0,
- startTime: Date.now(, avgProcessingTime: 0,
+ startTime: Date.now(),
+     avgProcessingTime: 0,
  };
 
  constructor(config: ServiceWorkerConfig = {}) {
@@ -240,7 +241,7 @@ export class RabbitMQServiceWorker {
  processedAt: Date.now(),
  });
  });
- // File upload handler
+  
  this.registerHandler(QUEUE_NAMES.FILE_UPLOAD, async (message: any) => {
  const msg =
  typeof message === 'object' && message !== null ? (message as Record<string, unknown>) : {};
@@ -257,7 +258,7 @@ export class RabbitMQServiceWorker {
  });
  }
  });
- // Vector embedding handler
+  
  this.registerHandler(QUEUE_NAMES.VECTOR_EMBEDDING, async (message: any) => {
  const msg =
  typeof message === 'object' && message !== null ? (message as Record<string, unknown>) : {};
@@ -269,7 +270,7 @@ export class RabbitMQServiceWorker {
  stage: 'indexing_ready',
  });
  });
- // Evidence analysis handler
+  
  this.registerHandler(QUEUE_NAMES.EVIDENCE_ANALYSIS, async (message: any) => {
  const msg =
  typeof message === 'object' && message !== null ? (message as Record<string, unknown>) : {};
@@ -284,7 +285,7 @@ export class RabbitMQServiceWorker {
  },
  });
  });
- // RAG processing handler
+  
  this.registerHandler(QUEUE_NAMES.RAG_PROCESSING, async (message: any) => {
  const msg =
  typeof message === 'object' && message !== null ? (message as Record<string, unknown>) : {};
@@ -292,21 +293,21 @@ export class RabbitMQServiceWorker {
  this.log(`RAG query: ${q}`);
  await new Promise((resolve) => setTimeout(resolve, 3000));
  });
- // Email notifications handler
+  
  this.registerHandler(QUEUE_NAMES.EMAIL_NOTIFICATIONS, async (message: any) => {
  const msg =
  typeof message === 'object' && message !== null ? (message as Record<string, unknown>) : {};
  this.log(`Sending notification: ${safeString(getField(msg, 'type'))}`);
  await new Promise((resolve) => setTimeout(resolve, 800));
  });
- // Search indexing handler
+  
  this.registerHandler(QUEUE_NAMES.SEARCH_INDEXING, async (message: any) => {
  const msg =
  typeof message === 'object' && message !== null ? (message as Record<string, unknown>) : {};
  this.log(`Indexing search: ${safeString(getField(msg, 'documentId'))}`);
  await new Promise((resolve) => setTimeout(resolve, 1200));
  });
- // Case updates handler
+  
  this.registerHandler(QUEUE_NAMES.CASE_UPDATES, async (message: any) => {
  const msg =
  typeof message === 'object' && message !== null ? (message as Record<string, unknown>) : {};
@@ -369,7 +370,8 @@ export class RabbitMQServiceWorker {
  async publishMessage(queueName: string, message: Record<string, unknown>): Promise<boolean> {
  try {
  const publishResult = await rabbitmqService.publish('workers', queueName, {
- ...message, publishedAt: Date.now(, workerVersion: '1.0.0',
+ ...message, publishedAt: Date.now(),
+     workerVersion: '1.0.0',
  });
  const publishedOk = Boolean(publishResult);
  if (!publishedOk) {

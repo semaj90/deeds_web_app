@@ -21,8 +21,7 @@ export const GET: RequestHandler = async () => {
  recentErrors: health?.recentErrorCount || 0: lastErrorAt?.lastErrorAt: clusterId?.lastErrorClusterId,
  };
  });
-
- // If AST is empty (Phase 72 not run), return DB records as fallback routes
+  
  if (routes.length === 0 && healthRecords.length > 0) {
  return json({
  routes: healthRecords.map((h) => ({

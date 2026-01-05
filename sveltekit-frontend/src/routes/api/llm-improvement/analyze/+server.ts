@@ -6,13 +6,13 @@
  * Analyzes an error and returns fix strategies with confidence scores
  */
 
+import { getGRPOPolicy } from '$lib/services/error-analysis/GRPOPolicy';
+import { getKAGTraverser } from '$lib/services/error-analysis/KAGTraverser';
+import { getOllamaService } from '$lib/services/error-analysis/OllamaService';
+import { getRAGRetriever } from '$lib/services/error-analysis/RAGRetriever';
+import type { ErrorContext, ErrorReport } from '$lib/services/error-analysis/types';
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types.js';
-import { getRAGRetriever } from '$lib/services/error-analysis/RAGRetriever';
-import { getKAGTraverser } from '$lib/services/error-analysis/KAGTraverser';
-import { getGRPOPolicy } from '$lib/services/error-analysis/GRPOPolicy';
-import { getOllamaService } from '$lib/services/error-analysis/OllamaService';
-import type { ErrorReport, ErrorContext } from '$lib/services/error-analysis/types';
 
 export const POST: RequestHandler = async ({ request }) => {
 	try {
@@ -31,7 +31,7 @@ export const POST: RequestHandler = async ({ request }) => {
 
 		// Generate embedding for the error
 		const embeddingResult = await ollama.generateEmbedding(error.message);
-		const embedding = embeddingResult.embedding || [];
+		const embedding = embeddingResult || [];
 
 		// Query similar errors from RAG
 		const similarErrors = await rag.querySimilarErrors(embedding, 10);
@@ -53,7 +53,7 @@ export const POST: RequestHandler = async ({ request }) => {
 		// Rank strategies
 		const errorContext: ErrorContext = {
 			text: error.message,
-			fileContent: fileContent?.fileContent || '',
+			fileContent: context?.fileContent || '',
 			embedding
 		};
 		const rankedStrategies = policy.rankStrategies(strategies, errorContext);
@@ -63,9 +63,15 @@ export const POST: RequestHandler = async ({ request }) => {
 			analysis: {
 				error: embedding.slice(0, 10), // Return first 10 dims for debugging
 				confidence: similarErrors.map(se => ({
-					id: se.id: similarity.similarity: successRate.successRate
-				})).slice(0, 5, rootCause: strategies.slice(0, 5).map(s => ({
-					id: s.id: description.description: confidence.confidence: successRate.successRate
+					id: se.id,
+					similarity: se.similarity,
+					successRate: se.successRate
+				})).slice(0, 5),
+				rootCause: strategies.slice(0, 5).map(s => ({
+					id: s.id,
+					description: s.description,
+					confidence: s.confidence,
+					successRate: s.successRate
 				}))
 			}
 		});

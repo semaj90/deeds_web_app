@@ -63,8 +63,7 @@ describe('Legal-AI API Endpoints', () => {
  vi.mocked(DataIsolationLayer.checkAccess).mockReturnValue({
  allowed: true,
  });
-
- // Create request
+  
  const request = new Request('http://localhost/api/legal-ai/citations', {
  method: 'POST',
  headers: {
@@ -78,8 +77,7 @@ describe('Legal-AI API Endpoints', () => {
  documentType: 'contract',
  }),
  });
-
- // Call endpoint
+  
  const response = await POST({ request } as any);
 
  // Verify response
@@ -122,8 +120,7 @@ describe('Legal-AI API Endpoints', () => {
  documentContent: 'Test content',
  }),
  });
-
- // Call endpoint
+  
  const response = await POST({ request } as any);
 
  // Verify response
@@ -163,8 +160,7 @@ describe('Legal-AI API Endpoints', () => {
  documentContent: 'Test content',
  }),
  });
-
- // Call endpoint
+  
  const response = await POST({ request } as any);
 
  // Verify response
@@ -193,8 +189,7 @@ describe('Legal-AI API Endpoints', () => {
  vi.mocked(DataIsolationLayer.checkAccess).mockReturnValue({
  allowed: false,
  });
-
- // Create request
+  
  const request = new Request('http://localhost/api/legal-ai/citations', {
  method: 'POST',
  headers: {
@@ -207,8 +202,7 @@ describe('Legal-AI API Endpoints', () => {
  documentContent: 'Test content',
  }),
  });
-
- // Call endpoint
+  
  const response = await POST({ request } as any);
 
  // Verify response
@@ -239,8 +233,7 @@ describe('Legal-AI API Endpoints', () => {
  vi.mocked(DataIsolationLayer.checkAccess).mockReturnValue({
  allowed: true,
  });
-
- // Create request
+  
  const request = new Request('http://localhost/api/legal-ai/citations', {
  method: 'POST',
  headers: {
@@ -250,8 +243,7 @@ describe('Legal-AI API Endpoints', () => {
  },
  body: JSON.stringify({ documentContent: 'Test content' }),
  });
-
- // Call endpoint
+  
  const response = await POST({ request } as any);
 
  // Verify response
@@ -265,8 +257,7 @@ describe('Legal-AI API Endpoints', () => {
  vi.mocked(FeatureFlagEnforcer.checkRequest).mockImplementation(() => {
  throw new Error('Test error');
  });
-
- // Create request
+  
  const request = new Request('http://localhost/api/legal-ai/citations', {
  method: 'POST',
  body: JSON.stringify({
@@ -274,8 +265,7 @@ describe('Legal-AI API Endpoints', () => {
  documentContent: 'Test content',
  }),
  });
-
- // Call endpoint
+  
  const response = await POST({ request } as any);
 
  // Verify response
@@ -308,8 +298,7 @@ describe('Legal-AI API Endpoints', () => {
  vi.mocked(DataIsolationLayer.checkAccess).mockReturnValue({
  allowed: true,
  });
-
- // Create request
+  
  const request = new Request('http://localhost/api/legal-ai/authorities', {
  method: 'PUT',
  headers: {
@@ -321,8 +310,7 @@ describe('Legal-AI API Endpoints', () => {
  citationIds: ['citation_1', 'citation_2'],
  }),
  });
-
- // Call endpoint
+  
  const response = await PUT({ request } as any);
 
  // Verify response
@@ -367,8 +355,7 @@ describe('Legal-AI API Endpoints', () => {
  vi.mocked(DataIsolationLayer.checkAccess).mockReturnValue({
  allowed: true,
  });
-
- // Create request
+  
  const request = new Request('http://localhost/api/legal-ai/authorities', {
  method: 'PUT',
  headers: {
@@ -378,8 +365,7 @@ describe('Legal-AI API Endpoints', () => {
  },
  body: JSON.stringify({ citationIds: [] }),
  });
-
- // Call endpoint
+  
  const response = await PUT({ request } as any);
 
  // Verify response
@@ -412,8 +398,7 @@ describe('Legal-AI API Endpoints', () => {
  vi.mocked(DataIsolationLayer.checkAccess).mockReturnValue({
  allowed: true,
  });
-
- // Create request
+  
  const request = new Request('http://localhost/api/legal-ai/reports?limit=10&offset=0', {
  method: 'GET',
  headers: {
@@ -421,8 +406,7 @@ describe('Legal-AI API Endpoints', () => {
  'X-User-ID': 'user-123',
  },
  });
-
- // Call endpoint
+  
  const response = await GET({ request } as any);
 
  // Verify response
@@ -465,8 +449,7 @@ describe('Legal-AI API Endpoints', () => {
  vi.mocked(DataIsolationLayer.checkAccess).mockReturnValue({
  allowed: true,
  });
-
- // Create request with custom pagination
+  
  const request = new Request('http://localhost/api/legal-ai/reports?limit=5&offset=10', {
  method: 'GET',
  headers: {
@@ -474,8 +457,7 @@ describe('Legal-AI API Endpoints', () => {
  'X-User-ID': 'user-123',
  },
  });
-
- // Call endpoint
+  
  const response = await GET({ request } as any);
 
  // Verify response
@@ -514,8 +496,7 @@ describe('Legal-AI API Endpoints', () => {
  const request = new Request('http://localhost/api/legal-ai/reports', {
  method: 'GET',
  });
-
- // Call endpoint
+  
  const response = await GET({ request } as any);
 
  // Verify response

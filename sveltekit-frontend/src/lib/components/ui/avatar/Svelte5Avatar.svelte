@@ -78,8 +78,7 @@ let displayInitials = $derived(() => {
 	}
 	return '??';
 });
-
-// Random color based on initials for consistent colors
+  
 let bgColor = $derived(() => {
 	const colors = [
 		'bg-blue-600', 'bg-green-600', 'bg-purple-600',

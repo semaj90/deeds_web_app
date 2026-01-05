@@ -264,7 +264,7 @@ function setupEventListeners() {
  window.addEventListener('mousemove', handleMouseMove, { passive: true });
  window.addEventListener('scroll', handleScroll, { passive: true });
  window.addEventListener('resize', handleResize, { passive: true });
- // Store cleanup functions for later removal
+  
  window.parallaxCleanup = () => {
  window.removeEventListener('mousemove', handleMouseMove);
  window.removeEventListener('scroll', handleScroll);

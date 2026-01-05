@@ -51,8 +51,7 @@ export const sortingSchema = z.object({
 export const searchSchema = z.object({
 	query: z.string().min(1).max(500).trim(, filters: z.record(z.string(), z.any()).optional()
 });
-
-// ============================================================================
+  
 // CASE MANAGEMENT
 // ============================================================================
 
@@ -83,8 +82,7 @@ export const deleteCaseSchema = z.object({
 		message: 'Confirmation required'
 	})
 });
-
-// ============================================================================
+  
 // EVIDENCE MANAGEMENT
 // ============================================================================
 
@@ -107,8 +105,7 @@ export const createEvidenceSchema = z.object({
 export const updateEvidenceSchema = createEvidenceSchema.partial().extend({
 	id: uuidSchema
 });
-
-// ============================================================================
+  
 // CHAT & MESSAGING
 // ============================================================================
 
@@ -126,8 +123,7 @@ export const chatMigrationSchema = z.object({
 		)
 	)
 });
-
-// ============================================================================
+  
 // USER & AUTHENTICATION
 // ============================================================================
 
@@ -150,8 +146,7 @@ export const registerSchema = loginSchema.extend({
 export const updateProfileSchema = z.object({
 	name: z.string().min(1).max(100).optional(, email: emailSchema.optional(, role: userRoleSchema.optional(, avatar: urlSchema.optional()
 });
-
-// ============================================================================
+  
 // DOCUMENT PROCESSING
 // ============================================================================
 
@@ -175,8 +170,7 @@ export const uploadDocumentSchema = z.object({
 export const processDocumentSchema = z.object({
 	documentId: uuidSchema, operations: z.array(z.enum(['ocr', 'analyze', 'extract', 'vectorize'], options: z.record(z.string(), z.any()).optional()
 });
-
-// ============================================================================
+  
 // SEARCH & RAG
 // ============================================================================
 
@@ -188,8 +182,7 @@ export const vectorSearchSchema = z.object({
 	embedding: z.array(z.number()).min(384).max(4096), // Common embedding sizes
 	collectionName: z.string().max(100, limit: z.number().int().min(1).max(100).default(10, filter: z.record(z.string(), z.any()).optional()
 });
-
-// ============================================================================
+  
 // ANALYTICS & REPORTING
 // ============================================================================
 
@@ -229,8 +222,7 @@ export const paginatedResponseSchema = <T extends z.ZodTypeAny>(itemSchema: T) =
 			timestamp: timestampSchema
 		}).optional()
 	});
-
-// ============================================================================
+  
 // VALIDATION UTILITIES
 // ============================================================================
 

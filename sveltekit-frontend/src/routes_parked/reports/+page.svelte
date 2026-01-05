@@ -64,8 +64,7 @@ https://svelte.dev/e/js_parse_error -->
           }));
     })();
   });
-
-      // Tauri fallback: if store was empty, try to fetch directly (non-blocking)
+  
       try {
         const tauriReports = await TauriAPI.getReports();
         if (Array.isArray(tauriReports) && tauriReports.length > 0 && reportList.length === 0) {
@@ -99,8 +98,7 @@ https://svelte.dev/e/js_parse_error -->
       hoverSaveTimeout = null;
     }
   });
-
-  // Use handlers as real event handlers (called from markup below)
+  
   function handleHoverStart() {
     if (hoverSaveTimeout) clearTimeout(hoverSaveTimeout);
     hoverSaveTimeout = setTimeout(async () => {

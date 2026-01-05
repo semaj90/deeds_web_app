@@ -71,7 +71,7 @@
  const db = req.result;
  if (!db.objectStoreNames.contains(LOCAL_STORE)) {
  const store = db.createObjectStore(LOCAL_STORE, { keyPath: 'id' });
- // sample indexes can be created here if needed in future
+  
  try {
  store.createIndex('title', 'title', { unique: false });
  } catch (_) {}
@@ -417,8 +417,7 @@
 
  return () => clearInterval(interval);
  });
-
- // add local refs to avoid compile-time prop checking
+  
  let yoRHaCenterRef = $state <any>(null);
  let yoRHaInterfaceRef = $state <any>(null);
 
@@ -428,15 +427,13 @@
  yoRHaCenterRef.$set ({ systemData });
  }
  });
-
- // Push legalSession into the command interface instance at runtime
+  
  $effect (() => {
  if (yoRHaInterfaceRef && typeof yoRHaInterfaceRef.$set === 'function') {
  yoRHaInterfaceRef.$set ({ legalSession });
  }
  });
-
- // This function is currently unused in the provided snippet.
+  
  // If it's meant to be used, it should be called from the template or other logic.
 </script>
 

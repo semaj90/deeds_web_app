@@ -209,7 +209,9 @@ class AIAssistantStore {
 			title,
 			messages: [],
 			model: 'gemma3',
-			temperature: 0.7, createdAt: Date.now(, updatedAt: Date.now(, pinned: false
+			temperature: 0.7, createdAt: Date.now(),
+     updatedAt: Date.now(),
+     pinned: false
 		};
 		this.conversations = [conversation, ...this.conversations];
 		this.currentConversationId = id;

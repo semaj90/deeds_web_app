@@ -56,8 +56,7 @@ export async function generateVLMEmbedding(
  temperature: 0.1, // Very low for consistent embeddings
  top_k: 40, top_p: 0.9,
  });
-
- // Parse embedding from response
+  
  const embedding = parseEmbeddingResponse(response);
 
  const processingTime = Date.now() - startTime;

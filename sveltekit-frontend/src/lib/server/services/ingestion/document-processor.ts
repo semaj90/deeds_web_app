@@ -129,8 +129,7 @@ export function chunkDocument(
  startIndex: startCharIdx, endIndex: endCharIdx, chunkTokens.length,
  chunkIndex,
  });
-
- // Move to next chunk with overlap
+  
  startIdx += chunkSize - overlap;
  chunkIndex++;
  }

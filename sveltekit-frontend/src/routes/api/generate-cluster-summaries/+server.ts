@@ -23,8 +23,7 @@ const PYTHON_PATH = 'C:\\Users\\james\\Videos\\deeds-web-app\\.venv\\Scripts\\py
 export async function POST() {
 	try {
 		await redis.connect().catch(() => {});
-
-		// 1. Run CUDA clustering analysis
+  
 		const clusterAnalysis = await runCUDAClustering();
 
 		// 2. Generate summaries with gemma3-legal

@@ -96,8 +96,7 @@
 
 			drawNESLine(fromNode.x, fromNode.y, toNode.x, toNode.y, edge.type);
 		});
-
-		// Draw nodes
+  
 		nodes.forEach((node) => {
 			drawNESCircle(node.x, node.y, 20, node.type, node === hoveredNode);
 		});

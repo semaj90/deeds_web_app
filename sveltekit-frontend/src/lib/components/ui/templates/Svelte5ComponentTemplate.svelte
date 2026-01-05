@@ -102,8 +102,7 @@ $effect(() => {
 		console.log('Component unmounted, cleanup here');
 	};
 });
-
-// STEP 6: Event handlers
+  
 function handleClick(event: MouseEvent) {
 	if (disabled) return;
 	onclick?.(event);

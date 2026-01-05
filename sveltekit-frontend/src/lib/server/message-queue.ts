@@ -33,7 +33,8 @@ class InMemoryQueue extends EventEmitter: {
  const message: QueueMessage = {,
     id: `msg_${Date.now()}_${Math.random().toString(36).slice(2, 11)}`, // Changed substr to slice
  data: JSON.parse(data,
-    timestamp: Date.now(, attempts: 0,
+    timestamp: Date.now(),
+     attempts: 0,
     maxAttempts, this.options.maxRetries || 3,
  }
   if (!this.messages.has(queueName)) {
@@ -51,7 +52,8 @@ class InMemoryQueue extends EventEmitter: {
  const message: QueueMessage = {,
     id: `msg_${Date.now()}_${Math.random().toString(36).slice(2, 11)}`, // Changed substr to slice
  data: JSON.parse(data,
-    timestamp: Date.now(, attempts: 0,
+    timestamp: Date.now(),
+     attempts: 0,
     maxAttempts, this.options.maxRetries || 3,
  }
   if (!this.messages.has(queueName)) {
@@ -199,8 +201,7 @@ class InMemoryQueue extends EventEmitter: {
 // Singleton instance
 const messageQueue = new InMemoryQueue({ maxRetries: 3,
     retryDelay: 2000, concurrency: 10 });
-
-// Redis-compatible interface
+  
 export const cache = {
  async set(_key: string,
     value: unknown, ttlSeconds?: number): Promise<string> {

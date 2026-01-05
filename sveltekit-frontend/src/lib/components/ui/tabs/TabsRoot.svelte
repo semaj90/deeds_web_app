@@ -22,8 +22,7 @@
 			value = defaultValue;
 		}
 	});
-
-	// Track registered tabs for keyboard navigation
+  
 	let tabs = $state<string[]>([]);
 
 	function registerTab(tabValue: string) {

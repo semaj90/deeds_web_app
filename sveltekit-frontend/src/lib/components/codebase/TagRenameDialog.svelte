@@ -52,8 +52,7 @@
 		if (!/^[a-zA-Z0-9_\-\.]+$/.test(newName)) return 'Only letters, numbers, _, -, . allowed';
 		return null;
 	});
-
-	// Reset state when tag changes
+  
 	$effect(() => {
 		if (tag) {
 			newName = tag.name;

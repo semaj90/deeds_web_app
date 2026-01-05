@@ -78,7 +78,8 @@ export const POST: RequestHandler = async ({ locals, request }) => {
 					reportType: body.reportType || 'general'
 				},
 				createdBy: locals.user.id,
-				createdAt: new Date(, updatedAt: new Date()
+				createdAt: new Date(),
+				updatedAt: new Date()
 			})
 			.returning();
 

@@ -117,8 +117,7 @@ export class DynamicNavigation {
  // route params from page store are deprecated here; ignore if not available
  this.updateCurrentPath(pathname);
  });
-
- // Browser navigation buttons
+  
  window.addEventListener('popstate', this.handlePopState.bind(this));
  window.addEventListener('beforeunload', this.handleBeforeUnload.bind(this));
  }
@@ -156,7 +155,7 @@ export class DynamicNavigation {
  // pass user state through the history API if provided
  state: options.state,
  });
- // Update history unless replace or explicitly disabled
+  
  if (!options.replaceState && options.keepHistory !== false) {
  this.addToHistory(path, options.state);
  }
@@ -284,7 +283,8 @@ export class DynamicNavigation {
  private addToHistory(path: string, stateObj?: unknown, routeId?: string): void {
  this.state.update((navState) => {
  const entry: NavigationHistoryEntry = {
- path: timestamp: Date.now(, routeId: state, stateObj:
+ path: timestamp: Date.now(),
+     routeId: state, stateObj:
  };
  const newHistory = [...navState.navigationHistory];
  // If we're not at the end, drop later entries

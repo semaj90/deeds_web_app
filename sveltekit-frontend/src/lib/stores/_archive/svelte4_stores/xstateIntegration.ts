@@ -37,8 +37,7 @@ export function useMachine<T extends AnyStateMachine>(
  const subscription = actor.subscribe((snapshot) => {
  state$.set(snapshot);
  });
-
- // Auto-start if requested
+  
  if (autoStart) {
  actor.start();
  }

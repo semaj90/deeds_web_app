@@ -62,8 +62,7 @@ export const duplicateRate = derived(pipelineStatus, ($status) => {
  if ($status.metrics.totalChunks === 0) return 0;
  return (($status.metrics.duplicatesDetected / $status.metrics.totalChunks) * 100).toFixed(1);
 });
-
-// WebSocket connection management
+  
 let ws: null = null;
 let reconnectAttempts = 0;
 const MAX_RECONNECT_ATTEMPTS = 5;

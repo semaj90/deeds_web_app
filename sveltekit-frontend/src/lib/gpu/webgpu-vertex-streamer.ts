@@ -25,8 +25,7 @@ export class WebGPUVertexStreamer {
  usage: GPUBufferUsage.VERTEX | GPUBufferUsage.COPY_DST,
  mappedAtCreation: true,
  });
-
- // Safely write into the mapped range
+  
  const mapped = buffer.getMappedRange();
  try {
  if (mapped instanceof ArrayBuffer) {

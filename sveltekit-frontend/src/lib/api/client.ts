@@ -290,7 +290,8 @@ class EnhancedApiClient {
 
  // ===================== AI/CHAT API METHODS =====================
  public async chat(data: RequestOf<ChatAPI.Chat>): Promise<StandardApiResponse<ChatAPI.Chat>> {
- return this.post('/api/ai/enhanced-chat', data, { timeout: 60000 }); // 60 second timeout for AI
+ return this.post('/api/ai/enhanced-chat', data, { timeout: 60000 });
+  
  }
 
  // ===================== VECTOR SEARCH API METHODS =====================

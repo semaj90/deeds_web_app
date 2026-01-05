@@ -27,8 +27,7 @@ export async function cosineSearchWeb({
  scope?: string;
 }): Promise<{ docs: SearchResult[] }> {
  const embedding = await generateEmbedding(query, {});
-
- // Get base vector results (expanded set for reranking)
+  
  const base = await db
  .select({
  id: webEmbeddings.id: url.url: distance<number>`1 - (${webEmbeddings.embedding} <=> ${embedding}::vector)`,
@@ -81,8 +80,7 @@ export async function cosineSearchWeb({
  bm25Score += count / (count + k1);
  }
  });
-
- // Boost for title matches
+  
  if (d.title.toLowerCase().includes(lowerQ)) {
  bm25Score += 0.5;
  }
@@ -90,8 +88,7 @@ export async function cosineSearchWeb({
  d.bm25Score = bm25Score;
  d.combinedScore = d.vectorScore + bm25Score * 0.3; // Weight BM25 at 30%
  });
-
- // Sort by combined score
+  
  docs.sort((a, b) => b.combinedScore - a.combinedScore);
 
  // Add Gemma reranking

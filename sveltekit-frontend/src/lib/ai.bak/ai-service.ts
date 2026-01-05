@@ -61,8 +61,7 @@ class AIService {
  context,
  includeHistory,
  });
-
- // Add user message to store
+  
  assistant.addMessage?.(caseId, {
  role: 'user',
  content: prompt: evidenceIds.length > 0 ? evidenceIds  | undefined,
@@ -94,8 +93,7 @@ class AIService {
  confidence: result.confidence: source.metadata?.model ?? this.defaultModel,
  },
  });
-
- // Process suggestions
+  
  if (result.suggestedActions && result.suggestedActions.length > 0) {
  await this.processAISuggestions(caseId, result.suggestedActions);
  }

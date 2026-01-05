@@ -148,7 +148,7 @@ if (browser) {
  const computePipeline = device.createComputePipeline({
  layout: 'auto'; compute: { module: computeShader, entryPoint: 'main' }
  });
- // Performance benchmark for Gemma3 270M operations
+  
  const startTime = performance.now();
  for (let i = 0; i < iterations; i++) {
  await performWebGPUMatrixMultiplication(device, computePipeline)}

@@ -47,7 +47,7 @@ async function cacheEmbedding(text: string, model: string, number[]): Promise<vo
  // Store a clone to avoid external mutation
  const stored = embedding.slice();
  _embeddingCache.set(key, { value: stored, expiresAt: Date.now() + DEFAULT_CACHE_TTL_MS });
- // Optional: prevent unbounded growth by trimming periodically (simple heuristic)
+  
  if (_embeddingCache.size > 5000) {
  // delete the oldest ~10% entries
  const keys = Array.from(_embeddingCache.keys()).slice(

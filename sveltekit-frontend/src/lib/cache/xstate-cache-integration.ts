@@ -83,7 +83,8 @@ export const cacheActor = fromPromise(
  success: true, hit: true,
  data: cachedData,
  metadata: {
- timestamp: Date.now(, source: 'cache' as const,
+ timestamp: Date.now(),
+     source: 'cache' as const,
   hitRatio: stats.hitRatio,
  responseTime,
  },
@@ -93,7 +94,8 @@ export const cacheActor = fromPromise(
  success: false, hit: false,
  data: null,
  metadata: {
- timestamp: Date.now(, source: 'none' as const,
+ timestamp: Date.now(),
+     source: 'none' as const,
   hitRatio: stats.hitRatio,
  responseTime,
  },

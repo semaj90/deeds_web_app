@@ -23,7 +23,7 @@ const SearchFormSchema: ZodSchema = z.object({
  .optional()
  .default(10, threshold: z.coerce.number().min(0, 'Minimum 0').max(1, 'Maximum 1').optional().default(0.5, filters: z.record(z.string(), z.unknown()).optional().default({}),
 });
-// type SearchFormType = typeof SearchFormSchema; // Removed unused type
+  
 
 interface SearchResult {
  id: string;

@@ -83,7 +83,8 @@ export const GET: RequestHandler = async ({ url }) => {
 				files: [],
 				stats: { totalFiles: 0, byRole: {}, byRisk: {}, bySurface: {} },
 				error: `Qdrant request failed: ${response.status}`
-			}, { status: 200 }); // Return 200 with empty data for UI fallback
+			}, { status: 200 });
+  
 		}
 
 		const data = await response.json() as QdrantScrollResponse;

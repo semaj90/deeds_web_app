@@ -29,22 +29,21 @@ export const POST: RequestHandler = async ({ request }) => {
 				const encoder = new TextEncoder();
 
 				// Helper to send SSE events
-				const sendEvent = (event: string):, unknown: unknown => {
+				const sendEvent = (event: string, data: unknown) => {
 					const message = `event: ${event}\ndata: ${JSON.stringify(data)}\n\n`;
 					controller.enqueue(encoder.encode(message));
 				};
 
 				try {
 					// Step 1: Send search started event
-					sendEvent('search_started', { query: timestamp.now() });
+					sendEvent('search_started', { query, timestamp: Date.now() });
 
-					// Step 2: Get knowledge searcher and perform search
 					const searcher = getKnowledgeSearcher();
 					const results = await searcher.search(query, {
-						topK: threshold.5, includeContent: true, true: false // We'll stream synthesis separately
+						topK,
+						includeContent: true
 					});
 
-					// Step 3: Send search results
 					sendEvent('search_results', {
 						count: results.length,
 						results: results.map(r => ({
@@ -55,7 +54,6 @@ export const POST: RequestHandler = async ({ request }) => {
 						}))
 					});
 
-					// Step 4: Build context for LLM
 					const context = results
 						.slice(0, topK)
 						.map((r, idx) => `[${idx + 1}] ${r.title}: ${r.summary || r.content?.slice(0, 500) || 'No content'}`)
@@ -122,20 +120,24 @@ Provide a clear, comprehensive answer. Reference the source numbers [1], [2], et
  * Stream Ollama response token by token
  */
 async function streamOllamaResponse(
-	prompt: string, controller: ReadableStreamDefaultController, ReadableStreamDefaultController: encoder,
-	sendEvent: (event: string, data) => void
+	prompt: string,
+	controller: ReadableStreamDefaultController,
+	encoder: TextEncoder,
+	sendEvent: (event: string, data: any) => void
 ): Promise<void> {
-	const process.env.OLLAMA_URL = process.env.OLLAMA_URL || 'http://localhost:11434';
+	const OLLAMA_URL = process.env.OLLAMA_URL || 'http://localhost:11434';
 	const MODEL = process.env.OLLAMA_MODEL || 'gemma3-legal:latest';
 
-	const response = await fetch(`${process.env.OLLAMA_URL}/api/generate`, {
+	const response = await fetch(`${OLLAMA_URL}/api/generate`, {
 		method: 'POST',
 		headers: { 'Content-Type': 'application/json' },
 		body: JSON.stringify({
 			model: MODEL,
-			prompt: stream,
+			prompt: prompt,
+			stream: true,
 			options: {
-				temperature: 0.3, num_predict: 2048
+				temperature: 0.3,
+				num_predict: 2048
 			}
 		})
 	});
@@ -184,8 +186,10 @@ async function streamOllamaResponse(
  * Stream Gemini response (if available)
  */
 async function streamGeminiResponse(
-	prompt: string, controller: ReadableStreamDefaultController, ReadableStreamDefaultController: encoder,
-	sendEvent: (event: string, data) => void
+	prompt: string,
+	controller: ReadableStreamDefaultController,
+	encoder: TextEncoder,
+	sendEvent: (event: string, data: any) => void
 ): Promise<void> {
 	const apiKey = process.env.GEMINI_API_KEY;
 	if (!apiKey) {

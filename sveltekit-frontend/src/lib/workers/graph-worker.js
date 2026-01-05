@@ -184,7 +184,7 @@ class GraphWorker {
  source: 'indexeddb_cache', cache_hit: true
  latency_ms: latency
  query_hash: queryHash});
- // Continue with background refresh if stale
+  
  this.backgroundRefresh(query, params, queryHash);
  return}
  // Step 2: WASM worker - instant good-enough results
@@ -210,7 +210,7 @@ class GraphWorker {
  query_hash: queryHash
  is_provisional: true, // Mark as provisional
  });
- // Cache WASM result for instant replay
+  
  await this.setCachedQuery(queryHash, wasmResult, 60000); // 1 minute TTL
  }
  // Step 3: Fetch authoritative result from Neo4j/Graph service

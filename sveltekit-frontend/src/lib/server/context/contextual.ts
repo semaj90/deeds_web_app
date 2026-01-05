@@ -52,7 +52,8 @@ export class ContextualService {
  private constructor() {
  this.memory = {
  shortTerm: [],
- longTerm: new Map(, predictions: [],
+ longTerm: new Map(),
+     predictions: [],
  actions: [],
  };
 
@@ -186,7 +187,8 @@ export class ContextualService {
  clearMemory(): void {
  this.memory = {
  shortTerm: [],
- longTerm: new Map(, predictions: [],
+ longTerm: new Map(),
+     predictions: [],
  actions: [],
  };
  this.currentContext.set(null);
@@ -261,8 +263,7 @@ export function createContextStore(): Writable<ContextualState | null> {
  const unsubscribe = service.subscribe((context) => {
  store.set(context);
  });
-
- // Return store with cleanup
+  
  return {
  subscribe: store.subscribe,
  set: (value) => {

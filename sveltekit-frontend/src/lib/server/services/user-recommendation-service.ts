@@ -59,9 +59,7 @@ interface StoreAiChatParams {
 					model: (params.metadata?.model as string) || 'unknown'
 				})
 				.returning({ id: userAiQueries.id });
-
-
-			// If part of a session, also store as RAG message
+  
 			if (params.sessionId) {
 				const [{ messageCount }] = await db
 					.select({ messageCount: count(ragMessages.id) })

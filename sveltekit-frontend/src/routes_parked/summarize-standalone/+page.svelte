@@ -61,7 +61,7 @@ Additionally, we recommend exploring settlement negotiations before filing suit,
  // Estimate processing time based on document length (roughly, 1 second per 1000 chars)
  estimatedProcessingTime = Math.ceil(charCount / 1000);
  });
- // Sample document loader
+  
  function loadSampleDocument() {
  reportText = sampleLegalDoc;
  activeTab = 'input';

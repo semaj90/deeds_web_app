@@ -170,8 +170,7 @@ redisLike.on?.('error', (err: unknown) => {
 redisLike.on?.('end', () => {
  console.warn('[redis] connection ended. awaiting reconnect');
 });
-
-// small helper: wait for a specific event or timeout
+  
 function waitForEvent(obj: RedisLike, event: string, timeoutMs = 5000): Promise<void> {
  return new Promise<void>((resolve, reject) => {
  let settled = false;

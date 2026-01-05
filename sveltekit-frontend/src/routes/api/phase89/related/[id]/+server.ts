@@ -54,7 +54,8 @@ export const GET: RequestHandler = async ({ params, fetch }) => {
 			.map((r: any) => ({
 				path: r.payload?.file_path || '',
 				similarity: r.score,
-				shared_imports: findSharedImports(pointData.result?.payload, r.payload, unit_kind: r.payload?.unit_kind || 'unknown',
+				shared_imports: findSharedImports(pointData.result?.payload, r.payload),
+				unit_kind: r.payload?.unit_kind || 'unknown',
 				component_name: r.payload?.component_name || r.payload?.module_name || 'Unknown'
 			}));
 

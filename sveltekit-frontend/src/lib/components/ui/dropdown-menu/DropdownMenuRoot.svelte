@@ -40,8 +40,7 @@
 			document.removeEventListener('keydown', handleKeydown);
 		};
 	});
-
-	// Create context with getter pattern for reactivity
+  
 	setContext<DropdownMenuContext>('dropdown-menu', {
 		get open() { return open; },
 		setOpen: (isOpen: boolean) => {

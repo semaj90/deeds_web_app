@@ -223,7 +223,8 @@ export const recommendationRoutingMachine = setup({
  routingKey,
  message,
  options: {
- persistent: true, timestamp: Date.now(, messageId: `msg_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+ persistent: true, timestamp: Date.now(),
+     messageId: `msg_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
  },
  }),
  });
@@ -627,8 +628,7 @@ export const recommendationRoutingMachine = setup({
  },
  },
 });
-
-// Helper functions
+  
 function determinePriority(documentType?: string): 'high' | 'standard' | 'background' {
  switch (documentType) {
  case 'evidence':

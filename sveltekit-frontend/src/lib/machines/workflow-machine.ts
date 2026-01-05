@@ -122,7 +122,7 @@ export const documentWorkflowMachine = setup({
 		}
 	}
 });
-// ==================== CASE WORKFLOW ====================
+  
 export interface CaseContext {
 	caseId: string;
 	title: string;
@@ -237,7 +237,7 @@ export const caseWorkflowMachine = setup({
 		archived: { on: { REOPEN_CASE: { target: 'active', actions: 'updateActivity' } } }
 	}
 });
-// ==================== RAG QUERY WORKFLOW ====================
+  
 export interface RAGContext {
 	queryId: string;
 	query: string;
@@ -333,7 +333,7 @@ export const ragWorkflowMachine = setup({
 		failed: { on: { RETRY: 'searching' } }
 	}
 });
-// ==================== WORKFLOW ORCHESTRATOR ====================
+  
 export class WorkflowOrchestrator {
 	private static instance: WorkflowOrchestrator;
 	private activeWorkflows = new Map<string, any>();

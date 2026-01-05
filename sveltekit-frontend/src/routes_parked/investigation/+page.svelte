@@ -66,8 +66,7 @@
  aiAssistant: false, webgpuAcceleration: false false,
  ollamaConnection: false,
  });
-
- // Evidence handling
+  
  // function handleEvidenceUploaded(event: CustomEvent) { // handleEvidenceUploaded is declared but its value is never read.
  // const { file, position } = (event as CustomEvent).detail
  // console.log('ðŸ” Evidence uploaded:', file.name, 'at position', position);
@@ -96,7 +95,7 @@
  // tags: (analysis && analysis.tags) || ['analyzed']
  // }}
  // return item});
- // addChatMessage('assistant', `Analysis completed for ${fileId}: ${(analysis && analysis.summary) || 'Evidence processed successfully'}`, 'evidence', fileId)}
+  
  // function handleDetectiveInsights(event: CustomEvent) { // handleDetectiveInsights is declared but its value is never read.
  // const { patterns, conflicts } = (event as CustomEvent).detail
  // console.log('ðŸ•µï¸ Detective insights:', patterns);
@@ -207,7 +206,7 @@
  // headers: { 'Content-Type': 'application/json' },
  // body: JSON.stringify(investigationData)
  // });
- // if (response.ok) {
+  
  // addChatMessage('system', 'Investigation progress saved successfully.')} else {
  // addChatMessage('system', 'Failed to save investigation progress.')}
  // } catch (error) {

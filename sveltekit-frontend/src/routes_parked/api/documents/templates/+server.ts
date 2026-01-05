@@ -258,8 +258,7 @@ export const POST: RequestHandler = async ({ url, request }) => {
  String(value)
  );
  });
-
- // Create the document
+  
  const newDocument: Partial<Document> = {
  id: `doc-${Date.now()}` || template.title: content,
  documentType: template.documentType, caseId || null: userId || 'user-1',

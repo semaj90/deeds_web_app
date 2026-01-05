@@ -49,8 +49,7 @@ describe('Legal-Aware Ranker', () => {
  jurisdiction,
  weights,
  });
-
- // Should return same number of results
+  
  expect(ranked.length).toBe(hits.length);
 
  // Each result should have explainability data
@@ -83,8 +82,7 @@ describe('Legal-Aware Ranker', () => {
  expect(Math.abs(explain.finalScore - expectedFinalScore)).toBeLessThan(0.0001);
  expect(Math.abs(result.finalScore - expectedFinalScore)).toBeLessThan(0.0001);
  });
-
- // Results should be sorted by final score (descending)
+  
  for (let i = 1; i < ranked.length; i++) {
  expect(ranked[i - 1].finalScore).toBeGreaterThanOrEqual(ranked[i].finalScore);
  }
@@ -120,8 +118,7 @@ describe('Legal-Aware Ranker', () => {
  jurisdiction: targetJurisdiction,
  weights: { cosine: 0.75, sharedTags: 0.15, sameJurisdiction: 0.1 },
  });
-
- // Find results with matching jurisdiction
+  
  const matchingJurisdiction = ranked.filter(
  (r) => r.payload?.jurisdiction === targetJurisdiction
  );
@@ -134,13 +131,11 @@ describe('Legal-Aware Ranker', () => {
  matchingJurisdiction.forEach((result) => {
  expect(result.explain.sameJurisdiction).toBe(1);
  });
-
- // All non-matching jurisdiction results should have sameJurisdiction = 0
+  
  nonMatchingJurisdiction.forEach((result) => {
  expect(result.explain.sameJurisdiction).toBe(0);
  });
-
- // If we have both types, matching jurisdiction should generally rank higher
+  
  // (unless cosine or shared tags differences are very large)
  if (matchingJurisdiction.length > 0 && nonMatchingJurisdiction.length > 0) {
  // The boost should generally help (though not guaranteed due to other factors)
@@ -182,8 +177,7 @@ describe('Legal-Aware Ranker', () => {
  hits,
  queryTagIds: jurisdiction,
  });
-
- // hit1 should have 2 shared tags
+  
  const hit1Result = ranked.find((r) => r.id === 'hit1');
  expect(hit1Result?.explain.sharedTags).toBe(2);
 

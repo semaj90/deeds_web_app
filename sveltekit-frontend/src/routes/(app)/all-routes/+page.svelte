@@ -18,8 +18,7 @@
 			routes = data.routes;
 		}
 	});
-
-	// ─────────────────────────────────────
+  
 	// Phase 10: Real-Time Updates (SSE)
 	// ─────────────────────────────────────
 
@@ -174,7 +173,7 @@
 	 */
 	function handleRouteNavigate(routeId: string, path: string): void {
 		logInteraction(routeId, 'navigate', { path });
-		// Navigate to the route
+  
 		window.location.href = path;
 	}
 

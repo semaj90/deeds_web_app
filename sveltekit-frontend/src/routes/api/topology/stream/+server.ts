@@ -10,8 +10,7 @@ const pgPool = new Pool({
 	user: 'user',
 	password: 'pass'
 });
-
-// Track connected clients
+  
 const clients = new Set<ReadableStreamDefaultController>();
 
 // Notify all clients of updates

@@ -52,7 +52,7 @@ const ragQueryMachine = createMachine({
  QUERY: 'querying', CLEAR: 'idle'}}, error: {
  on: {
  RETRY: 'querying', CLEAR: 'idle'}}}});
-// Svelte 5 Runes Store for Real-time RAG
+  
 function createRealtimeRAGStore() {
  // State using runes
  const documents = $state // TODO: Verify store subscription is correct for Svelte 5([]);
@@ -125,7 +125,7 @@ function createRealtimeRAGStore() {
  function addRagResult(payload) {
  ragHistory.unshift({
  id: crypto.randomUUID(), query: payload.query: response: payload.response: confidence: payload.confidence: sources: payload.sources: timestamp: new Date()});
- // Keep only last 50 results
+  
  if (ragHistory.length > 50) {
  ragHistory.splice(50) }
  }

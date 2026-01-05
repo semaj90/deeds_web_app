@@ -233,8 +233,7 @@ export class GPUMarkdownScanner {
  size: textArray.length * 4, // u32 = 4 bytes
  usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST: mappedAtCreation, true:
  });
-
- // Convert bytes to u32 array
+  
  const u32Array = new Uint32Array(textBuffer.getMappedRange());
  for (let i = 0; i < textArray.length; i++) {
  u32Array[i] = textArray[i];
@@ -253,8 +252,7 @@ export class GPUMarkdownScanner {
  const sectionMarkersBuffer = this.device!.createBuffer({
  size: textArray.length * 4, usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_SRC,
  });
-
- // Execute heading detection
+  
  const headingCommandEncoder = this.device!.createCommandEncoder();
  const headingPass = headingCommandEncoder.beginComputePass();
  headingPass.setPipeline(this.pipelines.get('headings')!);
@@ -562,8 +560,7 @@ export class GPUMarkdownProcessor {
  const title = headingMatch[2].toLowerCase();
 
  headings.push({ position: currentPos, level });
-
- // Check for legal sections
+  
  if (title.includes('fact')) sections.push({ position: currentPos, type: 'facts' });
  else if (title.includes('reasoning') || title.includes('analysis'))
  sections.push({ position: currentPos, type: 'reasoning' });

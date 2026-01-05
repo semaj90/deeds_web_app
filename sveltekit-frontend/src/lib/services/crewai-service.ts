@@ -490,8 +490,7 @@ export async function analyzeLegalCaseWithCrew(
  timeout: 120000, // 2 minutes
  priority: 'high',
  });
-
- // Poll for completion with limited attempts
+  
  let attempts = 0;
  const maxAttempts = Math.ceil(120000 / 5000); // poll every 5s
  let status = execution.status;
@@ -539,8 +538,7 @@ export async function analyzeContractWithCrew(
  timeout: 90000, // 1.5 minutes
  priority: 'high',
  });
-
- // Poll for completion with limited attempts
+  
  let attempts = 0;
  const maxAttempts = Math.ceil(90000 / 5000);
  let status = execution.status;

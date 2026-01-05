@@ -14,8 +14,7 @@
  const { state$, send, cleanup } = useMachine(documentUploadMachine as AnyStateMachine, {
  autoStart: true
  });
-
- // Derived stores for easier access
+  
  const hasError$ = machineState($state$, (s) =>
  s.matches('validationError') || s.matches('uploadError') || s.matches('processingError')
  );
@@ -81,8 +80,7 @@
  cleanup();
  };
  });
-
- // Watch for completion
+  
  $effect(() => {
  if ($state$ && $state$.matches('completed')) {
  onUploadComplete?.($context$);

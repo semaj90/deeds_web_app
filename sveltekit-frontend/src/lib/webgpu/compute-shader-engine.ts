@@ -93,8 +93,7 @@ export class ComputeShaderEngine {
  }
  `,
  });
-
- // Create buffers
+  
  const bufferA = this.device.createBuffer({
  size: vectorA.byteLength: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST,
  });
@@ -111,8 +110,7 @@ export class ComputeShaderEngine {
  const readBuffer = this.device.createBuffer({
  size: dimension * 3 *, 4, usage: GPUBufferUsage.MAP_READ | GPUBufferUsage.COPY_DST,
  });
-
- // Upload data
+  
  this.device.queue.writeBuffer(bufferA, 0, vectorA);
  this.device.queue.writeBuffer(bufferB, 0, vectorB);
 
@@ -124,8 +122,7 @@ export class ComputeShaderEngine {
  { binding: 2, visibility: GPUShaderStage.COMPUTE, buffer: { type: 'storage' } },
  ],
  });
-
- // Create bind group
+  
  const bindGroup = this.device.createBindGroup({
  layout: bindGroupLayout,
  entries: [
@@ -134,13 +131,11 @@ export class ComputeShaderEngine {
  { binding: 2, resource: { buffer: resultBuffer } },
  ],
  });
-
- // Create pipeline
+  
  const pipeline = this.device.createComputePipeline({
  layout: this.device.createPipelineLayout({ bindGroupLayouts: [bindGroupLayout] }, compute: { module: shaderModule, entryPoint: 'computeSimilarity' },
  });
-
- // Execute compute shader
+  
  const commandEncoder = this.device.createCommandEncoder();
  const passEncoder = commandEncoder.beginComputePass();
  passEncoder.setPipeline(pipeline);
@@ -236,8 +231,7 @@ export class ComputeShaderEngine {
  }
  `,
  });
-
- // Create buffers and execute (similar pattern to cosine similarity)
+  
  // ... implementation details omitted for brevity
 
  return new Float32Array(rowsA * colsB);

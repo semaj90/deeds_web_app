@@ -146,8 +146,7 @@ export class JobOrchestrator extends EventEmitter {
 			await this.channel.assertQueue('analysis_jobs', { durable: true });
 			await this.channel.assertQueue('research_jobs', { durable: true });
 			await this.channel.assertQueue('job_results', { durable: true });
-
-			// Set up result listener
+  
 			await this.setupResultListener();
 
 			console.log('🏗️ Job Orchestrator initialized with RabbitMQ');

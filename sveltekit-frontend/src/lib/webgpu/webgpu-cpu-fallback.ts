@@ -30,8 +30,7 @@ export class WebGPUCPUFallback {
  this.gpu = new GPU({
  mode: 'gpu',
  });
-
- // Test WebGL support
+  
  const canvas = document.createElement('canvas');
  const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
 

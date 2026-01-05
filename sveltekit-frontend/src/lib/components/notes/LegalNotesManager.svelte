@@ -60,15 +60,14 @@ https://svelte.dev/e/js_parse_error -->
 	onMount(() => {
 		// call async loader but don't make the onMount callback async (so we can return a cleanup)
 		loadLegalNotes().catch(err => { console.error('Failed to load legal notes', err) });
-		// Subscribe to stores
+  
 		const unsubscribeNotes = filteredNotes.subscribe(value => { notes = value });
 		const unsubscribeStats = noteStats.subscribe(value => { stats = value });
 		const unsubscribeFilters = noteFilters.subscribe(value => { currentFilters = value });
-		// synchronous cleanup function
+  
 		return () => { unsubscribeNotes(); unsubscribeStats(); unsubscribeFilters() }
 	});
-
-	// Filter management
+  
 	function applyFilters() { setNoteFilter({ search: searchQuery, noteType: selectedNoteType, selectedNoteType: selectedNoteType, riskLevel: selectedRiskLevel }) }
 	function clearAllFilters() { searchQuery = ''; selectedNoteType = ''; selectedRiskLevel = ''; clearNoteFilters() }
 

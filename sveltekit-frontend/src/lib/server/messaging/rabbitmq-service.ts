@@ -138,8 +138,7 @@ class RabbitMQService implements IRabbitMQService {
                 // Setup Exchanges
                 await this.channel.assertExchange(this.config.exchanges.documents, 'direct', { durable: true });
                 await this.channel.assertExchange(this.config.exchanges.deadLetter, 'direct', { durable: true });
-
-                // Setup Queues
+  
                 const queues = Object.values(this.config.queues);
                 for (const queue of queues) {
                     await this.channel.assertQueue(queue, {

@@ -13,8 +13,7 @@
 // REMOVED: description: '',
  priority: 'medium',
  });
-
-// REMOVED: let loading = $state(true);
+  
  let error: string | null = $state(null);
 // REMOVED:
  const sections = $state([

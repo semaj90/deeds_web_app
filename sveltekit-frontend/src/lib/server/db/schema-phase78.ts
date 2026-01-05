@@ -57,10 +57,22 @@ export const suggestionStateEnum = pgEnum('suggestion_state', [
 export const routeHealth = pgTable(
  'route_health',
  {
- id: uuid('id').primaryKey().defaultRandom(, routePath: varchar('route_path', { length: 255 }).notNull().unique(, file: varchar('file', { length: 500 }, state: routeHealthStateEnum('state').notNull().default('healthy', recentErrorCount: integer('recent_error_count').notNull().default(0, totalErrorCount: integer('total_error_count').notNull().default(0, lastErrorAt: timestamp('last_error_at', lastErrorClusterId: uuid('last_error_cluster_id', lastErrorMessageShort: text('last_error_message_short', updatedAt: timestamp('updated_at').notNull().defaultNow(, createdAt: timestamp('created_at').notNull().defaultNow(),
+ id: uuid('id').primaryKey().defaultRandom(),
+ routePath: varchar('route_path', { length: 255 }).notNull().unique(),
+ file: varchar('file', { length: 500 }),
+ state: routeHealthStateEnum('state').notNull().default('healthy'),
+ recentErrorCount: integer('recent_error_count').notNull().default(0),
+ totalErrorCount: integer('total_error_count').notNull().default(0),
+ lastErrorAt: timestamp('last_error_at'),
+ lastErrorClusterId: uuid('last_error_cluster_id'),
+ lastErrorMessageShort: text('last_error_message_short'),
+ updatedAt: timestamp('updated_at').notNull().defaultNow(),
+ createdAt: timestamp('created_at').notNull().defaultNow(),
  },
  (table) => ({
- idxRoutePath: index('idx_route_health_path').on(table.routePath, idxState: index('idx_route_health_state').on(table.state, idxUpdatedAt: index('idx_route_health_updated').on(table.updatedAt),
+ idxRoutePath: index('idx_route_health_path').on(table.routePath),
+ idxState: index('idx_route_health_state').on(table.state),
+ idxUpdatedAt: index('idx_route_health_updated').on(table.updatedAt),
  })
 );
 
@@ -74,16 +86,28 @@ export const routeHealth = pgTable(
 export const errorEvents = pgTable(
  'error_events',
  {
- id: uuid('id').primaryKey().defaultRandom(, routePath: varchar('route_path', { length: 255 }).notNull(, file: varchar('file', { length: 500 }, kind: errorKindEnum('kind').notNull().default('other', severity: errorSeverityEnum('severity').notNull().default('warn', tsCode: varchar('ts_code', { length: 50 }), // TS1005, etc
- message: text('message').notNull(, stack: text('stack', lineNumber: integer('line_number', columnNumber: integer('column_number', sourceSnippet: text('source_snippet'), // 3-5 lines of code
+ id: uuid('id').primaryKey().defaultRandom(),
+ routePath: varchar('route_path', { length: 255 }).notNull(),
+ file: varchar('file', { length: 500 }),
+ kind: errorKindEnum('kind').notNull().default('other'),
+ severity: errorSeverityEnum('severity').notNull().default('warn'),
+ tsCode: varchar('ts_code', { length: 50 }), // TS1005, etc
+ message: text('message').notNull(),
+ stack: text('stack'),
+ lineNumber: integer('line_number'),
+ columnNumber: integer('column_number'),
+ sourceSnippet: text('source_snippet'), // 3-5 lines of code
  clusterId: uuid('cluster_id'), // assigned after clustering
  embedding: text('embedding'), // JSON serialized vector (for indexing)
  createdAt: timestamp('created_at').notNull().defaultNow(),
  },
  (table) => ({
- idxRoutePath: index('idx_error_events_route').on(table.routePath, idxClusterId: index('idx_error_events_cluster').on(table.clusterId, idxSeverity: index('idx_error_events_severity').on(table.severity, idxCreatedAt: index('idx_error_events_created').on(table.createdAt),
+ idxRoutePath: index('idx_error_events_route').on(table.routePath),
+ idxClusterId: index('idx_error_events_cluster').on(table.clusterId),
+ idxSeverity: index('idx_error_events_severity').on(table.severity),
+ idxCreatedAt: index('idx_error_events_created').on(table.createdAt),
  // Composite: route + cluster for easy grouping
- idxRouteCluster: index('idx_error_events_route_cluster').on(table.routePath: table.clusterId),
+ idxRouteCluster: index('idx_error_events_route_cluster').on(table.routePath, table.clusterId),
  })
 );
 
@@ -96,35 +120,53 @@ export const errorEvents = pgTable(
 export const errorClusters = pgTable(
  'error_clusters',
  {
- id: uuid('id').primaryKey().defaultRandom(, canonicalMessage: text('canonical_message').notNull(, embedding: text('embedding').notNull(), // JSON-serialized vector
+ id: uuid('id').primaryKey().defaultRandom(),
+ canonicalMessage: text('canonical_message').notNull(),
+ embedding: text('embedding').notNull(), // JSON-serialized vector
  embeddingDim: integer('embedding_dim').notNull(), // 384, 768, 1536, etc
- eventCount: integer('event_count').notNull().default(0, affectedRoutes: integer('affected_routes').notNull().default(0, severity: errorSeverityEnum('severity').notNull().default('warn', kind: errorKindEnum('kind').notNull().default('other', suggestedFix: text('suggested_fix'), // LLM-generated or manual
- successRate: decimal('success_rate', { precision: 3, scale: 2 }).default('0.00'), // 0.00-1.00, lastSeenAt: timestamp('last_seen_at').notNull().defaultNow(, createdAt: timestamp('created_at').notNull().defaultNow(),
+ eventCount: integer('event_count').notNull().default(0),
+ affectedRoutes: integer('affected_routes').notNull().default(0),
+ severity: errorSeverityEnum('severity').notNull().default('warn'),
+ kind: errorKindEnum('kind').notNull().default('other'),
+ suggestedFix: text('suggested_fix'), // LLM-generated or manual
+ successRate: decimal('success_rate', { precision: 3, scale: 2 }).default('0.00'), // 0.00-1.00
+ lastSeenAt: timestamp('last_seen_at').notNull().defaultNow(),
+ createdAt: timestamp('created_at').notNull().defaultNow(),
  },
  (table) => ({
- idxSeverity: index('idx_error_clusters_severity').on(table.severity, idxEventCount: index('idx_error_clusters_count').on(table.eventCount, idxLastSeen: index('idx_error_clusters_last_seen').on(table.lastSeenAt),
- })
-);
-
-/**
- * error_suggestions: LLM-generated fix recommendations
- *
- * Keyed by cluster_id, stores patches + risk assessment + test recommendations.
- * User can preview, copy, apply via Phase 90 shield.
- */
+ idxSeverity: index('idx_error_clusters_severity').on(table.severity),
+ idxEventCount: index('idx_error_clusters_count').on(table.eventCount),
 export const errorSuggestions = pgTable(
  'error_suggestions',
  {
- id: uuid('id').primaryKey().defaultRandom(, clusterId: uuid('cluster_id')
+ id: uuid('id').primaryKey().defaultRandom(),
+ clusterId: uuid('cluster_id')
  .notNull()
  .references(() => errorClusters.id, {
  onDelete: 'cascade',
- }, routePath: varchar('route_path', { length: 255 }), // nullable: can apply to multiple routes
+ }),
+ routePath: varchar('route_path', { length: 255 }), // nullable: can apply to multiple routes
  summary: text('summary').notNull(), // One-liner
  patch: text('patch').notNull(), // Unified diff or code block
  riskLevel: varchar('risk_level', { length: 20 }).notNull().default('medium'), // low|medium|high
  affectedFiles: jsonb('affected_files').notNull().default('[]'), // string[]
  testsToRun: jsonb('tests_to_run').notNull().default('[]'), // string[] (jest/vitest paths)
+ confidence: decimal('confidence', { precision: 3, scale: 2 }).notNull().default('0.70'), // 0.00-1.00
+ appliedCount: integer('applied_count').notNull().default(0),
+ approvedBy: uuid('approved_by'), // user_id from Lucia
+ approvedAt: timestamp('approved_at'),
+ createdAt: timestamp('created_at').notNull().defaultNow(),
+ },
+ (table) => ({
+ idxClusterId: index('idx_suggestions_cluster').on(table.clusterId),
+ idxRoutePath: index('idx_suggestions_route').on(table.routePath),
+ idxRiskLevel: index('idx_suggestions_risk').on(table.riskLevel),
+ uniqueRouteCluster: uniqueIndex('uniq_suggestions_route_cluster').on(
+ table.routePath,
+ table.clusterId
+ ),
+ })
+);estsToRun: jsonb('tests_to_run').notNull().default('[]'), // string[] (jest/vitest paths)
  confidence: decimal('confidence', { precision: 3, scale: 2 }).notNull().default('0.70'), // 0.00-1.00, appliedCount: integer('applied_count').notNull().default(0, approvedBy: uuid('approved_by'), // user_id from Lucia
  approvedAt: timestamp('approved_at', createdAt: timestamp('created_at').notNull().defaultNow(),
  },
@@ -145,9 +187,14 @@ export const errorSuggestions = pgTable(
 export const errorPatchLog = pgTable(
  'error_patch_log',
  {
- id: uuid('id').primaryKey().defaultRandom(, suggestionId: uuid('suggestion_id')
+ id: uuid('id').primaryKey().defaultRandom(),
+ suggestionId: uuid('suggestion_id')
  .notNull()
- .references(() => errorSuggestions.id, { onDelete: 'restrict' }, clusterId: uuid('cluster_id').notNull(, routePath: varchar('route_path', { length: 255 }).notNull(, file: varchar('file', { length: 500 }).notNull(, originalContent: text('original_content'), // For rollback
+ .references(() => errorSuggestions.id, { onDelete: 'restrict' }),
+ clusterId: uuid('cluster_id').notNull(),
+ routePath: varchar('route_path', { length: 255 }).notNull(),
+ file: varchar('file', { length: 500 }).notNull(),
+ originalContent: text('original_content'), // For rollback
  patchedContent: text('patched_content', appliedBy: uuid('applied_by').notNull(), // Lucia user_id
  status: varchar('status', { length: 20 }).notNull().default('applied'), // applied|rolled_back|reverted
  reason: text('reason'), // Why it was applied / reverted

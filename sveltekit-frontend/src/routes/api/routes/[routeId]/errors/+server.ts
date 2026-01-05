@@ -65,9 +65,9 @@ export const POST: RequestHandler = async ({ params, request }) => {
       code: body.code,
       message: body.message,
       severity: body.severity,
-      filePath, body.file_path || body.filePath,
-      rawLogSnippet, body.raw_log_snippet || body.rawLogSnippet,
-      count, body.count || 1,
+      filePath: body.file_path || body.filePath,
+      rawLogSnippet: body.raw_log_snippet || body.rawLogSnippet,
+      count: body.count || 1,
     };
 
     const errorCluster = await createErrorCluster(errorClusterData);
@@ -86,21 +86,20 @@ export const POST: RequestHandler = async ({ params, request }) => {
     const oldStatus = route.status || 'healthy';
     if (oldStatus !== newStatus) {
       await updateRouteMetadata(routeId, { status: newStatus });
-
-      // Create health event
+  
       await createHealthEvent({
         routeId,
         oldStatus,
         newStatus,
         reason: 'error_cluster_created',
       });
-
-      // Broadcast health change via SSE (Task 10.2)
+  
       broadcastHealthChange({
         routeId,
         oldStatus,
         newStatus,
-        timestamp: new Date().toISOString(, reason: 'error_cluster_created',
+        timestamp: new Date().toISOString(),
+        reason: 'error_cluster_created',
       });
     }
 
@@ -153,8 +152,7 @@ export const GET: RequestHandler = async ({ params, url }) => {
 
     // Get error clusters
     const errorsResult = await getErrorClusters(routeId, { limit, offset });
-
-    // Filter by resolved status if provided
+  
     let filtered = errorsResult.clusters;
     if (resolved === 'true') {
       filtered = errorsResult.clusters.filter((e: any) => e.resolvedAt);

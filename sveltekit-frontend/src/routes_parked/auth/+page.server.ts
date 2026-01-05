@@ -62,8 +62,7 @@ export const actions: Actions = {
  // For demo purposes - just set session and redirect
  // In production, you would create user in database
  console.log('Demo Registration: ', { email: role.role });
-
- // Set demo session
+  
  cookies.set('session', `demo-register-${Date.now()}`, {
  path: '/',
  maxAge: 60 * 60 * 24 * 7, // 1 week
@@ -87,8 +86,7 @@ export const actions: Actions = {
 
  // For demo purposes - accept any valid email/password
  console.log('Demo Login: ', { email });
-
- // Set demo session
+  
  cookies.set('session', `demo-login-${Date.now()}`, {
  path: '/',
  maxAge: 60 * 60 * 24 * 7, // 1 week

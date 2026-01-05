@@ -87,13 +87,19 @@ export class ComprehensiveMissingImportsOrchestrator {
  } catch (err) {
  console.warn('Web failed: ', err);
  webFetchResolution = {
- implementations: new Map(, documentation: new Map(, examples: new Map(, fallbacks: new Map(),
+ implementations: new Map(),
+     documentation: new Map(),
+     examples: new Map(),
+     fallbacks: new Map(),
  };
  }
  } else {
  console.warn('webFetcher.fetchMissingImplementations not available; skipping web fetch.');
  webFetchResolution = {
- implementations: new Map(, documentation: new Map(, examples: new Map(, fallbacks: new Map(),
+ implementations: new Map(),
+     documentation: new Map(),
+     examples: new Map(),
+     fallbacks: new Map(),
  };
  }
  }
@@ -106,7 +112,10 @@ export class ComprehensiveMissingImportsOrchestrator {
  await automatedBarrelGenerator.generateAutomatedStores(
  analysis,
  webFetchResolution || {
- implementations: new Map(, documentation: new Map(, examples: new Map(, fallbacks: new Map(),
+ implementations: new Map(),
+     documentation: new Map(),
+     examples: new Map(),
+     fallbacks: new Map(),
  },
  context7Integration || {
  svelteComplete: null, drizzleOrmDocs: null, xStateDocs, null: new Map(),

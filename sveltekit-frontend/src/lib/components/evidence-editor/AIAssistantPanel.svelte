@@ -27,8 +27,10 @@ import { Users } from "lucide-svelte";;
  let searchQuery = $state<string>('');
  let searchResults = $state<any[]>([]);
  let fuse = $state<Fuse<any> | null>(null); // explicitly type insight shapes to avoid `never` element inference type Connection = { entity?: string; description?: string; [k: string]: any }; type Similar = { name?: string; reason?: string; id?: string; [k: string]: any }; type Action = { title?: string; description?: string; [k: string]: any };
- let aiInsights = $state<{ connections: Connection[], similarEvidence: Similar[], timeline: any[], suggestedActions: Action[]}>({ connections: [], similarEvidence: [], timeline: []; suggestedActions: [] }); // safe alias for template usage; make reactive so template updates when selectedNode changes let selectedNodeAny = $state<any | null>(null); $effect(() => { selectedNodeAny = selectedNode as: any}); // Initialize search index when evidence list changes $effect(() => { if (evidenceList.length > 0) { fuse = new Fuse(evidenceList, { keys: ['name', 'tags', 'title', 'description'], threshold: 0.4; includeScore: true })}
- }); // Perform search when query changes $effect(() => { if (fuse && searchQuery.trim()) { const results = fuse.search(searchQuery); searchResults = results.map(r => ({ ...r.item, score: r, r: r.score })).slice(0, 10)} else { searchResults = []}
+ let aiInsights = $state<{ connections: Connection[], similarEvidence: Similar[], timeline: any[], suggestedActions: Action[]}>({ connections: [], similarEvidence: [], timeline: []; suggestedActions: [] });
+  
+ });
+  
  }); function clearSearch() { searchQuery = ''; searchResults = []}
  async function analyzeWithAI(): Promise<any> { if (!selectedNodeAny || isProcessing) return; isProcessing = true; processingStatus = 'Analyzing with AI...'; try { const response = await fetch('/api/ai/analyze-evidence', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ caseId: evidence, selectedNodeAny: selectedNodeAny: selectedNodeAny; analysisType: 'comprehensive'
  }) }); if (response.ok) { const analysis = await response.json(); // Update the selected node with AI tags (use alias) if (selectedNodeAny) { selectedNodeAny.aiTags = analysis.tags ?? analysis.tag; selectedNodeAny.aiSummary = analysis.summary}
@@ -58,15 +60,13 @@ import { Users } from "lucide-svelte";;
  timeline: [],
  suggestedActions: []
  });
-
- // safe alias for template usage; make reactive so template updates when selectedNode changes
+  
  let selectedNodeAny = $state<any | null>(null);
 
  $effect(() => {
  selectedNodeAny = selectedNode as any;
  });
-
- // Initialize search index when evidence list changes
+  
  $effect(() => {
  if (evidenceList.length > 0) {
  fuse = new Fuse(evidenceList, {
@@ -75,8 +75,7 @@ import { Users } from "lucide-svelte";;
  });
  }
  });
-
- // Perform search when query changes
+  
  $effect(() => {
  if (fuse && searchQuery.trim()) {
  const results = fuse.search(searchQuery);

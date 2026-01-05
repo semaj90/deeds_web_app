@@ -55,8 +55,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
  includeTimeline,
  analysisDepth,
  });
-
- // Log the summary generation request
+  
  await auditService.logSummaryOperation(
  user.id,
  caseId,

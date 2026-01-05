@@ -231,7 +231,8 @@ export const gpuProcessingMachine = setup({
  initial: 'idle',
  context: {
  processingQueue: [],
- activeProcessing: new Map(, completedDocuments: [],
+ activeProcessing: new Map(),
+     completedDocuments: [],
  errorDocuments: [],
  serviceHealth: {
  gpu: 'healthy',
@@ -320,8 +321,7 @@ export const gpuProcessingMachine = setup({
  },
  },
 });
-
-// Actor Factory
+  
 export const createGPUProcessingActor = () => {
  return createActor(gpuProcessingMachine);
 };

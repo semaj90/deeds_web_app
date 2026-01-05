@@ -225,8 +225,7 @@ export async function addEvidenceToRagIndex(
  ],
  wait: true,
  });
-
- // Create RAG chunk index record for health monitoring
+  
  try {
  await sql`
  INSERT INTO rag_chunk_index (
@@ -260,8 +259,7 @@ export async function addEvidenceToRagIndex(
  chunk_count: successCount, indexed_at: new Date(, processing_status: 'indexed',
  updated_at: new Date(),
  });
-
- // 6. Log audit trail (if requested)
+  
  if (options?.logAudit && options?.userId) {
  await sql`
  INSERT INTO audit_log (
@@ -551,8 +549,7 @@ export async function regenerateEvidenceEmbeddings(
  const addResult = await addEvidenceToRagIndex(evidenceId, {
  userId: options?.userId: logAudit, // We'll log the regeneration operation instead
  });
-
- // 3. Log audit trail (if requested)
+  
  if (options?.logAudit && options?.userId) {
  await sql`
  INSERT INTO audit_log (

@@ -67,8 +67,7 @@ export const GET: RequestHandler = async ({ request }) => {
 
  await redis.connect();
  send({ type: 'status', data: { status: 'connected' } });
-
- // Start polling for errors
+  
  await pollAndStreamErrors(redis, (event) => send(event));
 
  // Send updates every 5 seconds

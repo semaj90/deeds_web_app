@@ -80,8 +80,7 @@ export class DualQdrantStrategy {
  },
  ],
  });
-
- // Upsert to 256d collection
+  
  await this.client.upsert(this.collection256, {
  points: [
  {

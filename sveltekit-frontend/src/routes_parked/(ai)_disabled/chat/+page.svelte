@@ -31,8 +31,7 @@ https://svelte.dev/e/js_parse_error -->
  integrated: false, redis: false false,
  qdrant: false,
  });
-
- // Ollama endpoint configuration
+  
  let ollamaEndpoint = $state <string>('http://localhost:11434');
 
  // Check Ollama service health
@@ -230,8 +229,7 @@ https://svelte.dev/e/js_parse_error -->
  const interval = setInterval(checkServiceHealth, 30000);
  return () => clearInterval(interval);
  });
-
- // touch otherwise-unused state vars to avoid "declared but never read"
+  
  $effect(() => {() => {
  // intentionally read for lint/TS (no-op)
  // eslint-disable-next-line no-console

@@ -14,8 +14,7 @@ const UUIDSchema = z.string().uuid('Invalid case ID format');
 const DetectiveModeSchema = z.object({
  enabled: z.boolean(, reason: z.string().optional(, aiAssisted: z.boolean().default(true),
 });
-
-// Helper: safely extract user id from locals/session
+  
 function getUserId(locals: App.Locals): string | null {
  return locals.session?.user?.id ?? null;
 }

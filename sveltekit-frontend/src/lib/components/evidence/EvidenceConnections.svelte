@@ -151,8 +151,7 @@
  const unsubscribeConnections = connections.subscribe(() => {
  setTimeout(drawConnections, 0);
  });
-
- // Handle window resize
+  
  const handleResize = () => resizeCanvas();
  window.addEventListener('resize', handleResize);
 

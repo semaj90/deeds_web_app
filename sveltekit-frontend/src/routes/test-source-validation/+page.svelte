@@ -111,8 +111,7 @@ function extractEntities(text: string): string[] {
 			matches.forEach((match) => entities.add(match));
 		}
 	});
-
-	// Capitalized words
+  
 	const capitalizedWords = text.match(/\b[A-Z][a-z]+(?:\s+[A-Z][a-z]+)*\b/g);
 	if (capitalizedWords) {
 		capitalizedWords.forEach((word) => {

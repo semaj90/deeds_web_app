@@ -105,8 +105,7 @@ import { X } from "lucide-svelte";;
  previousFocus.focus();
  }
  });
-
- // Event listeners
+  
  $effect(() => {
  document.addEventListener('keydown', handleKeydown);
 

@@ -46,8 +46,7 @@ export class DashboardErrorHandler {
  error: error.message,
  eventData: timestamp Date().toISOString(),
  });
-
- // Log to error tracking service if available
+  
  this.logToErrorTracking({
  type: 'parsing_error',
  message: error.message,
@@ -85,8 +84,7 @@ export class DashboardErrorHandler {
  type: 'processing_error',
  ...context,
  });
-
- // If not recoverable, notify user
+  
  if (!context.recoverable) {
  this.notifyUser({
  type: 'error',

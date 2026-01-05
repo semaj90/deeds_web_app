@@ -138,8 +138,7 @@ export const getEnvironmentInfo = () => ({
 	cudaEnabled: CONFIG.ENABLE_CUDA,
 	quicEnabled: CONFIG.QUIC_ENABLED,
 });
-
-// Provide backward-compatible alias helpers for legacy call sites.
+  
 // These mirror old env names to the canonical keys in CONFIG.
 export const LEGACY = {
 	DATABASE_URL: CONFIG.DATABASE_URL ?? CONFIG.POSTGRES_URL,

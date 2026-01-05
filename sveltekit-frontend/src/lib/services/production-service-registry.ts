@@ -211,7 +211,7 @@ export class ProductionServiceRegistry {
                 proxyConfig[route] = `${protocol}://localhost:${service.port}`;
             }
         });
-        // Add external services
+  
         proxyConfig['/api/ollama'] = 'http://localhost:11434';
         proxyConfig['/api/neo4j'] = 'http://localhost:7474';
         proxyConfig['/api/minio'] = 'http://localhost:9000';

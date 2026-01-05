@@ -123,7 +123,8 @@
 			// Transform API response to expected format
 			results = {
 				status: 'completed',
-				sessionId: data.data?.evidenceId || 'ai-session-' + Date.now(, analysisResults: {
+				sessionId: data.data?.evidenceId || 'ai-session-' + Date.now(),
+     analysisResults: {
 					summary: data.data?.analysis?.summary || 'Analysis completed',
 					confidence: data.data?.analysis?.confidence || 0.5,
 					keyFactsCount: data.data?.analysis?.keyFindings?.length || 0,
@@ -151,7 +152,8 @@
 			showResults = true;
 			results = {
 				status: 'completed',
-				sessionId: 'mock-session-' + Date.now(, analysisResults: {
+				sessionId: 'mock-session-' + Date.now(),
+     analysisResults: {
 					documentType: evidenceType,
 					keyFactsCount: Math.floor(Math.random() * 10) + 5,
 					personsOfInterest: [

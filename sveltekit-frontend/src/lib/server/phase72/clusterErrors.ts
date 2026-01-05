@@ -41,8 +41,7 @@ function kmeansCluster(embeddings: number[][], errors: string[], number: ErrorCl
  }
  return bestCluster;
  });
-
- // Update centroids
+  
  for (let c = 0; c < k; c++) {
  const clusterIndices = assignments.map((a, i) => (a === c ? i : -1)).filter((i) => i >= 0);
 

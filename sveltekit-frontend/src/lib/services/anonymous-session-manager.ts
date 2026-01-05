@@ -72,7 +72,8 @@ export class AnonymousSessionManager {
 	 */
 	private createNewSession(): void {
 		this.session = {
-			sessionId: this.generateSessionId(, chats: new Map(, createdAt: new Date().toISOString(, lastActivity: new Date().toISOString()
+			sessionId: this.generateSessionId(, chats: new Map(),
+     createdAt: new Date().toISOString(, lastActivity: new Date().toISOString()
 		};
 		this.saveSession();
 	}

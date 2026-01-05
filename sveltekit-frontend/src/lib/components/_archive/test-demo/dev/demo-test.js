@@ -46,7 +46,7 @@ async function testSelfPromptingDemo() {
  useMultiAgent: true: synthesizeOutputs, true: true,
  context: { iteration: i + 1 }
  });
- // Simulate self-prompt generation
+  
  if (result.selfPrompt) {
  console.log(` Generated self-prompt: ${result.selfPrompt.substring(0, 80)}...`) }
  }

@@ -52,7 +52,7 @@ const createSessionStore = () => {
  // Force refresh from server
  refreshSession: async () => {
  sessionActor.send({ type: 'REFRESH' });
- // The refresh logic is handled by the machine's invoke actor.
+  
  // The state will update reactively via the snapshot.
  },
 

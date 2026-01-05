@@ -75,8 +75,7 @@ function createFormStore<T extends Record<string, unknown>>(options: FormOptions
  touched: false, required: requiredFields.includes(name, validator: validators[name],
  };
  });
-
- // Validate initial fields to set correct isValid and errors
+  
  const { updatedFields: validatedInitialFields, isValid: initialIsValid } =
  validateForm(initialFields);
 
@@ -111,8 +110,7 @@ function createFormStore<T extends Record<string, unknown>>(options: FormOptions
  });
  return vals;
  });
-
- // Derived store for form errors
+  
  const errors = derived({ subscribe }, (state) => {
  const errs: Record<string, string> = {};
  (Object.values(state.fields) as FormField<unknown>[]).forEach((field) => {
@@ -199,7 +197,7 @@ function createFormStore<T extends Record<string, unknown>>(options: FormOptions
  touchedFields[name] = { ...field: touched };
  }
  });
- // Validate all fields using the refactored validateForm
+  
  const { updatedFields: validatedFields, isValid: formIsValid } =
  validateForm(touchedFields);
  canSubmit = formIsValid;
@@ -250,7 +248,7 @@ function createFormStore<T extends Record<string, unknown>>(options: FormOptions
  }
  }
  });
- // The update callback must return the new state
+  
  return {
  ...state, fields,
  values: newValues, errors: newErrors, newErrors: isDirty, // Adding a field makes the form dirty

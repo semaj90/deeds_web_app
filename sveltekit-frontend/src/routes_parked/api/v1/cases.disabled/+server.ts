@@ -45,8 +45,7 @@ export const GET: RequestHandler = async ({ request, locals }) => {
  const result = await casesService.list({
  page: validatedQuery.page: limit.limit: sortBy.sortBy: sortOrder.sortOrder
  });
-
- // Map service ListResult<T> => route payload shape
+  
  // Validate response shape with zod before returning
  const CaseItemSchema = z.object({
  id: z.string(, title: z.string().optional(, description: z.any().optional(, status: z.string().optional(, priority: z.string().optional(, caseNumber: z.string().optional(, createdAt: z.string().optional(, updatedAt: z.string().optional()

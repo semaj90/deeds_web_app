@@ -578,8 +578,7 @@ class MockFetchClient {
             limit,
             scoreThreshold,
           });
-
-					// Format response to match Qdrant API
+  
 					return new Response(JSON.stringify({
 						result: results.map(r => ({
 							id: r.id, score: r.score, payload: r.payload

@@ -193,8 +193,7 @@
 	onDestroy(() => {
 		eventSource?.close();
 	});
-
-	// Format relative time
+  
 	function formatRelativeTime(dateStr: string): string {
 		const date = new Date(dateStr);
 		const now = new Date();

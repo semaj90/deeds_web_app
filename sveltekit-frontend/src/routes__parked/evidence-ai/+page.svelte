@@ -30,8 +30,7 @@ import { onMount } from 'svelte';
  progress: 0,
  status: 'pending'
  });
-
- // Backend health state
+  
  let backendStatus = $state <{
  typescript: boolean
  pythonAI: boolean
@@ -41,8 +40,7 @@ import { onMount } from 'svelte';
  advancedAI: false,
  capabilities: []
  });
-
- // AI streaming state
+  
  let streamingTokens = $state <string>('');
  let isStreaming = $state <boolean>(false);
  let aiSource = $state <'ollama' | 'tensorrt' | 'typescript-fallback' | 'advanced-ai' | null>(null);
@@ -437,8 +435,7 @@ import { onMount } from 'svelte';
  }
  };
  });
-
- // onMount: health check, connect WS if available, heartbeat and cleanup
+  
  onMount(() => {
  let mounted = true;
  (async () => {
@@ -476,8 +473,7 @@ import { onMount } from 'svelte';
  if (searchTimeout) clearTimeout(searchTimeout);
  };
  });
-
- // ======================
+  
  // HELPER FUNCTIONS
  // ======================
 

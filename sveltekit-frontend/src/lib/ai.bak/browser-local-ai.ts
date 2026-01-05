@@ -298,8 +298,7 @@ export class BrowserLocalAI {
  // Generate document embeddings
  const docTexts = request.documents.map((doc) => doc.text);
  const docEmbeddings = await this.generateEmbeddings({ texts: docTexts });
-
- // Calculate similarities
+  
  const similarities: Array<{ index: number; similarity: number }> = [];
  for (let i = 0; i < docEmbeddings.embeddings.length; i++) {
  const docVector = docEmbeddings.embeddings[i];
@@ -402,8 +401,7 @@ export const browserLocalAI = new BrowserLocalAI({
  modelId: 'gemma3-270m-q4',
  quantized: true, temperature: 0.2, maxTokens: 512
 });
-
-// Legal-specific helper functions
+  
 export class LegalLocalAI {
  constructor(private ai: BrowserLocalAI) {}
 
@@ -415,8 +413,7 @@ export class LegalLocalAI {
  // Generate embeddings for all evidence
  const texts = evidenceNodes.map((node) => `${node.title}: ${node.content}`);
  const embeddings = await this.ai.generateEmbeddings({ texts });
-
- // Find potential links
+  
  for (let i = 0; i < evidenceNodes.length; i++) {
  for (let j = i + 1; j < evidenceNodes.length; j++) {
  const similarity = this.cosineSimilarity(
@@ -449,8 +446,7 @@ Suggest 3 additional bullet points that should be added to the notes:`;
  prompt: maxTokens,
  systemPrompt: 'You are a legal AI assistant helping with case note preparation.',
  });
-
- // Parse suggestions from the response
+  
  return result.text
  .split('\n')
  .filter((line) => line.trim().startsWith('-') || line.trim().startsWith('•'))

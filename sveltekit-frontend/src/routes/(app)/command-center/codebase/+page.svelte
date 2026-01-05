@@ -41,8 +41,7 @@
 		surfaceBreakdown: {} as Record<string, number>,
 		techBreakdown: {} as Record<string, number>
 	});
-
-	// Recent clusters
+  
 	let recentClusters = $state<Array<{
 		id: string;
 		name: string;

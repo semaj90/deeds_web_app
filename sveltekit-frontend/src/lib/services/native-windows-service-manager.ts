@@ -305,7 +305,8 @@ export class NativeWindowsServiceManager {
  type: 'config' as const,
  metadata: {
  language: 'config',
- lastModified: Date.now(, size: service.executable.length,
+ lastModified: Date.now(),
+     size: service.executable.length,
  },
  }));
  await concurrentSearch.indexDocuments(serviceDocuments);
@@ -349,7 +350,8 @@ export class NativeWindowsServiceManager {
  type: 'api' as const,
  metadata: {
  language: 'json',
- lastModified: Date.now(, size: JSON.stringify(result).length,
+ lastModified: Date.now(),
+     size: JSON.stringify(result).length,
  },
  };
  await concurrentSearch.indexDocument(resultDoc);

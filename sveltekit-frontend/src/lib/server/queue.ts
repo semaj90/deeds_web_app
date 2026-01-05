@@ -117,8 +117,7 @@ async function processRagIndexingJob(payload: any): Promise<void> {
  },
  ],
  });
-
- // Update database with extracted text
+  
  const { sql } = await import('$lib/server/db');
  try {
  await sql`UPDATE evidence_files SET extracted_text = ${text}, updated_at = NOW() WHERE chat_turn_id = ${chatTurnId} AND minio_object_name = ${obj.objectName}`;

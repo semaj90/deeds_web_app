@@ -222,8 +222,7 @@ export async function buildKagGraph(
  id: routeId, label: routePath,
  kind: 'route',
  });
-
- // 2. File node(s)
+  
  const frontendDir = path.resolve(__dirname, '../sveltekit-frontend');
  const possibleFiles = [
  `src/routes${routePath}/+page.svelte`,
@@ -264,8 +263,7 @@ export async function buildKagGraph(
  id: tableId, label: table,
  kind: 'table',
  });
-
- // Connect file to table
+  
  for (const node of nodes.filter((n) => n.kind === 'file')) {
  edges.push({
  from: node.id, tableId:
@@ -313,8 +311,7 @@ export async function buildKagGraph(
  id: testId, label: testFile,
  kind: 'test',
  });
-
- // Connect route to test
+  
  edges.push({
  from: routeId, to: testId,
  label: 'tested_by',

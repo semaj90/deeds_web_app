@@ -218,8 +218,7 @@ export async function phase90_search_errors(
     filter,
     with_payload: true
   });
-
-  // Filter by message content (basic text match as fallback)
+  
   const queryLower = query.toLowerCase();
   const filtered = results.points
     .filter(p => {

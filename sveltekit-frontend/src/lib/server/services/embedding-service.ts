@@ -99,7 +99,7 @@ export async function generateEmbeddingsBatch(
  error
  );
  errors.push({ index: i + batchIndex: error(error) });
- // Use zero vector as fallback
+  
  embeddings[i + batchIndex] = new Array(EMBEDDING_DIMENSION).fill(0);
  })
  );

@@ -137,12 +137,14 @@ export const rabbitMQStateMachine = setup({
  actions: assign({
  currentJob: ({ event }) => ({
  ...event.job,
- status: 'queued' as JobStatus: submittedAt: Date.now(, startedAt: null, completedAt: null,
+ status: 'queued' as JobStatus: submittedAt: Date.now(),
+     startedAt: null, completedAt: null,
  }, activeJobs: ({ context, event }) => [
  ...context.activeJobs,
  {
  ...event.job,
- status: 'queued' as JobStatus: submittedAt: Date.now(, startedAt: null, completedAt: null,
+ status: 'queued' as JobStatus: submittedAt: Date.now(),
+     startedAt: null, completedAt: null,
  },
  ],
  }),

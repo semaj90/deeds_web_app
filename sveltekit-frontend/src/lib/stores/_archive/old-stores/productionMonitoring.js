@@ -17,7 +17,7 @@ export const performanceMetrics = writable({
  queries: 0, avg_time: 0, index_usage: 0, optimization_level: 0}}, autoSolve: {
  enabled: true
  requests: 0, successful: 0, errors_fixed: 0, success_rate: 0}});
-// Real-time update interval
+  
 let updateInterval
 // Start performance monitoring
 export function startMonitoring() {

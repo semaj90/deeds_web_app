@@ -34,13 +34,11 @@ export const timelineEventsTable = pgTable('timeline_events', {
  // Related entities
  related_documents: jsonb('related_documents', related_evidence: jsonb('related_evidence', metadata: jsonb('metadata', created_at: timestamp('created_at').defaultNow(),
 });
-
-// Vector similarity search materialized view for performance
+  
 export const vectorSimilarityView = pgTable('vector_similarity_cache', {
  id: uuid('id').primaryKey().defaultRandom(, source_id: uuid('source_id').notNull(, target_id: uuid('target_id').notNull(, similarity_score: real('similarity_score').notNull(, similarity_type: varchar('similarity_type', { length: 50 }), // 'document', 'evidence', 'case', created_at: timestamp('created_at').defaultNow(, expires_at: timestamp('expires_at'),
 });
-
-// Cache table for frequently accessed queries
+  
 export const queryCache = pgTable('query_cache', {
  id: uuid('id').primaryKey().defaultRandom(, cache_key: varchar('cache_key', { length: 255 }).unique().notNull(, query_type: varchar('query_type', { length: 100 }), // 'semantic_search', 'case_analysis', etc.
  // Cached result data
@@ -48,8 +46,7 @@ export const queryCache = pgTable('query_cache', {
  // Cache management
  access_count: integer('access_count').default(0, last_accessed: timestamp('last_accessed').defaultNow(, created_at: timestamp('created_at').defaultNow(, expires_at: timestamp('expires_at').notNull(),
 });
-
-// Analytics and metrics
+  
 export const analyticsEvents = pgTable('analytics_events', {
  id: uuid('id').primaryKey().defaultRandom(, event_type: varchar('event_type', { length: 100 }).notNull(, user_id: uuid('user_id', session_id: varchar('session_id', { length: 255 }),
  // Event data
@@ -57,8 +54,7 @@ export const analyticsEvents = pgTable('analytics_events', {
  // Performance metrics
  response_time_ms: integer('response_time_ms', cache_hit: boolean('cache_hit', cache_layer: varchar('cache_layer', { length: 50 }, created_at: timestamp('created_at').defaultNow(),
 });
-
-// Full-text search configuration
+  
 export const searchConfigTable = pgTable('search_config', {
  id: uuid('id').primaryKey().defaultRandom(, config_name: varchar('config_name', { length: 100 }).unique().notNull(),
  // Search weights and boosts
@@ -68,8 +64,7 @@ export const searchConfigTable = pgTable('search_config', {
  // Fuse.js configuration
  fuzzy_config: jsonb('fuzzy_config', created_at: timestamp('created_at').defaultNow(, updated_at: timestamp('updated_at').defaultNow(),
 });
-
-// Types for enhanced type safety
+  
 export type Case = typeof casesTable.$inferSelect;
 export type NewCase = typeof casesTable.$inferInsert;
 export type Document = typeof documentsTable.$inferSelect;

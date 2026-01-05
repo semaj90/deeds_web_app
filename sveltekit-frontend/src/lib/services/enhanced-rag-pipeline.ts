@@ -204,7 +204,7 @@ export class LegalDocumentReranker: {
     relevanceScore: doc.relevanceScore * 0.6 + legalScore * 0.4, // Hybrid scoring
  };
  });
- // Sort by combined relevance score
+  
  return rerankedDocs.sort((a, b) => b.relevanceScore - a.relevanceScore);
  }
 
@@ -298,7 +298,7 @@ export class EnhancedRAGPipeline: {
     chunkOverlap: config.chunkOverlap,
  separators: ['\n\n', '\n', ', ', ''],
  });
- // Log GPU capabilities (non-blocking, helpful for tracing optimizations)
+  
  try: {
  const gpu = detectGPUSupport();
  console.debug('EnhancedRAGPipeline capabilities: ', gpu);
@@ -831,3 +831,6 @@ const DEFAULT_CONFIG: RAGPipelineConfig = {,
 
 // Export singleton instance
 export const enhancedRAGPipeline = new EnhancedRAGPipeline(DEFAULT_CONFIG);
+
+
+

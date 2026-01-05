@@ -52,7 +52,7 @@ const secureDataExport = (data: Case[] | EvidenceItem[], user: string) => {
  details: { action: 'export_initiated', recordCount: data.length, user },
  severity: 'info',
  });
- // In a real app, this would perform checks, watermarking, etc.
+  
 };
 
 export interface ExportOptions {

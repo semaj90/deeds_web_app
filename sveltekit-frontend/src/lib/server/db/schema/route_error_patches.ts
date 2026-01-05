@@ -11,7 +11,8 @@ export const routeErrorPatchesTable = pgTable(
  id: uuid('id').defaultRandom().primaryKey(),
 
  // Which route this patch is for
- routePath: text('route_path').notNull(, filePath: text('file_path').notNull(),
+ routePath: text('route_path').notNull(),
+ filePath: text('file_path').notNull(),
 
  // Which error cluster this patch addresses
  clusterId: text('cluster_id'),
@@ -20,13 +21,17 @@ export const routeErrorPatchesTable = pgTable(
  analysisId: uuid('analysis_id'),
 
  // The patch itself (unified diff format or code block)
- patchContent: text('patch_content').notNull(, description: text('description'), // Why this patch was proposed
+ patchContent: text('patch_content').notNull(),
+ description: text('description'), // Why this patch was proposed
 
  // Risk assessment
- riskLevel: text('risk_level').notNull().default('medium'), // "low" | "medium" | "high", affectedComponentCount: text('affected_component_count'), // How many components might be touched
+ riskLevel: text('risk_level').notNull().default('medium'), // "low" | "medium" | "high"
+ affectedComponentCount: text('affected_component_count'), // How many components might be touched
 
  // Status tracking
- status: text('status').notNull().default('proposed'), // "proposed" | "reviewed" | "applied" | "rejected", appliedAt: timestamp('applied_at', { withTimezone: true }, appliedByUserId: text('applied_by_user_id'),
+ status: text('status').notNull().default('proposed'), // "proposed" | "reviewed" | "applied" | "rejected"
+ appliedAt: timestamp('applied_at', { withTimezone: true }),
+ appliedByUserId: text('applied_by_user_id'),
 
  // Verification tracking (Phase 9)
  verificationStatus: text('verification_status').default('pending'), // "pending" | "passed" | "failed", verificationTimestamp: timestamp('verification_timestamp', { withTimezone: true }, verificationMessage: text('verification_message'),

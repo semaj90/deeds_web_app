@@ -172,8 +172,7 @@ export class SvelteCheckAnalyzer {
  }, returnType: func.getReturnType().getText(, isAsync: func.isAsync(, isExported: func.isExported(),
  });
  });
-
- // Arrow functions in variable declarations
+  
  sourceFile.getVariableDeclarations().forEach((decl) => {
  const init = decl.getInitializer();
  if (init?.getKind() === SyntaxKind.ArrowFunction) {

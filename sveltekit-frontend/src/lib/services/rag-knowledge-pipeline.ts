@@ -352,8 +352,7 @@ export class RAGKnowledgePipeline: {
     embedding: doc.embedding, entities.entities: keyPoints.keyPoints: source.source,
  },
  });
-
- // 2. Ripgrep keyword extraction
+  
  const ripgrepKeywords = await this.extractRipgrepKeywords(doc);
 
  // 3. Searchable text compilation

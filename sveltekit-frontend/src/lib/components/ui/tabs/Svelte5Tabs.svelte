@@ -39,8 +39,7 @@ $effect(() => {
 		value = tabs[0].id;
 	}
 });
-
-// Tab context for child TabPanel components
+  
 setContext('tabs', {
 	get activeTab() { return value; },
 	setActiveTab: (id: string) => {
@@ -48,8 +47,7 @@ setContext('tabs', {
 		onchange?.(id);
 	}
 });
-
-// Derived classes
+  
 let orientationClasses = $derived(
 	orientation === 'vertical'
 		? 'flex-col'

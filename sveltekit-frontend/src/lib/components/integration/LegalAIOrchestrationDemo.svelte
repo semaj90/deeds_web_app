@@ -17,8 +17,7 @@ Shows complete workflow from user input to AI-powered results -->
  let legalResearchForm = $state({ query: '', jurisdiction: 'federal', userRole: 'attorney', maxResults: 10 });
  let documentProcessingForm = $state({ content: '', documentType: 'contract', documentId: '' });
  let caseCreationForm = $state({ title: '', description: '', caseType: 'civil', jurisdiction: 'federal', clientId: '' });
-
- // Reactive derived values
+  
  const systemHealth = $healthStore;
  const currentWorkflow = $currentWorkflowStore;
  const workflows = $workflowStore;

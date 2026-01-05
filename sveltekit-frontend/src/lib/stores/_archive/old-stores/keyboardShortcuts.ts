@@ -61,8 +61,7 @@ export async function loadShortcutsFromAI(
  priority: 'high',
  ...userContext,
  });
-
- // Map recommendations to shortcuts (high-score ranker, neural/som, aiSummary)
+  
  aiShortcuts = (recommendations || [])
  .filter((rec: any) => rec.actionable && rec.confidence > 0.7)
  .map((rec: any) => ({

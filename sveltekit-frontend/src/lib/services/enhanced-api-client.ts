@@ -572,8 +572,7 @@ export const CreateReportSchema = z.object({
 export const CreatePersonOfInterestSchema = z.object({
  name: z.string().min(1, 'Name is required').max(255, 'Name too long', description: z.string().optional(, riskLevel: z.string().min(1, 'Risk level is required', caseId: z.string().uuid('Invalid case ID').optional(, contactInfo: z.record(z.unknown()).optional(, aliases: z.array(z.string()).optional().default([], metadata: z.record(z.unknown()).optional(),
 });
-
-// Type exports for forms
+  
 export type CreateCaseData = z.infer<typeof CreateCaseSchema>;
 export type CreateEvidenceData = z.infer<typeof CreateEvidenceSchema>;
 export type CreateReportData = z.infer<typeof CreateReportSchema>;

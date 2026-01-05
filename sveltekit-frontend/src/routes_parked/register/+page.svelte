@@ -22,8 +22,7 @@ https://svelte.dev/e/style_duplicate -->
  message: 'You must agree to the terms and conditions',
  path: ['terms']
  });
-
- // Initialize superForm with Svelte 5 runes
+  
  let { form, errors, enhance, message } = superForm({
  email: '',
  password: '',
@@ -33,8 +32,7 @@ https://svelte.dev/e/style_duplicate -->
  validators: zod(baseRegisterSchema as z.ZodObject<any>, resetForm: true,
  taintedMessage: null
  });
-
- // Password strength indicator
+  
  let passwordStrength = $derived (() => {
  const password = $form .password || '';
  let strength = 0;
@@ -47,8 +45,7 @@ https://svelte.dev/e/style_duplicate -->
 
  return strength;
  });
-
- // Handle login link
+  
  function handleLoginLink() {
  goto('/login');
  }

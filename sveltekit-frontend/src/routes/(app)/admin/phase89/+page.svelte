@@ -39,8 +39,7 @@
 			});
 		}
 	});
-
-	// Graph state
+  
 	let graphNodes = $state<GraphNode[]>([]);
 	let graphEdges = $state<GraphEdge[]>([]);
 

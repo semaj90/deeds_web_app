@@ -73,8 +73,7 @@ describe('AceContextService', () => {
       qdrantUrl: 'http://localhost:6333',
       maxRetries: 3, retryDelayMs: 1000
     });
-
-    // Get mock instances
+  
     const { EmbeddingService } = require('../error-analysis/embedding-service');
     const { QdrantService } = require('./qdrant-service');
     mockEmbeddingService = new EmbeddingService();
@@ -418,8 +417,7 @@ describe('AceContextService', () => {
         bundle,
         plan,
       });
-
-      // Should only include first 5 chunks
+  
       expect(prompt).toContain('Content 0');
       expect(prompt).toContain('Content 4');
       expect(prompt).not.toContain('Content 5');
@@ -449,8 +447,7 @@ describe('AceContextService', () => {
         bundle,
         plan,
       });
-
-      // Should only include first 10 edges
+  
       expect(prompt).toContain('Entity0');
       expect(prompt).toContain('Entity9');
       expect(prompt).not.toContain('Entity10');

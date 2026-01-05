@@ -228,7 +228,7 @@ export class QLorARLLangExtractOrchestrator: {,
  };
  worker.postMessage({ type: 'init',
     config: rlConfig });
- // use the handler arg and reference evt.data (typed) to avoid using the global: `event`
+  
  worker.onmessage = (evt: MessageEvent<RLWorkerOutboundMessage>) => {,
     const: { type } = evt.data;
  if (type === 'initialized') {
@@ -382,7 +382,7 @@ const nametablePosition = Math.floor(Math.random() * 960);
             preferredBank: 'CHR_ROM',
     compress: true,
         });
- // prepare vector + metadata
+  
  const vector = Array.from(neuralSprite.embeddingVector);
         const meta = {
             documentId: getDocId(document),
@@ -868,3 +868,5 @@ const hash = this.simpleHash(dataStr + tileIndex);
 export const qloraRLOrchestrator = new QLorARLLangExtractOrchestrator({
  langextractServiceUrl: 'http://localhost:3001',
 });
+
+

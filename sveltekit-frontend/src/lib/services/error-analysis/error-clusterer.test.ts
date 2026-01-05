@@ -68,8 +68,7 @@ describe('ErrorClusterer - Property-Based Tests (Task 4.1)', () => {
  clusters.forEach((cluster) => {
  expect(cluster.errors.length).toBeGreaterThan(0);
  });
-
- // Cluster count should be reasonable
+  
  expect(clusters.length).toBeLessThanOrEqual(Math.min(3, errors.length));
  }
  ),

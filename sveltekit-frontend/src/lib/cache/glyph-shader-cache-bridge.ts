@@ -91,7 +91,7 @@ class GlyphShaderCacheBridge {
  priority, request.legalContext?.renderingPriority === 'realtime' ? 'high' : 'normal',
  keys: [cacheKey, `glyph-texture: ${cacheKey}`],
  });
- // Step 2: Generate specialized glyph rendering WGSL
+  
  const glyphWGSL = this.generateGlyphShaderWGSL(request);
  // Step 3: Compile shader with optimizations
  const compiledShader = await ShaderCacheManager.getShader(cacheKey, glyphWGSL, {
@@ -100,7 +100,7 @@ class GlyphShaderCacheBridge {
  entryPoint: 'renderGlyphs',
  workgroupSize: [32, 32, 1], // Optimal for glyph processing
  });
- // Step 4: Create glyph textures
+  
  const glyphTextures = await this.createGlyphTextures(request);
  // Step 5: Quantize glyph data
  const quantizationData = await this.quantizeGlyphData(request);
@@ -126,7 +126,7 @@ class GlyphShaderCacheBridge {
  priority: 'normal',
  type: 'glyph_shader',
  });
- // Step 9: Cache shader with embedding for future search
+  
  await ShaderCacheManager.cacheShaderWithEmbedding(
  // Changed usage to ShaderCacheManager
  compiledShader,
@@ -344,7 +344,7 @@ fn renderTextureGlyph(glyph_index: u32, local_x: u32): u32 -> vec4<f32> {
  { binding: 3, resource: { buffer: renderingData.renderParams } },
  ],
  });
- // Execute compute shader
+  
  const commandEncoder = this.device.createCommandEncoder();
  const passEncoder = commandEncoder.beginComputePass();
  passEncoder.setPipeline(cachedShader.compiledShader.pipeline);

@@ -118,8 +118,7 @@
         addActivity('fixing', 'Fix Proposed', data.description, data.file);
         updateNodeStatus(data.nodeId, 'fixing');
       });
-
-      // Fix applied
+  
       eventSource.addEventListener('fix_applied', (e: MessageEvent) => {
         const data = JSON.parse(e.data);
         addActivity('fixed', 'Fix Applied', data.description, data.file);
@@ -127,15 +126,13 @@
         stats.fixedToday++;
         stats.totalErrors--;
       });
-
-      // Pattern learned
+  
       eventSource.addEventListener('pattern_learned', (e: MessageEvent) => {
         const data = JSON.parse(e.data);
         addActivity('learning', 'Pattern Learned', data.pattern, undefined);
         stats.confidence = data.confidence;
       });
-
-      // Error detected
+  
       eventSource.addEventListener('error_detected', (e: MessageEvent) => {
         const data = JSON.parse(e.data);
         addActivity('detecting', 'Error Detected', data.description, data.file);
@@ -202,8 +199,7 @@
     if (searchQuery && !node.id.toLowerCase().includes(searchQuery.toLowerCase())) return false;
     return true;
   });
-
-  // Get status color
+  
   function getStatusColor(status: string): string {
     switch (status) {
       case 'clean': return 'var(--color-success, #22c55e)';

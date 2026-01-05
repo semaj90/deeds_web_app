@@ -276,7 +276,7 @@ export class Context7SemanticAuditor {
  status: 'ok',
  message: `Successfully analyzed ${component} using Context7 MCP`,
  agentTriggered: false});
- // 2. Check for missing best practices
+  
  const bestPracticesCheck = await this.checkBestPractices(component);
  if (bestPracticesCheck.issues.length > 0) {
  for (const issue of bestPracticesCheck.issues) {

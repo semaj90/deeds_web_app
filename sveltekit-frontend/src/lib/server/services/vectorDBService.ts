@@ -58,8 +58,7 @@ export async function generateEmbedding(text: string, useCache: boolean = true):
 		const { embedding } = await getEmbeddingViaGate(fetch, text, {
 			model: process.env.EMBED_MODEL || 'nomic-embed-text'
 		});
-
-		// Cache the result for performance
+  
 		if (useCache && Array.isArray(embedding)) {
 			if (embeddingCache.size >= cacheMaxSize) {
 				const firstKey = embeddingCache.keys().next().value;

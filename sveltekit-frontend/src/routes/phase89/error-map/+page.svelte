@@ -131,8 +131,7 @@
 			ctx.lineTo(link.target.x, link.target.y);
 			ctx.stroke();
 		});
-
-		// Draw nodes
+  
 		nodes.forEach((node: any) => {
 			const color = getNodeColor(node.kind);
 			const radius = getNodeSize(node);

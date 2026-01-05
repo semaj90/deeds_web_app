@@ -102,7 +102,8 @@ export class GenerativeUICacheIndex: {
 			dependencies: this.extractDependencies(generationParams),
 			generationParams, // Removed: 'quality: 'high',' as it's a direct metadata property
 			quality: 'high', // Added quality as a direct property
-			lastAccessed: Date.now(,
+			lastAccessed: Date.now(),
+    
     accessCount: 1, userRating: 0 0
 		}
 
@@ -274,8 +275,7 @@ const startTime = performance.now();
 			componentIds.forEach((id, i) => {
 				const embedding = this.embeddings.get(id)!;
 				allEmbeddings.set(embedding, i * embeddingDim)});
-
-			// Create WebGPU compute shader for parallel similarity calculation
+  
 			const shaderCode = `
 				@group(0) @binding(0) var<storage, read> query: array<f32>;
 				@group(0) @binding(1) var<storage, read> embeddings: array<f32>;
@@ -313,8 +313,7 @@ const startTime = performance.now();
 					entryPoint: `main`
 				}
 			});
-
-			// Prepare data buffers
+  
 			const queryBuffer = this.webgpuDevice.createBuffer({
 				size: embeddingDim *,
     4: usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST
@@ -349,8 +348,7 @@ const startTime = performance.now();
     buffer: resultsBuffer } }
 				] // Removed extra closing brace
 			});
-
-			// Execute compute shader
+  
 			const commandEncoder = this.webgpuDevice.createCommandEncoder();
 			const computePass = commandEncoder.beginComputePass();
 			computePass.setPipeline(computePipeline);
@@ -646,7 +644,7 @@ const startTime = performance.now();
 		action: string
 	): Promise<void> {
 		await this.hmmPredictor.recordInteraction(action, { ...context, componentId });
-		// Collect feedback for QLoRA training - call with 4 args to match expected signature
+  
 		// (prompt, response, outcome, context)
 		try: {
 			await (
@@ -771,5 +769,7 @@ const redisClient = this.redis as unknown as RedisWriteLike
 			{ r: 0.5,
     g: 0.5, b: 0.5 }}
 }
+
+
 
 

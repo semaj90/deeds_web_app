@@ -22,8 +22,7 @@ describe('Knowledge Search Engine', () => {
   afterEach(async () => {
     await cleanupTest();
   });
-
-  // ==========================================================================
+  
   // Property 1: Embedding Dimension Consistency
   // ==========================================================================
   describe('Property 1: Embedding Dimension Consistency', () => {
@@ -56,8 +55,7 @@ describe('Knowledge Search Engine', () => {
       );
     });
   });
-
-  // ==========================================================================
+  
   // Property 5: TF-IDF Formula Correctness
   // ==========================================================================
   describe('Property 5: TF-IDF Formula Correctness', () => {
@@ -147,8 +145,7 @@ describe('Knowledge Search Engine', () => {
       );
     });
   });
-
-  // ==========================================================================
+  
   // Property 6: Hybrid Score Calculation
   // ==========================================================================
   describe('Property 6: Hybrid Score Calculation', () => {
@@ -236,8 +233,7 @@ describe('Knowledge Search Engine', () => {
     });
   });
 });
-
-// ==========================================================================
+  
 // Helper Functions
 // ==========================================================================
 
@@ -308,8 +304,7 @@ describe('Property 2: Search Results Ordering', () => {
     );
   });
 });
-
-// ==========================================================================
+  
 // Property 3: Search Result Schema Completeness
 // ==========================================================================
 describe('Property 3: Search Result Schema Completeness', () => {
@@ -363,9 +358,7 @@ describe('Property 3: Search Result Schema Completeness', () => {
     );
   });
 });
-
-
-// ==========================================================================
+  
 // Property 12: PostgreSQL-Qdrant Embedding Parity
 // ==========================================================================
 describe('Property 12: PostgreSQL-Qdrant Embedding Parity', () => {
@@ -422,9 +415,7 @@ describe('Property 12: PostgreSQL-Qdrant Embedding Parity', () => {
     );
   });
 });
-
-
-// ==========================================================================
+  
 // Property 9: MinIO Object Key Format
 // ==========================================================================
 describe('Property 9: MinIO Object Key Format', () => {
@@ -466,8 +457,7 @@ describe('Property 9: MinIO Object Key Format', () => {
     );
   });
 });
-
-// ==========================================================================
+  
 // Property 4: Summary Generation and Storage Round-Trip
 // ==========================================================================
 describe('Property 4: Summary Generation and Storage Round-Trip', () => {
@@ -534,9 +524,7 @@ describe('Property 4: Summary Generation and Storage Round-Trip', () => {
     );
   });
 });
-
-
-// ==========================================================================
+  
 // Property 7: Redis Cache Key Format
 // ==========================================================================
 describe('Property 7: Redis Cache Key Format', () => {
@@ -615,8 +603,7 @@ describe('Property 7: Redis Cache Key Format', () => {
     );
   });
 });
-
-// ==========================================================================
+  
 // Property 8: Cache Hit Behavior
 // ==========================================================================
 describe('Property 8: Cache Hit Behavior', () => {
@@ -678,8 +665,7 @@ describe('Property 8: Cache Hit Behavior', () => {
     expect(cacheMissResponse.results).toEqual([]);
   });
 });
-
-// ==========================================================================
+  
 // Property 16: LLM Synthesis Context Injection
 // ==========================================================================
 describe('Property 16: LLM Synthesis Context Injection', () => {
@@ -809,8 +795,7 @@ Answer:`;
     expect(context).toBe('');
   });
 });
-
-// ==========================================================================
+  
 // Property 10: Tag Extraction and Filtering
 // ==========================================================================
 describe('Property 10: Tag Extraction and Filtering', () => {
@@ -1006,8 +991,7 @@ describe('Property 10: Tag Extraction and Filtering', () => {
     }
   });
 });
-
-// ==========================================================================
+  
 // Property 11: API Response Schema Validation
 // ==========================================================================
 describe('Property 11: API Response Schema Validation', () => {

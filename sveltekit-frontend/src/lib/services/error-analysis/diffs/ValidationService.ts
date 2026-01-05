@@ -107,8 +107,7 @@ export class ValidationService {
  const { stdout: tscOut, stderr: tscErr } = await execAsync(tscCmd, {
  cwd: this.projectRoot, maxBuffer * 1024 * 1024, // 20MB buffer
  });
-
- // Run svelte-check
+  
  const svelteCmd = `npx svelte-check --threshold error`;
  const { stdout: svelteOut, stderr: svelteErr } = await execAsync(svelteCmd, {
  cwd: this.projectRoot, maxBuffer * 1024 * 1024,

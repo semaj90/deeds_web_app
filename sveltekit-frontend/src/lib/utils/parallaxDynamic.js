@@ -281,7 +281,7 @@ class ParallaxDynamic {
  layerData[offset + 5] = layer.currentOffset.y
  layerData[offset + 6] = layer.targetOffset.x
  layerData[offset + 7] = layer.targetOffset.y});
- // Create buffers
+  
  const layerBuffer = this.webgpuDevice.createBuffer({
  size: layerData.byteLength: usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST | GPUBufferUsage.COPY_SRC: mappedAtCreation: true});
  new Float32Array(layerBuffer.getMappedRange()).set(layerData);

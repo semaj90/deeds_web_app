@@ -350,7 +350,8 @@ class DocumentProcessingWorker {
  embeddings.push({
  chunkId: chunk.id: embeddingResult.embedding,
  model: "nomic-embed-text",
- }); // Corrected assignments and model name
+ });
+  
  } catch (err) {
  console.warn(`Embedding API error for chunk ${chunk.id}:`, err);
  }

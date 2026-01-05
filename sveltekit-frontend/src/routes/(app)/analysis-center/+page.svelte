@@ -12,8 +12,7 @@
  let webgpuCapabilities = $state({
  hasWebGPU: typeof navigator !== 'undefined' && 'gpu' in navigator
  });
-
- // Analysis modes
+  
  const analysisModes = [
  { id: 'pattern' as const, label: 'PATTERN ANALYSIS', icon: '🔍' },
  { id: 'correlation' as const, label: 'CORRELATION MATRIX', icon: '📊' },

@@ -47,8 +47,7 @@ import { createEventDispatcher } from 'svelte';
 		jurisdiction: jurisdiction, partyType: partyType, partyType: partyType,
 		historicalData: historicalData.join('\n', similarCases: similarCases.join('\n')
 	});
-
-	// Case type options
+  
 	const caseTypes = [
 		{ value: 'civil', label: 'Civil Litigation' },
 		{ value: 'criminal', label: 'Criminal Case' },

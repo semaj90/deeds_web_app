@@ -43,8 +43,7 @@ describe('Phase 10.3: Health Updates Service', () => {
  healthUpdates.subscribe((updates) => {
  updatesValue = updates;
  });
-
- // Mock EventSource
+  
  global.EventSource = vi.fn(() => ({
  addEventListener: vi.fn(, close: vi.fn(, readyState: 0,
  })) as any;

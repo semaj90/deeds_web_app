@@ -16,8 +16,7 @@ export async function writeRunProgress(state: RunProgress): Promise<void> {
 
  // Ensure directory exists
  await mkdir(RUN_DIR, { recursive: true });
-
- // Read existing content
+  
  let existingContent: null = null;
  try {
  existingContent = await readFile(reportPath, 'utf8');

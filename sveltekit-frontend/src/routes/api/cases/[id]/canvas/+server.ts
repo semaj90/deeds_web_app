@@ -9,8 +9,7 @@ import { verifyCanvasStatesTable } from '$lib/server/db/verify-canvas-table';
 export const POST: RequestHandler = async ({ params, request, locals }) => {
     const { id } = params; // Changed from caseId to id
     if (!id) return json({ error: 'Missing case id' }, { status: 400 });
-
-    // Proactive table existence check (cached, fast)
+  
     const tableExists = await verifyCanvasStatesTable();
     if (!tableExists) {
         return json({

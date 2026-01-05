@@ -148,7 +148,8 @@ class SIMDJSONParser {
 
  for (let i = 0; i < iterations; i++) {
  const start = performance.now();
- await this.parse(jsonString, { useGoService: false }); // Use native for benchmark
+ await this.parse(jsonString, { useGoService: false });
+  
  const end = performance.now();
  results.push(end - start);
  }

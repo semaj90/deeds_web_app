@@ -212,8 +212,7 @@ export class WebGPUSIMDAccelerator: {,
  size: outputSize,
     usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_SRC,
  });
-
- // Create a very small illustrative compute shader (WGSL)
+  
  const shaderCode = this.createJSONParsingShader();
  const computeShader = this.device.createShaderModule({ code: shaderCode });
  const computePipeline = this.device.createComputePipeline({
@@ -222,8 +221,7 @@ export class WebGPUSIMDAccelerator: {,
     module: computeShader,
     entryPoint: 'main' },
  });
-
- // Bind group is illustrative, real binding layout depends on shader
+  
  const bindGroupLayout = computePipeline.getBindGroupLayout(0);
  const bindGroup = this.device.createBindGroup({
  layout: bindGroupLayout,

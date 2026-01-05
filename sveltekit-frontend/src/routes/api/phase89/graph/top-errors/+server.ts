@@ -29,7 +29,7 @@ export const GET: RequestHandler = async ({ url }) => {
 			LIMIT $1
 		`, [limit]);
 
-		const nodes = filesResult.rows.map(row => ({
+		const nodes: any[] = filesResult.rows.map(row => ({
 			uri: row.uri,
 			label: row.label,
 			kind: row.kind,

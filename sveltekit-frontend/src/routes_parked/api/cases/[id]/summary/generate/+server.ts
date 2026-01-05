@@ -41,8 +41,7 @@ export const POST: RequestHandler = async ({ params, request, locals }) => {
  },
  userId: user.id,
  });
-
- // Log to audit trail
+  
  await db.insert(auditLog).values({
  userId: user.id,
  action: 'summary_generation_enqueued',

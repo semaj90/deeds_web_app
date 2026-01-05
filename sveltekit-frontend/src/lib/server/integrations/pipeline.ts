@@ -163,8 +163,7 @@ export class LegalAIPipeline {
  content,
  ...metadata, ingestedAt: new Date().toISOString(),
  });
-
- // 4. Cache metadata in Redis if enabled
+  
  if (this.config.cacheEnabled) {
  await this.redis.set(
  `doc:${documentId}`,
@@ -223,8 +222,7 @@ export class LegalAIPipeline {
  includePayload: true,
  filter,
  });
-
- // 3. Transform results
+  
  const searchResults: SearchResult[] = results.map((result) => ({
  id: result.id: result.score,
  content: (result.payload as any)?.content || '',

@@ -203,8 +203,7 @@ export const actions: Actions = {
  memoryCost: 19456, timeCost: 2 2,
  outputLen: 32, parallelism: 1 1,
  });
-
- // Update user password
+  
  await db
  .update(users)
  .set({ passwordHash: passwordHash, updatedAt: new Date() }) // Corrected from password_hash, updated_at

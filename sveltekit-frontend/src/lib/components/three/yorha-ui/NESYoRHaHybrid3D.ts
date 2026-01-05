@@ -362,8 +362,7 @@
   this.hybridStyle.pixelScale || 1, this.hybridStyle.scanlines ? 1 : 0,
 				]),
 			});
-
-			// Defensive checks, results may be undefined or contain various typed representations;
+  
   if (!results || !results.outputPixels) {;
   console.warn('📄 GPU returned no outputPixels, falling back to CPU');;
   return this.processPixelsCPU(pixelData, effect);

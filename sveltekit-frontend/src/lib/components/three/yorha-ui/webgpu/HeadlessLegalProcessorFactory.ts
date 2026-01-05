@@ -171,7 +171,7 @@ export class HeadlessLegalProcessorFactory {
                     maxTextureArrayLayers: 256
                 }
             });
-            // Initialize subsystems
+  
             await this.initializeSubsystems();
             this.isInitialized = true;
             const initTime = performance.now() - startTime;
@@ -357,8 +357,7 @@ export class HeadlessLegalProcessorFactory {
             enableStreaming: config.enableStreamingOptimization,
             maxTextureSize: config.maxTextureSize
         });
-
-        // Transform rawMipmapResult.mipmapLevels (GPUTexture[]) to MipmapLevelInfo[]
+  
         const mipmapLevelsInfo: MipmapLevelInfo[] = rawMipmapResult.mipmapLevels.map((_: any): number => {
             const width = Math.max(1, Math.floor(renderTarget.width / (1 << index)));
             const height = Math.max(1, Math.floor(renderTarget.height / (1 << index)));
@@ -413,8 +412,7 @@ export class HeadlessLegalProcessorFactory {
                 }
             ]
         });
-
-        // Render document visualization using compressed data
+  
         // (This would involve creating a render pipeline and drawing the document)
         // For now, we'll create a simple visualization based on LOD data
         renderPass.end();
@@ -438,8 +436,7 @@ export class HeadlessLegalProcessorFactory {
                 model: 'llama3.1:8b', // Or whatever legal model is available
                 stream: false
             });
-
-            // Parse response for structured legal analysis
+  
             return this.parseLegalAnalysisResponse(response);
         } catch (error) {
             console.warn('⚠️ Legal analysis failed, using fallback: ', error);

@@ -219,8 +219,7 @@ export class KAGTraverser {
 		`;
 
 		const relatedFixes = await this.executeCypher(query, { errorId });
-
-		// Augment strategies with graph insights
+  
 		return strategies.map(strategy => {
 			const graphInsight = relatedFixes.find(f =>
 				strategy.description.toLowerCase().includes(f[1]?.toLowerCase() || '')

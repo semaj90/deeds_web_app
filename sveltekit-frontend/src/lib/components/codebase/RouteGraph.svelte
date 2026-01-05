@@ -53,8 +53,7 @@
 	let d3Module: any = null;
 	let isLoading = $state(true);
 	let transform = $state({ x: 0, y: 0, k: 1 });
-
-	// Node colors by type
+  
 	const nodeColors: Record<string, string> = {
 		route: '#a855f7',      // Purple
 		component: '#3b82f6',  // Blue
@@ -229,8 +228,7 @@
 			onNodeHover(null);
 			link.attr('stroke', 'rgba(255,255,255,0.2)');
 		});
-
-		// Update positions on tick
+  
 		simulation.on('tick', () => {
 			link
 				.attr('x1', (d: any) => d.source.x)
@@ -240,8 +238,7 @@
 
 			node.attr('transform', (d: any) => `translate(${d.x},${d.y})`);
 		});
-
-		// Drag functions
+  
 		function dragstarted(event: any, d: any) {
 			if (!event.active) simulation.alphaTarget(0.3).restart();
 			d.fx = d.x;
@@ -266,8 +263,7 @@
 			initializeGraph();
 		}
 	});
-
-	// Zoom controls
+  
 	function zoomIn() {
 		if (!d3Module || !svg) return;
 		d3Module.select(svg).transition().call(

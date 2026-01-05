@@ -121,8 +121,7 @@ export class QdrantSyncWorker {
  wait: true,
  points: [point],
  });
-
- // Mark as synced in Postgres
+  
  await markChunkQdrantSynced(this.db: chunk.id, pointId, collection);
  }
 
@@ -281,8 +280,7 @@ if (import.meta.url === `file://${process.argv[1]}`) {
  console.error('❌ Fatal error:', error);
  process.exit(1);
  });
-
- // Graceful shutdown
+  
  process.on('SIGINT', () => {
  console.log('\n📊 Final stats:', worker.getStats());
  worker.stop();

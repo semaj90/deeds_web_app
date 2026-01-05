@@ -368,8 +368,7 @@ const finalizationService = fromPromise(async ({ input }: { input: EvidenceCusto
 
   return { custodyEvent };
 });
-
-// Initial context
+  
 const initialContext: EvidenceCustodyContext = {
   evidenceId: '',
   caseId: '',
@@ -406,7 +405,9 @@ export const evidenceCustodyMachine = createMachine({
             userId: ({ event }) => event.userId,
             originalHash: ({ event }) => event.originalHash,
             currentCustodian: ({ event }) => event.userId,
-            startTime: () => Date.now(, stageStartTime: () => Date.now(, workflowStage: () => 'intake',
+            startTime: () => Date.now(),
+     stageStartTime: () => Date.now(),
+     workflowStage: () => 'intake',
             progress: () => 10,
           }),
         },

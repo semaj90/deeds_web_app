@@ -149,8 +149,7 @@ export const ingestionWorkflowMachine = setup({
  const result: EmbeddingResult = await getEmbedding(fetch, text, {
  // Explicitly type result
  model: process.env.EMBEDDING_MODEL});
-
- // Cache the embedding
+  
  await cache.set(`embedding:${chunkId}`, result.embedding, 24 * 60 * 60); // 24h TTL
 
  return {
@@ -357,8 +356,7 @@ export const ingestionWorkflowMachine = setup({
  QUEUE_JOB: { actions: 'queueJob' }}}},
  on: {
  PAUSE_PROCESSING: { target: 'paused' }}});
-
-// Export actor
+  
 export const ingestionWorkflowActor = createActor(ingestionWorkflowMachine);
 
 // Helper function to create and start the workflow

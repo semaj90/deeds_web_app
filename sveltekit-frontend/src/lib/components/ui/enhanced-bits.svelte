@@ -50,8 +50,7 @@
  return 'h-10 px-4 py-2';
  }
  });
-
- // Combine classes
+  
  const combinedClasses = $derived(
  () => `${baseClasses} ${variantClasses} ${sizeClasses} ${className}`
  );

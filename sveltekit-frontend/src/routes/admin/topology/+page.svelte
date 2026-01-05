@@ -132,8 +132,7 @@
 					fx += (dx / dist) * force;
 					fy += (dy / dist) * force;
 				});
-
-				// Attraction along edges
+  
 				edges.forEach(edge => {
 					if (edge.from === n1.id) {
 						const n2 = nodes.find(n => n.id === edge.to);
@@ -200,8 +199,7 @@
 			ctx.lineTo(to.x, to.y);
 			ctx.stroke();
 		});
-
-		// Draw nodes
+  
 		filteredNodes.forEach(node => {
 			const radius = 5 + (node.errors / 5);
 			const color = colors[node.recommended_action as keyof typeof colors] || colors.monitor;

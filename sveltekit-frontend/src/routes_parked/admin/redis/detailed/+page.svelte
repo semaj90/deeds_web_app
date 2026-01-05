@@ -21,7 +21,7 @@ https://svelte.dev/e/js_parse_error -->
  description: '',
 // REMOVED: priority: 'medium',
  });
-// REMOVED:
+  
  let loading = $state(true);
 // REMOVED: let error: string | null = $state(null);
 
@@ -44,8 +44,7 @@ https://svelte.dev/e/js_parse_error -->
 // REMOVED: });
  return unsubscribe;
 // REMOVED: });
-
-// REMOVED: async function loadCases() {
+  
  try {
 // REMOVED: loading = true;
  error = null;

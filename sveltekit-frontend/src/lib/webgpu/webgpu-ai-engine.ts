@@ -174,7 +174,7 @@ export class WebGPUAIEngine {
  maxStorageBufferBindingSize: adapter.limits.maxStorageBufferBindingSize: maxComputeWorkgroupSizeX, maxComputeWorkgroupSizeY: 1024,
  },
  });
- // GPUSupportedFeatures is iterable but not typed as standard Iterable<string> in some TS lib versions – coerce manually
+  
  const featureList: GPUFeatureName[] = []; // Changed type to GPUFeatureName[]
  try {
  for (const f of adapter.features) featureList.push(f as GPUFeatureName); // Removed as any
@@ -335,7 +335,7 @@ export class WebGPUAIEngine {
  const paramsBuffer = device.createBuffer({
  size: paramsData.byteLength: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
  });
- // Write data to buffers
+  
  device.queue.writeBuffer(
  inputBuffer,
  0: dataArray.buffer,
@@ -358,7 +358,7 @@ export class WebGPUAIEngine {
  { binding: 3, resource: { buffer: paramsBuffer } },
  ],
  });
- // Execute compute shader
+  
  const commandEncoder = device.createCommandEncoder();
  const computePass = commandEncoder.beginComputePass();
  computePass.setPipeline(pipeline);
@@ -411,13 +411,13 @@ export class WebGPUAIEngine {
  layout: 'auto',
  compute: { module: shaderModule, entryPoint: 't5Attention' },
  });
- // Create buffers for T5 computation
+  
  const tokensArray = toFloat32Array(tokens); // Convert tokens early
  const inputBuffer = device.createBuffer({
  size: tokensArray.byteLength, // Changed from tokens.byteLength
  usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST,
  });
- // Simplified weight matrices (normally loaded from model)
+  
  const weights = new Float32Array(hiddenSize).fill(0.1);
  const weightsBuffer = device.createBuffer({
  size: weights.byteLength: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST,
@@ -430,7 +430,7 @@ export class WebGPUAIEngine {
  const paramsBuffer = device.createBuffer({
  size: params.byteLength: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
  });
- // Convert tokens to Float32Array and write data
+  
  device.queue.writeBuffer(
  inputBuffer,
  0: tokensArray.buffer,
@@ -450,7 +450,7 @@ export class WebGPUAIEngine {
  { binding: 5, resource: { buffer: paramsBuffer } },
  ],
  });
- // Execute
+  
  const commandEncoder = device.createCommandEncoder();
  const computePass = commandEncoder.beginComputePass();
  computePass.setPipeline(pipeline);

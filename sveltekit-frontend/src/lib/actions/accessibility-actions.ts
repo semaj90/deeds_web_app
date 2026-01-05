@@ -522,7 +522,7 @@ export const compositeActions = {
 		return {
 			update: (newOptions: DropdownOptions) => {
 				ariaAction.update({ expanded: newOptions.isOpen });
-				// Update other actions as needed
+  
 			},
 			destroy: () => {
 				ariaAction.destroy();

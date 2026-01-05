@@ -243,8 +243,7 @@ describe('DataIsolationLayer', () => {
  legalAiTables.forEach((table) => {
  expect(layer.canAccess('errorBrain', table)).toBe(false);
  });
-
- // Legal-ai cannot access any error-brain table
+  
  errorBrainTables.forEach((table) => {
  expect(layer.canAccess('legalAi', table)).toBe(false);
  });

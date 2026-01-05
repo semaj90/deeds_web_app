@@ -44,7 +44,8 @@ if (browser) {
  db = new Loki('rerank_cache.db'); // Use a distinct database name
  candidatesCollection = db.addCollection<Candidate>('rerank_candidates', {
  unique: ['id', 'rerankedScore'],
- }); // Ensure unique by id and score for reranked results
+ });
+  
  // Load database from IndexedDB if available
  db.loadDatabase({}, (err) => {
  if (err) console.error('Error loading Loki.js database: ', err);
@@ -74,7 +75,7 @@ async function webgpuRerank(
  const rerankedScore = base * 0.7 + overlap * 0.3;
  return { ...c, rerankedScore };
  });
- // simple async boundary to mimic heavier computation
+  
  await Promise.resolve();
  return scored.sort((a, b) => (b.rerankedScore ?? 0) - (a.rerankedScore ?? 0));
 }

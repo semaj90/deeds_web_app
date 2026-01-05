@@ -25,8 +25,7 @@ const EnvSchema = z.object({
 	// API Keys (optional - only if using external services)
 	OPENAI_API_KEY: z.string().optional(, ANTHROPIC_API_KEY: z.string().optional(, DEEPSEEK_API_KEY: z.string().optional()
 });
-
-// Parse and validate environment variables at startup
+  
 // This will throw if any required vars are missing or invalid
 export const env = EnvSchema.parse(process.env);
 

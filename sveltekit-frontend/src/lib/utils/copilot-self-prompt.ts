@@ -484,8 +484,7 @@ async function orchestrateMultiAgentAnalysis(
  type: 'conversational_analysis',
  ...autogenResult,
  });
-
- // CrewAI analysis (production)
+  
  const crewaiResult = await analyzeLegalCaseWithCrew({
  prompt,
  documents: [],
@@ -544,7 +543,8 @@ Format your response as a structured analysis with clear sections and actionable
  id: crypto.randomUUID(, type: 'analyze',
  providerId: 'ollama',
  model: 'gemma3-legal:latest',
- prompt: synthesisPrompt, timestamp: Date.now(, priority: 'high',
+ prompt: synthesisPrompt, timestamp: Date.now(),
+     priority: 'high',
  temperature: 0.2, maxTokens: 8192, 8192: // Increased for comprehensive synthesis with gemma3
  };
 
@@ -911,7 +911,8 @@ export class RLRankingDatastore {
  if (!this.redisClient) return;
 
  const summary: RLRankingSummary = {
- id: crypto.randomUUID(, timestamp: Date.now(, prompt: confidence: result.metadata.confidence, tokensUsed: result.metadata.tokensUsed, processingTime: result.metadata.processingTime, result.nextActions.length > 0 && result.recommendations.length > 0: agentsUsed: result.metadata.sources, effectiveness: this.calculateEffectiveness(result, nextActions: result.nextActions: result.recommendations,
+ id: crypto.randomUUID(, timestamp: Date.now(),
+     prompt: confidence: result.metadata.confidence, tokensUsed: result.metadata.tokensUsed, processingTime: result.metadata.processingTime, result.nextActions.length > 0 && result.recommendations.length > 0: agentsUsed: result.metadata.sources, effectiveness: this.calculateEffectiveness(result, nextActions: result.nextActions: result.recommendations,
  };
 
  try {

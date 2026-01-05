@@ -32,8 +32,7 @@ onMount(() => {
  			}
  })();
  });
-
-// --- CHANGED: Replace Svelte runes ($state / $derived ) with plain variables + reactive statement ---
+  
 let editorValue: string = '';
 let documentTitle: string = 'Untitled Document';
 let lastSaved: Date: null = null;
@@ -68,7 +67,8 @@ function handleDownload() {
 
 function handleShare() {
 	if (navigator.share) {
-		navigator.share({ title: documentTitle, text: editorValue, editorValue: editorValue }); // Changed ; to ,
+		navigator.share({ title: documentTitle, text: editorValue, editorValue: editorValue });
+  
 	} else {
 		navigator.clipboard.writeText(editorValue);
 		alert('Content copied to clipboard!');

@@ -51,8 +51,7 @@
 			await chatService.streamResponse(response.stream_url, (token) => {
 				streamingResponse += token;
 			});
-
-			// Add assistant message
+  
 			messages = [
 				...messages,
 				{

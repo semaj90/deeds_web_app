@@ -173,8 +173,7 @@ export class GPUGraphLayout {
  { binding: 2, resource: { buffer: this.paramsBuffer } },
  ],
  });
-
- // Run compute passes
+  
  for (let i = 0; i < iterations; i++) {
  const commandEncoder = this.device.createCommandEncoder();
  const passEncoder = commandEncoder.beginComputePass();
@@ -335,8 +334,7 @@ export class GPUGraphLayout {
  fy += (dy / dist) * force;
  }
  });
-
- // Attractive forces
+  
  this.edges.forEach((edge) => {
  const isSource = edge.source === node.id;
  const isTarget = edge.target === node.id;
@@ -357,8 +355,7 @@ export class GPUGraphLayout {
  }
  }
  });
-
- // Update velocity
+  
  node.vx = (node.vx + (fx * params.deltaTime) / node.mass) * params.damping;
  node.vy = (node.vy + (fy * params.deltaTime) / node.mass) * params.damping;
 
@@ -369,8 +366,7 @@ export class GPUGraphLayout {
  node.vy *= params.maxVelocity / speed;
  }
  });
-
- // Update positions
+  
  this.nodes.forEach((node) => {
  if (!node.fixed) {
  node.x += node.vx * params.deltaTime;

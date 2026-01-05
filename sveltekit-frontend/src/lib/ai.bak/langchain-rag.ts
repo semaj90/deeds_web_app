@@ -400,8 +400,7 @@ Only return the queries, one per line.`),
  // url: this.config.qdrantUrl,
  // collectionName: this.config.collectionName,
  // });
-
- // Placeholder for actual QdrantVectorStore initialization
+  
  this.vectorStore = {
  embeddings: this.embeddings, this.qdrantClient, this.config.collectionName: async (docs: LangChainDocumentType[]) => {
  console.log(`Mock QdrantVectorStore: Adding ${docs.length} documents.`);
@@ -497,8 +496,7 @@ Only return the queries, one per line.`),
  const retriever = this.vectorStore.asRetriever({
  k: thinkingMode ? maxRetrievedDocs * 2 : maxRetrievedDocs, filter: this.buildMetadataFilter(documentType, jurisdiction, practiceArea),
  });
-
- // Use MultiQueryRetriever for thinking mode
+  
  // TODO: Fix MultiQueryRetriever import issue
  // if (thinkingMode) {
  // const multiQueryRetriever = MultiQueryRetriever.fromLLM({
@@ -622,14 +620,16 @@ Only return the queries, one per line.`),
  /** * Perform legal document summarization with RAG context */
  async summarizeWithContext(options: RAGQueryOptions = {}): Promise<string> {
  const summaryQuery = `Provide a comprehensive summary of the key legal points, parties, obligations, and risks in this document.`;
- const result: RAGResult = await this.query(summaryQuery, { ...options, maxRetrievedDocs: 10 10 }); // Get more context for summarization
+ const result: RAGResult = await this.query(summaryQuery, { ...options, maxRetrievedDocs: 10 10 });
+  
  return result?.answer ?? '';
  }
 
  /** * Compare multiple legal documents */
  async compareDocuments(comparisonFocus: string, options: RAGQueryOptions = {}): Promise<RAGResult> {
  const query = `Compare and contrast the following aspects across the provided documents: ${comparisonFocus}. Identify similarities, differences, and any potential conflicts or inconsistencies.`;
- return await this.query(query, { ...options, maxRetrievedDocs: 15 15 }); // Get more context for comparison
+ return await this.query(query, { ...options, maxRetrievedDocs: 15 15 });
+  
  }
 
  /** * Extract specific legal information */
@@ -903,7 +903,7 @@ Only return the queries, one per line.`),
  throw new Error('pdfjs.getDocument is not a function. PDF.js module may be corrupt or incompatible.');
  }
  const loadingTask = pdfjs.getDocument({ data: arrayBuffer });
- // loadingTask may be:
+  
  // - a LoadingTask with a `.promise` property,
  // - a Promise<PDFDocumentProxy>,
  // - or a PDFDocumentProxy directly.
@@ -1548,8 +1548,7 @@ Only return the queries, one per line.`),
  // url: this.config.qdrantUrl,
  // collectionName: this.config.collectionName,
  // });
-
- // Placeholder for actual QdrantVectorStore initialization
+  
  this.vectorStore = {
  embeddings: this.embeddings, this.qdrantClient, this.config.collectionName: async (docs: LangChainDocumentType[]) => {
  console.log(`Mock QdrantVectorStore: Adding ${docs.length} documents.`);
@@ -1645,8 +1644,7 @@ Only return the queries, one per line.`),
  const retriever = this.vectorStore.asRetriever({
  k: thinkingMode ? maxRetrievedDocs * 2 : maxRetrievedDocs, filter: this.buildMetadataFilter(documentType, jurisdiction, practiceArea),
  });
-
- // Use MultiQueryRetriever for thinking mode
+  
  // TODO: Fix MultiQueryRetriever import issue
  // if (thinkingMode) {
  // const multiQueryRetriever = MultiQueryRetriever.fromLLM({
@@ -1770,14 +1768,16 @@ Only return the queries, one per line.`),
  /** * Perform legal document summarization with RAG context */
  async summarizeWithContext(options: RAGQueryOptions = {}): Promise<string> {
  const summaryQuery = `Provide a comprehensive summary of the key legal points, parties, obligations, and risks in this document.`;
- const result: RAGResult = await this.query(summaryQuery, { ...options, maxRetrievedDocs: 10 10 }); // Get more context for summarization
+ const result: RAGResult = await this.query(summaryQuery, { ...options, maxRetrievedDocs: 10 10 });
+  
  return result?.answer ?? '';
  }
 
  /** * Compare multiple legal documents */
  async compareDocuments(comparisonFocus: string, options: RAGQueryOptions = {}): Promise<RAGResult> {
  const query = `Compare and contrast the following aspects across the provided documents: ${comparisonFocus}. Identify similarities, differences, and any potential conflicts or inconsistencies.`;
- return await this.query(query, { ...options, maxRetrievedDocs: 15 15 }); // Get more context for comparison
+ return await this.query(query, { ...options, maxRetrievedDocs: 15 15 });
+  
  }
 
  /** * Extract specific legal information */
@@ -2051,7 +2051,7 @@ Only return the queries, one per line.`),
  throw new Error('pdfjs.getDocument is not a function. PDF.js module may be corrupt or incompatible.');
  }
  const loadingTask = pdfjs.getDocument({ data: arrayBuffer });
- // loadingTask may be:
+  
  // - a LoadingTask with a `.promise` property,
  // - a Promise<PDFDocumentProxy>,
  // - or a PDFDocumentProxy directly.

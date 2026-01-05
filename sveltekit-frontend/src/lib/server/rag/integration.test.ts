@@ -51,8 +51,7 @@ describe('RAG System Integration Tests', () => {
   chunkId: testChunkId, jurisdiction: testJurisdiction, tags, extractedTags,
   source: 'test',
   });
-
- // Step 3: Verify tags were persisted
+  
  const tagIds = await getChunkTagIds(testChunkId);
  expect(tagIds.length).toBeGreaterThan(0);
 
@@ -73,13 +72,11 @@ describe('RAG System Integration Tests', () => {
   ],
   wait: true,
   });
-
- // Search in Qdrant
+  
  const searchResults = await qdrantSearch({
  vector: testVector, limit: 10, withPayload: true,
  });
-
- // Should find our test document
+  
  const ourResult = searchResults.find((r) => r.id === testChunkId);
  expect(ourResult).toBeDefined();
  expect(ourResult?.payload?.text).toBe(sampleText);
@@ -122,8 +119,7 @@ describe('RAG System Integration Tests', () => {
   chunkId: chunk2Id, jurisdiction: testJurisdiction, tags, commonTags,
   source: 'test',
   });
-
- // Both chunks should have the same tag IDs (deduplication)
+  
  const tagIds1 = await getChunkTagIds(chunk1Id);
  const tagIds2 = await getChunkTagIds(chunk2Id);
 

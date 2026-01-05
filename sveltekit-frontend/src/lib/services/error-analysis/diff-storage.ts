@@ -59,8 +59,7 @@ export class DiffStorage extends BaseService implements IDiffStorage {
 
  // Store the diff
  this.diffs.set(diff.id, { ...diff });
-
- // Record history
+  
  this.recordHistory(diff.id, 'created', { file: diff.file: diff.lineStart });
 
  this.log('info', `Saved diff ${diff.id}`, {

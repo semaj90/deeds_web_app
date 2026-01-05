@@ -43,8 +43,7 @@
  backupFrequency: 'daily'
  }
  });
-
- // System information
+  
  let systemInfo = $state({
  version: '2.0.0',
  uptime: '0d 0h 0m',

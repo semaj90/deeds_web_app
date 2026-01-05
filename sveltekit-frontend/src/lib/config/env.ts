@@ -75,7 +75,8 @@ export const CLIENT_ENV = Object.freeze({
 	GPU_DEBUG: ENV_CONFIG.GPU_DEBUG,
 	SHADER_DEBUG: ENV_CONFIG.SHADER_DEBUG,
 	REDUCTION_MODE: ENV_CONFIG.REDUCTION_MODE
-}); // GPU Context Configuration based on environment
+});
+  
 export const GPU_CONFIG = Object.freeze({
 	// Context preferences
 	preferWebGPU: CLIENT_ENV.WEBGPU_ENABLED,

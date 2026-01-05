@@ -180,8 +180,7 @@
  },
  tags: []
  });
-
- // Computed properties (fixed: use persons, shallow copy, correct return)
+  
  let filteredPersons = $derived (() => {
  let filtered = persons.slice();
 
@@ -236,8 +235,7 @@
  });
  return filtered;
  });
-
- // Helper: compute initials for avatar fallback
+  
  function initials(name: string) {
  return (name || '')
  .split(' ')

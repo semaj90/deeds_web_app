@@ -32,8 +32,7 @@ https://svelte.dev/e/js_parse_error -->
  const unsubscribeConnected = isConnected.subscribe((value) => {
  isConnectedValue = value;
  });
-
- // Initialize document processing
+  
  const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000';
  const sseEndpoint = `${apiBaseUrl}/api/document-processing/stream`;
 

@@ -146,8 +146,7 @@ export class CrewAILegalReviewSystem {
  });
  }
  });
-
- // Store results and trigger document update loop
+  
  await this.storeResults(task, responses);
  documentUpdateLoop.queueDocumentUpdate(task.documentId, JSON.stringify(responses));
 

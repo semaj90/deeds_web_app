@@ -147,8 +147,7 @@ onMount(() => {
 
 		nodeLabel.attr('x', (d: any) => d.x).attr('y', (d: any) => d.y);
 	});
-
-	// Drag behavior - using any type to avoid d3 namespace issues
+  
 	function drag(simulation: any) {
 		function dragstarted(event: any) {
 			if (!event.active) simulation.alphaTarget(0.3).restart();
@@ -174,8 +173,7 @@ onMount(() => {
 		simulation.stop();
 	};
 });
-
-// ============================================================================
+  
 // Helper Functions
 // ============================================================================
 

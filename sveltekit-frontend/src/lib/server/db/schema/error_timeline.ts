@@ -11,14 +11,17 @@ export const errorTimelineTable = pgTable(
  id: uuid('id').defaultRandom().primaryKey(),
 
  // Route and cluster being tracked
- routePath: text('route_path').notNull(, clusterId: text('cluster_id').notNull(),
+ routePath: text('route_path').notNull(),
+ clusterId: text('cluster_id').notNull(),
 
  // Time period metadata (daily/hourly aggregation)
  timeWindow: text('time_window').notNull(), // ISO 8601 timestamp of window start (e.g., "2025-12-07T00Z")
  windowDuration: text('window_duration').notNull().default('PT1H'), // Duration (e.g., "PT1H" = 1 hour, "P1D" = 1 day)
 
  // Error statistics for this time window
- errorCount: text('error_count').notNull().default('0', uniqueErrorTypes: text('unique_error_types').notNull().default('0', avgSeverity: text('avg_severity'), // e.g., "0.67" (scale 0-1)
+ errorCount: text('error_count').notNull().default('0'),
+ uniqueErrorTypes: text('unique_error_types').notNull().default('0'),
+ avgSeverity: text('avg_severity'), // e.g., "0.67" (scale 0-1)
 
  // Health state transition
  previousHealthState: text('previous_health_state'), // "healthy" | "flaky" | "broken" (before this window)
@@ -26,7 +29,8 @@ export const errorTimelineTable = pgTable(
  stateChanged: text('state_changed').default('false'), // Did health state change during this window?
 
  // Trend indicators
- trendDirection: text('trend_direction'), // "improving" | "stable" | "degrading", trendScore: text('trend_score'), // Numeric score indicating trend strength
+ trendDirection: text('trend_direction'), // "improving" | "stable" | "degrading"
+ trendScore: text('trend_score'), // Numeric score indicating trend strength
 
  // Metadata
  dataCollectedAt: timestamp('data_collected_at', { withTimezone: true }).notNull().defaultNow(, notes: text('notes'), // Ad-hoc notes (e.g., "deployment caused spike")

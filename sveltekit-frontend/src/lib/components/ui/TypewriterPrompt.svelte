@@ -26,8 +26,7 @@
  }, 530);
  return () => clearInterval(interval);
  });
-
- // Typewriter effect
+  
  $effect(() => {
  if (prompt && prompt.text) {
  typeText(prompt.text);

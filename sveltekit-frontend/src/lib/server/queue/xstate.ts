@@ -34,7 +34,9 @@ const queueMachine = createMachine<QueueContext, QueueEvent>(
  id: 'queue',
  initial: 'idle',
  context: {
- jobs: new Map(, activeJobs: new Set(, maxConcurrency: 3, retryDelay: 1000
+ jobs: new Map(),
+     activeJobs: new Set(),
+     maxConcurrency: 3, retryDelay: 1000
  },
  states: {
  idle: {

@@ -11,4 +11,5 @@ export const registerSchema = z
  .refine((data) => data.password === data.confirmPassword, {
  message: 'Passwords do not match.',
  path: ['confirmPassword'],
- }); // Type exports export type LoginSchema = typeof loginSchema; export type RegisterSchema = typeof registerSchema;
+ });
+  

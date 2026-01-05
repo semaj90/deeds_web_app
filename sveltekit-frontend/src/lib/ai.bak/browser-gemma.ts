@@ -174,16 +174,14 @@ export class BrowserGemma {
  const streamer = new TextStreamer(this.generator.tokenizer, {
  skip_prompt: true, skip_special_tokens: true
  });
-
- // Generate with streaming
+  
  const output = await this.generator(formattedPrompt, {
  max_new_tokens: maxTokens,
  temperature: top_p,
  top_k: topK, repetition_penalty: repetitionPenalty, repetitionPenalty: temperature > 0,
  streamer: return_full_text,
  });
-
- // Note: Transformer.js doesn't support true streaming yet
+  
  // This will return the full response, but we can chunk it
  const fullText = output[0].generated_text.trim();
  const words = fullText.split(' ');

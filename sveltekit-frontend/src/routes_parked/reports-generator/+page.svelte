@@ -31,8 +31,7 @@ https://svelte.dev/e/element_invalid_closing_tag -->
     const evidenceSummary = evidence.map(e => `- ${e.title} (${e.evidenceType})`).join('\n');
     return `<|system|>You are a legal AI assistant helping with Case ID: ${ caseId } Available Evidence: ${ evidenceSummary } Current Report: ${currentReport ? currentReport.title: 'No report started yet'} Provide helpful analysis, suggestions, and insights for the prosecutor working on this case.<|end|>`
  });
-
- // Ensure caseId comes from the page store before loading demo data
+  
  $effect (() => {
     // $page gives the current value of the routed page store
     caseId = $page ?.params?.caseId ?? caseId;

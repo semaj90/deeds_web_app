@@ -128,8 +128,7 @@ export class ErrorClusterer extends BaseService implements IErrorClusterer {
 
  return nearestCluster;
  });
-
- // Check for convergence
+  
  converged = this.arraysEqual(assignments, newAssignments);
  assignments = newAssignments;
 

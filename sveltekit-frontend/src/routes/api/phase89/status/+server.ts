@@ -32,7 +32,12 @@ export const GET: RequestHandler = async () => {
 		]);
 
 		const postgres = {
-			error_instances_open: parseInt(errorStats.rows[0]?.open || '0', error_instances_stale: parseInt(errorStats.rows[0]?.stale || '0', error_instances_resolved: parseInt(errorStats.rows[0]?.resolved || '0', embeddings_count: parseInt(embeddingsCount.rows[0]?.count || '0', fix_attempts_total: parseInt(fixAttempts.rows[0]?.count || '0', kb_cards_total: parseInt(kbCards.rows[0]?.count || '0')
+			error_instances_open: parseInt(errorStats.rows[0]?.open || '0'),
+			error_instances_stale: parseInt(errorStats.rows[0]?.stale || '0'),
+			error_instances_resolved: parseInt(errorStats.rows[0]?.resolved || '0'),
+			embeddings_count: parseInt(embeddingsCount.rows[0]?.count || '0'),
+			fix_attempts_total: parseInt(fixAttempts.rows[0]?.count || '0'),
+			kb_cards_total: parseInt(kbCards.rows[0]?.count || '0')
 		};
 
 		// Redis Stats
@@ -97,10 +102,11 @@ export const GET: RequestHandler = async () => {
 		`);
 
 		const clusters = {
-			total, clusterResult.rowCount || 0,
+			total: clusterResult.rowCount || 0,
 			top_patterns: clusterResult.rows.map(row => ({
 				pattern: row.cluster_pattern || 'Unknown',
-				count: parseInt(row.count, confidence: parseFloat(row.avg_confidence || '0')
+				count: parseInt(row.count),
+				confidence: parseFloat(row.avg_confidence || '0')
 			}))
 		};
 
@@ -137,11 +143,11 @@ export const GET: RequestHandler = async () => {
 			ORDER BY similarity_score DESC
 			LIMIT 10
 		`);
-
 		const cosine_rankings = rankingsResult.rows.map(row => ({
 			query: row.query_text,
 			top_match: row.top_match,
-			similarity: parseFloat(row.similarity_score, confidence_boost: parseFloat(row.confidence_boost || '0')
+			similarity: parseFloat(row.similarity_score),
+			confidence_boost: parseFloat(row.confidence_boost || '0')
 		}));
 
 		return json({

@@ -109,8 +109,7 @@
 					r.payload.tags.forEach((t: string) => tags.add(t));
 				}
 			});
-
-			// Analyze each tag with gemma3-legal
+  
 			for (const tag of tags) {
 				const response = await fetch('/api/analyze-tag', {
 					method: 'POST',

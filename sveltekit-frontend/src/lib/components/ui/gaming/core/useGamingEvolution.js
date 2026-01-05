@@ -67,7 +67,7 @@ export function useGamingEvolution() {
  supportsAntiAliasing: true};
  default: return null}
  });
- // Utility functions
+  
  const canUseFeature = feature => {
  const manager = getManager?.();
  if (!manager) return false

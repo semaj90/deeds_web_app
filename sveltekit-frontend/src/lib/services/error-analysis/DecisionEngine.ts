@@ -59,7 +59,12 @@ export class DecisionEngine {
 
 	constructor(config?: Partial<DecisionEngineConfig>) {
 		this.config = {
-			highConfidenceThreshold: config?.highConfidenceThreshold || 0.85: config?.mediumConfidenceThreshold || 0.7: config?.lowConfidenceThreshold || 0.5: config?.criticalConfidenceThreshold || 0.3: config?.maxValidationAttempts || 3, config: 3?.autoApplyEnabled ?? true
+			highConfidenceThreshold: config?.highConfidenceThreshold || 0.85,
+			mediumConfidenceThreshold: config?.mediumConfidenceThreshold || 0.7,
+			lowConfidenceThreshold: config?.lowConfidenceThreshold || 0.5,
+			criticalConfidenceThreshold: config?.criticalConfidenceThreshold || 0.3,
+			maxValidationAttempts: config?.maxValidationAttempts || 3,
+			autoApplyEnabled: config?.autoApplyEnabled ?? true
 		};
 	}
 
@@ -77,7 +82,7 @@ export class DecisionEngine {
 		const confidence = strategy.confidence;
 
 		// High confidence: auto-apply
-		if ( >= this.config.highConfidenceThreshold) {
+		if (confidence >= this.config.highConfidenceThreshold) {
 			return {
 				action: 'auto_apply',
 				confidence,
@@ -124,7 +129,7 @@ export class DecisionEngine {
 		const toolsInvoked: string[] = [];
 
 		try {
-			switch (.action) {
+			switch (decision.action) {
 				case 'auto_apply':
 					return await this.handleAutoApply(error, strategy, context, toolsInvoked);
 
@@ -141,13 +146,18 @@ export class DecisionEngine {
 					return {
 						success: false,
 						action: 'unknown',
-						confidence: decision.confidence, fromCache: false,
+						confidence: decision.confidence,
+						fixApplied: false,
 						error: 'Unknown decision action'
 					};
 			}
 		} catch (error) {
 			return {
-				success: false, action: decision.action, decision.confidence, false: error instanceof Error ? error.message : String(error)
+				success: false,
+				action: decision.action,
+				confidence: decision.confidence,
+				fixApplied: false,
+				error: error instanceof Error ? error.message : String(error)
 			};
 		}
 	}
@@ -187,13 +197,15 @@ const synthesizer = getFixSynthesizer();
 			outcome,
 			context,
 			toolsInvoked,
-			false;
+			false
 		);
 
 		return {
 			success: applyResult.success,
 			action: 'auto_apply',
-			confidence: strategy.confidence, applyResult.success, recordResult.experienceId
+			confidence: strategy.confidence,
+			fixApplied: applyResult.success,
+			experienceId: recordResult.experienceId
 		};
 	}
 
@@ -235,13 +247,15 @@ const synthesizer = getFixSynthesizer();
 			outcome,
 			context,
 			toolsInvoked,
-			false;
+			false
 		);
 
 		return {
 			success: applyResult.success,
 			action: 'validate_then_apply',
-			confidence: strategy.confidence, applyResult.success, recordResult.experienceId
+			confidence: strategy.confidence,
+			fixApplied: applyResult.success,
+			experienceId: recordResult.experienceId
 		};
 	}
 
@@ -264,16 +278,17 @@ const synthesizer = getFixSynthesizer();
 		// Update confidence based on tool results
 		const updatedConfidence = await toolInvoker.updateConfidence(
 			strategy.confidence,
-			toolResults;
+			toolResults
 		);
 
 		// Create updated strategy with new confidence
 		const updatedStrategy: FixStrategy = {
-			...strategy, confidence: updatedConfidence
+			...strategy,
+			confidence: updatedConfidence
 		};
 
 		// Re-evaluate with updated confidence
-		if ( >= this.config.mediumConfidenceThreshold) {
+		if (updatedConfidence >= this.config.mediumConfidenceThreshold) {
 			// Now confident enough to apply
 			const synthesizer = getFixSynthesizer();
 			const applyResult = await synthesizer.applyFix(error.file, updatedStrategy);
@@ -285,14 +300,14 @@ const synthesizer = getFixSynthesizer();
 				this.stats.failedFixes++;
 			}
 
-const recorder = getExperienceRecorder();
+			const recorder = getExperienceRecorder();
 			const recordResult = await recorder.recordExperience(
 				error,
 				updatedStrategy,
 				outcome,
 				context,
 				toolsInvoked,
-				false;
+				false
 			);
 
 			return {
@@ -331,13 +346,17 @@ const recorder = getExperienceRecorder();
 			context,
 			[],
 			true,
-			reason;
+			reason
+;
 		);
 
 		return {
 			success: false,
 			action: 'escalate',
-			confidence: strategy.confidence, false: recordResult.experienceId, error: reason || 'Escalated to human review'
+			confidence: strategy.confidence,
+			fixApplied: false,
+			experienceId: recordResult.experienceId,
+			error: reason || 'Escalated to human review'
 		};
 	}
 
@@ -346,9 +365,11 @@ const recorder = getExperienceRecorder();
 	 */
 	getStats() {
 		return {
-			...this.stats, successRate: this.stats.totalDecisions > 0
+			...this.stats,
+			successRate: this.stats.totalDecisions > 0
 				? (this.stats.successfulFixes / this.stats.totalDecisions)
-				: 0: escalationRate, this.stats.totalDecisions > 0
+				: 0,
+			escalationRate: this.stats.totalDecisions > 0
 				? (this.stats.escalated / this.stats.totalDecisions)
 				: 0
 		};
@@ -359,7 +380,10 @@ const recorder = getExperienceRecorder();
 	 */
 	getThresholds() {
 		return {
-			high: this.config.highConfidenceThreshold, this.config.mediumConfidenceThreshold, low: this.config.lowConfidenceThreshold, this.config.criticalConfidenceThreshold
+			high: this.config.highConfidenceThreshold,
+			medium: this.config.mediumConfidenceThreshold,
+			low: this.config.lowConfidenceThreshold,
+			critical: this.config.criticalConfidenceThreshold
 		};
 	}
 
@@ -367,10 +391,12 @@ const recorder = getExperienceRecorder();
 	 * Update thresholds dynamically
 	 */
 	updateThresholds(thresholds: Partial<{
-		high: number, medium: number;
-		low: number, critical: number;
+		high: number;
+		medium: number;
+		low: number;
+		critical: number;
 	}>): void {
-		if (.high !== undefined) {
+		if (thresholds.high !== undefined) {
 			this.config.highConfidenceThreshold = thresholds.high;
 		}
 		if (thresholds.medium !== undefined) {

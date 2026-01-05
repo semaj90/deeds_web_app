@@ -216,10 +216,12 @@ export async function copilotOrchestrator(
  try {
  const agentResult = await agentRegistry[agent](prompt, options.context);
  // Normalize into AgentOutcome shape
- results.agentResults.push({ agent: agentResult.agent: agentResult.result }); // Corrected syntax
+ results.agentResults.push({ agent: agentResult.agent: agentResult.result });
+  
  } catch (err: unknown) {
  const msg = err instanceof Error ? err.message : String(err);
- results.agentResults.push({ agent: msg }); // Corrected syntax
+ results.agentResults.push({ agent: msg });
+  
  }
  } else {
  results.agentResults.push({ agent, error: `Agent not registered` });
@@ -781,7 +783,8 @@ export async function mcpSuggestBestPractices(results: any): Promise<AutoMCPSugg
  'Run multi-agent analysis with agents: ["autogen","crewai","copilot"] and enable synthesizeOutputs',
  reasoning: 'Gather broader diagnostics and synthesized insights',
  confidence: 0.6,
- }); // Corrected string
+ });
+  
  }
  return suggestions;
  } catch (err: unknown) {

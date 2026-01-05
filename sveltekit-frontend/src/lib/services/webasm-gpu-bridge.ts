@@ -86,8 +86,7 @@ export class WebASMGPUBridge {
                     maxComputeWorkgroupSizeZ: 64, maxStorageBufferBindingSize: 1024 1024 * 1024 * 1024, // 1GB
                 } as unknown as Record<string, number>
             });
-
-            // Detect capabilities
+  
             this.capabilities = await this.detectCapabilities(adapter);
             console.log('✅ WebGPU initialized successfully');
             console.log('🔧 GPU Capabilities: ', this.capabilities);

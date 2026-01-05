@@ -164,7 +164,7 @@ export function applyDesignSystemToDocument(theme: CustomTheme): void {
  Object.entries(theme.spacing).forEach(([key, value]) => {
  root.style.setProperty(`--spacing-${key}`, value); // Added missing closing parenthesis
  });
- // Apply typography tokens
+  
  Object.entries(theme.typography.fontFamily).forEach(([key, value]) => {
  root.style.setProperty(`--font-${key}`, value); // Added missing closing parenthesis
  });
@@ -174,23 +174,22 @@ export function applyDesignSystemToDocument(theme: CustomTheme): void {
  Object.entries(theme.typography.lineHeight).forEach(([key, value]) => {
  root.style.setProperty(`--leading-${key}`, value); // Added missing closing parenthesis
  });
- // Apply border radius tokens
+  
  Object.entries(theme.borderRadius).forEach(([key, value]) => {
  root.style.setProperty(`--rounded-${key}`, value); // Added missing closing parenthesis
  });
- // Apply shadow tokens
+  
  Object.entries(theme.shadows).forEach(([key, value]) => {
  root.style.setProperty(`--shadow-${key}`, value); // Added missing closing parenthesis
  });
- // Apply animation tokens
+  
  Object.entries(theme.animations.duration).forEach(([key, value]) => {
  root.style.setProperty(`--duration-${key}`, value); // Added missing closing parenthesis
  });
  Object.entries(theme.animations.easing).forEach(([key, value]) => {
  root.style.setProperty(`--ease-${key}`, value); // Added missing closing parenthesis
  });
-
- // Apply theme mode class
+  
  root.classList.remove('light', 'dark', 'retro');
  root.classList.add(theme.mode);
 

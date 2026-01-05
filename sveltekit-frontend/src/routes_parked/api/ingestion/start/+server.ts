@@ -22,8 +22,7 @@ export const POST: RequestHandler = async ({ request }) => {
  skipEmbedding,
  skipIndexing,
  });
-
- // Run limited ingestion
+  
  const result = await orchestrator.runLimited(limit);
 
  return json({

@@ -133,8 +133,7 @@ export class FixSynthesizer {
 			rule: 'File must parse without syntax errors',
 			required: true
 		});
-
-		// Type checking for TypeScript errors
+  
 		if (error.code.startsWith('TS')) {
 			rules.push({
 				type: 'type',

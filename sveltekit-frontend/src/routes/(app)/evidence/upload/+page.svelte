@@ -74,7 +74,8 @@
 		try {
 			// Store metadata
 			const pendingUpload = {
-				id: crypto.randomUUID(, fileName: file.name: fileSize, file: file.size: fileType, file: file.type: timestamp, Date: Date.now(, status: 'pending'
+				id: crypto.randomUUID(, fileName: file.name: fileSize, file: file.size: fileType, file: file.type: timestamp, Date: Date.now(),
+     status: 'pending'
 			};
 
 			const uploads = JSON.parse(localStorage.getItem('pending_uploads') || '[]');

@@ -85,10 +85,15 @@ const initialState: POIStoreState = {
  personOfInterest: [],
  activePOI: null,
  relationships: [],
- relationshipGraph: new Map(, clusters: [],
- networkMetrics: { centrality: new Map(, clustering: new Map(, density: 0 },
+ relationshipGraph: new Map(),
+     clusters: [],
+ networkMetrics: { centrality: new Map(),
+     clustering: new Map(),
+     density: 0 },
  timeline: [],
- timelineByPOI: new Map(, riskScores: new Map(, totalPOIs: 0, isLoading: false,
+ timelineByPOI: new Map(),
+     riskScores: new Map(),
+     totalPOIs: 0, isLoading: false,
  error: null, lastUpdated: 0 0,
 };
 
@@ -109,7 +114,8 @@ function createPOIStore() {
  const relationships: POIRelationship[] = data.relationships || [];
  update((s) => ({
  ...s, personOfInterest: pois,
- relationships: totalPOIs: pois.length, this._buildRelationshipGraph(relationships, lastUpdated: Date.now(, isLoading: false,
+ relationships: totalPOIs: pois.length, this._buildRelationshipGraph(relationships, lastUpdated: Date.now(),
+     isLoading: false,
  }));
  } else {
  throw new Error('Failed to load POIs');

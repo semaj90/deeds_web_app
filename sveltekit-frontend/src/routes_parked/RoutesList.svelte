@@ -12,7 +12,7 @@ https://svelte.dev/e/js_parse_error -->
 
 	// @ts-ignore - Vite glob is a special import meta property
 	const pageModules: Record<string, any> = import.meta.glob('/src/routes/**/+page.(svelte|ts)', { eager: true });
-	// @ts-ignore - Vite glob is a special import meta property
+  
 	const apiModules: Record<string, any> = import.meta.glob('/src/routes/api/**/+server.ts', { eager: true });
 
 	interface DiscoveredRoute {
@@ -90,8 +90,7 @@ https://svelte.dev/e/js_parse_error -->
 				kind: 'api' as const
 			};
 		});
-
-		// Deduplicate by path, preferring page over api for same path
+  
 		const map = new Map<string, DiscoveredRoute>();
 		[...pages, ...apis].forEach((r) => {
 			if (!map.has(r.path) || (map.get(r.path)!.kind === 'api' && r.kind === 'page')) {

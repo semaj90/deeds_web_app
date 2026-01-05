@@ -1,6 +1,6 @@
 import { json } from '@sveltejs/kit';
-import type { RequestHandler } from './$types';
 import { spawn } from 'child_process';
+import type { RequestHandler } from './$types';
 
 // Phase 89: Pipeline API Endpoint
 // Triggers CUDA clustering pipeline with real-time progress
@@ -22,7 +22,8 @@ export const POST: RequestHandler = async ({ request }) => {
 
 			// Non-blocking spawn
 			const proc = spawn(pythonPath, [scriptPath, ...args], {
-				cwd: process.cwd(, detached: true,
+				cwd: process.cwd(),
+				detached: true,
 				stdio: 'ignore'
 			});
 

@@ -37,9 +37,12 @@ class TableManager {
  id: id, // Assign the passed id
  sortColumn: null,
  sortDirection: 'asc',
- selectedRows: new Set(, currentPage: 1, pageSize: 10,
+ selectedRows: new Set(),
+     currentPage: 1, pageSize: 10,
  searchQuery: '',
- columnFilters: new Map(, columnWidths: new Map(, expandedRows: new Set(),
+ columnFilters: new Map(),
+     columnWidths: new Map(),
+     expandedRows: new Set(),
  ...initialState,
  };
  const store = writable(defaultState);
@@ -283,7 +286,8 @@ export function formatTableData(data: any[], columns: string[]): any[] {
 
 export function exportTableData(data: any[], filename?: string): void {
  const csv = convertToCSV(data);
- const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' }); // Fixed charset separator
+ const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
+  
  const link = document.createElement('a');
  if (link.download !== undefined) {
  const url = URL.createObjectURL(blob);

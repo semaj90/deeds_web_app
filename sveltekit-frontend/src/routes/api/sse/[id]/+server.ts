@@ -38,8 +38,7 @@ export const GET: RequestHandler = async ({ params }) => {
 					console.error('Failed to parse Redis message:', error);
 				}
 			});
-
-			// Send heartbeat every 30 seconds to keep connection alive
+  
 			heartbeatInterval = setInterval(() => {
 				try {
 					controller.enqueue(new TextEncoder().encode(`: heartbeat\n\n`));

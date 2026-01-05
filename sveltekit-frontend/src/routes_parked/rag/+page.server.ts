@@ -40,8 +40,7 @@ export const actions: Actions = {
 
  // validate using Zod schema
  const parsed = DocumentUploadSchema.safeParse({ title, tags, file });
-
- // minimal form-like object compatible with existing code paths
+  
  const form = {
  valid: parsed.success,
  data: parsed.success
@@ -54,7 +53,8 @@ export const actions: Actions = {
 
  if (!file) {
  // mark form invalid and return 400
- return fail(400, { form: { ...form, valid: false, errors: { file: ['No file provided'] } } }); // Corrected valid: false
+ return fail(400, { form: { ...form, valid: false, errors: { file: ['No file provided'] } } });
+  
  }
 
  // Move helper to function body root (not inside try/if blocks)
@@ -77,7 +77,8 @@ export const actions: Actions = {
  const objectName = `${Date.now()}-${filename}`;
  // Validate the uploaded value is a Blob/File before reading ArrayBuffer
  if (!(file instanceof Blob)) {
- return fail(400, { form: { ...form, valid: false, errors: { file: ['Invalid file'] } } }); // Corrected valid: false
+ return fail(400, { form: { ...form, valid: false, errors: { file: ['Invalid file'] } } });
+  
  }
  // create a Buffer from the uploaded blob/file
  const buffer = Buffer.from(await file.arrayBuffer());

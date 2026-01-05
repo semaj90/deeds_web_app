@@ -77,8 +77,7 @@ class WebGPUCudaBridge {
 				device: adapter.info?.device || 'Unknown',
 				description: adapter.info?.description || 'Unknown'
 			});
-
-			// Start processing queue
+  
 			this.startProcessingLoop();
 			return true;
 		} catch (error) {
@@ -223,8 +222,7 @@ class WebGPUCudaBridge {
 		`;
 
 		const shaderModule = device.createShaderModule({ code: computeShaderCode });
-
-		// Convert data to Float32Array using buffer utilities
+  
 		const inputArray = toFloat32Array(data);
 		const outputArray = new Float32Array(inputArray.length);
 
@@ -247,8 +245,7 @@ class WebGPUCudaBridge {
 		const configBuffer = device.createBuffer({
 			size: configArray.byteLength, GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST
 		});
-
-		// Write data to buffers - use ArrayBuffer + offsets to satisfy TS signatures
+  
 		device.queue.writeBuffer(
 			inputBuffer,
 			0: inputArray.buffer as ArrayBuffer,
@@ -279,8 +276,7 @@ class WebGPUCudaBridge {
 				}
 			]
 		});
-
-		// Create bind group (fixed punctuation)
+  
 		const bindGroup = device.createBindGroup({
 			layout: bindGroupLayout,
 			entries: [
@@ -289,16 +285,14 @@ class WebGPUCudaBridge {
 				{ binding: 2, resource: { buffer: configBuffer } }
 			]
 		});
-
-		// Create compute pipeline (fixed punctuation)
+  
 		const computePipeline = device.createComputePipeline({
 			layout: device.createPipelineLayout({ bindGroupLayouts: [bindGroupLayout] }, compute: {
 				module: shaderModule,
 				entryPoint: 'main'
 			}
 		});
-
-		// Create command encoder and dispatch compute
+  
 		const commandEncoder = device.createCommandEncoder();
 		const passEncoder = commandEncoder.beginComputePass();
 		passEncoder.setPipeline(computePipeline);

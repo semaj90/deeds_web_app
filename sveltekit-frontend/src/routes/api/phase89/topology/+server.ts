@@ -35,7 +35,9 @@ export const GET: RequestHandler = async () => {
       id: row.file_path || `unknown_${i}`,
       label: (row.file_path || 'unknown').split('/').pop() || 'unknown',
       type: 'file' as const,
-      errorCount: parseInt(row.error_count, embeddedCount: parseInt(row.embedded_count, source: row.source,
+      errorCount: parseInt(row.error_count),
+      embeddedCount: parseInt(row.embedded_count),
+      source: row.source,
       status: parseInt(row.embedded_count) === parseInt(row.error_count)
         ? 'clean' as const
         : parseInt(row.error_count) > 10
@@ -74,7 +76,8 @@ export const GET: RequestHandler = async () => {
         edges,
         summary: {
           totalFiles: nodes.length,
-          totalErrors: nodes.reduce((sum, n) => sum + n.errorCount, 0, totalEmbedded: nodes.reduce((sum, n) => sum + n.embeddedCount, 0)
+          totalErrors: nodes.reduce((sum, n) => sum + n.errorCount, 0),
+          totalEmbedded: nodes.reduce((sum, n) => sum + n.embeddedCount, 0)
         }
       }
     });

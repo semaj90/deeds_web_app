@@ -328,13 +328,13 @@ export class UnifiedAPIRouter {
  response.headers.set('access-control-allow-origin', '*');
  return response;
  });
- // Request ID middleware
+  
  this.use(async (event, context, next) => {
  const response = await next();
  response.headers.set('x-request-id', context.requestId);
  return response;
  });
- // Error handling middleware
+  
  this.use(async (event, context, next) => {
  try {
  return await next();
@@ -358,7 +358,7 @@ export class UnifiedAPIRouter {
  return json({ success: true, data: health });
  },
  });
- // Service discovery
+  
  this.register({
  path: '/api/services',
  method: 'GET',
@@ -367,7 +367,7 @@ export class UnifiedAPIRouter {
  return json({ success: true, data: services });
  },
  });
- // Route listing (dev only)
+  
  if (dev) {
  this.register({
  path: '/api/routes',
@@ -437,7 +437,7 @@ export const unifiedAPIRouter = new UnifiedAPIRouter({
  enableLogging: dev,
  defaultEncoding: 'json',
 });
-// ===== UTILITY FUNCTIONS =====
+  
 /**
  * Create a standardized API response
  */

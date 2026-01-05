@@ -78,8 +78,7 @@
 
  // Dispatch upload complete event
  dispatch('uploadComplete', { files: uploadedFiles });
-
- // Reset
+  
  uploadedFiles = [];
  isUploading = false;
  uploadProgress = 0;

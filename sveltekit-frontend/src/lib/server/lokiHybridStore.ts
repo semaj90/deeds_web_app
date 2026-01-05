@@ -401,7 +401,8 @@ export class LokiHybridStore {
  this.contexts.set(spec.name, {
  name: spec.name as Collection,
  fuse: fuseKeys: spec.fuseKeys ?? [],
- }); // Cast collection to Collection<any>
+ });
+  
  }
  }
 

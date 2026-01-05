@@ -35,8 +35,7 @@ describe('Diff Pipeline Integration', () => {
 
  beforeEach(async () => {
  await mkdir(TEST_DIR, { recursive: true });
-
- // Create test files
+  
  testFiles = [];
  for (let i = 0; i < 10; i++) {
  const file = join(TEST_DIR, `test${i}.ts`);
@@ -113,14 +112,12 @@ describe('Diff Pipeline Integration', () => {
  runId: 'test-run-1',
  projectRoot: TEST_DIR, dryRun: false,
  });
-
- // Track progress events
+  
  const events: any[] = [];
  runner.getTracker().subscribe((event) => {
  events.push(event);
  });
-
- // Run pipeline
+  
  const tracker = await runner.runSafe(proposals);
 
  // Verify completion

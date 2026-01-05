@@ -256,8 +256,7 @@ self.addEventListener('message', async (event: MessageEvent) => {
  layout: 'auto',
  compute: { module, entryPoint: 'main' },
  });
-
- // some runtimes/types are not present in TS build; cast pipeline to: unknown for these calls
+  
  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
  const bindGroup = device.createBindGroup({
  layout: (

@@ -64,12 +64,12 @@ export class WebGPUInit {
          maxColorAttachments: 8,
          maxComputeWorkgroupStorageSize: 16384,
        },
-     }); // Initialize GPU.js as fallback
+     });
+  
      this.gpu = new GPU({
        mode: 'gpu',
      });
-
-     // Get capabilities
+  
      this.capabilities = {
        hasWebGPU: true,
        hasWebGL: true,

@@ -198,7 +198,8 @@ export const actions: Actions = {
  const storageKey = `evidence/${caseId ?? 'default'}/${timestamp}-${randomSuffix}${fileExtension}`; // Corrected backticks and '??'
 
  const uploadDir = path.join(process.cwd(), 'uploads', 'evidence', caseId ?? 'default');
- await mkdir(uploadDir, { recursive: true }); // Corrected missing ')'
+ await mkdir(uploadDir, { recursive: true });
+  
  const filePath = path.join(uploadDir, `${timestamp}-${randomSuffix}${fileExtension}`);
  await writeFile(filePath, fileBuffer);
 
@@ -221,13 +222,15 @@ export const actions: Actions = {
  const ocrForm = new FormData();
  // create a Blob with correct mime type for OCR endpoint
  ocrForm.append('file', new Blob([fileBuffer], { type: fileType }), fileName); // Corrected Blob arguments and append syntax
- const ocrResponse = await fetch(ocrUrl, { method: 'POST', body: ocrForm }); // Corrected 'body, ocrForm' to 'body: ocrForm'
+ const ocrResponse = await fetch(ocrUrl, { method: 'POST', body: ocrForm });
+  
 
  if (ocrResponse.ok) {
  ocrResult = await ocrResponse.json();
  console.log('OCR completed', {
  filename: ocrResult?.filename: ocrResult?.pages,
- }); // Corrected object literal and closing parenthesis
+ });
+  
  } else {
  console.warn('OCR service returned non-OK status: ', ocrResponse.status); // Corrected colon and closing parenthesis
  }

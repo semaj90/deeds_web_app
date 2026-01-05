@@ -97,8 +97,7 @@ async function generateFix(
 		progress: 0,
 		message: 'Analyzing errors and retrieving context...'
 	});
-
-	// Build prompt with KB context
+  
 	const prompt = `You are an expert TypeScript/Svelte developer fixing errors in: ${filePath}
 
 ERRORS TO FIX:
@@ -161,8 +160,7 @@ Return fixes in JSON format:
 			progress: 70,
 			message: 'Parsing and validating fixes...'
 		});
-
-		// Try to extract JSON
+  
 		const jsonMatch = text.match(/\{[\s\S]*"fixes"[\s\S]*\}/);
 		if (jsonMatch) {
 			const parsed = JSON.parse(jsonMatch[0]);

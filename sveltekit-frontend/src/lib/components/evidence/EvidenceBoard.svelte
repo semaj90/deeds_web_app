@@ -140,8 +140,7 @@
  }
  return newSelection;
  });
-
- // Update inspector selection (single selection only)
+  
  if (!multiSelect) {
  selectedEvidenceForInspector = nodeId;
  }

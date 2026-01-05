@@ -342,8 +342,7 @@ Summary:`;
     words.forEach(word => {
       wordCounts.set(word, (wordCounts.get(word) || 0) + 1);
     });
-
-    // Compute TF (term frequency)
+  
     wordCounts.forEach((count, word) => {
       tfVector.set(word, count / totalWords);
     });

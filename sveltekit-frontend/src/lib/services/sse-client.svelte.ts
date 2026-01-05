@@ -64,8 +64,7 @@ export class SSEClient {
       this.eventSource = new EventSource(url.toString(), {
         withCredentials: this.config.withCredentials
       });
-
-      // Connection opened
+  
       this.eventSource.onopen = () => {
         this.isConnected = true;
         this.connectionError = null;

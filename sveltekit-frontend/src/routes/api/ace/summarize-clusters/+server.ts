@@ -153,8 +153,7 @@ export const GET: RequestHandler = async () => {
       tags: string[];
       created_at: string;
     }>('llm_summaries', { type: 'llm_summary', source_type: 'cluster' }, { limit: 100 });
-
-    // Get collection list
+  
     const listResponse = await fetch(`${QDRANT_URL}/collections`);
     const listData = await listResponse.json() as { result: { collections: Array<{ name: string }> } };
 

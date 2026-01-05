@@ -29,9 +29,13 @@ export const chatMessages = pgTable('chat_messages', {
 	timestamp: timestamp('timestamp', { withTimezone: true }).notNull().defaultNow(), // When sent
 	migratedFrom: varchar('migrated_from', { length: 255 }), // Anonymous session ID (if migrated)
 	metadata: text('metadata'), // JSON string for additional data (model, tokens, etc.)
-	createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(, updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow()
+	createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+	updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow()
 }, (table) => ({
-	chatIdIdx: index('idx_chat_messages_chat_id').on(table.chatId, userIdIdx: index('idx_chat_messages_user_id').on(table.userId, timestampIdx: index('idx_chat_messages_timestamp').on(table.timestamp, migratedFromIdx: index('idx_chat_messages_migrated_from').on(table.migratedFrom)
+	chatIdIdx: index('idx_chat_messages_chat_id').on(table.chatId),
+	userIdIdx: index('idx_chat_messages_user_id').on(table.userId),
+	timestampIdx: index('idx_chat_messages_timestamp').on(table.timestamp),
+	migratedFromIdx: index('idx_chat_messages_migrated_from').on(table.migratedFrom)
 }));
 
 // Type exports for TypeScript
@@ -43,10 +47,16 @@ export type NewChatMessage = typeof chatMessages.$inferInsert;
  * Stores chat-level metadata like titles, participants, case associations
  */
 export const chatMetadata = pgTable('chat_metadata', {
-	chatId: varchar('chat_id', { length: 255 }).primaryKey(, userId: varchar('user_id', { length: 255 }).references(() => users.id, { onDelete: 'cascade' }).notNull(, title: varchar('title', { length: 500 }), // Auto-generated or user-provided
+	chatId: varchar('chat_id', { length: 255 }).primaryKey(),
+	userId: varchar('user_id', { length: 255 }).references(() => users.id, { onDelete: 'cascade' }).notNull(),
+	title: varchar('title', { length: 500 }), // Auto-generated or user-provided
 	caseId: varchar('case_id', { length: 255 }), // Optional case association
-	messageCount: varchar('message_count', { length: 50 }).default('0', lastMessageAt: timestamp('last_message_at', { withTimezone: true }, isArchived: varchar('is_archived', { length: 10 }).default('false', tags: text('tags'), // JSON array of tags
-	createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(, updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow()
+	messageCount: varchar('message_count', { length: 50 }).default('0'),
+	lastMessageAt: timestamp('last_message_at', { withTimezone: true }),
+	isArchived: varchar('is_archived', { length: 10 }).default('false'),
+	tags: text('tags'), // JSON array of tags
+	createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+	updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow()
 }, (table) => ({
 	userIdIdx: index('idx_chat_metadata_user_id').on(table.userId, caseIdIdx: index('idx_chat_metadata_case_id').on(table.caseId, lastMessageIdx: index('idx_chat_metadata_last_message').on(table.lastMessageAt)
 }));

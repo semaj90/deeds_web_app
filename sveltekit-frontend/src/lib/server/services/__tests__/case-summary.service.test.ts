@@ -18,8 +18,7 @@ vi.mock('$lib/server/db', async () => {
     mockDb.transaction = vi.fn((cb) => cb(mockDb));
     return { db: mockDb };
 });
-
-// Mock redis
+  
 vi.mock('$lib/server/redis', async () => {
     const { vi } = await import('vitest');
     return {
@@ -28,8 +27,7 @@ vi.mock('$lib/server/redis', async () => {
         }
     };
 });
-
-// Mock verification service to prevent external calls
+  
 vi.mock('../verification.service', async () => {
     const { vi } = await import('vitest');
     return {

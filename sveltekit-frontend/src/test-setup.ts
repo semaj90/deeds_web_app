@@ -22,8 +22,7 @@ Object.defineProperty(global, 'crypto', {
 		}
 	}
 });
-
-// Mock environment variables
+  
 vi.mock('$env/static/private', () => ({
 	QDRANT_URL: 'http://localhost:6333',
 	QDRANT_COLLECTION: 'test_collection',
@@ -68,8 +67,7 @@ vi.mock('$app/stores', () => {
 	};
 	return { page, navigating };
 });
-
-// Mock fetch for tests
+  
 if (typeof global.fetch === 'undefined') {
 	global.fetch = vi.fn(() =>
 		Promise.resolve({

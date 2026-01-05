@@ -6,14 +6,16 @@ export const GET: RequestHandler = async () => {
 		// PostgreSQL Configuration
 		postgres: {
 			host: env.PGHOST || '127.0.0.1',
-			port: parseInt(env.PGPORT || '5434', database: env.PGDATABASE || 'legal',
+			port: parseInt(env.PGPORT || '5434'),
+			database: env.PGDATABASE || 'legal',
 			ssl: env.PGSSL === 'true'
 		},
 
 		// Redis Configuration
 		redis: {
 			url: env.REDIS_URL || 'redis://localhost:6379',
-			db: parseInt(env.REDIS_DB || '0', prefixes: {
+			db: parseInt(env.REDIS_DB || '0'),
+			prefixes: {
 				phase89: 'phase89:',
 				embeddings: 'emb:',
 				topk: 'topk:',
@@ -67,7 +69,8 @@ export const GET: RequestHandler = async () => {
 		// Version Info
 		version: {
 			phase: 89,
-			last_updated: new Date().toISOString(, features: [
+			last_updated: new Date().toISOString(),
+			features: [
 				'CUDA Acceleration',
 				'GPU Reranking',
 				'AST Signature Indexing',

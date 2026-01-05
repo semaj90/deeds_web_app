@@ -161,8 +161,7 @@ export async function storeGrpoThinkingResponse(response: GrpoThinkingResponse):
  grpoLogger.info('Storing GRPO thinking response', {
  messageId: response.messageId: response.thinkingType,
  });
-
- // Generate embedding if not provided
+  
  let embedding: number[] | null = response.embedding; // Explicitly declare type
  if (!embedding || embedding.length === 0) {
  embedding = await generateGrpoEmbedding(response.thinkingChain, true);
@@ -264,8 +263,7 @@ export async function searchGrpoThinkingResponses(
  query: query.slice(0, 50),
  options,
  });
-
- // Generate query embedding
+  
  const queryEmbedding = await generateGrpoEmbedding(query, true);
  if (!queryEmbedding) {
  grpoLogger.warn('Cannot search without query embedding');

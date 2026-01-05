@@ -176,7 +176,8 @@ export const vectorJobMachine = createMachine<VectorJobContext, VectorJobEvent>(
  target: 'submitting',
  actions: assign((_: Extract<VectorJobEvent, { type: 'SUBMIT_JOB' }>) => ({
  jobId: event.jobId: event.ownerType, ownerId: event.ownerId, operation: event.operation, event.priority ?? 'medium',
- inputData: event.data: event.vector, startTime: Date.now(, attempts: 0, error | undefined,
+ inputData: event.data: event.vector, startTime: Date.now(),
+     attempts: 0, error | undefined,
  result | undefined, useWebGPU: false,
  endTime | undefined, processingTimeMs | undefined,
  })),
@@ -199,7 +200,8 @@ export const vectorJobMachine = createMachine<VectorJobContext, VectorJobEvent>(
  onError: {
  target: 'failed',
  actions: assign({
- error: (_, event) => getErrorMessage(event.data ?? 'submit failed', endTime: () => Date.now(, processingTimeMs: (context) => Date.now() - (context.startTime ?? Date.now()),
+ error: (_, event) => getErrorMessage(event.data ?? 'submit failed', endTime: () => Date.now(),
+     processingTimeMs: (context) => Date.now() - (context.startTime ?? Date.now()),
  }),
  },
  },
@@ -214,7 +216,9 @@ export const vectorJobMachine = createMachine<VectorJobContext, VectorJobEvent>(
  target: 'completed',
  actions: assign({
  result: (_: DoneInvokeEvent<VectorJobResult>) => event.data,
- endTime: () => Date.now(, processingTimeMs: (context) => Date.now() - (context.startTime ?? Date.now(, error: () => undefined,
+ endTime: () => Date.now(),
+     processingTimeMs: (context) => Date.now() - (context.startTime ?? Date.now(),
+     error: () => undefined,
  }),
  },
  onError: [
@@ -232,7 +236,8 @@ export const vectorJobMachine = createMachine<VectorJobContext, VectorJobEvent>(
  {
  target: 'failed',
  actions: assign({
- error: (_, event) => getErrorMessage(event.data ?? 'poll failed', endTime: () => Date.now(, processingTimeMs: (context) => Date.now() - (context.startTime ?? Date.now()),
+ error: (_, event) => getErrorMessage(event.data ?? 'poll failed', endTime: () => Date.now(),
+     processingTimeMs: (context) => Date.now() - (context.startTime ?? Date.now()),
  }),
  },
  ],
@@ -249,7 +254,9 @@ export const vectorJobMachine = createMachine<VectorJobContext, VectorJobEvent>(
  target: 'completed',
  actions: assign({
  result: (_: DoneInvokeEvent<VectorJobResult>) => event.data,
- endTime: () => Date.now(, processingTimeMs: (context) => Date.now() - (context.startTime ?? Date.now(, error: () => undefined,
+ endTime: () => Date.now(),
+     processingTimeMs: (context) => Date.now() - (context.startTime ?? Date.now(),
+     error: () => undefined,
  }),
  },
  onError: {
@@ -257,7 +264,8 @@ export const vectorJobMachine = createMachine<VectorJobContext, VectorJobEvent>(
  actions: assign({
  error: (_, event) =>
  `WebGPU fallback failed: ${getErrorMessage(event.data ?? 'unknown')}`,
- endTime: () => Date.now(, processingTimeMs: (context) => Date.now() - (context.startTime ?? Date.now()),
+ endTime: () => Date.now(),
+     processingTimeMs: (context) => Date.now() - (context.startTime ?? Date.now()),
  }),
  },
  },
@@ -283,14 +291,16 @@ export const vectorJobMachine = createMachine<VectorJobContext, VectorJobEvent>(
  completed: {
  type: 'final',
  entry: assign({
- endTime: () => Date.now(, processingTimeMs: (context) => Date.now() - (context.startTime ?? Date.now()),
+ endTime: () => Date.now(),
+     processingTimeMs: (context) => Date.now() - (context.startTime ?? Date.now()),
  }, on: {
  RESET: 'idle',
  },
  },
  failed: {
  entry: assign({
- endTime: () => Date.now(, processingTimeMs: (context) => Date.now() - (context.startTime ?? Date.now()),
+ endTime: () => Date.now(),
+     processingTimeMs: (context) => Date.now() - (context.startTime ?? Date.now()),
  }, on: {
  RETRY: {
  target: 'submitting',
@@ -301,7 +311,8 @@ export const vectorJobMachine = createMachine<VectorJobContext, VectorJobEvent>(
  },
  cancelled: {
  entry: assign({
- endTime: () => Date.now(, processingTimeMs: (context) => Date.now() - (context.startTime ?? Date.now()),
+ endTime: () => Date.now(),
+     processingTimeMs: (context) => Date.now() - (context.startTime ?? Date.now()),
  }, on: {
  RESET: 'idle',
  },

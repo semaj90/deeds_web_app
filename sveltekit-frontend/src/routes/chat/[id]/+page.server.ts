@@ -38,7 +38,7 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 	return {
 		chatId,
 		history,
-		user, locals.user || null,
+		user: locals.user || null,
 		isAuthenticated,
 		shouldPromptAuth: !isAuthenticated,
 		// Merge Redis (ephemeral) + DB (persistent) if authenticated
@@ -101,7 +101,7 @@ export const actions: Actions = {
 			return {
 				success: true,
 				saved: !!locals.user,
-				hint: isAnonymous ? '💡 Sign in to save this conversation'  | undefined
+				hint: isAnonymous ? '💡 Sign in to save this conversation' : undefined
 			};
 		} catch (error: any) {
 			console.error('Failed to send message to RabbitMQ:', error);

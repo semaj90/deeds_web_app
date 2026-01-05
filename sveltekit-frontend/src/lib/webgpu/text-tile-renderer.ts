@@ -88,8 +88,7 @@ export class WebGPUTextTileRenderer {
  maxBufferSize: this.config.gpuMemoryPool * 1024 * 1024, maxComputeWorkgroupStorageSize,
  },
  });
-
- // Setup canvas context if available
+  
  if (this.canvas) {
  this.context = this.canvas.getContext('webgpu')!;
  this.context.configure({
@@ -119,23 +118,20 @@ export class WebGPUTextTileRenderer {
  usage: GPUBufferUsage.VERTEX | GPUBufferUsage.COPY_DST,
  label: 'text-tile-vertices',
  });
-
- // Create uniform buffer for rendering parameters
+  
  this.uniformBuffer = this.device.createBuffer({
  size: 256, // Uniform data
  usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
  label: 'text-tile-uniforms',
  });
-
- // Create texture atlas for NES-style tile patterns
+  
  this.textureAtlas = this.device.createTexture({
  size: { width: 256, height: 256, depthOrArrayLayers: 1 },
  format: 'rgba8unorm',
  usage: GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST,
  label: 'nes-tile-atlas',
  });
-
- // Create render pipeline with NES-style shaders
+  
  const shaderModule = this.device.createShaderModule({
  code: this.generateShaderCode(, label: 'text-tile-shaders',
  });
@@ -171,8 +167,7 @@ export class WebGPUTextTileRenderer {
  layout: 'auto',
  label: 'text-tile-render-pipeline',
  });
-
- // Create compute pipeline for tile processing
+  
  const computeModule = this.device.createShaderModule({
  code: this.generateComputeShaderCode(, label: 'text-tile-compute',
  });
@@ -549,7 +544,7 @@ fn cs_main(@builtin(global_invocation_id) global_id: vec3<u32>) {
 // Generated interaction handlers for tile ${tile.id}
 document.querySelector('.text-tile-${tile.id}').addEventListener('click', function(e) {
  console.log('Tile clicked: ', { id: '${tile.id}', compression: ${tile.compressionRatio}, semanticHash: '${tile.semanticHash}', patternId: '${tile.tileMetadata.patternId}' });
- // Trigger NES-style click animation
+  
  this.style.transform = 'scale(0.95)';
  setTimeout(() => this.style.transform = 'scale(1)', 100);
 });

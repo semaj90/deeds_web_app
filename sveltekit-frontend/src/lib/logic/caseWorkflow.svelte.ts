@@ -12,8 +12,7 @@ const machine = setup({
         approved: { type: 'final' }
     }
 });
-
-// 2. The Reactive Wrapper
+  
 export class CaseManager {
     // The "snapshot" is the reactive part the UI listens to
     state = $state() as any;

@@ -48,8 +48,7 @@
 			document.removeEventListener('keydown', handleKeydown);
 		};
 	});
-
-	// Create context with getter pattern for reactivity
+  
 	setContext<SelectContext>('select', {
 		get open() { return open; },
 		get value() { return value; },

@@ -19,8 +19,7 @@ export interface YoRHaFormFieldBase {
 export type YoRHaFormField =
  | (YoRHaFormFieldBase & { type: 'text' | 'textarea' | 'date' })
  | (YoRHaFormFieldBase & { type: 'select', options: Array<{ value: string, label: string }> });
-
-// Column definitions
+  
 export const documentsColumns: YoRHaColumn[] = [
  { key: 'yorha_id', title: 'YORHA ID', sortable: true, width: 140 },
  { key: 'title', title: 'DOCUMENT TITLE', sortable: true, filterable: true, width: 300 },

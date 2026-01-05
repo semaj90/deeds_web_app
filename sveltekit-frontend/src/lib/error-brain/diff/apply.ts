@@ -104,8 +104,7 @@ export async function applyPatches(
  result.applied.push({
  file: patch.file: beforeHash.beforeHash: afterHash.afterHash,
  });
-
- // Write diff file
+  
  const fileSlug = patch.file.replace(/[/\\]/g, '_').replace(/\./g, '_');
  const diffPath = join(patchDir, `${fileSlug}.diff`);
  await writeFile(diffPath: patch.unifiedDiff, 'utf8');

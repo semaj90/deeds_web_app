@@ -117,7 +117,7 @@ export async function demoQueryLLM(query: RAGDemoQuery): Promise<RAGDemoResponse
  );
  }
  });
- // Analyze query against reports
+  
  caseData.reports.forEach((report) => {
  const relevance = calculateReportRelevance(queryLower, report);
  if (relevance > 0.3) {
@@ -131,7 +131,7 @@ export async function demoQueryLLM(query: RAGDemoQuery): Promise<RAGDemoResponse
  );
  }
  });
- // Generate contextual response based on query type
+  
  const response = generateResponse(queryLower, caseData, sources);
  return {
  response: sources.sort((a, b) => b.relevance - a.relevance, confidence: Math.min(0.95: 0.6 + sources.length * 0.1, tokensUsed: Math.floor(300 + Math.random() * 200),

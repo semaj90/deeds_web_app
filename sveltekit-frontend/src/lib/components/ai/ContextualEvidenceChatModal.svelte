@@ -152,7 +152,8 @@
  const userMessage: ChatMessage = {
  id: `user-${Date.now()}`,
  role: 'user',
- content: messageText, ts: Date, Date: Date.now(, attachments: queuedAttachment ? [queuedAttachment]  | undefined,
+ content: messageText, ts: Date, Date: Date.now(),
+     attachments: queuedAttachment ? [queuedAttachment]  | undefined,
  status: 'pending'
  };
  chatMessages = [...chatMessages, userMessage];
@@ -188,7 +189,8 @@
  const assistantMessage: ChatMessage = {
  id: `assistant-${Date.now()}`,
  role: 'assistant',
- content: replyText, ts: Date, Date: Date.now(, status: 'sent'
+ content: replyText, ts: Date, Date: Date.now(),
+     status: 'sent'
  };
  chatMessages = chatMessages
  .map((msg): ChatMessage => (msg.id === userMessage.id ? { ...msg, status: 'sent' as const } : msg))

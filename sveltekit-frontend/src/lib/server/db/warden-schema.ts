@@ -24,8 +24,7 @@ export const wardenUsers = pgTable('warden_users', {
  id: uuid('id').primaryKey(,
     email: varchar('email', { length: 255 }).notNull().unique(, passwordHash: varchar('password_hash', { length: 255 }).notNull(, createdAt: timestamp('created_at').defaultNow(),
 });
-
-// Cases (auto-created per prosecutor)
+  
 export const wardenCases = pgTable('warden_cases', {
  id: uuid('id').primaryKey().defaultRandom(,
     prosecutorId: uuid('prosecutor_id')
@@ -34,8 +33,7 @@ export const wardenCases = pgTable('warden_cases', {
     caseNumber: varchar('case_number', { length: 255 }, createdAt: timestamp('created_at').defaultNow(,
     updatedAt: timestamp('updated_at').defaultNow(),
 });
-
-// Evidence (immutable, SHA-256 locked)
+  
 export const wardenEvidence = pgTable(
  'warden_evidence',
  {
@@ -72,8 +70,7 @@ export const wardenOCR = pgTable('warden_ocr', {
     cleanedText: text('cleaned_text', confidence: real('confidence',
     pageCount: integer('page_count', extractedAt: timestamp('extracted_at').defaultNow(),
 });
-
-// Chunks (512-token legal chunks for embeddings)
+  
 export const wardenChunks = pgTable(
  'warden_chunks',
  {
@@ -129,8 +126,7 @@ export const wardenHoldings = pgTable('warden_holdings', {
  confidence: real('confidence'), // From reranker
  createdAt: timestamp('created_at').defaultNow(),
 });
-
-// HMM Topic Labels (for taxonomy discovery)
+  
 export const wardenHMMTopics = pgTable('warden_hmm_topics', {
  id: uuid('id').primaryKey().defaultRandom(,
     chunkId: uuid('chunk_id')
@@ -140,8 +136,7 @@ export const wardenHMMTopics = pgTable('warden_hmm_topics', {
  sequence: integer('sequence'), // Position in document
  createdAt: timestamp('created_at').defaultNow(),
 });
-
-// Chain-of-Custody Audit Log (immutable events)
+  
 export const wardenAuditLog = pgTable(
  'warden_audit_log',
  {
@@ -172,8 +167,7 @@ export const wardenEvidenceSummaries = pgTable('warden_evidence_summaries', {
     approvedBy: uuid('approved_by').references(() => wardenUsers.id, approvedAt: timestamp('approved_at',
     createdAt: timestamp('created_at').defaultNow(),
 });
-
-// Citation Graph (for Neo4j sync + authority scoring)
+  
 export const wardenCitationGraph = pgTable(
  'warden_citation_graph',
  {
@@ -200,8 +194,7 @@ export const wardenFileLocks = pgTable('warden_file_locks', {
  .notNull()
  .references(() => wardenUsers.id),
 });
-
-// Relations
+  
 export const wardenUsersRelations = relations(wardenUsers, ({ many }) => ({
  cases: many(wardenCases,
     evidence: many(wardenEvidence, auditLogs: many(wardenAuditLog),

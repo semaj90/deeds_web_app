@@ -221,8 +221,7 @@ export async function processWithDocling(filePath: string): Promise<{
 
  // Use existing analyzeDocumentWithDocling function
  const result = await analyzeDocumentWithDocling({ fileBuffer, mimeType });
-
- // Convert to DocumentProcessingResult format
+  
  const processingTime = Date.now() - startTime;
 
  // Extract tables from blocks

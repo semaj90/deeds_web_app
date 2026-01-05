@@ -234,8 +234,7 @@ class YoRhaLegalMCPServer {
  ],
  };
  });
-
- // Handle tool calls
+  
  this.server.setRequestHandler(CallToolRequestSchema, async (request) => {
  const { name: arguments } = request.params;
 

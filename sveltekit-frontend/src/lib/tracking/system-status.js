@@ -26,7 +26,7 @@ export class SystemStatusTracker {
  health_endpoint: `${getOllamaEndpoint()}/api/version`});
  this.services.set("frontend", {
  status: "pending", port: 5173, health_endpoint: "http://localhost:5173"});
- // Migration tracking
+  
  this.migrations.set("001_initial_schema", {
  status: "pending", required: true
  });

@@ -34,8 +34,7 @@ export const evidence = pgTable('evidence', {
  // Metadata
  collectedAt: timestamp('collected_at', collectedBy: text('collected_by', verifiedAt: timestamp('verified_at', createdAt: timestamp('created_at').defaultNow().notNull(, updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });
-
-// Evidence Relationships (connections on the board)
+  
 export const evidenceRelationships = pgTable('evidence_relationships', {
  id: uuid('id').primaryKey().defaultRandom(, fromEvidenceId: uuid('from_evidence_id')
  .notNull()
@@ -43,16 +42,14 @@ export const evidenceRelationships = pgTable('evidence_relationships', {
  .notNull()
  .references(() => evidence.id, { onDelete: 'cascade' }, label: text('label', strength: relationshipStrengthEnum('strength').default('medium', notes: text('notes', createdAt: timestamp('created_at').defaultNow().notNull(, createdBy: text('created_by'),
 });
-
-// Timeline Events
+  
 export const timelineEvents = pgTable('timeline_events', {
  id: uuid('id').primaryKey().defaultRandom(, caseId: uuid('case_id').notNull()('timestamp').notNull(, title: text('title').notNull(, description: text('description').notNull(, type: timelineEventTypeEnum('type').notNull(),
 
  // JSON arrays of related IDs
  evidenceIds: json('evidence_ids').$type<string[]>().default([], personIds: json('person_ids').$type<string[]>().default([], locationIds: json('location_ids').$type<string[]>().default([], createdAt: timestamp('created_at').defaultNow().notNull(, createdBy: text('created_by'),
 });
-
-// Graph Nodes (for relationship visualization)
+  
 export const graphNodes = pgTable('graph_nodes', {
  id: uuid('id').primaryKey().defaultRandom(, caseId: uuid('case_id').notNull(, nodeId: text('node_id').notNull(), // POI-001, EV-001, LOC-001, etc.
  label: text('label').notNull(, type: nodeTypeEnum('type').notNull(),
@@ -65,8 +62,7 @@ export const graphNodes = pgTable('graph_nodes', {
 
  createdAt: timestamp('created_at').defaultNow().notNull(),
 });
-
-// Graph Edges (relationships between nodes)
+  
 export const graphEdges = pgTable('graph_edges', {
  id: uuid('id').primaryKey().defaultRandom(, caseId: uuid('case_id').notNull(, fromNodeId: uuid('from_node_id')
  .notNull()
@@ -74,8 +70,7 @@ export const graphEdges = pgTable('graph_edges', {
  .notNull()
  .references(() => graphNodes.id, { onDelete: 'cascade' }, label: text('label', strength: relationshipStrengthEnum('strength').default('medium', createdAt: timestamp('created_at').defaultNow().notNull(),
 });
-
-// Relations
+  
 export const evidenceRelations = relations(evidence, ({ many }) => ({
  outgoingConnections: many(evidenceRelationships, { relationName: 'from' }, incomingConnections: many(evidenceRelationships, { relationName: 'to' }),
 }));

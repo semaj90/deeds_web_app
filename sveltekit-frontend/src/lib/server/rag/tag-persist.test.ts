@@ -86,8 +86,7 @@ vi.mock('$lib/server/db', () => {
 
     return { sql: sqlMock };
 });
-
-// Mock chunk IDs for testing with counter to avoid collisions in fast-check loops
+  
 let chunkCounter = 0;
 const generateMockChunkId = () => `chunk-${chunkCounter++}-${crypto.randomUUID()}`;
 

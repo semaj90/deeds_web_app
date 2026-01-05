@@ -6,8 +6,7 @@ import type { DocumentItem, VisionItem } from '$lib/types/sharedTypes';
 const qdrant = new QdrantClient({
  url: process.env.QDRANT_URL || 'http://localhost:6333',
 });
-
-// Lightweight GPU inference stub (replace with real Gemma3/Triton adapter)
+  
 export async function runGPUInference(text: string): Promise<number[]> {
  // deterministic pseudo-embedding for tests: hash chars
  const vec: number[] = [];

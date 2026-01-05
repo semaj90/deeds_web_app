@@ -26,8 +26,7 @@ https://svelte.dev/e/js_parse_error -->
  }
  })();
  });
-
- // Page state
+  
  const integrationStatus = writable({
  mcpServerRunning: false, vsCodeExtensionActive: false
  clusterSystemOnline: false, ollamaModelsLoaded: false

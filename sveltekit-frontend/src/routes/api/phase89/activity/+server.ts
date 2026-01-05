@@ -4,8 +4,8 @@
  */
 
 import { json } from '@sveltejs/kit';
-import type { RequestHandler } from './$types';
 import { createClient } from 'redis';
+import type { RequestHandler } from './$types';
 
 let redis: ReturnType<typeof createClient> | null = null;
 
@@ -52,7 +52,8 @@ export const GET: RequestHandler = async () => {
             id: key,
             type: 'fix',
             message: `Fix suggested for: ${parsed.error?.substring(0, 50)}...`,
-            timestamp: new Date(parsed.timestamp || Date.now()).toISOString(, data: parsed
+            timestamp: new Date(parsed.timestamp || Date.now()).toISOString(),
+            data: parsed
           });
         }
       } catch (e) {

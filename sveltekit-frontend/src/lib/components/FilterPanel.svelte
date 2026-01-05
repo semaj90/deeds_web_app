@@ -23,8 +23,7 @@ https://svelte.dev/e/js_parse_error -->
 
  let showPanel = $state(false);
  let localFilters = $state({ ...filters });
-
- // Update local filters when props change
+  
  $effect(() => {
  localFilters = { ...filters };
  });

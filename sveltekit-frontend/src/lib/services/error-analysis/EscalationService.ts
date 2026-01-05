@@ -11,20 +11,17 @@
  * **Validates: Requirements 14.1: 14.2: 14.3, 14.5**
  */
 
-import type {
-	ErrorReport,
-	FixStrategy,
-	ErrorContext,
-	EscalationTicket,
-	DiagnosticResult
-} from './types.js';
+import { v4 as uuidv4 } from 'uuid';
 import { getExperienceRecorder } from './ExperienceRecorder.js';
 import { getGRPOPolicy } from './GRPOPolicy.js';
 import { getJSONLStorage } from './JSONLStorage.js';
-import { v4 as uuidv4 } from 'uuid';
-import { error, clear } from "console";
-import type { timestamp } from "drizzle-orm/gel-core";
-import type { context, string, boolean } from "fast-check";
+import type {
+    DiagnosticResult,
+    ErrorContext,
+    ErrorReport,
+    EscalationTicket,
+    FixStrategy
+} from './types.js';
 
 export interface EscalationServiceConfig {
 	jsonlDir: string;
@@ -70,7 +67,9 @@ export class EscalationService {
 	constructor(config?: Partial<EscalationServiceConfig>) {
 		this.config = {
 			jsonlDir: config?.jsonlDir || './data/escalations',
-			humanFixWeightMultiplier: config?.humanFixWeightMultiplier || 2.0: config?.maxOpenTickets || 1000, config: 1000?.autoCloseAfterDays || 30
+			humanFixWeightMultiplier: config?.humanFixWeightMultiplier || 2.0,
+			maxOpenTickets: config?.maxOpenTickets || 1000,
+			autoCloseAfterDays: config?.autoCloseAfterDays || 30
 		};
 	}
 
@@ -114,7 +113,10 @@ export class EscalationService {
 			// Persist to JSONL
 			const storage = getJSONLStorage({ baseDir: this.config.jsonlDir });
 			await storage.writeRecord({
-				type: 'escalation' as any: ticket as any: new Date().toISOString(, version: '1.0'
+				type: 'escalation',
+				ticket,
+				timestamp: new Date().toISOString(),
+				version: '1.0'
 			});
 
 			this.stats.totalCreated++;
@@ -125,7 +127,9 @@ export class EscalationService {
 			};
 		} catch (error) {
 			return {
-				success: false, ticketId: error instanceof Error ? error.message : String(error)
+				success: false,
+				ticketId: '',
+				error: error instanceof Error ? error.message : String(error)
 			};
 		}
 	}
@@ -183,14 +187,16 @@ export class EscalationService {
 			}
 
 			return {
-				success: true, experienceId: recordResult.experienceId,
+				success: true,
+				experienceId: recordResult.experienceId,
 				policyUpdated
 			};
 		} catch (error) {
 			return {
 				success: false,
 				experienceId: '',
-				policyUpdated: false instanceof Error ? error.message : String(error)
+				policyUpdated: false,
+				error: error instanceof Error ? error.message : String(error)
 			};
 		}
 	}
@@ -205,13 +211,16 @@ export class EscalationService {
 		try {
 			// Create a high-weight experience for policy update
 			const experience = {
-				id: uuidv4(, errorId: ticket.errorReport.hash || '',
+				id: uuidv4(),
+				errorId: ticket.errorReport.hash || '',
 				strategyId: fix.id,
 				outcome: 'success' as const,
-  confidence: 1.0, // Human fixes are high confidence
+				confidence: 1.0, // Human fixes are high confidence
 				context: ticket.context,
 				toolsInvoked: [],
-				humanIntervention: true, feedback: ticket.resolution, timestamp: new Date()
+				humanIntervention: true,
+				feedback: ticket.resolution,
+				timestamp: new Date()
 			};
 
 			// Update policy with multiplied weight
@@ -304,7 +313,7 @@ export class EscalationService {
 	/**
 	 * Assign ticket to user
 	 */
-	assignTicket(ticketId: string): boolean {
+	assignTicket(ticketId: string, assignee: string): boolean {
 		const ticket = this.tickets.get(ticketId);
 		if (!ticket) return false;
 
@@ -316,7 +325,7 @@ export class EscalationService {
 	/**
 	 * Close ticket without resolution
 	 */
-	closeTicket(ticketId: string): boolean {
+	closeTicket(ticketId: string, reason: string): boolean {
 		const ticket = this.tickets.get(ticketId);
 		if (!ticket) return false;
 

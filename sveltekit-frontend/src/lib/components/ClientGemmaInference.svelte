@@ -38,8 +38,7 @@
  tokenizer = await AutoTokenizer.from_pretrained('/models/', {
  local_files_only: true
  });
-
- // Load ONNX model
+  
  const modelPath = '/models/gemma3_270m_w8a16.onnx';
  const response = await fetch(modelPath);
  const modelBuffer = await response.arrayBuffer();
@@ -63,8 +62,7 @@
  model = await InferenceSession.create(modelBuffer, {
  executionProviders: executionProviders
  });
-
- // Determine which provider was actually selected
+  
  const selectedProvider = model.getExecutionProviders()[0];
  currentProvider = selectedProvider === 'WebGPUExecutionProvider' ? 'WebGPU' :
  selectedProvider === 'WebNNExecutionProvider' ? 'WebNN' : 'CPU';
@@ -88,8 +86,7 @@
  padding: true, truncation: true
  max_length: 512
  });
-
- // Convert to ONNX tensors
+  
  const { Tensor } = await import('onnxruntime-web');
  const inputIdsTensor = new Tensor('int32', new Int32Array(inputs.input_ids.data), [1, inputs.input_ids.data.length]);
  const attentionMaskTensor = new Tensor('int32', new Int32Array(inputs.attention_mask.data), [1, inputs.attention_mask.data.length]);

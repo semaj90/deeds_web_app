@@ -1283,8 +1283,7 @@ Object.assign(handlers, {
 			// Execute query via docker exec
 			const cmd = `docker exec ${containerName} psql -U ${dbUser} -d ${dbName} -t -A -F "," -c "${query.replace(/"/g, '\\"')}"`;
 			const output = execSync(cmd, { encoding: 'utf-8', timeout: 30000 });
-
-			// Parse CSV output
+  
 			const rows = output
 				.trim()
 				.split('\n')
@@ -1424,8 +1423,7 @@ Object.assign(handlers, {
 
 			const cmd = `docker exec ${containerName} redis-cli INFO stats`;
 			const output = execSync(cmd, { encoding: 'utf-8', timeout: 5000 });
-
-			// Parse Redis INFO output
+  
 			const stats: any = {};
 			output.split('\n').forEach(line => {
 				if (line.includes(':')) {
@@ -1433,8 +1431,7 @@ Object.assign(handlers, {
 					stats[key.trim()] = value.trim();
 				}
 			});
-
-			// Get key count
+  
 			const keysCmd = `docker exec ${containerName} redis-cli DBSIZE`;
 			const keysOutput = execSync(keysCmd, { encoding: 'utf-8', timeout: 5000 });
 			const keys = parseInt(keysOutput.match(/\d+/)?.[0] || '0');
@@ -1824,8 +1821,7 @@ Object.assign(handlers, {
 					}
 				});
 			});
-
-			// Simple complexity: count functions + branches
+  
 			const functionCount = (content.match(/function\s+\w+|=>\s*{/g) || []).length;
 			const branchCount = (content.match(/if\s*\(|switch\s*\(|\?\s*.*:/g) || []).length;
 			const complexity = functionCount + branchCount;
@@ -1970,7 +1966,8 @@ Object.assign(handlers, {
 			};
 		}
 	}
-});  // Close Object.assign(handlers, {...})
+});
+  
 
 // ═══════════════════════════════════════════════════════════════════════
 // Public API

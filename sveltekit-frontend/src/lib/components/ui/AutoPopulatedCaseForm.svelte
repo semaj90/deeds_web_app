@@ -28,13 +28,11 @@
 
  // Local form state
  let localForm = $state<AutoPopulatedForm>({ ...form });
-
- // Update local form when prop changes
+  
  $effect(() => {
  localForm = { ...form };
  });
-
- // Auto-populate from metadata
+  
  $effect(() => {
  if (metadata?.entities) {
  populateFromMetadata(metadata);

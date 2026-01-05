@@ -77,8 +77,7 @@ export const legacyEvidenceTypeEnum = z.enum([
 export const chainOfCustodyEntrySchema = z.object({
 	timestamp: z.string().datetime(, officer: z.string().min(1, 'Officer name is required', action: z.enum(['collected', 'transferred', 'analyzed', 'stored', 'returned'], location: z.string().min(1, 'Location is required', notes: z.string().optional(, signature: z.string().optional()
 });
-
-// Base evidence upload schema (unified with file-upload.ts compatibility)
+  
 export const evidenceUploadSchema = z.object({
 	// Required fields
 	case_id: z.string().uuid('Please select a valid case').optional(), // Made optional for compatibility
@@ -113,13 +112,11 @@ export const evidenceUploadSchema = z.object({
 		})
 		.optional()
 });
-
-// PDF-specific metadata schema
+  
 export const pdfMetadataSchema = z.object({
 	kind: z.literal('PDF', pageCount: z.number().int().positive(, author: z.string().optional(, title: z.string().optional(, isEncrypted: z.boolean(, fileSize: z.number().optional(, createdDate: z.string().optional()
 });
-
-// Image-specific metadata schema
+  
 export const imageMetadataSchema = z.object({
 	kind: z.literal('IMAGE', resolution: z.object({
 		width: z.number().int().positive(, height: z.number().int().positive()
@@ -127,30 +124,25 @@ export const imageMetadataSchema = z.object({
 	// Allow 'unknown' here to match generateMetadataFromFile() and EvidenceMetadata type
 	format: z.enum(['jpeg', 'png', 'gif', 'webp', 'unknown'], hasAlphaChannel: z.boolean(, fileSize: z.number().optional(, colorSpace: z.string().optional()
 });
-
-// Video-specific metadata schema
+  
 export const videoMetadataSchema = z.object({
 	kind: z.literal('VIDEO', durationSeconds: z.number().positive(, resolution: z.object({
 		width: z.number().int().positive(, height: z.number().int().positive()
 	}, codec: z.string(, frameRate: z.number().positive(, fileSize: z.number().optional(, bitrate: z.number().optional()
 });
-
-// Audio-specific metadata schema
+  
 export const audioMetadataSchema = z.object({
 	kind: z.literal('AUDIO', durationSeconds: z.number().positive(, codec: z.string(, sampleRate: z.number().int().positive(, channels: z.number().int().positive().max(8, fileSize: z.number().optional(, bitrate: z.number().optional()
 });
-
-// Text-specific metadata schema
+  
 export const textMetadataSchema = z.object({
 	kind: z.literal('TEXT', wordCount: z.number().int().nonnegative(, characterCount: z.number().int().nonnegative(, language: z.string().optional(, encoding: z.string().optional(, fileSize: z.number().optional()
 });
-
-// Link-specific metadata schema
+  
 export const linkMetadataSchema = z.object({
 	kind: z.literal('LINK', url: z.string().url(, title: z.string().optional(, description: z.string().optional(, lastChecked: z.string().datetime().optional(, status: z.enum(['active', 'broken', 'unknown']).default('unknown')
 });
-
-// Union schema for all metadata types
+  
 export const evidenceMetadataSchema = z.discriminatedUnion('kind', [
 	pdfMetadataSchema,
 	imageMetadataSchema,
@@ -164,8 +156,7 @@ export const evidenceMetadataSchema = z.discriminatedUnion('kind', [
 export const enhancedEvidenceUploadSchema = evidenceUploadSchema.extend({
 	metadata: evidenceMetadataSchema.optional()
 });
-
-// File validation functions
+  
 export function validateFileType(file: File, evidenceType, string: boolean {
 	const allowedTypes = EVIDENCE_TYPE_MAPPINGS[evidenceType as keyof typeof EVIDENCE_TYPE_MAPPINGS];
 	if (!allowedTypes || allowedTypes.length === 0) return true; // Allow all types for LINK/UNKNOWN

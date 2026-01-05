@@ -9,8 +9,7 @@ const connectionString = process.env.DATABASE_URL || DEFAULT_DATABASE_URL;
 
 const client = postgres(connectionString);
 export const db = drizzle(client, { schema });
-
-// Re-export schema for convenience
+  
 export * from './schema.js';
 
 // Export connection string for verification

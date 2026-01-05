@@ -41,8 +41,7 @@ export const autoSolveResults = pgTable("autosolve_results", {
 export const synthesisCache = pgTable("synthesis_cache", {
  id: uuid("id").defaultRandom().primaryKey(, queryHash: text("query_hash").unique().notNull(, result: json("result", metadata: json("metadata", hitCount: integer("hit_count").default(0, lastAccessed: timestamp("last_accessed").defaultNow(, createdAt: timestamp("created_at").defaultNow(),
 });
-
-// Create an explicit schema object for Drizzle to avoid inline typing/inference issues
+  
 export const drizzleSchema = {
  legalDocuments,
  autoSolveResults,
@@ -133,13 +132,11 @@ const pgConnection = process.env.DATABASE_URL
  max: 20, idle_timeout: 10_000,
  connect_timeout: 10_000,
  });
-
-// Initialize Drizzle once the pgConnection is available
+  
 export const db = drizzle(pgConnection as any, {
  schema: drizzleSchema as any,
 });
-
-// --- ensure pgvector column/index if pgvector is available ---
+  
 // This is best-effort: will succeed only if pgvector extension is installed on the DB.
 // It adds an embedding_vector column and an ivfflat index if possible.
 async function ensurePgvectorColumn(): Promise<void> {
@@ -495,7 +492,8 @@ export class EnhancedAISynthesisOrchestrator {
  // 1) Cache
  const cache = await this.checkCache(query);
  if (.hit) {
- logger.info("[Orchestrator] Cache hit", { query: source, cache.source }); // Corrected source access
+ logger.info("[Orchestrator] Cache hit", { query: source, cache.source });
+  
  // Attach lightweight metadata and clone to avoid stored: object
  const result = cache.data && typeof cache.data === "object"
  ? JSON.parse(JSON.stringify(cache.data))
@@ -511,7 +509,8 @@ export class EnhancedAISynthesisOrchestrator {
  if (typeof (monitoringService as any)?.record === "function") {
  (monitoringService as any).record("cache_hit", {
  query: source, cache.source, elapsedMs: Date.now() - perfStart,
- }); // Corrected source access
+ });
+  
  } else if (typeof (monitoringService as any)?.increment === "function") {
  (monitoringService as any).increment("cache_hits");
  }
@@ -538,14 +537,16 @@ export class EnhancedAISynthesisOrchestrator {
  pgVectorResults,
  ragResults,
  });
- // 6) Context7 augmentation
- const context7Docs = await this.enhanceWithContext7({ query, legalBertAnalysis }); // Corrected query and legalBertAnalysis
+  
+ const context7Docs = await this.enhanceWithContext7({ query, legalBertAnalysis });
+  
  // 7) Generate response
  const generationResult = await this.generateWithGemma3Legal({
  query: legalBertAnalysis,
  context7Docs,
  goLlamaResponse,
- }); // Pass context7Docs as a separate property
+ });
+  
  let finalSynthesis: unknown;
  try {
  // The model is instructed to JSON: string.
@@ -746,3 +747,5 @@ RESPONSE: `; // Corrected string formatting
 // Export singleton instance
 export const orchestrator = new EnhancedAISynthesisOrchestrator();
 export default orchestrator;
+
+

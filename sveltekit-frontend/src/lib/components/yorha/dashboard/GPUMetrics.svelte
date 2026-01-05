@@ -37,7 +37,8 @@
  performanceHistory = [
  ...performanceHistory.slice(1),
  {
- time: Date.now(, utilization: gpuMetrics.utilization,
+ time: Date.now(),
+     utilization: gpuMetrics.utilization,
  memory: (gpuMetrics.memoryUsed / gpuMetrics.memoryTotal) * 100
  }
  ];
@@ -57,7 +58,8 @@
  performanceHistory = [
  ...performanceHistory.slice(1),
  {
- time: Date.now(, utilization: gpuMetrics.utilization,
+ time: Date.now(),
+     utilization: gpuMetrics.utilization,
  memory: (gpuMetrics.memoryUsed / gpuMetrics.memoryTotal) * 100
  }
  ];

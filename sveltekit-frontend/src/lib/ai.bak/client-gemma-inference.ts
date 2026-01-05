@@ -48,8 +48,7 @@ export class ClientGemmaInference {
  this.gemmaSession = await ort.InferenceSession.create(gemmaModel, {
  executionProviders: ['webgpu', 'wasm'],
  });
-
- // Load Gemma3 tokenizer
+  
  const gemmaTokenizerResponse = await fetch('/models/gemma3_270m_onnx/tokenizer.json');
  this.gemmaTokenizer = await gemmaTokenizerResponse.json();
 
@@ -60,8 +59,7 @@ export class ClientGemmaInference {
  this.embeddingSession = await ort.InferenceSession.create(embeddingModel, {
  executionProviders: ['webgpu', 'wasm'],
  });
-
- // Load EmbeddingGemma tokenizer
+  
  const embeddingTokenizerResponse = await fetch(
  '/models/embeddinggemma_300m_onnx/tokenizer.json'
  );

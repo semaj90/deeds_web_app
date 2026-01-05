@@ -156,7 +156,8 @@ export class WebGPULegalDocumentGraphImpl implements WebGPULegalDocumentGraph {
  fallbackMode: boolean;
  note: string;
  } = {
- ts: Date.now(, latency: Math.round(this.stats.frameTime, frameDelta: Math.round(dt, gpuActive: !!this.device,
+ ts: Date.now(),
+     latency: Math.round(this.stats.frameTime, frameDelta: Math.round(dt, gpuActive: !!this.device,
  fallbackMode: !this.device,
  note: 'webgpu-frame',
  };

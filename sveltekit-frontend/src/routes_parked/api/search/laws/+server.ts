@@ -57,8 +57,7 @@ export const POST: RequestHandler = async ({ request }) => {
  offset,
  filters,
  });
-
- // Call Go microservice
+  
  const response = await fetch(`${GO_MICROSERVICE_URL}/search/laws`, {
  method: 'POST',
  headers: {

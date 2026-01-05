@@ -339,7 +339,7 @@ const result = await getLegalEmbedding(legalQuery);
  wordCount.set(word, (wordCount.get(word) || 0) + 1);
  }
  });
- // Return top terms by frequency
+  
  return Array.from(wordCount.entries())
  .sort(([, a], [, b]) => b - a)
  .slice(0, 10)
@@ -400,8 +400,7 @@ export const webgpuLangChainBridge = new WebGPULangChainBridge({
     compressVectors: true, practiceArea: 'legal-ai',
     documentType: 'general',
 });
-
-// Convenience functions
+  
 export async function processLegalDocumentWithWebGPU(
  text: string,
  options?: Partial<LangChainWebGPUConfig>
@@ -421,3 +420,5 @@ export async function processBatchDocumentsWithWebGPU(
 export async function getLangChainWebGPUStats(): Promise<any> {
  return webgpuLangChainBridge.getProcessingStats();
 }
+
+

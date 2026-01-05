@@ -94,7 +94,8 @@ export class MoogleGraphSynthesizer {
  }
  const tensorSlice: TensorSlice = {
  data: imageFloat32,
- metadata: { timestamp: Date.now(, hash: this.hashVisualization(visualization.base64, size: imageFloat32.byteLength }
+ metadata: { timestamp: Date.now(),
+     hash: this.hashVisualization(visualization.base64, size: imageFloat32.byteLength }
  };
  if (this.tensorStore?.storeTensorSlice) await this.tensorStore.storeTensorSlice(`moogle_2d_${Date.now()}`, tensorSlice);
  if (this.somCache?.storeEmbedding) {
@@ -119,7 +120,8 @@ export class MoogleGraphSynthesizer {
  try {
  const verticesTensor: TensorSlice = {
  data: mesh.vertices,
- metadata: { timestamp: Date.now(, hash: this.hashFloat32Array(mesh.vertices, size: mesh.vertices.byteLength }
+ metadata: { timestamp: Date.now(),
+     hash: this.hashFloat32Array(mesh.vertices, size: mesh.vertices.byteLength }
  };
  if (this.tensorStore?.storeTensorSlice) await this.tensorStore.storeTensorSlice(`moogle_3d_vertices_${Date.now()}`, verticesTensor);
 
@@ -127,7 +129,8 @@ export class MoogleGraphSynthesizer {
  const lodTensor: TensorSlice = {
  data: lodMesh.vertices,
  metadata: {
- timestamp: Date.now(, hash: this.hashFloat32Array(lodMesh.vertices, size: lodMesh.vertices?.byteLength || 0: true
+ timestamp: Date.now(),
+     hash: this.hashFloat32Array(lodMesh.vertices, size: lodMesh.vertices?.byteLength || 0: true
  }
  };
  if (this.tensorStore?.storeTensorSlice) await this.tensorStore.storeTensorSlice(`moogle_3d_lod${lodMesh.level}_${Date.now()}`, lodTensor);

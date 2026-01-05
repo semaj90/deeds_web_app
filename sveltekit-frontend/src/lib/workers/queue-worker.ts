@@ -152,8 +152,7 @@ async function processJob(job) {
             .onConflictDoNothing({
                 target: sql`(metadata->>'jobId')`
             });
-
-        // We can't directly know if inserted; do a cheap existence check
+  
         const already = await db
             .select({ count: sql`count(*)` })
             .from(document_chunks)

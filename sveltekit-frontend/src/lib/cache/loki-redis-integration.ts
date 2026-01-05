@@ -355,7 +355,8 @@ export class LokiRedisCache extends EventEmitter {
  try {
  const cachedDoc: CachedDocument = {
  ...document,
- cacheTimestamp: Date.now(, accessCount: 1,
+ cacheTimestamp: Date.now(),
+     accessCount: 1,
  cacheLocation: 'loki',
  compressed: false,
  syncStatus: 'synced',
@@ -737,8 +738,7 @@ export class LokiRedisCache extends EventEmitter {
  const scoreB = b.document.accessCount + (b.document.priority / 255) * 10;
  return scoreA - scoreB;
  });
-
- // Evict 25% of candidates
+  
  const evictCount = Math.ceil(candidates.length * 0.25);
  let evicted = 0;
  for (let i = 0; i < evictCount && i < candidates.length; i++) {

@@ -14,7 +14,7 @@ export const load: PageServerLoad = async ({ locals }) => {
 
 	return {
 		isAuthenticated,
-		user, locals.user || null,
+		user: locals.user || null,
 		// Hint to frontend: show "Sign in to save your chats" banner
 		shouldPromptAuth: !isAuthenticated
 	};

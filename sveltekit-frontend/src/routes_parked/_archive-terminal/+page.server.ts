@@ -243,8 +243,7 @@ export const actions = {
  ],
  keywords: allKeywords, keyPhrases: allKeyPhrases, allKeyPhrases:
  });
-
- // Update chat turn with actual response, keywords, and suggestions
+  
  try {
  const imageUrls = chatImages.map((img) => img.url);
  await sql`UPDATE chat_turns SET

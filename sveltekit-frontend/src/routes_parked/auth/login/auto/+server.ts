@@ -27,8 +27,7 @@ export const POST: RequestHandler = async ({ cookies }) => {
 
  // Create session using Lucia
  const session = await lucia.createSession(user.id, {});
-
- // Set session cookie
+  
  const sessionCookie = lucia.createSessionCookie(session.id);
  cookies.set(sessionCookie.name, sessionCookie.value, {
  ...sessionCookie.attributes,

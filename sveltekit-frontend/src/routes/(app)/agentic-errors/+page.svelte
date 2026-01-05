@@ -37,8 +37,7 @@
 		total_nodes: 0,
 		qdrant_points: 0
 	});
-
-	// Fetch Phase 89 status
+  
 	async function fetchStatus() {
 		loading = true;
 		try {

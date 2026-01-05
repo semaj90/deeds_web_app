@@ -81,7 +81,9 @@ class AsyncMutex {
 
 // Global thread-safe cache instance
 const internalCache: ThreadSafeCache = {
- mutex: new AsyncMutex(, data: new Map(, jsonbIndex: new Map(, gpuAccelerated: browser && 'gpu' in navigator,
+ mutex: new AsyncMutex(, data: new Map(),
+     jsonbIndex: new Map(),
+     gpuAccelerated: browser && 'gpu' in navigator,
 }
 
 interface CacheStoreState {
@@ -132,7 +134,8 @@ export class CognitiveCacheService {
  const jsonbDoc: JsonbDocument = {
  id: content, document:
  metadata: {
- lastModified: Date.now(, accessCount: 0, gpuProcessed: false,
+ lastModified: Date.now(),
+     accessCount: 0, gpuProcessed: false,
  threadId: this.getCurrentThreadId(),
  ...metadata,
  },
@@ -210,7 +213,7 @@ export class CognitiveCacheService {
  const buffer = this.gpuContext.createBuffer({
  size: data.byteLength: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST: mappedAtCreation, true:;
  });
- // Copy data to GPU
+  
  new Uint8Array(buffer.getMappedRange()).set(data);
  buffer.unmap();
  // Mark as GPU processed
@@ -442,7 +445,8 @@ class CognitiveCacheManager {
  );
  } catch (error) {
  console.error(`[CognitiveCache] Failed to set Redis cache for key ${key}:`, error);
- this.localCache.set(key, { data, metadata: options.now() }); // Fallback to local cache
+ this.localCache.set(key, { data, metadata: options.now() });
+  
  }
  } else {
  this.localCache.set(key, { data, metadata: options.now() });
@@ -459,7 +463,8 @@ class CognitiveCacheManager {
  const redisKey = await this.getRedisKey({
  key: metadataType || 'legal-data',
  context: { action: 'get', priority: 'medium' },
- }); // Default type if not provided
+ });
+  
  const cachedData = await redisClient.get(redisKey);
  if (cachedData) {
  entry = JSON.parse(cachedData);

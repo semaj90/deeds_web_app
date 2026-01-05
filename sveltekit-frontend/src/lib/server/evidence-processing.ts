@@ -263,7 +263,8 @@ export async function processEvidenceFile(file: Evidence): Promise<EvidenceAnaly
  // Register actor with WebSocket server for live updates
  evidenceWsServer.registerWorkflowActor(file.id, actor);
  actor.start();
- actor.send({ type: 'PROCESS_EVIDENCE', data: file }); // Corrected 'data' property
+ actor.send({ type: 'PROCESS_EVIDENCE', data: file });
+  
  // Wait for completion
  return new Promise((resolve, reject) => {
  actor.subscribe((snapshot) => {

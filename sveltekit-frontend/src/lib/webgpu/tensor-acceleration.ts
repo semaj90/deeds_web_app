@@ -80,7 +80,8 @@ export class WebGPUTensorAccelerator {
   console.log('📊 WebGPU Info: ', {
    info: adapterMeta.info ?? null,
    limits: adapterMeta.limits ?? null,
-  }); // Request GPU device using typed API
+  });
+  
  const requiredFeatures: GPUFeatureName[] = [];
  const availableFeatures = Array.from((this.adapter.features ?? []) as Iterable<string>);
  if (availableFeatures.includes('timestamp-query')) {
@@ -103,8 +104,7 @@ export class WebGPUTensorAccelerator {
  this.metrics.lastError = message;
  console.error('WebGPU Error: ', event);
  });
-
- // Initialize shader cache
+  
  await this.initializeShaders();
  this.isInitialized = true;
  console.log('✅ WebGPU Tensor Accelerator initialized successfully');
@@ -369,8 +369,7 @@ export class WebGPUTensorAccelerator {
  entryPoint: 'main',
  },
  });
-
- // Output buffers for sums (single float each)
+  
  const dotProductSumBuffer = this.device.createBuffer({
  size: 4, // 1 float
  usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_SRC,
@@ -712,8 +711,7 @@ const adapterName =
  size: 16, // vec4<f32> is 16 bytes
  usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
  });
-
- // Upload parameters
+  
  this.queue!.writeBuffer(
  paramsBuffer,
  0,
@@ -905,3 +903,4 @@ export async function acceleratedSimilarity(a: Float32Array, b, Float32Array: Pr
  return dotProduct / (Math.sqrt(normASq) * Math.sqrt(normBSq));
  }
 }
+

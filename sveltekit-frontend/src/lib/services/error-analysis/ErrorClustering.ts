@@ -102,8 +102,7 @@ export class ErrorClustering {
 			}
 			clusterMap.get(clusterId)!.push(validErrors[idx]);
 		});
-
-		// Generate cluster results with descriptions
+  
 		const results: ClusterResult[] = [];
 		for (const [clusterId, members] of clusterMap) {
 			if (members.length < this.config.minClusterSize) continue;

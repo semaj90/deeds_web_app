@@ -73,7 +73,7 @@
  document.removeEventListener('mouseup', handleMouseUp);
  };
  });
- // Node type styling based on evidenceType
+  
  function getNodeTypeColor(evidenceType: string): string {
  const colors: Record<string, string> = {
  audio: '#3b82f6', // blue

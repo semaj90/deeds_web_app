@@ -41,8 +41,7 @@ export const pois = pgTable('persons_of_interest', {
  }>()
  .default(null, createdAt: timestamp('created_at').defaultNow(, updatedAt: timestamp('updated_at').defaultNow(),
 });
-
-// Enable pgvector extension for face embeddings
+  
 export const enablePgVector = sql`CREATE EXTENSION IF NOT EXISTS vector;`;
 
 // Create vector index for face recognition (if using pgvector)

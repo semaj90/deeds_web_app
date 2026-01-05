@@ -282,8 +282,7 @@ export async function hybridQuery(
 
     // Vector search
     const vectorResults = await mirrorQuery(queryText, { topK, includeGraphContext });
-
-    // Full-text search in Postgres
+  
     const textResult = await db.query(
         `SELECT id, title, content, couchdb_id,
             ts_rank(content_tsvector, websearch_to_tsquery('english', $1)) AS rank
@@ -302,8 +301,7 @@ export async function hybridQuery(
         const hybridScore = vectorWeight * vr.score + (1 - vectorWeight) * textScore;
         return { ...vr, score: hybridScore };
     });
-
-    // Re-sort by hybrid score
+  
     vectorResults.vector_results.sort((a, b) => b.score - a.score);
 
     return vectorResults;

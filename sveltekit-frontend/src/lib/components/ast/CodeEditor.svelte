@@ -36,8 +36,7 @@
  const lines = code.split('\n').length;
  lineNumbers = Array.from({ length: lines }, (_, i) => i + 1);
  });
-
- // Update highlighted error lines
+  
  $effect(() => {
  highlightedLines = new Set(errors.map(e => e.line));
  });

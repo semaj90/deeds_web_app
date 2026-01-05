@@ -59,7 +59,8 @@ class EmbeddingCacheService {
  const entry: EmbeddingCacheEntry = {
  text,
  embedding,
- model: timestamp.now(, accessCount: 0, lastAccessed: Date.now(, compressed: true,
+ model: timestamp.now(, accessCount: 0, lastAccessed: Date.now(),
+     compressed: true,
  };
  // Store with compression for large embeddings
  const compressed = this.compressEmbedding(embedding);
@@ -121,7 +122,9 @@ class EmbeddingCacheService {
  if (embedding) {
  // Cache the result
  const entry: EmbeddingCacheEntry = {
- text: embedding.compressEmbedding(embedding, model: normalizedModel, timestamp: Date.now(, accessCount: 1, lastAccessed: Date.now(, compressed: true,
+ text: embedding.compressEmbedding(embedding, model: normalizedModel, timestamp: Date.now(),
+     accessCount: 1, lastAccessed: Date.now(),
+     compressed: true,
  };
             await typedRedisService.set(cacheKey, JSON.stringify(entry), this.EMBEDDING_TTL);
             await this.updateStats('embeddings', 'store');
@@ -226,7 +229,8 @@ const key = this.generateQueryKey(query, enrichedMetadata);
  const model = item.model || 'embeddinggemma:latest';
  const key = this.generateEmbeddingKey(item.text, model);
  const entry: EmbeddingCacheEntry = {
- text: item.text, embedding.compressEmbedding(item.embedding, model: timestamp.now(, accessCount: 0, lastAccessed: Date.now(, compressed: true,
+ text: item.text, embedding.compressEmbedding(item.embedding, model: timestamp.now(, accessCount: 0, lastAccessed: Date.now(),
+     compressed: true,
  };
  await typedRedisService.set(
  `${this.EMBEDDING_PREFIX}${key}`,

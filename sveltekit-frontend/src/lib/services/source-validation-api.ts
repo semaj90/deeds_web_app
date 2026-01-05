@@ -173,16 +173,14 @@ export async function completeValidationWorkflow(
 		rejected_chunk_ids: rejectedChunkIds,
 		validation_notes: validationNotes
 	});
-
-	// Step 2: Generate answer
+  
 	const answer = await sourceValidationAPI.generateAnswer({
 		validation_id: validation.validation_id,
 		case_id: caseId,
 		query,
 		llm_provider: llmProvider
 	});
-
-	// Step 3: Extract entities/relationships (simple regex for now)
+  
 	const entities = extractEntities(answer.answer);
 	const relationships = extractRelationships(answer.answer);
 
@@ -229,8 +227,7 @@ function extractEntities(text: string): string[] {
 			matches.forEach((match) => entities.add(match));
 		}
 	});
-
-	// Extract capitalized words (potential entities)
+  
 	const capitalizedWords = text.match(/\b[A-Z][a-z]+(?:\s+[A-Z][a-z]+)*\b/g);
 	if (capitalizedWords) {
 		capitalizedWords.forEach((word) => {

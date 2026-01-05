@@ -133,8 +133,7 @@ class CrewAILegalTeam {
  },
  ],
  });
-
- // Trial Preparation Crew
+  
  this.crews.set('trial_preparation', {
  name: 'Trial Preparation Team',
  process: 'hierarchical',
@@ -208,8 +207,7 @@ class CrewAILegalTeam {
  },
  ],
  });
-
- // Appeal Analysis Crew
+  
  this.crews.set('appeal_analysis', {
  name: 'Appeal Analysis Team',
  process: 'consensus',

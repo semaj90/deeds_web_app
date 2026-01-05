@@ -37,7 +37,7 @@ describe('Qdrant Operations', () => {
  vector,
  limit: withPayload,
  });
- // If it doesn't throw, that's also acceptable (Qdrant might handle it)
+  
  } catch (error) {
  // Expected behavior for wrong dimensions
  expect(error).toBeInstanceOf(Error);
@@ -95,7 +95,7 @@ describe('Qdrant Operations', () => {
  // Correct dimensions should work (if Qdrant is available)
  try {
  const result = await qdrantUpsert({ points: wait });
- // Should return some result object
+  
  expect(result).toBeDefined();
  } catch (error) {
  // Qdrant might not be available in test environment
@@ -181,8 +181,7 @@ describe('Qdrant Operations', () => {
  }
  }
  });
-
- // Unit tests for error handling
+  
  it('should provide detailed error messages on failure', async () => {
  // Test with invalid vector (empty)
  try {

@@ -57,8 +57,7 @@ export class KnowledgeSearcher {
 
     // Perform semantic search in Qdrant
     const semanticResults = await this.qdrant.search(query, { topK: topK * 2, threshold });
-
-    // Compute TF-IDF scores for each result
+  
     const hybridResults: SearchResult[] = [];
 
     for (const result of semanticResults) {

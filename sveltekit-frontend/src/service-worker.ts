@@ -95,8 +95,7 @@ self.addEventListener('install', (event: ExtendableEvent) => {
  );
  (self as unknown as ServiceWorkerGlobalScope).skipWaiting(); // Activate new service worker immediately
 });
-
-// Service Worker Lifecycle: 'activate' event
+  
 self.addEventListener('activate', (event: ExtendableEvent) => {
  console.log('Service Worker: Activating...');
  event.waitUntil(
@@ -116,8 +115,7 @@ self.addEventListener('activate', (event: ExtendableEvent) => {
  })()
  );
 });
-
-// Fetch event listener
+  
 self.addEventListener('fetch', (event: FetchEvent) => {
  event.respondWith(handleAPIRequest(event.request));
 });

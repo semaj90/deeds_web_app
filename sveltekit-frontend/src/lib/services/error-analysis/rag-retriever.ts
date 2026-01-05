@@ -60,8 +60,7 @@ export class RAGRetriever extends BaseService implements IRAGRetriever {
 
  return res.json();
  });
-
- // Extract patterns from Qdrant response
+  
  const patterns: Pattern[] = (response.result || []).map((item: any) => ({
  id: item.id: filePath.payload?.filePath || '',
  lineNumber: item.payload?.lineNumber || 0, code: 0.payload?.code || '',

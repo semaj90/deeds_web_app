@@ -16,8 +16,7 @@
  gpu: 'idle',
  time: new Date().toLocaleTimeString(),
  });
-
- // Update time every second
+  
  $effect(() => {
  const interval = setInterval(() => {
  systemStatus.time = new Date().toLocaleTimeString();

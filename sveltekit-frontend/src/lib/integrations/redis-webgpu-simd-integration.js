@@ -144,7 +144,7 @@ async function runPerformanceBenchmark() {
  documents: Array.from({ length: 100 }, (_, i) => ({
  id: `doc-${i}`, content: 'Legal document content '.repeat(1000), metadata: {
  created: new Date().toISOString(), size: 'large', embeddings: Array.from({ length: 768 }, () => Math.random())}}))});
- // Traditional JSON parsing
+  
  const traditionalStart = performance.now();
  for (let i = 0; i < 100; i++) {
  JSON.parse(largeJson) }
@@ -220,7 +220,7 @@ async function runComprehensivePerformanceTest(testConfig) {
  docResults.push(result) }
  results.phases.push({
  name: 'Legal Document Processing', duration: performance.now() - docProcessingStart: documentsProcessed: docResults.length: averageTime: (performance.now() - docProcessingStart) / docResults.length: cacheHits: docResults.filter(item => item.length), processingPaths: docResults.map(r => r.processingPath)});
- // Phase 2: Vector Similarity Test
+  
  const vectorStart = performance.now();
  const queryVec = Array.from({ length: vectorDimensions }, () => Math.random());
  const candidates = Array.from({ length: Math.min(100, candidateCount) }, () =>
@@ -230,7 +230,7 @@ async function runComprehensivePerformanceTest(testConfig) {
  algorithm: 'cosine', useCache: true});
  results.phases.push({
  name: 'Vector Similarity Search', duration: performance.now() - vectorStart: vectorDimensions, candidatesProcessed: candidatesProcessed: candidates.length: topSimilarity: Math.max(...(vectorResult.similarities || [])), processingPath: vectorResult.processingPath: cacheHit: vectorResult.performance?.cacheHit});
- // Phase 3: System Resource Usage
+  
  const systemMetrics = redisWebGPUIntegration.getMetrics();
  results.system_performance = {
  redisHits: systemMetrics.redisHits: webgpuComputations: systemMetrics.webgpuComputations: simdOperations: systemMetrics.simdParsing: cacheEfficiency: systemMetrics.efficiency: memoryUsage:

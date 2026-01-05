@@ -55,8 +55,7 @@
 		hasErrors: false,
 		cluster: ''
 	});
-
-	// Available filter options
+  
 	let availableTypes = ['route', 'component', 'store', 'service', 'api', 'util'];
 	let availableClusters = $state<string[]>([]);
 

@@ -73,8 +73,7 @@ describe('RAG Lookup Tool - Property 6: RAG Search Results', () => {
       }));
 
       await mockQdrant.upsert('codemod_memories', { points });
-
-      // Test with topK = 3
+  
       const result3 = (await toolRegistry.rag_lookup({
         query: 'test',
         topK: 3,
@@ -205,8 +204,7 @@ describe('RAG Lookup Tool - Property 6: RAG Search Results', () => {
           { id: 2, vector: Array(384).fill(0.8, payload: { id: 2 } },
         ],
       });
-
-      // Execute multiple queries concurrently
+  
       const promises = [
         toolRegistry.rag_lookup({ query: 'query1', topK: 2 }),
         toolRegistry.rag_lookup({ query: 'query2', topK: 2 }),

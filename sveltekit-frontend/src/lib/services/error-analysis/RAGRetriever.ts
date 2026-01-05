@@ -185,7 +185,8 @@ export class RAGRetriever {
 			similarity: r.score,
 			fixStrategies: [], // Will be populated from cache
 			successRate: (r.payload.success_rate as number) || 0,
-			timestamp: Date.now(, errorReport: {
+			timestamp: Date.now(),
+     errorReport: {
 				file: (r.payload.file as string) || '',
 				line: (r.payload.line as number) || 0,
 				column: (r.payload.column as number) || 0,

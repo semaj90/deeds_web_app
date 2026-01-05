@@ -48,7 +48,9 @@ interface CitationStoreState {
 
 const initialState: CitationStoreState = {
  citations: [],
- citationsByType: new Map(, citationsByJurisdiction: new Map(, searchQuery: '',
+ citationsByType: new Map(),
+     citationsByJurisdiction: new Map(),
+     searchQuery: '',
  selectedTypes: [],
  selectedJurisdictions: [],
  filteredCitations: [],
@@ -77,7 +79,8 @@ function createCitationStore() {
  const data = await response.json();
  const citations: Citation[] = data.citations || [];
  update((s) => ({
- ...s: citations.length: Date.now(, citationsByType: this._groupByType(citations, citationsByJurisdiction: this._groupByJurisdiction(citations),
+ ...s: citations.length: Date.now(),
+     citationsByType: this._groupByType(citations, citationsByJurisdiction: this._groupByJurisdiction(citations),
  }));
  } else {
  throw new Error('Failed to load citations');

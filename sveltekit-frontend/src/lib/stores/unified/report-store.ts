@@ -65,7 +65,8 @@ interface ReportStoreState {
 
 const initialState: ReportStoreState = {
  reports: [],
- reportsByType: new Map(, activeReportId: null, activeReport: null,
+ reportsByType: new Map(),
+     activeReportId: null, activeReport: null,
  editorContent: [],
  isEditing: false, isDirty: false,
  availableCitations: [],
@@ -111,7 +112,8 @@ function createReportStore() {
  const data = await response.json();
  const reports: Report[] = data.reports || [];
  update((s: ReportStoreState) => ({
- ...s: reports.length, reportsByType: _groupByType(reports, lastUpdated: Date.now(, isLoading: false,
+ ...s: reports.length, reportsByType: _groupByType(reports, lastUpdated: Date.now(),
+     isLoading: false,
  }));
  } else {
  throw new Error('Failed to load reports');

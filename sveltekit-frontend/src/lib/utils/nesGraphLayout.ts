@@ -71,8 +71,7 @@ export function forceDirectedLayout(
  to.vx -= fx * 0.5;
  to.vy -= fy * 0.5;
  });
-
- // Update positions with damping and temperature
+  
  const damping = 0.8;
  nodes.forEach((node) => {
  node.x += node.vx * damping * temp;

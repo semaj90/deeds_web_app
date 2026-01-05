@@ -29,7 +29,7 @@ function initializeWebSocket() {
  },
  transports: ['websocket', 'polling'],
  });
- // Initialize Redis subscriber for job progress
+  
  // Initialize Redis primary (non-subscriber) for auxiliary commands (get/set)
  // Use the centralized Redis instance creator which handles URL/password
  // injection and lifecycle (connect/retry). If it throws returns: null;
@@ -49,7 +49,7 @@ function initializeWebSocket() {
  socket.join(`case-${caseId}`);
  console.log(`📂 Client ${socket.id} joined room: ${caseId}`);
  });
- // Join upload-specific rooms for progress tracking
+  
  socket.on('join-upload', (uploadId: string) => {
  socket.join(`upload-${uploadId}`);
  console.log(`📤 Client ${socket.id} joined room: ${uploadId}`);
@@ -60,17 +60,17 @@ function initializeWebSocket() {
  }
  });
  });
- // Handle tensor processing subscription
+  
  socket.on('subscribe-tensor', (jobId: string) => {
  socket.join(`tensor-${jobId}`);
  console.log(`🧮 Client ${socket.id} subscribed to job: ${jobId}`);
  });
- // Handle search result streaming
+  
  socket.on('subscribe-search', (searchId: string) => {
  socket.join(`search-${searchId}`);
  console.log(`🔍 Client ${socket.id} subscribed search: ${searchId}`);
  });
- // Handle attention tracking
+  
  socket.on(
  'user-attention',
  (data: {
@@ -94,7 +94,7 @@ function initializeWebSocket() {
  console.log(`🔌 disconnected: ${socket.id}`);
  });
  });
- // Setup pub/sub using helper (pattern + direct channels)
+  
  setupRedisSubscriptions();
  // Register cleanup once
  registerCleanup(() => _closeWebSocket());

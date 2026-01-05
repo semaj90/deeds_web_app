@@ -5,9 +5,13 @@ import type { RequestHandler } from './$types.js';
 export const GET: RequestHandler = async () => {
 	const health = {
 		status: 'ok',
-		timestamp: new Date().toISOString(, system: {
-			uptime: os.uptime(, loadavg: os.loadavg(, memory: {
-				total: os.totalmem(, free: os.freemem(),
+		timestamp: new Date().toISOString(),
+		system: {
+			uptime: os.uptime(),
+			loadavg: os.loadavg(),
+			memory: {
+				total: os.totalmem(),
+				free: os.freemem(),
 			},
 		},
 		services: {

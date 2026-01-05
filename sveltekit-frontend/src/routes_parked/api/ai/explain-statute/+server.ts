@@ -18,8 +18,7 @@ export const POST: RequestHandler = async ({ request }) => {
  console.log('[Explain Statute] Processing:', {
  statute: ctx.statute, question.userQuestion || ctx.query,
  });
-
- // TODO: Fetch statute context from database
+  
  // For now, use placeholder
  const additionalContext = {
  sectionText: `18 U.S.C. § ${ctx.statute?.section || '1201'} - Kidnapping`,

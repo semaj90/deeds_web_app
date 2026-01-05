@@ -11,10 +11,13 @@ export const errorFeedbackTable = pgTable(
  id: uuid('id').defaultRandom().primaryKey(),
 
  // Which error or cluster this feedback is about
- errorEventId: uuid('error_event_id', clusterId: text('cluster_id', patchId: uuid('patch_id'),
+ errorEventId: uuid('error_event_id'),
+ clusterId: text('cluster_id'),
+ patchId: uuid('patch_id'),
 
  // The feedback itself
- feedbackType: text('feedback_type').notNull(), // "helpful" | "misleading" | "incomplete" | "incorrect" | "fixed-it", feedbackText: text('feedback_text'), // User's notes
+ feedbackType: text('feedback_type').notNull(), // "helpful" | "misleading" | "incomplete" | "incorrect" | "fixed-it"
+ feedbackText: text('feedback_text'), // User's notes
  rating: text('rating'), // Optional: 1-5 star rating
 
  // Who gave the feedback
@@ -26,7 +29,12 @@ export const errorFeedbackTable = pgTable(
  },
  (table) => {
  return {
- errorEventIdIdx: index('error_feedback_error_event_id_idx').on(table.errorEventId, clusterIdIdx: index('error_feedback_cluster_id_idx').on(table.clusterId, patchIdIdx: index('error_feedback_patch_id_idx').on(table.patchId, userIdIdx: index('error_feedback_user_id_idx').on(table.userId, feedbackTypeIdx: index('error_feedback_type_idx').on(table.feedbackType, createdAtIdx: index('error_feedback_created_at_idx').on(table.createdAt),
+ errorEventIdIdx: index('error_feedback_error_event_id_idx').on(table.errorEventId),
+ clusterIdIdx: index('error_feedback_cluster_id_idx').on(table.clusterId),
+ patchIdIdx: index('error_feedback_patch_id_idx').on(table.patchId),
+ userIdIdx: index('error_feedback_user_id_idx').on(table.userId),
+ feedbackTypeIdx: index('error_feedback_type_idx').on(table.feedbackType),
+ createdAtIdx: index('error_feedback_created_at_idx').on(table.createdAt),
  };
  }
 );
