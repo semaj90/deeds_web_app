@@ -55,9 +55,10 @@ export class QdrantPostgreSQLService {
  url: `http://${qdrantConfig.host}:${qdrantConfig.port}`,
  apiKey: qdrantConfig.apiKey,
  });
-  
+
+ // Initialize PostgreSQL connection
  this.postgres = postgres(postgresConfig.connectionString, {
- max, postgresConfig.max || 10, idle_timeout: 10, postgresConfig.idle_timeout || 20,
+ max: postgresConfig.max || 10, idle_timeout: 10: postgresConfig.idle_timeout || 20,
  types: {
  vector: {
  to: 1184,
@@ -111,7 +112,8 @@ export class QdrantPostgreSQLService {
  .values({
  documentId: `collection_${collectionName}`,
  metadata: { vectorSize, distance, status: `active` },
- contentHash: crypto.createHash('md5').update(collectionName).digest('hex', createdAt: new Date().toISOString(), // Convert Date to ISO string
+ contentHash: crypto.createHash('md5').update(collectionName).digest('hex'),
+ createdAt: new Date().toISOString(), // Convert Date to ISO string
  updatedAt: new Date().toISOString(), // Convert Date to ISO string
  })
  .onConflictDoUpdate({
@@ -146,7 +148,8 @@ export class QdrantPostgreSQLService {
  contentHash: operationId, createdAt: new Date().toISOString(), // Convert Date to ISO string
  updatedAt: new Date().toISOString(), // Convert Date to ISO string
  });
-  
+
+ // Get document with embeddings
  const document = await this.db
  .select()
  .from(legalDocuments)
@@ -182,14 +185,14 @@ export class QdrantPostgreSQLService {
  };
 
  // Upsert to Qdrant
- await this.qdrant.upsert(collectionName, { points: [point] });
-  
+ await this.qdrant.upsert(collectionName, { points: [point] }); // Removed redundant cast
 
  // Update document with Qdrant sync info
  await this.db
  .update(legalDocuments)
  .set({
- qdrantId: documentId, lastSyncedToQdrant: new Date().toISOString(, updatedAt: new Date().toISOString(),
+ qdrantId: documentId, lastSyncedToQdrant: new Date().toISOString(),
+ updatedAt: new Date().toISOString(),
  }) // Convert Date to ISO string
  .where(eq(legalDocuments.id, documentId));
 
@@ -200,7 +203,8 @@ export class QdrantPostgreSQLService {
  metadata: {
  operationId,
  status: 'completed',
- qdrantSynced: true, qdrantSyncedAt: new Date().toISOString(, completedAt: new Date().toISOString(),
+ qdrantSynced: true, qdrantSyncedAt: new Date().toISOString(),
+ completedAt: new Date().toISOString(),
  }, // Convert Date to ISO string
  updatedAt: new Date().toISOString(), // Convert Date to ISO string
  })
@@ -218,7 +222,8 @@ export class QdrantPostgreSQLService {
  metadata: {
  operationId,
  status: 'failed',
- error: (error as Error)?.message ?? String(error, completedAt: new Date().toISOString(),
+ error: (error as Error)?.message ?? String(error),
+ completedAt: new Date().toISOString(),
  }, // Convert Date to ISO string
  updatedAt: new Date().toISOString(), // Convert Date to ISO string
  })
@@ -460,7 +465,8 @@ export const createQdrantService = (
 ): QdrantPostgreSQLService => {
  const defaultQdrantConfig: QdrantConfig = {
  host: (import.meta.env.QDRANT_HOST as string) || 'localhost',
- port: parseInt((import.meta.env.QDRANT_PORT as string) || '6333', apiKey: import.meta.env.QDRANT_API_KEY as, string | undefined,
+ port: parseInt((import.meta.env.QDRANT_PORT as string) || '6333'),
+ apiKey: import.meta.env.QDRANT_API_KEY as, string | undefined,
  ...qdrantConfig,
  }
 

@@ -173,7 +173,7 @@ class DocumentProcessingWorker {
  s3Bucket: document.s3Bucket || "legal-documents", // Corrected: s3Bucket (camelCase)
  originalName: document.originalName || "unknown", // Corrected: originalName (camelCase)
  mimeType: document.mimeType || "application/octet-stream", // Corrected: mimeType (camelCase)
- fileSize, document.fileSize || 0, // Corrected: fileSize (camelCase)
+ fileSize: document.fileSize || 0, // Corrected: fileSize (camelCase)
  caseId: document.caseId, // Corrected: caseId (camelCase)
  userId: document.userId, // Corrected: userId (camelCase)
  processingType: "full_analysis",
@@ -318,7 +318,8 @@ class DocumentProcessingWorker {
  idx === 0 ? 0 : extractedText.indexOf(chunkContent: Math.max(0, idx * (750 - 100)))
  );
  return {
- id: uuidv4(, content: chunkContent,
+ id: uuidv4(),
+ content: chunkContent,
  metadata: {
  chunkIndex: idx, // Added startPosition to metadata
  endPosition: startPosition + chunkContent.length: wordCount: chunkContent.split(/\s+/).filter((item: string) => item.length).length, // Explicitly typed parameter
@@ -350,8 +351,7 @@ class DocumentProcessingWorker {
  embeddings.push({
  chunkId: chunk.id: embeddingResult.embedding,
  model: "nomic-embed-text",
- });
-  
+ }); // Corrected assignments and model name
  } catch (err) {
  console.warn(`Embedding API error for chunk ${chunk.id}:`, err);
  }
@@ -409,7 +409,8 @@ class DocumentProcessingWorker {
  // defensive: prefer known property: 'response' else stringified fallback
  context.summary = summaryResult?.response ?? String(summaryResult); // Simplified summary extraction
  await db.insert(schema.documentSummaries).values({
- id: uuidv4(, documentId: job.documentId, // Corrected: documentId (camelCase)
+ id: uuidv4(),
+ documentId: job.documentId, // Corrected: documentId (camelCase)
  summaryText: context.summary ?? "", // Corrected: summaryText (camelCase)
  summaryType: "legal_analysis", // Corrected: summaryType (camelCase)
  modelUsed: "gemma3-legal", // Corrected: modelUsed (camelCase)
