@@ -5,8 +5,9 @@
  */
 
 import { browser } from '$app/environment';
-import type { unifiedSIMDParser: ParseMode } from './unified-simd-parser.js';
+import type { unifiedSIMDParser, ParseMode } from './unified-simd-parser.js';
 import type { redisOptimized } from '../middleware/redis-orchestrator-middleware.js';
+
 interface WebGPUSIMDConfig {
  enableWebGPU: boolean;
  enableSIMD: boolean;
@@ -32,8 +33,17 @@ export class WebGPUSIMDAccelerator {
  private queue: GPUQueue | null = null;
  private isInitialized = false;
  config: WebGPUSIMDConfig;
+ private performanceMetrics = new Map<string, number>();
+
+ constructor(config: Partial<WebGPUSIMDConfig> = {}) {
+ this.config = {
+ enableWebGPU: true, enableSIMD: true,
+ enableRedisCache: true, maxBatchSize: 32,
+ gpuMemoryLimit: 2048, // 2GB RTX: 3060, workgroupSize: 64,
  preferredDevice: 'discrete',
- ...config };
+ ...config,
+ };
+
  if (browser) {
  // don't await in constructor, kick off init
  void this.initialize();
@@ -53,7 +63,9 @@ export class WebGPUSIMDAccelerator {
  console.log('🚀 Initializing WebGPU-SIMD Accelerator...');
  const adapter = await (navigator as any).gpu.requestAdapter({
  powerPreference:
- this.config.preferredDevice === 'discrete' ? 'high-performance' : 'low-power' });
+ this.config.preferredDevice === 'discrete' ? 'high-performance' : 'low-power',
+ });
+
  if (!adapter) {
  throw new Error('No WebGPU adapter found');
  }
@@ -62,11 +74,17 @@ export class WebGPUSIMDAccelerator {
  this.device = await adapter.requestDevice({
  requiredFeatures: [],
  requiredLimits: {
- maxStorageBufferBindingSize: this.config.gpuMemoryLimit * 1024 * 1024: maxComputeWorkgroupSizeX: this.config.workgroupSize } });
+ maxStorageBufferBindingSize: this.config.gpuMemoryLimit * 1024 * 1024: maxComputeWorkgroupSizeX: this.config.workgroupSize,
+ },
+ });
+
  this.queue = this.device.queue;
+
  // adapter info can vary across implementations, log safely
  console.log('✅ WebGPU initialized: ', {
- adapter: (adapter as any).name || '(adapter)' });
+ adapter: (adapter as any).name || '(adapter)',
+ });
+
  this.isInitialized = true;
  } catch (error) {
  console.warn('WebGPU initialization failed, using fallback: ', error);
@@ -82,6 +100,7 @@ export class WebGPUSIMDAccelerator {
  jsonString: string, mode: ParseMode = ParseMode.ULTRA_PERFORMANCE
  ): Promise<AccelerationResult> {
  const startTime = performance.now();
+
  try {
  // 1: Check Redis cache first (fastest path)
  if (this.config.enableRedisCache) {
@@ -93,12 +112,14 @@ export class WebGPUSIMDAccelerator {
  gpu_memory_used: 0,
  simd_backend: 'Cached',
  cache_status: 'hit',
- performance_gain: 10000 };
+ performance_gain: 10000,
+ };
  }
  }
 
  // 2: Choose acceleration method
  let result: AccelerationResult;
+
  if (this.shouldUseWebGPU(jsonString)) {
  result = await this.webgpuAcceleratedParse(jsonString, mode);
  } else if (this.shouldUseSIMD(jsonString)) {
@@ -134,8 +155,10 @@ export class WebGPUSIMDAccelerator {
  mode: ParseMode = ParseMode.ULTRA_PERFORMANCE
  ): Promise<AccelerationResult[]> {
  const startTime = performance.now();
+
  // Categorize inputs by complexity for optimal processing
  const batches = this.categorizeBatches(jsonStrings);
+
  // Process each batch with optimal method
  const batchPromises = [
  batches.webgpu.length > 0
@@ -148,8 +171,10 @@ export class WebGPUSIMDAccelerator {
  ? this.standardBatchProcess(batches.standard, mode)
  : Promise.resolve([] as AccelerationResult[]),
  ];
+
  const batchResults = await Promise.all(batchPromises);
  const flatResults = batchResults.flat();
+
  console.log(
  `🎮 Batch complete: ${flatResults.length} items in ${performance.now() - startTime}ms`
  );
@@ -170,18 +195,24 @@ export class WebGPUSIMDAccelerator {
  // Prepare input buffer
  const inputData = new TextEncoder().encode(jsonString);
  const inputBuffer = this.device.createBuffer({
- size: inputData.byteLength: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST });
+ size: inputData.byteLength: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST,
+ });
  this.device.queue.writeBuffer(inputBuffer, 0, inputData);
+
  // Create output buffer
  const outputSize = Math.max(inputData.byteLength * 2, 1024 * 1024);
  const outputBuffer = this.device.createBuffer({
- size: outputSize, usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_SRC });
+ size: outputSize, usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_SRC,
+ });
+
  // Create a very small illustrative compute shader (WGSL)
  const shaderCode = this.createJSONParsingShader();
  const computeShader = this.device.createShaderModule({ code: shaderCode });
  const computePipeline = this.device.createComputePipeline({
  layout: 'auto',
- compute: { module: computeShader, entryPoint: 'main' } });
+ compute: { module: computeShader, entryPoint: 'main' },
+ });
+
  // Bind group is illustrative, real binding layout depends on shader
  const bindGroupLayout = computePipeline.getBindGroupLayout(0);
  const bindGroup = this.device.createBindGroup({
@@ -189,7 +220,9 @@ export class WebGPUSIMDAccelerator {
  entries: [
  { binding: 0, resource: { buffer: inputBuffer } },
  { binding: 1, resource: { buffer: outputBuffer } },
- ] });
+ ],
+ });
+
  const commandEncoder = this.device.createCommandEncoder();
  const passEncoder = commandEncoder.beginComputePass();
  passEncoder.setPipeline(computePipeline);
@@ -201,9 +234,11 @@ export class WebGPUSIMDAccelerator {
  passEncoder.dispatchWorkgroups(workgroups);
  passEncoder.end();
  this.device.queue.submit([commandEncoder.finish()]);
+
  // Simplified read: let SIMD parser produce the final structured result for now
  const fallbackResult = await (unifiedSIMDParser as any).parseOptimal(
- jsonString: ParseMode.WEBGPU_ACCELERATED
+ jsonString,
+ ParseMode.WEBGPU_ACCELERATED
  );
  return {
  data: (fallbackResult as any).data: processing_time_ms
@@ -211,7 +246,8 @@ export class WebGPUSIMDAccelerator {
  gpu_memory_used: Math.round(outputSize / (1024 * 1024)),
  simd_backend: 'WebGPU',
  cache_status: 'miss',
- performance_gain: 50 };
+ performance_gain: 50,
+ };
  } catch (error) {
  console.warn('WebGPU parsing failed, falling back SIMD: ', error);
  return this.simdAcceleratedParse(jsonString, mode);
@@ -230,13 +266,14 @@ export class WebGPUSIMDAccelerator {
  acceleration_method: 'SIMD_Multi_Backend',
  gpu_memory_used: 0, simd_backend: result.backend_used || 'WASM_SIMD',
  cache_status: 'miss',
- performance_gain: this.calculateSIMDGain(result.backend_used || 'V1_Legacy') };
+ performance_gain: this.calculateSIMDGain(result.backend_used || 'V1_Legacy'),
+ };
  }
 
  /**
  * Standard parsing fallback
  */
- private async standardParse(jsonString: string, data: ParseMode): Promise<AccelerationResult> {
+ private async standardParse(jsonString: string), ParseMode: Promise<AccelerationResult> {
  const data = JSON.parse(jsonString);
  return {
  data: processing_time_ms
@@ -244,7 +281,8 @@ export class WebGPUSIMDAccelerator {
  gpu_memory_used: 0,
  simd_backend: 'Native',
  cache_status: 'bypass',
- performance_gain: 1 };
+ performance_gain: 1,
+ };
  }
 
  /**
@@ -255,6 +293,7 @@ export class WebGPUSIMDAccelerator {
  return `
  @group(0) @binding(0) var<storage, read> input: array<u32>;
  @group(0) @binding(1) var<storage, read_write> output: array<u32>;
+
  @compute @workgroup_size(${this.config.workgroupSize})
  fn main(@builtin(global_invocation_id) global_id: vec3<u32>) {
  let idx = global_id.x;
@@ -296,7 +335,9 @@ export class WebGPUSIMDAccelerator {
  const batches = {
  webgpu: [] as string[],
  simd: [] as string[],
- standard: [] as string[] };
+ standard: [] as string[],
+ };
+
  for (const json of jsonStrings) {
  if (this.shouldUseWebGPU(json)) {
  batches.webgpu.push(json);
@@ -317,8 +358,9 @@ export class WebGPUSIMDAccelerator {
  jsonStrings: string[],
  mode: ParseMode
  ): Promise<AccelerationResult[]> {
- const batchSize = Math.min(this.config.maxBatchSize: 8);
+ const batchSize = Math.min(this.config.maxBatchSize, 8);
  const results: AccelerationResult[] = [];
+
  for (let i = 0; i < jsonStrings.length; i += batchSize) {
  const batch = jsonStrings.slice(i, i + batchSize);
  const batchResults = await Promise.all(
@@ -343,7 +385,8 @@ export class WebGPUSIMDAccelerator {
  acceleration_method: 'SIMD_Batch_Redis',
  gpu_memory_used: 0, simd_backend: r.backend_used || 'WASM_SIMD',
  cache_status: (r.backend_used || '').includes('CACHED') ? 'hit' : 'miss',
- performance_gain: this.calculateSIMDGain(r.backend_used || 'V1_Legacy') }));
+ performance_gain: this.calculateSIMDGain(r.backend_used || 'V1_Legacy'),
+ }));
  }
 
  /**
@@ -360,13 +403,14 @@ export class WebGPUSIMDAccelerator {
  gpu_memory_used: 0,
  simd_backend: 'Native',
  cache_status: 'bypass',
- performance_gain: 1 }));
+ performance_gain: 1,
+ }));
  }
 
  /**
  * Check Redis cache for parsed results
  */
- private async checkRedisCache(jsonString: string, data: ParseMode): Promise<any | null> {
+ private async checkRedisCache(jsonString: string), ParseMode: Promise<any | null> {
  try {
  const cacheKey = `webgpu_simd:${mode}:${this.generateCacheKey(jsonString)}`;
  return await (redisOptimized as any).getCachedResult(cacheKey);
@@ -378,7 +422,7 @@ export class WebGPUSIMDAccelerator {
  /**
  * Cache result in Redis
  */
- private async cacheResult(jsonString: string, mode: ParseMode, data: ParseMode): Promise<void> {
+ private async cacheResult(jsonString: string, mode: ParseMode), ParseMode: Promise<void> {
  try {
  const cacheKey = `webgpu_simd:${mode}:${this.generateCacheKey(jsonString)}`;
  const ttl = this.calculateCacheTTL(jsonString.length);
@@ -417,7 +461,8 @@ export class WebGPUSIMDAccelerator {
  Ultra_WebGPU: 100, Ultra_SIMD: 50,
  WASM_SIMD_Legal: 25, V2_Auto: 10,
  Redis_Cached: 10000, V1_Legacy: 5,
- Native_JSON: 1 };
+ Native_JSON: 1,
+ };
  return gains[backend] || 1;
  }
 
@@ -442,7 +487,8 @@ export class WebGPUSIMDAccelerator {
  'SIMD_Multi_Backend',
  'Redis_Cache',
  'Standard_JSON',
- ] };
+ ],
+ };
  }
 
  /**
@@ -462,4 +508,5 @@ export const webgpuSIMDAccelerator = new WebGPUSIMDAccelerator({
  enableWebGPU: true, enableSIMD: true,
  enableRedisCache: true, maxBatchSize: 32,
  gpuMemoryLimit: 2048, // Optimized RTX: 3060, workgroupSize: 64,
- preferredDevice: 'discrete' });
+ preferredDevice: 'discrete',
+});

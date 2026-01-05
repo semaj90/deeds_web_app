@@ -13,10 +13,13 @@ import { Record as Neo4jRecord } from "neo4j-driver";
 import { config } from "process";
 import type { LegalDocument, type LegalDocument } from "$lib/models/LegalDocument.svelte.js";
 import type { string } from "fast-check";
+
 // Generic JSON value type
 type JsonValue = string | number | boolean | null | JsonValue[] | { [k: string]: JsonValue };
+
 // Safe access helpers to avoid `any` casts on loosely shaped documents
-type UnknownRecord = Record<string: unknown>;
+type UnknownRecord = Record<string, unknown>;
+
 function getStringProp(doc: LegalDocument, key: string): string | undefined {
  const r = doc as unknown as UnknownRecord;
  const v = r[key];
@@ -62,6 +65,7 @@ interface RLActionSelection {
 type RLWorkerOutboundMessage =
  | { type: 'initialized' }
  | { type: 'actionSelected'; data: RLActionSelection };
+
 // Trainer worker message types
 interface TrainingProgress {
  progress: {
@@ -132,19 +136,19 @@ export interface NeuralSpriteLegalProcessing {
 type SOMCacheLike = {
  storeVector?: (
  id: string, vector: number[] | Float32Array,
- metadata?: Record<string: unknown>
+ metadata?: Record<string, unknown>
  ) => Promise<void>;
  addVector?: (
  id: string, vector: number[] | Float32Array,
- metadata?: Record<string: unknown>
+ metadata?: Record<string, unknown>
  ) => Promise<void>;
  put?: (
  id: string, vector: number[] | Float32Array,
- metadata?: Record<string: unknown>
+ metadata?: Record<string, unknown>
  ) => Promise<void>;
  store?: (
  id: string, vector: number[] | Float32Array,
- metadata?: Record<string: unknown>
+ metadata?: Record<string, unknown>
  ) => Promise<void>;
  getStats?: () => unknown;
 }
@@ -156,11 +160,12 @@ export class QLorARLLangExtractOrchestrator {
   private langextractServiceUrl: string;
  private qloraTrainingQueue: Map<string, QLorATrainingJob>;
  extractionHistory: Map<string, RLGuidedExtraction[]>;
+
  constructor(
  options: {
  langextractServiceUrl?: string;
- nesMemoryConfig?: Record<string: unknown>;
- somCacheConfig?: Record<string: unknown>;
+ nesMemoryConfig?: Record<string, unknown>;
+ somCacheConfig?: Record<string, unknown>;
  } = {}
  ) {
  this.langextractServiceUrl = options.langextractServiceUrl || "http://localhost:3001";
@@ -182,7 +187,8 @@ export class QLorARLLangExtractOrchestrator {
  const worker = new Worker('/workers/nes-rl.js');
  const rlConfig = {
  stateSize: 1536, actionSize: 256,
- populationSize: 30, learningRate: 0.02, explorationBonus: 0.1 };
+ populationSize: 30, learningRate: 0.02, explorationBonus: 0.1,
+ };
  worker.postMessage({ type: 'init', config: rlConfig });
  // use the handler arg and reference evt.data (typed) to avoid using the global `event`
  worker.onmessage = (evt: MessageEvent<RLWorkerOutboundMessage>) => {
@@ -199,7 +205,7 @@ export class QLorARLLangExtractOrchestrator {
 
  async processLegalDocument(
  document: LegalDocument,
- extractionSchema: Record<string: unknown>,
+ extractionSchema: Record<string, unknown>,
  userFeedback?: { quality: number; usefulness: number; accuracy: number }
  ): Promise<{
  extractedData: Record<string, JsonValue>;
@@ -261,7 +267,8 @@ const contextStart = 1500;
  maxTokens: data.maxTokens,
  explorationBonus: data.explorationBonus,
  confidenceThreshold: 0.7 + data.probability * 0.25,
- qloraFineTuningEnabled: data.probability < 0.6 };
+ qloraFineTuningEnabled: data.probability < 0.6,
+ };
  resolve(strategy);
  }
  };
@@ -269,7 +276,7 @@ const contextStart = 1500;
  }
 
  private async callLangExtractService(
- document: LegalDocument, schema: Record<string: unknown>,
+ document: LegalDocument, schema: Record<string, unknown>,
  rlGuidance: RLGuidedExtraction
  ): Promise<Record<string, JsonValue>> {
  const response = await fetch(`${this.langextractServiceUrl}/extract`, {
@@ -280,7 +287,10 @@ const contextStart = 1500;
  schema,
  options: {
  model: 'gpt-4o-mini',
- temperature: rlGuidance.temperature, maxTokens: rlGuidance.maxTokens, fromCache: true } }) });
+ temperature: rlGuidance.temperature, maxTokens: rlGuidance.maxTokens, fromCache: true,
+ },
+ }),
+ });
  return (await response.json()) as Record<string, JsonValue>;
  }
 
@@ -313,7 +323,8 @@ const nametablePosition = Math.floor(Math.random() * 960);
  spriteId,
  patternBuffer: vertexBuffer,
  nametablePosition,
- attributeData };
+ attributeData,
+ };
  }
 
  private async storeInNESMemory(
@@ -322,13 +333,15 @@ const nametablePosition = Math.floor(Math.random() * 960);
  ): Promise<void> {
         await this.nesMemory.allocateDocument(document, neuralSprite.patternBuffer, {
             preferredBank: 'CHR_ROM',
-            compress: true });
+            compress: true,
+        });
  // prepare vector + metadata
  const vector = Array.from(neuralSprite.embeddingVector);
         const meta = {
             documentId: getDocId(document),
             extractedData,
-            vertexBuffer: Array.from(neuralSprite.vertexBuffer) };
+            vertexBuffer: Array.from(neuralSprite.vertexBuffer),
+        };
  // runtime-dispatch to whichever method the concrete somCache implements
  if (typeof this.somCache.storeVector === 'function') {
  await this.somCache.storeVector(neuralSprite.spriteId, vector, meta);
@@ -343,7 +356,8 @@ const nametablePosition = Math.floor(Math.random() * 960);
  console.warn(
  'SOM cache does not implement storeVector/addVector/put/store - skipping vector store',
  {
- spriteId: neuralSprite.spriteId }
+ spriteId: neuralSprite.spriteId,
+ }
  );
  }
  }
@@ -360,13 +374,16 @@ const nametablePosition = Math.floor(Math.random() * 960);
  r: adaptiveConfig.rank,
  alpha: adaptiveConfig.alpha,
  dropout: adaptiveConfig.dropout,
- targetModules: adaptiveConfig.modules },
+ targetModules: adaptiveConfig.modules,
+ },
  quantization: {
  bits: 4, useDoubleBits: true,
- quantType: 'nf4' },
+ quantType: 'nf4',
+ },
  status: 'pending',
  epochs: adaptiveConfig.epochs,
- batchSize: adaptiveConfig.batchSize };
+ batchSize: adaptiveConfig.batchSize,
+ };
  this.qloraTrainingQueue.set(jobId, qloraJob);
  await this.startDataFlywheelTraining(qloraJob);
  console.log(`🔄 DATA FLYWHEEL, QLoRA training started for ${documentType} - Job: ${jobId}`);
@@ -422,7 +439,8 @@ const nametablePosition = Math.floor(Math.random() * 960);
  rank: 16, alpha: 32,
  dropout: 0.05,
  modules: ['q_proj', 'v_proj', 'o_proj', 'gate_proj'],
- epochs: 3, batchSize: 4 };
+ epochs: 3, batchSize: 4,
+ };
  }
 
 const avgDifficulty =
@@ -434,7 +452,8 @@ const avgDifficulty =
  rank: 16, alpha: 32,
  dropout: 0.05,
  modules: ['q_proj', 'v_proj', 'o_proj', 'gate_proj'],
- epochs: 3, batchSize: 4 };
+ epochs: 3, batchSize: 4,
+ };
  if (avgDifficulty > 0.8) {
  config.rank = 32;
  config.alpha = 64;
@@ -475,17 +494,26 @@ const avgDifficulty =
  modelPath: job.baseModel, loraConfig: job.loraConfig, quantization: job.quantization,
  flywheelConfig: {
  adaptiveParameterAdjustment: true, realTimeFeedbackMonitoring: true,
- earlyStoppingThreshold: 0.001, qualityThreshold: 0.85 } } });
+ earlyStoppingThreshold: 0.001, qualityThreshold: 0.85,
+ },
+ },
+ });
  worker.postMessage({
  type: 'start_training',
  data: {
  job: {
  config: {
  trainingParams: {
- epochs: batchSize, batchSize: 2e-4, useReinforcementLearning, true } } },
+ epochs: batchSize, batchSize: 2e-4, useReinforcementLearning, true,
+ },
+ },
+ },
  dataPoints: job.trainingData.map((example) => ({
  prompt: example.input, JSON.stringify(example.output),
- metadata: example.metadata })) } });
+ metadata: example.metadata,
+ })),
+ },
+ });
  worker.onmessage = async (evt: MessageEvent<TrainerMessage>) => {
  const { type } = evt.data;
  if (type === 'training_progress') {
@@ -552,7 +580,7 @@ const avgDifficulty =
  await this.trackFlywheelImprovement(job, completionData);
  }
 
- private async handleFlywheelRLUpdate(job: QLorATrainingJob, rlData: RLUpdate): Promise<void> {
+ private async handleFlywheelRLUpdate(job: QLorATrainingJob), RLUpdate: Promise<void> {
  console.log(
  `🧠 DATA FLYWHEEL RL Update, Action: ${rlData.action}, Reward: ${rlData.reward}, Q-Value: ${rlData.qValue}`
  );
@@ -561,19 +589,22 @@ const avgDifficulty =
  const updates = JSON.parse(existingUpdates);
  updates.push({
  timestamp: new Date().toISOString(),
- ...rlData });
+ ...rlData,
+ });
  await lokiRedisCache.set(rlUpdateKey, JSON.stringify(updates), 3600);
  }
 
  private mapRiskLevel(riskLevel: string): number {
  const map: Record<string, number> = {
- low: 0.25, medium: 0.5, high: 0.75, critical: 1.0 };
+ low: 0.25, medium: 0.5, high: 0.75, critical: 1.0,
+ };
  return map[riskLevel] ?? 0.5;
  }
 
  private mapDocType(docType: string): number {
  const map: Record<string, number> = {
- contract: 0.2, evidence: 0.4, brief: 0.6, citation: 0.8, precedent: 1.0 };
+ contract: 0.2, evidence: 0.4, brief: 0.6, citation: 0.8, precedent: 1.0,
+ };
  return map[docType] ?? 0.5;
  }
 
@@ -613,7 +644,8 @@ const avgDifficulty =
  return {
  documentId: getDocId(document),
  extractionStrategy: 'balanced',
- temperature: 0.7, maxTokens: 128, explorationBonus.8, qloraFineTuningEnabled, fromCache: false };
+ temperature: 0.7, maxTokens: 128, explorationBonus.8, qloraFineTuningEnabled, fromCache: false,
+ };
  }
 
  private encodeDataToTile(data: any, options: number): Uint8Array {
@@ -665,7 +697,8 @@ const hash = this.simpleHash(dataStr + tileIndex);
  const progress = JSON.parse(existingProgress);
  progress.push({
  timestamp: new Date().toISOString(),
- ...progressData });
+ ...progressData,
+ });
  await lokiRedisCache.set(progressKey, JSON.stringify(progress), 7200);
  }
 
@@ -694,7 +727,9 @@ const hash = this.simpleHash(dataStr + tileIndex);
  finalAccuracy: completionData.finalAccuracy,
  finalLoss: completionData.finalLoss,
  trainingReward,
- loraConfig: job.loraConfig } });
+ loraConfig: job.loraConfig,
+ },
+ });
  console.log(`🧠 RL AGENT UPDATED, Training reward ${trainingReward} for ${job.jobId}`);
  }
 
@@ -708,7 +743,9 @@ const hash = this.simpleHash(dataStr + tileIndex);
  timestamp: new Date().toISOString(),
  jobId: job.jobId, job.trainingData.length, finalAccuracy: completionData.finalAccuracy, finalLoss: completionData.finalLoss, trainingTime: completionData.trainingTime || 0,
  config: {
- r: job.loraConfig.r, job.loraConfig.alpha, epochs: job.epochs, batchSize: job.batchSize } };
+ r: job.loraConfig.r, job.loraConfig.alpha, epochs: job.epochs, batchSize: job.batchSize,
+ },
+ };
  metrics.push(improvement);
  if (.length > 50) {
  metrics.splice(0, metrics.length - 50);
@@ -726,7 +763,8 @@ const hash = this.simpleHash(dataStr + tileIndex);
  type: 'updatePolicy',
  stateEmbedding: Array.from(stateEmbedding),
  action,
- reward });
+ reward,
+ });
  }
  }
 
@@ -741,9 +779,11 @@ const hash = this.simpleHash(dataStr + tileIndex);
  ),
  nesMemoryUsage: this.nesMemory.getMemoryStats(),
  somCacheStats:
- typeof this.somCache.getStats === 'function' ? this.somCache.getStats()  | undefined };
+ typeof this.somCache.getStats === 'function' ? this.somCache.getStats()  | undefined,
+ };
  }
 }
 
 export const qloraRLOrchestrator = new QLorARLLangExtractOrchestrator({
- langextractServiceUrl: 'http://localhost:3001' });
+ langextractServiceUrl: 'http://localhost:3001',
+});

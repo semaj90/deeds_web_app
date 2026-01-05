@@ -1,6 +1,7 @@
 <script lang="ts">
  import { goto } from '$app/navigation';
 
+ let title = $state('');
  let narrative = $state('');
  let who = $state('');
  let what = $state('');
@@ -14,6 +15,10 @@
  let uploadedFiles = $state<File[]>([]);
 
  async function handleSubmit() {
+ if (!title.trim()) {
+ error = 'Please provide a case title.';
+ return;
+ }
  if (!narrative.trim() || !what.trim()) {
  error = 'Please fill in at least the narrative and "What happened" fields.';
  return;
@@ -46,6 +51,7 @@
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
  body: JSON.stringify({
+ title,
  narrative,
  who,
  what,
@@ -95,19 +101,35 @@
  </header>
 
  <form onsubmit={(e) => { e.preventDefault(); handleSubmit(); }} class="intake-form">
- <!-- Main narrative -->
- <div class="form-section">
- <label for="narrative">
- <h2>What Happened?</h2>
- <p>Describe the incident in your own words. Include people, dates, locations, and key events.</p>
- </label>
- <textarea
- id="narrative"
- bind:value={narrative}
- placeholder="On March 15, 2024, Officer Smith responded to a robbery at 7-Eleven on Main St..."
- rows="8"
- class="narrative-box"
- ></textarea>
+  <!-- Case Title -->
+  <div class="form-section">
+  <label for="title">
+  <h2>Case Title</h2>
+  <p>Provide a short, descriptive title for this case.</p>
+  </label>
+  <input
+  id="title"
+  name="title"
+  type="text"
+  bind:value={title}
+  placeholder="State v. Doe - Armed Robbery at 7-Eleven"
+  class="title-input"
+  />
+  </div>
+
+  <!-- Main narrative -->
+  <div class="form-section">
+  <label for="narrative">
+  <h2>What Happened?</h2>
+  <p>Describe the incident in your own words. Include people, dates, locations, and key events.</p>
+  </label>
+  <textarea
+  id="narrative"
+  bind:value={narrative}
+  placeholder="On March 15, 2024, Officer Smith responded to a robbery at 7-Eleven on Main St..."
+  rows="8"
+  class="narrative-box"
+  ></textarea>
 
  <!-- File upload -->
  <div
@@ -311,6 +333,23 @@
  }
 
  .narrative-box:focus {
+ outline: none;
+ border-color: var(--yorha-crimson);
+ box-shadow: 0 0 0 2px rgba(255, 0, 0, 0.1);
+ }
+
+ .title-input {
+ width: 100%;
+ padding: 0.75rem;
+ border: 1px solid #ddd;
+ border-radius: 3px;
+ font-family: var(--yorha-font);
+ font-size: 1rem;
+ color: var(--yorha-ink);
+ font-weight: 500;
+ }
+
+ .title-input:focus {
  outline: none;
  border-color: var(--yorha-crimson);
  box-shadow: 0 0 0 2px rgba(255, 0, 0, 0.1);
