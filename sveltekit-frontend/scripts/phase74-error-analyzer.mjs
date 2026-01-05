@@ -35,40 +35,59 @@ const errorTypes = new Map(); // error code -> count
 const errorMessages = new Map(); // error message -> count
 const fileErrorDetails = new Map(); // file -> array of {line, col, message, type}
 
+
 // Parse patterns
-//  /path/to/file.ts:123:45 - error TS2304: Cannot find name 'foo'.
-const errorPattern = /^(.+?):(\d+):(\d+)\s*-\s*error\s+(TS\d+):\s*(.+)$/;
+// Pattern 1: /path/to/file.ts:123:45
+// Pattern 2: Error: Message
+let currentFile = null;
+let currentLine = null;
+let currentCol = null;
 
 for (const line of lines) {
-    const match = line.match(errorPattern);
-    if (match) {
-        const [, filePath, lineNum, colNum, errorCode, errorMsg] = match;
+    const trimmed = line.trim();
 
-        // Normalize file path
-        const normalizedPath = filePath.replace(/\\/g, '/');
+    // Check for file path line: c:\path\to\file.ts:123:45
+    const pathMatch = trimmed.match(/^([a-zA-Z]:[\\/][^:]+):(\d+):(\d+)$/);
+    if (pathMatch) {
+        currentFile = pathMatch[1].replace(/\\/g, '/');
+        currentLine = parseInt(pathMatch[2]);
+        currentCol = parseInt(pathMatch[3]);
+        continue;
+    }
+
+    // Check for error message: Error: Message (ts)
+    if (trimmed.startsWith('Error: ') && currentFile) {
+        const errorMsg = trimmed.substring(7);
+        const errorCodeMatch = errorMsg.match(/\((TS\d+|svelte)\)$/);
+        const errorCode = errorCodeMatch ? errorCodeMatch[1] : 'UNKNOWN';
+        const cleanMsg = errorMsg.replace(/\s*\(TS\d+|svelte\)$/, '');
 
         // Track file error count
-        fileErrors.set(normalizedPath, (fileErrors.get(normalizedPath) || 0) + 1);
+        fileErrors.set(currentFile, (fileErrors.get(currentFile) || 0) + 1);
 
         // Track error type
         errorTypes.set(errorCode, (errorTypes.get(errorCode) || 0) + 1);
 
         // Track error message pattern
-        const msgPattern = errorMsg.replace(/'[^']+'/g, "'X'").replace(/`[^`]+`/g, "`X`");
+        const msgPattern = cleanMsg.replace(/'[^']+'/g, "'X'").replace(/`[^`]+`/g, "`X`").substring(0, 100);
         errorMessages.set(msgPattern, (errorMessages.get(msgPattern) || 0) + 1);
 
         // Track details
-        if (!fileErrorDetails.has(normalizedPath)) {
-            fileErrorDetails.set(normalizedPath, []);
+        if (!fileErrorDetails.has(currentFile)) {
+            fileErrorDetails.set(currentFile, []);
         }
-        fileErrorDetails.get(normalizedPath).push({
-            line: parseInt(lineNum),
-            col: parseInt(colNum),
-            message: errorMsg,
+        fileErrorDetails.get(currentFile).push({
+            line: currentLine,
+            col: currentCol,
+            message: cleanMsg,
             type: errorCode
         });
+
+        // Reset so we don't attribute the same error message multiple times if the log is weird
+        // (though we keep currentFile for potential follow-up errors in the same file block)
     }
 }
+
 
 // Sort and analyze
 const sortedFiles = Array.from(fileErrors.entries())
