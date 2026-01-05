@@ -20,6 +20,11 @@ Applied `scripts/fix-colon-corruption.cjs` to:
 | `evidenceCustodyMachine.ts` | ✅ Fixed | Colon corruption |
 | `gguf-runtime.ts` | ✅ Fixed | Colon corruption |
 | `redis-webgpu-simd-integration.ts` | ✅ Fixed | Colon corruption |
+| `recursive-evidence-chain-worker.ts` | ✅ Fixed | Colon corruption |
+| `nodejs-orchestrator.ts` | ✅ Fixed | Colon corruption |
+| `KnowledgeIndexer.ts` | ✅ Fixed | Colon corruption |
+| `schema-phase90-hardened.ts` | ✅ Fixed | Colon corruption |
+| `qlora-rl-langextract-integration.ts` | ✅ Fixed | Colon corruption (Generics) |
 
 ### 3. Route Registry Fixed
 - Fixed `src/lib/routing/route-registry.svelte.ts` line 230
