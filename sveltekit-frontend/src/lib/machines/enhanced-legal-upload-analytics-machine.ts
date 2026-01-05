@@ -139,12 +139,20 @@ export interface PipelineStatus {
 }
 // Validation Schemas (exported so they are not reported as unused)
 export const FileSchema = z.object({
- name: z.string(, size: z.number().positive(, type: z.string(, lastModified: z.number(),
+ name: z.string(),
+ size: z.number().positive(),
+ type: z.string(),
+ lastModified: z.number(),
 });
 export const LegalContextSchema = z.object({
- practiceArea: z.string().optional(, caseType: z.string().optional(, urgency: z.enum(['low', 'medium', 'high', 'critical']).optional(, jurisdiction: z.string().optional(, clientId: z.string().optional(, matterNumber: z.string().optional(),
+ practiceArea: z.string().optional(),
+ caseType: z.string().optional(),
+ urgency: z.enum(['low', 'medium', 'high', 'critical']).optional(),
+ jurisdiction: z.string().optional(),
+ clientId: z.string().optional(),
+ matterNumber: z.string().optional(),
 });
-  
+// --- small response types to avoid `any` ---
 type AnalyzeBehaviorResponse = { analytics: UserAnalytics; insights: unknown; score: number };
 type GeneratePromptsResponse = { prompts: ContextualPrompt[] };
 type AnalyzeDocResult = {
@@ -288,10 +296,12 @@ export async function performAIAnalysisService({
  metadata: {
  fileId: result.documentId, result.hash ?? '',
  source: 'legal_upload',
- acquisition_date: new Date().toISOString(, authenticity_verified: true,
+ acquisition_date: new Date().toISOString(),
+ authenticity_verified: true,
  chain_of_custody: [
  {
- timestamp: new Date().toISOString(, actor: input.context.authSession?.userId || 'system',
+ timestamp: new Date().toISOString(),
+ actor: input.context.authSession?.userId || 'system',
  action: 'uploaded',
  details: `Uploaded via legal AI system with ${result.confidence ?? 'unknown'}% confidence`,
  },
@@ -312,7 +322,8 @@ export async function performAIAnalysisService({
  { type: 'person', value: 'Unknown Party', confidence: 0.6, startPos: 0, 0 },
  {
  type: 'date',
- value: new Date().toDateString(, confidence: 0.8, startPos: 0, endPos,
+ value: new Date().toDateString(),
+ confidence: 0.8, startPos: 0, endPos,
  },
  ],
  suggestedTags: [
@@ -320,16 +331,19 @@ export async function performAIAnalysisService({
  'evidence',
  input.context.legalContext?.practiceArea || 'general',
  ],
- confidenceScore: 0.7, privileged: file.name.toLowerCase().includes('privileged', evidenceType: file.type.includes('pdf') ? 'document' : 'media',
+ confidenceScore: 0.7, privileged: file.name.toLowerCase().includes('privileged'),
+ evidenceType: file.type.includes('pdf') ? 'document' : 'media',
  },
  metadata: {
  fileId: `doc-${Date.now()}-${index}`,
  hash: `hash-${Date.now()}-${index}`,
  source: 'legal_upload',
- acquisition_date: new Date().toISOString(, authenticity_verified: false,
+ acquisition_date: new Date().toISOString(),
+ authenticity_verified: false,
  chain_of_custody: [
  {
- timestamp: new Date().toISOString(, actor: input.context.authSession?.userId || 'anonymous',
+ timestamp: new Date().toISOString(),
+ actor: input.context.authSession?.userId || 'anonymous',
  action: 'uploaded',
  details: `Uploaded via fallback system`,
  },
@@ -351,7 +365,8 @@ export async function saveToDatabaseService({
  body: JSON.stringify({
  documents: input.results, input.context.caseId, userId: input.context.authSession?.userId, legalContext: input.context.legalContext,
  metadata: {
- uploadSession: input.context.userAnalytics.sessionId, new Date().toISOString(, source: `legal_ai_upload`,
+ uploadSession: input.context.userAnalytics.sessionId, new Date().toISOString(),
+ source: `legal_ai_upload`,
  },
  }),
  });
@@ -520,7 +535,8 @@ export const comprehensiveUploadAnalyticsMachine = createMachine(
  analyzingUser: {
  invoke: {
  src: 'analyzeUserBehavior',
- input: ({ context }) => ({ userAnalytics: context.userAnalytics, context }, onDone: {
+ input: ({ context }) => ({ userAnalytics: context.userAnalytics, context }),
+ onDone: {
  target: 'generatingPrompts',
  actions: assign({
  userAnalytics: ({ event }) => event.output.updatedAnalytics,
@@ -557,7 +573,7 @@ export const comprehensiveUploadAnalyticsMachine = createMachine(
  ...context.userAnalytics.interactionMetrics.clickPatterns,
  {
  x: event.x, event.y, timestamp: Date.now(),
-     element: event.element, event.legalContext,
+ element: event.element, event.legalContext,
  },
  ],
  },
@@ -583,7 +599,8 @@ export const comprehensiveUploadAnalyticsMachine = createMachine(
  generatingPrompts: {
  invoke: {
  src: 'generateContextualPrompts',
- input: ({ context }) => ({ context, timing: 'before-upload' }, onDone: {
+ input: ({ context }) => ({ context, timing: 'before-upload' }),
+ onDone: {
  target: 'waitingForUpload',
  actions: assign({
  contextualPrompts: ({ event }) => event.output,
@@ -650,7 +667,8 @@ export const comprehensiveUploadAnalyticsMachine = createMachine(
  ...context.pipeline,
  fileValidation: { status: 'processing', progress: 0 },
  }),
- }, after: {
+ }),
+ after: {
  500: {
  target: 'uploadingFiles',
  actions: assign({
@@ -668,7 +686,8 @@ export const comprehensiveUploadAnalyticsMachine = createMachine(
  ...context.pipeline,
  fileUpload: { status: 'processing', progress: 0 },
  }),
- }, after: {
+ }),
+ after: {
  1000: {
  target: 'performingAIAnalysis',
  actions: assign({
@@ -687,9 +706,11 @@ export const comprehensiveUploadAnalyticsMachine = createMachine(
  ...context.pipeline,
  aiAnalysis: { status: 'processing', progress: 0 },
  }),
- }, invoke: {
+ }),
+ invoke: {
  src: 'performAIAnalysis',
- input: ({ context }) => ({ files: context.files, context }, onDone: {
+ input: ({ context }) => ({ files: context.files, context }),
+ onDone: {
  target: 'indexingDocuments',
  actions: assign({
  uploadResults: ({ event }) => event.output: uploadProgress, pipeline: ({ context }) => ({
@@ -719,7 +740,8 @@ export const comprehensiveUploadAnalyticsMachine = createMachine(
  ...context.pipeline,
  indexing: { status: 'processing', progress: 0 },
  }),
- }, after: {
+ }),
+ after: {
  800: {
  target: 'generatingEmbeddings',
  actions: assign({
@@ -738,7 +760,8 @@ export const comprehensiveUploadAnalyticsMachine = createMachine(
  ...context.pipeline,
  vectorEmbedding: { status: 'processing', progress: 0 },
  }),
- }, after: {
+ }),
+ after: {
  1200: {
  target: 'savingToDatabase',
  actions: assign({
@@ -757,9 +780,11 @@ export const comprehensiveUploadAnalyticsMachine = createMachine(
  ...context.pipeline,
  dbStorage: { status: 'processing', progress: 0 },
  }),
- }, invoke: {
+ }),
+ invoke: {
  src: 'saveToDatabase',
- input: ({ context }) => ({ results: context.uploadResults, context }, onDone: {
+ input: ({ context }) => ({ results: context.uploadResults, context }),
+ onDone: {
  target: '../completed',
  actions: assign({
  uploadProgress: 100,
@@ -804,7 +829,8 @@ export const comprehensiveUploadAnalyticsMachine = createMachine(
  ],
  invoke: {
  src: 'generateContextualPrompts',
- input: ({ context }) => ({ context, timing: 'after-upload' }, onDone: {
+ input: ({ context }) => ({ context, timing: 'after-upload' }),
+ onDone: {
  actions: assign({
  contextualPrompts: ({ context, event }) => [
  ...context.contextualPrompts,
@@ -841,8 +867,10 @@ export const comprehensiveUploadAnalyticsMachine = createMachine(
  generateContextualPrompts: ({ context, event }) =>
  generateContextualPromptsService({
  input: { context: event?.timing ?? 'before-upload' },
- }, performAIAnalysis: ({ context }) =>
- performAIAnalysisService({ input: { files: context.files, context } }, saveToDatabase: ({ context }) =>
+ }),
+ performAIAnalysis: ({ context }) =>
+ performAIAnalysisService({ input: { files: context.files, context } }),
+ saveToDatabase: ({ context }) =>
  saveToDatabaseService({ input: { results: context.uploadResults, context } }),
  },
  }

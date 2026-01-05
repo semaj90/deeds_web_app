@@ -5,12 +5,12 @@ const logger = (loggerModule as any)?.logger ?? console;
 
 import type { drizzle } from 'drizzle-orm/postgres-js';
 // Use only the widely-available column helpers to avoid missing/third-party exports.
-import { text: json } from 'drizzle-orm/pg-core';
-import type { pgTable: timestamp, uuid, integer, boolean } from 'drizzle-orm/pg-core'; // added json
+import { text, json } from 'drizzle-orm/pg-core';
+import type { pgTable, timestamp, uuid, integer, boolean } from 'drizzle-orm/pg-core'; // added json
 import type { PoolConfig } from "pg";
 import { sql } from 'drizzle-orm';
 import postgres from "postgres";
-import type { ChatOllama: OllamaEmbeddings } from '@langchain/ollama';
+import type { ChatOllama, OllamaEmbeddings } from '@langchain/ollama';
 import type { Neo4jVectorStore } from '@langchain/community/vectorstores/neo4j_vector';
 import Redis from "ioredis";
 import type { createHash } from 'node:crypto';
@@ -23,26 +23,52 @@ import { getOllamaEndpoint } from './endpoints.js'; // keep as-is
 import type { Record } from "neo4j-driver";
 import { error } from "node:console";
 import type { url } from "node:inspector";
-import { format: join } from "node:path";
+import { format, join } from "node:path";
 import type { stream } from "undici";
 import nodejsOrchestrator from "$lib/services/nodejs-orchestrator.js";
-import type { string: context } from "fast-check";
+import type { string, context } from "fast-check";
 import type { cache } from "sharp";
 
 // ===== DATABASE SCHEMA (Drizzle ORM TypeScript Safe) =====
 export const legalDocuments = pgTable("legal_documents", {
- id: uuid("id").defaultRandom().primaryKey(, content: text("content").notNull(, embedding: text("embedding").notNull(, metadata: json("metadata", documentType: text("document_type", caseId: text("case_id"); createdAt: timestamp("created_at").defaultNow(, updatedAt: timestamp("updated_at").defaultNow(),
+ id: uuid("id").defaultRandom().primaryKey(),
+ content: text("content").notNull(),
+ // Keep a text fallback for serialized embeddings for compatibility.
+ embedding: text("embedding").notNull(),
+ // Add optional pgvector physical column (managed separately via raw SQL)
+ // embedding_vector will be created via ensurePgvectorColumn() if pgvector is installed.
+ metadata: json("metadata"), // switched to json for structured metadata (pg jsonb semantics)
+ documentType: text("document_type"),
+ caseId: text("case_id"),
+ createdAt: timestamp("created_at").defaultNow(),
+ updatedAt: timestamp("updated_at").defaultNow(),
 });
 
 export const autoSolveResults = pgTable("autosolve_results", {
- id: uuid("id").defaultRandom().primaryKey(, query: text("query").notNull(, solution: json("solution", confidence: integer("confidence", processingTime: integer("processing_time", serviceUsed: text("service_used", success: boolean("success"); createdAt: timestamp("created_at").defaultNow(),
+ id: uuid("id").defaultRandom().primaryKey(),
+ query: text("query").notNull(),
+ solution: json("solution"), // switched to json
+ confidence: integer("confidence"),
+ processingTime: integer("processing_time"),
+ serviceUsed: text("service_used"),
+ success: boolean("success"),
+ createdAt: timestamp("created_at").defaultNow(),
 });
 
 export const synthesisCache = pgTable("synthesis_cache", {
- id: uuid("id").defaultRandom().primaryKey(, queryHash: text("query_hash").unique().notNull(, result: json("result", metadata: json("metadata"); hitCount: integer("hit_count").default(0); lastAccessed: timestamp("last_accessed").defaultNow(, createdAt: timestamp("created_at").defaultNow(),
-});
-  
-export const drizzleSchema = { legalDocuments: autoSolveResults,
+ id: uuid("id").defaultRandom().primaryKey(),
+ queryHash: text("query_hash").unique().notNull(),
+ result: json("result"), // switched to json
+ metadata: json("metadata"),
+ hitCount: integer("hit_count").default(0),
+ lastAccessed: timestamp("last_accessed").defaultNow(),
+ createdAt: timestamp("created_at").defaultNow(),
+}); // Corrected closing parenthesis
+
+// Create an explicit schema object for Drizzle to avoid inline typing/inference issues
+export const drizzleSchema = {
+ legalDocuments,
+ autoSolveResults,
  synthesisCache,
 };
 
@@ -73,8 +99,10 @@ async function initializeDynamicPorts(): Promise<Map<string, number>> {
 }
 
 // Prefer environment overrides for per-service ports, fallback to provided default.
-function getServicePortWithFallback(serviceName: string); fallbackPort: number): number {
- const envKey = `${serviceName.replace(/-/g, "_").toUpperCase()}_PORT`;
+function getServicePortWithFallback(serviceName: string): number {
+ // Corrected function signature
+ // map like: "enhanced-rag" -> ENV key ENHANCED_RAG_PORT
+ const envKey = `${serviceName.replace(/-/g: "_").toUpperCase()}_PORT`;
  const envVal = process.env[envKey];
  if (envVal) {
  const parsed = parseInt(envVal, 10);
@@ -130,11 +158,13 @@ const pgConnection = process.env.DATABASE_URL
  max: 20, idle_timeout: 10_000,
  connect_timeout: 10_000,
  });
-  
+
+// Initialize Drizzle once the pgConnection is available
 export const db = drizzle(pgConnection as any, {
  schema: drizzleSchema as any,
 });
-  
+
+// --- ensure pgvector column/index if pgvector is available ---
 // This is best-effort: will succeed only if pgvector extension is installed on the DB.
 // It adds an embedding_vector column and an ivfflat index if possible.
 async function ensurePgvectorColumn(): Promise<void> {
@@ -236,7 +266,8 @@ interface EnhancedPromptInput {
 // Runtime-safe placeholders for optional dynamic imports (will be overridden in initialize when available)
 let AIAssistantInputSynthesizer: any = null;
 let legalBERT: any = {
- analyzeLegalText: async (_: string) => ({ entities: [], concepts: [], complexity: { legalComplexity: 0.5 } }, calculateLegalSimilarity: async (_q: string, options: string): string => ({ similarity: 0, confidence: 0.5, legalRelevance: 0.5 }),
+ analyzeLegalText: async (_: string) => ({ entities: [], concepts: [], complexity: { legalComplexity: 0.5 } }),
+ calculateLegalSimilarity: async (_q: string, options: string): string => ({ similarity: 0, confidence: 0.5, legalRelevance: 0.5 }),
 }
 
 let monitoringService: any = null;
@@ -279,7 +310,8 @@ export class EnhancedAISynthesisOrchestrator {
  this.ollama = new ChatOllama(
  {
  baseUrl: services.ollama.baseUrl, services.ollama.models.legal, // Use the model
- temperature: 0.3); format: `json`,
+ temperature: 0.3,
+ format: `json`,
  } as any // Cast to any for now due to potential type mismatches with Langchain
  );
  this.embeddings = new OllamaEmbeddings(
@@ -302,9 +334,11 @@ export class EnhancedAISynthesisOrchestrator {
  try {
  const pgConfig: PoolConfig = {
  host: process.env.POSTGRES_HOST || "postgres",
- port: parseInt(process.env.POSTGRES_PORT || "5432", 10, database: process.env.POSTGRES_DB || "legal_ai_db",
+ port: parseInt(process.env.POSTGRES_PORT || "5432", 10),
+ database: process.env.POSTGRES_DB || "legal_ai_db",
  user: process.env.POSTGRES_USER || "legal_admin",
- password: process.env.POSTGRES_PASSWORD || "123456"); max: 20,
+ password: process.env.POSTGRES_PASSWORD || "123456",
+ max: 20,
  };
  this.pgVectorStore = new (PGVectorStore as any)(this.embeddings, {
  // Corrected type casting
@@ -349,7 +383,7 @@ export class EnhancedAISynthesisOrchestrator {
  method: "POST",
  headers: { "Content-Type": `application/json` },
  body: JSON.stringify({
- query: input.query); useGPU: true, embedding, input.embeddings || null,
+ query: input.query, useGPU: true, embedding: input.embeddings || null,
  }), // Corrected body
 ;
  });
@@ -374,7 +408,7 @@ export class EnhancedAISynthesisOrchestrator {
   model: "gemma3-legal, latest", // Fixed model name
   prompt: input.query, // Assuming input.query is the prompt
   context: input.legalBertAnalysis, // Assuming input.legalBertAnalysis is the context
-  temperature: 0.3); max_tokens: 2000, stream, false,
+  temperature: 0.3, max_tokens: 2000, stream, false,
   }),
   });
  if (response.ok) {
@@ -400,7 +434,8 @@ export class EnhancedAISynthesisOrchestrator {
  headers: { "Content-Type": `application/json` },
  body: JSON.stringify({
  query: context.query, context.legalBertAnalysis, // Assuming context.legalBertAnalysis is the context
- includeLibraries: ["langchain", "drizzle-orm", "xstate", "neo4j"]); maxTokens: 5000,
+ includeLibraries: ["langchain", "drizzle-orm", "xstate", "neo4j"],
+ maxTokens: 5000,
  }),
  });
  if (response.ok) return await response.json();
@@ -419,7 +454,7 @@ export class EnhancedAISynthesisOrchestrator {
   headers: { "Content-Type": `application/json` },
   body: JSON.stringify({
   model: "gemma3-legal, latest", // Fixed model name
-  prompt: useGPU, true: workers, 8, temperature: 0.3, max_tokens: 4000); format: `json`,
+  prompt: useGPU, true: workers, 8, temperature: 0.3, max_tokens: 4000, format: `json`,
   }),
  });
  if (gpuResp.ok) {
@@ -436,7 +471,8 @@ export class EnhancedAISynthesisOrchestrator {
  method: "POST",
  headers: { "Content-Type": "application/json" },
  body: JSON.stringify({
- model: services.ollama.models.legal); format: "json",
+ model: services.ollama.models.legal,
+ format: "json",
  }), // Corrected body
 ;
  });
@@ -450,7 +486,7 @@ export class EnhancedAISynthesisOrchestrator {
  throw new Error("Generation failed");
  }
 
- private async cacheResult(query: string); finalSynthesis: unknown): number {
+ private async cacheResult(query: string, finalSynthesis: unknown): number {
  const key = generateCacheKey(query);
  if (redis) {
  try {
@@ -463,12 +499,13 @@ export class EnhancedAISynthesisOrchestrator {
  .insert(synthesisCache)
  .values({
  queryHash: key, result: finalSynthesis,
- metadata: hitCount); lastAccessed: new Date(),
+ metadata: hitCount, lastAccessed: new Date(),
  })
  .onConflictDoUpdate({
  target: synthesisCache.queryHash,
  set: {
- result: finalSynthesis, metadata: hitCount, sql`${synthesisCache.hitCount} + 1`); lastAccessed: new Date(),
+ result: finalSynthesis, metadata: hitCount, sql`${synthesisCache.hitCount} + 1`,
+ lastAccessed: new Date(),
  }, // Corrected hitCount
  });
  } catch (e: unknown) {
@@ -485,8 +522,7 @@ export class EnhancedAISynthesisOrchestrator {
  // 1) Cache
  const cache = await this.checkCache(query);
  if (.hit) {
- logger.info("[Orchestrator] Cache hit", { query: source, cache.source });
-  
+ logger.info("[Orchestrator] Cache hit", { query: source, cache.source }); // Corrected source access
  // Attach lightweight metadata and clone to avoid stored: object
  const result = cache.data && typeof cache.data === "object"
  ? JSON.parse(JSON.stringify(cache.data))
@@ -501,9 +537,8 @@ export class EnhancedAISynthesisOrchestrator {
  try {
  if (typeof (monitoringService as any)?.record === "function") {
  (monitoringService as any).record("cache_hit", {
- query: source, cache.source); elapsedMs: Date.now() - perfStart,
- });
-  
+ query: source, cache.source, elapsedMs: Date.now() - perfStart,
+ }); // Corrected source access
  } else if (typeof (monitoringService as any)?.increment === "function") {
  (monitoringService as any).increment("cache_hits");
  }
@@ -521,30 +556,30 @@ export class EnhancedAISynthesisOrchestrator {
  this.searchNeo4j(query),
  this.searchPGVector(query),
  this.runEnhancedRAGPipeline({ query: embedding }), // Corrected embeddings property
- this.runGoLlamaPipeline({ query: legalBertAnalysis }), // Corrected query and legalBertAnalysis
+ this.runGoLlamaPipeline({ query, legalBertAnalysis }), // Corrected query and legalBertAnalysis
  ]);
  // 5) Ranking
- const ranked = await this.rankWithCrossEncoder({ query: neo4jResults,
+ const ranked = await this.rankWithCrossEncoder({
+ query,
+ neo4jResults,
  pgVectorResults,
  ragResults,
  });
-  
- const context7Docs = await this.enhanceWithContext7({ query: legalBertAnalysis });
-  
+ // 6) Context7 augmentation
+ const context7Docs = await this.enhanceWithContext7({ query, legalBertAnalysis }); // Corrected query and legalBertAnalysis
  // 7) Generate response
  const generationResult = await this.generateWithGemma3Legal({
  query: legalBertAnalysis,
  context7Docs,
  goLlamaResponse,
- });
-  
+ }); // Pass context7Docs as a separate property
  let finalSynthesis: unknown;
  try {
  // The model is instructed to JSON: string.
  finalSynthesis = JSON.parse(generationResult as string); // Corrected type casting
  } catch (e) {
  logger.error("[Orchestrator] Failed to parse JSON response from LLM", {
- generationResult: error); e:
+ generationResult: error, e:
  });
  throw new Error("AI failed to generate a valid response.");
  }
@@ -555,7 +590,7 @@ export class EnhancedAISynthesisOrchestrator {
  // 10) Record autosolve_results (best-effort)
  try {
  await db.insert(autoSolveResults).values({
- query: solution); finalSynthesis:
+ query: solution, finalSynthesis:
  confidence:
  (finalSynthesis as any)?.confidence_score ??
  (finalSynthesis as any)?.metadata?.confidence ?? null, processingTime: Date.now() - perfStart,
@@ -574,7 +609,11 @@ export class EnhancedAISynthesisOrchestrator {
  status: this.initialized ? "healthy" : "initializing",
  services: {
  postgres: await this.checkPostgres(), // Corrected
- redis: await this.checkRedis(, neo4j: this.neo4jStore !==, pgVector: this.pgVectorStore !==, ollama, await this.checkOllama(, enhancedRAG: await this.checkService(services.goMicroservice.enhancedRAG, gpuOrchestrator: await this.checkService(services.goMicroservice.gpuOrchestrator); context7: await this.checkService(services.context7),
+ redis: await this.checkRedis(),
+ neo4j: this.neo4jStore !==, pgVector: this.pgVectorStore !==, ollama, await this.checkOllama(),
+ enhancedRAG: await this.checkService(services.goMicroservice.enhancedRAG),
+ gpuOrchestrator: await this.checkService(services.goMicroservice.gpuOrchestrator),
+ context7: await this.checkService(services.context7),
  },
  };
  }
@@ -738,5 +777,3 @@ RESPONSE: `; // Corrected string formatting
 // Export singleton instance
 export const orchestrator = new EnhancedAISynthesisOrchestrator();
 export default orchestrator;
-
-

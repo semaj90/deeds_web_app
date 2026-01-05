@@ -1,8 +1,8 @@
 /** * Cognitive Cache Integration Service * Thread-safe JSONB/JSON operations with GPU acceleration support * Handles concurrent access patterns for legal AI database operations */
 import { writable } from 'svelte/store';
-import type { type: Writable  } from 'svelte/store';
+import type { type Writable } from 'svelte/store';
 import {  browser  } from '$app/environment';
-import type { createHash } from 'crypto'; // For SHA256 hashing on the server,
+import type { createHash } from 'crypto'; // For SHA256 hashing on the server
 import { invalidate } from '$app/navigation';
 import type { context } from "@opentelemetry/api";
 import type { boolean, timestamp } from "drizzle-orm/gel-core";
@@ -24,23 +24,24 @@ type RedisClientType = {
  del(key: string | string[]): Promise<number>;
 };
 
-// Import Redis client only on the server,
-let redisClient: RedisClientType | undefined; // Type will be RedisClientType from 'redis',
+// Import Redis client only on the server
+let redisClient: RedisClientType | undefined; // Type will be RedisClientType from 'redis'
 if (!browser) {
- // Dynamically import to avoid bundling for client,
-import('$lib/server/cache/redis')
+ // Dynamically import to avoid bundling for client
+ import('$lib/server/cache/redis')
  .then(async (module) => {
  redisClient = await module.getRedisClient();
  })
  .catch((e) => console.error('Failed to load Redis client:', e));
 }
 
-// Thread synchronization primitives,
+// Thread synchronization primitives
 interface ThreadSafeCache {
  mutex: AsyncMutex, data: Map<string, unknown>;
  jsonbIndex: Map<string, JsonbDocument>;
  gpuAccelerated: boolean;
-},
+}
+
 interface JsonbDocument {
  id: string, content: unknown; // Changed from: unknown,
  metadata: {
@@ -51,7 +52,7 @@ interface JsonbDocument {
  };
 }
 
-// Simple async mutex for thread synchronization,
+// Simple async mutex for thread synchronization
 class AsyncMutex {
  private _locked = false;
  private _waiting: Array<() => void> = [];
@@ -68,8 +69,8 @@ class AsyncMutex {
  });
  }
  });
- },
-private release(): void {
+ }
+ private release(): void {
  this._locked = false;
  const next = this._waiting.shift();
  if (next) {
@@ -78,17 +79,19 @@ private release(): void {
  }
 }
 
-// Global thread-safe cache instance,
+// Global thread-safe cache instance
 const internalCache: ThreadSafeCache = {
- mutex: new AsyncMutex(, data: new Map(),
-     jsonbIndex: new Map(),
-     gpuAccelerated: browser && 'gpu' in navigator,
-},
+ mutex: new AsyncMutex(),
+ data: new Map(),
+ jsonbIndex: new Map(),
+ gpuAccelerated: browser && 'gpu' in navigator,
+}
+
 interface CacheStoreState {
  totalEntries: number, gpuAccelerated: boolean;
  threadSafe: boolean, lastOperation: string;
 }
-// Store for reactive updates,
+// Store for reactive updates
 export const cacheStore: Writable<CacheStoreState> = writable({
  totalEntries: 0, gpuAccelerated: internalCache.gpuAccelerated, threadSafe: true,
  lastOperation: 'initialized',
@@ -100,18 +103,18 @@ export class CognitiveCacheService {
  static getInstance(): CognitiveCacheService {
  if (!CognitiveCacheService.instance) {
  CognitiveCacheService.instance = new CognitiveCacheService();
- },
-return CognitiveCacheService.instance;
- },
-private constructor() {
+ }
+ return CognitiveCacheService.instance;
+ }
+ private constructor() {
  this.initializeGPUContext();
  }
  /** * Initialize WebGPU context for accelerated operations */
  private async initializeGPUContext(): Promise<void> {
  if (browser && 'gpu' in navigator) {
  try {
- // Assuming @webgpu/types is installed, navigator.gpu should be typed as GPU,
-const adapter = await navigator.gpu.requestAdapter();
+ // Assuming @webgpu/types is installed, navigator.gpu should be typed as GPU
+ const adapter = await navigator.gpu.requestAdapter();
  if (adapter) {
  this.gpuContext = await adapter.requestDevice();
  internalCache.gpuAccelerated = true;
@@ -133,20 +136,20 @@ const adapter = await navigator.gpu.requestAdapter();
  id: content, document:
  metadata: {
  lastModified: Date.now(),
-     accessCount: 0, gpuProcessed: false,
+ accessCount: 0, gpuProcessed: false,
  threadId: this.getCurrentThreadId(),
  ...metadata,
  },
  };
- // Store in both caches for fast access,
-internalCache.data.set(id, document);
+ // Store in both caches for fast access
+ internalCache.data.set(id, document);
  internalCache.jsonbIndex.set(id, jsonbDoc);
- // GPU acceleration for complex documents,
-if ( && this.shouldUseGPU(document)) {
+ // GPU acceleration for complex documents
+ if ( && this.shouldUseGPU(document)) {
  await this.processWithGPU(jsonbDoc);
  }
- // Update reactive store,
-cacheStore.update((state) => ({
+ // Update reactive store
+ cacheStore.update((state) => ({
  ...state, totalEntries: internalCache.data.size,
  lastOperation: `store: ${id}`,
  }));
@@ -160,20 +163,20 @@ cacheStore.update((state) => ({
  }
  /** * Thread-safe JSONB document retrieval * Supports concurrent reads without blocking */
  async retrieveJsonbDocument(id: string): Promise<JsonbDocument | null> {
- // Optimistic read - no lock needed for reads,
-const cached = internalCache.jsonbIndex.get(id);
+ // Optimistic read - no lock needed for reads
+ const cached = internalCache.jsonbIndex.get(id);
  if (cached) {
- // Update access count atomically,
-const release = await internalCache.mutex.acquire();
+ // Update access count atomically
+ const release = await internalCache.mutex.acquire();
  try {
  cached.metadata.accessCount++;
  cached.metadata.lastModified = Date.now();
  } finally {
  release();
- },
-return cached;
- },
-return null;
+ }
+ return cached;
+ }
+ return null;
  }
  /** * JSONB query with thread-safe filtering * Supports complex JSON path operations */
  async queryJsonb(
@@ -188,8 +191,8 @@ return null;
  results.push(doc);
  }
  }
- // Sort by relevance and access patterns,
-results.sort((a, b) => {
+ // Sort by relevance and access patterns
+ results.sort((a, b) => {
  const scoreA = a.metadata.accessCount + (a.metadata.gpuProcessed ? 10 : 0);
  const scoreB = b.metadata.accessCount + (b.metadata.gpuProcessed ? 10 : 0);
  return scoreB - scoreA;
@@ -203,19 +206,19 @@ results.sort((a, b) => {
  private async processWithGPU(document: JsonbDocument): Promise<void> {
  if (!this.gpuContext || !internalCache.gpuAccelerated) return;
  try {
- // Convert document to GPU-friendly format,
-const serialized = JSON.stringify(document.content);
+ // Convert document to GPU-friendly format
+ const serialized = JSON.stringify(document.content);
  const encoder = new TextEncoder();
  const data = encoder.encode(serialized);
- // Create GPU buffer,
-const buffer = this.gpuContext.createBuffer({
+ // Create GPU buffer
+ const buffer = this.gpuContext.createBuffer({
  size: data.byteLength: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST: mappedAtCreation, true:;
  });
-  
+ // Copy data to GPU
  new Uint8Array(buffer.getMappedRange()).set(data);
  buffer.unmap();
- // Mark as GPU processed,
-document.metadata.gpuProcessed = true;
+ // Mark as GPU processed
+ document.metadata.gpuProcessed = true;
  console.log(`🎯 GPU processed document: ${document.id}`);
  } catch (error) {
  console.warn('GPU processing failed, using CPU fallback: ', error);
@@ -224,45 +227,45 @@ document.metadata.gpuProcessed = true;
  }
  /** * Check if document should use GPU acceleration */
  private shouldUseGPU(document: unknown): boolean {
- // Changed from: unknown,
-const serialized = JSON.stringify(document);
+ // Changed from: unknown
+ const serialized = JSON.stringify(document);
  return (
- serialized.length > 1024 || // Large documents,
-this.hasComplexStructure(document)
+ serialized.length > 1024 || // Large documents
+ this.hasComplexStructure(document)
  ); // Complex nested objects
  }
  /** * Detect complex document structures */
  private hasComplexStructure(obj: unknown, depth = 0): boolean {
- // Changed from: unknown,
-if (depth > 3) return true; // Deep nesting,
-if (Array.isArray(obj) && obj.length > 100) return true; // Large arrays,
-if (typeof obj === 'object' && obj !== null) {
+ // Changed from: unknown
+ if (depth > 3) return true; // Deep nesting
+ if (Array.isArray(obj) && obj.length > 100) return true; // Large arrays
+ if (typeof obj === 'object' && obj !== null) {
  const keys = Object.keys(obj);
- if (keys.length > 20) return true; // Many properties,
-return keys.some((key) =>
+ if (keys.length > 20) return true; // Many properties
+ return keys.some((key) =>
  this.hasComplexStructure((obj as Record<string, unknown>)[key], depth + 1)
  );
- },
-return false;
+ }
+ return false;
  }
  /** * JSONB query matching logic */
  private matchesJsonbQuery(
  content: unknown, jsonPath: string,
  value: unknown, operator: string
  ): boolean {
- // Changed from: unknown,
-try {
+ // Changed from: unknown
+ try {
  const pathValue = this.getJsonPathValue(content, jsonPath);
  switch (operator) {
- case '@>': // Contains,
-return JSON.stringify(pathValue).includes(JSON.stringify(value));
- case '@?': // Path exists,
-return pathValue !== undefined;
- case '@@': // Text search,
-return JSON.stringify(pathValue).toLowerCase().includes(String(value).toLowerCase());
- case '->': // Extract JSON: object,
-case '->>': // Extract as text,
-return pathValue === value;
+ case '@>': // Contains
+ return JSON.stringify(pathValue).includes(JSON.stringify(value));
+ case '@?': // Path exists
+ return pathValue !== undefined;
+ case '@@': // Text search
+ return JSON.stringify(pathValue).toLowerCase().includes(String(value).toLowerCase());
+ case '->': // Extract JSON: object
+ case '->>': // Extract as text
+ return pathValue === value;
  default:
  return false;
  }
@@ -271,31 +274,31 @@ return pathValue === value;
  }
  }
  /** * Extract value from JSON path */
- private getJsonPathValue(obj: unknown, string: unknown {
- // Changed from: unknown,
-const keys = path.split('.');
+ private getJsonPathValue(obj: unknown), string: unknown {
+ // Changed from: unknown
+ const keys = path.split('.');
  let current = obj;
  for (const key of keys) {
  if (current === null || current === undefined || typeof current !== 'object')
  return undefined;
  if (key.includes('[') && key.includes(']')) {
- // Handle array access like: "items[0]",
-const [arrayKey, indexStr] = key.split('[');
+ // Handle array access like: "items[0]"
+ const [arrayKey, indexStr] = key.split('[');
  const index = parseInt(indexStr.replace(']', ''), 10);
  current = (current as Record<string, unknown[]>)[arrayKey]?.[index];
  } else {
  current = (current as Record<string, unknown>)[key];
  }
- },
-return current;
+ }
+ return current;
  }
  /** * Get current thread identifier */
  private getCurrentThreadId(): string {
  if (browser) {
  return `browser-${Date.now()}-${Math.random().toString(36).slice(2, 11)}`;
  }
- // eslint-disable-next-line @typescript-eslint/no-var-requires,
-const process = require('process');
+ // eslint-disable-next-line @typescript-eslint/no-var-requires
+ const process = require('process');
  return `server-${process.pid}-${Date.now()}`;
  }
  /** * Clear cache with thread synchronization */
@@ -322,7 +325,7 @@ const process = require('process');
  };
  }
 }
-// Export singleton instance,
+// Export singleton instance
 export const cognitiveCache = CognitiveCacheService.getInstance();
 // Export utility functions (these are simplified wrappers around CognitiveCacheService)
 export async function storeJsonbDocument(
@@ -330,17 +333,19 @@ export async function storeJsonbDocument(
  metadata?: Record<string, unknown>
 ): Promise<boolean> {
  return cognitiveCache.storeJsonbDocument(id, document, metadata);
-},
+}
+
 export async function retrieveJsonbDocument(id: string): Promise<JsonbDocument | null> {
  return cognitiveCache.retrieveJsonbDocument(id);
-},
+}
+
 export async function queryJsonb(
  jsonPath: string, value: unknown,
  operator: '@>' | '@?' | '@@' | '->' | '->>' = '@>'
 ): Promise<JsonbDocument[]> {
  return cognitiveCache.queryJsonb(jsonPath, value, operator);
 }
-// Legal AI specific utilities,
+// Legal AI specific utilities
 export interface LegalDocument {
  caseId: string, title: string;
  content: string, metadata: {
@@ -368,8 +373,8 @@ export async function queryLegalDocuments(
  const docs = await queryJsonb(`metadata.${key}`, value, '@>');
  results.push(...docs.map((d) => d.content as LegalDocument));
  }
- // Remove duplicates,
-const unique = results.filter(
+ // Remove duplicates
+ const unique = results.filter(
  (doc, index, self) => index === self.findIndex((d) => d.caseId === doc.caseId);
  );
  return unique;
@@ -392,25 +397,26 @@ interface CacheEntryMetadata {
 /** * Cache Options * Options for cache operations, such as TTL and cognitive value */
 interface CacheOptions {
  distributeAcrossCaches?: boolean;
- cognitiveValue?: number; // A score indicating the importance/relevance for cognitive processing,
-ttl?: number; // Time to live in seconds
+ cognitiveValue?: number; // A score indicating the importance/relevance for cognitive processing
+ ttl?: number; // Time to live in seconds
 }
 
 // Utility for SHA256 hashing (universal for browser and Node.js)
 async function sha256(str: string): Promise<string> {
  if (browser) {
- // In browser, use Web Crypto API,
-const textEncoder = new TextEncoder();
+ // In browser, use Web Crypto API
+ const textEncoder = new TextEncoder();
  const data = textEncoder.encode(str);
  const hashBuffer = await crypto.subtle.digest('SHA-256', data);
  const hashArray = Array.from(new Uint8Array(hashBuffer));
  const hexHash = hashArray.map((b) => b.toString(16).padStart(2, '0')).join('');
  return hexHash;
  } else {
- // In Node.js, use 'crypto' module,
-return createHash('sha256').update(str).digest('hex');
+ // In Node.js, use 'crypto' module
+ return createHash('sha256').update(str).digest('hex');
  }
-},
+}
+
 class CognitiveCacheManager {
  private localCache = new Map<
  string,
@@ -419,14 +425,16 @@ class CognitiveCacheManager {
 
  constructor() {
  console.log('CognitiveCacheManager initialized.');
- },
-async set(
+ }
+
+ async set(
  metadata: CacheEntryMetadata, data: unknown, 
  options: CacheOptions = {}
  ): Promise<void> {
  const key = metadata.key;
- const ttl = options.ttl ?? 3600; // Default TTL 1 hour,
-if (!browser && redisClient && redisClient.isReady) {
+ const ttl = options.ttl ?? 3600; // Default TTL 1 hour
+
+ if (!browser && redisClient && redisClient.isReady) {
  try {
  const redisKey = await this.getRedisKey(metadata);
  await redisClient.set(
@@ -438,15 +446,15 @@ if (!browser && redisClient && redisClient.isReady) {
  );
  } catch (error) {
  console.error(`[CognitiveCache] Failed to set Redis cache for key ${key}:`, error);
- this.localCache.set(key, { data, metadata: options.now() });
-  
+ this.localCache.set(key, { data, metadata: options.now() }); // Fallback to local cache
  }
  } else {
  this.localCache.set(key, { data, metadata: options.now() });
  console.log(`[CognitiveCache] Set local cache entry for key: ${key}, type: ${metadata.type}`);
  }
- },
-async get<T>(key: string, metadataType?: CacheEntryMetadata['type']): Promise<T | null> {
+ }
+
+ async get<T>(key: string, metadataType?: CacheEntryMetadata['type']): Promise<T | null> {
  let entry: | { data: unknown, metadata: CacheEntryMetadata; options: CacheOptions, timestamp: number }
  | undefined;
 
@@ -455,8 +463,7 @@ async get<T>(key: string, metadataType?: CacheEntryMetadata['type']): Promise<T 
  const redisKey = await this.getRedisKey({
  key: metadataType || 'legal-data',
  context: { action: 'get', priority: 'medium' },
- });
-  
+ }); // Default type if not provided
  const cachedData = await redisClient.get(redisKey);
  if (cachedData) {
  entry = JSON.parse(cachedData);
@@ -465,19 +472,21 @@ async get<T>(key: string, metadataType?: CacheEntryMetadata['type']): Promise<T 
  } catch (error) {
  console.error(`[CognitiveCache] Failed to get from Redis for key ${key}:`, error);
  }
- },
-if (!entry) {
+ }
+
+ if (!entry) {
  entry = this.localCache.get(key);
  if (entry) {
  console.log(`[CognitiveCache] Local cache hit for key: ${key}`);
  }
- },
-if (entry && Date.now() - entry.timestamp < (entry.options.ttl ?? 3600) * 1000) {
+ }
+
+ if (entry && Date.now() - entry.timestamp < (entry.options.ttl ?? 3600) * 1000) {
  return entry.data as T;
  }
 
- // Invalidate expired entry or if not found,
-if (!browser && redisClient && redisClient.isReady) {
+ // Invalidate expired entry or if not found
+ if (!browser && redisClient && redisClient.isReady) {
  try {
  const redisKey = await this.getRedisKey({
  key: metadataType || 'legal-data',
@@ -487,12 +496,13 @@ if (!browser && redisClient && redisClient.isReady) {
  } catch (error) {
  console.error(`[CognitiveCache] Failed to invalidate Redis entry for key ${key}:`, error);
  }
- },
-this.localCache.delete(key);
+ }
+ this.localCache.delete(key);
  console.log(`[CognitiveCache] Cache miss or expired for key: ${key}`);
  return null;
- },
-async invalidate(key: string, metadataType?: CacheEntryMetadata['type']): Promise<void> {
+ }
+
+ async invalidate(key: string, metadataType?: CacheEntryMetadata['type']): Promise<void> {
  if (!browser && redisClient && redisClient.isReady) {
  try {
  const redisKey = await this.getRedisKey({
@@ -504,23 +514,24 @@ async invalidate(key: string, metadataType?: CacheEntryMetadata['type']): Promis
  } catch (error) {
  console.error(`[CognitiveCache] Failed to invalidate Redis entry for key ${key}:`, error);
  }
- },
-this.localCache.delete(key);
+ }
+ this.localCache.delete(key);
  console.log(`[CognitiveCache] Invalidated local cache entry for key: ${key}`);
  }
 
- // Helper to generate Redis key following the langcache pattern,
-private async getRedisKey(metadata: CacheEntryMetadata): Promise<string> {
- // For 'embedding' and 'llm-result' types, use the langcache pattern,
-if (.type === 'embedding' || metadata.type === 'llm-result') {
+ // Helper to generate Redis key following the langcache pattern
+ private async getRedisKey(metadata: CacheEntryMetadata): Promise<string> {
+ // For 'embedding' and 'llm-result' types, use the langcache pattern
+ if (.type === 'embedding' || metadata.type === 'llm-result') {
  // Assuming 'key' here might be a prompt or a combination that can be hashed
- // For a real scenario, 'model' would be part of metadata.context or metadata itself,
-const model = metadata.context?.documentType || 'default'; // Placeholder for model name,
-const shaPrompt = await sha256(metadata.key); // Hash the key (e.g., prompt)
+ // For a real scenario, 'model' would be part of metadata.context or metadata itself
+ const model = metadata.context?.documentType || 'default'; // Placeholder for model name
+ const shaPrompt = await sha256(metadata.key); // Hash the key (e.g., prompt)
  return `langcache:${model}:${shaPrompt}`;
  }
- // For other types, use a simpler key,
-return `${metadata.type}:${metadata.key}`;
+ // For other types, use a simpler key
+ return `${metadata.type}:${metadata.key}`;
  }
-},
+}
+
 export const cognitiveCacheManager = new CognitiveCacheManager();

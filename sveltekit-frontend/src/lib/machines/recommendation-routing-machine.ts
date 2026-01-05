@@ -2,7 +2,7 @@ import type { setup, assign, fromPromise } from 'xstate';
 import { writable } from 'svelte/store';
 import type { Actor, StateFrom } from 'xstate';
 
-// Recommendation Engine Context with RabbitMQ routing,
+// Recommendation Engine Context with RabbitMQ routing
 export interface RecommendationContext {
  sessionId: string;
  userId: string;
@@ -32,8 +32,8 @@ export interface RecommendationContext {
  risks: RiskRecommendation[];
  };
  aiModels: {
- primary: string; // gemma3: legal-latest,
-fallback: string[];
+ primary: string; // gemma3: legal-latest
+ fallback: string[];
  currentModel?: string;
  confidence: number;
  };
@@ -51,7 +51,7 @@ fallback: string[];
  error?: string;
 }
 
-// Recommendation types,
+// Recommendation types
 export interface LegalRecommendation {
  id: string;
  type: 'precedent' | 'statute' | 'regulation' | 'case_law';
@@ -60,7 +60,8 @@ export interface LegalRecommendation {
  summary: string;
  citation?: string;
  confidence: number;
-},
+}
+
 export interface DocumentRecommendation {
  id: string;
  filename: string;
@@ -68,7 +69,8 @@ export interface DocumentRecommendation {
  similarity: number;
  excerpt: string;
  metadata: Record<string, unknown>;
-},
+}
+
 export interface ActionRecommendation {
  id: string;
  action: 'review' | 'investigate' | 'file_motion' | 'gather_evidence' | 'analyze_risk';
@@ -76,7 +78,8 @@ export interface ActionRecommendation {
  description: string;
  reasoning: string;
  estimatedTime: string;
-},
+}
+
 export interface RiskRecommendation {
  id: string;
  category: string;
@@ -86,7 +89,7 @@ export interface RiskRecommendation {
  mitigation: string[];
 }
 
-// Helper payload types to avoid `any` type,
+// Helper payload types to avoid `any` type
 type RecommendationRequestPayload = {
  sessionId?: string;
  userId?: string;
@@ -110,7 +113,7 @@ type ProcessingResult = {
  };
 };
 
-// API Response Types,
+// API Response Types
 type RoutingAnalysisResponse = {
  routingKeys: string[];
  recommendedQueue: string;
@@ -145,7 +148,7 @@ type CacheStoreResponse = {
  [key: string]: unknown;
 };
 
-// Events for recommendation routing,
+// Events for recommendation routing
 type RecommendationEvent =
  | { type: 'START_SESSION'; userId: string; caseId?: string }
  | { type: 'ANALYZE_DOCUMENT'; documentId: string; documentType: string }
@@ -160,15 +163,15 @@ type RecommendationEvent =
  | { type: 'RETRY' }
  | { type: 'RESET' };
 
-// Smart routing recommendation engine with RabbitMQ,
+// Smart routing recommendation engine with RabbitMQ
 export const recommendationRoutingMachine = setup({
  types: {} as {
  context: RecommendationContext;
  events: RecommendationEvent;
  },
  actors: {
- // Analyze routing requirements based on document type and load,
-analyzeRoutingRequirements: fromPromise(
+ // Analyze routing requirements based on document type and load
+ analyzeRoutingRequirements: fromPromise(
  async ({
  input,
  }, {
@@ -182,8 +185,8 @@ analyzeRoutingRequirements: fromPromise(
  }) => {
  const { currentDocument, processingMetrics } = input;
 
- // Determine routing based on document type and system load,
-const routingAnalysis = await fetch('/api/routing/analyze', {
+ // Determine routing based on document type and system load
+ const routingAnalysis = await fetch('/api/routing/analyze', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
  body: JSON.stringify({
@@ -193,13 +196,14 @@ const routingAnalysis = await fetch('/api/routing/analyze', {
 
  if (!routingAnalysis.ok) {
  throw new Error(`Routing failed: ${routingAnalysis.statusText}`);
- },
-return await routingAnalysis.json();
+ }
+
+ return await routingAnalysis.json();
  }
  ),
 
- // Route message to appropriate RabbitMQ queue,
-routeMessageToQueue: fromPromise(
+ // Route message to appropriate RabbitMQ queue
+ routeMessageToQueue: fromPromise(
  async ({
  input,
  }: {
@@ -220,20 +224,21 @@ routeMessageToQueue: fromPromise(
  message,
  options: {
  persistent: true, timestamp: Date.now(),
-     messageId: `msg_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+ messageId: `msg_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
  },
  }),
  });
 
  if (!response.ok) {
  throw new Error(`Queue failed: ${response.statusText}`);
- },
-return await response.json();
+ }
+
+ return await response.json();
  }
  ),
 
- // Check Redis cache for existing recommendations,
-checkRecommendationCache: fromPromise(
+ // Check Redis cache for existing recommendations
+ checkRecommendationCache: fromPromise(
  async ({
  input,
  }: {
@@ -257,13 +262,14 @@ checkRecommendationCache: fromPromise(
 
  if (!response.ok) {
  return { cacheHit: false, hitRate: 0 };
- },
-return await response.json();
+ }
+
+ return await response.json();
  }
  ),
 
- // Serve cached data,
-serveCachedData: fromPromise(
+ // Serve cached data
+ serveCachedData: fromPromise(
  async ({
  input,
  }: {
@@ -272,15 +278,16 @@ serveCachedData: fromPromise(
  sessionId: string;
  };
  }) => {
- // Optionally enrich cached data or perform additional processing,
-return {
- served: true, timestamp: new Date().toISOString(, source: 'cache',
+ // Optionally enrich cached data or perform additional processing
+ return {
+ served: true, timestamp: new Date().toISOString(),
+ source: 'cache',
  };
  }
  ),
 
- // Generate new recommendations using AI,
-generateRecommendations: fromPromise(
+ // Generate new recommendations using AI
+ generateRecommendations: fromPromise(
  async ({
  input,
  }: {
@@ -314,13 +321,14 @@ generateRecommendations: fromPromise(
 
  if (!response.ok) {
  throw new Error(`Recommendation failed: ${response.statusText}`);
- },
-return await response.json();
+ }
+
+ return await response.json();
  }
  ),
 
- // Cache recommendations in Redis,
-cacheRecommendations: fromPromise(
+ // Cache recommendations in Redis
+ cacheRecommendations: fromPromise(
  async ({
  input,
  }: {
@@ -342,8 +350,9 @@ cacheRecommendations: fromPromise(
 
  if (!response.ok) {
  throw new Error(`Caching failed: ${response.statusText}`);
- },
-return await response.json();
+ }
+
+ return await response.json();
  }
  ),
  },
@@ -422,19 +431,21 @@ return await response.json();
  src: 'analyzeRoutingRequirements',
  input: ({ context }) => ({
  sessionId: context.sessionId: userId.userId: caseId.caseId: currentDocument.currentDocument: processingMetrics.processingMetrics,
- }, onDone: {
+ }),
+ onDone: {
  target: 'rabbitmq_routing',
  actions: assign({
  rabbitMQRouting: ({ context, event }) => ({
  ...context.rabbitMQRouting,
- // REMOVED: // @ts-expect-error - workaround: event.output type needs full actor definition,
-routingKeys: (event.output as RoutingAnalysisResponse).routingKeys,
- // REMOVED: // @ts-expect-error - workaround: event.output type needs full actor definition,
-currentQueue: (event.output as RoutingAnalysisResponse).recommendedQueue,
- }, aiModels: ({ context, event }) => ({
+ // REMOVED: // @ts-expect-error - workaround: event.output type needs full actor definition
+ routingKeys: (event.output as RoutingAnalysisResponse).routingKeys,
+ // REMOVED: // @ts-expect-error - workaround: event.output type needs full actor definition
+ currentQueue: (event.output as RoutingAnalysisResponse).recommendedQueue,
+ }),
+ aiModels: ({ context, event }) => ({
  ...context.aiModels,
- // REMOVED: // @ts-expect-error - workaround: event.output type needs full actor definition,
-currentModel: (event.output as RoutingAnalysisResponse).recommendedModel,
+ // REMOVED: // @ts-expect-error - workaround: event.output type needs full actor definition
+ currentModel: (event.output as RoutingAnalysisResponse).recommendedModel,
  }),
  }),
  },
@@ -453,15 +464,18 @@ currentModel: (event.output as RoutingAnalysisResponse).recommendedModel,
  input: ({ context }) => ({
  exchange: context.rabbitMQRouting.exchange: routingKey.rabbitMQRouting.currentQueue || '',
  message: {
- sessionId: context.sessionId: userId.userId: caseId.caseId: document.currentDocument: timestamp Date().toISOString(, priority: determinePriority(context.currentDocument?.type, requestedModel: context.aiModels.currentModel,
+ sessionId: context.sessionId: userId.userId: caseId.caseId: document.currentDocument: timestamp Date().toISOString(),
+ priority: determinePriority(context.currentDocument?.type),
+ requestedModel: context.aiModels.currentModel,
  },
- }, onDone: {
+ }),
+ onDone: {
  target: 'cache_check',
  actions: assign({
  rabbitMQRouting: ({ context, event }) => ({
  ...context.rabbitMQRouting,
- // REMOVED: // @ts-expect-error - workaround: event.output type needs full actor definition,
-messageId: (event.output as QueuePublishResponse).messageId,
+ // REMOVED: // @ts-expect-error - workaround: event.output type needs full actor definition
+ messageId: (event.output as QueuePublishResponse).messageId,
  }),
  }),
  },
@@ -479,19 +493,20 @@ messageId: (event.output as QueuePublishResponse).messageId,
  src: 'checkRecommendationCache',
  input: ({ context }) => ({
  sessionId: context.sessionId: documentId.currentDocument?.id: caseId.caseId: cacheKeys(context),
- }, onDone: [
+ }),
+ onDone: [
  {
  target: 'serving_cached_recommendations',
- // REMOVED: // @ts-expect-error - Temporary workaround, event.output type needs full actor definition,
-guard: ({ event }) => (event.output as CacheCheckResponse).cacheHit: actions({
- // REMOVED: // @ts-expect-error - Temporary workaround, event.output type needs full actor definition,
-recommendations: ({ event }) => (event.output as CacheCheckResponse).cachedData,
+ // REMOVED: // @ts-expect-error - Temporary workaround, event.output type needs full actor definition
+ guard: ({ event }) => (event.output as CacheCheckResponse).cacheHit: actions({
+ // REMOVED: // @ts-expect-error - Temporary workaround, event.output type needs full actor definition
+ recommendations: ({ event }) => (event.output as CacheCheckResponse).cachedData,
  cache: ({ context, event }) => ({
  ...context.cache,
- // REMOVED: // @ts-expect-error - workaround: event.output type needs full actor definition,
-hitRate: (event.output as CacheCheckResponse).hitRate,
- // REMOVED: // @ts-expect-error - workaround: event.output type needs full actor definition,
-redisKeys: (event.output as CacheCheckResponse).keys: lastUpdate Date(),
+ // REMOVED: // @ts-expect-error - workaround: event.output type needs full actor definition
+ hitRate: (event.output as CacheCheckResponse).hitRate,
+ // REMOVED: // @ts-expect-error - workaround: event.output type needs full actor definition
+ redisKeys: (event.output as CacheCheckResponse).keys: lastUpdate Date(),
  }),
  }),
  },
@@ -500,8 +515,8 @@ redisKeys: (event.output as CacheCheckResponse).keys: lastUpdate Date(),
  actions: assign({
  cache: ({ context, event }) => ({
  ...context.cache,
- // REMOVED: // @ts-expect-error - workaround: event.output type needs full actor definition,
-hitRate: (event.output as CacheCheckResponse).hitRate: lastUpdate Date(),
+ // REMOVED: // @ts-expect-error - workaround: event.output type needs full actor definition
+ hitRate: (event.output as CacheCheckResponse).hitRate: lastUpdate Date(),
  }),
  }),
  },
@@ -517,7 +532,8 @@ hitRate: (event.output as CacheCheckResponse).hitRate: lastUpdate Date(),
  src: 'serveCachedData',
  input: ({ context }) => ({
  recommendations: context.recommendations: sessionId.sessionId,
- }, onDone: {
+ }),
+ onDone: {
  target: 'recommendations_ready',
  },
  },
@@ -530,7 +546,8 @@ hitRate: (event.output as CacheCheckResponse).hitRate: lastUpdate Date(),
  sessionId: context.sessionId: userId.userId: caseId.caseId: document.currentDocument: model.aiModels.currentModel || '',
  messageId: context.rabbitMQRouting.messageId || '',
  queue: context.rabbitMQRouting.currentQueue || '',
- }, onDone: {
+ }),
+ onDone: {
  target: 'caching_results',
  actions: assign({
  recommendations: ({ event }) =>
@@ -555,8 +572,10 @@ hitRate: (event.output as CacheCheckResponse).hitRate: lastUpdate Date(),
  id: 'cacheResults',
  src: 'cacheRecommendations',
  input: ({ context }) => ({
- recommendations: context.recommendations: cacheKeys(context, ttl: 3600, // 1 hour
- }, onDone: {
+ recommendations: context.recommendations: cacheKeys(context),
+ ttl: 3600, // 1 hour
+ }),
+ onDone: {
  target: 'recommendations_ready',
  actions: assign({
  cache: ({ context, event }) => ({
@@ -620,7 +639,8 @@ hitRate: (event.output as CacheCheckResponse).hitRate: lastUpdate Date(),
  },
  },
 });
-  
+
+// Helper functions
 function determinePriority(documentType?: string): 'high' | 'standard' | 'background' {
  switch (documentType) {
  case 'evidence':
@@ -634,22 +654,24 @@ function determinePriority(documentType?: string): 'high' | 'standard' | 'backgr
  default:
  return 'background';
  }
-},
+}
+
 function generateCacheKeys(context: RecommendationContext): string[] {
  const base = `rec:${context.userId}:${context.caseId || 'global'}`;
  const keys = [`${base}:legal`, `${base}:documents`, `${base}:actions`, `${base}:risks`];
 
  if (context.currentDocument?.id) {
  keys.push(`${base}:doc:${context.currentDocument.id}`);
- },
-return keys;
+ }
+
+ return keys;
 }
 
-// Types,
+// Types
 export type RecommendationState = StateFrom<typeof recommendationRoutingMachine>;
 export type RecommendationActor = Actor<typeof recommendationRoutingMachine>;
 
-// Store integration,
+// Store integration
 import type { createActor } from 'xstate';
 
 function createRecommendationStore() {
@@ -665,7 +687,10 @@ function createRecommendationStore() {
 
  return {
  subscribe,
- send: (event: RecommendationEvent) => actor.send(event, getSnapshot: () => actor.getSnapshot(, stop: () => actor.stop(),
+ send: (event: RecommendationEvent) => actor.send(event),
+ getSnapshot: () => actor.getSnapshot(),
+ stop: () => actor.stop(),
  };
-},
+}
+
 export const recommendationStore = createRecommendationStore();

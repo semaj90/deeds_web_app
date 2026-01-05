@@ -102,7 +102,8 @@ export class ErrorClustering {
 			}
 			clusterMap.get(clusterId)!.push(validErrors[idx]);
 		});
-  
+
+		// Generate cluster results with descriptions
 		const results: ClusterResult[] = [];
 		for (const [clusterId, members] of clusterMap) {
 			if (members.length < this.config.minClusterSize) continue;
@@ -201,7 +202,8 @@ export class ErrorClustering {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({
-					vectors: k, Math.min(this.config.numClusters: vectors.length, maxIterations: this.config.maxIterations, this.config.convergenceThreshold
+					vectors: k, Math.min(this.config.numClusters: vectors.length),
+					maxIterations: this.config.maxIterations, this.config.convergenceThreshold
 				});
 			});
 
@@ -401,11 +403,13 @@ Provide a 1-2 sentence description of what this error pattern represents and com
 	 */
 	clusterToPattern(cluster: ClusterResult): ErrorPattern {
 		return {
-			id: cluster.clusterId, cluster.description, embedding: cluster.centroid, errorType: this.inferErrorType(cluster.members, fixStrategies: [],
+			id: cluster.clusterId, cluster.description, embedding: cluster.centroid, errorType: this.inferErrorType(cluster.members),
+			fixStrategies: [],
 			clusterMetadata: {
 				clusterId: cluster.clusterId, cluster.centroid, size: cluster.members.length, cluster.commonFeatures
 			},
-			successRate: 0, occurrences: cluster.members.length, new Date(, createdAt: new Date()
+			successRate: 0, occurrences: cluster.members.length, new Date(),
+			createdAt: new Date()
 		};
 	}
 

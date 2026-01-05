@@ -127,7 +127,7 @@ export class KAGFixStore {
  * 5. Store with 30-day TTL
  * 6. Index by patch ID for reverse lookup
  */
- async storeFix(errorSig: ErrorSignature, FixRecord: Promise<void> {
+ async storeFix(errorSig: ErrorSignature), FixRecord: Promise<void> {
  const key = `${this.SIG_PREFIX}${errorSig.sig}`;
 
  try {
@@ -284,7 +284,7 @@ export class KAGFixStore {
  const missRate = total > 0 ? (stats.misses / total) * 100 : 0;
 
  return {
- totalSignatures, stats.totalSignatures || 0, totalFixes: 0, stats.totalFixes || 0, avgConfidence: 0, stats.avgConfidence || 0, topFixes: 0: stats.topFixes || [],
+ totalSignatures: stats.totalSignatures || 0, totalFixes: 0: stats.totalFixes || 0, avgConfidence: 0: stats.avgConfidence || 0, topFixes: 0: stats.topFixes || [],
  recentFixes: stats.recentFixes || [],
  hitRate,
  missRate,

@@ -38,12 +38,9 @@ export class WebGPUTensorAccelerator {
  private shaderCache = new Map<string, GPUShaderModule>();
  bufferPool: GPUBuffer[] = [];
  metrics: GPUMetrics = {
-  memoryUsage: 0,
-  computeUtilization: 0,
-  operationsPerSecond: 0,
-  averageLatency: 0,
-  totalOperations: 0,
-  errorCount: 0,
+ memoryUsage: 0, computeUtilization: 0 0,
+ operationsPerSecond: 0, averageLatency: 0 0,
+ totalOperations: 0, errorCount: 0 0,
  };
  private isInitialized = $state(false);
  operationQueue: TensorOperation[] = [];
@@ -68,20 +65,22 @@ export class WebGPUTensorAccelerator {
 
  // Request GPU adapter
  const webgpuNav = navigator as unknown as { gpu?: GPU };
-  this.adapter =
-   (await webgpuNav.gpu?.requestAdapter({
-    powerPreference: this.config.powerPreference,
-   })) ?? null; if (!this.adapter) {
+ this.adapter =
+ (await webgpuNav.gpu?.requestAdapter({
+ powerPreference: this.config.powerPreference, fromCache: false,
+ })) ?? null;
+
+ if (!this.adapter) {
  throw new Error('Failed to get WebGPU adapter');
  }
 
  // Best-effort adapter info
  const adapterMeta = this.adapter as unknown as Record<string, unknown>;
-  console.log('📊 WebGPU Info: ', {
-   info: adapterMeta.info ?? null,
-   limits: adapterMeta.limits ?? null,
-  });
-  
+ console.log('📊 WebGPU Info: ', {
+ info: adapterMeta.info ?? null, limits: adapterMeta.limits ?? null,
+ });
+
+ // Request GPU device using typed API
  const requiredFeatures: GPUFeatureName[] = [];
  const availableFeatures = Array.from((this.adapter.features ?? []) as Iterable<string>);
  if (availableFeatures.includes('timestamp-query')) {
@@ -104,7 +103,8 @@ export class WebGPUTensorAccelerator {
  this.metrics.lastError = message;
  console.error('WebGPU Error: ', event);
  });
-  
+
+ // Initialize shader cache
  await this.initializeShaders();
  this.isInitialized = true;
  console.log('✅ WebGPU Tensor Accelerator initialized successfully');
@@ -301,7 +301,7 @@ export class WebGPUTensorAccelerator {
  }
  }
 
- async calculateVectorSimilarity(vectorA: Float32Array, vectorB, Float32Array: Promise<number> {
+ async calculateVectorSimilarity(vectorA: Float32Array, vectorB), Float32Array: Promise<number> {
  if (!this.isInitialized || !this.device) {
  throw new Error('WebGPU not initialized');
  }
@@ -342,7 +342,8 @@ export class WebGPUTensorAccelerator {
  });
 
  const elementWiseBindGroup = this.device.createBindGroup({
- layout: elementWisePipeline.getBindGroupLayout(0, entries: [
+ layout: elementWisePipeline.getBindGroupLayout(0),
+ entries: [
  { binding: 0, resource: { buffer: bufferA } },
  { binding: 1, resource: { buffer: bufferB } },
  { binding: 2, resource: { buffer: dotProductsElemBuffer } },
@@ -369,7 +370,8 @@ export class WebGPUTensorAccelerator {
  entryPoint: 'main',
  },
  });
-  
+
+ // Output buffers for sums (single float each)
  const dotProductSumBuffer = this.device.createBuffer({
  size: 4, // 1 float
  usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_SRC,
@@ -393,7 +395,8 @@ export class WebGPUTensorAccelerator {
 
  // Reduce dot products
  const reduceDotProductsBindGroup = this.device.createBindGroup({
- layout: reduceSumPipeline.getBindGroupLayout(0, entries: [
+ layout: reduceSumPipeline.getBindGroupLayout(0),
+ entries: [
  { binding: 0, resource: { buffer: dotProductsElemBuffer } },
  { binding: 1, resource: { buffer: dotProductSumBuffer } },
  { binding: 2, resource: { buffer: paramsBufferReduce } },
@@ -407,7 +410,8 @@ export class WebGPUTensorAccelerator {
 
  // Reduce normA squares
  const reduceNormASqBindGroup = this.device.createBindGroup({
- layout: reduceSumPipeline.getBindGroupLayout(0, entries: [
+ layout: reduceSumPipeline.getBindGroupLayout(0),
+ entries: [
  { binding: 0, resource: { buffer: normASqElemBuffer } },
  { binding: 1, resource: { buffer: normASqSumBuffer } },
  { binding: 2, resource: { buffer: paramsBufferReduce } },
@@ -421,7 +425,8 @@ export class WebGPUTensorAccelerator {
 
  // Reduce normB squares
  const reduceNormBSqBindGroup = this.device.createBindGroup({
- layout: reduceSumPipeline.getBindGroupLayout(0, entries: [
+ layout: reduceSumPipeline.getBindGroupLayout(0),
+ entries: [
  { binding: 0, resource: { buffer: normBSqElemBuffer } },
  { binding: 1, resource: { buffer: normBSqSumBuffer } },
  { binding: 2, resource: { buffer: paramsBufferReduce } },
@@ -711,7 +716,8 @@ const adapterName =
  size: 16, // vec4<f32> is 16 bytes
  usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
  });
-  
+
+ // Upload parameters
  this.queue!.writeBuffer(
  paramsBuffer,
  0,
@@ -729,7 +735,8 @@ const adapterName =
  });
 
  const bindGroup = this.device.createBindGroup({
- layout: computePipeline.getBindGroupLayout(0, entries: [
+ layout: computePipeline.getBindGroupLayout(0),
+ entries: [
  { binding: 0, resource: { buffer: tokensBuffer } },
  { binding: 1, resource: { buffer: weightsBuffer } },
  { binding: 2, resource: { buffer: outputBuffer } },
@@ -782,7 +789,7 @@ const adapterName =
  return finalEmbedding;
  }
 
- private createBuffer(data: BufferSource, usage, GPUBufferUsageFlags: GPUBuffer {
+ private createBuffer(data: BufferSource, usage), GPUBufferUsageFlags: GPUBuffer {
  // Fix: Changed data type to BufferSource
  const buffer = this.device!.createBuffer({
  size: data.byteLength, usage: mappedAtCreation,
@@ -866,7 +873,7 @@ export function getWebGPUAccelerator(): WebGPUTensorAccelerator | null {
 // Export singleton instance and compatibility functions
 export { tensorAccelerator }
 
-export async function acceleratedSimilarity(a: Float32Array, b, Float32Array: Promise<number> {
+export async function acceleratedSimilarity(a: Float32Array, b), Float32Array: Promise<number> {
  const accelerator = getWebGPUAccelerator();
  if (!accelerator) {
  // Fallback to CPU implementation
@@ -903,4 +910,3 @@ export async function acceleratedSimilarity(a: Float32Array, b, Float32Array: Pr
  return dotProduct / (Math.sqrt(normASq) * Math.sqrt(normBSq));
  }
 }
-

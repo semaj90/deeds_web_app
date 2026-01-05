@@ -58,7 +58,7 @@ export class KnowledgeBaseLearning extends BaseService {
  * Store a successfully applied fix
  * Property 10: Knowledge Base Learning - store fixes
  */
- async storeFix(diff: Diff, error: ErrorType, ErrorType: Promise<StoredFix> {
+ async storeFix(diff: Diff, error: ErrorType), ErrorType: Promise<StoredFix> {
  this.validateInput(diff, 'diff');
  this.validateInput(error, 'error');
 
@@ -135,7 +135,9 @@ export class KnowledgeBaseLearning extends BaseService {
 
  // Score and rank fixes
  const scoredFixes = candidateFixes.map((fix, index) => ({
- fix: confidence: this.calculateFixConfidence(fix, similarity: this.calculateErrorSimilarity(error, fix, rank: index,
+ fix: confidence: this.calculateFixConfidence(fix),
+ similarity: this.calculateErrorSimilarity(error, fix),
+ rank: index,
  }));
 
  // Sort by combined score (confidence * similarity)
@@ -144,7 +146,8 @@ export class KnowledgeBaseLearning extends BaseService {
  const scoreB = b.confidence * b.similarity;
  return scoreB - scoreA;
  });
-  
+
+ // Return top N fixes
  const results = scoredFixes.slice(0, limit);
 
  this.log('info', `Retrieved ${results.length} fixes for error type ${error.type}`, {
@@ -176,7 +179,8 @@ export class KnowledgeBaseLearning extends BaseService {
 
  const results = fixes
  .map((fix, index) => ({
- fix: confidence: this.calculateFixConfidence(fix, similarity: 1.0, // Perfect match for same error type
+ fix: confidence: this.calculateFixConfidence(fix),
+ similarity: 1.0, // Perfect match for same error type
  rank: index,
  }))
  .slice(0, limit);
@@ -193,7 +197,7 @@ export class KnowledgeBaseLearning extends BaseService {
  * Update fix with application result
  * Increases confidence if successful, decreases if failed
  */
- async updateFixResult(fixId: string, boolean: Promise<StoredFix> {
+ async updateFixResult(fixId: string), boolean: Promise<StoredFix> {
  if (!fixId || typeof fixId !== 'string') {
  throw new Error('Invalid input: fixId must be a non-empty string');
  }
