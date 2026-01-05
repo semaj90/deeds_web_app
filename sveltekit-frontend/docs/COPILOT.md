@@ -412,3 +412,127 @@ for (const file of files) {
     fs.writeFileSync(file, content);
 }
 ```
+
+---
+
+## 📦 Drizzle ORM 0.44 Best Practices (2025)
+
+### Codebase-First Migration
+- Define schema as TypeScript objects (source of truth)
+- Use `drizzle-kit generate` for production SQL migrations
+- Use `drizzle-kit push` only for rapid prototyping
+
+### Safe Migration Patterns
+```typescript
+// ✅ Low-risk (additive)
+ALTER TABLE ADD COLUMN
+CREATE TABLE
+CREATE INDEX CONCURRENTLY
+
+// ❌ High-risk (multi-step required)
+DROP TABLE, DROP COLUMN, ALTER COLUMN TYPE
+```
+
+### Safe Column Rename (5-step)
+1. Add new "shadow" column
+2. Implement dual-writes
+3. Backfill data
+4. Flip reads to new column
+5. Drop old column later
+
+---
+
+## 🎨 Bits-UI v1.x/v2.x (Svelte 5)
+
+### Breaking Changes from 0.x
+| Old | New |
+|-----|-----|
+| `el` prop | `ref` prop |
+| `asChild` | `child` snippet |
+| `let:` directives | `children` snippet |
+| Accordion `multiple` | `type="multiple"` |
+
+### Portalling Pattern
+```svelte
+<Select.Portal>
+  <Select.Content>...</Select.Content>
+</Select.Portal>
+```
+
+---
+
+## 🚀 SvelteKit 2.0 Load Functions
+
+### Promise Behavior Change
+```typescript
+// ❌ Old - auto-awaited
+return { data: fetch('...') };
+
+// ✅ New - explicit await for blocking
+return { data: await fetch('...') };
+
+// ✅ Streaming (faster)
+return { data: fetch('...') }; // Don't await
+```
+
+---
+
+## 🔷 Svelte 5 Runes
+
+```svelte
+<script>
+  let count = $state(0);
+  let doubled = $derived(count * 2);
+  let { name } = $props();
+
+  $effect(() => {
+    console.log('count:', count);
+  });
+</script>
+```
+
+---
+
+## 🦫 Go 1.24/1.25 (2025)
+
+- **Generic Type Aliases**: Full parameterization
+- **errors.Join**: Structured error wrapping
+- **Swiss Tables**: 2-3% CPU reduction
+- **Go 1.25**: Removed "core types", experimental json/v2 (3-10x faster)
+
+---
+
+## 🔥 CUDA 12.8 + PyTorch 2.9
+
+```bash
+pip install torch==2.9.0+cu128 --index-url https://download.pytorch.org/whl/cu128
+```
+
+```python
+import torch
+print(f"CUDA: {torch.cuda.is_available()}")
+print(f"Device: {torch.cuda.get_device_name(0)}")
+```
+
+---
+
+## 📋 Agentic Error Fixing Workflow
+
+### Dry-Run Phase (1-210 files)
+```bash
+git add -A && git commit -m "Pre-fix checkpoint"
+node scripts/agentic-corruption-fixer.mjs --dry-run --limit 210
+```
+
+### Apply and Verify
+```bash
+node scripts/agentic-corruption-fixer.mjs --apply
+npm run check
+npx tsc --noEmit
+git add -A && git commit -m "Applied batch fixes"
+```
+
+---
+
+**See Also:** `docs/AGENTIC-ERROR-FIXING-KB.md` for comprehensive RAG/KAG/DAG knowledge base.
+

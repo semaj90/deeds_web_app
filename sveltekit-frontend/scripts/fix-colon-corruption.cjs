@@ -16,6 +16,9 @@ const targetFiles = [
     'src/lib/server/webgpu-langchain-bridge.ts',
     'src/lib/services/wasm-ranking-cache-service.ts',
     'src/lib/integrations/redis-webgpu-simd-integration.ts',
+    'src/lib/services/error-analysis/ErrorClustering.ts',
+    'src/lib/state/evidenceCustodyMachine.ts',
+    'src/lib/services/gguf-runtime.ts',
 ];
 
 function fixColonCorruption(content) {

@@ -96,7 +96,7 @@ class SIMDJSONParser {
 	}
 }; export interface JSONLStorageConfig {
 	baseDir: string, maxFileSize: number; // bytes
-	rotationInterval: number; // ms (default: 24 hours, compressOldFiles: boolean, batchSize: number; // Number of records to batch before flush, enableSIMD: boolean; // Use SIMD-optimized parsing
+	rotationInterval: number; // ms (default: 24 hours), compressOldFiles: boolean, batchSize: number; // Number of records to batch before flush, enableSIMD: boolean; // Use SIMD-optimized parsing
 }; export interface WriteResult {
 	success: boolean, filePath: string;
 	bytesWritten: number;
@@ -247,7 +247,8 @@ class SIMDJSONParser {
 	async writePattern(pattern: ErrorPattern): Promise<WriteResult> {
 		return this.writeRecord({
 			type: 'pattern',
-			data: pattern, timestamp: new Date().toISOString(, version: '1.0'
+			data: pattern, timestamp: new Date().toISOString(),
+			version: '1.0'
 		});
 	}
 
@@ -257,7 +258,8 @@ class SIMDJSONParser {
 	async writeExperience(experience: Experience): Promise<WriteResult> {
 		return this.writeRecord({
 			type: 'experience',
-			data: experience, timestamp: new Date().toISOString(, version: '1.0'
+			data: experience, timestamp: new Date().toISOString(),
+			version: '1.0'
 		});
 	}
 
@@ -267,7 +269,8 @@ class SIMDJSONParser {
 	async writeFixStrategy(strategy: FixStrategy): Promise<WriteResult> {
 		return this.writeRecord({
 			type: 'fix',
-			data: strategy, timestamp: new Date().toISOString(, version: '1.0'
+			data: strategy, timestamp: new Date().toISOString(),
+			version: '1.0'
 		});
 	}
 
@@ -277,7 +280,8 @@ class SIMDJSONParser {
 	async writeError(error: ErrorReport): Promise<WriteResult> {
 		return this.writeRecord({
 			type: 'error',
-			data: error, timestamp: new Date().toISOString(, version: '1.0'
+			data: error, timestamp: new Date().toISOString(),
+			version: '1.0'
 		});
 	}
 

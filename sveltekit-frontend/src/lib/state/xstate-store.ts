@@ -61,8 +61,8 @@ class XStateStoreManager {
  this.config = {
  persist: true,
  persistKey: 'legal-ai-state',
- devtools, browser && import.meta.env.NODE_ENV === 'development',
- logTransitions, browser && import.meta.env.NODE_ENV === 'development',
+ devtools: browser && import.meta.env.NODE_ENV === 'development',
+ logTransitions: browser && import.meta.env.NODE_ENV === 'development',
  syncAcrossTabs: true,
  ...config,
  };
@@ -90,7 +90,7 @@ class XStateStoreManager {
  window.addEventListener('beforeunload', () => {
  this.persistState();
  });
-  
+ // Periodic persistence (every 30 seconds)
  setInterval(() => {
  this.persistState();
  }, 30000);
@@ -102,7 +102,7 @@ class XStateStoreManager {
  window.addEventListener('offline', () => {
  this.appActor?.send({ type: 'OFFLINE' });
  });
-  
+ // Set up performance monitoring
  this.setupPerformanceMonitoring();
  }
  /** * Initialize the application machine and store */
@@ -119,7 +119,7 @@ class XStateStoreManager {
  this.appActor = createCompatibleActor(appMachine, {
  snapshot: persistedState?.appState, inspect: this.config.devtools ? this.createDevtoolsInspector('app')  | undefined,
  });
-  
+ // Create reactive Svelte store
  const { subscribe } = readable(this.appActor.getSnapshot(), (set: (v: unknown) => void) => {
  // Subscribe to state changes
  const subscription = this.appActor!.subscribe((state: any) => {
@@ -133,14 +133,14 @@ class XStateStoreManager {
  this.syncChannel.postMessage({ type: 'app-state-change', state });
  }
  });
-  
+ // Start the machine
  this.appActor!.start();
  // Cleanup subscription
  return () => {
  subscription.unsubscribe();
  };
  });
-  
+ // Send function for dispatching events
  const send = (event: AppEvents) => {
  if (this.config.logTransitions) {
  console.log('📤 App Event: ', event);
@@ -163,7 +163,7 @@ class XStateStoreManager {
  this.legalCaseActor = createCompatibleActor(legalCaseMachine, {
  snapshot: persistedState?.legalCaseState, inspect: this.config.devtools ? this.createDevtoolsInspector('legalCase')  | undefined,
  });
-  
+ // Create reactive Svelte store
  const { subscribe: subscribeCase } = readable(
  this.legalCaseActor.getSnapshot(),
  (set: (v: unknown) => void) => {
@@ -179,7 +179,7 @@ class XStateStoreManager {
  this.syncChannel.postMessage({ type: 'legal-case-state-change', state });
  }
  });
-  
+ // Start the machine
  this.legalCaseActor!.start();
  // Cleanup subscription
  return () => {
@@ -204,13 +204,20 @@ class XStateStoreManager {
  return {
  // User and authentication
  user: derived(appStore, ($app) =>
- appSelectors.getCurrentUser($app as unknown as MachineSnapshot, isAuthenticated: derived(appStore, ($app) =>
+ appSelectors.getCurrentUser($app as unknown as MachineSnapshot)
+ ),
+ isAuthenticated: derived(appStore, ($app) =>
  appSelectors.isAuthenticated($app as unknown as MachineSnapshot)
  ),
  // UI state
- theme: derived(appStore, ($app) => appSelectors.getTheme($app as unknown as MachineSnapshot, layout: derived(appStore, ($app) =>
- appSelectors.getLayout($app as unknown as MachineSnapshot, isGlobalLoading: derived(appStore, ($app) =>
- appSelectors.isGlobalLoading($app as unknown as MachineSnapshot, loadingMessage: derived(appStore, ($app) =>
+ theme: derived(appStore, ($app) => appSelectors.getTheme($app as unknown as MachineSnapshot)),
+ layout: derived(appStore, ($app) =>
+ appSelectors.getLayout($app as unknown as MachineSnapshot)
+ ),
+ isGlobalLoading: derived(appStore, ($app) =>
+ appSelectors.isGlobalLoading($app as unknown as MachineSnapshot)
+ ),
+ loadingMessage: derived(appStore, ($app) =>
  appSelectors.getLoadingMessage($app as unknown as MachineSnapshot)
  ),
  // Notifications
@@ -218,22 +225,29 @@ class XStateStoreManager {
  appSelectors.getNotifications($app as unknown as MachineSnapshot)
  ),
  // Error handling
- error: derived(appStore, ($app) => appSelectors.getError($app as unknown as MachineSnapshot, hasError: derived(appStore, ($app) =>
+ error: derived(appStore, ($app) => appSelectors.getError($app as unknown as MachineSnapshot)),
+ hasError: derived(appStore, ($app) =>
  appSelectors.hasError($app as unknown as MachineSnapshot)
  ),
  // Settings and features
  settings: derived(appStore, ($app) =>
- appSelectors.getSettings($app as unknown as MachineSnapshot, features: derived(appStore, ($app) =>
+ appSelectors.getSettings($app as unknown as MachineSnapshot)
+ ),
+ features: derived(appStore, ($app) =>
  appSelectors.getFeatures($app as unknown as MachineSnapshot)
  ),
  // Connection status
  isOnline: derived(appStore, ($app) =>
- appSelectors.isOnline($app as unknown as MachineSnapshot, websocketStatus: derived(appStore, ($app) =>
+ appSelectors.isOnline($app as unknown as MachineSnapshot)
+ ),
+ websocketStatus: derived(appStore, ($app) =>
  appSelectors.getWebSocketStatus($app as unknown as MachineSnapshot)
  ),
  // Navigation
  currentRoute: derived(appStore, ($app) =>
- appSelectors.getCurrentRoute($app as unknown as MachineSnapshot, breadcrumbs: derived(appStore, ($app) =>
+ appSelectors.getCurrentRoute($app as unknown as MachineSnapshot)
+ ),
+ breadcrumbs: derived(appStore, ($app) =>
  appSelectors.getBreadcrumbs($app as unknown as MachineSnapshot)
  ),
  };
@@ -244,33 +258,45 @@ class XStateStoreManager {
  // Notification helpers
  notify: {
  success: (title: string):, string: string =>
- appSend({ type: 'ADD_NOTIFICATION', notification: { type: 'success', title, message } }, error: (title: string):, string: string =>
- appSend({ type: 'ADD_NOTIFICATION', notification: { type: 'error', title, message } }, warning: (title: string):, string: string =>
- appSend({ type: 'ADD_NOTIFICATION', notification: { type: 'warning', title, message } }, info: (title: string):, string: string =>
- appSend({ type: 'ADD_NOTIFICATION', notification: { type: 'info', title, message } }, dismiss: (id: string) => appSend({ type: 'DISMISS_NOTIFICATION', id }),
+ appSend({ type: 'ADD_NOTIFICATION', notification: { type: 'success', title, message } }),
+ error: (title: string):, string: string =>
+ appSend({ type: 'ADD_NOTIFICATION', notification: { type: 'error', title, message } }),
+ warning: (title: string):, string: string =>
+ appSend({ type: 'ADD_NOTIFICATION', notification: { type: 'warning', title, message } }),
+ info: (title: string):, string: string =>
+ appSend({ type: 'ADD_NOTIFICATION', notification: { type: 'info', title, message } }),
+ dismiss: (id: string) => appSend({ type: 'DISMISS_NOTIFICATION', id }),
  },
  // Theme helpers
  theme: {
- setLight: () => appSend({ type: 'SET_THEME', theme: 'light' }, setDark: () => appSend({ type: 'SET_THEME', theme: 'dark' }, setAuto: () => appSend({ type: 'SET_THEME', theme: 'auto' }),
+ setLight: () => appSend({ type: 'SET_THEME', theme: 'light' }),
+ setDark: () => appSend({ type: 'SET_THEME', theme: 'dark' }),
+ setAuto: () => appSend({ type: 'SET_THEME', theme: 'auto' }),
  },
  // Layout helpers
  layout: {
- setDesktop: () => appSend({ type: 'SET_LAYOUT', layout: 'desktop' }, setTablet: () => appSend({ type: 'SET_LAYOUT', layout: 'tablet' }, setMobile: () => appSend({ type: 'SET_LAYOUT', layout: 'mobile' }),
+ setDesktop: () => appSend({ type: 'SET_LAYOUT', layout: 'desktop' }),
+ setTablet: () => appSend({ type: 'SET_LAYOUT', layout: 'tablet' }),
+ setMobile: () => appSend({ type: 'SET_LAYOUT', layout: 'mobile' }),
  },
  // Error helpers (use explicit ErrorPayload type)
  error: {
- set: (error: ErrorPayload) => appSend({ type: 'SET_ERROR', error } as unknown as AppEvents, clear: () => appSend({ type: 'CLEAR_ERROR' } as unknown as AppEvents, retry: () => appSend({ type: 'RETRY_FAILED_ACTION' } as unknown as AppEvents),
+ set: (error: ErrorPayload) => appSend({ type: 'SET_ERROR', error } as unknown as AppEvents),
+ clear: () => appSend({ type: 'CLEAR_ERROR' } as unknown as AppEvents),
+ retry: () => appSend({ type: 'RETRY_FAILED_ACTION' } as unknown as AppEvents),
  },
  // Loading helpers
  loading: {
- start: (message?: string) => appSend({ type: 'GLOBAL_LOADING', message }, stop: () => appSend({ type: 'GLOBAL_LOADING_COMPLETE' }),
+ start: (message?: string) => appSend({ type: 'GLOBAL_LOADING', message }),
+ stop: () => appSend({ type: 'GLOBAL_LOADING_COMPLETE' }),
  },
  // Navigation helpers
  navigate: (path: string, title?: string) => appSend({ type: 'NAVIGATE', path, title }),
  // Settings helpers (avoid direct AppContext['settings'] reference)
  settings: {
  update: (settings: Partial<Record<string, unknown>>) =>
- appSend({ type: 'UPDATE_SETTINGS', settings }, reset: () => appSend({ type: 'RESET_SETTINGS' }),
+ appSend({ type: 'UPDATE_SETTINGS', settings }),
+ reset: () => appSend({ type: 'RESET_SETTINGS' }),
  },
  };
  }
@@ -348,7 +374,7 @@ class XStateStoreManager {
  }
  });
  observer.observe({ entryTypes: ['navigation'] });
-  
+ // Monitor memory usage if available
  const perfMem = (performance as unknown as { memory?: { usedJSHeapSize: number } }).memory;
  if (perfMem) {
  setInterval(() => {

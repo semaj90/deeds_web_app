@@ -62,7 +62,7 @@ export class RabbitMQServiceWorker {
  private processingStats = {
  messagesProcessed: 0, errors: 0 0,
  startTime: Date.now(),
-     avgProcessingTime: 0,
+ avgProcessingTime: 0,
  };
 
  constructor(config: ServiceWorkerConfig = {}) {
@@ -151,7 +151,7 @@ export class RabbitMQServiceWorker {
  this.log('RabbitMQ Service Worker stopped', 'success');
  }
 
- private async startConsumer(queueName: string, MessageHandler: Promise<void> {
+ private async startConsumer(queueName: string), MessageHandler: Promise<void> {
  // Create a typed callback to avoid implicit any issues
  const callback = async (message: any, originalMessage?: unknown) => {
  const startTime = Date.now();
@@ -241,7 +241,7 @@ export class RabbitMQServiceWorker {
  processedAt: Date.now(),
  });
  });
-  
+ // File upload handler
  this.registerHandler(QUEUE_NAMES.FILE_UPLOAD, async (message: any) => {
  const msg =
  typeof message === 'object' && message !== null ? (message as Record<string, unknown>) : {};
@@ -252,13 +252,14 @@ export class RabbitMQServiceWorker {
  this.log(`File priority: ${priority}`);
  if (evidenceId) {
  await publishToQueue(QUEUE_NAMES.EVIDENCE_ANALYSIS, {
- evidenceId: getString(msg, 'fileName', stage: 'analysis_ready',
+ evidenceId: getString(msg, 'fileName'),
+ stage: 'analysis_ready',
  cudaAccelerated: getBoolean(msg, 'cudaAccelerated'),
  priority,
  });
  }
  });
-  
+ // Vector embedding handler
  this.registerHandler(QUEUE_NAMES.VECTOR_EMBEDDING, async (message: any) => {
  const msg =
  typeof message === 'object' && message !== null ? (message as Record<string, unknown>) : {};
@@ -270,14 +271,16 @@ export class RabbitMQServiceWorker {
  stage: 'indexing_ready',
  });
  });
-  
+ // Evidence analysis handler
  this.registerHandler(QUEUE_NAMES.EVIDENCE_ANALYSIS, async (message: any) => {
  const msg =
  typeof message === 'object' && message !== null ? (message as Record<string, unknown>) : {};
  this.log(`Analyzing evidence: ${safeString(getField(msg, 'evidenceId'))}`);
  await new Promise((resolve) => setTimeout(resolve, 1500));
  await publishToQueue(QUEUE_NAMES.CASE_UPDATES, {
- caseId: getString(msg, 'caseId', evidenceId: getString(msg, 'evidenceId', analysisComplete: true,
+ caseId: getString(msg, 'caseId'),
+ evidenceId: getString(msg, 'evidenceId'),
+ analysisComplete: true,
  insights: {
  confidence: 0.85,
  keyEntities: ['contract', 'signature', 'date'],
@@ -285,7 +288,7 @@ export class RabbitMQServiceWorker {
  },
  });
  });
-  
+ // RAG processing handler
  this.registerHandler(QUEUE_NAMES.RAG_PROCESSING, async (message: any) => {
  const msg =
  typeof message === 'object' && message !== null ? (message as Record<string, unknown>) : {};
@@ -293,21 +296,21 @@ export class RabbitMQServiceWorker {
  this.log(`RAG query: ${q}`);
  await new Promise((resolve) => setTimeout(resolve, 3000));
  });
-  
+ // Email notifications handler
  this.registerHandler(QUEUE_NAMES.EMAIL_NOTIFICATIONS, async (message: any) => {
  const msg =
  typeof message === 'object' && message !== null ? (message as Record<string, unknown>) : {};
  this.log(`Sending notification: ${safeString(getField(msg, 'type'))}`);
  await new Promise((resolve) => setTimeout(resolve, 800));
  });
-  
+ // Search indexing handler
  this.registerHandler(QUEUE_NAMES.SEARCH_INDEXING, async (message: any) => {
  const msg =
  typeof message === 'object' && message !== null ? (message as Record<string, unknown>) : {};
  this.log(`Indexing search: ${safeString(getField(msg, 'documentId'))}`);
  await new Promise((resolve) => setTimeout(resolve, 1200));
  });
-  
+ // Case updates handler
  this.registerHandler(QUEUE_NAMES.CASE_UPDATES, async (message: any) => {
  const msg =
  typeof message === 'object' && message !== null ? (message as Record<string, unknown>) : {};
@@ -358,11 +361,11 @@ export class RabbitMQServiceWorker {
  : 'unhealthy';
  const rabbitmqHealth: RabbitMQHealth = {
  status: inferredStatus ?? 'unhealthy',
- details, partial && typeof partial === 'object' ? { ...partial }  | undefined,
+ details: partial && typeof partial === 'object' ? { ...partial }  | undefined,
  };
  const stats = this.getStats();
  return {
- status, this.isRunning && rabbitmqHealth?.status === 'healthy' ? 'healthy' : 'unhealthy',
+ status: this.isRunning && rabbitmqHealth?.status === 'healthy' ? 'healthy' : 'unhealthy',
  stats: rabbitmq, rabbitmqHealth:
  };
  }
@@ -371,7 +374,7 @@ export class RabbitMQServiceWorker {
  try {
  const publishResult = await rabbitmqService.publish('workers', queueName, {
  ...message, publishedAt: Date.now(),
-     workerVersion: '1.0.0',
+ workerVersion: '1.0.0',
  });
  const publishedOk = Boolean(publishResult);
  if (!publishedOk) {

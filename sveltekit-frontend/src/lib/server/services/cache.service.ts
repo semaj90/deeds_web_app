@@ -116,7 +116,7 @@ export class CacheService {
  */
  async cacheSummary(caseId: string, summary: any, ttl?: number): Promise<void> {
  await this.set(caseId, summary, {
- ttl, ttl || DEFAULT_TTL,
+ ttl: ttl || DEFAULT_TTL,
  namespace: NAMESPACES.summary,
  });
  }
@@ -140,7 +140,7 @@ export class CacheService {
  */
  async cacheSimilarCases(caseId: string, cases: any[], ttl?: number): Promise<void> {
  await this.set(caseId, cases, {
- ttl, ttl || DEFAULT_TTL,
+ ttl: ttl || DEFAULT_TTL,
  namespace: NAMESPACES.similarCases,
  });
  }
@@ -165,7 +165,7 @@ export class CacheService {
  async cacheRagResults(query: string, results: any[], ttl?: number): Promise<void> {
  const key = this.hashQuery(query);
  await this.set(key, results, {
- ttl, ttl || DEFAULT_TTL,
+ ttl: ttl || DEFAULT_TTL,
  namespace: NAMESPACES.ragResults,
  });
  }
@@ -183,7 +183,7 @@ export class CacheService {
  */
  async cacheCitations(caseId: string, citations: any[], ttl?: number): Promise<void> {
  await this.set(caseId, citations, {
- ttl, ttl || DEFAULT_TTL,
+ ttl: ttl || DEFAULT_TTL,
  namespace: NAMESPACES.citations,
  });
  }
@@ -200,7 +200,7 @@ export class CacheService {
  */
  async cacheStatutes(jurisdiction: string, statutes: any[], ttl?: number): Promise<void> {
  await this.set(jurisdiction, statutes, {
- ttl, ttl || DEFAULT_TTL,
+ ttl: ttl || DEFAULT_TTL,
  namespace: NAMESPACES.statutes,
  });
  }

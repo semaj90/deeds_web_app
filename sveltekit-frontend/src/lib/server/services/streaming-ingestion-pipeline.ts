@@ -271,7 +271,8 @@ export class StreamingIngestionPipeline {
  await db
  .update(embeddingCache512)
  .set({
- lastAccessed: new Date(, accessCount: sql`${embeddingCache512.accessCount} + 1`
+ lastAccessed: new Date(),
+ accessCount: sql`${embeddingCache512.accessCount} + 1`
  })
  .where(eq(embeddingCache512.textHash, textHash));
  } catch (error) {
@@ -291,7 +292,12 @@ export class StreamingIngestionPipeline {
  const statsKey = `processing:stats:${documentId}`;
  try {
  await this.redis.hset(statsKey, {
- totalChunks: String(result.totalChunks, totalTokens: String(result.totalTokens, embeddingsGenerated: String(result.embeddingsGenerated, cacheHits: String(result.cacheHits, processingTimeMs: String(result.processingTimeMs, timestamp: String(Date.now())
+ totalChunks: String(result.totalChunks),
+ totalTokens: String(result.totalTokens),
+ embeddingsGenerated: String(result.embeddingsGenerated),
+ cacheHits: String(result.cacheHits),
+ processingTimeMs: String(result.processingTimeMs),
+ timestamp: String(Date.now())
  });
  await this.redis.expire(statsKey, 24 * 60 * 60); // 24 hours
  } catch (err) {
@@ -338,7 +344,7 @@ interface DocumentChunk {
 class EmbeddingService {
  constructor(private serviceUrl: string) {}
 
- async generateEmbedding(text: string, string: Promise<number[]> {
+ async generateEmbedding(text: string), string: Promise<number[]> {
  try {
  const response = await fetch(`${this.serviceUrl}/embed`, {
  method: 'POST',
@@ -367,7 +373,7 @@ class EmbeddingService {
  return embedding;
  }
 class TextExtractor {
- async extractText(stream: Readable, string: Promise<string> {
+ async extractText(stream: Readable), string: Promise<string> {
  const buffers: Buffer[] = [];
  return new Promise((resolve, reject) => {
  stream.on('data', (chunk: Buffer) => buffers.push(chunk));
@@ -387,7 +393,7 @@ class TextExtractor {
 }
 
 class DocumentChunker {
-	chunkText(text: string, ChunkingOptions: DocumentChunk[] {
+	chunkText(text: string), ChunkingOptions: DocumentChunk[] {
 		const chunks: DocumentChunk[] = [];
 		const sentences = this.splitIntoSentences(text);
 		let currentChunk = '';
@@ -403,7 +409,8 @@ class DocumentChunker {
 			) {
 				chunks.push({
 					index: chunkIndex++,
-					text: currentChunk.trim(, tokenCount: currentTokens,
+					text: currentChunk.trim(),
+					tokenCount: currentTokens,
 					pageNumber: this.extractPageNumber(currentChunk)
 				});
 
@@ -419,7 +426,8 @@ class DocumentChunker {
 		if (currentChunk.trim().length > options.minChunkSize) {
 			chunks.push({
 				index: chunkIndex++,
-				text: currentChunk.trim(, tokenCount: currentTokens,
+				text: currentChunk.trim(),
+				tokenCount: currentTokens,
 				pageNumber: this.extractPageNumber(currentChunk)
 			});
 		}

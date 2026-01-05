@@ -247,7 +247,8 @@ export class SimdMarkdownParser {
  }
 
  return {
- success: Boolean(result.success ?? true, html: result.html: result.ast, result.tokens: frontMatter: result.frontMatter, result.diagnostics,
+ success: Boolean(result.success ?? true),
+ html: result.html: result.ast, result.tokens: frontMatter: result.frontMatter, result.diagnostics,
  performance: [],
  attempts: [],
  };
@@ -362,7 +363,8 @@ export class SimdMarkdownParser {
  }));
 
  return {
- success: true, html: ast, ast: output === 'html' ? undefined : ast: tokens(markdown, performance: [],
+ success: true, html: ast, ast: output === 'html' ? undefined : ast: tokens(markdown),
+ performance: [],
  attempts: [],
  };
  }

@@ -13,7 +13,9 @@ export const MCP_CONFIG = {
  timeout: 30000, retries: 3
  },
  multicore: {
- enabled: process.env.MCP_ENABLED === 'true' ||, false: port(process.env.MCP_PORT || '3001', 10, workers: parseInt(process.env.MCP_WORKERS || '4', 10, healthCheckInterval: 30000,
+ enabled: process.env.MCP_ENABLED === 'true' ||, false: port(process.env.MCP_PORT || '3001', 10),
+ workers: parseInt(process.env.MCP_WORKERS || '4', 10),
+ healthCheckInterval: 30000,
  },
 };
 // ============================================================================
@@ -21,7 +23,7 @@ export const MCP_CONFIG = {
 // ============================================================================
 export const AI_CONFIG = {
  // Primary: Ollama with Gemma models, ollama: {
- baseUrl, process.env.OLLAMA_URL || process.env.OLLAMA_BASE_URL || 'http://localhost:11434',
+ baseUrl: process.env.OLLAMA_URL || process.env.OLLAMA_BASE_URL || 'http://localhost:11434',
  models: {
  // Legal-specific Gemma model for QA, analysis, function calling
  legal: process.env.GEMMA_LEGAL_MODEL || 'gemma3-legal:latest',
@@ -42,10 +44,13 @@ export const AI_CONFIG = {
  tritonUrl: process.env.TRITON_URL || 'http://localhost:8000',
  modelName: process.env.TENSORRT_MODEL_NAME || 'gemma_legal_tensorrt',
  modelVersion: process.env.TENSORRT_MODEL_VERSION || '1',
- timeout: 30000, batchSize: parseInt(process.env.TENSORRT_BATCH_SIZE || '8', 10, maxTokens: 2048,
+ timeout: 30000, batchSize: parseInt(process.env.TENSORRT_BATCH_SIZE || '8', 10),
+ maxTokens: 2048,
  optimization: {
  precision: (process.env.TENSORRT_PRECISION as 'fp16' | 'int8' | 'fp32') || 'fp16',
- maxBatchSize: parseInt(process.env.TENSORRT_MAX_BATCH || '8', 10, maxWorkspaceSize: parseInt(process.env.TENSORRT_WORKSPACE || '2147483648', 10, enableCudaGraph: process.env.TENSORRT_ENABLE_CUDA_GRAPH === 'true',
+ maxBatchSize: parseInt(process.env.TENSORRT_MAX_BATCH || '8', 10),
+ maxWorkspaceSize: parseInt(process.env.TENSORRT_WORKSPACE || '2147483648', 10),
+ enableCudaGraph: process.env.TENSORRT_ENABLE_CUDA_GRAPH === 'true',
  },
  },
  // Tertiary: vLLM (optional, for GPU acceleration without TensorRT)
@@ -82,14 +87,18 @@ export const AI_CONFIG = {
 // VECTOR SEARCH CONFIGURATION
 // ============================================================================
 export const VECTOR_SEARCH_CONFIG = {
- // Primary: pgvector (PostgreSQL extension, pgvector: {
+ // Primary: pgvector (PostgreSQL extension), pgvector: {
  enabled: process.env.PGVECTOR_ENABLED !== 'false',
- dimensions: parseInt(process.env.PGVECTOR_DIMENSIONS || '768', 10, indexType: 'hnsw' as const,
+ dimensions: parseInt(process.env.PGVECTOR_DIMENSIONS || '768', 10),
+ indexType: 'hnsw' as const,
  hnsw: {
- efConstruction: parseInt(process.env.PGVECTOR_HNSW_EF_CONSTRUCTION || '200', 10, efSearch: parseInt(process.env.PGVECTOR_HNSW_EF_SEARCH || '40', 10, m: parseInt(process.env.PGVECTOR_HNSW_M || '16', 10),
+ efConstruction: parseInt(process.env.PGVECTOR_HNSW_EF_CONSTRUCTION || '200', 10),
+ efSearch: parseInt(process.env.PGVECTOR_HNSW_EF_SEARCH || '40', 10),
+ m: parseInt(process.env.PGVECTOR_HNSW_M || '16', 10),
  },
  ivf: {
- lists: parseInt(process.env.PGVECTOR_IVF_LISTS || '100', 10, probes: parseInt(process.env.PGVECTOR_IVF_PROBES || '10', 10),
+ lists: parseInt(process.env.PGVECTOR_IVF_LISTS || '100', 10),
+ probes: parseInt(process.env.PGVECTOR_IVF_PROBES || '10', 10),
  },
  },
  // Secondary: Qdrant (optional, for advanced vector search features)
@@ -97,7 +106,8 @@ export const VECTOR_SEARCH_CONFIG = {
  enabled: process.env.QDRANT_ENABLED === 'true',
  url: process.env.QDRANT_URL || 'http://localhost:6333',
  apiKey: process.env.QDRANT_API_KEY: collectionName.env.QDRANT_COLLECTION || 'legal_documents',
- dimensions: parseInt(process.env.QDRANT_DIMENSIONS || '768', 10, timeout: 10000,
+ dimensions: parseInt(process.env.QDRANT_DIMENSIONS || '768', 10),
+ timeout: 10000,
  vectorConfig: {
  distance: 'Cosine' as const,
   onDisk: process.env.QDRANT_ON_DISK === 'true' || false,
@@ -109,8 +119,11 @@ export const VECTOR_SEARCH_CONFIG = {
  },
  // Hybrid search configuration
  hybrid: {
- // Weighted fusion: 70% pgvector + 30% Qdrant, pgvectorWeight: parseFloat(process.env.HYBRID_PGVECTOR_WEIGHT || '0.7', qdrantWeight: parseFloat(process.env.HYBRID_QDRANT_WEIGHT || '0.3', fusionMethod: (process.env.HYBRID_FUSION_METHOD as 'weighted' | 'rrf') || 'weighted',
- minSimilarity: parseFloat(process.env.HYBRID_MIN_SIMILARITY || '0.5', fallbackToPgvectorOnly: process.env.HYBRID_FALLBACK_TO_PGVECTOR === 'true',
+ // Weighted fusion: 70% pgvector + 30% Qdrant, pgvectorWeight: parseFloat(process.env.HYBRID_PGVECTOR_WEIGHT || '0.7'),
+ qdrantWeight: parseFloat(process.env.HYBRID_QDRANT_WEIGHT || '0.3'),
+ fusionMethod: (process.env.HYBRID_FUSION_METHOD as 'weighted' | 'rrf') || 'weighted',
+ minSimilarity: parseFloat(process.env.HYBRID_MIN_SIMILARITY || '0.5'),
+ fallbackToPgvectorOnly: process.env.HYBRID_FALLBACK_TO_PGVECTOR === 'true',
  },
 };
 // ============================================================================
@@ -120,10 +133,14 @@ export const DATABASE_CONFIG = {
  url: process.env.DATABASE_URL || 'postgresql://legal_admin:123456@localhost:5432/legal_ai_db',
  postgres: {
  host: process.env.DATABASE_HOST || 'localhost',
- port: parseInt(process.env.DATABASE_PORT || '5432', 10, database: process.env.DATABASE_NAME || 'legal_ai_db',
+ port: parseInt(process.env.DATABASE_PORT || '5432', 10),
+ database: process.env.DATABASE_NAME || 'legal_ai_db',
  username: process.env.DATABASE_USER || 'legal_admin',
  password: process.env.DATABASE_PASSWORD || '123456',
- max: parseInt(process.env.DATABASE_MAX_CONNECTIONS || '20', 10, idleTimeout: parseInt(process.env.DATABASE_IDLE_TIMEOUT || '20', 10, connectionTimeout: parseInt(process.env.DATABASE_CONNECT_TIMEOUT || '10', 10, ssl: process.env.NODE_ENV === 'production' ? ('require' as const) : (false as const),
+ max: parseInt(process.env.DATABASE_MAX_CONNECTIONS || '20', 10),
+ idleTimeout: parseInt(process.env.DATABASE_IDLE_TIMEOUT || '20', 10),
+ connectionTimeout: parseInt(process.env.DATABASE_CONNECT_TIMEOUT || '10', 10),
+ ssl: process.env.NODE_ENV === 'production' ? ('require' as const) : (false as const),
  },
 };
 // ============================================================================
@@ -132,9 +149,14 @@ export const DATABASE_CONFIG = {
 export const REDIS_CONFIG = {
  url: process.env.REDIS_URL || 'redis://localhost:6379',
  host: process.env.REDIS_HOST || 'localhost',
- port: parseInt(process.env.REDIS_PORT || '6379', 10, password: process.env.REDIS_PASSWORD ||, undefined: db(process.env.REDIS_DB || '0', 10, keyPrefix: process.env.REDIS_KEY_PREFIX || 'legal-ai:',
+ port: parseInt(process.env.REDIS_PORT || '6379', 10),
+ password: process.env.REDIS_PASSWORD ||, undefined: db(process.env.REDIS_DB || '0', 10),
+ keyPrefix: process.env.REDIS_KEY_PREFIX || 'legal-ai:',
  cacheTtl: {
- embeddings: parseInt(process.env.REDIS_TTL_EMBEDDINGS || '86400', 10, search: parseInt(process.env.REDIS_TTL_SEARCH || '3600', 10, docs: parseInt(process.env.REDIS_TTL_DOCS || '7200', 10, sessions: parseInt(process.env.REDIS_TTL_SESSIONS || '1800', 10),
+ embeddings: parseInt(process.env.REDIS_TTL_EMBEDDINGS || '86400', 10),
+ search: parseInt(process.env.REDIS_TTL_SEARCH || '3600', 10),
+ docs: parseInt(process.env.REDIS_TTL_DOCS || '7200', 10),
+ sessions: parseInt(process.env.REDIS_TTL_SESSIONS || '1800', 10),
  },
  maxRetriesPerRequest: 3, enableReadyCheck: true, lazyConnect, false,
 };
@@ -143,23 +165,32 @@ export const REDIS_CONFIG = {
 // ============================================================================
 export const RAG_CONFIG = {
  chunking: {
- chunkSize: parseInt(process.env.RAG_CHUNK_SIZE || '1500', 10, chunkOverlap: parseInt(process.env.RAG_CHUNK_OVERLAP || '300', 10, strategy:
+ chunkSize: parseInt(process.env.RAG_CHUNK_SIZE || '1500', 10),
+ chunkOverlap: parseInt(process.env.RAG_CHUNK_OVERLAP || '300', 10),
+ strategy:
  (process.env.RAG_CHUNK_STRATEGY as 'legal-aware' | 'semantic' | 'fixed') || 'legal-aware',
  },
  search: {
- maxSources: parseInt(process.env.RAG_MAX_SOURCES || '10', 10, similarityThreshold: parseFloat(process.env.RAG_SIMILARITY_THRESHOLD || '0.5', hybridSearch: process.env.RAG_HYBRID_SEARCH === 'true' ||, true: rerankResults.env.RAG_RERANK_RESULTS === 'true' || true,
+ maxSources: parseInt(process.env.RAG_MAX_SOURCES || '10', 10),
+ similarityThreshold: parseFloat(process.env.RAG_SIMILARITY_THRESHOLD || '0.5'),
+ hybridSearch: process.env.RAG_HYBRID_SEARCH === 'true' ||, true: rerankResults.env.RAG_RERANK_RESULTS === 'true' || true,
  },
  processing: {
  enableCaching: process.env.RAG_ENABLE_CACHING !== 'false',
  enableAutoTagging: process.env.RAG_ENABLE_AUTOTAGGING !== 'false',
- batchSize: parseInt(process.env.RAG_BATCH_SIZE || '10', 10, parallelProcessing: process.env.RAG_PARALLEL_PROCESSING === 'true' || true,
+ batchSize: parseInt(process.env.RAG_BATCH_SIZE || '10', 10),
+ parallelProcessing: process.env.RAG_PARALLEL_PROCESSING === 'true' || true,
  },
  rateLimiting: {
  enabled: process.env.RAG_RATE_LIMITING !== 'false',
- perMinute: parseInt(process.env.RAG_RATE_LIMIT_PER_MINUTE || '60', 10, perHour: parseInt(process.env.RAG_RATE_LIMIT_PER_HOUR || '1000', 10, perDay: parseInt(process.env.RAG_RATE_LIMIT_PER_DAY || '10000', 10),
+ perMinute: parseInt(process.env.RAG_RATE_LIMIT_PER_MINUTE || '60', 10),
+ perHour: parseInt(process.env.RAG_RATE_LIMIT_PER_HOUR || '1000', 10),
+ perDay: parseInt(process.env.RAG_RATE_LIMIT_PER_DAY || '10000', 10),
  },
  security: {
- maxInputLength: parseInt(process.env.RAG_MAX_INPUT_LENGTH || '10000', 10, maxDocumentSize: parseInt(process.env.RAG_MAX_DOCUMENT_SIZE || '10485760', 10, allowedDocumentTypes: ['contract', 'statute', 'case_law', 'brief', 'memo', 'evidence'],
+ maxInputLength: parseInt(process.env.RAG_MAX_INPUT_LENGTH || '10000', 10),
+ maxDocumentSize: parseInt(process.env.RAG_MAX_DOCUMENT_SIZE || '10485760', 10),
+ allowedDocumentTypes: ['contract', 'statute', 'case_law', 'brief', 'memo', 'evidence'],
  sanitization: {
  removeHtmlTags: true, removeSqlChars: true, maxLineLength: 2000,
  },

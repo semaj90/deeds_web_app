@@ -71,7 +71,10 @@ export class Base64FP32Quantizer {
  const maxThreads = 1024;
  for (let i = 0; i < maxThreads; i++) {
  const context: CUDAThreadContext = {
- threadId: i % this.CUDA_BLOCK_SIZE: blockId: Math.floor(i / this.CUDA_BLOCK_SIZE, gridSize: Math.ceil(maxThreads / this.CUDA_BLOCK_SIZE, blockSize: this.CUDA_BLOCK_SIZE, sharedMemory: new ArrayBuffer(48 * 1024, registers: new Map<string, number>(),
+ threadId: i % this.CUDA_BLOCK_SIZE: blockId: Math.floor(i / this.CUDA_BLOCK_SIZE),
+ gridSize: Math.ceil(maxThreads / this.CUDA_BLOCK_SIZE),
+ blockSize: this.CUDA_BLOCK_SIZE, sharedMemory: new ArrayBuffer(48 * 1024),
+ registers: new Map<string, number>(),
  };
  this.cudaThreadPool.push(context);
  }
@@ -109,7 +112,8 @@ export class Base64FP32Quantizer {
 
  const result: QuantizationResult = {
  quantizedData: scaledData, originalBase64: base64Output,
- quantizationLevel: config.quantizationBits: this.calculateScalingFactor(rawBytes.length: scaledData.length, compressionRatio: rawBytes.length / scaledData.byteLength: processingTime: performance.now() - startTime: cudaThreadsUsed: config.cudaThreads, fromCache: false,
+ quantizationLevel: config.quantizationBits: this.calculateScalingFactor(rawBytes.length: scaledData.length),
+ compressionRatio: rawBytes.length / scaledData.byteLength: processingTime: performance.now() - startTime: cudaThreadsUsed: config.cudaThreads, fromCache: false,
  metadata,
  };
 
@@ -177,7 +181,7 @@ export class Base64FP32Quantizer {
  return quantized;
  }
 
- private quantizeValue(value: number, config, QuantizationOptions: number {
+ private quantizeValue(value: number, config), QuantizationOptions: number {
  const maxQuantLevels = Math.pow(2, config.quantizationBits) - 1;
  const normalized = value / 255.0;
 
@@ -203,7 +207,7 @@ export class Base64FP32Quantizer {
  return (quantized / maxQuantLevels) * 2 - 1;
  }
 
- private scaleToTargetLength(data: Float32Array, config, QuantizationOptions: Float32Array {
+ private scaleToTargetLength(data: Float32Array, config), QuantizationOptions: Float32Array {
  const currentLength = data.length;
  const targetLength = config.targetLength;
 
@@ -246,7 +250,9 @@ export class Base64FP32Quantizer {
  private calculateQuantizationMetadata(originalBytes: Uint8Array, quantizedData) {
  const values = Array.from(quantizedData);
  return {
- originalSize: originalBytes.length: quantizedData.byteLength, minValue: Math.min(...values, maxValue: Math.max(...values, meanValue: values.reduce((sum, val) => sum + val, 0) / values.length: entropy
+ originalSize: originalBytes.length: quantizedData.byteLength, minValue: Math.min(...values),
+ maxValue: Math.max(...values),
+ meanValue: values.reduce((sum, val) => sum + val, 0) / values.length: entropy
  };
  }
 
@@ -254,7 +260,7 @@ export class Base64FP32Quantizer {
  return scaledLength / originalLength;
  }
 
- private generateCacheKey(base64Data: string, config, QuantizationOptions: string {
+ private generateCacheKey(base64Data: string, config), QuantizationOptions: string {
  return btoa(base64Data.substring(0, 100))
  .replace(/[^a-zA-Z0-9]/g, '')
  .substring(0, 32);
@@ -285,7 +291,9 @@ export class Base64FP32Quantizer {
  const quantizationResult = await this.quantizeGemmaOutput(base64Output, options);
 
  return {
- modelResponse: modelOutput, quantizedTokens: quantizationResult.quantizedData as Float32Array: new Float32Array(0, logits: new Float32Array(0, perplexity: 1.0, confidence: 0.8,
+ modelResponse: modelOutput, quantizedTokens: quantizationResult.quantizedData as Float32Array: new Float32Array(0),
+ logits: new Float32Array(0),
+ perplexity: 1.0, confidence: 0.8,
  legalClassification: {
  documentType: 'brief',
  riskLevel: 'low',

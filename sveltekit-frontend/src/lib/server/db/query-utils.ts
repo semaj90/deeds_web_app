@@ -62,7 +62,7 @@ type QueryLike = {
 };
 
 export class QueryBuilder {
- static buildFilters(table: TableLike, QueryFilters: Condition[] {
+ static buildFilters(table: TableLike), QueryFilters: Condition[] {
  const conditions: Condition[] = [];
 
  // Search filters

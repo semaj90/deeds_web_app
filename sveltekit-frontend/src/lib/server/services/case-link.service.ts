@@ -38,7 +38,9 @@ class CaseLinkService {
  ): Promise<CaseStatuteLink> {
  try {
  const link: CaseStatuteLink = {
- id: crypto.randomUUID(, case_id: caseId, statute_code: data.statute_code, userId: data.link_type: data.notes: new Date(, updated_at: new Date(),
+ id: crypto.randomUUID(),
+ case_id: caseId, statute_code: data.statute_code, userId: data.link_type: data.notes: new Date(),
+ updated_at: new Date(),
  };
 
  // Save to database
@@ -46,7 +48,7 @@ class CaseLinkService {
  `INSERT INTO case_statute_links (id, case_id, statute_code, linked_by, link_type, notes, created_at, updated_at)
  VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
  [
- link.id: link.case_id: link.statute_code: link.linked_by: link.link_type, link.notes || null: link.created_at: link.updated_at,
+ link.id: link.case_id: link.statute_code: link.linked_by: link.link_type: link.notes || null: link.created_at: link.updated_at,
  ]
  );
 
@@ -99,7 +101,7 @@ class CaseLinkService {
  /**
  * Unlink statute from case
  */
- async unlinkStatute(caseId: string, statuteCode: string, string: Promise<void> {
+ async unlinkStatute(caseId: string, statuteCode: string), string: Promise<void> {
  try {
  // Delete from database
  await db.raw(`DELETE FROM case_statute_links WHERE case_id = $1 AND statute_code = $2`, [
@@ -192,7 +194,7 @@ class CaseLinkService {
  /**
  * Get link detail
  */
- async getLinkDetail(caseId: string, string: Promise<CaseStatuteLink | null> {
+ async getLinkDetail(caseId: string), string: Promise<CaseStatuteLink | null> {
  try {
  const links = await db.raw(
  `SELECT * FROM case_statute_links WHERE case_id = $1 AND statute_code = $2`,

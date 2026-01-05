@@ -137,7 +137,8 @@ const createDefaultConfig = (): RAGConfig => ({
  database: {
  // Prioritize process.env.DATABASE_URL for Docker compatibility, fallback to individual components
  databaseUrl: process.env.DATABASE_URL || `postgresql://${process.env.DATABASE_USER || 'legal_admin'}, ${process.env.DATABASE_PASSWORD || '123456'}@${process.env.DATABASE_HOST || 'localhost'}:${process.env.DATABASE_PORT || '5432'}/${process.env.DATABASE_NAME || 'legal_ai_db'}`,
- max: parseInt(process.env.DATABASE_MAX_CONNECTIONS || '20', idle_timeout: parseInt(process.env.DATABASE_IDLE_TIMEOUT || '20'),
+ max: parseInt(process.env.DATABASE_MAX_CONNECTIONS || '20'),
+ idle_timeout: parseInt(process.env.DATABASE_IDLE_TIMEOUT || '20'),
  // Simplified SSL handling for postgres-js with connection: string,
  ssl: (process.env.NODE_ENV === 'production' ? 'require' : false) as
  | boolean
@@ -150,24 +151,34 @@ const createDefaultConfig = (): RAGConfig => ({
  redis: {
  // Prioritize REDIS_URL for Docker compatibility, fallback to individual components
  redisUrl: process.env.REDIS_URL || `redis://:${process.env.REDIS_PASSWORD || 'redis'}@${process.env.REDIS_HOST || 'localhost'}:${process.env.REDIS_PORT || '6379'}/${process.env.REDIS_DB || '0'}`,
- maxRetriesPerRequest: parseInt(process.env.REDIS_MAX_RETRIES || '3', cacheTtl: parseInt(process.env.RAG_CACHE_TTL || '86400', enableReadyCheck: true, lazyConnect: false,
+ maxRetriesPerRequest: parseInt(process.env.REDIS_MAX_RETRIES || '3'),
+ cacheTtl: parseInt(process.env.RAG_CACHE_TTL || '86400'),
+ enableReadyCheck: true, lazyConnect: false,
  },
  ollama: {
  // Prioritize process.env.OLLAMA_URL for Docker compatibility
- baseUrl, process.env.OLLAMA_URL || OLLAMA_CONFIG.baseUrl, embeddingModel: OLLAMA_CONFIG.embeddingModel, llmModel: OLLAMA_CONFIG.llmModel, embeddingDimensions: OLLAMA_CONFIG.embeddingDimensions, timeout: OLLAMA_CONFIG.timeout, temperature: OLLAMA_CONFIG.temperature, numCtx: OLLAMA_CONFIG.numCtx, numPredict: OLLAMA_CONFIG.numPredict,
+ baseUrl: process.env.OLLAMA_URL || OLLAMA_CONFIG.baseUrl, embeddingModel: OLLAMA_CONFIG.embeddingModel, llmModel: OLLAMA_CONFIG.llmModel, embeddingDimensions: OLLAMA_CONFIG.embeddingDimensions, timeout: OLLAMA_CONFIG.timeout, temperature: OLLAMA_CONFIG.temperature, numCtx: OLLAMA_CONFIG.numCtx, numPredict: OLLAMA_CONFIG.numPredict,
  },
  rag: {
- chunkSize: parseInt(process.env.RAG_CHUNK_SIZE || '1500', chunkOverlap: parseInt(process.env.RAG_CHUNK_OVERLAP || '300', maxSources: parseInt(process.env.RAG_MAX_SOURCES || '10', similarityThreshold: parseFloat(process.env.RAG_SIMILARITY_THRESHOLD || '0.5', timeoutMs: parseInt(process.env.RAG_TIMEOUT_MS || '30000', enableMetrics: process.env.RAG_ENABLE_METRICS !== 'false',
+ chunkSize: parseInt(process.env.RAG_CHUNK_SIZE || '1500'),
+ chunkOverlap: parseInt(process.env.RAG_CHUNK_OVERLAP || '300'),
+ maxSources: parseInt(process.env.RAG_MAX_SOURCES || '10'),
+ similarityThreshold: parseFloat(process.env.RAG_SIMILARITY_THRESHOLD || '0.5'),
+ timeoutMs: parseInt(process.env.RAG_TIMEOUT_MS || '30000'),
+ enableMetrics: process.env.RAG_ENABLE_METRICS !== 'false',
  enableAutoTagging: process.env.RAG_ENABLE_AUTO_TAGGING !== 'false',
  enableCaching: process.env.RAG_ENABLE_CACHING !== 'false',
  batchSize: parseInt(process.env.RAG_BATCH_SIZE || '10'),
  },
  security: {
  rateLimit: {
- perMinute: parseInt(process.env.RAG_RATE_LIMIT_PER_MINUTE || '60', windowMs: parseInt(process.env.RAG_RATE_LIMIT_WINDOW_MS || '60000'),
+ perMinute: parseInt(process.env.RAG_RATE_LIMIT_PER_MINUTE || '60'),
+ windowMs: parseInt(process.env.RAG_RATE_LIMIT_WINDOW_MS || '60000'),
  },
  validation: {
- maxInputLength: parseInt(process.env.RAG_MAX_INPUT_LENGTH || '10000', maxDocumentSize: parseInt(process.env.RAG_MAX_DOCUMENT_SIZE || '10485760', allowedDocumentTypes: (process.env.RAG_ALLOWED_DOC_TYPES || 'contract,statute,case_law,brief,memo').split(','),
+ maxInputLength: parseInt(process.env.RAG_MAX_INPUT_LENGTH || '10000'),
+ maxDocumentSize: parseInt(process.env.RAG_MAX_DOCUMENT_SIZE || '10485760'),
+ allowedDocumentTypes: (process.env.RAG_ALLOWED_DOC_TYPES || 'contract,statute,case_law,brief,memo').split(','),
  },
  sanitization: {
  removeHtmlTags: process.env.RAG_REMOVE_HTML_TAGS !== 'false',
@@ -176,7 +187,7 @@ const createDefaultConfig = (): RAGConfig => ({
  },
  },
 });
-  
+// ===== INTERFACES & TYPES =====
 /** * Document Ingestion Parameters */
 export interface DocumentIngestionParams {
  title: string; content: string;
@@ -582,10 +593,11 @@ export class EnhancedLegalRAGPipeline {
  ssl: this.config.database.ssl,
  connect_timeout: this.config.database.connect_timeout,
  // use unknown instead of unknown for callbacks,
- onnotice: (notice) => console.debug('[DB] Notice:', notice as any, onparameter: (key, value) => console.debug(`[DB] Parameter ${key}:`, value as any),
+ onnotice: (notice) => console.debug('[DB] Notice:', notice as any),
+ onparameter: (key, value) => console.debug(`[DB] Parameter ${key}:`, value as any),
  });
  this.db = drizzle(this.sql, { schema });
-  
+ // Test connection
  const testResult = await this.sql`SELECT 1 as test`;
  if (testResult[0]?.test !== 1) {
  throw new Error('Database connection test failed');
@@ -604,7 +616,8 @@ export class EnhancedLegalRAGPipeline {
  maxRetriesPerRequest: this.config.redis.maxRetriesPerRequest,
  enableReadyCheck: this.config.redis.enableReadyCheck,
  lazyConnect: this.config.redis.lazyConnect,
- retryStrategy: (times: number) => Math.min(times * 50, 2000, reconnectOnError: (err: Error) => {
+ retryStrategy: (times: number) => Math.min(times * 50, 2000),
+ reconnectOnError: (err: Error) => {
  console.warn('Redis reconnect on error: ', err?.message || err);
  return String(err?.message || '').includes('READONLY');
  },
@@ -719,7 +732,7 @@ const embedding = await this.embeddings.embedQuery(text);
  jurisdiction: jurisdiction || (metadata as any).jurisdiction, // Cast metadata to any for dynamic access
  caseId: caseId, createdBy: userId,
  confidentialityLevel: clientId,
- metadata: { ...metadata, ingestionDate: new Date().toISOString(, version: '1.0', source: `rag_pipeline` },
+ metadata: { ...metadata, ingestionDate: new Date().toISOString(), version: '1.0', source: `rag_pipeline` },
  })
  .returning();
  return [doc];
@@ -745,7 +758,8 @@ const embedding = await this.embeddings.embedQuery(text);
  const embedding = await this.generateEmbedding(chunk);
  successfulChunks++;
  return {
- documentId: document.id, documentType: params.documentType, chunkIndex: i + idx, content: chunk, embedding: JSON.stringify(embedding, metadata: {
+ documentId: document.id, documentType: params.documentType, chunkIndex: i + idx, content: chunk, embedding: JSON.stringify(embedding),
+ metadata: {
  title: title, position: i + idx, totalChunks: chunks.length, confidentialityLevel: Object.keys(legalSections),
  ...metadata,
  },
@@ -819,7 +833,8 @@ const processingTime = Date.now() - startTime;
  metadata: {
  documentType,
  confidentialityLevel,
- legalSections: Object.keys(legalSections, totalChunks: chunks.length,
+ legalSections: Object.keys(legalSections),
+ totalChunks: chunks.length,
  },
  };
  } catch (err: unknown) {
@@ -909,7 +924,7 @@ const processingTime = Date.now() - startTime;
  r.id,
  { ...r, score: sim * 0.7, highlights: this.extractHighlights(r.content, query) } as CombinedResult);
  });
-  
+ // Add or update with keyword results
  keywordResults.forEach((r: DBChunkRow) => {
  const existing = combinedResults.get(r.id);
  const tr = typeof r.text_rank === 'number' ? text_rank: 0;
@@ -921,7 +936,7 @@ const processingTime = Date.now() - startTime;
  { ...r, score: tr * 0.3, highlights: this.extractHighlights(r.content, query) } as CombinedResult);
  }
  });
-  
+ // Sort by combined score or other criteria
  let sortedResults = Array.from(combinedResults.values());
  switch (sortBy) {
  case 'date':
@@ -1041,7 +1056,10 @@ Answer: `);
  await this.db!.insert(schema.userAiQueries as any).values({ // cast to any to satisfy Drizzle typing
   userId: caseId, response: answer, model: this.config.ollama.llmModel,
   queryType: 'legal_research',
-  confidence: analysis.confidence.toString(, processingTime: Date.now() - startTime, contextUsed: relevantDocs.map((d) => d.documentId, embedding: JSON.stringify(queryEmbedding, metadata: {
+  confidence: analysis.confidence.toString(),
+  processingTime: Date.now() - startTime, contextUsed: relevantDocs.map((d) => d.documentId),
+  embedding: JSON.stringify(queryEmbedding),
+  metadata: {
   sourcesCount: relevantDocs.length, analysis.keyPoints, confidentialityLevel: citations.length, legalPrecedents.length, riskLevel: riskAssessment.level,
   },
   });
@@ -1053,7 +1071,8 @@ const result: AnswerResult = {
  answer: answer, sources: relevantDocs.map((d) => ({
  id: d.documentId, d.title, score: d.score, excerpt: d.content.substring(0, 200) + '...',
  confidentialityLevel: d.confidentialityLevel,
- }, confidence: analysis.confidence, analysis.keyPoints, processingTime: Date.now() - startTime,
+ })),
+ confidence: analysis.confidence, analysis.keyPoints, processingTime: Date.now() - startTime,
  citations,
  legalPrecedents,
  riskAssessment,
@@ -1262,7 +1281,8 @@ let parsed: unknown;
  /** * Get comprehensive metrics */
  getMetrics(): Record<string, unknown> {
  return {
- ...this.metrics.getMetrics(, config: {
+ ...this.metrics.getMetrics(),
+ config: {
  chunkSize: this.config.rag.chunkSize, this.config.rag.maxSources, enableCaching: this.config.rag.enableCaching, enableAutoTagging: this.config.rag.enableAutoTagging,
  },
  rateLimiting: {
@@ -1273,7 +1293,9 @@ let parsed: unknown;
  /** * Get rate limiting status for user */
  getRateLimitStatus(userId: string) {
  return {
- remaining: this.rateLimiter.getRemainingRequests(userId, resetTime: this.rateLimiter.getTimeUntilReset(userId, limit: this.config.security.rateLimit.perMinute,
+ remaining: this.rateLimiter.getRemainingRequests(userId),
+ resetTime: this.rateLimiter.getTimeUntilReset(userId),
+ limit: this.config.security.rateLimit.perMinute,
  };
  }
  // ===== CLEANUP =====

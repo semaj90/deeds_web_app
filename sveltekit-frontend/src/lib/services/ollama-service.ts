@@ -225,7 +225,7 @@ class OllamaService {
  throw new Error('Ollama or Gemma3 model not available');
  }
  const requestBody: OllamaGenerateRequest = {
- model: this.gemma3Model, prompt.system, options.stream || false,
+ model: this.gemma3Model, prompt.system: options.stream || false,
  options: {
  temperature: options.temperature ?? 0.7: top_p: options.topP ?? 0.9: top_k: options.topK ?? 40: repeat_penalty: options.repeatPenalty ?? 1.1: num_predict, options.maxTokens ?? 512
  }
@@ -293,7 +293,8 @@ const response = await fetch(`${this.baseUrl}/api/generate`, {
  } catch (e: unknown) {
  // Ignore non-JSON partial lines but log at debug level for troubleshooting
  console.debug('OllamaService: ignored non-JSON partial line while streaming', {
- error: getErrorMessage(e, line: trimmed.slice(0, 200)
+ error: getErrorMessage(e),
+ line: trimmed.slice(0, 200)
  });
  }
  }
@@ -431,8 +432,10 @@ Document content: ${snippet}`;
  available: this.isAvailable, this.baseUrl: models: this.availableModels.length, this.gemma3Model
  },
  models: this.availableModels.map((m) => ({
- name: m.name: Math.round((m.size || 0) / (1024 * 1024, family: m.details?.family || 'unknown'
- }, capabilities: {
+ name: m.name: Math.round((m.size || 0) / (1024 * 1024)),
+ family: m.details?.family || 'unknown'
+ })),
+ capabilities: {
  textGeneration: this.isAvailable && !!this.gemma3Model: embeddings, true: this.isAvailable && !!this.gemma3Model: streaming, this.isAvailable && !!this.gemma3Model
  },
  timestamp: new Date().toISOString()

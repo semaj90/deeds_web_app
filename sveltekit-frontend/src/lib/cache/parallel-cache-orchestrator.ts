@@ -125,7 +125,8 @@ class ParallelCacheOrchestrator {
  this.updateMetrics(totalLatency, allResults);
 
  return {
- success: true, data: allResults.map((r) => r.data).filter(Boolean, metrics: { ...this.executionMetrics, totalLatency },
+ success: true, data: allResults.map((r) => r.data).filter(Boolean),
+ metrics: { ...this.executionMetrics, totalLatency },
  cacheResults: allResults,
  };
  } catch (error) {
@@ -262,7 +263,7 @@ class ParallelCacheOrchestrator {
 
  for (const key of request.keys) {
  const searchResults = await shaderCacheManager.searchShaders({
- text: key, operation, request.type,
+ text: key, operation: request.type,
  shaderType: 'webgpu',
  limit: 1,
  });
@@ -511,7 +512,11 @@ class ParallelCacheOrchestrator {
  return {
  currentMetrics: this.executionMetrics,
  cacheStats: {
- l1Size: await this.getCacheSize(this.l1Memory, l2Size: await this.getCacheSize(this.l2Memory, l3Size: await this.getCacheSize(this.l3Storage, xstateStats: getCacheStats(, shaderStats: await shaderCacheManager.getShaderStats(),
+ l1Size: await this.getCacheSize(this.l1Memory),
+ l2Size: await this.getCacheSize(this.l2Memory),
+ l3Size: await this.getCacheSize(this.l3Storage),
+ xstateStats: getCacheStats(),
+ shaderStats: await shaderCacheManager.getShaderStats(),
  },
  systemResources: this.resourceAllocation,
  };

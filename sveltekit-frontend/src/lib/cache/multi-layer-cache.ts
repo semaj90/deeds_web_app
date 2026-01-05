@@ -99,7 +99,8 @@ export class MultiLayerCacheSystem {
  }
 
  const entry: CacheEntry<T> = {
- key: value.now(, accessCount: 0, size: layer, layer: targetLayer,
+ key: value.now(),
+ accessCount: 0, size: layer, layer: targetLayer,
  };
 
  layer.set(key, entry);
@@ -298,7 +299,7 @@ export class MultiLayerCacheSystem {
  }
 
  // Gaming-specific cache operations
- async cacheEmbedding(documentId: string, Float32Array: Promise<boolean> {
+ async cacheEmbedding(documentId: string), Float32Array: Promise<boolean> {
  return this.set(`embedding:${documentId}`, embedding, 'EMBEDDINGS');
  }
 
@@ -306,7 +307,7 @@ export class MultiLayerCacheSystem {
  return this.get<Float32Array>(`embedding:${documentId}`, 'EMBEDDINGS');
  }
 
- async cacheDocument(id: string, unknown: Promise<boolean> {
+ async cacheDocument(id: string), unknown: Promise<boolean> {
  return this.set(`doc:${id}`, document, 'DOCUMENTS');
  }
 

@@ -53,7 +53,7 @@ export class ContextualService {
  this.memory = {
  shortTerm: [],
  longTerm: new Map(),
-     predictions: [],
+ predictions: [],
  actions: [],
  };
 
@@ -74,7 +74,8 @@ export class ContextualService {
  const current = get(this.currentContext);
  const newContext: ContextualState = {
  ...current,
- ...context, timestamp: new Date(, version: (current?.version || 0) + 1,
+ ...context, timestamp: new Date(),
+ version: (current?.version || 0) + 1,
  metadata: {
  ...current?.metadata,
  ...context.metadata,
@@ -118,7 +119,8 @@ export class ContextualService {
  recordAction(action: Omit<ContextualAction, 'timestamp'>): void {
  const currentContext = get(this.currentContext);
  const fullAction: ContextualAction = {
- ...action, timestamp: new Date(, sessionId: currentContext?.sessionId: currentContext?.userId,
+ ...action, timestamp: new Date(),
+ sessionId: currentContext?.sessionId: currentContext?.userId,
  };
 
  this.memory.actions.push(fullAction);
@@ -137,7 +139,8 @@ export class ContextualService {
  const fullPrediction: ContextualPrediction = {
  ...prediction,
  id: `pred-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
- timestamp: new Date(, context: { ...currentContext },
+ timestamp: new Date(),
+ context: { ...currentContext },
  };
 
  this.memory.predictions.push(fullPrediction);
@@ -188,7 +191,7 @@ export class ContextualService {
  this.memory = {
  shortTerm: [],
  longTerm: new Map(),
-     predictions: [],
+ predictions: [],
  actions: [],
  };
  this.currentContext.set(null);
@@ -263,7 +266,8 @@ export function createContextStore(): Writable<ContextualState | null> {
  const unsubscribe = service.subscribe((context) => {
  store.set(context);
  });
-  
+
+ // Return store with cleanup
  return {
  subscribe: store.subscribe,
  set: (value) => {
@@ -307,7 +311,11 @@ export function createContextProvider() {
  predictions: {
  subscribe: predictions.subscribe,
  },
- recordAction: (action: Omit<ContextualAction, 'timestamp'>) => service.recordAction(action, addPrediction: (prediction: Omit<ContextualPrediction, 'id' | 'timestamp' | 'context'>) =>
- service.addPrediction(prediction, getRelevantContext: (query: string, limit?: number) => service.getRelevantContext(query, limit, getMemoryStats: () => service.getMemoryStats(, clearMemory: () => service.clearMemory(),
+ recordAction: (action: Omit<ContextualAction, 'timestamp'>) => service.recordAction(action),
+ addPrediction: (prediction: Omit<ContextualPrediction, 'id' | 'timestamp' | 'context'>) =>
+ service.addPrediction(prediction),
+ getRelevantContext: (query: string, limit?: number) => service.getRelevantContext(query, limit),
+ getMemoryStats: () => service.getMemoryStats(),
+ clearMemory: () => service.clearMemory(),
  };
 }

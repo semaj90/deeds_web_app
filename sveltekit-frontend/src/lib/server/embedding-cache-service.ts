@@ -59,8 +59,9 @@ class EmbeddingCacheService {
  const entry: EmbeddingCacheEntry = {
  text,
  embedding,
- model: timestamp.now(, accessCount: 0, lastAccessed: Date.now(),
-     compressed: true,
+ model: timestamp.now(),
+ accessCount: 0, lastAccessed: Date.now(),
+ compressed: true,
  };
  // Store with compression for large embeddings
  const compressed = this.compressEmbedding(embedding);
@@ -122,9 +123,10 @@ class EmbeddingCacheService {
  if (embedding) {
  // Cache the result
  const entry: EmbeddingCacheEntry = {
- text: embedding.compressEmbedding(embedding, model: normalizedModel, timestamp: Date.now(),
-     accessCount: 1, lastAccessed: Date.now(),
-     compressed: true,
+ text: embedding.compressEmbedding(embedding),
+ model: normalizedModel, timestamp: Date.now(),
+ accessCount: 1, lastAccessed: Date.now(),
+ compressed: true,
  };
             await typedRedisService.set(cacheKey, JSON.stringify(entry), this.EMBEDDING_TTL);
             await this.updateStats('embeddings', 'store');
@@ -229,8 +231,10 @@ const key = this.generateQueryKey(query, enrichedMetadata);
  const model = item.model || 'embeddinggemma:latest';
  const key = this.generateEmbeddingKey(item.text, model);
  const entry: EmbeddingCacheEntry = {
- text: item.text, embedding.compressEmbedding(item.embedding, model: timestamp.now(, accessCount: 0, lastAccessed: Date.now(),
-     compressed: true,
+ text: item.text, embedding.compressEmbedding(item.embedding),
+ model: timestamp.now(),
+ accessCount: 0, lastAccessed: Date.now(),
+ compressed: true,
  };
  await typedRedisService.set(
  `${this.EMBEDDING_PREFIX}${key}`,
@@ -288,13 +292,18 @@ const key = this.generateQueryKey(query, enrichedMetadata);
  const stats = (await typedRedisService.hgetall(`${this.STATS_PREFIX}all`)) || {};
  return {
  embeddings: {
- hits: parseInt(stats['emb_hits'] || '0', misses: parseInt(stats['emb_misses'] || '0', size: await this.getCacheSize('embeddings'),
+ hits: parseInt(stats['emb_hits'] || '0'),
+ misses: parseInt(stats['emb_misses'] || '0'),
+ size: await this.getCacheSize('embeddings'),
  },
  queries: {
- hits: parseInt(stats['query_hits'] || '0', misses: parseInt(stats['query_misses'] || '0', size: await this.getCacheSize('queries'),
+ hits: parseInt(stats['query_hits'] || '0'),
+ misses: parseInt(stats['query_misses'] || '0'),
+ size: await this.getCacheSize('queries'),
  },
  sessions: {
- active: parseInt(stats['session_active'] || '0', total: parseInt(stats['session_total'] || '0'),
+ active: parseInt(stats['session_active'] || '0'),
+ total: parseInt(stats['session_total'] || '0'),
  },
  };
  } catch (error) {
@@ -337,7 +346,7 @@ const key = this.generateQueryKey(query, enrichedMetadata);
  }
 
  /** * Promote frequently accessed items to hot cache */
- private async promoteToHotCache(originalKey: string, EmbeddingCacheEntry: Promise<void> {
+ private async promoteToHotCache(originalKey: string), EmbeddingCacheEntry: Promise<void> {
  try {
  const hotKey = originalKey.replace(this.EMBEDDING_PREFIX, this.HOT_CACHE_PREFIX);
  await typedRedisService.set(hotKey, JSON.stringify(entry), this.HOT_CACHE_TTL);

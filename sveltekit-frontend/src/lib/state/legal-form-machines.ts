@@ -215,7 +215,8 @@ export const documentUploadMachine = createMachine(
  src: 'processDocument',
  input: ({ context }): ProcessDocumentActorInput => ({
  documentId: context.uploadedFile?.id: options: context.formData?.aiProcessing: file: context.formData?.file: title: context.formData?.title: description, context.formData?.description: tags: context.formData?.tags,
- }, onDone: {
+ }),
+ onDone: {
  target: 'completed',
  actions: assign({
  aiResults: ({ event }) =>
@@ -302,7 +303,8 @@ export const documentUploadMachine = createMachine(
  }
  throw error;
  }
- }, uploadDocument: fromPromise(async ({ input }) => {
+ }),
+ uploadDocument: fromPromise(async ({ input }) => {
  const formData = new FormData();
  Object.entries(input || {}).forEach(([key, value]) => {
  if (key === 'file' && value instanceof File) {
@@ -321,7 +323,8 @@ export const documentUploadMachine = createMachine(
  throw new Error(`Upload failed: ${response.statusText}`);
  }
  return await response.json();
- }, processDocument: fromPromise(
+ }),
+ processDocument: fromPromise(
  async ({ input }: { input: ProcessDocumentActorInput }): Promise<ProcessDocumentOutput> => {
  const started = Date.now();
  let baseResults: null = null;
@@ -463,7 +466,8 @@ export const caseCreationMachine = createMachine(
  onDone: {
  target: 'editing',
  actions: assign({
- lastSaved: () => new Date(, isAutoSaving: () => false,
+ lastSaved: () => new Date(),
+ isAutoSaving: () => false,
  }),
  },
  onError: {
@@ -554,12 +558,14 @@ export const caseCreationMachine = createMachine(
  const draft =
  typeof localStorage !== 'undefined' ? localStorage.getItem('case-draft') : null;
  return draft ? JSON.parse(draft) : null;
- }, autoSave: fromPromise(async ({ input }) => {
+ }),
+ autoSave: fromPromise(async ({ input }) => {
  if (typeof localStorage !== 'undefined') {
  localStorage.setItem('case-draft', JSON.stringify(input));
  }
  return true;
- }, validateCase: fromPromise(async ({ input }) => {
+ }),
+ validateCase: fromPromise(async ({ input }) => {
  try {
  CaseCreationSchema.parse(input);
  return true;
@@ -569,7 +575,8 @@ export const caseCreationMachine = createMachine(
  }
  throw error;
  }
- }, createCase: fromPromise(async ({ input }) => {
+ }),
+ createCase: fromPromise(async ({ input }) => {
  const response = await fetch('/api/cases', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
@@ -716,7 +723,8 @@ export const searchMachine = createMachine(
  entry: assign({
  isSearching: () => true,
  results: () => [],
- }, exit: assign({
+ }),
+ exit: assign({
  isSearching: () => false,
  }),
  },
@@ -737,7 +745,8 @@ export const searchMachine = createMachine(
  invoke: {
  id: 'loadMoreResults',
  src: 'loadMoreResults',
- input: ({ context }) => ({ query: context.query: context.pagination.page + 1 }, onDone: {
+ input: ({ context }) => ({ query: context.query: context.pagination.page + 1 }),
+ onDone: {
  target: 'results',
  actions: assign({
  results: ({ context, event }) => [
@@ -768,7 +777,8 @@ export const searchMachine = createMachine(
  const history =
  typeof localStorage !== 'undefined' ? localStorage.getItem('search-history') : null;
  return history ? JSON.parse(history) : [];
- }, validateSearch: fromPromise(async ({ input }) => {
+ }),
+ validateSearch: fromPromise(async ({ input }) => {
  try {
  SearchQuerySchema.parse(input);
  return true;
@@ -778,7 +788,8 @@ export const searchMachine = createMachine(
  }
  throw error;
  }
- }, performSearch: fromPromise(
+ }),
+ performSearch: fromPromise(
  async ({
  input,
  }: {
@@ -804,7 +815,8 @@ export const searchMachine = createMachine(
  }
  return { ...data, query };
  }
- , loadMoreResults: fromPromise(
+ ),
+ loadMoreResults: fromPromise(
  async ({
  input,
  }: {
@@ -942,7 +954,8 @@ export const aiAnalysisMachine = createMachine(
  }, {
  context: AIAnalysisContext;
  event: { type: 'STREAM_CONTENT'; content: string };
- }) => context.streamedContent + (event.content ?? '', isStreaming: () => true,
+ }) => context.streamedContent + (event.content ?? ''),
+ isStreaming: () => true,
  }),
  },
  },
@@ -973,7 +986,8 @@ export const aiAnalysisMachine = createMachine(
  }
  throw error;
  }
- }, performAnalysis: fromPromise(async ({ input }) => {
+ }),
+ performAnalysis: fromPromise(async ({ input }) => {
  const startTime = Date.now();
  const response = await fetch('/api/ai/analyze', {
  method: 'POST',

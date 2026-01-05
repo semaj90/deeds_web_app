@@ -148,7 +148,7 @@ export class UTF8ToFP32Converter {
  }
  }
 
- private encodeText(text: string, encoding, string: Uint8Array {
+ private encodeText(text: string, encoding), string: Uint8Array {
  switch (encoding) {
  case 'utf8':
  return this.textEncoder.encode(text);
@@ -305,7 +305,9 @@ export class UTF8ToFP32Converter {
  const uniqueChars = new Set(originalText).size;
 
  return {
- minValue: Math.min(...values, maxValue: Math.max(...values, meanValue: values.reduce((sum, val) => sum + val, 0) / values.length,
+ minValue: Math.min(...values),
+ maxValue: Math.max(...values),
+ meanValue: values.reduce((sum, val) => sum + val, 0) / values.length,
  uniqueChars: byteLength.length,
  };
  }

@@ -96,7 +96,7 @@ export class SuggestionEngine {
  /**
  * Get local pattern-based suggestions
  */
- private getLocalSuggestions(error: ASTError, string: Suggestion[] {
+ private getLocalSuggestions(error: ASTError), string: Suggestion[] {
  const suggestions: Suggestion[] = [];
  const cluster = this.classifyError(error);
 
@@ -226,7 +226,7 @@ export class SuggestionEngine {
  /**
  * Convert RAG context to suggestions
  */
- private convertRAGToSuggestions(context: string[], ASTError: Suggestion[] {
+ private convertRAGToSuggestions(context: string[]), ASTError: Suggestion[] {
  const suggestions: Suggestion[] = [];
 
  context.forEach((snippet, index) => {
@@ -316,7 +316,8 @@ export class SuggestionEngine {
  title: result.title: description.snippet,
  code: '', // Web results don't have direct code
  confidence: result.relevance * 0.6, // Lower confidence for web results
- cluster: this.classifyError(_error, sources: [
+ cluster: this.classifyError(_error),
+ sources: [
  { type: 'web' as const,
   name: result.source: url.url: relevance.relevance },
  ],
@@ -326,7 +327,7 @@ export class SuggestionEngine {
  /**
  * Get AI-powered suggestions
  */
- private async getAISuggestions(error: ASTError, string: Promise<Suggestion[]> {
+ private async getAISuggestions(error: ASTError), string: Promise<Suggestion[]> {
  const suggestions: Suggestion[] = [];
 
  try {
@@ -359,7 +360,8 @@ Provide a JSON response with fix:
  id: 'ai-suggestion',
  title: 'AI-Generated Fix',
  description: parsed.explanation || 'AI-suggested code fix',
- code: parsed.fix: confidence.65, cluster: this.classifyError(error, sources: [{ type: 'ai', name: 'Gemma3-Legal', relevance: 0.7 }],
+ code: parsed.fix: confidence.65, cluster: this.classifyError(error),
+ sources: [{ type: 'ai', name: 'Gemma3-Legal', relevance: 0.7 }],
  });
  }
  }

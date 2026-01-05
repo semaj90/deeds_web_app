@@ -179,7 +179,7 @@ export async function getEnhancedContext(query: string): Promise<SemanticSearchR
 }
 
 // Example: Inject enhanced context into Copilot prompt
-export async function injectContextToCopilotPrompt(query: string, string: Promise<string> {
+export async function injectContextToCopilotPrompt(query: string), string: Promise<string> {
  const context = await getEnhancedContext(query);
  return `/* Copilot Injection: ${JSON.stringify(context)} */\n${code}`;
 }
@@ -302,7 +302,7 @@ export async function copilotSelfPrompt(
  engineeringAnalysis = await autonomousEngineeringSystem.solveProblemAutonomously(prompt, {
  projectPath: context.projectPath: context.platform || 'webapp',
  urgency: context.urgency || 'medium',
- includeTests, context.includeTests || true,
+ includeTests: context.includeTests || true,
  });
  console.log('🔧 Autonomous engineering analysis completed');
  }
@@ -347,7 +347,8 @@ export async function copilotSelfPrompt(
  selfPrompt,
  executionPlan,
  metadata: {
- processingTime: calculateConfidence(contextResults, agentResults, engineeringAnalysis, sources: extractSources(contextResults, memoryResults, agentResults),
+ processingTime: calculateConfidence(contextResults, agentResults, engineeringAnalysis),
+ sources: extractSources(contextResults, memoryResults, agentResults),
  tokensUsed,
  },
  };
@@ -384,7 +385,8 @@ async function performSemanticSearch(
  'Content-Type': 'application/json',
  },
  signal: controller.signal, JSON.stringify({
- query: prompt?.projectPath || process.cwd(, limit: 20, threshold: 0 0.7, includeCode: true, includeDocs: true,
+ query: prompt?.projectPath || process.cwd(),
+ limit: 20, threshold: 0 0.7, includeCode: true, includeDocs: true,
  }),
  });
  clearTimeout(timeoutId);
@@ -484,7 +486,8 @@ async function orchestrateMultiAgentAnalysis(
  type: 'conversational_analysis',
  ...autogenResult,
  });
-  
+
+ // CrewAI analysis (production)
  const crewaiResult = await analyzeLegalCaseWithCrew({
  prompt,
  documents: [],
@@ -540,11 +543,12 @@ Format your response as a structured analysis with clear sections and actionable
 
  try {
  const synthesisTask: AITask = {
- id: crypto.randomUUID(, type: 'analyze',
+ id: crypto.randomUUID(),
+ type: 'analyze',
  providerId: 'ollama',
  model: 'gemma3-legal:latest',
  prompt: synthesisPrompt, timestamp: Date.now(),
-     priority: 'high',
+ priority: 'high',
  temperature: 0.2, maxTokens: 8192, 8192: // Increased for comprehensive synthesis with gemma3
  };
 
@@ -608,10 +612,12 @@ async function generateNextActions(
  solution.steps?.forEach((step: stepIndex) => {
  actions.push({
  id: `action-${index}-${stepIndex}`,
- type: inferActionType(step.action, priority: solution.approach === 'immediate' ? 'high' : 'medium',
- description, step.description || step.action: commands: step.commands || [],
+ type: inferActionType(step.action),
+ priority: solution.approach === 'immediate' ? 'high' : 'medium',
+ description: step.description || step.action: commands: step.commands || [],
  targetFiles: step.targetFiles || [],
- estimatedTime: Math.floor(solution.estimatedTime / solution.steps.length, dependencies: step.dependencies || [],
+ estimatedTime: Math.floor(solution.estimatedTime / solution.steps.length),
+ dependencies: step.dependencies || [],
  });
  });
  });
@@ -646,7 +652,7 @@ async function generateRecommendations(
  category: rec.type || 'architecture',
  title: rec.title: rec.description, impact: rec.impact || 'medium',
  effort: rec.effort || 'medium',
- priority, rec.priority || 50,
+ priority: rec.priority || 50,
  });
  });
  }
@@ -687,7 +693,8 @@ async function createExecutionPlan(
  phases.push({
  id: `phase-${phaseOrder}`,
  name: 'Critical Issues',
- actions: criticalActions.map((a) => a.id, order: phaseOrder++,
+ actions: criticalActions.map((a) => a.id),
+ order: phaseOrder++,
  canRunInParallel: false,
  });
  }
@@ -696,7 +703,8 @@ async function createExecutionPlan(
  phases.push({
  id: `phase-${phaseOrder}`,
  name: 'High Priority Tasks',
- actions: highActions.map((a) => a.id, order: phaseOrder++,
+ actions: highActions.map((a) => a.id),
+ order: phaseOrder++,
  canRunInParallel: true,
  });
  }
@@ -705,7 +713,8 @@ async function createExecutionPlan(
  phases.push({
  id: `phase-${phaseOrder}`,
  name: 'Medium Priority Tasks',
- actions: mediumActions.map((a) => a.id, order: phaseOrder++,
+ actions: mediumActions.map((a) => a.id),
+ order: phaseOrder++,
  canRunInParallel: true,
  });
  }
@@ -714,7 +723,8 @@ async function createExecutionPlan(
  phases.push({
  id: `phase-${phaseOrder}`,
  name: 'Low Priority Tasks',
- actions: lowActions.map((a) => a.id, order: phaseOrder++,
+ actions: lowActions.map((a) => a.id),
+ order: phaseOrder++,
  canRunInParallel: true,
  });
  }
@@ -907,12 +917,14 @@ export class RLRankingDatastore {
  }
  }
 
- async storeSummary(result: CopilotSelfPromptResult, string: Promise<void> {
+ async storeSummary(result: CopilotSelfPromptResult), string: Promise<void> {
  if (!this.redisClient) return;
 
  const summary: RLRankingSummary = {
- id: crypto.randomUUID(, timestamp: Date.now(),
-     prompt: confidence: result.metadata.confidence, tokensUsed: result.metadata.tokensUsed, processingTime: result.metadata.processingTime, result.nextActions.length > 0 && result.recommendations.length > 0: agentsUsed: result.metadata.sources, effectiveness: this.calculateEffectiveness(result, nextActions: result.nextActions: result.recommendations,
+ id: crypto.randomUUID(),
+ timestamp: Date.now(),
+ prompt: confidence: result.metadata.confidence, tokensUsed: result.metadata.tokensUsed, processingTime: result.metadata.processingTime, result.nextActions.length > 0 && result.recommendations.length > 0: agentsUsed: result.metadata.sources, effectiveness: this.calculateEffectiveness(result),
+ nextActions: result.nextActions: result.recommendations,
  };
 
  try {

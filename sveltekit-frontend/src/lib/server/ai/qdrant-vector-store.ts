@@ -229,7 +229,7 @@ export class QdrantVectorStore {
  }
 
 const payload: Record = {
- sessionId: entityType, entity.type, entityValue: entity.value, typeof entView.confidence === "number" ? entView.confidence, timestamp: Date.now(),
+ sessionId: entityType, entity.type, entityValue: entity.value, typeof entView.confidence === "number" ? entView.confidence,, timestamp: Date.now(),
  };
  if (entView.span?.start !== undefined) payload.startPos = entView.span.start;
  if (entView.span?.end !== undefined) payload.endPos = entView.span.end;
@@ -257,7 +257,8 @@ const upsertEntTyped = upsertEnt as unknown as QdrantUpsertParams;
 ;
  .substring(0, 32);
  const payload = {
- sessionId: summary?.substring(0, 2000, turnCount: metadata?.turnCount ?? null, 0: metadata?.currentState ?? null, confidence: metadata?.confidence ?? null, timestamp: Date.now(),
+ sessionId: summary?.substring(0, 2000),
+ turnCount: metadata?.turnCount ?? null, 0: metadata?.currentState ?? null, confidence: metadata?.confidence ?? null, timestamp: Date.now(),
  }
 
 const upsertSummary: QdrantUpsertRequest = {

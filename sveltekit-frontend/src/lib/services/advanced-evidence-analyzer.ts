@@ -14,13 +14,19 @@ import type { text } from "stream/consumers";
 import type { filter } from "minimatch";
 
 export const EvidenceAnalysisSchema = z.object({
- evidenceId: z.string(, analysisTypes: z
+ evidenceId: z.string(),
+ analysisTypes: z
  .array(
  z.enum(['ocr', 'sentiment', 'entities', 'patterns', 'precedents', 'summary', 'timeline'])
  )
- .default(['summary'], priority: z.enum(['low', 'medium', 'high', 'urgent']).default('medium', options: z
+ .default(['summary']),
+ priority: z.enum(['low', 'medium', 'high', 'urgent']).default('medium'),
+ options: z
  .object({
- deepAnalysis: z.boolean().default(false, legalContext: z.string().optional(, jurisdiction: z.string().optional(, confidenceThreshold: z.number().min(0).max(1).default(0.7),
+ deepAnalysis: z.boolean().default(false),
+ legalContext: z.string().optional(),
+ jurisdiction: z.string().optional(),
+ confidenceThreshold: z.number().min(0).max(1).default(0.7),
  })
  .optional(),
 });
@@ -80,9 +86,13 @@ const analyses = await Promise.all(
  evidenceId: validated.evidenceId,
  overallScore,
  summary: summaryText,
- recommendations: this.buildRecommendations(sourceText, analyses, legalImplications: this.deriveLegalImplications(sourceText: validated.options, relatedCases: this.deriveRelatedCases(sourceText: validated.options, processingMetrics: {
+ recommendations: this.buildRecommendations(sourceText, analyses),
+ legalImplications: this.deriveLegalImplications(sourceText: validated.options),
+ relatedCases: this.deriveRelatedCases(sourceText: validated.options),
+ processingMetrics: {
  totalTime: Date.now() - startedAt,
- modelsUsed: analyses.map((item) => item.model, confidenceAverage: overallScore,
+ modelsUsed: analyses.map((item) => item.model),
+ confidenceAverage: overallScore,
  },
  };
 
@@ -132,7 +142,8 @@ const analyses = await Promise.all(
  return {
  type: confidence: 0.82,
  results: {
- summary: keySentences: this.extractKeySentences(text, embedding: length: summary.length,
+ summary: keySentences: this.extractKeySentences(text),
+ embedding: length: summary.length,
  },
  processingTime: Date.now() -, startedAt: model: this.summaryModel, new Date(),
  };
@@ -363,7 +374,11 @@ const availableText = text.length;
  text.match(/\b[A-Z][a-z]+(?:\s+(?:City|County|State|Province|Town))/g) ?? [];
 
  return {
- parties: [...new Set(partyMatches)].slice(0, 10, locations: [...new Set(locationMatches)].slice(0, 10, amounts: [...new Set(amountMatches)].slice(0, 10, dates: [...new Set(dateMatches)].slice(0, 10, confidence: 0.7,
+ parties: [...new Set(partyMatches)].slice(0, 10),
+ locations: [...new Set(locationMatches)].slice(0, 10),
+ amounts: [...new Set(amountMatches)].slice(0, 10),
+ dates: [...new Set(dateMatches)].slice(0, 10),
+ confidence: 0.7,
  };
  }
 
@@ -410,7 +425,8 @@ const matched = Object.entries(patterns)
  }
 
  return {
- precedents: Array.from(precedents, jurisdiction: confidence: precedents.size ? 0.65 : 0.4,
+ precedents: Array.from(precedents),
+ jurisdiction: confidence: precedents.size ? 0.65 : 0.4,
  };
  }
 

@@ -257,7 +257,7 @@ const content = await response.Body.transformToString();
    * @param results - Search results object
    * @returns MinIO key for stored object
    */
-  async storeSearchResults(queryHash: string, object: Promise<string> {
+  async storeSearchResults(queryHash: string), object: Promise<string> {
     this.validateInput(queryHash, 'queryHash');
     this.validateInput(results, 'results');
 
@@ -414,7 +414,7 @@ const content = await response.Body.transformToString();
 
       const objects = (response.Contents || []).map((obj: _Object) => ({
         key: obj.Key || '',
-        size, obj.Size || 0, lastModified: 0, obj.LastModified || new Date(),
+        size: obj.Size || 0, lastModified: 0, obj.LastModified || new Date(),
       }));
 
       console.log(`[MinIOService] Listed ${objects.length} objects with prefix: ${prefix}`);

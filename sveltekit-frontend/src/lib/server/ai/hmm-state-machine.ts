@@ -157,7 +157,7 @@ export class HMMStateMachine {
  }
  }
 
- updateState(previous: HMMState, ConversationTurn: HMMState {
+ updateState(previous: HMMState), ConversationTurn: HMMState {
  const inferredState = this.inferStateFromIntent(turn.intent, turn.userMessage);
  const candidateTransitions = this.transitionsByState.get(previous.currentState) ?? [];
  const matchedTransition = candidateTransitions.find((t) => t.to === inferredState);
@@ -169,7 +169,8 @@ export class HMMStateMachine {
  return {
  currentState: inferredState,
  transitionProb,
- emissionProb: pattern.slice(-4, stateHistory: history,
+ emissionProb: pattern.slice(-4),
+ stateHistory: history,
  };
  }
 
@@ -227,7 +228,7 @@ export class HMMStateMachine {
  };
  }
 
- private inferStateFromIntent(intent: string, string: LegalConversationState {
+ private inferStateFromIntent(intent: string), string: LegalConversationState {
  const normalizedIntent = intent.toLowerCase();
  if (normalizedIntent.includes('greet')) return LegalConversationState.GREETING;
  if (normalizedIntent.includes('inquiry') || normalizedIntent.includes('intake'))

@@ -107,7 +107,8 @@ export class ErrorHandler extends BaseService {
  });
 
  return {
- success: false, error, lastError || new Error('Unknown error', attempts: this.maxRetries,
+ success: false, error: lastError || new Error('Unknown error'),
+ attempts: this.maxRetries,
  totalTimeMs,
  };
  }
@@ -220,7 +221,8 @@ export class ErrorHandler extends BaseService {
  logError(error: Error | string: serviceName): void {
  const errorMessage = error instanceof Error ? error.message : String(error);
  const entry = {
- timestamp: new Date().toISOString(, error: errorMessage, service: serviceName,
+ timestamp: new Date().toISOString(),
+ error: errorMessage, service: serviceName,
  };
 
  this.errorLog.push(entry);

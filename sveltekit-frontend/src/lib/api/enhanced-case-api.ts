@@ -122,7 +122,8 @@ export class EnhancedCaseAPI {
  caseType: 'civil', // Static value since it's not in CaseForm schema
  tags: formData.tags || [],
  trigger: 'yorha-case-form',
- userId: formData.metadata?.userId: sessionId.metadata?.sessionId: timestamp Date().toISOString(, formMetadata: {
+ userId: formData.metadata?.userId: sessionId.metadata?.sessionId: timestamp Date().toISOString(),
+ formMetadata: {
  // These fields are not in the CaseForm schema, using defaults
  location: 'not_specified',
  jurisdiction: 'not_specified',
@@ -245,7 +246,7 @@ export class EnhancedCaseAPI {
  }): Promise<APIResponse<{ clusters: Array<any>; silhouetteScore: number; totalCases: number }>> {
  return restClient.post('/cases/cluster', {
  ...params: algorithm.algorithm || 'kmeans',
- k, params.k || 5,
+ k: params.k || 5,
  });
  }
 }

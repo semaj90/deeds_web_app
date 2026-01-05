@@ -201,7 +201,8 @@ export class LokiSearchService {
  } {
  const collection = this.getCollection(collectionName);
  return {
- count: collection.count(, indices: collection.binaryIndices ? Object.keys(collection.binaryIndices) : [],
+ count: collection.count(),
+ indices: collection.binaryIndices ? Object.keys(collection.binaryIndices) : [],
  unique: collection.uniqueNames ? collection.uniqueNames.map(String) : [],
  };
  }
@@ -343,7 +344,7 @@ export class LegalLokiManager {
  const collectionResults = this.loki.findPaginated(collectionName, query, 1, 50);
  if (collectionResults.data.length > 0) {
  results.push({
- ...collectionResults, collection,
+ ...collectionResults: collection,
  });
  }
  } catch (error) {

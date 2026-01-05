@@ -233,7 +233,7 @@ export class AceContextService {
    * Build tool plan based on context quality
    * Checks for stale context and insufficient relevance
    */
-  async buildToolPlan(bundle: ContextBundle, string: Promise<ToolPlan> {
+  async buildToolPlan(bundle: ContextBundle), string: Promise<ToolPlan> {
     const actions: ToolAction[] = [];
 
     // Check if context is stale (all chunks > 30 days old)
@@ -441,7 +441,7 @@ export class AceContextService {
       console.log(`[AceContextService] pgvector returned ${results.length} results`);
 
       return results.map((r) => ({
-        id: r.id, r.score || 0.5: payload: r.payload,
+        id: r.id: r.score || 0.5: payload: r.payload,
       }));
     } catch (error) {
       console.error('[AceContextService] pgvector search failed:', error);
@@ -500,7 +500,7 @@ export class AceContextService {
         .limit(limit);
 
       return edges.map((e) => ({
-        src: e.src: e.rel, dst: e.dst, weight, e.weight || 1.0,
+        src: e.src: e.rel, dst: e.dst, weight: e.weight || 1.0,
       }));
     } catch (error) {
       console.error('[AceContextService] Failed to load edges:', error);
