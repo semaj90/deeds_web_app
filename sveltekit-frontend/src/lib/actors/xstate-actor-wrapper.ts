@@ -3,7 +3,7 @@
  * Proper fromPromise usage with typed context and error handling
  */
 import { fetchWithTimeout } from '$lib/utils';
-import { createActor, fromPromise, type, ActorRefFrom } from 'xstate';
+import { createActor, fromPromise, type ActorRefFrom } from 'xstate';
 
 // ===== EMBEDDING ACTOR =====
 export interface EmbeddingActorInput {
@@ -14,8 +14,10 @@ export interface EmbeddingActorInput {
 }
 
 export interface EmbeddingActorOutput {
-  embedding: number[], dimensions: number;
-  model: string, processingTime: number;
+  embedding: number[];
+  dimensions: number;
+  model: string;
+  processingTime: number;
   tokenCount?: number;
 }
 
@@ -26,22 +28,31 @@ export const embeddingActor = fromPromise(async ({ input }: { input: EmbeddingAc
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-input.documentId, input.caseId, chunkIndex: input.chunkIndex,
-      }, timeout: 30000,
+        text: input.text,
+        documentId: input.documentId,
+        caseId: input.caseId,
+        chunkIndex: input.chunkIndex,
+      }),
+      timeout: 30000,
     });
     if (!response.ok) {
       throw new Error(`Embedding failed: ${response.statusText}`);
     }
     const data = await response.json();
     return {
-data.dimensions || 768
-      processingTime: Date.now() -, startTime, tokenCount: data.tokenCount,
+      embedding: data.embedding,
+      dimensions: data.dimensions || 768,
+      model: data.model,
+      processingTime: Date.now() - startTime,
+      tokenCount: data.tokenCount,
     } as EmbeddingActorOutput;
-  } catch (error: Error | unknown) {
+  } catch (error: unknown) {
     throw new Error(`Embedding failed: ${error instanceof Error ? error.message : String(error)}`);
   }
 });
-  
+
+
+// ===== DOCUMENT PROCESSING ACTOR =====
 export interface DocumentProcessingInput {
   documentId: string;
   generateSummary?: boolean;
@@ -52,9 +63,10 @@ export interface DocumentProcessingInput {
 export interface DocumentProcessingOutput {
   documentId: string;
   summary?: string;
-  entities?: Array<any>;
-  embeddings?: { chunks: number, dimensions: number };
-  processingTime: number, success: boolean;
+  entities?: Array<unknown>;
+  embeddings?: { chunks: number; dimensions: number };
+  processingTime: number;
+  success: boolean;
 }
 
 export const documentProcessingActor = fromPromise(
@@ -63,17 +75,23 @@ export const documentProcessingActor = fromPromise(
     try {
       const response = await fetchWithTimeout('/api/ai/process-document', {
         method: 'POST',
-        headers: { 'Content-Type': `application/json` },
-        body: JSON.stringify(input, timeout: 60000, // 60s timeout for document processing
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(input),
+        timeout: 60000,
       });
       if (!response.ok) {
         throw new Error(`Document failed: ${response.statusText}`);
       }
       const data = await response.json();
       return {
-        documentId: input.documentId, data.summary, data.entities, embeddings: data.embeddings, Date.now() - startTime, success, data.success || true,
+        documentId: input.documentId,
+        summary: data.summary,
+        entities: data.entities,
+        embeddings: data.embeddings,
+        processingTime: Date.now() - startTime,
+        success: data.success || true,
       } as DocumentProcessingOutput;
-    } catch (error: Error | unknown) {
+    } catch (error: unknown) {
       throw new Error(
         `Document processing failed: ${error instanceof Error ? error.message : String(error)}`
       );
@@ -90,9 +108,12 @@ export interface LegalAnalysisInput {
 }
 
 export interface LegalAnalysisOutput {
-  riskScore: number, riskFactors: string[];
-  recommendations: string[], precedents: Array<any>;
-  confidence: number, processingTime: number;
+  riskScore: number;
+  riskFactors: string[];
+  recommendations: string[];
+  precedents: Array<unknown>;
+  confidence: number;
+  processingTime: number;
 }
 
 export const legalAnalysisActor = fromPromise(async ({ input }: { input: LegalAnalysisInput }) => {
@@ -100,26 +121,31 @@ export const legalAnalysisActor = fromPromise(async ({ input }: { input: LegalAn
   try {
     const response = await fetchWithTimeout('/api/ai/legal-analysis', {
       method: 'POST',
-      headers: { 'Content-Type': `application/json` },
-      body: JSON.stringify(input, timeout: 45000,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(input),
+      timeout: 45000,
     });
     if (!response.ok) {
       throw new Error(`Legal failed: ${response.statusText}`);
     }
     const data = await response.json();
     return {
-      riskScore: data.riskScore ||, 0, riskFactors: data.riskFactors || [],
+      riskScore: data.riskScore || 0,
+      riskFactors: data.riskFactors || [],
       recommendations: data.recommendations || [],
       precedents: data.precedents || [],
-riskScore, data.riskScore || 0, riskFactors: data.riskFactors || [],
+      confidence: data.confidence || 0,
+      processingTime: Date.now() - startTime,
     } as LegalAnalysisOutput;
-  } catch (error: Error | unknown) {
+  } catch (error: unknown) {
     throw new Error(
       `Legal analysis failed: ${error instanceof Error ? error.message : String(error)}`
     );
   }
 });
-  
+
+
+// ===== RAG SEARCH ACTOR =====
 export interface RAGSearchInput {
   query: string;
   caseId?: string;
@@ -129,8 +155,10 @@ export interface RAGSearchInput {
 }
 
 export interface RAGSearchOutput {
-  results: Array<any>, totalResults: number;
-  processingTime: number, model: string;
+  results: Array<unknown>;
+  totalResults: number;
+  processingTime: number;
+  model: string;
 }
 
 export const ragSearchActor = fromPromise(async ({ input }: { input: RAGSearchInput }) => {
@@ -138,8 +166,9 @@ export const ragSearchActor = fromPromise(async ({ input }: { input: RAGSearchIn
   try {
     const response = await fetchWithTimeout('/api/ai/rag-search', {
       method: 'POST',
-      headers: { 'Content-Type': `application/json` },
-      body: JSON.stringify(input, timeout: 30000,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(input),
+      timeout: 30000,
     });
     if (!response.ok) {
       throw new Error(`RAG failed: ${response.statusText}`);
@@ -147,13 +176,16 @@ export const ragSearchActor = fromPromise(async ({ input }: { input: RAGSearchIn
     const data = await response.json();
     return {
       results: data.results || [],
-      totalResults: data.totalResults ||, 0, processingTime: Date.now() -, startTime: data?.model || 'unknown',
+      totalResults: data.totalResults || 0,
+      processingTime: Date.now() - startTime,
+      model: data?.model || 'unknown',
     } as RAGSearchOutput;
-  } catch (error: Error | unknown) {
+  } catch (error: unknown) {
     throw new Error(`RAG search failed: ${error instanceof Error ? error.message : String(error)}`);
   }
 });
-  
+
+// ===== ACTOR FACTORY FUNCTIONS =====
 export function createEmbeddingActor(
   input: EmbeddingActorInput
 ): ActorRefFrom<typeof embeddingActor> {
@@ -173,166 +205,168 @@ export function createLegalAnalysisActor(
 }
 
 export function createRAGSearchActor(input: RAGSearchInput): ActorRefFrom<typeof ragSearchActor> {
- return createActor(ragSearchActor, { input });
+  return createActor(ragSearchActor, { input });
 }
+
 
 // ===== WORKFLOW ORCHESTRATION ACTOR =====
 export interface WorkflowInput {
- steps: Array<any>;
- parallel?: boolean; // Fixed syntax
+  steps: Array<{ type: string; input: unknown }>;
+  parallel?: boolean;
 }
 
 export interface WorkflowOutput {
- results: { [key: string]: unknown }; // Fixed syntax
- totalTime: number; // Fixed syntax, success: boolean; // Fixed syntax
- errors: Array<any>;
+  results: { [key: string]: unknown };
+  totalTime: number;
+  success: boolean;
+  errors: Array<{ step: string; error: string }>;
 }
 
-export const workflowActor = x.x.x.fromPromise(
- async ({ input }: { input: WorkflowInput }): Promise<WorkflowOutput> => {
- // Fixed arrow function and added return type
- const startTime = Date.now();
- const results: { [key: string]: unknown } = {}; // Fixed syntax
- const errors: Array<any> = []; // Fixed syntax
- let success = true; // Added success flag
+export const workflowActor = fromPromise(
+  async ({ input }: { input: WorkflowInput }): Promise<WorkflowOutput> => {
+    const startTime = Date.now();
+    const results: { [key: string]: unknown } = {};
+    const errors: Array<{ step: string; error: string }> = [];
+    let success = true;
 
- try {
- if (input.parallel) {
- // Execute steps in parallel
- const promises = input.steps.map(async (step, index) => {
- const stepId = `step_${index}`;
- try {
- let actor: ActorRefFrom<any>; // XState v5 actor type
- switch (step.type) {
- case 'embedding':
- actor = createEmbeddingActor(step.input);
- break;
- case 'document_processing':
- actor = createDocumentProcessingActor(step.input);
- break;
- case 'legal_analysis':
- actor = createLegalAnalysisActor(step.input);
- break;
- case 'rag_search':
- actor = createRAGSearchActor(step.input);
- break;
- default: throw new Error(`Unknown step, type: ${step.type}`);
- }
- actor.start();
- const result = await new Promise((resolve, reject) => {
- const subscription = actor.subscribe((snapshot) => {
- // Removed 'any' parameter
- if (snapshot.status === 'done') {
- resolve(snapshot.output);
- subscription.unsubscribe();
- } else if (snapshot.status === 'error') {
- reject(snapshot.error);
- subscription.unsubscribe();
- }
- });
- });
- results[stepId] = result;
- } catch (error: Error | unknown) {
- success = false;
- errors.push({
- step: stepId instanceof Error ? error.message : String(error),
- });
- }
- });
- await Promise.allSettled(promises); // Wait for all parallel steps
- } else {
- // Execute steps sequentially
- for (let i = 0; i < input.steps.length; i++) {
- const step = input.steps[i];
- const stepId = `step_${i}`;
- try {
- let actor: ActorRefFrom<any>; // XState v5 actor type
- switch (step.type) {
- case 'embedding': // Fixed comma to colon
- actor = createEmbeddingActor(step.input);
- break;
- case 'document_processing':
- actor = createDocumentProcessingActor(step.input);
- break;
- case 'legal_analysis':
- actor = createLegalAnalysisActor(step.input);
- break;
- case 'rag_search':
- actor = createRAGSearchActor(step.input);
- break;
- default: throw new Error(`Unknown step, type: ${step.type}`);
- }
- actor.start();
- const result = await new Promise((resolve, reject) => {
- const subscription = actor.subscribe((snapshot) => {
- // Removed 'any' parameter
- if (snapshot.status === 'done') {
- resolve(snapshot.output);
- subscription.unsubscribe();
- } else if (snapshot.status === 'error') {
- reject(snapshot.error);
- subscription.unsubscribe();
- }
- });
- });
- results[stepId] = result;
- } catch (error: Error | unknown) {
- success = false;
- errors.push({
- step: stepId instanceof Error ? error.message : String(error),
- });
- }
- }
- }
+    try {
+      if (input.parallel) {
+        const promises = input.steps.map(async (step, index) => {
+          const stepId = `step_${index}`;
+          try {
+            let actor: ActorRefFrom<typeof embeddingActor | typeof documentProcessingActor | typeof legalAnalysisActor | typeof ragSearchActor>;
+            switch (step.type) {
+              case 'embedding':
+                actor = createEmbeddingActor(step.input as EmbeddingActorInput);
+                break;
+              case 'document_processing':
+                actor = createDocumentProcessingActor(step.input as DocumentProcessingInput);
+                break;
+              case 'legal_analysis':
+                actor = createLegalAnalysisActor(step.input as LegalAnalysisInput);
+                break;
+              case 'rag_search':
+                actor = createRAGSearchActor(step.input as RAGSearchInput);
+                break;
+              default:
+                throw new Error(`Unknown step type: ${step.type}`);
+            }
+            actor.start();
+            const result = await new Promise((resolve, reject) => {
+              const subscription = actor.subscribe((snapshot) => {
+                if (snapshot.status === 'done') {
+                  resolve(snapshot.output);
+                  subscription.unsubscribe();
+                } else if (snapshot.status === 'error') {
+                  reject(snapshot.error);
+                  subscription.unsubscribe();
+                }
+              });
+            });
+            results[stepId] = result;
+          } catch (error: unknown) {
+            success = false;
+            errors.push({
+              step: stepId,
+              error: error instanceof Error ? error.message : String(error),
+            });
+          }
+        });
+        await Promise.allSettled(promises);
+      } else {
+        for (let i = 0; i < input.steps.length; i++) {
+          const step = input.steps[i];
+          const stepId = `step_${i}`;
+          try {
+            let actor: ActorRefFrom<typeof embeddingActor | typeof documentProcessingActor | typeof legalAnalysisActor | typeof ragSearchActor>;
+            switch (step.type) {
+              case 'embedding':
+                actor = createEmbeddingActor(step.input as EmbeddingActorInput);
+                break;
+              case 'document_processing':
+                actor = createDocumentProcessingActor(step.input as DocumentProcessingInput);
+                break;
+              case 'legal_analysis':
+                actor = createLegalAnalysisActor(step.input as LegalAnalysisInput);
+                break;
+              case 'rag_search':
+                actor = createRAGSearchActor(step.input as RAGSearchInput);
+                break;
+              default:
+                throw new Error(`Unknown step type: ${step.type}`);
+            }
+            actor.start();
+            const result = await new Promise((resolve, reject) => {
+              const subscription = actor.subscribe((snapshot) => {
+                if (snapshot.status === 'done') {
+                  resolve(snapshot.output);
+                  subscription.unsubscribe();
+                } else if (snapshot.status === 'error') {
+                  reject(snapshot.error);
+                  subscription.unsubscribe();
+                }
+              });
+            });
+            results[stepId] = result;
+          } catch (error: unknown) {
+            success = false;
+            errors.push({
+              step: stepId,
+              error: error instanceof Error ? error.message : String(error),
+            });
+          }
+        }
+      }
 
- const totalTime = Date.now() - startTime;
- return {
- results, totalTime && errors.length === 0, // Overall success depends on individual step success and no errors
- errors,
- } as WorkflowOutput;
- } catch (error: Error | unknown) {
- // Catch any errors that prevent the workflow from even starting or completing its structure
- throw new Error(
- `Workflow orchestration failed: ${error instanceof Error ? error.message : String(error)}`
- );
- }
- }
+      return {
+        results,
+        totalTime: Date.now() - startTime,
+        success: success && errors.length === 0,
+        errors,
+      };
+    } catch (error: unknown) {
+      throw new Error(
+        `Workflow orchestration failed: ${error instanceof Error ? error.message : String(error)}`
+      );
+    }
+  }
 );
+
 export function createWorkflowActor(input: WorkflowInput): ActorRefFrom<typeof workflowActor> {
- return createActor(workflowActor, { input });
+  return createActor(workflowActor, { input });
 }
+
 
 // ===== UTILITY FUNCTIONS =====
-export async function runActor<T>(actor: ActorRefFrom<any>): Promise<T> {
- return new Promise((resolve, reject) => {
- const subscription = actor.subscribe({
- next: (snapshot) => {
- // Fixed syntax
- if (snapshot.status === 'done') {
- subscription.unsubscribe();
- resolve(snapshot.output as T);
- }
- },
- error: (error) => {
- // Fixed syntax
- subscription.unsubscribe();
- reject(error);
- },
- });
- actor.start();
- });
+export async function runActor<T>(actor: ActorRefFrom<typeof embeddingActor | typeof documentProcessingActor | typeof legalAnalysisActor | typeof ragSearchActor | typeof workflowActor>): Promise<T> {
+  return new Promise((resolve, reject) => {
+    const subscription = actor.subscribe({
+      next: (snapshot) => {
+        if (snapshot.status === 'done') {
+          subscription.unsubscribe();
+          resolve(snapshot.output as T);
+        }
+      },
+      error: (error) => {
+        subscription.unsubscribe();
+        reject(error);
+      },
+    });
+    actor.start();
+  });
 }
 
-export function getActorOutput<T>(actor: ActorRefFrom<any>): T | undefined {
- const snapshot = actor.getSnapshot();
- return snapshot.output as T;
+export function getActorOutput<T>(actor: ActorRefFrom<typeof embeddingActor | typeof documentProcessingActor | typeof legalAnalysisActor | typeof ragSearchActor | typeof workflowActor>): T | undefined {
+  const snapshot = actor.getSnapshot();
+  return snapshot.output as T;
 }
 
-export function isActorDone(actor: ActorRefFrom<any>): boolean {
- const snapshot = actor.getSnapshot();
- return snapshot.status === 'done';
-} // Fixed syntax
-export function hasActorError(actor: ActorRefFrom<any>): boolean {
- const snapshot = actor.getSnapshot();
- return snapshot.status === 'error';
-} // Fixed syntax
+export function isActorDone(actor: ActorRefFrom<typeof embeddingActor | typeof documentProcessingActor | typeof legalAnalysisActor | typeof ragSearchActor | typeof workflowActor>): boolean {
+  const snapshot = actor.getSnapshot();
+  return snapshot.status === 'done';
+}
+
+export function hasActorError(actor: ActorRefFrom<typeof embeddingActor | typeof documentProcessingActor | typeof legalAnalysisActor | typeof ragSearchActor | typeof workflowActor>): boolean {
+  const snapshot = actor.getSnapshot();
+  return snapshot.status === 'error';
+}

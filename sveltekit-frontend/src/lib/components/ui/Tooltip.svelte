@@ -1,15 +1,43 @@
 <script lang="ts">
- // Truncated file - replaced with stub
+	import { Tooltip } from 'bits-ui';
+	import { fade } from 'svelte/transition';
+
+	let {
+		content = '',
+		placement = 'top' as 'top' | 'bottom' | 'left' | 'right',
+		children
+	} = $props<{
+		content?: string;
+		placement?: 'top' | 'bottom' | 'left' | 'right';
+		children?: import('svelte').Snippet;
+	}>();
 </script>
 
-<main class="page-repair">
- <h1>Page under reconstruction</h1>
- <p>This placeholder replaces corrupted or missing markup for now.</p>
-</main>
+<Tooltip.Root delayDuration={400}>
+	<Tooltip.Trigger>
+		{#snippet child({ props })}
+			<div {...props} class="tooltip-trigger-wrapper">
+				{@render children?.()}
+			</div>
+		{/snippet}
+	</Tooltip.Trigger>
+
+	<Tooltip.Portal>
+		<Tooltip.Content
+			side={placement}
+			sideOffset={8}
+			class="z-50 overflow-hidden rounded-md bg-gray-900 px-3 py-1.5 text-xs text-white shadow-md"
+			transition={fade}
+			transitionConfig={{ duration: 150 }}
+		>
+			{content}
+			<Tooltip.Arrow class="fill-gray-900" />
+		</Tooltip.Content>
+	</Tooltip.Portal>
+</Tooltip.Root>
 
 <style>
- .page-repair {
- padding: 2rem;
- font-family: sans-serif;
- }
+	.tooltip-trigger-wrapper {
+		display: inline-block;
+	}
 </style>

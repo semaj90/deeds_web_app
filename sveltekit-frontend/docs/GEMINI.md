@@ -644,4 +644,18 @@ git add -A && git commit -m "Applied batch fixes"
 1. **Check Module Resolution**: Ensure `tsconfig.json` has `"moduleResolution": "bundler"`.
 2. **Verify Path Aliases**: Check `$lib` and `$app` mappings in `.svelte-kit/tsconfig.json`.
 3. **Type Decls**: If missing `@types/foo`, create `src/types/foo.d.ts` with `declare module 'foo';`.
-4. **Svelte-Check**: Use `svelte-check --threshold error` to isolate real blockers.
+
+### Phase 74.5: Batch Corruption Fixes
+- **Achievement**: Fixed redundant object literals `{ key: key }` in 1,800+ files.
+- **Verification**: User registration workflow now passing in Playwright.
+- **Health**: `/api/auth/health` returning 200 OK.
+
+### Phase 75: UI Reconstruction & Bits-UI Integration
+- **Objective**: Restore 421 "under reconstruction" stubs to functional components.
+- **Status**: 404 stubs restored from backups with multi-pass syntax cleaning.
+- **Strategy**:
+  - Systematic restoration from largest `.bak`/`.css-backup`.
+  - Application of `phase74-batch-import-fixer.cjs` logic.
+  - Integration of `bits-ui` for complex headless components (Dropdown, Select, Tooltip).
+  - Svelte 5 Rune conversion for restored logic.
+

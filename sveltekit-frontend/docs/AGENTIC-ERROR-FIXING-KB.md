@@ -448,6 +448,42 @@ npx svelte-check --threshold error 2>&1 | tail -5
 - [ ] Error count tracked in logs
 - [ ] Token accounting enabled
 
+
+---
+
+## 📊 Phase 74/75: Advanced Agentic Error Fixing & UI Restoration
+
+### Stub Restoration Strategy
+Many files were previously replaced with "Page under reconstruction" stubs to bypass build errors. Phase 75 focuses on:
+1. **Detection**: Finding files with `<h1>Page under reconstruction</h1>`.
+2. **Restoration**: Reverting to the largest backup (`.css-backup`, `.bak-phase42...`).
+3. **Multi-Pass Correction**:
+   - Fix **Redundant Object Literals**: `{ key: key }` → `{ key }`.
+   - Fix **Colon-Instead-of-Space**: `as: 'foo'` → `as 'foo'`.
+   - Fix **Displaced Types**: `), Type: ReturnType` → `): ReturnType`.
+   - Fix **CSS placeholders**: Replaces `{}` in complex CSS properties with valid values.
+4. **Svelte 5 Lifecycle Update**: Replace `<slot />` with `{@render children?.()}`.
+
+### UI Transformation: Bits-UI (Svelte 5)
+- **Objective**: Replace unstable custom headless components with `@bits-ui`.
+- **Bits-UI Pattern**:
+  ```svelte
+  <Component.Trigger>
+    {#snippet child({ props })}
+      <button {...props} onclick={() => console.log('clicked')}>
+        Trigger
+      </button>
+    {/snippet}
+  </Component.Trigger>
+  ```
+- **Reactivity Upgrade**: Transition components from `$state` stubs back to fully-realized reactive logic using Svelte 5 runes.
+
+### ACE Contextual Engineering Extensions
+- **RAG**: Use `npx svelte-check --output machine` results as the searchable index for targeted fixes.
+- **KAG**: Build a dependency graph of stubs to prioritize restoring "hub" components (like `Button` or `Input`) that many other pages depend on.
+- **DAG**: Execute restoration tasks in topological order of the dependency graph to minimize cascading errors.
+
 ---
 
 *This document is optimized for RAG retrieval by AI agents fixing svelte-check errors.*
+

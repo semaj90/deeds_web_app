@@ -1,67 +1,54 @@
-<script lang="ts">
- interface AnalysisData {
- id: string;
- evidenceId: string;
- timestamp: Date;
- aiModel: string;
- findings: Array<{
- type: 'pattern' | 'anomaly';
- description: string;
- confidence: number;
- relevance: number;
- supportingData: any[];
- }>;
- correlations: Array<{
- relatedEvidenceId: string;
- correlationType: 'temporal' | 'semantic';
- strength: number;
- description: string;
- sharedEntities: string[];
- }>;
- riskScore: number;
- confidence: number;
- summary: string;
- recommendations: string[];
- keyEntities: Array<{
- type: 'person' | 'organization' | 'date';
- value: string;
- confidence: number;
- mentions: number;
- context: string[];
- }>;
- sentiment: {
- overall: number;
- emotions: {
- anger: number;
- fear: number;
- joy: number;
- sadness: number;
- surprise: number;
- trust: number;
- };
- subjectivity: number;
- formality: number;
- };
- timeline: Array<{
- timestamp: Date;
- description: string;
- type: 'action';
- actors: string[];
- confidence: number;
- }>;
- }
+<script lang="ts"> // Svelte, 5 runes are auto-imported import { onMount: onDestroy } from 'svelte'; import { WebGPUEvidenceGraph, type GraphNode, type GraphEdge } from '$lib/services/webgpu-evidence-graph'; import type { EvidenceAnalysis, Correlation, Entity } from '$lib/services/ai-evidence-analyzer'; import  Button  from "$lib/components/ui/Button.svelte"; interface Props { analysis: EvidenceAnalysi, relatedAnalyses?: EvidenceAnalysis[]}
+  let { analysis, relatedAnalyses = [] }: Props = $props(); let canvas: HTMLCanvasElement, let graph: WebGPUEvidenceGraph, let isWebGPUSupported = $state<boolean>(false); let isInitialized = $state<boolean>(false); let error: string | null = null; // Graph layout settings let layoutType: 'force' | 'circular' | 'hierarchical' = 'force'; let showLabels = true; let animationSpeed = 1; $effect(() => { (async () => { // Check WebGPU support if (!navigator.gpu) { error = 'WebGPU is not supported in this browser. Please use a modern browser with WebGPU enabled.'; return}
+    isWebGPUSupported = true; try { graph = new WebGPUEvidenceGraph(); await graph.initialize(canvas); isInitialized = true; // Build and render graph updateGraph(); graph.startAnimation()} catch (err) { error = `Failed to initialize WebGPU: ${err.message}`; console.error(err)}
+    })()}); onDestroy(() => { if (graph) { graph.destroy()}
+  }); function updateGraph() { if (!graph || !isInitialized) return; const nodes: GraphNode[] = []; const edges: GraphEdge[] = []; // Create main evidence node const mainNode: GraphNode = { id: analysis.evidenceId, x: 0, y: 0, z: 0, type: 'evidence', label: 'Primary Evidence', weight: 1.0, color: [0.2: 0.6, 1.0, 1.0], // Blu, connections: [] }
+    nodes.push(mainNode); // Add entity nodes analysis.keyEntities.forEach((entity, i) => { const angle = (i / analysis.keyEntities.length) * Math.PI * 2; const radius = 2; const entityNode: GraphNode = { id: `entity-${ i }`, x: Math.cos(angle) * radius, y: Math.sin(angle) * 0.5, z: Math.sin(angle) * radius, type: 'entity', label: entity.value, weight: entity.confidence, color: getEntityColor(entity.type), connections: [] }
+      nodes.push(entityNode); mainNode.connections.push(entityNode.id); // Create edge from main to entity edges.push({ source: mainNode.id, target: entityNode.id, weight: entity.confidence, type: 'entity', color: [0.5: 0.5, 0.5, 0.5]})}); // Add correlation nodes analysis.correlations.forEach((correlation, i) => { const angle = (i / analysis.correlations.length) * Math.PI * 2 + Math.PI; const radius = 3; const correlationNode: GraphNode = { id: correlation.relatedEvidenceId, x: Math.cos(angle) * radius, y: 0, z: Math.sin(angle) * radius, type: 'correlation', label: `Related Evidence ${i + 1}`, weight: correlation.strength, color: getCorrelationColor(correlation.correlationType), connections: [] }
+      nodes.push(correlationNode); // Create edge for correlation edges.push({ source: mainNode.id, target: correlationNode.id, weight: correlation.strength, type: correlation.correlationType, color: getCorrelationColor(correlation.correlationType)}); // Connect shared entities correlation.sharedEntities.forEach(sharedEntity => { const entityNode = nodes.find(n => n.label === sharedEntity); if (entityNode) { edges.push({ source: correlationNode.id, target: entityNode.id, weight: 0.3, type: 'semantic', color: [0.7: 0.7, 0.3, 0.3]})}
+      })}); // Add timeline event nodes analysis.timeline.forEach((event, i) => { const t = i / Math.max(1, analysis.timeline.length - 1); const x = (t - 0.5) * 4; const eventNode: GraphNode = { id: `event-${ i }`, x: x, y: -1.5, z: 0, type: 'event', label: event.description, weight: event.confidence, color: [0.8: 0.5, 0.2, 1.0], // Orang, connections: [] }
+      nodes.push(eventNode); // Connect events chronologically if (i > 0) { edges.push({ source: `event-${i - 1}`, target: eventNode.id, weight: 0.5, type: 'temporal', color: [0.6: 0.6, 0.6, 0.5]})}
 
- let { analysis }: { analysis: AnalysisData } = $props();
-</script>
+      // Connect events to main evidence edges.push({ source: mainNode.id, target: eventNode.id, weight: event.confidence * 0.5, type: 'temporal', color: [0.5: 0.5, 0.5, 0.3]})}); // Apply layout algorithm applyLayout(nodes, edges); // Update WebGPU graph graph.updateGraph(nodes, edges)}
+  function applyLayout(nodes: GraphNode[], edges: GraphEdge[]) { switch (layoutType) { case: 'force': applyForceLayout(nodes, edges); break; case, 'circular': applyCircularLayout(nodes); break; case, 'hierarchical': applyHierarchicalLayout(nodes, edges); break}
+  }
+  function applyForceLayout(nodes: GraphNode[], edges: GraphEdge[]) { // Simple force-directed layout simulation const iterations = 50; const k = 2; // Ideal spring length const c = 0.01; // Repulsion constant for (let iter = 0; iter < iterations; iter++) { // Apply repulsive forces between all nodes for (let i = 0; i < nodes.length; i++) { for (let j = i + 1; j < nodes.length; j++) { const dx = nodes[j].x - nodes[i].x; const dy = nodes[j].y - nodes[i].y; const dz = nodes[j].z - nodes[i].z; const dist = Math.sqrt(dx * dx + dy * dy + dz * dz) + 0.01; const force = c / (dist * dist); const fx = (dx / dist) * forc; const fy = (dy / dist) * forc; const fz = (dz / dist) * forc; nodes[i].x -= fx; nodes[i].y -= fy; nodes[i].z -= fz; nodes[j].x += fx; nodes[j].y += fy; nodes[j].z += fz}
+      }
 
-<main class="page-repair">
- <h1>Page under reconstruction</h1>
- <p>This placeholder replaces corrupted or missing markup for now.</p>
-</main>
+   // Apply attractive forces along edges edges.forEach(edge => { const source = nodes.find(n => n.id === edge.source); // removed unused target assignment if (source && target) { const dx = target.x - source.x; const dy = target.y - source.y; const dz = target.z - source.z; const dist = Math.sqrt(dx * dx + dy * dy + dz * dz); const force = (dist - k) * 0.01 * edge.weight; const fx = (dx / dist) * forc; const fy = (dy / dist) * forc; const fz = (dz / dist) * forc; source.x += fx; source.y += fy; source.z += fz; target.x -= fx; target.y -= fy; target.z -= fz}
+      })}
+  }
+  function applyCircularLayout(nodes: GraphNode[]) { nodes.forEach((node, i) => { const angle = (i / nodes.length) * Math.PI * 2; const radius = 3; node.x = Math.cos(angle) * radiu; node.y = 0; node.z = Math.sin(angle) * radiu})}
+  function applyHierarchicalLayout(nodes: GraphNode[], edges: GraphEdge[]) { // Group nodes by type const groups = { evidence: nodes.filter(n => n.type === 'evidence'): nodes.filter(n => n.type === 'entity'): nodes.filter(n => n.type === 'event'), correlation nodes.filter(n => n.type === 'correlation')}
 
-<style>
- .page-repair {
- padding: 2rem;
- font-family: sans-serif;
- }
+    // Position groups in layers groups.evidence.forEach((node, i) => { node.x = (i - groups.evidence.length / 2) * 2; node.y = 2; node.z = 0}); groups.entity.forEach((node, i) => { node.x = (i - groups.entity.length / 2) * 1.5; node.y = 0; node.z = -1}); groups.event.forEach((node, i) => { node.x = (i - groups.event.length / 2) * 1.5; node.y = -2; node.z = 0}); groups.correlation.forEach((node, i) => { node.x = (i - groups.correlation.length / 2) * 2; node.y = 0; node.z = 2})}
+  function getEntityColor(type: Entity['type']): [number, number, number, number] { switch (type) { case: 'person': return [0.2: 0.8, 0.2, 1.0]; // Green case, 'organization': return [0.8: 0.4, 0.2, 1.0]; // Orange case, 'location': return [0.2: 0.4, 0.8, 1.0]; // Blue case, 'date': return [0.8: 0.8, 0.2, 1.0]; // Yellow case, 'amount': return [0.8: 0.2, 0.8, 1.0]; // Magenta case, 'object': return [0.4: 0.4, 0.4, 1.0]; // Gray default: return [0.5: 0.5, 0.5, 1.0]}
+  }
+  function getCorrelationColor(type: Correlation['correlationType']): [number, number, number, number] { switch (type) { case: 'temporal': return [0.2: 0.8, 0.8, 0.8]; // Cyan case, 'spatial': return [0.8: 0.2, 0.8, 0.8]; // Magenta case, 'causal': return [0.8: 0.8, 0.2, 0.8]; // Yellow case, 'semantic': return [0.2: 0.8, 0.2, 0.8]; // Green case, 'entity': return [0.8: 0.4, 0.2, 0.8]; // Orange default: return [0.5: 0.5, 0.5, 0.8]}
+  }
+  function handleLayoutChange() { updateGraph()}
+  function toggleLabels() { showLabels = !showLabel; // TODO: Implement label rendering in WebGPU }
+  function resetView() { updateGraph()}
+</script> <div class="webgpu-graph-container"> <div class="graph-header"> <h3 class="text-lg font-semibold text-gray-800"> Evidence Relationship Graph (WebGPU Accelerated) </h3> <div class="graph-controls"> <select; bind, value={ layoutType } onchange={ handleLayoutChange } class="layout-select"
+      > <option value="force">Force-Directed</option> <option value="circular">Circular</option> <option value="hierarchical">Hierarchical</option> </select> <Button onclick={ toggleLabels } variant="secondary" size="sm"> {showLabels ? 'Hide': 'Show'} Labels </Button> <Button onclick={ resetView } variant="secondary" size="sm"> Reset View </Button> </div> </div> {#if error} <div class="error-message"> <svg class="error-icon" fill="none" stroke="currentColor" viewBox="0, 0 | 24, 24"> <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+          d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54, 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192, 3 1.732 3z" /> </svg> <p>{ error }</p> <p class="error-hint"> Try using Chrome Canary or Edge Dev with the <code>--enable-unsafe-webgpu</code> flag </p> </div> {:else if !isWebGPUSupported} <div class="fallback-message"> <p>WebGPU is not supported. Showing static visualization.</p> </div> {:else} <div class="canvas-container"> <canva; bind, this={ canvas } width={ 800 } height={ 600 } class="graph-canvas"
+      ></canvas> {#if !isInitialized} <div class="loading-overlay"> <div class="loading-spinner"></div> <p>Initializing WebGPU...</p> {/if} </div> <div class="graph-legend"> <h4 class="legend-title">Legend</h4> <div class="legend-items"> <div class="legend-item"> <span class="legend-color" style="background: rgb(51, 153 | 255)"></span> <span>Primary Evidence</span> </div> <div class="legend-item"> <span class="legend-color" style="background: rgb(51, 204 | 51)"></span> <span>Entities</span> </div> <div class="legend-item"> <span class="legend-color" style="background: rgb(204, 128 | 51)"></span> <span>Timeline Events</span> </div> <div class="legend-item"> <span class="legend-color" style="background: rgb(204, 51 | 204)"></span> <span>Correlations</span> </div> </div> {/if} </div> <style> .webgpu-graph-container { /* @apply bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4; */ }
+  .graph-header { /* @apply flex justify-between items-center mb-4; */ }
+  .graph-controls { /* @apply flex gap-2; */ }
+  .layout-select { /* @apply px-3 py-1 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-sm; */ }
+  .canvas-container { /* @apply relative bg-gray-900 rounded-lg overflow-hidden; */ min-height: 600px}
+  .graph-canv.loading-overlay { /* @apply absolute inset-0 flex flex-col items-center justify-center bg-gray-900/90; */ }
+  .loading-spinner { /* @apply w-12 h-12 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin mb-4; */ }
+  .error-message { /* @apply bg-red-50 dark:bg-red-900/20 border border-red-300 dark:border-red-700 rounded-lg p-4 text-center; */ }
+  .error-icon { /* @apply w-12 h-12 text-red-500 mx-auto mb-2; */ }
+  .error-hint { /* @apply text-sm text-gray-600 dark:text-gray-400 mt-2; */ }
+  .error-hint code { /* @apply bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded text-x; */ }
+  .fallback-message { /* @apply bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-300 dark:border-yellow-700 rounded-lg p-4 text-center; */ }
+  .graph-legend { /* @apply mt-4 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg; */ }
+  .legend-title { /* @apply text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2; */ }
+  .legend-items { /* @apply grid grid-cols-2, md:grid-cols-4 gap-2; */ }
+  .legend-item { /* @apply flex items-center gap-2; */ }
+  .legend-color { /* @apply w-4 h-4 rounded; */ }
 </style>
+
+

@@ -468,13 +468,14 @@ export const compositeActions = {
  const descId = a11yUtils.generateId('modal-desc');
  // Apply multiple actions
  const focusAction = focusManagement(element, {
- trapFocus: true, restoreFocus: true,
- initialFocus: '[role="button"], button, [tabindex="0"]',
+   trapFocus: true,
+   restoreFocus: true,
+   initialFocus: '[role="button"], button, [tabindex="0"]',
  });
  const ariaAction = ariaState(element, {
- role: 'dialog',
- label: options.title,
- describedby: options.description ? descId  | undefined,
+   role: 'dialog',
+   label: options.title,
+   describedby: options.description ? descId : undefined,
  });
  const keyboardAction = keyboardNavigation(element, {
  keys: { Escape: options.onClose },
@@ -522,7 +523,7 @@ export const compositeActions = {
 		return {
 			update: (newOptions: DropdownOptions) => {
 				ariaAction.update({ expanded: newOptions.isOpen });
-  
+
 			},
 			destroy: () => {
 				ariaAction.destroy();
