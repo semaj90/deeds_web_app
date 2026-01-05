@@ -108,8 +108,11 @@
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({
-					evidenceId: crypto.randomUUID(, filename: evidenceFile?.name || 'uploaded_evidence.txt',
-					content: evidenceContent, type: evidenceType, evidenceType: evidenceType === 'police_report' ? 'document' : evidenceType
+					evidenceId: crypto.randomUUID(),
+					filename: evidenceFile?.name || 'uploaded_evidence.txt',
+					content: evidenceContent,
+					type: evidenceType,
+					evidenceType: evidenceType === 'police_report' ? 'document' : evidenceType
 				})
 			});
 			if (!response.ok) {

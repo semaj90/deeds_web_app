@@ -144,7 +144,11 @@
 			const variation = Math.random() * 0.1 - 0.05; // ±5%
 			metrics = {
 				...baseMetrics,
-				totalCases: Math.round(baseMetrics.totalCases * (1 + variation, activeCases: Math.round(baseMetrics.activeCases * (1 + variation, evidenceProcessed: Math.round(baseMetrics.evidenceProcessed * (1 + variation, aiQueries: Math.round(baseMetrics.aiQueries * (1 + variation, trends: {
+				totalCases: Math.round(baseMetrics.totalCases * (1 + variation)),
+			activeCases: Math.round(baseMetrics.activeCases * (1 + variation)),
+			evidenceProcessed: Math.round(baseMetrics.evidenceProcessed * (1 + variation)),
+			aiQueries: Math.round(baseMetrics.aiQueries * (1 + variation)),
+			trends: {
 					totalCases: (Math.random() - 0.5) * 20, // Random trend between -10% and +10%
 					activeCases: (Math.random() - 0.5) * 20,
 					evidenceProcessed: (Math.random() - 0.5) * 20,

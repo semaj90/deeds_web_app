@@ -19,12 +19,15 @@
 		theme: () => theme,
 		setTheme(v: 'dark' | 'light') { theme = v; },
 		sidebarOpen: () => sidebarOpen,
-		setSidebarOpen: (v: boolean) => (sidebarOpen = v, toggleSidebar: () => (sidebarOpen = !sidebarOpen, toggleTheme: () => (theme = theme === 'dark' ? 'light' : 'dark'),
+		setSidebarOpen: (v: boolean) => (sidebarOpen = v),
+		toggleSidebar: () => (sidebarOpen = !sidebarOpen),
+		toggleTheme: () => (theme = theme === 'dark' ? 'light' : 'dark')
 	});
-  
+
 	const navProps = $derived({
 		sidebarOpen: sidebarOpen,
-		setSidebarOpen: (v: boolean) => (sidebarOpen = v, toggleSidebar: () => (sidebarOpen = !sidebarOpen),
+		setSidebarOpen: (v: boolean) => (sidebarOpen = v),
+		toggleSidebar: () => (sidebarOpen = !sidebarOpen)
 	});
 
 	$effect(() => {
