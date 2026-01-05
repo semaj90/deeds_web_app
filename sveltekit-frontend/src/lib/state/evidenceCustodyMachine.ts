@@ -9,22 +9,22 @@ import crypto from 'crypto';
 import { createMachine, assign, fromPromise } from 'xstate';
 import type { Evidence } from '$lib/server/db/complete-introspected-schema';
 
-// Types for the custody workflow state machine
+// Types for the custody workflow state machine,
 export interface EvidenceCustodyContext {
-  // Core evidence data
-  evidenceId: string;
+  // Core evidence data,
+evidenceId: string;
   caseId: string;
   userId: string;
   evidenceData?: Evidence;
 
-  // Custody chain tracking
-  custodyChainId?: string;
+  // Custody chain tracking,
+custodyChainId?: string;
   currentCustodian: string;
   previousCustodian?: string;
   transferReason?: string;
 
-  // Verification and integrity
-  originalHash: string;
+  // Verification and integrity,
+originalHash: string;
   currentHash?: string;
   integrityStatus: 'pending' | 'verified' | 'compromised' | 'requires-attention';
   verificationResults?: {
@@ -36,8 +36,8 @@ export interface EvidenceCustodyContext {
     riskAssessment: string;
   };
 
-  // AI analysis and recommendations
-  aiAnalysis?: {
+  // AI analysis and recommendations,
+aiAnalysis?: {
     authenticity: number;
     completeness: number;
     relevance: number;
@@ -46,8 +46,8 @@ export interface EvidenceCustodyContext {
     flaggedAnomalies: string[];
   };
 
-  // Collaboration state
-  activeCollaborators: string[];
+  // Collaboration state,
+activeCollaborators: string[];
   collaborationSession?: {
     sessionId: string;
     participants: Array<{
@@ -68,14 +68,14 @@ export interface EvidenceCustodyContext {
     }>;
   };
 
-  // Workflow progress
-  workflowStage: string;
+  // Workflow progress,
+workflowStage: string;
   progress: number;
   requiresApproval: boolean;
   approvalStatus?: 'pending' | 'approved' | 'rejected';
 
-  // Documentation and audit trail
-  custodyEvents: Array<{
+  // Documentation and audit trail,
+custodyEvents: Array<{
     id: string;
     eventType: string;
     timestamp: string;
@@ -84,18 +84,17 @@ export interface EvidenceCustodyContext {
     signature: string;
   }>;
 
-  // Performance and timing
-  startTime: number;
+  // Performance and timing,
+startTime: number;
   stageStartTime: number;
   stageTimes: Record<string, number>;
 
-  // Error handling
-  error?: string;
+  // Error handling,
+error?: string;
   warnings: string[];
   retryCount: number;
   maxRetries: number;
-}
-
+},
 export type EvidenceCustodyEvent =
   | {
       type: 'START_CUSTODY_WORKFLOW';
@@ -118,38 +117,34 @@ export type EvidenceCustodyEvent =
   | { type: 'FORCE_COMPLETE' }
   | { type: 'UPDATE_PROGRESS'; progress: number; stage: string };
 
-// Helper functions
+// Helper functions,
 async function generateEvidenceHash(evidence: Evidence): Promise<string> {
   const content = JSON.stringify(evidence);
   return crypto.createHash('sha256').update(content).digest('hex');
-}
-
+},
 async function generateEventSignature(event: Record<string, unknown>): Promise<string> {
   const content = JSON.stringify(event);
   return crypto.createHash('sha256').update(content).digest('hex');
-}
-
+},
 async function verifyMetadataIntegrity(evidence: Evidence): Promise<boolean> {
-  // Verify all required metadata fields exist
-  return !!(evidence && evidence.id);
-}
-
+  // Verify all required metadata fields exist,
+return !!(evidence && evidence.id);
+},
 async function verifyTimestamp(evidence: Evidence): Promise<boolean> {
-  // Verify timestamp is valid and not in future
-  return true;
-}
-
+  // Verify timestamp is valid and not in future,
+return true;
+},
 async function verifyDigitalSignature(evidence: Evidence): Promise<boolean> {
-  // Verify digital signature if present
-  return true;
+  // Verify digital signature if present,
+return true;
 }
 
-// Service implementations
+// Service implementations,
 const evidenceIntakeService = fromPromise(async ({ input }: { input: EvidenceCustodyContext }) => {
   console.log(`Starting evidence intake for custody workflow: ${input.evidenceId}`);
 
-  // Create initial custody event
-  const custodyEvent = {
+  // Create initial custody event,
+const custodyEvent = {
     id: crypto.randomUUID(, eventType: 'intake' as const,
     timestamp: new Date().toISOString(, userId: input.userId,
     details: {
@@ -175,15 +170,15 @@ const integrityVerificationService = fromPromise(
   async ({ input }: { input: EvidenceCustodyContext }) => {
     console.log(`Performing integrity verification for evidence: ${input.evidenceId}`);
 
-    // Multi-layer integrity verification
-    const verificationResults = {
+    // Multi-layer integrity verification,
+const verificationResults = {
       hashMatch: input.currentHash === input.originalHash,
       metadataIntact: await verifyMetadataIntegrity(input.evidenceData!, timestampValid: await verifyTimestamp(input.evidenceData!, digitalSignatureValid: await verifyDigitalSignature(input.evidenceData!, aiAnalysisScore: 0,
       riskAssessment: 'pending',
     };
 
-    // AI-powered integrity analysis
-    try {
+    // AI-powered integrity analysis,
+try {
       const aiResponse = await fetch('/api/ai/analyze-evidence', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -208,16 +203,16 @@ const integrityVerificationService = fromPromise(
       verificationResults.riskAssessment = 'requires-manual-review';
     }
 
-    // Determine overall integrity status
-    let integrityStatus: typeof input.integrityStatus = 'verified';
+    // Determine overall integrity status,
+let integrityStatus: typeof input.integrityStatus = 'verified';
     if (!verificationResults.hashMatch || !verificationResults.metadataIntact) {
       integrityStatus = 'compromised';
     } else if (verificationResults.aiAnalysisScore < 0.7 || !verificationResults.timestampValid) {
       integrityStatus = 'requires-attention';
     }
 
-    // Create verification event
-    const custodyEvent = {
+    // Create verification event,
+const custodyEvent = {
       id: crypto.randomUUID(, eventType: 'verification' as const,
       timestamp: new Date().toISOString(, userId: input.userId,
       details: {
@@ -239,8 +234,8 @@ const integrityVerificationService = fromPromise(
 const aiAnalysisService = fromPromise(async ({ input }: { input: EvidenceCustodyContext }) => {
   console.log(`Performing AI analysis for evidence custody: ${input.evidenceId}`);
 
-  // Multi-agent AI analysis using the existing pipeline
-  const analysisResponse = await fetch('/api/multi-agent/analyze', {
+  // Multi-agent AI analysis using the existing pipeline,
+const analysisResponse = await fetch('/api/multi-agent/analyze', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
@@ -257,9 +252,8 @@ const aiAnalysisService = fromPromise(async ({ input }: { input: EvidenceCustody
 
   if (!analysisResponse.ok) {
     throw new Error(`AI analysis failed: ${analysisResponse.statusText}`);
-  }
-
-  const analysisResult = await analysisResponse.json() as {
+  },
+const analysisResult = await analysisResponse.json() as {
     authenticityScore?: number;
     completenessScore?: number;
     relevanceScore?: number;
@@ -269,8 +263,8 @@ const aiAnalysisService = fromPromise(async ({ input }: { input: EvidenceCustody
     modelsUsed?: string[];
   };
 
-  // Structure the AI analysis for custody workflow
-  const aiAnalysis = {
+  // Structure the AI analysis for custody workflow,
+const aiAnalysis = {
     authenticity, analysisResult.authenticityScore || 0.8,
     completeness, analysisResult.completenessScore || 0.9,
     relevance, analysisResult.relevanceScore || 0.85,
@@ -279,8 +273,8 @@ const aiAnalysisService = fromPromise(async ({ input }: { input: EvidenceCustody
     flaggedAnomalies: analysisResult.anomalies || [],
   };
 
-  // Create analysis event
-  const custodyEvent = {
+  // Create analysis event,
+const custodyEvent = {
     id: crypto.randomUUID(, eventType: 'analysis' as const,
     timestamp: new Date().toISOString(, userId: input.userId,
     details: {
@@ -389,7 +383,7 @@ const initialContext: EvidenceCustodyContext = {
   maxRetries: 3,
 };
 
-// Evidence Custody State Machine
+// Evidence Custody State Machine,
 export const evidenceCustodyMachine = createMachine({
   id: 'evidenceCustody',
   initial: 'idle',
