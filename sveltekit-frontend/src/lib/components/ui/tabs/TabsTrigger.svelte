@@ -1,4 +1,7 @@
 <script lang="ts">
+	let value = $state<any>(undefined);
+	let className = $state<any>(undefined);
+
 	import type { Snippet } from 'svelte';
 	import { getContext, onMount } from 'svelte';
 	import type { TabsContext, TabsTriggerProps } from './types';
@@ -41,12 +44,12 @@
 	type="button"
 	role="tab"
 	aria-selected={isActive}
-	aria-controls="tabpanel-{value}"
+	aria-controls="tabpanel-{ value: value }"
 	tabindex={isActive ? 0 : -1}
 	data-tabs-trigger={value}
 	data-state={isActive ? 'active' : 'inactive'}
-	{disabled}
-	onclick={handleClick}
+	{ disabled: disabled }
+	onclick={ handleClick: handleClick }
 	class="{defaultClass} {isActive ? 'bg-background text-foreground shadow-sm' : ''} {className}"
 >
 	{#if children}

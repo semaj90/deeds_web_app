@@ -1,4 +1,7 @@
 <script lang="ts">
+	let className = $state<any>(undefined);
+	let ariaLabel = $state<any>(undefined);
+
 	import type { Snippet } from 'svelte';
 	import { getContext } from 'svelte';
 	import type { DialogCloseProps } from './types';

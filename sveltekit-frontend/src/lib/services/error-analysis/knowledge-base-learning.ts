@@ -169,7 +169,7 @@ export class KnowledgeBaseLearning extends BaseService {
  throw new Error('Invalid input: errorType must be a non-empty string');
  }
 
- this.log('info', `Retrieving fixes for error type: ${errorType}`);
+ this.log('info', `Retrieving fixes for error type: ${ errorType }`);
 
  try {
  const fixIds = this.errorTypeIndex.get(errorType) || [];

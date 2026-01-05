@@ -175,7 +175,7 @@
 
  // Function to handle navigation to a case, addressing the goto() warning
  async function navigateToCase(caseId: string) {
- await goto(`/cases/${caseId}`);
+ await goto(`/cases/${ caseId: caseId }`);
  }
 
  let intervalId: ReturnType<typeof setInterval>;
@@ -391,7 +391,7 @@
  <button
  type="button"
  class="rounded border border-slate-600 px-4 py-2 text-sm text-slate-200 hover:border-slate-400"
- onclick={cancelNewCase}
+ onclick={ cancelNewCase: cancelNewCase }
  >
  Cancel
  </button>

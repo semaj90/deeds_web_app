@@ -155,8 +155,8 @@ const testJSONSamples = [
  // Large JSON for performance testing
  JSON.stringify({
  documents: Array.from({ length: 100 }, (_, i) => ({
- id: `DOC-${i}`,
- title: `Legal Document ${i}`,
+ id: `DOC-${ i }`,
+ title: `Legal Document ${ i }`,
  content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. '.repeat(10, metadata: { size: Math.random() * 1000, type: 'contract' },
  })),
  }),

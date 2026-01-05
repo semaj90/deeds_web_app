@@ -1,4 +1,11 @@
 <script lang="ts" module>
+	let className = $state<any>(undefined);
+	let contentClass = $state<any>(undefined);
+	let side = $state<any>(undefined);
+	let align = $state<any>(undefined);
+	let sideOffset = $state<any>(undefined);
+	let content = $state<any>(undefined);
+
 	// Re-export sub-components for compound component pattern
 	export { default as Content } from './TooltipContent.svelte';
 	export { default as Provider } from './TooltipProvider.svelte';
@@ -37,7 +44,7 @@
 	}: Props = $props();
 </script>
 
-<TooltipRoot bind:open {onOpenChange} {delayDuration} class={className}>
+<TooltipRoot bind:open { onOpenChange: onOpenChange } { delayDuration: delayDuration } class={className}>
 	<TooltipTrigger>
 		{#if children}
 			{@render children()}

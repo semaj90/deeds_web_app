@@ -60,7 +60,7 @@ export const POST: RequestHandler = async ({ request }) => {
  break;
 
  default:
- return json({ error: `Unknown operation type: ${type}` }, { status: 400 });
+ return json({ error: `Unknown operation type: ${ type }` }, { status: 400 });
  }
 
  return json({ ok: true, message: 'Operation logged' });

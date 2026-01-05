@@ -92,7 +92,7 @@ class InMemoryQueue extends EventEmitter {
  async publish(
  exchange: string, routingKey: string, content = {}
  ): Promise<boolean> {
- const queueName = `${exchange}:${routingKey}`;
+ const queueName = `${ exchange }:${ routingKey }`;
  await this.rpush(queueName, JSON.stringify(content));
  return true;
  }
@@ -189,7 +189,7 @@ export const cache = {
  async set(_key: string, value: unknown, ttlSeconds?: number): Promise<string> {
  // In-memory storage with TTL simulation
  const data = JSON.stringify(value);
- console.log(`💾 Cache SET: ${_key} (TTL: ${ttlSeconds}s)`);
+ console.log(`💾 Cache SET: ${ _key } (TTL: ${ ttlSeconds }s)`);
  // Simulate storage, no actual TTL implementation here
  return 'OK';
  },

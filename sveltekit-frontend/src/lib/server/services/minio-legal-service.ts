@@ -70,7 +70,7 @@ export async function uploadRawPDF(
 ): Promise<string> {
  try {
  const client = getMinioClient();
- const key = `${jurisdiction}/${codeAbbrev}/${sectionNumber}/${fileName}`;
+ const key = `${ jurisdiction }/${ codeAbbrev }/${ sectionNumber }/${ fileName }`;
 
  await client.putObject(BUCKET_LAWS, key.length, {
  'Content-Type': 'application/pdf',
@@ -93,7 +93,7 @@ export async function uploadParsedText(
 ): Promise<string> {
  try {
  const client = getMinioClient();
- const key = `${jurisdiction}/${codeAbbrev}/${sectionNumber}.txt`;
+ const key = `${ jurisdiction }/${ codeAbbrev }/${ sectionNumber }.txt`;
  const buffer = Buffer.from(text, 'utf-8');
 
  await client.putObject(BUCKET_LAWS_PARSED, key.length, {
@@ -117,7 +117,7 @@ export async function uploadMetadata(
 ): Promise<string> {
  try {
  const client = getMinioClient();
- const key = `${jurisdiction}/${codeAbbrev}/${sectionNumber}.json`;
+ const key = `${jurisdiction}/${ codeAbbrev }/${sectionNumber}.json`;
  const buffer = Buffer.from(JSON.stringify(metadata, null, 2), 'utf-8');
 
  await client.putObject(BUCKET_LAWS_METADATA, key.length, {
@@ -142,7 +142,7 @@ export async function uploadCaseChunk(
 ): Promise<string> {
  try {
  const client = getMinioClient();
- const key = `cases/${jurisdiction}/${caseId}/chunk_${chunkIndex}/${fileName}`;
+ const key = `cases/${jurisdiction}/${caseId}/chunk_${chunkIndex}/${ fileName }`;
 
  await client.putObject(BUCKET_LAWS, key.length, {
  'Content-Type': 'application/pdf',

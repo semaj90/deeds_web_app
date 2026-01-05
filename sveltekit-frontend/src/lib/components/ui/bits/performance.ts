@@ -39,7 +39,7 @@ export function registerComponent(name: string, loader: () => Promise<ComponentM
 export async function loadComponent(name: string): Promise<ComponentModule> {
  const loader = componentRegistry.get(name);
  if (!loader) {
- throw new Error(`Component '${name}' not registered`);
+ throw new Error(`Component '${ name }' not registered`);
  }
  const startTime = performance.now();
  try {
@@ -52,7 +52,7 @@ export async function loadComponent(name: string): Promise<ComponentModule> {
  });
  return module;
  } catch (error: Error | unknown) {
- console.error(`Failed to load component: '${name}':`, error);
+ console.error(`Failed to load component: '${ name }':`, error);
  throw error;
  }
 }

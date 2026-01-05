@@ -87,11 +87,11 @@ export class ErrorPatternRAG {
  ep.*,
  1 - (ep.embedding <=> ${sql.raw(JSON.stringify(embedding))}::vector) AS similarity
  FROM error_patterns ep
- WHERE 1 - (ep.embedding <=> ${sql.raw(JSON.stringify(embedding))}::vector) > ${minSimilarity}
- ${category ? sql`AND ep.category = ${category}` : sql``}
- AND ep.occurrence_count >= ${minOccurrences}
+ WHERE 1 - (ep.embedding <=> ${sql.raw(JSON.stringify(embedding))}::vector) > ${ minSimilarity }
+ ${category ? sql`AND ep.category = ${ category }` : sql``}
+ AND ep.occurrence_count >= ${ minOccurrences }
  ORDER BY similarity DESC
- LIMIT ${maxResults}
+ LIMIT ${ maxResults }
  ),
  fix_stats AS (
  SELECT
@@ -356,7 +356,7 @@ export class ErrorPatternRAG {
 
  const confidence = successRate >= 0.8 ? 'High' : successRate >= 0.5 ? 'Medium' : 'Low';
 
- return `${confidence} confidence fix (${totalAttempts} attempts, ${(successRate * 100).toFixed(0)}% success). Pattern: ${pattern.normalizedPattern.substring(0, 80)}`;
+ return `${confidence} confidence fix (${ totalAttempts } attempts, ${(successRate * 100).toFixed(0)}% success). Pattern: ${pattern.normalizedPattern.substring(0, 80)}`;
  }
 }
 

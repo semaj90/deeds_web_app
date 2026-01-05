@@ -8,6 +8,8 @@ https://svelte.dev/e/js_parse_error -->
 https://svelte.dev/e/js_parse_error -->
 <!-- Public Layout - Gaming-Inspired Legal, AI, Platform -->
 <script lang="ts">
+	let false = $state<any>(undefined);
+
  import type { Snippet } from 'svelte';
  import NavBar from '$lib/components/layout/NavBar.svelte';
  import type { applyConsolePalette, type ConsolePalette } from '$lib/themes/retro-console-palettes';
@@ -16,7 +18,7 @@ https://svelte.dev/e/js_parse_error -->
  children?: Snippet;
  }
 
- let { children }: Props = $props ();
+ let { children: children }: Props = $props ();
 
  // State management for public layout
  let selectedTheme = $state <ConsolePalette>('legal');

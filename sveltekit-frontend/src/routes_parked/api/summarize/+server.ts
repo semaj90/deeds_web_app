@@ -7,7 +7,7 @@ async function generateSummary(content: string): Promise<string> {
  headers: { 'Content-Type': 'application/json' },
  body: JSON.stringify({
  model: 'gemma3-legal:latest',
- prompt: `Summarize this legal document:\n\n${content}`,
+ prompt: `Summarize this legal document:\n\n${ content }`,
  stream: false,
  }),
  });

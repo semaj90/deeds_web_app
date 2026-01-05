@@ -58,7 +58,7 @@ export function buildOllamaUrl(
  context: 'server' | 'client' | 'docker' = 'client'
 ): string {
  const base = getOllamaEndpoint(context);
- return `${base}${endpoint.startsWith('/') ? endpoint : `/${endpoint}`}`;
+ return `${base}${endpoint.startsWith('/') ? endpoint : `/${ endpoint }`}`;
 }
 
 /**

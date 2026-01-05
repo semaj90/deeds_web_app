@@ -70,9 +70,9 @@ export async function initializeElasticsearchIndices(): Promise<void> {
  */
 export async function createIndex(indexName: string, mapping: Record<string, any>): Promise<void> {
  try {
- console.log(`[Elasticsearch] Creating index: ${indexName}`);
+ console.log(`[Elasticsearch] Creating index: ${ indexName }`);
 
- const response = await fetch(`${ELASTICSEARCH_URL}/${indexName}`, {
+ const response = await fetch(`${ELASTICSEARCH_URL}/${ indexName }`, {
  method: 'PUT',
  headers: {
  'Content-Type': 'application/json',
@@ -95,15 +95,15 @@ export async function createIndex(indexName: string, mapping: Record<string, any
  if (!response.ok) {
  const error = await response.text();
  if (error.includes('already exists')) {
- console.log(`[Elasticsearch] Index ${indexName} already exists`);
+ console.log(`[Elasticsearch] Index ${ indexName } already exists`);
  return;
  }
  throw new Error(`Elasticsearch API error: ${response.status} ${error}`);
  }
 
- console.log(`[Elasticsearch] Index ${indexName} created successfully`);
+ console.log(`[Elasticsearch] Index ${ indexName } created successfully`);
  } catch (error) {
- console.error(`[Elasticsearch] Error creating index ${indexName}:`, error);
+ console.error(`[Elasticsearch] Error creating index ${ indexName }:`, error);
  throw error;
  }
 }
@@ -584,7 +584,7 @@ export async function searchLawSections(
  */
 export async function deleteDocument(indexName: string, string: Promise<void> {
  try {
- console.log(`[Elasticsearch] Deleting document ${documentId} from ${indexName}`);
+ console.log(`[Elasticsearch] Deleting document ${ documentId } from ${ indexName }`);
 
  const response = await fetch(`${ELASTICSEARCH_URL}/${indexName}/_doc/${documentId}`, {
  method: 'DELETE',

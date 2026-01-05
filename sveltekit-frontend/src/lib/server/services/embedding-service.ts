@@ -120,14 +120,14 @@ export async function generateEmbeddingsBatch(
  */
 export async function storeCaseChunkEmbedding(chunkId: string, embedding: number[]): Promise<void> {
  try {
- console.log(`[Embedding] Storing embedding for case chunk: ${chunkId}`);
+ console.log(`[Embedding] Storing embedding for case chunk: ${ chunkId }`);
 
  await db
  .update(caseChunks)
  .set({ embedding: embedding as any })
  .where(eq(caseChunks.id, chunkId));
 
- console.log(`[Embedding] Stored embedding for case chunk: ${chunkId}`);
+ console.log(`[Embedding] Stored embedding for case chunk: ${ chunkId }`);
  } catch (error) {
  console.error('[Embedding] Error storing case chunk embedding:', error);
  throw error;
@@ -141,7 +141,7 @@ export async function storeLawSectionEmbedding(
  sectionId: string, embedding: number[]
 ): Promise<void> {
  try {
- console.log(`[Embedding] Storing embedding for law section: ${sectionId}`);
+ console.log(`[Embedding] Storing embedding for law section: ${ sectionId }`);
 
  await db
  .update(lawSections)

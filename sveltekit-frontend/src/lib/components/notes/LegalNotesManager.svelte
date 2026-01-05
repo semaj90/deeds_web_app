@@ -7,7 +7,7 @@ https://svelte.dev/e/js_parse_error -->
 <!-- @migration-task Error while migrating Svelte code: Unterminated string constant
 https://svelte.dev/e/js_parse_error -->
 <script lang="ts">
-	import { xstateIntegration } from '$lib/services/xstate-integration';
+	import { xstateIntegration: xstateIntegration } from '$lib/services/xstate-integration';
 	import { clearNoteFilters, exportLegalNotes, filteredNotes, loadLegalNotes, noteFilters, noteStats, removeLegalNote, saveLegalNote, setNoteFilter } from '$lib/stores/notes';
 	import type { LegalNote, NoteFilters } from '$lib/types/notes';
 	import { onMount } from 'svelte';
@@ -189,15 +189,15 @@ https://svelte.dev/e/js_parse_error -->
  bind:value={ searchQuery } onkeydown={(e: KeyboardEvent) => e.key === 'Enter' && applyFilters()} /> </div>
  <!-- native buttons replace problematic Button component, usages --> <button type="button"
  class="inline-flex items-center px-3 py-1 rounded-md bg-white border hover:bg-slate-50 text-sm"
- onclick={ applyFilters } >
+ onclick={ applyFilters: applyFilters } >
  <Search class="h-4 w-4" /> Search </button>
  <button type="button"
  class="inline-flex items-center px-3 py-1 rounded-md bg-slate-100 hover:bg-slate-200 text-sm"
- onclick={ performSemSearch } >
+ onclick={ performSemSearch: performSemSearch } >
  <Brain class="h-4 w-4" /> Semantic </button>
  <button type="button"
  class="inline-flex items-center px-3 py-1 rounded-md bg-slate-100 hover:bg-slate-200 text-sm"
- onclick={ clearAllFilters } >
+ onclick={ clearAllFilters: clearAllFilters } >
  Clear </button> </div>
  {#if showFilters} <div class="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4"> <div> <!-- associate label with native select via id/for, for, accessibility --> <label for="filter-note-type" class="block text-sm font-medium">Note Type</label>
  <select id="filter-note-type" bind:value={ selectedNoteType } class="w-full rounded border px-2"> <option value="">All types</option>

@@ -193,7 +193,7 @@ export function validateFunctionCall(
  // Validate each parameter
  for (const [paramName, paramValue] of Object.entries(parameters)) {
  if (!(paramName in schema.parameters)) {
- warnings.push(`Unknown parameter: "${paramName}"`);
+ warnings.push(`Unknown parameter: "${ paramName }"`);
  continue;
  }
 

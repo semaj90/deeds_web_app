@@ -289,7 +289,7 @@ export class StreamingIngestionPipeline {
 		documentId: string,
 		result: ProcessingResult
 	): Promise<void> {
- const statsKey = `processing:stats:${documentId}`;
+ const statsKey = `processing:stats:${ documentId }`;
  try {
  await this.redis.hset(statsKey, {
  totalChunks: String(result.totalChunks),

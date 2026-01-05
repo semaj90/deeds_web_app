@@ -1,4 +1,7 @@
 <script lang="ts">
+	let $uploadProgress$ = $state<any>(undefined);
+	let $errorMessage$ = $state<any>(undefined);
+
  /**
  * Document Upload Component - XState v5 Integration Example
  * Demonstrates proper usage of documentUploadMachine with Svelte
@@ -51,9 +54,9 @@
  if (fileSizeMB > maxFileSize) {
  send({
  type: 'SET_ERROR',
- error: `File size exceeds ${maxFileSize}MB limit`
+ error: `File size exceeds ${ maxFileSize: maxFileSize }MB limit`
  });
- onError?.(`File size exceeds ${maxFileSize}MB limit`);
+ onError?.(`File size exceeds ${ maxFileSize: maxFileSize }MB limit`);
  return;
  }
 
@@ -95,7 +98,7 @@
  class:drag-over={dragOver}
  role="button"
  tabindex="0"
- ondrop={handleDrop}
+ ondrop={ handleDrop: handleDrop }
  ondragover={(e) => {
  e.preventDefault();
  dragOver = true;
@@ -130,7 +133,7 @@
  </button>
 
  <p class="upload-hint">
- Supported: PDF, DOC, DOCX, TXT (max {maxFileSize}MB)
+ Supported: PDF, DOC, DOCX, TXT (max { maxFileSize: maxFileSize }MB)
  </p>
  </div>
 
@@ -153,7 +156,7 @@
  {#if $hasError$}
  <div class="error-message">
  <p><strong>Error:</strong> {$errorMessage$}</p>
- <button onclick={handleRetry} class="retry-button">Retry</button>
+ <button onclick={ handleRetry: handleRetry } class="retry-button">Retry</button>
  <button onclick={handleCancel} class="cancel-button">Cancel</button>
  </div>
  {/if}

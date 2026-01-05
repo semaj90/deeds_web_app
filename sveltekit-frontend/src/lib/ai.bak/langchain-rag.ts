@@ -324,12 +324,12 @@ export class LegalRAGService {
  STANDARD_RAG: PromptTemplate.fromTemplate(`
  You are a specialized legal AI assistant. Answer the user's question based solely on the provided legal document context.
 Context from legal documents: {context}
-Question: {question}
+Question: { question }
 Instructions: - Provide accurate legal analysis based only on the provided context - Cite specific document sections when making claims - If the context is insufficient, clearly state this limitation - Use appropriate legal terminology - Identify key legal concepts, parties, and obligations - If asked about jurisdiction-specific laws: note any applicable jurisdictions mentioned in the context.
 Answer: `, THINKING_MODE_RAG: PromptTemplate.fromTemplate(`
  You are a specialized legal AI assistant operating in "thinking mode." Provide comprehensive legal analysis based on the provided context.
 Context from legal documents: {context}
-Question: {question}
+Question: { question }
 Instructions for thinking mode: - Provide step-by-step legal reasoning - Consider multiple legal perspectives and interpretations - Identify potential risks, opportunities, and implications - Analyze relationships between different document sections - Consider statutory requirements and regulatory compliance - Suggest areas that may require additional research or legal counsel - Provide detailed citations to specific document sections.
 Comprehensive Analysis: `, VERBOSE_RAG: PromptTemplate.fromTemplate(`
  You are a specialized legal AI assistant providing detailed legal analysis based on the provided context.
@@ -408,7 +408,7 @@ Only return the queries, one per line.`),
  return docs.map((_, i) => `mock_doc_id_${Date.now()}_${i}`);
  },
  similaritySearch: async (query: string, col: number): number => {
- console.log(`Mock QdrantVectorStore: Similarity search for "${query}" (k=${k}).`);
+ console.log(`Mock QdrantVectorStore: Similarity search for "${query}" (k=${ k }).`);
  // Simulate returning relevant documents
  return [];
  },
@@ -1556,7 +1556,7 @@ Only return the queries, one per line.`),
  return docs.map((_, i) => `mock_doc_id_${Date.now()}_${i}`);
  },
  similaritySearch: async (query: string, col: number): number => {
- console.log(`Mock QdrantVectorStore: Similarity search for "${query}" (k=${k}).`);
+ console.log(`Mock QdrantVectorStore: Similarity search for "${query}" (k=${ k }).`);
  // Simulate returning relevant documents
  return [];
  },

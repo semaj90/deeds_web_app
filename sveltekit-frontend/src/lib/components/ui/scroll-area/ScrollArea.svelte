@@ -1,4 +1,7 @@
 <script lang="ts">
+	let className = $state<any>(undefined);
+	let scrollbarClass = $state<any>(undefined);
+
 	import type { Snippet } from 'svelte';
 
 	interface Props {
@@ -92,7 +95,7 @@
 <div class="{containerClass} {className}">
 	<div
 		bind:this={viewportElement}
-		onscroll={handleScroll}
+		onscroll={ handleScroll: handleScroll }
 		class={viewportClass()}
 	>
 		{#if children}

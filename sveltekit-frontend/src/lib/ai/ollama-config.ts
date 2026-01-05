@@ -159,7 +159,7 @@ export async function pullOllamaModel(modelName: string): Promise<boolean> {
 
  return response.ok;
  } catch (error) {
- console.error(`Failed to pull model ${modelName}:`, error);
+ console.error(`Failed to pull model ${ modelName }:`, error);
  return false;
  }
 }

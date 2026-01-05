@@ -126,7 +126,7 @@ INSTRUCTIONS:
 SOURCES:
 ${sourcesBlock}
 
-QUESTION: ${question}
+QUESTION: ${ question }
 
 ANSWER:`;
 }

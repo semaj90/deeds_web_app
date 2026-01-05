@@ -1,4 +1,6 @@
-<script lang="ts">let { placeholder = 'Search statutes by code or title...', isLoading = false } = $props();
+<script lang="ts">
+	let isLoading = $state<any>(undefined);
+let { placeholder = 'Search statutes by code or title...', isLoading = false } = $props();
 
  import { createEventDispatcher } from 'svelte';
 
@@ -42,8 +44,8 @@
  <input
  type="text"
  bind:value={query}
- {placeholder}
- onkeydown={handleKeydown}
+ { placeholder: placeholder }
+ onkeydown={ handleKeydown: handleKeydown }
  disabled={isLoading}
  class="search-input"
  />

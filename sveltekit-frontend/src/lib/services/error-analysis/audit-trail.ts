@@ -170,7 +170,7 @@ export class AuditTrail extends BaseService {
  this.entries.push(entry);
  this.pruneOldEntries();
 
- this.log('info', `Feature flag change logged: ${flag} = ${enabled}`, { status });
+ this.log('info', `Feature flag change logged: ${flag} = ${ enabled }`, { status });
 
  return entry;
  }

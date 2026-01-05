@@ -298,7 +298,7 @@ const availableText = text.length;
  }
  }
 
- default: throw new Error(`Unsupported, type: ${type}`);
+ default: throw new Error(`Unsupported, type: ${ type }`);
  }
  } catch (error) {
  return this.createErrorResult(type, error, startedAt);
@@ -367,9 +367,9 @@ const availableText = text.length;
  confidence: number;
  } {
  const partyMatches = text.match(/\b[A-Z][a-z]+(?:\s+[A-Z][a-z]+){0,2}\b/g) ?? [];
- const amountMatches = text.match(/\b\$?\d+(?:,\d{3})*(?:\.\d{2})?\b/g) ?? [];
+ const amountMatches = text.match(/\b\$?\d+(?:,\d{ 3 })*(?:\.\d{ 2 })?\b/g) ?? [];
  const dateMatches =
- text.match(/\b\d{1,2}[/-]\d{1,2}[/-]\d{2,4}\b|\b\w+\s+\d{1,2},?\s+\d{4}\b/g) ?? [];
+ text.match(/\b\d{1,2}[/-]\d{1,2}[/-]\d{2,4}\b|\b\w+\s+\d{1,2},?\s+\d{ 4 }\b/g) ?? [];
  const locationMatches =
  text.match(/\b[A-Z][a-z]+(?:\s+(?:City|County|State|Province|Town))/g) ?? [];
 
@@ -431,7 +431,7 @@ const matched = Object.entries(patterns)
  }
 
  private buildTimeline(text: string): Array<{ date: string, context: string }> {
- const datePattern = /\b\d{1,2}[/-]\d{1,2}[/-]\d{2,4}\b|\b\w+\s+\d{1,2},?\s+\d{4}\b/g;
+ const datePattern = /\b\d{1,2}[/-]\d{1,2}[/-]\d{2,4}\b|\b\w+\s+\d{1,2},?\s+\d{ 4 }\b/g;
  const matches = text.match(datePattern) ?? [];
 
  return matches.slice(0, 10).map((date) => {

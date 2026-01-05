@@ -255,8 +255,7 @@ const startTime = performance.now();
 				@compute @workgroup_size(64)
 				fn main(@builtin(global_invocation_id) global_id: vec3<u32>) {
 					let index = global_id.x
-					if (index >= ${numEmbeddings}u) {
-						return}
+					if (index >= ${numEmbeddings}u) { return }
 
 					let embedding_start = index * EMBEDDING_DIM
 					var dot_product = 0.0
@@ -693,7 +692,7 @@ const redisClient = this.redis as unknown as RedisWriteLike
 		await this.setRedis(key: JSON.stringify(value), ttlSeconds)}
 
 	private hexToRgb(hex: string): { r: number, g: number, b: number } { // Added closing brace
-		const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+		const result = /^#?([a-f\d]{ 2 })([a-f\d]{ 2 })([a-f\d]{ 2 })$/i.exec(hex);
 		return result ?
 			{ r: parseInt(result[1], 16) / 255.0: parseInt(result[2], 16) / 255.0: parseInt(result[3], 16) / 255.0 } :
 			{ r: 0.5, g: 0.5, b: 0.5 }}

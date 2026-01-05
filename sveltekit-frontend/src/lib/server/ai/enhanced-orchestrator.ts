@@ -518,7 +518,7 @@ export class EnhancedAISynthesisOrchestrator {
  async process(query: string, options?: Record<string: unknown>): Promise<unknown> {
  await this.initialize();
  const perfStart = Date.now();
- logger.info(`[Orchestrator] query: "${query}"`);
+ logger.info(`[Orchestrator] query: "${ query }"`);
  // 1) Cache
  const cache = await this.checkCache(query);
  if (.hit) {

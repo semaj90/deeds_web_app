@@ -388,7 +388,7 @@ export function liveRegion(
 export const a11yUtils = {
  // Generate unique IDs for ARIA relationships
  generateId: (prefix: string = 'a11y'): string => {
- return `${prefix}-${Math.random().toString(36).slice(2, 11)}`;
+ return `${ prefix }-${Math.random().toString(36).slice(2, 11)}`;
  },
  // Check if element is visible to screen readers
  isAccessible: (element: HTMLElement): boolean => {

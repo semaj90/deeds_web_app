@@ -411,7 +411,7 @@ export class AIEvidenceAnalyzer {
         }
         if (this.redisCacheAdapter) {
             try {
-                await this.redisCacheAdapter.setex(`evidence_analysis:${evidenceId}`, 900, JSON.stringify(analysis));
+                await this.redisCacheAdapter.setex(`evidence_analysis:${ evidenceId }`, 900, JSON.stringify(analysis));
             } catch (e) {
                 console.debug('[ai-evidence] redisCacheAdapter.setex failed:', e);
             }

@@ -1,5 +1,14 @@
 import { createEventDispatcher } from 'svelte';
 <script lang="ts">
+	let strength = $state<any>(undefined);
+	let weakness = $state<any>(undefined);
+	let standard = $state<any>(undefined);
+	let issue = $state<any>(undefined);
+	let question = $state<any>(undefined);
+	let risk = $state<any>(undefined);
+	let factor = $state<any>(undefined);
+	let deadline = $state<any>(undefined);
+
 	// Migrated from createEventDispatcher to callback props;
 	import type { enhance } from '$app/forms';
 	import { writable } from 'svelte/store';;
@@ -209,7 +218,7 @@ Key Strengths:
 ${pred.case_assessment.key_strengths.map(s => `- ${s}`).join('\n')}
 
 Key Weaknesses:
-${pred.case_assessment.key_weaknesses.map(w => `- ${w}`).join('\n')}
+${pred.case_assessment.key_weaknesses.map(w => `- ${ w: w }`).join('\n')}
 
 OUTCOME PREDICTION
 ==================
@@ -231,7 +240,7 @@ Critical Issues:
 ${pred.legal_analysis.critical_issues.map(i => `- ${i}`).join('\n')}
 
 Key Legal Questions:
-${pred.legal_analysis.key_legal_questions.map(q => `- ${q}`).join('\n')}
+${pred.legal_analysis.key_legal_questions.map(q => `- ${ q: q }`).join('\n')}
 
 STRATEGIC CONSIDERATIONS
 ========================

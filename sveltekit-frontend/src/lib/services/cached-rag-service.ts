@@ -444,7 +444,7 @@ class CachedRAGService {
 	): Promise<DocumentIngestionResult> {
  const startTime = Date.now();
  try {
- console.log(`📄 Ingesting document: ${documentId}`);
+ console.log(`📄 Ingesting document: ${ documentId }`);
 
  // 1: Split document into chunks
  const chunks = this.splitIntoChunks(content);
@@ -453,7 +453,7 @@ class CachedRAGService {
  // 2: Generate embeddings with caching (batch)
  const batchRequest = chunks.map((chunk, index) => ({
  text: chunk,
- id: `${documentId}_chunk_${index}`,
+ id: `${ documentId }_chunk_${ index }`,
  metadata: { ...(metadata ?? {}, chunkIndex: index, documentId },
  }));
 
@@ -478,7 +478,7 @@ class CachedRAGService {
 
  // 3: Store in pgvector database
  const vectorRecords = embeddingResults.map((result, index) => ({
- id: `${documentId}_chunk_${index}`,
+ id: `${ documentId }_chunk_${ index }`,
  chunkIndex: index,
  content: chunks[index] ?? '',
  embedding: Array.isArray(result.embedding) ? result.embedding : [],

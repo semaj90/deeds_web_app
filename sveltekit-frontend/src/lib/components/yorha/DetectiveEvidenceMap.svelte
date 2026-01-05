@@ -427,7 +427,7 @@ https://svelte.dev/e/js_parse_error -->
  <button onclick={resetZoom} class="px-3 py-1 text-xs bg-slate-700 text-slate-300 rounded hover:bg-slate-600">
  Reset Zoom
  </button>
- <button onclick={loadData} class="px-3 py-1 text-xs bg-slate-700 text-slate-300 rounded hover:bg-slate-600">
+ <button onclick={ loadData: loadData } class="px-3 py-1 text-xs bg-slate-700 text-slate-300 rounded hover:bg-slate-600">
  Refresh
  </button>
  </div>

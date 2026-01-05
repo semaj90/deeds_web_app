@@ -399,7 +399,7 @@
  <button
  type="button"
  class="rounded border border-slate-600 px-4 py-2 text-sm text-slate-200 hover:border-slate-400"
- onclick={cancelNewCase}
+ onclick={ cancelNewCase: cancelNewCase }
  >
  Cancel
  </button>
@@ -414,7 +414,7 @@
  <button
  type="button"
  class="absolute right-4 top-4 rounded-sm opacity-70 transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2 focus:ring-offset-slate-900"
- onclick={cancelNewCase}
+ onclick={ cancelNewCase: cancelNewCase }
  aria-label="Close"
  >
  <svg

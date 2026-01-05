@@ -269,7 +269,7 @@ export class GrpcStatusAdapter {
  // Parse and format details
  const parsed = parseEventDetails(event.details);
  const formatted = Object.entries(parsed)
- .map(([key, value]) => `${key}: ${value}`)
+ .map(([key, value]) => `${key}: ${ value }`)
  .join(', ');
 
  return formatted;

@@ -39,7 +39,7 @@ export class IndexedDBService {
  const db = await this.db;
  // For now, we fetch all documents. If 'type' needs to be filtered,
  // documents would need a 'type' property and a cursor could be used.
- console.log(`IndexedDBService: Fetching documents of type "${type}"`); // Log for context
+ console.log(`IndexedDBService: Fetching documents of type "${ type }"`); // Log for context
  return db.getAll(STORE_NAME);
  }
 

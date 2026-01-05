@@ -1,4 +1,6 @@
 <script lang="ts">
+	let className = $state<any>(undefined);
+
 	import type { Snippet } from 'svelte';
 	import { getContext } from 'svelte';
 	import { fade } from 'svelte/transition';
@@ -34,8 +36,8 @@
 	<div
 		class="{defaultClass} {className}"
 		transition:fade={{ duration: 150 }}
-		onclick={handleClick}
-		onkeydown={handleKeydown}
+		onclick={ handleClick: handleClick }
+		onkeydown={ handleKeydown: handleKeydown }
 		role="button"
 		tabindex="0"
 		aria-label="Close dialog"

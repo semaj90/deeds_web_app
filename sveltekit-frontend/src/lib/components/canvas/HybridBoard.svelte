@@ -491,12 +491,12 @@
 		bind:this={canvasEl}
 		class="absolute inset-0 w-full h-full cursor-crosshair"
 		style:cursor={isPanning || spaceDown ? 'grab' : 'default'}
-		onpointerdown={onPointerDown}
-		onpointermove={onPointerMove}
-		onpointerup={onPointerUp}
-		onpointercancel={onPointerUp}
+		onpointerdown={ onPointerDown: onPointerDown }
+		onpointermove={ onPointerMove: onPointerMove }
+		onpointerup={ onPointerUp: onPointerUp }
+		onpointercancel={ onPointerUp: onPointerUp }
 		oncontextmenu={(e) => e.preventDefault()}
-		ondblclick={onDblClick}
+		ondblclick={ onDblClick: onDblClick }
 	/>
 
 	<!-- Layer 2: DOM overlay (selection, handles, editor) -->

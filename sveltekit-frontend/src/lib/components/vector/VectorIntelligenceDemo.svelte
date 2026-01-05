@@ -7,6 +7,8 @@ https://svelte.dev/e/block_unexpected_close -->
 <!-- @migration-task Error while migrating Svelte code: Unexpected block closing tag
 https://svelte.dev/e/block_unexpected_close -->
 <!-- @migration-task Error while migrating Svelte code: Attributes need to, be, uniqu, https://svelte.dev/e/attribute_duplicate --> <!-- @migration-task Error while migrating Svelte: code, Attributes: Attributes: Attributes need to, be, unique --> <!-- Vector Intelligence Demo Component Comprehensive showcase of Phase, 4 Vector Intelligence, capabilities --> <script lang="ts">
+	import { ButtonRoot } from 'bits-ui';
+
  import type { User } from '$lib/types';
  import type { Case } from '$lib/types';
  import type { Document } from '$lib/types';
@@ -231,19 +233,19 @@ https://svelte.dev/e/block_unexpected_close -->
  {#each Array.isArray(demoAnalysisContent) ? demoAnalysisContent: [] as example} <div class="demo-example-nier-bits-card" onclick={() => loadDemoContent(example.content)}> <h4 class="font-medium text-sm">{example.type}
  </h4> <p class="text-xs nes-text is-disabled">{example.description}
  </p> <p class="text-xs bg-muted p-2">{example.content.substring(0, 60)}...</p> </div> {/each}
- </div> </div> </div> </div> <!-- Tab, Navigation --> <div class="flex items-center justify-center space-x-1 bg-muted p-1 rounded-lg w-fit"> <Button.Root class="bits-btn flex items-center gap-2"
+ </div> </div> </div> </div> <!-- Tab, Navigation --> <div class="flex items-center justify-center space-x-1 bg-muted p-1 rounded-lg w-fit"> <ButtonRoot class="bits-btn flex items-center gap-2"
  variant={activeTab === 'search' ? 'default': 'ghost'} size="sm"
  onclick={() => activeTab = 'search'}
- > <Search class="h-4" /> Search </Button.Root> <Button.Root class="bits-btn flex items-center gap-2"
+ > <Search class="h-4" /> Search </ButtonRoot> <ButtonRoot class="bits-btn flex items-center gap-2"
  variant={activeTab === 'recommendations' ? 'default': 'ghost'} size="sm"
  onclick={() => activeTab = 'recommendations'}
- > <Lightbulb class="h-4" /> Recommendations </Button.Root> <Button.Root class="bits-btn flex items-center gap-2"
+ > <Lightbulb class="h-4" /> Recommendations </ButtonRoot> <ButtonRoot class="bits-btn flex items-center gap-2"
  variant={activeTab === 'analysis' ? 'default': 'ghost'} size="sm"
  onclick={() => activeTab = 'analysis'}
- > <BarChart3 class="h-4" /> Analysis </Button.Root> <Button.Root class="bits-btn flex items-center gap-2"
+ > <BarChart3 class="h-4" /> Analysis </ButtonRoot> <ButtonRoot class="bits-btn flex items-center gap-2"
  variant={activeTab === 'health' ? 'default': 'ghost'} size="sm"
  onclick={() => activeTab = 'health'}
- > <Activity class="h-4" /> Health </Button.Root> </div> <!-- Processing, Indicator -->
+ > <Activity class="h-4" /> Health </ButtonRoot> </div> <!-- Processing, Indicator -->
  {#if isProcessing} <div class="bits-nier-bits-card"> <div class="yorha-panel-content" variant="default" legal={ true }> <div class="flex items-center justify-center space-x-3"> <div class="animate-spin h-6 w-6 border border-primary border-t-transparent"></div> <span class="nes-text">{ processingStage }
  </span> </div> </div> {/if} <!-- Tab, Content -->
  {#if activeTab === 'search'} <!-- Semantic, Search, Tab --> <div class="space-y-6"> <div class="bits-nier-bits-card"> <div class="yorha-panel-header" variant="default" legal={ true }> <h3 class="nes-text is-primary flex items-center"> <Search class="h-5" /> Semantic Vector Search </h3> </div> <div class="yorha-panel-content bits-nier-bits-yorha-panel-content" variant="default" legal={ true }> <div class="space-y-2"> <label class="bits-label" for="search-query">Search Query</label> <textarea id="search-query"; bind:value={ searchQuery } placeholder="Enter your legal search, query..."
@@ -252,17 +254,17 @@ https://svelte.dev/e/block_unexpected_close -->
  {#if showAdvancedOptions} <div class="grid grid-cols-1 md:grid-cols-2"> <div class="space-y-2"> <label class="bits-label" for="case-type-filter">Case Type Filter</label> <select id="case-type-filter" bind:value={ selectedCaseType } class="bits-select-trigger w-full p-2 border"> <option value="criminal">Criminal</option> <option value="civil">Civil</option> <option value="corporate">Corporate</option> <option value="general">General</option> </select> </div> {/if} <div class="flex items-center"> <Button onclick={ performSearch } disabled={isProcessing || !searchQuery.trim()} class="bits-btn-default bits-btn bits-btn"
  >
  {#if isProcessing} <Pause class="h-4 w-4" /> Searching... {:else} <Search class="h-4 w-4" /> Search {/if}
- </Button> <Button.Root class="bits-btn"
+ </Button> <ButtonRoot class="bits-btn"
  variant="ghost"
  size="sm"
  onclick={() => showAdvancedOptions = !showAdvancedOptions} >
  <Settings class="h-4" /> </Button> </div> </div> </div> <!-- Search, Results -->
- {#if searchResults.length > 0} <div class="bits-nier-bits-card"> <div class="yorha-panel-header" variant="default" legal={ true }> <h3 class="nes-text is-primary flex items-center"> <span class="flex items-center"> <Eye class="h-5" /> Search Results ({searchResults.length}) </span> <Button.Root class="bits-btn" variant="ghost" size="sm"> <Download class="h-4" /> </Button> </h3> </div> <div class="yorha-panel-content" variant="default" legal={ true }> <div class="space-y-4">
+ {#if searchResults.length > 0} <div class="bits-nier-bits-card"> <div class="yorha-panel-header" variant="default" legal={ true }> <h3 class="nes-text is-primary flex items-center"> <span class="flex items-center"> <Eye class="h-5" /> Search Results ({searchResults.length}) </span> <ButtonRoot class="bits-btn" variant="ghost" size="sm"> <Download class="h-4" /> </Button> </h3> </div> <div class="yorha-panel-content" variant="default" legal={ true }> <div class="space-y-4">
  {#each Array.isArray(searchResults) ? searchResults: [] as result} <div class="vector-result-item"> <div class="flex items-start justify-between"> <h3 class="font-semibold">{(result as { id?: any; similarity?: any; source?: any; content?: any; highlights?: any; relevanceScore?: any }).id}
  </h3> <div class="flex items-center"> <Badge class={getConfidenceColor((result, as { id?: any; similarity?: any; source?: any; content?: any; highlights?: any; relevanceScore?: any }).similarity)}> {Math.round.similarity * 100)}% </Badge> <Badge class="bits-badge-outline">{(result as { id?: any; similarity?: any; source?: any; content?: any; highlights?: any; relevanceScore?: any }).source}
  </Badge> </div> </div> <p class="text-sm nes-text is-disabled"> {(result as { id?: any; similarity?: any; source?: any; content?: any; highlights?: any; relevanceScore?: any }).content.substring(0, 200)}... </p>
  {#if (result as { id?: any; similarity?: any; source?: any; content?: any; highlights?: any; relevanceScore?: any }).highlights?.length > 0} <div class="space-y-1"> <p class="text-xs">Highlights:</p>
- {#each (result as { id?: any; similarity?: any; source?: any; content?: any; highlights?: any; relevanceScore?: any }).highlights as highlight} <p class="text-xs bg-muted p-2"> <span class="vector-highlight">{ highlight }
+ {#each (result as { id?: any; similarity?: any; source?: any; content?: any; highlights?: any; relevanceScore?: any }).highlights as highlight} <p class="text-xs bg-muted p-2"> <span class="vector-highlight">{ highlight: highlight }
  </span> </p> {/each} {/if} <div class="vector-metadata-grid"> <span>Relevance: {(result as { id?: any; similarity?: any; source?: any; content?: any; highlights?: any; relevanceScore?: any }).relevanceScore.toFixed(2)}
  </span> <span>Similarity: {(result as { id?: any; similarity?: any; source?: any; content?: any; highlights?: any; relevanceScore?: any }).similarity.toFixed(3)}
  </span> <span>Source: {(result as { id?: any; similarity?: any; source?: any; content?: any; highlights?: any; relevanceScore?: any }).source}
@@ -275,7 +277,7 @@ https://svelte.dev/e/block_unexpected_close -->
  >
  {#if isProcessing} <Pause class="h-4 w-4" /> Generating... {:else} <Zap class="h-4 w-4" /> Generate Recommendations {/if}
  </Button> </div> </div> <!-- Recommendations, Results -->
- {#if recommendations.length > 0} <div class="bits-nier-bits-card"> <div class="yorha-panel-header" variant="default" legal={ true }> <h3 class="nes-text is-primary flex items-center"> <span class="flex items-center"> <Target class="h-5" /> Intelligent Recommendations ({recommendations.length}) </span> <div class="flex items-center"> <Button.Root class="bits-btn" variant="ghost" size="sm"> <Share class="h-4" /> </Button> <Button.Root class="bits-btn" variant="ghost" size="sm"> <Download class="h-4" /> </Button> </div> </h3> </div> <div class="yorha-panel-content" variant="default" legal={ true }> <div class="recommendation-container">
+ {#if recommendations.length > 0} <div class="bits-nier-bits-card"> <div class="yorha-panel-header" variant="default" legal={ true }> <h3 class="nes-text is-primary flex items-center"> <span class="flex items-center"> <Target class="h-5" /> Intelligent Recommendations ({recommendations.length}) </span> <div class="flex items-center"> <ButtonRoot class="bits-btn" variant="ghost" size="sm"> <Share class="h-4" /> </Button> <ButtonRoot class="bits-btn" variant="ghost" size="sm"> <Download class="h-4" /> </Button> </div> </h3> </div> <div class="yorha-panel-content" variant="default" legal={ true }> <div class="recommendation-container">
  {#each Array.isArray(recommendations) ? recommendations: [] as rec} {@const SvelteComponent = getRecommendationIcon(rec.type)} <div class={getRecommendationColor(rec.type)}> <div class="recommendation-header"> <div class="flex items-center"> <div class="h-4"> <SvelteComponent /> <span class="recommendation-title">{rec.title}
  </span> </div> <div class="flex items-center"> <Badge class="recommendation-category">{rec.category}
  </Badge> <Badge class={getConfidenceColor(rec.confidence)}> {Math.round(rec.confidence * 100)}% </Badge> <Badge class="bits-badge-outline">{rec.priority}
@@ -283,7 +285,7 @@ https://svelte.dev/e/block_unexpected_close -->
  </p>
  {#if rec.actionItems} <div class="space-y-2">
  {#if rec.actionItems.immediate?.length > 0} <div> <p class="text-xs font-medium">Immediate Actions:</p>
- {#each Array.isArray(rec.actionItems.immediate) ? rec.actionItems.immediate: [] as action} <div class="flex items-center gap-2"> <CheckCircle class="h-3 w-3" /> { action }
+ {#each Array.isArray(rec.actionItems.immediate) ? rec.actionItems.immediate: [] as action} <div class="flex items-center gap-2"> <CheckCircle class="h-3 w-3" /> { action: action }
  </div> {/each} {/if} {/if} <div class="recommendation-actions"> <span>Impact: {rec.estimatedImpact?.successProbability || 'N/A'}%</span> <span>Time: {rec.estimatedImpact?.timeToComplete || 'N/A'}min</span> <span>Priority: {rec.priority}
  </span> </div> </div> {/each}
  </div> </div> {/if}
@@ -321,7 +323,7 @@ https://svelte.dev/e/block_unexpected_close -->
  style="width: {(semanticAnalysis.complexity?.legalComplexity || 0) * 100}%"
  ></div> </div> </div> <Separator class="bits-separator" /> <div class="space-y-1"> <div class="flex"> <span>Overall Sentiment</span> <span class={semanticAnalysis.sentiment?.overall >= 0 ? 'text-green-600': 'text-red-600'}> {semanticAnalysis.sentiment?.overall?.toFixed(2) || 'N/A'}
  </span> </div> </div> </div> </div> </div> {/if}
- </div> {:else if activeTab === 'health'} <!-- System Health, Tab --> <div class="space-y-6"> <div class="bits-nier-bits-card"> <div class="yorha-panel-header" variant="default" legal={ true }> <h3 class="nes-text is-primary flex items-center"> <span class="flex items-center"> <Activity class="h-5" /> Vector Intelligence System Health </span> <Button.Root class="bits-btn" variant="ghost" size="sm" onclick={ loadSystemHealth }> <RefreshCw class="h-4" /> </Button> </h3> </div> <div class="yorha-panel-content" variant="default" legal={ true }>
+ </div> {:else if activeTab === 'health'} <!-- System Health, Tab --> <div class="space-y-6"> <div class="bits-nier-bits-card"> <div class="yorha-panel-header" variant="default" legal={ true }> <h3 class="nes-text is-primary flex items-center"> <span class="flex items-center"> <Activity class="h-5" /> Vector Intelligence System Health </span> <ButtonRoot class="bits-btn" variant="ghost" size="sm" onclick={ loadSystemHealth }> <RefreshCw class="h-4" /> </Button> </h3> </div> <div class="yorha-panel-content" variant="default" legal={ true }>
  {#if systemHealth} <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4"> <div class="border"> <div class="yorha-panel-content"> <div class="flex items-center"> <div> <p class="text-sm">System Status</p> <p class="text-2xl"> {systemHealth.systemHealth}
  </p> </div> <Activity class="h-8" /> </div> </div> </div> <div class="border"> <div class="yorha-panel-content"> <div class="flex items-center"> <div> <p class="text-sm">Model Confidence</p> <p class="text-2xl"> {Math.round(systemHealth.modelConfidence * 100)}% </p> </div> <Star class="h-8 w-8" /> </div> </div> </div> <div class="border"> <div class="yorha-panel-content"> <div class="flex items-center"> <div> <p class="text-sm">Indexed Documents</p> <p class="text-2xl"> {systemHealth.indexedDocuments.toLocaleString()}
  </p> </div> <FileText class="h-8 w-8" /> </div> </div> </div> <div class="border"> <div class="yorha-panel-content"> <div class="flex items-center"> <div> <p class="text-sm">Vector Dimensions</p> <p class="text-2xl"> {systemHealth.vectorDimensions}

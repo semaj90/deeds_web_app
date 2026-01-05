@@ -1,4 +1,7 @@
 <script lang="ts">
+	let color = $state<any>(undefined);
+	let width = $state<any>(undefined);
+
 	/**
 	 * ═══════════════════════════════════════════════════════════════════════
 	 * Route Graph Visualization Component
@@ -7,7 +10,7 @@
 	 * Purpose: D3.js-based force-directed graph for codebase dependencies
 	 * Features: Zoom, pan, node interaction, filtering
 	 */
-	import { browser } from '$app/environment';
+	import { browser: browser } from '$app/environment';
 	import { onDestroy, onMount } from 'svelte';
 
 	// Props
@@ -307,9 +310,9 @@
 	{:else}
 		<!-- Zoom Controls -->
 		<div class="zoom-controls">
-			<button onclick={zoomIn} title="Zoom In">+</button>
-			<button onclick={resetZoom} title="Reset">⟲</button>
-			<button onclick={zoomOut} title="Zoom Out">−</button>
+			<button onclick={ zoomIn: zoomIn } title="Zoom In">+</button>
+			<button onclick={ resetZoom: resetZoom } title="Reset">⟲</button>
+			<button onclick={ zoomOut: zoomOut } title="Zoom Out">−</button>
 		</div>
 
 		<!-- Legend -->
@@ -318,7 +321,7 @@
 			{#each Object.entries(nodeColors) as [type, color]}
 				<div class="legend-item">
 					<span class="legend-dot" style="background: {color}"></span>
-					<span class="legend-label">{type}</span>
+					<span class="legend-label">{ type: type }</span>
 				</div>
 			{/each}
 		</div>
@@ -327,7 +330,7 @@
 		<svg
 			bind:this={svg}
 			{width}
-			{height}
+			{ height: height }
 			class="graph-svg"
 		></svg>
 

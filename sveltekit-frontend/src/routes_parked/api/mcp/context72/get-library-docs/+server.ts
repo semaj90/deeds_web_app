@@ -32,7 +32,7 @@ const libraryDocs: Record<
  '/bits-ui/bits-ui': {
  content: `# Bits UI v2
 \`\`\`svelte
-<Dialog.Root bind:open={isOpen}>
+<Dialog.Root bind:open={ isOpen }>
  <Dialog.Trigger>Open</Dialog.Trigger>
  <Dialog.Content>
  <Dialog.Title>Title</Dialog.Title>

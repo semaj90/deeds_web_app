@@ -60,7 +60,7 @@ class StatuteSearchService {
  SELECT * FROM statutes
  WHERE (code ILIKE $1 OR title ILIKE $1 OR full_text ILIKE $1)
  `;
- const params: any[] = [`%${query}%`];
+ const params: any[] = [`%${ query }%`];
 
  // Add filters
  if (filters.jurisdiction) {
@@ -103,7 +103,7 @@ class StatuteSearchService {
  async getStatuteDetail(code: string): Promise<Statute | null> {
  try {
  // Check cache first
- const cacheKey = `${this.CACHE_PREFIX}${code}`;
+ const cacheKey = `${this.CACHE_PREFIX}${ code }`;
  const cached = await redis.get(cacheKey);
  if (cached) {
  return JSON.parse(cached);
@@ -252,7 +252,7 @@ class StatuteSearchService {
  */
  async invalidateStatuteCache(code: string): Promise<void> {
  try {
- const cacheKey = `${this.CACHE_PREFIX}${code}`;
+ const cacheKey = `${this.CACHE_PREFIX}${ code }`;
  await redis.del(cacheKey);
  } catch (error) {
  console.error('Error invalidating statute cache:', error);

@@ -190,7 +190,7 @@ export const cacheService = new CacheService();
 export async function getCachedEmbedding(
  text: string, model: string = 'openai'
 ): Promise<number[] | null> {
- const key = `embedding:${model}:${Buffer.from(text).toString('base64')}`;
+ const key = `embedding:${ model }:${Buffer.from(text).toString('base64')}`;
  return await cacheService.get<number[]>(key);
 }
 
@@ -198,7 +198,7 @@ export async function setCachedEmbedding(
  text: string, embedding: number[],
  model: string = 'openai'
 ): Promise<void> {
- const key = `embedding:${model}:${Buffer.from(text).toString('base64')}`;
+ const key = `embedding:${ model }:${Buffer.from(text).toString('base64')}`;
  await cacheService.set(key, embedding, {
  ttlMs: 24 * 60 * 60 * 1000, // 24 hours for embeddings
  compress: true, // Always compress embeddings (large arrays)
@@ -213,7 +213,7 @@ export async function getCachedSearchResults(
  const filtersHash = filters
  ? Buffer.from(JSON.stringify(filters)).toString('base64').slice(0, 16)
  : 'none';
- const key = `search:${type}:${Buffer.from(query).toString('base64')}:${filtersHash}`;
+ const key = `search:${ type }:${Buffer.from(query).toString('base64')}:${filtersHash}`;
  return await cacheService.get<unknown[]>(key);
 }
 
@@ -225,7 +225,7 @@ export async function cacheSearchResults(
  const filtersHash = filters
  ? Buffer.from(JSON.stringify(filters)).toString('base64').slice(0, 16)
  : 'none';
- const key = `search:${type}:${Buffer.from(query).toString('base64')}:${filtersHash}`;
+ const key = `search:${ type }:${Buffer.from(query).toString('base64')}:${filtersHash}`;
  await cacheService.set(key, results, {
  ttlMs: 30 * 60 * 1000, // 30 minutes for search results
  compress: true,

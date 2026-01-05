@@ -44,7 +44,7 @@ export type RouteHealthEvent =
 export const createRouteHealthMachine = (routePath: string, file?: string) =>
  createMachine(
  {
- id: `routeHealth:${routePath}`,
+ id: `routeHealth:${ routePath }`,
  types: {
  context: {} as RouteHealthContext,
  events: {} as RouteHealthEvent,

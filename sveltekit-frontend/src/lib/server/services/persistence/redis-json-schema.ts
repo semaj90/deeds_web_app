@@ -31,7 +31,7 @@ export class RedisJSONStore {
 
  /**
  * Store clustering job with full state
- * Key: clustering, jobs:{jobId}
+ * Key: clustering, jobs:{ jobId }
  */
  async storeClusteringJob(jobId: string, data: {
  status: 'pending' | 'processing' | 'completed' | 'failed';
@@ -42,7 +42,7 @@ export class RedisJSONStore {
  error?: string;
  result?: any;
  }): Promise<void> {
- const key = `clustering:jobs:${jobId}`;
+ const key = `clustering:jobs:${ jobId }`;
  await this.client.json.set(key, '$', data);
  await this.client.expire(key, 7 * 24 * 60 * 60); // 7 days
  }
@@ -51,13 +51,13 @@ export class RedisJSONStore {
  * Get clustering job status
  */
  async getClusteringJob(jobId: string): Promise<any> {
- const key = `clustering:jobs:${jobId}`;
+ const key = `clustering:jobs:${ jobId }`;
  return await this.client.json.get(key);
  }
 
  /**
  * Store cluster version snapshot
- * Key: clustering, versions:{version}
+ * Key: clustering, versions:{ version }
  */
  async storeClusterVersion(version: number, data: {
  timestamp: number;
@@ -67,7 +67,7 @@ export class RedisJSONStore {
  labels: Record<string, string>;
  changePercentage?: number;
  }): Promise<void> {
- const key = `clustering:versions:${version}`;
+ const key = `clustering:versions:${ version }`;
  await this.client.json.set(key, '$', data);
  await this.client.expire(key, 30 * 24 * 60 * 60); // 30 days
  }
@@ -183,7 +183,7 @@ export class RedisJSONStore {
 
  /**
  * Store clustering metrics
- * Key: metrics, clustering:{ timestamp: timestamp }
+ * Key: metrics, clustering:{ timestamp }
  */
  async storeClusteringMetrics(timestamp: number, data: {
  jobCount: number;

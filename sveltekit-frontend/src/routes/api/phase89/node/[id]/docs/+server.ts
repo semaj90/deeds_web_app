@@ -1,5 +1,5 @@
 /**
- * API: GET /api/phase89/node/{id}/docs
+ * API: GET /api/phase89/node/{ id }/docs
  * Retrieves relevant documentation for a graph node (error/symbol/file)
  */
 

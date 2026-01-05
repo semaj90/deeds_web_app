@@ -1,4 +1,8 @@
 <script lang="ts">
+	let suggestion = $state<any>(undefined);
+
+	import { ButtonRoot } from 'bits-ui';
+
 import { browser } from '$app/environment';
 import { xstateIntegration } from '$lib/services/xstate-integration';
 import * as Button from 'bits-ui/components/button';
@@ -582,23 +586,23 @@ import { onMount } from 'svelte';
  <h2 class="text-xl font-semibold mb-4">Upload Evidence Document</h2>
  <div
  class="border-2 border-dashed rounded-lg p-8 text-center transition-colors {isDragging ? 'border-blue-500 bg-blue-50' : 'border-gray-300'}"
- ondragover={handleDragOver}
- ondragleave={handleDragLeave}
- ondrop={handleDrop}
+ ondragover={ handleDragOver: handleDragOver }
+ ondragleave={ handleDragLeave: handleDragLeave }
+ ondrop={ handleDrop: handleDrop }
  >
  {#if selectedFile}
  <div class="space-y-2">
  <p class="text-lg font-medium">{selectedFile.name}</p>
  <p class="text-gray-600">Size: {formatFileSize(selectedFile.size)}</p>
  <div class="flex justify-center space-x-2">
- <Button.Root onclick={uploadFile} disabled={workflowStatus.status === 'processing'}>
+ <ButtonRoot onclick={ uploadFile: uploadFile } disabled={workflowStatus.status === 'processing'}>
  {#if workflowStatus.status === 'processing'}
  Uploading...
  {:else}
  Upload File
  {/if}
- </Button.Root>
- <Button.Root variant="outline" onclick={() => selectedFile = null}>Clear</Button.Root>
+ </ButtonRoot>
+ <ButtonRoot variant="outline" onclick={() => selectedFile = null}>Clear</ButtonRoot>
  </div>
  </div>
  {:else}
@@ -612,9 +616,9 @@ import { onMount } from 'svelte';
  onchange={handleFileSelect}
  accept=".pdf,.doc,.docx,.txt,.jpg,.png"
  />
- <Button.Root onclick={() => document.getElementById('file-input')?.click()}>
+ <ButtonRoot onclick={() => document.getElementById('file-input')?.click()}>
  Select File
- </Button.Root>
+ </ButtonRoot>
  </div>
  {/if}
  </div>

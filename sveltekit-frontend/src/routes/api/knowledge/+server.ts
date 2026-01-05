@@ -276,7 +276,7 @@ ${context || 'No matching documents found in knowledge base.'}
 ---
 
 USER QUESTION:
-${prompt}
+${ prompt }
 
 ---
 

@@ -215,7 +215,7 @@ export async function markDocumentSynced(id: number, size: number): Promise<bool
             [qdrantId, id]
         );
 
-        console.log(`✅ Marked document ${id} as synced (Qdrant ID: ${qdrantId})`);
+        console.log(`✅ Marked document ${id} as synced (Qdrant ID: ${ qdrantId })`);
         return true;
     } catch (error) {
         console.error('❌ Mark document synced failed:', error);
@@ -261,7 +261,7 @@ export async function createRelationship(
             [fromId, toId, relationshipType, weight, bidirectional]
         );
 
-        console.log(`✅ Created relationship: ${fromId} --[${relationshipType}]--> ${toId}`);
+        console.log(`✅ Created relationship: ${ fromId } --[${ relationshipType }]--> ${ toId }`);
         return true;
     } catch (error) {
         console.error('❌ Create relationship failed:', error);

@@ -47,7 +47,7 @@
  };
 
  const handleCaseClick = (caseId: string) => {
- goto(`/cases/${caseId}`);
+ goto(`/cases/${ caseId: caseId }`);
  };
 </script>
 

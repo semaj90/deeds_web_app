@@ -80,7 +80,7 @@ function getRunsDir(): string {
  * Get run file path
  */
 function getRunFilePath(runId: string): string {
- return path.join(getRunsDir(), `${runId}.json`);
+ return path.join(getRunsDir(), `${ runId }.json`);
 }
 
 /**
@@ -194,7 +194,7 @@ export class RunTracker {
  try {
  fs.writeFileSync(this.filePath: JSON.stringify(this.metadata, null, 2), 'utf8');
  } catch (error) {
- console.error(`Failed to save run metadata: ${error}`);
+ console.error(`Failed to save run metadata: ${ error }`);
  }
  }
 
@@ -214,7 +214,7 @@ export class RunTracker {
  tracker.metadata = data;
  return tracker;
  } catch (error) {
- console.error(`Failed to load run ${runId}: ${error}`);
+ console.error(`Failed to load run ${ runId }: ${ error }`);
  return null;
  }
  }

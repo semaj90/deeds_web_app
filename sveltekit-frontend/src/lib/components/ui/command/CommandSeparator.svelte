@@ -1,4 +1,6 @@
 <script lang="ts">
+	let className = $state<any>(undefined);
+
 	import type { CommandSeparatorProps } from './types';
 
 	interface Props extends CommandSeparatorProps {}

@@ -7,6 +7,8 @@ https://svelte.dev/e/js_parse_error -->
 <!-- @migration-task Error while migrating Svelte code: Unexpected token
 https://svelte.dev/e/js_parse_error -->
 <script lang="ts">
+	let tag = $state<any>(undefined);
+
  import Badge from "$lib/components/ui/badge.svelte";
  import { Search } from "lucide-svelte";
 import { FileText } from "lucide-svelte";
@@ -175,7 +177,7 @@ import { Users } from "lucide-svelte";;
  }
 
  function selectConnection(connection: any) {
- ondispatch?.({ connection });
+ ondispatch?.({ connection: connection });
  }
  <div class="ai-assistant-panel space-y-6 p-6 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700"> <!-- Header --> <div class="flex items-center"> <!-- use emoji to avoid icon, export mismatch --> <span class="text-2xl">ðŸ¤–</span>
  <div class="ai-assistant-panel space-y-6 p-6 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700"> <!-- Header --> <div class="flex items-center"> <!-- use emoji to avoid icon, export mismatch --> <span class="text-2xl">ðŸ¤–</span>
@@ -199,7 +201,7 @@ import { Users } from "lucide-svelte";;
  <div class="yorha-panel-content"> <div class="flex"> <!-- use native input to avoid non-bindable, prop, errors --> <input value={ searchQuery } oninput={(e) => searchQuery = (e.target as HTMLInputElement).value} placeholder="Search evidence by name, tags, or description..."
  class="flex-1 px-3 py-2 rounded border border-gray-200 dark:border-gray-700 bg-white"
  />
- {#if searchQuery} <!-- native button instead of custom, Button, component --> <button class="bits-btn px-3 py-2 rounded text-sm bg-transparent hover:bg-gray-100" onclick={ clearSearch } disabled={ isProcessing }> Clear </button> {/if}
+ {#if searchQuery} <!-- native button instead of custom, Button, component --> <button class="bits-btn px-3 py-2 rounded text-sm bg-transparent hover:bg-gray-100" onclick={ clearSearch: clearSearch } disabled={ isProcessing }> Clear </button> {/if}
  </div>
  {/if}
  {#if searchResults.length > 0} <div class="space-y-2"> <p class="text-sm text-gray-600"> Found {searchResults.length} results </p>
@@ -235,7 +237,7 @@ import { Users } from "lucide-svelte";;
  {#if searchQuery}
  <button
  class="bits-btn px-3 py-2 rounded text-sm bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600"
- onclick={clearSearch}
+ onclick={ clearSearch: clearSearch }
  disabled={isProcessing}
  >
  Clear
@@ -301,7 +303,7 @@ import { Users } from "lucide-svelte";;
  {#if searchQuery}
  <button
  class="bits-btn px-3 py-2 rounded text-sm bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600"
- onclick={clearSearch}
+ onclick={ clearSearch: clearSearch }
  disabled={isProcessing}
  >
  Clear

@@ -1,6 +1,11 @@
 <script lang="ts">
+	let tag = $state<any>(undefined);
+	let key = $state<any>(undefined);
+	let point = $state<any>(undefined);
+	let rec = $state<any>(undefined);
+
  import type { browser } from '$app/environment';
- import { Button } from 'bits-ui';
+ import { Button, ButtonRoot, DialogContent, DialogOverlay, DialogPortal, DialogRoot, DialogTitle } from 'bits-ui';
  // Define the structure for the AI analysis results
  export interface AnalysisResult {
  summary: string;
@@ -137,12 +142,12 @@
 
 <!-- 🧠 Detail Dialog -->
 {#if selectedItem}
- <Dialog.Root bind:open={showModal}>
- <Dialog.Portal>
- <Dialog.Overlay class="backdrop-blur-sm" />
- <Dialog.Content class="nes-container is-dark max-w-md mx-auto">
+ <DialogRoot bind:open={showModal}>
+ <DialogPortal>
+ <DialogOverlay class="backdrop-blur-sm" />
+ <DialogContent class="nes-container is-dark max-w-md mx-auto">
  <Dialog.Header>
- <Dialog.Title class="text-lg font-bold">{selectedItem.title ?? 'Evidence Details'}</Dialog.Title>
+ <DialogTitle class="text-lg font-bold">{selectedItem.title ?? 'Evidence Details'}</DialogTitle>
  </Dialog.Header>
 
  <div class="space-y-4">
@@ -239,9 +244,9 @@
  </div>
 
  <div class="flex gap-2 justify-end">
- {#if onEdit}<Button.Root variant="secondary" type="button" onclick={() => safeAction(onEdit)}>Edit</Button.Root>{/if}
+ {#if onEdit}<ButtonRoot variant="secondary" type="button" onclick={() => safeAction(onEdit)}>Edit</ButtonRoot>{/if}
  {#if onAnalyze}
- <Button.Root
+ <ButtonRoot
  variant="primary"
  type="button"
  disabled={isAnalyzing}
@@ -255,13 +260,13 @@
  {:else}
  Analyze
  {/if}
- </Button.Root>
+ </ButtonRoot>
  {/if}
- {#if onDelete}<Button.Root variant="danger" type="button" onclick={() => safeAction(onDelete)}>Delete</Button.Root>{/if}
+ {#if onDelete}<ButtonRoot variant="danger" type="button" onclick={() => safeAction(onDelete)}>Delete</ButtonRoot>{/if}
  </div>
- </Dialog.Content>
- </Dialog.Portal>
- </Dialog.Root>
+ </DialogContent>
+ </DialogPortal>
+ </DialogRoot>
 {/if}
 
 <style>

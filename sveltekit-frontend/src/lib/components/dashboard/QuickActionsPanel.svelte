@@ -7,19 +7,19 @@
 
  const handleTimelineAnalysis = () => {
  if (caseId) {
- goto(`/cases/${caseId}?tab=timeline`);
+ goto(`/cases/${ caseId: caseId }?tab=timeline`);
  }
  };
 
  const handleEvidenceSummary = () => {
  if (caseId) {
- goto(`/cases/${caseId}?tab=summary`);
+ goto(`/cases/${ caseId: caseId }?tab=summary`);
  }
  };
 
  const handleSuspectConnections = () => {
  if (caseId) {
- goto(`/cases/${caseId}/board`);
+ goto(`/cases/${ caseId: caseId }/board`);
  }
  };
 

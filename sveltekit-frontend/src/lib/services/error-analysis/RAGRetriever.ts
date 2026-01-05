@@ -211,7 +211,7 @@ export class RAGRetriever {
 		}
 
 		try {
-			const cacheKey = `fix-strategies:${errorId}`;
+			const cacheKey = `fix-strategies:${ errorId }`;
 			const cached = await this.redisClient.get(cacheKey);
 
 			if (cached) {
@@ -234,7 +234,7 @@ export class RAGRetriever {
 		if (!this.redisClient) return;
 
 		try {
-			const cacheKey = `fix-strategies:${errorId}`;
+			const cacheKey = `fix-strategies:${ errorId }`;
 			await this.redisClient.set(cacheKey, JSON.stringify(strategies), { EX: ttl });
 		} catch (error) {
 			console.warn(`⚠️  Failed to cache fix strategies: ${error instanceof Error ? error.message : String(error)}`);

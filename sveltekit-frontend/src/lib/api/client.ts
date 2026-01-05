@@ -249,11 +249,11 @@ class EnhancedApiClient {
  public async updateCase(
  id: string, data: RequestOf<CaseAPI.Update>
  ): Promise<StandardApiResponse<CaseAPI.Update>> {
- return this.put(`/api/cases?id=${id}`, data);
+ return this.put(`/api/cases?id=${ id }`, data);
  }
 
  public async getCase(id: string): Promise<StandardApiResponse<CaseAPI.Get>> {
- return this.get(`/api/cases?id=${id}`);
+ return this.get(`/api/cases?id=${ id }`);
  }
 
  // ===================== EVIDENCE API METHODS =====================
@@ -274,8 +274,8 @@ class EnhancedApiClient {
  custodyNotes?: string
  ): Promise<StandardApiResponse<EvidenceAPI.Update>> {
  const url = custodyNotes
- ? `/api/evidence?id=${id}&custodyNotes=${encodeURIComponent(custodyNotes)}`
- : `/api/evidence?id=${id}`;
+ ? `/api/evidence?id=${ id }&custodyNotes=${encodeURIComponent(custodyNotes)}`
+ : `/api/evidence?id=${ id }`;
  return this.put(url, data);
  }
 

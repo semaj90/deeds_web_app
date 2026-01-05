@@ -1,4 +1,8 @@
 <script lang="ts">
+	let isPendingLinkSource = $state<any>(undefined);
+	let key = $state<any>(undefined);
+	let value = $state<any>(undefined);
+
  import Button from '$lib/components/ui/button';
 
  type EvidenceNodeType = {
@@ -105,13 +109,13 @@
  }
 </script>
 
-<svelte:window onmousemove={handleMouseMove} onmouseup={handleMouseUp} />
+<svelte:window onmousemove={ handleMouseMove: handleMouseMove } onmouseup={ handleMouseUp: handleMouseUp } />
 
 <!-- Node Element -->
 <div
  bind:this={element}
  class="evidence-node"
- class:selected={isSelected}
+ class:selected={ isSelected: isSelected }
  class:pending-link-source={isPendingLinkSource}
  class:dragging={isDragging}
  role="button"
@@ -121,7 +125,7 @@
  top: {node.y}px;
  --node-color: {getNodeTypeColor(node.evidenceType)};
  "
- onmousedown={handleMouseDown}
+ onmousedown={ handleMouseDown: handleMouseDown }
 >
  <!-- Node Header -->
  <div class="node-header">

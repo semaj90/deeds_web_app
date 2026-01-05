@@ -51,7 +51,7 @@ export const POST: RequestHandler = async ({ params, request }) => {
     const route = await getRouteMetadata(routeId);
     if (!route) {
       return error(409, {
-        message: `Route ${routeId} not found in route_metadata`,
+        message: `Route ${ routeId } not found in route_metadata`,
       });
     }
 
@@ -105,7 +105,7 @@ export const GET: RequestHandler = async ({ params, url }) => {
     const route = await getRouteMetadata(routeId);
     if (!route) {
       return error(404, {
-        message: `Route ${routeId} not found`,
+        message: `Route ${ routeId } not found`,
       });
     }
 

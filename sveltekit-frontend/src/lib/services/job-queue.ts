@@ -103,11 +103,11 @@ export class LegalAIJobQueue {
             });
 
             worker.on('completed', (job: RabbitMQJob<LegalJobData>, result: unknown) => {
-                console.log(`✅ Job ${job.id} completed in queue ${name}`);
+                console.log(`✅ Job ${job.id} completed in queue ${ name }`);
             });
 
             worker.on('failed', (job: RabbitMQJob<LegalJobData> | undefined, err: Error) => {
-                console.error(`❌ Job ${job?.id} failed in queue ${name}:`, err.message);
+                console.error(`❌ Job ${job?.id} failed in queue ${ name }:`, err.message);
             });
 
             this.workers.set(name, worker);
@@ -117,7 +117,7 @@ export class LegalAIJobQueue {
     private createJobProcessor(queueName: string) {
         return async (job: RabbitMQJob<LegalJobData>) => {
             const { id } = job;
-            console.log(`🚀 Processing job ${id} in ${queueName}`);
+            console.log(`🚀 Processing job ${ id } in ${ queueName }`);
             await new Promise(resolve => setTimeout(resolve, 1000));
             return { status: 'completed', queue: queueName, jobId: id };
         };

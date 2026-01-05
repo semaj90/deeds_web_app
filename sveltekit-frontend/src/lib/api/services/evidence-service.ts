@@ -154,7 +154,7 @@ export async function listEvidence(
 
 export async function getEvidenceById(evidenceId: string): Promise<Evidence> {
  try {
- const response = await fetch(`/api/evidence/${evidenceId}`, {
+ const response = await fetch(`/api/evidence/${ evidenceId }`, {
  method: 'GET',
  headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
  });
@@ -166,7 +166,7 @@ export async function getEvidenceById(evidenceId: string): Promise<Evidence> {
 
  const evidence: Evidence = await response.json();
  // TODO: Add audit logging for evidence access
- console.log(`Fetched evidence: ${evidence.title} (${evidenceId})`);
+ console.log(`Fetched evidence: ${evidence.title} (${ evidenceId })`);
  return evidence;
  } catch (error: Error | unknown) {
  console.error('Evidence fetch error: ', error);
@@ -201,7 +201,7 @@ export async function updateEvidence(
  evidenceId: string, updates: UpdateEvidenceData
 ): Promise<Evidence> {
  try {
- const response = await fetch(`/api/evidence/${evidenceId}`, {
+ const response = await fetch(`/api/evidence/${ evidenceId }`, {
  method: 'PUT',
  headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
  body: JSON.stringify(updates),
@@ -214,7 +214,7 @@ export async function updateEvidence(
 
  const updatedEvidence: Evidence = await response.json();
  // TODO: Add audit logging for evidence updates
- console.log(`Updated evidence: ${updatedEvidence.title} (${evidenceId})`);
+ console.log(`Updated evidence: ${updatedEvidence.title} (${ evidenceId })`);
  return updatedEvidence;
  } catch (error: Error | unknown) {
  console.error('Evidence update error: ', error);

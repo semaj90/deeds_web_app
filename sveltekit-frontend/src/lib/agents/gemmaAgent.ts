@@ -52,7 +52,7 @@ export async function runGemmaAgent(userPrompt: string): Promise<AgentResponse> 
  headers: { 'Content-Type': 'application/json' },
  body: JSON.stringify({
  model,
- prompt: `${SYSTEM_PROMPT}\n\nUser: ${userPrompt}`,
+ prompt: `${SYSTEM_PROMPT}\n\nUser: ${ userPrompt }`,
  stream: false,
  format: 'json',
  }),
@@ -125,7 +125,7 @@ export async function executeAgentWithContext(
  .map(([key, value]) => `${key}: ${JSON.stringify(value)}`)
  .join('\n');
 
- enhancedPrompt = `Context:\n${contextStr}\n\nUser Query:\n${userPrompt}`;
+ enhancedPrompt = `Context:\n${contextStr}\n\nUser Query:\n${ userPrompt }`;
  }
 
  return executeAgentWithTools(enhancedPrompt);
@@ -147,7 +147,7 @@ export async function* streamAgentResponse(
  headers: { 'Content-Type': 'application/json' },
  body: JSON.stringify({
  model,
- prompt: `${SYSTEM_PROMPT}\n\nUser: ${userPrompt}`,
+ prompt: `${SYSTEM_PROMPT}\n\nUser: ${ userPrompt }`,
  stream: true,
  }),
  });

@@ -264,7 +264,7 @@ export function exportChangeDataAsCSV(result: ChangeDetectionResult): string {
  rows.push([statuteId, previousLabel, currentLabel, 'Yes']);
  }
 
- return rows.map((row) => row.map((cell) => `"${cell}"`).join(',')).join('\n');
+ return rows.map((row) => row.map((cell) => `"${ cell }"`).join(',')).join('\n');
 }
 
 /**

@@ -13,7 +13,7 @@ export const POST: RequestHandler = async ({ request }) => {
  const { limit = 100, skipEmbedding = false, skipIndexing = false } = body;
 
  console.log(
- `Starting ingestion: limit=${limit}, skipEmbedding=${skipEmbedding}, skipIndexing=${skipIndexing}`
+ `Starting ingestion: limit=${ limit }, skipEmbedding=${ skipEmbedding }, skipIndexing=${ skipIndexing }`
  );
 
  // Create orchestrator

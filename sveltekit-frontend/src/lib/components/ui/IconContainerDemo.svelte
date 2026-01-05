@@ -1,4 +1,10 @@
 <script lang="ts">
+	let Search = $state<any>(undefined);
+	let User = $state<any>(undefined);
+	let Settings = $state<any>(undefined);
+	let Home = $state<any>(undefined);
+	let Star = $state<any>(undefined);
+
  import IconContainer from '$lib/components/ui/IconContainer.svelte';
  import Home from 'lucide-svelte/icons/Home';
  import Search from 'lucide-svelte/icons/Search';

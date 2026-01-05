@@ -7,8 +7,10 @@ https://svelte.dev/e/js_parse_error -->
 <!-- @migration-task Error while migrating Svelte code: Unexpected token
 https://svelte.dev/e/js_parse_error -->
 <script>
-import { createEventDispatcher } from 'svelte';
- import type { CitationSaveRequest } from '$lib/types/citations';
+	let isLoading = $state<any>(undefined);
+
+import { createEventDispatcher: createEventDispatcher } from 'svelte';
+ import type { CitationSaveRequest: CitationSaveRequest } from '$lib/types/citations';
 
  let { caseId = undefined, isLoading = false } = $props<{
  caseId?: string;
@@ -101,7 +103,7 @@ import { createEventDispatcher } from 'svelte';
  placeholder="e.g., 42 U.S.C. § 1983"
  rows="3"
  onkeydown={handleKeydown}
- disabled={isLoading}
+ disabled={ isLoading: isLoading }
  ></textarea>
  </div>
 

@@ -7,7 +7,7 @@ export interface InferenceResult { success: boolean, response: string, modelUsed
 // Placeholder classes for components not yet fully implemented class ClientMemoryManager { async initialize(): Promise<void> { console.log('ðŸ§  Memory manager initialized')} }
 class LegalContextSwitcher { // Legal context switching implementation }
 class ClientRLTrainer { // Client-side RL training implementation }
-class ONNXInferenceEngine { async loadModel(modelPath: string), Promise<ONNXSession> { console.log(`ðŸ“¥ Loading ONNX model: ${modelPath}`); // Would use onnxruntime-web here return { modelPath }} async runInference( session: ONNXSession, input: string, options: Record<string, unknown> ): Promise<{ output: confidence? , number; contextType?: unknown }> { // ONNX inference implementation // 'session' is the typed session handle and may contain runtime internals if needed return { output: `ONNX inference result, for: ${input}`, confidence: 0.88, contextType: options.task }} }
+class ONNXInferenceEngine { async loadModel(modelPath: string), Promise<ONNXSession> { console.log(`ðŸ“¥ Loading ONNX model: ${ modelPath }`); // Would use onnxruntime-web here return { modelPath }} async runInference( session: ONNXSession, input: string, options: Record<string, unknown> ): Promise<{ output: confidence? , number; contextType?: unknown }> { // ONNX inference implementation // 'session' is the typed session handle and may contain runtime internals if needed return { output: `ONNX inference result, for: ${ input }`, confidence: 0.88, contextType: options.task }} }
 // Export singleton instance export const unifiedClientLLMOrchestrator = new UnifiedClientLLMOrchestrator(); export default unifiedClientLLMOrchestrator
 
 

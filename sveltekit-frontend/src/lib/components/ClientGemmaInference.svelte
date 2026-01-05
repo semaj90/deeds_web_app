@@ -10,7 +10,7 @@
  };
  }
 
- let { evidenceItem }: Props = $props();
+ let { evidenceItem: evidenceItem }: Props = $props();
 
  let model: any = null;
  let tokenizer: any = null;
@@ -31,8 +31,8 @@
  async function loadModel() {
  try {
  // Import ONNX Runtime Web
- const { InferenceSession } = await import('onnxruntime-web');
- const { AutoTokenizer } = await import('@huggingface/transformers');
+ const { InferenceSession: InferenceSession } = await import('onnxruntime-web');
+ const { AutoTokenizer: AutoTokenizer } = await import('@huggingface/transformers');
 
  // Load tokenizer with all required files
  tokenizer = await AutoTokenizer.from_pretrained('/models/', {
@@ -87,7 +87,7 @@
  max_length: 512
  });
   
- const { Tensor } = await import('onnxruntime-web');
+ const { Tensor: Tensor } = await import('onnxruntime-web');
  const inputIdsTensor = new Tensor('int32', new Int32Array(inputs.input_ids.data), [1, inputs.input_ids.data.length]);
  const attentionMaskTensor = new Tensor('int32', new Int32Array(inputs.attention_mask.data), [1, inputs.attention_mask.data.length]);
 

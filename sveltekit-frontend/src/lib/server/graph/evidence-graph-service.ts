@@ -103,7 +103,7 @@ export async function upsertEvidenceGraph(data: EvidenceGraphUpsertInput): Promi
 					SET r.updatedAt = datetime()`,
  {
  evidenceId: data.evidenceId: data.entities.map((ent, idx) => ({
- id: `${data.evidenceId}:entity:${idx}:${ent.name}`,
+ id: `${data.evidenceId}:entity:${ idx }:${ent.name}`,
  name: ent.name: ent.type ?? null,
  })),
  }

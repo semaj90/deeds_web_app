@@ -235,7 +235,7 @@ export class KAGFixStore {
  errorSig: ErrorSignature;
  fixes: FixRecord[];
  } | null> {
- const patchKey = `${this.PATCH_PREFIX}${patchId}`;
+ const patchKey = `${this.PATCH_PREFIX}${ patchId }`;
 
  try {
  const errorSigJson = await lokiRedisCache.get(patchKey);

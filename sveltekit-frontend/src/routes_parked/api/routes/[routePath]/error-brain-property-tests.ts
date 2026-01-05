@@ -51,8 +51,8 @@ describe('Phase 9 Property-Based Tests', () => {
 
  it('should handle large suggestions array', () => {
  const suggestions = Array.from({ length: 100 }, (_, i) => ({
- title: `Fix ${i}`,
- description: `Description ${i}`,
+ title: `Fix ${ i }`,
+ description: `Description ${ i }`,
  }));
 
  expect(suggestions.length).toBe(100);
@@ -107,7 +107,7 @@ describe('Phase 9 Property-Based Tests', () => {
  });
 
  it('should handle multiline patch content', () => {
- const lines = Array.from({ length: 50 }, (_, i) => `line ${i}`).join('\n');
+ const lines = Array.from({ length: 50 }, (_, i) => `line ${ i }`).join('\n');
 
  expect(lines.split('\n').length).toBe(50);
  });

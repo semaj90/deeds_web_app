@@ -114,7 +114,7 @@ export class BrowserRAGChain {
  const { topK = 3, temperature = 0.7, maxTokens = 512, minSimilarity = 0.3 } = options;
  const startTime = performance.now();
 
- console.log(`🔍 [Browser RAG] Querying: "${question}"`);
+ console.log(`🔍 [Browser RAG] Querying: "${ question }"`);
 
  // Step 1: Generate query embedding
  console.log('📊 [Browser RAG] Generating query embedding...');
@@ -218,7 +218,7 @@ export class BrowserRAGChain {
  return `Context Information:
 ${context}
 
-Question: ${question}
+Question: ${ question }
 
 Instructions: Answer the question based ONLY on the context provided above. If the context does not contain enough information, say: "I don't have enough information to answer this question." Be concise and accurate.
 

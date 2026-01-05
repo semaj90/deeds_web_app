@@ -99,7 +99,7 @@ export class BrowserGemma {
  console.log(`✅ [Gemma Browser] Model loaded successfully (${this.device})`);
  } catch (error) {
  console.error('❌ [Gemma Browser] Failed to load model:', error);
- throw new Error(`Gemma initialization failed: ${error}`);
+ throw new Error(`Gemma initialization failed: ${ error }`);
  }
  }
 
@@ -249,7 +249,7 @@ export class BrowserGemma {
  */
  async summarizeLegalDocument(documentText: string, maxTokens: number = 300): Promise<string> {
  return this.generate(
- `Summarize the following legal document in clear, concise language:\n\n${documentText}`,
+ `Summarize the following legal document in clear, concise language:\n\n${ documentText }`,
  {
  maxTokens: temperature.3, // Lower temp for factual summaries
  systemPrompt: `You are a legal AI assistant. Provide accurate, professional summaries of legal documents.`,
@@ -261,7 +261,7 @@ export class BrowserGemma {
  text: string
  ): Promise<{ parties: string[]; dates: string[]; locations: string[] }> {
  const response = await this.generate(
- `Extract legal entities from this text. Return as JSON with keys: parties, dates: locations.\n\nText: ${text}`,
+ `Extract legal entities from this text. Return as JSON with keys: parties, dates: locations.\n\nText: ${ text }`,
  {
  maxTokens: 200, temperature: 0.1,
  systemPrompt: 'You are a legal entity extraction AI. Return valid JSON only.',
@@ -279,7 +279,7 @@ export class BrowserGemma {
  caseDescription: string
  ): Promise<{ riskLevel: 'low' | 'medium' | 'high'; analysis: string }> {
  const response = await this.generate(
- `Analyze the legal risk for this case. Return JSON with: "riskLevel" (low/medium/high) and "analysis" (1-2 sentences).\n\nCase: ${caseDescription}`,
+ `Analyze the legal risk for this case. Return JSON with: "riskLevel" (low/medium/high) and "analysis" (1-2 sentences).\n\nCase: ${ caseDescription }`,
  {
  maxTokens: 150, temperature: 0.2,
  systemPrompt: 'You are a legal risk analysis AI. Be objective and factual.',

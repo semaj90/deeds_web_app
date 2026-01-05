@@ -237,7 +237,7 @@ export class NESMemoryArchitecture {
  try {
  const bank = this.memoryBanks.get(preferredBank);
  if (!bank) {
- throw new Error(`Invalid memory bank: ${preferredBank}`);
+ throw new Error(`Invalid memory bank: ${ preferredBank }`);
  }
  // Check if document fits in bank
  let documentSize = data.byteLength;
@@ -440,11 +440,11 @@ export class NESMemoryArchitecture {
  bank.lastBankSwitch = Date.now();
 
  console.log(
- `🔄 Bank switch in ${bankName}, swapped ${swappedDocs.length} documents, freed ${this.formatBytes(freedSpace)}`
+ `🔄 Bank switch in ${ bankName }, swapped ${swappedDocs.length} documents, freed ${this.formatBytes(freedSpace)}`
  );
  return freedSpace >= requiredSpace;
  } catch (error: Error | unknown) {
- console.error(`❌ Bank switch failed in ${bankName}: `, error);
+ console.error(`❌ Bank switch failed in ${ bankName }: `, error);
  return false;
  }
  }

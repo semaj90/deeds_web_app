@@ -25,7 +25,7 @@ export interface LibraryDocsResult {
  * Stub implementation - replace with real MCP tool
  */
 export async function getLibraryDocs(libraryName: string): Promise<LibraryDocsResult> {
-  console.log(`[MCP Stub] getLibraryDocs called for: ${libraryName}`);
+  console.log(`[MCP Stub] getLibraryDocs called for: ${ libraryName }`);
 
   // Stub response
   return {
@@ -33,8 +33,8 @@ export async function getLibraryDocs(libraryName: string): Promise<LibraryDocsRe
       {
         name: libraryName,
         version: '1.0.0',
-        description: `Documentation for ${libraryName} (stub)`,
-        url: `https://npmjs.com/package/${libraryName}`,
+        description: `Documentation for ${ libraryName } (stub)`,
+        url: `https://npmjs.com/package/${ libraryName }`,
       },
     ],
     cached: false,
@@ -46,7 +46,7 @@ export async function getLibraryDocs(libraryName: string): Promise<LibraryDocsRe
  * Search library documentation
  */
 export async function searchLibraryDocs(query: string): Promise<LibraryDocsResult> {
-  console.log(`[MCP Stub] searchLibraryDocs called with: ${query}`);
+  console.log(`[MCP Stub] searchLibraryDocs called with: ${ query }`);
 
   return {
     docs: [],

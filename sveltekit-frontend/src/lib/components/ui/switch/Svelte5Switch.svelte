@@ -1,4 +1,8 @@
 <script lang="ts">
+	let className = $state<any>(undefined);
+	let id = $state<any>(undefined);
+	let disabled = $state<any>(undefined);
+
 /**
  * Svelte 5 Switch/Toggle Component
  * Native HTML with Svelte 5 runes and accessible toggle
@@ -75,25 +79,25 @@ function handleKeydown(e: KeyboardEvent) {
 
 <label
 	class="inline-flex items-center gap-3 cursor-pointer select-none {className}"
-	class:opacity-50={disabled}
-	class:cursor-not-allowed={disabled}
+	class:opacity-50={ disabled: disabled }
+	class:cursor-not-allowed={ disabled: disabled }
 >
 	<!-- Hidden native checkbox -->
 	<input
 		type="checkbox"
 		{id}
-		{name}
-		{disabled}
+		{ name: name }
+		{ disabled: disabled }
 		bind:checked
 		class="sr-only peer"
-		onchange={handleChange}
+		onchange={ handleChange: handleChange }
 	/>
 
 	<!-- Custom switch track -->
 	<button
 		type="button"
 		role="switch"
-		aria-checked={checked}
+		aria-checked={ checked: checked }
 		aria-labelledby="{id}-label"
 		{disabled}
 		class="relative inline-flex shrink-0 {dimensions.track}

@@ -224,15 +224,15 @@ async function indexErrorClusters(): Promise<void> {
     try {
       const { file_path, error_code, message, error_count } = cluster;
 
-      console.log(`⚠️  ${error_code}: ${message.slice(0, 60)}...`);
-      console.log(`    File: ${file_path} (${error_count} occurrences)`);
+      console.log(`⚠️  ${ error_code }: ${message.slice(0, 60)}...`);
+      console.log(`    File: ${ file_path } (${ error_count } occurrences)`);
 
       // Create rich query for embedding
       const errorContext = `
 Error Code: ${error_code}
-File: ${file_path}
-Message: ${message}
-Occurrences: ${error_count}
+File: ${ file_path }
+Message: ${ message }
+Occurrences: ${ error_count }
 Phase: Phase 66-79 Error Analysis
       `.trim();
 

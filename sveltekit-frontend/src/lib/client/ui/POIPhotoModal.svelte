@@ -1,4 +1,7 @@
 <script lang="ts">
+	let exifKey = $state<any>(undefined);
+	let aiTag = $state<any>(undefined);
+
  import { Brain } from "lucide-svelte";
 import { Calendar } from "lucide-svelte";
 import { Camera } from "lucide-svelte";

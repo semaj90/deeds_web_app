@@ -215,7 +215,7 @@ export class GraphService {
  `
  MERGE (c:Case {id: $caseId})
  MERGE (s:Statute {code: $code})
- MERGE (c)-[r:${linkType}]->(s)
+ MERGE (c)-[r:${ linkType }]->(s)
  SET r.createdAt = timestamp()
  `,
  { caseId: code }

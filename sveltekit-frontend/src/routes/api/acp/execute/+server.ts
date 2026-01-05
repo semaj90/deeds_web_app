@@ -42,7 +42,7 @@ export const POST: RequestHandler = async ({ request }) => {
 		if (!schema) {
 			return json(
 				{
-					error: `Unknown tool: ${tool}`,
+					error: `Unknown tool: ${ tool }`,
 					availableTools: [
 						'knowledge:search', 'knowledge:index',
 						'code:analyze', 'code:search', 'code:ast',

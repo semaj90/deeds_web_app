@@ -72,7 +72,7 @@ describe('YoRHa Performance Tests', () => {
  it('should handle bulk insert of 100 nodes', async () => {
  const nodes = Array.from({ length: 100 }, (_, i) => ({
  case_id: caseId,
- title: `Bulk Node ${i}`,
+ title: `Bulk Node ${ i }`,
  evidence_type: 'document',
  created_by: mockUser.id,
  }));

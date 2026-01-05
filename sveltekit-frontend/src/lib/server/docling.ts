@@ -61,7 +61,7 @@ export async function analyzeDocumentWithDocling(args: AnalyzeArgs): Promise<Doc
  proc.on('close', async (code) => {
  try {
  if (code !== 0) {
- return reject(new Error(`Docling exited with ${code}: ${stderr || 'no stderr'}`));
+ return reject(new Error(`Docling exited with ${ code }: ${stderr || 'no stderr'}`));
  }
 
  const raw = await readFile(tmpOutput, 'utf8');

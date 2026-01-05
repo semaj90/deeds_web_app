@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { TooltipContent, TooltipRoot, TooltipTrigger } from 'bits-ui';
+
 	import * as Tooltip from 'bits-ui/components/tooltip';
 	import { onMount } from 'svelte';
 
@@ -214,8 +216,8 @@
 <div class="nes-graph-container">
 	<canvas
 		bind:this={canvas}
-		onclick={handleCanvasClick}
-		onmousemove={handleCanvasMove}
+		onclick={ handleCanvasClick: handleCanvasClick }
+		onmousemove={ handleCanvasMove: handleCanvasMove }
 		onmouseleave={() => {
 			hoveredNode = null;
 			showTooltip = false;
@@ -225,15 +227,15 @@
 	></canvas>
 
 	{#if showTooltip && hoveredNode}
-		<Tooltip.Root open={showTooltip}>
-			<Tooltip.Trigger class="tooltip-trigger" style="left: {tooltipX}px; top: {tooltipY}px;" />
-			<Tooltip.Content class="nes-tooltip">
+		<TooltipRoot open={showTooltip}>
+			<TooltipTrigger class="tooltip-trigger" style="left: {tooltipX}px; top: {tooltipY}px;" />
+			<TooltipContent class="nes-tooltip">
 				<div class="nes-tooltip-content">
 					<div class="font-mono text-xs">{hoveredNode.label}</div>
 					<div class="text-[10px] text-[#aaa]">{hoveredNode.type}</div>
 				</div>
-			</Tooltip.Content>
-		</Tooltip.Root>
+			</TooltipContent>
+		</TooltipRoot>
 	{/if}
 </div>
 

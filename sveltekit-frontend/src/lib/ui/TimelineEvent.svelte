@@ -1,4 +1,8 @@
 <script lang="ts">
+	let time = $state<any>(undefined);
+	let title = $state<any>(undefined);
+	let description = $state<any>(undefined);
+
  let { time = "", title = "", description = "", type = "event" } = $props();
 </script>
 

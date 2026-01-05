@@ -223,7 +223,7 @@ code
 \`\`\`
 
 ## Confidence
-${text}
+${ text }
 
 ## Related Errors
 error1`,

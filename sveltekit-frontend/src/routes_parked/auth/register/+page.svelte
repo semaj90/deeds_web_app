@@ -34,7 +34,7 @@
  action="?/register"
  use:enhance={({ formData, cancel }) => {
  isLoading = true
- return async ({ result }) => {
+ return async ({ result: result }) => {
  isLoading = false
  if ((result as { type?: any }).type === 'redirect') {
  // Let SvelteKit handle the redirect

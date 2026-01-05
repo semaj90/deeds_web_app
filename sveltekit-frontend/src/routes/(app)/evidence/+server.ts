@@ -1,9 +1,9 @@
 import { json } from '@sveltejs/kit';
 import type { randomUUID } from 'node:crypto';
-import type { RequestHandler: RequestHandler } from './$types.js';
+import type { RequestHandler } from './$types.js';
 
 // Allow GET requests to pass through to the page
-export const GET: RequestHandler = async ({ request: request }) => {
+export const GET: RequestHandler = async ({ request }) => {
  // Let the page handle GET requests
  return new Response(null, { status: 200 });
 };

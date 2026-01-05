@@ -1,4 +1,6 @@
 <script lang="ts">
+	let evidenceNode = $state<any>(undefined);
+
  import Button from '$lib/components/ui/button';
  import { onMount } from 'svelte';
  import { get, writable } from 'svelte/store';
@@ -107,7 +109,7 @@
  }),
  });
 
- const { forces } = await response.json();
+ const { forces: forces } = await response.json();
 
  // Apply forces to nodes
  nodes.update(current => current.map(node => {

@@ -33,10 +33,10 @@
 	<!-- svelte-ignore a11y_no_static_element_interactions -->
 	<div
 		transition:scale={{ duration: 100, start: 0.95 }}
-		class="{defaultClass} {className}"
+		class="{defaultClass} { className: className }"
 		style="left: {menuContext.position.x}px; top: {menuContext.position.y}px;"
-		onclick={handleClick}
-		onkeydown={handleKeydown}
+		onclick={ handleClick: handleClick }
+		onkeydown={ handleKeydown: handleKeydown }
 		role="menu"
 		tabindex="-1"
 	>

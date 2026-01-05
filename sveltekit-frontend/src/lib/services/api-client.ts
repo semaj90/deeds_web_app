@@ -169,7 +169,7 @@ class ApiClient {
  endpoint: string, options: RequestInit = {},
  retryCount = 0
  ): Promise<ApiResponse<T>> {
- const url = `${this.baseURL}${endpoint}`;
+ const url = `${this.baseURL}${ endpoint }`;
  const controller = new AbortController();
  const timeoutId = setTimeout(() => controller.abort(), this.timeout);
 
@@ -214,7 +214,7 @@ class ApiClient {
  }
 
  async get<T>(endpoint: string, params?: Record<string, any>): Promise<ApiResponse<T>> {
- const url = params ? `${endpoint}?${new URLSearchParams(params)}` : endpoint;
+ const url = params ? `${ endpoint }?${new URLSearchParams(params)}` : endpoint;
  return this.request<T>(url);
  }
 
@@ -253,7 +253,7 @@ export const caseApi = {
  },
 
  async getCase(id: string): Promise<ApiResponse<Case>> {
- return apiClient.get<Case>(`/api/cases/${id}`);
+ return apiClient.get<Case>(`/api/cases/${ id }`);
  },
 
  async createCase(data: Omit<Case, 'id' | 'createdAt' | 'updatedAt'>): Promise<ApiResponse<Case>> {
@@ -261,11 +261,11 @@ export const caseApi = {
  },
 
  async updateCase(id: string, data: Partial<Case>): Promise<ApiResponse<Case>> {
- return apiClient.put<Case>(`/api/cases/${id}`, data);
+ return apiClient.put<Case>(`/api/cases/${ id }`, data);
  },
 
  async deleteCase(id: string): Promise<ApiResponse<void>> {
- return apiClient.delete<void>(`/api/cases/${id}`);
+ return apiClient.delete<void>(`/api/cases/${ id }`);
  },
 
  async getCaseStats(): Promise<ApiResponse<CaseStats>> {
@@ -287,7 +287,7 @@ export const evidenceApi = {
  },
 
  async getEvidenceItem(id: string): Promise<ApiResponse<Evidence>> {
- return apiClient.get<Evidence>(`/api/evidence/${id}`);
+ return apiClient.get<Evidence>(`/api/evidence/${ id }`);
  },
 
  async uploadEvidence(formData: FormData): Promise<ApiResponse<Evidence>> {

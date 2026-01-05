@@ -1,4 +1,7 @@
 <script lang="ts">
+	let className = $state<any>(undefined);
+	let content = $state<any>(undefined);
+
 /**
  * Svelte 5 Tooltip Component
  * Native HTML with Svelte 5 runes and accessible tooltip
@@ -59,10 +62,10 @@ function hide() {
 <div
 	class="relative inline-block {className}"
 	bind:this={triggerRef}
-	onmouseenter={show}
-	onmouseleave={hide}
-	onfocus={show}
-	onblur={hide}
+	onmouseenter={ show: show }
+	onmouseleave={ hide: hide }
+	onfocus={ show: show }
+	onblur={ hide: hide }
 >
 	<!-- Trigger content -->
 	{#if children}

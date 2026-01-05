@@ -55,7 +55,7 @@ export class FeatureFlags extends BaseService implements IFeatureFlags {
 
  const enabled = this.flags[flagName as keyof FeatureFlagConfig] ?? false;
 
- this.log('info', `Feature flag check: ${flagName} = ${enabled}`);
+ this.log('info', `Feature flag check: ${ flagName } = ${enabled}`);
 
  return enabled;
  }
@@ -70,7 +70,7 @@ export class FeatureFlags extends BaseService implements IFeatureFlags {
  const oldValue = this.flags[flagName as keyof FeatureFlagConfig];
  this.flags[flagName as keyof FeatureFlagConfig] = enabled;
 
- this.log('info', `Feature flag updated: ${flagName} = ${oldValue} -> ${enabled}`);
+ this.log('info', `Feature flag updated: ${ flagName } = ${oldValue} -> ${enabled}`);
  }
 
  /**

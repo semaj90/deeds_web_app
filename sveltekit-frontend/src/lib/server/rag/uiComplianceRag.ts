@@ -84,5 +84,5 @@ export async function initUIComplianceRAG(): Promise<GemmaVectorStore> {
 
 export async function fetchUISpecForRoute(route: string): Promise<StoredDoc[]> {
  const store = await initUIComplianceRAG();
- return store.similaritySearch(`Describe YoRHa compliance requirements for route ${route}`, 5);
+ return store.similaritySearch(`Describe YoRHa compliance requirements for route ${ route }`, 5);
 }

@@ -146,10 +146,10 @@
  Version History
  </button>
  {:else}
- <button class="btn-primary" onclick={saveSummary} disabled={isSaving}>
+ <button class="btn-primary" onclick={ saveSummary: saveSummary } disabled={isSaving}>
  {isSaving ? 'Saving...' : 'Save'}
  </button>
- <button class="btn-secondary" onclick={cancelEdit}>
+ <button class="btn-secondary" onclick={ cancelEdit: cancelEdit }>
  Cancel
  </button>
  {/if}

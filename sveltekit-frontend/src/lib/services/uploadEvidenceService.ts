@@ -141,7 +141,7 @@ export async function completeUpload(
  params.append('checksum', checksum);
  }
 
- const response = await fetch(`${API_BASE}/${evidenceId}/complete?${params}`, {
+ const response = await fetch(`${API_BASE}/${ evidenceId }/complete?${params}`, {
  method: 'POST',
  });
 
@@ -157,7 +157,7 @@ export async function completeUpload(
  * Get current upload status
  */
 export async function getUploadStatus(jobId: string): Promise<UploadStatus> {
- const response = await fetch(`${API_BASE}/${jobId}/progress`);
+ const response = await fetch(`${API_BASE}/${ jobId }/progress`);
 
  if (!response.ok) {
  throw new Error('Failed to get upload status');
@@ -175,7 +175,7 @@ export async function streamProcessingEvents(
  onError?: (error: Error) => void
 ): Promise<void> {
  return new Promise((resolve, reject) => {
- const eventSource = new EventSource(`${API_BASE}/${jobId}/stream`);
+ const eventSource = new EventSource(`${API_BASE}/${ jobId }/stream`);
 
  eventSource.onmessage = (event) => {
  try {
@@ -253,7 +253,7 @@ export async function uploadEvidence(
  * Retry failed processing
  */
 export async function retryProcessing(evidenceId: string): Promise<{ jobId: string }> {
- const response = await fetch(`${API_BASE}/${evidenceId}/retry`, {
+ const response = await fetch(`${API_BASE}/${ evidenceId }/retry`, {
  method: 'POST',
  });
 
@@ -269,7 +269,7 @@ export async function retryProcessing(evidenceId: string): Promise<{ jobId: stri
  * Get evidence details
  */
 export async function getEvidenceDetails(evidenceId: string) {
- const response = await fetch(`${API_BASE}/${evidenceId}`);
+ const response = await fetch(`${API_BASE}/${ evidenceId }`);
 
  if (!response.ok) {
  throw new Error('Failed to get evidence details');
@@ -306,7 +306,7 @@ export async function listEvidence(
  * Delete evidence
  */
 export async function deleteEvidence(evidenceId: string): Promise<void> {
- const response = await fetch(`${API_BASE}/${evidenceId}`, {
+ const response = await fetch(`${API_BASE}/${ evidenceId }`, {
  method: 'DELETE',
  });
 

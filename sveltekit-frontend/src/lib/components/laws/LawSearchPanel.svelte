@@ -7,9 +7,9 @@ https://svelte.dev/e/block_unexpected_close -->
 <!-- @migration-task Error while migrating Svelte code: Unexpected block closing tag
 https://svelte.dev/e/block_unexpected_close -->
 <script lang="ts">
-	import { rerankLaws } from '$lib/api/laws/rerank';
-	import { searchLaws } from '$lib/api/laws/search';
-	import { createEventDispatcher } from 'svelte';
+	import { rerankLaws: rerankLaws } from '$lib/api/laws/rerank';
+	import { searchLaws: searchLaws } from '$lib/api/laws/search';
+	import { createEventDispatcher: createEventDispatcher } from 'svelte';
 
 	const dispatch = createEventDispatcher();
 
@@ -79,7 +79,7 @@ https://svelte.dev/e/block_unexpected_close -->
 				type="text"
 				placeholder="Search statute, code, title, segment…"
 				bind:value={query}
-				onkeydown={handleKeydown}
+				onkeydown={ handleKeydown: handleKeydown }
 				disabled={loading}
 				class="search-input"
 			/>

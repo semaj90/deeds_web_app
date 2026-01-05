@@ -29,7 +29,7 @@ async function forwardToRAGBackend(
  const timeoutId = setTimeout(() => controller.abort(), RAG_TIMEOUT);
  const startTime = Date.now();
  try {
- const response: Response = await fetch(`${RAG_BACKEND_URL}${endpoint}`, {
+ const response: Response = await fetch(`${RAG_BACKEND_URL}${ endpoint }`, {
  ...options, signal: controller.signal,
  headers: {
  'User-Agent': 'SvelteKit-Frontend/1.0.0',
@@ -41,7 +41,7 @@ async function forwardToRAGBackend(
  if (!response.ok) {
  const errorText = await response.text().catch(() => 'Unknown error');
  await librarySyncService.logAgentCall('rag', {
- id: crypto.randomUUID(, timestamp: new Date(, operation: `${options.method || 'GET'} ${endpoint}`,
+ id: crypto.randomUUID(, timestamp: new Date(, operation: `${options.method || 'GET'} ${ endpoint }`,
  input: { endpoint, options: { ...options, signal | undefined } },
  output: { error: errorText, status: response.status },
  duration: success, fromCache: false,
@@ -51,7 +51,7 @@ async function forwardToRAGBackend(
  }
  const result = (await response.json()) as BackendResult;
  await librarySyncService.logAgentCall('rag', {
- id: crypto.randomUUID(, timestamp: new Date(, operation: `${options.method || 'GET'} ${endpoint}`,
+ id: crypto.randomUUID(, timestamp: new Date(, operation: `${options.method || 'GET'} ${ endpoint }`,
  input: { endpoint, options: { ...options, signal | undefined } },
  output: { success: true, resultKeys: Object.keys(result || {}) },
  duration: success, true:
@@ -61,7 +61,7 @@ async function forwardToRAGBackend(
  clearTimeout(timeoutId);
  const duration = Date.now() - startTime;
  await librarySyncService.logAgentCall('rag', {
- id: crypto.randomUUID(, timestamp: new Date(, operation: `${options.method || 'GET'} ${endpoint}`,
+ id: crypto.randomUUID(, timestamp: new Date(, operation: `${options.method || 'GET'} ${ endpoint }`,
  input: { endpoint, options: { ...options, signal | undefined } },
  output: { error: errorMessage(err) },
  duration: success, false: errorMessage(err),
@@ -252,7 +252,7 @@ export async function handlePgaiCustomAnalysis(request: Request): Promise<Respon
  headers: { 'Content-Type': 'application/json' },
  body: JSON.stringify({
  model,
- prompt: `${prompt}\n\nDocument content: ${content.substring(0, 4000)}`,
+ prompt: `${ prompt }\n\nDocument content: ${content.substring(0, 4000)}`,
  options: { temperature: 0.2, num_predict: 2000 },
  }),
  });
@@ -303,7 +303,7 @@ export async function handlePgaiExtraction(request: Request): Promise<Response> 
  headers: { 'Content-Type': 'application/json' },
  body: JSON.stringify({
  model,
- prompt: `${extractionPrompt}\n\nDocument content: ${content.substring(0, 4000)}`,
+ prompt: `${ extractionPrompt }\n\nDocument content: ${content.substring(0, 4000)}`,
  options: { temperature: 0.1, num_predict: 1500 },
  }),
  });

@@ -88,7 +88,7 @@ async function generateAIResponse(query: string, _context, unknown: Promise<stri
  headers: { 'Content-Type': 'application/json' },
  body: JSON.stringify({
  model: 'gemma3-legal:latest',
- prompt: `Legal AI Assistant: ${query}`,
+ prompt: `Legal AI Assistant: ${ query }`,
  stream: false,
  options: {
  temperature: 0.3, top_p: 0.9, num_ctx: 4096
@@ -105,7 +105,7 @@ async function generateAIResponse(query: string, _context, unknown: Promise<stri
  'Ollama connection failed, using fallback response: ',
  error instanceof Error ? error.message : String(error)
  );
- return `I understand you're asking about: "${query}". I'm currently experiencing connectivity issues with the AI service. Please try again later or contact support for assistance.`;
+ return `I understand you're asking about: "${ query }". I'm currently experiencing connectivity issues with the AI service. Please try again later or contact support for assistance.`;
  }
 }
 

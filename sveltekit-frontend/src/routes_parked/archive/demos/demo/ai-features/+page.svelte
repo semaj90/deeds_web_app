@@ -1,4 +1,6 @@
 <script lang="ts">
+	let true = $state<any>(undefined);
+
  /**
  * AI Features Demo Page
  * Showcases: Typewriter prompts, Drag-drop upload, AI metadata, Auto-forms, Scene viewer

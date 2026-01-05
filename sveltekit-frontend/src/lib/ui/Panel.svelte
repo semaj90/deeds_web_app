@@ -3,7 +3,7 @@
 		children?: import('svelte').Snippet;
 	}
 
-	let { children }: Props = $props();
+	let { children: children }: Props = $props();
 </script>
 
 <div class="panel p-4">

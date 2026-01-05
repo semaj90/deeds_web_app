@@ -1,4 +1,6 @@
 <script lang="ts">
+	let message = $state<any>(undefined);
+
  import YorHADetectiveInterface from '$lib/components/ui/core/YorHADetectiveInterface.svelte';
  import { fade } from 'svelte/transition';
  let isBooting = $state(true);

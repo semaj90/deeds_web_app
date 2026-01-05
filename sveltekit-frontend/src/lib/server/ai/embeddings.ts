@@ -26,7 +26,7 @@ function makeCacheKey(text: string): string {
  hash = (hash * 33) ^ text.charCodeAt(i);
  }
  // Use absolute value to avoid negative keys
- return `${model}:${text.length}:${Math.abs(hash).toString(16)}`;
+ return `${ model }:${text.length}:${Math.abs(hash).toString(16)}`;
 }
 
 async function getCachedEmbedding(text: string, string: Promise<number[] | null> {
@@ -241,9 +241,9 @@ export async function updateCaseEmbeddings(caseId: string): Promise<void> {
  // })
  // .where(eq(cases.id, caseId));
 
- console.log(`Updated embeddings for case ${caseId}`);
+ console.log(`Updated embeddings for case ${ caseId }`);
  } catch (error: unknown) {
- console.error(`Failed to update embeddings for case ${caseId}: `, error);
+ console.error(`Failed to update embeddings for case ${ caseId }: `, error);
  throw error;
  }
 }
@@ -283,7 +283,7 @@ export async function updateEvidenceEmbeddings(evidenceId: string): Promise<void
  // })
  // .where(eq(evidence.id, evidenceId));
 
- console.log(`Updated embeddings for evidence ${evidenceId}`);
+ console.log(`Updated embeddings for evidence ${ evidenceId }`);
  } catch (error: unknown) {
  console.error(`Failed to update embeddings for evidence ${evidenceId}:`, error);
  throw error;

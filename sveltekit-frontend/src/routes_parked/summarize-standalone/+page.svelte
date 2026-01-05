@@ -303,7 +303,7 @@ Additionally, we recommend exploring settlement negotiations before filing suit,
  <div class="processing-steps">
  {#each processingSteps as step, i}
  <div class="step {i === processingSteps.length - 1 ? 'current' : 'completed'}">
- {step}
+ { step: step }
  </div>
  {/each}
  </div>
@@ -348,7 +348,7 @@ Additionally, we recommend exploring settlement negotiations before filing suit,
  <h5>🏷️ Key Legal Terms</h5>
  <div class="terms-list">
  {#each Array.isArray(metadata.keyLegalTerms) ? metadata.keyLegalTerms : [] as term}
- <span class="term-tag">{term}</span>
+ <span class="term-tag">{ term: term }</span>
  {/each}
  </div>
  </div>

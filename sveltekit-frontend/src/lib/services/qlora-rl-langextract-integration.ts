@@ -4,15 +4,12 @@
  */
 
 import type { NESMemoryArchitecture } from '../memory/nes-memory-architecture.js';
-import type { LegalDocument } from '../memory/nes-memory-architecture.js';
 import type { WebGPUSOMCache } from '../webgpu/som-webgpu-cache.js';
 import type { lokiRedisCache } from '../cache/loki-redis-integration.js';
 import type { metrics } from "@opentelemetry/api";
-import { boolean } from "drizzle-orm/gel-core";
 import { Record as Neo4jRecord } from "neo4j-driver";
 import { config } from "process";
-import type { LegalDocument, type LegalDocument } from "$lib/models/LegalDocument.svelte.js";
-import type { string } from "fast-check";
+import type { LegalDocument } from "$lib/models/LegalDocument.svelte.js";
 
 // Generic JSON value type
 type JsonValue = string | number | boolean | null | JsonValue[] | { [k: string]: JsonValue };
@@ -363,7 +360,7 @@ const nametablePosition = Math.floor(Math.random() * 960);
  }
 
  private async triggerQLoRAFineTuning(documentType: string): Promise<string> {
- const jobId = `qlora_flywheel_${documentType}_${Date.now()}`;
+ const jobId = `qlora_flywheel_${ documentType }_${Date.now()}`;
  const trainingData = await this.collectDataFlywheelExamples(documentType);
  const adaptiveConfig = await this.calculateAdaptiveLoRAConfig(documentType, trainingData);
  const qloraJob: QLorATrainingJob = {
@@ -386,7 +383,7 @@ const nametablePosition = Math.floor(Math.random() * 960);
  };
  this.qloraTrainingQueue.set(jobId, qloraJob);
  await this.startDataFlywheelTraining(qloraJob);
- console.log(`🔄 DATA FLYWHEEL, QLoRA training started for ${documentType} - Job: ${jobId}`);
+ console.log(`🔄 DATA FLYWHEEL, QLoRA training started for ${ documentType } - Job: ${jobId}`);
  console.log(`📊 Training with ${trainingData.length} high-quality examples`);
  return jobId;
  }
@@ -395,7 +392,7 @@ const nametablePosition = Math.floor(Math.random() * 960);
  documentType: string
  ): Promise<LegalExtractionExample[]> {
  const examples: LegalExtractionExample[] = [];
- const historyKey = `extraction_history:${documentType}`;
+ const historyKey = `extraction_history:${ documentType }`;
  try {
  const historyData = await lokiRedisCache.get(historyKey);
  if (!historyData) return [];

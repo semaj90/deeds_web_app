@@ -830,7 +830,8 @@ console.log(response.answer);
 | Batch 2 | 50 | 86,345 | 85,577 | -768 (-0.8%) |
 | Batch 3 | 50 | 85,577 | 83,195 | -2,382 (-2.8%) |
 | Batch 4 | 15 | 83,195 | 83,153 | -42 (-0.05%) |
-| **Total** | **215** | **98,370** | **83,153** | **-15,217 (-15.5%)** |
+| Dry-Run | 1 | 83,153 | 82,327 | -826 (-1.0%) |
+| **Total** | **216** | **98,370** | **82,327** | **-16,043 (-16.3%)** |
 
 ### Restoration Strategy
 Files were restored from `main` branch (`5d4dfa07dd`) to fix colon-semicolon corruption:
@@ -838,20 +839,30 @@ Files were restored from `main` branch (`5d4dfa07dd`) to fix colon-semicolon cor
 git checkout 5d4dfa07dd -- sveltekit-frontend/src/lib/path/to/file.ts
 ```
 
+### Manual Fixes (Dry-Run)
+1. **`qlora-rl-langextract-integration.ts`**:
+   - Restored from main.
+   - Fixed duplicate imports (`LegalDocument`) and shadowing (`boolean`, `string`).
+   - Reduced errors from 1,022 to 365.
+2. **`lucia.ts`**:
+   - Fixed template literal corruption (`${ userId: userId }` -> `${userId}`).
+   - Root cause for many auth-related errors.
+
 ### Top Remaining Error Files (Need Manual Fixes)
 | File | Errors | Issue |
 |------|--------|-------|
-| `NESYoRHaHybrid3D.ts` | 1,034 | Complex 3D component |
-| `nes-memory-architecture.ts` | 474 | Memory architecture |
-| `enhanced-rag-pipeline.ts` | 416 | RAG pipeline |
-| `tensor-acceleration.ts` | 407 | WebGPU types |
-| `webgpu-langchain-bridge.ts` | 383 | Bridge types |
+| `error-analysis/+page.svelte` | 1,140 | Missing imports/definitions |
+| `NESYoRHaHybrid3D.ts` | 1,008 | DEFERRED |
+| `grpoThinkingService.ts` | 871 | New top offender |
+| `LegalAIOrchestrationDemo.svelte` | 835 | Svelte 5 migration |
+| `rag-pipeline-enhanced.ts` | 757 | RAG pipeline |
 
 ### Commits
 - `8f6b081668` - Batch 1: Restore top 100 files
 - `b62cda054e` - Batch 2: Restore files 101-150
 - `bd6ab89990` - Batch 3: Restore files 151-200
 - `18a77d46a1` - Batch 4: Restore files 201-215
+- `[Pending]` - Dry-run fixes & lucia.ts repair
 
 ---
 

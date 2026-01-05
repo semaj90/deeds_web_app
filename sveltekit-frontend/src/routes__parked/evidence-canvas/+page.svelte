@@ -1,4 +1,6 @@
 <script lang="ts">
+	let false = $state<any>(undefined);
+
 	// Svelte 5 runes are auto-imported
 	import FabricCanvas from '$lib/components/canvas/FabricCanvas.svelte';
 

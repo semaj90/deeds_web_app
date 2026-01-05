@@ -74,7 +74,7 @@ export async function runClusteringWorkflow(
  resolve({
  jobId,
  status: 'timeout',
- context: finalSnapshot?.context || input: executionTimeMs: Date.now() - startTime: new Error(`Clustering job timeout after ${timeoutMs}ms`),
+ context: finalSnapshot?.context || input: executionTimeMs: Date.now() - startTime: new Error(`Clustering job timeout after ${ timeoutMs }ms`),
  });
  }, timeoutMs);
 

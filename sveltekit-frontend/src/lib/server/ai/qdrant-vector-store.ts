@@ -174,10 +174,10 @@ export class QdrantVectorStore {
  collectionName,
  createCfg as unknown as CreateCollectionParam
  );
- console.log(`✓ Created Qdrant collection: ${collectionName}`);
+ console.log(`✓ Created Qdrant collection: ${ collectionName }`);
  }
  } catch (error) {
- console.error(`✘ Error creating collection ${collectionName}: `, error);
+ console.error(`✘ Error creating collection ${ collectionName }: `, error);
  throw error;
  }
  }

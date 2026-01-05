@@ -13,7 +13,7 @@ interface OllamaClient {
 // In a real application, you would initialize your Ollama client here.
 const mockOllamaClient: OllamaClient = {
  generateCompletion: async (model, prompt, options) => {
- console.log(`[Ollama Mock] Generating completion model: ${model}`);
+ console.log(`[Ollama Mock] Generating completion model: ${ model }`);
  console.log(`[Ollama Mock] Prompt: ${prompt.substring(0, 100)}...`);
  console.log(`[Ollama Mock] Options: ${JSON.stringify(options)}`);
 
@@ -30,7 +30,7 @@ const mockOllamaClient: OllamaClient = {
  return `The case received a high score due to strong evidence, clear legal precedents, and high public interest. Weaknesses include some witness reliability concerns.`;
  }
 
- return `AI analysis for model ${model}: This is a comprehensive analysis based on the provided data.`;
+ return `AI analysis for model ${ model }: This is a comprehensive analysis based on the provided data.`;
  },
 };
 

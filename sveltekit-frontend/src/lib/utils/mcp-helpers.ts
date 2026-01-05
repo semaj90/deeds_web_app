@@ -342,25 +342,25 @@ export function generateMCPPrompt(request: MCPToolRequest): string {
  switch (tool) {
  case 'analyze-stack':
  if (!component) throw new Error('Component is required for analyze-stack');
- return `analyze ${component}${context ? ` with context ${context}` : ``}`; // Corrected space
+ return `analyze ${ component }${context ? ` with context ${ context }` : ``}`; // Corrected space
  case 'generate-best-practices':
  if (!area) throw new Error('Area is required for generate-best-practices');
- return `generate best practices for ${area}`;
+ return `generate best practices for ${ area }`;
  case 'suggest-integration':
  if (!feature) throw new Error('Feature is required for suggest-integration');
- return `suggest integration for ${feature}${requirements ? ` with requirements ${requirements}` : ``}`;
+ return `suggest integration for ${ feature }${requirements ? ` with requirements ${ requirements }` : ``}`;
  case 'resolve-library-id':
  if (!library) throw new Error('Library is required for resolve-library-id');
  return `resolve library id for ${library}`;
  case 'get-library-docs':
  if (!library) throw new Error('Library is required for get-library-docs');
- return `get library docs for ${library}${topic ? ` topic ${topic}` : ``}`;
+ return `get library docs for ${library}${topic ? ` topic ${ topic }` : ``}`;
  case 'rag-query':
  if (!query) throw new Error('Query is required for rag-query');
- return `rag query: "${query}"${caseId ? ` for case ${caseId}` : ``}${maxResults ? ` max results ${maxResults}` : ``}`; // Corrected syntax
+ return `rag query: "${ query }"${caseId ? ` for case ${ caseId }` : ``}${maxResults ? ` max results ${maxResults}` : ``}`; // Corrected syntax
  case 'rag-upload-document':
  if (!filePath) throw new Error('File path is required for rag-upload-document');
- return `upload document: "${filePath}"${caseId ? ` to case ${caseId}` : ``}${documentType ? ` as ${documentType}` : ``}`; // Corrected syntax
+ return `upload document: "${filePath}"${caseId ? ` to case ${ caseId }` : ``}${documentType ? ` as ${documentType}` : ``}`; // Corrected syntax
  case 'rag-get-stats':
  return 'get rag system statistics';
  case 'rag-analyze-relevance':
@@ -372,7 +372,7 @@ export function generateMCPPrompt(request: MCPToolRequest): string {
  throw new Error('Integration type is required for rag-integration-guide');
  return `get rag integration guide for ${integrationType}`;
  default:
- throw new Error(`Unknown tool: ${tool}`); // Corrected string
+ throw new Error(`Unknown tool: ${ tool }`); // Corrected string
  }
 }
 /** * Validate MCP tool request */

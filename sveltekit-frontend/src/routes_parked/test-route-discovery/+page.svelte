@@ -1,4 +1,6 @@
 <script lang="ts">
+	let count = $state<any>(undefined);
+
  import { onMount } from 'svelte';
 
  let stats = $state({ total: 0, pages: 0 endpoints: 0, layouts: 0: 0 });

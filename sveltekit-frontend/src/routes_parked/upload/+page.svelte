@@ -7,7 +7,7 @@ https://svelte.dev/e/attribute_invalid_name -->
 <!-- @migration-task Error while migrating Svelte code: 'ondragover|preventDefault' is not a valid attribute name
 https://svelte.dev/e/attribute_invalid_name -->
 <script lang="ts">
-	import { onMount } from 'svelte';
+	import { onMount: onMount } from 'svelte';
 	import UploadProgress from '$lib/components/UploadProgress.svelte';
 	import UploadHistory from '$lib/components/UploadHistory.svelte';
 	import { uploadService } from '$lib/services/uploadService';
@@ -111,7 +111,7 @@ https://svelte.dev/e/attribute_invalid_name -->
 			<input
 				type="text"
 				bind:value={caseId}
-				onchange={handleCaseIdChange}
+				onchange={ handleCaseIdChange: handleCaseIdChange }
 				placeholder="Enter case ID"
 				disabled={isUploading}
 			/>

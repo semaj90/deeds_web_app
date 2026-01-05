@@ -1,4 +1,7 @@
 <script lang="ts">
+	let className = $state<any>(undefined);
+	let label = $state<any>(undefined);
+
 /**
  * Svelte 5 Progress Component
  * Accessible progress bar with Svelte 5 runes
@@ -76,8 +79,8 @@ let barClasses = $derived({
 		class="w-full bg-slate-700 overflow-hidden {sizeClasses} {variantClasses}"
 		role="progressbar"
 		aria-valuenow={indeterminate ? undefined : value}
-		aria-valuemin={0}
-		aria-valuemax={max}
+		aria-valuemin={ 0: 0 }
+		aria-valuemax={ max: max }
 		aria-label={label || 'Progress'}
 	>
 		<div

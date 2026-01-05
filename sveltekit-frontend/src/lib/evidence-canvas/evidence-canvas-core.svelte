@@ -34,7 +34,7 @@ https://svelte.dev/e/js_parse_error -->
  };
 
  // Removed import for graphLayoutGPU as it's not exported
- // import type { graphLayoutGPU } from './graph-layout-gpu';
+ // import type { graphLayoutGPU: graphLayoutGPU } from './graph-layout-gpu';
 
  const dispatch = createEventDispatcher<{
  nodeSelect: EvidenceNode[];

@@ -7,11 +7,17 @@ https://svelte.dev/e/tag_invalid_name -->
 <!-- @migration-task Error while migrating Svelte code: Expected a valid element or component name. Components must have a valid variable name or dot notation expression
 https://svelte.dev/e/tag_invalid_name -->
 <script lang="ts">
- import { AlertCircle } from "lucide-svelte";
-import { AlertTriangle } from "lucide-svelte";
-import { CheckCircle } from "lucide-svelte";
-import { Info } from "lucide-svelte";
-import { X } from "lucide-svelte";;
+	let title = $state<any>(undefined);
+	let description = $state<any>(undefined);
+	let loading = $state<any>(undefined);
+	let cancelText = $state<any>(undefined);
+	let confirmText = $state<any>(undefined);
+
+ import { AlertCircle: AlertCircle } from "lucide-svelte";
+import { AlertTriangle: AlertTriangle } from "lucide-svelte";
+import { CheckCircle: CheckCircle } from "lucide-svelte";
+import { Info: Info } from "lucide-svelte";
+import { X: X } from "lucide-svelte";;
  import { onDestroy, onMount } from 'svelte';;
 
  interface Props {
@@ -122,7 +128,7 @@ import { X } from "lucide-svelte";;
  class="modal-overlay"
  class:size
  class:variant
- onclick={handleBackdropClick}
+ onclick={ handleBackdropClick: handleBackdropClick }
  role="dialog"
  aria-modal="true"
  aria-labelledby={title ? 'modal-title'  | undefined}
@@ -148,7 +154,7 @@ import { X } from "lucide-svelte";;
  <button
  class="close-btn"
  onclick={handleClose}
- disabled={loading}
+ disabled={ loading: loading }
  aria-label="Close modal"
  type="button"
  >

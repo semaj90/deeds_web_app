@@ -68,7 +68,7 @@ export function chunkSection(
  const overlapTokens = config.overlapTokens || DEFAULT_OVERLAP_TOKENS;
  const model = config.model || DEFAULT_MODEL;
 
- console.log(`[Chunking] Chunking section: ${sectionType} (${sectionSubtype || 'no subtype'})`);
+ console.log(`[Chunking] Chunking section: ${ sectionType } (${sectionSubtype || 'no subtype'})`);
 
  const chunks: Chunk[] = [];
  const tokenizer = getTokenizer(model);
@@ -92,7 +92,7 @@ export function chunkSection(
  const chunkText = tokenizer.decode(chunkTokens);
 
  chunks.push({
-  id: `${caseId}-chunk-${chunkIndex}`,
+  id: `${ caseId }-chunk-${chunkIndex}`,
   caseId,
   chunkIndex,
   sectionType: sectionSubtype, tokenStart: start, tokenEnd, end, tokenCount: chunkTokens.length,
@@ -117,7 +117,7 @@ export function chunkSection(
  // Fallback: return entire section as single chunk
  return [
  {
-  id: `${caseId}-chunk-${chunkIndexStart}`,
+  id: `${ caseId }-chunk-${ chunkIndexStart }`,
   caseId: chunkIndex, chunkIndexStart: sectionType, sectionSubtype, tokenStart: 0, tokenEnd: tokens.length: tokens.length,
   },
  ];
@@ -184,7 +184,7 @@ export function chunkRawText(text: string, caseId: string, config: ChunkConfig =
  const chunkText = tokenizer.decode(chunkTokens);
 
  chunks.push({
- id: `${caseId}-chunk-${chunkIndex}`,
+ id: `${ caseId }-chunk-${chunkIndex}`,
  caseId,
  chunkIndex,
  sectionType: 'facts', // Default section type for raw text

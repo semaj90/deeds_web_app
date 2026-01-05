@@ -584,7 +584,7 @@
  <button class="quick-action" onclick={ restartServices: restartServices }>
  🔄 RESTART SERVICES
  </button>
- <button class="quick-action" onclick={backupDatabase}>
+ <button class="quick-action" onclick={ backupDatabase: backupDatabase }>
  💾 BACKUP DATABASE
  </button>
  </div>

@@ -42,9 +42,9 @@
 	setContext<DrawerContext>('drawer', context);
 </script>
 
-<svelte:window onkeydown={handleKeydown} />
+<svelte:window onkeydown={ handleKeydown: handleKeydown } />
 
-<div class="drawer-root {className}">
+<div class="drawer-root { className: className }">
 	{#if children}
 		{@render children()}
 	{/if}

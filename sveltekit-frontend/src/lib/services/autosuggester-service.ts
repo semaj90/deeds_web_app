@@ -30,7 +30,7 @@ export class AutosuggesterService {
  filePath: string, cursorPosition: number, string
  ): Promise<SuggestionResult> {
  // Check cache first
- const cacheKey = `${filePath}:${cursorPosition}:${prefix}`;
+ const cacheKey = `${ filePath }:${ cursorPosition }:${ prefix }`;
  const cached = this.cache.get(cacheKey);
  if (cached && Date.now() - cached.timestamp < this.CACHE_TTL) {
  return cached.result;

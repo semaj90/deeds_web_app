@@ -1474,7 +1474,7 @@ Object.assign(handlers, {
 			const minioAlias = 'local';
 
 			// Upload via docker exec with mc (MinIO Client)
-			const cmd = `docker exec ${containerName} mc cp /tmp/upload.tmp ${minioAlias}/${bucket}/${key}`;
+			const cmd = `docker exec ${containerName} mc cp /tmp/upload.tmp ${minioAlias}/${ bucket }/${key}`;
 
 			// Note: This requires mc to be configured inside the container
 			// Alternative: Use MinIO SDK via HTTP
@@ -1505,7 +1505,7 @@ Object.assign(handlers, {
 		try {
 			// Use MinIO HTTP API
 			const minioUrl = process.env.MINIO_URL || 'http://localhost:9000';
-			const response = await fetch(`${minioUrl}/${bucket}?list-type=2&prefix=${prefix}`, {
+			const response = await fetch(`${minioUrl}/${bucket}?list-type=2&prefix=${ prefix }`, {
 				headers: {
 					'Authorization': 'Basic ' + Buffer.from('minioadmin:minioadmin').toString('base64')
 				}

@@ -163,7 +163,7 @@
 		class:dragging={isDragging}
 		ondragover={ handleDragOver: handleDragOver }
 		ondragleave={ handleDragLeave: handleDragLeave }
-		ondrop={handleDrop}
+		ondrop={ handleDrop: handleDrop }
 	>
 		<div class="drop-content">
 			<div class="drop-icon">📁</div>

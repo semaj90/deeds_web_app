@@ -1100,9 +1100,17 @@ const answer = await ragChain.invoke({ input: 'Fix Drizzle errors' });
 
 ### Summary
 - **Baseline**: 98,370 errors
-- **Current**: 83,153 errors
-- **Reduction**: -15,217 (-15.5%)
-- **Files Restored**: 215 from main
+- **Current**: 82,327 errors
+- **Reduction**: -16,043 (-16.3%)
+- **Files Restored**: 216 from main
+
+### Recent Actions
+1. **Dry-Run Verification**:
+   - Restored `qlora-rl-langextract-integration.ts` (reduced errors 1022 -> 365).
+   - Fixed `lucia.ts` template literal corruption.
+2. **Next Steps**:
+   - Fix `grpoThinkingService.ts` (871 errors).
+   - Fix `LegalAIOrchestrationDemo.svelte` (835 errors).
 
 ---
 

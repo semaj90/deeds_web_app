@@ -1,5 +1,7 @@
 <!-- Modern Dark YoRHa Legal, AI, Platform -->
 <script lang="ts">
+	import { DialogClose, DialogContent, DialogDescription, DialogOverlay, DialogRoot, DialogTitle } from 'bits-ui';
+
 	import { goto } from '$app/navigation';
 	import * as Dialog from '$lib/components/ui/dialog';
 	import AlertTriangle from 'lucide-svelte/icons/alert-triangle';
@@ -381,12 +383,12 @@
 </style>
 
 {#if showNewCaseModal}
- <Dialog.Root bind:open={showNewCaseModal}>
- <Dialog.Overlay
+ <DialogRoot bind:open={showNewCaseModal}>
+ <DialogOverlay
  class="fixed inset-0 z-50 bg-black/80 data-[state=open]:animate-in data-[state=closed]:animate-out
  data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0"
  />
- <Dialog.Content
+ <DialogContent
  class="fixed left-[50%] top-[50%] z-50 grid w-full max-w-lg translate-x-[-50%] translate-y-[-50%] gap-4
  border border-slate-700 bg-black/60 p-6 shadow-lg duration-200 data-[state=open]:animate-in
  data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0
@@ -395,10 +397,10 @@
  data-[state=open]:slide-in-from-top-[48%] sm:rounded-lg md:w-full"
  >
  <Dialog.Header>
- <Dialog.Title class="text-xl font-semibold text-slate-100">Create New Case</Dialog.Title>
- <Dialog.Description class="text-sm text-slate-300">
+ <DialogTitle class="text-xl font-semibold text-slate-100">Create New Case</DialogTitle>
+ <DialogDescription class="text-sm text-slate-300">
  Fill in the details for the new case.
- </Dialog.Description>
+ </DialogDescription>
  </Dialog.Header>
  <form
  class="space-y-4"
@@ -444,7 +446,7 @@
  <button
  type="button"
  class="rounded border border-slate-600 px-4 py-2 text-sm text-slate-200 hover:border-slate-400"
- onclick={cancelNewCase}
+ onclick={ cancelNewCase: cancelNewCase }
  >
  Cancel
  </button>
@@ -456,7 +458,7 @@
  </button>
  </div>
  </form>
- <Dialog.Close
+ <DialogClose
  class="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground"
  >
  <svg
@@ -475,7 +477,7 @@
  <path d="M6 6L18 18" ></path>
  </svg>
  <span class="sr-only">Close</span>
- </Dialog.Close>
- </Dialog.Content>
- </Dialog.Root>
+ </DialogClose>
+ </DialogContent>
+ </DialogRoot>
 {/if}

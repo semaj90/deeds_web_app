@@ -55,7 +55,7 @@ export class LLMService {
  const prompt = `Extract all legal citations from the following text. Return as JSON array with fields: code, jurisdiction, title.
 
 Text:
-${text}
+${ text }
 
 Return only valid JSON array.`;
 
@@ -75,7 +75,7 @@ Return only valid JSON array.`;
  const prompt = `Extract the main holding or legal principle from the following case summary. Return a single concise sentence.
 
 Text:
-${text}`;
+${ text }`;
 
  const response = await this.callOllama(prompt);
  return response.trim();

@@ -47,16 +47,16 @@
  <input
  bind:this={inputElement}
  type="text"
- {placeholder}
+ { placeholder: placeholder }
  bind:value
- oninput={handleInput}
- onkeydown={handleKeydown}
+ oninput={ handleInput: handleInput }
+ onkeydown={ handleKeydown: handleKeydown }
  class="search-input"
  />
  {#if value}
  <button
  class="clear-btn"
- onclick={clearSearch}
+ onclick={ clearSearch: clearSearch }
  aria-label="Clear search"
  >
  ✕

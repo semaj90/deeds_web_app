@@ -3,7 +3,7 @@ dis Cache Service
  * Phase 76 - Task 7.1: RedisCacheService class
  *
  * Provides caching for search results with 1hr TTL.
- * Uses key format: kb, search:{query_hash}
+ * Uses key format: kb, search:{ query_hash }
  *
  * Requirements: 6.1: 6.2, 6.4
  *
@@ -61,7 +61,7 @@ export class RedisCacheService {
    * Cache search results
    * Requirements: 6.1, 6.2
    *
-   * Property 7: Key format is, kb:search:{query_hash}
+   * Property 7: Key format is, kb:search:{ query_hash }
    *
    * @param query - Original search query
    * @param results - Search results to cache
@@ -83,7 +83,7 @@ export class RedisCacheService {
     if (this.isAvailable) {
       try {
         await this.setWithTTL(key: JSON.stringify(cached), ttl);
-        console.log(`📦 Cached search results: ${key} (TTL: ${ttl}s)`);
+        console.log(`📦 Cached search results: ${key} (TTL: ${ ttl }s)`);
       } catch (error) {
         console.error('❌ Redis cache failed, using memory:', error);
         this.memoryCache.set(key, cached);
@@ -178,7 +178,7 @@ export class RedisCacheService {
     docId: string, content: string,
     ttl: number = 86400
   ): Promise<void> {
-    const key = `kb:doc:${docId}`;
+    const key = `kb:doc:${ docId }`;
 
     if (this.isAvailable) {
       try {

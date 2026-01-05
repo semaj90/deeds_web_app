@@ -1,4 +1,6 @@
 <script lang="ts">
+	let className = $state<any>(undefined);
+
 /**
  * Svelte 5 Dropdown Menu Component
  * Accessible dropdown with Svelte 5 runes

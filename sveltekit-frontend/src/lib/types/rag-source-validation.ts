@@ -385,7 +385,7 @@ export async function updateKnowledgeGraph(
  * Get case canvas state
  */
 export async function getCaseCanvas(caseId: string): Promise<CaseCanvasState> {
-  const response = await fetch(`/api/canvas/${caseId}`);
+  const response = await fetch(`/api/canvas/${ caseId }`);
 
   if (!response.ok) {
     throw new Error(`Failed to get canvas: ${response.statusText}`);
@@ -401,7 +401,7 @@ export async function addCanvasPin(
   caseId: string,
   pin: Omit<CanvasPin, 'pin_id' | 'case_id' | 'created_at'>
 ): Promise<CanvasPin> {
-  const response = await fetch(`/api/canvas/${caseId}/pin`, {
+  const response = await fetch(`/api/canvas/${ caseId }/pin`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(pin),

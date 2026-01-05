@@ -123,7 +123,7 @@ export class OllamaClient {
  */
  async summarizeLegalDocument(text: string): Promise<string> {
  const result = await this.generate(
- `Summarize the following legal document concisely and accurately:\n\n${text}`,
+ `Summarize the following legal document concisely and accurately:\n\n${ text }`,
  { temperature: 0.3, maxTokens: 300 }
  );
  return result.response;
@@ -131,7 +131,7 @@ export class OllamaClient {
 
  async answerLegalQuestion(question: string): Promise<string> {
  const result = await this.generate(
- `Context: ${context}\n\nQuestion: ${question}\n\nAnswer the question based only on the provided context. Be accurate and concise.`,
+ `Context: ${ context }\n\nQuestion: ${ question }\n\nAnswer the question based only on the provided context. Be accurate and concise.`,
  { temperature: 0.5, maxTokens: 400 }
  );
  return result.response;
@@ -139,7 +139,7 @@ export class OllamaClient {
 
  async extractLegalEntities(text: string): Promise<string> {
  const result = await this.generate(
- `Extract legal entities (parties, dates, locations) from this text. Return as JSON:\n\n${text}`,
+ `Extract legal entities (parties, dates, locations) from this text. Return as JSON:\n\n${ text }`,
  { temperature: 0.1, maxTokens: 200 }
  );
  return result.response;
@@ -167,7 +167,7 @@ export function getOllamaEndpoint(
  return `${baseUrl}/api/embeddings`;
  }
 
- throw new Error(`Unsupported model: ${model}`);
+ throw new Error(`Unsupported model: ${ model }`);
 }
 
 /**

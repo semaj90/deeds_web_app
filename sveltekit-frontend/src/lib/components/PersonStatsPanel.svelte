@@ -1,12 +1,15 @@
 <script lang="ts">
-	import { Button } from 'bits-ui';
+	let attr = $state<any>(undefined);
+	let value = $state<any>(undefined);
+
+	import { Button, ButtonRoot } from 'bits-ui';
 	import type { FugitiveDexPerson } from './types';
 
 	interface Props {
 		selectedPerson: FugitiveDexPerson | null;
 	}
 
-	let { selectedPerson }: Props = $props();
+	let { selectedPerson: selectedPerson }: Props = $props();
 </script>
 
 {#if selectedPerson}
@@ -27,7 +30,7 @@
 					<div class="attribute-row">
 						<span class="text-xs opacity-70 capitalize">{attr}:</span>
 						<div class="attr-bar">
-							<div class="attr-fill" style="width: {value}%"></div>
+							<div class="attr-fill" style="width: { value: value }%"></div>
 						</div>
 						<span class="text-xs font-bold text-green-400">{value}</span>
 					</div>
@@ -45,9 +48,9 @@
 		<div class="actions-section">
 			<h4 class="text-amber-300 text-sm mb-3">ACTIONS</h4>
 			<div class="space-y-2">
-				<Button.Root class="nes-btn is-primary w-full text-xs">UPDATE INTEL</Button.Root>
-				<Button.Root class="nes-btn is-warning w-full text-xs">VIEW TIMELINE</Button.Root>
-				<Button.Root class="nes-btn w-full text-xs">EXPORT PROFILE</Button.Root>
+				<ButtonRoot class="nes-btn is-primary w-full text-xs">UPDATE INTEL</ButtonRoot>
+				<ButtonRoot class="nes-btn is-warning w-full text-xs">VIEW TIMELINE</ButtonRoot>
+				<ButtonRoot class="nes-btn w-full text-xs">EXPORT PROFILE</ButtonRoot>
 			</div>
 		</div>
 	</div>

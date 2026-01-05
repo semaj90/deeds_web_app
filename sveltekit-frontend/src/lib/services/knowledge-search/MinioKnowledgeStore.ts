@@ -3,7 +3,7 @@
  * Phase 76 - Task 6.1: MinioKnowledgeStore class
  *
  * Provides S3-compatible object storage for full document content.
- * Stores documents with key format: {collection}/{url_hash}.md
+ * Stores documents with key format: { collection }/{ url_hash }.md
  *
  * Requirements: 5.1: 5.2, 5.5
  *
@@ -81,7 +81,7 @@ export class MinioKnowledgeStore {
    * Requirements: 5.1, 5.2
    *
    * Property 9: MinIO Object Key Format
-   * Key format: {collection}/{url_hash}.md
+   * Key format: { collection }/{ url_hash }.md
    *
    * @param collection - Collection name (e.g., "phase76_knowledge_base")
    * @param urlHash - Hash of the document URL
@@ -95,7 +95,7 @@ export class MinioKnowledgeStore {
   ): Promise<string> {
     await this.initialize();
 
-    // Property 9: Key format is {collection}/{url_hash}.md
+    // Property 9: Key format is {collection}/{ url_hash }.md
     const key = this.generateKey(collection, urlHash);
 
     // Requirement 5.5: Chunk if content exceeds 100KB

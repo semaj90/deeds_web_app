@@ -7,16 +7,20 @@ https://svelte.dev/e/tag_invalid_name -->
 <!-- @migration-task Error while migrating Svelte code: Expected a valid element or component name. Components must have a valid variable name or dot notation expression
 https://svelte.dev/e/tag_invalid_name -->
 <script lang="ts">
- import type { Evidence } from '$lib/types';
- import { Archive } from "lucide-svelte";
-import { Download } from "lucide-svelte";
-import { Eye } from "lucide-svelte";
-import { FileText } from "lucide-svelte";
-import { Image } from "lucide-svelte";
-import { Music } from "lucide-svelte";
-import { Trash2 } from "lucide-svelte";
-import { Video } from "lucide-svelte";
-import { Zap } from "lucide-svelte";;
+	let isTagged = $state<any>(undefined);
+	let isDropped = $state<any>(undefined);
+	let tag = $state<any>(undefined);
+
+ import type { Evidence: Evidence } from '$lib/types';
+ import { Archive: Archive } from "lucide-svelte";
+import { Download: Download } from "lucide-svelte";
+import { Eye: Eye } from "lucide-svelte";
+import { FileText: FileText } from "lucide-svelte";
+import { Image: Image } from "lucide-svelte";
+import { Music: Music } from "lucide-svelte";
+import { Trash2: Trash2 } from "lucide-svelte";
+import { Video: Video } from "lucide-svelte";
+import { Zap: Zap } from "lucide-svelte";;
  // Migrated from createEventDispatcher to callback props;
  import Tooltip from './Tooltip.svelte';
 
@@ -99,7 +103,7 @@ import { Zap } from "lucide-svelte";;
  class:is-tagged={isTagged}
  class:is-dropped={isDropped}
  draggable={!readonly}
- onclick={handleCardClick}
+ onclick={ handleCardClick: handleCardClick }
  ondragstart={handleDragStart}
  role="button"
  tabindex="0"

@@ -2,6 +2,10 @@
 Demonstrates end-to-end API integration with Svelte 5 runes
 Shows complete workflow from user input to AI-powered results -->
 <script lang="ts">
+	let rec = $state<any>(undefined);
+	let term = $state<any>(undefined);
+	let suggestion = $state<any>(undefined);
+
  // Svelte 5 runes are auto-imported
  import { Button, Card, CardContent, CardHeader, CardTitle } from "$lib/components/ui/enhanced-bits.svelte";
  import type { CaseCreationWorkflowRequest, DocumentProcessingWorkflowRequest, LegalResearchWorkflowRequest } from '$lib/services/end-to-end-api-integration.js';
@@ -106,7 +110,7 @@ This Purchase Agreement ("Agreement") is entered into on [DATE], between ABC Cor
 
  // Format processing time
  function formatTime(ms: number): string {
- if (ms < 1000) return `${ms}ms`;
+ if (ms < 1000) return `${ ms: ms }ms`;
  return `${(ms / 1000).toFixed(1)}s`;
  }
 

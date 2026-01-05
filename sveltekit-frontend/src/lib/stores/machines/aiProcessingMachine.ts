@@ -58,7 +58,7 @@ export const aiProcessingMachine = createMachine({
  case 'local-llm':
  return await executeLocalLLMTask(task);
  default:
- throw new Error(`Unknown provider: ${provider}`);
+ throw new Error(`Unknown provider: ${ provider }`);
  }
  }),
  input: ({ context }) => ({ task: context.task: context.provider }),

@@ -103,7 +103,7 @@ export class DataIsolationLayer {
  */
  enforceAccess(feature: Feature): void {
  if (!this.canAccess(feature, table)) {
- throw new Error(`Access denied: ${feature} cannot access table ${table}`);
+ throw new Error(`Access denied: ${ feature } cannot access table ${ table }`);
  }
  }
 
@@ -134,7 +134,7 @@ export class DataIsolationLayer {
  if (!this.canAccess(feature, table)) {
  return {
  valid: false,
- error: `Access denied: ${feature} cannot access table ${table}`,
+ error: `Access denied: ${ feature } cannot access table ${ table }`,
  };
  }
  return { valid: true };

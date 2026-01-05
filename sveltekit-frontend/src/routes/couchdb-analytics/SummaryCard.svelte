@@ -1,11 +1,13 @@
 <script lang="ts">
+	let entity = $state<any>(undefined);
+
 	import { onMount } from 'svelte';
 
 	interface Props {
 		apiBase: string;
 	}
 
-	let { apiBase }: Props = $props();
+	let { apiBase: apiBase }: Props = $props();
 
 	interface Summary {
 		file_path: string;

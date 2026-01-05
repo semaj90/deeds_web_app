@@ -233,7 +233,7 @@ export class KnowledgeSearcher {
 Context:
 ${context}
 
-Question: ${query}
+Question: ${ query }
 
 Answer:`;
 
@@ -246,7 +246,7 @@ Answer:`;
       case 'claude':
         return await this.callClaude(prompt);
       default:
-        throw new Error(`Unsupported LLM provider: ${provider}`);
+        throw new Error(`Unsupported LLM provider: ${ provider }`);
     }
   }
 

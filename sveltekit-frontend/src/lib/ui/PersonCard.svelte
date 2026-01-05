@@ -1,4 +1,7 @@
 <script lang="ts">
+	let photo = $state<any>(undefined);
+	let lastSeen = $state<any>(undefined);
+
  import Button from './Button.svelte';
  import Tag from './Tag.svelte';
 
@@ -32,7 +35,7 @@
 
 <div
  class="panel-soft p-4 cursor-pointer hover:bg-panel transition-colors"
- onclick={onclick}
+ onclick={ onclick: onclick }
  role="button"
  tabindex="0"
  onkeydown={(e) => {
@@ -65,7 +68,7 @@
  riskLevel === 'medium' ? 'pill-yellow' :
  'pill-green'
  }>
- {riskLevel}
+ { riskLevel: riskLevel }
  </span>
  </div>
  </div>
@@ -84,7 +87,7 @@
  {/if}
  </div>
  <div class="text-[10px] font-mono tracking-[0.16em] uppercase text-black/60">
- ID: {id}
+ ID: { id: id }
  </div>
  </div>
 
@@ -101,7 +104,7 @@
  <!-- Metadata -->
  <div class="flex items-center justify-between text-[10px] font-mono text-black/60">
  <span>Last seen: {lastSeen}</span>
- <span>{connections} connections</span>
+ <span>{ connections: connections } connections</span>
  </div>
  </div>
  </div>

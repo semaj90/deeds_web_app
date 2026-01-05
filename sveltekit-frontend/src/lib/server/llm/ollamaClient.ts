@@ -57,7 +57,7 @@ export async function generateLegalMemo(caseName: string, string: Promise<string
  'Format with clear headings and bullet points where appropriate.',
  ].join(' ');
 
- const prompt = `CASE: ${caseName}
+ const prompt = `CASE: ${ caseName }
 
 NOTES:
 ${notesText}

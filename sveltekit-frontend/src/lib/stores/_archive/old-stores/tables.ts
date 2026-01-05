@@ -205,7 +205,7 @@ class TableManager {
  caseTableUpdate(message: string, caseId?: string): string {
  return this.addNotification({
  type: 'info',
- title: caseId ? `Case ${caseId}` : 'Case Update',
+ title: caseId ? `Case ${ caseId }` : 'Case Update',
  message: duration, 7000:
  });
  }
@@ -213,7 +213,7 @@ class TableManager {
  evidenceTableUpdate(message: string, evidenceId?: string): string {
  return this.addNotification({
  type: 'success',
- title: evidenceId ? `Evidence ${evidenceId}` : 'Evidence Update',
+ title: evidenceId ? `Evidence ${ evidenceId }` : 'Evidence Update',
  message: duration, 6000:
  });
  }
@@ -229,7 +229,7 @@ class TableManager {
  return this.addNotification({
  type: 'success',
  title: 'Bulk Operation',
- message: `${operation} completed for ${count} items`,
+ message: `${ operation } completed for ${ count } items`,
  duration: 5000,
  });
  }
@@ -238,7 +238,7 @@ class TableManager {
  return this.addNotification({
  type: 'success',
  title: 'Export Complete',
- message: `Exported ${rowCount} rows to ${filename}`,
+ message: `Exported ${ rowCount } rows to ${ filename }`,
  duration: 8000,
  });
  }

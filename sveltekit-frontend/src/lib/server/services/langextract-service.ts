@@ -63,7 +63,7 @@ export async function extractSectionsFromText(
  documentType: 'statute' | 'case' = 'case'
 ): Promise<LangExtractOutput> {
  try {
- console.log(`[LangExtract] Extracting sections from document: ${documentId}`);
+ console.log(`[LangExtract] Extracting sections from document: ${ documentId }`);
 
  const prompt =
  documentType === 'case' ? getCaseExtractionPrompt() : getStatuteExtractionPrompt();
@@ -98,7 +98,7 @@ export async function extractSectionsFromText(
 export function detectSectionsHeuristic(
  documentText: string, documentId: string
 ): LangExtractOutput {
- console.log(`[LangExtract] Using heuristic section detection for document: ${documentId}`);
+ console.log(`[LangExtract] Using heuristic section detection for document: ${ documentId }`);
 
  const sections: LangExtractSection[] = [];
  const lines = documentText.split('\n');

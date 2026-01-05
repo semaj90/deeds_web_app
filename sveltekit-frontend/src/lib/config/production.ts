@@ -21,7 +21,7 @@ export const ENV = {
 // ============================================================================
 const getEnv = (key: string, fallback: string = '') => {
  if (ENV.isBrowser) {
- return (import.meta.env as any)[`VITE_${key}`] || (import.meta.env as any)[key] || fallback;
+ return (import.meta.env as any)[`VITE_${ key }`] || (import.meta.env as any)[key] || fallback;
  }
  return process.env[key] || fallback;
 };

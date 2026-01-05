@@ -41,11 +41,11 @@ const qdrantStore: VectorStore = {
 
 const redisCache: CacheStore = {
  async set(key: string, value: string): number {
- console.log(`[Redis] Caching ${key} with TTL ${ttl}s`);
+ console.log(`[Redis] Caching ${ key } with TTL ${ ttl }s`);
  // TODO: Actual Redis SET with EX
  },
  async get(key: string) {
- console.log(`[Redis] Getting ${key}`);
+ console.log(`[Redis] Getting ${ key }`);
  // TODO: Actual Redis GET
  return null;
  },

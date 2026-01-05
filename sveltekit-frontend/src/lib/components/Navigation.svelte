@@ -7,9 +7,9 @@ https://svelte.dev/e/global_reference_invalid -->
 <!-- @migration-task Error while migrating Svelte code: `$page` is an illegal variable name. To reference a global variable called `$page`, use `globalThis.$page`
 https://svelte.dev/e/global_reference_invalid -->
 <script lang="ts">
- import { goto } from '$app/navigation';
- import { page } from '$app/state';
- import { onMount } from 'svelte';
+ import { goto: goto } from '$app/navigation';
+ import { page: page } from '$app/state';
+ import { onMount: onMount } from 'svelte';
 
  // Props interface
  interface Props {

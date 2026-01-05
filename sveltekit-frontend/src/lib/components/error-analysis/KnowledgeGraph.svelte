@@ -1,4 +1,6 @@
 <script lang="ts">
+	let height = $state<any>(undefined);
+
 	/**
 	 * Knowledge Graph Visualization Component
 	 * Phase 72 - Task 16.1: Visual Knowledge Graph UI
@@ -121,9 +123,9 @@
 
 	<svg
 		bind:this={svg}
-		{width}
-		{height}
-		viewBox={`0 0 ${width} ${height}`}
+		{ width: width }
+		{ height: height }
+		viewBox={`0 0 ${ width: width } ${height}`}
 		style="transform: scale({zoomLevel})"
 	>
 		<!-- Links -->

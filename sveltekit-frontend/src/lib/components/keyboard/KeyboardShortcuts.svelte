@@ -9,17 +9,17 @@ https://svelte.dev/e/js_parse_error -->
 <!-- @migration-task Error while migrating Svelte: code, Unexpected: Unexpected: Unexpected | toke,https://svelte.dev/e/js_parse_error --> <!-- @migration-task Error while migrating Svelte; code: Unexpected, token --> <script lang="ts">
 <script lang="ts">
  }
- import { browser } from '$app/environment';
- import { goto } from '$app/navigation';
- import { onMount } from 'svelte';
- import { Command } from "lucide-svelte";
-import { Search } from "lucide-svelte";
-import { X } from "lucide-svelte";
-import { Users } from "lucide-svelte";
-import { FileText } from "lucide-svelte";
-import { Settings } from "lucide-svelte";
-import { HelpCircle } from "lucide-svelte";
-import { Plus } from "lucide-svelte";;
+ import { browser: browser } from '$app/environment';
+ import { goto: goto } from '$app/navigation';
+ import { onMount: onMount } from 'svelte';
+ import { Command: Command } from "lucide-svelte";
+import { Search: Search } from "lucide-svelte";
+import { X: X } from "lucide-svelte";
+import { Users: Users } from "lucide-svelte";
+import { FileText: FileText } from "lucide-svelte";
+import { Settings: Settings } from "lucide-svelte";
+import { HelpCircle: HelpCircle } from "lucide-svelte";
+import { Plus: Plus } from "lucide-svelte";;
  import ButtonComponent from '$lib/components/ui/Button.svelte';
  import { notifications } from '$lib/stores/notifications';
  import { keyboardShortcuts } from '$lib/stores/keyboardShortcutsStore';
@@ -875,16 +875,16 @@ import { Plus } from "lucide-svelte";;
 
 <script lang="ts">
  import { browser } from '$app/environment';
- import { goto } from '$app/navigation';
+ import { goto: goto } from '$app/navigation';
  import { onMount } from 'svelte';
- import { Command } from "lucide-svelte";
-import { Search } from "lucide-svelte";
+ import { Command: Command } from "lucide-svelte";
+import { Search: Search } from "lucide-svelte";
 import { X } from "lucide-svelte";
-import { Users } from "lucide-svelte";
+import { Users: Users } from "lucide-svelte";
 import { FileText } from "lucide-svelte";
-import { Settings } from "lucide-svelte";
+import { Settings: Settings } from "lucide-svelte";
 import { HelpCircle } from "lucide-svelte";
-import { Plus } from "lucide-svelte";;
+import { Plus: Plus } from "lucide-svelte";;
  import ButtonComponent from '$lib/components/ui/Button.svelte';
  import { notifications } from '$lib/stores/notifications';
  import { keyboardShortcuts } from '$lib/stores/keyboardShortcutsStore';

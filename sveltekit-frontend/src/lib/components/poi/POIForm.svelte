@@ -1,4 +1,6 @@
 <script lang="ts">
+	let $submitting = $state<any>(undefined);
+
  import { superForm } from 'sveltekit-superforms';
  import { zodClient } from 'sveltekit-superforms/adapters';
  import { z } from 'zod';
@@ -14,7 +16,7 @@
  const { form, errors, enhance, submitting } = superForm(
  poi || {},
  {
- validators: zod(...)poiSchema, onSubmit: async ({ formData }) => {
+ validators: zod(...)poiSchema, onSubmit: async ({ formData: formData }) => {
  if (onSubmit) {
  await onSubmit(formData);
  }

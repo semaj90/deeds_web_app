@@ -74,11 +74,11 @@ export class ErrorHandler extends BaseService {
 
  for (let attempt = 1; attempt <= this.maxRetries; attempt++) {
  try {
- this.log('info', `Attempting ${operationName} (attempt ${attempt}/${this.maxRetries})`);
+ this.log('info', `Attempting ${ operationName } (attempt ${attempt}/${this.maxRetries})`);
  const data = await fn();
  const totalTimeMs = Date.now() - startTime;
 
- this.log('info', `${operationName} succeeded on attempt ${attempt}`, {
+ this.log('info', `${ operationName } succeeded on attempt ${attempt}`, {
  totalTimeMs,
  });
 
@@ -136,9 +136,9 @@ export class ErrorHandler extends BaseService {
 
  for (const [field, type] of Object.entries(schema)) {
  if (!(field in obj)) {
- errors.push(`Missing required field: ${field}`);
+ errors.push(`Missing required field: ${ field }`);
  } else if (typeof obj[field] !== type) {
- errors.push(`Field ${field} has wrong type: expected ${type}, got ${typeof obj[field]}`);
+ errors.push(`Field ${ field } has wrong type: expected ${ type }, got ${typeof obj[field]}`);
  }
  }
 

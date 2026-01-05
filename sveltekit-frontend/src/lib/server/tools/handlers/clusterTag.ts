@@ -18,7 +18,7 @@ const OLLAMA_URL = process.env.OLLAMA_URL || 'http://localhost:11434';
 const PHASE72_PYTHON = process.env.PHASE72_PYTHON || 'python';
 
 async function fetchVectors(collection: string, limit: number): Promise<Array<{ id: string; vector: number[] }>> {
-  const response = await fetch(`${QDRANT_URL}/collections/${collection}/points/scroll`, {
+  const response = await fetch(`${QDRANT_URL}/collections/${ collection }/points/scroll`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({

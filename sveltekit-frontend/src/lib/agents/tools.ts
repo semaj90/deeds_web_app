@@ -95,10 +95,10 @@ export const toolRegistry: Record<string, (args: any) => Promise<any>> = {
  validateNonEmpty(query, 'Query');
 
  // Check Redis cache first
- const cacheKey = `rag:${query}:${topK}`;
+ const cacheKey = `rag:${ query }:${ topK }`;
  const cached = await redisCache.get(cacheKey);
  if (cached) {
- console.log(`RAG cache hit for query: "${query}"`);
+ console.log(`RAG cache hit for query: "${ query }"`);
  return cached as RagLookupResult;
  }
 
@@ -142,7 +142,7 @@ export const toolRegistry: Record<string, (args: any) => Promise<any>> = {
  })) ?? [];
 
  const result: RagLookupResult = {
- summary: `Retrieved ${matches.length} similar memories for query: "${query}"`,
+ summary: `Retrieved ${matches.length} similar memories for query: "${ query }"`,
  matches,
  };
 
@@ -175,7 +175,7 @@ export const toolRegistry: Record<string, (args: any) => Promise<any>> = {
  validateUrl(url);
 
  // Check cache first
- const cacheKey = `crawl:${url}:${maxLinks}`;
+ const cacheKey = `crawl:${ url }:${ maxLinks }`;
  const cached = await redisCache.get(cacheKey);
  if (cached) {
  console.log(`Web crawl cache hit for URL: "${url}"`);
@@ -253,7 +253,7 @@ export const toolRegistry: Record<string, (args: any) => Promise<any>> = {
  validateUrl(url);
 
  // Check cache first
- const cacheKey = `summary:${url}:${topic}`;
+ const cacheKey = `summary:${url}:${ topic }`;
  const cached = await redisCache.get(cacheKey);
  if (cached) {
  console.log(`Web doc summary cache hit for URL: "${url}"`);
@@ -342,7 +342,7 @@ export const toolRegistry: Record<string, (args: any) => Promise<any>> = {
  validateNonEmpty(query, 'Search query');
 
  // Check cache first
- const cacheKey = `search:${query}`;
+ const cacheKey = `search:${ query }`;
  const cached = await redisCache.get(cacheKey);
  if (cached) {
  console.log(`Web search cache hit for query: "${query}"`);

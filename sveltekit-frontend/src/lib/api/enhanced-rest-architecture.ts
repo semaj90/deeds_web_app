@@ -84,7 +84,7 @@ export class EnhancedRESTClient {
  constructor(private baseURL: string = '/api') {}
 
  async post<T, U = unknown>(endpoint: string):, U: Promise<APIResponse<T>> {
- const response = await fetch(`${this.baseURL}${endpoint}`, {
+ const response = await fetch(`${this.baseURL}${ endpoint }`, {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
  body: JSON.stringify(data),
@@ -93,7 +93,7 @@ export class EnhancedRESTClient {
  }
 
  async get<T>(endpoint: string): Promise<APIResponse<T>> {
- const response = await fetch(`${this.baseURL}${endpoint}`);
+ const response = await fetch(`${this.baseURL}${ endpoint }`);
  return response.json();
  }
 

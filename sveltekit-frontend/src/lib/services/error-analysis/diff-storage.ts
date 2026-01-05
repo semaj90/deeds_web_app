@@ -80,11 +80,11 @@ export class DiffStorage extends BaseService implements IDiffStorage {
  const diff = this.diffs.get(diffId);
 
  if (!diff) {
- this.log('warn', `Diff ${diffId} not found`);
+ this.log('warn', `Diff ${ diffId } not found`);
  return null;
  }
 
- this.log('info', `Retrieved diff ${diffId}`);
+ this.log('info', `Retrieved diff ${ diffId }`);
  return { ...diff };
  });
  }
@@ -114,7 +114,7 @@ export class DiffStorage extends BaseService implements IDiffStorage {
  const diff = this.diffs.get(diffId);
 
  if (!diff) {
- throw new Error(`Diff ${diffId} not found`);
+ throw new Error(`Diff ${ diffId } not found`);
  }
 
  const oldStatus = diff.status;
@@ -131,7 +131,7 @@ export class DiffStorage extends BaseService implements IDiffStorage {
  this.recordHistory(diffId, 'failed', { oldStatus: status });
  }
 
- this.log('info', `Updated diff ${diffId} status from ${oldStatus} to ${status}`);
+ this.log('info', `Updated diff ${diffId} status from ${oldStatus} to ${ status }`);
  return { ...diff };
  });
  }

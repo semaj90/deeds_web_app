@@ -114,7 +114,7 @@ import { Zap } from "lucide-svelte";;
  />
  <button
  class="px-4 py-3 border border-beige hover:bg-beige hover:text-noir rounded flex items-center gap-2"
- onclick={performSimilaritySearch}
+ onclick={ performSimilaritySearch: performSimilaritySearch }
  disabled={isSearching || documentEmbeddings.length === 0}
  >
  {#if isSearching}

@@ -9,7 +9,7 @@
 		apiBase: string;
 	}
 
-	let { apiBase }: Props = $props();
+	let { apiBase: apiBase }: Props = $props();
 
 	interface ErrorNode {
 		file_path: string;
@@ -244,7 +244,7 @@
 									<span class="no-imports">No imports</span>
 								{:else}
 									{#each selectedNode.imports.slice(0, 10) as imp}
-										<div class="import-item">{imp}</div>
+										<div class="import-item">{ imp: imp }</div>
 									{/each}
 									{#if selectedNode.imports.length > 10}
 										<div class="import-item more">+{selectedNode.imports.length - 10} more</div>

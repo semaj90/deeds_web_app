@@ -137,7 +137,7 @@ async function generateClusterSummaries(clusters: any) {
 async function analyzeClusterWithLLM(clusterId: number, errors: any[]) {
 	const prompt = `Analyze this error cluster and provide an actionable summary.
 
-Cluster ID: ${clusterId}
+Cluster ID: ${ clusterId }
 Error Count: ${errors.length}
 
 Sample Errors:

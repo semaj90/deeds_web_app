@@ -306,7 +306,7 @@ class XStateStoreManager {
  const win = typeof window !== 'undefined' ? (window as DevtoolsWindow)  | undefined;
  if (win && win.__REDUX_DEVTOOLS_EXTENSION__) {
  const devtools = win.__REDUX_DEVTOOLS_EXTENSION__.connect({
- name: `XState: ${machineId}`,
+ name: `XState: ${ machineId }`,
  trace: true,
  });
  const ev = inspectionEvent as unknown as InspectionEvent;

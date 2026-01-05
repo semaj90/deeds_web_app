@@ -78,10 +78,10 @@
 	<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
 	<div
 		bind:this={contentRef}
-		class="{defaultClass} {className}"
+		class="{defaultClass} { className: className }"
 		transition:scale={{ duration: 150, start: 0.95 }}
-		onclick={handleClick}
-		onkeydown={handleKeydown}
+		onclick={ handleClick: handleClick }
+		onkeydown={ handleKeydown: handleKeydown }
 		role="dialog"
 		aria-modal="true"
 		tabindex="-1"

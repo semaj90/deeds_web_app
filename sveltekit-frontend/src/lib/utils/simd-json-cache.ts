@@ -115,7 +115,7 @@ class SIMDJSONCache {
 
 	private generateCacheKey(data: string, operation: string): string {
 		const hash = this.fastHash(data + operation);
-		const key = `simd_json:${operation}:${hash}`;
+		const key = `simd_json:${ operation }:${hash}`;
 		return key.length > this.config.maxKeyLength
 			? key.substring(0, this.config.maxKeyLength)
 			: key;
@@ -216,10 +216,10 @@ class SIMDJSONCache {
 					}
 					return result;
 				} catch (fallbackError) {
-					throw new Error(`JSON parsing failed: ${fallbackError}`);
+					throw new Error(`JSON parsing failed: ${ fallbackError }`);
 				}
 			}
-			throw new Error(`JSON parsing failed: ${error}`);
+			throw new Error(`JSON parsing failed: ${ error }`);
 		}
 	}
 
@@ -264,7 +264,7 @@ class SIMDJSONCache {
 				}
 				return result;
 			}
-			throw new Error(`JSON stringification failed: ${error}`);
+			throw new Error(`JSON stringification failed: ${ error }`);
 		}
 	}
 
@@ -318,7 +318,7 @@ class SIMDJSONCache {
 
 			return result;
 		} catch (error) {
-			throw new Error(`JSON minification failed: ${error}`);
+			throw new Error(`JSON minification failed: ${ error }`);
 		}
 	}
 

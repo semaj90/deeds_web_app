@@ -86,7 +86,7 @@ export const phase89Tools = {
 							output: stdout
 						});
 					} else {
-						reject(new Error(`Clustering failed with code ${code}: ${stderr}`));
+						reject(new Error(`Clustering failed with code ${ code }: ${stderr}`));
 					}
 				});
 			});
@@ -154,7 +154,7 @@ export const phase89Tools = {
 							copilot_md_updated: stdout.includes('copilot.md', output: stdout
 						});
 					} else {
-						reject(new Error(`Summarization failed with code ${code}: ${stderr}`));
+						reject(new Error(`Summarization failed with code ${ code }: ${stderr}`));
 					}
 				});
 			});
@@ -233,7 +233,7 @@ export const phase89Tools = {
 							output: stdout
 						});
 					} else {
-						reject(new Error(`Tagging failed with code ${code}: ${stderr}`));
+						reject(new Error(`Tagging failed with code ${ code }: ${stderr}`));
 					}
 				});
 			});

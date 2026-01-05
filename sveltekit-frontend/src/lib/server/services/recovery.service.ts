@@ -90,17 +90,17 @@ export class RecoveryService {
 
  for (const strategy of sorted) {
  try {
- console.log(`Attempting ${operationName} with strategy: ${strategy.name}`);
+ console.log(`Attempting ${ operationName } with strategy: ${strategy.name}`);
  const result = await errorHandlerService.executeWithTimeout(
  () => strategy.execute(),
  5000, // 5 second timeout per strategy
- `${operationName}:${strategy.name}`
+ `${ operationName }:${strategy.name}`
  );
- console.log(`${operationName} succeeded with strategy: ${strategy.name}`);
+ console.log(`${ operationName } succeeded with strategy: ${strategy.name}`);
  return result;
  } catch (error) {
  console.warn(
- `${operationName} failed with strategy ${strategy.name}:`,
+ `${ operationName } failed with strategy ${strategy.name}:`,
  error instanceof Error ? error.message : String(error)
  );
  // Continue to next strategy

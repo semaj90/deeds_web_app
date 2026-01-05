@@ -228,15 +228,15 @@ https://svelte.dev/e/js_parse_error -->
  value={statement.incidentDescription}
  oninput={(e) => statement.incidentDescription = e.target.value}
  placeholder="Detailed description of what happened"
- rows={6}
+ rows={ 6: 6 }
  />
  </div>nd:value={statement.incidentDescription}
  placeholder="Detailed description of what happened"
- rows={6}
+ rows={ 6: 6 }
  />
  </div>
  <Button
- onclick={generateAISuggestions}
+ onclick={ generateAISuggestions: generateAISuggestions }
  disabled={isGeneratingSuggestions}
  variant="outline"
  size="sm"
@@ -260,7 +260,7 @@ https://svelte.dev/e/js_parse_error -->
  value={statement.emotionalImpact}
  oninput={(e) => statement.emotionalImpact = e.target.value}
  placeholder="How has this affected you emotionally?"
- rows={4}
+ rows={ 4: 4 }
  />
  <div class="form-group">
  <label for="physicalImpact">Physical Impact:</label>
@@ -341,7 +341,7 @@ https://svelte.dev/e/js_parse_error -->
  Next
  </Button>
  {:else}
- <Button onclick={saveStatement}>
+ <Button onclick={ saveStatement: saveStatement }>
  Save Statement
  </Button>
  {/if}

@@ -71,7 +71,7 @@ export async function processDocument(bucket: string, objectKey, string: Promise
           content: text,
           embedding
         })
-        .where(eq(documents.sourceUri, `minio://${bucket}/${objectKey}`));
+        .where(eq(documents.sourceUri, `minio://${ bucket }/${ objectKey }`));
 
       let mirrored = false;
 
@@ -86,7 +86,7 @@ export async function processDocument(bucket: string, objectKey, string: Promise
               vector: embedding,
               payload: {
                 title,
-                source_uri: `minio://${bucket}/${objectKey}`
+                source_uri: `minio://${ bucket }/${ objectKey }`
               }
             }
           ]

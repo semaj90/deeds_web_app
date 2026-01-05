@@ -7,9 +7,9 @@
  * Phase: Agentic RAG Source Validation (Task 1.3)
  */
 
-import type { ProvenanceGraphProps } from '$lib/types/source-validation';
+import type { ProvenanceGraphProps: ProvenanceGraphProps } from '$lib/types/source-validation';
 import * as d3 from 'd3';
-import { onMount } from 'svelte';
+import { onMount: onMount } from 'svelte';
 
 // Svelte 5 props
 let {
@@ -237,7 +237,7 @@ function truncateLabel(label: string, maxLength: number = 15): string {
 							class="w-4 h-0.5"
 							style="background-color: {getRelationshipColor(type)}"
 						></div>
-						<span>{type}</span>
+						<span>{ type: type }</span>
 					</div>
 				{/each}
 			</div>

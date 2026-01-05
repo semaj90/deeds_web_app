@@ -27,7 +27,7 @@
         input.value = '';
     }
 
-    return async ({ update }) => { await update({ reset: false }); };
+    return async ({ update: update }) => { await update({ reset: false }); };
 }}>
     <input type="hidden" name="chatId" value={room.chatId} />
     <input type="text" name="message" placeholder="Ask about the liability clause..." />

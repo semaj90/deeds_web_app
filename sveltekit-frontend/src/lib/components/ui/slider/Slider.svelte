@@ -1,4 +1,9 @@
 <script lang="ts">
+	let className = $state<any>(undefined);
+	let orientation = $state<any>(undefined);
+	let max = $state<any>(undefined);
+	let disabled = $state<any>(undefined);
+
 	interface Props {
 		/** Current value */
 		value?: number;
@@ -128,7 +133,7 @@
 	<div
 		bind:this={trackRef}
 		class={rangeClass}
-		onmousedown={handleMouseDown}
+		onmousedown={ handleMouseDown: handleMouseDown }
 	>
 		<!-- Filled track -->
 		<div
@@ -141,13 +146,13 @@
 	<button
 		type="button"
 		role="slider"
-		aria-valuemin={min}
+		aria-valuemin={ min: min }
 		aria-valuemax={max}
-		aria-valuenow={value}
-		aria-label={ariaLabel}
+		aria-valuenow={ value: value }
+		aria-label={ ariaLabel: ariaLabel }
 		aria-orientation={orientation}
 		{disabled}
-		onkeydown={handleKeydown}
+		onkeydown={ handleKeydown: handleKeydown }
 		class="absolute block h-5 w-5 rounded-full border-2 border-primary bg-background
 			ring-offset-background transition-colors focus-visible:outline-none
 			focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2
@@ -157,5 +162,5 @@
 </div>
 
 {#if name}
-	<input type="hidden" {name} {value} />
+	<input type="hidden" { name: name } { value: value } />
 {/if}

@@ -1,4 +1,6 @@
 <script lang="ts">
+	let onClose = $state<any>(undefined);
+
 	/**
 	 * ═══════════════════════════════════════════════════════════════════════
 	 * Tag Rename Dialog Component
@@ -127,7 +129,7 @@
 						id="new-name"
 						type="text"
 						bind:value={newName}
-						onkeydown={handleKeydown}
+						onkeydown={ handleKeydown: handleKeydown }
 						class="name-input"
 						class:invalid={newName && !isValid}
 						class:valid={isValid}

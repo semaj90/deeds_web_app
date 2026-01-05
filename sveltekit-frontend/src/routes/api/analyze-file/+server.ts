@@ -33,7 +33,7 @@ export async function POST({ request }: RequestEvent) {
 		const errors = await db.execute(sql`
 			SELECT message, code, line_number, timestamp
 			FROM raw_error_embeddings
-			WHERE source = ${filePath}
+			WHERE source = ${ filePath }
 			ORDER BY timestamp DESC
 			LIMIT 20
 		`);
@@ -56,7 +56,7 @@ export async function POST({ request }: RequestEvent) {
 				metadata,
 				created_at
 			) VALUES (
-				${filePath},
+				${ filePath },
 				${analysis.summary},
 				${JSON.stringify(comments)},
 				${errors.rows.length},

@@ -72,7 +72,7 @@ export async function withTransaction<T>(
  );
  }
 
- console.error(`Transaction ${operationName} failed:`, error);
+ console.error(`Transaction ${ operationName } failed:`, error);
  throw error;
  }
 }

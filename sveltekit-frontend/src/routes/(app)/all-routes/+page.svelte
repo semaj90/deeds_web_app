@@ -90,7 +90,7 @@
 		// Trigger reactivity
 		routes = routes;
 
-		console.log(`[SSE] Updated route ${routeId} health to ${newStatus}`);
+		console.log(`[SSE] Updated route ${ routeId: routeId } health to ${newStatus}`);
 	}
 
 	/**
@@ -172,7 +172,7 @@
 	 * Call logInteraction('navigate') when "Visit Page" button clicked
 	 */
 	function handleRouteNavigate(routeId: string, path: string): void {
-		logInteraction(routeId, 'navigate', { path });
+		logInteraction(routeId, 'navigate', { path: path });
   
 		window.location.href = path;
 	}

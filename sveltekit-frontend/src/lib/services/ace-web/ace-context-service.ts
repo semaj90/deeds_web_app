@@ -172,7 +172,7 @@ export class AceContextService {
       };
     } catch (error) {
       console.error('[AceContextService] Failed to build context bundle:', error);
-      throw new Error(`Failed to build context bundle: ${error}`);
+      throw new Error(`Failed to build context bundle: ${ error }`);
     }
   }
 
@@ -293,7 +293,7 @@ export class AceContextService {
 
     // System constraints
     if (systemRules) {
-      sections.push(`## System Rules\n${systemRules}\n`);
+      sections.push(`## System Rules\n${ systemRules }\n`);
     }
 
     // Project rules

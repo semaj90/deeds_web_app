@@ -16,7 +16,7 @@ export const POST: RequestHandler = async ({ params, request }) => {
  if (!route) {
  return json(
  {
- error: `Route not found: ${routeId}`,
+ error: `Route not found: ${ routeId }`,
  code: 'NOT_FOUND',
  },
  { status: 409 }
@@ -78,7 +78,7 @@ export const GET: RequestHandler = async ({ params, url }) => {
  if (!route) {
  return json(
  {
- error: `Route not found: ${routeId}`,
+ error: `Route not found: ${ routeId }`,
  code: 'NOT_FOUND',
  },
  { status: 404 }

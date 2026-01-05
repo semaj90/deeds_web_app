@@ -119,7 +119,7 @@ export async function listCases(options: CaseListOptions = {}): Promise<CaseList
 
 export async function getCaseById(caseId: string): Promise<LegalCase> {
  try {
- const response = await fetch(`/api/cases/${caseId}`, {
+ const response = await fetch(`/api/cases/${ caseId }`, {
  method: 'GET',
  headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
  });
@@ -131,7 +131,7 @@ export async function getCaseById(caseId: string): Promise<LegalCase> {
 
  const caseData: LegalCase = await response.json();
  // TODO: Add audit logging for case access
- console.log(`Fetched case ${caseData.title} (${caseId})`);
+ console.log(`Fetched case ${caseData.title} (${ caseId })`);
  return caseData;
  } catch (error: Error | unknown) {
  console.error('Case fetch error: ', error);
@@ -164,7 +164,7 @@ export async function createCase(caseData: CreateCaseData): Promise<LegalCase> {
 
 export async function updateCase(caseId: string, updates, UpdateCaseData: Promise<LegalCase> {
  try {
- const response = await fetch(`/api/cases/${caseId}`, {
+ const response = await fetch(`/api/cases/${ caseId }`, {
  method: 'PUT',
  headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
  body: JSON.stringify(updates),
@@ -177,7 +177,7 @@ export async function updateCase(caseId: string, updates, UpdateCaseData: Promis
 
  const updatedCase: LegalCase = await response.json();
  // TODO: Add audit logging for case updates
- console.log(`Updated case ${updatedCase.title} (${caseId})`);
+ console.log(`Updated case ${updatedCase.title} (${ caseId })`);
  return updatedCase;
  } catch (error: Error | unknown) {
  console.error('Case update error: ', error);
@@ -187,7 +187,7 @@ export async function updateCase(caseId: string, updates, UpdateCaseData: Promis
 
 export async function deleteCase(caseId: string): Promise<void> {
  try {
- const response = await fetch(`/api/cases/${caseId}`, {
+ const response = await fetch(`/api/cases/${ caseId }`, {
  method: 'DELETE',
  headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
  });
@@ -198,7 +198,7 @@ export async function deleteCase(caseId: string): Promise<void> {
  }
 
  // TODO: Add audit logging for case deletion
- console.log(`Deleted case ${caseId}`);
+ console.log(`Deleted case ${ caseId }`);
  } catch (error: Error | unknown) {
  console.error('Case deletion error: ', error);
  throw new Error(`Failed to delete case ${(error as Error).message}`);
@@ -208,7 +208,7 @@ export async function deleteCase(caseId: string): Promise<void> {
 // Case Document Management
 export async function getCaseDocuments(caseId: string): Promise<CaseDocument[]> {
  try {
- const response = await fetch(`/api/cases/${caseId}/documents`, {
+ const response = await fetch(`/api/cases/${ caseId }/documents`, {
  method: 'GET',
  headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
  });
@@ -219,7 +219,7 @@ export async function getCaseDocuments(caseId: string): Promise<CaseDocument[]> 
  }
 
  const documents: CaseDocument[] = await response.json();
- console.log(`Fetched ${documents.length} documents for case ${caseId}`);
+ console.log(`Fetched ${documents.length} documents for case ${ caseId }`);
  return documents;
  } catch (error: Error | unknown) {
  console.error('Case documents fetch error: ', error);

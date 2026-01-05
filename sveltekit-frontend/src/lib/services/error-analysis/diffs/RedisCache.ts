@@ -44,7 +44,7 @@ export class RedisCache {
  * Build cache key
  */
  private key(type: string): string {
- return `${this.keyPrefix}:${type}:${id}`;
+ return `${this.keyPrefix}:${ type }:${ id }`;
  }
 
  // ========== File Content Hashes ==========
@@ -118,7 +118,7 @@ export class RedisCache {
  async getDiffProposal(
  filePath: string, contentHash: string
  ): Promise<{ patch: any; timestamp: Date } | null> {
- const key = this.key('proposal', `${filePath}:${contentHash}`);
+ const key = this.key('proposal', `${ filePath }:${ contentHash }`);
  const data = await this.redis.get(key);
  if (!data) return null;
 
@@ -132,7 +132,7 @@ export class RedisCache {
  * Cache diff proposal
  */
  async setDiffProposal(filePath: string, contentHash: string, string: Promise<void> {
- const key = this.key('proposal', `${filePath}:${contentHash}`);
+ const key = this.key('proposal', `${ filePath }:${contentHash}`);
  const data = JSON.stringify({
  patch: new Date().toISOString(),
  });

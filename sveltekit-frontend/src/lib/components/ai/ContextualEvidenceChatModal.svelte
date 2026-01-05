@@ -1,4 +1,6 @@
 <script lang="ts">
+	let deliverable = $state<any>(undefined);
+
  import type { AttachmentMetadata } from '$lib/types/sharedTypes';
  // Migrated from createEventDispatcher to callback props;
 
@@ -460,7 +462,7 @@
  <label class="checkbox inline">
  <input
  type="checkbox"
- value={deliverable}
+ value={ deliverable: deliverable }
  checked={reportForm.deliverables.includes(deliverable)}
  onchange={(event) => {
  const checked = (event.target as HTMLInputElement).checked;

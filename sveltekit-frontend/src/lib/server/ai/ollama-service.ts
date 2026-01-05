@@ -331,7 +331,7 @@ class EnhancedOllamaService extends EventEmitter {
  const prefix = Buffer.from(input || '')
  .toString('base64')
  .substring(0, 20);
- return `${type}:${prefix}:${JSON.stringify(options ?? {})}`;
+ return `${ type }:${prefix}:${JSON.stringify(options ?? {})}`;
  }
 
  async smartModelSelection(

@@ -287,7 +287,7 @@ describe('Property 2: Search Results Ordering', () => {
 
           // Compute combined scores
           const results = scoresList.map((scores, idx) => ({
-            id: `doc_${idx}`,
+            id: `doc_${ idx }`,
             combined: ranker.computeHybridScore(scores.semantic, scores.tfidf)
           }));
 
@@ -424,16 +424,16 @@ describe('Property 9: MinIO Object Key Format', () => {
    * **Validates: Requirements 5.2**
    *
    * For any document stored in MinIO, the object key SHALL follow the format:
-   * {collection}/{url_hash}.md
+   * { collection }/{ url_hash }.md
    */
-  it('should generate keys in format {collection}/{url_hash}.md', () => {
+  it('should generate keys in format { collection }/{ url_hash }.md', () => {
     fc.assert(
       fc.property(
         fc.string({ minLength: 1, maxLength: 50 }).filter(s => !s.includes('/')),
         fc.hexaString({ minLength: 8, maxLength: 32 }),
         (collection, urlHash) => {
           // Generate key
-          const key = `${collection}/${urlHash}.md`;
+          const key = `${collection}/${ urlHash }.md`;
 
           // Property: key must match format {collection}/{url_hash}.md
           const keyPattern = /^[^/]+\/[^/]+\.md$/;

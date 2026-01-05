@@ -143,7 +143,7 @@ export class LokiEvidenceService {
  try {
  const existing = this.evidenceCollection.findOne({ id: evidenceId });
  if (!existing) {
- throw new Error(`Evidence ${evidenceId} not found in local storage`);
+ throw new Error(`Evidence ${ evidenceId } not found in local storage`);
  }
  // Update local record
  const updated = {
@@ -181,7 +181,7 @@ export class LokiEvidenceService {
  try {
  const existing = this.evidenceCollection.findOne({ id: evidenceId });
  if (!existing) {
- throw new Error(`Evidence ${evidenceId} not found in local storage`);
+ throw new Error(`Evidence ${ evidenceId } not found in local storage`);
  }
  // Remove from local collection
  this.evidenceCollection.remove(existing);
@@ -211,12 +211,12 @@ export class LokiEvidenceService {
 
  public getEvidenceById(id: string): LokiEvidence | null {
  if (!this.evidenceCollection) return null;
- return this.evidenceCollection.findOne({ id: id });
+ return this.evidenceCollection.findOne({ id });
  }
 
  public getEvidenceByCase(caseId: string): LokiEvidence[] {
  if (!this.evidenceCollection) return [];
- return this.evidenceCollection.find({ caseId: caseId });
+ return this.evidenceCollection.find({ caseId });
  }
 
  public searchEvidence(query: string): LokiEvidence[] {
@@ -237,7 +237,7 @@ export class LokiEvidenceService {
 
  public getEvidenceByType(type: string): LokiEvidence[] {
  if (!this.evidenceCollection) return [];
- return this.evidenceCollection.find({ type: type });
+ return this.evidenceCollection.find({ type });
  }
 
  public getEvidenceByDateRange(startDate: string, endDate: string): LokiEvidence[] {
@@ -327,14 +327,14 @@ export class LokiEvidenceService {
  });
  break;
  case 'UPDATE':
- await fetch(`/api/evidence/${recordId}`, {
+ await fetch(`/api/evidence/${ recordId }`, {
  method: 'PATCH',
  headers: { 'Content-Type': 'application/json' },
  body: JSON.stringify(data),
  });
  break;
  case 'DELETE':
- await fetch(`/api/evidence/${recordId}`, { method: 'DELETE' });
+ await fetch(`/api/evidence/${ recordId }`, { method: 'DELETE' });
  break;
  }
  }

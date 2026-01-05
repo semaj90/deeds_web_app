@@ -39,7 +39,7 @@
  </div>
  {:else if error}
  <div class="error">
- <p>{error}</p>
+ <p>{ error: error }</p>
  </div>
  {:else if statutes.length === 0}
  <div class="empty">

@@ -6,7 +6,7 @@ import type { PageServerLoad } from './$types.js';
  */
 
 export const load: PageServerLoad = async ({ params, fetch, url }) => {
- const { routePath: routePath } = params;
+ const { routePath } = params;
 
  // Decode the route path from URL encoding
  const decodedRoutePath = decodeURIComponent(routePath);

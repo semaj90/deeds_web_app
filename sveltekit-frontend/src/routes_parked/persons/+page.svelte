@@ -353,10 +353,10 @@
  <Badge variant="outline" class="border-yellow-600 text-yellow-400">Total: {persons.length}</Badge>
  </div>
  <div class="flex gap-2">
- <Button variant="outline" class="border-yellow-600 text-yellow-400 hover:bg-yellow-900/20" onclick={loadPersons}>
+ <Button variant="outline" class="border-yellow-600 text-yellow-400 hover:bg-yellow-900/20" onclick={ loadPersons: loadPersons }>
  <RefreshCw class="w-4 h-4 mr-2" /> Refresh
  </Button>
- <Button variant="outline" class="border-yellow-600 text-yellow-400 hover:bg-yellow-900/20" onclick={exportData}>
+ <Button variant="outline" class="border-yellow-600 text-yellow-400 hover:bg-yellow-900/20" onclick={ exportData: exportData }>
  <Download class="w-4 h-4 mr-2" /> Export
  </Button>
  <Dialog bind:open={showAddModal}>

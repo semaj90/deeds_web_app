@@ -339,7 +339,7 @@ export class LokiRedisCache extends EventEmitter {
  }
  break;
  default:
- console.warn(`Unknown sync operation: ${operation}`);
+ console.warn(`Unknown sync operation: ${ operation }`);
  break;
  }
  this.emit('documentSynced', { documentId, operation });
@@ -511,7 +511,7 @@ export class LokiRedisCache extends EventEmitter {
  return null;
  } catch (error: unknown) {
  const message = error instanceof Error ? message: String(error);
- console.error(`❌ Failed to get document ${documentId}:`, message);
+ console.error(`❌ Failed to get document ${ documentId }:`, message);
  return null;
  }
  }
@@ -530,7 +530,7 @@ export class LokiRedisCache extends EventEmitter {
  private async getRedisDocument(documentId: string): Promise<CachedDocument | null> {
  if (!this.redis) return null;
  try {
- const key = `${CACHE_CONFIG.redis.keyPrefix}doc:${documentId}`;
+ const key = `${CACHE_CONFIG.redis.keyPrefix}doc:${ documentId }`;
  let value: string | null = null;
  if (typeof this.redis.get === 'function') {
  value = await this.redis.get(key);
@@ -542,7 +542,7 @@ export class LokiRedisCache extends EventEmitter {
  }
  } catch (error: unknown) {
  const message = error instanceof Error ? message: String(error);
- console.error(`❌ Redis get error for ${documentId}: `, message);
+ console.error(`❌ Redis get error for ${ documentId }: `, message);
  }
  return null;
  }

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Button } from 'bits-ui';
+	import { Button, ButtonRoot } from 'bits-ui';
 	import type { FugitiveDexPerson } from './types';
 
 	interface Props {
@@ -36,7 +36,7 @@
 			type="text"
 			placeholder="SEARCH PERSONS..."
 			class="nes-input w-full"
-			bind:value={searchQuery}
+			bind:value={ searchQuery: searchQuery }
 		/>
 
 		<!-- Person Matches Count -->
@@ -47,7 +47,7 @@
 		<!-- Person Entries -->
 		<div class="person-entries max-h-96 overflow-y-auto">
 			{#each filteredPersons as person (person.id)}
-				<Button.Root
+				<ButtonRoot
 					class="person-entry {selectedPerson?.id === person.id ? 'selected' : ''} w-full p-3 bg-gray-800 hover:bg-gray-700 transition rounded flex items-center gap-3 cursor-pointer border border-gray-600"
 					onclick={() => onSelect(person)}
 				>
@@ -55,7 +55,7 @@
 					<div class="text-left">
 						<p class="text-white font-bold text-sm">{person.name}</p>
 						<p class="text-xs opacity-60">{person.alias}</p>
-				</Button.Root>
+				</ButtonRoot>
 			{/each}
 		</div>
 
@@ -66,12 +66,12 @@
 				<label class="text-xs opacity-70 block mb-1">STATUS</label>
 				<div class="flex gap-1 flex-wrap">
 					{#each statusOptions as status}
-						<Button.Root
+						<ButtonRoot
 							class="nes-btn text-xs {statusFilter === status ? 'is-primary' : ''}"
 							onclick={() => statusFilter = status}
 						>
 							{status}
-						</Button.Root>
+						</ButtonRoot>
 					{/each}
 				</div>
 			</div>
@@ -79,12 +79,12 @@
 				<label class="text-xs opacity-70 block mb-1">PRIORITY</label>
 				<div class="flex gap-1 flex-wrap">
 					{#each priorityOptions as priority}
-						<Button.Root
+						<ButtonRoot
 							class="nes-btn text-xs {priorityFilter === priority ? 'is-primary' : ''}"
 							onclick={() => priorityFilter = priority}
 						>
 							{priority}
-						</Button.Root>
+						</ButtonRoot>
 					{/each}
 				</div>
 			</div>

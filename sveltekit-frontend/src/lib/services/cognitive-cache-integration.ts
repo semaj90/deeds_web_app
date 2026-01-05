@@ -151,7 +151,7 @@ export class CognitiveCacheService {
  // Update reactive store
  cacheStore.update((state) => ({
  ...state, totalEntries: internalCache.data.size,
- lastOperation: `store: ${id}`,
+ lastOperation: `store: ${ id }`,
  }));
  return true;
  } catch (error) {

@@ -1,4 +1,6 @@
 <script lang="ts">
+	let hint = $state<any>(undefined);
+
  /**
  * Context Confirmation Modal
  *

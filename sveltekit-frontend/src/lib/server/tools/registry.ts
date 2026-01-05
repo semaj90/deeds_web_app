@@ -277,7 +277,7 @@ class ToolRegistry {
         success: false,
         run_id: '',
         tool: name,
-        error: `Tool '${name}' not found. Available: ${this.list().join(', ')}`,
+        error: `Tool '${ name }' not found. Available: ${this.list().join(', ')}`,
         duration_ms: 0,
         timestamp: new Date().toISOString()
       };

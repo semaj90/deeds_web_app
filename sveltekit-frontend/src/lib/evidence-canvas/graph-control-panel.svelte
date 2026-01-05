@@ -1,5 +1,8 @@
 import { createEventDispatcher } from 'svelte';
 <script lang="ts">
+	let currentPhase = $state<any>(undefined);
+	let algorithm = $state<any>(undefined);
+
  // Migrated from createEventDispatcher to callback props;
 
  const dispatch = createEventDispatcher<{
@@ -59,13 +62,13 @@ import { createEventDispatcher } from 'svelte';
  <h4>GPU Status</h4>
  <div class="status-item">
  <span class="status-label">WebGPU:</span>
- <span class="status-value" class:supported={webgpuSupported}>
+ <span class="status-value" class:supported={ webgpuSupported: webgpuSupported }>
  {webgpuSupported ? 'Supported' : 'Not Supported'}
  </span>
  </div>
  <div class="status-item">
  <span class="status-label">Acceleration:</span>
- <span class="status-value" class:enabled={gpuAccelerationEnabled}>
+ <span class="status-value" class:enabled={ gpuAccelerationEnabled: gpuAccelerationEnabled }>
  {gpuAccelerationEnabled ? 'Enabled' : 'Disabled'}
  </span>
  </div>
@@ -74,7 +77,7 @@ import { createEventDispatcher } from 'svelte';
  <!-- Case Phase -->
  <div class="control-section">
  <h4>Case Phase</h4>
- <select bind:value={currentPhase} onchange={handlePhaseChange}>
+ <select bind:value={currentPhase} onchange={ handlePhaseChange: handlePhaseChange }>
  {#each phases as phase}
  <option value={phase}>{phase.charAt(0).toUpperCase() + phase.slice(1)}</option>
  {/each}

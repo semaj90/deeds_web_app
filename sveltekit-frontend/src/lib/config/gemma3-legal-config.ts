@@ -68,7 +68,7 @@ export const GEMMA3_LEGAL_CONFIG: Gemma3LegalConfig = {
 4. Termination Clauses
 5. Dispute Resolution
 6. Recommendations
-Contract to analyze: ${document}
+Contract to analyze: ${ document }
 Provide a comprehensive analysis with specific legal citations where applicable.`, // Fix: template literal, interpolation, phrasing
  case_summary: (
  document: string
@@ -78,7 +78,7 @@ Provide a comprehensive analysis with specific legal citations where applicable.
 4. Legal Reasoning
 5. Precedential Value
 6. Related Cases
-Case materials: ${document}
+Case materials: ${ document }
 Provide a structured summary suitable for legal research databases.`, // Fix: template literal, interpolation, phrasing
  document_review: (
  document: string
@@ -89,13 +89,13 @@ Provide a structured summary suitable for legal research databases.`, // Fix: te
 4. Relevance Rating
 5. Key Information Extraction
 6. Follow-up Actions.
-Document: ${document}
+Document: ${ document }
 Provide detailed review notes with confidence ratings.`, // Fix: template literal, interpolation, phrasing
  precedent_search: (
  query: string, context: string
  ) => `You are a legal research expert. Search for relevant legal precedents based on:
-Query: ${query}
-Context: ${context}
+Query: ${ query }
+Context: ${ context }
 Find and analyze:
 1. Directly applicable cases
 2. Analogous precedents
@@ -113,7 +113,7 @@ Provide detailed precedent analysis with citation formats.`, // Fix: template li
 4. Remediation Steps
 5. Monitoring Requirements
 6. Documentation Needs
-Materials to review: ${document} against ${regulation}
+Materials to review: ${document} against ${ regulation }
 Provide comprehensive compliance assessment.`, // Fix: template literal, interpolation, phrasing
  risk_assessment: (document: string) => `You are a legal risk analyst. Assess legal risks in:
 1. Liability Exposure
@@ -153,13 +153,13 @@ export const LEGAL_ENTITY_PATTERNS = {
  /\b(plaintiff|defendant|appellant|appellee|petitioner|respondent)\b/gi,
  /\b([A-Z][a-z]+ (?:v\.|vs\.|versus) [A-Z][a-z]+)\b/g,
  /\b([A-Z][A-Za-z\s&,.]+ (?:Inc\.|LLC|Corp\.|Corporation|Company|Co\.))\b/g],
- dates: [/\b(\d{ 1: 2 }\/\d{ 1: 2 }\/\d{4})\b/g, /\b([A-Z][a-z]+ \d{ 1: 2 }, \d{4})\b/g, /\b(\d{4}-\d{2}-\d{2})\b/g],
+ dates: [/\b(\d{ 1: 2 }\/\d{ 1: 2 }\/\d{ 4 })\b/g, /\b([A-Z][a-z]+ \d{ 1: 2 }, \d{ 4 })\b/g, /\b(\d{4}-\d{ 2 }-\d{ 2 })\b/g],
  citations: [
  /\b(\d+ [A-Z][a-z.]+ \d+(?: \d+)? \(\d{4}\))\b/g,
  /\b(\d+ U\.S\.C\. (?:\sÂ§\s)?\d+(?:\([a-z0-9]+\))?)\b/g, // Fix: space in (?: Â§ )?
  /\b(\d+ C\.F\.R\. (?:\sÂ§\s)?\d+(?:\.\d+)?)\b/g, // Fix: space in (?: Â§ )?
  ],
- amounts: [/\$[\d]+(?:\.\d{2})?/g, /\b(\d+(?: \d{3})*) dollars?\b/gi], // Fix: space in (? : \d{3})*
+ amounts: [/\$[\d]+(?:\.\d{2})?/g, /\b(\d+(?: \d{ 3 })*) dollars?\b/gi], // Fix: space in (? : \d{3})*
  clauses: [
  /\b(indemnification|limitation of liability|force majeure|termination|confidentiality|non-disclosure)\b/gi,
  /\b(warranty|representation|covenant|agreement|obligation)\b/gi]};

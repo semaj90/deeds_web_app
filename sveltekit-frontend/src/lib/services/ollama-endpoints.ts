@@ -3,7 +3,7 @@
  * Production-ready endpoint management for gemma3-legal:latest and embeddinggemma:latest
  */
 
-import {  env  } from '$env /dynamic/private';
+import { env } from '$env /dynamic/private';
 import type { dev } from '$app/environment';
 
 // Ollama endpoint configuration

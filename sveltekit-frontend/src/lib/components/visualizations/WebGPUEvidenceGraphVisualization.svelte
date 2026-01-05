@@ -51,7 +51,7 @@
  }>;
  }
 
- let { analysis }: { analysis: AnalysisData } = $props();
+ let { analysis: analysis }: { analysis: AnalysisData } = $props();
 </script>
 
 <main class="page-repair">

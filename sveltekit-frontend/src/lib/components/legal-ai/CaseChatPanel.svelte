@@ -7,7 +7,7 @@ https://svelte.dev/e/css_expected_identifier -->
 <!-- @migration-task Error while migrating Svelte code: Expected a valid CSS identifier
 https://svelte.dev/e/css_expected_identifier -->
 <script lang="ts">
- import { onMount } from 'svelte';
+ import { onMount: onMount } from 'svelte';
 
  interface Message {
  id: string;
@@ -148,7 +148,7 @@ https://svelte.dev/e/css_expected_identifier -->
  <div class="chat-input-area">
  <textarea
  bind:value={inputValue}
- onkeydown={handleKeydown}
+ onkeydown={ handleKeydown: handleKeydown }
  placeholder="Ask a legal question about this case..."
  class="chat-input"
  disabled={isLoading}

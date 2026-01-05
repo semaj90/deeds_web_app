@@ -125,11 +125,14 @@ class UniversalASTParser {
     const lines = content.split('\n').length;
 
     const fileAST: FileAST = {
-      id: this.generateId(filePath, 'root', file_path: filePath,
+      id: this.generateId(filePath, 'root'),
+      file_path: filePath,
       language,
       root: {
-        id: this.generateId(filePath, 'program', type: 'Program',
-        name: path.basename(filePath, start: 0,
+        id: this.generateId(filePath, 'program'),
+        type: 'Program',
+        name: path.basename(filePath),
+        start: 0,
         end: content.length,
         children: [],
         metadata: { language }
@@ -141,7 +144,8 @@ class UniversalASTParser {
       metadata: {
         lines,
         bytes: content.length,
-        hash: Buffer.from(content).toString('base64').slice(0, 32, analyzed_at: new Date().toISOString()
+        hash: Buffer.from(content).toString('base64').slice(0, 32),
+        analyzed_at: new Date().toISOString()
       }
     };
 
@@ -188,7 +192,8 @@ class UniversalASTParser {
 
       // Add to AST
       fileAST.root.children.push({
-        id: this.generateId(fileAST.file_path, `import_${source}`, type: 'Import',
+        id: this.generateId(fileAST.file_path, `import_${ source }`),
+        type: 'Import',
         name: source,
         start: match.index,
         end: match.index + match[0].length,
@@ -211,7 +216,8 @@ class UniversalASTParser {
       });
 
       fileAST.root.children.push({
-        id: this.generateId(fileAST.file_path, `export_${name}`, type: 'Export',
+        id: this.generateId(fileAST.file_path, `export_${ name }`),
+        type: 'Export',
         name,
         kind: isDefault ? 'default' : 'named',
         start: match.index,
@@ -226,7 +232,8 @@ class UniversalASTParser {
     while ((match = functionRegex.exec(content)) !== null) {
       const [fullMatch, name] = match;
       fileAST.root.children.push({
-        id: this.generateId(fileAST.file_path, `function_${name}`, type: 'Function',
+        id: this.generateId(fileAST.file_path, `function_${ name }`),
+        type: 'Function',
         name,
         start: match.index,
         end: match.index + fullMatch.length,
@@ -240,7 +247,8 @@ class UniversalASTParser {
     while ((match = classRegex.exec(content)) !== null) {
       const [fullMatch, name, extendsClass, implementsInterfaces] = match;
       fileAST.root.children.push({
-        id: this.generateId(fileAST.file_path, `class_${name}`, type: 'Class',
+        id: this.generateId(fileAST.file_path, `class_${name}`),
+        type: 'Class',
         name,
         start: match.index,
         end: match.index + fullMatch.length,
@@ -257,7 +265,8 @@ class UniversalASTParser {
     while ((match = interfaceRegex.exec(content)) !== null) {
       const [fullMatch, name, extendsInterfaces] = match;
       fileAST.root.children.push({
-        id: this.generateId(fileAST.file_path, `interface_${name}`, type: 'Interface',
+        id: this.generateId(fileAST.file_path, `interface_${name}`),
+        type: 'Interface',
         name,
         start: match.index,
         end: match.index + fullMatch.length,
@@ -273,7 +282,8 @@ class UniversalASTParser {
     while ((match = typeRegex.exec(content)) !== null) {
       const [fullMatch, name] = match;
       fileAST.root.children.push({
-        id: this.generateId(fileAST.file_path, `type_${name}`, type: 'Type',
+        id: this.generateId(fileAST.file_path, `type_${name}`),
+        type: 'Type',
         name,
         start: match.index,
         end: match.index + fullMatch.length,
@@ -289,7 +299,8 @@ class UniversalASTParser {
     if (scriptMatch) {
       const scriptContent = scriptMatch[1];
       const scriptNode: UniversalASTNode = {
-        id: this.generateId(fileAST.file_path, 'script', type: 'Script',
+        id: this.generateId(fileAST.file_path, 'script'),
+        type: 'Script',
         name: 'script',
         start: scriptMatch.index!,
         end: scriptMatch.index! + scriptMatch[0].length,
@@ -308,7 +319,8 @@ class UniversalASTParser {
     const styleMatch = content.match(/<style[^>]*>([\s\S]*?)<\/style>/);
     if (styleMatch) {
       fileAST.root.children.push({
-        id: this.generateId(fileAST.file_path, 'style', type: 'Style',
+        id: this.generateId(fileAST.file_path, 'style'),
+        type: 'Style',
         name: 'style',
         start: styleMatch.index!,
         end: styleMatch.index! + styleMatch[0].length,
@@ -328,7 +340,8 @@ class UniversalASTParser {
 
     if (templateContent) {
       const templateNode: UniversalASTNode = {
-        id: this.generateId(fileAST.file_path, 'template', type: 'Template',
+        id: this.generateId(fileAST.file_path, 'template'),
+        type: 'Template',
         name: 'template',
         start: 0,
         end: templateContent.length,
@@ -342,7 +355,8 @@ class UniversalASTParser {
       while ((match = componentRegex.exec(templateContent)) !== null) {
         const componentName = match[1];
         templateNode.children.push({
-          id: this.generateId(fileAST.file_path, `component_${componentName}`, type: 'Component',
+          id: this.generateId(fileAST.file_path, `component_${componentName}`),
+          type: 'Component',
           name: componentName,
           start: match.index,
           end: match.index + match[0].length,
@@ -356,7 +370,8 @@ class UniversalASTParser {
       const propRegex = /export\s+let\s+(\w+)/g;
       while ((match = propRegex.exec(content)) !== null) {
         fileAST.root.children.push({
-          id: this.generateId(fileAST.file_path, `prop_${match[1]}`, type: 'Prop',
+          id: this.generateId(fileAST.file_path, `prop_${match[1]}`),
+          type: 'Prop',
           name: match[1],
           start: match.index,
           end: match.index + match[0].length,

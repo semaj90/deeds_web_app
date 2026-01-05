@@ -46,7 +46,7 @@ function createSSEStatusStore() {
  try {
  const headers: Record<string, string> = {};
  if (token) {
- headers['Authorization'] = `Bearer ${token}`;
+ headers['Authorization'] = `Bearer ${ token }`;
  }
 
  eventSource = new EventSource(endpoint);
@@ -104,7 +104,7 @@ function createSSEStatusStore() {
 
  callback(data);
  } catch (error) {
- console.error(`[SSE] Error parsing ${eventType} event:`, error);
+ console.error(`[SSE] Error parsing ${ eventType } event:`, error);
  }
  });
  },

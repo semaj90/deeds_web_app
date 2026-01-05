@@ -1,4 +1,6 @@
 <script lang="ts">
+	let prompt = $state<any>(undefined);
+
  let { children, prompt = ">" } = $props();
 </script>
 

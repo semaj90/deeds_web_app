@@ -13,7 +13,7 @@ export const GET: RequestHandler = async ({ params }) => {
             // Subscribe to the specific Chat ID channel
             await subscriber.subscribe(`chat_stream:${params.chatId}`, (message) => {
                 // Format for Server-Sent Events (SSE)
-                controller.enqueue(`data: ${message}\n\n`);
+                controller.enqueue(`data: ${ message }\n\n`);
             });
         },
         async cancel() {

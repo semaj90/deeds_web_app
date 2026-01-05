@@ -7,6 +7,10 @@ https://svelte.dev/e/tag_invalid_name -->
 <!-- @migration-task Error while migrating Svelte code: Expected a valid element or component name. Components must have a valid variable name or dot notation expression
 https://svelte.dev/e/tag_invalid_name -->
 <script lang="ts">
+	let isLoading = $state<any>(undefined);
+	let error = $state<any>(undefined);
+	let action = $state<any>(undefined);
+
 	// Migrated from createEventDispatcher to callback props;
 	import { Brain } from "lucide-svelte";
 import { TriangleAlert } from "lucide-svelte";
@@ -34,11 +38,11 @@ import { Target } from "lucide-svelte";;
 	}
 
 	function applyRecommendation(recommendationId: string) {
-		dispatch('apply', { recommendationId });
+		dispatch('apply', { recommendationId: recommendationId });
 	}
 
 	function dismissRecommendation(recommendationId: string) {
-		dispatch('dismiss', { recommendationId });
+		dispatch('dismiss', { recommendationId: recommendationId });
 	}
 
 	function getTypeIcon(type: string) {
@@ -82,7 +86,7 @@ import { Target } from "lucide-svelte";;
 		{#if !isLoading}
 			<button
 				class="generate-btn"
-				onclick={generateRecommendations}
+				onclick={ generateRecommendations: generateRecommendations }
 				disabled={isLoading}
 			>
 				<Brain class="btn-icon" />
@@ -100,7 +104,7 @@ import { Target } from "lucide-svelte";;
 		<div class="error-state">
 			<TriangleAlert class="error-icon" />
 			<p>Failed to generate recommendations: {error}</p>
-			<button class="retry-btn" onclick={generateRecommendations}>
+			<button class="retry-btn" onclick={ generateRecommendations: generateRecommendations }>
 				Try Again
 			</button>
 		</div>

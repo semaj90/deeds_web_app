@@ -174,7 +174,7 @@ export function createLegalCaseStore() {
  entityType: 'CASE',
  entityId: caseId, userId: currentUser?.id || 'unknown',
  });
- const response = await fetch(`/api/cases/${caseId}/analyze`, {
+ const response = await fetch(`/api/cases/${ caseId }/analyze`, {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
  });
@@ -215,7 +215,7 @@ export function createLegalCaseStore() {
  entityType: 'DOCUMENT',
  entityId: documentId, userId: currentUser?.id || 'unknown',
  });
- const response = await fetch(`/api/documents/${documentId}/analyze`, {
+ const response = await fetch(`/api/documents/${ documentId }/analyze`, {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
  });
@@ -264,7 +264,7 @@ export function createLegalCaseStore() {
  type: 'CASE_STATUS_UPDATED',
  entityType: 'CASE',
  entityId: caseId, userId: currentUser?.id || 'unknown',
- details: { oldStatus: oldStatus },
+ details: { oldStatus },
  });
  } catch (error: any) {
  // Rollback on failure

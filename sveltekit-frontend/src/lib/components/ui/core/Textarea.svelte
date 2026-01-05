@@ -1,5 +1,10 @@
 import { createEventDispatcher } from 'svelte';
 <script lang="ts">
+	let rows = $state<any>(undefined);
+	let placeholder = $state<any>(undefined);
+	let id = $state<any>(undefined);
+	let className = $state<any>(undefined);
+
  // Migrated from createEventDispatcher to callback props;
  const dispatch = createEventDispatcher();
 

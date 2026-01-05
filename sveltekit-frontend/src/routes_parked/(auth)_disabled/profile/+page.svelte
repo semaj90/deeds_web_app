@@ -87,7 +87,7 @@
  (env['VITE_API_ORIGIN'] as string | undefined) ??
  '';
  if (!base) return path;
- return base.replace(/\/$/, '') + (path.startsWith('/') ? path : `/${path}`);
+ return base.replace(/\/$/, '') + (path.startsWith('/') ? path : `/${ path: path }`);
  }
  // --- END ADDED ---
 

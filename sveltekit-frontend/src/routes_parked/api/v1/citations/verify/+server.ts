@@ -688,8 +688,8 @@ async function generateEmbeddings(text: string): Promise<number[]> {
 function extractSection(text: string, sectionName) | null {
 	const patterns = [
 ;
-		new RegExp(`${sectionName}:\\s*([^\\n]+)`, 'i'),
-		new RegExp(`${sectionName}\\s*:\\s*([\\s\\S]*?)(?=\\n\\n|$)`, 'i')
+		new RegExp(`${ sectionName }:\\s*([^\\n]+)`, 'i'),
+		new RegExp(`${ sectionName }\\s*:\\s*([\\s\\S]*?)(?=\\n\\n|$)`, 'i')
 	];
 
 	for (const pattern of patterns) {

@@ -208,7 +208,7 @@ export const globalUserStore = {
 
  async loadUserProfile(userId: string) {
  try {
- const response = await fetch(`/api/v1/users/${userId}/profile`);
+ const response = await fetch(`/api/v1/users/${ userId }/profile`);
  if (response.ok) {
  const profile = await response.json();
  globalUserState.profile = profile;
@@ -220,7 +220,7 @@ export const globalUserStore = {
 
  async loadUserPreferences(userId: string) {
  try {
- const response = await fetch(`/api/v1/users/${userId}/preferences`);
+ const response = await fetch(`/api/v1/users/${ userId }/preferences`);
  if (response.ok) {
  const preferences = await response.json();
  globalUserState.preferences = { ...defaultPreferences, ...preferences };

@@ -110,7 +110,7 @@ async function fetchDocumentContent(url: string, textRef: string): Promise<strin
   }
 
   // If textRef is a hash/id, fetch from storage (stub)
-  return `Document content for ${url} (ref: ${textRef})`;
+  return `Document content for ${ url } (ref: ${ textRef })`;
 }
 
 async function langextractBatchHandler(request: LangExtractBatchRequest): Promise<ToolResult<LangExtractResult>> {

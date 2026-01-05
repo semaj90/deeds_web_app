@@ -7,6 +7,10 @@ https://svelte.dev/e/js_parse_error -->
 <!-- @migration-task Error while migrating Svelte code: Unexpected token
 https://svelte.dev/e/js_parse_error -->
 <script>
+	let searchQuery = $state<any>(undefined);
+	let sourceTypeFilter = $state<any>(undefined);
+	let tag = $state<any>(undefined);
+
 let { searchQuery = '', sourceTypeFilter = '', limit = 20, caseId = undefined } = $props<{
  searchQuery?: string;
  sourceTypeFilter?: string;
@@ -75,7 +79,7 @@ import type { CitationSearchResult, SavedCitation } from '$lib/types/citations';
  if (!confirm('Are you sure you want to delete this citation?')) return;
 
  try {
- const response = await fetch(`/api/citations/${citationId}`, {
+ const response = await fetch(`/api/citations/${ citationId: citationId }`, {
  method: 'DELETE'
  });
 
@@ -110,7 +114,7 @@ import type { CitationSearchResult, SavedCitation } from '$lib/types/citations';
  onkeydown={(e) => e.key === 'Enter' && handleSearch()}
  disabled={isLoading}
  />
- <select bind:value={sourceTypeFilter} onchange={handleSearch} disabled={isLoading}>
+ <select bind:value={sourceTypeFilter} onchange={ handleSearch: handleSearch } disabled={isLoading}>
  {#each sourceTypes as type}
  <option value={type.value}>{type.label}</option>
  {/each}

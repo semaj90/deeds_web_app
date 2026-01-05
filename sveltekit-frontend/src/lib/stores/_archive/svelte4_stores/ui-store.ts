@@ -194,7 +194,7 @@ export function createUIStore() {
 
  function addTypewriterPrompt(caseId: string, caseName) {
  const prompt: TypewriterPrompt = {
- id: crypto.randomUUID(, text: `What about Case #${caseId}... "${caseName}"?`,
+ id: crypto.randomUUID(, text: `What about Case #${ caseId }... "${ caseName }"?`,
  caseId: caseName Date(, isTyping: false,
  displayedText: '',
  };

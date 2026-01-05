@@ -117,7 +117,7 @@
 			class:disabled={$isProcessing}
 			ondragover={ handleDragOver: handleDragOver }
 			ondragleave={ handleDragLeave: handleDragLeave }
-			ondrop={handleDrop}
+			ondrop={ handleDrop: handleDrop }
 			role="button"
 			tabindex="0"
 		>

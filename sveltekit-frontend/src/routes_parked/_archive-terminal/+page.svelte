@@ -126,7 +126,7 @@
 
 	// Handle keyword chip click
 	function handleKeywordClick(keyword: string) {
-		message = `Show me more evidence about: ${keyword}`;
+		message = `Show me more evidence about: ${ keyword: keyword }`;
 		// Focus the input
 		const input = document.getElementById('message') as HTMLTextAreaElement;
 		if (input) {
@@ -239,7 +239,7 @@
 		enctype="multipart/form-data"
 		use:enhance={() => {
 			isSubmitting = true;
-			return async ({ update }) => {
+			return async ({ update: update }) => {
 				await update();
 			};
 		}}

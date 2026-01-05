@@ -277,7 +277,7 @@
  <AutoPopulatedCaseForm
  form={demoForm}
  onSubmit={(form) => alert('Form submitted: ' + form.caseName)}
- editable={true}
+ editable={ true: true }
  />
  </section>
  {/if}

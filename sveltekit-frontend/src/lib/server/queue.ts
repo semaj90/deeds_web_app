@@ -21,7 +21,7 @@ export async function enqueueJob(queueName: string, options: any): Promise<void>
  };
 
  jobQueue.push(job);
- console.log(`[Queue] Enqueued job ${job.id} to ${queueName}`);
+ console.log(`[Queue] Enqueued job ${job.id} to ${ queueName }`);
 
  // Process the job asynchronously
  setTimeout(() => processJob(job), 100);
@@ -52,7 +52,7 @@ async function processJob(job: QueueJob): Promise<void> {
 async function processRagIndexingJob(payload: any): Promise<void> {
  const { caseId, chatTurnId, message, objects, processedFiles } = payload;
 
- console.log(`[RAG Worker] Processing evidence for case ${caseId}, turn ${chatTurnId}`);
+ console.log(`[RAG Worker] Processing evidence for case ${ caseId }, turn ${ chatTurnId }`);
 
  // Process uploaded files (existing logic)
  for (const obj of objects || []) {
@@ -106,7 +106,7 @@ async function processRagIndexingJob(payload: any): Promise<void> {
  wait: true,
  points: [
  {
- id: `${caseId}-${chatTurnId}-${obj.objectName}`,
+ id: `${ caseId }-${ chatTurnId }-${obj.objectName}`,
  vector: embedding,
  payload: {
  content: fullText,
@@ -120,7 +120,7 @@ async function processRagIndexingJob(payload: any): Promise<void> {
   
  const { sql } = await import('$lib/server/db');
  try {
- await sql`UPDATE evidence_files SET extracted_text = ${text}, updated_at = NOW() WHERE chat_turn_id = ${chatTurnId} AND minio_object_name = ${obj.objectName}`;
+ await sql`UPDATE evidence_files SET extracted_text = ${text}, updated_at = NOW() WHERE chat_turn_id = ${ chatTurnId } AND minio_object_name = ${obj.objectName}`;
  } catch (dbError) {
  console.error(`[RAG Worker] Database update error for ${obj.objectName}:`, dbError);
  }

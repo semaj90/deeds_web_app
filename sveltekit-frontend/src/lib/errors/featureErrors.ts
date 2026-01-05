@@ -187,7 +187,7 @@ export class FeatureErrorHandler {
  field?: string,
  reason?: string
  ): FeatureErrorResponse {
- const message = `Invalid input${field ? ` for field '${field}'` : ''}${reason ? `: ${reason}` : ''}`;
+ const message = `Invalid input${field ? ` for field '${ field }'` : ''}${reason ? `: ${ reason }` : ''}`;
 
  // Log the error
  if (feature === 'errorBrain') {

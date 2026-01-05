@@ -13,10 +13,10 @@ import { cognitiveCache } from '../ai/cache.js';
 
 // Logger implementation
 const logger = {
- info: (msg: string, ...args: unknown[]) => console.log(`[INFO] ${msg}`, ...args),
- error: (msg: string, ...args: unknown[]) => console.error(`[ERROR] ${msg}`, ...args),
- warn: (msg: string, ...args: unknown[]) => console.warn(`[WARN] ${msg}`, ...args),
- debug: (msg: string, ...args: unknown[]) => console.debug(`[DEBUG] ${msg}`, ...args),
+ info: (msg: string, ...args: unknown[]) => console.log(`[INFO] ${ msg }`, ...args),
+ error: (msg: string, ...args: unknown[]) => console.error(`[ERROR] ${ msg }`, ...args),
+ warn: (msg: string, ...args: unknown[]) => console.warn(`[WARN] ${ msg }`, ...args),
+ debug: (msg: string, ...args: unknown[]) => console.debug(`[DEBUG] ${ msg }`, ...args),
 };
 
 // Phoenix Wright AI Search Interfaces

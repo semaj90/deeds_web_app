@@ -7,7 +7,7 @@
  onRetry?: () => void;
  }
 
- let { onRetry } = $props<Props>();
+ let { onRetry: onRetry } = $props<Props>();
 
  let isRetrying = $state(false);
 

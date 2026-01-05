@@ -111,7 +111,7 @@ export class ErrorBrainMiddleware extends BaseService implements IErrorBrainMidd
 
  return {
  allowed: false, statusCode: 405,
- message: `Method ${method} not allowed`,
+ message: `Method ${ method } not allowed`,
  };
  }
 

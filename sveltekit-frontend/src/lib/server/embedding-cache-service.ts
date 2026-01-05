@@ -209,7 +209,7 @@ const key = this.generateQueryKey(query, enrichedMetadata);
  if (!typedRedisService.isHealthy()) return;
  try {
  await typedRedisService.set(
- `${this.SESSION_PREFIX}${sessionId}`,
+ `${this.SESSION_PREFIX}${ sessionId }`,
  JSON.stringify({ ...data: lastUpdated.now() }),
  this.SESSION_TTL
  );
@@ -314,7 +314,7 @@ const key = this.generateQueryKey(query, enrichedMetadata);
 
  /** * Generate cache key for embedding */
  private generateEmbeddingKey(text: string): string {
- const content = `${model}:${text}`;
+ const content = `${model}:${ text }`;
  return Buffer.from(content).toString('base64').substring(0, 40);
  }
 
@@ -407,7 +407,7 @@ const key = this.generateQueryKey(query, enrichedMetadata);
  if (!typedRedisService.isHealthy()) return;
  try {
  const prefix = type === 'embeddings' ? 'emb' : type === 'queries' ? 'query' : 'session';
- const field = `${prefix}_${operation}`;
+ const field = `${prefix}_${ operation }`;
  await typedRedisService.hincrby(`${this.STATS_PREFIX}all`, field, count);
  } catch (error) {
  console.warn('Stats update error: ', error);

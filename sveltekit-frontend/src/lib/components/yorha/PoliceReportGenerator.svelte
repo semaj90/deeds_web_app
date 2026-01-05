@@ -208,7 +208,7 @@ import { createEventDispatcher } from 'svelte';
  {/if}
  </button>
  <button
- onclick={clearAll}
+ onclick={ clearAll: clearAll }
  class="px-4 py-3 bg-slate-700 hover:bg-slate-600 text-slate-300 rounded-lg transition-colors"
  >
  Clear

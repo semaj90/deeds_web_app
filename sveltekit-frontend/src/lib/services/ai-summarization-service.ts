@@ -3,13 +3,13 @@
 
 export const aiSummarizationService = {
  summarizeEvidence: async (evidenceId: string) => {
- console.log(`Mock AI summarizing evidence: ${evidenceId}`);
- return { id: evidenceId, summary: `Summary for evidence ${evidenceId}` };
+ console.log(`Mock AI summarizing evidence: ${ evidenceId }`);
+ return { id: evidenceId, summary: `Summary for evidence ${ evidenceId }` };
  },
  summarizeCase: async (caseId: string) => {
- console.log(`Mock AI summarizing case: ${caseId}`);
+ console.log(`Mock AI summarizing case: ${ caseId }`);
  return {
- summary: `Comprehensive AI summary for case ${caseId}`,
+ summary: `Comprehensive AI summary for case ${ caseId }`,
  confidence: 0.85,
  processingTime: 1200,
  };

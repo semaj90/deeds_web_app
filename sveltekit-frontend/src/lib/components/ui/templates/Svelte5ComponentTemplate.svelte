@@ -1,4 +1,6 @@
 <script lang="ts">
+	let className = $state<any>(undefined);
+
 /**
  * Svelte 5 + bits-ui Component Template
  *
@@ -129,7 +131,7 @@ function handleKeydown(event: KeyboardEvent) {
 		   {variantClasses} {sizeClasses} {stateClasses} {className}"
 	role="button"
 	tabindex={disabled ? -1 : 0}
-	aria-disabled={disabled}
+	aria-disabled={ disabled: disabled }
 	onmouseenter={() => isHovered = true}
 	onmouseleave={() => isHovered = false}
 	onfocus={() => isFocused = true}

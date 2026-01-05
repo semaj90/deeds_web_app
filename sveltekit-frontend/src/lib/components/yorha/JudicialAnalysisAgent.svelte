@@ -1,5 +1,9 @@
 import { createEventDispatcher } from 'svelte';
 <script lang="ts">
+	let charge = $state<any>(undefined);
+	let rec = $state<any>(undefined);
+	let risk = $state<any>(undefined);
+
  // Migrated from createEventDispatcher to callback props;
 
  interface Evidence {
@@ -193,7 +197,7 @@ ${analysis.risks.map(r => `• ${r}`).join('\n')}`;
  Jurisdiction
  </label>
  <select
- bind:value={jurisdiction}
+ bind:value={ jurisdiction: jurisdiction }
  class="w-full bg-slate-800 border border-slate-600 rounded-lg px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-cyan-500"
  >
  <option value="federal">Federal</option>
@@ -287,7 +291,7 @@ ${analysis.risks.map(r => `• ${r}`).join('\n')}`;
  💾
  </button>
  <button
- onclick={clearAnalysis}
+ onclick={ clearAnalysis: clearAnalysis }
  class="px-3 py-1 bg-slate-700 hover:bg-slate-600 text-slate-300 rounded text-sm"
  title="Clear analysis"
  >

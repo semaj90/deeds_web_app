@@ -76,9 +76,9 @@ export async function createCollection(
  config: { size: number, distance: 'Cosine' | 'Euclid' | 'Manhattan' }
 ): Promise<void> {
  try {
- console.log(`[Qdrant] Creating collection: ${collectionName}`);
+ console.log(`[Qdrant] Creating collection: ${ collectionName }`);
 
- const response = await fetch(`${process.env.QDRANT_URL}/collections/${collectionName}`, {
+ const response = await fetch(`${process.env.QDRANT_URL}/collections/${ collectionName }`, {
  method: 'PUT',
  headers: {
  'Content-Type': 'application/json',
@@ -97,15 +97,15 @@ export async function createCollection(
  if (!response.ok) {
  const error = await response.text();
  if (error.includes('already exists')) {
- console.log(`[Qdrant] Collection ${collectionName} already exists`);
+ console.log(`[Qdrant] Collection ${ collectionName } already exists`);
  return;
  }
  throw new Error(`Qdrant API error: ${response.status} ${error}`);
  }
 
- console.log(`[Qdrant] Collection ${collectionName} created successfully`);
+ console.log(`[Qdrant] Collection ${ collectionName } created successfully`);
  } catch (error) {
- console.error(`[Qdrant] Error creating collection ${collectionName}:`, error);
+ console.error(`[Qdrant] Error creating collection ${ collectionName }:`, error);
  throw error;
  }
 }
@@ -381,7 +381,7 @@ export async function searchLawSections(
  */
 export async function deletePoint(collectionName: string, string: Promise<void> {
  try {
- console.log(`[Qdrant] Deleting point ${pointId} from ${collectionName}`);
+ console.log(`[Qdrant] Deleting point ${pointId} from ${ collectionName }`);
 
  const response = await fetch(
  `${process.env.QDRANT_URL}/collections/${collectionName}/points/${hashStringToNumber(pointId)}`,

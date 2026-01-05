@@ -63,7 +63,7 @@
 <button onclick={testCaseList} disabled={isLoading}>
  {isLoading ? 'Loading...' : 'Test Case List API'}
 </button>
-<button onclick={testCaseCreation} disabled={isLoading}>
+<button onclick={ testCaseCreation: testCaseCreation } disabled={isLoading}>
  {isLoading ? 'Loading...' : 'Test Case Creation API'}
 </button>
 

@@ -490,7 +490,7 @@ export async function executePhase90Tool(
       return phase90_get_fix_recommendation(params.clusterId as number);
 
     default:
-      throw new Error(`Unknown Phase 90 tool: ${toolName}`);
+      throw new Error(`Unknown Phase 90 tool: ${ toolName }`);
   }
 }
 

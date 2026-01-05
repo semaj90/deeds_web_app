@@ -1,4 +1,6 @@
 <script lang="ts">
+	let placeholder = $state<any>(undefined);
+
 	/**
 	 * ═══════════════════════════════════════════════════════════════════════
 	 * Semantic Search Component
@@ -148,10 +150,10 @@
 		<input
 			bind:this={inputElement}
 			bind:value={query}
-			oninput={handleInput}
-			onkeydown={handleKeydown}
-			onblur={handleBlur}
-			onfocus={handleFocus}
+			oninput={ handleInput: handleInput }
+			onkeydown={ handleKeydown: handleKeydown }
+			onblur={ handleBlur: handleBlur }
+			onfocus={ handleFocus: handleFocus }
 			type="text"
 			{placeholder}
 			class="search-input"
@@ -160,7 +162,7 @@
 		{#if isLoading}
 			<Loader2 class="loading-icon h-4 w-4 animate-spin" />
 		{:else if query}
-			<button class="clear-btn" onclick={clearSearch}>
+			<button class="clear-btn" onclick={ clearSearch: clearSearch }>
 				<X class="h-3 w-3" />
 			</button>
 		{/if}

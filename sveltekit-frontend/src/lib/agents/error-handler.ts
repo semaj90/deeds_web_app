@@ -39,14 +39,14 @@ export class ToolErrorHandler {
  */
 return new ToolExecutionError(
 ErrorType.NETWORK_ERROR,
-`Network error in ${context}: ${error.message}`,
+`Network error in ${ context }: ${error.message}`,
 error as Error,
 true);
  if (error instanceof TypeError) {
  if (error.message.includes('fetch')) {
  return new ToolExecutionError(
  ErrorType.NETWORK_ERROR,
- `Network error in ${context}: ${error.message}`,
+ `Network error in ${ context }: ${error.message}`,
  error as Error,
  true
  );
@@ -57,7 +57,7 @@ true);
  if (error.name === 'AbortError') {
  return new ToolExecutionError(
  ErrorType.TIMEOUT_ERROR,
- `Request timeout in ${context}`,
+ `Request timeout in ${ context }`,
  error,
  true
  );
@@ -66,7 +66,7 @@ true);
 
  return new ToolExecutionError(
  ErrorType.NETWORK_ERROR,
- `Network error in ${context}`,
+ `Network error in ${ context }`,
  error as Error,
  true
  );
@@ -83,7 +83,7 @@ true
  if (status >= 500) {
  return new ToolExecutionError(
  ErrorType.SERVICE_UNAVAILABLE,
- `Service unavailable in ${context}: ${status} ${statusText}`,
+ `Service unavailable in ${ context }: ${ status } ${ statusText }`,
  undefined,
  true
  );
@@ -92,7 +92,7 @@ true
  if (status === 408 || status === 504) {
  return new ToolExecutionError(
  ErrorType.TIMEOUT_ERROR,
- `Request timeout in ${context}: ${status} ${statusText}`,
+ `Request timeout in ${ context }: ${ status } ${ statusText }`,
  undefined,
  true
  );

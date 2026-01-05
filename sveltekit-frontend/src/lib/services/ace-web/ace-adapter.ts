@@ -229,7 +229,7 @@ export class AceAdapter {
    * In production, this should poll the job status API
    */
   private async waitForIngestion(ms: number): Promise<void> {
-    console.log(`[ACE] Waiting ${ms}ms for ingestion to complete...`);
+    console.log(`[ACE] Waiting ${ ms }ms for ingestion to complete...`);
     return new Promise((resolve) => setTimeout(resolve, ms));
   }
 
@@ -239,7 +239,7 @@ export class AceAdapter {
   private async callLLM(prompt: string): Promise<string> {
     const { provider, model, temperature, maxTokens } = this.llmConfig;
 
-    console.log(`[ACE] Calling LLM: ${provider} (model: ${model || 'default'})`);
+    console.log(`[ACE] Calling LLM: ${ provider } (model: ${model || 'default'})`);
 
     try {
       if (provider === 'gemma3') {

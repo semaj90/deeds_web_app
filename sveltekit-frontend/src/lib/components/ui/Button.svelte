@@ -1,4 +1,7 @@
 <script lang="ts">
+	let onclick = $state<any>(undefined);
+	let className = $state<any>(undefined);
+
  type Variant = 'default' | 'destructive' | 'outline' | 'secondary' | 'ghost' | 'link'; // Example variants, adjust as needed
  let { children,
  onclick,

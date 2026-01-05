@@ -1,4 +1,6 @@
 <script lang="ts">
+	let className = $state<any>(undefined);
+
 	import { getContext } from 'svelte';
 	import { fade } from 'svelte/transition';
 	import type { AlertDialogContext } from './types';

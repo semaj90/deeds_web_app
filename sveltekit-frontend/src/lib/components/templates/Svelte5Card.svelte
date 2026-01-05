@@ -1,4 +1,8 @@
 <script lang="ts">
+	let className = $state<any>(undefined);
+	let title = $state<any>(undefined);
+	let subtitle = $state<any>(undefined);
+
 	/**
 	 * Svelte 5 + bits-ui v2.x Card Template
 	 *
@@ -53,8 +57,8 @@
 <!-- svelte-ignore a11y_click_events_have_key_events -->
 <div
 	class="nes-panel {variantClasses} {className}"
-	class:cursor-pointer={onclick}
-	onclick={onclick}
+	class:cursor-pointer={ onclick: onclick }
+	onclick={ onclick: onclick }
 	role={onclick ? 'button' : undefined}
 	tabindex={onclick ? 0 : undefined}
 	onkeydown={onclick ? (e) => e.key === 'Enter' && onclick() : undefined}

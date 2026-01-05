@@ -9,7 +9,7 @@
 
 import type { PageServerLoad } from './$types';
 
-export const load: PageServerLoad = async ({ fetch: fetch }) => {
+export const load: PageServerLoad = async ({ fetch }) => {
   // Fetch error stats from our API
   let errorStats = {
     total: 0,

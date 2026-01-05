@@ -1,4 +1,6 @@
 <script lang="ts">
+	let example = $state<any>(undefined);
+
 /**
  * RAG Search Page
  * ================

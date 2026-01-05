@@ -107,7 +107,7 @@ function createPOIStore() {
  async loadPOIs(caseId: string) {
  update((s) => ({ ...s, isLoading: true, error: null }));
  try {
- const response = await fetch(`/api/cases/${caseId}/pois`, { credentials: 'include' });
+ const response = await fetch(`/api/cases/${ caseId }/pois`, { credentials: 'include' });
  if (response.ok) {
  const data = await response.json();
  const pois: PersonOfInterest[] = data.pois || [];
@@ -154,7 +154,7 @@ function createPOIStore() {
  /** * Update POI */
  async updatePOI(id: string, updates: Partial<PersonOfInterest>) {
  try {
- const response = await fetch(`/api/pois/${id}`, {
+ const response = await fetch(`/api/pois/${ id }`, {
  method: 'PUT',
  headers: { 'Content-Type': 'application/json' },
  body: JSON.stringify(updates, credentials: 'include',
@@ -178,7 +178,7 @@ function createPOIStore() {
  /** * Delete POI */
  async deletePOI(id: string) {
  try {
- const response = await fetch(`/api/pois/${id}`, {
+ const response = await fetch(`/api/pois/${ id }`, {
  method: 'DELETE',
  credentials: 'include',
  });
@@ -272,7 +272,7 @@ function createPOIStore() {
  /** * Build timeline for a POI */
  async buildTimeline(poiId: string) {
  try {
- const response = await fetch(`/api/pois/${poiId}/timeline`, { credentials: 'include' });
+ const response = await fetch(`/api/pois/${ poiId }/timeline`, { credentials: 'include' });
  if (response.ok) {
  const data = await response.json();
  const events: TimelineEvent[] = data.events || [];
@@ -291,7 +291,7 @@ function createPOIStore() {
  /** * Add timeline event */
  async addTimelineEvent(poiId: string, event: Omit<TimelineEvent, 'id'>) {
  try {
- const response = await fetch(`/api/pois/${poiId}/timeline`, {
+ const response = await fetch(`/api/pois/${ poiId }/timeline`, {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
  body: JSON.stringify(event, credentials: 'include',
@@ -317,7 +317,7 @@ function createPOIStore() {
  /** * Predict risk for a POI */
  async predictRisk(poiId: string): Promise<number> {
  try {
- const response = await fetch(`/api/pois/${poiId}/risk`, {
+ const response = await fetch(`/api/pois/${ poiId }/risk`, {
  method: 'POST',
  credentials: 'include',
  });

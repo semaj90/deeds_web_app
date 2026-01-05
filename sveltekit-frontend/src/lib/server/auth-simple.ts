@@ -101,7 +101,7 @@ export const simpleAuthService = new SimpleAuthService();
  * @throws An error if authentication fails (e.g., invalid credentials, account deactivated).
  */
 export async function authenticate(email: string, options: string): Promise<UserRecord> {
- console.log(`[auth-simple] Attempting to authenticate user: ${email}`);
+ console.log(`[auth-simple] Attempting to authenticate user: ${ email }`);
 
  // Simulate a delay for database lookup
  await new Promise(resolve => setTimeout(resolve, 500));

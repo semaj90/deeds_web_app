@@ -1,4 +1,6 @@
 <script lang="ts">
+	let pkg = $state<any>(undefined);
+
 	type RouteDetail = {
 		path: string;
 		kind: 'page' | 'layout' | 'endpoint';
@@ -268,7 +270,7 @@
 								class="text-left px-2 py-[3px] font-mono border border-dashed border-[#262017] bg-[#f9f4e4] hover:bg-[#262017] hover:text-[#f3eddc]"
 								onclick={() => window.open(rel, '_blank')}
 							>
-								{rel}
+								{ rel: rel }
 							</button>
 						{/each}
 					{:else}
@@ -319,7 +321,7 @@
 						<div class="pt-2 flex gap-2">
 							<button
 								class="px-3 py-[4px] text-[11px] font-mono tracking-[0.2em] uppercase border border-[#37b36a] bg-[#133822] text-[#d7fbe3] hover:bg-[#1a4e30] disabled:opacity-50"
-								onclick={askErrorBrain}
+								onclick={ askErrorBrain: askErrorBrain }
 								disabled={!!actionInProgress}
 							>
 								{#if actionInProgress === 'error_brain'}
@@ -365,7 +367,7 @@
 						<div class="pt-2 flex gap-2">
 							<button
 								class="px-3 py-[4px] text-[11px] font-mono tracking-[0.2em] uppercase border border-[#f0c14b] bg-[#8a6112] text-[#fff6dd] hover:bg-[#b87f19] disabled:opacity-50"
-								onclick={runCodemod}
+								onclick={ runCodemod: runCodemod }
 								disabled={!!actionInProgress}
 							>
 								{#if actionInProgress === 'codemod'}
@@ -397,7 +399,7 @@
 						</p>
 						<button
 							class="px-3 py-[4px] text-[11px] font-mono tracking-[0.2em] uppercase border border-[#37b3a9] bg-[#104442] text-[#d4fbf7] hover:bg-[#16635f] disabled:opacity-50"
-							onclick={runPlaywrightCheck}
+							onclick={ runPlaywrightCheck: runPlaywrightCheck }
 							disabled={!!actionInProgress}
 						>
 							{#if actionInProgress === 'playwright'}

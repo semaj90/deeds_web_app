@@ -35,7 +35,7 @@ https://svelte.dev/e/js_parse_error -->
 </svelte:head>
 
 <div class="dev-layout">
- <NavBar {user} {sidebarOpen} onToggleSidebar={toggleSidebar} />
+ <NavBar {user} {sidebarOpen} onToggleSidebar={ toggleSidebar: toggleSidebar } />
  <div class="dev-content">
  <aside class="dev-sidebar">
  <Sidebar {user} open={sidebarOpen} theme={consolePalette} />

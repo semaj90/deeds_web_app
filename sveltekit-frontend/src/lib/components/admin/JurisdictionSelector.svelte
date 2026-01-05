@@ -1,4 +1,6 @@
 <script lang="ts">
+	let disabled = $state<any>(undefined);
+
 	interface JurisdictionSelectorProps {
 		value: string;
 		onChange: (jurisdiction: string) => void;

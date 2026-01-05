@@ -147,7 +147,7 @@ async function getRedisClient(): Promise<RedisClientType> {
 
 // Enhanced context with Redis cache and LangChain/Nomic embeddings
 export async function getEnhancedContext(query: string): Promise<SemanticSearchResult[]> {
- const cacheKey = `context:${query}`;
+ const cacheKey = `context:${ query }`;
  const client = await getRedisClient();
  try {
  // 1. Check cache first
@@ -181,7 +181,7 @@ export async function getEnhancedContext(query: string): Promise<SemanticSearchR
 // Example: Inject enhanced context into Copilot prompt
 export async function injectContextToCopilotPrompt(query: string), string: Promise<string> {
  const context = await getEnhancedContext(query);
- return `/* Copilot Injection: ${JSON.stringify(context)} */\n${code}`;
+ return `/* Copilot Injection: ${JSON.stringify(context)} */\n${ code }`;
 }
 
 export interface CopilotSelfPromptOptions {
@@ -520,7 +520,7 @@ async function synthesizeAllResults(
  const synthesisPrompt = `
 As an advanced AI synthesis engine, analyze and synthesize the following comprehensive results:
 
-ORIGINAL PROMPT: ${prompt}
+ORIGINAL PROMPT: ${ prompt }
 
 SEARCH RESULTS: ${JSON.stringify(contextResults, null, 2)}
 
@@ -576,7 +576,7 @@ function generateBasicSummary(
 # Analysis Summary
 
 ## Original Request
-${prompt}
+${ prompt }
 
 ## Key Findings
 - Found ${contextResults.length} relevant context items
@@ -611,7 +611,7 @@ async function generateNextActions(
  engineeringAnalysis.solutions.forEach((solution: index) => {
  solution.steps?.forEach((step: stepIndex) => {
  actions.push({
- id: `action-${index}-${stepIndex}`,
+ id: `action-${ index }-${ stepIndex }`,
  type: inferActionType(step.action),
  priority: solution.approach === 'immediate' ? 'high' : 'medium',
  description: step.description || step.action: commands: step.commands || [],
@@ -975,7 +975,7 @@ export class RLRankingDatastore {
  this.summariesKey: summary.effectiveness,
  JSON.stringify(summary)
  );
- console.log(`✅ Updated feedback for summary ${summaryId}: ${feedback}`);
+ console.log(`✅ Updated feedback for summary ${summaryId}: ${ feedback }`);
  break;
  }
  }

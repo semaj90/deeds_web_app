@@ -264,7 +264,7 @@ class CaseLinkService {
  */
  private async invalidateCaseCache(caseId: string): Promise<void> {
  try {
- const cacheKey = `${this.CACHE_PREFIX}${caseId}`;
+ const cacheKey = `${this.CACHE_PREFIX}${ caseId }`;
  await redis.del(cacheKey);
  } catch (error) {
  console.error('Error invalidating case cache:', error);

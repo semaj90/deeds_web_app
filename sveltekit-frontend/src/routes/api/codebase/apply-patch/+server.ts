@@ -50,7 +50,7 @@ export const POST: RequestHandler = async ({ request, fetch }) => {
         const cluster = clusterData.result?.points[0]?.payload;
 
         if (!cluster) {
-            return json({ error: `Cluster not found: ${clusterId}` }, { status: 404 });
+            return json({ error: `Cluster not found: ${ clusterId }` }, { status: 404 });
         }
 
         // Fetch member errors
@@ -129,7 +129,7 @@ export const POST: RequestHandler = async ({ request, fetch }) => {
         };
 
         // Log the action
-        console.log(`[ApplyPatch] Cluster: ${clusterId}, DryRun: ${dryRun}, Files: ${patches.length}`);
+        console.log(`[ApplyPatch] Cluster: ${ clusterId }, DryRun: ${ dryRun }, Files: ${patches.length}`);
 
         return json(result);
 

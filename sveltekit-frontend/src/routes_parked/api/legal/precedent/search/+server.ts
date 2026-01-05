@@ -367,7 +367,7 @@ function generateMockPrecedents(
 ): PrecedentMatch[] {
  const basePrecedents: Partial<PrecedentMatch>[] = [
  {
- title: `${searchTerm} - Supreme Court Landmark Decision`,
+ title: `${ searchTerm } - Supreme Court Landmark Decision`,
  court: 'Supreme Court of the United States',
  jurisdiction: 'Federal',
  precedentialValue: 'BINDING',
@@ -375,7 +375,7 @@ function generateMockPrecedents(
  practiceAreas: ['Constitutional Law', 'Civil Rights'],
  },
  {
- title: `${searchTerm} - Circuit Court Analysis`,
+ title: `${ searchTerm } - Circuit Court Analysis`,
  court: '9th Circuit Court of Appeals',
  jurisdiction: 'Federal',
  precedentialValue: 'BINDING',
@@ -383,7 +383,7 @@ function generateMockPrecedents(
  practiceAreas: ['Contract Law', 'Business Law'],
  },
  {
- title: `${searchTerm} - District Court Interpretation`,
+ title: `${ searchTerm } - District Court Interpretation`,
  court: 'U.S. District Court Northern District of California',
  jurisdiction: 'Federal',
  precedentialValue: 'PERSUASIVE',

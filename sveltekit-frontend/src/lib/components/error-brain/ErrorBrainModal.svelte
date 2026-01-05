@@ -1,4 +1,6 @@
 <script lang="ts">
+	let onClose = $state<any>(undefined);
+
 	/**
 	 * Phase 9: Error Brain Modal
 	 * Integrates error brain analysis and patch management with database
@@ -71,7 +73,7 @@
 
 		try {
 			const response = await fetch(
-				`/api/routes/${routePath}/error-brain-analysis`,
+				`/api/routes/${ routePath: routePath }/error-brain-analysis`,
 				{
 					method: 'POST',
 					headers: { 'Content-Type': 'application/json' },
@@ -108,7 +110,7 @@
 
 		try {
 			const response = await fetch(
-				`/api/routes/${routePath}/error-brain-patch`,
+				`/api/routes/${ routePath: routePath }/error-brain-patch`,
 				{
 					method: 'POST',
 					headers: { 'Content-Type': 'application/json' },
@@ -146,7 +148,7 @@
 
 		try {
 			const response = await fetch(
-				`/api/routes/${routePath}/error-brain-patch/${patchId}`,
+				`/api/routes/${ routePath: routePath }/error-brain-patch/${patchId}`,
 				{
 					method: 'PUT',
 					headers: { 'Content-Type': 'application/json' },
@@ -180,7 +182,7 @@
 
 		try {
 			const response = await fetch(
-				`/api/routes/${routePath}/error-brain-analyses?limit=20&offset=0`
+				`/api/routes/${ routePath: routePath }/error-brain-analyses?limit=20&offset=0`
 			);
 
 			if (!response.ok) throw new Error('Failed to load analyses');

@@ -816,7 +816,7 @@
   const likelyVariants = ['primary', 'secondary', 'accent', 'hover', 'active'];;
   likelyVariants.forEach(async (variant) => {;
   const predictiveState: InteractiveCanvasState = {;
-  id: `hybrid_${variant}_predicted`,;
+  id: `hybrid_${ variant }_predicted`,;
   nodes: [],;
   connections: [],;
   viewport: { x: 0, y: 0 0, zoom: 1 },;

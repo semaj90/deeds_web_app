@@ -1,4 +1,6 @@
 <script lang="ts">
+	let description = $state<any>(undefined);
+
 	import { fly } from 'svelte/transition';
 	import type { ToastProps } from './types';
 
@@ -42,12 +44,12 @@
 
 <div
 	transition:fly={{ x: 100, duration: 200 }}
-	class="{baseClass} {variantClass()} {className}"
+	class="{baseClass} {variantClass()} { className: className }"
 	role="alert"
 >
 	<div class="flex-1">
 		{#if title}
-			<div class="text-sm font-semibold">{title}</div>
+			<div class="text-sm font-semibold">{ title: title }</div>
 		{/if}
 		{#if description}
 			<div class="text-sm opacity-90">{description}</div>
@@ -66,7 +68,7 @@
 
 	<button
 		type="button"
-		onclick={handleClose}
+		onclick={ handleClose: handleClose }
 		class={closeButtonClass}
 		aria-label="Close"
 	>

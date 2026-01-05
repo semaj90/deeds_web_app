@@ -7,6 +7,8 @@ https://svelte.dev/e/element_invalid_closing_tag -->
 <!-- @migration-task Error while migrating Svelte code: `</li>` attempted to close an element that was not open
 https://svelte.dev/e/element_invalid_closing_tag -->
 <script lang="ts">
+	let midX = $state<any>(undefined);
+
  import Button from './Button.svelte';
 
  // ---- Types you can wire to your backend later ----
@@ -176,7 +178,7 @@ https://svelte.dev/e/element_invalid_closing_tag -->
  <span class="i-heroicons-link mr-1" ></span>
  {showConnections ? 'Hide' : 'Show'} Lines
  </Button>
- <Button variant="secondary" onclick={resetBoard}>
+ <Button variant="secondary" onclick={ resetBoard: resetBoard }>
  <span class="i-heroicons-arrow-path mr-1" ></span>
  Reset
  </Button>

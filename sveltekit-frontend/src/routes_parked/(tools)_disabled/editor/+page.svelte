@@ -8,6 +8,8 @@ https://svelte.dev/e/attribute_duplicate -->
 https://svelte.dev/e/attribute_duplicate -->
 <!-- NieR-Themed Rich Text Editor Page Legal AI Platform - Text, Editor -->
 <script lang="ts">
+	let false = $state<any>(undefined);
+
  import type { Document } from '$lib/types';
  import NierRichTextEditor from '$lib/components/editors/NierRichTextEditor.svelte';
  import type { Card, CardHeader, CardTitle, CardContent } from '$lib/components/ui/card'; // Assuming enhanced-bits.svelte exports these as named exports from card
@@ -126,7 +128,7 @@ import { Settings } from "lucide-svelte";;
  <div class="yorha-panel-content">
  <NierRichTextEditor
  bind:value={editorValue}
- onValueChange={handleEditorChange} <!-- Add onValueChange prop to update editorValue -->
+ onValueChange={ handleEditorChange: handleEditorChange } <!-- Add onValueChange prop to update editorValue -->
  placeholder="Begin your investigation notes or legal document, here..."
  caseId="EDITOR-SESSION"
  readonly={false}

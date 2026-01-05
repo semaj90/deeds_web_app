@@ -113,13 +113,13 @@ class CitationExtractionWorker {
  },
  // Case citations: 123 F.3d 456 (9th Cir. 2000)
  {
- regex: /(\d+)\s+F\.?\s*(\d+d?)\s+(\d+)\s*\(([^)]+)\s+(\d{4})\)/gi,
+ regex: /(\d+)\s+F\.?\s*(\d+d?)\s+(\d+)\s*\(([^)]+)\s+(\d{ 4 })\)/gi,
  type: 'case_law' as const,
  jurisdiction: 'Federal',
  },
  // State case citations: 123 Cal.App.4th 456 (2000)
  {
- regex: /(\d+)\s+Cal\.?\s*App\.?\s*(\d+\w*)\s+(\d+)\s*\((\d{4})\)/gi,
+ regex: /(\d+)\s+Cal\.?\s*App\.?\s*(\d+\w*)\s+(\d+)\s*\((\d{ 4 })\)/gi,
  type: 'case_law' as const,
  jurisdiction: 'CA',
  },

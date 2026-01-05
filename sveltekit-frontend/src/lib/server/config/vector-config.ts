@@ -76,7 +76,7 @@ export function validateVectorDimensions(vector: number[]): boolean {
 
 // Helper to get collection name with dimension suffix
 export function getCollectionName(baseName: string): string {
- return `${baseName}_${VECTOR_CONFIG.DIMENSIONS}`;
+ return `${ baseName }_${VECTOR_CONFIG.DIMENSIONS}`;
 }
 
 // Export environment check
@@ -111,7 +111,7 @@ Redis: ${VECTOR_CONFIG.DOCKER_SERVICES.REDIS_URL}
 
 --- Collections ---
 ${Object.entries(VECTOR_CONFIG.COLLECTIONS)
- .map(([k, v]) => ` - ${k}: ${v}`)
+ .map(([k, v]) => ` - ${k}: ${ v }`)
  .join('\n')}
 --------------------
 `.trim();

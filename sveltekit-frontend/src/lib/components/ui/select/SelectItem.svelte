@@ -1,4 +1,7 @@
 <script lang="ts">
+	let value = $state<any>(undefined);
+	let className = $state<any>(undefined);
+
 	import type { Snippet } from 'svelte';
 	import { getContext } from 'svelte';
 	import type { SelectContext, SelectItemProps } from './types';
@@ -46,8 +49,8 @@
 	data-value={value}
 	data-disabled={disabled || undefined}
 	tabindex={disabled ? -1 : 0}
-	onclick={handleClick}
-	onkeydown={handleKeydown}
+	onclick={ handleClick: handleClick }
+	onkeydown={ handleKeydown: handleKeydown }
 	class="{defaultClass} {isSelected ? 'bg-accent text-accent-foreground' : 'hover:bg-accent/50'} {className}"
 >
 	<!-- Check icon -->

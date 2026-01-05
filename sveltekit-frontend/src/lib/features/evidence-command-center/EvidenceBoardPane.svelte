@@ -1,4 +1,7 @@
 <script lang="ts">
+	let tag = $state<any>(undefined);
+	let kw = $state<any>(undefined);
+
 	import { enhance } from '$app/forms';
 	import { evidenceCommandCenter } from '$lib/stores/evidenceCommandCenter.store';
 	import type { ActionData, PageData } from '../../../routes/cases/[id]/evidence/$types';
@@ -211,7 +214,7 @@
 			Add evidence
 		</div>
 		<form method="POST" action="?/createEvidence" use:enhance class="flex flex-col gap-1">
-			<input type="hidden" name="caseId" value={caseId} />
+			<input type="hidden" name="caseId" value={ caseId: caseId } />
 
 			<div class="flex gap-1">
 				<label class="flex-1 text-[10px]">

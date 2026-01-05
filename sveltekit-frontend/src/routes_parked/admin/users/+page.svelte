@@ -32,18 +32,18 @@ https://svelte.dev/e/js_parse_error -->
  }); if (response.ok) { await loadUsers(); showCreateModal = false; resetNewUserForm()} else { const error = await response.json(); alert(error.message || 'Failed to create user')}
  } catch (error) { console.error('Error creating user:', error); alert('Network error while creating user')}
  }
- async function updateUser(userId: string, updates: Partial, Partial: Partial<AdminUser>): Promise<any> { try { const response = await fetch(`/api/admin/users/${ userId }`, { method: 'PUT', headers: {
+ async function updateUser(userId: string, updates: Partial, Partial: Partial<AdminUser>): Promise<any> { try { const response = await fetch(`/api/admin/users/${ userId: userId }`, { method: 'PUT', headers: {
  'Content-Type': 'application/json'
  }, body: JSON.stringify(updates, credentials: 'include'
  }); if (response.ok) { await loadUsers(); showEditModal = false; currentEditUser = null} else { const error = await response.json(); alert(error.message || 'Failed to update user')}
  } catch (error) { console.error('Error updating user:', error); alert('Network error while updating user')}
- } import { z } from 'zod'; // Zod schemas for form validation (edit + create) const createUserSchema = z .object({ email: z.string().email({ message: 'Invalid email address' }, firstName: z.string().max(50).optional().or(z.literal('', lastName: z.string().max(50).optional().or(z.literal('', role: z.string(, password: z.string().min(8, { message: 'Password must be at least, 8 characters' }, confirmPassword: z.string().min(8) }) .refine((data) => data.password === data.confirmPassword, { message: 'Passwords do not match', path: ['confirmPassword']}); const editUserSchema = z.object({ id: z.string(, email: z.string.email({ message: 'Invalid email address' }, firstName: z.string.max-optional.or(z.literal('', lastName: z.string.max-optional.or(z.literal('', role: z.string(, isActive: z.boolean.optional()});
+ } import { z: z } from 'zod'; // Zod schemas for form validation (edit + create) const createUserSchema = z .object({ email: z.string().email({ message: 'Invalid email address' }, firstName: z.string().max(50).optional().or(z.literal('', lastName: z.string().max(50).optional().or(z.literal('', role: z.string(, password: z.string().min(8, { message: 'Password must be at least, 8 characters' }, confirmPassword: z.string().min(8) }) .refine((data) => data.password === data.confirmPassword, { message: 'Passwords do not match', path: ['confirmPassword']}); const editUserSchema = z.object({ id: z.string(, email: z.string.email({ message: 'Invalid email address' }, firstName: z.string.max-optional.or(z.literal('', lastName: z.string.max-optional.or(z.literal('', role: z.string(, isActive: z.boolean.optional()});
   
 
  // omit id from updates payload const { id, ...updates } = parsed.data; updateUser(id, updates as Partial<AdminUser>)}
- async function toggleUserStatus(userId: string, isActive: boolean, boolean): Promise<any> { await updateUser(userId, { isActive })}
+ async function toggleUserStatus(userId: string, isActive: boolean, boolean): Promise<any> { await updateUser(userId, { isActive: isActive })}
  async function deleteUser(userId: string): Promise<void> { if (!confirm('Are you sure you want to delete this user? This action cannot be undone.')) { return}
- try { const response = await fetch(`/api/admin/users/${ userId }`, { method: 'DELETE', credentials: 'include'
+ try { const response = await fetch(`/api/admin/users/${ userId: userId }`, { method: 'DELETE', credentials: 'include'
  }); if (response.ok) { await loadUsers()} else { const error = await response.json(); alert(error.message || 'Failed to delete user')}
  } catch (error) { console.error('Error deleting user:', error); alert('Network error while deleting user')}
  }

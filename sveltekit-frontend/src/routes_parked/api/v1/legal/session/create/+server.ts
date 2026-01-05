@@ -40,7 +40,7 @@ export const POST: RequestHandler = async ({ request }) => {
  // Store session
  activeSessions.set(session_id, session);
 
- console.log(`[Legal AI] created: ${session_id} for user: ${user_id}`);
+ console.log(`[Legal AI] created: ${session_id} for user: ${ user_id }`);
 
  return json({ success: true, session, message: 'Legal AI session created successfully' });
  } catch (error: Error | unknown) {

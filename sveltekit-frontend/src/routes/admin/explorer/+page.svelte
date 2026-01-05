@@ -1,4 +1,9 @@
 <script lang="ts">
+	let $filterType = $state<any>(undefined);
+	let func = $state<any>(undefined);
+	let dep = $state<any>(undefined);
+	let tag = $state<any>(undefined);
+
 	import { onMount } from 'svelte';
 	import { writable } from 'svelte/store';
 

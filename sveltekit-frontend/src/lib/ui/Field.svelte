@@ -1,4 +1,6 @@
 <script lang="ts">
+	let error = $state<any>(undefined);
+
 // Svelte 5 runes mode
 // callers provide a control snippet; we pass the generated id to it
 // minimal helper type to accept any snippet callback signature

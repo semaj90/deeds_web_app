@@ -18,7 +18,7 @@
 	`.replace(/\s+/g, ' ').trim();
 </script>
 
-<tbody class="{defaultClass} {className}" {...rest}>
+<tbody class="{defaultClass} { className: className }" {...rest}>
 	{#if children}
 		{@render children()}
 	{/if}

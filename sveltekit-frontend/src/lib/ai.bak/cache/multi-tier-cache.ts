@@ -43,7 +43,7 @@ export default class MultiTierCache<V = unknown> {
  }
 
  private storageKey(key: string): string {
- return `${this.storageKeyPrefix}${key}`;
+ return `${this.storageKeyPrefix}${ key }`;
  }
 
  private isExpired(expiresAt?: number | null): boolean {

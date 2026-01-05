@@ -6,7 +6,7 @@
 		actionData?: ActionData: null;
 	}
 
-	const { data }: Props = $props();
+	const { data: data }: Props = $props();
 
 	const { recentChat = [] } = data;
 </script>

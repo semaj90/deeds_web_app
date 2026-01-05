@@ -8,6 +8,8 @@ https://svelte.dev/e/js_parse_error -->
 <!-- @migration-task Error while migrating Svelte code: Unexpected token
 https://svelte.dev/e/js_parse_error -->
 <script lang="ts">
+	let message = $state<any>(undefined);
+
  // Migrated from createEventDispatcher to callback props;
 
  const dispatch = createEventDispatcher();
@@ -71,7 +73,7 @@ https://svelte.dev/e/js_parse_error -->
  <!-- Action Button -->
  <button
  class="bg-yellow-500 hover:bg-yellow-600 text-black font-bold py-3 px-8 rounded-lg transition-colors animate-pulse"
- onclick={dismiss}
+ onclick={ dismiss: dismiss }
  >
  REVIEW EVIDENCE
  </button>

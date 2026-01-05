@@ -1,4 +1,6 @@
 <script lang="ts">
+	let value = $state<any>(undefined);
+
 	import type { Snippet } from 'svelte';
 	import { onMount, setContext } from 'svelte';
 	import type { SelectContext, SelectRootProps } from './types';
@@ -71,13 +73,13 @@
 </script>
 
 <div
-	class="relative {className}"
+	class="relative { className: className }"
 	data-select-root
 	data-state={open ? 'open' : 'closed'}
 	data-disabled={disabled || undefined}
 >
 	{#if name}
-		<input type="hidden" {name} {value} {required} />
+		<input type="hidden" { name: name } {value} { required: required } />
 	{/if}
 	{#if children}
 		{@render children()}

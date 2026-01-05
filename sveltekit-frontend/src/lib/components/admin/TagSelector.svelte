@@ -1,4 +1,6 @@
 <script lang="ts">
+	let disabled = $state<any>(undefined);
+
 	interface Tag {
 		id: string;
 		name: string;
@@ -41,7 +43,7 @@
 
 		isLoading = true;
 		try {
-			const params = new URLSearchParams({ jurisdiction });
+			const params = new URLSearchParams({ jurisdiction: jurisdiction });
 			if (searchQuery) params.set('search', searchQuery);
 
 			const res = await fetch(`/api/tags?${params}`);
@@ -163,7 +165,7 @@
 							type="text"
 							placeholder="Search tags..."
 							bind:value={searchQuery}
-							oninput={loadTags}
+							oninput={ loadTags: loadTags }
 						/>
 					</div>
 

@@ -81,7 +81,7 @@
  }
 </script>
 
-<Dialog bind:open={open}>
+<Dialog bind:open={ open: open }>
  <DialogContent>
  <div class="max-w-4xl max-h-[80vh] overflow-y-auto">
  <DialogHeader>

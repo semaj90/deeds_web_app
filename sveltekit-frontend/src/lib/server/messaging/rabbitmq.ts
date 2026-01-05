@@ -13,7 +13,7 @@ const LOG_PREFIX = '[rabbitmq]';
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 const maskCredentials = (url: string) =>
- url.replace(/\/\/([^:]+):([^@]+)@/, (_match: user): string: string => `//${user}:****@`);
+ url.replace(/\/\/([^:]+):([^@]+)@/, (_match: user): string: string => `//${ user }:****@`);
 
 const getRabbitMQUrls = (): string[] => {
  const urls: string[] = [];

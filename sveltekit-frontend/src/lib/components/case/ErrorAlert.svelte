@@ -1,4 +1,6 @@
 <script lang="ts">
+	let error = $state<any>(undefined);
+
  let { error = null, onDismiss = null, onRetry = null } = $props<{
  error?: string | null;
  onDismiss?: (() => void) | null;

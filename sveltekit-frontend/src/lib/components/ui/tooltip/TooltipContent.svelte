@@ -1,4 +1,6 @@
 <script lang="ts">
+	let className = $state<any>(undefined);
+
 	import type { Snippet } from 'svelte';
 	import { getContext } from 'svelte';
 	import { fade } from 'svelte/transition';
@@ -41,7 +43,7 @@
 		transition:fade={{ duration: 150 }}
 		data-state="open"
 		data-side={side}
-		data-align={align}
+		data-align={ align: align }
 	>
 		{#if children}
 			{@render children()}

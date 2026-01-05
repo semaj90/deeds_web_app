@@ -7,8 +7,8 @@ https://svelte.dev/e/element_invalid_closing_tag -->
 <!-- @migration-task Error while migrating Svelte code: `</style>` attempted to close an element that was not open
 https://svelte.dev/e/element_invalid_closing_tag -->
 <script lang="ts">
- import { FileText } from "lucide-svelte";;
- import { onMount } from 'svelte';;
+ import { FileText: FileText } from "lucide-svelte";;
+ import { onMount: onMount } from 'svelte';;
 
  // Reactive state using Svelte 5 runes ($state )
  let submitting = $state (false);
@@ -52,7 +52,7 @@ https://svelte.dev/e/element_invalid_closing_tag -->
  return;
  deletingId = id;
  try {
- const res = await fetch(`/api/v1/rag/documents/${id}`, { method: 'DELETE' });
+ const res = await fetch(`/api/v1/rag/documents/${ id: id }`, { method: 'DELETE' });
  const json = await res.json();
  if (json?.success) {
  documents = documents.filter((d) => d.id !== id);
@@ -175,7 +175,7 @@ https://svelte.dev/e/element_invalid_closing_tag -->
  <label>Tags (comma separated)</label>
  <input type="text" bind:value={tags} placeholder="contracts, NDA, evidence" />
  <div style="margin-top:0.75rem;">
- <button onclick={uploadFile} disabled={uploading}
+ <button onclick={ uploadFile: uploadFile } disabled={uploading}
  >{uploading ? 'Uploading…' : 'Upload'}</button
  >
  </div>
@@ -230,7 +230,7 @@ https://svelte.dev/e/element_invalid_closing_tag -->
  <option value="fuzzy">Fuzzy</option>
  </select>
  <div style="margin-top:0.75rem;">
- <button onclick={searchDocuments} disabled={searching}
+ <button onclick={ searchDocuments: searchDocuments } disabled={searching}
  >{searching ? 'Searching…' : 'Search'}</button
  >
  </div>

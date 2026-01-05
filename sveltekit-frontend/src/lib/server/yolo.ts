@@ -95,13 +95,13 @@ def load_yolo_model(model_path):
  session = ort.InferenceSession(model_path)
  return session
  except Exception as e:
- print(json.dumps({'error': f'Failed to load model: {e}'}))
+ print(json.dumps({'error': f'Failed to load model: { e }'}))
  sys.exit(1)
 
 def preprocess_image(image_path, input_size=(640, 640)):
  """Preprocess image for YOLO inference"""
  image = cv2.imread(image_path)
- if image is None: raise ValueError(f"Could not load, image: {image_path}")
+ if image is None: raise ValueError(f"Could not load, image: { image_path }")
 
  # Resize image
  image_resized = cv2.resize(image, input_size)
@@ -214,7 +214,7 @@ def analyze_document(image_path, model_path, output_path, conf_threshold=0.5, io
  for box, score, class_id in zip(boxes): obj = {
  'bbox': box.tolist(),
  'confidence': float(score),
- 'class': class_names[class_id] if class_id < len(class_names) else f'class_{class_id}'
+ 'class': class_names[class_id] if class_id < len(class_names) else f'class_{ class_id }'
  }
 
  # Categorize as layout region or object
@@ -285,7 +285,7 @@ if __name__ == "__main__":
  const result = JSON.parse(stdout.trim());
  resolve(result);
  } catch (parseError) {
- reject(new Error(`Failed to parse YOLO output: ${parseError}`));
+ reject(new Error(`Failed to parse YOLO output: ${ parseError }`));
  }
  } else {
  reject(new Error(`YOLO process failed: ${stderr}`));

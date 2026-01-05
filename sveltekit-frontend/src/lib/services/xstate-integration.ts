@@ -167,7 +167,7 @@ export const xstateIntegration = {
  legalAIActor.send(event);
  } else {
  console.warn(
- `[XState] Cannot send event: actor not available or unknown machine, ID: ${machineId}`
+ `[XState] Cannot send event: actor not available or unknown machine, ID: ${ machineId }`
  );
  }
  } catch (error) {

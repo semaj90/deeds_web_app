@@ -39,7 +39,7 @@ export const POST: RequestHandler = async ({ request }) => {
  resolve(
  json({
  success: true,
- message: `Successfully indexed directory: ${root}`,
+ message: `Successfully indexed directory: ${ root }`,
  output: stdout,
  })
  );
@@ -47,7 +47,7 @@ export const POST: RequestHandler = async ({ request }) => {
  resolve(
  json(
  {
- error: `Indexing failed with code ${code}`,
+ error: `Indexing failed with code ${ code }`,
  stderr,
  stdout,
  },

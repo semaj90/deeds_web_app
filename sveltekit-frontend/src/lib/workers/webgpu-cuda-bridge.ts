@@ -507,7 +507,7 @@ class WebGPUCudaBridge {
 				).thinking_content
 			};
 		} catch (error) {
-			throw new Error(`Enhanced CUDA server failed: ${error}`);
+			throw new Error(`Enhanced CUDA server failed: ${ error }`);
 		}
 	}
 
@@ -746,7 +746,7 @@ self.onmessage = async (event: MessageEvent<WebGPUCudaBridgeMessage>) => {
 				self.postMessage({ type: 'cleanup-complete', requestId });
 				break;
 			default:
-				throw new Error(`Unknown message type: ${type}`);
+				throw new Error(`Unknown message type: ${ type }`);
 		}
 	} catch (error) {
 		self.postMessage({

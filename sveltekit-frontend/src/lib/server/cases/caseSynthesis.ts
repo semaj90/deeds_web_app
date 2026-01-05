@@ -54,7 +54,7 @@ export async function buildCaseSynthesis(caseId: string): Promise<CaseSynthesis>
  });
 
  if (!caseData) {
- throw new Error(`Case not found: ${caseId}`);
+ throw new Error(`Case not found: ${ caseId }`);
  }
 
  // Fetch most recent 25 notes (pinned first, then by update date)

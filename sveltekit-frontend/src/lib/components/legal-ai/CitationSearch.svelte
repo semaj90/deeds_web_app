@@ -1,4 +1,6 @@
-<script lang="ts">let { placeholder = 'Search citations...', minChars = 2 } = $props();
+<script lang="ts">
+	let placeholder = $state<any>(undefined);
+let { placeholder = 'Search citations...', minChars = 2 } = $props();
 
  import { debounce } from '$lib/utils/debounce';
  import { createEventDispatcher } from 'svelte';
@@ -87,7 +89,7 @@
  }
 </script>
 
-<svelte:window onclick={handleClickOutside} />
+<svelte:window onclick={ handleClickOutside: handleClickOutside } />
 
 <div class="citation-search">
  <div class="search-input-wrapper">

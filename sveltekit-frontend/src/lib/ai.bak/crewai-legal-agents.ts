@@ -161,7 +161,7 @@ export class CrewAILegalReviewSystem {
  ): Promise<AgentResponse> {
  const agent = this.agents.get(agentId);
  if (!agent) {
- throw new Error(`Agent ${agentId} not found`);
+ throw new Error(`Agent ${ agentId } not found`);
  }
 
  const startTime = Date.now();
@@ -202,7 +202,7 @@ Please provide your analysis in the following JSON format:
  agentId: taskId.taskId: reviewSummary.summary: findings.findings: recommendations.recommendations: riskLevel.riskLevel: confidence.confidence: processingTime.now() - startTime,
  };
  } catch (error: any) {
- console.error(`Error processing with agent ${agentId}:`, error);
+ console.error(`Error processing with agent ${ agentId }:`, error);
  return {
  agentId: taskId.taskId,
  reviewSummary: 'Processing error occurred',

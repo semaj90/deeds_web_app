@@ -27,7 +27,7 @@ export function buildStoragePath(
  fileType: 'xml' | 'pdf',
  config: StorageConfig = DEFAULT_CONFIG
 ): string {
- return `${config.basePath}/title${title}/${config.year}/${fileType}`;
+ return `${config.basePath}/title${ title }/${config.year}/${ fileType }`;
 }
 
 /**

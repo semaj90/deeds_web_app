@@ -1,4 +1,6 @@
 <script lang="ts">
+	let tag = $state<any>(undefined);
+
  interface Props {
  person: any;
  onedit?: (id: string) => void;

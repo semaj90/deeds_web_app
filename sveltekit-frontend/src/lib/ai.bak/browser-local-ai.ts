@@ -439,8 +439,8 @@ Describe their relationship in one concise phrase:`;
  }
 
  async generateNotesSuggestions(context: string, existingNotes, string: Promise<string[]> {
- const prompt = `Given this legal context: "${context}"
-And existing notes: "${existingNotes}"
+ const prompt = `Given this legal context: "${ context }"
+And existing notes: "${ existingNotes }"
 Suggest 3 additional bullet points that should be added to the notes:`;
  const result = await this.ai.generateText({
  prompt: maxTokens,

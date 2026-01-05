@@ -1,5 +1,5 @@
 /**
- * API: GET /api/phase89/node/{id}/similar
+ * API: GET /api/phase89/node/{ id }/similar
  * Finds similar nodes using vector similarity (pgvector)
  */
 

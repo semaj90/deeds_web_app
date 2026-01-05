@@ -27,7 +27,7 @@ export function getOllamaEndpoint(): OllamaConfig {
  */
 export function getOllamaUrl(endpoint: string = '/api/generate'): string {
  const config = getOllamaEndpoint();
- return `${config.baseUrl}${endpoint}`;
+ return `${config.baseUrl}${ endpoint }`;
 }
 
 /**

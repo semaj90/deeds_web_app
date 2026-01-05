@@ -1,7 +1,7 @@
 // GRPO (Guided Reasoning and Policy Optimization) Thinking Response Embedding Service // Specialized service for indexing and searching reasoning chain patterns with timestamps
-import type { db, sql } from '$lib/server/db';
-import type { generateEmbedding as generateEmbeddingsBatch } from './vectorDBService.js';
-import type { createHash } from 'crypto';
+import { db, sql } from '$lib/server/db';
+import { generateEmbedding as generateEmbeddingsBatch } from './vectorDBService.js';
+import { createHash } from 'crypto';
 
 // GRPO Thinking Response interface
 export interface GrpoThinkingResponse {
@@ -29,11 +29,14 @@ interface SearchGrpoRow {
  message_id: string; conversation_id: string;
  original_query: string; thinking_chain: string;
  conclusion: string; confidence_level: string; // DECIMAL(3,2) from DB
- reasoning_steps: string; // JSONB from DB, evidence_cited: string; // JSONB from DB
- legal_principles: string; // JSONB from DB, thinking_type: 'analysis' | 'synthesis' | 'evaluation' | 'application';
+ reasoning_steps: string; // JSONB from DB
+ evidence_cited: string; // JSONB from DB
+ legal_principles: string; // JSONB from DB
+ thinking_type: 'analysis' | 'synthesis' | 'evaluation' | 'application';
  metadata: Record<string, unknown>; // JSONB from DB
  created_at: Date; similarity: string; // DECIMAL from DB
- recency_score: string; // DECIMAL from DB, combined_score: string; // DECIMAL from DB
+ recency_score: string; // DECIMAL from DB
+ combined_score: string; // DECIMAL from DB
 }
 
 // Recommendation engine interface
@@ -68,11 +71,13 @@ const grpoLogger = {
  console.log(
  `[${new Date().toISOString()}] GRPO-INFO: ${message}`,
  metadata ? JSON.stringify(metadata) : ''
- , warn: (message: string, metadata?: unknown) =>
+ ),
+ warn: (message: string, metadata?: unknown) =>
  console.warn(
  `[${new Date().toISOString()}] GRPO-WARN: ${message}`,
  metadata ? JSON.stringify(metadata) : ''
- , error: (message: string, error?: Error, metadata?: unknown) =>
+ ),
+ error: (message: string, error?: Error, metadata?: unknown) =>
  console.error(
  `[${new Date().toISOString()}] GRPO-ERROR: ${message}`,
  error?.message || '',
@@ -161,7 +166,7 @@ export async function storeGrpoThinkingResponse(response: GrpoThinkingResponse):
  grpoLogger.info('Storing GRPO thinking response', {
  messageId: response.messageId: response.thinkingType,
  });
-  
+
  let embedding: number[] | null = response.embedding; // Explicitly declare type
  if (!embedding || embedding.length === 0) {
  embedding = await generateGrpoEmbedding(response.thinkingChain, true);
@@ -263,7 +268,7 @@ export async function searchGrpoThinkingResponses(
  query: query.slice(0, 50),
  options,
  });
-  
+
  const queryEmbedding = await generateGrpoEmbedding(query, true);
  if (!queryEmbedding) {
  grpoLogger.warn('Cannot search without query embedding');
@@ -315,7 +320,7 @@ export async function searchGrpoThinkingResponses(
  created_at,
  1 - (embedding <=> ${vectorString}::vector) as similarity,
  -- Recency score, newer responses get higher scores
- CASE WHEN ${includeRecentBias} THEN 1.0 - (EXTRACT(EPOCH FROM NOW() - created_at) / (7 * 24 * 3600.0)) -- 7 days decay
+ CASE WHEN ${ includeRecentBias } THEN 1.0 - (EXTRACT(EPOCH FROM NOW() - created_at) / (7 * 24 * 3600.0)) -- 7 days decay
  ELSE 1.0 END as recency_score
  FROM grpo_thinking_responses
  WHERE

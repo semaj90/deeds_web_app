@@ -8,7 +8,7 @@ import type { RequestHandler } from './$types';
 // Global pipeline instance (shared across SSE connections)
 let globalPipeline: InstanceType<typeof EnhancedAgenticPipeline> | null = null;
 
-export const GET: RequestHandler = async ({ request: request }) => {
+export const GET: RequestHandler = async ({ request }) => {
 	// Initialize pipeline if not exists
 	if (!globalPipeline) {
 		globalPipeline = new EnhancedAgenticPipeline();

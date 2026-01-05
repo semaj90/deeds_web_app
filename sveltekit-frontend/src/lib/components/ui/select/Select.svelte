@@ -1,4 +1,9 @@
 <script lang="ts" module>
+	let disabled = $state<any>(undefined);
+	let required = $state<any>(undefined);
+	let placeholder = $state<any>(undefined);
+	let labels = $state<any>(undefined);
+
 	// Re-export sub-components for compound component pattern
 	export { default as Content } from './SelectContent.svelte';
 	export { default as Group } from './SelectGroup.svelte';
@@ -50,7 +55,7 @@
 	);
 </script>
 
-<SelectRoot bind:value {defaultValue} {onValueChange} {disabled} {required} {name} class={className} {placeholder}>
+<SelectRoot bind:value { defaultValue: defaultValue } { onValueChange: onValueChange } {disabled} {required} { name: name } class={ className: className } { placeholder: placeholder }>
 	<SelectTrigger>
 		<SelectValue {placeholder} {labels} />
 	</SelectTrigger>

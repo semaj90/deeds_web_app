@@ -269,7 +269,7 @@ class CrewAILegalTeam {
  context: { [key: string]: any },
  priority: 'low' | 'medium' | 'high' | 'critical' = 'medium'
  ): Promise<WorkflowResult> {
- const workflowId = `${crewName}_${Date.now()}_${Math.random().toString(36).substr(2, 6)}`;
+ const workflowId = `${ crewName }_${Date.now()}_${Math.random().toString(36).substr(2, 6)}`;
  const startTime = Date.now();
 
  try {
@@ -339,7 +339,7 @@ class CrewAILegalTeam {
  return {
  status: 'failed',
  results,
- finalDeliverable: `Workflow failed: ${error}`,
+ finalDeliverable: `Workflow failed: ${ error }`,
  insights,
  recommendations,
  };
@@ -566,7 +566,7 @@ Final synthesis:`;
  return data.response;
  } catch (error: any) {
  console.error('Synthesis failed:', error);
- return `Synthesis failed: ${error}. Individual results available above.`;
+ return `Synthesis failed: ${ error }. Individual results available above.`;
  }
  }
 

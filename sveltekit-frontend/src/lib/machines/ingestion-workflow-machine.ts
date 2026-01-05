@@ -135,7 +135,7 @@ export const ingestionWorkflowMachine = setup({
  setRetrying: assign(() => ({ isRetrying: true }))},
  actors: {
  // Main job processing orchestrator
- processJob: fromPromise(async ({ input }, { input: { number: number } }) => {
+ processJob: fromPromise(async ({ input }, { input: { number } }) => {
  const { job } = input
  console.log(`ðŸš€ Starting job processing: ${job.id}`);
 

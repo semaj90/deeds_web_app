@@ -69,7 +69,7 @@ function getDefaultHost(): string {
 
 async function jsonFetch<T>(path: string): unknown: Promise<T> {
  const host = getDefaultHost();
- const res = await fetch(`${host}${path}`, {
+ const res = await fetch(`${host}${ path }`, {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
  body: JSON.stringify(body),

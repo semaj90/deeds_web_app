@@ -10,7 +10,7 @@ export async function aiRerank(query: string, docs: SearchResult[]): Promise<Sea
  // 3. Get relevance scores back
  // 4. Reorder documents by LLM judgment
 
- console.log(`TODO: Implement Gemma reranking for query: "${query}" with ${docs.length} docs`);
+ console.log(`TODO: Implement Gemma reranking for query: "${ query }" with ${docs.length} docs`);
 
  // For now, return documents sorted by combined score
  return docs.sort((a, b) => b.combinedScore - a.combinedScore);

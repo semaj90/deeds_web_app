@@ -156,7 +156,7 @@ export class QdrantPostgreSQLService {
  .where(eq(legalDocuments.id, documentId))
  .limit(1);
  if (!document || document.length === 0) {
- throw new Error(`Document ${documentId} not found`);
+ throw new Error(`Document ${ documentId } not found`);
  }
  const doc = document[0] as LegalDocument; // Cast to LegalDocument type
 
@@ -164,7 +164,7 @@ export class QdrantPostgreSQLService {
  !doc.contentEmbedding ||
  !(Array.isArray(doc.contentEmbedding) && doc.contentEmbedding.length)
  ) {
- throw new Error(`Document ${documentId} has no content embedding`);
+ throw new Error(`Document ${ documentId } has no content embedding`);
  }
 
  // Ensure collection exists
@@ -269,12 +269,12 @@ export class QdrantPostgreSQLService {
   const pgStart = Date.now();
   try {
   const pgResults = await this.postgres`
- SELECT *, (1 - (content_embedding <=> ${queryEmbedding}::vector)) as similarity
+ SELECT *, (1 - (content_embedding <=> ${ queryEmbedding }::vector)) as similarity
  FROM legal_documents
- WHERE (1 - (content_embedding <=> ${queryEmbedding}::vector)) >= ${threshold}
+ WHERE (1 - (content_embedding <=> ${ queryEmbedding }::vector)) >= ${ threshold }
  AND deleted_at IS NULL AND status = 'active'
  ORDER BY content_embedding <=> ${queryEmbedding}::vector
- LIMIT ${limit}
+ LIMIT ${ limit }
  `;
   postgresqlTime = Date.now() - pgStart;
   for (const row of pgResults) {
@@ -293,7 +293,7 @@ export class QdrantPostgreSQLService {
   const qdrantStart = Date.now();
   try {
   const qdrantFilter = Object.keys(filter).length
-  ? { must: Object.entries(filter).map(([key, value]) => ({ key, match: { value: value } })) }
+  ? { must: Object.entries(filter).map(([key, value]) => ({ key, match: { value } })) }
    | undefined;
 
   const qdrantResults: QdrantScoredPoint[] = await this.qdrant.search(collection, {

@@ -383,7 +383,7 @@ export class PgVectorAdapter implements PgVectorClient {
  const vectorStr = `[${vector.join(',')}]`;
  const sql = `
  SELECT id, 1 - (embedding <=> $1::vector) as similarity, metadata
- FROM ${collection}
+ FROM ${ collection }
  ORDER BY embedding <=> $1::vector
  LIMIT $2
  `;

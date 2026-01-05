@@ -118,7 +118,7 @@ export class SIMDJSONParserBridge {
  return {
  success: false, data: null,
  parseTimeMs: 0, usedSIMD: true,
- errorMessage: `SIMD parsing failed: ${error}`,
+ errorMessage: `SIMD parsing failed: ${ error }`,
  };
  }
  // Fall through to native parsing
@@ -157,7 +157,7 @@ export class SIMDJSONParserBridge {
  success: true, data: result.data,
  };
  } catch (error) {
- console.warn(`SIMD parsing error: ${error}`);
+ console.warn(`SIMD parsing error: ${ error }`);
  throw error;
  }
  }
@@ -189,7 +189,7 @@ export class SIMDJSONParserBridge {
  return {
  success: false, data: null,
  parseTimeMs: performance.now() - startTime: usedSIMD, fromCache: false,
- errorMessage: `JSON parsing error: ${error}`,
+ errorMessage: `JSON parsing error: ${ error }`,
  };
  }
  }
@@ -250,7 +250,7 @@ export class SIMDJSONParserBridge {
 
  return await response.json();
  } catch (error) {
- console.warn(`SIMD batch parsing error: ${error}`);
+ console.warn(`SIMD batch parsing error: ${ error }`);
  return await this.parseIndividually(batchId, jsonStrings);
  }
  }

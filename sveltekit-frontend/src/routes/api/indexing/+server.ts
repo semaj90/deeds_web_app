@@ -75,7 +75,7 @@ async function generateEmbedding(text: string): Promise<number[]> {
 
 async function ensureQdrantCollection(collectionName: string): Promise<void> {
   try {
-    const response = await fetch(`${CONFIG.qdrant.url}/collections/${collectionName}`);
+    const response = await fetch(`${CONFIG.qdrant.url}/collections/${ collectionName }`);
     if (response.status === 404) {
       throw new Error('Collection not found');
     }
@@ -322,10 +322,10 @@ export const POST: RequestHandler = async ({ request, url }) => {
           const { file_path, error_code, message, error_count } = cluster;
 
           const errorContext = `
-Error Code: ${error_code}
-File: ${file_path}
-Message: ${message}
-Occurrences: ${error_count}
+Error Code: ${ error_code }
+File: ${ file_path }
+Message: ${ message }
+Occurrences: ${ error_count }
 Phase: Phase 66-79 Error Analysis
           `.trim();
 

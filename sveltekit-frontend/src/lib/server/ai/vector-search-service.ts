@@ -179,7 +179,7 @@ export class VectorSearchService {
             } catch (fallbackError) {
                 console.error(`[VectorSearchService] Fallback provider ${fallbackProvider} also failed:`, fallbackError);
                 this.updateProviderStatus(fallbackProvider, false, Date.now() - startTime);
-                throw new Error(`All vector search failed: ${error}, ${fallbackError}`);
+                throw new Error(`All vector search failed: ${ error }, ${ fallbackError }`);
             }
         }
 

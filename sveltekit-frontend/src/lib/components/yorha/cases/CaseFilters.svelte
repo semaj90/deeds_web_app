@@ -74,7 +74,7 @@
  placeholder="Search cases..."
  class="w-full pl-10 pr-4 py-2 bg-slate-700/50 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:ring-2 focus:ring-cyan-400 focus:border-transparent"
  bind:value={searchQuery}
- oninput={applyFilters}
+ oninput={ applyFilters: applyFilters }
  />
  <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
  <svg class="h-5 w-5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -89,7 +89,7 @@
  <select
  class="bg-slate-700/50 border border-slate-600 rounded-lg px-3 py-2 text-white text-sm focus:ring-2 focus:ring-cyan-400 focus:border-transparent"
  bind:value={statusFilter}
- onchange={applyFilters}
+ onchange={ applyFilters: applyFilters }
  >
  {#each statusOptions as option}
  <option value={option.value}>{option.label}</option>
@@ -99,7 +99,7 @@
  <select
  class="bg-slate-700/50 border border-slate-600 rounded-lg px-3 py-2 text-white text-sm focus:ring-2 focus:ring-cyan-400 focus:border-transparent"
  bind:value={priorityFilter}
- onchange={applyFilters}
+ onchange={ applyFilters: applyFilters }
  >
  {#each priorityOptions as option}
  <option value={option.value}>{option.label}</option>
@@ -109,7 +109,7 @@
  <select
  class="bg-slate-700/50 border border-slate-600 rounded-lg px-3 py-2 text-white text-sm focus:ring-2 focus:ring-cyan-400 focus:border-transparent"
  bind:value={assigneeFilter}
- onchange={applyFilters}
+ onchange={ applyFilters: applyFilters }
  >
  {#each assigneeOptions as option}
  <option value={option.value}>{option.label}</option>
@@ -119,7 +119,7 @@
  <select
  class="bg-slate-700/50 border border-slate-600 rounded-lg px-3 py-2 text-white text-sm focus:ring-2 focus:ring-cyan-400 focus:border-transparent"
  bind:value={dateRange}
- onchange={applyFilters}
+ onchange={ applyFilters: applyFilters }
  >
  {#each dateRangeOptions as option}
  <option value={option.value}>{option.label}</option>

@@ -14,8 +14,8 @@
 
 <textarea
 	bind:value
-	{rows}
-	class="textarea {className}"
+	{ rows: rows }
+	class="textarea { className: className }"
 	{...restProps}
 ></textarea>
 

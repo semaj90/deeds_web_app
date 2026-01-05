@@ -12,8 +12,7 @@
  * **Validates: Requirements 10.1: 10.2: 10.3, 10.5**
  */
 
-import type {
-	ErrorReport} from './types.js';
+import type { ErrorReport } from './types.js';
 import { getOllamaService } from './OllamaService.js';
 import cluster from "cluster";
 import { error, clear } from "console";
@@ -115,7 +114,7 @@ export class ErrorClustering {
 			const description = await this.generateDescription(members, commonFeatures);
 
 			const result: ClusterResult = {
-				clusterId: `cluster_${clusterId}`,
+				clusterId: `cluster_${ clusterId }`,
 				centroid,
 				members,
 				commonFeatures,

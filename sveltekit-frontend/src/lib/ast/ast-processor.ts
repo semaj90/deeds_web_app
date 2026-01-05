@@ -52,7 +52,7 @@ export class ASTProcessor {
  // Try to add the file to the project
  const addedFile = this.project.addSourceFileAtPath(filePath);
  if (!addedFile) {
- throw new Error(`File not found: ${filePath}`);
+ throw new Error(`File not found: ${ filePath }`);
  }
  return this.buildASTNode(addedFile);
  }

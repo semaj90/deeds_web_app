@@ -22,7 +22,7 @@ interface CollectionSummary {
 
 async function getCollectionInfo(name: string): Promise<{ points_count: number } | null> {
   try {
-    const response = await fetch(`${QDRANT_URL}/collections/${name}`);
+    const response = await fetch(`${QDRANT_URL}/collections/${ name }`);
     if (!response.ok) return null;
     const data = await response.json() as { result: { points_count: number } };
     return { points_count: data.result.points_count };
@@ -33,7 +33,7 @@ async function getCollectionInfo(name: string): Promise<{ points_count: number }
 
 async function sampleCollection(name: string, limit: number = 10): Promise<Array<{ id: string; payload: Record<string, unknown> }>> {
   try {
-    const response = await fetch(`${QDRANT_URL}/collections/${name}/points/scroll`, {
+    const response = await fetch(`${QDRANT_URL}/collections/${ name }/points/scroll`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ limit, with_payload: true, with_vector: false })

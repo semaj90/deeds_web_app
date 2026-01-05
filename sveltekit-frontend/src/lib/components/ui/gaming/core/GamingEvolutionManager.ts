@@ -291,7 +291,7 @@ export class GamingEvolutionManager {
 
         this.currentState = { ...this.currentState, currentEra: era, isTransitioning: false };
         this.notifyListeners();
-        console.log(`🎮 Gaming era to: ${era}`);
+        console.log(`🎮 Gaming era to: ${ era }`);
     }
 
     public async upgradeEra(): Promise<void> {

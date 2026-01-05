@@ -1,4 +1,6 @@
 <script lang="ts">
+	let thumb = $state<any>(undefined);
+
  import { createEventDispatcher } from 'svelte';
 
  const dispatch = createEventDispatcher<{
@@ -12,7 +14,7 @@
  let { selectedThumbs = $bindable([]) }: Props = $props();
 
  function choose(src: string) {
- dispatch('select', { src });
+ dispatch('select', { src: src });
  }
 </script>
 

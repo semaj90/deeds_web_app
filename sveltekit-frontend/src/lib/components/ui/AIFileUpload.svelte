@@ -1,4 +1,7 @@
 <script lang="ts">
+	let accept = $state<any>(undefined);
+	let multiple = $state<any>(undefined);
+
  /**
  * AI File Upload Component
  * Drag-and-drop with auto-detection and AI analysis
@@ -224,7 +227,7 @@
  }
 
  function formatFileSize(bytes: number): string {
- if (bytes < 1024) return `${bytes} B`;
+ if (bytes < 1024) return `${ bytes: bytes } B`;
  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
  }
@@ -239,11 +242,11 @@
  <div
  class="drop-zone"
  class:dragging={isDragging}
- ondragenter={handleDragEnter}
- ondragleave={handleDragLeave}
- ondragover={handleDragOver}
- ondrop={handleDrop}
- onclick={openFilePicker}
+ ondragenter={ handleDragEnter: handleDragEnter }
+ ondragleave={ handleDragLeave: handleDragLeave }
+ ondragover={ handleDragOver: handleDragOver }
+ ondrop={ handleDrop: handleDrop }
+ onclick={ openFilePicker: openFilePicker }
  role="button"
  tabindex="0"
  onkeydown={(e) => e.key === 'Enter' && openFilePicker()}
@@ -253,7 +256,7 @@
  type="file"
  {accept}
  {multiple}
- onchange={handleFileSelect}
+ onchange={ handleFileSelect: handleFileSelect }
  class="hidden-input"
  />
 

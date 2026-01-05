@@ -66,7 +66,7 @@ export class MinIOService {
     this.validateInput(html, 'html');
 
     const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-    const key = `crawl/${sourceId}/${timestamp}.html`;
+    const key = `crawl/${ sourceId }/${timestamp}.html`;
 
     try {
       await this.putObject(this.buckets.raw, key, html, {
@@ -78,7 +78,7 @@ export class MinIOService {
       return key;
     } catch (error) {
       console.error('[MinIOService] Failed to store raw HTML:', error);
-      throw new Error(`Failed to store raw HTML: ${error}`);
+      throw new Error(`Failed to store raw HTML: ${ error }`);
     }
   }
 
@@ -97,7 +97,7 @@ export class MinIOService {
     this.validateInput(markdown, 'markdown');
 
     const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-    const key = `crawl/${sourceId}/${timestamp}.md`;
+    const key = `crawl/${ sourceId }/${timestamp}.md`;
 
     try {
       await this.putObject(this.buckets.raw, key, markdown, {
@@ -109,7 +109,7 @@ export class MinIOService {
       return key;
     } catch (error) {
       console.error('[MinIOService] Failed to store clean markdown:', error);
-      throw new Error(`Failed to store clean markdown: ${error}`);
+      throw new Error(`Failed to store clean markdown: ${ error }`);
     }
   }
 
@@ -136,7 +136,7 @@ export class MinIOService {
       return key;
     } catch (error) {
       console.error('[MinIOService] Failed to store summary:', error);
-      throw new Error(`Failed to store summary: ${error}`);
+      throw new Error(`Failed to store summary: ${ error }`);
     }
   }
 
@@ -169,7 +169,7 @@ const key = `chunks/${docId}.jsonl`;
       return key;
     } catch (error) {
       console.error('[MinIOService] Failed to store chunks:', error);
-      throw new Error(`Failed to store chunks: ${error}`);
+      throw new Error(`Failed to store chunks: ${ error }`);
     }
   }
 
@@ -293,7 +293,7 @@ const content = await response.Body.transformToString();
 
     const date = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
     const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-    const key = `${errorType}/${date}/${sourceId}-${timestamp}.json`;
+    const key = `${errorType}/${date}/${ sourceId }-${timestamp}.json`;
 
     try {
       const jsonContent = JSON.stringify(errorData, null, 2);

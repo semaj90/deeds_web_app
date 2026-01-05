@@ -174,7 +174,7 @@ export function validateFiles(
  if (maxFiles && files.length > maxFiles) {
  return files.map((_, index) => ({
  valid: false,
- error: `Maximum ${maxFiles} files allowed`,
+ error: `Maximum ${ maxFiles } files allowed`,
  }));
  }
 

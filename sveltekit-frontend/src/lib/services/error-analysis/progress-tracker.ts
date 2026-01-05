@@ -80,7 +80,7 @@ export class ProgressTracker extends BaseService {
  this.startTime = new Date();
  this.metrics.startTime = this.startTime.toISOString();
 
- this.log('info', `Progress tracking started: ${totalErrors} errors`);
+ this.log('info', `Progress tracking started: ${ totalErrors } errors`);
  }
 
  /**

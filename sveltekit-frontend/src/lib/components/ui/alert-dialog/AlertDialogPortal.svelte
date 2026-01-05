@@ -7,7 +7,7 @@
 		children?: Snippet;
 	}
 
-	let { children }: Props = $props();
+	let { children: children }: Props = $props();
 
 	const dialogContext = getContext<AlertDialogContext>('alert-dialog');
 </script>

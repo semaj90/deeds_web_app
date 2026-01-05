@@ -33,7 +33,7 @@ import { createEventDispatcher } from 'svelte';
  const response = await fetch('/api/evidence/ai/analyze', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({ node }),
+ body: JSON.stringify({ node: node }),
  });
 
  const result = await response.json();
@@ -109,8 +109,8 @@ import { createEventDispatcher } from 'svelte';
  <dl>
  {#each Object.entries(node.metadata) as [key, value]}
  <div>
- <dt>{key}:</dt>
- <dd>{value}</dd>
+ <dt>{ key: key }:</dt>
+ <dd>{ value: value }</dd>
  </div>
  {/each}
  </dl>
@@ -141,7 +141,7 @@ import { createEventDispatcher } from 'svelte';
  <textarea
  bind:value={analysis}
  placeholder="AI analysis will appear here..."
- rows={6}
+ rows={ 6: 6 }
  readonly
  ></textarea>
  </div>
@@ -183,7 +183,7 @@ import { createEventDispatcher } from 'svelte';
  <Textarea
  bind:value={node.description}
  onchange={(e) => updateNode({ description: e.currentTarget.value })}
- rows={3}
+ rows={ 3: 3 }
  />
  </label>
 

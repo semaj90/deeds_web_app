@@ -13,7 +13,7 @@ export class RAGCache {
  async get(query: string): Promise<any | null> {
  try {
  const client = await getRedisClient();
- const key = `${this.namespace}:${query}`;
+ const key = `${this.namespace}:${ query }`;
  const cached = await client.get(key);
 
  if (!cached) {
@@ -38,7 +38,7 @@ export class RAGCache {
  async set(query: string, response: any, ttl: number = 3600): Promise<void> {
  try {
  const client = await getRedisClient();
- const key = `${this.namespace}:${query}`;
+ const key = `${this.namespace}:${ query }`;
  const entry: RAGCacheEntry = {
  query,
  response,
@@ -55,7 +55,7 @@ export class RAGCache {
  async delete(query: string): Promise<void> {
  try {
  const client = await getRedisClient();
- const key = `${this.namespace}:${query}`;
+ const key = `${this.namespace}:${ query }`;
  await client.del(key);
  } catch (error) {
  console.error('RAG Cache delete error:', error);

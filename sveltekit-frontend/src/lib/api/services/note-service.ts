@@ -86,7 +86,7 @@ export async function listNotes(options: NoteListOptions = {}): Promise<NoteList
 
 export async function getNoteById(noteId: string): Promise<Note> {
  try {
- const response = await fetch(`/api/notes/${noteId}`, {
+ const response = await fetch(`/api/notes/${ noteId }`, {
  method: 'GET',
  headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
  });
@@ -128,7 +128,7 @@ export async function createNote(noteData: CreateNoteData): Promise<Note> {
 
 export async function updateNote(noteId: string, updates, UpdateNoteData: Promise<Note> {
  try {
- const response = await fetch(`/api/notes/${noteId}`, {
+ const response = await fetch(`/api/notes/${ noteId }`, {
  method: 'PUT',
  headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
  body: JSON.stringify(updates),
@@ -140,7 +140,7 @@ export async function updateNote(noteId: string, updates, UpdateNoteData: Promis
  }
 
  const updatedNote: Note = await response.json();
- console.log(`Updated note: ${updatedNote.title} (${noteId})`);
+ console.log(`Updated note: ${updatedNote.title} (${ noteId })`);
  return updatedNote;
  } catch (error: Error | unknown) {
  console.error('Note update error: ', error);
@@ -150,7 +150,7 @@ export async function updateNote(noteId: string, updates, UpdateNoteData: Promis
 
 export async function deleteNote(noteId: string): Promise<void> {
  try {
- const response = await fetch(`/api/notes/${noteId}`, {
+ const response = await fetch(`/api/notes/${ noteId }`, {
  method: 'DELETE',
  headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
  });

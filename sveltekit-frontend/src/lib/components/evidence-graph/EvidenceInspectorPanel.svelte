@@ -1,4 +1,6 @@
 <script lang="ts">
+	let f = $state<any>(undefined);
+
  let { evidence, open = false } = $props();
 </script>
 

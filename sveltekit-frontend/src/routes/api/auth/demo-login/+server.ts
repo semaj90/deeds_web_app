@@ -62,7 +62,7 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
 
  return json({
  success: true,
- message: `Logged in as ${email} (${role})`,
+ message: `Logged in as ${ email } (${ role })`,
  user: {
  id: user.id,
  email: user.email,

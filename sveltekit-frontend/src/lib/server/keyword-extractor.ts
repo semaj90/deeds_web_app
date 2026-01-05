@@ -88,7 +88,7 @@ Format as JSON:
  "topics": ["topic1", "topic2"]
 }
 
-${context ? `Context: ${context}` : ''}`;
+${context ? `Context: ${ context }` : ''}`;
 
  // This would call vision analysis
  // For now, return structured fallback
@@ -320,14 +320,14 @@ function extractEntitiesFallback(content: string): KeywordExtractionResult['enti
 
  // Date pattern
  const datePattern =
- /\b(\d{1,2}\/\d{1,2}\/\d{4}|\d{4}-\d{2}-\d{2}|January|February|March|April|May|June|July|August|September|October|November|December)\b/gi;
+ /\b(\d{1,2}\/\d{1,2}\/\d{4}|\d{4}-\d{ 2 }-\d{ 2 }|January|February|March|April|May|June|July|August|September|October|November|December)\b/gi;
  const dates = content.match(datePattern) || [];
  dates.forEach((date) => {
  entities.push({ text: date, type: 'DATE', confidence: 0.9 });
  });
   
  const moneyPattern =
- /\$[\d,]+(?:\.\d{2})?|\b\d+(?:,\d{3})*(?:\.\d{2})?\s*(?:dollars|USD|cents)\b/gi;
+ /\$[\d,]+(?:\.\d{ 2 })?|\b\d+(?:,\d{ 3 })*(?:\.\d{ 2 })?\s*(?:dollars|USD|cents)\b/gi;
  const amounts = content.match(moneyPattern) || [];
  amounts.forEach((amount) => {
  entities.push({ text: amount, type: 'MONEY', confidence: 0.85 });

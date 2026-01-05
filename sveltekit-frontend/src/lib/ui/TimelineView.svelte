@@ -1,4 +1,6 @@
 <script lang="ts">
+	let caseId = $state<any>(undefined);
+
  import Button from './Button.svelte';
  import Tag from './Tag.svelte';
 
@@ -147,7 +149,7 @@
  <div class="flex gap-1 mt-2">
  <span class="text-[10px] font-mono text-black/60">Evidence:</span>
  {#each event.evidenceIds as evidId}
- <span class="tag">{evidId}</span>
+ <span class="tag">{ evidId: evidId }</span>
  {/each}
  </div>
  {/if}
@@ -156,7 +158,7 @@
  <div class="flex gap-1 mt-2">
  <span class="text-[10px] font-mono text-black/60">Persons:</span>
  {#each event.personIds as personId}
- <span class="tag">{personId}</span>
+ <span class="tag">{ personId: personId }</span>
  {/each}
  </div>
  {/if}

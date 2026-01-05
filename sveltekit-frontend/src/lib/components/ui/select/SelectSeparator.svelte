@@ -1,4 +1,6 @@
 <script lang="ts">
+	let className = $state<any>(undefined);
+
 	import type { SelectSeparatorProps } from './types';
 
 	let {

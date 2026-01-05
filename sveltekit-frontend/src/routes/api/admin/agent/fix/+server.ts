@@ -98,7 +98,7 @@ async function generateFix(
 		message: 'Analyzing errors and retrieving context...'
 	});
   
-	const prompt = `You are an expert TypeScript/Svelte developer fixing errors in: ${filePath}
+	const prompt = `You are an expert TypeScript/Svelte developer fixing errors in: ${ filePath }
 
 ERRORS TO FIX:
 ${errors.map((e, i) => `${i + 1}. ${e}`).join('\n')}

@@ -6,11 +6,11 @@
  }>();
 </script>
 
-<article class="stats-card" role="group" aria-label={title}>
- <div class="card-title">{title}</div>
+<article class="stats-card" role="group" aria-label={ title: title }>
+ <div class="card-title">{ title: title }</div>
  <div class="card-value">{value ?? '—'}</div>
  {#if subtitle}
- <div class="card-sub">{subtitle}</div>
+ <div class="card-sub">{ subtitle: subtitle }</div>
  {/if}
  {@render children?.()}
 </article>

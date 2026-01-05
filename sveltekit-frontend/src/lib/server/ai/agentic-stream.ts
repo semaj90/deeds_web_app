@@ -29,7 +29,7 @@ export async function runAIAgentStream(
  onToken: (token: string) => Promise<void>,
  options?: { systemPrompt?: string; temperature?: number; maxTokens?: number }
 ): Promise<string> {
- console.log(`[AI Agent Stream] Running for prompt: ${prompt}`);
+ console.log(`[AI Agent Stream] Running for prompt: ${ prompt }`);
  console.log('Options:', options);
 
  // Simulate streaming

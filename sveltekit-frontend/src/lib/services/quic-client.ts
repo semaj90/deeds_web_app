@@ -203,7 +203,7 @@ class QUICClient {
 
 	// Enhanced fetch with optimizations
 	private async fetch(path: string, options: RequestInit = {}): Promise<Response> {
-		const url = `${this.baseUrl}${path}`;
+		const url = `${this.baseUrl}${ path }`;
 		const headers = new Headers(options.headers ?? {});
 
 		// Add connection hints
@@ -223,7 +223,7 @@ class QUICClient {
 			return response;
 		} catch (err) {
 			const msg = err instanceof Error ? err.message : String(err);
-			console.error(`Fetch failed for ${path}: ${msg}`);
+			console.error(`Fetch failed for ${ path }: ${msg}`);
 			throw new Error(msg);
 		}
 	}
@@ -321,7 +321,7 @@ class QUICClient {
 
 	async runPerformanceBenchmark(iterations: number = 100): Promise<SimdBenchmarkResponse> {
 		try {
-			const response = await this.fetch(`/performance?iterations=${iterations}`, {
+			const response = await this.fetch(`/performance?iterations=${ iterations }`, {
 				method: 'GET',
 				headers: { 'Accept': 'application/json' }
 			});
@@ -510,7 +510,7 @@ class QUICClient {
 
 	// Create new stream
 	private createStream(type: QUICStream['type'], priority: number): string {
-		const streamId = `${type}_${Date.now()}_${Math.random().toString(36).slice(2, 11)}`;
+		const streamId = `${ type }_${Date.now()}_${Math.random().toString(36).slice(2, 11)}`;
 		const stream: QUICStream = {
 			id: streamId,
 			type,
@@ -527,7 +527,7 @@ class QUICClient {
 			...state, streamCount: state.streamCount + 1
 		}));
 
-		console.log(`📊 Created ${type} stream: ${streamId}`);
+		console.log(`📊 Created ${ type } stream: ${streamId}`);
 		return streamId;
 	}
 

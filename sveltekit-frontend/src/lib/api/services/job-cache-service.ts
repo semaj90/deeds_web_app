@@ -24,7 +24,7 @@ export interface JobOptions {
 // Core Job Management Functions
 export async function getJobStatus(jobId: string): Promise<JobStatus> {
  try {
- const response = await fetch(`/api/jobs/${jobId}`, {
+ const response = await fetch(`/api/jobs/${ jobId }`, {
  method: 'GET',
  headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
  });
@@ -44,7 +44,7 @@ export async function getJobStatus(jobId: string): Promise<JobStatus> {
 
 export async function cancelJob(jobId: string): Promise<void> {
  try {
- const response = await fetch(`/api/jobs/${jobId}/cancel`, {
+ const response = await fetch(`/api/jobs/${ jobId }/cancel`, {
  method: 'POST',
  headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
  });
@@ -54,7 +54,7 @@ export async function cancelJob(jobId: string): Promise<void> {
  throw new Error(error.message || 'Failed to cancel job');
  }
 
- console.log(`Job cancelled: ${jobId}`);
+ console.log(`Job cancelled: ${ jobId }`);
  } catch (error: Error | unknown) {
  console.error('Job cancellation error: ', error);
  throw new Error(`Failed to cancel job: ${(error as Error).message}`);
@@ -121,7 +121,7 @@ export function pollJobStatus(
 // Cache Management for Jobs
 export async function clearJobCache(jobId: string): Promise<void> {
  try {
- const response = await fetch(`/api/jobs/${jobId}/cache`, {
+ const response = await fetch(`/api/jobs/${ jobId }/cache`, {
  method: 'DELETE',
  headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
  });

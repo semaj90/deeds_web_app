@@ -79,12 +79,12 @@ export class CacheService {
 	 * @returns SHA-256 hash (64 hex characters)
 	 */
 	computeHash(filePath: string): string {
-		const content = `${filePath}:${errorOutput}`;
+		const content = `${ filePath }:${ errorOutput }`;
 		return createHash('sha256').update(content).digest('hex');
 	}
 
 	/**
-	 * Generate cache key with pattern: svelte-check: {file_path}, {hash}
+	 * Generate cache key with pattern: svelte-check: { file_path }, {hash}
 	 *
 	 * Property 24: Redis Cache Key Pattern
 	 * For any computed file hash, the system SHALL check Redis cache
@@ -128,7 +128,7 @@ export class CacheService {
 
 			// Verify hash matches (integrity check)
 			if (result.fileHash !== hash) {
-				console.warn(`⚠️  Cache integrity check failed for ${filePath}`);
+				console.warn(`⚠️  Cache integrity check failed for ${ filePath }`);
 				await this.redis.del(key);
 				return null;
 			}
@@ -285,6 +285,6 @@ export function getCacheService(redisUrl?: string): CacheService {
  * @returns SHA-256 hash
  */
 export function computeFileHash(fileContent: string): string {
-	const content = `${fileContent}:${errorOutput}`;
+	const content = `${fileContent}:${ errorOutput }`;
 	return createHash('sha256').update(content).digest('hex');
 }

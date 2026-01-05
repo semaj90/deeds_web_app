@@ -504,10 +504,10 @@ export class WebGPUAIEngine {
  ? `Resume ${recentJobs[0].type} computation?`
  : 'Start new AI computation?',
  didYouMean: [
- `${context} with kernel attention?`,
- `${context} using T5 transformer?`,
- `${context} with WebGPU acceleration?`,
- `${context} with modular switching?`,
+ `${ context } with kernel attention?`,
+ `${ context } using T5 transformer?`,
+ `${ context } with WebGPU acceleration?`,
+ `${ context } with modular switching?`,
  ],
  othersSearched: [
  'kernel splicing attention',
@@ -559,7 +559,7 @@ export class WebGPUAIEngine {
  ModularSwitch: {
  switch: (moduleName: string):, unknown: unknown => {
  // config: unknown to; config, any
- console.log(`🔄 Switching to module: ${moduleName}`);
+ console.log(`🔄 Switching to module: ${ moduleName }`);
  this.activeModule = moduleName; // Hot-swappable module loading
  return { switched: true, module: moduleName, config };
  },

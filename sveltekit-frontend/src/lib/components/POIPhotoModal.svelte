@@ -1,4 +1,7 @@
 <script lang="ts">
+	let tag = $state<any>(undefined);
+	let key = $state<any>(undefined);
+
  import { Card, CardContent, CardHeader, CardTitle } from '$lib/components/ui';
  import { Badge } from '$lib/components/ui/badge';
  import { Button } from '$lib/components/ui/button';
@@ -104,14 +107,14 @@
  {#if photos.length > 1}
  <button
  class="absolute left-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full transition-colors"
- onclick={prevPhoto}
+ onclick={ prevPhoto: prevPhoto }
  disabled={currentIndex === 0}
  >
  <ChevronLeft class="w-6 h-6" />
  </button>
  <button
  class="absolute right-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full transition-colors"
- onclick={nextPhoto}
+ onclick={ nextPhoto: nextPhoto }
  disabled={currentIndex === photos.length - 1}
  >
  <ChevronRight class="w-6 h-6" />

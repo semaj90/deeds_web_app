@@ -1,4 +1,6 @@
 <script lang="ts">
+	let linkType = $state<any>(undefined);
+
  import { createEventDispatcher, onMount } from 'svelte';
 
  interface CaseStatuteLink {
@@ -44,7 +46,7 @@
  const params = new URLSearchParams();
  if (selectedLinkType) params.set('link_type', selectedLinkType);
 
- const response = await fetch(`/api/cases/${caseId}/laws?${params}`);
+ const response = await fetch(`/api/cases/${ caseId: caseId }/laws?${params}`);
  if (response.ok) {
  const data = await response.json();
  if (data.success) {
@@ -69,7 +71,7 @@
  }
 
  try {
- const response = await fetch(`/api/cases/${caseId}/laws/${statuteCode}`, {
+ const response = await fetch(`/api/cases/${ caseId: caseId }/laws/${ statuteCode: statuteCode }`, {
  method: 'DELETE',
  });
 
@@ -104,7 +106,7 @@
 <div class="case-statute-links">
  <div class="list-header">
  <h3>Linked Statutes ({filteredLinks.length})</h3>
- <button class="refresh-btn" onclick={loadLinks} disabled={isLoading}>
+ <button class="refresh-btn" onclick={ loadLinks: loadLinks } disabled={isLoading}>
  {isLoading ? '⏳' : '🔄'} Refresh
  </button>
  </div>
@@ -112,7 +114,7 @@
  <div class="filters">
  <div class="filter-group">
  <label for="link-type-filter">Link Type:</label>
- <select id="link-type-filter" bind:value={selectedLinkType} onchange={loadLinks}>
+ <select id="link-type-filter" bind:value={selectedLinkType} onchange={ loadLinks: loadLinks }>
  <option value="">All</option>
  {#each Object.keys(stats.byLinkType) as linkType}
  <option value={linkType}>
@@ -132,7 +134,7 @@
  {:else if error}
  <div class="error">
  <p>{error}</p>
- <button onclick={loadLinks}>Retry</button>
+ <button onclick={ loadLinks: loadLinks }>Retry</button>
  </div>
  {:else if filteredLinks.length === 0}
  <div class="empty-state">

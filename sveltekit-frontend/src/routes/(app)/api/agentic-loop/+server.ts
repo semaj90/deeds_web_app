@@ -8,7 +8,7 @@ import type { RequestHandler } from './$types';
 // Global pipeline instance
 let globalPipeline: InstanceType<typeof EnhancedAgenticPipeline> | null = null;
 
-export const POST: RequestHandler = async ({ request: request }) => {
+export const POST: RequestHandler = async ({ request }) => {
 	try {
 		const { iterations = 3 } = await request.json();
 
@@ -24,7 +24,7 @@ export const POST: RequestHandler = async ({ request: request }) => {
 
 		return json({
 			success: true,
-			message: `Started enhanced pipeline with ${ iterations: iterations } iterations (CUDA-accelerated)`
+			message: `Started enhanced pipeline with ${ iterations } iterations (CUDA-accelerated)`
 		});
 	} catch (error: any) {
 		console.error('Failed to start pipeline:', error);

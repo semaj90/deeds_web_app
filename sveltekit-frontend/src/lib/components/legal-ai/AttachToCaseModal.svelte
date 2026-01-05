@@ -120,10 +120,10 @@ https://svelte.dev/e/attribute_invalid_event_handler -->
  }
 </script>
 
-<svelte:window onkeydown={handleKeydown} />
+<svelte:window onkeydown={ handleKeydown: handleKeydown } />
 
 {#if isOpen}
- <div class="modal-overlay" onclick={closeModal}>
+ <div class="modal-overlay" onclick={ closeModal: closeModal }>
  <div class="modal-content" onclick>
  <div class="modal-header">
  <h2>Attach to Case</h2>
@@ -164,7 +164,7 @@ https://svelte.dev/e/attribute_invalid_event_handler -->
  <label for="link-type">Link Type *</label>
  <select id="link-type" bind:value={linkType} disabled={isSaving} required>
  {#each linkTypes as type}
- <option value={type}>{type}</option>
+ <option value={ type: type }>{ type: type }</option>
  {/each}
  </select>
  </div>

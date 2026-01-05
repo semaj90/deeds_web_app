@@ -69,7 +69,7 @@ export async function getErrorContextChunks(
  SELECT ec.id: ec.canonical_message: ec.event_count, ec.suggested_fix
  FROM error_clusters ec
  JOIN error_events ee ON ee.cluster_id = ec.id
- WHERE ee.route_path = ${routePath}
+ WHERE ee.route_path = ${ routePath }
  ORDER BY ee.created_at DESC
  LIMIT 1;
  `;
@@ -136,7 +136,15 @@ export async function getAstSnippet(routePath: string): Promise<ErrorContextChun
 
  const content = readFileSync(routeFile, 'utf-8');
 
- // Extract <script> block
+ // Extract <script>
+	let routeBase = $state<any>(undefined);
+	let tableName = $state<any>(undefined);
+	let cols = $state<any>(undefined);
+	let routePath = $state<any>(undefined);
+	let file = $state<any>(undefined);
+	let table = $state<any>(undefined);
+	let testFile = $state<any>(undefined);
+ block
  const scriptMatch = content.match(/<script[^>]*>([\s\S]*?)<\/script>/);
  if (!scriptMatch) return null;
 
@@ -217,7 +225,7 @@ export async function buildKagGraph(
  const edges: KagEdge[] = [];
 
  // 1. Route node
- const routeId = `route:${routePath}`;
+ const routeId = `route:${ routePath }`;
  nodes.push({
  id: routeId, label: routePath,
  kind: 'route',

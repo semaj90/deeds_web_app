@@ -47,8 +47,8 @@ class AuthStateStore {
 	authState = $state<AuthState>(initialState);
 
 	buildApiUrl(path: string) {
-		if (!path.startsWith('/')) path = `/${path}`;
-		return `${API_BASE}${path}`;
+		if (!path.startsWith('/')) path = `/${ path }`;
+		return `${API_BASE}${ path }`;
 	}
 }
 

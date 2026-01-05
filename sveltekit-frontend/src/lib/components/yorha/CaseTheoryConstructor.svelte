@@ -1,5 +1,11 @@
 import { createEventDispatcher } from 'svelte';
 <script lang="ts">
+	let proof = $state<any>(undefined);
+	let theme = $state<any>(undefined);
+	let counter = $state<any>(undefined);
+	let item = $state<any>(undefined);
+	let content = $state<any>(undefined);
+
  import type { CaseTheoryPlan } from '$lib/types/case-theory';
  // Migrated from createEventDispatcher to callback props;
 

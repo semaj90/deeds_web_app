@@ -259,7 +259,7 @@ class EvidenceGlobalStore {
  }
  this.stats.totalConnections++;
  this.updateCaseMetadata();
- console.log(`🔗 connection: ${fromNodeId} → ${toNodeId} (${relationship})`);
+ console.log(`🔗 connection: ${ fromNodeId } → ${ toNodeId } (${ relationship })`);
  return connectionId;
  }
 

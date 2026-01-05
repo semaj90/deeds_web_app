@@ -1,4 +1,8 @@
 <script lang="ts" module>
+	let overlayClass = $state<any>(undefined);
+	let title = $state<any>(undefined);
+	let description = $state<any>(undefined);
+
 	// Re-export sub-components for compound component pattern
 	export { default as Close } from './DialogClose.svelte';
 	export { default as Content } from './DialogContent.svelte';
@@ -49,10 +53,10 @@
 	}: Props = $props();
 </script>
 
-<DialogRoot bind:open {onOpenChange} class={className}>
+<DialogRoot bind:open { onOpenChange: onOpenChange } class={ className: className }>
 	<DialogPortal>
 		<DialogOverlay class={overlayClass} />
-		<DialogContent class={contentClass}>
+		<DialogContent class={ contentClass: contentClass }>
 			{#if title || description}
 				<div class="mb-4">
 					{#if title}

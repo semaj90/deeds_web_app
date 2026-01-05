@@ -1,4 +1,8 @@
 <script lang="ts">
+	let link = $state<any>(undefined);
+	let title = $state<any>(undefined);
+	let summary = $state<any>(undefined);
+
  let { title = "", summary = "", link = "", status = "open" } = $props();
 </script>
 

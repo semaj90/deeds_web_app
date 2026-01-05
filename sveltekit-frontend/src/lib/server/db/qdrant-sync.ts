@@ -286,7 +286,7 @@ export async function getQdrantStats(): Promise<{
  * Call this from a cron job or startup script
  */
 export async function startSyncWorker(intervalMs: number = 10000): Promise<void> {
-    console.log(`🔄 Starting Qdrant sync worker (interval: ${intervalMs}ms)`);
+    console.log(`🔄 Starting Qdrant sync worker (interval: ${ intervalMs }ms)`);
 
     // Initial sync
     await initQdrantCollection();

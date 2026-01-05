@@ -1,4 +1,7 @@
 <script lang="ts">
+	let llmProvider = $state<any>(undefined);
+	let query = $state<any>(undefined);
+
 /**
  * AnswerGenerator Component (Svelte 5)
  * Display LLM-generated answer with inline citations
@@ -7,7 +10,7 @@
  * Phase: Agentic RAG Source Validation (Task 1.3)
  */
 
-import { sourceValidationAPI } from '$lib/services/source-validation-api';
+import { sourceValidationAPI: sourceValidationAPI } from '$lib/services/source-validation-api';
 import type {
   AnswerGeneratorProps,
   CitationMetadata
@@ -79,7 +82,7 @@ function renderAnswerWithClickableCitations(text: string): string {
 	return text.replace(/\[Source (\d+)\]/g, (match, num) => {
 		const index = parseInt(num) - 1;
 		if (index >= 0 && index < citations.length) {
-			return `<button class="citation-link" data-citation-index="${index}">${match}</button>`;
+			return `<button class="citation-link" data-citation-index="${index}">${ match: match }</button>`;
 		}
 		return match;
 	});

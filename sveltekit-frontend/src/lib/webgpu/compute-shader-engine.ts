@@ -220,14 +220,14 @@ export class ComputeShaderEngine {
  let row = id.y;
  let col = id.x;
 
- if (row >= ${rowsA} || col >= ${colsB}) { return; }
+ if (row >= ${ rowsA } || col >= ${ colsB }) { return; }
 
  var sum = 0.0;
- for (var k = 0u; k < ${colsA}; k = k + 1u) {
- sum = sum + matrixA[row * ${colsA} + k] * matrixB[k * ${colsB} + col];
+ for (var k = 0u; k < ${ colsA }; k = k + 1u) {
+ sum = sum + matrixA[row * ${ colsA } + k] * matrixB[k * ${ colsB } + col];
  }
 
- result[row * ${colsB} + col] = sum;
+ result[row * ${ colsB } + col] = sum;
  }
  `,
  });

@@ -19,7 +19,7 @@ export const POST: RequestHandler = async ({ request }) => {
  status: 200,
  headers: {
  'Content-Type': 'application/json',
- 'Content-Disposition': `attachment; filename="phoenix-wright-search-${caseId}.json"`,
+ 'Content-Disposition': `attachment; filename="phoenix-wright-search-${ caseId }.json"`,
  },
  });
  }
@@ -54,7 +54,7 @@ export const POST: RequestHandler = async ({ request }) => {
  status: 200,
  headers: {
  'Content-Type': 'application/pdf',
- 'Content-Disposition': `attachment; filename="phoenix-wright-search-${caseId}.pdf"`,
+ 'Content-Disposition': `attachment; filename="phoenix-wright-search-${ caseId }.pdf"`,
  },
  });
  }
@@ -99,7 +99,7 @@ function generateSearchReportHTML(caseId: string, result, PhoenixWrightSearchRes
  <body>
  <div class="header">
  <h1>⚖️ Phoenix Wright AI Legal Search Report</h1>
- <p>Case ID: ${caseId}</p>
+ <p>Case ID: ${ caseId }</p>
  <p>Generated: ${new Date().toLocaleString()}</p>
  </div>
 

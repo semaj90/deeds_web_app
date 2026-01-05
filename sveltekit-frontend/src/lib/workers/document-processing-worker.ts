@@ -286,13 +286,13 @@ class DocumentProcessingWorker {
  private async extractPDFText(filePath: string): Promise<string> {
  // Simulate PDF text extraction
  // In production, use pdf-parse or similar library
- return `Extracted PDF text from ${filePath}. This would contain the actual document content extracted using a proper PDF parsing library.`;
+ return `Extracted PDF text from ${ filePath }. This would contain the actual document content extracted using a proper PDF parsing library.`;
  }
 
  private async extractImageText(filePath: string): Promise<string> {
  // Simulate OCR with Tesseract
  // In production, use node-tesseract-ocr or similar
- return `OCR extracted text from image ${filePath}.`;
+ return `OCR extracted text from image ${ filePath }.`;
  }
 
  private async extractPlainText(filePath: string): Promise<string> {

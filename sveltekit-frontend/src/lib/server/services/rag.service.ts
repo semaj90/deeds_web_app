@@ -68,7 +68,7 @@ export class RAGService {
  query: string, jurisdiction: string, number
  ): Promise<Statute[]> {
  try {
- const cacheKey = `${jurisdiction}:${query}`;
+ const cacheKey = `${ jurisdiction }:${ query }`;
 
  return await cacheService.getOrSet(
  cacheKey,
@@ -94,7 +94,7 @@ export class RAGService {
  query: string, jurisdiction: string, number
  ): Promise<CaseLaw[]> {
  try {
- const cacheKey = `${jurisdiction}:${query}`;
+ const cacheKey = `${ jurisdiction }:${ query }`;
 
  return await cacheService.getOrSet(
  cacheKey,
@@ -160,7 +160,7 @@ export class RAGService {
  */
  async retrieveStatuteContext(code: string, limit: number = 5): Promise<string[]> {
  try {
- const cacheKey = `statute_context:${code}`;
+ const cacheKey = `statute_context:${ code }`;
 
  return await cacheService.getOrSet(
  cacheKey,

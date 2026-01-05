@@ -82,7 +82,7 @@ describe('Legal Tag Extraction', () => {
 
  // All extracted cases should match the pattern
  result.cases.forEach((caseRef) => {
- expect(caseRef).toMatch(/\b[A-Z][a-z]+ v\. [A-Z][a-z]+(?: \(\d{4}\))?/);
+ expect(caseRef).toMatch(/\b[A-Z][a-z]+ v\. [A-Z][a-z]+(?: \(\d{ 4 }\))?/);
  });
   
  expect(result.cases).toEqual([...new Set(result.cases)]);

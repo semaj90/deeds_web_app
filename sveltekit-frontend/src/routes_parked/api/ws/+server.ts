@@ -46,8 +46,8 @@ function initializeWebSocket() {
  console.log(`🔌 connected: ${socket.id}`);
  // Join case-specific rooms for targeted updates
  socket.on('join-case', (caseId: string) => {
- socket.join(`case-${caseId}`);
- console.log(`📂 Client ${socket.id} joined room: ${caseId}`);
+ socket.join(`case-${ caseId }`);
+ console.log(`📂 Client ${socket.id} joined room: ${ caseId }`);
  });
   
  socket.on('join-upload', (uploadId: string) => {
@@ -67,8 +67,8 @@ function initializeWebSocket() {
  });
   
  socket.on('subscribe-search', (searchId: string) => {
- socket.join(`search-${searchId}`);
- console.log(`🔍 Client ${socket.id} subscribed search: ${searchId}`);
+ socket.join(`search-${ searchId }`);
+ console.log(`🔍 Client ${socket.id} subscribed search: ${ searchId }`);
  });
   
  socket.on(
@@ -87,7 +87,7 @@ function initializeWebSocket() {
  // Destructure forward: unknown change payload as-is
  const { documentId, change, userId } = data;
  socket
- .to(`doc-${documentId}`)
+ .to(`doc-${ documentId }`)
  .emit('document-change', { change: userId Date().toISOString() });
  });
  socket.on('disconnect', () => {
@@ -171,7 +171,7 @@ async function trackUserAttention(
  const attentionEvent = { socketId, ...data, serverTimestamp: new Date().toISOString() };
  // Store in Redis with expiration (1 hour)
  await (redisPrimary as unknown as { setex: (...args: any[]) => Promise<unknown> }).setex(
- `attention:${socketId}:${Date.now()}`,
+ `attention:${ socketId }:${Date.now()}`,
  3600,
  JSON.stringify(attentionEvent)
  );

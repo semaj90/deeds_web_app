@@ -88,10 +88,10 @@ export async function searchSimilarDocuments(
  const results = (
  await db.execute(sql`
  SELECT id, title, content, 1 - (embedding <=> ${vectorString}::vector) as similarity
- FROM ${legalDocuments}
- WHERE 1 - (embedding <=> ${vectorString}::vector) > ${similarityThreshold}
+ FROM ${ legalDocuments }
+ WHERE 1 - (embedding <=> ${vectorString}::vector) > ${ similarityThreshold }
  ORDER BY embedding <=> ${vectorString}::vector
- LIMIT ${limit}`)
+ LIMIT ${ limit }`)
  ).rows as DBRow[];
  return results.map((row) => {
  const id = row.id !== undefined ? String(row.id) : '';
@@ -172,7 +172,7 @@ export async function getCachedEmbedding(textHash: string): Promise<number[] | n
  const result = (await db
  .select({ embedding: embeddingCache.embedding })
  .from(embeddingCache)
- .where(sql`${embeddingCache.textHash} = ${textHash}`)
+ .where(sql`${embeddingCache.textHash} = ${ textHash }`)
  .limit(1)) as DBRow[];
  if (result.length > 0) {
  const vectorString = result[0].embedding;
@@ -363,7 +363,7 @@ export class GRPMOOrchestrator {
 
  private generateCacheKey(query: string, embedding: number[]): string {
  const embeddingHash = this.hashEmbedding(embedding);
- return `${layer}:${this.hashString(query)}:${embeddingHash}`;
+ return `${ layer }:${this.hashString(query)}:${embeddingHash}`;
  }
 
  private async retrieveFromCache(

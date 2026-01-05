@@ -7,6 +7,8 @@ https://svelte.dev/e/js_parse_error -->
 <!-- @migration-task Error while migrating Svelte code: The 'type' modifier cannot be used on a named import when 'import type' is used on its import statement.
 https://svelte.dev/e/js_parse_error -->
 <script lang="ts">
+	let nodeId = $state<any>(undefined);
+
  import type { type AISuggestion } from './ai-suggestions-service';
 
  let { show = $bindable(false) }: { show: boolean } = $props();
@@ -29,7 +31,7 @@ https://svelte.dev/e/js_parse_error -->
 </script>
 
 {#if show && currentSuggestion}
- <div class="modal-overlay" onclick={closeModal} onkeydown={(e) => { if (e.key === 'Enter' || e.key === ' ') closeModal(); }} role="button" tabindex="0">
+ <div class="modal-overlay" onclick={ closeModal: closeModal } onkeydown={(e) => { if (e.key === 'Enter' || e.key === ' ') closeModal(); }} role="button" tabindex="0">
  <div class="modal-content" onclick={(e) => e.stopPropagation()} role="dialog">
  <!-- Modal Header -->
  <div class="modal-header">

@@ -42,7 +42,7 @@ export async function fetchFromOllama<T>(
 ): Promise<T> {
  const controller = new AbortController();
  const timeout = setTimeout(() => controller.abort(), init.timeoutMs ?? DEFAULT_TIMEOUT_MS);
- const url = `${getOllamaBaseUrl()}${path.startsWith('/') ? path : `/${path}`}`;
+ const url = `${getOllamaBaseUrl()}${path.startsWith('/') ? path : `/${ path }`}`;
 
  try {
  const response = await fetch(url, {

@@ -48,7 +48,7 @@ export function getOllamaEndpoint(path: string = ''): string {
  * Supports paths like 'api/version', 'api/generate', etc.
  */
 export function getOllamaEndpoint(path: string): string {
- return `${process.env.OLLAMA_URL}/${path}`;
+ return `${process.env.OLLAMA_URL}/${ path }`;
 }
 
 /**

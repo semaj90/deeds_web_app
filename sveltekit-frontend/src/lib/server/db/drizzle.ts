@@ -127,7 +127,7 @@ export async function storeEmbedding(
  try {
  const cache = await getCache();
  if (cache && typeof cache.set === 'function') {
- await cache.set(`embedding:${recordId}`, metadata, 24 * 60 * 60 * 1000);
+ await cache.set(`embedding:${ recordId }`, metadata, 24 * 60 * 60 * 1000);
  }
  } catch (err) {
  // ignore cache write errors
@@ -166,7 +166,7 @@ export async function fetchDocumentFromMinIO(
  for await (const chunk of stream) chunks.push(chunk as Buffer);
  return Buffer.concat(chunks).toString('utf8');
  } catch (err) {
- console.error(`❌ Failed to fetch from MinIO: ${bucket}/${key}`, err);
+ console.error(`❌ Failed to fetch from MinIO: ${bucket}/${ key }`, err);
  return '';
  }
 }

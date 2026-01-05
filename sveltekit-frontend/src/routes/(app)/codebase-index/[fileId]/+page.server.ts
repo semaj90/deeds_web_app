@@ -16,8 +16,8 @@ interface FileProfile {
 	generated_at: string;
 }
 
-export const load: PageServerLoad = async ({ params: params }) => {
-	const { fileId: fileId } = params;
+export const load: PageServerLoad = async ({ params }) => {
+	const { fileId } = params;
 
 	// In a real implementation, we would fetch from Qdrant by ID
 	// const response = await fetch(`${QDRANT_URL}/collections/${COLLECTION_NAME}/points/${fileId}`);

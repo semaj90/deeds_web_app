@@ -35,6 +35,6 @@
     Name: {userStore.userDisplayName ?? 'Guest'}
   </div>
 
-  <button onclick={login} data-testid="login-btn">Login</button>
-  <button onclick={logout} data-testid="logout-btn">Logout</button>
+  <button onclick={ login: login } data-testid="login-btn">Login</button>
+  <button onclick={ logout: logout } data-testid="logout-btn">Logout</button>
 </div>

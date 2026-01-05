@@ -1,4 +1,6 @@
 <script lang="ts">
+	let pkg = $state<any>(undefined);
+
 	type RouteHealth = 'green' | 'yellow' | 'red';
 
 	type RouteDetail = {

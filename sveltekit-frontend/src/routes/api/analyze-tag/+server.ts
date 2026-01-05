@@ -42,7 +42,7 @@ export async function POST({ request }: RequestEvent) {
 		await db.execute(sql`
 			INSERT INTO phase89_enhanced_tags (tag_name, summary, embedding, metadata, created_at)
 			VALUES (
-				${tag},
+				${ tag },
 				${analysis.summary},
 				${JSON.stringify(embedding)},
 				${JSON.stringify({
@@ -122,7 +122,7 @@ async function analyzeTagWithLLM(tag: string, occurrences: any[]) {
 
 	const prompt = `Analyze this Qdrant tag and provide a concise summary.
 
-Tag: ${tag}
+Tag: ${ tag }
 Occurrences: ${occurrences.length}
 
 Sample Data:
@@ -165,7 +165,7 @@ Related: [tag1, tag2, tag3]`;
 	const relatedMatch = text.match(/Related:\s*(.+)/i);
 
 	return {
-		summary: summaryMatch ? summaryMatch[1].trim() : `Tag representing ${tag} patterns`,
+		summary: summaryMatch ? summaryMatch[1].trim() : `Tag representing ${ tag } patterns`,
 		relatedTags: relatedMatch
 			? relatedMatch[1]
 					.split(',')

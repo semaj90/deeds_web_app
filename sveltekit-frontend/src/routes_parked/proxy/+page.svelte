@@ -2,7 +2,7 @@
  interface Props {
  data: { message: string; path: string; targetExample: string; now: string };
  }
- let { data }: Props = $props ();
+ let { data: data }: Props = $props ();
 </script>
 
 <main class="page-repair">

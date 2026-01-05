@@ -39,13 +39,13 @@ https://svelte.dev/e/js_parse_error -->
 
 <div
  class="fabric-canvas-container"
- style="width: {width}px; height: {height}px; border: 1px solid #ccc; background-color: #f0f0f0;"
+ style="width: { width: width }px; height: { height: height }px; border: 1px solid #ccc; background-color: #f0f0f0;"
 >
- <canvas id="fabric-canvas-{caseId}" {width} {height}></canvas>
- <p>Fabric.js Canvas Placeholder (Case ID: {caseId})</p>
- <p>Dimensions: {width}x{height}</p>
- <p>Read Only: {readOnly}</p>
- <p>Grid Enabled: {gridEnabled}</p>
+ <canvas id="fabric-canvas-{ caseId: caseId }" { width: width } { height: height }></canvas>
+ <p>Fabric.js Canvas Placeholder (Case ID: { caseId: caseId })</p>
+ <p>Dimensions: { width: width }x{ height: height }</p>
+ <p>Read Only: { readOnly: readOnly }</p>
+ <p>Grid Enabled: { gridEnabled: gridEnabled }</p>
  <p>Snap to Grid: {snapToGrid}</p>
  <button onclick={() => onSave({ objects: [{ type: 'dummy', id: 'simulated-object' }] })}>
  Simulate Save

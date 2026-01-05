@@ -280,7 +280,7 @@ export class RouteOperationLogger {
 
  console.log(`\nBy Category:`);
  for (const [category, count] of Object.entries(report.byCategory)) {
- console.log(` ${category}: ${count}`);
+ console.log(` ${ category }: ${ count }`);
  }
 
  console.log('\n' + '='.repeat(80));

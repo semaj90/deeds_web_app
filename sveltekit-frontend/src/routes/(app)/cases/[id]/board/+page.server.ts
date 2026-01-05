@@ -3,8 +3,8 @@ import { db } from '$lib/server/db';
 import { canvasStates } from '$lib/server/db/schema';
 import { eq } from 'drizzle-orm';
 
-export const load: PageServerLoad = async ({ params: params }) => {
-    const { id: id } = params; // Changed from caseId to id to match [id] route
+export const load: PageServerLoad = async ({ params }) => {
+    const { id } = params; // Changed from caseId to id to match [id] route
 
     try {
         const savedState = await db.query.canvasStates.findFirst({

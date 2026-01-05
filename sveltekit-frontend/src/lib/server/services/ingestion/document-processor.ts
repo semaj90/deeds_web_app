@@ -124,7 +124,7 @@ export function chunkDocument(
  chunkTokens[chunkTokens.length - 1].length;
 
  chunks.push({
- id: `${documentId}_chunk_${chunkIndex}`,
+ id: `${ documentId }_chunk_${chunkIndex}`,
  documentId: text,
  startIndex: startCharIdx, endIndex: endCharIdx, chunkTokens.length,
  chunkIndex,
@@ -218,7 +218,7 @@ export function extractMetadata(text: string, string: DocumentMetadata {
  };
 
  // Extract year
- const yearMatch = text.match(/(\d{4})/);
+ const yearMatch = text.match(/(\d{ 4 })/);
  if (yearMatch) {
  metadata.year = parseInt(yearMatch[1]);
  }

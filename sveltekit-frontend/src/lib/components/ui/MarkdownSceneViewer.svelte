@@ -104,10 +104,10 @@
  </button>
  {:else}
  {#if !scene.validated}
- <button class="btn btn-success" onclick={handleValidate}>
+ <button class="btn btn-success" onclick={ handleValidate: handleValidate }>
  ✅ Validate
  </button>
- <button class="btn btn-danger" onclick={handleReject}>
+ <button class="btn btn-danger" onclick={ handleReject: handleReject }>
  ❌ Reject
  </button>
  {/if}

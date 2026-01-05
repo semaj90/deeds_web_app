@@ -7,10 +7,10 @@
  let { children, title: class, className: className = '' }: Props = $props();
 </script>
 
-<div class="evidence-board-layout {className}">
+<div class="evidence-board-layout { className: className }">
  {#if title}
  <header class="evidence-board-header">
- <h1 class="evidence-board-title">{title}</h1>
+ <h1 class="evidence-board-title">{ title: title }</h1>
  </header>
  {/if}
 

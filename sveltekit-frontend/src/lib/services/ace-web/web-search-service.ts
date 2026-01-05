@@ -80,7 +80,7 @@ export class WebSearchService {
     // DuckDuckGo HTML scraping (simple approach)
     // Note: This is a basic implementation. For production, consider using a proper API or service
     const encodedQuery = encodeURIComponent(query);
-    const url = `https://html.duckduckgo.com/html/?q=${encodedQuery}&kl=${region}`;
+    const url = `https://html.duckduckgo.com/html/?q=${encodedQuery}&kl=${ region }`;
 
     const response = await fetch(url, {
       headers: {

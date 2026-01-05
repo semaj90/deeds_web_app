@@ -48,7 +48,7 @@ export const POST: RequestHandler = async ({ request }) => {
  resolve(
  json(
  {
- error: `Indexing failed with code ${code}`,
+ error: `Indexing failed with code ${ code }`,
  stderr,
  stdout,
  },

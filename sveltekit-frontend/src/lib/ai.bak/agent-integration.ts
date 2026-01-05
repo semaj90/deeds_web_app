@@ -13,7 +13,7 @@ export async function triggerAgentActions(
  const triggers: AgentTrigger[] = auditResults
  .filter((r) => r.status === 'missing' || r.status === 'error')
  .map((r, i) => ({
- todoId: r.todoId || `todo-${i}`,
+ todoId: r.todoId || `todo-${ i }`,
  action: 'code_review',
  status: 'pending',
  }));

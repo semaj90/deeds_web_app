@@ -265,7 +265,7 @@ export const productionServiceRegistry = new ProductionServiceRegistry();
 // Export service utilities
 export function getServiceUrl(serviceName: string, protocol: 'http' | 'grpc' | 'quic' | 'websocket' = 'http'): string {
     const service = productionServiceRegistry.getServiceByName(serviceName);
-    if (!service) throw new Error(`Service not found: ${serviceName}`);
+    if (!service) throw new Error(`Service not found: ${ serviceName }`);
     const protocolMap = { http: 'http', grpc: 'grpc', quic: 'quic', websocket: 'ws' };
     return `${protocolMap[protocol]}://localhost:${service.port}`;
 }

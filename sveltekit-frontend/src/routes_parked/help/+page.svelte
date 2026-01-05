@@ -7,23 +7,25 @@ https://svelte.dev/e/element_invalid_closing_tag -->
 <!-- @migration-task Error while migrating Svelte code: `</icon>` attempted to close an element that was not open
 https://svelte.dev/e/element_invalid_closing_tag -->
 <script lang="ts">
+	import { ButtonRoot: ButtonRoot } from 'bits-ui';
+
  import Button from "$lib/components/ui/enhanced-bits.svelte";
- import { AlertTriangle } from "lucide-svelte";
- import { ArrowRight } from "lucide-svelte";
- import { Book } from "lucide-svelte";
- import { Clock } from "lucide-svelte";
- import { Download } from "lucide-svelte";
- import { ExternalLink } from "lucide-svelte";
- import { HelpCircle } from "lucide-svelte";
+ import { AlertTriangle: AlertTriangle } from "lucide-svelte";
+ import { ArrowRight: ArrowRight } from "lucide-svelte";
+ import { Book: Book } from "lucide-svelte";
+ import { Clock: Clock } from "lucide-svelte";
+ import { Download: Download } from "lucide-svelte";
+ import { ExternalLink: ExternalLink } from "lucide-svelte";
+ import { HelpCircle: HelpCircle } from "lucide-svelte";
  import { Info } from "lucide-svelte";
- import { MessageSquare } from "lucide-svelte";
+ import { MessageSquare: MessageSquare } from "lucide-svelte";
  import { Play } from "lucide-svelte";
- import { Search } from "lucide-svelte";
- import { Star } from "lucide-svelte";
+ import { Search: Search } from "lucide-svelte";
+ import { Star: Star } from "lucide-svelte";
  import { UserIcon } from "lucide-svelte";
- import { Video } from "lucide-svelte";
- import { Sparkles } from "lucide-svelte";
- import { Brain } from "lucide-svelte";
+ import { Video: Video } from "lucide-svelte";
+ import { Sparkles: Sparkles } from "lucide-svelte";
+ import { Brain: Brain } from "lucide-svelte";
 
  interface HelpArticle {
  id: string;
@@ -503,7 +505,7 @@ Build on previous responses:
  bind:value={searchQuery}
  />
  <button
- onclick={toggleSearchMode}
+ onclick={ toggleSearchMode: toggleSearchMode }
  class="absolute right-2 top-1/2 transform -translate-y-1/2 px-4 py-2 bg-white text-blue-600 rounded-md hover:bg-gray-50 transition flex items-center gap-2 font-medium"
  class:disabled={isSearching}
  disabled={isSearching}
@@ -620,11 +622,11 @@ Build on previous responses:
  <div class="prose prose-sm max-w-none text-gray-700 mb-4">
  {@html article.content.split('\n').slice(0, 3).join('\n').substring(0, 150)}...
  </div>
- <Button.Root variant="ghost" size="sm" class="w-full justify-center">
+ <ButtonRoot variant="ghost" size="sm" class="w-full justify-center">
  <Book class="h-4 w-4 mr-2" />
  Read Full Article
  <ArrowRight class="h-4 w-4 ml-2" />
- </Button.Root>
+ </ButtonRoot>
  </article>
  {/each}
  </div>
@@ -667,21 +669,21 @@ Build on previous responses:
  Need More Help?
  </h3>
  <div class="grid gap-4 md:grid-cols-3">
- <Button.Root variant="outline" class="h-auto p-4 flex-col items-start">
+ <ButtonRoot variant="outline" class="h-auto p-4 flex-col items-start">
  <MessageSquare class="h-6 w-6 mb-2" />
  <div class="font-medium">Contact Support</div>
  <div class="text-sm text-gray-600">Get help from our team</div>
- </Button.Root>
- <Button.Root variant="outline" class="h-auto p-4 flex-col items-start">
+ </ButtonRoot>
+ <ButtonRoot variant="outline" class="h-auto p-4 flex-col items-start">
  <Video class="h-6 w-6 mb-2" />
  <div class="font-medium">Video Tutorials</div>
  <div class="text-sm text-gray-600">Step-by-step video guides</div>
- </Button.Root>
- <Button.Root variant="outline" class="h-auto p-4 flex-col items-start">
+ </ButtonRoot>
+ <ButtonRoot variant="outline" class="h-auto p-4 flex-col items-start">
  <Download class="h-6 w-6 mb-2" />
  <div class="font-medium">User Manual</div>
  <div class="text-sm text-gray-600">Complete PDF documentation</div>
- </Button.Root>
+ </ButtonRoot>
  </div>
  </section>
  </div>

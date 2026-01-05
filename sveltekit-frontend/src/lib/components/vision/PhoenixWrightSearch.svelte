@@ -374,7 +374,7 @@
  </button>
 
  <button
- onclick={resetSearch}
+ onclick={ resetSearch: resetSearch }
  class="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded font-medium transition-colors"
  >
  Reset

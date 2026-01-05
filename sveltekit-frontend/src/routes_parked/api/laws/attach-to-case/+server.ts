@@ -25,7 +25,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 
  return json({
  success: true,
- message: `Attached ${citation} to case`,
+ message: `Attached ${ citation } to case`,
  timestamp: new Date().toISOString(),
  });
  } catch (error) {

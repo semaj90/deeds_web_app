@@ -1,4 +1,7 @@
 <script lang="ts">
+	let isTagged = $state<any>(undefined);
+	let isDropped = $state<any>(undefined);
+
  import type { Evidence } from '$lib/types';
  import { Archive } from "lucide-svelte";
 import { FileText } from "lucide-svelte";
@@ -235,11 +238,11 @@ import { onMount } from 'svelte';
  class:readonly
  class:dragging={isDragging}
  class:drop-active={dropZoneActive}
- onmousedown={handleMouseDown}
- onwheel={handleWheel}
- onkeydown={handleKeyDown}
- ondragover={handleDragOver}
- ondragleave={handleDragLeave}
+ onmousedown={ handleMouseDown: handleMouseDown }
+ onwheel={ handleWheel: handleWheel }
+ onkeydown={ handleKeyDown: handleKeyDown }
+ ondragover={ handleDragOver: handleDragOver }
+ ondragleave={ handleDragLeave: handleDragLeave }
  ondrop={handleDrop}
  role="region"
  aria-label="Evidence detective canvas - drag evidence here for AI tagging"
@@ -247,7 +250,7 @@ import { onMount } from 'svelte';
 >
  <!-- Drop zone indicator -->
  <div class="drop-zone-indicator" class:active={dropZoneActive}>
- <Target size={48} />
+ <Target size={ 48: 48 } />
  <p>Drop evidence here for AI detective mode</p>
  </div>
 

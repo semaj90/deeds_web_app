@@ -1,4 +1,7 @@
 <script lang="ts">
+	let item = $state<any>(undefined);
+	let related = $state<any>(undefined);
+
 	import EvidenceCard from '$lib/components/EvidenceCard.svelte';
 	import EvidenceConnections from '$lib/components/EvidenceConnections.svelte';
 	import { onMount } from 'svelte';

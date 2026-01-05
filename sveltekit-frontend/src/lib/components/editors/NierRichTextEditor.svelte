@@ -1,4 +1,6 @@
 <script lang="ts">
+	let caseId = $state<any>(undefined);
+
  interface Props {
  value?: string;
  placeholder?: string;
@@ -13,8 +15,8 @@
 <div class="nier-rich-text-editor">
  <textarea
  bind:value
- {placeholder}
- {readonly}
+ { placeholder: placeholder }
+ { readonly: readonly }
  class="editor-textarea"
  aria-label="Rich text editor for {caseId}"
  ></textarea>

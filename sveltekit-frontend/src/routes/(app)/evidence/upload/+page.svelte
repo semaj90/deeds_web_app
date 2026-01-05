@@ -209,7 +209,7 @@
 		class:drag-active={dragActive}
 		ondragover={ handleDragOver: handleDragOver }
 		ondragleave={ handleDragLeave: handleDragLeave }
-		ondrop={handleDrop}
+		ondrop={ handleDrop: handleDrop }
 		onclick={ handleClick: handleClick }
 		role="button"
 		tabindex="0"
@@ -224,7 +224,7 @@
 		bind:this={fileInput}
 		type="file"
 		accept=".pdf,.docx,.png,.jpg,.jpeg"
-		onchange={handleFileSelect}
+		onchange={ handleFileSelect: handleFileSelect }
 		style="display: none"
 	/>
 

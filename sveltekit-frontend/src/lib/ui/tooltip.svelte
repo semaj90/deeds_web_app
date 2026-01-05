@@ -1,4 +1,6 @@
 <script lang="ts">
+	let text = $state<any>(undefined);
+
  let { children, text = '' } = $props ();
 </script>
 

@@ -170,7 +170,7 @@ export class VerificationService {
  * Infer jurisdiction from domain
  */
  private inferJurisdiction(domain: string): string {
- const stateMatch = domain.match(/\.([a-z]{2})\.gov/);
+ const stateMatch = domain.match(/\.([a-z]{ 2 })\.gov/);
  if (stateMatch) {
  return stateMatch[1].toUpperCase();
  }

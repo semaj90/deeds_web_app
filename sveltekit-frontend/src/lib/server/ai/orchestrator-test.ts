@@ -301,7 +301,7 @@ export async function testSpecificOrchestrator(
 }> {
  const modelFor = { server: 'server-orchestrator', client: 'gemma270m', mcp: 'auto' } as const;
  const request: LLMBridgeRequest = {
- id: `test-specific-${orchestratorType}-${Date.now()}`,
+ id: `test-specific-${ orchestratorType }-${Date.now()}`,
  type: 'chat',
  content,
  context: { userId: 'test-user', sessionId: 'test-session' },

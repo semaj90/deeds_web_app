@@ -19,8 +19,8 @@ export function emitUnifiedDiff(filePath: string, before: string): string {
 
  // Simple line-based diff
  const diff: string[] = [];
- diff.push(`--- a/${filePath}`);
- diff.push(`+++ b/${filePath}`);
+ diff.push(`--- a/${ filePath }`);
+ diff.push(`+++ b/${ filePath }`);
 
  let i = 0;
  let j = 0;

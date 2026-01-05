@@ -528,7 +528,7 @@ export class RabbitMQLegalQueue {
     private createSTOMPFrame(command: string, headers: Record<string, string> = {}, body: string = ''): string {
         let frame = command + '\n';
         for (const [key, value] of Object.entries(headers)) {
-            frame += `${key}:${value}\n`;
+            frame += `${key}:${ value }\n`;
         }
         frame += '\n' + body + '\x00';
         return frame;

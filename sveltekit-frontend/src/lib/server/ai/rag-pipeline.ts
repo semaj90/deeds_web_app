@@ -187,9 +187,9 @@ export class LegalRAGPipeline {
  .join('\n\n---\n\n');
  const template = PromptTemplate.fromTemplate(`
 You are a legal AI assistant. Answer ONLY from context.
-${conversationContext ? `Previous Context:\n${conversationContext}\n\n` : ''}
+${conversationContext ? `Previous Context:\n${ conversationContext }\n\n` : ''}
 Context: {context}
-Question: {question}
+Question: { question }
 Answer:
  `);
 
@@ -276,7 +276,7 @@ Answer:
  FROM documents
  ${caseId ? sql`WHERE case_id = ${caseId} AND content ILIKE ${pattern}` : sql`WHERE content ILIKE ${pattern}`}
  ORDER BY char_length(content) DESC
- LIMIT ${limit}
+ LIMIT ${ limit }
  `;
  return rows.map((r, i) => {
  const text = r.summary?.toString() || r.content?.toString() || r.title?.toString() || '';

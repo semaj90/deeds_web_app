@@ -419,7 +419,7 @@ class RAGIngestionWorker {
  const nodes: GraphNode[] = [];
  const edges: GraphEdge[] = [];
 
- const evidenceNodeId = `evidence:${evidenceId}`;
+ const evidenceNodeId = `evidence:${ evidenceId }`;
  nodes.push({
  id: evidenceNodeId,
  type: 'Evidence',
@@ -427,7 +427,7 @@ class RAGIngestionWorker {
  });
 
  if (caseId) {
- const caseNodeId = `case:${caseId}`;
+ const caseNodeId = `case:${ caseId }`;
  if (!nodes.some((n) => n.id === caseNodeId)) {
  nodes.push({ id: caseNodeId, type: 'Case', label: `C: ${String(caseId).slice(0, 6)}` });
  }

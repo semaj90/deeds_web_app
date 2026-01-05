@@ -1,4 +1,6 @@
 <script lang="ts">
+	let onApply = $state<any>(undefined);
+
  /**
  * DiffViewer Component
  * Side-by-side diff viewer with syntax highlighting

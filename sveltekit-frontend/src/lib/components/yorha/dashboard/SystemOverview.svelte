@@ -181,7 +181,7 @@
  {#each Object.entries(systemMetrics.services) as [service, status]}
  <div class="flex items-center space-x-2">
  <div class="w-2 h-2 {status === 'online' ? 'bg-green-400' : 'bg-red-400'} rounded-full"></div>
- <span class="text-xs text-slate-400 capitalize">{service}</span>
+ <span class="text-xs text-slate-400 capitalize">{ service: service }</span>
  </div>
  {/each}
  </div>

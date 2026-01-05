@@ -1,4 +1,6 @@
 <script lang="ts">
+	let item = $state<any>(undefined);
+
  import { createEventDispatcher, onMount } from 'svelte';
 
  interface Statute {

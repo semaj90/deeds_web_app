@@ -232,7 +232,7 @@
 								class={`filter-chip ${filters.types.includes(type) ? 'active' : ''} ${getTypeColor(type)}`}
 								onclick={() => toggleTypeFilter(type)}
 							>
-								{type}
+								{ type: type }
 							</button>
 						{/each}
 					</div>

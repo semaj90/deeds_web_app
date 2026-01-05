@@ -83,11 +83,11 @@ async function measureAsync<T>(
  try {
  const result = await fn();
  const end = performance.now();
- console.log(`Measured ${name} in ${category}: ${end - start}ms`);
+ console.log(`Measured ${ name } in ${ category }: ${end - start}ms`);
  return result;
  } catch (error) {
  const end = performance.now();
- console.error(`Error in ${name} in ${category}: ${end - start}ms`, error);
+ console.error(`Error in ${ name } in ${ category }: ${end - start}ms`, error);
  throw error;
  }
 }

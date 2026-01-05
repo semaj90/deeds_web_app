@@ -10,7 +10,7 @@ import type { DocumentEmbedding, SOMNode } from './som-rag-system.js';
 import { SelfOrganizingMapRAG } from './som-rag-system.js';
 
 const errorHandler = {
- system: (message: string, data?: unknown) => console.error(`[SYSTEM] ${message}`, data, analysis: (message: string, data?: unknown) => console.error(`[ANALYSIS] ${message}`, data),
+ system: (message: string, data?: unknown) => console.error(`[SYSTEM] ${ message }`, data, analysis: (message: string, data?: unknown) => console.error(`[ANALYSIS] ${ message }`, data),
 };
 
 const copilotOrchestrator = async (
@@ -208,10 +208,10 @@ export class EnhancedIngestionPipeline {
  await this.qdrantClient.createCollection(collectionName, {
  vectors: { size: 384, distance: 'Cosine' },
  });
- console.log(`✅ Created collection: ${collectionName}`);
+ console.log(`✅ Created collection: ${ collectionName }`);
  }
  } catch (error) {
- console.error(`❌ Failed to ensure collection ${collectionName}:`, error);
+ console.error(`❌ Failed to ensure collection ${ collectionName }:`, error);
  throw error;
  }
  }

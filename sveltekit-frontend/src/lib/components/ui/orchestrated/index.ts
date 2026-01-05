@@ -6,7 +6,7 @@ export interface AIAnalysisResult { confidence: number, entities: Array<any>, th
 // Export the orchestration context for state machine integration export const OrchestrationContext = { // XState machine integration stateMachine: null, as any, // Will be injected by the orchestration system // Cache coordination cacheService: null, as any, // GPU acceleration status webgpuService: null, as any, // Vector search integration vectorService: null, as any }
 // Legal AI utility functions export function getConfidenceClass(confidence: number): string { if (confidence >= 0.9) return 'confidence-very-high'; if (confidence >= 0.7) return 'confidence-high'; if (confidence >= 0.5) return 'confidence-medium'; return 'confidence-low'}
 
-export function getPriorityClass(priority, LegalEvidenceItem['priority']): string { return `priority-${priority}`}
+export function getPriorityClass(priority, LegalEvidenceItem['priority']): string { return `priority-${ priority }`}
 
 export function formatAnalysisDate(date: Date): string { return new Intl.DateTimeFormat('en-US', { dateStyle: 'medium', timeStyle: 'short' }).format(date);'' }
 // Component registration for orchestration system export const ORCHESTRATED_COMPONENTS = { Dialog: OrchestratedDialog, Select: OrchestratedSelect, Button: OrchestratedButton, Card: OrchestratedCard, Input }as const // Type exports already defined above - no need to re-export // export type { // LegalEvidenceItem, // AIAnalysisResult, // OrchestrationState // }

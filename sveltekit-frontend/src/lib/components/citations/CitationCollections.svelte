@@ -76,7 +76,7 @@
  if (!confirm('Are you sure you want to delete this collection?')) return;
 
  try {
- const response = await fetch(`/api/citations/collections/${collectionId}`, {
+ const response = await fetch(`/api/citations/collections/${ collectionId: collectionId }`, {
  method: 'DELETE'
  });
 
@@ -137,7 +137,7 @@
  </div>
 
  <div class="form-actions">
- <button onclick={handleCreateCollection} class="btn-primary">
+ <button onclick={ handleCreateCollection: handleCreateCollection } class="btn-primary">
  Create Collection
  </button>
  <button onclick={() => (showCreateForm = false)} class="btn-secondary">

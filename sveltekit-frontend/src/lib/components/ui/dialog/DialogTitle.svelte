@@ -1,4 +1,6 @@
 <script lang="ts">
+	let className = $state<any>(undefined);
+
 	import type { Snippet } from 'svelte';
 	import type { DialogTitleProps } from './types';
 
@@ -16,19 +18,19 @@
 </script>
 
 {#if level === 1}
-	<h1 class="{defaultClass} {className}" data-dialog-title="">
+	<h1 class="{defaultClass} { className: className }" data-dialog-title="">
 		{#if children}
 			{@render children()}
 		{/if}
 	</h1>
 {:else if level === 2}
-	<h2 class="{defaultClass} {className}" data-dialog-title="">
+	<h2 class="{defaultClass} { className: className }" data-dialog-title="">
 		{#if children}
 			{@render children()}
 		{/if}
 	</h2>
 {:else if level === 3}
-	<h3 class="{defaultClass} {className}" data-dialog-title="">
+	<h3 class="{defaultClass} { className: className }" data-dialog-title="">
 		{#if children}
 			{@render children()}
 		{/if}

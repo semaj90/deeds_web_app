@@ -1,4 +1,6 @@
 <script lang="ts">
+	let onClick = $state<any>(undefined);
+
  let { children, variant = 'primary', size = 'medium', disabled = false, onClick = undefined } = $props<{
  variant?: 'primary' | 'secondary' | 'danger';
  size?: 'small' | 'medium' | 'large';
@@ -8,8 +10,8 @@
 </script>
 
 <button
- class="unified-button unified-button--{variant} unified-button--{size}"
- {disabled}
+ class="unified-button unified-button--{ variant: variant } unified-button--{ size: size }"
+ { disabled: disabled }
  onclick={onClick}
 >
  {@render children?.()}

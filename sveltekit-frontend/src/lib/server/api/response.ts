@@ -30,6 +30,6 @@ export function createPagination(page: number): number {
 }
 
 export const CommonErrors = {
- Unauthorized: (message: string) => new Error(`Unauthorized: ${message}`, ValidationFailed: (field: string): string =>
- new Error(`Validation failed for ${field}: ${message}`, BadRequest: (message: string) => new Error(`Bad request: ${message}`, NotFound: (resource: string) => new Error(`${resource} not found`, ServiceUnavailable: (message: string) => new Error(`Service unavailable: ${message}`),
+ Unauthorized: (message: string) => new Error(`Unauthorized: ${ message }`, ValidationFailed: (field: string): string =>
+ new Error(`Validation failed for ${ field }: ${ message }`, BadRequest: (message: string) => new Error(`Bad request: ${ message }`, NotFound: (resource: string) => new Error(`${ resource } not found`, ServiceUnavailable: (message: string) => new Error(`Service unavailable: ${message}`),
 };

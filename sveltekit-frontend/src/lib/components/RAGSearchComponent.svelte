@@ -34,7 +34,7 @@ https://svelte.dev/e/js_parse_error -->
  const result = await response.json(); // Show success notification console.log(`Document ingested: ${result.chunks.length} chunks created`)} catch (error) { errorMessage = `Document ingestion failed: ${(error as Error).message}`}
  }; fileInput.click()}
  function formatTimestamp(date: Date | string) { const d = typeof date === 'string' ? new Date(date): date; return d.toLocaleTimeString() + ' ' + d.toLocaleDateString()}
- function highlightMatch(text: string; query: string) { if (!query) return text; const regex = new RegExp(`(${ query })`, 'gi'); return text.replace(regex, '<mark class="bg-yellow-300">$1</mark>')}
+ function highlightMatch(text: string; query: string) { if (!query) return text; const regex = new RegExp(`(${ query: query })`, 'gi'); return text.replace(regex, '<mark class="bg-yellow-300">$1</mark>')}
 
  // Suggestions based on system components const searchSuggestions = [
  'evidence analysis',
@@ -82,7 +82,7 @@ https://svelte.dev/e/js_parse_error -->
  >
  {#snippet children()} {#if isSearching} <Loader2 class="w-4 h-4 mr-2" /> Searching... {:else} <Search class="w-4 h-4" /> Search {/if} {/snippet}
  </ButtonBits>
- <ButtonBits onclick={ ingestDocument } variant="ghost" size="lg" class="border-blue-500">
+ <ButtonBits onclick={ ingestDocument: ingestDocument } variant="ghost" size="lg" class="border-blue-500">
  {#snippet children()} ðŸ“„ Ingest Doc {/snippet}
  </ButtonBits> </div>
  <!-- Search, Configuration --> <div class="flex gap-4"> <label class="flex items-center"> <span>Results:</span>
@@ -101,7 +101,7 @@ https://svelte.dev/e/js_parse_error -->
  size="xs"
  class="text-xs bg-nier-bg-tertiary border border-nier-border-muted hover:bg-nier-bg-primary"
  >
- {#snippet children()} { suggestion } {/snippet}
+ {#snippet children()} { suggestion: suggestion } {/snippet}
  </ButtonBits> {/each}
  </div> </div> </CardBits>
  <!-- Error, Message -->

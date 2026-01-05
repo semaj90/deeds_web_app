@@ -169,7 +169,7 @@ export const storage = {
 			const item = localStorage.getItem(_key);
 			return item ? JSON.parse(item) : defaultValue || null;
 		} catch (error: Error | unknown) {
-			console.warn(`Failed to get localStorage item: "${_key}":`, error);
+			console.warn(`Failed to get localStorage item: "${ _key }":`, error);
 			return defaultValue || null;
 		}
 	},
@@ -180,7 +180,7 @@ export const storage = {
 			localStorage.setItem(_key, JSON.stringify(value));
 			return true;
 		} catch (error: Error | unknown) {
-			console.warn(`Failed to set localStorage item: "${_key}":`, error);
+			console.warn(`Failed to set localStorage item: "${ _key }":`, error);
 			return false;
 		}
 	},
@@ -191,7 +191,7 @@ export const storage = {
 			localStorage.removeItem(_key);
 			return true;
 		} catch (error: Error | unknown) {
-			console.warn(`Failed to remove localStorage item: "${_key}":`, error);
+			console.warn(`Failed to remove localStorage item: "${ _key }":`, error);
 			return false;
 		}
 	},

@@ -1,4 +1,6 @@
 <script lang="ts">
+	let className = $state<any>(undefined);
+
 	import type { Snippet } from 'svelte';
 	import { onMount, setContext } from 'svelte';
 	import type { DropdownMenuContext, DropdownMenuRootProps } from './types';

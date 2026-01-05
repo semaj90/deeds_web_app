@@ -45,7 +45,7 @@ export class WebGPUVertexStreamer {
  }
 
  this.activeStreams.set(id, buffer);
- console.log(`📡 Streamed vertex tensor: ${id} (${tensor.length} floats)`);
+ console.log(`📡 Streamed vertex tensor: ${ id } (${tensor.length} floats)`);
  }
 
  closeStream(id: string): void {

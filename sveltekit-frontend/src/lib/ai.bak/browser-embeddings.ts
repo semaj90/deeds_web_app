@@ -66,7 +66,7 @@ export class BrowserEmbeddings {
  console.log(`✅ [BrowserML] Model loaded successfully (${this.device})`);
  } catch (error) {
  console.error('❌ [BrowserML] Failed to load model:', error);
- throw new Error(`Browser ML initialization failed: ${error}`);
+ throw new Error(`Browser ML initialization failed: ${ error }`);
  }
  }
 

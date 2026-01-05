@@ -148,7 +148,7 @@ export class MinIOService {
  Metadata: metadata,
  });
  await this.client.send(cmd);
- return `minio://${bucket}/${key}`;
+ return `minio://${ bucket }/${ key }`;
  }
 
  static async uploadLargeFile(
@@ -164,7 +164,7 @@ export class MinIOService {
  },
  });
  await upload.done();
- return `minio://${bucket}/${key}`;
+ return `minio://${ bucket }/${ key }`;
  }
 
  static async listObjects(

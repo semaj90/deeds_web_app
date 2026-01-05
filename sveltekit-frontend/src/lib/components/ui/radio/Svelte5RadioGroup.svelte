@@ -1,4 +1,7 @@
 <script lang="ts">
+	let required = $state<any>(undefined);
+	let name = $state<any>(undefined);
+
 /**
  * Svelte 5 RadioGroup Component
  * Accessible radio button group with Svelte 5 runes
@@ -100,8 +103,8 @@ function getOptionClasses(option: RadioOption) {
 </script>
 
 <fieldset
-	class="w-full {className}"
-	{disabled}
+	class="w-full { className: className }"
+	{ disabled: disabled }
 	aria-required={required}
 >
 	{#if label}

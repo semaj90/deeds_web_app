@@ -98,7 +98,7 @@ class CitationService {
  WHERE user_id = $1
  AND (statute_code ILIKE $2 OR statute_title ILIKE $2)
  `;
- const params: any[] = [userId, `%${query}%`];
+ const params: any[] = [userId, `%${ query }%`];
 
  // Add filters
  if (filters.jurisdiction) {
@@ -141,7 +141,7 @@ class CitationService {
  async getCitationDetail(id: string): Promise<Citation | null> {
  try {
  // Check cache first
- const cacheKey = `${this.CACHE_PREFIX}${id}`;
+ const cacheKey = `${this.CACHE_PREFIX}${ id }`;
  const cached = await redis.get(cacheKey);
  if (cached) {
  return JSON.parse(cached);

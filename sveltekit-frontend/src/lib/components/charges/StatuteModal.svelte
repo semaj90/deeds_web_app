@@ -1,4 +1,7 @@
 <script lang="ts">
+	let onClose = $state<any>(undefined);
+	let code = $state<any>(undefined);
+
 	interface BundledCharge {
 		statuteCode: string;
 		title: string;

@@ -122,7 +122,7 @@ async function generateEmbedding(text: string, model: string = 'gemma'): Promise
  const config = getConfig();
 
  // Check cache first
- const cacheKey = `embedding:${model}:${Buffer.from(text).toString('base64').slice(0, 64)}`;
+ const cacheKey = `embedding:${ model }:${Buffer.from(text).toString('base64').slice(0, 64)}`;
  try {
  const redis = getRedisClient();
  const cached = await redis.get(cacheKey);
@@ -135,7 +135,7 @@ async function generateEmbedding(text: string, model: string = 'gemma'): Promise
 
  // Generate embedding using Ollama
  const embeddingModel =
- model === 'gemma' ? 'embedding-gemma:latest' : `embedding-${model}:latest`;
+ model === 'gemma' ? 'embedding-gemma:latest' : `embedding-${ model }:latest`;
  const response = await fetch(`${config.ollamaUrl}/api/embeddings`, {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
@@ -162,7 +162,7 @@ async function generateEmbedding(text: string, model: string = 'gemma'): Promise
  return embedding;
  } catch (error) {
  console.error('[Vector Service] Embedding generation failed:', error);
- throw new Error(`Failed to generate embedding: ${error}`);
+ throw new Error(`Failed to generate embedding: ${ error }`);
  }
 }
 
@@ -187,7 +187,7 @@ async function searchPgVector(
  if (metadataFilter && Object.keys(metadataFilter).length > 0) {
  const filterConditions = Object.entries(metadataFilter).map(([key, value]) => {
  if (typeof value === 'string') {
- return sql`metadata->>${sql.raw(key)} = ${value}`;
+ return sql`metadata->>${sql.raw(key)} = ${ value }`;
  }
  return sql`metadata->${sql.raw(key)} = ${JSON.stringify(value)}`;
  });

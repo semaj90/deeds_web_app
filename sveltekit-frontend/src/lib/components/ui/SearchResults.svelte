@@ -1,4 +1,6 @@
 <script lang="ts">
+	let query = $state<any>(undefined);
+
  /**
  * SearchResults Component
  * Display web search results with source attribution
@@ -51,11 +53,11 @@
  }
 </script>
 
-<div class="search-results {className}">
+<div class="search-results { className: className }">
  {#if isLoading}
  <div class="loading-state">
  <div class="spinner"></div>
- <p>Searching for "{query}"...</p>
+ <p>Searching for "{ query: query }"...</p>
  </div>
  {:else if results.length === 0}
  <div class="empty-state">

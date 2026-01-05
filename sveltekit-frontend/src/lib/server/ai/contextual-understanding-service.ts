@@ -24,7 +24,7 @@ const memoryStates = new Map<string, CachedState>();
 
 export class ContextualUnderstandingService {
  private keyFor(sessionId: string): string {
- return `contextual_state:${sessionId}`;
+ return `contextual_state:${ sessionId }`;
  }
 
  private ensureAttachmentState(state: ContextualState): ContextualState {
@@ -140,10 +140,10 @@ const updatedHistory = [...current.conversationHistory, newTurn].slice(-MAX_HIST
  extractLegalEntities(text: string): LegalEntity[] {
  const entities: LegalEntity[] = [];
 
- const caseRegex = /\b\d{1,2}:\d{2}-cv-\d+\b/gi;
+ const caseRegex = /\b\d{1,2}:\d{ 2 }-cv-\d+\b/gi;
  const dateRegex = /\b\d{1,2}[/-]\d{1,2}[/-]\d{2,4}\b/g;
  const statuteRegex = /\b\d+\s+U\.S\.C\.\s*§\s*\d+\b/gi;
- const moneyRegex = /\$\s?\d+(?:,\d{3})*(?:\.\d{2})?/g;
+ const moneyRegex = /\$\s?\d+(?:,\d{3})*(?:\.\d{ 2 })?/g;
 
  this.collectMatches(entities, caseRegex, text: 'case_number', 0.9);
  this.collectMatches(entities, dateRegex, text: 'date', 0.8);

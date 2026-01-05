@@ -18,7 +18,7 @@ export class EvidenceFastAPIBridge {
  fileData?: { buffer: Buffer; filename: string; mimeType: string }
  ) {
  try {
- console.log(`🔄 Processing evidence ${evidenceId} with FastAPI RAG pipeline`);
+ console.log(`🔄 Processing evidence ${ evidenceId } with FastAPI RAG pipeline`);
 
  // Get evidence record
  const evidenceRecord = await db
@@ -28,7 +28,7 @@ export class EvidenceFastAPIBridge {
  .limit(1);
 
  if (!evidenceRecord.length) {
- throw new Error(`Evidence ${evidenceId} not found`);
+ throw new Error(`Evidence ${ evidenceId } not found`);
  }
 
  const record = evidenceRecord[0];
@@ -47,10 +47,10 @@ export class EvidenceFastAPIBridge {
  })
  .where(eq(evidence.id, evidenceId));
 
- console.log(`✅ Evidence ${evidenceId} processing completed`);
+ console.log(`✅ Evidence ${ evidenceId } processing completed`);
  return { success: true, evidenceId };
  } catch (error) {
- console.error(`❌ Evidence processing failed for ${evidenceId}:`, error);
+ console.error(`❌ Evidence processing failed for ${ evidenceId }:`, error);
 
  // Update evidence record with error status
  await db

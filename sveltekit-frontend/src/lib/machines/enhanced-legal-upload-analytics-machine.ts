@@ -315,7 +315,7 @@ export async function performAIAnalysisService({
  // Enhanced legal fallback analysis (unchanged)
  return input.files.map((file, index) => ({
  fileName: file.name, true:
- documentId: `doc-${Date.now()}-${index}`,
+ documentId: `doc-${Date.now()}-${ index }`,
  aiInsights: {
  summary: `Legal document analysis for ${file.name}. Document contains relevant legal content.`,
  keyEntities: [
@@ -335,8 +335,8 @@ export async function performAIAnalysisService({
  evidenceType: file.type.includes('pdf') ? 'document' : 'media',
  },
  metadata: {
- fileId: `doc-${Date.now()}-${index}`,
- hash: `hash-${Date.now()}-${index}`,
+ fileId: `doc-${Date.now()}-${ index }`,
+ hash: `hash-${Date.now()}-${ index }`,
  source: 'legal_upload',
  acquisition_date: new Date().toISOString(),
  authenticity_verified: false,

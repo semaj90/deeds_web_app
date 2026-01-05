@@ -65,7 +65,7 @@
 			};
 
 			const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-			downloadBlob(blob, `${filename}.json`);
+			downloadBlob(blob, `${ filename: filename }.json`);
 			showSuccess('JSON');
 		} finally {
 			isExporting = false;
@@ -91,7 +91,7 @@
 			const combinedCSV = `# Nodes\n${nodesCSV}\n\n# Edges\n${edgesCSV}`;
 
 			const blob = new Blob([combinedCSV], { type: 'text/csv' });
-			downloadBlob(blob, `${filename}.csv`);
+			downloadBlob(blob, `${ filename: filename }.csv`);
 			showSuccess('CSV');
 		} finally {
 			isExporting = false;
@@ -108,7 +108,7 @@
 		try {
 			const svgData = new XMLSerializer().serializeToString(svgElement);
 			const svgBlob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' });
-			downloadBlob(svgBlob, `${filename}.svg`);
+			downloadBlob(svgBlob, `${ filename: filename }.svg`);
 			showSuccess('SVG');
 		} finally {
 			isExporting = false;

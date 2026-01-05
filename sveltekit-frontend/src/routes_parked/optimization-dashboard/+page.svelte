@@ -1,4 +1,6 @@
 <script lang="ts">
+	let rec = $state<any>(undefined);
+
 import { enhancedRAGStore } from '$lib/stores/enhanced-rag-store.js';
 import type { WorkerStats } from '$lib/workers/specialized-worker-system.js';
 import { onMount } from 'svelte';
@@ -94,7 +96,7 @@ import { onMount } from 'svelte';
  })
  });
  if (jobResponse.ok) {
- const { jobId } = await jobResponse.json();
+ const { jobId: jobId } = await jobResponse.json();
  // Wait for job completion
  const resultResponse = await fetch('/api/workers/wait', {
  method: 'PUT',

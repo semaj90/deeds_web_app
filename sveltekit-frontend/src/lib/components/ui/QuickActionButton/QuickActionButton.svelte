@@ -1,4 +1,7 @@
 <script lang="ts">
+	let ariaLabel = $state<any>(undefined);
+	let icon = $state<any>(undefined);
+
  let { children, icon = null, variant = 'default', disabled = false, ariaLabel = undefined } = $props<{
  icon?: string | null;
  variant?: 'default' | 'secondary' | 'destructive' | 'outline' | 'ghost' | 'link';
@@ -7,7 +10,7 @@
  }>();
 </script>
 
-<button type="button" class={`quick-action ${variant}`} {disabled} aria-label={ariaLabel}>
+<button type="button" class={`quick-action ${ variant: variant }`} { disabled: disabled } aria-label={ariaLabel}>
  {#if icon}
  <span class={`icon ${icon}`} aria-hidden="true"></span>
  {/if}

@@ -46,8 +46,8 @@ export class EvidenceDetectiveService {
  const analysisPrompt = `
 Evidence Detective Analysis Request:
 
-Case ID: ${caseId}
-Query: ${query}
+Case ID: ${ caseId }
+Query: ${ query }
 
 Available Evidence:
 ${evidenceText}

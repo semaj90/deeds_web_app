@@ -164,8 +164,8 @@ export class KnowledgeBase {
 
  try {
  // Generate embeddings
- const errorEmbedding = await this.generateEmbedding(`Error: ${errorMessage} in ${filePath}`);
- const patchEmbedding = await this.generateEmbedding(`Patch: ${patch} for ${errorMessage}`);
+ const errorEmbedding = await this.generateEmbedding(`Error: ${ errorMessage } in ${ filePath }`);
+ const patchEmbedding = await this.generateEmbedding(`Patch: ${patch} for ${ errorMessage }`);
 
  // Update or create error pattern
  const patternId = `${errorCode || 'unknown'}-${filePath}`;
@@ -175,7 +175,7 @@ export class KnowledgeBase {
 					embedding, fix_count, success_rate, last_seen, metadata
 				)
 				VALUES (
-					${patternId}, ${errorMessage}, ${options?.errorCode || null},
+					${patternId}, ${ errorMessage }, ${options?.errorCode || null},
 					${filePath}, ${options?.lineNumber || null}, ${sql.raw(`'[${errorEmbedding.join(',')}]'::vector`)},
 					1, ${success ? 1.0 : 0.0}, NOW(), ${JSON.stringify(options?.metadata || {})}
 				)
@@ -187,7 +187,7 @@ export class KnowledgeBase {
 			`);
 
  // Store patch knowledge
- const patchId = `${runId}-${Date.now()}`;
+ const patchId = `${ runId }-${Date.now()}`;
  await db.execute(sql`
 				INSERT INTO patch_knowledge (
 					id, patch_content, target_file, error_fixed, embedding,
@@ -196,7 +196,7 @@ export class KnowledgeBase {
 				VALUES (
 					${patchId}, ${patch}, ${filePath}, ${errorMessage},
 					${sql.raw(`'[${patchEmbedding.join(',')}]'::vector`)},
-					true, ${success}, NOW(), ${runId}
+					true, ${ success }, NOW(), ${ runId }
 				)
 			`);
 

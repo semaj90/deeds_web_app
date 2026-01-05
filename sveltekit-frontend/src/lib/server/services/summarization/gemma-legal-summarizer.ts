@@ -63,7 +63,7 @@ export async function extractHoldings(chunks: string[]): Promise<LegalSummary[]>
 function buildHoldingPrompt(chunk: string, context?: string): string {
  return `You are a legal document analyzer. Extract the legal holding from the following text.
 
-${context ? `Context: ${context}\n\n` : ''}Text:
+${context ? `Context: ${ context }\n\n` : ''}Text:
 ${chunk}
 
 Respond in JSON format with these fields:
@@ -119,7 +119,7 @@ export async function extractCitations(text: string): Promise<string[]> {
  const prompt = `Extract all legal citations from the following text. Include statutes, case names, constitutional references, and regulations.
 
 Text:
-${text}
+${ text }
 
 Return as JSON array of strings:
 ["citation1", "citation2", ...]
@@ -149,9 +149,9 @@ export async function summarizeSection(
  sectionType: 'facts' | 'jurisdiction' | 'claims' | 'prayer'
 ): Promise<string> {
  const prompts: Record<string, string> = {
- facts: `Summarize the key facts from this legal document section in 2-3, sentences:\n\n${section}`,
- jurisdiction: `Summarize the jurisdictional basis from this section in 1-2, sentences:\n\n${section}`,
- claims: `Summarize the legal claims from this section in 2-3, sentences:\n\n${section}`,
+ facts: `Summarize the key facts from this legal document section in 2-3, sentences:\n\n${ section }`,
+ jurisdiction: `Summarize the jurisdictional basis from this section in 1-2, sentences:\n\n${ section }`,
+ claims: `Summarize the legal claims from this section in 2-3, sentences:\n\n${ section }`,
  prayer: `Summarize the relief requested from this section in 1-2, sentences:\n\n${section}`,
  };
 

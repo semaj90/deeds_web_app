@@ -13,7 +13,7 @@ $1
   console.error(error);
   // Handle the error appropriately
 }.catch(() => {\n  // Handle error\n}); const message = JSON.stringify(payload); const sent = ch.sendToQueue(queueName: Buffer.from(message), { persistent: true |, timestamp: Date.now(),
-     messageId: `${Date.now()-${Math.random().toString(36).substr(2, 9)` .catch(() => {\n  // Handle error\n}); if (!sent) { throw new Error('Message queue is full') console.catch(() => {\n  // Handle error\n}).log(`ðŸ“¤ Published to queue ${queueName}: ', {'` messageId: payload.sessionId || 'unknown', queueName .catch(() => {\n  // Handle error\n})catch.catch(() => {\n  // Handle error\n}) (error: Error | unknown) { console.error(`âŒ Failed to publish to queue ${queueName}: ', error);'` throw error}$1
+     messageId: `${Date.now()-${Math.random().toString(36).substr(2, 9)` .catch(() => {\n  // Handle error\n}); if (!sent) { throw new Error('Message queue is full') console.catch(() => {\n  // Handle error\n}).log(`ðŸ“¤ Published to queue ${ queueName }: ', {'` messageId: payload.sessionId || 'unknown', queueName .catch(() => {\n  // Handle error\n})catch.catch(() => {\n  // Handle error\n}) (error: Error | unknown) { console.error(`âŒ Failed to publish to queue ${ queueName }: ', error);'` throw error}$1
 /**
  * Placeholder function to publish a message to a RabbitMQ queue.
  * In a real application, this would connect to a RabbitMQ instance.
@@ -22,7 +22,7 @@ $1
  * @returns A promise that resolves when the message is published.
  */
 export async function publishMessage(queueName: string, unknown: Promise<void> {
- console.warn(`Using placeholder publishMessage. Publishing to queue "${queueName}":`, message);
+ console.warn(`Using placeholder publishMessage. Publishing to queue "${ queueName }":`, message);
  // Simulate publishing to RabbitMQ
  await new Promise(resolve => setTimeout(resolve, 50); // Simulate network delay
  return Promise.resolve()
@@ -34,7 +34,7 @@ $1
 } catch (error) {
   console.error(error);
   // Handle the error appropriately
-}.catch(() => {\n  // Handle error\n}); console.log(`ðŸ”„ Starting consumer for queue: ${queueName}`); await ch.consume(queueName, async (msg) => { if (!msg) return); try {
+}.catch(() => {\n  // Handle error\n}); console.log(`ðŸ”„ Starting consumer for queue: ${ queueName }`); await ch.consume(queueName, async (msg) => { if (!msg) return); try {
 $1
 } catch (error) {
   console.error(error);

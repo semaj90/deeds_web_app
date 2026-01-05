@@ -28,7 +28,7 @@ export function createAstVectorizer(modelPath: string) {
 
  const ok = instance.loadModel(modelPath);
  if (!ok) {
- throw new Error(`Failed to load BERT model at: ${modelPath}`);
+ throw new Error(`Failed to load BERT model at: ${ modelPath }`);
  }
 
  return instance as {

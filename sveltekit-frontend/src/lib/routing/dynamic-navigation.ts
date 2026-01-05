@@ -174,7 +174,7 @@ export class DynamicNavigation {
  ): Promise<void> {
  const route = routeRegistry.getRoute(routeId);
  if (!route) {
- throw new Error(`Route not found: ${routeId}`);
+ throw new Error(`Route not found: ${ routeId }`);
  }
  const template = route.route ?? route.path ?? '';
  const path = this.buildPath(String(template), params);
@@ -333,9 +333,9 @@ export class DynamicNavigation {
  // replace parameter patterns: :id, [id], [[id]] (simple)
  for (const [key, value] of Object.entries(params)) {
  const v = String(value ?? '');
- path = path.replace(new RegExp(`:${key}\\b`, 'g'), v);
- path = path.replace(new RegExp(`\\[\\[${key}\\]\\]`, 'g'), v);
- path = path.replace(new RegExp(`\\[${key}\\]`, 'g'), v);
+ path = path.replace(new RegExp(`:${ key }\\b`, 'g'), v);
+ path = path.replace(new RegExp(`\\[\\[${ key }\\]\\]`, 'g'), v);
+ path = path.replace(new RegExp(`\\[${ key }\\]`, 'g'), v);
  }
  // remove unresolved optional segments like /[[...]] or /[[id]]
  path = path.replace(/\/\[\[[^\]]+\]\]/g, '');

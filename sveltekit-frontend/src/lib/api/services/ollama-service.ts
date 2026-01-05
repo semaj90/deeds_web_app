@@ -163,7 +163,7 @@ export async function pullModel(name: string): Promise<void> {
  throw new Error(error.message || 'Failed to pull model');
  }
 
- console.log(`Started pulling model: ${name}`);
+ console.log(`Started pulling model: ${ name }`);
  } catch (error: Error | unknown) {
  console.error('Ollama pull model error: ', error);
  throw new Error(`Failed to pull model: ${(error as Error).message}`);

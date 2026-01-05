@@ -143,7 +143,7 @@ export class NativeWindowsServiceManager {
 
  private async checkPortInUse(port: number): Promise<boolean> {
  try {
- const testUrl = `http://localhost:${port}`;
+ const testUrl = `http://localhost:${ port }`;
  await fetch(testUrl, {
  method: 'HEAD',
  signal: AbortSignal.timeout(2000),

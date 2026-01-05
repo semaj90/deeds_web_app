@@ -96,7 +96,7 @@ export class RabbitMQServiceWorker {
 
  registerHandler(queueName: string): void {
  this.handlers.set(queueName, handler);
- this.log(`Handler registered for queue: ${queueName}`);
+ this.log(`Handler registered for queue: ${ queueName }`);
  }
 
  async start(): Promise<void> {
@@ -156,7 +156,7 @@ export class RabbitMQServiceWorker {
  const callback = async (message: any, originalMessage?: unknown) => {
  const startTime = Date.now();
  try {
- this.log(`Processing message from ${queueName}: ${JSON.stringify(message).slice(0, 200)}`);
+ this.log(`Processing message from ${ queueName }: ${JSON.stringify(message).slice(0, 200)}`);
  await Promise.race([
  handler(message, originalMessage),
  new Promise<never>((_, reject) =>
@@ -170,7 +170,7 @@ export class RabbitMQServiceWorker {
  } catch (error) {
  this.processingStats.errors++;
  const msg = error instanceof Error ? error.message : String(error);
- this.log(`Error processing message from ${queueName}: ${msg}`, 'error');
+ this.log(`Error processing message from ${ queueName }: ${msg}`, 'error');
  // do not rethrow here to avoid crashing consumer loop; let the service manage retries
  }
  };
@@ -378,7 +378,7 @@ export class RabbitMQServiceWorker {
  });
  const publishedOk = Boolean(publishResult);
  if (!publishedOk) {
- this.log(`Failed to publish message to ${queueName}`, 'error');
+ this.log(`Failed to publish message to ${ queueName }`, 'error');
  return false;
  }
  this.log(`Published message to ${queueName}`, 'success');

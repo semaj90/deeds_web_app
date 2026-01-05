@@ -342,7 +342,7 @@ describe('AuditTrail', () => {
  entry = await auditTrail.logRollback({}, 'success');
  break;
  default:
- throw new Error(`Unknown operation: ${operation}`);
+ throw new Error(`Unknown operation: ${ operation }`);
  }
 
  expect(entry!.operation).toBe(operation);

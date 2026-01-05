@@ -118,7 +118,7 @@ export class PDFFileLoader {
  const text = await this.extractTextFromPDF(fullBuffer);
 
  if (!text || text.trim().length === 0) {
- console.warn(`No text extracted from MinIO: ${bucketKey}`);
+ console.warn(`No text extracted from MinIO: ${ bucketKey }`);
  resolve(null);
  return;
  }

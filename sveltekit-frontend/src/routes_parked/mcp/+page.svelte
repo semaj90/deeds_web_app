@@ -7,7 +7,7 @@ https://svelte.dev/e/bind_invalid_value -->
 <!-- @migration-task Error while migrating Svelte code: Can only bind to state or props
 https://svelte.dev/e/bind_invalid_value -->
 <script lang="ts">
- import { goto } from '$app/navigation';
+ import { goto: goto } from '$app/navigation';
  import type { DialogClose as Close, DialogContent as Content, DialogOverlay as Overlay, Dialog as Root } from '$lib/components/ui/dialog';
  import type { appActions, appStore } from '$lib/stores/app-store';
 // REMOVED: import { onDestroy, onMount } from 'svelte';
@@ -184,7 +184,7 @@ https://svelte.dev/e/bind_invalid_value -->
 
  // Function to handle navigation to a case, addressing the goto() warning
  async function navigateToCase(caseId: string) {
- await goto(`/cases/${caseId}`);
+ await goto(`/cases/${ caseId: caseId }`);
  }
 
  let intervalId: ReturnType<typeof setInterval>;
@@ -400,7 +400,7 @@ https://svelte.dev/e/bind_invalid_value -->
  <button
  type="button"
  class="rounded border border-slate-600 px-4 py-2 text-sm text-slate-200 hover:border-slate-400"
- onclick={cancelNewCase}
+ onclick={ cancelNewCase: cancelNewCase }
  >
  Cancel
  </button>

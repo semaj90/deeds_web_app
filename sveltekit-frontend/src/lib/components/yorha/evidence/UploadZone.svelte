@@ -108,9 +108,9 @@
  <div
  class="border-2 border-dashed rounded-lg p-8 text-center transition-colors {isDragOver ? 'border-cyan-400 bg-cyan-400/10' : 'border-slate-600 hover:border-slate-500'}"
  role="region"
- ondragover={handleDragOver}
- ondragleave={handleDragLeave}
- ondrop={handleDrop}
+ ondragover={ handleDragOver: handleDragOver }
+ ondragleave={ handleDragLeave: handleDragLeave }
+ ondrop={ handleDrop: handleDrop }
  >
  <div class="mb-4">
  <div class="text-4xl mb-4">📁</div>
@@ -150,7 +150,7 @@
  <button
  class="px-4 py-2 bg-green-400/20 hover:bg-green-400/30 text-green-400 text-sm rounded-lg transition-colors disabled:opacity-50"
  disabled={isUploading}
- onclick={uploadFiles}
+ onclick={ uploadFiles: uploadFiles }
  >
  {isUploading ? 'Uploading...' : 'Upload All'}
  </button>

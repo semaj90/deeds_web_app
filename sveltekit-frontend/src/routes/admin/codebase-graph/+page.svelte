@@ -1,5 +1,7 @@
 <script lang="ts">
-	import { Button, Dialog } from 'bits-ui';
+	let tag = $state<any>(undefined);
+
+	import { Button, ButtonRoot, Dialog, DialogClose, DialogContent, DialogOverlay, DialogPortal, DialogRoot, DialogTitle } from 'bits-ui';
 	import { onMount } from 'svelte';
 
 	interface VectorCluster {
@@ -225,13 +227,13 @@
 					       placeholder-gray-500 focus:border-purple-500 focus:outline-none"
 					onkeydown={(e) => e.key === 'Enter' && performVectorSearch()}
 				/>
-				<Button.Root
+				<ButtonRoot
 					class="px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-lg
 					       font-medium transition-colors"
-					onclick={performVectorSearch}
+					onclick={ performVectorSearch: performVectorSearch }
 				>
 					Search
-				</Button.Root>
+				</ButtonRoot>
 			</div>
 
 			{#if searchResults.length > 0}
@@ -340,18 +342,18 @@
 		</div>
 
 		<!-- Cluster Details Dialog -->
-		<Dialog.Root bind:open={detailsOpen}>
-			<Dialog.Portal>
-				<Dialog.Overlay class="fixed inset-0 bg-black/50 backdrop-blur-sm z-40" />
-				<Dialog.Content
+		<DialogRoot bind:open={detailsOpen}>
+			<DialogPortal>
+				<DialogOverlay class="fixed inset-0 bg-black/50 backdrop-blur-sm z-40" />
+				<DialogContent
 					class="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50
 					       w-full max-w-3xl max-h-[90vh] overflow-y-auto p-6 bg-gray-800 rounded-xl
 					       shadow-2xl border border-gray-700"
 				>
 					{#if selectedCluster}
-						<Dialog.Title class="text-2xl font-bold text-white mb-4">
+						<DialogTitle class="text-2xl font-bold text-white mb-4">
 							Cluster #{selectedCluster.cluster_id} - {selectedCluster.pattern}
-						</Dialog.Title>
+						</DialogTitle>
 
 						<div class="space-y-6">
 							<!-- Summary -->
@@ -411,45 +413,45 @@
 
 							<!-- Actions -->
 							<div class="flex gap-3 pt-4 border-t border-gray-700">
-								<Button.Root
+								<ButtonRoot
 									class="flex-1 px-4 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-lg
 									       font-medium transition-colors flex items-center justify-center gap-2"
 									onclick={() => initiateAgenticFix(selectedCluster)}
 								>
 									<div class="i-carbon-machine-learning"></div>
 									Agentic Fix
-								</Button.Root>
-								<Button.Root
+								</ButtonRoot>
+								<ButtonRoot
 									class="px-4 py-3 bg-gray-700 hover:bg-gray-600 text-white rounded-lg
 									       transition-colors"
 									onclick={() => (detailsOpen = false)}
 								>
 									Close
-								</Button.Root>
+								</ButtonRoot>
 							</div>
 						</div>
 					{/if}
 
-					<Dialog.Close
+					<DialogClose
 						class="absolute top-4 right-4 p-2 hover:bg-gray-700 rounded-lg transition-colors"
 					>
 						<div class="i-carbon-close text-xl text-gray-400"></div>
-					</Dialog.Close>
-				</Dialog.Content>
-			</Dialog.Portal>
-		</Dialog.Root>
+					</DialogClose>
+				</DialogContent>
+			</DialogPortal>
+		</DialogRoot>
 
 		<!-- Agentic Fix Status Dialog -->
-		<Dialog.Root bind:open={fixDialogOpen}>
-			<Dialog.Portal>
-				<Dialog.Overlay class="fixed inset-0 bg-black/50 backdrop-blur-sm z-40" />
-				<Dialog.Content
+		<DialogRoot bind:open={fixDialogOpen}>
+			<DialogPortal>
+				<DialogOverlay class="fixed inset-0 bg-black/50 backdrop-blur-sm z-40" />
+				<DialogContent
 					class="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50
 					       w-full max-w-2xl p-6 bg-gray-800 rounded-xl shadow-2xl border border-gray-700"
 				>
-					<Dialog.Title class="text-2xl font-bold text-white mb-4">
+					<DialogTitle class="text-2xl font-bold text-white mb-4">
 						🤖 Agentic Fix Pipeline
-					</Dialog.Title>
+					</DialogTitle>
 
 					<div class="mb-6">
 						<pre
@@ -458,15 +460,15 @@
 						>{agenticFixStatus}</pre>
 					</div>
 
-					<Button.Root
+					<ButtonRoot
 						class="w-full px-4 py-3 bg-gray-700 hover:bg-gray-600 text-white rounded-lg
 						       transition-colors"
 						onclick={() => (fixDialogOpen = false)}
 					>
 						Close
-					</Button.Root>
-				</Dialog.Content>
-			</Dialog.Portal>
-		</Dialog.Root>
+					</ButtonRoot>
+				</DialogContent>
+			</DialogPortal>
+		</DialogRoot>
 	</div>
 </div>

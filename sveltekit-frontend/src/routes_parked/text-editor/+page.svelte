@@ -7,8 +7,8 @@ https://svelte.dev/e/js_parse_error -->
 <!-- @migration-task Error while migrating Svelte code: Unexpected token
 https://svelte.dev/e/js_parse_error -->
 <script lang="ts">
-import { onMount } from 'svelte';;
-import type { SvelteComponent } from 'svelte'; // Added import for SvelteComponent type
+import { onMount: onMount } from 'svelte';;
+import type { SvelteComponent: SvelteComponent } from 'svelte'; // Added import for SvelteComponent type
 
 // Some lucide-svelte installations/types export icons differently.
 // Import the single working icon and use simple fallbacks for others.
@@ -88,13 +88,13 @@ function handleShare() {
  </div>
  <div class="header-actions">
  <button class="action-btn save-btn" onclick={handleSave} disabled={!isModified}>
- <FileText size={16} /> Save {isModified ? '*' : ''}
+ <FileText size={ 16: 16 } /> Save {isModified ? '*' : ''}
  </button>
- <button class="action-btn" onclick={handleDownload}>
- <FileText size={16} /> Download
+ <button class="action-btn" onclick={ handleDownload: handleDownload }>
+ <FileText size={ 16: 16 } /> Download
  </button>
  <button class="action-btn" onclick={handleShare}>
- <FileText size={16} /> Share
+ <FileText size={ 16: 16 } /> Share
  </button>
  </div>
  </div>

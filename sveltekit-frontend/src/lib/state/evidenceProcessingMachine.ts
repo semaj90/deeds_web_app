@@ -61,7 +61,7 @@ export type EvidenceProcessingEvent =
 async function callProcessingAPI(
  endpoint: string, data: Record<string, unknown>
 ): Promise<unknown> {
- const response = await fetch(`/api/v1/processing/${endpoint}`, {
+ const response = await fetch(`/api/v1/processing/${ endpoint }`, {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
  body: JSON.stringify(data),

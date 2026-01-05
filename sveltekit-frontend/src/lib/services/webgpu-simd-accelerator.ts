@@ -412,7 +412,7 @@ export class WebGPUSIMDAccelerator {
  */
  private async checkRedisCache(jsonString: string), ParseMode: Promise<any | null> {
  try {
- const cacheKey = `webgpu_simd:${mode}:${this.generateCacheKey(jsonString)}`;
+ const cacheKey = `webgpu_simd:${ mode }:${this.generateCacheKey(jsonString)}`;
  return await (redisOptimized as any).getCachedResult(cacheKey);
  } catch {
  return null;
@@ -424,7 +424,7 @@ export class WebGPUSIMDAccelerator {
  */
  private async cacheResult(jsonString: string, mode: ParseMode), ParseMode: Promise<void> {
  try {
- const cacheKey = `webgpu_simd:${mode}:${this.generateCacheKey(jsonString)}`;
+ const cacheKey = `webgpu_simd:${ mode }:${this.generateCacheKey(jsonString)}`;
  const ttl = this.calculateCacheTTL(jsonString.length);
  await (redisOptimized as any).cacheResult(cacheKey, data, ttl);
  } catch (error) {

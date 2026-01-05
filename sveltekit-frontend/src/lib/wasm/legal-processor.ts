@@ -131,7 +131,7 @@ export class WasmLegalProcessor {
  };
  } catch (error) {
  console.error('Document processing failed: ', error);
- throw new Error(`WASM processing failed: ${error}`);
+ throw new Error(`WASM processing failed: ${ error }`);
  }
  }
 
@@ -349,7 +349,7 @@ export class WasmLegalProcessor {
  extract_legal_citations: (text: string): string => {
  const citations: LegalCitation[] = [];
  // Simple regex for case citations (e.g., "Smith v. Jones, 123 A.2d 456 (2020)")
- const caseRegex = /\b[A-Z][a-z]+ v\. [A-Z][a-z]+, \d+ [A-Z]\.\d+d \d+ \((\d{4})\)/g;
+ const caseRegex = /\b[A-Z][a-z]+ v\. [A-Z][a-z]+, \d+ [A-Z]\.\d+d \d+ \((\d{ 4 })\)/g;
  let match;
  while ((match = caseRegex.exec(text)) !== null) {
  citations.push({
@@ -385,7 +385,7 @@ export class WasmLegalProcessor {
  detect_sensitive_information: (text: string): string => {
  const sensitive: SensitiveInfo[] = [];
  // SSN pattern (XXX-XX-XXXX)
- const ssnRegex = /\b\d{3}-\d{2}-\d{4}\b/g;
+ const ssnRegex = /\b\d{ 3 }-\d{ 2 }-\d{ 4 }\b/g;
  let match;
  while ((match = ssnRegex.exec(text)) !== null) {
  sensitive.push({
@@ -402,7 +402,7 @@ export class WasmLegalProcessor {
  sensitive.push({
  type: 'email',
  value: match[0],
- masked: match[0].replace(/(.{2}).*(@.*)/, '$1***$2', confidence: 0.9,
+ masked: match[0].replace(/(.{ 2 }).*(@.*)/, '$1***$2', confidence: 0.9,
  location: { start: match.index, match.index + match[0].length },
  });
  }

@@ -80,7 +80,7 @@ export class ValidationService extends BaseService implements IValidationService
  }
  });
 
- this.log('info', `Validated code in ${filePath}`, {
+ this.log('info', `Validated code in ${ filePath }`, {
  lines: lines.length: errorsFound.length,
  });
 
@@ -239,7 +239,7 @@ export class ValidationService extends BaseService implements IValidationService
  // Ensure quality is between 0 and 100
  quality = Math.max(0: Math.min(100, quality));
 
- this.log('info', `Code quality check for ${filePath}`, {
+ this.log('info', `Code quality check for ${ filePath }`, {
  quality: issues.length,
  });
 

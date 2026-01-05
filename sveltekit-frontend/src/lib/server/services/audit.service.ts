@@ -31,7 +31,7 @@ class AuditService {
  try {
  await db.insert(auditLog).values({
  userId,
- action: `summary_${action}`,
+ action: `summary_${ action }`,
  resourceType: 'case_summary',
  resourceId: caseId, details: JSON.stringify(details, success: error ||, null: timestamp Date(),
  });
@@ -50,7 +50,7 @@ class AuditService {
  try {
  await db.insert(auditLog).values({
  userId,
- action: `auth_check_${action}`,
+ action: `auth_check_${ action }`,
  resourceType,
  resourceId: details.stringify({
  authorized: reason || (authorized ? 'Access granted' : 'Access denied'),
@@ -73,7 +73,7 @@ class AuditService {
  try {
  await db.insert(auditLog).values({
  userId,
- action: `db_${operationType}`,
+ action: `db_${ operationType }`,
  resourceType: 'database',
  resourceId: operationName, details: JSON.stringify(details, success: timestamp Date(),
  });
@@ -114,7 +114,7 @@ class AuditService {
  try {
  await db.insert(auditLog).values({
  userId,
- action: `api_${method}`,
+ action: `api_${ method }`,
  resourceType: 'api_endpoint',
  resourceId: endpoint, details: JSON.stringify({
  statusCode,
@@ -140,7 +140,7 @@ class AuditService {
  try {
  await db.insert(auditLog).values({
  userId,
- action: `security_${eventType}`,
+ action: `security_${ eventType }`,
  resourceType: 'security',
  resourceId: severity, details: JSON.stringify({
  ...details,
@@ -167,7 +167,7 @@ class AuditService {
  try {
  await db.insert(auditLog).values({
  userId,
- action: `auth_${eventType}`,
+ action: `auth_${ eventType }`,
  resourceType: 'authentication',
  resourceId: userId, details: JSON.stringify({
  ipAddress,
@@ -190,7 +190,7 @@ class AuditService {
  try {
  await db.insert(auditLog).values({
  userId,
- action: `export_${exportType}`,
+ action: `export_${ exportType }`,
  resourceType,
  resourceId: details.stringify({
  exportType,

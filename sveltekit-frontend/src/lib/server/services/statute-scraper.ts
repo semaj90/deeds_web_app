@@ -31,7 +31,7 @@ async function fetchStatuteContent(url: string): Promise<string> {
 
  return await response.text();
  } catch (error) {
- console.error(`Failed to fetch statute from ${url}:`, error);
+ console.error(`Failed to fetch statute from ${ url }:`, error);
  throw error;
  }
 }

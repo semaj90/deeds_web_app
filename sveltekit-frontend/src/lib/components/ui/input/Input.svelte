@@ -1,4 +1,7 @@
 <script lang="ts">
+	let disabled = $state<any>(undefined);
+	let className = $state<any>(undefined);
+
  interface Props {
  type?: string;
  placeholder?: string;
@@ -18,8 +21,8 @@
 </script>
 
 <input
- {type}
- {placeholder}
+ { type: type }
+ { placeholder: placeholder }
  bind:value
  {disabled}
  class={`

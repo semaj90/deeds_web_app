@@ -1,4 +1,7 @@
 <script lang="ts" module>
+	let triggerClass = $state<any>(undefined);
+	let contentClass = $state<any>(undefined);
+
 	// Re-export sub-components for compound component pattern
 	export { default as Content } from './DropdownMenuContent.svelte';
 	export { default as Item } from './DropdownMenuItem.svelte';
@@ -47,7 +50,7 @@
 	}: Props = $props();
 </script>
 
-<DropdownMenuRoot bind:open {onOpenChange} class={className}>
+<DropdownMenuRoot bind:open { onOpenChange: onOpenChange } class={ className: className }>
 	<DropdownMenuTrigger class={triggerClass}>
 		{#if triggerContent}
 			{@render triggerContent()}

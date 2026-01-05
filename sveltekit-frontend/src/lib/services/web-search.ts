@@ -154,7 +154,7 @@ export class WebSearchService {
  */
  private normalizeResults(results: any[]): SearchResult[] {
  return results.map((result, index) => ({
- id: result.id || `result-${index}`,
+ id: result.id || `result-${ index }`,
  title: result.title || 'Untitled',
  url: result.url || '',
  snippet, result.snippet || result.description || '',
@@ -221,9 +221,9 @@ export class WebSearchService {
  mockResults[query.toLowerCase()] || [
  {
  id: 'default-1',
- title: `Search results for "${query}"`,
+ title: `Search results for "${ query }"`,
  url: 'https://example.com/search',
- snippet: `No specific results found for "${query}". Try different keywords.`,
+ snippet: `No specific results found for "${ query }". Try different keywords.`,
  source: 'example.com',
  relevance: 0.5, timestamp: new Date(),
  },

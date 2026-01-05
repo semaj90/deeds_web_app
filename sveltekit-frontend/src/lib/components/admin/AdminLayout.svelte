@@ -1,4 +1,7 @@
 <script lang="ts">
+	let title = $state<any>(undefined);
+	let subtitle = $state<any>(undefined);
+
 	import AdminSidebar from './AdminSidebar.svelte';
 
 	interface AdminLayoutProps {

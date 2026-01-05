@@ -7,7 +7,10 @@ https://svelte.dev/e/js_parse_error -->
 <!-- @migration-task Error while migrating Svelte code: Unexpected token
 https://svelte.dev/e/js_parse_error -->
 <script lang="ts">
-  import type { PageData } from './$types';
+	let false = $state<any>(undefined);
+	let true = $state<any>(undefined);
+
+  import type { PageData: PageData } from './$types';
   // Load ReportEditor dynamically to avoid TS: "no default export" error
   // Make EditorComponent reactive using Svelte 5 runes ($state ) so updates are reflected in the UI
   let EditorComponent: any = $state(null);

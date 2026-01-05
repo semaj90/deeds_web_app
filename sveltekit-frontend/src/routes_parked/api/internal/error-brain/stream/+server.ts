@@ -50,7 +50,7 @@ export const GET: RequestHandler = async (event) => {
  const message = `data: ${JSON.stringify(evt)}\n\n`;
  controller.enqueue(encoder.encode(message));
  } catch (err) {
- console.error(`SSE send error: ${err}`);
+ console.error(`SSE send error: ${ err }`);
  }
  });
   

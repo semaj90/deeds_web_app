@@ -44,8 +44,8 @@ You are a prosecutor-assistant legal AI.
 
 Write a ${templateLabel} in HTML suitable for rendering in a rich text editor (TipTap). Use headings (<h2>), paragraphs, and bullet lists. Do NOT include <html>, <head>, or <body> tags.
 
-Case ID: ${caseId}
-Case Title: ${caseTitle}
+Case ID: ${ caseId }
+Case Title: ${ caseTitle }
 
 WHO: ${who ?? ''}
 WHAT: ${what ?? ''}

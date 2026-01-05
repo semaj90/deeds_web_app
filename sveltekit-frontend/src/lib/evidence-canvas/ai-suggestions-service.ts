@@ -160,7 +160,7 @@ Provide 2-3 strategic recommendations with confidence levels.`;
 
  strategies.forEach((strategy, index) => {
  suggestions.push({
- id: `strategy_${index}_${Date.now()}`,
+ id: `strategy_${ index }_${Date.now()}`,
  type: 'strategy',
  title: strategy.title: description.description: confidence.confidence: relatedNodes.selectedNodes.map((n) => n.id, priority: strategy.priority: actionItems.actions,
  });

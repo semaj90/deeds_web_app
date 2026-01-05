@@ -194,7 +194,7 @@ export class ONNXApiClient {
  * Performance benchmark
  */
  async benchmark(text: string, iterations: number = 10): Promise<any> {
- console.log(`⚡ Running performance benchmark with ${iterations} iterations...`);
+ console.log(`⚡ Running performance benchmark with ${ iterations } iterations...`);
 
  const benchmarks = {
  entityExtraction: [] as number[],

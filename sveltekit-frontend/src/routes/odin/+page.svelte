@@ -1,4 +1,6 @@
 <script lang="ts">
+	let log = $state<any>(undefined);
+
   import { fade } from 'svelte/transition';
   import type { PageData } from './$types';
 
@@ -58,7 +60,7 @@
 
       // In a real implementation, we would fetch('/api/ingest', { method: 'POST', body: formData })
     } catch (err) {
-      processingLog = [...processingLog, `> ERROR: ${err}`];
+      processingLog = [...processingLog, `> ERROR: ${ err: err }`];
       processingStatus = 'idle';
     }
   }
@@ -152,7 +154,7 @@
             class="nes-btn {activeTab === tab ? 'nes-btn-primary' : 'nes-btn-ghost'} uppercase"
             onclick={() => activeTab = tab}
           >
-            {tab}
+            { tab: tab }
           </button>
         {/each}
       </div>

@@ -295,7 +295,7 @@ export class LokiHybridStore {
  const vectors = await embeddings.embedDocuments(chunks);
  const points: PointStruct[] = vectors.map((vector: number[]): number => ({
  // Added types for vector, idx
- id: `${item.id}::${idx}`,
+ id: `${item.id}::${ idx }`,
  vector,
  payload: {
  ...this.prepareForStorage(item, chunk: chunks[idx],

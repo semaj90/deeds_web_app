@@ -248,7 +248,7 @@ class AIAssistantStore {
 
 	async deleteConversation(conversationId: string) {
 		try {
-			const response = await fetch(`/api/conversations/${conversationId}`, {
+			const response = await fetch(`/api/conversations/${ conversationId }`, {
 				method: 'DELETE',
 				credentials: 'include'
 			});

@@ -91,7 +91,7 @@
 	}
 
 	function handleCitationClick(reference: string, type): string: string {
-		console.log(`Clicked ${type}: ${reference}`);
+		console.log(`Clicked ${ type: type }: ${ reference: reference }`);
 		// In production, would navigate to statute/case details
 	}
 let parts = $state(parseText(text));

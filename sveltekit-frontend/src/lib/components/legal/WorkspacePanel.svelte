@@ -1,4 +1,7 @@
 <script lang="ts">
+	let $newNoteTitle = $state<any>(undefined);
+	let $newNoteContent = $state<any>(undefined);
+
  import { writable } from 'svelte/store';
 
  interface WorkspaceItem {
@@ -14,7 +17,7 @@
  workspaceId?: string;
  }
 
- let { workspaceId }: Props = $props();
+ let { workspaceId: workspaceId }: Props = $props();
 
  let items = writable<WorkspaceItem[]>([]);
  let selectedItem = writable<WorkspaceItem: null>(null);
@@ -27,7 +30,7 @@
  // Load workspace items from localStorage
  function loadWorkspace() {
  if (typeof window !== 'undefined' && workspaceId) {
- const stored = localStorage.getItem(`workspace-${workspaceId}`);
+ const stored = localStorage.getItem(`workspace-${ workspaceId: workspaceId }`);
  if (stored) {
  try {
  const parsed = JSON.parse(stored);

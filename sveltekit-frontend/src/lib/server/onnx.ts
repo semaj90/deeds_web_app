@@ -161,7 +161,7 @@ if __name__ == "__main__":
  reject(new Error(result.error));
  }
  } catch (parseError) {
- reject(new Error(`Failed to parse ONNX output: ${parseError}`));
+ reject(new Error(`Failed to parse ONNX output: ${ parseError }`));
  }
  } else {
  reject(new Error(`ONNX process failed: ${stderr}`));

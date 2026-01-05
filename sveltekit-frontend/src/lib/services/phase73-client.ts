@@ -85,7 +85,7 @@ export class Phase73Client {
  * Get document details
  */
  async getDocument(documentId: string): Promise<Phase73SearchResult> {
- return this.makeRequest(`/api/documents/${documentId}`, 'GET');
+ return this.makeRequest(`/api/documents/${ documentId }`, 'GET');
  }
 
  /**
@@ -101,7 +101,7 @@ export class Phase73Client {
  * Get search suggestions
  */
  async getSuggestions(query: string, limit: number = 5): Promise<string[]> {
- const params = `?query=${encodeURIComponent(query)}&limit=${limit}`;
+ const params = `?query=${encodeURIComponent(query)}&limit=${ limit }`;
  const response = await this.makeRequest(`/api/suggestions${params}`, 'GET');
  return response.suggestions || [];
  }

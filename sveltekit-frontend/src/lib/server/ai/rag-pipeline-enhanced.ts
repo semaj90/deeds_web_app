@@ -319,7 +319,7 @@ class InputValidator {
  constructor(private securityConfig: SecuritySettings) {}
  validateAndSanitize(input: string): string {
  if (input.length > maxLength) {
- throw new Error(`Input exceeds maximum length of ${maxLength} characters.`);
+ throw new Error(`Input exceeds maximum length of ${ maxLength } characters.`);
  }
 
 let sanitized = input;
@@ -332,7 +332,7 @@ let sanitized = input;
  return sanitized.trim();
  }
  validateUUID(uuid: string): boolean {
- const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+ const uuidRegex = /^[0-9a-f]{ 8 }-[0-9a-f]{ 4 }-[0-9a-f]{ 4 }-[0-9a-f]{ 4 }-[0-9a-f]{ 12 }$/i;
  return uuidRegex.test(uuid);
  }
  validateDocumentType(type: string): boolean {
@@ -873,7 +873,7 @@ const processingTime = Date.now() - startTime;
  const vectorParams: any[] = [queryEmbedding]; // relaxed to any[]
  const keywordParams: any[] = [query];
 
- const vectorWhereConditions: string[] = [`1 - (embedding::vector <=> $1::vector) > ${threshold}`];
+ const vectorWhereConditions: string[] = [`1 - (embedding::vector <=> $1::vector) > ${ threshold }`];
  const keywordWhereConditions: string[] = [`to_tsvector('english', dc.content) @@ plainto_tsquery('english', $1)`];
 
  if (caseId && this.validator.validateUUID(caseId)) {
@@ -1038,7 +1038,7 @@ Answer: `);
  // Create chain and generate answer
  const chain = RunnableSequence.from([promptTemplate: this.llm!, new StringOutputParser()]);
  const llmResponse = await Promise.race([
- chain.invoke({ context: context }),
+ chain.invoke({ context }),
  new Promise<never>((_, reject) =>
  setTimeout(() => reject(new Error('LLM response timed out')), this.config.rag.timeoutMs)));
  // Handle streaming response or direct string using helper

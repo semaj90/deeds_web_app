@@ -29,7 +29,7 @@ export function extractLegalTags(text: string): ExtractedLegalTags {
  const statutes = text.match(/\b\d+\s+U\.S\.C\.\s§?\s?\d+[a-zA-Z0-9\-]*/g) ?? [];
 
  // Case law: "People v. Vital (1996)", "Smith v. Jones"
- const cases = text.match(/\b[A-Z][a-z]+ v\. [A-Z][a-z]+(?: \(\d{4}\))?/g) ?? [];
+ const cases = text.match(/\b[A-Z][a-z]+ v\. [A-Z][a-z]+(?: \(\d{ 4 }\))?/g) ?? [];
 
  // California codes: "Penal Code § 187", "PC § 187"
  const caCodes = text.match(/\b(Penal Code|PC)\s§?\s?\d+[a-zA-Z0-9\-]*/gi) ?? [];

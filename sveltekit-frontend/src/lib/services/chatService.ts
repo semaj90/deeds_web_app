@@ -124,7 +124,7 @@ class ChatService {
  */
  async getHistory(caseId: string, limit: number = 10): Promise<ChatMessage[]> {
  try {
- const response = await fetch(`${API_BASE}/history/${caseId}?limit=${limit}`);
+ const response = await fetch(`${API_BASE}/history/${ caseId }?limit=${ limit }`);
 
  if (!response.ok) {
  throw new Error('Failed to get history');
@@ -142,7 +142,7 @@ class ChatService {
  */
  async getEvidenceMemory(caseId: string, limit: number = 10): Promise<EvidenceItem[]> {
  try {
- const response = await fetch(`${API_BASE}/evidence/${caseId}?limit=${limit}`);
+ const response = await fetch(`${API_BASE}/evidence/${ caseId }?limit=${ limit }`);
 
  if (!response.ok) {
  throw new Error('Failed to get evidence memory');
@@ -160,7 +160,7 @@ class ChatService {
  */
  async deleteHistory(caseId: string): Promise<void> {
  try {
- const response = await fetch(`${API_BASE}/history/${caseId}`, {
+ const response = await fetch(`${API_BASE}/history/${ caseId }`, {
  method: 'DELETE',
  });
 

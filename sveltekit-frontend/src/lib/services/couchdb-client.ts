@@ -51,7 +51,7 @@ class CouchDBClient {
     path: string,
     options: RequestInit = {}
   ): Promise<T> {
-    const response = await fetch(`${this.baseUrl}${path}`, {
+    const response = await fetch(`${this.baseUrl}${ path }`, {
       ...options,
       headers: {
         'Content-Type': 'application/json',
@@ -81,7 +81,7 @@ class CouchDBClient {
    */
   async createDatabase(name: string): Promise<boolean> {
     try {
-      await this.request(`/${name}`, { method: 'PUT' });
+      await this.request(`/${ name }`, { method: 'PUT' });
       return true;
     } catch (error: any) {
       if (error.message.includes('file_exists')) {
@@ -96,7 +96,7 @@ class CouchDBClient {
    */
   async get<T extends CouchDBDoc>(database: string, docId: string): Promise<T | null> {
     try {
-      return await this.request<T>(`/${database}/${encodeURIComponent(docId)}`);
+      return await this.request<T>(`/${ database }/${encodeURIComponent(docId)}`);
     } catch {
       return null;
     }
@@ -107,7 +107,7 @@ class CouchDBClient {
    */
   async put<T extends CouchDBDoc>(database: string, doc: T): Promise<CouchDBResponse> {
     const docId = doc._id || crypto.randomUUID();
-    return this.request(`/${database}/${encodeURIComponent(docId)}`, {
+    return this.request(`/${ database }/${encodeURIComponent(docId)}`, {
       method: 'PUT',
       body: JSON.stringify({ ...doc, _id: docId })
     });
@@ -117,7 +117,7 @@ class CouchDBClient {
    * Bulk insert documents
    */
   async bulkDocs<T extends CouchDBDoc>(database: string, docs: T[]): Promise<CouchDBResponse[]> {
-    return this.request<CouchDBResponse[]>(`/${database}/_bulk_docs`, {
+    return this.request<CouchDBResponse[]>(`/${ database }/_bulk_docs`, {
       method: 'POST',
       body: JSON.stringify({ docs })
     });
@@ -127,7 +127,7 @@ class CouchDBClient {
    * Delete document
    */
   async delete(database: string, docId: string, rev: string): Promise<CouchDBResponse> {
-    return this.request(`/${database}/${encodeURIComponent(docId)}?rev=${rev}`, {
+    return this.request(`/${database}/${encodeURIComponent(docId)}?rev=${ rev }`, {
       method: 'DELETE'
     });
   }
@@ -160,7 +160,7 @@ class CouchDBClient {
     }
 
     const query = params.toString() ? `?${params.toString()}` : '';
-    return this.request<ViewResult<T>>(`/${database}/_design/${designDoc}/_view/${viewName}${query}`);
+    return this.request<ViewResult<T>>(`/${database}/_design/${designDoc}/_view/${ viewName }${query}`);
   }
 
   /**
@@ -172,7 +172,7 @@ class CouchDBClient {
     views: Record<string, { map: string; reduce?: string }>
   ): Promise<CouchDBResponse> {
     const designDoc = {
-      _id: `_design/${designName}`,
+      _id: `_design/${ designName }`,
       views
     };
 

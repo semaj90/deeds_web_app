@@ -269,7 +269,7 @@ class RabbitMQEmbeddingWorker {
         if (!textToEmbed) {
             const [doc] = await db.select().from(documents).where(eq(documents.id, entity_id)).limit(1);
             if (!doc) {
-                throw new Error(`Document ${entity_id} not found`);
+                throw new Error(`Document ${ entity_id } not found`);
             }
             documentData = doc;
 
@@ -286,11 +286,11 @@ class RabbitMQEmbeddingWorker {
         }
 
         if (!textToEmbed || textToEmbed.trim().length === 0) {
-            throw new Error(`No text content available for ${embedding_type} embedding`);
+            throw new Error(`No text content available for ${ embedding_type } embedding`);
         }
 
         // Generate embedding using Ollama
-        console.log(`🧠 Generating ${embedding_type} embedding for document ${entity_id} (${textToEmbed.length} chars)`);
+        console.log(`🧠 Generating ${ embedding_type } embedding for document ${ entity_id } (${textToEmbed.length} chars)`);
         const embedding = await createEmbedding(textToEmbed);
 
         // Update document in database with the new embedding

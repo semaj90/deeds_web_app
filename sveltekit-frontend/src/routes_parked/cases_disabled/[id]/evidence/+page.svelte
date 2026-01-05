@@ -1,4 +1,6 @@
 <script lang="ts">
+	let form = $state<any>(undefined);
+
 	import {
 	 CommandCenterShell,
 	 EvidenceBoardPane,
@@ -19,11 +21,11 @@
 
 <CommandCenterShell caseId={data.caseId}>
 	{#if $evidenceCommandCenter.activeView === 'board'}
-		<EvidenceBoardPane {data} actionData={form} />
+		<EvidenceBoardPane { data: data } actionData={ form: form } />
 	{:else if $evidenceCommandCenter.activeView === 'graph'}
-		<EvidenceGraphPane {data} />
+		<EvidenceGraphPane { data: data } />
 	{:else if $evidenceCommandCenter.activeView === 'chat'}
-		<EvidenceChatPane {data} actionData={form} />
+		<EvidenceChatPane { data: data } actionData={form} />
 	{/if}
 </CommandCenterShell>
 

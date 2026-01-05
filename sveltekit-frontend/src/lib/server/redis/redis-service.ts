@@ -14,7 +14,7 @@ export class RedisService {
  EX: ttlSeconds,
  });
  } catch (error) {
- console.error(`[RedisService] Cache set error for key: "${key}":`, error);
+ console.error(`[RedisService] Cache set error for key: "${ key }":`, error);
  }
  }
 
@@ -23,7 +23,7 @@ export class RedisService {
  const cached = await redis.get(key);
  return cached ? JSON.parse(cached) : null;
  } catch (error) {
- console.error(`[RedisService] Cache get error for key: "${key}":`, error);
+ console.error(`[RedisService] Cache get error for key: "${ key }":`, error);
  return null;
  }
  }
@@ -32,7 +32,7 @@ export class RedisService {
  try {
  await redis.del(key);
  } catch (error) {
- console.error(`[RedisService] Cache delete error for key: "${key}":`, error);
+ console.error(`[RedisService] Cache delete error for key: "${ key }":`, error);
  }
  }
 

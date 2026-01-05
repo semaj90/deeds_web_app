@@ -81,7 +81,7 @@ function buildVisionQuery(documentType: string): string {
 3. Obligations and rights
 4. Termination clauses
 5. Dispute resolution mechanisms
-${context ? `Context: ${context}` : ''}`,
+${context ? `Context: ${ context }` : ''}`,
 
  evidence: `Analyze this evidence document. Extract:
 1. Type of evidence (document, photo, video, etc.)
@@ -89,7 +89,7 @@ ${context ? `Context: ${context}` : ''}`,
 3. Relevant dates and times
 4. Parties or individuals mentioned
 5. Relevance to legal proceedings
-${context ? `Context: ${context}` : ''}`,
+${context ? `Context: ${ context }` : ''}`,
 
  statute: `Analyze this statute/law document. Extract:
 1. Statute number and title

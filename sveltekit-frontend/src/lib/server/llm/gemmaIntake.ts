@@ -60,7 +60,7 @@ WHY: ${why ?? ''}
 HOW: ${how ?? ''}
 
 NARRATIVE:
-${narrative}
+${ narrative }
 `;
 
  const res = await fetch('http://127.0.0.1:11434/api/generate', {

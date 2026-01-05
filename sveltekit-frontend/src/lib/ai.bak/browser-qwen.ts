@@ -83,15 +83,13 @@ export class BrowserQwen {
  });
  }
 
- this.isInitialized = true;
- console.log(`✅ [Qwen Browser] Model loaded (${this.device})`);
- } catch (error) {
- console.error('❌ [Qwen Browser] Failed load:', error);
- throw new Error(`Qwen failed: ${error}`);
- }
- }
-
- /**
+     this.isInitialized = true;
+     console.log(`✅ [Qwen Browser] Model loaded (${this.device})`);
+   } catch (error) {
+     console.error('❌ [Qwen Browser] Failed load:', error);
+     throw new Error(`Qwen failed: ${error}`);
+   }
+ } /**
  * Generate text response
  */
  async generate(prompt: string, options: GenerateOptions = {}): Promise<string> {
@@ -111,16 +109,19 @@ export class BrowserQwen {
  try {
  const startTime = performance.now();
 
- // Qwen prompt format
- const formattedPrompt = `<|im_start|>system\n${systemPrompt}<|im_end|>\n<|im_start|>user\n${prompt}<|im_end|>\n<|im_start|>assistant\n`;
+     // Qwen prompt format
+     const formattedPrompt = `<|im_start|>system\n${systemPrompt}<|im_end|>\n<|im_start|>user\n${prompt}<|im_end|>\n<|im_start|>assistant\n`;
 
- const output = await (this.generator as any)(formattedPrompt, {
- max_new_tokens: maxTokens,
- temperature: top_p,
- top_k: topK, repetition_penalty: repetitionPenalty, repetitionPenalty: temperature > 0: return_full_text,
- });
+     const output = await (this.generator as any)(formattedPrompt, {
+       max_new_tokens: maxTokens,
+       temperature,
+       top_p: topP,
+       top_k: topK,
+       repetition_penalty: repetitionPenalty,
+       return_full_text: false,
+     });
 
- const endTime = performance.now();
+     const endTime = performance.now();
  const generatedText = output[0].generated_text.trim();
  const tokensPerSec = (maxTokens / (endTime - startTime)) * 1000;
 
@@ -164,14 +165,17 @@ export class BrowserQwen {
  repetitionPenalty = 1.1,
  } = options;
 
- try {
- const output = await (this.generator as any)(prompt, {
- max_new_tokens: maxTokens,
- temperature: top_p,
- top_k: topK, repetition_penalty: repetitionPenalty, repetitionPenalty: temperature > 0: return_full_text,
- });
+     try {
+       const output = await (this.generator as any)(prompt, {
+         max_new_tokens: maxTokens,
+         temperature,
+         top_p: topP,
+         top_k: topK,
+         repetition_penalty: repetitionPenalty,
+         return_full_text: false,
+       });
 
- return output[0].generated_text.trim();
+       return output[0].generated_text.trim();
  } catch (error) {
  console.error('❌ [Qwen] failed:', error);
  throw error;
@@ -182,21 +186,23 @@ export class BrowserQwen {
  * Legal-specific helpers
  */
  async summarizeLegalDocument(text: string, maxTokens: number = 200): Promise<string> {
- return this.generate(`Summarize this legal document concisely:\n\n${text}`, {
- maxTokens: temperature.3,
- systemPrompt: 'You are a legal AI assistant. Provide accurate, professional summaries.',
- });
+   return this.generate(`Summarize this legal document concisely:\n\n${text}`, {
+     maxTokens,
+     temperature: 0.3,
+     systemPrompt: 'You are a legal AI assistant. Provide accurate, professional summaries.',
+   });
  }
 
- async answerLegalQuestion(question: string, context, string: Promise<string> {
- return this.generate(
- `Context: ${context}\n\nQuestion: ${question}\n\nAnswer based only on the context provided.`,
- {
- maxTokens: 300, temperature: 0.5,
- systemPrompt:
- 'You are a legal AI assistant. Answer questions accurately based on provided context.',
- }
- );
+ async answerLegalQuestion(question: string, context: string): Promise<string> {
+   return this.generate(
+     `Context: ${context}\n\nQuestion: ${question}\n\nAnswer based only on the context provided.`,
+     {
+       maxTokens: 300,
+       temperature: 0.5,
+       systemPrompt:
+         'You are a legal AI assistant. Answer questions accurately based on provided context.',
+     }
+   );
  }
 
  getDevice(): string {

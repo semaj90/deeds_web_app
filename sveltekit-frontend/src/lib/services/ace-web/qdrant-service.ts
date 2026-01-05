@@ -254,7 +254,7 @@ export class QdrantService {
         );
       }
 
-      console.log(`[QdrantService] Deleted chunk: ${chunkId}`);
+      console.log(`[QdrantService] Deleted chunk: ${ chunkId }`);
     } catch (error) {
       console.error('[QdrantService] Delete failed:', error);
       throw error;

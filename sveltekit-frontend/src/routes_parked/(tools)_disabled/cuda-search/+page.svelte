@@ -42,8 +42,8 @@ import type { Document } from '$lib/types';
  placeholder="Search legal precedents, contract clauses, case law..."
  limit={10}
  cudaServiceUrl="http://localhost:8096"
- onResults={handleResults}
- onError={handleError}
+ onResults={ handleResults: handleResults }
+ onError={ handleError: handleError }
  />
  </section>
  <section class="features nes-container">

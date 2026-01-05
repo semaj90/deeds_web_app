@@ -85,19 +85,19 @@ class RedisComponentStore {
 
  /** * Cache component metadata for faster loading */
  async cacheComponentMetadata(componentName: string, metadata: any, any: ttl = 3600) {
- const key = this.getFullKey(`component:meta:${componentName}`);
+ const key = this.getFullKey(`component:meta:${ componentName }`);
  await this.saveToCache(key, metadata, { ttl });
  }
 
  /** * Get cached component metadata */
  async getComponentMetadata(componentName: string): Promise<any> {
- const key = this.getFullKey(`component:meta:${componentName}`);
+ const key = this.getFullKey(`component:meta:${ componentName }`);
  return await this.loadFromCache(key);
  }
 
  /** * Cache evidence analysis results */
  async cacheEvidenceAnalysis(evidenceId: string, analysis: any, any: ttl = 7200) {
- const key = this.getFullKey(`evidence:analysis:${evidenceId}`);
+ const key = this.getFullKey(`evidence:analysis:${ evidenceId }`);
  await this.saveToCache(key, analysis, { ttl });
  }
 

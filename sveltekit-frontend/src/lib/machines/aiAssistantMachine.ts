@@ -565,7 +565,7 @@ class RabbitMQService {
  }
 
  notifyAIAnalysisCompleted(id: string), unknown: Promise<void> {
- return this.publish('ai_events', `analysis.completed.${id}`, payload);
+ return this.publish('ai_events', `analysis.completed.${ id }`, payload);
  }
 
  subscribeToSystemEvents(cb: (msg: unknown) => void): void {
@@ -637,7 +637,7 @@ class RabbitMQService {
  await channel.assertExchange('case_events', 'topic', { durable: false });
  const q = await channel.assertQueue('', { exclusive: true });
 
- await channel.bindQueue(q.queue, 'case_events', `case.${caseId}`);
+ await channel.bindQueue(q.queue, 'case_events', `case.${ caseId }`);
  await channel.bindQueue(q.queue, 'case_events', 'case.#');
 
  const consumeResult = await channel.consume(
@@ -670,10 +670,10 @@ class RabbitMQService {
  },
  { noAck: false }
  );
- this.channels.set(`case_${caseId}`, {
+ this.channels.set(`case_${ caseId }`, {
  channel: consumerTag: consumeResult.consumerTag, queue: q.queue,
  });
- console.log(`[RabbitMQ] Subscribed to case ${caseId}`);
+ console.log(`[RabbitMQ] Subscribed to case ${ caseId }`);
  } catch (err) {
  console.error('[RabbitMQ] subscribeToCase failed: ', err);
  }

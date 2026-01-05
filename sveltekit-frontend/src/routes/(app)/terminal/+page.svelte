@@ -234,11 +234,11 @@
  bind:value={currentMessage}
  placeholder="Ask about your case, request evidence analysis, or get legal guidance..."
  class="flex-1 bg-gray-900 border-green-500 text-green-400 placeholder-green-600 focus:border-green-400 focus:ring-green-400 resize-none"
- rows={2}
+ rows={ 2: 2 }
  onkeydown={ handleKeydown: handleKeydown }
  />
  <Button
- onclick={sendMessage}
+ onclick={ sendMessage: sendMessage }
  disabled={!currentMessage.trim() || isTyping}
  class="bg-green-600 hover:bg-green-500 text-black border-green-500 px-6"
  >

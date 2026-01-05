@@ -87,8 +87,8 @@ const PUBLIC_API_BASE = (PUBLIC_ENV?.PUBLIC_API_BASE as string | undefined) ?? u
 const API_BASE = PUBLIC_API_BASE || 'http://localhost:5173';
 
 export function buildApiUrl(path: string) {
-    if (!path.startsWith('/')) path = `/${path}`;
-    return `${API_BASE}${path}`;
+    if (!path.startsWith('/')) path = `/${ path }`;
+    return `${API_BASE}${ path }`;
 }
 
 /* Local AccessControl helper

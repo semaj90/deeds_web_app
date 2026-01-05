@@ -150,7 +150,7 @@ export class RunProgressTracker {
  */
  patchFailed(filePath: string): void {
  this.progress.failedPatches++;
- this.progress.lastError = `Failed to apply patch to ${filePath}: ${reason}`;
+ this.progress.lastError = `Failed to apply patch to ${ filePath }: ${reason}`;
  this.progress.errorStack?.push(this.progress.lastError);
  this.progress.updatedAt = new Date();
  this.emit('error', {

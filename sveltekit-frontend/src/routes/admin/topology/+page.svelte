@@ -1,4 +1,10 @@
 <script lang="ts">
+	let $searchQuery = $state<any>(undefined);
+	let $filterTag = $state<any>(undefined);
+	let $filterAction = $state<any>(undefined);
+	let tag = $state<any>(undefined);
+	let dep = $state<any>(undefined);
+
 	import { onMount } from 'svelte';
 	import { writable } from 'svelte/store';
 
@@ -375,10 +381,10 @@
 		{:else}
 			<canvas
 				bind:this={canvas}
-				onmousedown={handleMouseDown}
-				onmousemove={handleMouseMove}
-				onmouseup={handleMouseUp}
-				onwheel={handleWheel}
+				onmousedown={ handleMouseDown: handleMouseDown }
+				onmousemove={ handleMouseMove: handleMouseMove }
+				onmouseup={ handleMouseUp: handleMouseUp }
+				onwheel={ handleWheel: handleWheel }
 			></canvas>
 		{/if}
 	</div>

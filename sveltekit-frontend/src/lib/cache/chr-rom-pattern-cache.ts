@@ -130,13 +130,13 @@ export class CHRROMPatternCache {
  const responseTime = performance.now() - startTime;
  this.updateMetrics(responseTime);
  console.log(
- `ðŸŽ¯ CHR-ROM L1 cache hit for pattern: ${patternId} (${responseTime.toFixed(2)}ms)`
+ `ðŸŽ¯ CHR-ROM L1 cache hit for pattern: ${ patternId } (${responseTime.toFixed(2)}ms)`
  );
  return pattern;
  }
 
  // Check Redis cache (L2)
- const redisKey = `${this.CACHE_PREFIX}pattern:${patternId}`;
+ const redisKey = `${this.CACHE_PREFIX}pattern:${ patternId }`;
  const cachedData = await this.redis?.get(redisKey);
  if (cachedData) {
  const pattern = this.deserializePattern(cachedData);
@@ -147,7 +147,7 @@ export class CHRROMPatternCache {
  const responseTime = performance.now() - startTime;
  this.updateMetrics(responseTime);
  console.log(
- `ðŸŽ¯ CHR-ROM L2 cache hit for pattern: ${patternId} (${responseTime.toFixed(2)}ms)`
+ `ðŸŽ¯ CHR-ROM L2 cache hit for pattern: ${ patternId } (${responseTime.toFixed(2)}ms)`
  );
  return pattern;
  }

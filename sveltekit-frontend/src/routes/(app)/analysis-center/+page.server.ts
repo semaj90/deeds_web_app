@@ -11,7 +11,7 @@ export const load: PageServerLoad = async () => {
 
 export const actions: Actions = {
  // Server-side analysis action
- analyze: async ({ request: request }) => {
+ analyze: async ({ request }) => {
  const data = await request.formData();
  const query = String(data.get('query') ?? '');
  const mode = String(data.get('mode') ?? 'pattern');

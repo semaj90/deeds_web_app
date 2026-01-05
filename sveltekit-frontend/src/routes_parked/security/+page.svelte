@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { ButtonRoot } from 'bits-ui';
+
  // Use bits-ui Button component (switch from enhanced-bits import)
  import type { Button } from '$lib/components/ui/button';
 
@@ -19,10 +21,10 @@
  <!-- Header -->
  <header class="mb-8">
  <a href="/ai/dashboard" class="inline-flex items-center">
- <Button.Root class="bits-btn" variant="ghost" size="sm">
+ <ButtonRoot class="bits-btn" variant="ghost" size="sm">
  <span class="mr-2">⬅️</span>
  Back to Dashboard
- </Button.Root>
+ </ButtonRoot>
  </a>
  <div class="p-6 rounded-lg bg-black/20 border border-gray-700/50">
  <h1 class="text-2xl sm:text-3xl font-bold mb-2 flex">

@@ -294,7 +294,7 @@ export class WebGPUTensorAccelerator {
  };
 
  for (const [name, source] of Object.entries(shaders)) {
- const shader = this.device.createShaderModule({ label: `${name}Shader`, code: source });
+ const shader = this.device.createShaderModule({ label: `${ name }Shader`, code: source });
  if (this.config.shaderCacheEnabled) {
  this.shaderCache.set(name, shader);
  }

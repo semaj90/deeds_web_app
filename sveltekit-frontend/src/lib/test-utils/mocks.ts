@@ -228,7 +228,7 @@ class MockRedisClient {
 	 * Set value with optional TTL
 	 */
  async set(key: string, value: string, options?: { EX?: number }): Promise<void> {
-		const entry: MockRedisEntry = { value: value };
+		const entry: MockRedisEntry = { value };
 
 		if (options?.EX) {
 			entry.expiresAt = Date.now() + (options.EX * 1000);
@@ -431,7 +431,7 @@ class MockMinIOClient {
 		data: Buffer | string,
 		metadata?: Record<string, string>
 	): Promise<void> {
-		const objectKey = `${bucket}/${key}`;
+		const objectKey = `${ bucket }/${ key }`;
 		this.objects.set(objectKey, {
 			bucket,
 			key,
@@ -445,7 +445,7 @@ class MockMinIOClient {
 	 * Get object
 	 */
  async getObject(bucket: string): Promise<Buffer | string | null> {
-		const objectKey = `${bucket}/${key}`;
+		const objectKey = `${ bucket }/${ key }`;
 		const object = this.objects.get(objectKey);
 		return object ? object.data : null;
 	}
@@ -454,7 +454,7 @@ class MockMinIOClient {
 	 * Check if object exists
 	 */
  async statObject(bucket: string): Promise<{ size: number } | null> {
-		const objectKey = `${bucket}/${key}`;
+		const objectKey = `${ bucket }/${ key }`;
 		const object = this.objects.get(objectKey);
 
 		if (!object) return null;
@@ -490,7 +490,7 @@ class MockMinIOClient {
 	 * Delete object
 	 */
  async removeObject(bucket: string): Promise<void> {
-		const objectKey = `${bucket}/${key}`;
+		const objectKey = `${ bucket }/${key}`;
 		this.objects.delete(objectKey);
 	}
 

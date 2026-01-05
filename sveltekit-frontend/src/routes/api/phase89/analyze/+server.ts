@@ -120,7 +120,7 @@ Provide your analysis in this JSON structure:
 		} catch (e) {
 			// Fallback: return raw content
 			analysis = {
-				pattern_name: `cluster_${cluster_id}_analysis`,
+				pattern_name: `cluster_${ cluster_id }_analysis`,
 				root_cause: content.slice(0, 500),
 				fix_strategy: ['Review the analysis above'],
 				estimated_effort: 'moderate',

@@ -1,4 +1,6 @@
 <script lang="ts" module>
+	let placeholder = $state<any>(undefined);
+
 	// Re-export individual components for compound pattern
 	export { default as CommandEmpty } from './CommandEmpty.svelte';
 	export { default as CommandGroup } from './CommandGroup.svelte';
@@ -32,7 +34,7 @@
 	}: Props = $props();
 </script>
 
-<CommandRoot bind:value {onValueChange} class={className}>
+<CommandRoot bind:value { onValueChange: onValueChange } class={ className: className }>
 	<CommandInput {placeholder} />
 	<CommandList>
 		{#if children}

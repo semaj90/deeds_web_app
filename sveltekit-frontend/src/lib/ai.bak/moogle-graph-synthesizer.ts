@@ -205,7 +205,7 @@ export class MoogleGraphSynthesizer {
  // Cache key generation
  private generateCacheKey(paths: SoraTraversalPath[], _config: MoogleVisualizationConfig, mode) {
  const pathSignature = paths.map(p => p.nodes.map(n => n.id).join('-')).join('_');
- return `moogle_${mode}_${this.simpleHash(pathSignature)}`;
+ return `moogle_${ mode }_${this.simpleHash(pathSignature)}`;
  }
 
  // Missing visualization methods (stubs for now)

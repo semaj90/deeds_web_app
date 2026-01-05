@@ -183,7 +183,7 @@ class CognitiveSmartRouter {
  if (health.healthy) {
  return {
  engine: engine as RouteDecision['engine'],
- reasoning: `Best available engine for ${requestType}`,
+ reasoning: `Best available engine for ${ requestType }`,
  expectedLatency:
  ROUTING_CONFIG.engineCapabilities[
  engine as keyof typeof ROUTING_CONFIG.engineCapabilities

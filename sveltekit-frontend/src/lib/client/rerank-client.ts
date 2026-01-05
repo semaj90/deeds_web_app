@@ -89,7 +89,7 @@ export async function rerank(
  if (browser && candidatesCollection) {
  // Check if all candidates for this query are already cached
  // This is a simplified cache check. A more robust one would involve hashing the query and candidate IDs.
- cacheKey = `rerank:${query}:${candidates.map((c) => c.id).join(',')}`;
+ cacheKey = `rerank:${ query }:${candidates.map((c) => c.id).join(',')}`;
  const cachedResult = candidatesCollection.findOne({ 'metadata.cacheKey': cacheKey });
  if (cachedResult) {
  console.log('Cache hit for rerank: ', cacheKey);

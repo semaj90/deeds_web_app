@@ -29,7 +29,7 @@
  };
 </script>
 
-<div class={`stat-card ${variant} ${hoverable ? 'hoverable' : ''}`}>
+<div class={`stat-card ${ variant: variant } ${hoverable ? 'hoverable' : ''}`}>
  {#if icon}
  <div class="stat-icon">
  {@render icon()}

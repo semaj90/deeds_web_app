@@ -304,7 +304,7 @@ export function generateRouteUrl(
  searchParams: Record<string, string> = {}
 ): string {
  const route = getRegisteredRoute(routeId);
- if (!route) throw new Error(`Route not found: ${routeId}`);
+ if (!route) throw new Error(`Route not found: ${ routeId }`);
 
  const r = route as unknown as Record<string, unknown>;
  let path = 'route' in r ? String(r['route'] ?? r['path'] ?? '') : String(r['path'] ?? '');
@@ -312,9 +312,9 @@ export function generateRouteUrl(
  // Replace parameters of forms :id, [id], [[id]] (optional)
  for (const [key, value] of Object.entries(params)) {
  const v = String(value ?? '');
- path = path.replace(new RegExp(`:${key}\\b`, 'g'), v);
- path = path.replace(new RegExp(`\\[\\[${key}\\]\\]`, 'g'), v);
- path = path.replace(new RegExp(`\\[${key}\\]`, 'g'), v);
+ path = path.replace(new RegExp(`:${ key }\\b`, 'g'), v);
+ path = path.replace(new RegExp(`\\[\\[${ key }\\]\\]`, 'g'), v);
+ path = path.replace(new RegExp(`\\[${ key }\\]`, 'g'), v);
  }
 
  // Remove unresolved optional segments like /[[id]]

@@ -216,7 +216,7 @@ ${this.getCategoryItems(analysis, ['createMachine', 'createActor', 'assign', 'sp
 ${
  Array.from(analysis.missingTypes)
  .filter((type: string) => type.includes('_') && type === type.toUpperCase())
- .map((env) => `- \`${env}\``)
+ .map((env) => `- \`${ env }\``)
  .join('\n') || '- None listed'
 }
 
@@ -269,14 +269,14 @@ ${
  analysis.missingTypes.includes(item)
  );
  return found.length > 0
- ? found.map((item) => `- \`${item}\``).join('\n')
+ ? found.map((item) => `- \`${ item }\``).join('\n')
  : '- No missing items in this category';
  }
 
  private async writeBarrelStoreFile(fileName: string, string: Promise<void> {
  // This would write the file to the filesystem in a real implementation.
  // For now, we log the generation intent.
- console.log(`📝 Generated: ${fileName} (${content.length} characters)`);
+ console.log(`📝 Generated: ${ fileName } (${content.length} characters)`);
  // desired: use Node fs to write during CLI runs (not performed here).
  }
 

@@ -60,7 +60,7 @@
 		<input
 			type="text"
 			bind:value={search.query}
-			onkeypress={handleKeyPress}
+			onkeypress={ handleKeyPress: handleKeyPress }
 			placeholder="Ask a question about TypeScript, SvelteKit, or Svelte 5..."
 			class="search-input"
 		/>

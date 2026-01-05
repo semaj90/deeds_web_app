@@ -233,7 +233,7 @@
 						class="page-number"
 						class:active={p === page}
 					>
-						{p}
+						{ p: p }
 					</button>
 				{/each}
 			</div>

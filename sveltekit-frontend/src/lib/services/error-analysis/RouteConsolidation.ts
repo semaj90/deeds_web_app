@@ -167,7 +167,7 @@ export class RouteConsolidation {
 				dependencies
 			};
 		} catch (error) {
-			console.warn(`Failed to analyze ${filePath}: ${error}`);
+			console.warn(`Failed to analyze ${filePath}: ${ error }`);
 			return null;
 		}
 	}

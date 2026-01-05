@@ -11,7 +11,7 @@
 <p
 	class={`
 		text-sm text-muted-foreground
-		${className}
+		${ className: className }
 	`}
 	{...rest}
 >

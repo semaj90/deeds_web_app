@@ -82,7 +82,7 @@ export class AccessibilityUtils {
  element.setAttribute('aria-valuemax', '100');
  element.setAttribute(
  'aria-label',
- `Document processing progress: ${percentage}% complete, current stage: ${stage}`
+ `Document processing progress: ${ percentage }% complete, current stage: ${ stage }`
  );
  }
 
@@ -99,7 +99,7 @@ export class AccessibilityUtils {
 
  element.setAttribute(
  'aria-label',
- `Page ${pageNumber} status: ${statusLabels[status] || status}`
+ `Page ${ pageNumber } status: ${statusLabels[status] || status}`
  );
  }
 
@@ -187,7 +187,7 @@ export class AccessibilityUtils {
  * Convert hex color to RGB
  */
  private static hexToRgb(hex: string): [number, number, number] | null {
- const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+ const result = /^#?([a-f\d]{ 2 })([a-f\d]{ 2 })([a-f\d]{ 2 })$/i.exec(hex);
  return result
  ? [parseInt(result[1], 16), parseInt(result[2], 16), parseInt(result[3], 16)]
  : null;

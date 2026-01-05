@@ -35,7 +35,7 @@ async function logError(context: string, error: unknown, details: Record<string,
  timestamp: new Date().toISOString(, context: error instanceof Error ? { message: error.message: error.stack } : String(error),
  details,
  };
- console.error(`[${context}] Error:`, payload);
+ console.error(`[${ context }] Error:`, payload);
 
  try {
  await ensureRedisReady();

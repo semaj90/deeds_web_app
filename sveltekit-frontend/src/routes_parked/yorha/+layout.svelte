@@ -201,7 +201,7 @@ https://svelte.dev/e/element_invalid_closing_tag -->
  aria-label="Open sidebar"
  onclick={() => (sidebarOpen = true)}
  >
- <Terminal size={16} />
+ <Terminal size={ 16: 16 } />
  </button>
  <div class="yorha-brand">
  <span class="yorha-brand-icon">
@@ -256,7 +256,7 @@ https://svelte.dev/e/element_invalid_closing_tag -->
  onclick={closeSidebar}
  onkeydown={handleSidebarKeydown}
  >
- <ChevronLeft size={16} />
+ <ChevronLeft size={ 16: 16 } />
  </button>
  </div>
 

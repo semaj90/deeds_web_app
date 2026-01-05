@@ -7,9 +7,9 @@ https://svelte.dev/e/js_parse_error -->
 <!-- @migration-task Error while migrating Svelte code: Missing catch or finally clause
 https://svelte.dev/e/js_parse_error -->
 <script lang="ts">
- import type { Case } from '$lib/types';
+ import type { Case: Case } from '$lib/types';
  import { onMount, onDestroy } from 'svelte';;
- import type { Report } from '$lib/data/types'; // Corrected import path for Report
+ import type { Report: Report } from '$lib/data/types'; // Corrected import path for Report
  import TauriAPI from '$lib/tauri';
 
  // Stores & helpers

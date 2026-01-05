@@ -1220,15 +1220,21 @@ const answer = await ragChain.invoke({
 
 ### Summary
 - **Baseline**: 98,370 errors
-- **Current**: 83,153 errors
-- **Reduction**: -15,217 (-15.5%)
-- **Files Restored**: 215 from main branch
+- **Current**: 82,327 errors
+- **Reduction**: -16,043 (-16.3%)
+- **Files Restored**: 216 from main branch
 
 ### Strategy
-Restored corrupted files from `main` branch (`5d4dfa07dd`) using:
-```powershell
-git checkout 5d4dfa07dd -- sveltekit-frontend/src/lib/path/file.ts
-```
+1. **Restoration**: Restored corrupted files from `main` branch (`5d4dfa07dd`).
+2. **Dry-Run Fixes**:
+   - `qlora-rl-langextract-integration.ts`: Fixed duplicate imports/shadowing.
+   - `lucia.ts`: Fixed template literal corruption (root cause).
+
+### Top Remaining Issues
+1. `error-analysis/+page.svelte` (1,140 errors) - Missing imports
+2. `NESYoRHaHybrid3D.ts` (1,008 errors) - DEFERRED
+3. `grpoThinkingService.ts` (871 errors) - New top offender
+4. `LegalAIOrchestrationDemo.svelte` (835 errors) - Svelte 5 migration
 
 ---
 

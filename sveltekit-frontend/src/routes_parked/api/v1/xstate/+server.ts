@@ -67,8 +67,8 @@ export const GET: RequestHandler = async ({ url }) => {
  status: 'operational',
  endpoints: {
  event: '/api/v1/xstate (POST)',
- machine_status: '/api/v1/xstate?machineId={id}',
- actor_status: '/api/v1/xstate?actorId={id}',
+ machine_status: '/api/v1/xstate?machineId={ id }',
+ actor_status: '/api/v1/xstate?actorId={ id }',
  machines: '/api/v1/xstate/machines',
  actors: '/api/v1/xstate/actors',
  },

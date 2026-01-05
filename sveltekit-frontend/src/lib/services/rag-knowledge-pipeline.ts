@@ -356,10 +356,10 @@ export class RAGKnowledgePipeline {
  // Simulated ripgrep pattern matching
  // In production, this would shell out to: rg -o '\b[A-Z][a-z]+\b' | sort | uniq
  const patterns = [
- /\b[A-Z][a-z]{3}\b/g, // Capitalized words (names, places)
+ /\b[A-Z][a-z]{ 3 }\b/g, // Capitalized words (names, places)
  /\b\d{1,2}\/\d{1,2}\/\d{2,4}\b/g, // Dates
- /\b[A-Z]{2}\b/g, // Acronyms
- /\$\d+(?:\d{3})*(?:\.\d{2})?/g, // Currency
+ /\b[A-Z]{ 2 }\b/g, // Acronyms
+ /\$\d+(?:\d{ 3 })*(?:\.\d{ 2 })?/g, // Currency
  /\b\d+ U\.S\.C\. § \d+\b/g, // Legal citations
  ];
 

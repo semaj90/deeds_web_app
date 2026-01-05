@@ -316,7 +316,7 @@ export class AuthService {
  /** * Get case by ID via Go microservice */
  async getCaseById(caseId: string) {
  try {
- const response = await fetch(`${getLegalGatewayUrl()}/cases/${caseId}`, {
+ const response = await fetch(`${getLegalGatewayUrl()}/cases/${ caseId }`, {
  headers: { Authorization: `Bearer ${process.env.SERVICE_AUTH_TOKEN}` },
  });
  if (!response.ok) {
@@ -343,7 +343,7 @@ export class AuthService {
  /** * Get documents for a case via Go microservice */
  async getCaseDocuments(caseId: string) {
  try {
- const response = await fetch(`${getLegalGatewayUrl()}/cases/${caseId}/documents`, {
+ const response = await fetch(`${getLegalGatewayUrl()}/cases/${ caseId }/documents`, {
  headers: { Authorization: `Bearer ${process.env.SERVICE_AUTH_TOKEN}` },
  });
  if (!response.ok) {
@@ -390,7 +390,7 @@ export class AuthService {
  /** * Get sample cases for demo page */
  async getSampleCases(limit: number = 5) {
  try {
- const response = await fetch(`${getLegalGatewayUrl()}/cases?limit=${limit}`, {
+ const response = await fetch(`${getLegalGatewayUrl()}/cases?limit=${ limit }`, {
  headers: { Authorization: `Bearer ${process.env.SERVICE_AUTH_TOKEN}` },
  });
  if (!response.ok) {

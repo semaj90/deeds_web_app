@@ -37,7 +37,7 @@ export class AceContextManager extends BaseService implements IAceContextManager
  throw new Error('Invalid input: sessionId must be a non-empty string');
  }
 
- this.log('info', `Creating ACE context for session ${sessionId}`);
+ this.log('info', `Creating ACE context for session ${ sessionId }`);
 
  try {
  const context: ACEContext = {
@@ -53,7 +53,7 @@ export class AceContextManager extends BaseService implements IAceContextManager
 
  this.contexts.set(sessionId, context);
 
- this.log('info', `ACE context created for session ${sessionId}`);
+ this.log('info', `ACE context created for session ${ sessionId }`);
  return context;
  } catch (error) {
  this.log('error', 'Context creation failed', error);
@@ -96,7 +96,7 @@ export class AceContextManager extends BaseService implements IAceContextManager
  throw new Error('Invalid input: sessionId must be a non-empty string');
  }
 
- this.log('info', `Loading ACE context for session ${sessionId}`);
+ this.log('info', `Loading ACE context for session ${ sessionId }`);
 
  try {
  const context = this.contexts.get(sessionId) || null;
@@ -296,7 +296,7 @@ export class AceContextManager extends BaseService implements IAceContextManager
  throw new Error('Invalid input: offset must be non-negative');
  }
 
- this.log('info', `Listing contexts (limit: ${limit}, offset: ${offset})`);
+ this.log('info', `Listing contexts (limit: ${limit}, offset: ${ offset })`);
 
  try {
  const allContexts = Array.from(this.contexts.values());

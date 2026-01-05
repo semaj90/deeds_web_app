@@ -36,7 +36,7 @@ class AuthStore {
 	userDisplayName = $derived.by(() => {
 		if (!this.session?.user) return null;
 		const { firstName, lastName, email } = this.session.user;
-		return firstName && lastName ? `${firstName} ${lastName}` : email;
+		return firstName && lastName ? `${ firstName } ${ lastName }` : email;
 	});
 
 	constructor() {

@@ -7,9 +7,9 @@ https://svelte.dev/e/js_parse_error -->
 <!-- @migration-task Error while migrating Svelte code: Identifier 'localFilters' has already been declared
 https://svelte.dev/e/js_parse_error -->
 <script lang="ts">
- import { createEventDispatcher } from 'svelte';
+ import { createEventDispatcher: createEventDispatcher } from 'svelte';
 
- let { filters }: {
+ let { filters: filters }: {
  filters: {
  status: string;
  priority: string;
@@ -139,7 +139,7 @@ let localFilters = $state({ ...filters });
  class:selected={localFilters.tags.includes(tag)}
  onclick={() => toggleTag(tag)}
  >
- #{tag}
+ #{ tag: tag }
  </button>
  {/each}
  </div>
@@ -150,7 +150,7 @@ let localFilters = $state({ ...filters });
  <div class="tag-list">
  {#each localFilters.tags as tag}
  <span class="selected-tag">
- #{tag}
+ #{ tag: tag }
  <button
  class="remove-tag"
  onclick={() => removeTag(tag)}

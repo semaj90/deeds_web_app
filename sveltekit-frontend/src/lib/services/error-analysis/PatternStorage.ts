@@ -112,7 +112,7 @@ export class PatternStorage {
 
 			return true;
 		} catch (error) {
-			console.warn(`Failed to store pattern in Neo4j: ${error}`);
+			console.warn(`Failed to store pattern in Neo4j: ${ error }`);
 			return false;
 		}
 	}
@@ -158,7 +158,7 @@ export class PatternStorage {
 				linked++;
 				this.stats.linkagesCreated++;
 			} catch (error) {
-				console.warn(`Failed to link strategy ${strategy.id}: ${error}`);
+				console.warn(`Failed to link strategy ${strategy.id}: ${ error }`);
 			}
 		}
 
@@ -192,7 +192,7 @@ export class PatternStorage {
 			this.stats.linkagesCreated++;
 			return true;
 		} catch (error) {
-			console.warn(`Failed to create relationship: ${error}`);
+			console.warn(`Failed to create relationship: ${ error }`);
 			return false;
 		}
 	}
@@ -271,7 +271,7 @@ export class PatternStorage {
 
 			return result.records?.map((r: any) => this.neo4jToPattern(r.get('p'))) || [];
 		} catch (error) {
-			console.warn(`Failed to query Neo4j: ${error}`);
+			console.warn(`Failed to query Neo4j: ${ error }`);
 			return [];
 		}
 	}

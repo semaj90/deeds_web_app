@@ -47,7 +47,8 @@ export function getCouchDbUrl(): string {
 
 export function getMinioConfig() {
  return {
- endpoint: env.MINIO_ENDPOINT || (isDocker ? 'minio:9000' : 'localhost:9000', accessKey: env.MINIO_ACCESS_KEY || 'minioadmin',
+ endpoint: env.MINIO_ENDPOINT || (isDocker ? 'minio:9000' : 'localhost:9000'),
+ accessKey: env.MINIO_ACCESS_KEY || 'minioadmin',
  secretKey: env.MINIO_SECRET_KEY || 'minioadmin',
  useSSL: env.MINIO_USE_SSL === 'true',
  };
@@ -67,17 +68,52 @@ export function isProduction(): boolean {
 
 // Define the Zod schema for environment variables
 const ConfigSchema = z.object({
- NODE_ENV: z.enum(['development', 'test', 'production']).default('development', POSTGRES_URL: z.string().url().default(getDatabaseUrl(, POSTGRES_USER: z.string().default('legal_admin', POSTGRES_PASSWORD: z.string().default('123456', POSTGRES_DB: z.string().default('legal_ai_db', POSTGRES_HOST: z.string().default(isDocker ? 'postgres' : 'localhost', POSTGRES_PORT: z.coerce.number().default(5432, REDIS_URL: z.string().url().default(getRedisUrl(, REDIS_PASSWORD: z.string().default('redis', OLLAMA_URL: z.string().url().default(getOllamaUrl(, TRITON_URL: z
+ NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
+ POSTGRES_URL: z.string().url().default(getDatabaseUrl()),
+ POSTGRES_USER: z.string().default('legal_admin'),
+ POSTGRES_PASSWORD: z.string().default('123456'),
+ POSTGRES_DB: z.string().default('legal_ai_db'),
+ POSTGRES_HOST: z.string().default(isDocker ? 'postgres' : 'localhost'),
+ POSTGRES_PORT: z.coerce.number().default(5432),
+ REDIS_URL: z.string().url().default(getRedisUrl()),
+ REDIS_PASSWORD: z.string().default('redis'),
+ OLLAMA_URL: z.string().url().default(getOllamaUrl()),
+ TRITON_URL: z
  .string()
  .url()
- .default(`http://${isDocker ? 'triton' : 'localhost'}:8001`, QDRANT_URL: z.string().url().default(getQdrantUrl(, NEO4J_URL: z.string().url().default(getNeo4jConfig().uri, NEO4J_USER: z.string().default('neo4j', NEO4J_PASSWORD: z.string().default('legal123456', MINIO_URL: z.string().url().default(`http://${getMinioConfig().endpoint}`, MINIO_ACCESS_KEY: z.string().default('minioadmin', MINIO_SECRET_KEY: z.string().default('minioadmin', MINIO_BUCKET: z.string().default('deeds-storage', ENABLE_GPU: z.coerce.boolean().default(false, ENABLE_CUDA: z.coerce.boolean().default(false, ENABLE_WEBGPU: z.coerce.boolean().default(false, ENABLE_SIMD_JSON: z.coerce.boolean().default(false, RTX_3060_OPTIMIZATION: z.coerce.boolean().default(false, OCR_MODE: z.string().optional(, DEV_QUIC_PORT: z.coerce.number().optional(, QUIC_ENABLED: z.coerce.boolean().default(false, DEV_BYPASS_AUTH: z.coerce.boolean().default(false, MEMORY_CACHE_TTL: z.coerce.number().default(300, VECTOR_CACHE_SIZE: z.coerce.number().default(1000, JWT_SECRET: z.string().default('dev-secret', API_KEY: z.string().default('dev-api-key', LOG_LEVEL: z.string().default('info', ENABLE_STRUCTURED_LOGGING: z.coerce.boolean().default(false),
+ .default(`http://${isDocker ? 'triton' : 'localhost'}:8001`),
+ QDRANT_URL: z.string().url().default(getQdrantUrl()),
+ NEO4J_URL: z.string().url().default(getNeo4jConfig().uri),
+ NEO4J_USER: z.string().default('neo4j'),
+ NEO4J_PASSWORD: z.string().default('legal123456'),
+ MINIO_URL: z.string().url().default(`http://${getMinioConfig().endpoint}`),
+ MINIO_ACCESS_KEY: z.string().default('minioadmin'),
+ MINIO_SECRET_KEY: z.string().default('minioadmin'),
+ MINIO_BUCKET: z.string().default('deeds-storage'),
+ ENABLE_GPU: z.coerce.boolean().default(false),
+ ENABLE_CUDA: z.coerce.boolean().default(false),
+ ENABLE_WEBGPU: z.coerce.boolean().default(false),
+ ENABLE_SIMD_JSON: z.coerce.boolean().default(false),
+ RTX_3060_OPTIMIZATION: z.coerce.boolean().default(false),
+ OCR_MODE: z.string().optional(),
+ DEV_QUIC_PORT: z.coerce.number().optional(),
+ QUIC_ENABLED: z.coerce.boolean().default(false),
+ DEV_BYPASS_AUTH: z.coerce.boolean().default(false),
+ MEMORY_CACHE_TTL: z.coerce.number().default(300),
+ VECTOR_CACHE_SIZE: z.coerce.number().default(1000),
+ JWT_SECRET: z.string().default('dev-secret'),
+ API_KEY: z.string().default('dev-api-key'),
+ LOG_LEVEL: z.string().default('info'),
+ ENABLE_STRUCTURED_LOGGING: z.coerce.boolean().default(false),
  // Backward-compatible (legacy) aliases
- DATABASE_URL: z.string().url().optional(, MINIO_ENDPOINT: z.string().url().optional(, MINIO_REGION: z.string().optional(),
+ DATABASE_URL: z.string().url().optional(),
+ MINIO_ENDPOINT: z.string().url().optional(),
+ MINIO_REGION: z.string().optional(),
 });
 
 const parsed = ConfigSchema.safeParse({
 	NODE_ENV: env.NODE_ENV,
-	POSTGRES_URL, env.POSTGRES_URL || env.DATABASE_URL,
+	POSTGRES_URL: env.POSTGRES_URL || env.DATABASE_URL,
 	POSTGRES_USER: env.POSTGRES_USER,
 	POSTGRES_PASSWORD: env.POSTGRES_PASSWORD,
 	POSTGRES_DB: env.POSTGRES_DB,
@@ -100,7 +136,8 @@ const parsed = ConfigSchema.safeParse({
 		if (/^[a-z0-9._-]+:\d+$/i.test(raw)) return `http://${raw}`;
 		// Fallback: in non-production, prefix http://, in production: leave undefined to fail validation
 		return env.NODE_ENV === 'production' ? raw : `http://${raw}`;
-	})(, MINIO_ACCESS_KEY: env.MINIO_ACCESS_KEY,
+	})(),
+	MINIO_ACCESS_KEY: env.MINIO_ACCESS_KEY,
 	MINIO_SECRET_KEY: env.MINIO_SECRET_KEY,
 	MINIO_BUCKET: env.MINIO_BUCKET,
 	ENABLE_GPU: env.ENABLE_GPU,
@@ -138,7 +175,8 @@ export const getEnvironmentInfo = () => ({
 	cudaEnabled: CONFIG.ENABLE_CUDA,
 	quicEnabled: CONFIG.QUIC_ENABLED,
 });
-  
+
+// Provide backward-compatible alias helpers for legacy call sites.
 // These mirror old env names to the canonical keys in CONFIG.
 export const LEGACY = {
 	DATABASE_URL: CONFIG.DATABASE_URL ?? CONFIG.POSTGRES_URL,

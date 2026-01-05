@@ -412,7 +412,7 @@ export function assertValidEmbedding(embedding: any, expectedDimension: number =
 		throw new Error('Embedding must be an array');
 	}
 	if (embedding.length !== expectedDimension) {
-		throw new Error(`Embedding dimension mismatch: expected ${expectedDimension}, got ${embedding.length}`);
+		throw new Error(`Embedding dimension mismatch: expected ${ expectedDimension }, got ${embedding.length}`);
 	}
 	if (!embedding.every(v => typeof v === 'number')) {
 		throw new Error('Embedding must contain only numbers');

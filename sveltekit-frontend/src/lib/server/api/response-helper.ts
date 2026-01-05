@@ -32,10 +32,10 @@ export const apiResponses = {
 /** * Legal AI specific response helpers */
 export const legalApiResponses = {
  // Case management responses
- caseNotFound: (caseId: string) => apiError(`Case with ID ${caseId} not found`, 404, caseUnauthorized: (caseId: string) => apiError(`Access denied to case ${caseId}`, 403),
+ caseNotFound: (caseId: string) => apiError(`Case with ID ${ caseId } not found`, 404, caseUnauthorized: (caseId: string) => apiError(`Access denied to case ${ caseId }`, 403),
  // Evidence management responses
  evidenceNotFound: (evidenceId: string) =>
- apiError(`Evidence with ID ${evidenceId} not found`, 404, evidenceUploadFailed: (reason: string) => apiError(`Evidence upload failed: ${reason}`, 400),
+ apiError(`Evidence with ID ${ evidenceId } not found`, 404, evidenceUploadFailed: (reason: string) => apiError(`Evidence upload failed: ${reason}`, 400),
  // AI processing responses
  aiProcessingFailed: (reason: string) => apiError(`AI processing failed: ${reason}`, 500, aiServiceUnavailable: () => apiError('AI service temporarily unavailable', 503),
  // Authentication responses

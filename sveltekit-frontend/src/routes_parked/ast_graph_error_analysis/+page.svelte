@@ -7,6 +7,8 @@ https://svelte.dev/e/element_invalid_closing_tag -->
 <!-- @migration-task Error while migrating Svelte code: `</li>` attempted to close an element that was not open
 https://svelte.dev/e/element_invalid_closing_tag -->
 <script lang="ts">
+	import { DialogClose, DialogContent, DialogOverlay, DialogPortal, DialogRoot, DialogTitle } from 'bits-ui';
+
 	import NESGraphRenderer from '$lib/components/NESGraphRenderer.svelte';
 	import { initializeNodePositions, forceDirectedLayout } from '$lib/utils/nesGraphLayout';
 	import * as Dialog from 'bits-ui/components/dialog';
@@ -140,13 +142,13 @@ https://svelte.dev/e/element_invalid_closing_tag -->
 </div>
 
 <!-- Node Details Dialog (bits-ui) -->
-<Dialog.Root bind:open={showNodeDialog}>
-	<Dialog.Portal>
-		<Dialog.Overlay class="nes-dialog-overlay" />
-		<Dialog.Content class="nes-dialog">
-			<Dialog.Title class="nes-dialog-title">
+<DialogRoot bind:open={showNodeDialog}>
+	<DialogPortal>
+		<DialogOverlay class="nes-dialog-overlay" />
+		<DialogContent class="nes-dialog">
+			<DialogTitle class="nes-dialog-title">
 				{selectedNode?.label || 'Node Details'}
-			</Dialog.Title>
+			</DialogTitle>
 
 			<div class="nes-dialog-body">
 				<div class="nes-detail-row">
@@ -165,10 +167,10 @@ https://svelte.dev/e/element_invalid_closing_tag -->
 				{/if}
 			</div>
 
-			<Dialog.Close class="nes-btn nes-btn-close">CLOSE</Dialog.Close>
-		</Dialog.Content>
-	</Dialog.Portal>
-</Dialog.Root>
+			<DialogClose class="nes-btn nes-btn-close">CLOSE</DialogClose>
+		</DialogContent>
+	</DialogPortal>
+</DialogRoot>
 
 <style>
 	:global(body) {

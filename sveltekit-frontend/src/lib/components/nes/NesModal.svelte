@@ -1,4 +1,6 @@
 <script lang="ts">
+	let widthClass = $state<any>(undefined);
+
  import { onMount } from 'svelte';
 
  interface Props {

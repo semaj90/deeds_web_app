@@ -5,7 +5,7 @@
 		data: PageData;
 	}
 
-	const { data }: Props = $props();
+	const { data: data }: Props = $props();
 	const { evidence: evidenceRows = [] } = data;
 
 	// Fake "graph" for now: just treat evidence as nodes

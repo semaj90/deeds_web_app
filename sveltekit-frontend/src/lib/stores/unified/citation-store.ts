@@ -120,7 +120,7 @@ function createCitationStore() {
  async findSimilarCitations(citationId: string, threshold?: number) {
  update((s) => ({ ...s, isLoading: true }));
  try {
- const response = await fetch(`/api/citations/${citationId}/similar`, {
+ const response = await fetch(`/api/citations/${ citationId }/similar`, {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
  body: JSON.stringify({ threshold: threshold || 0.7 }),

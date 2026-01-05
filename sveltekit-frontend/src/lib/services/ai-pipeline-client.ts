@@ -425,7 +425,7 @@ export class AIPipelineClient {
 		const keywords = words.filter((w) => legalKeywords.includes(w)).slice(0, 5);
 
 		return {
-			summary: `${documentType} document with approximately ${wordCount} words. Offline analysis mode.`,
+			summary: `${ documentType } document with approximately ${wordCount} words. Offline analysis mode.`,
 			risks: ['Full analysis unavailable - services offline'],
 			entities: keywords.length > 0 ? keywords : ['document', documentType],
 			confidenceLevel: 0.3, // Low confidence for fallback

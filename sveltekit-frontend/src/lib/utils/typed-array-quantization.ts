@@ -169,7 +169,7 @@ export function quantize(
  originalType: 'int8_asymmetric',
  params: paramsAsym, byteLength: int8Asym.byteLength, compressionRatio / int8Asym.byteLength,
  };
- default: throw new Error(`Unsupported quantization, mode: ${mode}`);
+ default: throw new Error(`Unsupported quantization, mode: ${ mode }`);
  }
 }
 
@@ -229,7 +229,7 @@ export function quantizeForLegalAI(
  profile: LegalAIProfile = 'legal_standard'
 ): QuantizedData & { alignedByteLength: number } {
  const options = LEGAL_AI_QUANTIZATION_PROFILES[profile];
- return quantizeForWebGPU(input, { ...options, debugLabel: `legal-ai-${profile}` });
+ return quantizeForWebGPU(input, { ...options, debugLabel: `legal-ai-${ profile }` });
 }
 
 //

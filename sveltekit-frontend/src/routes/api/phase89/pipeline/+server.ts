@@ -31,7 +31,7 @@ export const POST: RequestHandler = async ({ request }) => {
 
 			return json({
 				status: 'started',
-				message: `Pipeline started with chunk size ${chunkSize}`,
+				message: `Pipeline started with chunk size ${ chunkSize }`,
 				pid: proc.pid
 			});
 		}

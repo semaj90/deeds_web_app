@@ -12,7 +12,7 @@
 	}: Props = $props();
 </script>
 
-<div role="group" class="p-1 {className}">
+<div role="group" class="p-1 { className: className }">
 	{#if children}
 		{@render children()}
 	{/if}

@@ -1,4 +1,7 @@
 <script lang="ts">
+	let charge = $state<any>(undefined);
+	let witness = $state<any>(undefined);
+
  /**
  * AutoPopulatedCaseForm Component
  * Fill case forms from uploaded data (e.g., name, charge, location)
@@ -134,7 +137,7 @@
  };
 </script>
 
-<form class="case-form {className}" onsubmit={(e) => { e.preventDefault(); handleSubmit(); }}>
+<form class="case-form { className: className }" onsubmit={(e) => { e.preventDefault(); handleSubmit(); }}>
  <!-- Header -->
  <div class="form-header">
  <h2 class="form-title">Case Information</h2>

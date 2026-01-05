@@ -67,7 +67,7 @@ export async function getContextFromRag(opts: {
  key: 'case_id',
  match: { value: caseId },
  });
- console.log(`[RAG] Filtering by case_id: ${caseId}`);
+ console.log(`[RAG] Filtering by case_id: ${ caseId }`);
  }
 
  if (jurisdiction) {
@@ -75,7 +75,7 @@ export async function getContextFromRag(opts: {
  key: 'jurisdiction',
  match: { value: jurisdiction },
  });
- console.log(`[RAG] Filtering by jurisdiction: ${jurisdiction}`);
+ console.log(`[RAG] Filtering by jurisdiction: ${ jurisdiction }`);
  }
 
  if (tags && tags.length > 0) {

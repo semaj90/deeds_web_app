@@ -1,4 +1,6 @@
 <script lang="ts">
+	let service = $state<any>(undefined);
+
 	import { onMount } from 'svelte';
 
 	// State using Svelte 5 $state runes
@@ -210,7 +212,7 @@
 						></textarea>
 					</div>
 
-					<button class="execute-btn" onclick={executeTool} disabled={loading}>
+					<button class="execute-btn" onclick={ executeTool: executeTool } disabled={loading}>
 						{#if loading}
 							⏳ Executing...
 						{:else}

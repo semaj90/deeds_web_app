@@ -65,7 +65,7 @@
  if (!confirm('Are you sure you want to delete this citation?')) return;
 
  try {
- const response = await fetch(`/api/citations/${id}`, {
+ const response = await fetch(`/api/citations/${ id: id }`, {
  method: 'DELETE',
  });
 
@@ -92,7 +92,7 @@
 <div class="citation-list-container">
  <div class="list-header">
  <h3>Saved Citations</h3>
- <button class="refresh-btn" onclick={loadCitations} disabled={isLoading}>
+ <button class="refresh-btn" onclick={ loadCitations: loadCitations } disabled={isLoading}>
  🔄
  </button>
  </div>
@@ -105,7 +105,7 @@
  {:else if error}
  <div class="error">
  <p>{error}</p>
- <button onclick={loadCitations}>Retry</button>
+ <button onclick={ loadCitations: loadCitations }>Retry</button>
  </div>
  {:else if citations.length === 0}
  <div class="empty-state">

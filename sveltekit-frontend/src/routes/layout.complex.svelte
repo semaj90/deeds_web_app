@@ -8,7 +8,7 @@
 	interface Props {
 		children: Snippet;
 	}
-	let { children }: Props = $props();
+	let { children: children }: Props = $props();
 
 	// Runes-mode reactive locals
 	let theme = $state<'dark' | 'light'>('dark');

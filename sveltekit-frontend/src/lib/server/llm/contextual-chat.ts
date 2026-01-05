@@ -70,7 +70,7 @@ export async function contextualChat(params: ContextChatRequest): Promise<Contex
  const keywords = extractionResult.keywords;
  const keyPhrases = extractionResult.keyPhrases;
  const suggestions: Suggestion[] = extractionResult.keyPhrases.slice(0, 3).map((phrase, i) => ({
- query: `Explore: ${phrase}`,
+ query: `Explore: ${ phrase }`,
  reason: `Key phrase from analysis`,
  score: 0.8 - i * 0.1,
  }));

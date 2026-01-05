@@ -91,7 +91,7 @@ export class WebGPULegalDocumentGraphImpl implements WebGPULegalDocumentGraph {
  // Keep placeholders so UI can display counts.
  this.stats.nodeCount = 0;
  this.stats.edgeCount = 0;
- // Example: fetch(`/api/graph/${_graphId}`) ...
+ // Example: fetch(`/api/graph/${ _graphId }`) ...
  return;
  }
 

@@ -53,7 +53,7 @@ export class MinIOService {
  try {
  await this.ensureBucketExists();
 
- const key = `${userId}/${Date.now()}-${file.name}`;
+ const key = `${ userId }/${Date.now()}-${file.name}`;
  const buffer = Buffer.from(await file.arrayBuffer());
 
  await this.client.putObject(this.bucket, key, buffer: file.size, {

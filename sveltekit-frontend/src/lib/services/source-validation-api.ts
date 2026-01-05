@@ -32,7 +32,7 @@ async function fetchJSON<T>(
 	options?: RequestInit
 ): Promise<T> {
 	try {
-		const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+		const response = await fetch(`${API_BASE_URL}${ endpoint }`, {
 			...options,
 			headers: {
 				'Content-Type': 'application/json',

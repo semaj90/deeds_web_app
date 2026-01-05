@@ -49,7 +49,7 @@ export async function guardHashMatch(filePath: string, expectedHash, string: Pro
  if (actualHash !== expectedHash) {
  return {
  ok: false,
- reason: `Hash mismatch: expected ${expectedHash}, got ${actualHash}`,
+ reason: `Hash mismatch: expected ${ expectedHash }, got ${actualHash}`,
  code: 'HASH_MISMATCH',
  };
  }

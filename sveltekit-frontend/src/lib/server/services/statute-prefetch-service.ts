@@ -85,7 +85,7 @@ export async function prefetchStatuteContext(sectionId: string): Promise<Prefetc
  const statute = await db.select().from(statutes).where(eq(statutes.id, sectionId));
 
  if (statute.length === 0) {
- throw new Error(`Statute not found: ${sectionId}`);
+ throw new Error(`Statute not found: ${ sectionId }`);
  }
 
  const statuteRecord = statute[0];

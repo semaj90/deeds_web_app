@@ -1,4 +1,6 @@
 <script lang="ts">
+	let point = $state<any>(undefined);
+
   import Card from "$lib/components/ui/Card/Card.svelte";
   import CardContent from "$lib/components/ui/Card/CardContent.svelte";
   import CardHeader from "$lib/components/ui/Card/CardHeader.svelte";

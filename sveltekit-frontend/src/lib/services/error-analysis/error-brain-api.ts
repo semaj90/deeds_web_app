@@ -233,7 +233,7 @@ export class ErrorBrainAPI extends BaseService {
  message: string;
  }> {
  try {
- this.log('info', `Setting feature flag: ${flag} = ${enabled}`);
+ this.log('info', `Setting feature flag: ${ flag } = ${ enabled }`);
 
  // Validate flag name
  const validFlags = [
@@ -250,17 +250,17 @@ export class ErrorBrainAPI extends BaseService {
  if (!validFlags.includes(flag)) {
  return {
  success: false,
- message: `Invalid flag: ${flag}`,
+ message: `Invalid flag: ${ flag }`,
  };
  }
 
  this.featureFlags.setFlag(flag, enabled);
 
- this.log('info', `Feature flag set successfully: ${flag} = ${enabled}`);
+ this.log('info', `Feature flag set successfully: ${ flag } = ${ enabled }`);
 
  return {
  success: true,
- message: `Feature ${flag} set to ${enabled}`,
+ message: `Feature ${ flag } set to ${ enabled }`,
  };
  } catch (err) {
  const message = err instanceof Error ? err.message : String(err);

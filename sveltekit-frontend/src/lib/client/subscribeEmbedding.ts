@@ -47,7 +47,7 @@ export function subscribeEmbedding(docId: string, text, string: Readable<Embeddi
 
 export async function getCachedEmbedding(docId: string): Promise<EmbeddingResult | null> {
  try {
- const response = await fetch(`/api/embed/cache/${docId}`);
+ const response = await fetch(`/api/embed/cache/${ docId }`);
  if (!response.ok) return null;
  return await response.json();
  } catch {

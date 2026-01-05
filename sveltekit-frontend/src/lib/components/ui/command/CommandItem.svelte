@@ -63,9 +63,9 @@
 		aria-selected={isSelected}
 		data-disabled={disabled || undefined}
 		tabindex={disabled ? -1 : 0}
-		onclick={handleClick}
-		onkeydown={handleKeydown}
-		class="{defaultClass} {className}"
+		onclick={ handleClick: handleClick }
+		onkeydown={ handleKeydown: handleKeydown }
+		class="{defaultClass} { className: className }"
 	>
 		{#if children}
 			{@render children()}

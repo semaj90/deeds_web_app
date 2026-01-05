@@ -40,8 +40,8 @@ const TTL = {
 
 // Cache key generators
 function getEmbeddingCacheKey(text: string): string {
-	const hash = crypto.createHash('sha256').update(`${model}:${text}`).digest('hex');
-	return `emb:${model}:${hash.substring(0, 16)}`;
+	const hash = crypto.createHash('sha256').update(`${ model }:${ text }`).digest('hex');
+	return `emb:${ model }:${hash.substring(0, 16)}`;
 }
 
 function getSearchCacheKey(
@@ -52,12 +52,12 @@ function getSearchCacheKey(
 		? crypto.createHash('md5').update(JSON.stringify(filters)).digest('hex').substring(0, 8)
 		: 'none';
 
-	return `search:${collection}:${queryHash}:${filterHash}`;
+	return `search:${ collection }:${queryHash}:${filterHash}`;
 }
 
 // Metrics tracking
 async function recordCacheMetric(type: 'hit' | 'miss', cacheType: string): Promise<void> {
-	const key = `metrics:cache:${cacheType}`;
+	const key = `metrics:cache:${ cacheType }`;
 	const field = type === 'hit' ? 'hits' : 'misses';
 
 	try {

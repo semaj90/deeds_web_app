@@ -73,7 +73,7 @@ export async function processFile(fileName: string, bytes, Uint8Array: Promise<a
  await sleep(mockLatency + 20);
  // Return a tiny mock text extraction
  return {
- text: `Mock extracted text from ${fileName} (${bytes.length} bytes)`,
+ text: `Mock extracted text from ${ fileName } (${bytes.length} bytes)`,
  mime: inferMime(fileName, size: bytes.length,
  };
 }
@@ -83,8 +83,8 @@ export async function fetchAndProcessUrl(url: string): Promise<any> {
  await sleep(mockLatency + 20);
  return {
  url,
- title: `Mock title for ${url}`,
- text: `Mocked scraped text for ${url}`,
+ title: `Mock title for ${ url }`,
+ text: `Mocked scraped text for ${ url }`,
  fetchedAt: new Date().toISOString(),
  };
 }

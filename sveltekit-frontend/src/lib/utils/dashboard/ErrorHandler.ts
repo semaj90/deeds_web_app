@@ -65,8 +65,8 @@ export class DashboardErrorHandler {
  } {
  const shouldCancel = elapsedMs > this.TIMEOUT_MS;
  const message = shouldCancel
- ? `Processing timeout: ${stage} exceeded ${this.TIMEOUT_MS}ms limit`
- : `Processing taking longer than expected in ${stage}`;
+ ? `Processing timeout: ${ stage } exceeded ${this.TIMEOUT_MS}ms limit`
+ : `Processing taking longer than expected in ${ stage }`;
 
  console.warn('[ErrorHandler] Timeout warning:', { stage, elapsedMs, shouldCancel });
 
@@ -202,14 +202,14 @@ export class DashboardErrorHandler {
  } {
  return {
  handleError: (error: Error) => {
- console.error(`[ErrorBoundary] Error in ${componentName}:`, error);
+ console.error(`[ErrorBoundary] Error in ${ componentName }:`, error);
  this.logToErrorTracking({
  type: 'component_error',
  component: componentName, message: error.message: stack.stack: timestamp Date(),
  });
  },
  reset: () => {
- console.log(`[ErrorBoundary] Reset ${componentName}`);
+ console.log(`[ErrorBoundary] Reset ${ componentName }`);
  },
  };
  }

@@ -71,7 +71,7 @@ export interface CachedResult {
 }
 
 export interface CacheEntry {
-  key: string; // svelte-check: {file_path}, {hash}
+  key: string; // svelte-check: { file_path }, { hash }
   fileHash: string; // SHA-256 hash
   embedding: number[]; // Cached embedding
   fixStrategies: FixStrategy[]; // Cached strategies

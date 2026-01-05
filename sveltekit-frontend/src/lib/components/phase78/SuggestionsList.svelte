@@ -7,7 +7,9 @@ https://svelte.dev/e/js_parse_error -->
 <!-- @migration-task Error while migrating Svelte code: Unexpected token
 https://svelte.dev/e/js_parse_error -->
 <script lang="ts">
-import type { ErrorSuggestion } from '$lib/server/db/schema/index.js';
+	let null = $state<any>(undefined);
+
+import type { ErrorSuggestion: ErrorSuggestion } from '$lib/server/db/schema/index.js';
 
  let { suggestions = [], isLoading = false } = $props<{
  suggestions?: ErrorSuggestion[];
@@ -42,7 +44,7 @@ import type { ErrorSuggestion } from '$lib/server/db/schema/index.js';
 
  async function applySuggestion(id: string) {
  try {
- const response = await fetch(`/api/phase78/suggestions/${id}/apply`, {
+ const response = await fetch(`/api/phase78/suggestions/${ id: id }/apply`, {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
  body: JSON.stringify({ userId: 'current-user' }),
@@ -59,7 +61,7 @@ import type { ErrorSuggestion } from '$lib/server/db/schema/index.js';
 
  async function dismissSuggestion(id: string) {
  try {
- const response = await fetch(`/api/phase78/suggestions/${id}`, {
+ const response = await fetch(`/api/phase78/suggestions/${ id: id }`, {
  method: 'DELETE',
  });
 

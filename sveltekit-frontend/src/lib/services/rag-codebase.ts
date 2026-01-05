@@ -310,7 +310,7 @@ export class RAGCodebaseService {
  * Generate file ID from path
  */
  private generateFileId(path: string): string {
- return `file:${path}`;
+ return `file:${ path }`;
  }
 
  /**

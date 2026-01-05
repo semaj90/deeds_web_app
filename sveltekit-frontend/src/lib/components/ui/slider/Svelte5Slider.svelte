@@ -1,4 +1,13 @@
 <script lang="ts">
+	let className = $state<any>(undefined);
+	let id = $state<any>(undefined);
+	let label = $state<any>(undefined);
+	let name = $state<any>(undefined);
+	let step = $state<any>(undefined);
+	let disabled = $state<any>(undefined);
+	let min = $state<any>(undefined);
+	let max = $state<any>(undefined);
+
 /**
  * Svelte 5 Slider Component
  * Accessible range input with Svelte 5 runes
@@ -110,7 +119,7 @@ function handleChange(e: Event) {
 					{#if valueLabel}
 						{@render valueLabel(value)}
 					{:else}
-						{value}
+						{ value: value }
 					{/if}
 				</span>
 			{/if}
@@ -135,8 +144,8 @@ function handleChange(e: Event) {
 			type="range"
 			{id}
 			{name}
-			{min}
-			{max}
+			{ min: min }
+			{ max: max }
 			{step}
 			{disabled}
 			bind:value
@@ -160,11 +169,11 @@ function handleChange(e: Event) {
 				   [&::-moz-range-thumb]:cursor-pointer
 				   focus:outline-none"
 			style="height: {size === 'sm' ? '12px' : size === 'lg' ? '20px' : '16px'}"
-			oninput={handleInput}
-			onchange={handleChange}
+			oninput={ handleInput: handleInput }
+			onchange={ handleChange: handleChange }
 			aria-valuemin={min}
 			aria-valuemax={max}
-			aria-valuenow={value}
+			aria-valuenow={ value: value }
 		/>
 	</div>
 

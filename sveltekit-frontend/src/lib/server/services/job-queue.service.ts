@@ -119,7 +119,7 @@ export class JobQueueService {
  case 'citation_extraction':
  return this.queues.citations;
  default:
- throw new Error(`Unknown job type: ${jobType}`);
+ throw new Error(`Unknown job type: ${ jobType }`);
  }
  }
 

@@ -1,4 +1,8 @@
 <script lang="ts">
+	let className = $state<any>(undefined);
+	let name = $state<any>(undefined);
+	let required = $state<any>(undefined);
+
 	import type { Snippet } from 'svelte';
 
 	interface Props {
@@ -65,10 +69,10 @@
 	type="button"
 	role="checkbox"
 	aria-checked={indeterminate ? 'mixed' : checked}
-	aria-label={ariaLabel}
-	{disabled}
-	onclick={handleClick}
-	onkeydown={handleKeydown}
+	aria-label={ ariaLabel: ariaLabel }
+	{ disabled: disabled }
+	onclick={ handleClick: handleClick }
+	onkeydown={ handleKeydown: handleKeydown }
 	data-state={state}
 	class="{defaultClass} {checked || indeterminate ? 'bg-primary text-primary-foreground' : 'bg-background'} {className}"
 >

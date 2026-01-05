@@ -34,7 +34,7 @@ function parseTransport(value | undefined): ErrorBrainTransport {
  if (['none', 'sse', 'redis', 'both'].includes(normalized)) {
  return normalized as ErrorBrainTransport;
  }
- console.warn(`Invalid ERROR_BRAIN_TRANSPORT="${value}", defaulting to "none"`);
+ console.warn(`Invalid ERROR_BRAIN_TRANSPORT="${ value }", defaulting to "none"`);
  return 'none';
 }
 
@@ -43,7 +43,7 @@ function parseApplyMode(value | undefined): ErrorBrainApplyMode {
  if (['off', 'safe', 'full'].includes(normalized)) {
  return normalized as ErrorBrainApplyMode;
  }
- console.warn(`Invalid ERROR_BRAIN_APPLY_MODE="${value}", defaulting to "off"`);
+ console.warn(`Invalid ERROR_BRAIN_APPLY_MODE="${ value }", defaulting to "off"`);
  return 'off';
 }
 
@@ -131,7 +131,7 @@ export function isPatchSafe(
  if (linesChanged > config.maxPatchSize) {
  return {
  safe: false,
- reason: `Patch size ${linesChanged} exceeds limit ${config.maxPatchSize}`,
+ reason: `Patch size ${ linesChanged } exceeds limit ${config.maxPatchSize}`,
  };
  }
 

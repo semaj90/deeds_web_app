@@ -18,7 +18,7 @@ const COUCHDB_URL = CONFIG.COUCHDB_URL || 'http://admin:password@localhost:5984'
 const KNOWLEDGE_DB = 'knowledge_graph';
 
 export interface KnowledgeNode {
-    _id: string; // Format: "node:{postgres_id}"
+    _id: string; // Format: "node:{ postgres_id }"
     _rev?: string; // CouchDB revision
     type: 'concept' | 'document' | 'entity' | 'topic';
     postgres_id: number;
@@ -42,11 +42,11 @@ export interface KnowledgeNode {
 }
 
 export interface KnowledgeEdge {
-    _id: string; // Format: "edge: {from_id}, {to_id}"
+    _id: string; // Format: "edge: { from_id }, { to_id }"
     _rev?: string;
     type: 'edge';
-    from_id: string; // node:{id}
-    to_id: string;   // node:{id}
+    from_id: string; // node:{ id }
+    to_id: string;   // node:{ id }
     relationship: 'related_to' | 'parent_of' | 'references' | 'implements' | 'extends';
     weight?: number; // 0-1 strength of connection
     bidirectional?: boolean;
@@ -209,7 +209,7 @@ export async function createEdge(edge: Omit<KnowledgeEdge, '_rev'>): Promise<Kno
 export async function getChildren(nodeId: string): Promise<KnowledgeNode[]> {
     try {
         const response = await fetch(
-            `${COUCHDB_URL}/${KNOWLEDGE_DB}/_design/graph/_view/children?key="${nodeId}"`
+            `${COUCHDB_URL}/${KNOWLEDGE_DB}/_design/graph/_view/children?key="${ nodeId }"`
         );
 
         if (!response.ok) return [];
@@ -228,7 +228,7 @@ export async function getChildren(nodeId: string): Promise<KnowledgeNode[]> {
 export async function getNeighbors(nodeId: string): Promise<string[]> {
     try {
         const response = await fetch(
-            `${COUCHDB_URL}/${KNOWLEDGE_DB}/_design/graph/_view/neighbors?key="${nodeId}"`
+            `${COUCHDB_URL}/${KNOWLEDGE_DB}/_design/graph/_view/neighbors?key="${ nodeId }"`
         );
 
         if (!response.ok) return [];

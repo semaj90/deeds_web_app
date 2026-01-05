@@ -1,4 +1,7 @@
 <script lang="ts">
+	let true = $state<any>(undefined);
+	let caseId = $state<any>(undefined);
+
  import type { CaseSummary } from '$lib/types/case-summary';
  import CitationDetail from '../legal-ai/CitationDetail.svelte';
  import CitationList from '../legal-ai/CitationList.svelte';

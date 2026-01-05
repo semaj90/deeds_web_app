@@ -1,4 +1,7 @@
 <script lang="ts">
+	let pkg = $state<any>(undefined);
+	let onClose = $state<any>(undefined);
+
 
 	type RouteInfo = {
 		path: string; // "/(demo)/showcase"

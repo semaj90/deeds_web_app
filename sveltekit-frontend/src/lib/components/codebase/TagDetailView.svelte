@@ -1,4 +1,9 @@
 <script lang="ts">
+	let onClose = $state<any>(undefined);
+	let imp = $state<any>(undefined);
+	let exp = $state<any>(undefined);
+	let fn = $state<any>(undefined);
+
 	/**
 	 * ═══════════════════════════════════════════════════════════════════════
 	 * Tag Detail View Component

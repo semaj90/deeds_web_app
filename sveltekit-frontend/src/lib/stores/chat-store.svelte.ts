@@ -121,7 +121,7 @@ export class ChatStore {
 
     async loadSession(sessionId: string): Promise<void> {
         try {
-             const response = await fetch(`/api/chat/session/${sessionId}`);
+             const response = await fetch(`/api/chat/session/${ sessionId }`);
             if (!response.ok) { throw new Error('Session not found'); }
             const session: ChatSession = await response.json();
             this.session = session;
@@ -150,7 +150,7 @@ export class ChatStore {
 
     async loadHistory(sessionId: string): Promise<void> {
         try {
-            const response = await fetch(`/api/chat/history/${sessionId}`);
+            const response = await fetch(`/api/chat/history/${ sessionId }`);
             if (!response.ok) { throw new Error('Failed to load history'); }
             const history = await response.json();
             this.messages = history.messages || [];

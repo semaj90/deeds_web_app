@@ -177,7 +177,7 @@ export class IngestionOrchestrator {
  this.progress.phase = 'loading';
  this.progress.totalDocuments = limit;
 
- console.log(`Starting limited ingestion: ${limit} documents`);
+ console.log(`Starting limited ingestion: ${ limit } documents`);
 
  // Load and process batch
  const rawDocuments = await this.loader.getDocuments(limit, 0);

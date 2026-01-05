@@ -147,7 +147,7 @@ export function setSessionTokenCookie(
  * @param sessionId The ID of the session to invalidate.
  */
 export async function invalidateSession(sessionId: string): Promise<void> {
- console.log(`[Session Service] Invalidating session: ${sessionId}`);
+ console.log(`[Session Service] Invalidating session: ${ sessionId }`);
  // TODO: Implement actual session deletion from DB/Redis
  // Example with Drizzle:
  // import type { db } from '$lib/server/db/client';

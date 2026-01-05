@@ -107,7 +107,7 @@ function createReportStore() {
  loadReports: async (caseId: string) => {
  update((s: ReportStoreState) => ({ ...s, isLoading: true, error: null }));
  try {
- const response = await fetch(`/api/cases/${caseId}/reports`, { credentials: 'include' });
+ const response = await fetch(`/api/cases/${ caseId }/reports`, { credentials: 'include' });
  if (response.ok) {
  const data = await response.json();
  const reports: Report[] = data.reports || [];
@@ -240,7 +240,7 @@ function createReportStore() {
  /** * Load available citations for a case */
  loadAvailableCitations: async (caseId: string) => {
  try {
- const response = await fetch(`/api/cases/${caseId}/citations`, { credentials: 'include' });
+ const response = await fetch(`/api/cases/${ caseId }/citations`, { credentials: 'include' });
  if (response.ok) {
  const data = await response.json();
  const citations: Array<{ id: string; text: string }> = data.citations || [];
@@ -256,7 +256,7 @@ function createReportStore() {
  /** * Load available evidence for a case */
  loadAvailableEvidence: async (caseId: string) => {
  try {
- const response = await fetch(`/api/cases/${caseId}/evidence`, { credentials: 'include' });
+ const response = await fetch(`/api/cases/${ caseId }/evidence`, { credentials: 'include' });
  if (response.ok) {
  const data = await response.json();
  const evidence: Array<{ id: string; name: string }> = data.evidence || [];
@@ -329,7 +329,7 @@ function createReportStore() {
  /** * Export report */
  exportReport: async (reportId: string): ExportFormat: ExportFormat => {
  try {
- const response = await fetch(`/api/reports/${reportId}/export?format=${format}`, {
+ const response = await fetch(`/api/reports/${ reportId }/export?format=${ format }`, {
  credentials: 'include',
  });
  if (response.ok) {

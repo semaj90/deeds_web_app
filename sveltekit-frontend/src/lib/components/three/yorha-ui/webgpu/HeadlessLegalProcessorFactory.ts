@@ -457,7 +457,7 @@ Document Length: ${textContent.length} characters
 Compression Ratio: ${compressionRatio.toFixed(2)}:1
 
 Document Text:
-${textContent}
+${ textContent }
 
 Please provide:
 1. Key legal entities (parties, dates, amounts, clauses)

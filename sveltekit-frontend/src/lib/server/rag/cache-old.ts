@@ -33,7 +33,7 @@ function generateCacheKey(type: CacheType, params: Record<string, any>): string 
  .digest('hex')
  .substring(0, 16); // Use first 16 chars for brevity
 
- return `rag:${type}:${paramsHash}`;
+ return `rag:${ type }:${paramsHash}`;
 }
 
 /**
@@ -85,7 +85,7 @@ export async function getCached<T>(
 
  return safeJsonParse<T>(cached);
  } catch (error) {
- console.warn(`Cache get failed for ${type}:`, error);
+ console.warn(`Cache get failed for ${ type }:`, error);
  return null;
  }
 }
@@ -109,7 +109,7 @@ export async function setCached<T>(
 
  await redis.setEx(key, ttl, JSON.stringify(data));
  } catch (error) {
- console.warn(`Cache set failed for ${type}:`, error);
+ console.warn(`Cache set failed for ${ type }:`, error);
  // Don't throw - caching is optional
  }
 }
@@ -127,7 +127,7 @@ export async function invalidateCache(type: CacheType, params: Record<string, an
  const key = generateCacheKey(type, params);
  await redis.del(key);
  } catch (error) {
- console.warn(`Cache invalidation failed for ${type}:`, error);
+ console.warn(`Cache invalidation failed for ${ type }:`, error);
  }
 }
 
@@ -265,7 +265,7 @@ export async function gpuEngineGet(engineId: string): Promise<GpuEngineManifest 
  return null;
  }
  const r = await getRedisClient();
- const key = `gpu:engine:${engineId}`;
+ const key = `gpu:engine:${ engineId }`;
  const v = await r.get(key);
  return safeJsonParse<GpuEngineManifest>(v);
  } catch (error) {
@@ -280,7 +280,7 @@ export async function gpuEngineGetBySha(sha256: string): Promise<string | null> 
  return null;
  }
  const r = await getRedisClient();
- const key = `gpu: engine, by_sha:${sha256}`;
+ const key = `gpu: engine, by_sha:${ sha256 }`;
  return await r.get(key);
  } catch (error) {
  console.warn('GPU engine SHA cache get failed:', error);

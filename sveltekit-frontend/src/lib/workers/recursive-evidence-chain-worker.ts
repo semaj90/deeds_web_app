@@ -154,7 +154,7 @@ export class RecursiveEvidenceChainProcessor {
 			};
 		} catch (error: Error | unknown) {
 			const msg = error instanceof Error ? error.message : String(error);
-			console.error(`Error processing evidence ${rootEvidenceId}:`, msg);
+			console.error(`Error processing evidence ${ rootEvidenceId }:`, msg);
 			return {
 				evidenceId: rootEvidenceId, depth: currentDepth,
 				chainOfCustody: [],
@@ -183,7 +183,7 @@ export class RecursiveEvidenceChainProcessor {
 			return (await response.json()) as EvidenceData;
 		} catch (error: Error | unknown) {
 			const msg = error instanceof Error ? error.message : String(error);
-			console.warn(`Could not fetch evidence data for ${evidenceId}:`, msg);
+			console.warn(`Could not fetch evidence data for ${ evidenceId }:`, msg);
 			return { id: evidenceId, error: msg } as EvidenceData;
 		}
 	}
@@ -200,7 +200,7 @@ export class RecursiveEvidenceChainProcessor {
 			return data.chainOfCustody || [];
 		} catch (error: Error | unknown) {
 			const msg = error instanceof Error ? error.message : String(error);
-			console.warn(`Could not fetch chain of custody for ${evidenceId}:`, msg);
+			console.warn(`Could not fetch chain of custody for ${ evidenceId }:`, msg);
 			return [];
 		}
 	}
@@ -253,7 +253,7 @@ export class RecursiveEvidenceChainProcessor {
 			);
 		} catch (error: Error | unknown) {
 			const msg = error instanceof Error ? error.message : String(error);
-			console.warn(`Could not find related evidence for ${evidenceId}:`, msg);
+			console.warn(`Could not find related evidence for ${ evidenceId }:`, msg);
 			return [];
 		}
 	}

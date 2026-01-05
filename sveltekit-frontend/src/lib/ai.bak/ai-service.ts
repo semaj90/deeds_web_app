@@ -142,7 +142,7 @@ class AIService {
  if (evidence.aiSummary) enhancedPrompt += ` (Summary: ${evidence.aiSummary})`;
  enhancedPrompt += '\n';
  } else {
- enhancedPrompt += `- ${id}\n`;
+ enhancedPrompt += `- ${ id }\n`;
  }
  });
  }
@@ -259,7 +259,7 @@ class AIService {
 
  async suggestInvestigation(caseId: string, currentFocus?: string): Promise<AIServiceResponse> {
  const prompt = currentFocus
- ? `Based on the current focus "${currentFocus}", suggest next steps for the investigation and additional evidence to collect.`
+ ? `Based on the current focus "${ currentFocus }", suggest next steps for the investigation and additional evidence to collect.`
  : `Based on the current case evidence, suggest next steps for the investigation and additional evidence to collect.`;
  return this.sendToAI({ caseId, prompt, context: 'investigation', includeHistory: true });
  }
@@ -267,7 +267,7 @@ class AIService {
  async annotateEvidence(
  caseId: string, evidenceId: string
  ): Promise<AIServiceResponse> {
- const prompt = `Review and enhance this annotation for the evidence: "${annotation}". Provide additional context, legal implications, or suggestions for further analysis.`;
+ const prompt = `Review and enhance this annotation for the evidence: "${ annotation }". Provide additional context, legal implications, or suggestions for further analysis.`;
  return this.sendToAI({
  caseId,
  prompt,

@@ -124,19 +124,19 @@ export class SuggestionEngine {
  if (match) {
  const [, prop, type] = match;
  suggestions.push({
- id: `local-optional-${prop}`,
+ id: `local-optional-${ prop }`,
  title: `Use optional chaining`,
- description: `Access ${prop} safely with optional chaining`,
- code: `obj?.${prop}`,
+ description: `Access ${ prop } safely with optional chaining`,
+ code: `obj?.${ prop }`,
  confidence: 0.75,
  cluster,
  sources: [{ type: 'local', name: 'Pattern Match', relevance: 0.85 }],
  });
  suggestions.push({
- id: `local-extend-${type}`,
- title: `Extend ${type} interface`,
- description: `Add ${prop} property to ${type} type definition`,
- code: `interface ${type} {\n ${prop}: unknown;\n}`,
+ id: `local-extend-${ type }`,
+ title: `Extend ${ type } interface`,
+ description: `Add ${ prop } property to ${type} type definition`,
+ code: `interface ${type} {\n ${ prop }: unknown;\n}`,
  confidence: 0.7,
  cluster,
  sources: [{ type: 'local', name: 'Pattern Match', relevance: 0.8 }],

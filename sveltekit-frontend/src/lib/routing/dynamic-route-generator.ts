@@ -286,7 +286,7 @@ export class DynamicRouteGenerator {
  for (const [paramName, paramCfg] of Object.entries(r.params)) {
  const optional = paramCfg.optional ? '?' : '';
  const t = paramCfg.type ?? 'string';
- types += ` ${paramName}${optional}: ${t};\n`;
+ types += ` ${ paramName }${optional}: ${t};\n`;
  }
  types += ' };\n';
  }

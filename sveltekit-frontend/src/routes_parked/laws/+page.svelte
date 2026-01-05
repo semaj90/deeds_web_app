@@ -52,10 +52,10 @@
 	<!-- CENTER: Primary Workspace -->
 	<main class="workspace">
 		<LawSearchPanel
-			onselect={handleSelect}
-			oncitations={handleCitationsUpdate}
-			onreranked={handleRerankedUpdate}
-			onloading={handleLoadingUpdate}
+			onselect={ handleSelect: handleSelect }
+			oncitations={ handleCitationsUpdate: handleCitationsUpdate }
+			onreranked={ handleRerankedUpdate: handleRerankedUpdate }
+			onloading={ handleLoadingUpdate: handleLoadingUpdate }
 		/>
 	</main>
 

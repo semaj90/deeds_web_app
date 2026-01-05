@@ -103,7 +103,7 @@ export async function performContext7Search(options: Context7SearchOptions): Pro
  ...result.metadata}}))} catch (error: Error | unknown) {
  console.error('Context7 semantic search failed: ', error);
  return [ {
- content: `Search failed: ${error}`,
+ content: `Search failed: ${ error }`,
  relevanceScore: 0,
  sourceType: 'documentation',
  context: { error: true, query: options.query }}]}
@@ -143,12 +143,12 @@ export class Context7AgentOrchestrator {
  message: `Agent completed ${trigger.action} for ${trigger.todoId}`,
  agentTriggered: true});
  return completedTrigger} catch (error: Error | unknown) {
- const failedTrigger: AgentTrigger = { ...trigger, status: 'done', result: `Error: ${error}` };
+ const failedTrigger: AgentTrigger = { ...trigger, status: 'done', result: `Error: ${ error }` };
  this.triggers.set(trigger.todoId, failedTrigger);
  this.logAuditEntry({
  timestamp: new Date().toISOString(, step: `agent_trigger_${trigger.action}`,
  status: 'error',
- message: `Agent failed ${trigger.action} for ${trigger.todoId}: ${error}`,
+ message: `Agent failed ${trigger.action} for ${trigger.todoId}: ${ error }`,
  agentTriggered: true});
  return failedTrigger}
  }
@@ -159,7 +159,7 @@ export class Context7AgentOrchestrator {
  component: 'typescript',
  context: `legal-ai`};
  const prompt = generateMCPPrompt(analysisRequest);
- const codebaseAnalysis = await mcpCodebaseAnalyze(`Code review for ${todoId}: ${prompt}`);
+ const codebaseAnalysis = await mcpCodebaseAnalyze(`Code review for ${ todoId }: ${prompt}`);
  return `Code Review Completed:\n${JSON.stringify(codebaseAnalysis, null, 2)}`}
  private async performFix(todoId: string): Promise<string> {
  // Use auto-fix integrated with copilot orchestrator for comprehensive fixing
@@ -175,7 +175,7 @@ export class Context7AgentOrchestrator {
  useSemanticSearch: true,
  agents: ['autogen', 'claude'],
  synthesizeOutputs: true};
- const orchestratorResult = await copilotOrchestrator(`Analyze auto-fix results for ${todoId}`, options);
+ const orchestratorResult = await copilotOrchestrator(`Analyze auto-fix results for ${ todoId }`, options);
  return `Auto-Fix + Orchestrator Applied:
 Auto-Fix Results: ${autoFixResult.summary.filesFixed} files, ${autoFixResult.summary.totalIssues} issues
 ${autoFixResult.fixes.imports.length > 0 ? `Import fixes: ${autoFixResult.fixes.imports.length}` : ``}
@@ -190,7 +190,7 @@ Orchestrator Analysis: ${orchestratorResult.selfPrompt}`} else {
  useSemanticSearch: true,
  agents: ['autogen', 'claude'],
  synthesizeOutputs: true};
- const result = await copilotOrchestrator(`Fix issues identified in ${todoId}`, options);
+ const result = await copilotOrchestrator(`Fix issues identified in ${ todoId }`, options);
  return `Fix Applied (orchestrator fallback):\n${result.selfPrompt}`}
  }
  /** * Perform auto-fix for specific area */
@@ -225,7 +225,7 @@ Detailed Results: ${Object.entries(result.fixes)
  .join('\n')}
 Recommendations: ${result.recommendations.join('\n')}
 Config Improvements: ${result.configImprovements?.join('\n') || 'None'}`} catch (error: Error | unknown) {
- return `Auto-Fix Failed for ${todoId}: ${error}`}
+ return `Auto-Fix Failed for ${todoId}: ${ error }`}
  }
  private async performAnalysis(todoId: string): Promise<string> {
  // Comprehensive analysis using multiple Context7 tools
@@ -272,9 +272,9 @@ export class Context7SemanticAuditor {
  // 1. Analyze stack component using Context7
  await this.analyzeComponent(component);
  results.push({
- step: `analyze_${component}`,
+ step: `analyze_${ component }`,
  status: 'ok',
- message: `Successfully analyzed ${component} using Context7 MCP`,
+ message: `Successfully analyzed ${ component } using Context7 MCP`,
  agentTriggered: false});
   
  const bestPracticesCheck = await this.checkBestPractices(component);
@@ -314,7 +314,7 @@ export class Context7SemanticAuditor {
  results.push({
  step: `semantic_audit_${component}`,
  status: 'error',
- message: `Semantic audit failed: ${error}`,
+ message: `Semantic audit failed: ${ error }`,
  agentTriggered: false})}
  return results}
  private async analyzeComponent(component: string): Promise<unknown> {
@@ -339,7 +339,7 @@ export class Context7SemanticAuditor {
  // 30% chance of finding issues
  issues.push(`${area} best practices need review for ${component}`)}
  } catch (error: Error | unknown) {
- issues.push(`Failed to check ${area} best practices: ${error}`)}
+ issues.push(`Failed to check ${area} best practices: ${ error }`)}
  }
  return { issues }}
  private async checkSemanticIntegration(component: string): Promise<SemanticAuditResult> {

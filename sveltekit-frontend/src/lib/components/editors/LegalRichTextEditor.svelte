@@ -1,4 +1,9 @@
 <script lang="ts">
+	let minHeight = $state<any>(undefined);
+	let content = $state<any>(undefined);
+	let placeholder = $state<any>(undefined);
+	let readonly = $state<any>(undefined);
+
  /**
  * Legal Rich Text Editor
  * TipTap-based editor for legal documents
@@ -139,7 +144,7 @@
  <div class="toolbar flex flex-wrap items-center gap-1 p-2 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
  <!-- Undo/Redo -->
  <div class="flex items-center gap-1 pr-2 border-r border-gray-300 dark:border-gray-600">
- <button type="button" onclick={undo} class="toolbar-btn" title="Undo (Ctrl+Z)">
+ <button type="button" onclick={ undo: undo } class="toolbar-btn" title="Undo (Ctrl+Z)">
  <span class="i-lucide-undo-2"></span>
  </button>
  <button type="button" onclick={redo} class="toolbar-btn" title="Redo (Ctrl+Y)">
@@ -164,7 +169,7 @@
 
  <!-- Text Formatting -->
  <div class="flex items-center gap-1 pr-2 border-r border-gray-300 dark:border-gray-600">
- <button type="button" onclick={toggleBold} class="toolbar-btn {isBold ? 'active' : ''}" title="Bold (Ctrl+B)">
+ <button type="button" onclick={ toggleBold: toggleBold } class="toolbar-btn {isBold ? 'active' : ''}" title="Bold (Ctrl+B)">
  <span class="i-lucide-bold"></span>
  </button>
  <button type="button" onclick={toggleItalic} class="toolbar-btn {isItalic ? 'active' : ''}" title="Italic (Ctrl+I)">
@@ -180,10 +185,10 @@
 
  <!-- Lists -->
  <div class="flex items-center gap-1 pr-2 border-r border-gray-300 dark:border-gray-600">
- <button type="button" onclick={toggleBulletList} class="toolbar-btn {isBulletList ? 'active' : ''}" title="Bullet List">
+ <button type="button" onclick={ toggleBulletList: toggleBulletList } class="toolbar-btn {isBulletList ? 'active' : ''}" title="Bullet List">
  <span class="i-lucide-list"></span>
  </button>
- <button type="button" onclick={toggleOrderedList} class="toolbar-btn {isOrderedList ? 'active' : ''}" title="Numbered List">
+ <button type="button" onclick={ toggleOrderedList: toggleOrderedList } class="toolbar-btn {isOrderedList ? 'active' : ''}" title="Numbered List">
  <span class="i-lucide-list-ordered"></span>
  </button>
  <button type="button" onclick={toggleBlockquote} class="toolbar-btn {isBlockquote ? 'active' : ''}" title="Quote">
@@ -211,7 +216,7 @@
  {#if !editor}
  <textarea
  bind:value={content}
- oninput={handleTextareaInput}
+ oninput={ handleTextareaInput: handleTextareaInput }
  {placeholder}
  disabled={readonly}
  class="w-full h-full bg-transparent border-none outline-none resize-none"

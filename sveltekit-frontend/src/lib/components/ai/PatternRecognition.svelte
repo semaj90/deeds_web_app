@@ -7,6 +7,10 @@ https://svelte.dev/e/expected_token -->
 <!-- @migration-task Error while migrating Svelte code: Expected token >
 https://svelte.dev/e/expected_token -->
 <script lang="ts">
+	let content = $state<any>(undefined);
+	let concern = $state<any>(undefined);
+	let recommendation = $state<any>(undefined);
+
 	// Removed createEventDispatcher, enhance, writable as they are deprecated or unused.
 	// // Migrated from createEventDispatcher to callback props;
 	// import type { enhance } from '$app/forms';
@@ -130,7 +134,7 @@ https://svelte.dev/e/expected_token -->
 		</label>
 		<select
 			id="documentType"
-			bind:value={documentType}
+			bind:value={ documentType: documentType }
 			class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
 		>
 			<option value="contract">Contract</option>
@@ -234,7 +238,7 @@ https://svelte.dev/e/expected_token -->
 		{#if analysis}
 			<button
 				type="button"
-				onclick={clearAnalysis} // Changed back to onclick
+				onclick={ clearAnalysis: clearAnalysis } // Changed back to onclick
 				class="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500"
 			>
 				Clear

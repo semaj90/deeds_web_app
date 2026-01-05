@@ -1,6 +1,6 @@
 // Reactive Media Query Store for Svelte, 5
 // File: src/lib/utils/media-query.svelte.ts
-import {  browser  } from '$app/environment';
+import { browser } from '$app/environment';
 
 /**
  * Creates a reactive media query store using Svelte 5 runes

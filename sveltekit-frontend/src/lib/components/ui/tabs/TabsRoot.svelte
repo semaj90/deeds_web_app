@@ -1,4 +1,6 @@
 <script lang="ts">
+	let orientation = $state<any>(undefined);
+
 	import type { Snippet } from 'svelte';
 	import { onMount, setContext } from 'svelte';
 	import type { TabsContext, TabsRootProps } from './types';
@@ -45,8 +47,8 @@
 </script>
 
 <div
-	class="tabs-root {className}"
-	data-orientation={orientation}
+	class="tabs-root { className: className }"
+	data-orientation={ orientation: orientation }
 	role="tablist"
 	aria-orientation={orientation}
 >

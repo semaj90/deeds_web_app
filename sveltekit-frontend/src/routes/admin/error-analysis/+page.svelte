@@ -1,5 +1,9 @@
 <script lang="ts">
-	import { Button, Dialog, Separator } from 'bits-ui';
+	let tag = $state<any>(undefined);
+	let rec = $state<any>(undefined);
+	let log = $state<any>(undefined);
+
+	import { Button, ButtonRoot, Dialog, DialogContent, DialogDescription, DialogOverlay, DialogPortal, DialogRoot, DialogTitle, Separator, SeparatorRoot } from 'bits-ui';
 	import { onMount } from 'svelte';
 	import type { PageData } from './$types';
 
@@ -38,7 +42,7 @@
 
 	// Execute agentic fix with function tool calling
 	async function executeAgenticFix(clusterId: number) {
-		agenticLogs = [`🚀 Starting agentic fix for cluster #${clusterId}...`];
+		agenticLogs = [`🚀 Starting agentic fix for cluster #${ clusterId: clusterId }...`];
 
 		try {
 			const response = await fetch('/api/phase89/agentic-fix', {
@@ -75,19 +79,19 @@
 			await loadAnalysis();
 
 		} catch (err) {
-			agenticLogs = [...agenticLogs, `❌ Error: ${err}`];
+			agenticLogs = [...agenticLogs, `❌ Error: ${ err: err }`];
 		}
 	}
 
 	// Execute next step command
 	async function executeNextStep(command: string) {
-		agenticLogs = [`⚡ Executing: ${command}`];
+		agenticLogs = [`⚡ Executing: ${ command: command }`];
 
 		try {
 			const response = await fetch('/api/phase89/execute-command', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ command })
+				body: JSON.stringify({ command: command })
 			});
 
 			const result = await response.json();
@@ -126,14 +130,14 @@
 						RAG+KAG powered analysis • Agentic recommendations • Duplicate detection
 					</p>
 				</div>
-				<Button.Root
+				<ButtonRoot
 					onclick={() => loadAnalysis()}
 					disabled={loading}
 					class="px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold rounded-xl hover:from-purple-700 hover:to-pink-700 transition-all shadow-lg disabled:opacity-50"
 				>
 					<i class="i-carbon-renew mr-2"></i>
 					{loading ? 'Loading...' : 'Refresh Analysis'}
-				</Button.Root>
+				</ButtonRoot>
 			</div>
 
 			{#if analysisData}
@@ -272,19 +276,19 @@
 	</div>
 
 	<!-- Cluster Details Dialog -->
-	<Dialog.Root bind:open={dialogOpen}>
-		<Dialog.Portal>
-			<Dialog.Overlay class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50" />
-			<Dialog.Content class="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50 w-full max-w-4xl max-h-[90vh] overflow-y-auto bg-gray-900 rounded-2xl shadow-2xl border border-purple-500/30 p-8">
+	<DialogRoot bind:open={dialogOpen}>
+		<DialogPortal>
+			<DialogOverlay class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50" />
+			<DialogContent class="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50 w-full max-w-4xl max-h-[90vh] overflow-y-auto bg-gray-900 rounded-2xl shadow-2xl border border-purple-500/30 p-8">
 				{#if selectedCluster}
-					<Dialog.Title class="text-3xl font-bold text-white mb-2">
+					<DialogTitle class="text-3xl font-bold text-white mb-2">
 						Cluster #{selectedCluster.cluster_id}
-					</Dialog.Title>
-					<Dialog.Description class="text-gray-400 mb-6">
+					</DialogTitle>
+					<DialogDescription class="text-gray-400 mb-6">
 						{selectedCluster.error_count} errors • Priority: {selectedCluster.priority}
-					</Dialog.Description>
+					</DialogDescription>
 
-					<Separator.Root class="h-px bg-purple-500/30 mb-6" />
+					<SeparatorRoot class="h-px bg-purple-500/30 mb-6" />
 
 					<!-- Pattern -->
 					<div class="mb-6">
@@ -336,12 +340,12 @@
 											<div class="text-white font-semibold mb-1">{step.action}</div>
 											<code class="text-xs text-gray-400 font-mono">{step.command}</code>
 										</div>
-										<Button.Root
+										<ButtonRoot
 											onclick={() => executeNextStep(step.command)}
 											class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm"
 										>
 											Execute
-										</Button.Root>
+										</ButtonRoot>
 									</div>
 								{/each}
 							</div>
@@ -357,13 +361,13 @@
 						<p class="text-gray-300 mb-4 text-sm">
 							Full automated fix with LLM summarization, ripgrep tagging, and copilot.md/claude.md updates
 						</p>
-						<Button.Root
+						<ButtonRoot
 							onclick={() => executeAgenticFix(selectedCluster.cluster_id)}
 							class="px-6 py-3 bg-gradient-to-r from-pink-600 to-purple-600 text-white font-semibold rounded-lg hover:from-pink-700 hover:to-purple-700 transition-all shadow-lg"
 						>
 							<i class="i-carbon-play-filled mr-2"></i>
 							Run Full Pipeline
-						</Button.Root>
+						</ButtonRoot>
 
 						{#if agenticLogs.length > 0}
 							<div class="mt-4 p-4 bg-gray-800/50 rounded-lg max-h-64 overflow-y-auto">
@@ -374,20 +378,20 @@
 						{/if}
 					</div>
 
-					<Separator.Root class="h-px bg-purple-500/30 mb-6" />
+					<SeparatorRoot class="h-px bg-purple-500/30 mb-6" />
 
 					<div class="flex justify-end gap-3">
-						<Button.Root
+						<ButtonRoot
 							onclick={() => dialogOpen = false}
 							class="px-4 py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-600 transition-colors"
 						>
 							Close
-						</Button.Root>
+						</ButtonRoot>
 					</div>
 				{/if}
-			</Dialog.Content>
-		</Dialog.Portal>
-	</Dialog.Root>
+			</DialogContent>
+		</DialogPortal>
+	</DialogRoot>
 </div>
 
 <style>

@@ -154,7 +154,7 @@ export class EnhancedCaseAPI {
  * Get case by ID with enhanced data
  */
  async getCaseById(caseId: string): Promise<APIResponse<CaseResponse>> {
- return restClient.get<CaseResponse>(`/cases/${caseId}`);
+ return restClient.get<CaseResponse>(`/cases/${ caseId }`);
  }
 
  /**
@@ -188,7 +188,7 @@ export class EnhancedCaseAPI {
  async updateCase(
  caseId: string, updates: Partial<CaseCreationRequest>
  ): Promise<APIResponse<CaseResponse>> {
- return restClient.post<CaseResponse>(`/cases/${caseId}`, {
+ return restClient.post<CaseResponse>(`/cases/${ caseId }`, {
  ...updates,
  metadata: {
  updatedVia: 'yorha-command-center',
@@ -203,7 +203,7 @@ export class EnhancedCaseAPI {
  * Get worker processing status for a case
  */
  async getWorkerStatus(caseId?: string): Promise<APIResponse> {
- const url = caseId ? `/worker/autotag/trigger?caseId=${caseId}` : '/worker/autotag/trigger';
+ const url = caseId ? `/worker/autotag/trigger?caseId=${ caseId }` : '/worker/autotag/trigger';
  return restClient.get(url);
  }
 

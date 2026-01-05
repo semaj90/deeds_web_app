@@ -1,4 +1,6 @@
 <script lang="ts">
+	let title = $state<any>(undefined);
+
  // Minimal props / state for the dashboard placeholder
  let { title = 'Case Scoring Dashboard' } = $props<{
  title?: string;

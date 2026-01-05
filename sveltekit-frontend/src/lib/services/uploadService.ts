@@ -139,7 +139,7 @@ class UploadService {
  */
  async getHistory(caseId: string, limit: number = 10): Promise<any[]> {
  try {
- const response = await fetch(`${API_BASE}/history/${caseId}?limit=${limit}`);
+ const response = await fetch(`${API_BASE}/history/${ caseId }?limit=${ limit }`);
 
  if (!response.ok) {
  throw new Error('Failed to get history');

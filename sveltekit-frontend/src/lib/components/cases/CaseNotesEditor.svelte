@@ -1,4 +1,6 @@
 <script lang="ts">
+	let onClose = $state<any>(undefined);
+
  import NierRichTextEditor from '$lib/components/editors/NierRichTextEditor.svelte';
  import { onMount } from 'svelte';
 
@@ -60,7 +62,7 @@
 
  try {
  const res = await fetch(
- `/api/cases/${caseId}/notes/search?q=${encodeURIComponent(query)}`
+ `/api/cases/${ caseId: caseId }/notes/search?q=${encodeURIComponent(query)}`
  );
  if (!res.ok) throw new Error(`Search failed: ${res.status}`);
  const data = await res.json();
@@ -94,7 +96,7 @@
  }
 
  try {
- const res = await fetch(`/api/cases/${caseId}/notes/${hit.id}`);
+ const res = await fetch(`/api/cases/${ caseId: caseId }/notes/${hit.id}`);
  if (!res.ok) throw new Error(`Failed to load note ${hit.id}`);
  const data = await res.json();
  if (data?.note) {
@@ -174,7 +176,7 @@
  isLoading = true;
  error = null;
  try {
- const response = await fetch(`/api/cases/${caseId}/notes`);
+ const response = await fetch(`/api/cases/${ caseId: caseId }/notes`);
  if (!response.ok) throw new Error('Failed to load notes');
  const data = await response.json();
  notes = sortNotes(data.notes || []);
@@ -218,7 +220,7 @@
  try {
  if (isNewNote) {
  // Create new note
- const response = await fetch(`/api/cases/${caseId}/notes`, {
+ const response = await fetch(`/api/cases/${ caseId: caseId }/notes`, {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
  body: JSON.stringify({
@@ -237,7 +239,7 @@
  lastSavedContent = data.note.content;
  } else if (selectedNote) {
  // Update existing note
- const response = await fetch(`/api/cases/${caseId}/notes/${selectedNote.id}`, {
+ const response = await fetch(`/api/cases/${ caseId: caseId }/notes/${selectedNote.id}`, {
  method: 'PATCH',
  headers: { 'Content-Type': 'application/json' },
  body: JSON.stringify({
@@ -265,7 +267,7 @@
  if (!confirm('Are you sure you want to delete this note?')) return;
 
  try {
- const response = await fetch(`/api/cases/${caseId}/notes/${noteId}`, {
+ const response = await fetch(`/api/cases/${ caseId: caseId }/notes/${ noteId: noteId }`, {
  method: 'DELETE',
  });
 
@@ -302,7 +304,7 @@
  async function loadEvidenceRefs(noteId: string) {
  isLoadingRefs = true;
  try {
- const response = await fetch(`/api/cases/${caseId}/notes/${noteId}/refs`);
+ const response = await fetch(`/api/cases/${caseId}/notes/${ noteId: noteId }/refs`);
  if (!response.ok) throw new Error('Failed to load evidence references');
  const data = await response.json();
  evidenceRefs = data.refs || [];
@@ -316,7 +318,7 @@
 
  async function removeEvidenceRef(noteId: string, evidenceId: string, string): string {
  try {
- const response = await fetch(`/api/cases/${caseId}/notes/${noteId}/refs/${evidenceId}`, {
+ const response = await fetch(`/api/cases/${caseId}/notes/${ noteId: noteId }/refs/${ evidenceId: evidenceId }`, {
  method: 'DELETE',
  });
 

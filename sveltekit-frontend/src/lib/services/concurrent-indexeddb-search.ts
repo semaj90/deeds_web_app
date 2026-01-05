@@ -320,7 +320,7 @@ export class ConcurrentIndexedDBSearch {
  return reject(err);
  }
  }
- const workerId = `worker-${workerIndex}`;
+ const workerId = `worker-${ workerIndex }`;
  const messageHandler = (event: MessageEvent) => {
  const eventData = event.data as WorkerMessage;
  if (eventData.workerId === workerId && eventData.type === 'searchResult') {
@@ -490,7 +490,7 @@ export class ConcurrentIndexedDBSearch {
  errors: { code: string, message: string; file: string, line: number }[]
  ): Promise<void> {
  const documents: SearchableDocument[] = errors.map((error, index) => ({
- id: `error-${index}-${Date.now()}`,
+ id: `error-${ index }-${Date.now()}`,
  content: `${error.code}: ${error.message}`,
  path: error.file,
  type: 'error',

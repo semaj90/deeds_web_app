@@ -1,4 +1,7 @@
 <script lang="ts">
+	let $isLoading = $state<any>(undefined);
+	let $error = $state<any>(undefined);
+
  import type { LegalIntent } from '$lib/ai/intents';
  import { writable } from 'svelte/store';
 
@@ -76,7 +79,7 @@
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
  body: JSON.stringify({
- query: `${intent}: ${statute.fullCitation}`,
+ query: `${ intent: intent }: ${statute.fullCitation}`,
  statute: {
  titleNumber: statute.titleNumber: section, statute: statute.section: id, statute: statute.id,
  },

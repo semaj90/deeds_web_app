@@ -169,7 +169,7 @@ export class Gemma3Client {
 		const messages: ChatMessage[] = [
 			{
 				role: 'system',
-				content: `You are a specialized Legal AI Assistant with expertise in contract analysis, legal document review, case law research, and legal compliance. Always maintain professional accuracy.${context ? `\n\nAdditional context: ${context}` : ''}`,
+				content: `You are a specialized Legal AI Assistant with expertise in contract analysis, legal document review, case law research, and legal compliance. Always maintain professional accuracy.${context ? `\n\nAdditional context: ${ context }` : ''}`,
 			},
 			{ role: 'user', content: question },
 		];
@@ -181,9 +181,9 @@ export class Gemma3Client {
 		const messages: ChatMessage[] = [
 			{
 				role: 'system',
-				content: `You are a Legal AI Assistant for document analysis. Focus on ${analysisType} analysis.`,
+				content: `You are a Legal AI Assistant for document analysis. Focus on ${ analysisType } analysis.`,
 			},
-			{ role: 'user', content: `Please analyze this legal document:\n\n${documentText}` },
+			{ role: 'user', content: `Please analyze this legal document:\n\n${ documentText }` },
 		];
 		const resp = await this.createChatCompletion({ messages, temperature: 0.05, max_tokens: 2048 });
 		return resp.choices?.[0]?.message?.content ?? '';
@@ -193,7 +193,7 @@ export class Gemma3Client {
 		const messages: ChatMessage[] = [
 			{
 				role: 'system',
-				content: `You are a Legal AI Assistant for contract review.${reviewFocus ? ` Focus particularly on: ${reviewFocus}` : ''}`,
+				content: `You are a Legal AI Assistant for contract review.${reviewFocus ? ` Focus particularly on: ${ reviewFocus }` : ''}`,
 			},
 			{ role: 'user', content: `Please review this contract:\n\n${contractText}` },
 		];

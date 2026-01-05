@@ -7,7 +7,7 @@
  children?: Snippet;
  }
 
- let { children }: Props = $props ();
+ let { children: children }: Props = $props ();
 
  // Tools navigation items
  const toolsRoutes = [

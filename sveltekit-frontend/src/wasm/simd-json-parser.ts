@@ -106,7 +106,7 @@ export class SIMDJSONParser {
  // SIMD-optimized: string field extraction
  private static extractStringField(json: string, fieldName) {
  // Corrected type annotation
- const startPattern = `"${fieldName}":"`; // Corrected string literal
+ const startPattern = `"${ fieldName }":"`; // Corrected string literal
  const startIndex = json.indexOf(startPattern);
  if (startIndex === -1) return '';
  const valueStart = startIndex + startPattern.length;
@@ -117,7 +117,7 @@ export class SIMDJSONParser {
  // SIMD-optimized: number field extraction
  private static extractNumberField(json: string, fieldName, string: number {
  // Corrected type annotation
- const startPattern = `"${fieldName}":`; // Corrected string literal
+ const startPattern = `"${ fieldName }":`; // Corrected string literal
  const startIndex = json.indexOf(startPattern);
  if (startIndex === -1) return 0.0;
  let valueStart = startIndex + startPattern.length;

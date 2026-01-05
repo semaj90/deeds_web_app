@@ -262,7 +262,7 @@ class RouteRegistry {
     }
 
     private asString(v: any): string | undefined {
-        return typeof v === 'string' ? v  | undefined;
+        return typeof v === 'string' ? v : undefined;
     }
 
     // Persistence
@@ -270,7 +270,9 @@ class RouteRegistry {
         if (!this.options.persistState || !browser) return;
         try {
             const persistedData = {
-                favorites: Array.from(this.favorites, recentRoutes: this.recentRoutes, routeHistory: this.routeHistory
+                favorites: Array.from(this.favorites),
+                recentRoutes: this.recentRoutes,
+                routeHistory: this.routeHistory
             };
             localStorage.setItem(this.options.storageKey, JSON.stringify(persistedData));
         } catch (e) {

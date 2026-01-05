@@ -100,7 +100,7 @@ class CitationLibraryService {
  */
  async getCollectionDetail(collectionId: string): Promise<CitationCollection | null> {
  try {
- const cacheKey = `${this.CACHE_PREFIX}${collectionId}`;
+ const cacheKey = `${this.CACHE_PREFIX}${ collectionId }`;
  const cached = await redis.get(cacheKey);
  if (cached) {
  return JSON.parse(cached);
@@ -317,7 +317,7 @@ class CitationLibraryService {
  */
  private async invalidateCollectionCache(collectionId: string): Promise<void> {
  try {
- const cacheKey = `${this.CACHE_PREFIX}${collectionId}`;
+ const cacheKey = `${this.CACHE_PREFIX}${ collectionId }`;
  await redis.del(cacheKey);
  } catch (error) {
  console.error('Error invalidating collection cache:', error);

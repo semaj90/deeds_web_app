@@ -161,7 +161,7 @@ export async function redisRateLimit(
  return checkRateLimit(key);
  }
 
- const redisKey = `rate:${key}`;
+ const redisKey = `rate:${ key }`;
 
  try {
  const current = await withBackoff(async () => {

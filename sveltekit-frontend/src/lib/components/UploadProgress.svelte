@@ -1,4 +1,6 @@
 <script lang="ts">
+	let uploadProgress = $state<any>(undefined);
+
 let { uploadProgress = 0, uploadStatus = '', currentDocId = '' } = $props();
 	
 	
@@ -41,7 +43,7 @@ let { uploadProgress = 0, uploadStatus = '', currentDocId = '' } = $props();
 		<span class="status-label" style="color: {getStatusColor(uploadStatus)}">
 			{getStatusLabel(uploadStatus)}
 		</span>
-		<span class="progress-percentage">{uploadProgress}%</span>
+		<span class="progress-percentage">{ uploadProgress: uploadProgress }%</span>
 	</div>
 
 	<div class="progress-bar-container">

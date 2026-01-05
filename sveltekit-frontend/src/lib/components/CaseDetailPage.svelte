@@ -1,4 +1,6 @@
 <script lang="ts">
+	let charge = $state<any>(undefined);
+
  import { page } from '$app/stores';
  import { onMount } from 'svelte';
  import SimilarCasesPanel from './SimilarCasesPanel.svelte';

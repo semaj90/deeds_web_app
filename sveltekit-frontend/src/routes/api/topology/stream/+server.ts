@@ -15,7 +15,7 @@ const clients = new Set<ReadableStreamDefaultController>();
 
 // Notify all clients of updates
 export function broadcastUpdate(event: string, data: any) {
-	const message = `event: ${event}\ndata: ${JSON.stringify(data)}\n\n`;
+	const message = `event: ${ event }\ndata: ${JSON.stringify(data)}\n\n`;
 	clients.forEach(controller => {
 		try {
 			controller.enqueue(new TextEncoder().encode(message));

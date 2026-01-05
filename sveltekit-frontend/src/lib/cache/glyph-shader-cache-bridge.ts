@@ -146,7 +146,7 @@ class GlyphShaderCacheBridge {
  private generateGlyphShaderWGSL(request: GlyphRenderingRequest): string {
  const { compressionMethod } = request.renderingHints; // Removed unused: quantizationLevel, targetResolution
  const isHighSecurity = request.legalContext?.confidentialityLevel === 'privileged';
- return ` // Legal Document Glyph Renderer - Optimized for ${compressionMethod}
+ return ` // Legal Document Glyph Renderer - Optimized for ${ compressionMethod }
 @group(0) @binding(0) var<storage, read> glyph_data: array<u32>;
 @group(0) @binding(1) var<storage, read> quantization_table: array<f32>;
 @group(0) @binding(2) var glyph_texture: texture_storage_2d<rgba8unorm, write>;

@@ -399,7 +399,7 @@ Provide ONLY the corrected code snippet that fixes this specific error. Do not i
  }
 
  const tsCodeMatch = line.match(/TS(\d+)/);
- const code = tsCodeMatch ? `TS${tsCodeMatch[1]}` : `TS-${index}`;
+ const code = tsCodeMatch ? `TS${tsCodeMatch[1]}` : `TS-${ index }`;
  const severity: TypeScriptError['severity'] = line.includes('error') ? 'error' : 'warning';
  const messageParts = line.split(':').slice(1); // remove file(...) prefix
  const message = messageParts.join(':').trim();

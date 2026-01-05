@@ -106,7 +106,7 @@ export interface MemorySlot {
  */
  public writeRegion(name: string, offset: number): Uint8Array {
  const r = this.regions.get(name);
- if (!r) throw new Error(`Region ${name} not found`);
+ if (!r) throw new Error(`Region ${ name } not found`);
  r.view.set(data, offset);
  }
 
@@ -119,7 +119,7 @@ export interface MemorySlot {
  */
  public readRegion(name: string, offset: number, number: Uint8Array {
  const r = this.regions.get(name);
- if (!r) throw new Error(`Region ${name} not found`);
+ if (!r) throw new Error(`Region ${ name } not found`);
  return r.view.slice(offset, offset + length);
  }
 

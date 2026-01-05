@@ -32,8 +32,8 @@ class ProductionServiceClient {
  const url = endpoint.startsWith('http')
  ? endpoint
  : endpoint.startsWith('/')
- ? `${this.baseUrl}${endpoint}`
- : `${this.baseUrl}/${endpoint}`;
+ ? `${this.baseUrl}${ endpoint }`
+ : `${this.baseUrl}/${ endpoint }`;
 
  // Cross-runtime safe "now" — avoid non-null assertions
  const perf = globalThis as unknown as { performance?: { now?: () => number } } | undefined;
@@ -166,7 +166,7 @@ class ProductionServiceClient {
  // Normalize and avoid duplicate slashes; do not assume caller included baseUrl
  const cleaned = servicePath;
  // Ensure healthPath is appended with a single slash separator
- const normalizedHealthPath = healthPath.startsWith('/') ? healthPath : `/${healthPath}`;
+ const normalizedHealthPath = healthPath.startsWith('/') ? healthPath : `/${ healthPath }`;
  const path = cleaned.endsWith(normalizedHealthPath)
  ? cleaned
  : `${cleaned.replace(/\/+$/, '')}${normalizedHealthPath}`;

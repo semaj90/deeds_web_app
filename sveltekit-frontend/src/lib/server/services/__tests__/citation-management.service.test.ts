@@ -406,8 +406,8 @@ describe('CitationManagementService', () => {
  describe('Performance', () => {
  it('should handle large result sets', async () => {
  const largeResultSet = Array.from({ length: 1000 }, (_, i) => ({
- id: `citation-${i}`,
- citationText: `Citation ${i}`,
+ id: `citation-${ i }`,
+ citationText: `Citation ${ i }`,
  }));
 
  expect(largeResultSet).toHaveLength(1000);

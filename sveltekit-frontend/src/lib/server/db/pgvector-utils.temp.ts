@@ -228,8 +228,8 @@ export async function searchSimilarMessages(
         const sql = `
             SELECT * FROM search_similar_messages(
                 ${vectorString}::vector,
-                ${threshold}::float,
-                ${limit}::int
+                ${ threshold }::float,
+                ${ limit }::int
             );
         `;
         const results = (await db.execute(sql)) as Array<Row>;
@@ -259,8 +259,8 @@ export async function searchSimilarEvidence(
             SELECT * FROM search_similar_evidence(
                 ${vectorString}::vector,
                 ${caseIdParam},
-                ${threshold}::float,
-                ${limit}::int
+                ${ threshold }::float,
+                ${ limit }::int
             );
         `;
         const results = (await db.execute(sql)) as Array<Row>;

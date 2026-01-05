@@ -490,10 +490,10 @@ function validateImportData(
  if (type === 'cases') {
  const caseItem = item as Case;
  if (!caseItem.title || caseItem.title.trim().length === 0) {
- errors.push(`Case at index ${index}: Title is required`);
+ errors.push(`Case at index ${ index }: Title is required`);
  }
  if (!caseItem.description || caseItem.description.trim().length === 0) {
- errors.push(`Case at index ${index}: Description is required`);
+ errors.push(`Case at index ${ index }: Description is required`);
  }
  } else if (type === 'evidence') {
  const evidenceItem = item as EvidenceItem;

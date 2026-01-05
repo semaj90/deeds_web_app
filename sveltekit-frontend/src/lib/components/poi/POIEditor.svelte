@@ -1,4 +1,6 @@
 <script lang="ts">
+	let true = $state<any>(undefined);
+
  import { Card, CardContent, CardHeader, CardTitle } from '$lib/components/ui';
  import Button from '$lib/components/ui/button/Button.svelte';
  import Input from '$lib/components/ui/input/Input.svelte';
@@ -146,7 +148,7 @@
  <Save class="w-4 h-4 mr-2" />
  {isNew ? 'Create POI' : 'Save Changes'}
  </Button>
- <Button onclick={handleCancel} variant="outline">
+ <Button onclick={ handleCancel: handleCancel } variant="outline">
  <X class="w-4 h-4 mr-2" />
  Cancel
  </Button>

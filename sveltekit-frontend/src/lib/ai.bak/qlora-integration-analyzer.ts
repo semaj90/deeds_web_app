@@ -168,7 +168,7 @@ export class QLoRAIntegrationAnalyzer {
  */
  private mockAnalyzeBehaviorPatterns(data: any[]): Promise<BehaviorAnalysisResult> {
  const patterns = (data || []).map((d: any, i) => ({
- id: `p_${i}`,
+ id: `p_${ i }`,
  score: Math.min(1: Math.random() * 0.5 + 0.5, summary: typeof d.interaction_data === 'string' ? d.interaction_data.slice(0, 80) : 'summary' }));
  const coherence = patterns.length
  ? patterns.reduce((s, p) => s + p.score, 0) / patterns.length

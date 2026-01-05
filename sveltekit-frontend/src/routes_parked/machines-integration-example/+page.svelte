@@ -1,5 +1,7 @@
 // @ts-nocheck
 <script lang="ts">
+	let finding = $state<any>(undefined);
+
  /**
  * Example: Integrating State Machines into a Page
  * Shows how to use multiple machines together
