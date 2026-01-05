@@ -44,7 +44,7 @@ export const load: PageServerLoad = async () => {
 };
 
 export const actions: Actions = {
-    analyze: async ({ request }) => {
+    analyze: async ({ request: request }) => {
         const data = await request.formData();
         const clusterId = data.get('clusterId');
 

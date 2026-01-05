@@ -1,4 +1,6 @@
 <script lang="ts">
+	let $isProcessing = $state<any>(undefined);
+
 	import { isProcessing, registerServiceWorker, uploadFileViaQUIC, uploadProgress } from '$lib/mlp';
 	import { onMount } from 'svelte';
 
@@ -113,8 +115,8 @@
 			class="drop-zone"
 			class:dragging={isDragging}
 			class:disabled={$isProcessing}
-			ondragover={handleDragOver}
-			ondragleave={handleDragLeave}
+			ondragover={ handleDragOver: handleDragOver }
+			ondragleave={ handleDragLeave: handleDragLeave }
 			ondrop={handleDrop}
 			role="button"
 			tabindex="0"

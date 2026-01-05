@@ -1,4 +1,8 @@
 <script lang="ts">
+	let code = $state<any>(undefined);
+	let count = $state<any>(undefined);
+	let t = $state<any>(undefined);
+
     import type { PageData } from './$types';
 
     let { data }: { data: PageData } = $props();

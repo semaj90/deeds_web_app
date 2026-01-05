@@ -178,7 +178,7 @@
 
  // Function to handle navigation to a case, addressing the goto() warning
  async function navigateToCase(caseId: string) {
- await goto(`/cases/${caseId}`);
+ await goto(`/cases/${ caseId: caseId }`);
  }
 
  let intervalId: ReturnType<typeof setInterval>;
@@ -334,7 +334,7 @@
 <!-- svelte-ignore a11y_click_events_have_key_events -->
 <div
  class="fixed inset-0 z-50 bg-black/80 animate-in fade-in-0"
- onclick={cancelNewCase}
+ onclick={ cancelNewCase: cancelNewCase }
  role="button"
  tabindex="0"
  aria-label="Close dialog"

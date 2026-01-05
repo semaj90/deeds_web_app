@@ -54,7 +54,7 @@
 			const res = await fetch('/api/system/phase78/apply-patch', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ suggestionId }),
+				body: JSON.stringify({ suggestionId: suggestionId }),
 			});
 
 			const result = await res.json();
@@ -122,7 +122,7 @@
 						← Back to Monitor
 					</a>
 					<button
-						onclick={loadData}
+						onclick={ loadData: loadData }
 						disabled={isLoading}
 						class="px-4 py-2 bg-blue-600 text-white font-semibold rounded hover:bg-blue-700 disabled:bg-gray-400 transition"
 					>

@@ -1,4 +1,7 @@
 <script lang="ts">
+	let tag = $state<any>(undefined);
+	let log = $state<any>(undefined);
+
 	import { onDestroy, onMount } from 'svelte';
 	import type { PageData } from './$types';
 
@@ -438,7 +441,7 @@
 							🚀 Run CUDA Pipeline
 						{/if}
 					</button>
-					<button onclick={fetchClusters} class="refresh-btn">
+					<button onclick={ fetchClusters: fetchClusters } class="refresh-btn">
 						🔄 Refresh Clusters
 					</button>
 				</div>

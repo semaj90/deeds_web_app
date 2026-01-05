@@ -1,9 +1,9 @@
 // API endpoint: /api/ast-topology
 // Returns codebase topology as graph data
 
-import { json } from '@sveltejs/kit';
+import { json: json } from '@sveltejs/kit';
 import pg from 'pg';
-import type { RequestHandler } from './$types';
+import type { RequestHandler: RequestHandler } from './$types';
 
 const { Pool } = pg;
 

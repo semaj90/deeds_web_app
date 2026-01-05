@@ -578,10 +578,10 @@
           📥 IMPORT CONFIG
           <input id="import-config" type="file" accept=".json" onchange={importConfig} style="display: none;" />
         </label>
-        <button class="quick-action" onclick={exportConfig}>
+        <button class="quick-action" onclick={ exportConfig: exportConfig }>
           📤 EXPORT CONFIG
         </button>
- <button class="quick-action" onclick={restartServices}>
+ <button class="quick-action" onclick={ restartServices: restartServices }>
  🔄 RESTART SERVICES
  </button>
  <button class="quick-action" onclick={backupDatabase}>

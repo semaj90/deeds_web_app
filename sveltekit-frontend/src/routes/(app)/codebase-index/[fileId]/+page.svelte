@@ -1,4 +1,8 @@
 <script lang="ts">
+	let parent = $state<any>(undefined);
+	let route = $state<any>(undefined);
+	let module = $state<any>(undefined);
+
 	// Props from server loader (properly typed)
 	let { data } = $props();
 

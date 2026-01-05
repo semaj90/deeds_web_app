@@ -1,4 +1,8 @@
 <script lang="ts">
+	let related = $state<any>(undefined);
+	let comment = $state<any>(undefined);
+	let rec = $state<any>(undefined);
+
 	import { onMount } from 'svelte';
 
 	interface PageData {
@@ -54,7 +58,7 @@
 				})
 			});
 
-			const { embedding } = await embedRes.json();
+			const { embedding: embedding } = await embedRes.json();
 
 			// 2. Search Qdrant collections
 			const collections =
@@ -145,7 +149,7 @@
 			const response = await fetch('/api/analyze-file', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ filePath })
+				body: JSON.stringify({ filePath: filePath })
 			});
 
 			fileAnalysis = await response.json();

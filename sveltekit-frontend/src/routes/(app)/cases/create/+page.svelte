@@ -125,7 +125,7 @@
 	}
 
 	async function navigateToCase(caseId: string) {
-		await goto(`/cases/${caseId}`);
+		await goto(`/cases/${ caseId: caseId }`);
 	}
 
 	onMount(() => {
@@ -143,7 +143,7 @@
 			<h1 class="text-2xl font-bold">YoRHa Detective</h1>
 			<button
 				class="rounded border border-emerald-500/60 bg-emerald-500/20 px-4 py-2 text-sm font-semibold text-emerald-100 hover:bg-emerald-500/30 transition-colors"
-				onclick={openNewCase}
+				onclick={ openNewCase: openNewCase }
 			>
 				New Case
 			</button>

@@ -1,4 +1,6 @@
 <script lang="ts">
+	let t = $state<any>(undefined);
+
 	import { browser } from '$app/environment';
 	import type { PageData } from './$types';
 
@@ -15,7 +17,7 @@
 		clusterCount?: number;
 	};
 
-	let { data } = $props<{ data: PageData }>();
+	let { data: data } = $props<{ data: PageData }>();
 
 	let activeTab = $state<TabId>('overview');
 
@@ -117,7 +119,7 @@
 			<button
 				class="px-3 py-2 rounded-lg border border-neutral-700 hover:border-neutral-500 transition-colors text-xs"
 				disabled={loadingDiagnostics}
-				onclick={loadDiagnostics}
+				onclick={ loadDiagnostics: loadDiagnostics }
 			>
 				Refresh
 			</button>

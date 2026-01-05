@@ -26,6 +26,6 @@ export const load: PageServerLoad = async () => {
 			hasGeminiKey: !!process.env.GEMINI_API_KEY
 		};
 	} catch (err) {
-		throw error(500, `Failed to load analysis: ${err}`);
+		throw error(500, `Failed to load analysis: ${ err: err }`);
 	}
 };

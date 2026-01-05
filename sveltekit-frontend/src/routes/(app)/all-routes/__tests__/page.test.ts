@@ -258,7 +258,7 @@ describe('Phase 8: Error Display', () => {
 
  it('should format error count as "N errors" or "1 error"', () => {
  const formatErrorCount = (count: number) => {
- return count === 1 ? '1 error' : `${count} errors`;
+ return count === 1 ? '1 error' : `${ count: count } errors`;
  };
 
  expect(formatErrorCount(1)).toBe('1 error');

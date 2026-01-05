@@ -161,8 +161,8 @@
 	<div
 		class="drop-zone"
 		class:dragging={isDragging}
-		ondragover={handleDragOver}
-		ondragleave={handleDragLeave}
+		ondragover={ handleDragOver: handleDragOver }
+		ondragleave={ handleDragLeave: handleDragLeave }
 		ondrop={handleDrop}
 	>
 		<div class="drop-content">

@@ -1,4 +1,7 @@
 <script lang="ts">
+	let tag = $state<any>(undefined);
+	let errorType = $state<any>(undefined);
+
 	import type { PageData } from './$types';
 
 	const { data } = $props<{ data: PageData }>();

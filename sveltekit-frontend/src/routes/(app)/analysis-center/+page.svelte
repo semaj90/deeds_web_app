@@ -1,4 +1,6 @@
 <script lang="ts">
+	let tag = $state<any>(undefined);
+
   import { Input } from '$lib/components/ui/input';
  import type { PageData } from './$types';
 
@@ -100,9 +102,9 @@
  <form
  method="post"
  action="?/analyze"
- use:enhance={({ formData }) => {
+ use:enhance={({ formData: formData }) => {
  isAnalyzing = true;
- return async ({ result }) => {
+ return async ({ result: result }) => {
  isAnalyzing = false;
  if (result.type === 'success' && result.data?.analysis) {
  analysisResults = [result.data.analysis, ...analysisResults];

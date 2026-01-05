@@ -102,7 +102,7 @@ type IntermediateEvidenceMetadata = {
  processingOptions: ProcessingOptions;
 } & Partial<FinalEvidenceMetadata>; // All other fields are optional
 
-export const load: PageServerLoad = async ({ locals }) => {
+export const load: PageServerLoad = async ({ locals: locals }) => {
 	// Initialize the form with default values
 	const form = await superValidate(zod(evidenceUploadSchema));
 

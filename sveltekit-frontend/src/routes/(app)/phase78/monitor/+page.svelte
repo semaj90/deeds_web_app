@@ -1,4 +1,6 @@
 <script lang="ts">
+	let height = $state<any>(undefined);
+
  import { onMount } from 'svelte';
 
  interface MonitoringStats {
@@ -117,7 +119,7 @@
  </div>
 
  <button
- onclick={loadStats}
+ onclick={ loadStats: loadStats }
  disabled={isLoading}
  class="px-4 py-2 bg-blue-600 text-white font-semibold rounded hover:bg-blue-700 disabled:bg-gray-400 transition"
  >

@@ -1,4 +1,6 @@
 <script lang="ts">
+	let code = $state<any>(undefined);
+
 
 	let { data } = $props();
 

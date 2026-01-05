@@ -251,7 +251,7 @@
 			<Button onclick={startAnalysis} disabled={analyzing || !caseId || !evidenceContent} class="bg-[#ffd700] text-[#0a0a0a] hover:bg-[#ffed4a] disabled:opacity-50 disabled:cursor-not-allowed">
 				{analyzing ? 'Analyzing...' : 'Start Analysis'}
 			</Button>
-			<Button onclick={resetForm} variant="outline" class="bg-[#f7d51d] text-[#0a0a0a] hover:bg-[#e5c51b]">Reset</Button>
+			<Button onclick={ resetForm: resetForm } variant="outline" class="bg-[#f7d51d] text-[#0a0a0a] hover:bg-[#e5c51b]">Reset</Button>
 		</CardFooter>
 	</Card>
 
