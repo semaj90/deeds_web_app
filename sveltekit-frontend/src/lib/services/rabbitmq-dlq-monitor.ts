@@ -93,8 +93,8 @@ export class DLQMonitor {
  this.stats.retried++;
  this.stats.rescued++} else {
  // Add retry attempt record
- msg.retryAttempts.push({ attemptNumber: new Date().toISOString(, errorMessage: 'Retry failed' });
-  
+ msg.retryAttempts.push({ attemptNumber: new Date().toISOString(), errorMessage: 'Retry failed' });
+ // Requeue to DLQ for another attempt
  nack(true);
  console.log(`ðŸ”„ Job requeued to DLQ: ${msg.documentId}`)}
  } catch (error) {

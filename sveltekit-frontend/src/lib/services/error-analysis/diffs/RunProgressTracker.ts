@@ -66,7 +66,9 @@ export class RunProgressTracker {
  phase: 'idle',
  totalPatches: 0, generatedPatches: 0, appliedPatches: 0, failedPatches: 0, rolledBackPatches: 0,
  validationStatus: 'pending',
- errorCountBefore: 0, errorCountAfter: 0, startedAt: new Date(, updatedAt: new Date(, errorStack: [],
+ errorCountBefore: 0, errorCountAfter: 0, startedAt: new Date(),
+ updatedAt: new Date(),
+ errorStack: [],
  };
  }
 
@@ -90,7 +92,8 @@ export class RunProgressTracker {
  */
  private emit(type: ProgressEvent['type'], data: Partial<RunProgress> = {}): void {
  const event: ProgressEvent = {
- type: runId.progress.runId: timestamp Date(, data: {
+ type: runId.progress.runId: timestamp Date(),
+ data: {
  ...this.progress,
  ...data,
  },
