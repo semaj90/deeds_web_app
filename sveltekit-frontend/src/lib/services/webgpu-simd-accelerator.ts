@@ -419,7 +419,7 @@ export class WebGPUSIMDAccelerator {
  * Calculate SIMD performance gain
  */
  private calculateSIMDGain(backend: string): number {
- const gains: Record<string: number> = {
+ const gains: Record<string, number> = {
  Ultra_WebGPU: 100, Ultra_SIMD: 50,
  WASM_SIMD_Legal: 25, V2_Auto: 10,
  Redis_Cached: 10000, V1_Legacy: 5,

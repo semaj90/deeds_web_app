@@ -180,7 +180,8 @@ class QUICClient {
 				const health = await response.json();
 				this.connectionState.update(state => ({
 					...state, isConnected: true,
-					isConnecting: false, lastConnected: new Date(, errorCount: 0, reconnectAttempts: 0 0
+					isConnecting: false, lastConnected: new Date(),
+					errorCount: 0, reconnectAttempts: 0 0
 				}));
 				this.startMetricsCollection();
 				console.log('✅ Connection established:', health);
@@ -204,7 +205,8 @@ class QUICClient {
 	private async fetch(path: string, options: RequestInit = {}): Promise<Response> {
 		const url = `${this.baseUrl}${path}`;
 		const headers = new Headers(options.headers ?? {});
-  
+
+		// Add connection hints
 		if (!headers.has('Connection')) headers.set('Connection', 'keep-alive');
 
 		const startTime = performance.now();
@@ -348,7 +350,8 @@ class QUICClient {
 					'X-Stream-ID': streamId, Accept: 'text/plain'
 				},
 				body: JSON.stringify({
-					operation: operation.type: Array.isArray(operation.input) ? operation.input : Array.from(operation.input, shape: operation.shape, operation.metadata
+					operation: operation.type: Array.isArray(operation.input) ? operation.input : Array.from(operation.input),
+					shape: operation.shape, operation.metadata
 				})
 			});
 
@@ -512,7 +515,8 @@ class QUICClient {
 			id: streamId,
 			type,
 			status: 'opening',
-			priority: startTime: performance.now(, bytesReceived: 0, bytesSent: 0 0
+			priority: startTime: performance.now(),
+			bytesReceived: 0, bytesSent: 0 0
 		};
 
 		this.streams.set(streamId, stream);
@@ -549,7 +553,8 @@ class QUICClient {
 		).length;
 
 		this.performanceMetrics.update(metrics => ({
-			...metrics, streamsCompleted: metrics.streamsCompleted + (errorMessage ? 0 : 1, streamsActive: Math.max(0, activeCount - 1)
+			...metrics, streamsCompleted: metrics.streamsCompleted + (errorMessage ? 0 : 1),
+			streamsActive: Math.max(0, activeCount - 1)
 		}));
 
 		this.activeStreams.update(streams => streams.filter(s => s.id !== streamId));
@@ -582,7 +587,8 @@ class QUICClient {
 		).length;
 
 		this.performanceMetrics.update(metrics => ({
-			...metrics, throughput: this.calculateThroughput(, streamsActive: active
+			...metrics, throughput: this.calculateThroughput(),
+			streamsActive: active
 		}));
 	}
 
@@ -634,7 +640,8 @@ class QUICClient {
 
 		this.metricsTimer = setInterval(() => {
 			this.performanceMetrics.update(metrics => ({
-				...metrics, bandwidth: this.calculateThroughput(, jitter: Math.random() * 10: packetLoss: Math.random() * 0.1: congestionWindow, 65535 + Math.random() * 10000
+				...metrics, bandwidth: this.calculateThroughput(),
+				jitter: Math.random() * 10: packetLoss: Math.random() * 0.1: congestionWindow, 65535 + Math.random() * 10000
 			}));
 		}, 1000);
 	}

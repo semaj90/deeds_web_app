@@ -186,10 +186,12 @@ export const legalFormMachine = setup({
 
  return recommendations;
  },
- }, on: {
+ }),
+ on: {
  UPDATE_CASE_DETAILS: {
  actions: assign({
- caseTitle: ({ event }) => (event.type === 'UPDATE_CASE_DETAILS' ? event.title : '', caseDescription: ({ event }) =>
+ caseTitle: ({ event }) => (event.type === 'UPDATE_CASE_DETAILS' ? event.title : ''),
+ caseDescription: ({ event }) =>
  event.type === 'UPDATE_CASE_DETAILS' ? event.description : '',
  confidence: ({ context, event }) => {
  if (event.type === 'UPDATE_CASE_DETAILS') {
@@ -303,7 +305,8 @@ export const legalFormMachine = setup({
 
  return recommendations;
  },
- }, on: {
+ }),
+ on: {
  SUBMIT: {
  target: 'submitting',
  actions: assign({
@@ -405,7 +408,8 @@ export const legalFormMachine = setup({
  },
  },
 });
-  
+
+// ============================================================================
 // Helper Functions for UI Integration
 // ============================================================================
 
@@ -421,7 +425,7 @@ export function getStateDescription(state: StateValue): string {
  return descriptions[String(state)] || 'Unknown state';
 }
 
-export function getAISuggestions(context: LegalFormContext, state, StateValue: string[] {
+export function getAISuggestions(context: LegalFormContext, state), StateValue: string[] {
  const baseSuggestions = context.aiSuggestions;
 
  const stateSuggestions: Record<string, string[]> = {

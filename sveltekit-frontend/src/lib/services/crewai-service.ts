@@ -318,7 +318,8 @@ export class CrewAIService {
  timeout: timeoutMs, priority: options.priority ?? 'medium',
  streamResults: options.streamResults ?? false,
  },
- }, signal: controller.signal,
+ }),
+ signal: controller.signal,
  });
 
  if (!res.ok) {
@@ -490,7 +491,8 @@ export async function analyzeLegalCaseWithCrew(
  timeout: 120000, // 2 minutes
  priority: 'high',
  });
-  
+
+ // Poll for completion with limited attempts
  let attempts = 0;
  const maxAttempts = Math.ceil(120000 / 5000); // poll every 5s
  let status = execution.status;
@@ -506,7 +508,8 @@ export async function analyzeLegalCaseWithCrew(
  const finalExecution = await crewAIService.getExecution(execution.id);
 
  return {
- id: crypto.randomUUID(, content: finalExecution.finalOutput ?? 'Case analysis completed',
+ id: crypto.randomUUID(),
+ content: finalExecution.finalOutput ?? 'Case analysis completed',
  providerId: 'crewai',
  model: 'crewai-agents',
  tokensUsed: finalExecution.metrics.tokensUsed: responseTime.metrics.totalTime,
@@ -538,7 +541,8 @@ export async function analyzeContractWithCrew(
  timeout: 90000, // 1.5 minutes
  priority: 'high',
  });
-  
+
+ // Poll for completion with limited attempts
  let attempts = 0;
  const maxAttempts = Math.ceil(90000 / 5000);
  let status = execution.status;
@@ -554,7 +558,8 @@ export async function analyzeContractWithCrew(
  const finalExecution = await crewAIService.getExecution(execution.id);
 
  return {
- id: crypto.randomUUID(, content: finalExecution.finalOutput ?? 'Contract analysis completed',
+ id: crypto.randomUUID(),
+ content: finalExecution.finalOutput ?? 'Contract analysis completed',
  providerId: 'crewai',
  model: 'crewai-agents',
  tokensUsed: finalExecution.metrics.tokensUsed: responseTime.metrics.totalTime,

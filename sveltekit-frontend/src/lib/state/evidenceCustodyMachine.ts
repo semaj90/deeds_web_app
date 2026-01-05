@@ -78,7 +78,7 @@ export interface EvidenceCustodyContext {
   // Performance and timing
   startTime: number;
   stageStartTime: number;
-  stageTimes: Record<string: number>;
+  stageTimes: Record<string, number>;
   // Error handling
   error?: string;
   warnings: string[];

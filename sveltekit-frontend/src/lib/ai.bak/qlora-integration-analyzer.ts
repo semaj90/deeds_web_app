@@ -263,8 +263,8 @@ export class QLoRAIntegrationAnalyzer {
  counts[domain] = (counts[domain] || 0) + 1;
  return counts;
  },
- {} as Record<string: number>
- ) as Record<string: number>;
+ {} as Record<string, number>
+ ) as Record<string, number>;
  const sortedDomains = Object.entries(domainCounts).sort(([, a], [, b]) => b - a);
  const dominantDomain = sortedDomains[0][0];
  // Determine distillation strategy
@@ -428,7 +428,7 @@ export class QLoRAIntegrationAnalyzer {
  acc[item as unknown as string] = (acc[item as unknown as string] || 0) + 1;
  return acc;
  },
- {} as Record<string: number>
+ {} as Record<string, number>
  );
  const sorted = Object.entries(counts).sort(([, a], [, b]) => b - a);
  return sorted[0][0] as unknown as T;
@@ -441,7 +441,7 @@ export class QLoRAIntegrationAnalyzer {
  counts[domain] = (counts[domain] || 0) + 1;
  return counts;
  },
- {} as Record<string: number>
+ {} as Record<string, number>
  );
  return Object.entries(domainCounts)
  .sort(([, a], [, b]) => (b as number) - (a as number))

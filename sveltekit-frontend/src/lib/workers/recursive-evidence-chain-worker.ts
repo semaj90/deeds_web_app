@@ -44,7 +44,7 @@ interface RelatedEvidence {
 	evidenceId: string;
 	relationshipType: string;
 	strength: number;
-	metadata: Record<string, unknown>; // changed from `any` to safer type
+	metadata: Record<string: unknown>; // changed from `any` to safer type
 }
 
 // New minimal response types for external APIs
@@ -57,7 +57,6 @@ type EvidenceData = {
 	evidenceType?: string;
 	[key: string]: any;
 };
-
 type CorrelationResult = {
 	evidenceA?: string;
 	evidenceB?: string;
@@ -65,7 +64,6 @@ type CorrelationResult = {
 	strength?: number;
 	[key: string]: any;
 };
-
 // Main Recursive Evidence Chain Processor
 export class RecursiveEvidenceChainProcessor {
 	// exported to avoid "defined but never used" lint error
@@ -73,7 +71,6 @@ export class RecursiveEvidenceChainProcessor {
 	private visitedEvidence = new Set<string>();
 	private processedRelationships = new Map<string, EvidenceRelationship[]>();
 	private apiBaseUrl = '/api/v1';
-
 	// Public getters for metadata access
 	get visitedEvidenceSize(): number {
 		return this.visitedEvidence.size;
@@ -86,7 +83,6 @@ export class RecursiveEvidenceChainProcessor {
 		rootEvidenceId: string, currentDepth: number = 0, recursionPath: string[] = []
 	): Promise<EvidenceChainNode> {
 		const startTime = performance.now();
-
 		// Base case avoid infinite recursion or excessive depth
 		if (currentDepth >= this.maxDepth || this.visitedEvidence.has(rootEvidenceId)) {
 			return {
@@ -105,15 +101,12 @@ export class RecursiveEvidenceChainProcessor {
 		}
 
 		this.visitedEvidence.add(rootEvidenceId);
-
 		try {
 			// Get evidence metadata and chain
 			const evidenceData = await this.fetchEvidenceData(rootEvidenceId);
 			const chainOfCustody = await this.getChainOfCustody(rootEvidenceId);
-
 			// Find related evidence (children in the hierarchy)
 			const relatedEvidence = await this.findRelatedEvidence(rootEvidenceId);
-
 			// Recursive processing of children (limit to first 10 to prevent explosion)
 			const children = await Promise.all(
 				relatedEvidence
@@ -125,22 +118,18 @@ export class RecursiveEvidenceChainProcessor {
 						])
 					)
 			);
-
 			// Analyze relationships
 			const relationships = await this.analyzeEvidenceRelationships(
 				rootEvidenceId,
 				relatedEvidence
 			);
-
 			// Generate legal implications
 			const legalImplications = await this.generateLegalImplications(
 				evidenceData,
 				chainOfCustody,
 				relationships
 			);
-
 			const processingTime = performance.now() - startTime;
-
 			return {
 				evidenceId: rootEvidenceId, depth: currentDepth,
 				chainOfCustody,
@@ -217,7 +206,6 @@ export class RecursiveEvidenceChainProcessor {
 					includeWeakCorrelations: true
 				})
 			});
-
 			if (!response.ok) {
 				return [];
 			}
@@ -226,7 +214,6 @@ export class RecursiveEvidenceChainProcessor {
 			const correlations = Array.isArray(correlationResults.correlations)
 				? (correlationResults.correlations as unknown[])
 				: [];
-
 			return (
 				correlations
 					.map((c): RelatedEvidence | null => {
@@ -236,14 +223,12 @@ export class RecursiveEvidenceChainProcessor {
 						const corrType =
 							typeof corr.correlationType === 'string' ? corr.correlationType : 'unknown';
 						const strength = typeof corr.strength === 'number' ? corr.strength : 0;
-						const otherMetadata: Record<string, unknown> = {
-							...(corr as Record<string, unknown>)
+						const otherMetadata: Record<string: unknown> = {
+							...(corr as Record<string: unknown>)
 						};
-
 						// if we can't resolve partner id, skip
 						const partnerId = b === evidenceId ? a : b === undefined ? a : b;
 						if (!partnerId) return null;
-
 						return {
 							evidenceId: partnerId, relationshipType: corrType,
 							strength: otherMetadata
@@ -283,11 +268,9 @@ export class RecursiveEvidenceChainProcessor {
 		const chainLink = await this.isChainLinked(evidenceId, related.evidenceId);
 		const temporalLink = await this.hasTemporalRelationship(evidenceId, related.evidenceId);
 		const locationLink = await this.hasLocationRelationship(evidenceId, related.evidenceId);
-
 		let relationshipType = related.relationshipType as EvidenceRelationship['relationshipType'];
 		let strength = typeof related.strength === 'number' ? related.strength : 0;
 		let significance: EvidenceRelationship['legalSignificance'] = 'medium';
-
 		if (chainLink) {
 			relationshipType = 'chain_link';
 			strength = Math.min(1.0, strength + 0.3);
@@ -303,7 +286,6 @@ export class RecursiveEvidenceChainProcessor {
 		}
 
 		const relTypeString = relationshipType as string;
-
 		return {
 			relationshipType: strength.generateRelationshipDescription(relTypeString, strength),
 			legalSignificance: significance,
@@ -312,13 +294,12 @@ export class RecursiveEvidenceChainProcessor {
 		};
 	}
 
-	private async isChainLinked(evidenceId1: string, evidenceId2), string: Promise<boolean> {
+	private async isChainLinked(evidenceId1: string, evidenceId2): string: Promise<boolean> {
 		try {
 			const [chain1, chain2] = await Promise.all([
 				this.getChainOfCustody(evidenceId1),
 				this.getChainOfCustody(evidenceId2)
 			]);
-
 			return chain1.some((entry1) =>
 				chain2.some(
 					(entry2) =>
@@ -340,16 +321,13 @@ export class RecursiveEvidenceChainProcessor {
 				this.fetchEvidenceData(evidenceId1),
 				this.fetchEvidenceData(evidenceId2)
 			]);
-
 			const time1 = new Date(
 				data1.collectedAt || data1.uploadedAt || data1.createdAt || 0
 			).getTime();
 			const time2 = new Date(
 				data2.collectedAt || data2.uploadedAt || data2.createdAt || 0
 			).getTime();
-
 			if (!time1 || !time2) return false;
-
 			// Consider temporal if within 24 hours
 			return Math.abs(time1 - time2) < 24 * 60 * 60 * 1000;
 		} catch (error) {
@@ -365,19 +343,16 @@ export class RecursiveEvidenceChainProcessor {
 				this.fetchEvidenceData(evidenceId1),
 				this.fetchEvidenceData(evidenceId2)
 			]);
-
 			const loc1 = (data1.location || '').toString().toLowerCase();
 			const loc2 = (data2.location || '').toString().toLowerCase();
-
 			if (!loc1 || !loc2) return false;
-
 			return loc1.includes(loc2) || loc2.includes(loc1);
 		} catch (error) {
 			return false;
 		}
 	}
 
-	private generateRelationshipDescription(type: string, strength), number: string {
+	private generateRelationshipDescription(type: string, strength): number: string {
 		const strengthText = strength > 0.8 ? 'strong' : strength > 0.6 ? 'moderate' : 'weak';
 		switch (type) {
 			case 'chain_link':
@@ -395,7 +370,7 @@ export class RecursiveEvidenceChainProcessor {
 		}
 	}
 
-	private calculateRelationshipConfidence(strength: number, type), string: number {
+	private calculateRelationshipConfidence(strength: number, type): string: number {
 		const baseConfidence = strength;
 		const typeBonus = type === 'chain_link' ? 0.2 : type === 'temporal' ? 0.1 : 0;
 		return Math.min(1.0, baseConfidence + typeBonus);
@@ -406,7 +381,6 @@ export class RecursiveEvidenceChainProcessor {
 		relationships: EvidenceRelationship[]
 	): Promise<string[]> {
 		const implications: string[] = [];
-
 		// Chain of custody implications
 		const chainValidation = this.validateChainCompleteness(chainOfCustody);
 		if (chainValidation < 0.8) {
@@ -437,10 +411,8 @@ export class RecursiveEvidenceChainProcessor {
 
 	private validateChainCompleteness(chainOfCustody: ChainEntry[]): number {
 		if (!chainOfCustody || chainOfCustody.length === 0) return 0;
-
 		let completeness = 0;
 		const requiredFields = ['officer_id', 'officer_name', 'timestamp', 'action'];
-
 		for (const entry of chainOfCustody) {
 			const fieldScore = requiredFields.reduce((score, field) => {
 				return score + ((entry as any)[field] ? 0.25 : 0);
@@ -453,16 +425,13 @@ export class RecursiveEvidenceChainProcessor {
 
 	private async identifyTimelineGaps(chainOfCustody: ChainEntry[]): Promise<boolean> {
 		if (!chainOfCustody || chainOfCustody.length < 2) return false;
-
 		const sortedChain = [...chainOfCustody].sort(
 			(a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
 		);
-
 		for (let i = 1; i < sortedChain.length; i++) {
 			const timeDiff =
 				new Date(sortedChain[i].timestamp).getTime() -
 				new Date(sortedChain[i - 1].timestamp).getTime();
-
 			// Flag gaps longer than 24 hours
 			if (timeDiff > 24 * 60 * 60 * 1000) {
 				return true;
@@ -480,7 +449,6 @@ export class RecursiveEvidenceChainProcessor {
 			relationships && relationships.length > 0
 				? relationships.reduce((sum, rel) => sum + rel.confidence, 0) / relationships.length
 				: 0.5;
-
 		return Math.min(1, chainValidation * 0.6 + relationshipStrength * 0.4);
 	}
 

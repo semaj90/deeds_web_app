@@ -47,6 +47,11 @@ function fixColonCorruption(content) {
     // `async foo(): Promise<void>` is correct, but `async foo(), Promise<void>` is wrong
     fixed = fixed.replace(/\)\s*,\s*(Promise|void|string|number|boolean|any|unknown|null|undefined|Array|Record|Map|Set|object)/g, '): $1');
 
+    // Fix generic type parameters where colon is used instead of comma
+    // e.g. Record<string: number> -> Record<string, number>
+    // e.g. Map<string: any> -> Map<string, any>
+    fixed = fixed.replace(/(Record|Map)<([^>:]+)\s*:\s*([^>]+)>/g, '$1<$2, $3>');
+
     // Fix property declarations with comma instead of colon
     // `property, type;` -> `property: type;`
     fixed = fixed.replace(/(\w+)\s*,\s*(GPUDevice|GPUQueue|string|number|boolean|WebGPUSIMDConfig|AccelerationResult)\s*[;|]/g, '$1: $2;');
@@ -156,6 +161,9 @@ function fixColonCorruption(content) {
     fixed = fixed.replace(/\s*;\s*$/gm, ';');
     fixed = fixed.replace(/\{\s*,\s*/g, '{ ');
     fixed = fixed.replace(/,\s*\}/g, ' }');
+
+    // Specific fix for qlora-rl-langextract-integration.ts
+    fixed = fixed.replace(/Record<string:\s*number>/g, 'Record<string, number>');
 
     return fixed;
 }
