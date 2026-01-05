@@ -1,6 +1,4 @@
 <script lang="ts">
-	let t = $state<any>(undefined);
-
 	import { browser } from '$app/environment';
 	import type { PageData } from './$types';
 

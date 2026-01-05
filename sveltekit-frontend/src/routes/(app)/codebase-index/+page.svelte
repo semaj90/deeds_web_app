@@ -1,7 +1,4 @@
 <script lang="ts">
-	let surface = $state<any>(undefined);
-	let tag = $state<any>(undefined);
-
 	// Props from server load (properly typed via SvelteKit)
 	let { data } = $props();
 

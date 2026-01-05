@@ -1,7 +1,4 @@
 <script lang="ts">
-	let tag = $state<any>(undefined);
-	let child = $state<any>(undefined);
-
 	import { onMount, onDestroy } from 'svelte';
 	import type { PageData } from './$types';
 
@@ -196,7 +193,7 @@
 	onDestroy(() => {
 		eventSource?.close();
 	});
-  
+
 	function formatRelativeTime(dateStr: string): string {
 		const date = new Date(dateStr);
 		const now = new Date();

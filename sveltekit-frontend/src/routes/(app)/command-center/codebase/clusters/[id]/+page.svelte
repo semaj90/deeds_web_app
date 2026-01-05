@@ -1,8 +1,4 @@
 <script lang="ts">
-	let s = $state<any>(undefined);
-	let file = $state<any>(undefined);
-	let msg = $state<any>(undefined);
-
     import type { PageData } from './$types';
 
     let { data }: { data: PageData } = $props();

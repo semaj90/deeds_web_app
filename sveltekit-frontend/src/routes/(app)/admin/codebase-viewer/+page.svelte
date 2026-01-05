@@ -1,7 +1,4 @@
 <script lang="ts">
-	let code = $state<any>(undefined);
-
-
 	let { data } = $props();
 
 	let selectedCollection = $state<string | null>(null);

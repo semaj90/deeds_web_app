@@ -1,15 +1,6 @@
 <script lang="ts">
-	let refreshData = $state<any>(undefined);
-	let isLoading = $state<any>(undefined);
-	let error = $state<any>(undefined);
-	let routePath = $state<any>(undefined);
-	let suggestions = $state<any>(undefined);
-	let false = $state<any>(undefined);
-
- import { page } from '$app/state';
  import ErrorEventsList from '$lib/components/phase78/ErrorEventsList.svelte';
  import SuggestionsList from '$lib/components/phase78/SuggestionsList.svelte';
- import type { ErrorEvent, ErrorSuggestion } from '$lib/server/db/schema/index.js';
 // Load data on mount
  import { onMount } from 'svelte';
  onMount(() => {

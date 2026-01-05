@@ -1,9 +1,4 @@
 <script lang="ts">
-	let t = $state<any>(undefined);
-	let imp = $state<any>(undefined);
-	let exp = $state<any>(undefined);
-	let comment = $state<any>(undefined);
-
     import type { PageData } from './$types';
 
     let { data }: { data: PageData } = $props();

@@ -1,7 +1,4 @@
 <script lang="ts">
-	let tag = $state<any>(undefined);
-	let log = $state<any>(undefined);
-
 	import { onDestroy, onMount } from 'svelte';
 	import type { PageData } from './$types';
 
@@ -42,7 +39,7 @@
 			});
 		}
 	});
-  
+
 	let graphNodes = $state<GraphNode[]>([]);
 	let graphEdges = $state<GraphEdge[]>([]);
 

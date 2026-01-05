@@ -1,8 +1,4 @@
 <script lang="ts">
-	let related = $state<any>(undefined);
-	let comment = $state<any>(undefined);
-	let rec = $state<any>(undefined);
-
 	import { onMount } from 'svelte';
 
 	interface PageData {
@@ -113,7 +109,7 @@
 					r.payload.tags.forEach((t: string) => tags.add(t));
 				}
 			});
-  
+
 			for (const tag of tags) {
 				const response = await fetch('/api/analyze-tag', {
 					method: 'POST',

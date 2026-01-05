@@ -1,6 +1,4 @@
 <script lang="ts">
-	let tag = $state<any>(undefined);
-
   import { Input } from '$lib/components/ui/input';
  import type { PageData } from './$types';
 
@@ -14,7 +12,7 @@
  let webgpuCapabilities = $state({
  hasWebGPU: typeof navigator !== 'undefined' && 'gpu' in navigator
  });
-  
+
  const analysisModes = [
  { id: 'pattern' as const, label: 'PATTERN ANALYSIS', icon: '🔍' },
  { id: 'correlation' as const, label: 'CORRELATION MATRIX', icon: '📊' },

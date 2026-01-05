@@ -1,6 +1,4 @@
 <script lang="ts">
-	let height = $state<any>(undefined);
-
  import { onMount } from 'svelte';
 
  interface MonitoringStats {
