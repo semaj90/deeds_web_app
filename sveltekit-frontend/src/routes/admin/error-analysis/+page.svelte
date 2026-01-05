@@ -3,7 +3,7 @@
 	let rec = $state<any>(undefined);
 	let log = $state<any>(undefined);
 
-	import { Button, ButtonRoot, Dialog, DialogContent, DialogDescription, DialogOverlay, DialogPortal, DialogRoot, DialogTitle, Separator, SeparatorRoot } from 'bits-ui';
+	import { ButtonRoot, DialogContent, DialogDescription, DialogOverlay, DialogPortal, DialogRoot, DialogTitle, SeparatorRoot } from 'bits-ui';
 	import { onMount } from 'svelte';
 	import type { PageData } from './$types';
 
@@ -42,7 +42,7 @@
 
 	// Execute agentic fix with function tool calling
 	async function executeAgenticFix(clusterId: number) {
-		agenticLogs = [`🚀 Starting agentic fix for cluster #${ clusterId: clusterId }...`];
+		agenticLogs = [`🚀 Starting agentic fix for cluster #${clusterId}...`];
 
 		try {
 			const response = await fetch('/api/phase89/agentic-fix', {
@@ -79,13 +79,13 @@
 			await loadAnalysis();
 
 		} catch (err) {
-			agenticLogs = [...agenticLogs, `❌ Error: ${ err: err }`];
+			agenticLogs = [...agenticLogs, `❌ Error: ${err}`];
 		}
 	}
 
 	// Execute next step command
 	async function executeNextStep(command: string) {
-		agenticLogs = [`⚡ Executing: ${ command: command }`];
+		agenticLogs = [`⚡ Executing: ${command}`];
 
 		try {
 			const response = await fetch('/api/phase89/execute-command', {

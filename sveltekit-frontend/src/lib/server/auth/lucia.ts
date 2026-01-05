@@ -3,7 +3,22 @@
 
 export const auth = {
  sessionCookieName: 'yorha_session',
- validateSession: async () => ({ session: null, user: null }, createSession: async (userId: string): any: any => ({ id: 'demo-session-' + userId, userId: expiresAt Date(Date.now() + 1000 * 60 * 60 * 24) }, createSessionCookie: (sessionId: string) => ({ name: 'yorha_session', value: sessionId, attributes: { path: '/', httpOnly: true } }, createBlankSessionCookie: () => ({ name: 'yorha_session', value: '', attributes: {} }),
+ validateSession: async () => ({ session: null, user: null }),
+ createSession: async (userId: string) => ({
+ id: 'demo-session-' + userId,
+ userId,
+ expiresAt: new Date(Date.now() + 1000 * 60 * 60 * 24)
+ }),
+ createSessionCookie: (sessionId: string) => ({
+ name: 'yorha_session',
+ value: sessionId,
+ attributes: { path: '/', httpOnly: true }
+ }),
+ createBlankSessionCookie: () => ({
+ name: 'yorha_session',
+ value: '',
+ attributes: {}
+ }),
 };
 
 export type Auth = typeof auth;

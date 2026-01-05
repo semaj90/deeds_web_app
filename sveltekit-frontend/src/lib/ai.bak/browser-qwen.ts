@@ -1,4 +1,3 @@
-import type { Document } from '$lib/types';
 
 /**
  * Browser-based Qwen 0.5B LLM using Transformer.js v3
@@ -23,7 +22,7 @@ import type { Document } from '$lib/types';
  * const response = await qwen.generate('Summarize this contract...');
  */
 
-import {  pipeline, env  } from '@huggingface/transformers';
+import { env, pipeline } from '@huggingface/transformers';
 
 // Configure Transformers.js for browser
 env.allowLocalModels = true;
@@ -65,7 +64,8 @@ export class BrowserQwen {
 
  try {
  this.generator = await pipeline('text-generation', this.modelName, {
- device: this.device, dtype.device === 'webgpu' ? 'fp32' : 'q4',
+ device: this.device,
+ dtype: this.device === 'webgpu' ? 'fp32' : 'q4',
  progress_callback: (progress: unknown) => {
  if ((progress as any).status === 'downloading') {
  const pct = (((progress as any).loaded / (progress as any).total) * 100).toFixed(1);

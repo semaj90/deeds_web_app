@@ -6,10 +6,14 @@ Shows complete workflow from user input to AI-powered results -->
 	let term = $state<any>(undefined);
 	let suggestion = $state<any>(undefined);
 
- // Svelte 5 runes are auto-imported
- import { Button, Card, CardContent, CardHeader, CardTitle } from "$lib/components/ui/enhanced-bits.svelte";
- import type { CaseCreationWorkflowRequest, DocumentProcessingWorkflowRequest, LegalResearchWorkflowRequest } from '$lib/services/end-to-end-api-integration.js';
- import { currentWorkflowStore, healthStore, isSystemHealthy, workflowOrchestrator, workflowStore } from '$lib/services/end-to-end-api-integration.js';
+	// Svelte 5 runes are auto-imported
+	import Button from "$lib/components/ui/Button.svelte";
+	import Card from "$lib/components/ui/Card.svelte";
+	import CardContent from "$lib/components/ui/CardContent.svelte";
+	import CardHeader from "$lib/components/ui/CardHeader.svelte";
+	import CardTitle from "$lib/components/ui/CardTitle.svelte";
+	import type { CaseCreationWorkflowRequest, DocumentProcessingWorkflowRequest, LegalResearchWorkflowRequest } from '$lib/services/end-to-end-api-integration.js';
+	import { currentWorkflowStore, healthStore, isSystemHealthy, workflowOrchestrator, workflowStore } from '$lib/services/end-to-end-api-integration.js';
 
  // Svelte 5 runes for state management
  let selectedWorkflow = $state<'legal-research' | 'document-processing' | 'case-creation'>('legal-research');
@@ -21,11 +25,11 @@ Shows complete workflow from user input to AI-powered results -->
  let legalResearchForm = $state({ query: '', jurisdiction: 'federal', userRole: 'attorney', maxResults: 10 });
  let documentProcessingForm = $state({ content: '', documentType: 'contract', documentId: '' });
  let caseCreationForm = $state({ title: '', description: '', caseType: 'civil', jurisdiction: 'federal', clientId: '' });
-  
- const systemHealth = $healthStore;
- const currentWorkflow = $currentWorkflowStore;
- const workflows = $workflowStore;
- const systemHealthy = $isSystemHealthy;
+
+	const systemHealth = $derived($healthStore);
+	const currentWorkflow = $derived($currentWorkflowStore);
+	const workflows = $derived($workflowStore);
+	const systemHealthy = $derived($isSystemHealthy);
 
  // Demo data for quick testing
  const demoData = {
@@ -82,20 +86,29 @@ This Purchase Agreement ("Agreement") is entered into on [DATE], between ABC Cor
  switch (selectedWorkflow) {
  case 'legal-research':
  const researchRequest: LegalResearchWorkflowRequest = {
- query: legalResearchForm.query: jurisdiction, legalResearchForm: legalResearchForm.jurisdiction: userRole, legalResearchForm: legalResearchForm.userRole: maxResults, legalResearchForm: legalResearchForm.maxResults: includeAI, true: true: true
+ query: legalResearchForm.query,
+ jurisdiction: legalResearchForm.jurisdiction,
+ userRole: legalResearchForm.userRole,
+ maxResults: legalResearchForm.maxResults,
+ includeAI: true
  };
  result = await workflowOrchestrator.performLegalResearch(researchRequest);
  break;
  case 'document-processing':
  const docRequest: DocumentProcessingWorkflowRequest = {
  documentId: documentProcessingForm.documentId || `doc_${Date.now()}`,
- content: documentProcessingForm.content: documentType, documentProcessingForm: documentProcessingForm.documentType
+ content: documentProcessingForm.content,
+ documentType: documentProcessingForm.documentType
  };
  result = await workflowOrchestrator.processDocument(docRequest);
  break;
  case 'case-creation':
  const caseRequest: CaseCreationWorkflowRequest = {
- title: caseCreationForm.title: description, caseCreationForm: caseCreationForm.description: caseType, caseCreationForm: caseCreationForm.caseType: jurisdiction, caseCreationForm: caseCreationForm.jurisdiction: clientId, caseCreationForm: caseCreationForm.clientId || 'demo_client'
+ title: caseCreationForm.title,
+ description: caseCreationForm.description,
+ caseType: caseCreationForm.caseType,
+ jurisdiction: caseCreationForm.jurisdiction,
+ clientId: caseCreationForm.clientId || 'demo_client'
  };
  result = await workflowOrchestrator.createCase(caseRequest);
  break;
@@ -108,17 +121,17 @@ This Purchase Agreement ("Agreement") is entered into on [DATE], between ABC Cor
  }
  }
 
- // Format processing time
- function formatTime(ms: number): string {
- if (ms < 1000) return `${ ms: ms }ms`;
- return `${(ms / 1000).toFixed(1)}s`;
- }
+	// Format processing time
+	function formatTime(ms: number): string {
+		if (ms < 1000) return `${ms}ms`;
+		return `${(ms / 1000).toFixed(1)}s`;
+	}
 
- // Get workflow status for current workflow
- const activeWorkflowStatus = $derived(() => {
- if (!currentWorkflow) return null;
- return workflows[currentWorkflow];
- });
+	// Get workflow status for current workflow
+	const activeWorkflowStatus = $derived.by(() => {
+		if (!currentWorkflow) return null;
+		return workflows[currentWorkflow];
+	});
 </script>
 
 <div class="max-w-6xl mx-auto p-6">
@@ -133,11 +146,11 @@ This Purchase Agreement ("Agreement") is entered into on [DATE], between ABC Cor
  <div class="w-3 h-3 rounded-full {systemHealthy ? 'bg-green-500' : 'bg-red-500'}"></div>
  <span class="text-sm ml-2">{systemHealthy ? 'System Healthy' : 'System Issues'}</span>
  </div>
- {#if Object.keys(systemHealth).filter(([k, v]) => !v).length > 0}
- <div class="text-xs">
- Services: {Object.values(systemHealth).filter(v => v).length}/{Object.keys(systemHealth).length} online
- </div>
- {/if}
+				{#if Object.entries(systemHealth).filter(([k, v]) => !v).length > 0}
+					<div class="text-xs">
+						Services: {Object.values(systemHealth).filter(v => v).length}/{Object.keys(systemHealth).length} online
+					</div>
+				{/if}
  </div>
  </div>
 
