@@ -1,9 +1,4 @@
 <script lang="ts">
-	let isLoading = $state<any>(undefined);
-	let isSelected = $state<any>(undefined);
-	let entity = $state<any>(undefined);
-	let onCancel = $state<any>(undefined);
-
 /**
  * SourceValidator Component (Svelte 5)
  * Human-in-the-loop source validation with approval/rejection UI

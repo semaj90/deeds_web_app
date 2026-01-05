@@ -1,17 +1,7 @@
-import { createEventDispatcher } from 'svelte';
 <script lang="ts">
-	let strength = $state<any>(undefined);
-	let weakness = $state<any>(undefined);
-	let standard = $state<any>(undefined);
-	let issue = $state<any>(undefined);
-	let question = $state<any>(undefined);
-	let risk = $state<any>(undefined);
-	let factor = $state<any>(undefined);
-	let deadline = $state<any>(undefined);
-
-	// Migrated from createEventDispatcher to callback props;
-	import type { enhance } from '$app/forms';
-	import { writable } from 'svelte/store';;
+	import { enhance } from '$app/forms';
+	import { createEventDispatcher } from 'svelte';
+	import { writable } from 'svelte/store';
 
 	const dispatch = createEventDispatcher();
 
@@ -21,8 +11,8 @@ import { createEventDispatcher } from 'svelte';
 		caseType = 'civil',
 		jurisdiction = 'general',
 		partyType = 'plaintiff',
-		historicalData = [],
-		similarCases = []
+		historicalData = [] as string[],
+		similarCases = [] as string[]
 	} = $props();
 
 	// Define a type for the prediction outcome part that is stored in history
@@ -30,7 +20,6 @@ import { createEventDispatcher } from 'svelte';
 		success_probability: number;
 		most_likely_outcome: string;
 		confidence_level: string;
-		// Add other properties if needed for history display
 	}
 
 	// Define a type for an item in the analysis history
@@ -43,20 +32,23 @@ import { createEventDispatcher } from 'svelte';
 	}
 
 	// Local state
-	let isLoading = $state <boolean>(false);
-	let prediction = $state <any>(null); // Keep as any for flexibility, or define a proper type if available
-	let error = $state <string | null>(null);
+	let isLoading = $state(false);
+	let prediction = $state<any>(null);
+	let error = $state<string | null>(null);
 	let showAdvanced = writable(false);
-	let analysisHistory = writable<AnalysisHistoryItem[]>([]); // Explicitly type the writable store
+	let analysisHistory = writable<AnalysisHistoryItem[]>([]);
 	let exportFormat = writable('json');
 
 	// Form data
 	let formData = writable({
-		caseFacts: caseFacts, caseType: caseType, caseType: caseType,
-		jurisdiction: jurisdiction, partyType: partyType, partyType: partyType,
-		historicalData: historicalData.join('\n', similarCases: similarCases.join('\n')
+		caseFacts,
+		caseType,
+		jurisdiction,
+		partyType,
+		historicalData: historicalData.join('\n'),
+		similarCases: similarCases.join('\n')
 	});
-  
+
 	const caseTypes = [
 		{ value: 'civil', label: 'Civil Litigation' },
 		{ value: 'criminal', label: 'Criminal Case' },
@@ -100,7 +92,7 @@ import { createEventDispatcher } from 'svelte';
 			const similarCasesValue = form.get('similarCases');
 
 			const data = {
-				caseFacts: form.get('caseFacts', caseType: form.get('caseType', jurisdiction: form.get('jurisdiction', partyType: form.get('partyType'),
+				caseFacts: form.get('caseFacts'), caseType: form.get('caseType'), jurisdiction: form.get('jurisdiction'), partyType: form.get('partyType'),
 				// Check if value is a string before splitting, otherwise default to empty array
 				historicalData: typeof historicalDataValue === 'string' ? historicalDataValue.split('\n').filter((item: string) => item.trim()) : [],
 				similarCases: typeof similarCasesValue === 'string' ? similarCasesValue.split('\n').filter((item: string) => item.trim()) : []
@@ -127,12 +119,11 @@ import { createEventDispatcher } from 'svelte';
 			// Add to history
 			analysisHistory.update(history => [{
 				timestamp: new Date().toISOString(),
-				// Ensure caseFacts is a string before slicing, provide fallback if somehow null
 				caseFacts: (data.caseFacts?.toString() || '').slice(0, 100) + '...',
-				// Ensure caseType is a string, provide fallback if somehow null
-				caseType: (data.caseType?.toString() || 'unknown', prediction: result.outcome_prediction, // This should conform to OutcomePredictionSummary
+				caseType: data.caseType?.toString() || 'unknown',
+				prediction: result.outcome_prediction,
 				id: Date.now()
-			}, ...history.slice(0, 9)]); // Keep last 10
+			}, ...history.slice(0, 9)]);
 
 			dispatch('predictionComplete', { prediction: result });
 
@@ -155,12 +146,14 @@ import { createEventDispatcher } from 'svelte';
 		if (!prediction) return;
 
 		const data = {
-			export_timestamp: new Date().toISOString(, case_data: $formData: prediction_results, prediction: prediction: prediction
+			export_timestamp: new Date().toISOString(),
+			case_data: $formData,
+			prediction_results: prediction
 		};
 
 		let content, filename, mimeType;
 
-		if ($exportFormat === 'json') {
+		if ($exportFormat=== 'json') {
 			content = JSON.stringify(data, null, 2);
 			filename = `case-prediction-${Date.now()}.json`;
 			mimeType = 'application/json';
@@ -278,9 +271,11 @@ Factors Considered: ${pred.metadata.factors_considered.join(', ')}
 	}
 
 	// Load from history
-	function loadFromHistory(historyItem) {
+	function loadFromHistory(historyItem: AnalysisHistoryItem) {
 		formData.update(data => ({
-			...data, caseFacts: historyItem, historyItem: historyItem.caseFacts: caseType, historyItem: historyItem.caseType
+			...data,
+			caseFacts: historyItem.caseFacts,
+			caseType: historyItem.caseType
 		}));
 	}
 </script>
@@ -306,7 +301,7 @@ Factors Considered: ${pred.metadata.factors_considered.join(', ')}
 					<textarea
 						id="caseFacts"
 						name="caseFacts"
-						bind:value={$formData .caseFacts}
+						bind:value={$formData.caseFacts}
 						placeholder="Enter detailed case facts, evidence, witness statements, and relevant circumstances..."
 						rows="8"
 						required
@@ -316,7 +311,7 @@ Factors Considered: ${pred.metadata.factors_considered.join(', ')}
 				<div class="form-row">
 					<div class="form-group">
 						<label for="caseType">Case Type</label>
-						<select id="caseType" name="caseType" bind:value={$formData .caseType}>
+						<select id="caseType" name="caseType" bind:value={$formData.caseType}>
 							{#each caseTypes as type (type.value)}
 								<option value={type.value}>{type.label}</option>
 							{/each}
@@ -325,7 +320,7 @@ Factors Considered: ${pred.metadata.factors_considered.join(', ')}
 
 					<div class="form-group">
 						<label for="jurisdiction">Jurisdiction</label>
-						<select id="jurisdiction" name="jurisdiction" bind:value={$formData .jurisdiction}>
+						<select id="jurisdiction" name="jurisdiction" bind:value={$formData.jurisdiction}>
 							{#each jurisdictions as juris (juris.value)}
 								<option value={juris.value}>{juris.label}</option>
 							{/each}
@@ -334,7 +329,7 @@ Factors Considered: ${pred.metadata.factors_considered.join(', ')}
 
 					<div class="form-group">
 						<label for="partyType">Your Role</label>
-						<select id="partyType" name="partyType" bind:value={$formData .partyType}>
+						<select id="partyType" name="partyType" bind:value={$formData.partyType}>
 							{#each partyTypes as party (party.value)}
 								<option value={party.value}>{party.label}</option>
 							{/each}
@@ -359,7 +354,7 @@ Factors Considered: ${pred.metadata.factors_considered.join(', ')}
 							<textarea
 								id="historicalData"
 								name="historicalData"
-								bind:value={$formData .historicalData}
+								bind:value={$formData.historicalData}
 								placeholder="Enter historical case data, one per line..."
 								rows="4"
 							></textarea>
@@ -373,7 +368,7 @@ Factors Considered: ${pred.metadata.factors_considered.join(', ')}
 							<textarea
 								id="similarCases"
 								name="similarCases"
-								bind:value={$formData .similarCases}
+								bind:value={$formData.similarCases}
 								placeholder="Enter similar case references, one per line..."
 								rows="4"
 							></textarea>
@@ -413,7 +408,7 @@ Factors Considered: ${pred.metadata.factors_considered.join(', ')}
 			<div class="results-header">
 				<h3>📊 Case Outcome Analysis</h3>
 				<div class="export-controls">
-					<select bind:value={$exportFormat }>
+					<select bind:value={$exportFormat}>
 						<option value="json">JSON</option>
 						<option value="txt">Text Report</option>
 					</select>
@@ -626,7 +621,7 @@ Factors Considered: ${pred.metadata.factors_considered.join(', ')}
 		</div>
 	{/if}
 
-	{#if $analysisHistory .length > 0}
+	{#if $analysisHistory.length > 0}
 		<div class="analysis-history">
 			<h3>📚 Recent Analyses</h3>
 			<div class="history-list">
@@ -740,7 +735,7 @@ Factors Considered: ${pred.metadata.factors_considered.join(', ')}
 		font-family: inherit;
 	}
 
-	textarea:focus, select: focus, focus: focus {
+	textarea:focus, select:focus, focus:focus {
 		outline: none;
 		border-color: #3498db;
 		box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);

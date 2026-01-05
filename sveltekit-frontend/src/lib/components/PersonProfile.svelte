@@ -1,12 +1,9 @@
 <script lang="ts">
-	let associate = $state<any>(undefined);
-	let habit = $state<any>(undefined);
-
 	import Button from '$lib/components/ui/button/Button.svelte';
 	import type { FugitiveDexPerson } from './types';
 
 	interface Props {
-		selectedPerson: FugitiveDexPerson: null;
+		selectedPerson: FugitiveDexPerson | null;
 		onOpenAIModal: (person: FugitiveDexPerson) => void;
 	}
 

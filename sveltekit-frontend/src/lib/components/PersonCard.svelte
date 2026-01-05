@@ -1,7 +1,5 @@
 <script lang="ts">
-	let tag = $state<any>(undefined);
-
- interface Props {
+	interface Props {
  person: any;
  onedit?: (id: string) => void;
  ondelete?: (id: string) => void;

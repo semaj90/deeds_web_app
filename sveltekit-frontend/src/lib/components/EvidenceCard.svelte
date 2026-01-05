@@ -1,10 +1,6 @@
 <script lang="ts">
-	let tag = $state<any>(undefined);
-	let keyword = $state<any>(undefined);
-	let suggestion = $state<any>(undefined);
-
- import type { Evidence } from '$lib/schemas/evidence';
- import { formatDistanceToNow } from 'date-fns';
+	import type { Evidence } from '$lib/schemas/evidence';
+	import { formatDistanceToNow } from 'date-fns';
 
  interface Props {
  evidence: Evidence;

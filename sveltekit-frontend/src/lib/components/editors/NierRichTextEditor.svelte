@@ -1,15 +1,13 @@
 <script lang="ts">
-	let caseId = $state<any>(undefined);
+	interface Props {
+		value?: string;
+		placeholder?: string;
+		caseId?: string;
+		readonly?: boolean;
+		autosave?: boolean;
+	}
 
- interface Props {
- value?: string;
- placeholder?: string;
- caseId?: string;
- readonly?: boolean;
- autosave?: boolean;
- }
-
- let { value = $bindable(''), placeholder = '', caseId = '', readonly = false, autosave = false }: Props = $props();
+	let { value = $bindable(''), placeholder = '', caseId = '', readonly = false, autosave = false }: Props = $props();
 </script>
 
 <div class="nier-rich-text-editor">
