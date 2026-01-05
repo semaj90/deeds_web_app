@@ -44,7 +44,7 @@ export const actions: Actions = {
  id: `A${Date.now()}`,
  query.response,
  mode,
- timestamp: new Date().toISOString(, confidence: 0.85,
+ timestamp: new Date().toISOString(), confidence: 0.85,
  },
  };
  } catch (error) {

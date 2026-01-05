@@ -26,7 +26,7 @@
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
  body: JSON.stringify({
- caseId: id, message: messageText, messageText: messageText,
+ caseId: id, message: messageText, messageText,
  context: 'case_analysis'
  })
  });

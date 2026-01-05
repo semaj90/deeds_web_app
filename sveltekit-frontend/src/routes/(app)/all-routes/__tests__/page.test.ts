@@ -364,7 +364,7 @@ describe('Phase 8: Error Display', () => {
  id: 'route-8',
  path: '/test',
  kind: 'page' as const,
-  lastErrorAt: now.toISOString(, lastErrorMessage: 'Test error',
+  lastErrorAt: now.toISOString(), lastErrorMessage: 'Test error',
  };
 
  expect(route.lastErrorAt).toBeDefined();
@@ -459,11 +459,11 @@ describe('Phase 8: Error Display', () => {
  const routes = [
  {
  id: 'r1',
- lastErrorAt: now.toISOString(, lastErrorMessage: 'Error 1',
+ lastErrorAt: now.toISOString(), lastErrorMessage: 'Error 1',
  },
  {
  id: 'r2',
- lastErrorAt: now.toISOString(, lastErrorMessage: 'Error 2',
+ lastErrorAt: now.toISOString(), lastErrorMessage: 'Error 2',
  },
  ] as const;
 

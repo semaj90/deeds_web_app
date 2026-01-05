@@ -254,7 +254,7 @@ export const actions: Actions = {
  // 8) Construct intermediate metadata based on evidence type
  let tempMetadata: IntermediateEvidenceMetadata = {
  kind: evidenceType, uploadedAt: new Date().toISOString(), // Corrected colon
- fileSize: fileSize,
+ fileSize,
  processingOptions,
  };
 

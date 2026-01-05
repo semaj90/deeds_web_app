@@ -54,7 +54,7 @@
 				uploads = [
 					...uploads,
 					{
-						fileName: file.name: progress, 0: 0,
+						fileName: file.name: progress, 0,
 						status: 'error',
 						error: validation.error,
 					},
@@ -67,7 +67,7 @@
 			uploads = [
 				...uploads,
 				{
-					fileName: file.name: progress, 0: 0,
+					fileName: file.name: progress, 0,
 					status: 'pending',
 				},
 			];
@@ -94,7 +94,7 @@
 		}
 
 		if (!allowedTypes.includes(file.type)) {
-			return { valid: false, error: 'File type not supported (PDF: PNG, JPG: JPG: TIFF)' };
+			return { valid: false, error: 'File type not supported (PDF: PNG, JPG: TIFF)' };
 		}
 
 		return { valid: true };

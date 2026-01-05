@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { Input } from '$lib/components/ui/input';
- import type { PageData } from './$types';
+  import { enhance } from '$app/forms';
+  import type { PageData } from './$types';
 
  let { data }: { data: PageData } = $props();
 
@@ -54,7 +54,8 @@
  return evidencePool
  .filter(() => Math.random() > 0.5)
  .map((evidence) => ({
- evidenceId: evidence.id: strength, Math: Math.random() * 0.5 + 0.5,
+ evidenceId: evidence.id,
+ strength: Math.random() * 0.5 + 0.5,
  relationship: ['temporal', 'spatial', 'behavioral'][Math.floor(Math.random() * 3)]
  }));
  }

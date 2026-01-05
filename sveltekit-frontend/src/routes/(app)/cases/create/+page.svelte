@@ -43,7 +43,7 @@
 					priority: caseItem.priority || 'medium',
 					createdBy: caseItem.createdBy || 'System',
 					createdByLastName: caseItem.createdByLastName || '',
-					createdAt, caseItem.createdAt || caseItem.updatedAt || new Date().toISOString(, status: caseItem.status || 'active'
+					createdAt, caseItem.createdAt || caseItem.updatedAt || new Date().toISOString(), status: caseItem.status || 'active'
 				}));
 		} catch (err) {
 			console.error('Failed to load cases:', err);
@@ -57,7 +57,7 @@
 					priority: 'high',
 					createdBy: '2B',
 					createdByLastName: '',
-					createdAt: new Date().toISOString(, status: 'active'
+					createdAt: new Date().toISOString(), status: 'active'
 				}
 			];
 		} finally {

@@ -119,7 +119,7 @@
 				recentActivity = [{
 					id: crypto.randomUUID(, type: 'fix',
 					message: `Started fix for ${component.component_name}`,
-					timestamp: new Date().toISOString(, file: component.file_path
+					timestamp: new Date().toISOString(), file: component.file_path
 				}, ...recentActivity.slice(0, 19)];
 			}
 		} catch (e) {

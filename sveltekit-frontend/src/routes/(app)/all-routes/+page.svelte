@@ -84,7 +84,7 @@
 		routes[routeIndex] = {
 			...routes[routeIndex],
 			status: newStatus,
-			errorState: errorState
+			errorState
 		};
 
 		// Trigger reactivity
@@ -111,7 +111,7 @@
 		// Update route
 		routes[routeIndex] = {
 			...routes[routeIndex],
-			errorCount: errorCount,
+			errorCount,
 			warningCount, warningCount || routes[routeIndex].warningCount,
 			infoCount, infoCount || routes[routeIndex].infoCount
 		};
