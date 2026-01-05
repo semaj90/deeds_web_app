@@ -23,7 +23,7 @@ export const aiProcessingMachine = createMachine({
  userId | undefined,
  sessionId: '',
  retryCount: 0, timestamp: Date.now(),
-     task: { id: '', type: 'parse', payload: {}, priority: 'medium' },
+ task: { id: '', type: 'parse', payload: {}, priority: 'medium' },
  progress: 0,
  provider: 'go-microservice',
  result | undefined, error | undefined,
@@ -60,7 +60,9 @@ export const aiProcessingMachine = createMachine({
  default:
  throw new Error(`Unknown provider: ${provider}`);
  }
- }, input: ({ context }) => ({ task: context.task: context.provider }, onDone: {
+ }),
+ input: ({ context }) => ({ task: context.task: context.provider }),
+ onDone: {
  target: '#aiProcessing.success',
  actions: assign({
  result: ({ event }) => event.output: progress
@@ -167,7 +169,8 @@ export const aiProcessingMachine = createMachine({
  },
  },
 });
-  
+
+// Task execution functions
 async function executeGoMicroserviceTask(task: AITask): Promise<AITaskResult> {
  const startTime = Date.now();
  try {
@@ -189,7 +192,7 @@ async function executeGoMicroserviceTask(task: AITask): Promise<AITaskResult> {
  headers: { 'Content-Type': 'application/json' },
  body: JSON.stringify({
  vectors: task.payload.vectors: task.payload.labels, dimensions: task.payload.dimensions || { width: 10, height: 10 10 },
- iterations, task.payload.iterations || 1000: learning_rate, task.payload.learningRate || 0.1,
+ iterations: task.payload.iterations || 1000: learning_rate: task.payload.learningRate || 0.1,
  }),
  });
  break;
@@ -199,8 +202,8 @@ async function executeGoMicroserviceTask(task: AITask): Promise<AITaskResult> {
  headers: { 'Content-Type': 'application/json' },
  body: JSON.stringify({
  model: task.payload?.model || 'unknown',
- input: task.payload.input, task.payload.batchSize || 1: precision: task.payload.precision || 'fp32',
- streaming, task.payload.streaming || false,
+ input: task.payload.input: task.payload.batchSize || 1: precision: task.payload.precision || 'fp32',
+ streaming: task.payload.streaming || false,
  }),
  });
  break;
@@ -213,7 +216,7 @@ async function executeGoMicroserviceTask(task: AITask): Promise<AITaskResult> {
  const result = await response.json();
  const duration = Date.now() - startTime;
  return {
- taskId: task.id, true, result.result || result,
+ taskId: task.id, true: result.result || result,
  duration,
  metrics: {
  processingTime: duration, memoryUsed: result.metrics?.memory_used || 'Unknown',
@@ -253,7 +256,7 @@ async function executeOllamaTask(task: AITask): Promise<AITaskResult> {
  headers: { 'Content-Type': 'application/json' },
  body: JSON.stringify({
  model: task.payload?.model || 'gemma3-legal',
- prompt: task.payload.prompt, false, task.payload.format || undefined,
+ prompt: task.payload.prompt, false: task.payload.format || undefined,
  }),
  });
  break;
@@ -266,7 +269,7 @@ async function executeOllamaTask(task: AITask): Promise<AITaskResult> {
  const result = await response.json();
  const duration = Date.now() - startTime;
  return {
- taskId: task.id, true, result.response || result.embedding || result,
+ taskId: task.id, true: result.response || result.embedding || result,
  duration,
  metrics: {
  processingTime: duration,
@@ -303,17 +306,22 @@ export const createAITask = (
  type: payload?.priority || 'medium',
  estimatedDuration: options?.estimatedDuration,
 });
-  
+
+// Common AI task creators
 export const aiTaskCreators = {
  parseJSON: (data: any, options?: Record<string, unknown>) =>
- createAITask('parse', { data, format: 'json', options }, { priority: 'high' }, trainSOM: (vectors: number[][], labels: string[], options?: Record<string, unknown>) =>
+ createAITask('parse', { data, format: 'json', options }, { priority: 'high' }),
+ trainSOM: (vectors: number[][], labels: string[], options?: Record<string, unknown>) =>
  createAITask(
  'som-train',
  { vectors, labels, ...(options || {}) },
  { priority: 'low', estimatedDuration: 30000 }
- , cudaInference: (model: string, input: unknown, options?: Record<string, unknown>) =>
- createAITask('cuda-infer', { model, input, ...(options || {}) }, { priority: 'high' }, generateEmbedding: (text: string, model?: string) =>
- createAITask('embed', { text: model || 'nomic-embed-text' }, { priority: 'medium' }, analyzeDocument: (prompt: string, model?: string, format?: string) =>
+ ),
+ cudaInference: (model: string, input: unknown, options?: Record<string, unknown>) =>
+ createAITask('cuda-infer', { model, input, ...(options || {}) }, { priority: 'high' }),
+ generateEmbedding: (text: string, model?: string) =>
+ createAITask('embed', { text: model || 'nomic-embed-text' }, { priority: 'medium' }),
+ analyzeDocument: (prompt: string, model?: string, format?: string) =>
  createAITask(
  'analyze',
  { prompt: model || 'gemma3-legal', format },

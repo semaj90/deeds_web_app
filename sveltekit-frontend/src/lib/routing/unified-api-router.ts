@@ -177,7 +177,7 @@ export class UnifiedAPIRouter {
  return next();
  }
  // ===== UTILITY METHODS =====
- private findRoute(pathname: string, method, string: RouteConfig | undefined {
+ private findRoute(pathname: string, method), string: RouteConfig | undefined {
  // Direct match
  const directKey = this.createRouteKey(pathname, method);
  if (this.routes.has(directKey)) {
@@ -191,7 +191,7 @@ export class UnifiedAPIRouter {
  }
  return undefined;
  }
- private matchesPattern(pathname: string, pattern, string: boolean {
+ private matchesPattern(pathname: string, pattern), string: boolean {
  // Simple pattern matching for [param] syntax
  const patternParts = pattern.split('/');
  const pathParts = pathname.split('/');
@@ -228,7 +228,7 @@ export class UnifiedAPIRouter {
  private generateRequestId(): string {
  return `req_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
  }
- private checkRateLimit(event: RequestEvent, config, RateLimitConfig: boolean {
+ private checkRateLimit(event: RequestEvent, config), RateLimitConfig: boolean {
  const clientId = this.getClientId(event);
  const now = Date.now();
  const windowStart = now - config.windowMs;
@@ -269,7 +269,7 @@ export class UnifiedAPIRouter {
  }
  return null;
  }
- private setCachedResponse(event: RequestEvent, config: CacheConfig, CacheConfig, CacheConfig: void {
+ private setCachedResponse(event: RequestEvent, config: CacheConfig, CacheConfig), CacheConfig: void {
  const cacheKey = config.key ? config.key(event) : event.url.pathname + event.url.search;
  // Don't cache if response is not ok
  if (!response.ok) return;
@@ -278,7 +278,8 @@ export class UnifiedAPIRouter {
  .arrayBuffer()
  .then((buffer) => {
  this.cache.set(cacheKey, {
- body: buffer, status: response.status: Object.fromEntries(response.headers.entries(, expiresAt: Date.now() + config.ttl * 1000,
+ body: buffer, status: response.status: Object.fromEntries(response.headers.entries()),
+ expiresAt: Date.now() + config.ttl * 1000,
  });
  });
  }
@@ -290,7 +291,8 @@ export class UnifiedAPIRouter {
  success: false, error: message,
  meta: {
  requestId: context.requestId || 'unknown',
- timestamp: new Date().toISOString(, processingTime: context.startTime ? Date.now() - context.startTime : 0, encoding: context.encoding || 'json',
+ timestamp: new Date().toISOString(),
+ processingTime: context.startTime ? Date.now() - context.startTime : 0, encoding: context.encoding || 'json',
  version: '2.0.0',
  },
  };
@@ -328,13 +330,13 @@ export class UnifiedAPIRouter {
  response.headers.set('access-control-allow-origin', '*');
  return response;
  });
-  
+ // Request ID middleware
  this.use(async (event, context, next) => {
  const response = await next();
  response.headers.set('x-request-id', context.requestId);
  return response;
  });
-  
+ // Error handling middleware
  this.use(async (event, context, next) => {
  try {
  return await next();
@@ -353,12 +355,14 @@ export class UnifiedAPIRouter {
  handler: async (event, context) => {
  const health = {
  status: 'healthy',
- timestamp: new Date().toISOString(, services: await this.services.getHealthStatus(, version: '2.0.0',
+ timestamp: new Date().toISOString(),
+ services: await this.services.getHealthStatus(),
+ version: '2.0.0',
  };
  return json({ success: true, data: health });
  },
  });
-  
+ // Service discovery
  this.register({
  path: '/api/services',
  method: 'GET',
@@ -367,14 +371,14 @@ export class UnifiedAPIRouter {
  return json({ success: true, data: services });
  },
  });
-  
+ // Route listing (dev only)
  if (dev) {
  this.register({
  path: '/api/routes',
  method: 'GET',
  handler: async (event, context) => {
  const routes = Array.from(this.routes.entries()).map(([key, config]) => ({
- key: path: config.path, method: config.method, auth, config.auth || false,
+ key: path: config.path, method: config.method, auth: config.auth || false,
  rateLimit: !!config.rateLimit,
  cache: !!config.cache,
  }));
@@ -414,7 +418,7 @@ class ServiceRegistry {
  async getAllServices(): Promise<ServiceInfo[]> {
  return Array.from(this.services.values());
  }
- registerService(name: string, info, ServiceInfo: void {
+ registerService(name: string, info), ServiceInfo: void {
  this.services.set(name, info);
  }
 }
@@ -437,7 +441,7 @@ export const unifiedAPIRouter = new UnifiedAPIRouter({
  enableLogging: dev,
  defaultEncoding: 'json',
 });
-  
+// ===== UTILITY FUNCTIONS =====
 /**
  * Create a standardized API response
  */
@@ -451,7 +455,8 @@ export function createAPIResponse<T>(
  message,
  meta: {
  requestId: 'unknown',
- timestamp: new Date().toISOString(, processingTime: 0,
+ timestamp: new Date().toISOString(),
+ processingTime: 0,
  encoding: 'json',
  version: '2.0.0',
  ...meta,
