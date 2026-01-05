@@ -1,6 +1,4 @@
 <script lang="ts">
-	let file = $state<any>(undefined);
-
 	import { onMount } from 'svelte';
 
 	interface Props {

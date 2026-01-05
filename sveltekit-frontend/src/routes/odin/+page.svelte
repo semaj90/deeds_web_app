@@ -1,6 +1,4 @@
 <script lang="ts">
-	let log = $state<any>(undefined);
-
   import { fade } from 'svelte/transition';
   import type { PageData } from './$types';
 

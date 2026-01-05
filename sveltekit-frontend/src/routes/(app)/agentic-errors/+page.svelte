@@ -1,10 +1,7 @@
 <script lang="ts">
-	let tag = $state<any>(undefined);
-
 	import { DialogClose, DialogContent, DialogOverlay, DialogPortal, DialogRoot, DialogTitle, TabsContent, TabsList, TabsRoot, TabsTrigger } from 'bits-ui';
 
 	import * as Dialog from 'bits-ui';
-	import * as Tabs from 'bits-ui';
 	import { onMount } from 'svelte';
 
 	interface Cluster {
@@ -41,7 +38,7 @@
 		total_nodes: 0,
 		qdrant_points: 0
 	});
-  
+
 	async function fetchStatus() {
 		loading = true;
 		try {

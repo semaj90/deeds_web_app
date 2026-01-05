@@ -1,6 +1,4 @@
 <script lang="ts">
-	let entity = $state<any>(undefined);
-
 	import { onMount } from 'svelte';
 
 	interface Props {

@@ -1,6 +1,4 @@
 <script lang="ts">
-	let service = $state<any>(undefined);
-
 	import { onMount } from 'svelte';
 
 	// State using Svelte 5 $state runes

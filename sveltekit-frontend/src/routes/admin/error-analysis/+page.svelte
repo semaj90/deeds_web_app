@@ -1,8 +1,4 @@
 <script lang="ts">
-	let tag = $state<any>(undefined);
-	let rec = $state<any>(undefined);
-	let log = $state<any>(undefined);
-
 	import { ButtonRoot, DialogContent, DialogDescription, DialogOverlay, DialogPortal, DialogRoot, DialogTitle, SeparatorRoot } from 'bits-ui';
 	import { onMount } from 'svelte';
 	import type { PageData } from './$types';

@@ -1,6 +1,4 @@
 <script lang="ts">
-	let tag = $state<any>(undefined);
-
 	import { Button, ButtonRoot, Dialog, DialogClose, DialogContent, DialogOverlay, DialogPortal, DialogRoot, DialogTitle } from 'bits-ui';
 	import { onMount } from 'svelte';
 
@@ -75,7 +73,7 @@
 				cluster_id: cluster.cluster_id,
 				tags: cluster.tags || []
 			});
-  
+
 			for (const filePath of cluster.file_paths || []) {
 				const fileId = `file-${filePath.replace(/[^a-zA-Z0-9]/g, '-')}`;
 				if (!nodes.find((n) => n.id === fileId)) {

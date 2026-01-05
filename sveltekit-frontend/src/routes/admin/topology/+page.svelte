@@ -1,10 +1,4 @@
 <script lang="ts">
-	let $searchQuery = $state<any>(undefined);
-	let $filterTag = $state<any>(undefined);
-	let $filterAction = $state<any>(undefined);
-	let tag = $state<any>(undefined);
-	let dep = $state<any>(undefined);
-
 	import { onMount } from 'svelte';
 	import { writable } from 'svelte/store';
 
@@ -138,7 +132,7 @@
 					fx += (dx / dist) * force;
 					fy += (dy / dist) * force;
 				});
-  
+
 				edges.forEach(edge => {
 					if (edge.from === n1.id) {
 						const n2 = nodes.find(n => n.id === edge.to);
@@ -205,7 +199,7 @@
 			ctx.lineTo(to.x, to.y);
 			ctx.stroke();
 		});
-  
+
 		filteredNodes.forEach(node => {
 			const radius = 5 + (node.errors / 5);
 			const color = colors[node.recommended_action as keyof typeof colors] || colors.monitor;
