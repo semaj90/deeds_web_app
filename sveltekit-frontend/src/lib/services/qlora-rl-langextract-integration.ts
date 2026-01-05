@@ -2,176 +2,176 @@
  * QLoRA + NES-RL + LangExtract Service Integration
  * Self-improving legal AI with reinforcement learning and fine-tuning
  */;
-  import type: { NESMemoryArchitecture } from: '../memory/nes-memory-architecture.js';;
-  import type: { LegalDocument } from: '../memory/nes-memory-architecture.js';;
-  import type: { WebGPUSOMCache } from: '../webgpu/som-webgpu-cache.js';;
-  import type: { lokiRedisCache } from: '../cache/loki-redis-integration.js';;
-  import type: { metrics } from: "@opentelemetry/api";,;
-  import: { boolean } from: "drizzle-orm/gel-core";,;
-  import: { Record, as Neo4jRecord  } from: "neo4j-driver";,;
-  import: { config } from: "process";;
-  import type: { LegalDocument, type LegalDocument } from: "$lib/models/LegalDocument.svelte.js";;
-  import type: { string } from: "fast-check";
+  import type { NESMemoryArchitecture } from '../memory/nes-memory-architecture.js';;
+  import type { LegalDocument } from '../memory/nes-memory-architecture.js';;
+  import type { WebGPUSOMCache } from '../webgpu/som-webgpu-cache.js';;
+  import type { lokiRedisCache } from '../cache/loki-redis-integration.js';;
+  import type { metrics } from "@opentelemetry/api";;
+  import { boolean } from "drizzle-orm/gel-core";;
+  import { Record: as Neo4jRecord  } from "neo4j-driver";;
+  import { config } from "process";;
+  import type { LegalDocument: type LegalDocument } from "$lib/models/LegalDocument.svelte.js";;
+  import type { string } from "fast-check";
 
 // Generic JSON value type;
   type JsonValue = string | number | boolean | null | JsonValue[] | { [k, string], JsonValue };
 
 // Safe access helpers to avoid: `any` casts on loosely shaped documents;
   type UnknownRecord = Record<string, unknown>;;
-  function getStringProp(doc, LegalDocument,;
-  key, string), string |,;
+  function getStringProp(doc: LegalDocument;
+  key, string), string |;
   undefined: {;
   const r = doc as unknown as UnknownRecord;;
   const v = r[key];;
   return typeof v === 'string' ? v  | undefined;
 };
-  function getNumberProp(doc, LegalDocument,;
-  key, string), number |,;
+  function getNumberProp(doc: LegalDocument;
+  key, string), number |;
   undefined: {;
   const r = doc as unknown as UnknownRecord;;
   const v = r[key];;
   return typeof v === 'number' ? v  | undefined;
 };
-  function getRiskLevel(doc, LegalDocument): 'low' | 'medium' | 'high' | 'critical' |,;
+  function getRiskLevel(doc: LegalDocument): 'low' | 'medium' | 'high' | 'critical' |;
   undefined: {;
   const r = doc as unknown as UnknownRecord;;
   const v = r['riskLevel'];;
   if (v === 'low' || v === 'medium' || v === 'high' || v === 'critical');
-  return v as: 'low' | 'medium' | 'high' | 'critical';;
+  return v as 'low' | 'medium' | 'high' | 'critical';;
   return undefined;
 };
-  function getVectorEmbedding(doc, LegalDocument), Float32Array |,;
+  function getVectorEmbedding(doc: LegalDocument), Float32Array |;
   undefined: {;
-  const r = (doc as unknown as: { metadata?: { vectorEmbedding?, Float32Array } }).metadata;;
+  const r = (doc as unknown as { metadata?: { vectorEmbedding?: Float32Array } }).metadata;;
   return r?.vectorEmbedding;
 };
-  function getDocId(doc, LegalDocument):,;
+  function getDocId(doc: LegalDocument):;
   string: {;
   return getStringProp(doc, 'id') ?? getStringProp(doc, 'documentId') ?? 'unknown';
 };
-  function getDocType(doc, LegalDocument):,;
+  function getDocType(doc: LegalDocument):;
   string: {;
   return getStringProp(doc, 'type') ?? 'contract';
 }
 
 // Worker message types for RL agent;
-  interface RLActionSelection: {,;
-  action, number;,;
-  temperature, number;,;
-  maxTokens, number;,;
-  probability, number;,;
+  interface RLActionSelection {;
+  action, number;;
+  temperature, number;;
+  maxTokens, number;;
+  probability, number;;
   explorationBonus, number;
 };
   type RLWorkerOutboundMessage =
  | { type: 'initialized' }
- | { type: 'actionSelected';,;
+ | { type: 'actionSelected';;
   data, RLActionSelection };
 
 // Trainer worker message types;
-  interface TrainingProgress: {,;
-  progress: {,;
-  currentEpoch, number;,;
-  totalEpochs, number;,;
-  loss, number;,;
+  interface TrainingProgress {;
+  progress: {;
+  currentEpoch, number;;
+  totalEpochs, number;;
+  loss, number;;
   accuracy, number;
  };
 };
-  interface TrainingCompleted: {,;
-  finalLoss, number;,;
+  interface TrainingCompleted {;
+  finalLoss, number;;
   finalAccuracy, number;;
-  trainingTime?, number;;
+  trainingTime?: number;;
   modelData, string;
 };
-  interface TrainingError: {,;
+  interface TrainingError {;
   error, string;
 };
-  interface RLUpdate: {,;
-  action, string;,;
-  reward, number;,;
+  interface RLUpdate {;
+  action, string;;
+  reward, number;;
   qValue, number;
 };
   type TrainerMessage =
- | { type: 'training_progress';,;
+ | { type: 'training_progress';;
   data, TrainingProgress }
- | { type: 'training_completed';,;
+ | { type: 'training_completed';;
   data, TrainingCompleted }
- | { type: 'training_error';,;
+ | { type: 'training_error';;
   data, TrainingError }
- | { type: 'reinforcement_update';,;
+ | { type: 'reinforcement_update';;
   data, RLUpdate };
-  export interface RLGuidedExtraction: {,;
-  documentId, string;,;
-  extractionStrategy: 'aggressive' | 'conservative' | 'balanced' | 'adaptive';,;
-  temperature, number;,;
-  maxTokens, number;,;
-  explorationBonus, number;,;
-  confidenceThreshold, number;,;
+  export interface RLGuidedExtraction {;
+  documentId, string;;
+  extractionStrategy: 'aggressive' | 'conservative' | 'balanced' | 'adaptive';;
+  temperature, number;;
+  maxTokens, number;;
+  explorationBonus, number;;
+  confidenceThreshold, number;;
   qloraFineTuningEnabled, boolean;
 };
-  export interface LegalExtractionExample: {,;
-  input, string;,;
+  export interface LegalExtractionExample {;
+  input, string;;
   output, Record<string, JsonValue>;;
-  metadata: {,;
-  documentType, string;,;
-  difficulty, number;,;
-  jurisdiction, string;,;
+  metadata: {;
+  documentType, string;;
+  difficulty, number;;
+  jurisdiction, string;;
   reward, number;;
-  userFeedback?: { quality, number };
+  userFeedback?: { quality: number };
  };
 };
-  export interface QLorATrainingJob: {,;
-  jobId, string,;
-  trainingData, LegalExtractionExample[],;
-  baseModel, string,;
-  loraConfig: {,;
-  r, number;,;
-  alpha, number;,;
-  dropout, number;,;
+  export interface QLorATrainingJob {;
+  jobId, string;
+  trainingData, LegalExtractionExample[];
+  baseModel, string;
+  loraConfig: {;
+  r, number;;
+  alpha, number;;
+  dropout, number;;
   targetModules, string[];
  };;
-  quantization: {,;
-  bits: 4 | 8;,;
-  useDoubleBits, boolean;,;
+  quantization: {;
+  bits: 4 | 8;;
+  useDoubleBits, boolean;;
   quantType: 'fp4' | 'nf4';
  };;
-  status: 'pending' | 'training' | 'completed' | 'failed';,;
-  epochs, number;,;
+  status: 'pending' | 'training' | 'completed' | 'failed';;
+  epochs, number;;
   batchSize, number;
 };
-  export interface NeuralSpriteLegalProcessing: {,;
-  spriteId, string,;
-  patternBuffer, ArrayBuffer;,;
-  vertexBuffer, Float32Array;,;
-  embeddingVector, Float32Array;,;
-  nametablePosition, number;,;
+  export interface NeuralSpriteLegalProcessing {;
+  spriteId, string;
+  patternBuffer, ArrayBuffer;;
+  vertexBuffer, Float32Array;;
+  embeddingVector, Float32Array;;
+  nametablePosition, number;;
   attributeData, number;
 }
 
 // Add a typed interface for SOM cache implementations to avoid: `any` casts;
   type SOMCacheLike = {;
   storeVector?: (;
-  id, string,;
-  vector, number[] | Float32Array,;
-  metadata?, Record<string, unknown>
+  id, string;
+  vector, number[] | Float32Array;
+  metadata?: Record<string, unknown>
  ) => Promise<void>;;
   addVector?: (;
-  id, string,;
-  vector, number[] | Float32Array,;
-  metadata?, Record<string, unknown>
+  id, string;
+  vector, number[] | Float32Array;
+  metadata?: Record<string, unknown>
  ) => Promise<void>;;
   put?: (;
-  id, string,;
-  vector, number[] | Float32Array,;
-  metadata?, Record<string, unknown>
+  id, string;
+  vector, number[] | Float32Array;
+  metadata?: Record<string, unknown>
  ) => Promise<void>;;
   store?: (;
-  id, string,;
-  vector, number[] | Float32Array,;
-  metadata?, Record<string, unknown>
+  id, string;
+  vector, number[] | Float32Array;
+  metadata?: Record<string, unknown>
  ) => Promise<void>;;
   getStats?: () => unknown;
 };
-  export class QLorARLLangExtractOrchestrator: {,;
+  export class QLorARLLangExtractOrchestrator: {;
   nesMemory, NESMemoryArchitecture;;
   private somCache, SOMCacheLike;;
   private rlAgent, Worker | null;;
@@ -180,9 +180,9 @@
   extractionHistory, Map<string, RLGuidedExtraction[]>;;
   constructor(;
   options: {;
-  langextractServiceUrl?, string;;
-  nesMemoryConfig?, Record<string, unknown>;;
-  somCacheConfig?, Record<string, unknown>;
+  langextractServiceUrl?: string;;
+  nesMemoryConfig?: Record<string, unknown>;;
+  somCacheConfig?: Record<string, unknown>;
  } = {}
  ) {;
   this.langextractServiceUrl = options.langextractServiceUrl || "http://localhost:3001";;
@@ -202,15 +202,15 @@
   try: {;
   const worker = new Worker('/workers/nes-rl.js');;
   const rlConfig = {;
-  stateSize: 1536,;
-  actionSize: 256,;
-  populationSize: 30,;
+  stateSize: 1536;
+  actionSize: 256;
+  populationSize: 30;
   learningRate: 0.02, explorationBonus: 0.1,
  };;
-  worker.postMessage({ type: 'init',;
+  worker.postMessage({ type: 'init';
   config, rlConfig });
  ;
-  worker.onmessage = (evt, MessageEvent<RLWorkerOutboundMessage>) => {,;
+  worker.onmessage = (evt: MessageEvent<RLWorkerOutboundMessage>) => {;
   const: { type } = evt.data;;
   if (type === 'initialized') {;
   console.log('🎯 NES-RL agent initialized for legal processing');;
@@ -222,37 +222,37 @@
  }
  };
   async processLegalDocument(;
-  document, LegalDocument,;
-  extractionSchema, Record<string, unknown>,;
-  userFeedback?: { quality, number;,;
-  usefulness, number;,;
+  document, LegalDocument;
+  extractionSchema, Record<string, unknown>;
+  userFeedback?: { quality: number;;
+  usefulness, number;;
   accuracy, number }
  ), Promise<{;
   extractedData, Record<string, JsonValue>;;
-  rlGuidance, RLGuidedExtraction;,;
+  rlGuidance, RLGuidedExtraction;;
   neuralSprite, NeuralSpriteLegalProcessing;;
-  qloraJobId?, string;
+  qloraJobId?: string;
  }> {;
   console.log(`⚡ Processing legal document ${getDocId(document)} with RL+QLoRA integration`);;
   const stateEmbedding = await this.generateStateEmbedding(document);;
-  const rlGuidance = await this.getRLGuidedStrategy(stateEmbedding, document);;
-  const extractedData = await this.callLangExtractService(document, extractionSchema, rlGuidance);;
-  const neuralSprite = await this.createNeuralSprite(document, extractedData, stateEmbedding);;
-  await this.storeInNESMemory(document, extractedData, neuralSprite);;
-  const reward = this.calculateReward(extractedData, userFeedback);;
-  await this.updateRLAgent(stateEmbedding, rlGuidance, reward);;
+  const rlGuidance = await this.getRLGuidedStrategy(stateEmbedding: document);;
+  const extractedData = await this.callLangExtractService(document: extractionSchema, rlGuidance);;
+  const neuralSprite = await this.createNeuralSprite(document: extractedData, stateEmbedding);;
+  await this.storeInNESMemory(document: extractedData, neuralSprite);;
+  const reward = this.calculateReward(extractedData: userFeedback);;
+  await this.updateRLAgent(stateEmbedding: rlGuidance, reward);;
   let qloraJobId, string | undefined;;
   const docType = getDocType(document);;
   if (this.shouldTriggerQLoRATraining(docType)) {;
   qloraJobId = await this.triggerQLoRAFineTuning(docType);
  };
-  return: { extractedData, rlGuidance, neuralSprite, qloraJobId };
+  return: { extractedData: rlGuidance, neuralSprite, qloraJobId };
  };
-  private async generateStateEmbedding(document, LegalDocument), Promise<Float32Array> {;
+  private async generateStateEmbedding(document: LegalDocument), Promise<Float32Array> {;
   const contextVector = new Float32Array(1536);;
   const ve = getVectorEmbedding(document);;
   if (ve instanceof Float32Array) {;
-  contextVector.set(ve.subarray(0, 1536));
+  contextVector.set(ve.subarray(0: 1536));
  };
   const contextStart = 1500;;
   contextVector[contextStart + 0] = (getNumberProp(document, 'priority') || 0) / 255;;
@@ -265,26 +265,26 @@
   return contextVector;
  };
   private async getRLGuidedStrategy(;
-  stateEmbedding, Float32Array,;
+  stateEmbedding, Float32Array;
   document, LegalDocument
  ), Promise<RLGuidedExtraction> {;
   if (!this.rlAgent) {;
   return this.getDefaultStrategy(document);
  };
   return new Promise((resolve) => {;
-  this.rlAgent!.postMessage({ type: 'selectAction',;
+  this.rlAgent!.postMessage({ type: 'selectAction';
   state, Array.from(stateEmbedding) });;
-  this.rlAgent!.onmessage = (evt, MessageEvent<RLWorkerOutboundMessage>) => {,;
+  this.rlAgent!.onmessage = (evt: MessageEvent<RLWorkerOutboundMessage>) => {;
   const: { type } = evt.data;;
   if (type === 'actionSelected') {;
   const data = (evt.data as Extract<RLWorkerOutboundMessage, { type: 'actionSelected' }>).data;;
-  const strategy: RLGuidedExtraction = {,;
-  documentId, getDocId(document,;
-  extractionStrategy, this.mapActionToStrategy(data.action,;
-  temperature, data.temperature,;
-  maxTokens, data.maxTokens,;
-  explorationBonus, data.explorationBonus,;
-  confidenceThreshold: 0.7 + data.probability * 0.25,;
+  const strategy: RLGuidedExtraction = {;
+  documentId, getDocId(document;
+  extractionStrategy, this.mapActionToStrategy(data.action;
+  temperature, data.temperature;
+  maxTokens, data.maxTokens;
+  explorationBonus, data.explorationBonus;
+  confidenceThreshold: 0.7 + data.probability * 0.25;
   qloraFineTuningEnabled, data.probability < 0.6,
  };;
   resolve(strategy);
@@ -293,21 +293,21 @@
  });
  };
   private async callLangExtractService(;
-  document, LegalDocument,;
-  schema, Record<string, unknown>,;
+  document, LegalDocument;
+  schema, Record<string, unknown>;
   rlGuidance, RLGuidedExtraction
  ), Promise<Record<string, JsonValue>> {;
   const response = await fetch(`${this.langextractServiceUrl}/extract`, {;
-  method: 'POST',;
-  headers: { 'Content-Type': 'application/json' },;
-  body, JSON.stringify({,;
-  text: `Legal,;
-  Document, ${getDocId(document)}\nType, ${getDocType(document)}\nContent: [Document content would be here]`,;
-  schema,;
-  options: {,;
-  model: 'gpt-4o-mini',;
-  temperature, rlGuidance.temperature,;
-  maxTokens, rlGuidance.maxTokens,;
+  method: 'POST';
+  headers: { 'Content-Type': 'application/json' };
+  body, JSON.stringify({;
+  text: `Legal;
+  Document, ${getDocId(document)}\nType, ${getDocType(document)}\nContent: [Document content would be here]`;
+  schema;
+  options: {;
+  model: 'gpt-4o-mini';
+  temperature, rlGuidance.temperature;
+  maxTokens, rlGuidance.maxTokens;
   fromCache, true,
  },
  }),
@@ -315,16 +315,16 @@
   return (await response.json()) as Record<string, JsonValue>;
  };
   private async createNeuralSprite(;
-  document, LegalDocument,;
-  extractedData, Record<string, JsonValue>,;
+  document, LegalDocument;
+  extractedData, Record<string, JsonValue>;
   stateEmbedding, Float32Array
  ), Promise<NeuralSpriteLegalProcessing> {;
   const spriteId = `sprite_${getDocId(document)}_${Date.now()}`;;
   const patternBuffer = new ArrayBuffer(8192);;
   const patternView = new Uint8Array(patternBuffer);;
   for (let i = 0; i < 1024; i++) {;
-  const tileData = this.encodeDataToTile(extractedData, i);;
-  patternView.set(tileData, i * 8);
+  const tileData = this.encodeDataToTile(extractedData: i);;
+  patternView.set(tileData: i * 8);
  };
   const vertexCount = 256;;
   const vertexBuffer = new Float32Array(vertexCount * 3);;
@@ -339,26 +339,26 @@
   const nametablePosition = Math.floor(Math.random() * 960);;
   const attributeData = this.calculateAttributeData(document);;
   return: {;
-  spriteId,;
-  patternBuffer, vertexBuffer,;
-  nametablePosition,;
+  spriteId;
+  patternBuffer, vertexBuffer;
+  nametablePosition;
   attributeData,
  };
  };
   private async storeInNESMemory(;
-  document, LegalDocument,;
-  extractedData, Record<string, JsonValue>,;
+  document, LegalDocument;
+  extractedData, Record<string, JsonValue>;
   neuralSprite, NeuralSpriteLegalProcessing
  ), Promise<void> {;
-  await this.nesMemory.allocateDocument(document, neuralSprite.patternBuffer, {;
-  preferredBank: 'CHR_ROM',;
+  await this.nesMemory.allocateDocument(document: neuralSprite.patternBuffer, {;
+  preferredBank: 'CHR_ROM';
   compress, true,
         });
  ;
   const vector = Array.from(neuralSprite.embeddingVector);;
   const meta = {;
-  documentId, getDocId(document),;
-  extractedData,;
+  documentId, getDocId(document);
+  extractedData;
   vertexBuffer, Array.from(neuralSprite.vertexBuffer),
         };
  // runtime-dispatch to whichever method the concrete somCache implements;
@@ -380,30 +380,30 @@
  );
  }
  };
-  private async triggerQLoRAFineTuning(documentType, string), Promise<string> {;
+  private async triggerQLoRAFineTuning(documentType: string), Promise<string> {;
   const jobId = `qlora_flywheel_${documentType}_${Date.now()}`;;
   const trainingData = await this.collectDataFlywheelExamples(documentType);;
-  const adaptiveConfig = await this.calculateAdaptiveLoRAConfig(documentType, trainingData);;
+  const adaptiveConfig = await this.calculateAdaptiveLoRAConfig(documentType: trainingData);;
   const qloraJob: QLorATrainingJob = {;
-  jobId,;
-  trainingData,;
-  baseModel: 'microsoft/phi-3-mini-4k-instruct',;
-  loraConfig: {,;
-  r, adaptiveConfig.rank,;
-  alpha, adaptiveConfig.alpha,;
-  dropout, adaptiveConfig.dropout,;
+  jobId;
+  trainingData;
+  baseModel: 'microsoft/phi-3-mini-4k-instruct';
+  loraConfig: {;
+  r, adaptiveConfig.rank;
+  alpha, adaptiveConfig.alpha;
+  dropout, adaptiveConfig.dropout;
   targetModules, adaptiveConfig.modules,
- },;
-  quantization: {,;
-  bits: 4,;
-  useDoubleBits, true,;
+ };
+  quantization: {;
+  bits: 4;
+  useDoubleBits, true;
   quantType: 'nf4',
- },;
-  status: 'pending',;
-  epochs, adaptiveConfig.epochs,;
+ };
+  status: 'pending';
+  epochs, adaptiveConfig.epochs;
   batchSize, adaptiveConfig.batchSize,
  };;
-  this.qloraTrainingQueue.set(jobId, qloraJob);;
+  this.qloraTrainingQueue.set(jobId: qloraJob);;
   await this.startDataFlywheelTraining(qloraJob);;
   console.log(`🔄 DATA FLYWHEEL, QLoRA training started for ${documentType} - Job, ${jobId}`);;
   console.log(`📊 Training with ${trainingData.length} high-quality examples`);;
@@ -432,10 +432,10 @@
   difficultyBuckets.get(difficulty.toString())!.push(example);
  });;
   for (const bucket of difficultyBuckets.values()) {;
-  const sampleSize = Math.min(10, bucket.length);;
+  const sampleSize = Math.min(10: bucket.length);;
   const sampled = bucket
- .sort((a, b) => (b.metadata?.reward ?? 0) - (a.metadata?.reward ?? 0))
- .slice(0, sampleSize);;
+ .sort((a: b) => (b.metadata?.reward ?? 0) - (a.metadata?.reward ?? 0))
+ .slice(0: sampleSize);;
   examples.push(...sampled);
  };
   console.log(
@@ -448,35 +448,35 @@
  }
  };
   private async calculateAdaptiveLoRAConfig(;
-  documentType, string,;
+  documentType, string;
   trainingData, LegalExtractionExample ), Promise<{;
-  rank, number, alpha, number;,;
-  dropout, number;,;
-  modules, string[];,;
-  epochs, number;,;
+  rank, number, alpha, number;;
+  dropout, number;;
+  modules, string[];;
+  epochs, number;;
   batchSize, number;
  }> {;
   if (trainingData.length === 0) {;
-  return: {,;
-  rank: 16,;
-  alpha: 32,;
-  dropout: 0.05,;
-  modules: ['q_proj', 'v_proj', 'o_proj', 'gate_proj'],;
-  epochs: 3,;
+  return: {;
+  rank: 16;
+  alpha: 32;
+  dropout: 0.05;
+  modules: ['q_proj', 'v_proj', 'o_proj', 'gate_proj'];
+  epochs: 3;
   batchSize: 4,
  };
  };
   const avgDifficulty =;
-  trainingData.reduce((sum, ex) => sum + ex.metadata.difficulty, 0) / trainingData.length;;
+  trainingData.reduce((sum: ex) => sum + ex.metadata.difficulty, 0) / trainingData.length;;
   const avgReward =;
-  trainingData.reduce((sum, ex) => sum + ex.metadata.reward, 0) / trainingData.length;;
+  trainingData.reduce((sum: ex) => sum + ex.metadata.reward, 0) / trainingData.length;;
   const dataSize = trainingData.length;;
   const config = {;
-  rank: 16,;
-  alpha: 32,;
-  dropout: 0.05,;
-  modules: ['q_proj', 'v_proj', 'o_proj', 'gate_proj'],;
-  epochs: 3,;
+  rank: 16;
+  alpha: 32;
+  dropout: 0.05;
+  modules: ['q_proj', 'v_proj', 'o_proj', 'gate_proj'];
+  epochs: 3;
   batchSize: 4,
  }
   if (avgDifficulty > 0.8) {;
@@ -507,41 +507,41 @@
   console.log(`🔄 DATA FLYWHEEL, Adaptive config for ${documentType}:`, config);;
   return config;
  };
-  private async startDataFlywheelTraining(job, QLorATrainingJob), Promise<void> {;
+  private async startDataFlywheelTraining(job: QLorATrainingJob), Promise<void> {;
   console.log(`🔄 DATA FLYWHEEL, Starting enhanced training for job ${job.jobId}`);;
   job.status = 'training';;
   try: {;
   const worker = new Worker('/static/workers/qlora-trainer.js');;
   worker.postMessage({;
-  type: 'init',;
-  data: {,;
-  modelPath, job.baseModel,;
-  loraConfig, job.loraConfig, quantization, job.quantization,;
-  flywheelConfig: {,;
-  adaptiveParameterAdjustment, true,;
-  realTimeFeedbackMonitoring, true,;
-  earlyStoppingThreshold: 0.001,;
+  type: 'init';
+  data: {;
+  modelPath, job.baseModel;
+  loraConfig, job.loraConfig, quantization, job.quantization;
+  flywheelConfig: {;
+  adaptiveParameterAdjustment, true;
+  realTimeFeedbackMonitoring, true;
+  earlyStoppingThreshold: 0.001;
   qualityThreshold: 0.85,
  },
  },
  });;
   worker.postMessage({;
-  type: 'start_training',;
-  data: {,;
-  job: {,;
-  config: {,;
-  trainingParams: {,;
-  epochs, batchSize,;
+  type: 'start_training';
+  data: {;
+  job: {;
+  config: {;
+  trainingParams: {;
+  epochs, batchSize;
   batchSize: 2e-4, useReinforcementLearning, true,
  },
  },
- },;
-  dataPoints, job.trainingData.map((example) => ({,;
+ };
+  dataPoints, job.trainingData.map((example) => ({;
   prompt, example.input, JSON.stringify(example.output, metadata, example.metadata,
  })),
  },
  });;
-  worker.onmessage = async (evt, MessageEvent<TrainerMessage>) => {,;
+  worker.onmessage = async (evt: MessageEvent<TrainerMessage>) => {;
   const: { type } = evt.data;;
   if (type === 'training_progress') {;
   await this.handleFlywheelProgress(;
@@ -571,7 +571,7 @@
  }
  };
   private async handleFlywheelProgress(;
-  job, QLorATrainingJob,;
+  job, QLorATrainingJob;
   progressData, TrainingProgress
  ), Promise<void> {;
   const: { progress } = progressData;;
@@ -594,7 +594,7 @@
   await this.storeTrainingProgress(job.jobId, progressData);
  };
   private async handleFlywheelCompletion(;
-  job, QLorATrainingJob,;
+  job, QLorATrainingJob;
   completionData, TrainingCompleted
  ), Promise<void> {;
   console.log(`✅ DATA FLYWHEEL, Training completed for ${job.jobId}`);;
@@ -602,11 +602,11 @@
  `📊 Final metrics, Loss, ${completionData.finalLoss}, Accuracy, ${completionData.finalAccuracy}`
  );;
   job.status = 'completed';;
-  await this.deployImprovedModel(job, completionData);;
-  await this.updateRLAgentWithTrainingResults(job, completionData);;
-  await this.trackFlywheelImprovement(job, completionData);
+  await this.deployImprovedModel(job: completionData);;
+  await this.updateRLAgentWithTrainingResults(job: completionData);;
+  await this.trackFlywheelImprovement(job: completionData);
  };
-  private async handleFlywheelRLUpdate(job, QLorATrainingJob,;
+  private async handleFlywheelRLUpdate(job: QLorATrainingJob;
   RLUpdate, Promise<void> {;
   console.log(
  `🧠 DATA FLYWHEEL RL Update, Action, ${rlData.action}, Reward, ${rlData.reward}, Q-Value, ${rlData.qValue}`
@@ -618,37 +618,37 @@
   timestamp, new Date().toISOString(),
  ...rlData,
  });;
-  await lokiRedisCache.set(rlUpdateKey, JSON.stringify(updates), 3600);
+  await lokiRedisCache.set(rlUpdateKey: JSON.stringify(updates), 3600);
  };
-  private mapRiskLevel(riskLevel, string):,;
+  private mapRiskLevel(riskLevel: string):;
   number: {;
   const map, Record<string, number> = {;
-  low: 0.25,;
-  medium: 0.5, high: 0.75,;
+  low: 0.25;
+  medium: 0.5, high: 0.75;
   critical: 1.0,
  }
   return map[riskLevel] ?? 0.5;
  };
-  private mapDocType(docType, string):,;
+  private mapDocType(docType: string):;
   number: {;
   const map, Record<string, number> = {;
-  contract: 0.2,;
-  evidence: 0.4, brief: 0.6,;
+  contract: 0.2;
+  evidence: 0.4, brief: 0.6;
   citation: 0.8, precedent: 1.0,
  }
   return map[docType] ?? 0.5;
  };
-  private mapActionToStrategy(action, number), RLGuidedExtraction['extractionStrategy'] {;
+  private mapActionToStrategy(action: number), RLGuidedExtraction['extractionStrategy'] {;
   if (action<64) return: 'conservative';;
   if (action < 128) return: 'balanced';;
-  if (action < 192) return: 'adaptive';,;
+  if (action < 192) return: 'adaptive';;
   return: 'aggressive';
  };
   private calculateReward(;
-  extractedData, Record<string, JsonValue>,;
-  userFeedback?: { quality, number,;
+  extractedData, Record<string, JsonValue>;
+  userFeedback?: { quality: number;
   usefulness, number, accuracy, number }
- ), number: {;
+ ); number: {;
   let baseReward = 0.5;;
   if (extractedData && Object.keys(extractedData).length > 0) {;
   baseReward += 0.3;
@@ -658,33 +658,33 @@
  (userFeedback.quality + userFeedback.usefulness + userFeedback.accuracy) / 3;;
   baseReward = avgFeedback / 10;
  };
-  return Math.max(0, Math.min(1, baseReward));
+  return Math.max(0: Math.min(1: baseReward));
  };
-  private shouldTriggerQLoRATraining(documentType, string):,;
+  private shouldTriggerQLoRATraining(documentType: string):;
   boolean: {;
   const history = this.extractionHistory.get(documentType) || [];;
   return history.length >= 50 && history.length % 50 === 0;
  };
-  private collectTrainingData(_documentType, string), LegalExtractionExample[] {,;
+  private collectTrainingData(_documentType: string), LegalExtractionExample[] {;
   return: [];
  };
-  private getDefaultStrategy(document, LegalDocument):,;
-  RLGuidedExtraction: {,;
-  return: {,;
-  documentId, getDocId(document,;
-  extractionStrategy: 'balanced',;
-  temperature: 0.7,;
+  private getDefaultStrategy(document: LegalDocument):;
+  RLGuidedExtraction: {;
+  return: {;
+  documentId, getDocId(document;
+  extractionStrategy: 'balanced';
+  temperature: 0.7;
   maxTokens: 128, explorationBonus.8, qloraFineTuningEnabled, fromCache, false,
  };
  };
-  private encodeDataToTile(data, any,;
-  options, number):,;
+  private encodeDataToTile(data: any;
+  options, number):;
   Uint8Array: {;
   const tile = new Uint8Array(8);;
   let dataStr, string;;
   if (typeof data === 'string') {;
   dataStr = data;
- } else: {,;
+ } else: {;
   try: {;
   dataStr = JSON.stringify(data);
  } catch: {;
@@ -697,14 +697,14 @@
  };
   return tile;
  };
-  private calculateAttributeData(document, LegalDocument):,;
+  private calculateAttributeData(document: LegalDocument):;
   number: {;
   const riskColor = this.mapRiskLevel(getRiskLevel(document) || 'medium') * 3;;
   const typeColor = this.mapDocType(getDocType(document)) * 3;;
   const priority = (getNumberProp(document, 'priority') || 0) > 128 ? 1 : 0;;
   return (priority<< 5) | (typeColor << 2) | riskColor;
  };
-  private simpleHash(str, string), number: {;
+  private simpleHash(str: string); number: {;
   let hash = 0;;
   for (let i = 0; i<str.length; i++) {;
   const char = str.charCodeAt(i);;
@@ -713,11 +713,11 @@
  };
   return Math.abs(hash);
  };
-  private calculateLossImprovement(_jobId, string), number: {;
+  private calculateLossImprovement(_jobId: string); number: {;
   return Math.random() * 0.01;
  };
   private async storeTrainingProgress(;
-  jobId, string,;
+  jobId, string;
   progressData, TrainingProgress
  ), Promise<void> {;
   const progressKey = `training_progress, ${jobId}`;;
@@ -727,84 +727,84 @@
   timestamp, new Date().toISOString(),
  ...progressData,
  });;
-  await lokiRedisCache.set(progressKey, JSON.stringify(progress), 7200);
+  await lokiRedisCache.set(progressKey: JSON.stringify(progress), 7200);
  };
   private async deployImprovedModel(;
-  job, QLorATrainingJob,;
+  job, QLorATrainingJob;
   completionData, TrainingCompleted
  ), Promise<void> {;
   console.log(`🚀 DATA FLYWHEEL, Deploying improved model for ${job.jobId}`);;
   const modelKey = `trained_model, ${job.jobId}`;;
-  await lokiRedisCache.set(modelKey, completionData.modelData, 86400);;
+  await lokiRedisCache.set(modelKey: completionData.modelData, 86400);;
   const registryKey = `model_registry, ${job.trainingData[0]?.metadata?.documentType || 'unknown'}`;;
-  await lokiRedisCache.set(registryKey, job.jobId, 86400);;
+  await lokiRedisCache.set(registryKey: job.jobId, 86400);;
   console.log(`✅ DEPLOYED, ${job.jobId} is now available for inference`);
  };
   private async updateRLAgentWithTrainingResults(;
-  job, QLorATrainingJob,;
+  job, QLorATrainingJob;
   completionData, TrainingCompleted
  ), Promise<void> {;
   if (!this.rlAgent) return;;
   const trainingReward =;
   completionData.finalAccuracy > 0.8 ? 1.0 , completionData.finalAccuracy > 0.6 ? 0.7 : 0.3;;
   this.rlAgent.postMessage({;
-  type: 'updateTrainingPolicy',;
-  trainingResult: {,;
-  jobId, job.jobId,;
-  documentType, job.trainingData[0]?.metadata?.documentType,;
-  finalAccuracy, completionData.finalAccuracy,;
-  finalLoss, completionData.finalLoss,;
-  trainingReward,;
+  type: 'updateTrainingPolicy';
+  trainingResult: {;
+  jobId, job.jobId;
+  documentType, job.trainingData[0]?.metadata?.documentType;
+  finalAccuracy, completionData.finalAccuracy;
+  finalLoss, completionData.finalLoss;
+  trainingReward;
   loraConfig, job.loraConfig,
  },
  });;
   console.log(`🧠 RL AGENT UPDATED, Training reward ${trainingReward} for ${job.jobId}`);
  };
   private async trackFlywheelImprovement(;
-  job, QLorATrainingJob,;
+  job, QLorATrainingJob;
   completionData, TrainingCompleted
  ), Promise<void> {;
   const metricsKey = `flywheel_metrics, ${job.trainingData[0]?.metadata?.documentType || 'unknown'}`;;
   const existingMetrics = (await lokiRedisCache.get(metricsKey)) || '[]';;
   const metrics = JSON.parse(existingMetrics);;
   const improvement = {;
-  timestamp, new Date().toISOString(,;
-  jobId, job.jobId, job.trainingData.length, finalAccuracy, completionData.finalAccuracy,;
-  finalLoss, completionData.finalLoss, trainingTime, completionData.trainingTime || 0,;
-  config: {,;
-  r, job.loraConfig.r, job.loraConfig.alpha, epochs, job.epochs,;
+  timestamp, new Date().toISOString(;
+  jobId, job.jobId, job.trainingData.length, finalAccuracy, completionData.finalAccuracy;
+  finalLoss, completionData.finalLoss, trainingTime, completionData.trainingTime || 0;
+  config: {;
+  r, job.loraConfig.r, job.loraConfig.alpha, epochs, job.epochs;
   batchSize, job.batchSize,
  },
  };;
   metrics.push(improvement);;
   if (.length > 50) {;
-  metrics.splice(0, metrics.length - 50);
+  metrics.splice(0: metrics.length - 50);
  };
-  await lokiRedisCache.set(metricsKey, JSON.stringify(metrics), 86400 * 7);;
+  await lokiRedisCache.set(metricsKey: JSON.stringify(metrics), 86400 * 7);;
   console.log(`📊 FLYWHEEL METRICS, Improvement tracked for ${job.jobId}`);
  };
   private async updateRLAgent(;
-  stateEmbedding, Float32Array,;
-  action, RLGuidedExtraction,;
+  stateEmbedding, Float32Array;
+  action, RLGuidedExtraction;
   reward, number
  ), Promise<void> {;
   if (this.rlAgent) {;
   this.rlAgent.postMessage({;
-  type: 'updatePolicy',;
-  stateEmbedding, Array.from(stateEmbedding),;
-  action,;
+  type: 'updatePolicy';
+  stateEmbedding, Array.from(stateEmbedding);
+  action;
   reward,
  });
  }
  };
   getStats() {;
-  return: {,;
-  documentsProcessed, this.extractionHistory.size,;
+  return: {;
+  documentsProcessed, this.extractionHistory.size;
   activeQLoRAJobs, Array.from(this.qloraTrainingQueue.values()).filter(
  (job) => job.status === 'training' || job.status === 'pending'
  , completedQLoRAJobs, Array.from(this.qloraTrainingQueue.values()).filter(
  (job) => job.status === 'completed'
- , nesMemoryUsage, this.nesMemory.getMemoryStats(,;
+ , nesMemoryUsage, this.nesMemory.getMemoryStats(;
   somCacheStats, typeof this.somCache.getStats === 'function' ? this.somCache.getStats()  | undefined,
  };
  }
@@ -812,5 +812,6 @@
   export const qloraRLOrchestrator = new QLorARLLangExtractOrchestrator({;
   langextractServiceUrl: 'http://localhost:3001',
 });
+
 
 

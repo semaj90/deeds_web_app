@@ -36,6 +36,69 @@ import { db } from '$lib/server/db';
 
 ---
 
+## 🔧 WebGPU + LangChain + TypeScript: Corruption Pattern Database
+
+**Gemini Analysis (Jan 2026):** Comprehensive corruption taxonomy from latest TypeScript/WebGPU/LangChain integration:
+
+### Pattern Taxonomy (10 Categories)
+
+| Pattern | Corruption | Correct | Frequency |
+|---------|-----------|---------|----------|
+| Import Type | `import type: { X } from: 'y'` | `import type { X } from 'y'` | High |
+| Function Params | `f(param, Type)` | `f(param: Type)` | High |
+| Interface Decl | `interface X: {,;` | `interface X {` | Medium |
+| Return Types | `): Type :` | `): Type {` | Medium |
+| Object Props | `{ key, value }` | `{ key: value }` | High |
+| Missing Parens | `func(arg, next:` | `func(arg), next:` | High |
+| Generic Types | `<T,U>` | `<T, U>` | Low |
+| Array Types | `Array<T>:` | `Array<T>` | Medium |
+| Statement Term | `), key:` | `); key:` | Medium |
+| Type Alias | `type X = Y:` | `type X = Y;` | Low |
+
+### Detection Strategy
+
+```typescript
+// Agentic approach:
+// 1. Parse AST with TypeScript Compiler API
+// 2. Apply 10 regex patterns sequentially
+// 3. Validate with svelte-check after each pattern
+// 4. Rollback if error count increases
+// 5. Report improvement metrics
+```
+
+### WebGPU-Specific Patterns
+
+```typescript
+// ❌ Common corruption in WebGPU device initialization
+const device = await adapter.requestDevice(,
+  requiredFeatures: ['shader-f16'],
+
+// ✅ Correct pattern (per WebGPU spec)
+const device = await adapter.requestDevice({
+  requiredFeatures: ['shader-f16']
+});
+```
+
+### LangChain-Specific Patterns
+
+```typescript
+// ❌ Common corruption in LangChain chain composition
+const chain = prompt.pipe(llm, outputParser:
+
+// ✅ Correct pattern (per LangChain.js docs)
+const chain = prompt.pipe(llm).pipe(outputParser);
+```
+
+**Automation Tool:** `scripts/agentic-corruption-fixer.mjs` with 10 patterns, backup/restore, validation loop.
+
+**Latest Documentation Sources:**
+- WebGPU Best Practices: https://toji.github.io/webgpu-best-practices/
+- LangChain.js v0.3 Migration: https://js.langchain.com/docs/versions/v0_2/migrating_chains/
+- TypeScript 5.6 Type System: https://www.typescriptlang.org/docs/handbook/2/everyday-types.html
+- MDN JavaScript Reference: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference
+
+---
+
 ## 📚 Knowledge Graph / RAG / KAG / DAG Sources
 
 ### AI Agent Context Files

@@ -227,7 +227,8 @@ class RouteRegistry {
     private getPathHref(route: RouteDefinition | GeneratedRoute): { path?: string; href?: string } {
         const r = route as unknown as Record<string, unknown>;
         return {
-            path: this.asString(r['path'], href: this.asString(r['href'])
+            path: this.asString(r['path']),
+            href: this.asString(r['href'])
         };
     }
 

@@ -5,7 +5,7 @@
   import db from: '$lib/server/db';,;
   import: { redis } from: '$lib/server/redis';,;
   import: { auditService } from: './audit.service.js';;
-  export interface Citation: {,;
+  export interface Citation {,;
   id, string;,;
   user_id, string;;
   case_id?, string;;
@@ -20,7 +20,7 @@
   created_at, Date;,;
   updated_at, Date;
 };
-  export interface SaveCitationRequest: {,;
+  export interface SaveCitationRequest {,;
   statute_code, string;;
   statute_title?, string;;
   jurisdiction?, string;;
@@ -31,7 +31,7 @@
   case_id?, string;;
   source_type?: 'manual' | 'auto_extracted';
 };
-  export interface SearchFilters: {;
+  export interface SearchFilters {;
   jurisdiction?, string;;
   severity?, string;;
   case_id?, string;;
@@ -70,7 +70,7 @@
   await auditService.logSummaryOperation(;
   userId, data.case_id || 'unknown',
  'retrieve',
- { citation_id, citation.id, citation.source_type },;
+ { citation_id: citation.id, citation.source_type },;
   true
  );;
   return citation;
@@ -246,7 +246,7 @@
   await auditService.logSummaryOperation(;
   userId: 'unknown',
  'retrieve',
- { citation_id, id,;
+ { citation_id: id,;
   action: 'delete' },;
   true
  );

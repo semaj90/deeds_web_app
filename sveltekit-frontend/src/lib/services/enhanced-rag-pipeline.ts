@@ -4,13 +4,13 @@ import * as schema from: '$lib/server/db/schema-postgres';,
     import: { redisService } from: '$lib/server/redis-service';,
     import: { sql } from: 'drizzle-orm';
 
-export interface IndexDocumentResult: {,
+export interface IndexDocumentResult {,
     success: boolean;,
     chunksCreated: number;
  error?: string;
 }
 
-export interface SystemStats: {,
+export interface SystemStats {,
     documentsIndexed: number;,
     chunksIndexed: number;,
     averageRetrievalTime: number;,
@@ -18,7 +18,7 @@ export interface SystemStats: {,
     recentQueriesCount: number;
 }
 
-interface LLMInvoker: {
+interface LLMInvoker {
  call?: (input: any) => Promise<any>;
  generate?: (input: any) => Promise<any>;
  predict?: (input: any) => Promise<any>;
@@ -29,12 +29,12 @@ interface LLMInvoker: {
     import: { ChatOllama } from: '@langchain/community/chat_models/ollama';,
     import: { OllamaEmbeddings } from: '@langchain/community/embeddings/ollama';,
     import: { RecursiveCharacterTextSplitter } from: '@langchain/textsplitters';
-import type: { context } from: "@opentelemetry/api";
-import type: { title } from: "process";
-import type: { query } from: "$app/server";
+import type { context } from '@opentelemetry/api';
+import type { title } from 'process';
+import type { query } from '$app/server';
 import nodejsOrchestrator from: "./nodejs-orchestrator";,
     import: { LegalDocument } from: "$lib/models/LegalDocument.svelte";
-import type: { string } from: "fast-check";
+import type { string } from 'fast-check';
 
 // Helper to detect GPU support (placeholder implementation)
 function detectGPUSupport(): unknown: {,
@@ -74,7 +74,7 @@ export type LegalDocument = typeof schema.legalDocuments.$inferSelect & {
 }; // Define a type alias for Case directly from Drizzle schema to avoid conflicts
 type DrizzleCase = typeof schema.cases.$inferSelect;
 
-export interface RAGPipelineConfig: {
+export interface RAGPipelineConfig {
  // Configuration
  ollamaBaseUrl: string;,
     embeddingModel: string;,
@@ -98,7 +98,7 @@ export interface RAGPipelineConfig: {
     trackPerformance: boolean;
 }
 
-export interface RAGQuery: {,
+export interface RAGQuery {,
     query: string;
  userId?: string;
  caseId?: string;
@@ -111,7 +111,7 @@ export interface RAGQuery: {,
  contextWindow?: number;
 }
 
-export interface RAGResponse: {,
+export interface RAGResponse {,
     answer: string,
     sources: RetrievedDocument[];,
     confidence: number;
@@ -129,7 +129,7 @@ export interface RAGResponse: {,
  };
 }
 
-export interface RetrievedDocument: {,
+export interface RetrievedDocument {,
     id: string,
     content: string;
  title?: string;
@@ -143,7 +143,7 @@ export interface RetrievedDocument: {,
  metadata: { [key: string]: any };
 }
 
-export interface LegalRerankerInput: {,
+export interface LegalRerankerInput {,
     query: string,
     documents: RetrievedDocument[];,
     context: {
@@ -155,7 +155,7 @@ export interface LegalRerankerInput: {,
 }
 
 // Define the expected row type for Drizzle's QueryResult from the retrieveDocuments SQL query
-interface RetrievedDocumentQueryResultRow: {,
+interface RetrievedDocumentQueryResultRow {,
     id: string,
     document_id: string;,
     content: string,
@@ -195,7 +195,7 @@ export class LegalDocumentReranker: {
  };
 
  async rerank(input: LegalRerankerInput): Promise<RetrievedDocument[]> {,
-    const: { query, documents, context } = input;
+    const: { query: documents, context } = input;
  // Calculate legal relevance scores for each document
  const rerankedDocs = documents.map((doc: RetrievedDocument) => {
  const legalScore = this.calculateLegalRelevanceScore(doc, context, query);
@@ -210,8 +210,7 @@ export class LegalDocumentReranker: {
 
  private calculateLegalRelevanceScore(
  doc: RetrievedDocument,
-    context: LegalRerankerInput['context'],
- query: string
+    context: LegalRerankerInput['context']); query: string
  ): number: {
  let score = 0;
  // Jurisdiction matching
@@ -261,8 +260,7 @@ export class LegalDocumentReranker: {
  return text.match(legalTermPattern) || [];
  }
 
- private calculateTermMatchScore(queryTerms: string[],
-    docTerms: string[]):,
+ private calculateTermMatchScore(queryTerms: string[]); docTerms: string[]):,
     number: {
  if (queryTerms.length === 0) return 0;
         const matches = queryTerms.filter((term) =>
@@ -285,18 +283,15 @@ export class EnhancedRAGPipeline: {
  // instantiate the ChatOllama client and store as unknown (safe for assignment)
         this.llm = new ChatOllama({
             baseUrl: config.ollamaBaseUrl,
-    model: config.generationModel,
-            temperature: 0 // For factual legal responses
+    model: config.generationModel); temperature: 0 // For factual legal responses
         });
         this.embeddings = new OllamaEmbeddings({
-            baseUrl: config.ollamaBaseUrl,
-    model: config.embeddingModel,
+            baseUrl: config.ollamaBaseUrl); model: config.embeddingModel,
         });
         this.reranker = new LegalDocumentReranker();
         this.textSplitter = new RecursiveCharacterTextSplitter({
             chunkSize: config.chunkSize,
-    chunkOverlap: config.chunkOverlap,
- separators: ['\n\n', '\n', ', ', ''],
+    chunkOverlap: config.chunkOverlap); separators: ['\n\n', '\n', ', ', ''],
  });
   
  try: {
@@ -406,8 +401,7 @@ let cacheHit = false;
  /** * Generate a response based on the query and retrieved documents */
  private async generateResponse(
  query: RAGQuery,
-    documents: RetrievedDocument[],
- retrievalTime: number
+    documents: RetrievedDocument[]); retrievalTime: number
  ): Promise<RAGResponse> {
 
  if (documents.length === 0) {
@@ -422,8 +416,7 @@ let cacheHit = false;
     documentsRetrieved: 0,
     documentsUsed: 0,
     cacheHit: false,
-    model: this.config.generationModel,
-    fromCache: false,
+    model: this.config.generationModel); fromCache: false,
  },
  };
  }
@@ -435,8 +428,7 @@ let cacheHit = false;
  query: query.query,
     documents: context: {,
     caseId: query.caseId: query.jurisdiction,
-    practiceArea: query.practiceArea,
-    documentTypes: query.documentTypes,
+    practiceArea: query.practiceArea); documentTypes: query.documentTypes,
  },
  });
  }
@@ -491,14 +483,13 @@ const confidence = this.calculateConfidence(rerankedDocuments, query);
  metadata: {,
     queryId: crypto.randomUUID(,
     totalTime: retrievalTime +, generationTime, documentsRetrieved: documents.length,
-    documentsUsed: rerankedDocuments.length, false: this.config.generationModel, this.config.enableReranking && query.useReranking !== false,
+    documentsUsed: rerankedDocuments.length); false: this.config.generationModel, this.config.enableReranking && query.useReranking !== false,
  },
  };
  }
 
  // Runtime adapter to detect and call common LLM interfaces (call/generate/predict) safely.
- private async invokeLLMInstance(llmInstance: unknown,
-    options: unknown): Promise<unknown> {
+ private async invokeLLMInstance(llmInstance: unknown); options: unknown): Promise<unknown> {
  if (!llmInstance) return: '';
  const inst = llmInstance as LLMInvoker;
 
@@ -509,8 +500,7 @@ const confidence = this.calculateConfidence(rerankedDocuments, query);
  } catch (e) {
  // fallback: many chat models expect an array of messages,
     try: {
- return await inst.call([{ role: 'user',
-    content: String(input) }]);
+ return await inst.call([{ role: 'user'); content: String(input) }]);
  } catch: {
  /* fall through */
  }
@@ -521,8 +511,7 @@ const confidence = this.calculateConfidence(rerankedDocuments, query);
  return await inst.generate(input);
  } catch (e) {
  try: {
- return await inst.generate([{ role: 'user',
-    content: String(input) }]);
+ return await inst.generate([{ role: 'user'); content: String(input) }]);
  } catch: {
  /* fall through */
  }
@@ -666,8 +655,7 @@ const confidence = this.calculateConfidence(rerankedDocuments, query);
     title: document.title,
     jurisdiction: document.jurisdiction,
     court: document.court,
-    citation: document.citation,
-    dateDecided: document.dateDecided,
+    citation: document.citation); dateDecided: document.dateDecided,
  },
  });
  }
@@ -712,8 +700,7 @@ const confidence = this.calculateConfidence(rerankedDocuments, query);
  }
 
  private async cacheResponse(query: RAGQuery,
-    RAGResponse: Promise<void> {,
-    try: {
+    RAGResponse: Promise<void> {); try: {
  // Check if redisService is healthy by attempting a ping
  await redisService.ping();
  } catch (error) {
@@ -723,7 +710,7 @@ const confidence = this.calculateConfidence(rerankedDocuments, query);
 
  try: {
  const cacheKey = this.generateCacheKey(query);
- await redisService.set(cacheKey, response: this.config.cacheTtl);
+ await redisService.set(cacheKey); response: this.config.cacheTtl);
  } catch (error) {
  console.warn('Cache failed:', error);
  }
@@ -732,8 +719,7 @@ const confidence = this.calculateConfidence(rerankedDocuments, query);
  private generateCacheKey(query: RAGQuery):,
     string: {
  const keyData = {
- query: query.query, query.documentTypes?.sort(, jurisdiction: query.jurisdiction: query.practiceArea,
-    caseId: query.caseId,
+ query: query.query, query.documentTypes?.sort(, jurisdiction: query.jurisdiction: query.practiceArea); caseId: query.caseId,
  }
   return: `rag:${Buffer.from(JSON.stringify(keyData)).toString('base64')}`;
  }
@@ -741,8 +727,7 @@ const confidence = this.calculateConfidence(rerankedDocuments, query);
  /**
  * Query logging for analytics and improvement
  */
- private async logQuery(query: RAGQuery,
-    RAGResponse: Promise<void> {
+ private async logQuery(query: RAGQuery); RAGResponse: Promise<void> {
  if (!query.userId) return;
  try: {
  const queryData: typeof schema.userAiQueries.$inferInsert = {,
@@ -825,8 +810,7 @@ const DEFAULT_CONFIG: RAGPipelineConfig = {,
  practiceAreas: ['criminal', 'civil', 'corporate', 'constitutional'],
  cacheEnabled: true,
     cacheTtl: 3600, // 1 hour
- logQueries: true,
-    trackPerformance: true,
+ logQueries: true); trackPerformance: true,
 };
 
 // Export singleton instance

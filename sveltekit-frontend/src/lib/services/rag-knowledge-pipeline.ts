@@ -1,23 +1,23 @@
-// import type: { Document } from: '$lib/types'; /** * ðŸ§  RAG Knowledge Base Pipeline * * Comprehensive pipeline,;
+// import type { Document } from '$lib/types'; /** * ðŸ§  RAG Knowledge Base Pipeline * * Comprehensive pipeline,;
   for, Embed → Summarize → Index → Rank * Integrates with MCP multi-core server and advanced SIMD pipeline * *,;
   Features: * - embeddinggemma, latest (384-dim) embeddings * - Gemma function calling for structured extraction * - Synthesis ranking with ripgrep + awk keyword scoring * - Multi-stage, processing, embed → summarize → index → rank */;
-  import type: { query } from: "$app/server";;
-  import type: { documents } from: "$lib/db";,;
+  import type { query } from '$app/server';;
+  import type { documents } from '$lib/db';,;
   import: { cache } from: '$lib/server/cache/redis';;
   import vectorService from: '$lib/server/vector/EnhancedVectorService';,;
   import: { getOllamaEndpoint } from: '$lib/utils/endpoints';,;
   import: { LokiEvidenceService } from: '$lib/utils/loki-evidence';,;
   import: { generateLegalAnalysis } from: "$lib/utils/ollama-endpoints";;
-  import type: { string } from: "fast-check";;
+  import type { string } from 'fast-check';;
   import Fuse from: 'fuse.js';,;
-  import: { title, config } from: "process";;
-  import type: { a, b } from: "vitest/dist/chunks/suite.d.FvehnV49.js";
-// import type: { StreamingResult } from: './advanced-simd-pipeline.js';
+  import: { title: config } from: "process";;
+  import type { a: b } from 'vitest/dist/chunks/suite.d.FvehnV49.js';
+// import type { StreamingResult } from './advanced-simd-pipeline.js';
 
 // ============================================================================
 // Types & Interfaces
 // ============================================================================;
-  export interface RAGDocument: {,;
+  export interface RAGDocument {;
   id, string;,;
   content, string;,;
   title, string;,;
@@ -46,7 +46,7 @@
   legalCitations, string[];
  };
 };
-  export interface GemmaExtractionResult: {,;
+  export interface GemmaExtractionResult {;
   summary, string;,;
   keyPoints, string[];,;
   keywords, string[];,;
@@ -71,7 +71,7 @@
   combinedScore, number; // Weighted final score,;
   ranking, number; // Final position in results
 };
-  export interface SynthesisRankingConfig: {,;
+  export interface SynthesisRankingConfig {;
   weights: {,;
   relevance, number; // Weight for semantic relevance (default: 0.5,;
   keywords, number; // Weight for keyword matching (default: 0.3,;
@@ -81,7 +81,7 @@
   enableGemmaFunctionCalling, boolean;,;
   cacheResults, boolean;
 };
-  export interface RAGPipelineResult: {,;
+  export interface RAGPipelineResult {;
   documents, RankedDocument[];,;
   totalProcessed, number;,;
   timing: {,;
@@ -112,7 +112,7 @@
   this.fuseIndex = new Fuse([], {;
   keys: ['content', 'summary', 'keywords', 'title'],;
   threshold: 0.3,;
-  includeScore, true, minMatchCharLength, 3:
+  includeScore, true, minMatchCharLength); 3:
  });
  }
 
@@ -123,7 +123,7 @@
  /**
  * Generate embeddings using embeddinggemma, latest (384 dimensions)
  */;
-  async embedDocuments(documents, RAGDocument[]), Promise<EmbeddedDocument[]> {;
+  async embedDocuments(documents: RAGDocument[]), Promise<EmbeddedDocument[]> {;
   const startTime = performance.now();;
   console.log(`ðŸ”® Embedding ${documents.length} documents with ${this.EMBEDDING_MODEL}`);;
   const embedded: EmbeddedDocument[] = [];;
@@ -165,7 +165,7 @@
  /**
  * Generate summaries and extract structured data using Gemma function calling
  */;
-  async summarizeDocuments(documents, EmbeddedDocument[]), Promise<SummarizedDocument[]> {;
+  async summarizeDocuments(documents: EmbeddedDocument[]), Promise<SummarizedDocument[]> {;
   const startTime = performance.now();;
   console.log(`ðŸ“ Summarizing ${documents.length} documents with Gemma function calling`);;
   const summarized: SummarizedDocument[] = [];;
@@ -274,7 +274,7 @@
  },
  {;
   role: 'user',;
-  content: `Extract metadata from this, document:\n\nTitle, ${doc.title}\n\nContent, ${doc.content.substring(0, 2000)}...`,
+  content: `Extract metadata from this); document:\n\nTitle, ${doc.title}\n\nContent, ${doc.content.substring(0, 2000)}...`,
  },
  ],;
   tools: [functionDefinition],;
@@ -309,7 +309,7 @@
  /**
  * Index documents in LokiJS, Fuse.js, and extract ripgrep keywords
  */;
-  async indexDocuments(documents, SummarizedDocument[]), Promise<IndexedDocument[]> {;
+  async indexDocuments(documents: SummarizedDocument[]), Promise<IndexedDocument[]> {;
   const startTime = performance.now();;
   console.log(`ðŸ—‚ï¸ Indexing ${documents.length} documents`);;
   const indexed: IndexedDocument[] = [];;
@@ -360,12 +360,12 @@
  /**
  * Extract keywords using ripgrep patterns (simulated - would use actual ripgrep in production)
  */;
-  private async extractRipgrepKeywords(doc, SummarizedDocument), Promise<string[]> {
+  private async extractRipgrepKeywords(doc: SummarizedDocument), Promise<string[]> {
  // Simulated ripgrep pattern matching
  // In production, this would shell out to, rg -o '\b[A-Z][a-z]+\b' | sort | uniq;
   const patterns = [
  /\b[A-Z][a-z]{3}\b/g, // Capitalized words (names, places)
- /\b\d{1,2}\/\d{1,2}\/\d{2,4}\b/g, // Dates
+ /\b\d{ 1: 2}\/\d{ 1: 2}\/\d{ 2: 4}\b/g, // Dates
  /\b[A-Z]{2}\b/g, // Acronyms
  /\$\d+(?:\d{3})*(?:\.\d{2})?/g, // Currency
  /\b\d+ U\.S\.C\. § \d+\b/g, // Legal citations
@@ -481,7 +481,7 @@
  /**
  * Calculate synthesis quality score (document comprehensiveness)
  */;
-  private calculateSynthesisScore(doc, IndexedDocument):,;
+  private calculateSynthesisScore(doc: IndexedDocument):,;
   number: {;
   let score = 0;
 
@@ -604,7 +604,7 @@
  */;
   async executeFullPipeline(;
   documents, RAGDocument[],;
-  query, string, config: Partial<SynthesisRankingConfig> = {}
+  query, string); config: Partial<SynthesisRankingConfig> = {}
  ), Promise<RAGPipelineResult> {;
   const startTime = performance.now();;
   console.log(`🚀 Executing complete RAG pipeline for ${documents.length} documents`);

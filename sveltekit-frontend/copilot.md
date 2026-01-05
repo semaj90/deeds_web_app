@@ -35,6 +35,145 @@ import { db } from '$lib/server/db';
 
 ---
 
+## 🔧 WebGPU + LangChain + TypeScript: Corruption Patterns
+
+**Latest Findings (Jan 2026):** Common corruption patterns from WebGPU/LangChain integration:
+
+### Pattern 1: Import Type Corruption
+```typescript
+// ❌ CORRUPTED
+import type: { GPUDevice } from: 'webgpu';
+
+// ✅ CORRECT (per TypeScript 5.6+ docs)
+import type { GPUDevice } from 'webgpu';
+```
+
+### Pattern 2: Function Parameter Type Syntax
+```typescript
+// ❌ CORRUPTED
+function process(data, GPUBuffer) { }
+
+// ✅ CORRECT (per LangChain.js v0.3+ patterns)
+function process(data: GPUBuffer) { }
+```
+
+### Pattern 3: Interface Declaration
+```typescript
+// ❌ CORRUPTED
+interface WebGPUContext: {,;
+
+// ✅ CORRECT
+interface WebGPUContext {
+```
+
+### Pattern 4: Object Literal Properties
+```typescript
+// ❌ CORRUPTED
+const config = { device, gpuDevice, adapter, gpuAdapter };
+
+// ✅ CORRECT
+const config = { device: gpuDevice, adapter: gpuAdapter };
+```
+
+### Pattern 5: Return Type Declarations
+```typescript
+// ❌ CORRUPTED
+async function init(): Promise<GPUDevice> :
+
+// ✅ CORRECT
+async function init(): Promise<GPUDevice> {
+```
+
+**Agentic Fixer Tool:** Use `scripts/agentic-corruption-fixer.mjs` for automated pattern detection and fixing with svelte-check validation.
+
+**Web Resources Referenced:**
+- WebGPU API: https://developer.mozilla.org/en-US/docs/Web/API/WebGPU_API
+- LangChain.js TypeScript: https://js.langchain.com/docs/get_started/introduction
+- TypeScript 5.6: https://www.typescriptlang.org/docs/handbook/release-notes/typescript-5-6.html
+
+---
+
+## 📚 Latest Technology Stack (Jan 2026)
+
+### TypeScript 5.6+ Configuration
+```json
+{
+  "compilerOptions": {
+    "module": "NodeNext",
+    "target": "ES2022",
+    "moduleResolution": "NodeNext",
+    "skipLibCheck": true,
+    "strict": true
+  }
+}
+```
+**Source:** https://learn.microsoft.com/en-us/azure/ai-foundry/openai/
+
+### Drizzle ORM 0.44 Patterns
+```typescript
+// ✅ CORRECT Drizzle 0.44 relations syntax
+import { relations } from 'drizzle-orm';
+
+export const documentsRelations = relations('documents', ({ one, many }) => ({
+  case: one('cases', {
+    fields: [documents.caseId],
+    references: [cases.id]
+  }),
+  evidence: many('evidence')
+}));
+```
+**Source:** https://orm.drizzle.team/docs/rqb#many-to-one
+
+### Bits UI Svelte 5 $bindable Rune
+```svelte
+<script lang="ts">
+interface Props {
+  value = $bindable('');
+  class: className = '';
+}
+</script>
+```
+**Source:** https://bits-ui.com/docs/utilities/bindable
+
+### SvelteKit 2 Load Functions
+```typescript
+// ✅ CORRECT SvelteKit 2 pattern
+export async function load({ params, fetch }) {
+  const response = await fetch(`/api/data/${params.id}`);
+  return { data: await response.json() };
+}
+```
+**Source:** https://kit.svelte.dev/docs/load
+
+### Go 1.25 WASM Export
+```go
+//go:wasmexport processData
+func processData(ptr, len uint32) uint32 {
+  // WASM export implementation
+}
+```
+**Source:** https://go.dev/blog/wasm
+
+### Python 3.13 Type Annotations
+```python
+from typing import Annotated
+
+def process_data(items: list[str], count: int) -> dict[str, int]:
+    return {item: count for item in items}
+```
+**Source:** https://docs.python.org/3.13/library/typing.html
+
+### CUDA 12+ Kernel Invocation
+```cpp
+// ✅ CORRECT CUDA 12 pattern
+__global__ void vectorAdd(float* a, float* b, float* c, int n);
+
+vectorAdd<<<blocks, threads>>>(d_a, d_b, d_c, numElements);
+```
+**Source:** https://docs.nvidia.com/cuda/cuda-c-programming-guide/
+
+---
+
 ## 📚 Knowledge Graph / RAG / KAG / DAG Sources
 
 ### AI Agent Context Files

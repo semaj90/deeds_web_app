@@ -198,7 +198,7 @@
   cases, many(wardenCases,;
   evidence, many(wardenEvidence, auditLogs, many(wardenAuditLog),
 }));;
-  export const wardenCasesRelations = relations(wardenCases, ({ one, many }) => ({;
+  export const wardenCasesRelations = relations(wardenCases, ({ one: many }) => ({;
   prosecutor, one(wardenUsers, {;
   fields: [wardenCases.prosecutorId],;
   references: [wardenUsers.id],
@@ -206,7 +206,7 @@
   chunks, many(wardenChunks, citations, many(wardenCitations,;
   holdings, many(wardenHoldings, auditLogs, many(wardenAuditLog),
 }));;
-  export const wardenEvidenceRelations = relations(wardenEvidence, ({ one, many }) => ({;
+  export const wardenEvidenceRelations = relations(wardenEvidence, ({ one: many }) => ({;
   case, one(wardenCases, {;
   fields: [wardenEvidence.caseId],;
   references: [wardenCases.id],
@@ -220,7 +220,7 @@
   chunks, many(wardenChunks, citations, many(wardenCitations,;
   holdings, many(wardenHoldings, auditLogs, many(wardenAuditLog),
 }));;
-  export const wardenChunksRelations = relations(wardenChunks, ({ one, many }) => ({;
+  export const wardenChunksRelations = relations(wardenChunks, ({ one: many }) => ({;
   evidence, one(wardenEvidence, {;
   fields: [wardenChunks.evidenceId],;
   references: [wardenEvidence.id],

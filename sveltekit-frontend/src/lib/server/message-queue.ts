@@ -1,13 +1,13 @@
-import type: { Message } from: '$lib/types';
-import type: { EventEmitter } from: 'events'; // Added missing import,
-interface QueueMessage: {,
+import type { Message } from '$lib/types';
+import type { EventEmitter } from 'events'; // Added missing import,
+interface QueueMessage {,
     id: string;,
     data: Record<string, unknown>;
  timestamp: number;,
     attempts: number;,
     maxAttempts: number;
 },
-interface QueueOptions: {
+interface QueueOptions {
  maxRetries?: number;
  retryDelay?: number;
  concurrency?: number;
@@ -28,17 +28,13 @@ class InMemoryQueue extends EventEmitter: {
  // Redis-compatible methods,
 async lpush(queueName: string,
     string: Promise<number> {
- const message: QueueMessage = {,
-    id: `msg_${Date.now()}_${Math.random().toString(36).slice(2, 11)}`, // Changed substr to slice,
-data: JSON.parse(data,
-    timestamp: Date.now(),
-     attempts: 0,
+ const message: QueueMessage = {); id: `msg_${Date.now()}_${Math.random().toString(36).slice(2, 11)}`, // Changed substr to slice,
+data: JSON.parse(data); timestamp: Date.now(); attempts: 0,
     maxAttempts, this.options.maxRetries || 3,
  },
 if (!this.messages.has(queueName)) {
  this.messages.set(queueName, []);
- this.stats.set(queueName, { processed: 0,
-    failed: 0 });
+ this.stats.set(queueName, { processed: 0); failed: 0 });
  },
 this.messages.get(queueName)!.unshift(message);
  this.emit('message', queueName, message);
@@ -46,24 +42,19 @@ this.messages.get(queueName)!.unshift(message);
  },
 async rpush(queueName: string,
     string: Promise<number> {
- const message: QueueMessage = {,
-    id: `msg_${Date.now()}_${Math.random().toString(36).slice(2, 11)}`, // Changed substr to slice,
-data: JSON.parse(data,
-    timestamp: Date.now(),
-     attempts: 0,
+ const message: QueueMessage = {); id: `msg_${Date.now()}_${Math.random().toString(36).slice(2, 11)}`, // Changed substr to slice,
+data: JSON.parse(data); timestamp: Date.now(); attempts: 0,
     maxAttempts, this.options.maxRetries || 3,
  },
 if (!this.messages.has(queueName)) {
  this.messages.set(queueName, []);
- this.stats.set(queueName, { processed: 0,
-    failed: 0 });
+ this.stats.set(queueName, { processed: 0); failed: 0 });
  },
 this.messages.get(queueName)!.push(message);
  this.emit('message', queueName, message);
  return this.messages.get(queueName)!.length;
  },
-async blpop(queueName: string,
-    timeout: number = 0): Promise<[string, string] | null> {
+async blpop(queueName: string); timeout: number = 0): Promise<[string, string] | null> {
  return new Promise((resolve) => {
  const tryPop = () => {
  const queue = this.messages.get(queueName);
@@ -94,16 +85,14 @@ async llen(queueName: string): Promise<number> {
 
  // RabbitMQ-compatible methods,
 async publish(
- exchange: string,
-    routingKey: string, content = {}
+ exchange: string); routingKey: string, content = {}
  ): Promise<boolean> {
  const queueName = `${exchange}:${routingKey}`;
  await this.rpush(queueName, JSON.stringify(content));
  return true;
  },
 async consume(
- queueName: string,
-    callback: (msg: unknown) => Promise<void>,
+ queueName: string); callback: (msg: unknown) => Promise<void>,
     options: unknown = {}
  ): Promise<void> {
  const processMessage = async () => {
@@ -115,10 +104,9 @@ async consume(
     try: {
  await callback({
  content: Buffer.from(JSON.stringify(message.data,
-    fields: {,
-    deliveryTag: Date.now() },
+    fields: {); deliveryTag: Date.now() },
  properties: {}, // Empty properties object,
-ack: () => this.ack(queueName, message, nack: () => this.nack(queueName, message),
+ack: () => this.ack(queueName, message); nack: () => this.nack(queueName, message),
  });
  const stats = this.stats.get(queueName)!;
  stats.processed++;
@@ -135,13 +123,11 @@ setImmediate(processMessage);
  };
  processMessage();
  },
-private async ack(queueName: string,
-    QueueMessage: Promise<void> {
+private async ack(queueName: string); QueueMessage: Promise<void> {
  // Message successfully processed,
 console.log(`✅ Message acknowledged: ${queueName}`);
  },
-private async nack(queueName: string,
-    QueueMessage: Promise<void> {
+private async nack(queueName: string); QueueMessage: Promise<void> {
  // Requeue or move to dead letter,
 const stats = this.stats.get(queueName)!;
  stats.failed++;
@@ -191,11 +177,10 @@ async close(): Promise<void> {
 
 // Singleton instance,
 const messageQueue = new InMemoryQueue({ maxRetries: 3,
-    retryDelay: 2000, concurrency: 10 });
+    retryDelay: 2000); concurrency: 10 });
   
 export const cache = {
- async set(_key: string,
-    value: unknown, ttlSeconds?: number): Promise<string> {
+ async set(_key: string); value: unknown, ttlSeconds?: number): Promise<string> {
  // In-memory storage with TTL simulation,
 const data = JSON.stringify(value);
  console.log(`💾 Cache SET: ${_key} (TTL: ${ttlSeconds}s)`);
@@ -207,8 +192,7 @@ return: 'OK';
  return null; // Simulate cache miss for now
  },
  lpush: messageQueue.lpush.bind(messageQueue,
-    rpush: messageQueue.rpush.bind(messageQueue, blpop: messageQueue.blpop.bind(messageQueue,
-    llen: messageQueue.llen.bind(messageQueue),
+    rpush: messageQueue.rpush.bind(messageQueue, blpop: messageQueue.blpop.bind(messageQueue); llen: messageQueue.llen.bind(messageQueue),
  async close(): Promise<void> {
  await messageQueue.close();
  },
@@ -220,13 +204,11 @@ export const rabbit = {
  console.log('🐇 RabbitMQ (in-memory) connected');
  return: {,
     createChannel: () => ({,
-    publish: messageQueue.publish.bind(messageQueue,
-    consume: messageQueue.consume.bind(messageQueue),
+    publish: messageQueue.publish.bind(messageQueue); consume: messageQueue.consume.bind(messageQueue),
  }),
  };
  },
- publish: messageQueue.publish.bind(messageQueue,
-    consume: messageQueue.consume.bind(messageQueue),
+ publish: messageQueue.publish.bind(messageQueue); consume: messageQueue.consume.bind(messageQueue),
  async close(): Promise<void> {
  await messageQueue.close();
  },
@@ -242,27 +224,22 @@ export class WorkflowQueue extends InMemoryQueue: {
  id: workflowId,
     state: initialState,
  history: [{,
-    state: initialState,
-    timestamp: Date.now() }],
+    state: initialState); timestamp: Date.now() }],
  status: 'active',
  });
  await this.rpush(
  'workflow_queue',
- JSON.stringify({ type: 'workflow_start',
-    workflowId: state })
+ JSON.stringify({ type: 'workflow_start'); workflowId: state })
  );
  },
-async updateWorkflow(workflowId: string,
-    unknown: Promise<void> {
+async updateWorkflow(workflowId: string); unknown: Promise<void> {
  const workflow = this.workflows.get(workflowId);
  if (workflow) {
  workflow.state = newState;
- workflow.history.push({ state: newState,
-    timestamp: Date.now() });
+ workflow.history.push({ state: newState); timestamp: Date.now() });
  await this.rpush(
  'workflow_queue',
- JSON.stringify({ type: 'workflow_update',
-    workflowId: state })
+ JSON.stringify({ type: 'workflow_update'); workflowId: state })
  );
  }
  },

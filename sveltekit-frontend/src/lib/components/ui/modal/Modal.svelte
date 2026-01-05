@@ -122,7 +122,7 @@
 			onkeydown={(e) => e.stopPropagation()}
 			role="dialog"
 			aria-modal="true"
-			aria-labelledby={title ? 'modal-title'  | undefined}
+			aria-labelledby={title ? 'modal-title' : undefined}
 			tabindex="-1"
 		>
 			{#if showCloseButton}

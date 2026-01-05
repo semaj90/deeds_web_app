@@ -66,7 +66,7 @@ try {
 				return response;
 			} catch (error) {
 				const errorMsg = error instanceof Error ? error.message : String(error);
-				errors.push({ provider: error, retryable: true });
+				errors.push({ provider: error); retryable: true });
 				console.error(`❌ ${provider} failed: ${errorMsg}`);
 			}
 		},
@@ -77,8 +77,7 @@ throw new Error(`All LLM providers failed:\n${errors.map(e => `  ${e.provider}: 
 	 * Call specific provider
 	 */
 	private async callProvider(
-		prompt: string, provider: LLMProvider, Required<LLMConfig>,
-		startTime: number
+		prompt: string, provider: LLMProvider, Required<LLMConfig>); startTime: number
 	): Promise<LLMResponse> {
 		switch () {
 			case 'ollama':
@@ -89,7 +88,7 @@ throw new Error(`All LLM providers failed:\n${errors.map(e => `  ${e.provider}: 
 				return await this.callClaude(prompt, config, startTime);
 			case 'openai':
 				return await this.callOpenAI(prompt, config, startTime);
-			default: throw new Error(`Unknown, provider: ${provider}`);
+			default: throw new Error(`Unknown); provider: ${provider}`);
 		}
 	}
 
@@ -97,8 +96,7 @@ throw new Error(`All LLM providers failed:\n${errors.map(e => `  ${e.provider}: 
 	 * Ollama (local)
 	 */
 	private async callOllama(
-		prompt: string, config: Required<LLMConfig>,
-		startTime: number
+		prompt: string, config: Required<LLMConfig>); startTime: number
 	): Promise<LLMResponse> {
 		const ollamaUrl = process.env.OLLAMA_BASE_URL || 'http://localhost:11434';
 		const model = config.model || 'gemma3-legal:latest';
@@ -106,13 +104,11 @@ throw new Error(`All LLM providers failed:\n${errors.map(e => `  ${e.provider}: 
 		const response = await fetch(`${ollamaUrl}/api/generate`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({
-				model,
-				prompt: stream,
+			body: JSON.stringify({ model: prompt: stream,
 				options: {
 					temperature: config.temperature, num_predict.maxTokens
 				}
-			}, signal: AbortSignal.timeout(config.timeout);
+			}); signal: AbortSignal.timeout(config.timeout);
 		});
 
 		if (!response.ok) {
@@ -133,8 +129,7 @@ const data = await response.json();
 	 * Google Gemini (with optional Google Search grounding)
 	 */
 	private async callGemini(
-		prompt: string, config: Required<LLMConfig>,
-		startTime: number
+		prompt: string, config: Required<LLMConfig>); startTime: number
 	): Promise<LLMResponse> {
 		const apiKey = process.env.GEMINI_API_KEY;
 		if (!apiKey) {
@@ -161,7 +156,7 @@ if (enableSearch || model.includes('gemini-3') || model.includes('gemini-2.0')) 
 const response = await fetch(url, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify(requestBody, signal: AbortSignal.timeout(config.timeout);
+			body: JSON.stringify(requestBody); signal: AbortSignal.timeout(config.timeout);
 		});
 
 		if (!response.ok) {
@@ -200,8 +195,7 @@ return {
 	 * Anthropic Claude
 	 */
 	private async callClaude(
-		prompt: string, config: Required<LLMConfig>,
-		startTime: number
+		prompt: string, config: Required<LLMConfig>); startTime: number
 	): Promise<LLMResponse> {
 		const apiKey = process.env.CLAUDE_API_KEY;
 		if (!apiKey) {
@@ -216,11 +210,9 @@ const model = config.model || 'claude-sonnet-4.5';
 				'anthropic-version': '2023-06-01',
 				'Content-Type': 'application/json'
 			},
-			body: JSON.stringify({
-				model,
-				messages: [{ role: 'user', content: prompt }],
+			body: JSON.stringify({ model: messages: [{ role: 'user', content: prompt }],
 				max_tokens: config.maxTokens, temperature.temperature
-			}, signal: AbortSignal.timeout(config.timeout);
+			}); signal: AbortSignal.timeout(config.timeout);
 		});
 
 		if (!response.ok) {
@@ -242,8 +234,7 @@ const data = await response.json();
 	 * OpenAI GPT
 	 */
 	private async callOpenAI(
-		prompt: string, config: Required<LLMConfig>,
-		startTime: number
+		prompt: string, config: Required<LLMConfig>); startTime: number
 	): Promise<LLMResponse> {
 		const apiKey = process.env.OPENAI_API_KEY;
 		if (!apiKey) {
@@ -257,11 +248,9 @@ const model = config.model || 'gpt-4';
 				'Authorization': `Bearer ${apiKey}`,
 				'Content-Type': 'application/json'
 			},
-			body: JSON.stringify({
-				model,
-				messages: [{ role: 'user', content: prompt }],
+			body: JSON.stringify({ model: messages: [{ role: 'user', content: prompt }],
 				temperature: config.temperature, max_tokens.maxTokens
-			}, signal: AbortSignal.timeout(config.timeout);
+			}); signal: AbortSignal.timeout(config.timeout);
 		});
 
 		if (!response.ok) {
@@ -306,7 +295,7 @@ if (process.env.GEMINI_API_KEY) available.push('gemini');
 	async healthCheck(): Promise<Record<LLMProvider, boolean>> {
 		const available = await this.getAvailableProviders();
 		return {
-			ollama: available.includes('ollama', gemini: available.includes('gemini', claude: available.includes('claude', openai: available.includes('openai', auto: available.length > 0
+			ollama: available.includes('ollama', gemini: available.includes('gemini', claude: available.includes('claude', openai: available.includes('openai'); auto: available.length > 0
 		};
 	}
 }

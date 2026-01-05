@@ -35,6 +35,164 @@ import { db } from '$lib/server/db';
 
 ---
 
+## 🔧 WebGPU + LangChain + TypeScript: Corruption Patterns
+
+**Latest Analysis (Jan 2026):** Systematic corruption patterns in WebGPU/LangChain TypeScript code:
+
+### Critical Patterns Detected
+
+1. **Import Type Syntax** - Colons replacing spaces
+   - Pattern: `import type: { X } from: 'y'`
+   - Fix: `import type { X } from 'y'`
+   - Source: TypeScript 5.6 module resolution docs
+
+2. **Function Parameters** - Commas replacing colons
+   - Pattern: `function f(param, Type)`
+   - Fix: `function f(param: Type)`
+   - Source: LangChain.js v0.3 type safety guidelines
+
+3. **Interface Declarations** - Extra punctuation
+   - Pattern: `interface X: {,;`
+   - Fix: `interface X {`
+   - Source: TypeScript handbook
+
+4. **Missing Closing Parentheses** - Early termination
+   - Pattern: `crypto.randomUUID(, next:`
+   - Fix: `crypto.randomUUID(), next:`
+   - Common in WebGPU device initialization
+
+5. **Object Property Shorthand** - Wrong separator
+   - Pattern: `{ id, item.id }`
+   - Fix: `{ id: item.id }`
+   - Source: MDN JavaScript object literals
+
+**Automated Detection:** `scripts/agentic-corruption-fixer.mjs` uses 10 regex patterns with svelte-check validation loop.
+
+**Reference Documentation:**
+- WebGPU Spec: https://gpuweb.github.io/gpuweb/
+- LangChain TypeScript Guide: https://js.langchain.com/docs/get_started/introduction
+- TypeScript 5.6 Release Notes: https://devblogs.microsoft.com/typescript/announcing-typescript-5-6/
+
+---
+
+## 📦 Technology Stack Specifications (Jan 2026)
+
+### 🟦 Drizzle ORM 0.44
+**Relations Syntax (Breaking Change from 0.33):**
+```typescript
+import { pgTable, text, integer, relations } from 'drizzle-orm/pg-core';
+
+export const users = pgTable('users', {
+  id: text('id').primaryKey(),
+  name: text('name').notNull()
+});
+
+// ✅ Drizzle 0.44 syntax
+export const usersRelations = relations(users, ({ many }) => ({
+  posts: many(posts)
+}));
+
+// ❌ OLD Drizzle 0.33 syntax (no longer valid)
+export const usersRelations: Relations<'users', {}> = { ... };
+```
+**Docs:** https://orm.drizzle.team/docs/rqb
+
+### 🧩 Bits UI Svelte 5 Components
+**$bindable Rune Pattern:**
+```svelte
+<script lang="ts">
+import type { Snippet } from 'svelte';
+
+interface Props {
+  value = $bindable('');
+  placeholder?: string;
+  class?: string;
+  children?: Snippet;
+}
+
+let { value = $bindable(''), placeholder, class: className, children }: Props = $props();
+</script>
+```
+**Docs:** https://bits-ui.com/docs/components/button
+
+### ⚡ SvelteKit 2 Patterns
+**Load Function (No Generic Return Type):**
+```typescript
+// ✅ SvelteKit 2
+export async function load({ params, parent, fetch, url }) {
+  const parentData = await parent();
+  return {
+    post: await getPost(params.id),
+    metadata: parentData.metadata
+  };
+}
+
+// ❌ SvelteKit 1 (deprecated)
+export const load: PageLoad = async () => { ... };
+```
+**Docs:** https://kit.svelte.dev/docs/load
+
+### 🔶 Go 1.25 WASM
+**WASM Export Directive:**
+```go
+package main
+
+import "syscall/js"
+
+//go:wasmexport add
+func add(a, b int32) int32 {
+  return a + b
+}
+
+func main() {
+  js.Global().Set("goAdd", js.FuncOf(addWrapper))
+  select {}
+}
+```
+**Docs:** https://go.dev/wiki/WebAssembly
+
+### 🐍 Python 3.13 Types
+**Type Annotations with Annotated:**
+```python
+from typing import Annotated
+import torch
+
+def process_tensor(
+    data: Annotated[torch.Tensor, "Input tensor"],
+    device: Annotated[str, "cuda or cpu"] = "cuda"
+) -> Annotated[torch.Tensor, "Processed output"]:
+    return data.to(device).float()
+```
+**Docs:** https://docs.python.org/3.13/library/typing.html
+
+### 💡 CUDA 12+ Kernel Launch
+**Execution Configuration:**
+```cpp
+// ✅ CUDA 12+ unified memory pattern
+__global__ void vectorAdd(float* a, float* b, float* c, int n) {
+  int idx = blockIdx.x * blockDim.x + threadIdx.x;
+  if (idx < n) c[idx] = a[idx] + b[idx];
+}
+
+int main() {
+  int n = 1<<20;
+  size_t bytes = n * sizeof(float);
+
+  float *a, *b, *c;
+  cudaMallocManaged(&a, bytes);
+  cudaMallocManaged(&b, bytes);
+  cudaMallocManaged(&c, bytes);
+
+  int threads = 256;
+  int blocks = (n + threads - 1) / threads;
+  vectorAdd<<<blocks, threads>>>(a, b, c, n);
+  cudaDeviceSynchronize();
+}
+```
+**Docs:** https://docs.nvidia.com/cuda/cuda-c-programming-guide/
+
+---
+
 ## 📚 Knowledge Graph / RAG / KAG / DAG Sources
 
 ### AI Agent Context Files

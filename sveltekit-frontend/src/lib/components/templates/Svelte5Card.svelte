@@ -55,9 +55,9 @@
 	class="nes-panel {variantClasses} {className}"
 	class:cursor-pointer={onclick}
 	onclick={onclick}
-	role={onclick ? 'button'  | undefined}
-	tabindex={onclick ? 0  | undefined}
-	onkeydown={onclick ? (e) => e.key === 'Enter' && onclick()  | undefined}
+	role={onclick ? 'button' : undefined}
+	tabindex={onclick ? 0 : undefined}
+	onkeydown={onclick ? (e) => e.key === 'Enter' && onclick() : undefined}
 >
 	{#if header}
 		<div class="nes-panel-header">

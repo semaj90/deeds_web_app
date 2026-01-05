@@ -375,3 +375,112 @@ if (!tableExists) {
 - `src/lib/server/db/verify-canvas-table.ts` - Table existence check
 - `drizzle.config.ts` - Drizzle Kit configuration
 - `drizzle/` - Migration files
+
+---
+
+## 🎮 WebGPU / LangChain.js / TypeScript 5.5 Best Practices (2025)
+
+### WebGPU API Guidelines
+
+**Type Setup:**
+```bash
+npm install --save-dev @webgpu/types
+```
+
+Add to `tsconfig.json`:
+```json
+{
+  "compilerOptions": {
+    "types": ["@webgpu/types"]
+  }
+}
+```
+
+**Key Interfaces:**
+- `GPUDevice`: Main entry point, manages resources and command queues
+- `GPUBuffer`: GPU memory block, created via `device.createBuffer()`
+- `GPUComputePipeline`: Compute shader execution pipeline
+
+**Buffer Creation Pattern:**
+```typescript
+const buffer = device.createBuffer({
+    size: data.byteLength,
+    usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST,
+});
+device.queue.writeBuffer(buffer, 0, data);
+```
+
+### LangChain.js 0.3 TypeScript Guidelines
+
+**Embeddings Interface:**
+```typescript
+interface Embeddings {
+    embedDocuments(documents: string[]): Promise<number[][]>;
+    embedQuery(text: string): Promise<number[]>;
+}
+```
+
+**Runnable Interface for Chains:**
+- All chain components implement `Runnable` for composition
+- Use `RunnableSequence.from([...])` for chaining
+
+**Provider Integration:**
+- OpenAI, Ollama, Vertex AI embeddings all follow same interface
+- Prefer `@langchain/ollama` for local embeddings
+
+### TypeScript 5.5 Best Practices
+
+1. **Enable Strict Mode**: `"strict": true` in tsconfig
+2. **Use Inferred Type Predicates**: TS 5.5 auto-infers `Array.filter()` types
+3. **Leverage `NoInfer<T>`**: Prevent unwanted generic inference
+4. **Prefer `unknown` over `any`**: Forces type checking before use
+5. **Use Utility Types**: `Partial`, `Required`, `Pick`, `Omit`, `Record`
+
+### Common Corruption Patterns to Fix
+
+**Colon-Instead-of-Space Pattern:**
+```typescript
+// ❌ WRONG (corrupted)
+import: { browser } from: '$app/environment';
+interface Foo: {
+function bar(param, string): void {
+
+// ✅ CORRECT
+import { browser } from '$app/environment';
+interface Foo {
+function bar(param: string): void {
+```
+
+**Fix Script:**
+```bash
+node scripts/fix-colon-corruption.cjs
+```
+
+### High-Error Files Requiring Attention
+
+| File | Error Count | Pattern |
+|------|-------------|---------|
+| `webgpu-simd-accelerator.ts` | ~400 | Colon corruption |
+| `webgpu-langchain-bridge.ts` | ~400 | Colon corruption |
+| `qlora-*-integration.ts` | ~400 | Colon corruption |
+
+### Agentic Tool Calling for svelte-check
+
+**Pattern Matching Workflow:**
+1. Run `npx svelte-check --threshold error > errors.txt`
+2. Parse error patterns (file:line:col:message)
+3. Cluster by error type and file
+4. Apply batch fixes with regex/AST transforms
+5. Re-run svelte-check to verify
+
+**Fix Script Template:**
+```javascript
+// scripts/fix-pattern.cjs
+const fs = require('fs');
+const files = ['src/lib/...'];
+for (const file of files) {
+    let content = fs.readFileSync(file, 'utf-8');
+    content = content.replace(/WRONG_PATTERN/g, 'CORRECT_PATTERN');
+    fs.writeFileSync(file, content);
+}
+```

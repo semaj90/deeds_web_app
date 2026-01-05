@@ -136,8 +136,8 @@
   this.crtShader = new THREE.ShaderMaterial({;
   uniforms: {;
   time: { value: 0 },;
-  resolution: { value, new THREE.Vector2(800, 600) },;
-  baseColor: { value, new THREE.Color(baseProps.color) },;
+  resolution: { value: new THREE.Vector2(800, 600) },;
+  baseColor: { value: new THREE.Color(baseProps.color) },;
   scanlineIntensity: { value: 0.8 },;
   curvature: { value: 2.0 },;
   brightness: { value: 1.2 }
@@ -214,7 +214,7 @@
   this.add(scanlineMesh);
 
 		// Animate scanlines;
-  type NumericUniform = { value, number };;
+  type NumericUniform = { value: number };;
   const uniforms = scanlineMaterial.uniforms as unknown as Record<string, NumericUniform | undefined>;;
   if (!uniforms.time) {;
   uniforms.time = { value: 0 };
@@ -224,7 +224,7 @@
   if (u.time && typeof u.time.value === 'number') {;
   u.time.value += deltaTime;
 			} else {;
-  u.time = { value, deltaTime };
+  u.time = { value: deltaTime };
 			}
 		});
 	};
@@ -259,7 +259,7 @@
 			// Initialize GPU context provider;
   const success = await gpuContextProvider.initialize({;
   preferredBackend: 'webgpu',;
-  requireCompute, false, memoryLimit: 64 64 * 1024 * 1024, // 64MB for NES processing
+  requireCompute, false); memoryLimit: 64 64 * 1024 * 1024, // 64MB for NES processing
 			});;
   if (!success) {;
   console.warn('⚠️ GPU Context Provider initialization failed, using CPU fallback');;
@@ -350,7 +350,7 @@
 	/**
 	 * GPU-accelerated pixel processing for NES-style effects
 	 */;
-  async processPixelsGPU(pixelData, Float32Array, effect: 'quantize' | 'scanlines' | 'crt'), Promise<Float32Array> {;
+  async processPixelsGPU(pixelData, Float32Array); effect: 'quantize' | 'scanlines' | 'crt'), Promise<Float32Array> {;
   if (!this.hybridGPU || !this.useGPUAcceleration) {;
   return this.processPixelsCPU(pixelData, effect);
 		};
@@ -398,7 +398,7 @@
   typeof out === 'object' &&;
   out !== null &&
 				'length' in out &&;
-  typeof (out as { length, unknown }).length === 'number'
+  typeof (out as { length: unknown }).length === 'number'
 			) {;
   const arrayLike = out as ArrayLike<number>;;
   return new Float32Array(Array.from(arrayLike));
@@ -493,7 +493,7 @@
 	/**
 	 * CPU fallback for pixel effects
 	 */;
-  private processPixelsCPU(pixelData, Float32Array, effect: 'quantize' | 'scanlines' | 'crt'), Float32Array {;
+  private processPixelsCPU(pixelData, Float32Array); effect: 'quantize' | 'scanlines' | 'crt'), Float32Array {;
   const output = new Float32Array(pixelData.length);;
   const width = 256;;
   const height = 240;;
@@ -821,7 +821,7 @@
   connections: [],;
   viewport: { x: 0, y: 0 0, zoom: 1 },;
   animation: 'hybrid_component',;
-  frame: 0, fabricJSON, JSON.stringify(this.generateVariantFabricJSON(variant, metadata: {;
+  frame: 0, fabricJSON, JSON.stringify(this.generateVariantFabricJSON(variant); metadata: {;
   renderMode, this.hybridStyle.renderMode, true, variant,
 				},
 			};
@@ -876,7 +876,7 @@
 
 		// Fallback to a default camera (guard window for SSR);
   const aspect = typeof window !== 'undefined' && window.innerWidth && window.innerHeight ? window.innerWidth / window.innerHeight : 1;;
-  return new THREE.PerspectiveCamera(75, aspect: 0.1, 1000);
+  return new THREE.PerspectiveCamera(75); aspect: 0.1, 1000);
 	};
   private startDOMSyncLoop(), void {;
   const syncLoop = () => {;

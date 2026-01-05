@@ -1,4 +1,4 @@
-import db from '$lib/server/db/client';
+import { db } from '$lib/server/db/client';
 import { sessions, users } from '$lib/server/db/schema';
 import { DrizzlePostgreSQLAdapter } from '@lucia-auth/adapter-drizzle';
 import type { Cookies } from '@sveltejs/kit';

@@ -405,6 +405,421 @@ netstat -ano | findstr :4005
 
 ---
 
-**Last Updated**: 2025-01-25
-**Phase**: 89+ (Svelte 5 + bits-ui Migration)
-**Status**: ✅ 392 → 0 errors, templates created, UnoCSS configured
+## 🖥️ WebGPU API (Browser GPU Acceleration)
+
+### TypeScript Types (Built-in)
+WebGPU types are now included in TypeScript DOM lib. Add to `tsconfig.json`:
+```json
+{
+  "compilerOptions": {
+    "lib": ["DOM", "ES2022"],
+    "types": ["@webgpu/types"]
+  }
+}
+```
+
+### Core Interfaces
+```typescript
+// GPU Initialization Pattern
+async function initWebGPU(): Promise<{ device: GPUDevice; context: GPUCanvasContext }> {
+  // Check for WebGPU support
+  if (!navigator.gpu) {
+    throw new Error('WebGPU not supported - use CPU fallback');
+  }
+
+  // Request adapter (physical GPU)
+  const adapter: GPUAdapter | null = await navigator.gpu.requestAdapter({
+    powerPreference: 'high-performance' // or 'low-power'
+  });
+  if (!adapter) throw new Error('No GPU adapter found');
+
+  // Request device (logical GPU connection)
+  const device: GPUDevice = await adapter.requestDevice({
+    requiredFeatures: ['shader-f16'], // optional features
+    requiredLimits: {
+      maxStorageBufferBindingSize: adapter.limits.maxStorageBufferBindingSize
+    }
+  });
+
+  // Configure canvas context
+  const canvas = document.querySelector('canvas') as HTMLCanvasElement;
+  const context: GPUCanvasContext = canvas.getContext('webgpu')!;
+  const format: GPUTextureFormat = navigator.gpu.getPreferredCanvasFormat();
+
+  context.configure({
+    device,
+    format,
+    alphaMode: 'premultiplied'
+  });
+
+  return { device, context };
+}
+```
+
+### Buffer Creation
+```typescript
+// GPUBuffer - Vertex/Index/Uniform/Storage
+const vertexBuffer: GPUBuffer = device.createBuffer({
+  label: 'Vertex Buffer',
+  size: Float32Array.BYTES_PER_ELEMENT * vertexData.length,
+  usage: GPUBufferUsage.VERTEX | GPUBufferUsage.COPY_DST,
+  mappedAtCreation: true
+});
+new Float32Array(vertexBuffer.getMappedRange()).set(vertexData);
+vertexBuffer.unmap();
+
+// Uniform buffer (for shader constants)
+const uniformBuffer: GPUBuffer = device.createBuffer({
+  size: 64, // 4x4 matrix = 16 floats * 4 bytes
+  usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST
+});
+device.queue.writeBuffer(uniformBuffer, 0, matrixData);
+```
+
+### Shader Modules (WGSL)
+```typescript
+const shaderModule: GPUShaderModule = device.createShaderModule({
+  label: 'Triangle Shader',
+  code: `
+    struct VertexOutput {
+      @builtin(position) pos: vec4f,
+      @location(0) color: vec4f
+    }
+
+    @vertex
+    fn vertexMain(@location(0) position: vec3f) -> VertexOutput {
+      var output: VertexOutput;
+      output.pos = vec4f(position, 1.0);
+      output.color = vec4f(1.0, 0.0, 0.0, 1.0);
+      return output;
+    }
+
+    @fragment
+    fn fragmentMain(input: VertexOutput) -> @location(0) vec4f {
+      return input.color;
+    }
+  `
+});
+```
+
+### Render Pipeline
+```typescript
+const pipeline: GPURenderPipeline = device.createRenderPipeline({
+  label: 'Render Pipeline',
+  layout: 'auto',
+  vertex: {
+    module: shaderModule,
+    entryPoint: 'vertexMain',
+    buffers: [{
+      arrayStride: 12, // 3 floats * 4 bytes
+      attributes: [{
+        shaderLocation: 0,
+        offset: 0,
+        format: 'float32x3'
+      }]
+    }]
+  },
+  fragment: {
+    module: shaderModule,
+    entryPoint: 'fragmentMain',
+    targets: [{ format: navigator.gpu.getPreferredCanvasFormat() }]
+  },
+  primitive: {
+    topology: 'triangle-list',
+    cullMode: 'back'
+  }
+});
+```
+
+### Compute Pipeline (GPU Compute)
+```typescript
+const computePipeline: GPUComputePipeline = device.createComputePipeline({
+  label: 'Matrix Multiply',
+  layout: 'auto',
+  compute: {
+    module: device.createShaderModule({
+      code: `
+        @group(0) @binding(0) var<storage, read> inputA: array<f32>;
+        @group(0) @binding(1) var<storage, read> inputB: array<f32>;
+        @group(0) @binding(2) var<storage, read_write> output: array<f32>;
+
+        @compute @workgroup_size(64)
+        fn main(@builtin(global_invocation_id) gid: vec3u) {
+          let i = gid.x;
+          output[i] = inputA[i] * inputB[i];
+        }
+      `
+    }),
+    entryPoint: 'main'
+  }
+});
+```
+
+### Error Handling
+```typescript
+// Handle device lost
+device.lost.then((info: GPUDeviceLostInfo) => {
+  console.error(`GPU device lost: ${info.reason}`, info.message);
+  if (info.reason !== 'destroyed') {
+    // Re-initialize WebGPU
+    initWebGPU();
+  }
+});
+
+// Capture validation errors
+device.pushErrorScope('validation');
+// ... GPU operations
+device.popErrorScope().then((error: GPUError | null) => {
+  if (error) console.error('Validation error:', error.message);
+});
+```
+
+### HTML Fallback Pattern
+```typescript
+class GPUAccelerator {
+  private device: GPUDevice | null = null;
+  private useGPU: boolean = false;
+
+  async init(): Promise<void> {
+    try {
+      if (typeof navigator !== 'undefined' && navigator.gpu) {
+        const adapter = await navigator.gpu.requestAdapter();
+        if (adapter) {
+          this.device = await adapter.requestDevice();
+          this.useGPU = true;
+          console.log('✅ WebGPU initialized');
+          return;
+        }
+      }
+    } catch (e) {
+      console.warn('WebGPU init failed:', e);
+    }
+    // Fallback to CPU/SIMD.js
+    console.log('⚠️ Using CPU fallback (SIMD.js)');
+    this.useGPU = false;
+  }
+
+  compute(data: Float32Array): Float32Array {
+    if (this.useGPU && this.device) {
+      return this.computeGPU(data);
+    }
+    return this.computeCPU(data);
+  }
+
+  private computeCPU(data: Float32Array): Float32Array {
+    // CPU fallback implementation
+    return data.map(x => x * 2);
+  }
+
+  private computeGPU(data: Float32Array): Float32Array {
+    // WebGPU compute implementation
+    // ... (use compute pipeline)
+    return data;
+  }
+}
+```
+
+---
+
+## 🔗 LangChain.js TypeScript (RAG + Agents)
+
+### Installation
+```bash
+npm install langchain @langchain/core @langchain/ollama @langchain/qdrant
+```
+
+### Ollama Integration (Local LLM)
+```typescript
+import { Ollama } from '@langchain/ollama';
+
+// Text completion model
+const llm = new Ollama({
+  model: 'gemma3-legal:latest', // or 'llama3', 'mistral', etc.
+  baseUrl: 'http://localhost:11434',
+  temperature: 0.7,
+  maxRetries: 2
+});
+
+// Simple invocation
+const response: string = await llm.invoke('Explain TypeScript generics');
+console.log(response);
+
+// Streaming
+for await (const chunk of await llm.stream('Write a haiku')) {
+  process.stdout.write(chunk);
+}
+```
+
+### Chat Models (Ollama)
+```typescript
+import { ChatOllama } from '@langchain/ollama';
+import { HumanMessage, SystemMessage, AIMessage } from '@langchain/core/messages';
+
+const chatModel = new ChatOllama({
+  model: 'gemma3-legal:latest',
+  temperature: 0
+});
+
+const messages = [
+  new SystemMessage('You are a TypeScript expert.'),
+  new HumanMessage('How do I fix TS2322?')
+];
+
+const response = await chatModel.invoke(messages);
+console.log(response.content);
+```
+
+### Embeddings (768D via Ollama)
+```typescript
+import { OllamaEmbeddings } from '@langchain/ollama';
+
+const embeddings = new OllamaEmbeddings({
+  model: 'embeddinggemma:latest', // 768D vectors
+  baseUrl: 'http://localhost:11434'
+});
+
+// Single embedding
+const vector: number[] = await embeddings.embedQuery('TypeScript error TS2322');
+console.log(`Vector dimensions: ${vector.length}`); // 768
+
+// Batch embeddings
+const vectors: number[][] = await embeddings.embedDocuments([
+  'How to fix TS2322',
+  'Type mismatch error',
+  'Drizzle ORM schema'
+]);
+```
+
+### Qdrant Vector Store
+```typescript
+import { QdrantVectorStore } from '@langchain/qdrant';
+import { OllamaEmbeddings } from '@langchain/ollama';
+import type { Document } from '@langchain/core/documents';
+
+const embeddings = new OllamaEmbeddings({ model: 'embeddinggemma:latest' });
+
+// Connect to existing collection
+const vectorStore = await QdrantVectorStore.fromExistingCollection(embeddings, {
+  url: process.env.QDRANT_URL || 'http://localhost:6333',
+  collectionName: 'phase72_error_patterns'
+});
+
+// Add documents
+const documents: Document[] = [
+  { pageContent: 'TS2322: Type string not assignable to number', metadata: { errorCode: 'TS2322' } },
+  { pageContent: 'TS1005: Missing semicolon', metadata: { errorCode: 'TS1005' } }
+];
+await vectorStore.addDocuments(documents);
+
+// Similarity search
+const results = await vectorStore.similaritySearch('type mismatch', 5);
+for (const doc of results) {
+  console.log(`[${doc.metadata.errorCode}] ${doc.pageContent}`);
+}
+
+// Search with scores
+const scored = await vectorStore.similaritySearchWithScore('type error', 3);
+for (const [doc, score] of scored) {
+  console.log(`[Score: ${score.toFixed(3)}] ${doc.pageContent}`);
+}
+
+// Convert to retriever (for RAG chains)
+const retriever = vectorStore.asRetriever({ k: 5 });
+const docs = await retriever.invoke('Drizzle schema error');
+```
+
+### Agent with Tools
+```typescript
+import { createAgent, tool } from 'langchain';
+import * as z from 'zod';
+
+// Define custom tools
+const searchCodebase = tool(
+  async ({ query }) => {
+    // Call ripgrep or semantic search
+    const results = await fetch(`http://localhost:3002/search?q=${query}`);
+    return JSON.stringify(await results.json());
+  },
+  {
+    name: 'search_codebase',
+    description: 'Search the codebase for code patterns or errors',
+    schema: z.object({
+      query: z.string().describe('Search query')
+    })
+  }
+);
+
+const readFile = tool(
+  async ({ filepath, startLine, endLine }) => {
+    const content = await fs.readFile(filepath, 'utf-8');
+    const lines = content.split('\n').slice(startLine - 1, endLine);
+    return lines.join('\n');
+  },
+  {
+    name: 'read_file',
+    description: 'Read file contents with optional line range',
+    schema: z.object({
+      filepath: z.string(),
+      startLine: z.number().optional().default(1),
+      endLine: z.number().optional()
+    })
+  }
+);
+
+// Create agent
+const agent = createAgent({
+  model: 'gemma3-legal:latest',
+  tools: [searchCodebase, readFile]
+});
+
+// Run agent
+const result = await agent.invoke({
+  messages: [{ role: 'user', content: 'Find and fix TS2322 errors in schema-postgres.ts' }]
+});
+console.log(result);
+```
+
+### RAG Chain Pattern
+```typescript
+import { ChatOllama } from '@langchain/ollama';
+import { QdrantVectorStore } from '@langchain/qdrant';
+import { createStuffDocumentsChain } from 'langchain/chains/combine_documents';
+import { createRetrievalChain } from 'langchain/chains/retrieval';
+import { ChatPromptTemplate } from '@langchain/core/prompts';
+
+// Setup
+const model = new ChatOllama({ model: 'gemma3-legal:latest' });
+const vectorStore = await QdrantVectorStore.fromExistingCollection(embeddings, {
+  url: 'http://localhost:6333',
+  collectionName: 'phase76_knowledge_base'
+});
+
+// Create RAG prompt
+const prompt = ChatPromptTemplate.fromTemplate(`
+Answer the question based on the following context:
+
+{context}
+
+Question: {input}
+`);
+
+// Create chains
+const documentChain = await createStuffDocumentsChain({ llm: model, prompt });
+const retriever = vectorStore.asRetriever({ k: 5 });
+const ragChain = await createRetrievalChain({
+  combineDocsChain: documentChain,
+  retriever
+});
+
+// Query
+const response = await ragChain.invoke({
+  input: 'How do I fix Drizzle ExtraConfigColumn errors?'
+});
+console.log(response.answer);
+```
+
+---
+
+**Last Updated**: 2025-01-27
+**Phase**: 96+ (WebGPU + LangChain Knowledge Base)
+**Status**: ✅ 392 → 0 errors, templates created, UnoCSS configured, WebGPU + LangChain documented

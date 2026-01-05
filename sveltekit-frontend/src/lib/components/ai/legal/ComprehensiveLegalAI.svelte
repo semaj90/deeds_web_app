@@ -29,7 +29,7 @@
   let systemStats = $state<any>({});
   let recommendations = $state<any[]>([]);
   let processedResults = $state<any>({});
-  
+
   let workerPool: any = null;
   let simdCache: any = null;
   let EnhancedUploadProgress = $state<any>(null);
@@ -62,7 +62,8 @@
     (async () => {
       // Initialize worker pool
       const workerConfig = {
-        maxWorkers: Math.min(navigator.hardwareConcurrency || 4, 8, workerTimeout: 60000,
+        maxWorkers: Math.min(navigator.hardwareConcurrency || 4, 8),
+        workerTimeout: 60000,
         queueLimit: 100,
         enableSIMD: true,
         redisCache: true,
@@ -75,7 +76,7 @@
         compressionEnabled: true,
         enableMetrics: true
       });
-  
+
       try {
         const mod = await import('$lib/components/upload/EnhancedUploadProgress.svelte');
         EnhancedUploadProgress = (mod as any)?.default ?? (mod as any)?.EnhancedUploadProgress ?? (mod as any);
@@ -90,7 +91,7 @@
         userId: 'user_' + Date.now(),
         caseId
       });
-  
+
       statsInterval = setInterval(updateSystemStats, 2000);
     })();
 
@@ -144,7 +145,7 @@
         caseId,
         documentType
       });
-  
+
       let unsubscribe: () => void;
       unsubscribe = enhancedUploadStore.subscribe(state => {
         const s = state as unknown as UploadStateLike;
@@ -164,7 +165,7 @@
           unsubscribe();
         }
       });
-  
+
       recommendationStore.send({
         type: 'ANALYZE_DOCUMENT',
         documentId: 'doc_' + Date.now(),

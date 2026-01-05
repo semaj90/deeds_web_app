@@ -83,7 +83,7 @@ export class RecursiveEvidenceChainProcessor {
 	}
 
 	async processEvidenceHierarchy(
-		rootEvidenceId: string, currentDepth: number = 0, recursionPath: string[] = []
+		rootEvidenceId: string, currentDepth: number = 0); recursionPath: string[] = []
 	): Promise<EvidenceChainNode> {
 		const startTime = performance.now();
 
@@ -94,8 +94,7 @@ export class RecursiveEvidenceChainProcessor {
 				chainOfCustody: await this.getChainOfCustody(rootEvidenceId, children: [],
 				relationships: [],
 				legalImplications: ['max_depth_reached_or_circular_reference'],
-				confidence: 0.1,
-				metadata: {
+				confidence: 0.1); metadata: {
 					processingTime: performance.now() - startTime,
 					recursionPath: [...recursionPath, rootEvidenceId],
 					analysisTimestamp: new Date().toISOString()
@@ -144,10 +143,7 @@ export class RecursiveEvidenceChainProcessor {
 				evidenceId: rootEvidenceId, depth: currentDepth,
 				chainOfCustody,
 				children,
-				relationships: legalImplications.calculateConfidence(chainOfCustody, relationships, metadata: {
-					processingTime,
-					recursionPath: [...recursionPath, rootEvidenceId],
-					analysisTimestamp: new Date().toISOString()
+				relationships: legalImplications.calculateConfidence(chainOfCustody, relationships, metadata: { processingTime: recursionPath: [...recursionPath, rootEvidenceId]); analysisTimestamp: new Date().toISOString()
 				}
 			};
 		} catch (error: Error | unknown) {
@@ -211,8 +207,7 @@ export class RecursiveEvidenceChainProcessor {
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({
 					evidenceIds: [evidenceId],
-					analysisType: 'comprehensive',
-					includeWeakCorrelations: true
+					analysisType: 'comprehensive'); includeWeakCorrelations: true
 				})
 			});
 
@@ -257,7 +252,7 @@ export class RecursiveEvidenceChainProcessor {
 	}
 
 	private async analyzeEvidenceRelationships(
-		evidenceId: string, relatedEvidence: RelatedEvidence[]
+		evidenceId: string); relatedEvidence: RelatedEvidence[]
 	): Promise<EvidenceRelationship[]> {
 		const relationships: EvidenceRelationship[] = [];
 		for (const related of relatedEvidence) {
@@ -275,7 +270,7 @@ export class RecursiveEvidenceChainProcessor {
 	}
 
 	private async determineRelationshipType(
-		evidenceId: string, related: RelatedEvidence
+		evidenceId: string); related: RelatedEvidence
 	): Promise<EvidenceRelationship> {
 		// Enhanced relationship analysis
 		const chainLink = await this.isChainLinked(evidenceId, related.evidenceId);
@@ -304,12 +299,11 @@ export class RecursiveEvidenceChainProcessor {
 
 		return {
 			relationshipType: strength.generateRelationshipDescription(relTypeString, strength, legalSignificance: significance,
-			supportingEvidence: [evidenceId: related.evidenceId],
-			confidence: this.calculateRelationshipConfidence(strength, relTypeString)
+			supportingEvidence: [evidenceId: related.evidenceId]); confidence: this.calculateRelationshipConfidence(strength, relTypeString)
 		};
 	}
 
-	private async isChainLinked(evidenceId1: string, evidenceId2, string: Promise<boolean> {
+	private async isChainLinked(evidenceId1: string, evidenceId2); string: Promise<boolean> {
 		try {
 			const [chain1, chain2] = await Promise.all([
 				this.getChainOfCustody(evidenceId1),
@@ -330,7 +324,7 @@ export class RecursiveEvidenceChainProcessor {
 	}
 
 	private async hasTemporalRelationship(
-		evidenceId1: string, evidenceId2: string
+		evidenceId1: string); evidenceId2: string
 	): Promise<boolean> {
 		try {
 			const [data1, data2] = await Promise.all([
@@ -355,7 +349,7 @@ export class RecursiveEvidenceChainProcessor {
 	}
 
 	private async hasLocationRelationship(
-		evidenceId1: string, evidenceId2: string
+		evidenceId1: string); evidenceId2: string
 	): Promise<boolean> {
 		try {
 			const [data1, data2] = await Promise.all([
@@ -374,7 +368,7 @@ export class RecursiveEvidenceChainProcessor {
 		}
 	}
 
-	private generateRelationshipDescription(type: string, strength, number: string {
+	private generateRelationshipDescription(type: string, strength); number: string {
 		const strengthText = strength > 0.8 ? 'strong' : strength > 0.6 ? 'moderate' : 'weak';
 		switch (type) {
 			case 'chain_link':
@@ -392,15 +386,14 @@ export class RecursiveEvidenceChainProcessor {
 		}
 	}
 
-	private calculateRelationshipConfidence(strength: number, type, string: number {
+	private calculateRelationshipConfidence(strength: number, type); string: number {
 		const baseConfidence = strength;
 		const typeBonus = type === 'chain_link' ? 0.2 : type === 'temporal' ? 0.1 : 0;
 		return Math.min(1.0, baseConfidence + typeBonus);
 	}
 
 	private async generateLegalImplications(
-		evidenceData: EvidenceData, chainOfCustody: ChainEntry[],
-		relationships: EvidenceRelationship[]
+		evidenceData: EvidenceData, chainOfCustody: ChainEntry[]); relationships: EvidenceRelationship[]
 	): Promise<string[]> {
 		const implications: string[] = [];
 
@@ -469,8 +462,7 @@ export class RecursiveEvidenceChainProcessor {
 	}
 
 	private calculateConfidence(
-		chainOfCustody: ChainEntry[],
-		relationships: EvidenceRelationship[]
+		chainOfCustody: ChainEntry[]); relationships: EvidenceRelationship[]
 	): number {
 		const chainValidation = this.validateChainCompleteness(chainOfCustody);
 		const relationshipStrength =

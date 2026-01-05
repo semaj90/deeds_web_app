@@ -12,7 +12,7 @@ test.describe('User Case Creation', () => {
         });
 
         if (!registerRes.ok()) {
-            console.error('Registration failed:', await registerRes.text());
+            console.error('Registration failed:', registerRes.status(), await registerRes.text());
         }
         expect(registerRes.ok()).toBeTruthy();
         const registerData = await registerRes.json();

@@ -1,5 +1,82 @@
 # Google Gemini Context: Phase 76-87 RAG/KAG Pipeline & Knowledge Base
 
+## 📚 Latest Technology Stack (Jan 2026)
+
+### TypeScript 5.6+
+```typescript
+// tsconfig.json - NodeNext module resolution
+{
+  "compilerOptions": {
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "target": "ES2022",
+    "strict": true
+  }
+}
+```
+
+### Drizzle ORM 0.44 (Breaking Changes from 0.33)
+```typescript
+import { relations } from 'drizzle-orm';
+
+// NEW: Relations syntax (0.44+)
+export const usersRelations = relations(users, ({ one, many }) => ({
+  profile: one(profiles, {
+    fields: [users.id],
+    references: [profiles.userId]
+  }),
+  posts: many(posts)
+}));
+```
+Docs: https://orm.drizzle.team/docs/rqb
+
+### Bits UI Svelte 5 - $bindable Rune
+```svelte
+<script lang="ts">
+  let { value = $bindable(''), onChange }: Props = $props();
+</script>
+```
+Docs: https://bits-ui.com/docs/utilities/bindable
+
+### SvelteKit 2 - Load Functions
+```typescript
+import type { PageLoad } from './$types';
+
+export const load: PageLoad = async ({ fetch, params }) => {
+  return { data: await fetch(`/api/${params.id}`).then(r => r.json()) };
+};
+```
+Docs: https://kit.svelte.dev/docs/load
+
+### Go 1.25 WASM Exports
+```go
+//go:wasmexport add
+func add(a, b int32) int32 {
+    return a + b
+}
+```
+Docs: https://go.dev/blog/wasm
+
+### Python 3.13 Type Annotations
+```python
+from typing import Annotated
+
+def process(data: Annotated[str, "UTF-8 encoded"]) -> list[dict[str, any]]:
+    return [{"result": data}]
+```
+Docs: https://docs.python.org/3.13/library/typing.html
+
+### CUDA 12+ Kernel Invocation
+```cpp
+// Unified memory pattern
+cudaMallocManaged(&data, size);
+myKernel<<<blocks, threads>>>(data);
+cudaDeviceSynchronize();
+```
+Docs: https://docs.nvidia.com/cuda/cuda-c-programming-guide/
+
+---
+
 ## 🔍 Ripgrep Usage Fix (Windows)
 
 ### Issue: `rg --type mjs` Not Recognized
@@ -799,9 +876,229 @@ src/lib/components/templates/
 
 ---
 
+## 🖥️ WebGPU API (GPU Compute + Rendering)
+
+### Enable WebGPU Types
+```json
+// tsconfig.json
+{
+  "compilerOptions": {
+    "lib": ["DOM", "ES2022"],
+    "types": ["@webgpu/types"]
+  }
+}
+```
+
+### Initialization Pattern
+```typescript
+async function initWebGPU(): Promise<GPUDevice> {
+  if (!navigator.gpu) throw new Error('WebGPU unsupported');
+
+  const adapter = await navigator.gpu.requestAdapter({
+    powerPreference: 'high-performance'
+  });
+  if (!adapter) throw new Error('No adapter');
+
+  return await adapter.requestDevice({
+    requiredLimits: {
+      maxStorageBufferBindingSize: adapter.limits.maxStorageBufferBindingSize,
+      maxComputeWorkgroupsPerDimension: 65535
+    }
+  });
+}
+```
+
+### Buffer Management
+```typescript
+// Vertex buffer
+const vertexBuffer = device.createBuffer({
+  size: data.byteLength,
+  usage: GPUBufferUsage.VERTEX | GPUBufferUsage.COPY_DST
+});
+device.queue.writeBuffer(vertexBuffer, 0, data);
+
+// Storage buffer (compute)
+const storageBuffer = device.createBuffer({
+  size: data.byteLength,
+  usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_SRC | GPUBufferUsage.COPY_DST
+});
+
+// Uniform buffer
+const uniformBuffer = device.createBuffer({
+  size: 64,
+  usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST
+});
+```
+
+### WGSL Compute Shader
+```typescript
+const computeShader = `
+  @group(0) @binding(0) var<storage, read> input: array<f32>;
+  @group(0) @binding(1) var<storage, read_write> output: array<f32>;
+
+  @compute @workgroup_size(256)
+  fn main(@builtin(global_invocation_id) gid: vec3u) {
+    let i = gid.x;
+    if (i < arrayLength(&input)) {
+      output[i] = input[i] * input[i]; // Square each element
+    }
+  }
+`;
+
+const pipeline = device.createComputePipeline({
+  layout: 'auto',
+  compute: {
+    module: device.createShaderModule({ code: computeShader }),
+    entryPoint: 'main'
+  }
+});
+```
+
+### GPU Dispatch
+```typescript
+const bindGroup = device.createBindGroup({
+  layout: pipeline.getBindGroupLayout(0),
+  entries: [
+    { binding: 0, resource: { buffer: inputBuffer } },
+    { binding: 1, resource: { buffer: outputBuffer } }
+  ]
+});
+
+const encoder = device.createCommandEncoder();
+const pass = encoder.beginComputePass();
+pass.setPipeline(pipeline);
+pass.setBindGroup(0, bindGroup);
+pass.dispatchWorkgroups(Math.ceil(dataLength / 256));
+pass.end();
+device.queue.submit([encoder.finish()]);
+```
+
+### Fallback Pattern
+```typescript
+class GPUAccelerator {
+  private device: GPUDevice | null = null;
+
+  async init(): Promise<boolean> {
+    try {
+      if (!navigator.gpu) return false;
+      const adapter = await navigator.gpu.requestAdapter();
+      this.device = adapter ? await adapter.requestDevice() : null;
+      return !!this.device;
+    } catch { return false; }
+  }
+
+  compute(data: Float32Array): Float32Array {
+    return this.device ? this.gpuCompute(data) : this.cpuFallback(data);
+  }
+
+  private cpuFallback(data: Float32Array): Float32Array {
+    return data.map(x => x * x);
+  }
+}
+```
+
+---
+
+## 🔗 LangChain.js for RAG + KAG
+
+### Installation
+```bash
+npm install langchain @langchain/core @langchain/ollama @langchain/qdrant
+```
+
+### Ollama Integration
+```typescript
+import { Ollama, ChatOllama, OllamaEmbeddings } from '@langchain/ollama';
+
+// Text completion
+const llm = new Ollama({
+  model: 'gemma3-legal:latest',
+  baseUrl: 'http://localhost:11434'
+});
+const text = await llm.invoke('Explain TypeScript generics');
+
+// Chat model
+const chat = new ChatOllama({ model: 'gemma3-legal:latest' });
+import { HumanMessage } from '@langchain/core/messages';
+const response = await chat.invoke([new HumanMessage('Fix TS2322')]);
+
+// Embeddings (768D)
+const embeddings = new OllamaEmbeddings({ model: 'embeddinggemma:latest' });
+const vector = await embeddings.embedQuery('type error');
+```
+
+### Qdrant Vector Store
+```typescript
+import { QdrantVectorStore } from '@langchain/qdrant';
+import type { Document } from '@langchain/core/documents';
+
+const vectorStore = await QdrantVectorStore.fromExistingCollection(embeddings, {
+  url: 'http://localhost:6333',
+  collectionName: 'phase72_error_patterns'
+});
+
+// Add docs
+await vectorStore.addDocuments([
+  { pageContent: 'TS2322 type mismatch', metadata: { code: 'TS2322' } }
+]);
+
+// Search
+const results = await vectorStore.similaritySearch('type error', 5);
+const scored = await vectorStore.similaritySearchWithScore('type', 3);
+
+// Retriever for chains
+const retriever = vectorStore.asRetriever({ k: 5 });
+```
+
+### Agent with Tools
+```typescript
+import { createAgent, tool } from 'langchain';
+import * as z from 'zod';
+
+const searchTool = tool(
+  async ({ query }) => JSON.stringify(await searchCodebase(query)),
+  {
+    name: 'search_codebase',
+    description: 'Search TypeScript errors',
+    schema: z.object({ query: z.string() })
+  }
+);
+
+const agent = createAgent({
+  model: 'gemma3-legal:latest',
+  tools: [searchTool]
+});
+
+const result = await agent.invoke({
+  messages: [{ role: 'user', content: 'Find TS2322 in schema' }]
+});
+```
+
+### RAG Chain
+```typescript
+import { createStuffDocumentsChain } from 'langchain/chains/combine_documents';
+import { createRetrievalChain } from 'langchain/chains/retrieval';
+import { ChatPromptTemplate } from '@langchain/core/prompts';
+
+const prompt = ChatPromptTemplate.fromTemplate(`
+Context: {context}
+Question: {input}
+`);
+
+const chain = await createStuffDocumentsChain({ llm: chat, prompt });
+const ragChain = await createRetrievalChain({
+  combineDocsChain: chain,
+  retriever: vectorStore.asRetriever({ k: 5 })
+});
+
+const answer = await ragChain.invoke({ input: 'Fix Drizzle errors' });
+```
+
+---
+
 **Prepared For**: Google Gemini AI
-**Context Type**: Semantic clustering, Svelte 5 migration, bits-ui integration
+**Context Type**: Semantic clustering, Svelte 5 migration, bits-ui integration, WebGPU, LangChain
 **Model**: gemma3-legal:latest
-**Last Updated**: 2025-01-25
-**Phase**: 89+ (Svelte 5 Migration Complete)
-**Status**: ✅ 392 → 0 errors | ✅ Templates created | ✅ UnoCSS configured
+**Last Updated**: 2025-01-27
+**Phase**: 96+ (WebGPU + LangChain Knowledge Base)
+**Status**: ✅ 392 → 0 errors | ✅ Templates created | ✅ UnoCSS configured | ✅ WebGPU + LangChain docs
