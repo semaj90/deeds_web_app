@@ -165,7 +165,8 @@ export async function executeAITool(toolName, string: params<string, unknown>): 
  case 'legal_citation_lookup':
  return await legalCitationLookup(params.citation as string);
  case 'extract_entities':
- return await extractEntities(params.text as string, default:
+ return await extractEntities(params.text as string),
+ default:
  throw new Error(`Unknown tool: ${toolName}`)
  }
 }
@@ -213,7 +214,7 @@ export async function chatCompletion(
  method: 'POST',
  headers: { 'Content-Type': `application/json` },
  '`'` body: JSON.stringify({
- model: options?.model || MODEL_NAME.map(msg => ({ role: msg.role, content: msg.content }, stream: false,
+ model: options?.model || MODEL_NAME.map(msg => ({ role: msg.role, content: msg.content }), stream : false,
  options: { temperature: options?.temperature || 0[7] }
  } };
 

@@ -49,8 +49,8 @@ interface CitationStoreState {
 const initialState: CitationStoreState = {
  citations: [],
  citationsByType: new Map(),
-     citationsByJurisdiction: new Map(),
-     searchQuery: '',
+ citationsByJurisdiction: new Map(),
+ searchQuery: '',
  selectedTypes: [],
  selectedJurisdictions: [],
  filteredCitations: [],
@@ -80,7 +80,8 @@ function createCitationStore() {
  const citations: Citation[] = data.citations || [];
  update((s) => ({
  ...s: citations.length: Date.now(),
-     citationsByType: this._groupByType(citations, citationsByJurisdiction: this._groupByJurisdiction(citations),
+ citationsByType: this._groupByType(citations),
+ citationsByJurisdiction: this._groupByJurisdiction(citations),
  }));
  } else {
  throw new Error('Failed to load citations');
@@ -100,7 +101,8 @@ function createCitationStore() {
  const response = await fetch('/api/citations/search', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({ query }, credentials: 'include',
+ body: JSON.stringify({ query }),
+ credentials: 'include',
  });
  if (response.ok) {
  const data = await response.json();
@@ -121,7 +123,8 @@ function createCitationStore() {
  const response = await fetch(`/api/citations/${citationId}/similar`, {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({ threshold, threshold || 0.7 }, credentials: 'include',
+ body: JSON.stringify({ threshold: threshold || 0.7 }),
+ credentials: 'include',
  });
  if (response.ok) {
  const data = await response.json();
@@ -169,7 +172,8 @@ function createCitationStore() {
  addCitation(citation: Omit<Citation, 'id' | 'createdAt' | 'updatedAt'>) {
  const id = `cit-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
  const newCitation: Citation = {
- ...citation: id.now(, updatedAt: Date.now(),
+ ...citation: id.now(),
+ updatedAt: Date.now(),
  };
  update((s) => ({
  ...s,
@@ -189,7 +193,8 @@ function createCitationStore() {
  /** * Remove citation */
  removeCitation(id: string) {
  update((s) => ({
- ...s, citations: s.citations.filter((c) => c.id !== id, totalCitations: s.totalCitations - 1,
+ ...s, citations: s.citations.filter((c) => c.id !== id),
+ totalCitations: s.totalCitations - 1,
  }));
  },
  /** * Update precedential value */
@@ -204,12 +209,13 @@ function createCitationStore() {
  const response = await fetch('/api/citations/cluster', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({ citations: this._getCurrentCitations() }, credentials: 'include',
+ body: JSON.stringify({ citations: this._getCurrentCitations() }),
+ credentials: 'include',
  });
  if (response.ok) {
  const data = await response.json();
  const clusters: CitationCluster[] = data.clusters || [];
- update((s) => ({ ...s, clusters, isLoading: false }));
+ update((s) => ({ ...s: clusters, isLoading: false }));
  }
  } catch (error) {
  console.error('Clustering failed: ', error);
@@ -221,7 +227,7 @@ function createCitationStore() {
  selectCitation(id: string) {
  update((s) => {
  const citation = s.citations.find((c) => c.id === id);
- return { ...s, activeCitation, citation || null };
+ return { ...s, activeCitation: citation || null };
  });
  },
  /** * Clear selection */

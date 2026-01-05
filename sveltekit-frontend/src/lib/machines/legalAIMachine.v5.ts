@@ -156,7 +156,8 @@ export const legalAIMachine = createMachine(
  src: 'authenticateUser',
  input: ({ event }) => ({
  credentials: (event as Extract<LegalAIEvent, { type: 'AUTH.LOGIN' }>).credentials,
- }, onDone: { target: 'authenticated', actions: ['setUser'] },
+ }),
+ onDone: { target: 'authenticated', actions: ['setUser'] },
  onError: { target: 'idle', actions: ['clearUser'] },
  },
  },
@@ -177,7 +178,8 @@ export const legalAIMachine = createMachine(
  src: 'loadCases',
  input: ({ event }) => ({
  filters: (event as Extract<LegalAIEvent, { type: 'CASES.LOAD' }>).filters,
- }, onDone: { target: 'authenticated', actions: 'setCases' },
+ }),
+ onDone: { target: 'authenticated', actions: 'setCases' },
  onError: { target: 'authenticated' },
  },
  },
@@ -187,7 +189,8 @@ export const legalAIMachine = createMachine(
  src: 'processAIQuery',
  input: ({ event }) => ({
  prompt: (event as Extract<LegalAIEvent, { type: 'AI.QUERY' }>).prompt,
- }, onDone: { target: 'authenticated', actions: 'setAIResponse' },
+ }),
+ onDone: { target: 'authenticated', actions: 'setAIResponse' },
  onError: { target: 'authenticated', actions: 'setAIError' },
  },
  },
@@ -213,9 +216,11 @@ export const legalAIMachine = createMachine(
  // avoid `any` — narrow the event shape we expect
  const doneEvent = event as { output?: typeof initialContext.system } | undefined;
  return { system: doneEvent?.output ?? initialContext.system };
- }, setSystemError: assign((context) => ({
+ }),
+ setSystemError: assign((context) => ({
  system: { ...context.system, connected: false },
- }, setUser: assign((_, event) => {
+ })),
+ setUser: assign((_, event) => {
  const doneEvent = event as { output?: AuthResponse } | undefined;
  const out = doneEvent?.output;
  return {
@@ -225,31 +230,37 @@ export const legalAIMachine = createMachine(
  isAuthenticated: true,
  },
  };
- }, clearUser: assign(() => ({
+ }),
+ clearUser: assign(() => ({
  user: {
  id: null, email: null,
  role: null,
  permissions: [] as string[],
  isAuthenticated: false,
  },
- }, setCases: assign((context, event) => {
+ })),
+ setCases: assign((context, event) => {
  const doneEvent = event as { output?: Case[] } | undefined;
  const casesOutput = doneEvent?.output ?? [];
  return { cases: { ...context.cases, items: casesOutput, loading: false } };
- }, setCurrentCase: assign((context, event) => {
+ }),
+ setCurrentCase: assign((context, event) => {
  const selectEvent = event as Extract<LegalAIEvent, { type: 'CASES.SELECT' }>;
  return {
  cases: { ...context.cases, currentCase: selectEvent?.case ?? context.cases.currentCase },
  };
- }, setAIResponse: assign((context, event) => {
+ }),
+ setAIResponse: assign((context, event) => {
  const doneEvent = event as { output?: AIResponse } | undefined;
  const aiResponse = doneEvent?.output ?? null;
  return { ai: { ...context.ai, lastResponse: aiResponse, isProcessing: false } };
- }, setAIError: assign((context, event) => {
+ }),
+ setAIError: assign((context, event) => {
  const errorEvent = event as { error?: Error } | undefined;
  const message = errorEvent?.error?.message ?? 'AI processing failed';
  return { ai: { ...context.ai, error: message, isProcessing: false } };
- }, startAIProcessing: assign((context, event) => {
+ }),
+ startAIProcessing: assign((context, event) => {
  const queryEvent = event as Extract<LegalAIEvent, { type: 'AI.QUERY' }>;
  return {
  ai: {
@@ -290,17 +301,23 @@ export const legalAIMachine = createMachine(
  services: {
  database: serviceHealth.some(
  (s) => String(s.service).includes('postgres') && String(s.status) === 'healthy'
- , redis: serviceHealth.some(
+ ),
+ redis: serviceHealth.some(
  (s) => String(s.service).includes('redis') && String(s.status) === 'healthy'
- , ollama: serviceHealth.some(
+ ),
+ ollama: serviceHealth.some(
  (s) => String(s.service).includes('ollama') && String(s.status) === 'healthy'
- , gpu: serviceHealth.some(
+ ),
+ gpu: serviceHealth.some(
  (s) => String(s.service).includes('gpu') && String(s.status) === 'healthy'
- , pgvector: serviceHealth.some(
+ ),
+ pgvector: serviceHealth.some(
  (s) => String(s.service).includes('pgvector') && String(s.status) === 'healthy'
- , qdrant: serviceHealth.some(
+ ),
+ qdrant: serviceHealth.some(
  (s) => String(s.service).includes('qdrant') && String(s.status) === 'healthy'
- , neo4j: serviceHealth.some(
+ ),
+ neo4j: serviceHealth.some(
  (s) => String(s.service).includes('neo4j') && String(s.status) === 'healthy'
  ),
  },
@@ -308,7 +325,7 @@ export const legalAIMachine = createMachine(
  errorCount: serviceHealth.reduce(
  (acc: number, s) => acc + ((s.errorCount as number) || 0),
  0
- , uptime: Date.now(),
+ ), uptime: Date.now(),
  },
  };
  } catch (error: unknown) {
@@ -324,7 +341,9 @@ export const legalAIMachine = createMachine(
  metrics: { errorCount: 1, performanceScore: 0, uptime: 0 },
  };
  }
- }, authenticateUser: fromPromise(
+ }),
+
+ authenticateUser: fromPromise(
  async ({
  input,
  }: {
@@ -357,7 +376,9 @@ export const legalAIMachine = createMachine(
  throw new Error('Authentication service unavailable');
  }
  }
- , loadCases: fromPromise(
+ ),
+
+ loadCases: fromPromise(
  async ({
  input,
  }: {
@@ -378,7 +399,9 @@ export const legalAIMachine = createMachine(
  status: (caseData.status as string) ?? 'pending',
  priority: (caseData.priority as string) ?? 'medium',
  category: (caseData.category as string) ?? 'general',
- createdAt: (caseData.createdAt as string) ?? (caseData.created_at as, string | undefined, updatedAt: (caseData.updatedAt as string) ?? (caseData.updated_at as, string | undefined, description: caseData.description as, string | undefined,
+ createdAt: (caseData.createdAt as string) ?? (caseData.created_at as, string | undefined),
+ updatedAt: (caseData.updatedAt as string) ?? (caseData.updated_at as, string | undefined),
+ description: caseData.description as, string | undefined,
  assignedTo: (caseData.assignedTo as string) ?? (caseData.assigned_to as, string | undefined),
  }));
  } else {
@@ -390,7 +413,9 @@ export const legalAIMachine = createMachine(
  return [];
  }
  }
- , processAIQuery: fromPromise(
+ ),
+
+ processAIQuery: fromPromise(
  async ({ input }: { input: { prompt: string } }): Promise<AIResponse> => {
  try {
  const response = (await productionServiceClient.makeRequest('/api/ai/query', {
@@ -406,7 +431,8 @@ export const legalAIMachine = createMachine(
  sources: ((data.sources as Source[]) ??
  (data.references as Source[]) ??
  []) as Source[],
- timestamp: new Date().toISOString(, model: (data.model as string) || 'unknown',
+ timestamp: new Date().toISOString(),
+ model: (data.model as string) || 'unknown',
  metadata: (data.metadata as Record<string, unknown>) || {},
  };
  } else {
@@ -432,7 +458,8 @@ export const legalAIMachine = createMachine(
 // legalAIActor.subscribe((snapshot) => {
 // legalAIState.set(snapshot);
 // });
-  
+
+// Start the actor - moved to integration service to prevent conflicts
 // legalAIActor.start();
 
 export default legalAIMachine;

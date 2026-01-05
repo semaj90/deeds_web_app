@@ -162,7 +162,7 @@ export class DynamicRouteGenerator {
  const name = m[2];
  // optional when explicitly double-bracketed or when it's a catch-all (ellipsis)
  const optional = routePath.includes(`[[${name}]]`) || Boolean(ellipsis);
- params[name] = { optional, optional || false, type: 'string' };
+ params[name] = { optional: optional || false, type: 'string' };
  }
  return params;
  }
@@ -178,7 +178,8 @@ export class DynamicRouteGenerator {
  const config: DynamicRouteConfig = {
  pattern: options.pattern ?? 'dynamic',
  template: options.template ?? 'dynamic',
- component: options.component ?? this.inferComponentPath(path, layout: options.layout,
+ component: options.component ?? this.inferComponentPath(path),
+ layout: options.layout,
  params: options.params,
  preload: options.preload ?? true,
  ssr: options.ssr ?? true,
@@ -190,11 +191,14 @@ export class DynamicRouteGenerator {
  path,
  component: config.component!,
  layout: config.layout,
- params: config.params ?? this.extractParams(path, metadata: {
+ params: config.params ?? this.extractParams(path),
+ metadata: {
  category: 'dynamic',
  status: 'active',
  tags: ['dynamic'],
- preload: Boolean(config.preload, ssr: Boolean(config.ssr, hydrate: Boolean(config.hydrate),
+ preload: Boolean(config.preload),
+ ssr: Boolean(config.ssr),
+ hydrate: Boolean(config.hydrate),
  },
  };
 

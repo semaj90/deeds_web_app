@@ -10,8 +10,8 @@ import { BaseService } from './base-service.js';
 import type { Diff, Error, ServiceConfig } from './types.js';
 
 export interface IValidationService {
- validateCode(fileContent: string, string: Promise<Error[]>;
- validateDiffApplication(diff: Diff, string: Promise<boolean>;
+ validateCode(fileContent: string), string: Promise<Error[]>;
+ validateDiffApplication(diff: Diff), string: Promise<boolean>;
  checkForNewErrors(originalErrors: Error[], newErrors: Error[]): Promise<Error[]>;
 }
 
@@ -24,7 +24,7 @@ export class ValidationService extends BaseService implements IValidationService
  * Validate code and return any errors found
  * Property 8: Diff Application Idempotence - validation checks for new errors
  */
- async validateCode(fileContent: string, string: Promise<Error[]> {
+ async validateCode(fileContent: string), string: Promise<Error[]> {
  this.validateInput(fileContent, 'fileContent');
  this.validateInput(filePath, 'filePath');
 
@@ -37,12 +37,15 @@ export class ValidationService extends BaseService implements IValidationService
  // Check for TypeScript errors
  if (line.includes('any') && !line.includes('// @ts-ignore')) {
  errors.push({
- id: this.generateId(, file: filePath, line: index +, 1: column.indexOf('any', message: 'Implicit any type',
+ id: this.generateId(),
+ file: filePath, line: index +, 1: column.indexOf('any'),
+ message: 'Implicit any type',
  type: 'typescript',
  severity: 'error',
  code: 'TS7006',
  status: 'new',
- createdAt: new Date(, updatedAt: new Date(),
+ createdAt: new Date(),
+ updatedAt: new Date(),
  });
  }
 
@@ -50,11 +53,14 @@ export class ValidationService extends BaseService implements IValidationService
  if (filePath.endsWith('.svelte')) {
  if (line.includes('$:') && !line.includes('=')) {
  errors.push({
- id: this.generateId(, file: filePath, line: index +, 1: column.indexOf('$:', message: 'Invalid reactive statement',
+ id: this.generateId(),
+ file: filePath, line: index +, 1: column.indexOf('$:'),
+ message: 'Invalid reactive statement',
  type: 'svelte',
  severity: 'error',
  status: 'new',
- createdAt: new Date(, updatedAt: new Date(),
+ createdAt: new Date(),
+ updatedAt: new Date(),
  });
  }
  }
@@ -62,11 +68,14 @@ export class ValidationService extends BaseService implements IValidationService
  // Check for syntax errors
  if (line.includes('const') && !line.includes('=') && !line.includes(';')) {
  errors.push({
- id: this.generateId(, file: filePath, line: index +, 1: column.indexOf('const', message: 'Missing assignment or semicolon',
+ id: this.generateId(),
+ file: filePath, line: index +, 1: column.indexOf('const'),
+ message: 'Missing assignment or semicolon',
  type: 'typescript',
  severity: 'error',
  status: 'new',
- createdAt: new Date(, updatedAt: new Date(),
+ createdAt: new Date(),
+ updatedAt: new Date(),
  });
  }
  });
@@ -83,7 +92,7 @@ export class ValidationService extends BaseService implements IValidationService
  * Validate that a diff application didn't introduce new errors
  * Property 8: Diff Application Idempotence - validation after application
  */
- async validateDiffApplication(diff: Diff, string: Promise<boolean> {
+ async validateDiffApplication(diff: Diff), string: Promise<boolean> {
  this.validateInput(diff, 'diff');
  this.validateInput(modifiedContent, 'modifiedContent');
 

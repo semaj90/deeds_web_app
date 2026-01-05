@@ -270,7 +270,8 @@ const hasAIAnalysis = ({ context: _context }: { context: LegalCaseContext }) => 
 // isLoading: false,
 // error: null
 // });
-  
+
+// const assignEvidence = assign({
 // evidence: ({ event }) => event.output ?? [],
 // stats: ({ context, event }) => {
 // const data = event.output;
@@ -281,31 +282,38 @@ const hasAIAnalysis = ({ context: _context }: { context: LegalCaseContext }) => 
 // };
 // }
 // });
-  
+
+// const assignSearchResults = assign({
 // searchResults: ({ event }) => (event.output?.results ?? []) as unknown[],
 // searchQuery: ({ event }) => (event as Extract<LegalCaseEvents, { type: 'SEARCH' }>).query ?? ''
 // });
-  
+
+// const assignError = assign({
 // error: ({ event }) => (event.error?.message ?? String(event.error ?? 'An error occurred')) as string,
 // isLoading: false
 // });
-  
+
+// const setLoading = assign({
 // isLoading: true,
 // error: null
 // });
-  
+
+// const clearError = assign({
 // error: null
 // });
-  
+
+// const updateFormData = assign({
 // formData: ({ context, event }) => ({
 // ...context.formData,
 // caseForm: { ...context.formData.caseForm, ...((event as Extract<LegalCaseEvents, { type: 'UPDATE_CASE_FORM' }>).data ?? {}) }
 // })
 // });
-  
+
+// const switchTab = assign({
 // activeTab: ({ event }) => (event as Extract<LegalCaseEvents, { type: 'SWITCH_TAB' }>).tab
 // });
-  
+
+// const updateWorkflowStage = assign({
 // workflowStage: ({ event }) => (event as Extract<LegalCaseEvents, { type: 'SET_WORKFLOW_STAGE' }>).stage,
 // nextActions: ({ event }) => {
 // const stage = (event as Extract<LegalCaseEvents, { type: 'SET_WORKFLOW_STAGE' }>).stage;
@@ -319,10 +327,12 @@ const hasAIAnalysis = ({ context: _context }: { context: LegalCaseContext }) => 
 // return nextActionsMap[stage] || [];
 // }
 // });
-  
+
+// const assignAIProgress = assign({
 // aiAnalysisProgress: ({ event }) => (event as Extract<LegalCaseEvents, { type: 'AI_ANALYSIS_PROGRESS' }>).progress ?? 0
 // });
-  
+
+// const assignAISummary = assign({
 // aiSummary: ({ event }) => (event.output?.summary ?? null) as string | null,
 // aiAnalysisProgress: 100,
 // stats: ({ context, event }) => ({
@@ -331,18 +341,21 @@ const hasAIAnalysis = ({ context: _context }: { context: LegalCaseContext }) => 
 // processingTime: (event.output?.processingTime ?? context.stats.processingTime)
 // })
 // });
-  
+
+// const assignSimilarCases = assign({
 // similarCases: ({ event }) => (event.output ?? [])
 // });
-  
+
+// const assignEmbedding = assign({
 // lastEmbedding: ({ event }) => (event.output?.embedding ?? null),
 // isLoading: false
 // });
-  
+
+// const assignRelatedEvidence = assign({
 // relatedEvidence: ({ event }) => (event.output ?? []),
 // isLoading: false
 // });
-  
+// === Main state machine ===
 export const legalCaseMachine = setup({
  types: {} as {
  context: LegalCaseContext, events: LegalCaseEvents;
@@ -465,7 +478,8 @@ export const legalCaseMachine = setup({
  context.notifications = [
  ...context.notifications,
  {
- id: Date.now().toString(, message: `Evidence uploaded successfully. ${(output?.uploadedEvidence?.length || 0)} items added.`,
+ id: Date.now().toString(),
+ message: `Evidence uploaded successfully. ${(output?.uploadedEvidence?.length || 0)} items added.`,
  type: 'info' as const
  }
  ];
@@ -482,7 +496,8 @@ export const legalCaseMachine = setup({
  context.notifications = [
  ...context.notifications,
  {
- id: Date.now().toString(, message: 'AI analysis completed',
+ id: Date.now().toString(),
+ message: 'AI analysis completed',
  type: 'info' as const
  }
  ];
@@ -492,7 +507,8 @@ export const legalCaseMachine = setup({
  context.notifications = [
  ...context.notifications,
  {
- id: Date.now().toString(, message: `Found ${(output?.length || 0)} related evidence items`,
+ id: Date.now().toString(),
+ message: `Found ${(output?.length || 0)} related evidence items`,
  type: 'info' as const
  }
  ];
@@ -502,7 +518,15 @@ export const legalCaseMachine = setup({
  }
  },
  actors: { // Define actors here, wrapped with fromPromise
- loadCase: fromPromise(loadCaseService, createCase: fromPromise(createCaseService, loadEvidence: fromPromise(loadEvidenceService, processEvidence: fromPromise(processEvidenceService, findSimilarCases: fromPromise(findSimilarCasesService, search: fromPromise(searchService, generateEmbedding: fromPromise(generateEmbeddingService, searchRelatedEvidence: fromPromise(searchRelatedEvidenceService, uploadEvidence: fromPromise(async (
+ loadCase: fromPromise(loadCaseService),
+ createCase: fromPromise(createCaseService),
+ loadEvidence: fromPromise(loadEvidenceService),
+ processEvidence: fromPromise(processEvidenceService),
+ findSimilarCases: fromPromise(findSimilarCasesService),
+ search: fromPromise(searchService),
+ generateEmbedding: fromPromise(generateEmbeddingService),
+ searchRelatedEvidence: fromPromise(searchRelatedEvidenceService),
+ uploadEvidence: fromPromise(async (
  { context: _context, input }, { context: LegalCaseContext, input: LegalCaseActors['uploadEvidence']['input'] }
  ): Promise<UploadEvidenceServiceResult> => {
  const formData = new FormData();
@@ -512,13 +536,15 @@ export const legalCaseMachine = setup({
  const response = await fetch('/api/unified/upload', { method: 'POST', body: formData });
  if (!response.ok) throw new Error('Upload failed');
  return await response.json();
- }, aiSummarizeCase: fromPromise(async (
+ }),
+ aiSummarizeCase: fromPromise(async (
  { context: _context, input }: { context: LegalCaseContext, input: LegalCaseActors['aiSummarizeCase']['input'] }
  ): Promise<CaseSummaryServiceResult> => {
  if (!input.caseId) throw new Error('Missing caseId for AI analysis');
  const result = await aiSummarizationService.summarizeCase(input.caseId);
  return result as CaseSummaryServiceResult;
- }, updateCase: fromPromise(async (
+ }),
+ updateCase: fromPromise(async (
  { input }: { input: LegalCaseActors['updateCase']['input'] }
  ): Promise<Case> => {
  const caseId = input.caseId;
@@ -530,7 +556,8 @@ export const legalCaseMachine = setup({
  });
  if (!response.ok) throw new Error('Update failed');
  return await response.json();
- }, deleteCase: fromPromise(async (
+ }),
+ deleteCase: fromPromise(async (
  { input }: { input: LegalCaseActors['deleteCase']['input'] }
  ): Promise<boolean> => {
  if (!input.caseId) throw new Error('Missing caseId for delete');
@@ -579,7 +606,8 @@ export const legalCaseMachine = setup({
  invoke: [{
  id: 'loadCase',
  src: 'loadCase', // Reference actor by string ID
- input: ({ event }) => ({ caseId: (event as Extract<LegalCaseEvents, { type: 'LOAD_CASE' }>).caseId }, onDone: { target: 'caseLoaded', actions: [{ type: 'assignCaseData' }] },
+ input: ({ event }) => ({ caseId: (event as Extract<LegalCaseEvents, { type: 'LOAD_CASE' }>).caseId }),
+ onDone: { target: 'caseLoaded', actions: [{ type: 'assignCaseData' }] },
  onError: { target: 'error', actions: [{ type: 'assignError' }] }
  }]
  },
@@ -636,7 +664,8 @@ export const legalCaseMachine = setup({
  input: ({ context }) => ({
  files: context.uploadQueue, context.caseId ?? '',
  documentType: 'evidence'
- }, onDone: {
+ }),
+ onDone: {
  target: 'loadingEvidence',
  actions: [
  assign({ uploadQueue: [] }),
@@ -650,7 +679,8 @@ export const legalCaseMachine = setup({
  invoke: [{
  id: 'processEvidence',
  src: 'processEvidence', // Reference actor by string ID
- input: ({ context, event }) => ({ evidenceId: (event as Extract<LegalCaseEvents, { type: 'PROCESS_EVIDENCE' }>).evidenceId ?? context.selectedEvidence?.id ?? '' }, onDone: {
+ input: ({ context, event }) => ({ evidenceId: (event as Extract<LegalCaseEvents, { type: 'PROCESS_EVIDENCE' }>).evidenceId ?? context.selectedEvidence?.id ?? '' }),
+ onDone: {
  target: 'ready',
  actions: [
  { type: 'setLoadingFalse' },
@@ -667,7 +697,8 @@ export const legalCaseMachine = setup({
  invoke: [{
  id: 'aiSummarizeCase',
  src: 'aiSummarizeCase', // Reference actor by string ID
- input: ({ context }) => ({ caseId: context.caseId ?? '' }, onDone: { target: 'complete', actions: [{ type: 'assignAISummary' }] },
+ input: ({ context }) => ({ caseId: context.caseId ?? '' }),
+ onDone: { target: 'complete', actions: [{ type: 'assignAISummary' }] },
  onError: { target: '#legalCase.caseLoaded.ready', actions: [{ type: 'assignError' }] }
  }],
  on: { AI_ANALYSIS_PROGRESS: { actions: [{ type: 'assignAIProgress' }] } }
@@ -685,7 +716,8 @@ export const legalCaseMachine = setup({
  invoke: [{
  id: 'findSimilarCases',
  src: 'findSimilarCases', // Reference actor by string ID
- input: ({ context }) => ({ caseId: context.caseId ?? '' }, onDone: { target: 'ready', actions: [{ type: 'setLoadingFalse' }, { type: 'assignSimilarCases' }] },
+ input: ({ context }) => ({ caseId: context.caseId ?? '' }),
+ onDone: { target: 'ready', actions: [{ type: 'setLoadingFalse' }, { type: 'assignSimilarCases' }] },
  onError: { target: 'ready', actions: [{ type: 'assignError' }] }
  }]
  },
@@ -693,7 +725,8 @@ export const legalCaseMachine = setup({
  invoke: [{
  id: 'updateCase',
  src: 'updateCase', // Reference actor by string ID
- input: ({ context, event }) => ({ caseId: context.caseId ?? '', updates: (event as Extract<LegalCaseEvents, { type: 'UPDATE_CASE' }>).updates }, onDone: { target: 'ready', actions: [{ type: 'setLoadingFalse' }, { type: 'assignCaseData' }] },
+ input: ({ context, event }) => ({ caseId: context.caseId ?? '', updates: (event as Extract<LegalCaseEvents, { type: 'UPDATE_CASE' }>).updates }),
+ onDone: { target: 'ready', actions: [{ type: 'setLoadingFalse' }, { type: 'assignCaseData' }] },
  onError: { target: 'ready', actions: [{ type: 'assignError' }] }
  }]
  },
@@ -701,7 +734,8 @@ export const legalCaseMachine = setup({
  invoke: [{
  id: 'deleteCase',
  src: 'deleteCase', // Reference actor by string ID
- input: ({ context }) => ({ caseId: context.caseId ?? '' }, onDone: {
+ input: ({ context }) => ({ caseId: context.caseId ?? '' }),
+ onDone: {
  target: '#legalCase.idle',
  actions: [{ type: 'resetContext' }]
  },
@@ -712,7 +746,8 @@ export const legalCaseMachine = setup({
  invoke: [{
  id: 'generateEmbedding',
  src: 'generateEmbedding', // Reference actor by string ID
- input: ({ event }) => ({ text: (event as Extract<LegalCaseEvents, { type: 'GENERATE_EMBEDDING' }>).text }, onDone: [{ target: 'searchingRelatedEvidence', actions: [{ type: 'assignEmbedding' }] }],
+ input: ({ event }) => ({ text: (event as Extract<LegalCaseEvents, { type: 'GENERATE_EMBEDDING' }>).text }),
+ onDone: [{ target: 'searchingRelatedEvidence', actions: [{ type: 'assignEmbedding' }] }],
  onError: { target: 'ready', actions: [{ type: 'assignError' }] }
  }]
  },
@@ -723,7 +758,8 @@ export const legalCaseMachine = setup({
  input: ({ context, event }) => ({
  text: (event as Extract<LegalCaseEvents, { type: 'SEARCH_RELATED_EVIDENCE' }>).embedding ? undefined : context.case?.description || 'Related evidence search',
  caseId: context.caseId ?? undefined
- }, onDone: {
+ }),
+ onDone: {
  target: 'ready',
  actions: [
  { type: 'assignRelatedEvidence' },
@@ -747,7 +783,8 @@ export const legalCaseMachine = setup({
  invoke: [{
  id: 'search',
  src: 'search', // Reference actor by string ID
- input: ({ context, event }) => ({ query: (event as Extract<LegalCaseEvents, { type: 'SEARCH' }>).query: filters, context.filters }, onDone: { target: 'idle', actions: [{ type: 'setLoadingFalse' }, { type: 'assignSearchResults' }] },
+ input: ({ context, event }) => ({ query: (event as Extract<LegalCaseEvents, { type: 'SEARCH' }>).query: filters, context.filters }),
+ onDone: { target: 'idle', actions: [{ type: 'setLoadingFalse' }, { type: 'assignSearchResults' }] },
  onError: { target: 'error', actions: [{ type: 'assignError' }] }
  }]
  },
@@ -779,9 +816,12 @@ export const legalCaseSelectors = {
  getWorkflowStage: (state: any) => state.context.workflowStage,
  getNextActions: (state: any) => state.context.nextActions,
  getStats: (state: any) => state.context.stats,
- canStartAIAnalysis: (state: any) => hasEvidence({ context: state.context }, hasEmbedding: (state: any) => !!state.context.lastEmbedding,
+ canStartAIAnalysis: (state: any) => hasEvidence({ context: state.context }),
+ hasEmbedding: (state: any) => !!state.context.lastEmbedding,
  hasRelatedEvidence: (state: any) => state.context.relatedEvidence.length > 0,
- isInState: (stateName: string) => (state: any) => state.matches(stateName, isGeneratingEmbedding: (state: any) => state.matches('caseLoaded.generatingEmbedding', isSearchingRelatedEvidence: (state: any) => state.matches('caseLoaded.searchingRelatedEvidence')
+ isInState: (stateName: string) => (state: any) => state.matches(stateName),
+ isGeneratingEmbedding: (state: any) => state.matches('caseLoaded.generatingEmbedding'),
+ isSearchingRelatedEvidence: (state: any) => state.matches('caseLoaded.searchingRelatedEvidence')
 };
 
 

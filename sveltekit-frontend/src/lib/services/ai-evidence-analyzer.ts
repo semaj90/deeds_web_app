@@ -18,7 +18,7 @@ export interface WasmClusteringService {
 }
 
 export interface NesGPUBridge {
-    uploadTensor(id: string, Float32Array: Promise<boolean>;
+    uploadTensor(id: string), Float32Array: Promise<boolean>;
     runCompute(kernel: string, params?: Record<string, unknown>): Promise<unknown>;
 }
 
@@ -36,7 +36,7 @@ export interface QdrantClientAdapter {
 // ADDED: Postgres JSON Store interface
 export interface PostgresJsonStore {
     upsertJson(table: string, id: string, payload: Record<string, unknown>): Promise<void>;
-    getJson(table: string, string: Promise<Record<string, unknown> | null>;
+    getJson(table: string), string: Promise<Record<string, unknown> | null>;
 }
 
 // ADDED: Redis Cache Adapter interface
@@ -243,7 +243,8 @@ export class AIEvidenceAnalyzer {
 
         const analysis: EvidenceAnalysis = {
             id: `analysis-${evidence.id}-${Date.now()}`,
-            evidenceId: evidence.id, timestamp: new Date(, aiModel: this.analysisModel,
+            evidenceId: evidence.id, timestamp: new Date(),
+            aiModel: this.analysisModel,
             findings,
             correlations,
             riskScore,
@@ -400,7 +401,7 @@ export class AIEvidenceAnalyzer {
         }
     }
 
-    private async storeAnalysis(evidenceId: string, EvidenceAnalysis: Promise<void> {
+    private async storeAnalysis(evidenceId: string), EvidenceAnalysis: Promise<void> {
         if (this.pgJsonStore) {
             try {
                 await this.pgJsonStore.upsertJson('evidence_analysis', evidenceId, analysis as unknown as Record<string, unknown>);
@@ -460,7 +461,7 @@ export class AIEvidenceAnalyzer {
         return sentiment;
     }
 
-    private async parseCorrelation(raw: string, string: Promise<Correlation> {
+    private async parseCorrelation(raw: string), string: Promise<Correlation> {
         const correlation = await this.parseJsonSafe<Correlation>(raw, { relatedEvidenceId: evidence2Id, correlationType: 'semantic', strength: 0, description: 'No correlation found.', sharedEntities: [] });
         if (!isRecord(correlation) || typeof correlation.description !== 'string') {
             console.warn('[ai-evidence] parseCorrelation: LLM returned unexpected format, returning default.');
