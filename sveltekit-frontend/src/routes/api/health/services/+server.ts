@@ -22,7 +22,7 @@ export const GET: RequestHandler = async () => {
  const startTime = Date.now();
  try {
  const services = getServiceAdapters();
- const serviceUrls = services.urls;
+ const serviceUrls = services.env;
 
  // Perform comprehensive health checks
  const healthStatus = await healthCheckServices();
@@ -32,59 +32,60 @@ export const GET: RequestHandler = async () => {
  ...healthStatus,
  services: {
  ...healthStatus.services,
- // Add additional checks
- qdrant: await checkQdrant(services.qdrant, minio: await checkMinIO(services.minio, rabbitmq: await checkRabbitMQ(services.rabbitmq),
- },
- urls: serviceUrls,
- responseTimeMs: Date.now() - startTime,
- environment: services.env.nodeEnv,
- };
+        // Add additional checks
+        qdrant: await checkQdrant(services.qdrant),
+        minio: await checkMinIO(services.minio),
+        rabbitmq: await checkRabbitMQ(services.rabbitmq),
+      },
+      urls: serviceUrls,
+      responseTimeMs: Date.now() - startTime,
+      environment: services.env.nodeEnv,
+    };
 
- // Overall health status
- const allHealthy = Object.values(detailedStatus.services).every((status) => status === true);
+    // Overall health status
+    const allHealthy = Object.values(detailedStatus.services).every((status) => status === true);
 
- return json(
- {
- status: allHealthy ? 'healthy' : 'degraded',
- timestamp: new Date().toISOString(),
- ...detailedStatus,
- },
- {
- status: allHealthy ? 200 : 503,
- headers: {
- 'Cache-Control': 'no-cache, no-store, must-revalidate',
- 'X-Health-Check': 'true',
- },
- }
- );
- } catch (error: unknown) {
- console.error('Health check failed: ', error);
- const msg = error instanceof Error ? error.message : String(error);
- return json(
- {
- status: 'unhealthy',
- timestamp: new Date().toISOString(, error: msg,
- responseTimeMs: Date.now() - startTime,
- },
- { status: 503 }
- );
- }
+    return json(
+      {
+        status: allHealthy ? 'healthy' : 'degraded',
+        timestamp: new Date().toISOString(),
+        ...detailedStatus,
+      },
+      {
+        status: allHealthy ? 200 : 503,
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'X-Health-Check': 'true',
+        },
+      }
+    );
+  } catch (error: unknown) {
+    console.error('Health check failed: ', error);
+    const msg = error instanceof Error ? error.message : String(error);
+    return json(
+      {
+        status: 'unhealthy',
+        timestamp: new Date().toISOString(),
+        error: msg,
+        responseTimeMs: Date.now() - startTime,
+      },
+      { status: 503 }
+    );
+  }
 };
 
 /**
  * Check Qdrant connectivity
  */
 async function checkQdrant(qdrant: any): Promise<boolean> {
- try {
- await qdrant.search('legal_documents', { vector: Array(768).fill(0, limit: 1 });
- return true;
- } catch (error) {
- console.warn('Qdrant health check failed: ', error);
- return false;
- }
-}
-
-/**
+  try {
+    await qdrant.search('legal_documents', { vector: Array(768).fill(0), limit: 1 });
+    return true;
+  } catch (error) {
+    console.warn('Qdrant health check failed: ', error);
+    return false;
+  }
+}/**
  * Check MinIO connectivity
  */
 async function checkMinIO(minio: any): Promise<boolean> {

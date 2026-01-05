@@ -3,9 +3,8 @@
  * Returns file-error topology for visualization
  */
 
-import { json } from '@sveltejs/kit';
+import { json, type RequestHandler } from '@sveltejs/kit';
 import pg from 'pg';
-import type { RequestHandler } from './$types';
 
 const { Pool } = pg;
 

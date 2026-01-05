@@ -6,16 +6,16 @@
  * Endpoint: GET /api/codebase-index/search
  * Purpose: Semantic search across codebase index
  */
+import { env } from '$env/dynamic/private';
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
-import { env } from '$env/dynamic/private';
 
 interface SearchResult {
   id: string;
   filePath: string;
   label: string;
   type: string;
-  score: float;
+  score: number;
   errorCount: number;
   snippet?: string;
 }

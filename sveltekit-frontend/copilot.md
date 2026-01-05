@@ -868,14 +868,39 @@ The user is asking how to migrate from `export let` to an alternative syntax.  T
 
 ---
 
-## 🗄️ Drizzle ORM 0.44 Migration Best Practices
+## 🗄️ Drizzle ORM 0.44.7 Migration Best Practices
 
 ### Stack
-- **Drizzle ORM**: 0.44.x
-- **Drizzle Kit**: 0.30.x
+- **Drizzle ORM**: 0.44.7 (CRITICAL: use array syntax for table callbacks)
+- **Drizzle Kit**: 0.31.6
 - **PostgreSQL**: via `postgres-js` driver
 - **Schema Location**: `src/lib/server/db/schema-postgres.ts`
 - **Migrations Directory**: `drizzle/`
+
+### ⚠️ CRITICAL: Table Callback Syntax (0.31+)
+**Old (WRONG) - Returns object:**
+```typescript
+// ❌ DO NOT USE - causes ExtraConfigColumn errors
+pgTable('users', { ... }, (table) => ({
+  indexes: [index('name_idx').on(table.name)],
+  foreignKeys: [foreignKey({ ... })]
+}));
+```
+
+**New (CORRECT) - Returns array:**
+```typescript
+// ✅ CORRECT for Drizzle 0.31+
+pgTable('users', { ... }, (table) => [
+  index('name_idx').on(table.name),
+  uniqueIndex('email_idx').on(table.email),
+  foreignKey({
+    columns: [table.parentId],
+    foreignColumns: [users.id],
+    name: 'custom_fk'
+  }),
+  primaryKey({ columns: [table.id, table.name] })
+]);
+```
 
 ### Migration Scripts (package.json)
 ```bash

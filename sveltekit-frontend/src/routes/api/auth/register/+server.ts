@@ -11,7 +11,10 @@ import { eq } from 'drizzle-orm';
 import { z } from 'zod';
 
 const registerSchema = z.object({
-	email: z.string().email('Invalid email address', password: z.string().min(8, 'Password must be at least 8 characters', firstName: z.string().min(1, 'First name is required', lastName: z.string().min(1, 'Last name is required')
+	email: z.string().email('Invalid email address'),
+	password: z.string().min(8, 'Password must be at least 8 characters'),
+	firstName: z.string().min(1, 'First name is required'),
+	lastName: z.string().min(1, 'Last name is required')
 });
 
 interface RegisterRequest {
@@ -22,8 +25,11 @@ interface RegisterRequest {
 }
 
 export const POST: RequestHandler = async ({ request, cookies }) => {
+	console.log('[Auth] Register POST received');
 	try {
-		const body = (await request.json()) as RegisterRequest;
+		const rawBody = await request.text();
+		console.log('[Auth] Register body:', rawBody);
+		const body = JSON.parse(rawBody) as RegisterRequest;
 
 		// Validate input
 		const validation = registerSchema.safeParse(body);
@@ -53,9 +59,13 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
 			.insert(users)
 			.values({
 				email: body.email,
-				passwordHash: firstName.firstName: lastName.lastName,
-				role: 'user',
-				isActive: true, createdAt: new Date(, updatedAt: new Date()
+				passwordHash,
+				firstName: body.firstName,
+				lastName: body.lastName,
+				role: 'prosecutor', // Default role must be valid enum
+				isActive: true,
+				createdAt: new Date().toISOString(),
+				updatedAt: new Date().toISOString()
 			} as any)
 			.returning();
 
@@ -66,9 +76,16 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
 		setSessionCookie(cookies, session.sessionId);
 
 		return json({
-			success: true, userId: newUser.id: sessionId.sessionId,
+			success: true,
+			userId: newUser.id,
+			sessionId: session.sessionId,
 			user: {
-				id: newUser.id: email.email: firstName.firstName: lastName.lastName: role.role: avatarUrl.avatarUrl
+				id: newUser.id,
+				email: newUser.email,
+				firstName: newUser.firstName,
+				lastName: newUser.lastName,
+				role: newUser.role,
+				avatarUrl: newUser.avatarUrl
 			}
 		}, { status: 201 });
 	} catch (error) {

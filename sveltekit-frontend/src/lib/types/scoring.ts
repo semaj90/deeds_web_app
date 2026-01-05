@@ -1,4 +1,4 @@
-// Scoring types for CaseScoringService
+// Scoring types for CaseRankingService
 
 export interface CaseScoringRequest {
  caseId: string;

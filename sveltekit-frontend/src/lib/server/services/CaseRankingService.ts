@@ -99,7 +99,7 @@ export interface YohaUIState {
 // Ollama service instance
 const ollama = ollamaService;
 
-export class CaseScoringService {
+export class CaseRankingService {
  private DEFAULT_TEMPERATURE = 0.7;
  private SCORING_MODEL = 'gemma3-legal';
  private readonly CRITERIA_WEIGHTS: Record<string, number> = {
@@ -154,7 +154,7 @@ export class CaseScoringService {
 
  await this.saveScoring(scoringResult);
  await cognitiveCache.set(cacheKey, scoringResult, { ttl: 3600 });
-  
+
 
  logger.info('Case scored successfully', {
  caseId: request.caseId,
@@ -185,7 +185,7 @@ export class CaseScoringService {
  caseId: request.caseId,
  query: request.query,
  });
-  
+
  const [precedents, contradictions, evidenceMatches] = await Promise.all([
  this.semanticPrecedentSearch(request),
  request.detectContradictions !== false
@@ -880,4 +880,4 @@ Provide 2-3 specific strategic recommendations for the prosecution team.`;
 }
 
 // Export singleton instance
-export const caseScoringService = new CaseScoringService();
+export const caseRankingService = new CaseRankingService();

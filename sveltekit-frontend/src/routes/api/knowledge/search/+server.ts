@@ -84,7 +84,7 @@ export const POST: RequestHandler = async ({ request }) => {
       metadata: {
         queryTime,
         totalResults: results.length,
-        synthesized, body.synthesize || false,
+        synthesized: body.synthesize || false,
         llmProvider: body.llmProvider || 'ollama'
       }
     });

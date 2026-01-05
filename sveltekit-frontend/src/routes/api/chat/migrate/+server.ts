@@ -116,7 +116,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 
 		return json({
 			success: true,
-			migratedCount: messageIds,
+			migratedCount,
 			chatCount: chatIds.size,
 			message: `Successfully saved ${migratedCount} chat messages to your account!`
 		});

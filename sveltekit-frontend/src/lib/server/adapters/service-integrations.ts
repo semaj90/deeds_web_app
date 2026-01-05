@@ -520,7 +520,14 @@ export function getServiceAdapters() {
  const urls = getServiceUrls(env);
 
  return {
- env: urls OllamaAdapter(env.ollama, redis: new RedisAdapter(env.redis, qdrant: new QdrantAdapter(env.qdrant, pgvector: new PgVectorAdapter(env.pgvector, minio: new MinIOAdapter(env.minio, neo4j: new Neo4jAdapter(env.neo4j, rabbitmq: {} // Placeholder as RabbitMQAdapter is not implemented yet
+ env: urls,
+ ollama: new OllamaAdapter(env.ollama),
+ redis: new RedisAdapter(env.redis),
+ qdrant: new QdrantAdapter(env.qdrant),
+ pgvector: new PgVectorAdapter(env.pgvector),
+ minio: new MinIOAdapter(env.minio),
+ neo4j: new Neo4jAdapter(env.neo4j),
+ rabbitmq: {} // Placeholder as RabbitMQAdapter is not implemented yet
  };
 }
 

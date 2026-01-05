@@ -48,7 +48,9 @@ export const GET: RequestHandler = async () => {
 		});
 
 		return json({
-			errorCodes: Array.from(errorCodes).sort(, surfaces: Array.from(surfaces).sort(, techs: Array.from(techs).sort()
+			errorCodes: Array.from(errorCodes).sort(),
+			surfaces: Array.from(surfaces).sort(),
+			techs: Array.from(techs).sort()
 		});
 	} catch (error) {
 		console.error('Failed to get filter options:', error);

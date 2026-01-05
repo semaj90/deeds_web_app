@@ -6,9 +6,9 @@
  * Endpoint: POST /api/codebase-index/reindex
  * Purpose: Trigger codebase reindexing and clustering
  */
+import { env } from '$env/dynamic/private';
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
-import { env } from '$env/dynamic/private';
 
 const FASTAPI_URL = env.FASTAPI_URL || 'http://localhost:8090';
 
@@ -32,7 +32,8 @@ export const POST: RequestHandler = async ({ request, fetch }) => {
 			},
 			body: JSON.stringify({
 				force: options.force
-			}, signal: AbortSignal.timeout(60000) // 60s timeout for full reindex
+			}),
+			signal: AbortSignal.timeout(60000) // 60s timeout for full reindex
 		});
 
 		if (response.ok) {
@@ -47,7 +48,8 @@ export const POST: RequestHandler = async ({ request, fetch }) => {
 							'Content-Type': 'application/json',
 							'Accept': 'application/json'
 						},
-						body: JSON.stringify({ k: 10, generate_summaries: true }, signal: AbortSignal.timeout(30000)
+						body: JSON.stringify({ k: 10, generate_summaries: true }),
+						signal: AbortSignal.timeout(30000)
 					});
 
 					if (clusterResponse.ok) {

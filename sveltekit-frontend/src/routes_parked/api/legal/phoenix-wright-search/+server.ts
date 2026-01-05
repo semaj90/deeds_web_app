@@ -1,5 +1,5 @@
 import type { RequestHandler } from './$types.js';
-import { caseScoringService } from '$lib/server/services/CaseScoringService';
+import { caseRankingService } from '$lib/server/services/CaseRankingService';
 import type { PhoenixWrightSearchRequest } from '$lib/types/scoring';
 
 export const POST: RequestHandler = async ({ request }) => {
@@ -15,7 +15,7 @@ export const POST: RequestHandler = async ({ request }) => {
  }
 
  // Perform Phoenix Wright AI search
- const result = await caseScoringService.phoenixWrightSearch(searchRequest);
+ const result = await caseRankingService.phoenixWrightSearch(searchRequest);
 
  return new Response(JSON.stringify(result), {
  status: 200,

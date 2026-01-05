@@ -28,7 +28,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 
       // 1. Upload to Docling Gateway (Mock)
       // const doclingRes = await fetch('http://localhost:8000/process', { method: 'POST', body: file });
-  
+
       // const lang = await detectLanguage(text);
 
       // 3. Chunking & Indexing (Mock)
@@ -37,7 +37,8 @@ export const POST: RequestHandler = async ({ request, locals }) => {
       results.push({
         filename: file.name,
         status: 'indexed',
-        docId: crypto.randomUUID(, chunks: 12,
+        docId: crypto.randomUUID(),
+        chunks: 12,
         language: 'en-US'
       });
     }

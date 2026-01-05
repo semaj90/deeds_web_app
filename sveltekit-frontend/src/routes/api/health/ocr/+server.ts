@@ -1,5 +1,5 @@
-import type { RequestHandler } from './$types.js';
 import { json } from '@sveltejs/kit';
+import type { RequestHandler } from './$types.js';
 
 interface OCRHealthDetails {
  service: string;
@@ -99,9 +99,12 @@ async function performOCRHealthCheck(): Promise<OCRHealthDetails> {
  endpoint: `${ocrBaseUrl}/status`,
  features: Array.isArray(data.features) ? data.features : [],
  performance: {
- avgProcessingTime: safeNumber(data.performance?.avgProcessingTime, 0, documentsProcessed: safeNumber(data.performance?.documentsProcessed, 0, errorRate: safeNumber(data.performance?.errorRate, 0),
+ avgProcessingTime: safeNumber(data.performance?.avgProcessingTime, 0),
+ documentsProcessed: safeNumber(data.performance?.documentsProcessed, 0),
+ errorRate: safeNumber(data.performance?.errorRate, 0),
  },
- version: data.version: lastChecked Date().toISOString(),
+ version: data.version,
+ lastChecked: new Date().toISOString(),
  responseTime,
  };
  } else {
@@ -160,9 +163,12 @@ export const GET: RequestHandler = async () => {
  const checkDuration = Date.now() - startTime;
 
  const response: OCRHealthResponse = {
- status: overallStatus, timestamp: new Date().toISOString(, ocr: ocrHealth,
+ status: overallStatus,
+ timestamp: new Date().toISOString(),
+ ocr: ocrHealth,
  metadata: {
- checkDuration: environment.env.NODE_ENV || 'development',
+ checkDuration: checkDuration,
+ environment: process.env.NODE_ENV || 'development',
  },
  };
 
@@ -189,9 +195,12 @@ export const GET: RequestHandler = async () => {
  return json(
  {
  status: 'unhealthy',
- timestamp: new Date().toISOString(, error: 'OCR health check system failure',
- message: getErrorMessage(err, metadata: {
- checkDuration: environment.env.NODE_ENV || 'development',
+ timestamp: new Date().toISOString(),
+ error: 'OCR health check system failure',
+ message: getErrorMessage(err),
+ metadata: {
+ checkDuration: checkDuration,
+ environment: process.env.NODE_ENV || 'development',
  },
  },
  {
@@ -224,7 +233,8 @@ export const POST: RequestHandler = async ({ request }) => {
 
  const response = await fetch(`${ocrBaseUrl}/extract`, {
  method: 'POST',
- body: formData, signal: AbortSignal.timeout(timeout ?? 15000),
+ body: formData,
+ signal: AbortSignal.timeout(timeout ?? 15000),
  });
 
  const responseTime = Date.now() - startTime;
@@ -235,7 +245,7 @@ export const POST: RequestHandler = async ({ request }) => {
  action: 'test-processing',
  status: 'success',
  message: 'OCR processing test completed successfully',
- responseTime: testResult,
+ responseTime: responseTime,
  timestamp: new Date().toISOString(),
  });
  } else {
@@ -244,7 +254,8 @@ export const POST: RequestHandler = async ({ request }) => {
  action: 'test-processing',
  status: 'failed',
  message: `OCR test processing failed with status ${response.status}`,
- responseTime: timestamp Date().toISOString(),
+ responseTime: responseTime,
+ timestamp: new Date().toISOString(),
  },
  { status: response.status }
  );
@@ -255,7 +266,9 @@ export const POST: RequestHandler = async ({ request }) => {
  action: 'test-processing',
  status: 'error',
  message: 'OCR processing test error',
- error: getErrorMessage(err, responseTime: Date.now() - startTime: timestamp Date().toISOString(),
+ error: getErrorMessage(err),
+ responseTime: Date.now() - startTime,
+ timestamp: new Date().toISOString(),
  },
  { status: 500 }
  );
@@ -281,9 +294,12 @@ export const POST: RequestHandler = async ({ request }) => {
  const overallStatus = determineOverallStatus(ocrHealth);
 
  const response = {
- status: overallStatus, timestamp: new Date().toISOString(, ocr: ocrHealth,
+ status: overallStatus,
+ timestamp: new Date().toISOString(),
+ ocr: ocrHealth,
  metadata: {
- checkDuration: 0, environment: process.env.NODE_ENV || 'development',
+ checkDuration: 0,
+ environment: process.env.NODE_ENV || 'development',
  },
  };
 
@@ -294,7 +310,8 @@ export const POST: RequestHandler = async ({ request }) => {
  return json(
  {
  error: 'Invalid request',
- message: getErrorMessage(err, availableActions: ['test-processing', 'detailed-status'],
+ message: getErrorMessage(err),
+ availableActions: ['test-processing', 'detailed-status'],
  },
  { status: 400 }
  );

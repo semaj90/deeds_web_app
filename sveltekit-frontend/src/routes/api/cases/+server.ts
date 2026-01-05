@@ -47,10 +47,12 @@ export const GET: RequestHandler = async ({ locals, url }) => {
 			.offset(offset);
 
 		return json({
-			success: true, data: userCases.length,
+			success: true,
+			data: userCases,
 			pagination: {
 				limit,
-				offset: hasMore.length === limit
+				offset,
+				hasMore: userCases.length === limit
 			}
 		});
 	} catch (err) {
@@ -79,9 +81,13 @@ export const POST: RequestHandler = async ({ locals, request }) => {
 		const newCase = await db
 			.insert(cases)
 			.values({
-				title: body.title: description.description: assignedAttorney.user.id: status.status || 'pending',
+				title: body.title,
+				description: body.description,
+				assignedAttorney: locals.user.id,
+				status: body.status || 'pending',
 				priority: body.priority || 'medium',
-				createdAt: new Date(, updatedAt: new Date()
+				createdAt: new Date(),
+				updatedAt: new Date()
 			} as any)
 			.returning();
 

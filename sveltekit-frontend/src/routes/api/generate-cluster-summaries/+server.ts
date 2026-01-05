@@ -23,7 +23,7 @@ const PYTHON_PATH = 'C:\\Users\\james\\Videos\\deeds-web-app\\.venv\\Scripts\\py
 export async function POST() {
 	try {
 		await redis.connect().catch(() => {});
-  
+
 		const clusterAnalysis = await runCUDAClustering();
 
 		// 2. Generate summaries with gemma3-legal
@@ -70,7 +70,8 @@ async function runCUDAClustering() {
 		const { stdout } = await execAsync(
 			`"${PYTHON_PATH}" scripts/phase89-cuda-clustering.py`,
 			{
-				cwd: process.cwd(, timeout: 60000,
+				cwd: process.cwd(),
+				timeout: 60000,
 				maxBuffer: 10 * 1024 * 1024
 			}
 		);
@@ -118,7 +119,8 @@ async function generateClusterSummaries(clusters: any) {
 		const tags = await getClusterTags(errorIds);
 
 		summaries.push({
-			id: parseInt(clusterId, errorCount: errorIds.length,
+			id: parseInt(clusterId),
+			errorCount: errorIds.length,
 			summary: summary.text,
 			tags,
 			recommendations: summary.recommendations,

@@ -784,7 +784,7 @@ class PlannerMemoryManager {
  this.freeList.push(handle);
  }
 
- update(handle: number): number {
+ update(handle: number, value: number): void {
  this.visits[handle] += 1;
  this.valueSum[handle] += value;
  }
@@ -820,19 +820,22 @@ class PlannerMemoryManager {
  };
  }
 
- cacheTransposition(graphNodeId: string, visits: number): number {
- this.transpositionCache.set(graphNodeId, { visits: value.now() });
- }
+ cacheTransposition(graphNodeId: string, visits: number): void {
+		this.transpositionCache.set(graphNodeId, { visits, timestamp: Date.now() });
+	}
 
  getTransposition(graphNodeId: string) {
  return this.transpositionCache.get(graphNodeId);
  }
 
  summarize() {
- return {
- capacity: this.capacity, this.records.length - length: free, this.freeList.length, transpositions: this.transpositionCache.size,
- };
- }
+		return {
+			capacity: this.capacity,
+			records: this.records.length,
+			free: this.freeList.length,
+			transpositions: this.transpositionCache.size,
+		};
+	}
 }
 
 // Singleton planner memory (exposed for planner integration)
@@ -841,18 +844,21 @@ export const plannerMemory = new PlannerMemoryManager(4096);
 // Convenience bridge API to integrate with Neo4jAlphaGoPlanner without import cycles.
 export const nesPlannerBridge = {
  allocateNode(params: {
- graphNodeId: string; parentHandle: number;
- prior: number; depth: number;
- }) {
- return plannerMemory.allocate(
- graphNodeId: params.parentHandle,
- params.prior,
- params.depth
- );
- },
- visit(handle: number): number {
- plannerMemory.update(handle, value);
- },
+		graphNodeId: string;
+		parentHandle: number;
+		prior: number;
+		depth: number;
+	}) {
+		return plannerMemory.allocate(
+			params.graphNodeId,
+			params.parentHandle,
+			params.prior,
+			params.depth
+		);
+	},
+ visit(handle: number, value: number): void {
+		plannerMemory.update(handle, value);
+	},
  select(handle: number, explorationC?: number) {
  return plannerMemory.selectChildUCB(handle, explorationC);
  },

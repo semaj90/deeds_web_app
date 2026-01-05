@@ -1,6 +1,6 @@
 import type { User } from '$lib/types';
 import type { Document } from '$lib/types';
-import type { caseScoringService } from '../services/CaseScoringService.js';
+import { caseRankingService } from '../services/CaseRankingService.js';
 import type { cognitiveCache } from '../ai/cache.js';
 import type { aiService } from './index.js';
 import type { contextualUnderstanding } from '../ai/contextual-understanding-service.js';
@@ -123,7 +123,7 @@ async function summarizeWithGemma(params: {
 	const cached = await cognitiveCache.get<AgenticScoringResult>(cacheKey);
 	if (cached) return cached;
 
-	const result: CaseScoringServiceResult = await caseScoringService.scoreCase(request);
+	const result: CaseScoringServiceResult = await caseRankingService.scoreCase(request);
 	const contextualSummary = await summarizeWithGemma({
 		query: `Summarize why this case received a score of ${result.score}`,
 		context: result.explanation

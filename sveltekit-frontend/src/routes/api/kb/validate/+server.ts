@@ -5,9 +5,9 @@
  * POST /api/kb/validate
  */
 
+import { couchdb } from '$lib/services/couchdb-client.js';
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
-import { couchdb } from '$lib/services/couchdb-client.js';
 
 const QDRANT_URL = process.env.QDRANT_URL || 'http://localhost:6333';
 
@@ -52,7 +52,8 @@ export const POST: RequestHandler = async ({ request }) => {
           const data = await response.json() as { result: { payload: Record<string, unknown> } };
           selectedSources.push({
             chunk_id: chunkId,
-            content: String(data.result.payload.content || '', metadata: data.result.payload,
+            content: String(data.result.payload.content || ''),
+            metadata: data.result.payload,
             selected: true
           });
         }
@@ -70,7 +71,7 @@ export const POST: RequestHandler = async ({ request }) => {
       selected_chunk_ids: body.selected_chunk_ids,
       rejected_chunk_ids: body.rejected_chunk_ids || [],
       user_notes: body.user_notes,
-      pinned_to_canvas, body.pin_to_canvas || false,
+      pinned_to_canvas: body.pin_to_canvas || false,
       sources_count: selectedSources.length,
       validated_at: new Date().toISOString()
     };
@@ -92,8 +93,10 @@ export const POST: RequestHandler = async ({ request }) => {
           query_id: body.query_id,
           pinned_sources: selectedSources.map(s => ({
             chunk_id: s.chunk_id,
-            preview: s.content.slice(0, 200, metadata: s.metadata
-          }, pinned_at: new Date().toISOString()
+            preview: s.content.slice(0, 200),
+            metadata: s.metadata
+          })),
+          pinned_at: new Date().toISOString()
         };
 
         await couchdb.put('ace_validations', canvasUpdate);
