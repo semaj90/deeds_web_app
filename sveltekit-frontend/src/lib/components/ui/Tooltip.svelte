@@ -1,43 +1,33 @@
 <script lang="ts">
-	import { Tooltip } from 'bits-ui';
-	import { fade } from 'svelte/transition';
+  import { Tooltip as BitsTooltip } from "bits-ui";
+  import { cn } from "$lib/utils/cn";
+  import { fade } from "svelte/transition";
 
-	let {
-		content = '',
-		placement = 'top' as 'top' | 'bottom' | 'left' | 'right',
-		children
-	} = $props<{
-		content?: string;
-		placement?: 'top' | 'bottom' | 'left' | 'right';
-		children?: import('svelte').Snippet;
-	}>();
+  let {
+    children,
+    content,
+    delayDuration = 500,
+    class: className = "",
+    side = "top",
+    ...rest
+  } = $props();
 </script>
 
-<Tooltip.Root delayDuration={400}>
-	<Tooltip.Trigger>
-		{#snippet child({ props })}
-			<div {...props} class="tooltip-trigger-wrapper">
-				{@render children?.()}
-			</div>
-		{/snippet}
-	</Tooltip.Trigger>
-
-	<Tooltip.Portal>
-		<Tooltip.Content
-			side={placement}
-			sideOffset={8}
-			class="z-50 overflow-hidden rounded-md bg-gray-900 px-3 py-1.5 text-xs text-white shadow-md"
-			transition={fade}
-			transitionConfig={{ duration: 150 }}
-		>
-			{content}
-			<Tooltip.Arrow class="fill-gray-900" />
-		</Tooltip.Content>
-	</Tooltip.Portal>
-</Tooltip.Root>
-
-<style>
-	.tooltip-trigger-wrapper {
-		display: inline-block;
-	}
-</style>
+<BitsTooltip.Root {delayDuration} {...rest}>
+  <BitsTooltip.Trigger class={className}>
+    {#if children}
+      {@render children()}
+    {/if}
+  </BitsTooltip.Trigger>
+  <BitsTooltip.Content
+    {side}
+    class={cn(
+      "z-50 overflow-hidden rounded-md border bg-popover px-3 py-1.5 text-sm text-popover-foreground shadow-md transition-all data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2"
+    )}
+  >
+    <div transition:fade={{ duration: 150 }}>
+      {content}
+    </div>
+    <BitsTooltip.Arrow class="fill-popover" />
+  </BitsTooltip.Content>
+</BitsTooltip.Root>

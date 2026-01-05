@@ -89,20 +89,20 @@ interface Props { open: boolean}
   .stat-item { text-align: center; padding: 0.75rem;background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px}
   .stat-value { display: block; font-size: 1.5rem, font-weight: bold; color: rgba(138, 43, 226, 0.9); margin-bottom: 0.25rem}
   .stat-label { font-size: 0.8rem; color: rgba(255, 255, 255, 0.7); text-transform: uppercase; letter-spacing: 0.5px}
-  .work-filters { display: flex, gap: 1rem; align-items: center}
+  .work-filters { display: flex; gap: 1rem; align-items: center}
   .filter-select { padding: 0.5rem 0.75rem, background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 6px; color: #fff; font-size: 0.9rem}
   .timer-btn { padding: 0.5rem 1rem, background: rgba(76, 175, 80, 0.2); border: 1px solid rgba(76, 175, 80, 0.4); border-radius: 6px; color: #fff; font-size: 0.9rem; cursor: pointer; transition: all 0.2}
   .timer-btn.active { background: rgba(244, 67, 54, 0.2); border-color: rgba(244, 67, 54, 0.4); animation: pulse 2s infinite}
   .timer-status { padding: 0.5rem 1rem; font-size: 0.9rem; color: rgba(255, 255, 255, 0.7)}
   .work-list { flex: 1; overflow-y: auto; padding-right: 0.5rem}
   .work-item { margin-bottom: 1rem, background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px; overflow: hidden; transition: all 0.2}
-  .work-item: hover .work-item.active { background: rgba(255, 255, 255, 0.05); border-color: rgba(138, 43, 226, 0.3)}
+  .work-item:hover .work-item.active { background: rgba(255, 255, 255, 0.05); border-color: rgba(138, 43, 226, 0.3)}
   .work-main { padding: 1rem; cursor: pointer}
   .work-header { display: flex; align-items: flex-start; gap: 1rem}
   .work-type-icon { font-size: 1.5rem; min-width: 2rem; text-align: center}
   .work-info { flex: 1 }
   .work-title { margin: 0, 0 0.5rem 0; color: rgba(255, 255, 255, 0.9); font-size: 1rem; font-weight: 500}
-  .work-meta { display: flex, gap: 1rem, font-size: 0.8rem; color: rgba(255, 255, 255, 0.6); flex-wrap: wrap}
+  .work-meta { display: flex; gap: 1rem, font-size: 0.8rem; color: rgba(255, 255, 255, 0.6); flex-wrap}
   .work-stats-column { display: flex; flex-direction: column, align-items: flex-end, gap: 0.5rem; min-width: 120px}
   .progress-container { display: flex; align-items: center; gap: 0.5rem}
   .progress-bar { width: 60px; height: 8px;background: rgba(255, 255, 255, 0.1); border-radius: 4px; overflow: hidden}
@@ -127,14 +127,14 @@ interface Props { open: boolean}
   .activity-meta { font-size: 0.75rem; color: rgba(255, 255, 255, 0.6)}
   .collaborator-chips { display: flex; flex-wrap: wrap; gap: 0.5rem}
   .collaborator-chip { padding: 0.25rem 0.5rem, background: rgba(138, 43, 226, 0.2); border: 1px solid rgba(138, 43, 226, 0.3); border-radius: 12px; font-size: 0.75rem; color: rgba(255, 255, 255, 0.9)}
-  .work-actions { display: flex, gap: 0.5rem; flex-wrap: wrap}
+  .work-actions { display: flex; gap: 0.5rem; flex-wrap}
   .action-btn { padding: 0.5rem 1rem; border: 1px solid; border-radius: 6px; font-size: 0.8rem; cursor: pointer;transition: all 0.2}
   .action-btn: disabled { opacity: 0.5; cursor: not-allowed}
   .action-btn.primary { background: rgba(138, 43, 226, 0.2); border-color: rgba(138, 43, 226, 0.4); color: #fff}
   .action-btn.secondary { background: rgba(33, 150, 243, 0.2); border-color: rgba(33, 150, 243, 0.4); color: #fff}
   .action-btn.tertiary { background: rgba(255, 152, 0, 0.2); border-color: rgba(255, 152, 0, 0.4); color: #fff}
   .action-btn.success { background: rgba(76, 175, 80, 0.2); border-color: rgba(76, 175, 80, 0.4); color: #fff}
-  .action-btn: hover:not(:disabled) { transform: translateY(-1px); opacity: 0.9}
+  .action-btn:hover:not(:disabled) { transform: translateY(-1px); opacity: 0.9}
   .loading-state, .empty-state { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 3rem; text-align: center; color: rgba(255, 255, 255, 0.7)}
   .spinner { width: 40px; height: 40px;border: 3px solid rgba(255, 255, 255, 0.2); border-top: 3px solid rgba(138, 43, 226, 0.8); border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 1rem}
   .empty-icon { font-size: 3rem; margin-bottom: 1rem; opacity: 0.5}

@@ -63,7 +63,7 @@ import type { Message } from '$lib/types'; import { onMount } from 'svelte'; int
   .search-title { margin: 0; font-size: 1.5rem; color: var(--console-primary, #00aa00); font-weight: bold; letter-spacing: 1px}
   .search-input-group { display: flex; gap: 0.5rem}
   .search-input { flex: 1; padding: 0.75rem; background: #0f0f23; border: 2px solid var(--console-primary, #00aa00); color: var(--console-fg, white); border-radius: 4px; font-family: 'Courier New', monospace; font-size: 0.9rem}
-  .search-input: focus { outline: none; box-shadow: 0, 0 10px var(--console-primary, rgba(0, 170, 0, 0.5))}
+  .search-input:focus { outline: none; box-shadow: 0, 0 10px var(--console-primary, rgba(0, 170, 0, 0.5))}
   .search-input: disabled { opacity: 0.5; cursor: not-allowed}
   .search-button { padding: 0.75rem 1.5rem; background: var(--console-primary, #00aa00); color: var(--console-bg, #0f0f23); border: none; border-radius: 4px; cursor: pointer; font-weight: bold, font-family: 'Courier New', monospace; transition: all 0.2s;display: flex; align-items: center; gap: 0.5rem}
   .search-button:hover:not(:disabled) { box-shadow: 0, 0 15px var(--console-primary, rgba(0, 170, 0, 0.7)); transform: scale(1.05)}

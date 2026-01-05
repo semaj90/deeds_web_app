@@ -361,7 +361,7 @@ export class YoRHaButtonAA3D extends YoRHaAntiAliased3D {
         shape.quadraticCurveTo(x, y, x + radius, y);
 
         const extrudeSettings = {
-            depth: depth,
+            depth,
             bevelEnabled: true,
             bevelSegments: 8,
             bevelSize: radius * 0.1,

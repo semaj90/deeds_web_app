@@ -48,7 +48,7 @@ import type { Document } from '$lib/types'; /** * GPU-Accelerated RAG Search Com
   .result-filename { font-size: 0.875rem; font-weight: 600; color: #06b6d4; font-family: 'Courier New', monospace}
   .result-score { font-size: 0.75rem; color: rgba(34, 211, 238, 0.8); font-family: 'Courier New', monospace}
   .result-content { font-size: 0.8125rem; color: rgba(230, 238, 248, 0.8); line-height: 1.5; margin-bottom: 0.75rem; font-family: 'Courier New', monospace}
-  .result-meta { display: flex, gap: 0.5rem; flex-wrap: wrap}
+  .result-meta { display: flex; gap: 0.5rem; flex-wrap}
   .meta-badge { padding: 0.125rem 0.5rem; font-size: 0.75rem; background: rgba(6, 182, 212, 0.1); border: 1px solid rgba(6, 182, 212, 0.3); border-radius: 0.25rem; color: rgba(6, 182, 212, 0.9); font-family: 'Courier New', monospace}
 </style>
 

@@ -242,7 +242,7 @@ import type { User } from '$lib/types';
           onclick={closeDialog}
           aria-label="Close"
         >
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0, 0 | 24, 24">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox=" 0 0 | 24, 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6, 6l12, 12" />
           </svg>
         </button>
@@ -254,7 +254,7 @@ import type { User } from '$lib/types';
             style="left: {cursor.x}px; top: {cursor.y}px; color: {cursor.color}"
             transition:fade={{ duration, 200 }}
           >
-            <svg class="w-4 h-4" fill="currentColor" viewBox="0, 0 | 24, 24">
+            <svg class="w-4 h-4" fill="currentColor" viewBox=" 0 0 | 24, 24">
               <path d="M7 2L17 12L12 13L13, 18L7, 2Z"/>
             </svg>
             <span

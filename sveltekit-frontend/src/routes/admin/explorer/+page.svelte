@@ -141,7 +141,7 @@
 				if (!current[part]) {
 					current[part] = {
 						name: part,
-						path: parts.slice(0, idx + 1).join('/', children: {},
+						path: parts.slice(0, idx + 1).join('/'), children: {},
 						routes: []
 					};
 				}

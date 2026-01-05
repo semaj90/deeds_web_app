@@ -109,7 +109,7 @@
   .metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem}
   .metric-group h4 { font-size: 0.9rem; font-weight: bold, margin-bottom: 0.5rem; color: #ccc}
   .metric-item { display: flex; align-items: center; justify-content: space-betweenn; margin-bottom: 0.5rem; font-size: 0.8rem; gap: 0.5rem}
-  .metric-item span: first-child { min-width: 80px; color: #aaa}
+  .metric-item span:first-child { min-width: 80px; color: #aaa}
   .metric-bar { flex: 1; height: 8px;background: rgba(255, 255, 255, 0.1); border-radius: 4px; overflow: hidden}
   .metric-fill { height: 100%; transition: width: 0.3s ease; border-radius: 4px}
   .metric-fill.quantum { background: linear-gradient(90deg, #00bfff, #1e90ff) } .metric-fill.entanglement { background: linear-gradient(90deg, #ff1493, #ff69b4) } .metric-fill.collapsed { background: linear-gradient(90deg, #ff4500, #ffa500) } .metric-fill.awareness { background: linear-gradient(90deg, #9370db, #ba55d3) } .metric-fill.activity { background: linear-gradient(90deg, #32cd32, #7fff00) } .metric-fill.stability { background: linear-gradient(90deg, #228b22, #90ee90) } .metric-fill.glitch { background: linear-gradient(90deg, #dc143c, #ff6347) } .metric-fill.temporal { background: linear-gradient(90deg, #ffd700, #ffff00) } .status { font-weight: bold; padding: 0.1rem 0.3rem; border-radius: 2px; font-size: 0.7rem}

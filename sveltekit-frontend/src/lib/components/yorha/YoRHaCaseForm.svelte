@@ -98,9 +98,9 @@
   .form-input:focus { box-shadow: 0, 0 0 3px rgba(212, 175, 55, 0.2); transform: translateY(-1px)}
   .form-input:hover:not(:focus) { border-color: rgba(212, 175, 55, 0.5)}
   /* Button enhancements */ .next-btn, .prev-btn, .submit-btn { position: relative; transition: all 0.2s ease;overflow: hidden}
-  .next-btn:hover, .submit-btn: hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3)}
-  .prev-btn: hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(212, 175, 55, 0.1)}
-  .next-btn::before, .submit-btn: :before { content: ''; position: absolute;top: 0; left: -100%; width: 100%; height: 100%;background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent); transition: left: 0.5}
+  .next-btn:hover, .submit-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3)}
+  .prev-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(212, 175, 55, 0.1)}
+  .next-btn::before, .submit-btn::before { content: ''; position: absolute;top: 0; left: -100%; width: 100%; height: 100%;background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent); transition: left: 0.5}
   .next-btn:hover::before, .submit-btn:hover::before { left: 100%}
   /* Progress animations */ .progress-bar, .step-progress { animation: slideIn 0.3s ease-out}
   @keyframes slideIn { from { width: 0; opacity: 0}

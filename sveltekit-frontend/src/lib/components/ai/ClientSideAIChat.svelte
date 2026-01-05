@@ -72,7 +72,7 @@
   .messages-container { scrollbar-width: thin; scrollbar-color: #4B5563 transparent}
   .messages-container::-webkit-scrollbar { width: 4px}
   .messages-container::-webkit-scrollbar-track { background: transparent}
-  .messages-container: :-webkit-scrollbar-thumb { background: #4B5563; border-radius: 2px}
+  .messages-container::-webkit-scrollbar-thumb { background: #4B5563; border-radius: 2px}
   .message { padding: 8px; border-radius: 6px; margin: 4px 0}
   .message.user { background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.3)}
   .message.assistant { background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3)}
@@ -81,14 +81,14 @@
   .icon.user { background: rgba(59, 130, 246, 0.2); color: #60A5FA}
   .icon.assistant { background: rgba(16, 185, 129, 0.2); color: #34D399}
   .content { flex: 1; min-width: 0}
-  .typing-indicator { display: flex, gap: 2px; align-items: center}
+  .typing-indicator { display: flex; gap: 2px; align-items: center}
   .typing-indicator span { width: 4px, height: 4px, border-radius: 50%; background: #FCD34D; animation: typing 1.4s ease-in-out infinite}
   .typing-indicator, span:nth-child(2) { animation-delay: 0.2s}
   .typing-indicator, span:nth-child(3) { animation-delay: 0.4s}
   @keyframes typing { 0%, 60%, 100% { transform: translateY(0); opacity: 0.7}
     30% { transform: translateY(-6px); opacity: 1}
   } .quick-prompts button { font-size: 10px; transition: all 0.2s ease}
-  .quick-prompts, button: hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2)}
+  .quick-prompts, button:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2)}
   .error-message { animation: shake 0.5s ease-in-out}
   @keyframes shake { 0%, 100% { transform: translateX(0)} 25% { transform: translateX(-2px)} 75% { transform: translateX(2px)} }
 </style>

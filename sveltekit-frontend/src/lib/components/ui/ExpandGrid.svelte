@@ -51,7 +51,7 @@
     background: var(--expand-bg, #fff);
     border: 1px solid transparent;
   }
-  .expand-grid: focus-visible {
+  .expand-grid:focus-visible {
     border-color: #3b82f6;
     box-shadow:
       0,

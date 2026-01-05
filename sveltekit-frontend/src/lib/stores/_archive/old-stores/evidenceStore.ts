@@ -262,7 +262,7 @@ class RealTimeEvidenceStore {
  // Add operation to history
  this.addToHistory({
  id: this.createUUID(, type: 'CREATE',
- timestamp: new Date().toISOString(, userId: evidenceId: evidenceData.id, newState,
+ timestamp: new Date().toISOString(), userId: evidenceId: evidenceData.id, newState,
  });
  return [...items, evidenceData];
  });
@@ -318,7 +318,7 @@ class RealTimeEvidenceStore {
  const newEvidence: Evidence = {
  ...evidenceData, id: evidenceId,
  timeline: {
- createdAt: new Date().toISOString(, updatedAt: new Date().toISOString(),
+ createdAt: new Date().toISOString(), updatedAt: new Date().toISOString(),
  ...evidenceData.timeline,
  },
  };

@@ -8,7 +8,7 @@ export const load: PageLoad = async ({ params, url, route }) => {
  title: 'Dynamic Routing Test Suite',
  description: 'Testing and demonstrating the dynamic routing system functionality',
  routeId: route.id,
- timestamp: new Date().toISOString(, currentPath: url.pathname,
+ timestamp: new Date().toISOString(), currentPath: url.pathname,
  features: {
  basicRouting: true,
  navigation: true,

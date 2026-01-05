@@ -21,7 +21,7 @@ describe('LinkMetadataForm Component', () => {
  statute_code: '18 U.S.C. § 1001',
  link_type: 'CHARGED_UNDER',
  notes: 'Primary charge',
- created_at: new Date().toISOString(, updated_at: new Date().toISOString(),
+ created_at: new Date().toISOString(), updated_at: new Date().toISOString(),
  };
 
  beforeEach(() => {

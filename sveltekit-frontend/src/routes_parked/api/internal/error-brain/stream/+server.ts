@@ -39,7 +39,7 @@ export const GET: RequestHandler = async (event) => {
  const connectionEvent = {
  type: 'connection',
  message: 'Error-brain event stream connected',
- timestamp: new Date().toISOString(, subscriberCount: transport.getSubscriberCount() + 1,
+ timestamp: new Date().toISOString(), subscriberCount: transport.getSubscriberCount() + 1,
  };
 
  controller.enqueue(encoder.encode(`data: ${JSON.stringify(connectionEvent)}\n\n`));

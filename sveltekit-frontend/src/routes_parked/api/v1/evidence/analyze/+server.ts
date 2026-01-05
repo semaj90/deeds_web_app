@@ -58,7 +58,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
  success: true,
  data: {
  evidenceId: similar_results.results || [],
- processed_at: new Date().toISOString(, userId: isTestMode ? 'test-user' : getUserId(locals as App.Locals),
+ processed_at: new Date().toISOString(), userId: isTestMode ? 'test-user' : getUserId(locals as App.Locals),
  },
  });
  } catch (error: Error | unknown) {

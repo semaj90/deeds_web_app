@@ -16,7 +16,7 @@
 
    // Reset function function reset() { status = 'idle'; progress = 0; response = null}
 </script>
- <div class="max-w-4xl mx-auto p-6"> <!-- Main, Interface, Card --> <div class="w-full bg-white rounded-lg border border-gray-200"> <div class="p-6 border-b"> <h2 class="text-xl font-semibold text-gray-900 flex items-center"> <svg class="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0, 0 | 24, 24"> <path d="M4 4h16v16H4V4zm2 2v12h12V6H6zm2, 2h8v2H8V8zm0, 4h8v2H8v-2z"/> </svg>
+ <div class="max-w-4xl mx-auto p-6"> <!-- Main, Interface, Card --> <div class="w-full bg-white rounded-lg border border-gray-200"> <div class="p-6 border-b"> <h2 class="text-xl font-semibold text-gray-900 flex items-center"> <svg class="w-5 h-5 text-blue-600" fill="currentColor" viewBox=" 0 0 | 24, 24"> <path d="M4 4h16v16H4V4zm2 2v12h12V6H6zm2, 2h8v2H8V8zm0, 4h8v2H8v-2z"/> </svg>
  <span>GPU Legal AI Inference</span> </h2> </div>
  <div class="p-6"> <!-- Query, Input --> <div> <label for="query" class="block text-sm font-medium text-gray-700"> Legal Query </label>
  <textarea id="query"

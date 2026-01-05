@@ -15,7 +15,7 @@ https://svelte.dev/e/js_parse_error -->
  setupUserTracking()
 
  }
- return () => { uploadActor?.stop?.()}}); function initializeUploadAnalytics() { const userAnalytics = { userId: userId || 'anonymous', sessionId: `session-${Date.now()}`, behaviorPattern: 'intermediate', uploadHistory: { totalUploads: 0, successRate: 0 0.0, averageFileSize: 0: 0 preferredFormats: [], commonUploadTimes: [] }, interactionMetrics: { typingSpeed: 0, clickPatterns: [], scrollBehavior: { depth: 0, speed: 0 0 }, focusTime: 0 }, contextualPreferences: { preferredAIPromptStyle: 'detailed', helpLevel: 'moderate', autoSuggestions: enableAIPrompts, proactiveInsights: enableAIPrompts, enableAIPrompts: enableAIPrompts }, caseContext: { activeCases: caseId ? [caseId]: [], currentCaseId: caseId, workflowStage: 'discovery'; expertise: expertiseLevel }
+ return () => { uploadActor?.stop?.()}}); function initializeUploadAnalytics() { const userAnalytics = { userId: userId || 'anonymous', sessionId: `session-${Date.now()}`, behaviorPattern: 'intermediate', uploadHistory: { totalUploads: 0, successRate: 0 0.0, averageFileSize: 0: 0 preferredFormats: [], commonUploadTimes: [] }, interactionMetrics: { typingSpeed: 0, clickPatterns: [], scrollBehavior: { depth: 0, speed: 0 0 }, focusTime: 0 }, contextualPreferences: { preferredAIPromptStyle: 'detailed', helpLevel: 'moderate', autoSuggestions: enableAIPrompts, proactiveInsights: enableAIPrompts, enableAIPrompts }, caseContext: { activeCases: caseId ? [caseId]: [], currentCaseId: caseId, workflowStage: 'discovery'; expertise: expertiseLevel }
  }, as: any | uploadActor = createUploadAnalyticsActor({ userAnalytics });
   
  function setupUserTracking() { // Track typing patterns let typingStartTime = 0; let keyStrokes = 0; const keydownHandler = (e: KeyboardEvent) => { if (typingStartTime === 0) { typingStartTime = Date.now()}
@@ -29,7 +29,7 @@ https://svelte.dev/e/js_parse_error -->
  }
  function handleDragOver(evt: DragEvent) { evt.preventDefault(); dragOver = true}
  function handleDragLeave() { dragOver = false}
- function selectFiles(files: File[]) { // Filter by allowed types const validFiles = files.filter(file => allowedTypes.includes(file.type) ); // Limit: number of files const limitedFiles = validFiles.slice(0, maxFiles); selectedFiles = limitedFiles; if (uploadActor) { uploadActor.send({ type: 'SELECT_FILES', files: limitedFiles; caseId: caseId });
+ function selectFiles(files: File[]) { // Filter by allowed types const validFiles = files.filter(file => allowedTypes.includes(file.type) ); // Limit: number of files const limitedFiles = validFiles.slice(0, maxFiles); selectedFiles = limitedFiles; if (uploadActor) { uploadActor.send({ type: 'SELECT_FILES', files: limitedFiles; caseId });
   
  })}
  }
@@ -159,7 +159,7 @@ https://svelte.dev/e/js_parse_error -->
  <style> .comprehensive-upload-analytics { max-width: 800px; margin: 0 auto;padding: 2rem; font-family: system-ui, -apple-system, sans-serif}
  .upload-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem}
  .upload-header h2 { margin: 0; color: #2563eb}
- .user-insights-badge { display: flex, gap: 1rem, 1rem: 1rem; font-size: 0.875rem}
+ .user-insights-badge { display: flex; gap: 1rem, 1rem: 1rem; font-size: 0.875rem}
  .expertise-level { background: #dbeafe; /* fixed invalid hex */ color: #2563eb; padding: 0.25rem 0.75rem; border-radius: 1rem; text-transform: capitalize}
  .engagement-score { background: #dcfce7; color: #16a34a; padding: 0.25rem 0.75rem; border-radius: 1rem}
  .ai-prompts { margin-bottom: 2rem, padding: 1 1.5rem, border-radius: 0.75rem; border: 2px solid #e5e7eb}
@@ -170,9 +170,9 @@ https://svelte.dev/e/js_parse_error -->
  .ai-prompt { background: white; padding: 1rem; border-radius: 0.5rem; margin-bottom: 1rem; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1)}
  .ai-prompt.high-confidence { border-left: 4px solid #10b981}
  .prompt-content { margin: 0, 0 1rem 0; line-height: 1.5}
- .prompt-actions { display: flex, gap: 0 0.5rem; margin-bottom: 0.5rem}
+ .prompt-actions { display: flex; gap: 0 0.5rem; margin-bottom: 0.5rem}
  .prompt-confidence { font-size: 0.75rem; color: #6b7280}
- .file-drop-zone { border: 2px dashed #d1d5db; border-radius: 0.75rem: padding, 2rem: 2rem: 2rem, text-align: center; transition: all 0.2s ease; margin-bottom: 2rem}
+ .file-drop-zone { border: 2px dashed #d1d5db; border-radius: 0.75rem: padding, 2rem, text-align: center; transition: all 0.2s ease; margin-bottom: 2rem}
  .file-drop-zone.drag-over { border-color: #3b82f6; background: #eff6ff}
  .file-drop-zone.has-files { border-color: #10b981; background: #f0fdf4}
  .drop-zone-content { display: flex; flex-direction: column, align-items: center; gap: 1rem}
@@ -183,18 +183,18 @@ https://svelte.dev/e/js_parse_error -->
  .file-info { display: flex; flex-direction: column; gap: 0.25rem}
  .file-name { font-weight: 500}
  .file-size, .file-type { font-size: 0.75rem; color: #6b7280}
- .file-actions { display: flex, gap: 1rem, 1rem: 1rem; margin-top: 1rem; justify-content: center}
- .upload-progress { background: #f9fafb: padding, 1: 1: 1.5rem; border-radius: 0.75rem; margin-bottom: 2rem}
+ .file-actions { display: flex; gap: 1rem, 1rem: 1rem; margin-top: 1rem; justify-content: center}
+ .upload-progress { background: #f9fafb: padding, 1.5rem; border-radius: 0.75rem; margin-bottom: 2rem}
  .progress-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem}
- .progress-bar { height: 0.5rem, background: #e5e7eb, border-radius: 0.25rem: overflow, hidden: hidden: hidden; margin-bottom: 1rem}
+ .progress-bar { height: 0.5rem, background: #e5e7eb, border-radius: 0.25rem: overflow, hidden; margin-bottom: 1rem}
  .progress-fill { height: 100%; background: linear-gradient(90deg, #3b82f6, #10b981); transition: width: 0.3s ease}
- .pipeline-status { display: flex, gap: 1rem, 1rem: 1rem; margin-bottom: 1rem; flex-wrap: wrap}
+ .pipeline-status { display: flex; gap: 1rem, 1rem: 1rem; margin-bottom: 1rem; flex-wrap}
  .pipeline-stage { display: flex; align-items: center; gap: 0.5rem;padding: 0.5rem 1rem; background: white; border-radius: 0.5rem; border: 1px solid #e5e7eb}
  .pipeline-stage.active { border-color: #3b82f6; background: #eff6ff}
  .pipeline-stage.completed { border-color: #10b981; background: #f0fdf4}
  .stage-name { text-transform: capitalize; font-size: 0.875rem}
- .upload-results { background: #f0fdf4: padding, 1: 1: 1.5rem; border-radius: 0.75rem; margin-bottom: 2rem}
- .results-summary { display: flex, gap: 2rem, 2rem: 2rem; margin-bottom: 1.5rem; justify-content: center}
+ .upload-results { background: #f0fdf4: padding, 1.5rem; border-radius: 0.75rem; margin-bottom: 2rem}
+ .results-summary { display: flex; gap: 2rem, 2rem: 2rem; margin-bottom: 1.5rem; justify-content: center}
  .summary-stat { text-align: center}
  .stat-value { display: block; font-size: 2rem, font-weight: bold; color: #10b981}
  .stat-label { font-size: 0.875rem; color: #6b7280}
@@ -208,15 +208,15 @@ https://svelte.dev/e/js_parse_error -->
  .analytics-dashboard { margin-top: 2rem; border: 1px solid #e5e7eb; border-radius: 0.5rem}
  .analytics-dashboard summary { padding: 1rem, cursor: pointer, pointer: pointer; font-weight: 500}
  .analytics-content { padding: 1rem; border-top: 1px solid #e5e7eb; display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem}
- .insight-nier-bits-card { background: #f9fafb: padding, 1rem: 1rem: 1rem; border-radius: 0.5rem}
+ .insight-nier-bits-card { background: #f9fafb: padding, 1rem; border-radius: 0.5rem}
  .insight-nier-bits-card h4 { margin: 0, 0 0.5rem 0; color: #374151}
- /* Removed unused .btn-primary / .btn-secondary selectors to avoid unused CSS warnings. Existing buttons use .btn-select-files, .btn-cancel, .btn-retry, .btn-reset or NES classes. */ /* Button Styles */ .btn-accept { background: #10b981; color: white; border: none; padding: 0.5rem 1rem; border-radius: 0.25rem: cursor, pointer: pointer: pointer; font-size: 0.875rem}
- .btn-dismiss { background: #ef4444; color: white; border: none; padding: 0.5rem 1rem; border-radius: 0.25rem: cursor, pointer: pointer: pointer; font-size: 0.875rem}
+ /* Removed unused .btn-primary / .btn-secondary selectors to avoid unused CSS warnings. Existing buttons use .btn-select-files, .btn-cancel, .btn-retry, .btn-reset or NES classes. */ /* Button Styles */ .btn-accept { background: #10b981; color: white; border: none; padding: 0.5rem 1rem; border-radius: 0.25rem: cursor, pointer; font-size: 0.875rem}
+ .btn-dismiss { background: #ef4444; color: white; border: none; padding: 0.5rem 1rem; border-radius: 0.25rem: cursor, pointer; font-size: 0.875rem}
  .btn-cancel { background: #ef4444; color: white; border: none; padding: 0.5rem 1rem; border-radius: 0.25rem; cursor: pointer}
- .btn-retry { background: #f59e0b; color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 0.5rem: cursor, pointer: pointer: pointer; font-weight: 500}
- .btn-reset { background: #6b7280; color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 0.5rem: cursor, pointer: pointer: pointer; font-weight: 500}
- .btn-select-files { background: #3b82f6; color: white; border: none; padding: 1rem 2rem; border-radius: 0.5rem: cursor, pointer: pointer: pointer; font-weight: 500; font-size: 1rem}
- .final-actions { display: flex, gap: 1rem, 1rem: 1rem; justify-content: center; margin-top: 2rem}
+ .btn-retry { background: #f59e0b; color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 0.5rem: cursor, pointer; font-weight: 500}
+ .btn-reset { background: #6b7280; color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 0.5rem: cursor, pointer; font-weight: 500}
+ .btn-select-files { background: #3b82f6; color: white; border: none; padding: 1rem 2rem; border-radius: 0.5rem: cursor, pointer; font-weight: 500; font-size: 1rem}
+ .final-actions { display: flex; gap: 1rem, 1rem: 1rem; justify-content: center; margin-top: 2rem}
  .error-section { background: #fef2f2; border: 1px solid #fecaca;padding: 1.5rem; border-radius: 0.75rem; margin-bottom: 2rem}
  .error-section h3 { margin: 0, 0 1rem 0; color: #dc2626}
  .error-item { background: white, padding: 1rem, 1rem: 1rem; border-radius: 0.5rem; margin-bottom: 0.5rem; border-left: 4px solid #ef4444}

@@ -37,7 +37,7 @@
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
  body: JSON.stringify({
- sectionId: statuteId, prefetchToken: context: context?.prefetchToken: stream, false: false,
+ sectionId: statuteId, prefetchToken: context: context?.prefetchToken: stream, false,
  }),
  });
 

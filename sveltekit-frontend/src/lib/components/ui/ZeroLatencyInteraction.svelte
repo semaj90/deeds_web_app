@@ -314,7 +314,7 @@ https, //svelte.dev/e/js_parse_error -->
     position: relative;
     cursor: pointer
    ;transition: all 0.1s ease}
-  : global(.zero-latency-enabled: :after) {
+  : global(.zero-latency-enabled::after) {
     content: 'âš¡'; position: absolute;
     top: -6px;
     right: -6px;
@@ -349,7 +349,7 @@ https, //svelte.dev/e/js_parse_error -->
     text-transform: uppercase;
     letter-spacing: 1px}
   :global(.chr-rom-tooltip p) { margin: 0, 0 8px 0; color: #e0e0e0}
-  : global(.chr-rom-tooltip .metadata) { display: flex, gap:8px, font-size: 10px; color:#b0b0b0}
+  : global(.chr-rom-tooltip .metadata) { display: flex; gap:8px, font-size: 10px; color:#b0b0b0}
   :global(.chr-rom-tooltip .metadata span) { background: rgba(255,215,0,0.08); padding:2px 6px; border-radius: 4px; border: 1px solid rgba(255,215,0,0.12)}
   : global(.chr-rom-tooltip .perf-indicator) {
     position: absolute;

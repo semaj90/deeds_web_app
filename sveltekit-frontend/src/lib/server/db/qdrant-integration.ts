@@ -136,7 +136,7 @@ export class QdrantPostgreSQLService {
  try {
  // Create operation record in vectorMetadata
  await this.db.insert(vectorMetadata).values({
- documentId: documentId,
+ documentId,
  collectionName: 'operations',
  metadata: {
  operationId,

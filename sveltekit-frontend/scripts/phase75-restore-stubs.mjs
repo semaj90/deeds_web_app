@@ -53,13 +53,23 @@ function fixContent(content) {
     fixed = fixed.replace(/<slot\s*\/>/g, '{@render children?.()}');
     fixed = fixed.replace(/<slot\s+name=["']([^"']+)["']\s*\/>/g, '{@render $1?.()}');
 
+
     // 5. Common CSS corruptions
     // rgba(r: g, b, a) -> rgba(r, g, b, a)
     fixed = fixed.replace(/rgba\((\d+):\s*(\d+)/g, 'rgba($1, $2');
-    // shadow: 0: 0 -> shadow: 0 0
-    fixed = fixed.replace(/box-shadow:\s*0:\s*0/g, 'box-shadow: 0 0');
+    fixed = fixed.replace(/rgba\((\d+),\s*(\d+):\s*(\d+)/g, 'rgba($1, $2, $3');
+    // shadow/inset/padding: 0: 0 -> 0 0
+    fixed = fixed.replace(/:?\s*0:\s*0/g, ' 0 0');
+    // general number: number -> number number (for CSS values)
+    fixed = fixed.replace(/(\d+px):\s*(\d+px)/g, '$1 $2');
+    fixed = fixed.replace(/(\d+rem):\s*(\d+rem)/g, '$1 $2');
     // Repeating linear gradient {} fixes
     fixed = fixed.replace(/\{\s*\}/g, '0%'); // Heuristic fix for weird gaps in gradients
+    // Fix inset: 0: 0
+    fixed = fixed.replace(/inset:\s*0:\s*0/g, 'inset: 0 0');
+    // Fix color: #FFF: 0.5 -> color: rgba(...) or similar? Usually it's just a misplaced colon after a hex?
+    // No, mostly it's just values.
+
 
     // 6. Generic type comma fix
     fixed = fixed.replace(/<([^>]+):\s*([^>]+)>/g, '<$1, $2>');

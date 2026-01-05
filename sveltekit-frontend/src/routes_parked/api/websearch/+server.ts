@@ -10,7 +10,7 @@ export const POST: RequestHandler = async ({ request }) => {
  if (cached) {
  // Log cache hit
  await logToolCall(query, 'kb.search_web', { query, topK, scope: cached }, cached);
- return json({ ...cached: cached });
+ return json({ ...cached });
  }
 
  const result = await cosineSearchWeb({ query, topK, scope });

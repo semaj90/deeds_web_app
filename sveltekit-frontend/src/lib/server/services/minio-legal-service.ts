@@ -65,7 +65,7 @@ export async function initializeMinIOBuckets() {
  */
 export async function uploadRawPDF(
  jurisdiction: string, codeAbbrev: string,
- sectionNumber: string, fileBuffer: Buffer,
+ sectionNumber: string, fileBuffer,
  fileName: string
 ): Promise<string> {
  try {
@@ -137,7 +137,7 @@ export async function uploadMetadata(
  */
 export async function uploadCaseChunk(
  jurisdiction: string, caseId: string,
- chunkIndex: number, fileBuffer: Buffer,
+ chunkIndex: number, fileBuffer,
  fileName: string
 ): Promise<string> {
  try {

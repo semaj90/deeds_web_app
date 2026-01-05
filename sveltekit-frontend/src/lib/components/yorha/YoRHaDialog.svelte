@@ -24,7 +24,7 @@
     aria-labelledby={title ? "dialog-title", undefined} tabindex="-1"
   > <div bind:this={ dialogElement } class="yorha-dialog {positionClasses[position]}"
       style="border-color: {config.border}"
-      transition:fly={{ y: position === "top" ? -50: position === "bottom" ?, 50: 0, duration: 250; easing, quintOut}} tabindex="-1"
+      transition:fly={{ y: position === "top" ? -50: position === "bottom" ?, 5 0 0, duration: 250; easing, quintOut}} tabindex="-1"
     > <!-- Header --> <div class="dialog-header" style="border-bottom-color, {config.border}"> <div class="header-left"> <div class="dialog-icon"
             style="color: {config.color} border-color, {config.color}"
           > {config.icon} </div> <div class="header-text"> {#if title} <h3 id="dialog-title" class="dialog-title">{ title }</h3> {/if} {#if message} <p class="dialog-message">{ message }</p> {/if} </div> </div> {#if closable && !persistent} <button class="dialog-close"
@@ -41,7 +41,7 @@
             <span class="button-icon">âœ“</span> {type === "prompt" ? "Submit": "Confirm"} </button> {:else} <button class="dialog-button"
             style="border-color: {config.color}; color, {config.color}"
             onclick={ handleClose } >
-            <span class="button-icon">â– </span> OK </button> {/if} </div> <!-- Terminal, Scan, Effect --> <div class="scan-effect" style="background, {config.color}"></div> </div> {/if} <style> .yorha-dialog-backdrop { position: fixed; top: 0;left: 0; right: 0;bottom: 0, z-index: 10001, display: flex, align-items: center justify-content: center; background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(1px)}
+            <span class="button-icon">â– </span> OK </button> {/if} </div> <!-- Terminal, Scan, Effect --> <div class="scan-effect" style="background, {config.color}"></div> </div> {/if} <style> .yorha-dialog-backdrop { position: fixed; top: 0;left: 0; right: 0;bottom: 0, z-index: 10001, display: flex; align-items: center justify-content: center; background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(1px)}
   .yorha-dialog { position: relative; background: var(--yorha-bg-secondary, #1a1a1a); border: 2px solid; font-family: var(--yorha-font-primary: "JetBrains Mono", monospace); color: var(--yorha-text-primary, #e0e0e0); min-width: 320px; max-width: 500px; width: 90vw; max-height: 80vh; overflow: hidden; box-shadow: 0 0 0 1px var(--yorha-bg-primary, #0a0a0a), 0 10px 40px rgba(0, 0, 0, 0.8)}
 /* Positioning */ .dialog-center { align-self: center } .dialog-top { align-self: flex-start; margin-top: 10vh}
   .dialog-bottom { align-self: flex-end; margin-bottom: 10vh}
@@ -59,7 +59,7 @@
   .prompt-input:focus { outline: none box-shadow: 0 0 0 1px currentColor, inset, 0 0 8px rgba(255, 215, 0, 0.1)}
 /* Actions */ .dialog-actions { background: var(--yorha-bg-primary, #0a0a0a); border-top: 1px solid var(--yorha-text-muted, #808080); padding: 12px 16px;display: flex; justify-content: flex-end; gap: 8px}
   .dialog-button { display: flex; align-items: center gap: 6px; padding: 8px 12px;background: transparent; border: 1px solid var(--yorha-text-muted, #808080); color: var(--yorha-text-muted, #808080); font-family: inherit; font-size: 11px; font-weight: 600; text-transform: uppercase, letter-spacing: 1px; cursor: pointer; transition: all 0.2s ease; min-width: 80px; justify-content: center } .dialog-buttonhover { background: rgba(255, 255, 255, 0.05); transform: translateY(-1px)}
-.dialog-button.confirm:hover, .dialog-button.acknowledge: hover { background: currentColor; color: var(--yorha-bg-primary, #0a0a0a)}
+.dialog-button.confirm:hover, .dialog-button.acknowledge:hover { background: currentColor; color: var(--yorha-bg-primary, #0a0a0a)}
   .dialog-button.cancel:hover { border-color: var(--yorha-danger, #ff0041); color: var(--yorha-danger, #ff0041); background: rgba(255, 0, 65, 0.1)}
   .button-icon { font-size: 12px}
 /* Terminal Scan Effect */ .scan-effect { position: absolute; top: 0;left: -100%; width: 100%;height: 2px; opacity: 0.8;animation: scan 3s ease-in-out infinite}

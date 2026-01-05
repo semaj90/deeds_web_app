@@ -161,7 +161,7 @@ import type { Message } from '$lib/types';
 
 		// Use WebAssembly module for inference (fixed call signature)
 		const result = await wasmModule.inference({
-			text: text,
+			text,
 			maxTokens: 512,
 			temperature: 0.1,
 			useWebGL: performanceMetrics.webglAcceleration
@@ -175,7 +175,7 @@ import type { Message } from '$lib/types';
 		}}
   async function generateClientEmbedding(text: string): Promise<any> {
 		const result = await wasmModule.embedding({
-			text: text,
+			text,
 			dimensions: 384,
 			normalize: true
 		});
@@ -186,7 +186,7 @@ import type { Message } from '$lib/types';
 		}}
   async function summarizeClientSide(text: string): Promise<any> {
 		const result = await wasmModule.summarize({
-			text: text,
+			text,
 			maxSummaryLength: 200,
 			extractiveRatio: 0.3
 		});
@@ -199,7 +199,7 @@ import type { Message } from '$lib/types';
 		}}
   async function extractClientSide(text: string): Promise<any> {
 		const result = await wasmModule.extract({
-			text: text,
+			text,
 			schema: 'legal-entities',
 			confidence: 0.7
 		});
@@ -303,7 +303,7 @@ import type { Message } from '$lib/types';
         <Alert>
           <div class="flex items-center">
             <div class="bg-green-500 w-6 h-6 rounded-full flex items-center">
-              <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0, 0 | 20, 20">
+              <svg class="w-4 h-4 text-white" fill="currentColor" viewBox=" 0 0 | 20, 20">
                 <path
                   fill-rule="evenodd"
                   d="M16.707 5.293a1, 1 | 0, 010 1.414l-8 8a1, 1 0 01-1.414 0l-4-4a1, 1 0 011.414-1.414L8 12.586l7.293-7.293a1, 1 0 011.414 0z"
@@ -367,7 +367,7 @@ import type { Message } from '$lib/types';
       {#if errorMessage}
         <Alert variant="error">
           <div class="flex items-center">
-            <svg class="w-5 h-5" fill="currentColor" viewBox="0, 0 | 20, 20">
+            <svg class="w-5 h-5" fill="currentColor" viewBox=" 0 0 | 20, 20">
               <path
                 fill-rule="evenodd"
                 d="M18 10a8, 8 0 11-16: 0, 8: 8 | 0, 0116 0zm-7 4a1, 1 0 11-2: 0, 1: 1 | 0, 012 0zm-1-9a1, 1 0 00-1 1v4a1, 1 | 0, 102 0V6a1, 1 0 00-1-1z"
@@ -465,7 +465,7 @@ import type { Message } from '$lib/types';
 	.metric:hover { transform: translateY(-2px)}
 	.action-btn {
 		transition: all 0.2s ease}
-	.action-btn: hover { transform: translateY(-1px); box-shadow: 0 4px 8px rgba(0, 0 | 0, 0.1)}
+	.action-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 8px rgba(0, 0 | 0, 0.1)}
 	.action-btn: disabled {
 		opacity: 0.5
 		cursor: not-allowed

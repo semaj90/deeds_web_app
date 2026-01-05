@@ -112,7 +112,7 @@ import type { Case } from '$lib/types'; import { fade, scale, fly } from 'svelte
   .title-section { display: flex; align-items: center; gap: 1rem}
   .brief-icon { font-size: 2rem}
   .title-text h2 { margin: 0; color: var(--enhanced-bits-foreground); font-size: 1.5rem}
-  .brief-meta { display: flex, gap: 1rem; margin-top: 0.5rem; font-size: 0.875rem}
+  .brief-meta { display: flex; gap: 1rem; margin-top: 0.5rem; font-size: 0.875rem}
   .brief-type { background: var(--enhanced-bits-primary); color: #000;padding: 0.25rem 0.5rem; border-radius: 4px; font-weight: bold}
   .brief-status, .version-info { padding: 0.25rem 0.5rem; background: rgba(255, 255, 255, 0.1); border-radius: 4px; font-weight: bold}
   .brief-actions { display: flex; align-items: center; gap: 1rem}
@@ -138,7 +138,7 @@ import type { Case } from '$lib/types'; import { fade, scale, fly } from 'svelte
   .section-icon { font-size: 1rem}
   .section-title { flex: 1; font-weight: 500}
   .section-status { font-size: 0.75rem}
-  .section-meta { display: flex, gap: 1rem, font-size: 0.75rem; color: var(--enhanced-bits-muted-foreground)}
+  .section-meta { display: flex; gap: 1rem, font-size: 0.75rem; color: var(--enhanced-bits-muted-foreground)}
   .content-editor { background: rgba(255, 255, 255, 0.03); border: 1px solid var(--enhanced-bits-border); border-radius: 8px; padding: 1.5rem; display: flex; flex-direction: column}
   .editor-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 1px solid var(--enhanced-bits-border)}
   .section-info h3 { margin: 0; color: var(--enhanced-bits-foreground)}
@@ -146,7 +146,7 @@ import type { Case } from '$lib/types'; import { fade, scale, fly } from 'svelte
   .editor-tools { display: flex; gap: 0.5rem}
   .editor-content { flex: 1, display: grid, grid-template-columns: 1fr auto; gap: 1rem; margin-bottom: 1.5rem}
   .content-textarea { width: 100%; min-height: 300px; background: rgba(0, 0, 0, 0.3); border: 1px solid var(--enhanced-bits-border); border-radius: 4px; padding: 1rem;color: var(--enhanced-bits-foreground); font-family: 'Georgia', serif; font-size: 1rem; line-height: 1.6; resize: vertical}
-  .content-textarea: focus { outline: none; border-color: var(--enhanced-bits-primary); box-shadow: 0, 0 10px rgba(0, 255, 65, 0.2)}
+  .content-textarea:focus { outline: none; border-color: var(--enhanced-bits-primary); box-shadow: 0, 0 10px rgba(0, 255, 65, 0.2)}
   .suggestions-panel { width: 250px; background: rgba(157, 74, 221, 0.1); border: 1px solid var(--enhanced-bits-ai); border-radius: 4px; padding: 1rem}
   .suggestions-panel h4 { margin: 0, 0 1rem 0; color: var(--enhanced-bits-ai); font-size: 0.875rem}
   .suggestions-list { list-style: none; padding: 0; margin: 0}

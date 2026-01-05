@@ -100,8 +100,8 @@
 
  try {
  const request: PhoenixWrightSearchRequest = {
- caseId: query, searchQuery: searchQuery,
- jurisdiction, jurisdiction || undefined: detectContradictions, true: true, true:
+ caseId: query, searchQuery,
+ jurisdiction, jurisdiction || undefined: detectContradictions, true, true:
  includeTestimony: true, maxResults: 10 10,
  searchScope: 'broad'
  };
@@ -195,7 +195,7 @@
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
  body: JSON.stringify({
- caseId: result, searchResult: searchResult,
+ caseId: result, searchResult,
  format: 'pdf'
  })
  });

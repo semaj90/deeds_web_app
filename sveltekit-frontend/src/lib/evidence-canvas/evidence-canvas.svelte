@@ -19,7 +19,7 @@ https://svelte.dev/e/js_parse_error -->
  import GraphControlPanel from './graph-control-panel.svelte';
  import { graphLayoutGPU } from './graph-layout-gpu';
  import { webgpuInitService } from './webgpu-init-service';
- type EvidenceEdge = { source: string, target: string: string };
+ type EvidenceEdge = { source: string, target: string };
 
  let { caseId, caseType = 'general', jurisdiction = 'general', initialNodes = [], initialEdges = [] } = $props<{ caseId: string; caseType?: string; jurisdiction?: string; initialNodes?: EvidenceNode[]; initialEdges?: EvidenceEdge[]; }>();
 

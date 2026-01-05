@@ -36,7 +36,7 @@
  function handleStartReview() {
  crew.startReview({
  taskId: `review-${Date.now()}`,
- documentId: assignedAgents, selectedAgents: selectedAgents,
+ documentId: assignedAgents, selectedAgents,
  priority: taskPriority
  });
  }

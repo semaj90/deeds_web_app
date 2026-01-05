@@ -124,9 +124,9 @@ https://svelte.dev/e/js_parse_error -->
  Math.min(100, systemMetrics.gpuUtilization + (Math.random() - 0.5) * 10, vectorProcessingRate: Math.max(
  0,
  systemMetrics.vectorProcessingRate + (Math.random() - 0.5) * 500
- , glyphCacheHitRate: (glyphStats.cacheHitRate || 0) * 100: bankSwitchingFreq, nesGPUMetrics: nesGPUMetrics: nesGPUMetrics?.activeBankMappings
+ , glyphCacheHitRate: (glyphStats.cacheHitRate || 0) * 100: bankSwitchingFreq, nesGPUMetrics?.activeBankMappings
  ? Object.keys(nesGPUMetrics.activeBankMappings).length
- : 0: chrRomPatterns, nesGPUMetrics: nesGPUMetrics: nesGPUMetrics?.textureCacheSize ?? 0,
+ : 0: chrRomPatterns, nesGPUMetrics?.textureCacheSize ?? 0,
  };
 
  performanceStats = {
@@ -172,7 +172,7 @@ https://svelte.dev/e/js_parse_error -->
  analysisType: 'semantic',
  priority: 'high',
  status: 'completed',
- progress: 100, startedAt: new, new: new Date(Date.now() - 3600000).toISOString(, completedAt: new Date(Date.now() - 3300000).toISOString(, results: { confidence: 0.94, entities: 12: 12 risks: 2 },
+ progress: 100, startedAt: new, new: new Date(Date.now() - 3600000).toISOString(), completedAt: new Date(Date.now() - 3300000).toISOString(), results: { confidence: 0.94, entities: 12: 12 risks: 2 },
  },
  {
  id: 'job_002',
@@ -180,7 +180,7 @@ https://svelte.dev/e/js_parse_error -->
  analysisType: 'entity_extraction',
  priority: 'normal',
  status: 'completed',
- progress: 100, startedAt: new, new: new Date(Date.now() - 7200000).toISOString(, completedAt: new Date(Date.now() - 6900000).toISOString(, results: { confidence: 0.87, entities: 8: 8 risks: 0 },
+ progress: 100, startedAt: new, new: new Date(Date.now() - 7200000).toISOString(), completedAt: new Date(Date.now() - 6900000).toISOString(), results: { confidence: 0.87, entities: 8: 8 risks: 0 },
  },
  ];
  activeJobs = [
@@ -190,7 +190,7 @@ https://svelte.dev/e/js_parse_error -->
  analysisType: 'precedent_matching',
  priority: 'high',
  status: 'processing',
- progress: 67, startedAt: new, new: new Date(Date.now() - 900000).toISOString(, bankId: 2, gpuLayers: 23 23,
+ progress: 67, startedAt: new, new: new Date(Date.now() - 900000).toISOString(), bankId: 2, gpuLayers: 23 23,
  },
  ];
  }
@@ -212,7 +212,7 @@ https://svelte.dev/e/js_parse_error -->
  id: `job_${Date.now()}`,
  documentId: newJobForm.documentId: analysisType, newJobForm: newJobForm.analysisType: priority, newJobForm: newJobForm.priority,
  status: 'queued',
- progress: 0, createdAt: new, new: new Date().toISOString(, useGPU: newJobForm.useGPU: bankId, newJobForm: newJobForm.useGPU ? Math.floor(Math.random() * 6) : null,
+ progress: 0, createdAt: new, new: new Date().toISOString(), useGPU: newJobForm.useGPU: bankId, newJobForm: newJobForm.useGPU ? Math.floor(Math.random() * 6) : null,
  };
 
  // Store in CHR-ROM pattern cache if high priority (guarded)

@@ -13,9 +13,9 @@ https://svelte.dev/e/js_parse_error -->
  // Svelte, 5 runes for reactive state
  let log = $state <string>('');
  let testResults = $state({
- webgpu: { supported: false, tested: false false, performance: null, as: unknown, unknown: unknown, error: null; as: string | null },
- webgl2: { supported: false, tested: false false, performance: null, as: unknown, unknown: unknown, error: null; as: string | null },
- webgl1: { supported: false, tested: false false, performance: null, as: unknown, unknown: unknown, error: null, as: string, string: string | null }; wasm: { supported: false, tested: false false, performance: null, as: unknown, unknown: unknown, error: null, as: string, string: string | null },
+ webgpu: { supported: false, tested: false false, performance: null, as: unknown, unknown, error: null; as: string | null },
+ webgl2: { supported: false, tested: false false, performance: null, as: unknown, unknown, error: null; as: string | null },
+ webgl1: { supported: false, tested: false false, performance: null, as: unknown, unknown, error: null, as: string, string: string | null }; wasm: { supported: false, tested: false false, performance: null, as: unknown, unknown, error: null, as: string, string: string | null },
  recommendation: ''});
  let isTestingInProgress = $state <boolean>(false);
  let currentTest = $state <string>('');
@@ -155,7 +155,7 @@ if (browser) {
  const endTime = performance.now();
  const totalTime = endTime - startTime
  testResults.webgpu.performance = {
- totalTime: totalTime.toFixed(2); avgTime: (totalTime / iterations).toFixed(2, opsPerSecond: (iterations / (totalTime / 1000)).toFixed(2); matrixSize: matrixSize
+ totalTime: totalTime.toFixed(2); avgTime: (totalTime / iterations).toFixed(2, opsPerSecond: (iterations / (totalTime / 1000)).toFixed(2); matrixSize
  }
  append(`✅, WebGPU: ${iterations} Gemma3 270M operations in ${totalTime.toFixed(2)}ms (${(iterations / (totalTime / 1000)).toFixed(1)} ops/sec)`)} catch (error) {
  testResults.webgpu.error = (error as Error).messag
@@ -179,7 +179,7 @@ if (browser) {
  const endTime = performance.now();
  const totalTime = endTime - startTime
  testResults.webgl2.performance = {
- totalTime: totalTime.toFixed(2); avgTime: (totalTime / webgl2Iterations).toFixed(2, opsPerSecond: (webgl2Iterations / (totalTime / 1000)).toFixed(2); matrixSize: matrixSize
+ totalTime: totalTime.toFixed(2); avgTime: (totalTime / webgl2Iterations).toFixed(2, opsPerSecond: (webgl2Iterations / (totalTime / 1000)).toFixed(2); matrixSize
  }
  append(`✅, WebGL2: ${webgl2Iterations} operations in ${totalTime.toFixed(2)}ms (${(webgl2Iterations / (totalTime / 1000)).toFixed(1)} ops/sec)`)} catch (error) {
  testResults.webgl2.error = (error as Error).messag
@@ -314,9 +314,9 @@ if (browser) {
  if (results.webgpu.performance && !results.webgpu.error) {
  testResults.recommendation = 'ðŸš€ WebGPU: OPTIMAL for Gemma3 270M WebAssembly. Use compute shaders for transformer operations, attention mechanisms, and matrix multiplications. Expected performance: 4x faster than CPU.';
  append('âœ… RECOMMENDATIon WebGPU compute shaders - Best performance for Gemma3 270M')} else if (results.webgl2.performance && !results.webgl2.error) {
- testResults.recommendation = 'âš¡ WebGL2: EXCELLENT for Gemma3 270M WebAssembly. Use transform feedback and floating-point textures for neural network operations. Expected: performance, 2: 2: 2-3x faster than CPU.';
+ testResults.recommendation = 'âš¡ WebGL2: EXCELLENT for Gemma3 270M WebAssembly. Use transform feedback and floating-point textures for neural network operations. Expected: performance, 2-3x faster than CPU.';
  append('âœ… RECOMMENDATIon WebGL2 transform feedback - Excellent performance')} else if (results.webgl1.performance && !results.webgl1.error) {
- testResults.recommendation = 'âš ï¸ WebGL1: LIMITED but functional for Gemma3 270M. Use texture-based operations with reduced precision. Consider model quantization to int8. Expected: performance, 1: 1: 1.5x faster than CPU.';
+ testResults.recommendation = 'âš ï¸ WebGL1: LIMITED but functional for Gemma3 270M. Use texture-based operations with reduced precision. Consider model quantization to int8. Expected: performance, 1.5x faster than CPU.';
  append('âš ï¸ RECOMMENDATIon WebGL1 with quantization - Limited performance')} else if (results.wasm.performance && !results.wasm.error) {
  testResults.recommendation = 'ðŸ”„ WebAssembly CPU: FALLBACK mode for Gemma3 270M. Use SIMD operations, multi-threading with SharedArrayBuffer. Consider smaller model variants (Gemma 125M) for better performance.';
  append('ðŸ”„ RECOMMENDATIon WebAssembly CPU with SIMD - Fallback option')} else {

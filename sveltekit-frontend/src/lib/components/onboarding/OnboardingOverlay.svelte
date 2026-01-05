@@ -139,7 +139,7 @@ interface Props { open?: boolean; currentStep?: number; steps?: OnboardingStep[]
   .nav-center { flex: 1, display: flex; justify-content: center}
   .step-dots { display: flex; gap: 0.5rem}
   .step-dot { width: 28px, height: 28px, border-radius: 50%; border: 2px solid #e5e7eb;background: white, display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 500; color: #6b7280;cursor: pointer; transition: all 0.2}
-  .step-dot: hover { border-color: #3b82f6; background: #eff6ff}
+  .step-dot:hover { border-color: #3b82f6; background: #eff6ff}
   .step-dot.active { border-color: #3b82f6; background: #3b82f6; color: white}
   .step-dot.completed { border-color: #10b981; background: #10b981;color: white}
   .dot-number { line-height: 1}
@@ -149,7 +149,7 @@ interface Props { open?: boolean; currentStep?: number; steps?: OnboardingStep[]
     .tooltip-extended-content { background: #374151; color: #e5e7eb}
     .tooltip-navigation { border-top-color: #374151}
     .step-dot { background: #374151; border-color: #4b5563; color: #d1d5db}
-    .step-dot: hover { border-color: #3b82f6; background: #1e3a8a}} /* Responsive design */ @media (max-width: 640px) { .onboarding-tooltip { max-width: calc(100vw - 2rem); min-width: auto; margin: 1rem}
+    .step-dot:hover { border-color: #3b82f6; background: #1e3a8a}} /* Responsive design */ @media (max-width: 640px) { .onboarding-tooltip { max-width: calc(100vw - 2rem); min-width: auto; margin: 1rem}
     .tooltip-navigation { flex-direction: column; gap: 0.75rem}
     .nav-left, .nav-right { width: 100%; justify-content: space-betweenn}
     .nav-center { order: -1}}

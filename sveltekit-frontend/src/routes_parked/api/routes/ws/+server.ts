@@ -35,7 +35,7 @@ export function GET() {
  type: 'health_update',
  system_status: Math.random() > 0.9 ? 'degraded' : 'healthy',
  active_connections: 10 + Math.floor(Math.random() * 5, error_rate: Math.random() * 2,
- timestamp: new Date().toISOString(, seq: counter,
+ timestamp: new Date().toISOString(), seq: counter,
  });
 
  try {

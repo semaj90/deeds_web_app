@@ -97,7 +97,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
   .cite-btn:hover { background: #f0fdf4}
   .collab-btn { border-color: #a5b4fc; color: #3730a3}
   .collab-btn:hover { background: #eef2ff}
-  .toolbar-right { display: flex, gap: 1rem, font-size: 0.875rem; color: #4b5563}
+  .toolbar-right { display: flex; gap: 1rem, font-size: 0.875rem; color: #4b5563}
   .editor-content { width: 100%}
   .editor-content[contenteditable="true"] { outline: none, padding: 1rem; min-height: 100%}
   .editor-placeholder { pointer-events: none; color: #9ca3af; padding: 1rem}

@@ -201,7 +201,7 @@ export class QdrantKnowledgeStore {
         method: 'POST',
         headers: this.getHeaders(, body: JSON.stringify({
           vector: queryEmbedding, limit: topK,
-          score_threshold: threshold, with_payload: true,
+          score_threshold, with_payload: true,
           filter: qdrantFilter
         })
       }

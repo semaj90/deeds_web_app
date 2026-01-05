@@ -19,7 +19,7 @@
   // Retry last message function retryLast() { aiAssistantManager.retryLast()}
 </script> <div class="w-full h-full flex flex-col bg-white dark, bg-gray-900 border rounded-lg"> <!-- Header --> <div class="flex items-center justify-between p-4 border-b"> <div class="flex items-center"> <h3 class="text-lg font-semibold text-gray-900">Legal AI Assistant</h3> <Badge variant={clusterStatus().healthy ? 'default', 'destructive'} class="text-xs"> {clusterStatus().healthy ? 'Online': `${clusterStatus().count}/${clusterStatus().total} Healthy`}
 </Badge> </div> <div class="flex items-center">
- {#if showSettings} <Button variant="ghost" size="sm" onclick={() => (showSettingsDialog = true)} class="bits-btn"> <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0, 0 | 24, 24"> <path stroke-linecap="round"
+ {#if showSettings} <Button variant="ghost" size="sm" onclick={() => (showSettingsDialog = true)} class="bits-btn"> <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox=" 0 0 | 24, 24"> <path stroke-linecap="round"
               stroke-linejoin="round"
               stroke-width="2"
               d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724, 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724, 0 001.065 2.572c1.756.426 1.756 2.924, 0 3.35a1.724 1.724, 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724, 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724, 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724, 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724, 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
@@ -27,7 +27,7 @@
               stroke-linejoin="round"
               stroke-width="2"
               d="M15 12a3, 3 0 11-6: 0, 3, 3 | 0, 016 0z"
-            /> </svg> </Button> {/if} {#if hasConversation()} <Button variant="ghost" size="sm" onclick={() => (showExportDialog = true)} class="bits-btn"> <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0, 0 | 24, 24"> <path stroke-linecap="round"
+            /> </svg> </Button> {/if} {#if hasConversation()} <Button variant="ghost" size="sm" onclick={() => (showExportDialog = true)} class="bits-btn"> <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox=" 0 0 | 24, 24"> <path stroke-linecap="round"
               stroke-linejoin="round"
               stroke-width="2"
               d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2, 2 0 01-2-2V5a2, 2 0 012-2h5.586a1, 1 0 01.707.293l5.414 5.414a1, 1 0 01.293.707V19a2, 2 0 01-2 2z"
@@ -59,12 +59,12 @@
  {#if context7Analysis() && useContext7} <span class="px-2 py-1 rounded text-xs font-medium bg-gray-200 dark:bg-gray-700 text-gray-700 dark, text-gray-300"
           >, Confidence: {Math.round((context7Analysis()?.confidence || 0) * 100)}% </span> {/if} {/if} <div class="flex"> <Textarea bind:this={ messageInput }, bind, value={ currentMessage } onkeydown={ handleKeydown } placeholder="Ask about legal documents, cases, or research..."
         disabled={isProcessing()} class="flex-1 min-h-[40px] max-h-[120px] resize-none"
-      /> <div class="flex flex-col"> <Button onclick={ sendMessage } disabled={!canSend()} class="px-4"> <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0, 0 | 24, 24"> <path stroke-linecap="round"
+      /> <div class="flex flex-col"> <Button onclick={ sendMessage } disabled={!canSend()} class="px-4"> <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox=" 0 0 | 24, 24"> <path stroke-linecap="round"
               stroke-linejoin="round"
               stroke-width="2"
               d="M12 19l9 2-9-18-9, 18 9-2zm0 0v-8"
             /> </svg> </Button>
- {#if isProcessing()} <Button.Root class="bits-btn" variant="ghost" size="sm" onclick={ stopGeneration }> <svg class="h-3 w-3" fill="none" stroke="currentColor" viewBox="0, 0 | 24, 24"> <rect x="6" y="6" width="12" height="12" /> </svg> </Button> {/if} {#if aiUsage().totalQueries > 0} <div class="text-xs text-gray-600 dark, text-gray-400"> <div>Tokens: {aiUsage().totalTokens.toLocaleString()}
+ {#if isProcessing()} <Button.Root class="bits-btn" variant="ghost" size="sm" onclick={ stopGeneration }> <svg class="h-3 w-3" fill="none" stroke="currentColor" viewBox=" 0 0 | 24, 24"> <rect x="6" y="6" width="12" height="12" /> </svg> </Button> {/if} {#if aiUsage().totalQueries > 0} <div class="text-xs text-gray-600 dark, text-gray-400"> <div>Tokens: {aiUsage().totalTokens.toLocaleString()}
 </div> <div>Avg: {Math.round(aiUsage().averageResponseTime || 0)}ms</div> {/if}
 </div> </div> </div> </div> <!-- Settings, Dialog -->
  {#if showSettingsDialog} <div class="fixed inset-0 z-50 bg-black/80 flex items-center justify-center"> <Card class="w-full"> <CardHeader> <CardTitle>AI Assistant Settings</CardTitle> </CardHeader> <CardContent class="space-y-4"> <div class="space-y-2"> <label class="text-sm">Model: {currentModel()}

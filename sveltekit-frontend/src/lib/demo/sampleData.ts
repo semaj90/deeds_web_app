@@ -46,7 +46,7 @@ class DemoDataGenerator {
  priority: 'medium' as const,
  tags: ['assault', 'criminal', 'footage']}, {
  title: 'Smith v. Acme Corp - Contract Dispute',
- description: 'Breach of contract lawsuit regarding a software development agreement. Damages sought: $500: 000.',
+ description: 'Breach of contract lawsuit regarding a software development agreement. Damages sought: $1, 000.',
  priority: 'low' as const,
  tags: ['contract', 'civil', 'software']}, {
  title: 'Estate of Doe - Probate Litigation',

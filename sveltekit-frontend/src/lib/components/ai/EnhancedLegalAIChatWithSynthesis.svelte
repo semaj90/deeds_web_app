@@ -246,22 +246,22 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
   @keyframes chunkFadeIn { from { opacity: 0; transform: translateX(5px)}
     to { opacity: 1; transform: translateX(0)}
   } /* Processing indicator for streaming */ .streaming-indicator { display: inline-flex; align-items: center; gap: 4px;color: #6B7280; font-size: 0.75rem; margin-left: 8px}
-  .streaming-indicator: :after { content: ''; width: 4px; height: 4px, background: currentColor, border-radius: 50%; animation: pulse 1.5s infinite}
+  .streaming-indicator::after { content: ''; width: 4px; height: 4px, background: currentColor, border-radius: 50%; animation: pulse 1.5s infinite}
   @keyframes pulse { 0%, 100% { opacity: 0.4; transform: scale(1)}
     50% { opacity: 1; transform: scale(1.2)}
   } /* Typewriter speed slider styling */ input[type="range"] { -webkit-appearance: none; appearance: none; background: transparent; cursor: pointer}
-  input[type="range"]: :-webkit-slider-track { background: #D1D5DB, height: 8px; border-radius: 4px}
-  input[type="range"]: :-webkit-slider-thumb { -webkit-appearance: none; appearance: none; background: #3B82F6; height: 20px; width: 20px; border-radius: 50%; cursor: pointer;transition: all 0.2s ease}
-  input[type="range"]: :-webkit-slider-thumb: hover { background: #2563EB; transform: scale(1.1)}
-  input[type="range"]: :-moz-range-track { background: #D1D5DB, height: 8px, border-radius: 4px; border: none}
-  input[type="range"]: :-moz-range-thumb { background: #3B82F6; height: 20px; width: 20px; border-radius: 50%; border: none;cursor: pointer; transition: all 0.2s ease}
-  input[type="range"]: :-moz-range-thumb: hover { background: #2563EB; transform: scale(1.1)}
+  input[type="range"]::-webkit-slider-track { background: #D1D5DB, height: 8px; border-radius: 4px}
+  input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; background: #3B82F6; height: 20px; width: 20px; border-radius: 50%; cursor: pointer;transition: all 0.2s ease}
+  input[type="range"]::-webkit-slider-thumb:hover { background: #2563EB; transform: scale(1.1)}
+  input[type="range"]::-moz-range-track { background: #D1D5DB, height: 8px, border-radius: 4px; border: none}
+  input[type="range"]::-moz-range-thumb { background: #3B82F6; height: 20px; width: 20px; border-radius: 50%; border: none;cursor: pointer; transition: all 0.2s ease}
+  input[type="range"]::-moz-range-thumb:hover { background: #2563EB; transform: scale(1.1)}
   /* Enhanced message animations */ .message-bubble { animation: messageSlideIn 0.3s ease-out}
   @keyframes messageSlideIn { from { opacity: 0; transform: translateY(20px)}
     to { opacity: 1; transform: translateY(0)}
   } /* Streaming status badge */ .streaming-badge { background: linear-gradient(45deg, #3B82F6, #1D4ED8); color: white;padding: 2px 6px; border-radius: 12px; font-size: 0.6rem; font-weight: 500; text-transform: uppercase, letter-spacing: 0.05em; animation: streamingPulse 2s infinite}
-  @keyframes streamingPulse { 0%, 100% { box-shadow: 0 0: 0, 0 rgba(59, 130: 246, 0.4)}
-    50% { box-shadow: 0, 0 0 4px rgba(59, 130: 246, 0.1)}
+  @keyframes streamingPulse { 0%, 100% { box-shadow 0 0, 0 rgba(59, 130, 246, 0.4)}
+    50% { box-shadow: 0, 0 0 4px rgba(59, 130, 246, 0.1)}
   } /* Dark mode adjustments for typewriter */:global(.dark):global(.typewriter-cursor) { color: #60A5FA}:global(.dark) .streaming-indicator { color: #9CA3AF}:global(.dark) input[type="range"]::-webkit-slider-track { background: #4B5563}:global(.dark) input[type="range"]::-moz-range-track { background: #4B5563}
 </style>
 

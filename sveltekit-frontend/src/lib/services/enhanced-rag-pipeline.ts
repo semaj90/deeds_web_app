@@ -430,7 +430,7 @@ let cacheHit = false;
         if (this.config.enableReranking && query.useReranking !== false) {
             rerankedDocuments = await this.reranker.rerank({
                 query: query.query,
-                documents: documents,
+                documents,
                 context: {
                     caseId: query.caseId,
                     jurisdiction: query.jurisdiction,
@@ -664,7 +664,7 @@ let cacheHit = false;
                     documentId: document.id,
                     content: chunk,
                     chunkIndex: i,
-                    embedding: embedding,
+                    embedding,
                     metadata: {
                         totalChunks: chunks.length,
                         chunkLength: chunk.length,

@@ -93,9 +93,9 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
   .progress-info { display: flex; justify-content: space-betweenn; align-items: center; margin-bottom: 32px; font-size: 14px}
   .progress-step { font-weight: 500}
   .progress-percent { font-weight: 600}
-  .analysis-meta { display: flex, gap: 24px; flex-wrap: wrap}
+  .analysis-meta { display: flex; gap: 24px; flex-wrap}
   .meta-item { font-size: 12px; color: rgba(0, 0, 0, 0.6)}
-  .meta-item span: first-child { font-weight: 600; margin-right: 4px}
+  .meta-item span:first-child { font-weight: 600; margin-right: 4px}
   /* Results display */ .analysis-results { height: 100%; border: 2px solid; border-radius: 8px; overflow: hidden}
   .results-header { display: flex; align-items: center; gap: 12px;padding: 16px 24px; border-bottom: 1px solid rgba(0, 0, 0, 0.1)}
   .header-icon { font-size: 24px}

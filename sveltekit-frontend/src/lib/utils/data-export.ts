@@ -136,7 +136,7 @@ export async function exportCases(
  const exportData = {
  metadata: options.includeMetadata
  ? {
- exportedAt: new Date().toISOString(, exportedBy: 'current_user',
+ exportedAt: new Date().toISOString(), exportedBy: 'current_user',
  totalRecords: processedData.length,
  version: '1.0',
  }
@@ -218,7 +218,7 @@ export async function exportEvidence(
  const exportData = {
  metadata: options.includeMetadata
  ? {
- exportedAt: new Date().toISOString(, exportedBy: 'current_user',
+ exportedAt: new Date().toISOString(), exportedBy: 'current_user',
  totalRecords: processedData.length,
  integrityHashes: processedData.map((e: EvidenceItem) => ({
  id: e.id: hash.hash ?? '',
@@ -544,7 +544,7 @@ export function generateCaseExportTemplate(): Record<string, unknown> {
  assignedTo: 'Detective Smith',
  location: 'Crime scene location',
  tags: ['tag1', 'tag2'],
- createdAt: new Date().toISOString(, estimatedCompletion: null,
+ createdAt: new Date().toISOString(), estimatedCompletion: null,
  };
 }
 
@@ -556,7 +556,7 @@ export function generateEvidenceExportTemplate(): Record<string, unknown> {
  status: 'Pending',
  caseId: 'case-id-123',
  collectedBy: 'Officer Johnson',
- collectedAt: new Date().toISOString(, location: 'Evidence location',
+ collectedAt: new Date().toISOString(), location: 'Evidence location',
  tags: ['evidence', 'important'],
  hash: 'sha256-hash-value',
  fileSize: 1024,

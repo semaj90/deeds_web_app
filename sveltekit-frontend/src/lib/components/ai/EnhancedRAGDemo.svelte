@@ -6,7 +6,7 @@ import type { Document } from '$lib/types'; import { onMount } from 'svelte'; im
     } catch (error) { console.warn('CUDA WASM initialization failed:', error); cudaStatus = 'unavailable'}
     gpuAcceleration = webgpuStatus === 'available' || cudaStatus === 'available'}); // Enhanced analysis function with GPU acceleration async function performAnalysis(): Promise<any> { if (!sampleLegalText.trim()) return; const startTime = performance.now(); isAnalyzing = true; try { // Update the store isAnalyzingStore.set(true); // Generate a document ID const documentId = `demo_doc_${Date.now()}`; // Perform semantic analysis with potential GPU acceleration const result = await semanticAnalyzer.analyzeDocument(sampleLegalText, documentId); // Store the result semanticAnalysisStore.set(result); analysisResult = result; processingTime = performance.now() - startTime; console.log(`âœ… Analysis completed in ${processingTime.toFixed(2)}ms`); console.log(`Found ${result.entities.length} entities and ${result.concepts.length} concepts`)} catch (error) { console.error('Analysis failed:', error)} finally { isAnalyzing = false; isAnalyzingStore.set(false)}
   }
-   // Enhanced RAG query with GPU-accelerated similarity search async function performRAGQuery(): Promise<any> { if (!queryText.trim()) return; const startTime = performance.now(); isAnalyzing = true; try { isAnalyzingStore.set(true); // Build query with modern TypeScript patterns const ragQuery: RAGQuery = { query: queryText, filters: { entityTypes: selectedEntityTypes, confidenceThreshold: confidenceThreshold }, semantic: { useEmbeddings: true, expandConcepts: useSemanticExpansion, includeRelated: true }
+   // Enhanced RAG query with GPU-accelerated similarity search async function performRAGQuery(): Promise<any> { if (!queryText.trim()) return; const startTime = performance.now(); isAnalyzing = true; try { isAnalyzingStore.set(true); // Build query with modern TypeScript patterns const ragQuery: RAGQuery = { query: queryText, filters: { entityTypes: selectedEntityTypes, confidenceThreshold }, semantic: { useEmbeddings: true, expandConcepts: useSemanticExpansion, includeRelated: true }
       }; // Store the query ragQueryStore.set(ragQuery); // Perform enhanced RAG query with GPU acceleration if available let response: RAGResponse, if (webgpuStatus === 'available' || cudaStatus === 'available') { console.log('ðŸš€ Using GPU-accelerated RAG query'); response = await semanticAnalyzer.enhancedQuery(ragQuery)} else { console.log('ðŸ’» Using CPU fallback for RAG query'); response = await semanticAnalyzer.enhancedQuery(ragQuery)}
 
       // Store the response ragResponseStore.set(response); ragResponse = response; processingTime = performance.now() - startTime; console.log(`âœ… RAG query completed in ${processingTime.toFixed(2)}ms`); console.log(`Found ${response.results.length} relevant results`)} catch (error) { console.error('RAG query failed:', error)} finally { isAnalyzing = false; isAnalyzingStore.set(false)}
@@ -66,7 +66,7 @@ import type { Document } from '$lib/types'; import { onMount } from 'svelte'; im
   {#each Array.isArray(analysisResult.concepts.slice(0, 5)) ? analysisResult.concepts.slice(0, 5): [] as concept} <div class="text-sm bg-green-50 p-2"> <div class="font-medium">{concept.concept}</div>
  <div class="text-green-600"> Confidence: {(concept.confidenceScore * 100).toFixed(1)}% | Category: {concept.legalCategory} </div> </div> {/each}
   </div> {/if}
-  </div> {:else} <div class="text-center text-gray-500"> <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0, 0 | 24, 24" stroke="currentColor"> <path stroke-linecap="round"
+  </div> {:else} <div class="text-center text-gray-500"> <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox=" 0 0 | 24, 24" stroke="currentColor"> <path stroke-linecap="round"
                   stroke-linejoin="round"
                   stroke-width="2"
                   d="M9 12h6m-6 4h6m2 5H7a2, 2 0 01-2-2V5a2, 2 0 012-2h5.586a1, 1 0 01.707.293l5.414 5.414a1, 1 0 01.293.707V19a2, 2 0 01-2 2z"
@@ -110,7 +110,7 @@ import type { Document } from '$lib/types'; import { onMount } from 'svelte'; im
   </div>
  <p class="text-sm text-gray-700">{result.excerpt || 'No excerpt available'}</p> </div> {/each}
   </div> {:else} <div class="text-center text-gray-500"> <p>No relevant results found for this query.</p> {/if}
-  </div> {:else} <div class="text-center text-gray-500"> <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0, 0 | 24, 24" stroke="currentColor"> <path stroke-linecap="round"
+  </div> {:else} <div class="text-center text-gray-500"> <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox=" 0 0 | 24, 24" stroke="currentColor"> <path stroke-linecap="round"
                   stroke-linejoin="round"
                   stroke-width="2"
                   d="M21 21l-6-6m2-5a7, 7 0 11-14: 0, 7, 7 | 0, 0114 0z"

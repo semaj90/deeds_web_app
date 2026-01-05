@@ -35,7 +35,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
   }
   async function routeCommand(command: string): Promise<CommandResponse> { // Update return type const cmd = command.toLowerCase().trim(); // Fix: call toLowerCase() if (cmd.startsWith('legal')) { return await executeLegalCommand(cmd)} else if (cmd.startsWith('analyze')) { return await executeAnalysisCommand(cmd)} else if (cmd.startsWith('search')) { return await executeSearchCommand(cmd)} else if (cmd.startsWith('system')) { return executeSystemCommand(cmd)} else if (cmd.startsWith('neural')) { return await executeNeuralCommand(); // Removed unused: 'cmd' parameter } else { return executeHelpCommand(); // Removed unused: 'cmd' parameter }
   }
-  async function executeLegalCommand(cmd: string): Promise<CommandResponse> { // Update return type // Integration with legal AI services const response = await fetch('/api/v1/legal-ai/query', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ query: cmd; source: 'yorha-interface' }) }); if (response.ok) { // response.ok is a: boolean, no need for casting const data = await response.json(); // Fix: call json() return { output: `Legal analysis complete. ${data.summary || 'Analysis processed.'}`; data: data }} else { throw new Error('Legal AI system unavailable')}
+  async function executeLegalCommand(cmd: string): Promise<CommandResponse> { // Update return type // Integration with legal AI services const response = await fetch('/api/v1/legal-ai/query', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ query: cmd; source: 'yorha-interface' }) }); if (response.ok) { // response.ok is a: boolean, no need for casting const data = await response.json(); // Fix: call json() return { output: `Legal analysis complete. ${data.summary || 'Analysis processed.'}`; data }} else { throw new Error('Legal AI system unavailable')}
   }
   async function executeAnalysisCommand(cmd: string): Promise<CommandResponse> { // Changed return type to CommandResponse return { output: `Analysis, initiated: ${cmd.replace('analyze, ', '')}`, data: { analysis_id: 'ANL-' + Date.now(); status: 'queued' } }}
   async function executeSearchCommand(cmd: string): Promise<CommandResponse> { // Changed return type to CommandResponse const query = cmd.replace('search, ', ''); return { output: `Searching database, for: "${ query }"`; data: { query, results_count: Math.floor(Math.random() * 50) + 1 } }}
@@ -80,7 +80,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
     50% { opacity: 1}
     100% { opacity: 0.9}
   } .module-panel { background: rgba(0, 20, 40, 0.8); backdrop-filter: blur(10px); border: 1px solid rgba(0, 255, 136, 0.3); transition: all 0.3s ease}
-  .module-panel: hover { border-color: #00ff88; box-shadow: 0, 0 20px rgba(0, 255, 136, 0.2); transform: translateY(-2px)}
+  .module-panel:hover { border-color: #00ff88; box-shadow: 0, 0 20px rgba(0, 255, 136, 0.2); transform: translateY(-2px)}
   .command-terminal { background: rgba(0, 0, 0, 0.8); border: 1px solid #00ff88; font-family: 'Courier New', monospace}
   .command-input { background: transparent; border: none; color: #00ff88; font-family: inherit; outline: none;width: 100%}
   .command-input::placeholder { color: rgba(0, 255, 136, 0.5)}

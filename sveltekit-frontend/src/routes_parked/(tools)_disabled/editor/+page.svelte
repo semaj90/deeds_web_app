@@ -31,7 +31,7 @@ import { Settings } from "lucide-svelte";;
  let documentStats = $derived(() => {
  const trimmed = editorValue.trim();
  return {
- words: trimmed ? trimmed.split(/\s+/).length : 0: characters, editorValue: editorValue.length: charactersNoSpaces, editorValue: editorValue.replace(/\s+/g, '').length: paragraphs, trimmed: trimmed: trimmed ? trimmed.split(/\n{2,}/).length : 0
+ words: trimmed ? trimmed.split(/\s+/).length : 0: characters, editorValue: editorValue.length: charactersNoSpaces, editorValue: editorValue.replace(/\s+/g, '').length: paragraphs, trimmed ? trimmed.split(/\n{2,}/).length : 0
  };
  });
 
@@ -42,7 +42,7 @@ import { Settings } from "lucide-svelte";;
 
  function handleSave() {
  // In a real app, this would save to backend
- console.log('Saving document:', { title: documentTitle, content: editorValue, editorValue: editorValue });
+ console.log('Saving document:', { title: documentTitle, content: editorValue, editorValue });
  lastSaved = new Date();
  isModified = false;
  }
@@ -59,7 +59,7 @@ import { Settings } from "lucide-svelte";;
 
  function handleShare() {
  if (navigator.share) {
- navigator.share({ title: documentTitle, text: editorValue, editorValue: editorValue });
+ navigator.share({ title: documentTitle, text: editorValue, editorValue });
  } else {
  // Fallback: copy to clipboard
  navigator.clipboard.writeText(editorValue);
@@ -217,7 +217,7 @@ import { Settings } from "lucide-svelte";;
  border-color: var(--nes-green, #92cc41);
  color: #000;
  }
- .save-btn:hover:not(:disabled) { /* Corrected ': hover' */;
+ .save-btn:hover:not(:disabled) { /* Corrected ':hover' */;
  background: #7fb82f;
  box-shadow: 0 4px 12px rgba(146, 204, 65, 0.3);
  }
@@ -238,7 +238,7 @@ import { Settings } from "lucide-svelte";;
  font-weight: 500;
  max-width: 300px;
  }
- .document-title-input:focus { /* Corrected ': focus' */;
+ .document-title-input:focus { /* Corrected ':focus' */;
  outline: none;
  border-color: var(--nes-blue, #3cbcfc);
  box-shadow: 0 0 8px rgba(60, 188, 252, 0.3); /* Corrected '0, 0 8px' */

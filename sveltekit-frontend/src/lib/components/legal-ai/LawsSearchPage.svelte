@@ -15,7 +15,7 @@
  }
 
  let statutes: Statute[] = $state([]);
- let selectedStatute: Statute: null = $state(null);
+ let selectedStatute: null = $state(null);
  let isSearching = $state(false);
  let searchError: string | null = $state(null);
 

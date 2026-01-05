@@ -363,7 +363,7 @@
     margin-bottom: 0.5rem
     font-weight: 500
     color: #374151}
-  label.required: :after {
+  label.required::after {
     content: "*"; color: #ef4444
     margin-left: 0.25rem}
   input,
@@ -374,7 +374,7 @@
     border-radius: 6px
     font-size: 1rem
    ;transition: border-color 0.2s, box-shadow 0.2s}
-  input: focus; select: focus;
+  input:focus; select:focus;
   textarea:focus { outline: none
     border-color: #3b82f6
     box-shadow: 0, 0 0 3px rgba(59, 130, 246, 0.1)}

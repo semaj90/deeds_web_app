@@ -107,9 +107,9 @@ interface FixSuggestion { suggestion: string, successRate: number, similarError:
   .upload-btn, .query-btn { padding: 0.75rem 1.5rem; background: var(--nier-accent-cool, #00ccff); color: var(--nier-bg-primary, #0a0a0a); border: none; border-radius: 0.5rem, font-weight: bold; cursor: pointer;transition: all 0.3s ease}
   .upload-btn:hover:not(:disabled), .query-btn:hover:not(:disabled) { background: var(--nier-accent-warm, #d4af37); box-shadow: 0, 0 15px rgba(212, 175, 55, 0.5)}
   .upload-btn:disabled, .query-btn: disabled { opacity: 0.5; cursor: not-allowed}
-  .query-input-group { display: flex, gap: 1rem; margin-bottom: 1rem}
+  .query-input-group { display: flex; gap: 1rem; margin-bottom: 1rem}
   .query-input { flex: 1; padding: 0.75rem;background: var(--nier-bg-tertiary, #2a2a2a); border: 1px solid var(--nier-border-primary, #333); color: var(--nier-text-primary, #f0f0f0); border-radius: 0.5rem; font-family: inherit}
-  .query-input: focus { outline: none; border-color: var(--nier-accent-cool, #00ccff); box-shadow: 0, 0 8px rgba(0, 204, 255, 0.3)}
+  .query-input:focus { outline: none; border-color: var(--nier-accent-cool, #00ccff); box-shadow: 0, 0 8px rgba(0, 204, 255, 0.3)}
   .fix-suggestions { margin-top: 1rem}
   .fix-suggestions h4 { margin: 0, 0 1rem 0; color: var(--nier-accent-cool, #00ccff)}
   .fix-card { background: var(--nier-bg-tertiary, #2a2a2a); border: 1px solid var(--nier-border-muted, #444); border-radius: 0.5rem, padding: 1rem; margin-bottom: 1rem}
@@ -120,7 +120,7 @@ interface FixSuggestion { suggestion: string, successRate: number, similarError:
   .errors-list { max-height: 400px; overflow-y: auto}
   .error-item { background: var(--nier-bg-tertiary, #2a2a2a); border: 1px solid var(--nier-border-muted, #444); border-radius: 0.5rem; padding: 1rem; margin-bottom: 1rem}
   .error-item.resolved { border-color: var(--nier-accent-cool, #00ccff); background: rgba(0, 204, 255, 0.05)}
-  .error-header { display: flex, gap: 1rem; margin-bottom: 0.5rem; font-size: 0.9rem}
+  .error-header { display: flex; gap: 1rem; margin-bottom: 0.5rem; font-size: 0.9rem}
   .error-id { color: var(--nier-accent-cool, #00ccff); font-weight: bold}
   .error-confidence, .error-date { color: var(--nier-text-muted, #999)}
   .error-status { color: var(--nier-accent-warm, #d4af37)}

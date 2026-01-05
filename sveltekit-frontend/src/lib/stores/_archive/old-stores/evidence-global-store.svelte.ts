@@ -498,7 +498,7 @@ class EvidenceGlobalStore {
  if (!caseData) throw new Error('Case not found');
  return JSON.stringify(
  {
- case: caseData, exportedAt: new Date().toISOString(, version: '1.0',
+ case: caseData, exportedAt: new Date().toISOString(), version: '1.0',
  },
  null,
  2

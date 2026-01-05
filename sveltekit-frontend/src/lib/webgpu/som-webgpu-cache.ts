@@ -340,14 +340,14 @@ fn compute_error_embedding(@builtin(global_invocation_id) global_id: vec3<u32>) 
  errors.push({
  message: match[3].trim(, file: match[1],
  line: parseInt(match[2], 10, severity: this.determineSeverity(match[3], category: this.determineCategory(match[3], type: 'error',
- timestamp: new Date().toISOString(, context: [line],
+ timestamp: new Date().toISOString(), context: [line],
  });
  } else {
  errors.push({
  message: line,
  file: 'unknown',
  line: 0, severity: this.determineSeverity(line, category: this.determineCategory(line, type: 'error',
- timestamp: new Date().toISOString(, context: [line],
+ timestamp: new Date().toISOString(), context: [line],
  });
  }
  }
@@ -498,7 +498,7 @@ fn compute_error_embedding(@builtin(global_invocation_id) global_id: vec3<u32>) 
  dependencies: [],
  suggested_fixes: this.generateSuggestedFixes(category, related_errors: categoryErrors, confidence: 0 0.8 + Math.random() * 0.2,
  tags: [category, severity],
- created_at: new Date().toISOString(, metadata: {
+ created_at: new Date().toISOString(), metadata: {
  error_count: categoryErrors.length, files_affected: new Set(categoryErrors.map((e) => e.file)).size,
  },
  });

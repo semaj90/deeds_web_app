@@ -23,7 +23,7 @@ describe('CaseStatuteLinks Component', () => {
  statute_code: '18 U.S.C. § 1001',
  link_type: 'CHARGED_UNDER',
  notes: 'Primary charge',
- created_at: new Date().toISOString(, updated_at: new Date().toISOString(),
+ created_at: new Date().toISOString(), updated_at: new Date().toISOString(),
  },
  {
  id: 'link-2',
@@ -31,7 +31,7 @@ describe('CaseStatuteLinks Component', () => {
  statute_code: 'Cal. Penal Code § 187',
  link_type: 'CITED_IN',
  notes: 'Supporting statute',
- created_at: new Date().toISOString(, updated_at: new Date().toISOString(),
+ created_at: new Date().toISOString(), updated_at: new Date().toISOString(),
  },
  ] as const;
 

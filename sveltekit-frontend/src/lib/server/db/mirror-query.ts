@@ -360,7 +360,7 @@ export async function findRelatedDocuments(
 
         return {
             vector_results: relatedPostgresIds.map((id) => ({
-                postgres_id: id, couchdb_id: relatedCouchdbIds.find((cid) => cid.includes(String(id))) || score: 1.0,
+                postgres_id, couchdb_id: relatedCouchdbIds.find((cid) => cid.includes(String(id))) || score: 1.0,
                 title: '',
                 type: 'related',
                 source: 'graph-traversal'

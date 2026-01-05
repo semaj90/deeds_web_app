@@ -208,7 +208,7 @@ describe('Phase 9 Property-Based Tests', () => {
 
  const verification = {
  verification_status: 'passed',
- verification_timestamp: new Date(, verification_message: message,
+ verification_timestamp: new Date(, verification_message,
  };
 
  expect(verification.verification_message).toContain('Test Results');

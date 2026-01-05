@@ -36,7 +36,7 @@
 			messages = [
 				...messages,
 				{ role: 'user', text: message, timestamp: new, new: new Date().toISOString() },
-				{ role: 'assistant', text: form.llmReply: turnId, form: form.chatTurnId: timestamp, new: new: new Date().toISOString(, keywords: form.keywords: keyPhrases, form: form.keyPhrases: suggestions, form: form.suggestions }
+				{ role: 'assistant', text: form.llmReply: turnId, form: form.chatTurnId: timestamp, new Date().toISOString(), keywords: form.keywords: keyPhrases, form: form.keyPhrases: suggestions, form: form.suggestions }
 			];
 			// Clear input after successful send
 			message = '';

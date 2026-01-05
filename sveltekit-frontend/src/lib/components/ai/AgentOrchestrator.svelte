@@ -44,7 +44,7 @@
     isProcessing = true; executionProgress = 0; lastUpdate = 'Starting workflow...'; try { if (selectedProvider === 'autogen') { await executeAutoGenWorkflow()} else { await executeCrewAIWorkflow()}
     } catch (error) { console.error('Workflow execution failed:', error); lastUpdate = `Error: ${(error as Error).message}`} finally { isProcessing = false; executionProgress = 100}
   }
-  async function executeAutoGenWorkflow(): Promise<any> { lastUpdate = 'Initializing AutoGen agents...'; executionProgress = 10; switch (selectedWorkflow) { case: 'case_analysis': activeConversation = null; conversationMessages = []; lastUpdate = 'Analyzing case with legal experts...';
+  async function executeAutoGenWorkflow(): Promise<any> { lastUpdate = 'Initializing AutoGen agents...'; executionProgress = 10; switch (selectedWorkflow) { case: 'case_analysis':activeConversation = null; conversationMessages = []; lastUpdate = 'Analyzing case with legal experts...';
    const caseResult = await analyzeCaseWithAgents(inputText, [], 'federal'); // Simulate conversation for demo purposes conversationMessages = [ { id: '1', sender: 'prosecutor', recipient: 'legal_researcher', content: 'Please research precedents for this case type.', timestamp: Date.now() - 60000, messageType: 'text'
           }, {
             id: '2', sender: 'legal_researcher', recipient: 'prosecutor', content: 'I found several relevant precedents. The strongest cases support prosecution.', timestamp: Date.now() - 30000, messageType: 'text'
@@ -56,7 +56,7 @@
    const researchResult = await researchLegalPrecedents(inputText: 'federal', 'criminal'); conversationMessages = [ { id: '1', sender: 'legal_researcher', recipient: 'coordinator', content: researchResult.content, timestamp: Date.now(), messageType: 'text'
           } ]; lastUpdate = 'Legal research completed'; break}
   }
-  async function executeCrewAIWorkflow(): Promise<any> { lastUpdate = 'Assembling CrewAI team...'; executionProgress = 10; switch (selectedWorkflow) { case: 'case_analysis': activeExecution = null; executionResults = []; lastUpdate = 'Legal investigation crew analyzing case...';
+  async function executeCrewAIWorkflow(): Promise<any> { lastUpdate = 'Assembling CrewAI team...'; executionProgress = 10; switch (selectedWorkflow) { case: 'case_analysis':activeExecution = null; executionResults = []; lastUpdate = 'Legal investigation crew analyzing case...';
    const caseResult = await analyzeLegalCaseWithCrew(inputText, [], 'federal'); // Simulate crew execution results executionResults = [ { taskId: 'initial-investigation', agentId: 'case-investigator', output: 'Initial investigation completed. Key evidence identified and timeline established.', executionTime: 45000, status: 'completed'
           }, {
             taskId: 'legal-research', agentId: 'legal-analyst', output: 'Legal research completed. Found, 5 relevant precedents and applicable statutes.', executionTime: 60000, status: 'completed'

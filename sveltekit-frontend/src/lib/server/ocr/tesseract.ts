@@ -13,7 +13,7 @@ export interface OcrResult {
  * Extract text from an image file using Tesseract OCR
  */
 export async function extractTextFromImage(
- imageBuffer: Buffer, filename: string
+ imageBuffer, filename: string
 ): Promise<OcrResult> {
  const tempDir = tmpdir();
  const tempFile = path.join(tempDir, `ocr-${Date.now()}-${filename}`);

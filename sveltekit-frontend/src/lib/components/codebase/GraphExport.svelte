@@ -59,7 +59,7 @@
 				nodes,
 				edges,
 				metadata: {
-					exportedAt: new Date().toISOString(, nodeCount: nodes.length,
+					exportedAt: new Date().toISOString(), nodeCount: nodes.length,
 					edgeCount: edges.length
 				}
 			};

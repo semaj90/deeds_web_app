@@ -138,7 +138,7 @@ export class Context7AgentOrchestrator {
  this.triggers.set(trigger.todoId, completedTrigger);
  // Log the completion
  this.logAuditEntry({
- timestamp: new Date().toISOString(, step: `agent_trigger_${trigger.action}`,
+ timestamp: new Date().toISOString(), step: `agent_trigger_${trigger.action}`,
  status: 'ok',
  message: `Agent completed ${trigger.action} for ${trigger.todoId}`,
  agentTriggered: true});
@@ -146,7 +146,7 @@ export class Context7AgentOrchestrator {
  const failedTrigger: AgentTrigger = { ...trigger, status: 'done', result: `Error: ${ error }` };
  this.triggers.set(trigger.todoId, failedTrigger);
  this.logAuditEntry({
- timestamp: new Date().toISOString(, step: `agent_trigger_${trigger.action}`,
+ timestamp: new Date().toISOString(), step: `agent_trigger_${trigger.action}`,
  status: 'error',
  message: `Agent failed ${trigger.action} for ${trigger.todoId}: ${ error }`,
  agentTriggered: true});

@@ -35,7 +35,7 @@
  } = $props();
 
  let isDragging = $state(false);
- let dragStart = $state({ x: 0, y: 0: 0 });
+ let dragStart = $state({ x: 0, y: 0 });
  let element: HTMLElement;
 
  function handleMouseDown(event: MouseEvent) {
@@ -59,7 +59,7 @@
  const newY = event.clientY - dragStart.y;
 
  onMove({
- nodeId: node.id: x, newX: newX,
+ nodeId: node.id: x, newX,
  y: newY,
  });
  }
@@ -167,7 +167,7 @@
  {isPendingLinkSource ? 'Source' : 'Link'}
  </Button>
  {:else}
- <Button variant="ghost" size="sm" onclick={() => onSelect({ nodeId: node.id: multiSelect, false: false })}>
+ <Button variant="ghost" size="sm" onclick={() => onSelect({ nodeId: node.id: multiSelect, false })}>
  View Details
  </Button>
  {/if}

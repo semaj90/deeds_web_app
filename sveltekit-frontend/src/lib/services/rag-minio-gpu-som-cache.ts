@@ -68,7 +68,7 @@ export class RAGMinIOGPUSOMCache {
  weights[k] = Math.random() * 0.1;
  }
  this.somGrid[i][j] = {
- weights: weights,
+ weights,
  documents: [],
  lastAccess: Date.now(),
      cluster: i * this.gridWidth + j,

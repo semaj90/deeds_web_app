@@ -245,7 +245,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
   .tag-badge { font-size: 0.75rem}
   .result-actions { display: flex; gap: 0.5rem}
   .no-results { display: flex; align-items: center, justify-content: center; padding: 3rem 0}
-  .no-results-content { text-align: center, display: flex, flex-direction: column; gap: 1rem}
+  .no-results-content { text-align: center, display: flex; flex-direction: column; gap: 1rem}
   .no-results-icon { margin: 0 auto; color: var(--muted-foreground)}
   .no-results-title { font-size: 1.125rem; font-weight: 500}
   .no-results-description { color: var(--muted-foreground)}

@@ -39,12 +39,12 @@ import type { User } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
   .rating-label { margin: 0, 0 12px 0; color: #555; font-size: 14px}
   .star-rating { display: flex; justify-content: center; gap: 4px}
   .star { background: none, border: none, font-size: 32px; color: #ddd; cursor: pointer; transition: color 0.2s, transform 0.1; padding: 4px; border-radius: 4px}
-  .star: hover { color: #ffc107; transform: scale(1.1)}
+  .star:hover { color: #ffc107; transform: scale(1.1)}
   .star.active { color: #ffc107}
   .feedback-section { display: flex; flex-direction: column; gap: 8px}
   .feedback-textarea-label { color: #555; font-size: 14px; font-weight: 500}
   .feedback-textarea { border: 2px solid #e1e1e1; border-radius: 8px; padding: 12px; font-size: 14px; font-family: inherit; resize: vertical;transition: border-color 0.2}
-  .feedback-textarea: focus { outline: none; border-color: #4f46e5; box-shadow: 0, 0 0 3px rgba(79, 70, 229, 0.1)}
+  .feedback-textarea:focus { outline: none; border-color: #4f46e5; box-shadow: 0, 0 0 3px rgba(79, 70, 229, 0.1)}
   .feedback-actions { display: flex; justify-content: flex-end}
   .submit-button { background: #4f46e5; color: white; border: none; padding: 12px 24px; border-radius: 8px; font-size: 14px, font-weight: 600; cursor: pointer;transition: background-color 0.2s, transform 0.1}
   .submit-buttonhover: not(:disabled) { background: #4338ca; transform: translateY(-1px)}

@@ -110,7 +110,7 @@ export class NESMemoryArchitecture {
  // NES-style memory management state
  private readonly memoryState = {
  currentScanline: 0, vblankActive: false,
- ppu2000: 0, // PPU control register
+ ppu2000, // PPU control register
  ppu2001: 0, // PPU mask register
  ppu2002: 0, // PPU status register
  oamaddr: 0, // OAM address register

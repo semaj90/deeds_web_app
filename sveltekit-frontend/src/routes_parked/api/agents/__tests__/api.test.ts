@@ -11,7 +11,7 @@ import { describe, it, expect, beforeAll, afterAll, vi } from 'vitest';
  */
 const mockHealthResponse = {
  status: 'healthy',
- timestamp: new Date().toISOString(, services: {
+ timestamp: new Date().toISOString(), services: {
  ollama: 'healthy',
  qdrant: 'healthy',
  redis: 'healthy',

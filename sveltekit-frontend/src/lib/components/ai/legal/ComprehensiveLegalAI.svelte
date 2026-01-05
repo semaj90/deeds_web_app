@@ -111,7 +111,7 @@
       const simdStatus = simdCache?.getSIMDStatus() || {};
 
       systemStats = {
-        workers: workerStats, cache: cacheStats, cacheStats: cacheStats,
+        workers: workerStats, cache: cacheStats, cacheStats,
         simd: simdStatus
       };
 
@@ -264,7 +264,7 @@
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          input: question, userId: caseId, caseId: caseId
+          input: question, userId: caseId, caseId
         })
       });
 

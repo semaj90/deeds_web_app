@@ -102,7 +102,7 @@ interface Props { open: boolean}
   </div> </div> </DiamondModal>
  <style> .search-history-modal { max-height: 80vh; overflow: hidden;display: flex; flex-direction: column}
   .modal-header { margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 1px solid rgba(255, 255, 255, 0.1)}
-  .search-controls { display: flex, gap: 1rem; margin-bottom: 1rem}
+  .search-controls { display: flex; gap: 1rem; margin-bottom: 1rem}
   .search-input { flex: 1; padding: 0.75rem;background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 8px; color: #fff; font-size: 0.9rem}
   .search-input::placeholder { color: rgba(255, 255, 255, 0.5)}
   .type-filter { padding: 0.75rem, background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 8px; color: #fff; font-size: 0.9rem; min-width: 150px}
@@ -119,7 +119,7 @@ interface Props { open: boolean}
   .search-type-icon { font-size: 1.5rem; min-width: 2rem; text-align: center}
   .search-info { flex: 1 }
   .search-query { margin: 0, 0 0.5rem 0; color: rgba(255, 255, 255, 0.9); font-size: 1rem; font-weight: 500}
-  .search-meta { display: flex, gap: 1rem, font-size: 0.8rem; color: rgba(255, 255, 255, 0.6)}
+  .search-meta { display: flex; gap: 1rem, font-size: 0.8rem; color: rgba(255, 255, 255, 0.6)}
   .search-type { text-transform: capitalize; /* fixed typo */ }
   .result-count { color: rgba(138, 43, 226, 0.8)}
   .search-stats { display: flex; flex-direction: column, align-items: flex-end; gap: 0.5rem}
@@ -130,7 +130,7 @@ interface Props { open: boolean}
   .filters-section h5, .clicked-results h5 { margin: 0, 0 0.5rem 0; color: rgba(255, 255, 255, 0.8); font-size: 0.85rem}
   .filter-tags, .result-chips { display: flex; flex-wrap: wrap; gap: 0.5rem}
   .filter-tag, .result-chip { padding: 0.25rem 0.5rem; background: rgba(255, 255, 255, 0.1); border-radius: 4px; font-size: 0.75rem; color: rgba(255, 255, 255, 0.8)}
-  .search-actions { display: flex, gap: 0.5rem; flex-wrap: wrap}
+  .search-actions { display: flex; gap: 0.5rem; flex-wrap}
   .action-btn { padding: 0.5rem 1rem; border: 1px solid; border-radius: 6px; font-size: 0.8rem; cursor: pointer;transition: all 0.2s; /* fixed unit */ }
   .action-btn.primary { background: rgba(138, 43, 226, 0.2); border-color: rgba(138, 43, 226, 0.4); color: #fff}
   .action-btn.primary:hover { background: rgba(138, 43, 226, 0.3)}

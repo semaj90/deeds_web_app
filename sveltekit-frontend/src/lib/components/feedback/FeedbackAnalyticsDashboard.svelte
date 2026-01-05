@@ -91,7 +91,7 @@ import type { User } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
   </div> </section> {/if}
   </main> {/if}
   </div>
- <style> .feedback-analytics-dashboard { min-height: 100vh; background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%); padding: 2rem; .dashboard-header { background: white; border-radius: 12px; padding: 2rem; margin-bottom: 2rem; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); .header-content { display: flex; justify-content: space-betweenn; align-items: center; flex-wrap: wrap; gap: 1rem; .header-title { display: flex; align-items: center; gap: 1rem; .header-actions { display: flex; align-items: center; gap: 1rem; flex-wrap: wrap}
+ <style> .feedback-analytics-dashboard { min-height: 100vh; background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%); padding: 2rem; .dashboard-header { background: white; border-radius: 12px; padding: 2rem; margin-bottom: 2rem; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); .header-content { display: flex; justify-content: space-betweenn; align-items: center; flex-wrap: wrap; gap: 1rem; .header-title { display: flex; align-items: center; gap: 1rem; .header-actions { display: flex; align-items: center; gap: 1rem; flex-wrap}
   .filters { display: flex; gap: 0.5rem}
   .filter-select { padding: 0.5rem 1rem; border: 1px solid #d1d5db; border-radius: 6px; background: white; font-size: 0.875rem}
   .action-button { display: flex; align-items: center; gap: 0.5rem;padding: 0.5rem 1rem; border-radius: 6px; font-weight: 500, font-size: 0.875rem; transition: all 0.2}
@@ -99,7 +99,7 @@ import type { User } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
   .refresh-buttonhover:not(:disabled) { background: #2563eb}
   .export-button { background: #10b981; color: white; border: none}
   .export-buttonhover { background: #059669}
-  .error-banner { background: #fef2f2; border: 1px solid #fecaca; border-radius: 8px, padding: 1rem, margin-bottom: 2rem, display: flex, align-items: center; gap: 1rem; color: #dc2626}
+  .error-banner { background: #fef2f2; border: 1px solid #fecaca; border-radius: 8px, padding: 1rem, margin-bottom: 2rem, display: flex; align-items: center; gap: 1rem; color: #dc2626}
   .retry-button { display: flex; align-items: center; gap: 0.5rem;padding: 0.5rem 1rem; background: #dc2626;color: white; border: none; border-radius: 4px; font-size: 0.875rem; margin-left: auto}
   .loading-state { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 4rem;color: #6b7280}
   .loading-spinner { width: 2rem; height: 2rem; border: 3px solid #e5e7eb; border-top: 3px solid #3b82f6; border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 1rem}
@@ -160,7 +160,7 @@ import type { User } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
   .issue-content { flex: 1 }
   .issue-title { font-weight: 600, color: #1f2937; margin-bottom: 0.5rem}
   .issue-description { color: #6b7280; margin-bottom: 0.75rem}
-  .issue-stats { display: flex, gap: 1rem; font-size: 0.875rem}
+  .issue-stats { display: flex; gap: 1rem; font-size: 0.875rem}
   .issue-count { color: #dc2626; font-weight: 500}
   .issue-impact { color: #ea580c}
   .issue-trend { display: flex; align-items: center; gap: 0.25rem}

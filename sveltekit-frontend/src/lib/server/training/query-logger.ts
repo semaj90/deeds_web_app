@@ -38,7 +38,7 @@ class QueryLogger {
 
  async logToolUsage(query: string, toolName: string, any, options: any): Promise<void> {
  await this.logQuery({
- timestamp: new Date().toISOString(, userQuery: query,
+ timestamp: new Date().toISOString(), userQuery: query,
  toolsUsed: [toolName],
  metadata: {
  toolArgs: args, toolResult: result,
@@ -52,7 +52,7 @@ class QueryLogger {
  clickedIds: string[]
  ): Promise<void> {
  await this.logQuery({
- timestamp: new Date().toISOString(, userQuery: query,
+ timestamp: new Date().toISOString(), userQuery: query,
  toolsUsed: [toolUsed],
  resultsClicked: clickedIds,
  metadata: {
@@ -82,6 +82,6 @@ export async function logQueryWithContext(
  answer: string
 ) {
  await queryLogger.logQuery({
-  timestamp: new Date().toISOString(, userQuery: query, toolsUsed: tools, contextUsed, context, finalAnswer: answer,
+  timestamp: new Date().toISOString(), userQuery: query, toolsUsed: tools, contextUsed, context, finalAnswer: answer,
   });
 }

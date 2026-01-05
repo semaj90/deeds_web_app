@@ -147,7 +147,7 @@ export const POST: RequestHandler = async ({ request }) => {
  'Check Svelte syntax',
  ],
  },
- timestamp: new Date().toISOString(, userId: authResult.context?.userId,
+ timestamp: new Date().toISOString(), userId: authResult.context?.userId,
  };
 
  // Log operation
@@ -254,7 +254,7 @@ export const PATCH: RequestHandler = async ({ request }) => {
  },
  ],
  },
- timestamp: new Date().toISOString(, userId: authResult.context?.userId,
+ timestamp: new Date().toISOString(), userId: authResult.context?.userId,
  };
 
  // Log operation
@@ -350,9 +350,9 @@ export const GET: RequestHandler = async ({ request }) => {
  rootCause: 'Missing type definition',
  suggestedFixes: ['Add type annotation'],
  },
- timestamp: new Date(Date.now() - 3600000).toISOString(, userId: authResult.context?.userId,
+ timestamp: new Date(Date.now() - 3600000).toISOString(), userId: authResult.context?.userId,
  },
- timestamp: new Date(Date.now() - 3600000).toISOString(, userId: authResult.context?.userId,
+ timestamp: new Date(Date.now() - 3600000).toISOString(), userId: authResult.context?.userId,
  },
  ];
 

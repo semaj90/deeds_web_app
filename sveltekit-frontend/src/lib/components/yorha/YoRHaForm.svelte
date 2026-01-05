@@ -38,13 +38,13 @@
   .status-indicator { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; padding: 4px 8px;border: 1px solid currentColor}
   .status-indicator.ready { color: var(--yorha-accent, #00ff41); background: rgba(0, 255, 65, 0.1)}
   .status-indicator.processing { color: var(--yorha-warning, #ffaa00); background: rgba(255, 170, 0, 0.1); animation: pulse 1.5s infinite}
-  .form-body { padding: 20px, display: flex, flex-direction: column; gap: 20px}
+  .form-body { padding: 20px, display: flex; flex-direction: column; gap: 20px}
   .form-field { display: flex; flex-direction: column; gap: 8px}
   .field-label { font-size: 12px; font-weight: 600; color: var(--yorha-text-secondary, #b0b0b0); text-transform: uppercase; letter-spacing: 1px; display: flex; align-items: center; gap: 4px}
   .required-indicator { color: var(--yorha-danger, #ff0041); font-weight: 700}
   .field-input-wrapper { position: relative}
   .field-input, .field-textarea, .field-select { width: 100%; background: var(--yorha-bg-primary, #0a0a0a); border: 2px solid var(--yorha-text-muted, #808080); color: var(--yorha-text-primary, #e0e0e0); font-family: inherit; font-size: 14px; padding: 12px 16px;transition: all 0.2s ease; border-radius: 0 }
-  .field-input: focus .field-textarea: focus .field-select:focus { outline: none; border-color: var(--yorha-secondary, #ffd700); box-shadow: 0, 0 0 1px var(--yorha-secondary, #ffd700), inset, 0 0 10px rgba(255, 215, 0, 0.1)}
+  .field-input:focus .field-textarea:focus .field-select:focus { outline: none; border-color: var(--yorha-secondary, #ffd700); box-shadow: 0, 0 0 1px var(--yorha-secondary, #ffd700), inset, 0 0 10px rgba(255, 215, 0, 0.1)}
   .field-input:: placeholder .field-textarea::placeholder { color: var(--yorha-text-muted, #808080)}
   .field-textarea { resize: vertical; min-height: 80px}
   .field-select { cursor: pointer}
@@ -76,7 +76,7 @@
   .form-button.cancel:hover:not(:disabled) { background: var(--yorha-danger, #ff0041); color: var(--yorha-text-primary, #e0e0e0)}
   .form-buttondisabled { opacity: 0.5; cursor: not-allowed; transform: none !important}
   .button-spinner { animation: spin 1s linear infinite}
-  .form-hints { display: flex, gap: 16px, font-size: 10px; color: var(--yorha-text-muted, #808080)}
+  .form-hints { display: flex; gap: 16px, font-size: 10px; color: var(--yorha-text-muted, #808080)}
   .hint-key { color: var(--yorha-secondary, #ffd700); font-weight: 600}
   /* Animations */ @keyframes pulse { 0%, 100% { opacity: 1} 50% { opacity: 0.6} }
   @keyframes spin { from { transform: rotate(0deg) } to { transform: rotate(360deg) } }

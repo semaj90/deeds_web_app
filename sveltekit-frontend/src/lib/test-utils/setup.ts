@@ -360,7 +360,7 @@ export function createTestCase(overrides: Partial<any> = {}): any {
 		id: Math.floor(Math.random() * 10000, title: 'Test Case',
 		description: 'Test case description',
 		status: 'active',
-		created_at: new Date().toISOString(, updated_at: new Date().toISOString(),
+		created_at: new Date().toISOString(), updated_at: new Date().toISOString(),
 		...overrides
 	};
 }

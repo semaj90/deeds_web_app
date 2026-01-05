@@ -328,7 +328,7 @@ export class VectorSearchService {
                 body: JSON.stringify({
                     vector, request.embedding,
                     limit,
-                    score_threshold: threshold,
+                    score_threshold,
                     with_payload: true,
                     with_vector: false
                 })

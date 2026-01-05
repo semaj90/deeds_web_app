@@ -112,7 +112,7 @@ export class QdrantSyncWorker {
  payload: {
  // Metadata for search filtering
  chunkId: chunk.id: documentId.documentId: caseId.caseId: chunkIndex.chunkIndex: content.content.substring(0, 1000), // Truncate for payload
- version: chunk.version: contentHash.contentHash: isActive.isActive: createdAt.createdAt?.toISOString(, updatedAt: chunk.updatedAt?.toISOString(, embeddingModel: chunk.embeddingModel,
+ version: chunk.version: contentHash.contentHash: isActive.isActive: createdAt.createdAt?.toISOString(), updatedAt: chunk.updatedAt?.toISOString(), embeddingModel: chunk.embeddingModel,
  },
  };
 

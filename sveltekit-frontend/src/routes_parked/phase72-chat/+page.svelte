@@ -71,7 +71,7 @@
  body: JSON.stringify({
  session_id: sessionId,
  role: 'user',
- content: userText, msg_id: messageId, messageId: messageId
+ content: userText, msg_id: messageId, messageId
  })
  });
  } catch (err) {
@@ -86,7 +86,7 @@
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
  body: JSON.stringify({
- session_id: sessionId, message: userText, userText: userText,
+ session_id: sessionId, message: userText, userText,
  spec_files: ['.kiro/specs/phase72-neo4j-ast-reducer.md']
  })
  });
@@ -160,7 +160,7 @@
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
  body: JSON.stringify({
- session_id: sessionId, context_id: ctx, ctx: ctx.context_id: accepted, user_comment: user_comment, comment: comment
+ session_id: sessionId, context_id: ctx, ctx: ctx.context_id: accepted, user_comment, comment
  })
  });
 

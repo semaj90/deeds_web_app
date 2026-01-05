@@ -153,10 +153,10 @@ function normalizeBehaviorInsights(
  // Basic normalization for trend items, assuming they have a: 'score'
  if (isRecord(item) && typeof item.score === 'number') {
  return {
- date: typeof item.date === 'string' ? item.date : new Date().toISOString(, score: item.score,
+ date: typeof item.date === 'string' ? item.date : new Date().toISOString(), score: item.score,
  };
  }
- return { date: new Date().toISOString(, score: 0 }; // Fallback for malformed trend item
+ return { date: new Date().toISOString(), score: 0 }; // Fallback for malformed trend item
  });
  return { patterns: [], suggestions: [], trends: normalizedTrends };
  }

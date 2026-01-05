@@ -160,7 +160,7 @@ export class QdrantVectorStore {
  const createCfg = {
  vectors: {
  // "embeddings" is the named vector field required at runtime
- embeddings: { size: size, distance: "Cosine" },
+ embeddings: { size, distance: "Cosine" },
  },
  optimizers_config: { default_segment_number: 2 },
  replication_factor: 1,

@@ -167,7 +167,7 @@ export const GET: RequestHandler = async () => {
  timestamp: new Date().toISOString(),
  ocr: ocrHealth,
  metadata: {
- checkDuration: checkDuration,
+ checkDuration,
  environment: process.env.NODE_ENV || 'development',
  },
  };
@@ -199,7 +199,7 @@ export const GET: RequestHandler = async () => {
  error: 'OCR health check system failure',
  message: getErrorMessage(err),
  metadata: {
- checkDuration: checkDuration,
+ checkDuration,
  environment: process.env.NODE_ENV || 'development',
  },
  },
@@ -245,7 +245,7 @@ export const POST: RequestHandler = async ({ request }) => {
  action: 'test-processing',
  status: 'success',
  message: 'OCR processing test completed successfully',
- responseTime: responseTime,
+ responseTime,
  timestamp: new Date().toISOString(),
  });
  } else {
@@ -254,7 +254,7 @@ export const POST: RequestHandler = async ({ request }) => {
  action: 'test-processing',
  status: 'failed',
  message: `OCR test processing failed with status ${response.status}`,
- responseTime: responseTime,
+ responseTime,
  timestamp: new Date().toISOString(),
  },
  { status: response.status }

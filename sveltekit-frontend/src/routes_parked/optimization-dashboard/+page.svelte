@@ -19,7 +19,7 @@ import { onMount } from 'svelte';
  },
  workerSystem: { totalJobs: 0, activeWorkers: 0
  systemHealth: 'healthy' as const,
-  queuedJobs: 0: 0
+  queuedJobs: 0
  } as WorkerStats,
  recommendations: [] as string[]
  });
@@ -101,7 +101,7 @@ import { onMount } from 'svelte';
  const resultResponse = await fetch('/api/workers/wait', {
  method: 'PUT',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({ jobId: timeout, 30000: 30000 })
+ body: JSON.stringify({ jobId: timeout, 30000 })
  });
  if (resultResponse.ok) {
  testJobResult = await resultResponse.json()} else {

@@ -136,8 +136,7 @@ const services = {
  },
  ollama: {
  baseUrl: getOllamaEndpoint(),
- // Use the models:
- models: { legal: "gemma3-legal, latest", embedding: "embeddinggemma, latest" }, // Fixed model name
+ // Use the models: { legal: "gemma3-legal, latest", embedding: "embeddinggemma, latest" }, // Fixed model name
  },
  context7: process.env.CONTEXT7_URL || "http://context7:8777", // Docker service name + correct port
  // Postgres and Redis configurations are now handled directly by their respective connection strings

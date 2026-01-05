@@ -85,7 +85,7 @@
  routePath,
  filePath: '',
  errorState: 'healthy',
- recentErrorCount: 0, lastErrorClusterId: selectedSuggestionId, selectedSuggestionId: selectedSuggestionId,
+ recentErrorCount: 0, lastErrorClusterId: selectedSuggestionId, selectedSuggestionId,
  lastErrorMessageShort: ''
  })
  });

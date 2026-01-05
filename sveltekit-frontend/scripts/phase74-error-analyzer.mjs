@@ -1,193 +1,96 @@
-#!/usr/bin/env node
-/**
- * Phase 74: Error Analyzer - Parse svelte-check output and generate fix priorities
- *
- * Usage:
- *   node scripts/phase74-error-analyzer.mjs logs/errors-post-phase73.txt
- *
- * Features:
- *   - Parse error counts per file
- *   - Cluster by error type
- *   - Generate top 100 highest-error files
- *   - Suggest common fix patterns
- */
-
 import fs from 'fs';
 import path from 'path';
+import readline from 'readline';
 
-// Parse arguments
-const errorLogPath = process.argv[2] || 'logs/errors-post-phase73.txt';
-
-if (!fs.existsSync(errorLogPath)) {
-    console.error(`❌ Error log not found: ${errorLogPath}`);
-    console.error('Usage: node scripts/phase74-error-analyzer.mjs <path-to-error-log>');
-    process.exit(1);
-}
-
-console.log(`📊 Analyzing errors from: ${errorLogPath}\n`);
-
-const content = fs.readFileSync(errorLogPath, 'utf-8');
-const lines = content.split('\n');
-
-// Data structures
-const fileErrors = new Map(); // file -> count
-const errorTypes = new Map(); // error code -> count
-const errorMessages = new Map(); // error message -> count
-const fileErrorDetails = new Map(); // file -> array of {line, col, message, type}
-
-
-// Parse patterns
-// Pattern 1: /path/to/file.ts:123:45
-// Pattern 2: Error: Message
-let currentFile = null;
-let currentLine = null;
-let currentCol = null;
-
-for (const line of lines) {
-    const trimmed = line.trim();
-
-    // Check for file path line: c:\path\to\file.ts:123:45
-    const pathMatch = trimmed.match(/^([a-zA-Z]:[\\/][^:]+):(\d+):(\d+)$/);
-    if (pathMatch) {
-        currentFile = pathMatch[1].replace(/\\/g, '/');
-        currentLine = parseInt(pathMatch[2]);
-        currentCol = parseInt(pathMatch[3]);
-        continue;
+async function analyzeErrors(logPath) {
+    if (!fs.existsSync(logPath)) {
+        console.error('File not found: ' + logPath);
+        return;
     }
 
-    // Check for error message: Error: Message (ts)
-    if (trimmed.startsWith('Error: ') && currentFile) {
-        const errorMsg = trimmed.substring(7);
-        const errorCodeMatch = errorMsg.match(/\((TS\d+|svelte)\)$/);
-        const errorCode = errorCodeMatch ? errorCodeMatch[1] : 'UNKNOWN';
-        const cleanMsg = errorMsg.replace(/\s*\(TS\d+|svelte\)$/, '');
+    console.log('📊 Analyzing errors from: ' + logPath);
 
-        // Track file error count
-        fileErrors.set(currentFile, (fileErrors.get(currentFile) || 0) + 1);
+    const fileStream = fs.createReadStream(logPath);
+    const rl = readline.createInterface({
+        input: fileStream,
+        crlfDelay: Infinity
+    });
 
-        // Track error type
-        errorTypes.set(errorCode, (errorTypes.get(errorCode) || 0) + 1);
+    const fileErrors = {};
+    const errorTypes = {};
+    const messagePatterns = {};
 
-        // Track error message pattern
-        const msgPattern = cleanMsg.replace(/'[^']+'/g, "'X'").replace(/`[^`]+`/g, "`X`").substring(0, 100);
-        errorMessages.set(msgPattern, (errorMessages.get(msgPattern) || 0) + 1);
+    let currentFile = null;
+    let totalErrors = 0;
 
-        // Track details
-        if (!fileErrorDetails.has(currentFile)) {
-            fileErrorDetails.set(currentFile, []);
+    // Robust path regex that matches Windows and Linux paths followed by line:col
+    const pathRegex = /([a-zA-Z]:[\\/][^:]+|[\\/][^:]+):(\d+):(\d+)/;
+
+    for await (const line of rl) {
+        const trimmed = line.trim();
+        if (!trimmed) continue;
+
+        const pathMatch = trimmed.match(pathRegex);
+        if (pathMatch) {
+            currentFile = pathMatch[1].replace(/\\/g, '/');
+            continue;
         }
-        fileErrorDetails.get(currentFile).push({
-            line: currentLine,
-            col: currentCol,
-            message: cleanMsg,
-            type: errorCode
-        });
 
-        // Reset so we don't attribute the same error message multiple times if the log is weird
-        // (though we keep currentFile for potential follow-up errors in the same file block)
+        if (trimmed.startsWith('Error: ') || trimmed.startsWith('[vite:css][postcss]')) {
+            totalErrors++;
+            const errorMessage = trimmed.replace('Error: ', '');
+
+            if (currentFile) {
+                fileErrors[currentFile] = (fileErrors[currentFile] || 0) + 1;
+            }
+
+            // Extract error type (e.g. TS2304)
+            const typeMatch = errorMessage.match(/\(ts\s+(\d+)\)|\(svelte\s+(\d+)\)|TS(\d+)|\[postcss\]/);
+            const errorType = typeMatch ? (typeMatch[1] || typeMatch[2] || typeMatch[3] || 'POSTCSS') : 'UNKNOWN';
+            errorTypes[errorType] = (errorTypes[errorType] || 0) + 1;
+
+            // Pattern categorization
+            let pattern = errorMessage;
+            if (errorType !== 'UNKNOWN') {
+                pattern = errorMessage.split(' (ts')[0].split(' (svelte')[0];
+            }
+            // Remove specific names to generalize pattern
+            pattern = pattern.replace(/'[^']+'/g, "'X'");
+            messagePatterns[pattern] = (messagePatterns[pattern] || 0) + 1;
+        }
     }
+
+    const sortedFiles = Object.entries(fileErrors).sort((a, b) => b[1] - a[1]);
+    const sortedTypes = Object.entries(errorTypes).sort((a, b) => b[1] - a[1]);
+    const sortedPatterns = Object.entries(messagePatterns).sort((a, b) => b[1] - a[1]);
+
+    console.log('\n📈 Summary Statistics:');
+    console.log('   Total Files with Errors: ' + Object.keys(fileErrors).length);
+    console.log('   Total Error Count: ' + totalErrors);
+    console.log('   Unique Error Types: ' + Object.keys(errorTypes).length);
+
+    console.log('\n📁 Top 20 Highest-Error Files:');
+    sortedFiles.slice(0, 20).forEach(([file, count], i) => {
+        console.log('  ' + (i + 1).toString().padStart(2, ' ') + '. ' + count.toString().padStart(4, ' ') + ' errors - ' + file);
+    });
+
+    console.log('\n🔍 Top 20 Error Types:');
+    sortedTypes.slice(0, 20).forEach(([type, count]) => {
+        console.log('  ' + type.padEnd(10, ' ') + ' - ' + count.toString().padStart(5, ' ') + ' occurrences');
+    });
+
+    const reportPath = 'logs/top-100-error-files.txt';
+    fs.writeFileSync(reportPath, sortedFiles.slice(0, 100).map(([f, c]) => c + '\t' + f).join('\n'));
+    console.log('\n✅ Top 100 files written to: ' + reportPath);
+
+    const jsonReport = {
+        stats: { totalFiles: Object.keys(fileErrors).length, totalErrors, uniqueTypes: Object.keys(errorTypes).length },
+        files: sortedFiles,
+        types: sortedTypes,
+        patterns: sortedPatterns
+    };
+    fs.writeFileSync('logs/error-analysis-phase75.json', JSON.stringify(jsonReport, null, 2));
 }
 
-
-// Sort and analyze
-const sortedFiles = Array.from(fileErrors.entries())
-    .sort((a, b) => b[1] - a[1]);
-
-const sortedTypes = Array.from(errorTypes.entries())
-    .sort((a, b) => b[1] - a[1]);
-
-const sortedMessages = Array.from(errorMessages.entries())
-    .sort((a, b) => b[1] - a[1]);
-
-// Output summary
-console.log(`📈 Summary Statistics:`);
-console.log(`   Total Files with Errors: ${fileErrors.size}`);
-console.log(`   Total Error Count: ${Array.from(fileErrors.values()).reduce((sum, n) => sum + n, 0)}`);
-console.log(`   Unique Error Types: ${errorTypes.size}`);
-console.log(`\n`);
-
-// Top 100 files
-console.log(`📁 Top 100 Highest-Error Files:\n`);
-const top100 = sortedFiles.slice(0, 100);
-for (let i = 0; i < top100.length; i++) {
-    const [file, count] = top100[i];
-    const shortPath = file.replace(/^.*\/src\//, 'src/');
-    console.log(`${(i + 1).toString().padStart(3)}. ${count.toString().padStart(4)} errors - ${shortPath}`);
-}
-
-// Top 20 error types
-console.log(`\n\n🔍 Top 20 Error Types:\n`);
-for (let i = 0; i < Math.min(20, sortedTypes.length); i++) {
-    const [code, count] = sortedTypes[i];
-    console.log(`${code.padEnd(8)} - ${count.toString().padStart(5)} occurrences`);
-}
-
-// Top 20 error messages
-console.log(`\n\n💬 Top 20 Error Message Patterns:\n`);
-for (let i = 0; i < Math.min(20, sortedMessages.length); i++) {
-    const [msg, count] = sortedMessages[i];
-    console.log(`${count.toString().padStart(5)}x - ${msg.substring(0, 100)}`);
-}
-
-// Write top 100 to file
-const outputDir = 'logs';
-if (!fs.existsSync(outputDir)) {
-    fs.mkdirSync(outputDir, { recursive: true });
-}
-
-const top100Path = path.join(outputDir, 'top-100-error-files.txt');
-const top100Content = top100.map(([file, count], i) => {
-    const shortPath = file.replace(/^.*\/src\//, 'src/');
-    return `${i + 1}. ${count} errors - ${shortPath}`;
-}).join('\n');
-
-fs.writeFileSync(top100Path, top100Content, 'utf-8');
-console.log(`\n\n✅ Top 100 files written to: ${top100Path}`);
-
-// Write detailed analysis
-const analysisPath = path.join(outputDir, 'error-analysis-phase74.json');
-const analysis = {
-    summary: {
-        totalFiles: fileErrors.size,
-        totalErrors: Array.from(fileErrors.values()).reduce((sum, n) => sum + n, 0),
-        uniqueErrorTypes: errorTypes.size
-    },
-    topFiles: top100.map(([file, count]) => ({ file, count })),
-    errorTypes: Object.fromEntries(sortedTypes.slice(0, 50)),
-    commonMessages: Object.fromEntries(sortedMessages.slice(0, 50))
-};
-
-fs.writeFileSync(analysisPath, JSON.stringify(analysis, null, 2), 'utf-8');
-console.log(`✅ Detailed analysis written to: ${analysisPath}`);
-
-// Fix suggestions
-console.log(`\n\n🔧 Suggested Fix Strategy:\n`);
-console.log(`1. **Start with Top 5 Files** (likely 50%+ of total errors):`);
-for (let i = 0; i < Math.min(5, top100.length); i++) {
-    const [file] = top100[i];
-    console.log(`   - ${file.replace(/^.*\/src\//, 'src/')}`);
-}
-
-console.log(`\n2. **Focus on High-Impact Error Types**:`);
-const highImpact = ['TS2304', 'TS2322', 'TS2345', 'TS2339', 'TS7006'];
-for (const code of highImpact) {
-    const count = errorTypes.get(code);
-    if (count) {
-        const meaning = {
-            'TS2304': 'Cannot find name (missing import)',
-            'TS2322': 'Type X is not assignable to type Y',
-            'TS2345': 'Argument type mismatch',
-            'TS2339': 'Property does not exist on type',
-            'TS7006': 'Implicit any parameter'
-        };
-        console.log(`   - ${code}: ${meaning[code]} (${count} occurrences)`);
-    }
-}
-
-console.log(`\n3. **Automated Fix Patterns**:`);
-console.log(`   - Add missing imports (TS2304)`);
-console.log(`   - Add type assertions (TS2322, TS2345)`);
-console.log(`   - Add optional chaining (TS2339)`);
-console.log(`   - Add explicit types (TS7006)`);
-
-console.log(`\n✨ Phase 74 Error Analysis Complete\n`);
+const logFile = process.argv[2] || 'logs/errors-phase75-post-clean.txt';
+analyzeErrors(logFile);

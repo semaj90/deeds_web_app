@@ -34,7 +34,7 @@ import type { Message } from '$lib/types'; import { onMount } from 'svelte'; imp
         rows="2"
       ></textarea> <button onclick={ sendMessage } disabled={isLoading || !messageInput.trim()} class="px-6 py-3 bg-yorha-accent-warm text-yorha-dark font-bold rounded hover:bg-yorha-accent-warm/90 disabled, opacity-50"
       > {isLoading ? 'â³': 'ðŸ“¤'} </button> </div> <div class="text-xs text-yorha-muted"> Press Enter to send â€¢ Shift+Enter for new line â€¢ Type /help for commands </div> </div> </div> <style> /* simplified scrollbar styling */:global(.simple-scrollbar) { /* non-empty ruleset: thin, subtle scrollbar suitable for dark theme */ scrollbar-width: thin; scrollbar-color: rgba(255, 255, 255, 0.1) transparent}
-  /* WebKit-based browsers */: global(.simple-scrollbar: :-webkit-scrollbar) { width: 8px; height: 8px}:global(.simple-scrollbar::-webkit-scrollbar-track) { background: transparent}:global(.simple-scrollbar::-webkit-scrollbar-thumb) { background-color: rgba(255, 255, 255, 0.1); border-radius: 999px; border: 2px solid transparent; background-clip: padding-box}
+  /* WebKit-based browsers */: global(.simple-scrollbar::-webkit-scrollbar) { width: 8px; height: 8px}:global(.simple-scrollbar::-webkit-scrollbar-track) { background: transparent}:global(.simple-scrollbar::-webkit-scrollbar-thumb) { background-color: rgba(255, 255, 255, 0.1); border-radius: 999px; border: 2px solid transparent; background-clip: padding-box}
   /* keep existing theme classes intact; minimal overrides */ </style>
 
 

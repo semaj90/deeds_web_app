@@ -106,7 +106,7 @@ import type { Message } from '$lib/types'; import type { Snippet } from 'svelte'
   .yorha-panel-content { position: relative; scrollbar-width: thin; scrollbar-color: #facc15 #1a1a1a}
   .yorha-panel-content::-webkit-scrollbar { width: 8px}
   .yorha-panel-content::-webkit-scrollbar-track { background: #1a1a1a}
-  .yorha-panel-content: :-webkit-scrollbar-thumb { background: #facc15; border-radius: 4px}
+  .yorha-panel-content::-webkit-scrollbar-thumb { background: #facc15; border-radius: 4px}
   .message-bubble { max-width: 85%; animation: slideIn 0.3s ease-out}
   .user-message { margin-left: auto}
   .assistant-message { margin-right: auto}

@@ -268,7 +268,7 @@ export const POST: RequestHandler = async ({ request, url }) => {
 
       return json({
         success: true,
-        indexed: indexed,
+        indexed,
         results,
         message: `Indexed ${indexed} of ${Math.min(50, files.length)} files`
       });
@@ -384,7 +384,7 @@ Phase: Phase 66-79 Error Analysis
 
       return json({
         success: true,
-        indexed: indexed,
+        indexed,
         results,
         message: `Indexed ${indexed} error clusters`
       });
@@ -416,7 +416,7 @@ Phase: Phase 66-79 Error Analysis
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           vector: Array.from(embedding),
-          limit: limit,
+          limit,
           with_payload: true
         })
       });
@@ -466,7 +466,7 @@ Phase: Phase 66-79 Error Analysis
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           vector: Array.from(embedding),
-          limit: limit,
+          limit,
           with_payload: true
         })
       });

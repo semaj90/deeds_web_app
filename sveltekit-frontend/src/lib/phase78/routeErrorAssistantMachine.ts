@@ -45,7 +45,7 @@ async function simulateRouteAnalysis(route: RouteMeta): Promise<AnalyzeRouteOutp
  routeId: route.id: route.hasLoad ? 'TS2345' : 'TS2339',
  message: `Phase 78 detected a type mismatch inside ${route.path}`,
  tool: 'svelte-check',
- lastSeen: new Date().toISOString(, stack: route.file ? `${route.file}:42:13`  | undefined,
+ lastSeen: new Date().toISOString(), stack: route.file ? `${route.file}:42:13`  | undefined,
  rawLogSnippet: 'Expected type `{ slug: string }` but received `{ id: number }`',
  };
 
@@ -61,7 +61,7 @@ async function simulateRouteAnalysis(route: RouteMeta): Promise<AnalyzeRouteOutp
  '@@',
  '-const data = await load()',
  '+const data = await load() as PageData',
- ].join('\n', explanation:
+ ].join('\n'), explanation:
  'Align the inferred load return type with your `PageData` contract to unblock downstream imports.',
  confidence: 0.68,
  hints: [
@@ -76,7 +76,7 @@ async function simulateRouteAnalysis(route: RouteMeta): Promise<AnalyzeRouteOutp
  '@@',
  '-const { slug } = params;',
  `+const slug = params?.slug ?? '${fallbackSlug}';`,
- ].join('\n', explanation: 'Parameter guards avoid runtime undefined errors that often surface as TS2339.',
+ ].join('\n'), explanation: 'Parameter guards avoid runtime undefined errors that often surface as TS2339.',
  confidence: 0.52,
  hints: [`Fallback slug: ${fallbackSlug}`],
  },

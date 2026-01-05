@@ -76,7 +76,7 @@ import type { Document } from '$lib/types'; // Enhanced Evidence Canvas with NES
  <style> .evidence-canvas-container { margin: 1rem; padding: 1rem;background: var(--yorha-bg-secondary); border: 2px solid var(--yorha-text-muted)}
   .canvas-wrapper { position: relative; display: inline-block;border: 2px solid var(--yorha-secondary); background: var(--yorha-bg-primary); margin-bottom: 1rem}
   .evidence-canvas { display: block; background: transparent; cursor: default; image-rendering: pixelated; image-rendering: -moz-crisp-edge; image-rendering: crisp-edge}
-  .controls-panel { display: flex, gap: 1rem; align-items: center; flex-wrap: wrap; margin-bottom: 1rem}
+  .controls-panel { display: flex; gap: 1rem; align-items: center; flex-wrap: wrap; margin-bottom: 1rem}
   .nes-field { margin: 0}
   .nes-field label { font-family: 'Press Start 2P', monospace; font-size: 10px; color: var(--yorha-text-accent); margin-right: 0.5rem}
   .file-details { padding: 1rem; background: var(--yorha-bg-tertiary);border: 2px solid var(--yorha-accent)}

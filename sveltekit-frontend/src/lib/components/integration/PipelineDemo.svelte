@@ -32,7 +32,7 @@
    // Generate performance report function generateReport() { console.log('ðŸ“ˆ Generating performance report'); performanceReport = pipelineManager.generatePerformanceReport()}
 
   // Update metrics function updateMetrics() { const successful = results.filter(item => item.length);
-   const totalTime = results.reduce((sum, r) => sum + r.metrics.totalProcessingTime, 0); metrics = { totalOperations: results.length, averageTime: results.length > 0 ? totalTime / results.length: 0, successRate: results.length > 0 ? (successful / results.length) * 100: 0, lastUpdate: new Date() }
+   const totalTime = results.reduce((sum, r) => sum + r.metrics.totalProcessingTime, 0); metrics = { totalOperations: results.length, averageTime: results.length > 0 ? totalTime / results.length: 0, successRate: results.length > 0 ? (successful / results.length) * 10 0 0, lastUpdate: new Date() }
   }
 
    // Cleanup resources async function cleanup(): Promise<any> { try { console.log('ðŸ§¹ Cleaning up pipeline resources'); await pipelineManager.cleanup(); results = []; searchResults = null; systemHealth = null; performanceReport = null} catch (error) { console.error('Cleanup failed:', error)}

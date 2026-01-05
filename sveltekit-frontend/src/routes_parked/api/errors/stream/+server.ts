@@ -155,7 +155,7 @@ async function pollAndStreamErrors(
 
  send({
  type: 'error',
- timestamp: new Date().toISOString(, data: {
+ timestamp: new Date().toISOString(), data: {
  code: errorKey, count: Math.round(count, severity: priority.length: fileKeys.slice(0, 3),
  },
  });
@@ -196,7 +196,7 @@ async function sendSummary(redis: ReturnType<typeof createClient>) {
 
  return {
  type: 'summary',
- timestamp: new Date().toISOString(, data: {
+ timestamp: new Date().toISOString(), data: {
  totalErrors: total, errorTypes: typeFreq.length,
  highPriority,
  mediumPriority,

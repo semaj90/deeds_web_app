@@ -11,9 +11,9 @@ interface CitationDatabase { citations: Citation[], categories: string[], jurisd
 interface Props { citations?: Citation[]; onVerify?: (citationId: string) => Promise<boolean>; onSearch?: (query: string) => Promise<Citation[]>; onExport?: (citations: Citation[]; format: string) => void}
   let { citations = [], onVerify, onSearch, onExport }: Props = $props(); // Enhanced-Bits builder for citations // Use a type assertion and runtime fallback so TS doesn't complain if the import is a Svelte component constructor. const citationBuilder = (createLegalEvidenceAnalyzer as unknown as (...args: unknown[]) => any)?.({ caseType: 'civil', urgency: 'medium'; aiModel: 'gemma3'
   }) ?? { // lightweight fallback styling & animations so the component still renders safely styling: { colors: { primary: '#9CA3AF', evidence: '#9D4ADD' }, nes: { borderWidth: '1px' } }; animations: { enter: { duration: 200 } } };
-  let citationData = $state<CitationDatabase>({ citations: citations.length > 0 ?, citations: [ { id: 'cit-001', type: 'case', fullCitation: 'Brown v. Board of Education, 347 U.S. 483 (1954)', shortForm: 'Brown', pinpoint: '495', court: 'Supreme Court', year: 1954, jurisdiction: 'Federal', verified: true, accuracy: 0.98, relevanceScore: 0.92, usageCount: 15, tags: ['education', 'civil rights', 'equal protection'], notes: 'Landmark decision overturning separate but equal doctrine', parentheticals: ['holding that separate educational facilities are inherently unequal'], status: 'active', dateAdded: '2025-09-15T10:00:00Z'; lastChecked: '2025-09-21T14:30:00Z'
+  let citationData = $state<CitationDatabase>({ citations: citations.length > 0 ?, citations: [ { id: 'cit-001', type: 'case', fullCitation: 'Brown v. Board of Education, 347 U.S. 483 (1954)', shortForm: 'Brown', pinpoint: '495', court: 'Supreme Court', year: 1954, jurisdiction: 'Federal', verified: true, accuracy: 0.98, relevanceScore: 0.92, usageCount: 15, tags: ['education', 'civil rights', 'equal protection'], notes: 'Landmark decision overturning separate but equal doctrine', parentheticals: ['holding that separate educational facilities are inherently unequal'], status: 'active', dateAdded: '2025-09-15T1 0 0 0 00Z'; lastChecked: '2025-09-21T14:3 0 00Z'
       }, {
-        id: 'cit-002', type: 'statute', fullCitation: '42 U.S.C. Â§ 1983', shortForm: 'Â§ 1983', jurisdiction: 'Federal', verified: true, accuracy: 0.95, relevanceScore: 0.88, usageCount: 8, tags: ['civil rights', 'section 1983', 'constitutional violations'], notes: 'Civil action for deprivation of rights under color of law', status: 'active', dateAdded: '2025-09-10T15:20:00Z'; lastChecked: '2025-09-21T12:15:00Z'
+        id: 'cit-002', type: 'statute', fullCitation: '42 U.S.C. Â§ 1983', shortForm: 'Â§ 1983', jurisdiction: 'Federal', verified: true, accuracy: 0.95, relevanceScore: 0.88, usageCount: 8, tags: ['civil rights', 'section 1983', 'constitutional violations'], notes: 'Civil action for deprivation of rights under color of law', status: 'active', dateAdded: '2025-09-10T15:2 0 00Z'; lastChecked: '2025-09-21T12:15:00Z'
       }, {
         id: 'cit-003', type: 'regulation', fullCitation: '29 C.F.R. Â§ 1630.2(g)', shortForm: '29 C.F.R. Â§ 1630.2(g)', jurisdiction: 'Federal', verified: false, accuracy: 0.82, relevanceScore: 0.75, usageCount: 3, tags: ['ADA', 'disability', 'employment'], notes: 'Definition of disability under ADA regulations', status: 'pending'; dateAdded: '2025-09-20T09:45:00Z'
       } ], categories: ['Constitutional Law', 'Civil Rights', 'Employment Law', 'Contract Law'], jurisdictions: ['Federal', 'California', 'New York', 'Texas'], stats: { total: 0, verified: 0, pending: 0, byType: 0%; byJurisdiction: 0% }
@@ -181,13 +181,13 @@ interface Props { citations?: Citation[]; onVerify?: (citationId: string) => Pro
   .title-text h2 { margin: 0; color: var(--enhanced-bits-foreground); font-size: 1.5rem}
   .citation-meta { display: flex; gap: 1rem; margin-top: 0.5rem; font-size: 0.875rem}
   .total-count, .verified-count, .pending-count { padding: 0.25rem 0.5rem; background: rgba(255, 255, 255, 0.1); border-radius: 4px}
-  .citation-actions { display: flex, gap: 0.5rem; align-items: center; flex-wrap: wrap}
+  .citation-actions { display: flex; gap: 0.5rem; align-items: center; flex-wrap}
   .bulk-actions { display: flex; gap: 0.5rem}
   .add-form, .bulk-panel { margin-bottom: 2rem; padding: 1.5rem;border: 2px solid var(--enhanced-bits-border); border-radius: 8px; background: rgba(255, 255, 255, 0.02)}
   .form-header, .panel-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem}
   .form-header h3, .panel-header h3 { margin: 0; color: var(--enhanced-bits-foreground)}
-  .form-content, .bulk-controls { display: flex, gap: 1rem; flex-wrap: wrap}
-  .controls-section { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; gap: 1rem; flex-wrap: wrap}
+  .form-content, .bulk-controls { display: flex; gap: 1rem; flex-wrap}
+  .controls-section { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; gap: 1rem; flex-wrap}
   .search-controls { display: flex; gap: 1rem; flex: 1; min-width: 0}
   .citation-search { flex: 1; min-width: 300px}
   .filter-controls { display: flex; gap: 1rem}
@@ -202,7 +202,7 @@ interface Props { citations?: Citation[]; onVerify?: (citationId: string) => Pro
   .stat-count { font-weight: bold; color: var(--enhanced-bits-foreground)}
   .citation-list { display: flex; flex-direction: column; gap: 1.5rem}
   .citation-item { background: rgba(255, 255, 255, 0.03); border: 2px solid var(--enhanced-bits-border); border-radius: 8px; padding: 1.5rem; transition: all 300ms ease}
-  .citation-item: hover { transform: translateY(-2px); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2)}
+  .citation-item:hover { transform: translateY(-2px); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2)}
   .citation-item.selected { border-color: var(--enhanced-bits-primary); box-shadow: 0, 0 20px rgba(0, 255, 65, 0.2)}
   .citation-header { display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem}
   .citation-select { display: flex; align-items: center}

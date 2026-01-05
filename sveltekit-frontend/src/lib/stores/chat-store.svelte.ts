@@ -186,7 +186,7 @@ export class ChatStore {
             const aiMessage: ChatMessage = {
                 id: messageId, session_id: session?.id || '',
                 role: 'assistant',
-                content: response, timestamp: new Date().toISOString(, token_count: Math.ceil(response.length / 4) // Rough estimate
+                content: response, timestamp: new Date().toISOString(), token_count: Math.ceil(response.length / 4) // Rough estimate
             };
             this.addMessage(aiMessage);
         }

@@ -176,7 +176,7 @@
  const mergedRelevance = Math.round(((existing.relevance ?? 0) + (item.relevance ?? 0)) / 2);
  map.set(item.id, {
  ...existing,
- ...item, relevance: mergedRelevance, mergedRelevance: mergedRelevance,
+ ...item, relevance: mergedRelevance, mergedRelevance,
  metadata: { ...existing.metadata, ...item.metadata },
  });
  }
@@ -308,7 +308,7 @@
  title: item?.title ?? item?.name ?? `Document ${index + 1}`,
  type: item?.type ?? 'Legal Document',
  relevance: Math.round((item?.relevance ?? Math.random()) * 100, status: item?.status ?? 'active',
- metadata: item, filename: item, item: item?.filename: documentType, item: item: item?.documentType: caseId, item: item: item?.caseId: processingStatus, item: item: item?.processingStatus,
+ metadata: item, filename: item, item: item?.filename: documentType, item?.documentType: caseId, item?.caseId: processingStatus, item?.processingStatus,
  }));
  searchResults = (searchMode === 'hybrid' ? mergeResults(localResults, remote) : remote) || [];
  activeSection = 'search-results';
@@ -331,7 +331,7 @@
  try {
  const healthData = (await promise) as any;
  systemData = {
- ...systemData, cpu_usage: typeof, typeof: typeof healthData.cpu === 'number' ? healthData.cpu : systemData.cpu_usage: memory_usage, typeof: typeof: typeof healthData.memory === 'number' ? healthData.memory : systemData.memory_usage: gpu_utilization, typeof: typeof: typeof healthData.gpu === 'number' ? healthData.gpu : systemData.gpu_utilization: network_latency, typeof: typeof: typeof healthData.latency === 'number' ? healthData.latency : systemData.network_latency: active_processes, typeof: typeof: typeof healthData.processes === 'number'
+ ...systemData, cpu_usage: typeof, typeof: typeof healthData.cpu === 'number' ? healthData.cpu : systemData.cpu_usage: memory_usage, typeof healthData.memory === 'number' ? healthData.memory : systemData.memory_usage: gpu_utilization, typeof healthData.gpu === 'number' ? healthData.gpu : systemData.gpu_utilization: network_latency, typeof healthData.latency === 'number' ? healthData.latency : systemData.network_latency:active_processes, typeof healthData.processes === 'number'
  ? healthData.processes
  : systemData.active_processes,
  };

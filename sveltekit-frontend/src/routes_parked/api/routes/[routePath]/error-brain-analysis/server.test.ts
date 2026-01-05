@@ -24,7 +24,7 @@ describe('POST /api/routes/:routePath/error-brain-analysis', () => {
  phase: 'suggesting',
  error_message: null,
  metadata: {},
- created_at: new Date().toISOString(, completed_at: null, updated_at: new Date().toISOString(),
+ created_at: new Date().toISOString(), completed_at: null, updated_at: new Date().toISOString(),
  };
 
  const request = new Request('http://localhost/api/routes/test-route/error-brain-analysis', {

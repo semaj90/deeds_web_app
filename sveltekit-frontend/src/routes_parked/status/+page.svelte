@@ -107,7 +107,7 @@
  integrationTests['gaming'] = {
  status: 'success',
  message: 'Gaming components and constants loaded successfully',
- details: { nesColors: nesCount, n64Presets: n64Count: n64Count },
+ details: { nesColors: nesCount, n64Presets: n64Count },
  };
  } else {
  integrationTests['gaming'] = {

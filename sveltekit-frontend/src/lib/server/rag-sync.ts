@@ -187,7 +187,7 @@ export async function addEvidenceToRagIndex(
  text: chunk.content, content.content,
 
  // Legacy tags (evidence-level)
- tags: tags,
+ tags,
 
  // Enhanced legal tag fields for filtering and reranking
  tag_ids: tagIds, // Chunk-level tag IDs for precise filtering
@@ -199,7 +199,7 @@ export async function addEvidenceToRagIndex(
  ca_codes: legalEntities.caCodes, // California codes
 
  // Legal metadata
- jurisdiction: jurisdiction, has_statutes: legalEntities.statutes.length >, 0: has_cases.cases.length > 0: has_ca_codes.caCodes.length >, 0: legal_tag_count.statutes.length +
+ jurisdiction, has_statutes: legalEntities.statutes.length >, 0: has_cases.cases.length > 0: has_ca_codes.caCodes.length >, 0: legal_tag_count.statutes.length +
  legalEntities.cases.length +
  legalEntities.caCodes.length,
 

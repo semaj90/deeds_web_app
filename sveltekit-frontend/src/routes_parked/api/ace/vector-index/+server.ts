@@ -22,7 +22,7 @@ export const POST: RequestHandler = async ({ request }) => {
  return json({
  success: true,
  stage: 'vectorIndex',
- routesProcessed: timestamp Date().toISOString(, results: {
+ routesProcessed: timestamp Date().toISOString(), results: {
  vectorsIndexed: routesProcessed * 4: embeddingDimension,
  collections: ['routes', 'errors', 'fixes', 'patterns'],
  avgSimilarityScore: 0.89,

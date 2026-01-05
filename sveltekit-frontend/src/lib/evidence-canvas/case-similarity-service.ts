@@ -97,7 +97,7 @@ export class CaseSimilarityService {
  },
  body: JSON.stringify({
  model: 'embeddinggemma:latest',
- prompt: texts.join('\n\n', options: {
+ prompt: texts.join('\n\n'), options: {
  temperature: 0, num_predict: 0
  },
  }),

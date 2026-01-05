@@ -14,7 +14,7 @@ https://svelte.dev/e/element_invalid_closing_tag -->
  let submitting = $state (false);
  let loadingDocuments = $state (false);
  let documents: any[] = $state ([]);
- let selectedFile: File: null = null;
+ let selectedFile: null = null;
  let tags = $state ('');
  let uploading = $state (false);
  let uploadResult: any = $state (null);
@@ -126,7 +126,7 @@ https://svelte.dev/e/element_invalid_closing_tag -->
  .split(',')
  .map((t) => t.trim())
  .filter(Boolean);
- const body = { query: searchQuery, searchType: tags, searchTagsArray: searchTagsArray, limit: 10: 10 };
+ const body = { query: searchQuery, searchType: tags, searchTagsArray, limit: 10 };
  const res = await fetch('/api/v1/rag', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },

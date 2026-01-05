@@ -43,7 +43,7 @@ export class ClientEmbeddingService {
  // For now, we'll use a simple tokenizer approach
  // In production, you'd want to use @xenova/transformers or similar
  this.tokenizer = {
- encode: (text: string) => this.simpleTokenize(text, decode: (tokens: number[]) => tokens.join(' ', config: tokenizerConfig,
+ encode: (text: string) => this.simpleTokenize(text, decode: (tokens: number[]) => tokens.join(' '), config: tokenizerConfig,
  };
 
  this.isInitialized = true;

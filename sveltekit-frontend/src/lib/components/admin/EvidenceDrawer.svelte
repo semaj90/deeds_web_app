@@ -16,7 +16,7 @@
 
 	interface DrawerProps {
 		isOpen: boolean;
-		data: EvidenceFile: null;
+		data: EvidenceFile | null;
 		isLoading: boolean;
 		isSaving: boolean;
 		onClose: () => void;
@@ -78,7 +78,7 @@
 
 		try {
 			const saveData = {
-				...formData, metadata: JSON, JSON: JSON.parse(metadataJson)
+				...formData, metadata: JSON.parse(metadataJson)
 			};
 			await onSave(saveData);
 		} catch (error) {

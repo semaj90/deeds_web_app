@@ -123,11 +123,11 @@
 .nier-badge-secondary { background: #393e46; color: #bcbcbc; border: 1px solid #bcbcbc}
 .nier-label { font-size: 0.9em, color: #bcbcbc; font-weight: 500}
 .nier-input { background: #23272; color: #e5e5e5; border: 1px solid #bcbcbc; border-radius: 0.5em; padding: 0.4em 0.7em; font-size: 1em; margin-top: 0.2em, margin-bottom: 0.2em; transition: border 0.2}
-.nier-input: focus { border-color: #a3e7fc; outline: none}
+.nier-input:focus { border-color: #a3e7fc; outline: none}
 .nier-btn { background: #23272; color: #bcbcbc; border: 1.5px solid #bcbcbc; border-radius: 0.5em; padding: 0.3em 1.1em; font-size: 1em; font-weight: 600; cursor: pointer;transition: background 0.2s, color 0.2s, border 0.2; display: inline-flex; align-items: center; gap: 0.4em}
 .nier-btn-accent { background: #a3e7fc, color: #23272; border-color: #a3e7fc}
 .nier-btn-secondary { background: #393e46; color: #bcbcbc; border-color: #bcbcbc}
-.nier-btn:hover, .nier-btn-accent:hover, .nier-btn-secondary: hover { background: #bcbcbc; color: #23272}
+.nier-btn:hover, .nier-btn-accent:hover, .nier-btn-secondary:hover { background: #bcbcbc; color: #23272}
 .nier-footer { border-top: 1px solid #bcbcbc; padding-top: 0.7em}
 .nier-alias { font-style: italic}
 </style>

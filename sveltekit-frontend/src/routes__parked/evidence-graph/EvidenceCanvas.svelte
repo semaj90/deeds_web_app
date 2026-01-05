@@ -72,7 +72,7 @@ https://svelte.dev/e/attribute_invalid_event_handler -->
  let edgeThreshold = $state (0.6);
  let contextMenu = $state <{ visible: boolean; x: number; y: number; node: EvidenceNode: null }>({
  visible: false, x: 0 0,
- y: 0, node: null, null: null
+ y: 0, node: null, null
  });
  let metadataNode = $state <EvidenceNode: null>(null);
  let pinnedNodeIds = $state <string[]>([]);
@@ -94,7 +94,7 @@ https://svelte.dev/e/attribute_invalid_event_handler -->
  onMount(() => {
  if (typeof window === 'undefined') return;
  const handler = () => {
- contextMenu = { ...contextMenu, visible: false, false: false };
+ contextMenu = { ...contextMenu, visible: false, false };
  };
  window.addEventListener('click', handler);
  return () => window.removeEventListener('click', handler);
@@ -269,7 +269,7 @@ https://svelte.dev/e/attribute_invalid_event_handler -->
  {
  label: 'Explore Graph',
  action: 'explore_relationship',
- data: data
+ data
  }
  ],
  timestamp: new Date()
@@ -286,7 +286,7 @@ https://svelte.dev/e/attribute_invalid_event_handler -->
  {
  label: 'Apply Pattern',
  action: 'apply_pattern',
- data: data
+ data
  }
  ],
  timestamp: new Date()

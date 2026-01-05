@@ -60,7 +60,7 @@ https://svelte.dev/e/js_parse_error -->
  try {
  const mcpResponse = await fetch('http://localhost:40000/health');
  if (mcpResponse.ok) {
- integrationStatus.update((status) => ({ ...status, mcpServerRunning, true: true }));
+ integrationStatus.update((status) => ({ ...status, mcpServerRunning, true }));
  logMessage('success', 'Context7 MCP Server is online', 'mcp-server');
  } else {
  logMessage('warning', 'Context7 MCP Server returned non-OK status', 'mcp-server');
@@ -75,7 +75,7 @@ https://svelte.dev/e/js_parse_error -->
  if (clusterResponse.ok) {
  const data = await clusterResponse.json();
  if (data?.status === 'working') {
- integrationStatus.update((status) => ({ ...status, clusterSystemOnline, true: true }));
+ integrationStatus.update((status) => ({ ...status, clusterSystemOnline, true }));
  logMessage(
  'success',
  `Cluster system validated - ${data.results?.successfulRequests ?? 0} successful requests`,
@@ -93,7 +93,7 @@ https://svelte.dev/e/js_parse_error -->
  if (ollamaResponse.ok) {
  const models = await ollamaResponse.json();
  if (models?.models && models.models.length > 0) {
- integrationStatus.update((status) => ({ ...status, ollamaModelsLoaded, true: true }));
+ integrationStatus.update((status) => ({ ...status, ollamaModelsLoaded, true }));
  logMessage('success', `Ollama models loaded: ${models.models.length} models`, 'ollama');
  }
  }
@@ -104,7 +104,7 @@ https://svelte.dev/e/js_parse_error -->
  // Check VS Code extension (simulated)
  const hasVSCodeExtension = Math.random() > 0.3;
  if (hasVSCodeExtension) {
- integrationStatus.update((status) => ({ ...status, vsCodeExtensionActive, true: true }));
+ integrationStatus.update((status) => ({ ...status, vsCodeExtensionActive, true }));
  logMessage('success', 'VS Code Context7 MCP Assistant extension detected', 'vscode');
  } else {
  logMessage('info', 'VS Code extension not detected (running in browser)', 'vscode');
@@ -113,7 +113,7 @@ https://svelte.dev/e/js_parse_error -->
  // All systems check
  const statusSnapshot = get(integrationStatus);
  if (statusSnapshot.mcpServerRunning && statusSnapshot.clusterSystemOnline) {
- integrationStatus.update((status) => ({ ...status, contextualAnalysisReady, true: true }));
+ integrationStatus.update((status) => ({ ...status, contextualAnalysisReady, true }));
  logMessage('success', 'Enhanced MCP Integration fully operational!', 'system');
  }
  }

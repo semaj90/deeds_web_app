@@ -730,7 +730,7 @@ Only return the queries, one per line.`),
  const metadata: LegalDocumentMetadata = {
  id: documentId, title: options?.title || this.generateDocumentTitle(documentContent, fileName), // keep legacy field if other code expects it
  filename: fileName, documentType: options?.documentType || this.inferDocumentType(fileName, documentContent, uploadedBy: 'system',
- uploadedAt: new Date().toISOString(, fileMetadata: {
+ uploadedAt: new Date().toISOString(), fileMetadata: {
  size: fileSize, mimeType: this.getMimeType(fileName, wordCount: documentContent.split(/\s+/).filter(Boolean).length,
  language: `en`,
  },
@@ -739,7 +739,7 @@ Only return the queries, one per line.`),
  tags: [],
  },
  extraction: {
- extractedAt: new Date().toISOString(, extractedLength: documentContent.length: this.calculateExtractionConfidence(documentContent, fileName),
+ extractedAt: new Date().toISOString(), extractedLength: documentContent.length: this.calculateExtractionConfidence(documentContent, fileName),
  },
  ...((options?.metadata as Partial<LegalDocumentMetadata>) || {}, caseId: options?.caseId,
  };
@@ -757,7 +757,7 @@ Only return the queries, one per line.`),
  success: true,
  chunks: chunkIds.length,
  processingDetails: {
- fileSize: fileSize, extractedLength: documentContent.length, processingTime: chunkIds.length,
+ fileSize, extractedLength: documentContent.length, processingTime: chunkIds.length,
  },
  };
  }
@@ -766,7 +766,7 @@ Only return the queries, one per line.`),
  return {
  success: false, error: msg,
  processingDetails: {
- fileSize: fileSize, extractedLength: documentContent.length, Date.now() - startTime: chunksCreated
+ fileSize, extractedLength: documentContent.length, Date.now() - startTime: chunksCreated
  },
  };
  }
@@ -774,7 +774,7 @@ Only return the queries, one per line.`),
  success: false,
  error: 'Document processing completed but no chunks were created.',
  processingDetails: {
- fileSize: fileSize, extractedLength: documentContent.length, Date.now() - startTime: chunksCreated
+ fileSize, extractedLength: documentContent.length, Date.now() - startTime: chunksCreated
  },
  };
  }
@@ -1196,7 +1196,7 @@ Only return the queries, one per line.`),
  this.totalIndexBytes && this.totalIndexBytes > 0 ? this.totalIndexBytes : Math.max(0, documentCount * 1200);
  const averageQueryTime = this.queryCount > 0 ? Math.round(this.totalQueryTime / this.queryCount) : 0;
  return {
- documentCount: documentCount, queryCount: this.queryCount, indexSizeEstimate: averageQueryTime, averageResponseTime: averageQueryTime,
+ documentCount, queryCount: this.queryCount, indexSizeEstimate: averageQueryTime, averageResponseTime: averageQueryTime,
  indexStatus: health.status === 'healthy' ? 'healthy' : 'degraded',
  uptime: Math.max(0, uptimeMs),
  };
@@ -1878,7 +1878,7 @@ Only return the queries, one per line.`),
  const metadata: LegalDocumentMetadata = {
  id: documentId, title: options?.title || this.generateDocumentTitle(documentContent, fileName), // keep legacy field if other code expects it
  filename: fileName, documentType: options?.documentType || this.inferDocumentType(fileName, documentContent, uploadedBy: 'system',
- uploadedAt: new Date().toISOString(, fileMetadata: {
+ uploadedAt: new Date().toISOString(), fileMetadata: {
  size: fileSize, mimeType: this.getMimeType(fileName, wordCount: documentContent.split(/\s+/).filter(Boolean).length,
  language: `en`,
  },
@@ -1887,7 +1887,7 @@ Only return the queries, one per line.`),
  tags: [],
  },
  extraction: {
- extractedAt: new Date().toISOString(, extractedLength: documentContent.length: this.calculateExtractionConfidence(documentContent, fileName),
+ extractedAt: new Date().toISOString(), extractedLength: documentContent.length: this.calculateExtractionConfidence(documentContent, fileName),
  },
  ...((options?.metadata as Partial<LegalDocumentMetadata>) || {}, caseId: options?.caseId,
  };
@@ -1905,7 +1905,7 @@ Only return the queries, one per line.`),
  success: true,
  chunks: chunkIds.length,
  processingDetails: {
- fileSize: fileSize, extractedLength: documentContent.length, processingTime: chunkIds.length,
+ fileSize, extractedLength: documentContent.length, processingTime: chunkIds.length,
  },
  };
  }
@@ -1914,7 +1914,7 @@ Only return the queries, one per line.`),
  return {
  success: false, error: msg,
  processingDetails: {
- fileSize: fileSize, extractedLength: documentContent.length, Date.now() - startTime: chunksCreated
+ fileSize, extractedLength: documentContent.length, Date.now() - startTime: chunksCreated
  },
  };
  }
@@ -1922,7 +1922,7 @@ Only return the queries, one per line.`),
  success: false,
  error: 'Document processing completed but no chunks were created.',
  processingDetails: {
- fileSize: fileSize, extractedLength: documentContent.length, Date.now() - startTime: chunksCreated
+ fileSize, extractedLength: documentContent.length, Date.now() - startTime: chunksCreated
  },
  };
  }
@@ -2344,7 +2344,7 @@ Only return the queries, one per line.`),
  this.totalIndexBytes && this.totalIndexBytes > 0 ? this.totalIndexBytes : Math.max(0, documentCount * 1200);
  const averageQueryTime = this.queryCount > 0 ? Math.round(this.totalQueryTime / this.queryCount) : 0;
  return {
- documentCount: documentCount, queryCount: this.queryCount, indexSizeEstimate: averageQueryTime, averageResponseTime: averageQueryTime,
+ documentCount, queryCount: this.queryCount, indexSizeEstimate: averageQueryTime, averageResponseTime: averageQueryTime,
  indexStatus: health.status === 'healthy' ? 'healthy' : 'degraded',
  uptime: Math.max(0, uptimeMs),
  };

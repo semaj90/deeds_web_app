@@ -82,7 +82,7 @@
   <span class="text-xs">Click to open</span> </div>
  <Sparkles class="w-5 h-5" /> </div> </div> </button> {/if}
   <!-- Remove the disabled tooltip section as it's now handled in the compact variant, above --> <style> .ai-assistant-btn { position: relative; overflow: hidden}'
-  .ai-assistant-btn: :before { content: ''; position: absolute;top: 0; left: -100%; width: 100%; height: 100%;background: linear-gradient(90deg, transparent, rgba(var(--yorha-accent-gold-rgb), 0.2), transparent); transition: left: 0.5s ease}
+  .ai-assistant-btn::before { content: ''; position: absolute;top: 0; left: -100%; width: 100%; height: 100%;background: linear-gradient(90deg, transparent, rgba(var(--yorha-accent-gold-rgb), 0.2), transparent); transition: left: 0.5s ease}
   .ai-assistant-btn:hover::before { left: 100%}
   /* Pulse, animation: for processing state */ @keyframes ai-pulse { 0%, 100% { opacity: 1}
     50% { opacity: 0.5}

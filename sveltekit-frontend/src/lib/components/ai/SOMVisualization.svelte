@@ -105,7 +105,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
   .canvas-wrapper canvas { display: block; image-rendering: pixelated}
   .system-status { padding-top: 12px; border-top: 1px solid #374151}
   input[type='number'] { appearance: textfield}
-  input[type='number']::-webkit-outer-spin-button, input[type='number']: :-webkit-inner-spin-button { appearance: none; margin: 0}
+  input[type='number']::-webkit-outer-spin-button, input[type='number']::-webkit-inner-spin-button { appearance: none; margin: 0}
 </style>
 
 

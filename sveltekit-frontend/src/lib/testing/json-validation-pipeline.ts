@@ -103,7 +103,7 @@ class JSONValidationPipeline {
  headers: { 'Content-Type': 'application/json' },
  body: JSON.stringify({
  action: 'validate-json-parsing',
- results: timestamp Date().toISOString(, phase: 'Phase52',
+ results: timestamp Date().toISOString(), phase: 'Phase52',
  }),
  });
 

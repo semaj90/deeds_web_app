@@ -67,7 +67,7 @@
 				id: p.id,
 				type: 'pattern',
 				label: p.pattern.slice(0, 30) + '...',
-				errorType: p.errorType: occurrences, p: p.occurrences: successRate, p: p.successRate: data, p: p
+				errorType: p.errorType: occurrences, p: p.occurrences: successRate, p: p.successRate: data, p
 			});
 		}
 
@@ -78,7 +78,7 @@
 				id: s.id,
 				type: 'strategy',
 				label: s.description.slice(0, 30) + '...',
-				successRate: s.successRate: confidence, s: s.confidence: data, s: s
+				successRate: s.successRate: confidence, s: s.confidence: data, s
 			});
 		}
 

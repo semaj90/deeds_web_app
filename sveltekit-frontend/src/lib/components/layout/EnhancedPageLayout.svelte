@@ -44,7 +44,7 @@
   } .welcome-features { display: flex; justify-content: space-around; margin-top: 12px}
   .feature { display: flex; flex-direction: column, align-items: center; gap: 4px}
   .feature-icon { font-size: 18px}
-  .feature span: last-child { font-size: 10px, color: #ccc; text-align: center}
+  .feature span:last-child { font-size: 10px, color: #ccc; text-align: center}
   .page-content { position: relative; z-index: 1}
   .page-content.with-overlays { padding-top: 20px}
   /* small additions for the replaced elements */ .welcome-title { font-size: 14px; color: #00ff41; margin: 0}

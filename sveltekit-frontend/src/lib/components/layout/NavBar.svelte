@@ -401,7 +401,7 @@ import type { User } from '$lib/types';
     font-weight: 500}
   .signup-btn { background: var(--console-primary, #00aa00); color: var(--console-bg, #0f0f23)}
   .login-btn:hover { background: var(--console-primary, #00aa00); color: var(--console-bg, #0f0f23)}
-  .signup-btn: hover {
+  .signup-btn:hover {
     background: transparent
    ;color: var(--console-primary, #00aa00)}
   /* Mobile Responsive */

@@ -55,7 +55,7 @@ class MemoryCollection<T extends Doc = Doc> {
 
 class LokiMemoryAdapter {
  // Minimal API-compatible stubs. Real persistence not required for in-memory shim.
- save(dbname: string, dbstring: string, string: cb?: (err?: unknown) => void): void {
+ save(dbname: string, dbstring, string: cb?: (err?: unknown) => void): void {
  cb?.();
  }
  load(dbname: string, cb?: (err?: unknown, data?: string) => void): void {

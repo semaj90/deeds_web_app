@@ -130,7 +130,7 @@ import type { Document } from '$lib/types'; import { onMount } from 'svelte'; im
  <div class="metadata-item"> <span class="metadata-label">Analysis Date:</span>
  <span class="metadata-value">{new Date().toLocaleString()}</span> </div> </div> </div> {/if}
   <style> /* Main toolbar styling */ .evidence-toolbar { margin-bottom: 2rem; max-width: 1000px; margin-left: auto; margin-right: auto}
-  .upload-section { display: flex, gap: 1rem; align-items: center; margin-bottom: 1rem; flex-wrap: wrap}
+  .upload-section { display: flex; gap: 1rem; align-items: center; margin-bottom: 1rem; flex-wrap}
   .upload-section .nes-btn { display: flex; align-items: center; gap: 0.5rem}
   /* Progress section */ .progress-section { margin: 1rem 0; display: flex; align-items: center; gap: 1rem}
   .progress-text { font-family: 'Press Start 2P', monospace; font-size: 12px}
@@ -138,7 +138,7 @@ import type { Document } from '$lib/types'; import { onMount } from 'svelte'; im
   .options-grid label { display: flex; align-items: center; gap: 0.5rem}
   /* Advanced settings */ .advanced-settings { margin-top: 1rem}
   .advanced-settings summary { cursor: pointer; font-family: 'Press Start 2P', monospace; margin-bottom: 0.5rem}
-  .settings-row { display: flex, gap: 2rem; align-items: center; flex-wrap: wrap; margin-top: 1rem}
+  .settings-row { display: flex; gap: 2rem; align-items: center; flex-wrap: wrap; margin-top: 1rem}
   /* Canvas wrapper */ .evidence-canvas-wrapper { display: flex; justify-content: center, align-items: center; margin: 2rem auto;border: 4px solid #212529; max-width: 820px; height: 620px; background: #f8f8f8; position: relative; /* fixed missing colon */ }
   canvas { background: #fff; border: 2px solid #000}
   /* Evidence list styling */ .evidence-list { margin: 2rem auto; max-width: 1000px}

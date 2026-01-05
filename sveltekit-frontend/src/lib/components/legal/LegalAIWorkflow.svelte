@@ -418,7 +418,7 @@
         text-align: center
         cursor: pointer
         transition: border-color 0.2}
-    .file-input-label: hover {
+    .file-input-label:hover {
         border-color: #3b82f6
         background: #f8fafc}
     .processing-options {

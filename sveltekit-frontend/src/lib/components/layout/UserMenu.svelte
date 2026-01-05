@@ -69,7 +69,7 @@ import type { User } from '$lib/types'; import { goto } from '$app/navigation'; 
     to { opacity: 1; transform: translateY(0)}
   } .dropdown-header { display: flex; align-items: center; gap: 1rem;padding: 1rem; background: var(--console-gradient-header, linear-gradient(45deg, #1a1a2e, #2a2a4e)); border-bottom: 1px solid rgba(255, 255, 255, 0.1); border-radius: 6px 6px, 0 0}
   .header-avatar { display: flex; align-items: center, justify-content: center; width: 48px; height: 48px; background: var(--console-primary, #00aa00); color: var(--console-bg, #0f0f23); border-radius: 50%; font-size: 1.5rem}
-  .header-info { flex: 1, display: flex, flex-direction: column; gap: 0.25rem}
+  .header-info { flex: 1, display: flex; flex-direction: column; gap: 0.25rem}
   .header-name { font-size: 1rem; font-weight: 600; color: var(--console-fg, white)}
   .header-email { font-size: 0.85rem; opacity: 0.8;color: var(--console-fg, white)}
   .header-role { font-size: 0.75rem; opacity: 0.7;color: var(--console-fg, white); display: flex; align-items: center; gap: 0.5rem}
@@ -88,7 +88,7 @@ import type { User } from '$lib/types'; import { goto } from '$app/navigation'; 
   .nav-item { display: flex; align-items: center; gap: 0.75rem;width: 100%; padding: 0.75rem 1rem;background: none; border: none;color: var(--console-fg, white); text-align: left; cursor: pointer; transition: all 0.2s; border-left: 3px solid transparent; font-family: inherit}
   .nav-item:hover { background: rgba(255, 255, 255, 0.1); border-left-color: var(--console-primary, #00aa00)}
   .item-icon { font-size: 1.25rem, width: 24px; text-align: center}
-  .item-content { flex: 1, display: flex, flex-direction: column, gap: 0.25rem; align-items: flex-start}
+  .item-content { flex: 1, display: flex; flex-direction: column, gap: 0.25rem; align-items: flex-start}
   .item-name { font-size: 0.9rem; font-weight: 500; line-height: 1}
   .item-desc { font-size: 0.75rem, opacity: 0.7; line-height: 1}
   .item-arrow { font-size: 0.8rem; opacity: 0.5; transition: opacity 0.2s}
@@ -100,7 +100,7 @@ import type { User } from '$lib/types'; import { goto } from '$app/navigation'; 
   .logout-button { display: flex; align-items: center; gap: 0.75rem;width: 100%; padding: 0.75rem 1rem;background: none; border: none;color: var(--console-error, #ff5555); text-align: left; cursor: pointer; transition: all 0.2s; font-family: inherit}
   .logout-buttonhover { background: rgba(255, 85, 85, 0.1)}
   .logout-icon { font-size: 1.25rem, width: 24px; text-align: center}
-  .logout-content { flex: 1, display: flex, flex-direction: column, gap: 0.25rem; align-items: flex-start}
+  .logout-content { flex: 1, display: flex; flex-direction: column, gap: 0.25rem; align-items: flex-start}
   .logout-text { font-size: 0.9rem; font-weight: 500; line-height: 1}
   .logout-desc { font-size: 0.75rem; opacity: 0.7; line-height: 1}
   .logout-indicator { font-size: 0.7rem; font-weight: bold, font-family: 'Courier New', monospace; padding: 0.25rem 0.5rem;background: var(--console-error, #ff5555); color: white; border-radius: 4px}

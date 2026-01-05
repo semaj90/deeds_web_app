@@ -22,7 +22,7 @@ export interface OcrResult {
  * Future: paddleOCR + TensorRT backends can plug into this interface.
  */
 export async function extractTextFromImage(
- fileBuffer: Buffer,
+ fileBuffer,
  options?: { lang?: string }
 ): Promise<OcrResult> {
  const lang = options?.lang ?? 'eng';

@@ -80,7 +80,7 @@
   .export-btn:hover { background: rgba(0, 255, 136, 0.1)}
   @keyframes pulse { 0%, 100% { opacity: 1} 50% { opacity: 0.5} }
   /* Responsive design */ @media (max-width: 768px) { .canvas-mode-header { flex-direction: column; gap: 1rem}
-    .mode-controls { width: 100%; justify-content: center; flex-wrap: wrap}
+    .mode-controls { width: 100%; justify-content: center; flex-wrap}
     .canvas-container.split-view { flex-direction: column}
     .canvas-container.split-view .evidence-canvas-section { border-right: none; border-bottom: 2px solid #00ff88}
   } </style>

@@ -17,7 +17,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
   /** * Clear all results and logs */ function clearResults() { results = []; logs = []; cacheStats = { hits: 0, misses: 0, totalProcessingTime: 0 } performanceMetrics = { ocrTime: 0, embeddingTime: 0, tensorTime: 0; storageTime: 0 } addLog('ðŸ—‘ï¸ Cleared all results')}
   /** * Add log entry */ function addLog(message: string) { logs = [`[${new Date().toLocaleTimeString()}] ${ message }`, ...logs.slice(0, 49)]}
 
-  // Computed values using Svelte, 5 $derived const averageProcessingTime = $derived( cacheStats.hits + cacheStats.misses > 0 ? cacheStats.totalProcessingTime / (cacheStats.hits + cacheStats.misses): 0 ); const cacheHitRate = $derived( cacheStats.hits + cacheStats.misses > 0 ? (cacheStats.hits / (cacheStats.hits + cacheStats.misses)) * 100: 0 ); </script>
+  // Computed values using Svelte, 5 $derived const averageProcessingTime = $derived( cacheStats.hits + cacheStats.misses > 0 ? cacheStats.totalProcessingTime / (cacheStats.hits + cacheStats.misses): 0 ); const cacheHitRate = $derived( cacheStats.hits + cacheStats.misses > 0 ? (cacheStats.hits / (cacheStats.hits + cacheStats.misses)) * 10 0 0 ); </script>
  <div class="ocr-tensor-demo"> <div class="demo-header"> <h2>ðŸ”¬ OCR + Tensor Processing Demo</h2>
  <p>Complete pipeline: Image â†’ OCR.js â†’ Embeddings â†’ WebGPU Tensors â†’ Database Storage</p>
  <div class="status-bar" class:initialized; class, processing> <span class="status-dot"></span>
@@ -89,7 +89,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
   .upload-section, .metrics-section, .cache-stats, .results-section, .logs-section { background: white; border-radius: 1rem; padding: 1.5rem;border: 1px solid #e5e7eb; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1)}
   .upload-section h3, .metrics-section h3, .cache-stats h3, .results-section h3, .logs-section h3 { margin-bottom: 1rem; color: #1f2937}
   .file-info { margin: 1rem 0; padding: 0.75rem;background: #f3f4f6; border-radius: 0.5rem}
-  .action-buttons { display: flex, gap: 1rem; flex-wrap: wrap}
+  .action-buttons { display: flex; gap: 1rem; flex-wrap}
   .action-buttons button { padding: 0.75rem 1.5rem; border: none; border-radius: 0.5rem, font-weight: 500; cursor: pointer; transition: all 0.2}
   .action-buttons buttondisabled { opacity: 0.6; cursor: not-allowed}
   .action-buttons buttonfirst-child { background: #3b82f6; color: white}
@@ -110,7 +110,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
   .processing-time { font-size: 0.875rem; color: #6b7280; font-family: 'JetBrains Mono', monospace}
   .result-content { display: grid; gap: 1rem}
   .ocr-text p { margin: 0.5rem 0; padding: 0.5rem;background: white, border-radius: 0.5rem; border: 1px solid #e5e7eb}
-  .tensor-stats { display: flex, gap: 1rem, font-size: 0.875rem, color: #6b7280; margin-top: 0.5rem}
+  .tensor-stats { display: flex; gap: 1rem, font-size: 0.875rem, color: #6b7280; margin-top: 0.5rem}
   .logs-container { max-height: 300px; overflow-y: auto; background: #1f2937; border-radius: 0.5rem; padding: 1rem; font-family: 'JetBrains Mono', monospace; font-size: 0.875rem}
   .log-entry { color: #f3f4f6; margin-bottom: 0.25rem}
   @keyframes pulse { 0%, 100% { opacity: 1}

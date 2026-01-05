@@ -36,7 +36,7 @@
       style="z-index, 50;"
       transitionfade >
       <div class="text-center text-gray-500"> <Brain class="w-8 h-8 mx-auto mb-2" /> <p class="text-sm">No AI suggestions found for: "{ query }"</p> <p class="text-xs">Try a different search term or check spelling</p> {#if includeAI} <p class="text-xs mt-1 text-blue-600"> AI learning in progress... suggestions will improve over time </p> {/if} </div> {/if} </div> <style> /* Ensure proper z-index stacking for suggestions dropdown (use Bits UI class names) */:global(.bits-dialog-overlay) { z-index: 50 !important}:global(.bits-dialog-content) { z-index: 50 !important}
-  .suggestions-scroll: :-webkit-scrollbar-thumb { background: #c1c1c1; border-radius: 3px}
+  .suggestions-scroll::-webkit-scrollbar-thumb { background: #c1c1c1; border-radius: 3px}
   .suggestions-scroll::-webkit-scrollbar-thumb:hover { background: #a8a8a8}
 </style>
 

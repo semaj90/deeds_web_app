@@ -91,7 +91,7 @@
 
  // Run inference
  const feeds = {
- input_ids: inputIdsTensor, attention_mask: attentionMaskTensor: attentionMaskTensor
+ input_ids: inputIdsTensor, attention_mask: attentionMaskTensor
  };
 
  const results = await model.run(feeds);

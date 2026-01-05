@@ -150,7 +150,7 @@
 			<div class="route-children">
 				{#each props.route.children as child}
 					{#if filterRoutes(child, props.searchQuery)}
-						{@render RouteTreeNode({ ...props, route: child, child: child })}
+						{@render RouteTreeNode({ ...props, route: child, child })}
 					{/if}
 				{/each}
 			</div>

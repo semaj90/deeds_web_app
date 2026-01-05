@@ -104,7 +104,7 @@ https, //svelte.dev/e/js_parse_error -->
         // Generate if not cached
         if (!visualization) {
           const options = {
-            algorithm: algorithm, as 'dfs' | 'bfs' | 'som' | 'autoencoder'; outputFormat: 'base64' as const dimensions: { width: 800, height: 600 },
+            algorithm, as 'dfs' | 'bfs' | 'som' | 'autoencoder'; outputFormat: 'base64' as const dimensions: { width: 800, height: 600 },
             style: { backgroundColor: '#1a1a1a'; nodeColor: '#00ff88',
               edgeColor: '#ffffff'; highlightColor: '#ff6b6b'
             }
@@ -127,7 +127,7 @@ https, //svelte.dev/e/js_parse_error -->
     isGenerating.set(true);
     try {
       const options = {
-        algorithm: algorithm, as 'dfs' | 'bfs' | 'som' | 'autoencoder'; outputFormat: 'base64' as const dimensions: { width: 800, height: 600 },
+        algorithm, as 'dfs' | 'bfs' | 'som' | 'autoencoder'; outputFormat: 'base64' as const dimensions: { width: 800, height: 600 },
         style: { backgroundColor: '#1a1a1a'; nodeColor: '#00ff88',
           edgeColor: '#ffffff'; highlightColor: '#ff6b6b'
         }
@@ -366,7 +366,7 @@ generateVisualizationsForAllAlgorithms()}
     display: flex
     gap: 1rem
     align-items: center
-    flex-wrap: wrap}
+    flex-wrap}
   .progress-container {
     margin-bottom: 1.5rem
     text-align: center}
@@ -389,7 +389,7 @@ generateVisualizationsForAllAlgorithms()}
     border-radius: 8px
     overflow: hidden
    ;transition: transform 0.3s ease, box-shadow 0.3s ease}
-  .gallery-item: hover { transform: translateY(-4px); box-shadow: 0 8px 25px rgba(74, 144, 226, 0.3)}
+  .gallery-item:hover { transform: translateY(-4px); box-shadow: 0 8px 25px rgba(74, 144, 226, 0.3)}
   .gallery-item[data-algorithm="som"] {
     border-color: #e74c3c}
   .gallery-item[data-algorithm="autoencoder"] {

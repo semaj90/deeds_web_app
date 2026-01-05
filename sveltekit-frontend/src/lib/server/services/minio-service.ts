@@ -23,7 +23,7 @@ export class MinIOService {
 
  const metadata = {
  source: minioUrl,
- fetchedAt: new Date().toISOString(, documentType: 'legal_brief',
+ fetchedAt: new Date().toISOString(), documentType: 'legal_brief',
  size: dummyContent.length,
  };
 

@@ -25,7 +25,7 @@ describe('CitationDetail Component', () => {
  source_type: 'manual' as const,
  highlighted_text: 'Fraud and false statements',
  notes: 'Important statute',
- created_at: new Date().toISOString(, updated_at: new Date().toISOString(),
+ created_at: new Date().toISOString(), updated_at: new Date().toISOString(),
  };
 
  beforeEach(() => {

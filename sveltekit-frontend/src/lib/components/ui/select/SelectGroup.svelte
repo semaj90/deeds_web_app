@@ -1,19 +1,19 @@
 <script lang="ts">
-	import type { Snippet } from 'svelte';
-	import type { SelectGroupProps } from './types';
+  import { Select as BitsSelect } from "bits-ui";
+  import { cn } from "$lib/utils/cn";
+  import type { Snippet } from "svelte";
 
-	interface Props extends SelectGroupProps {
-		children?: Snippet;
-	}
+  interface Props {
+    children?: Snippet;
+    class?: string;
+    [key: string]: any;
+  }
 
-	let {
-		children,
-		class: className = '',
-	}: Props = $props();
+  let { children, class: className = "", ...rest }: Props = $props();
 </script>
 
-<div role="group" class="p-1 { className }">
-	{#if children}
-		{@render children()}
-	{/if}
-</div>
+<BitsSelect.Group class={cn("p-1", className)} {...rest}>
+  {#if children}
+    {@render children()}
+  {/if}
+</BitsSelect.Group>

@@ -66,7 +66,7 @@ export async function getRecentCases(limit: number = 5): Promise<RecentCase[]> {
  id: 'fallback-1',
  title: 'Sample Case #1',
  status: 'active',
- lastAccessed: new Date().toISOString(, confidence: 0.8, priority: 150, caseType: 'litigation',
+ lastAccessed: new Date().toISOString(), confidence: 0.8, priority: 150, caseType: 'litigation',
  urgency: 'high',
  glyphSignature: 'fb001',
  metadata: {

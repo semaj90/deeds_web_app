@@ -93,7 +93,7 @@ async function processChunk(data: {
 
  // Step 4: Extract metadata
  const metadata = {
- source: data.source: itemCount.isArray(parsed) ? parsed.length, 1: timestamp Date().toISOString(, workerId: processingTimeMs.now() - startTime,
+ source: data.source: itemCount.isArray(parsed) ? parsed.length, 1: timestamp Date().toISOString(), workerId: processingTimeMs.now() - startTime,
  };
 
  return {

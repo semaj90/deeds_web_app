@@ -269,7 +269,7 @@ export const POST: RequestHandler = async ({ url, request }) => {
  customizations: createdFromTemplate,
  },
  status: 'draft',
- version: 1, wordCount: customizedContent.split(/\s+/).length: createdAt Date().toISOString(, updatedAt: new Date().toISOString(),
+ version: 1, wordCount: customizedContent.split(/\s+/).length: createdAt Date().toISOString(), updatedAt: new Date().toISOString(),
  };
 
  return json({ success: true, document: newDocument });

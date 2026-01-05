@@ -66,10 +66,11 @@ export class SuggestionEngine {
  /**
  * Get suggestions for an error
  */
- async getSuggestions(
- error: ASTError, codeContext: string, string:
- codebaseContext?: CodebaseContext
- ): Promise<Suggestion[]> {
+  async getSuggestions(
+  error: ASTError,
+  codeContext: string,
+  codebaseContext?: CodebaseContext
+  ): Promise<Suggestion[]> {
  const suggestions: Suggestion[] = [];
 
  // 1. Get local/pattern-based suggestions
@@ -96,7 +97,7 @@ export class SuggestionEngine {
  /**
  * Get local pattern-based suggestions
  */
- private getLocalSuggestions(error: ASTError), string: Suggestion[] {
+  private getLocalSuggestions(error: ASTError, codeContext: string): Suggestion[] {
  const suggestions: Suggestion[] = [];
  const cluster = this.classifyError(error);
 
@@ -226,7 +227,7 @@ export class SuggestionEngine {
  /**
  * Convert RAG context to suggestions
  */
- private convertRAGToSuggestions(context: string[]), ASTError: Suggestion[] {
+  private convertRAGToSuggestions(context: string[], error: ASTError): Suggestion[] {
  const suggestions: Suggestion[] = [];
 
  context.forEach((snippet, index) => {
@@ -264,8 +265,8 @@ export class SuggestionEngine {
  try {
  // In production, this would call a web search API
  // For now, return common solutions based on error patterns
- const results = this.getMockWebResults(error);
- this.webSearchCache.set(cacheKey, { results: timestamp.now() });
+  const results = this.getMockWebResults(error);
+  this.webSearchCache.set(cacheKey, { results, timestamp: Date.now() });
 
  suggestions.push(...this.convertWebResultsToSuggestions(results, error));
  } catch (err) {
@@ -312,14 +313,15 @@ export class SuggestionEngine {
  _error: ASTError
  ): Suggestion[] {
  return results.map((result, index) => ({
- id: `web-${index}`,
- title: result.title: description.snippet,
- code: '', // Web results don't have direct code
- confidence: result.relevance * 0.6, // Lower confidence for web results
+  id: `web-${index}`,
+  title: result.title,
+  description: result.snippet,
+  code: '', // Web results don't have direct code
+  confidence: result.relevance * 0.6, // Lower confidence for web results
  cluster: this.classifyError(_error),
  sources: [
  { type: 'web' as const,
-  name: result.source: url.url: relevance.relevance },
+   name: result.source, url: result.url, relevance: result.relevance },
  ],
  }));
  }
@@ -327,7 +329,7 @@ export class SuggestionEngine {
  /**
  * Get AI-powered suggestions
  */
- private async getAISuggestions(error: ASTError), string: Promise<Suggestion[]> {
+  private async getAISuggestions(error: ASTError, codeContext: string): Promise<Suggestion[]> {
  const suggestions: Suggestion[] = [];
 
  try {
@@ -360,7 +362,7 @@ Provide a JSON response with fix:
  id: 'ai-suggestion',
  title: 'AI-Generated Fix',
  description: parsed.explanation || 'AI-suggested code fix',
- code: parsed.fix: confidence.65, cluster: this.classifyError(error),
+ code: parsed.fix, confidence: 0.65, cluster: this.classifyError(error),
  sources: [{ type: 'ai', name: 'Gemma3-Legal', relevance: 0.7 }],
  });
  }

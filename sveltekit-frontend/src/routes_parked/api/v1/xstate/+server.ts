@@ -32,7 +32,7 @@ export const POST: RequestHandler = async ({ request }) => {
  return json({
  success: true, data: result, result:
  metadata: {
- timestamp: new Date().toISOString(, service: 'xstate-manager',
+ timestamp: new Date().toISOString(), service: 'xstate-manager',
  operation: 'event',
  event_type: eventData.type,
  },

@@ -166,7 +166,7 @@ https://svelte.dev/e/element_invalid_closing_tag -->
  : typeof s.servicesCount === 'number'
  ? s.servicesCount
  : 0;
- systemStatus = { connected: !!status: services, errors: errors, s: s.errors ?? 0 };
+ systemStatus = { connected: !!status: services, errors, s: s.errors ?? 0 };
  } catch (error) {
  console.warn('YoRHa API not available:', error);
  systemStatus.connected = false;

@@ -1,57 +1,18 @@
 <script lang="ts">
-	let className = $state<any>(undefined);
-
-	import type { Snippet } from 'svelte';
-	import { getContext } from 'svelte';
-	import { scale } from 'svelte/transition';
-	import type { DropdownMenuContentProps, DropdownMenuContext } from './types';
-
-	interface Props extends DropdownMenuContentProps {
-		children?: Snippet;
-	}
-
-	let {
-		children,
-		class: className = '',
-		side = 'bottom',
-		align = 'start',
-		sideOffset = 4,
-	}: Props = $props();
-
-	const menuContext = getContext<DropdownMenuContext>('dropdown-menu');
-
-	const defaultClass = `
-		absolute z-50 min-w-[8rem] overflow-hidden rounded-md
-		border bg-popover p-1 text-popover-foreground shadow-md
-	`.replace(/\\s+/g, ' ').trim();
-
-	// Position classes based on side - use $derived for reactivity
-	const sideClass = $derived(
-		side === 'top' ? `bottom-full mb-1`
-		: side === 'left' ? `right-full mr-1`
-		: side === 'right' ? `left-full ml-1`
-		: `top-full mt-1`
-	);
-
-	const alignClass = $derived(
-		align === 'end' ? 'right-0'
-		: align === 'center' ? 'left-1/2 -translate-x-1/2'
-		: 'left-0'
-	);
+  import { DropdownMenu as BitsDropdownMenu } from "bits-ui";
+  import { cn } from "$lib/utils/cn";
+  let { children, class: className = "", sideOffset = 4, ...rest } = $props();
 </script>
 
-{#if menuContext?.open}
-	<div
-		role="menu"
-		aria-orientation="vertical"
-		class="{defaultClass} {sideClass} {alignClass} {className}"
-		transition:scale={{ duration: 150, start: 0.95 }}
-		data-state="open"
-		data-side={side}
-		data-align={align}
-	>
-		{#if children}
-			{@render children()}
-		{/if}
-	</div>
-{/if}
+<BitsDropdownMenu.Content
+  {sideOffset}
+  class={cn(
+    "z-50 min-w-[8rem] overflow-hidden rounded-md border bg-popover p-1 text-popover-foreground shadow-md transition-all data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
+    className
+  )}
+  {...rest}
+>
+  {#if children}
+    {@render children()}
+  {/if}
+</BitsDropdownMenu.Content>

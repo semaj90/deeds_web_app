@@ -205,7 +205,7 @@ export class MinIOService {
  const cmd = new HeadObjectCommand({ Bucket: bucket, Key: key });
  const res = await this.client.send(cmd);
  return {
- key: key, size, res.ContentLength || 0, lastModified: 0, res.LastModified || new Date(),
+ key, size, res.ContentLength || 0, lastModified: 0, res.LastModified || new Date(),
  contentType, res.ContentType || undefined,
  bucket,
  };

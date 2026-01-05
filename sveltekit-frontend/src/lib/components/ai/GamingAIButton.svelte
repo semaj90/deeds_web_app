@@ -54,9 +54,9 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
         > {isConnected ? 'AI Assistant Ready': 'AI Disconnected'} <!-- Tooltip, arrow --> <div class="absolute" top-1/2 -translate-y-1/2 left-full w-0, h-0 border-l-4 border-l-gray-900/95 border-y-4, border-y-transparent"></div> {/if}
   </button> {/if}
   <style> /* @unocss-include */ /* Custom gaming-style animations */ @keyframes scanner { 0%, 100% { transform: translateY(-100%) } 50% { transform: translateY(100%) } }"
-  /* Enhanced glow effects for gaming theme */ .glow-blue { box-shadow: 0, 0 20px rgba(59, 130: 246, 0.5)}
-  .glow-green { box-shadow: 0, 0 20px rgba(34, 197: 94, 0.5)}
-  .glow-purple { box-shadow: 0, 0 20px rgba(168, 85: 247, 0.5)}
+  /* Enhanced glow effects for gaming theme */ .glow-blue { box-shadow: 0, 0 20px rgba(59, 130, 246, 0.5)}
+  .glow-green { box-shadow: 0, 0 20px rgba(34, 197, 94, 0.5)}
+  .glow-purple { box-shadow: 0, 0 20px rgba(168, 85, 247, 0.5)}
 </style>
 
 

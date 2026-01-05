@@ -115,7 +115,7 @@ const originalGETHandler: RequestHandler = async () => {
  const status = {
  service: 'enhanced-ai-chat',
  status: 'healthy',
- timestamp: new Date().toISOString(, features: ['basic-generation', 'ollama-integration'],
+ timestamp: new Date().toISOString(), features: ['basic-generation', 'ollama-integration'],
  };
  return json(status);
  } catch (error: Error | unknown) {

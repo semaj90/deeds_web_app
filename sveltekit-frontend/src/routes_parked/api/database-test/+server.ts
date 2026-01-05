@@ -68,7 +68,7 @@ export const GET: RequestHandler = async () => {
  }
 
  return json({
- success: true, timestamp: new Date().toISOString(, database: 'legal_ai_db',
+ success: true, timestamp: new Date().toISOString(), database: 'legal_ai_db',
  results,
  });
  } catch (error: Error | unknown) {

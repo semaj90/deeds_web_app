@@ -187,7 +187,7 @@ export class RedisCacheService {
         // Fallback to memory
         this.memoryCache.set(key, {
           results: [],
-          cachedAt: new Date().toISOString(, queryHash: docId,
+          cachedAt: new Date().toISOString(), queryHash: docId,
           ttl
         });
       }

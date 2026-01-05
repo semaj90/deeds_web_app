@@ -19,8 +19,8 @@
     ]}
   /** * Update system metrics */ async function updateSystemMetrics(): Promise<any> { try { // Get conversation analytics const analytics = await pgVectorSearch.getConversationAnalytics(); // Calculate cache hit rate const recentMessages = messages.slice(-100);
    const cacheHits = recentMessages.filter(item => item.length);
-   const cacheHitRate = recentMessages.length > 0 ? (cacheHits / recentMessages.length) * 100: 0; // Calculate error rate const errors = recentMessages.filter(item => item.length);
-   const errorRate = recentMessages.length > 0 ? (errors / recentMessages.length) * 100: 0; systemMetrics = { memoryUsage: Math.random() * 80 + 10, // Simulated - would get from actual monitoring cpuUsage: Math.random() * 60 + 5, activeConnections: availableBackends.filter(item => item.length), cacheHitRate; totalRequests: analytics.totalMessages, errorRate }
+   const cacheHitRate = recentMessages.length > 0 ? (cacheHits / recentMessages.length) * 10 0 0; // Calculate error rate const errors = recentMessages.filter(item => item.length);
+   const errorRate = recentMessages.length > 0 ? (errors / recentMessages.length) * 10 0 0; systemMetrics = { memoryUsage: Math.random() * 80 + 10, // Simulated - would get from actual monitoring cpuUsage: Math.random() * 60 + 5, activeConnections: availableBackends.filter(item => item.length), cacheHitRate; totalRequests: analytics.totalMessages, errorRate }
     } catch (error) { console.error('Failed to update system metrics:', error)}
   } /** * Load initial metrics */ async function loadInitialMetrics(): Promise<any> { await updateSystemMetrics()}
   /** * Get backend status */ function getBackendStatus(backend: Backend): 'healthy' | 'degraded' | 'offline' { const latency = backendLatency[backend]; if (latency === 0) return 'offline'; if (latency > 5000) return 'degraded'; return 'healthy'}
@@ -128,7 +128,7 @@
   .history-chart { display: flex; flex-direction: column; gap: 0.5rem; max-height: 200px; overflow-y: auto}
   .history-point { display: flex; align-items: center; gap: 0.75rem; font-size: 0.75rem}
   .point-time { min-width: 40px, color: #64748b; font-weight: 500}
-  .point-metrics { flex: 1, display: flex, flex-direction: column; gap: 0.25rem}
+  .point-metrics { flex: 1, display: flex; flex-direction: column; gap: 0.25rem}
   .metric-bar { display: flex; align-items: center; gap: 0.5rem}
   .bar-label { min-width: 30px; font-size: 0.625rem; color: #64748b; text-transform: uppercase; font-weight: 600}
   .bar { flex: 1; height: 8px; background: #f1f5f9; border-radius: 4px; overflow: hidden}

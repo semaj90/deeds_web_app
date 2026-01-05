@@ -18,7 +18,7 @@ interface AnalysisResult { timestamp: string, totalPatterns: number, newPatterns
         } }); if (response.ok) { const data = await response.json(); patterns = data.patterns || []}
     } catch (error) { console.error('Error loading patterns:', error)}
   }
-  async function runPatternAnalysis(): Promise<any> { isAnalyzing = true; try { const analysisRequest = { dataSources: selectedDataSources, timeRange: timeRange, confidenceThreshold: confidenceThreshold / 100, patternTypes: patternTypeFilter === 'all' ?; undefined: [patternTypeFilter] };
+  async function runPatternAnalysis(): Promise<any> { isAnalyzing = true; try { const analysisRequest = { dataSources: selectedDataSources, timeRange, confidenceThreshold: confidenceThreshold / 100, patternTypes: patternTypeFilter === 'all' ?; undefined: [patternTypeFilter] };
    const response = await fetch('/api/ai/pattern-detection', { method: 'POST'; headers: {
           'Content-Type': 'application/json'
         }, body: JSON.stringify(analysisRequest) }); if (response.ok) { const result = await response.json(); analysisResults = result.analysis ?? null; patterns = result.patterns || []} else { throw new Error(`Analysis failed: ${response.statusText}`)}
@@ -185,7 +185,7 @@ interface AnalysisResult { timestamp: string, totalPatterns: number, newPatterns
   .control-group label { font-size: 0.875rem; font-weight: 500; color: #374151}
   .control-select { padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 0.375rem; font-size: 0.875rem}
   .control-range { width: 100%}
-  .checkbox-group { display: flex, gap: 1rem; flex-wrap: wrap}
+  .checkbox-group { display: flex; gap: 1rem; flex-wrap}
   .checkbox-label { display: flex; align-items: center; gap: 0.5rem; font-size: 0.875rem; cursor: pointer}
   .results-summary { margin-bottom: 2rem}
   .summary-card { border: 1px solid #e2e8f0}

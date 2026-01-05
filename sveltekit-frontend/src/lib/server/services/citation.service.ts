@@ -257,7 +257,7 @@ class CitationService {
  userId,
  'unknown',
  'retrieve',
- { citation_id: id, action: 'delete' },
+ { citation_id, action: 'delete' },
  true
  );
  } catch (error) {

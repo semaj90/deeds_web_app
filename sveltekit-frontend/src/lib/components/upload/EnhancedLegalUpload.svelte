@@ -137,13 +137,13 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
 </div> </div> {/if} {#if !ocrResults && !legalAnalysis && !semanticEmbeddings} <div class="nes-container is-rounded"> <p class="nes-text">No processing data available yet. Upload a document to see detailed analysis.</p> {/if}
 </div> </div> </Dialog.Content> </Dialog.Portal> </Dialog> <style> /* bits-ui + nes.css integration styles */ .enhanced-legal-upload { max-width: 900px; margin: 2rem auto; font-family: 'Press Start 2P', monospace}
   .upload-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem, flex-wrap: wrap; gap: 1rem}
-  .feature-indicators { display: flex, gap: 0.5rem; flex-wrap: wrap}
+  .feature-indicators { display: flex; gap: 0.5rem; flex-wrap}
   /* Custom nes.css enhancements for file upload */ .file-upload-area { cursor: pointer; transition: all 0.3s ease; min-height: 200px, display: flex; align-items: center; justify-content: center; text-align: center}
-  .file-upload-area: hover { transform: translateY(-2px); box-shadow: 4px 4px 0px #000}
+  .file-upload-area:hover { transform: translateY(-2px); box-shadow: 4px 4px 0px #000}
   .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem}
   /* NES.css checkbox styling */ .checkbox-group { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; margin-top: 1rem}
   /* File preview with retro styling */ .file-preview { display: flex; flex-direction: column; gap: 1rem}
-  .file-info { display: flex; align-items: flex-start; gap: 1rem; flex-wrap: wrap}
+  .file-info { display: flex; align-items: flex-start; gap: 1rem; flex-wrap}
   .image-preview { width: 100px, height: 100px; object-fit: cover; image-rendering: pixelated; border: 4px solid #000}
   .file-icon { width: 100px; height: 100px; display: flex; align-items: center; justify-content: center; font-size: 2rem; border: 4px solid #000;background: #fff}
   .file-details { flex: 1; min-width: 200px}

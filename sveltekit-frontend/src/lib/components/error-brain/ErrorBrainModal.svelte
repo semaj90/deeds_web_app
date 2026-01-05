@@ -78,7 +78,7 @@
 					method: 'POST',
 					headers: { 'Content-Type': 'application/json' },
 					body: JSON.stringify({
-						suggestions: selected_suggestion_index, selectedSuggestionIndex: selectedSuggestionIndex,
+						suggestions: selected_suggestion_index, selectedSuggestionIndex,
 						phase: currentPhase, error_message: errorMessage, errorMessage, errorMessage || null,
 						metadata: { timestamp: new Date().toISOString() }
 					})
@@ -115,7 +115,7 @@
 					method: 'POST',
 					headers: { 'Content-Type': 'application/json' },
 					body: JSON.stringify({
-						file_path: filePath, patch_content: patchContent, patchContent: patchContent,
+						file_path: filePath, patch_content: patchContent, patchContent,
 						description: `Patch from error brain analysis`,
 						analysis_id: analysisId,
 						risk_level: 'medium'

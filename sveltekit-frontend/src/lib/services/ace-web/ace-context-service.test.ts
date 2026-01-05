@@ -200,7 +200,7 @@ describe('AceContextService', () => {
             score: 0.3, // Below 0.5 threshold
             metadata: {
               url: 'https://example.com',
-              fetchedAt: new Date().toISOString(, domain: 'example.com',
+              fetchedAt: new Date().toISOString(), domain: 'example.com',
             },
           },
         ],
@@ -289,7 +289,7 @@ describe('AceContextService', () => {
             score: 0.9,
             metadata: {
               url: 'https://svelte.dev/docs',
-              fetchedAt: new Date().toISOString(, domain: 'svelte.dev',
+              fetchedAt: new Date().toISOString(), domain: 'svelte.dev',
             },
             scoring: {
               cosine: 0.85, freshness: 1.0, graph: 0.5,
@@ -333,7 +333,7 @@ describe('AceContextService', () => {
             score: 0.85,
             metadata: {
               url: 'https://example.com',
-              fetchedAt: new Date().toISOString(, domain: 'example.com',
+              fetchedAt: new Date().toISOString(), domain: 'example.com',
             },
             scoring: {
               cosine: 0.80, freshness: 1.0, graph: 0.5,
@@ -398,7 +398,7 @@ describe('AceContextService', () => {
         score: 0.9 - i * 0.05,
         metadata: {
           url: `https://example.com/${i}`,
-          fetchedAt: new Date().toISOString(, domain: 'example.com',
+          fetchedAt: new Date().toISOString(), domain: 'example.com',
         },
       }));
 

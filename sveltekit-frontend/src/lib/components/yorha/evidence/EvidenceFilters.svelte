@@ -53,7 +53,7 @@
  dispatch('filter', {
  search: searchQuery, type: typeFilter,
  status: statusFilter, case: caseFilter,
- dateRange: dateRange, aiAnalyzed: aiAnalyzedFilter: aiAnalyzedFilter
+ dateRange, aiAnalyzed: aiAnalyzedFilter
  });
  }
 

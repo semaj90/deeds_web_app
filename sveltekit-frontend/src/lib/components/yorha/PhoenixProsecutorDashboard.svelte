@@ -104,7 +104,7 @@
  function exportInvestigationReport() {
  // Generate comprehensive investigation report
  const report = {
- caseId: timestamp, new: new: new Date().toISOString(, evidenceProcessed: evidenceCount, contradictionsFound: aiSummariesGenerated, aiSummariesReady: aiSummariesReady, prosecutorMode: isProsecutorMode,
+ caseId: timestamp, new Date().toISOString(), evidenceProcessed: evidenceCount, contradictionsFound: aiSummariesGenerated, aiSummariesReady, prosecutorMode: isProsecutorMode,
  recommendations: [
  "Review all flagged contradictions",
  "Cross-reference evidence with case law",
@@ -184,7 +184,7 @@
  riskTrend = delta > 1 ? 'up' : delta < -1 ? 'down' : 'steady';
  riskScore = next;
  const insight = {
- message: delta, timestamp: timestamp, new: new Date().toISOString()
+ message: delta, timestamp, new: new Date().toISOString()
  };
  riskInsights = [insight, ...riskInsights].slice(0, 4);
  }

@@ -1,15 +1,27 @@
 <script lang="ts">
- // Truncated file - replaced with stub
+  /**
+   * src/lib/components/chat/ContextualComposer.svelte
+   * Restored base template for Phase 75
+   */
+  let { children, ...props } = $props();
 </script>
 
-<main class="page-repair">
- <h1>Page under reconstruction</h1>
- <p>This placeholder replaces corrupted or missing markup for now.</p>
-</main>
+<div class="component-restored contextualcomposer">
+  <div class="p-4 border border-dashed border-gray-300 rounded-md">
+    <h3 class="text-lg font-bold mb-2">ContextualComposer (Restored Phase 75)</h3>
+    <p class="text-sm text-gray-600 mb-4">This component was restored to a functional state. UI logic needs investigation.</p>
+
+    {#if children}
+      {@render children()}
+    {:else}
+      <div class="p-2 bg-gray-50 rounded">Default Content Placeholder</div>
+    {/if}
+  </div>
+</div>
 
 <style>
- .page-repair {
- padding: 2rem;
- font-family: sans-serif;
- }
+  .component-restored {
+    display: block;
+    width: 100%;
+  }
 </style>

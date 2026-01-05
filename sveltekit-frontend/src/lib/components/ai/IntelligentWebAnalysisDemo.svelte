@@ -143,7 +143,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
   .metric { display: flex; flex-direction: column; gap: 0.25rem; text-align: center; padding: 0.75rem;background: #f9fafb; border-radius: 0.5rem}
   .metric-label { font-size: 0.75rem, color: #6b7280; text-transform: uppercase; font-weight: 500}
   .metric-value { font-size: 1.25rem; font-weight: 600; color: #1f2937}
-  .efficiency-metrics { border-top: 1px solid #e5e7eb; padding-top: 1rem, display: flex, flex-direction: column; gap: 0.5rem}
+  .efficiency-metrics { border-top: 1px solid #e5e7eb; padding-top: 1rem, display: flex; flex-direction: column; gap: 0.5rem}
   .efficiency-metric { display: flex; justify-content: space-betweenn, font-size: 0.875rem; color: #6b7280}
   .analytics-section { margin-bottom: 1rem; padding-bottom: 1rem; border-bottom: 1px solid #f3f4f6}
   .analytics-sectionlast-child { border-bottom: none}

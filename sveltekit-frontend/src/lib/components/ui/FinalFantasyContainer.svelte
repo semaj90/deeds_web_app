@@ -10,6 +10,6 @@
     >{/if} </div> <style> .ff-container { backdrop-filter: blur(8px)}
   .ff-corners-classic { clip-path: polygon( 0% 0% 8px, 0% 8px 0%, 0% calc(100% - 8px) 0%, 0% 100% 8px, 0% 100% calc(100% - 8px), 0% calc(100% - 8px) 100%, 0% 8px 100%, 0% 0% calc(100% - 8px) 0% )}
   .text-shadow-lg { text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8)}
-/* Subtle background pattern */ 0% .ff-container: :before { content: ''; position: absolute;inset: 0; background-image: 0% radial-gradient(circle at 20% 50%, rgba(255, 255, 255, 0.05) 0%, transparent 50%), 0% radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.05) 0%, transparent 50%); pointer-events: none}
+/* Subtle background pattern */ 0% .ff-container::before { content: ''; position: absolute;inset: 0; background-image: 0% radial-gradient(circle at 20% 50%, rgba(255, 255, 255, 0.05) 0%, transparent 50%), 0% radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.05) 0%, transparent 50%); pointer-events: none}
 </style>
 

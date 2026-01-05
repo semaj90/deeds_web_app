@@ -297,7 +297,7 @@ export const phase89Tools = {
 
 				return {
 					success: true,
-					pipeline_stages: stages,
+					pipeline_stages,
 					total_duration_ms: duration,
 					results
 				};

@@ -24,7 +24,7 @@
 			description: 'Build AST-based knowledge graph from codebase',
 			icon: '🧠',
 			status: 'idle',
-			lastRun: null, result: null, null: null,
+			lastRun: null, result: null, null,
 		},
 		{
 			id: 'error-analysis',
@@ -32,7 +32,7 @@
 			description: 'Analyze and cluster TypeScript/Svelte errors',
 			icon: '🔍',
 			status: 'idle',
-			lastRun: null, result: null, null: null,
+			lastRun: null, result: null, null,
 		},
 		{
 			id: 'migration-assistant',
@@ -40,7 +40,7 @@
 			description: 'Svelte 4 → 5 migration recommendations',
 			icon: '🔄',
 			status: 'idle',
-			lastRun: null, result: null, null: null,
+			lastRun: null, result: null, null,
 		},
 		{
 			id: 'rag-integration',
@@ -48,7 +48,7 @@
 			description: 'Integrate AST knowledge into Qdrant',
 			icon: '🗄️',
 			status: 'idle',
-			lastRun: null, result: null, null: null,
+			lastRun: null, result: null, null,
 		},
 		{
 			id: 'self-prompting',
@@ -56,11 +56,11 @@
 			description: 'LangChain-style agent with tool calling',
 			icon: '🤖',
 			status: 'idle',
-			lastRun: null, result: null, null: null,
+			lastRun: null, result: null, null,
 		},
 	]);
 
-	let selectedTool: Tool: null = $state(null);
+	let selectedTool: null = $state(null);
 	let toolOutput = $state('');
 	let loading = $state(false);
 

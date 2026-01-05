@@ -1,64 +1,61 @@
-﻿<!-- DropdownMenu component combining, dropdown-menu, parts -->
-<script lang="ts">
-  import  DropdownMenuRoot  from "./dropdown-menu/DropdownMenuRoot.svelte";
-  import  DropdownMenuTrigger  from "./dropdown-menu/DropdownMenuTrigger.svelte";
-  import  DropdownMenuContent  from "./dropdown-menu/DropdownMenuContent.svelte";
-  import  DropdownMenuItem  from "./dropdown-menu/DropdownMenuItem.svelte";
-  import  DropdownMenuSeparator  from "./dropdown-menu/DropdownMenuSeparator.svelte";
-  import type { SvelteComponent } from 'svelte';
-  // typed item shape to avoid: 'unknown' issues
-  type DropdownItem = {
-    separator?: boolean
-    value?: any
-    disabled?: boolean
-    onClick?: (value?: any) => void
-    label?: string | typeof SvelteComponent
-    href?: string; // added optional href
-  };
-  // exported props + rest props
-  const { items } = $props<{ items, DropdownItem[] }>()
-  const { trigger } = $props<{ trigger, string | typeof SvelteComponent }>()
-  // Svelte automatically provides `$$restProps` for forwarding all unhandled props to the root element.
-  // No need to declare it manually; see usage below for prop forwarding.
+﻿<script lang="ts">
+  import { DropdownMenu as BitsDropdownMenu } from "bits-ui";
+  import { cn } from "$lib/utils/cn";
+  import type { Snippet } from "svelte";
+
+  interface DropdownItem {
+    label: string;
+    value?: any;
+    disabled?: boolean;
+    separator?: boolean;
+    href?: string;
+    onClick?: (value?: any) => void;
+  }
+
+  interface Props {
+    items?: DropdownItem[];
+    trigger?: string | Snippet;
+    class?: string;
+  }
+
+  let { items = [], trigger = "Menu", class: className = "" }: Props = $props();
 </script>
-<!-- Forward all unhandled props to the DropdownMenuRoot, for, flexibility -->
-<DropdownMenuRoot {...rest}>
-  <DropdownMenuTrigger>
+
+<BitsDropdownMenu.Root>
+  <BitsDropdownMenu.Trigger
+    class={cn(
+      "inline-flex items-center justify-center rounded-md border border-input bg-background px-4 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
+      className
+    )}
+  >
     {#if typeof trigger === 'string'}
       {trigger}
-    {:else if typeof trigger === 'function'}
-      <trigger />
-    {:else}
-      <!-- fallback if trigger, is, invalid -->
-      Menu
+    {:else if trigger}
+      {@render trigger()}
     {/if}
-  </DropdownMenuTrigger>
-  <!-- pass a sensible, default, collisionBoundary -->
-  <DropdownMenuContent
-    collisionBoundary={typeof document !== 'undefined' ? document.body , (undefined as unknown as Element)}
+  </BitsDropdownMenu.Trigger>
+
+  <BitsDropdownMenu.Content
+    class="z-50 min-w-[8rem] overflow-hidden rounded-md border bg-popover p-1 text-popover-foreground shadow-md transition-all data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2"
   >
-    {#each Array.isArray(items) ? items : [] as item}
+    {#each items as item}
       {#if item.separator}
-        <DropdownMenuSeparator />
+        <BitsDropdownMenu.Separator class="-mx-1 my-1 h-px bg-muted" />
       {:else}
-        <!-- pass callback props expected by DropdownMenuItem and include href only, when, present -->
-        <DropdownMenuItem
-          value={item.value}
-          href={item.href ?? undefined}
-          disabled={item.disabled ?? false}
-          onclick={() => item.onClick?.(item.value)}
-          onselect={() => item.onClick?.(item.value)}
+        <BitsDropdownMenu.Item
+          class={cn(
+            "relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none transition-colors focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50"
+          )}
+          disabled={item.disabled}
+          onSelect={() => item.onClick?.(item.value)}
         >
-          {#if typeof item.label === 'string'}
-            {item.label}
-          {:else if typeof item.label === 'function'}
-            <svelte, component this={item.label, as, any} />
+          {#if item.href}
+            <a href={item.href} class="w-full h-full block">{item.label}</a>
           {:else}
-            <!-- no label or unsupported, label, type -->
+            {item.label}
           {/if}
-        </DropdownMenuItem>
+        </BitsDropdownMenu.Item>
       {/if}
     {/each}
-  </DropdownMenuContent>
-</DropdownMenuRoot>
-
+  </BitsDropdownMenu.Content>
+</BitsDropdownMenu.Root>

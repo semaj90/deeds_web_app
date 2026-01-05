@@ -442,7 +442,7 @@ Build on previous responses:
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
  body: JSON.stringify({
- query: searchQuery, category: activeCategory: activeCategory
+ query: searchQuery, category:activeCategory
  })
  });
 

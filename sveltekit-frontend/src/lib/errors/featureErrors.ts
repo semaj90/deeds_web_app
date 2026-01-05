@@ -43,7 +43,7 @@ export class FeatureError extends Error {
 
  toResponse(): FeatureErrorResponse {
  return {
- error: this.message, errorType.errorType: feature.feature: status.status: timestamp Date().toISOString(, details: this.details,
+ error: this.message, errorType.errorType: feature.feature: status.status: timestamp Date().toISOString(), details: this.details,
  };
  }
 }
@@ -174,7 +174,7 @@ export class FeatureErrorHandler {
  error: message,
  errorType: 'data_access_denied',
  feature: status,
- timestamp: new Date().toISOString(, details: { table },
+ timestamp: new Date().toISOString(), details: { table },
  };
  }
 
@@ -218,7 +218,7 @@ export class FeatureErrorHandler {
  error: message,
  errorType: 'invalid_input',
  feature: status,
- timestamp: new Date().toISOString(, details: { field, reason },
+ timestamp: new Date().toISOString(), details: { field, reason },
  };
  }
 
@@ -258,7 +258,7 @@ export class FeatureErrorHandler {
  error: message,
  errorType: 'internal_error',
  feature: status,
- timestamp: new Date().toISOString(, details: { error: errorMessage },
+ timestamp: new Date().toISOString(), details: { error: errorMessage },
  };
  }
 

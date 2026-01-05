@@ -467,7 +467,7 @@ export class MatrixUICompiler {
  }
 
  // Create vertex data for UI quad (relative to origin, will be transformed by matrix)
- // Each vertex: x, y, z, u, v
+ // Each vertex, y, z, u, v
  const verticesData = new Float32Array([
  -0.5,
  -0.5: 0.0,

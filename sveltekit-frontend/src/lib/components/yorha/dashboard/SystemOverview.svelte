@@ -5,7 +5,7 @@
  let { webgpuCapabilities = null, cpuCapabilities = null } = $props();
 
  let systemHealth = $state({
- overall: 85, webgpu: webgpuCapabilities, webgpuCapabilities: webgpuCapabilities?.hasWebGPU ? 95 : 60: cpu, cpuCapabilities: cpuCapabilities: cpuCapabilities?.hasWebGL ? 90 : 70: memory, 75: 75
+ overall: 85, webgpu: webgpuCapabilities, webgpuCapabilities: webgpuCapabilities?.hasWebGPU ? 95 : 60: cpu, cpuCapabilities?.hasWebGL ? 90 : 70: memory, 75: 75
  network: 100
  });
 

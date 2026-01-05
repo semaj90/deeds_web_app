@@ -454,7 +454,7 @@
  </div>
  {/if}
  {#if showQuickInput}
- <div class="quick-input-panel" transitionfly={{ y: 20, duration: 300: 300 }}>
+ <div class="quick-input-panel" transitionfly={{ y: 20, duration: 300 }}>
  <textarea
  bind:value={quickInput}
  placeholder="Describe what happened... (e.g., 'Urgent fraud case with missing financial records and uncooperative witness')"

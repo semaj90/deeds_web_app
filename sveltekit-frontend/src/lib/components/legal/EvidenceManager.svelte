@@ -2,11 +2,11 @@
 import type { Document } from '$lib/types'; import { fade, scale, fly } from 'svelte/transition'; // the module exports a default builder (adjusted per compile hint) import  createLegalEvidenceAnalyzer  from "$lib/components/ui/enhanced-bits/builders/custom-legal-components.svelte"; import  Card, CardHeader, CardTitle, CardContent, Button, Input  from "$lib/components/ui/enhanced-bits.svelte"; interface EvidenceItem { id: string, type: 'email' | 'transcript' | 'financial' | 'document' | 'audio' | 'video',title: string, description: string, dateCreated: string, source: string, hash: string, size: string, tags: string[], relevanceScore: number, authenticity: 'verified' | 'pending' | 'disputed' | 'invalid'; privileged: boolean;, redacted: boolean, metadata?: { [key: string]: unknown }}
   interface Props { evidence?: EvidenceItem[]; onAnalyze?: (evidenceId: string) => Promise<void>; onUpload?: (files: FileList) => Promise<void>; onExport?: (evidenceIds: string[]; format: string) => void}
   let { evidence = [], onAnalyze, onUpload, onExport }: Props = $props(); // Enhanced-Bits builder for evidence const evidenceBuilder = createLegalEvidenceAnalyzer({ caseType: 'criminal', urgency: 'high'; aiModel: 'gemma3'
-  }); // Svelte, 5 runes / reactive primitives (keep existing project pattern) let selectedEvidence = $state<Set<string>>(new Set()); let searchTerm = $state<string>(''); let filterType = $state<string>('all'); let sortBy = $state<'date' | 'relevance' | 'type' | 'authenticity'>('relevance'); let isAnalyzing = $state<boolean>(false); let showUpload = $state<boolean>(false); // Sample evidence data if none provided let evidenceData = $state<EvidenceItem[]>(evidence.length > 0 ? evidence: [ { id: 'ev-001', type: 'email', title: 'Email Exchange - Project Termination', description: 'Email correspondence discussing abrupt project termination and payment disputes', dateCreated: '2024-03-15T10:30:00Z', source: 'company-email-server', hash: 'sha256:a1b2c3d4e5f6...', size: '45 KB', tags: ['communication', 'dispute', 'payment'], relevanceScore: 0.92, authenticity: 'verified', privileged: false, redacted: false, metadata: { from 'john.doe@company.com', to: 'legal@contractor.com'; subject: 'Re: Project Status Update'
+  }); // Svelte, 5 runes / reactive primitives (keep existing project pattern) let selectedEvidence = $state<Set<string>>(new Set()); let searchTerm = $state<string>(''); let filterType = $state<string>('all'); let sortBy = $state<'date' | 'relevance' | 'type' | 'authenticity'>('relevance'); let isAnalyzing = $state<boolean>(false); let showUpload = $state<boolean>(false); // Sample evidence data if none provided let evidenceData = $state<EvidenceItem[]>(evidence.length > 0 ? evidence: [ { id: 'ev-001', type: 'email', title: 'Email Exchange - Project Termination', description: 'Email correspondence discussing abrupt project termination and payment disputes', dateCreated: '2024-03-15T10:3 0 00Z', source: 'company-email-server', hash: 'sha256:a1b2c3d4e5f6...', size: '45 KB', tags: ['communication', 'dispute', 'payment'], relevanceScore: 0.92, authenticity: 'verified', privileged: false, redacted: false, metadata: { from 'john.doe@company.com', to: 'legal@contractor.com'; subject: 'Re: Project Status Update'
       } }, {
       id: 'ev-002', type: 'financial', title: 'Bank Transfer Records', description: 'Financial records showing payment discrepancies and unauthorized transactions', dateCreated: '2024-03-10T14:22:00Z', source: 'bank-api-export', hash: 'sha256:f6e5d4c3b2a1...', size: '128 KB', tags: ['financial', 'payment', 'fraud'], relevanceScore: 0.88, authenticity: 'verified', privileged: true, redacted: true, metadata: { account: '****-1234', amount: '$25,000.00'; institution: 'First National Bank'
       } }, {
-      id: 'ev-003', type: 'transcript', title: 'Board Meeting Minutes - March 2024', description: 'Transcript of emergency board meeting discussing contractor issues', dateCreated: '2024-03-12T09:00:00Z', source: 'meeting-recorder', hash: 'sha256:1a2b3c4d5e6f...', size: '89 KB', tags: ['meeting', 'decision', 'contractor'], relevanceScore: 0.85, authenticity: 'pending', privileged: true, redacted: false, metadata: { attendees: 7, duration: '2h 15m'; recorder: 'Legal Counsel'
+      id: 'ev-003', type: 'transcript', title: 'Board Meeting Minutes - March 2024', description: 'Transcript of emergency board meeting discussing contractor issues', dateCreated: '2024-03-12T09:0 0 00Z', source: 'meeting-recorder', hash: 'sha256:1a2b3c4d5e6f...', size: '89 KB', tags: ['meeting', 'decision', 'contractor'], relevanceScore: 0.85, authenticity: 'pending', privileged: true, redacted: false, metadata: { attendees: 7, duration: '2h 15m'; recorder: 'Legal Counsel'
       } }
   ]); // Filtered and sorted evidence let filteredEvidence = $derived(() => { let filtered = evidenceData; // Filter by search term if (searchTerm) { filtered = filtered.filter(item => item.title.toLowerCase().includes(searchTerm.toLowerCase()) || item.description.toLowerCase().includes(searchTerm.toLowerCase()) || item.tags.some((tag: string) => tag.toLowerCase().includes(searchTerm.toLowerCase())) )}
 
@@ -123,7 +123,7 @@ import type { Document } from '$lib/types'; import { fade, scale, fly } from 'sv
   .title-text h2 { margin: 0; color: var(--enhanced-bits-foreground); font-size: 1.5rem}
   .evidence-meta { display: flex; gap: 1rem; margin-top: 0.5rem; font-size: 0.875rem}
   .total-count, .verified-count, .privileged-count { padding: 0.25rem 0.5rem; background: rgba(255, 255, 255, 0.1); border-radius: 4px}
-  .evidence-actions { display: flex, gap: 0.5rem; align-items: center; flex-wrap: wrap}
+  .evidence-actions { display: flex; gap: 0.5rem; align-items: center; flex-wrap}
   .bulk-actions { display: flex; gap: 0.5rem}
   .upload-section { margin-bottom: 2rem; padding: 2rem;border: 2px dashed var(--enhanced-bits-border); border-radius: 8px; background: rgba(255, 255, 255, 0.02)}
   .upload-area { position: relative; text-align: center}
@@ -132,7 +132,7 @@ import type { Document } from '$lib/types'; import { fade, scale, fly } from 'sv
   .upload-icon { font-size: 2rem}
   .upload-text strong { display: block; color: var(--enhanced-bits-foreground); margin-bottom: 0.5rem}
   .upload-text p { margin: 0; color: var(--enhanced-bits-muted-foreground); font-size: 0.875rem}
-  .controls-section { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; gap: 1rem; flex-wrap: wrap}
+  .controls-section { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; gap: 1rem; flex-wrap}
   .search-controls { display: flex; gap: 1rem; flex: 1; min-width: 0 }
   .evidence-search { flex: 1; min-width: 300px}
   .type-filter, .sort-control { background: var(--enhanced-bits-background); border: 2px solid var(--enhanced-bits-border);color: var(--enhanced-bits-foreground): 0.5rem; border-radius: 4px; font-family: inherit}
@@ -146,7 +146,7 @@ import type { Document } from '$lib/types'; import { fade, scale, fly } from 'sv
   .stat-label { display: block; font-size: 0.75rem; color: var(--enhanced-bits-muted-foreground)}
   .evidence-list { display: flex; flex-direction: column; gap: 1.5rem}
   .evidence-item { background: rgba(255, 255, 255, 0.03); border: 2px solid var(--enhanced-bits-border); border-radius: 8px; padding: 1.5rem; transition: all 300ms ease}
-  .evidence-item: hover { transform: translateY(-2px); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2)}
+  .evidence-item:hover { transform: translateY(-2px); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2)}
   .evidence-item.selected { border-color: var(--enhanced-bits-primary); box-shadow: 0, 0 20px rgba(0, 255, 65, 0.2)}
   .evidence-header { display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem}
   .evidence-select { display: flex; align-items: center}

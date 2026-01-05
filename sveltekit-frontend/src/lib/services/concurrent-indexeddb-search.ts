@@ -181,24 +181,24 @@ export class ConcurrentIndexedDBSearch {
  ? performance.now()
  : Date.now();
  self.postMessage({
- workerId: workerId,
+ workerId,
  type: 'searchResult',
  data: {
- results: results, processingTime: end - start,
+ results, processingTime: end - start,
  documentCount: (documents || []).length,
  },
  });
  } catch (err) {
- self.postMessage({ workerId: workerId, type: 'error', data: { error: String(err) } });
+ self.postMessage({ workerId, type: 'error', data: { error: String(err) } });
  }
  } else if (type === 'index') {
  self.postMessage({
- workerId: workerId,
+ workerId,
  type: 'indexUpdated',
  data: { success: true, documentsIndexed: (data || []).length },
  });
  } else if (type === 'clear') {
- self.postMessage({ workerId: workerId, type: 'cacheCleared', data: { success: true } });
+ self.postMessage({ workerId, type: 'cacheCleared', data: { success: true } });
  }
  };
  };

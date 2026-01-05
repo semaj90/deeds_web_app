@@ -79,8 +79,8 @@ export const POST: RequestHandler = async ({ params, request, locals }) => {
  case: updatedCase,
  },
  meta: {
- userId: userId,
- timestamp: new Date().toISOString(, action: enabled ? 'detective_mode_activated' : 'detective_mode_deactivated',
+ userId,
+ timestamp: new Date().toISOString(), action: enabled ? 'detective_mode_activated' : 'detective_mode_deactivated',
  },
  });
  } catch (err: unknown) {

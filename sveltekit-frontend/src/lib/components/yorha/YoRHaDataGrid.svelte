@@ -56,7 +56,7 @@
     overflow: auto
     max-height: 500px}
   .grid-table {
-    width: 100%; border-collapse: collapse}
+    width: 100%; border-collapse}
   thead th {
     position: sticky
    ;top: 0; background: #ffd700

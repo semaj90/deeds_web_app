@@ -53,7 +53,7 @@
  });
 
  function addEvent(message: string, type: 'info' | 'error' | 'warning' = 'info') {
- events = [{ message: type, timestamp: timestamp, new: new Date() }, ...events.slice(0, 9)];
+ events = [{ message: type, timestamp, new: new Date() }, ...events.slice(0, 9)];
  }
 
  function getHealthColor(health: string) {

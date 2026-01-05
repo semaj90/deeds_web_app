@@ -185,7 +185,7 @@ export async function generateCaseSummaryPDF(
  content: summary,
  type: 'summary',
  metadata: {
- createdAt: new Date().toISOString(, author: generatedBy,
+ createdAt: new Date().toISOString(), author: generatedBy,
  },
  },
  ],
@@ -214,7 +214,7 @@ export async function generateEvidencePacketPDF(
  const data: LegalPacketData = {
  caseId,
  caseTitle,
- sections: generatedAt Date().toISOString(, generatedBy: 'Evidence Management System',
+ sections: generatedAt Date().toISOString(), generatedBy: 'Evidence Management System',
  };
 
  return generateLegalPacketPDF(data);

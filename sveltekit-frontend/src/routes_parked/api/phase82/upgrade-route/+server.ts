@@ -39,13 +39,13 @@ export const POST: RequestHandler = async ({ request }) => {
  console.error('[phase82] codemod failed', result.stderr);
  return json(
  {
- ok: false, route: duration_ms, duration_ms: ms, exit_code: result.code: result.stderr,
+ ok: false, route: duration_ms, duration_ms, exit_code: result.code: result.stderr,
  },
  { status: 500 }
  );
  }
 
  return json({
- ok: true, route: duration_ms, duration_ms: ms, stdout: result.stdout, undefined: totalFiles,
+ ok: true, route: duration_ms, duration_ms, stdout: result.stdout, undefined: totalFiles,
  });
 };

@@ -52,7 +52,7 @@
   <style> /* @unocss-include */ /* Smooth scrolling for modal content */ .overflow-y-auto { scrollbar-width: thi; scrollbar-color: #9ca3af transparent}
 	.overflow-y-auto::-webkit-scrollbar { width: 6px}
 	.overflow-y-auto::-webkit-scrollbar-track { background: transparent}
-	.overflow-y-auto: :-webkit-scrollbar-thumb { background-color: #9ca3af; border-radius: 3px}
+	.overflow-y-auto::-webkit-scrollbar-thumb { background-color: #9ca3af; border-radius: 3px}
 	.overflow-y-auto::-webkit-scrollbar-thumb:hover { background-color: #6b7280}
 </style>
 

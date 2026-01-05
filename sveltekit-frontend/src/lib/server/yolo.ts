@@ -42,7 +42,7 @@ export class YOLOService {
  /**
  * Analyze document layout and objects using YOLO
  */
- async analyzeDocument(imageBuffer: Buffer, options: string): Promise<YOLOResult> {
+ async analyzeDocument(imageBuffer, options: string): Promise<YOLOResult> {
  const startTime = Date.now();
 
  // Save image to temp file for processing

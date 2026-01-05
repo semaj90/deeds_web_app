@@ -1,29 +1,18 @@
 <script lang="ts">
-	import { getContext } from 'svelte';
-	import type { SelectContext, SelectValueProps } from './types';
+  import { Select as BitsSelect } from "bits-ui";
+  import { cn } from "$lib/utils/cn";
 
-	interface Props extends SelectValueProps {
-		/** Mapping of values to display labels */
-		labels?: Record<string, string>;
-	}
+  interface Props {
+    placeholder?: string;
+    class?: string;
+    [key: string]: any;
+  }
 
-	let {
-		placeholder = 'Select...',
-		labels = {},
-		class: className = '',
-	}: Props = $props();
-
-	const selectContext = getContext<SelectContext>('select');
-
-	const displayValue = $derived(
-		selectContext?.value
-			? (labels[selectContext.value] ?? selectContext.value)
-			: placeholder
-	);
-
-	const isPlaceholder = $derived(!selectContext?.value);
+  let { placeholder = "Select...", class: className = "", ...rest }: Props = $props();
 </script>
 
-<span class="{isPlaceholder ? 'text-muted-foreground' : ''} { className }">
-	{displayValue}
-</span>
+<BitsSelect.Value
+  class={cn("text-sm", className)}
+  {placeholder}
+  {...rest}
+/>

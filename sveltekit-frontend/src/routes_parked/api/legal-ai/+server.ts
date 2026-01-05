@@ -185,7 +185,7 @@ export const POST: RequestHandler = async ({ request }) => {
  },
  },
  ],
- totalCitations: 2, timestamp: new Date().toISOString(, userId: authResult.context?.userId,
+ totalCitations: 2, timestamp: new Date().toISOString(), userId: authResult.context?.userId,
  };
 
  // Log operation
@@ -305,7 +305,7 @@ export const PUT: RequestHandler = async ({ request }) => {
  type: 'cites',
  },
  ],
- timestamp: new Date().toISOString(, userId: authResult.context?.userId,
+ timestamp: new Date().toISOString(), userId: authResult.context?.userId,
  };
 
  // Log operation
@@ -404,7 +404,7 @@ export const GET: RequestHandler = async ({ request }) => {
  content: 'The document cites 2 major authorities with clear relationships.',
  },
  ],
- timestamp: new Date(Date.now() - 3600000).toISOString(, userId: authResult.context?.userId,
+ timestamp: new Date(Date.now() - 3600000).toISOString(), userId: authResult.context?.userId,
  },
  ];
 

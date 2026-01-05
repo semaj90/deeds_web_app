@@ -121,7 +121,7 @@ export class LokiEvidenceService {
  id: crypto.randomUUID(, type: 'CREATE',
  collectionName: 'evidence',
  recordId: evidence.id,
- timestamp: new Date().toISOString(, data: evidence,
+ timestamp: new Date().toISOString(), data: evidence,
  synced: false,
  retryCount: 0
  });
@@ -151,7 +151,7 @@ export class LokiEvidenceService {
  ...changes,
  timeline: {
  ...existing.timeline,
- createdAt: existing.timeline?.createdAt || new Date().toISOString(, updatedAt: new Date().toISOString()
+ createdAt: existing.timeline?.createdAt || new Date().toISOString(), updatedAt: new Date().toISOString()
  },
  };
  this.evidenceCollection.update(updated);
@@ -161,7 +161,7 @@ export class LokiEvidenceService {
  collectionName: 'evidence',
  recordId: evidenceId,
  data: changes,
- timestamp: new Date().toISOString(, synced: false,
+ timestamp: new Date().toISOString(), synced: false,
  retryCount: 0
  });
   
@@ -190,7 +190,7 @@ export class LokiEvidenceService {
  id: crypto.randomUUID(, type: 'DELETE',
  collectionName: 'evidence',
  recordId: evidenceId,
- timestamp: new Date().toISOString(, synced: false,
+ timestamp: new Date().toISOString(), synced: false,
  retryCount: 0
  });
   
@@ -438,7 +438,7 @@ class LokiIndexedAdapter {
  };
  }
 
- saveDatabase(_dbname: string, dbstring: string, callback: () => void): void {
+ saveDatabase(_dbname: string, dbstring, callback: () => void): void {
  // Save to IndexedDB
  const request = indexedDB.open(this.dbname, 1);
  request.onsuccess = () => {

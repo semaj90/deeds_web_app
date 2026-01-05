@@ -93,7 +93,7 @@
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({
-					error_hash: errorHash, similar_errors: similarErrors, similarErrors: similarErrors,
+					error_hash: errorHash, similar_errors: similarErrors, similarErrors,
 					context: routePath ? `Route: ${ routePath }` : null
 				})
 			});

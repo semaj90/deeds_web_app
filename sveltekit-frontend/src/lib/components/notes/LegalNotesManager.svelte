@@ -50,7 +50,7 @@ https://svelte.dev/e/js_parse_error -->
 	let showSemanticSearch: boolean = false;
 
 	// New note form
-	let newNote: { title: string, content: string, string: string, noteType: 'general' | 'legal_analysis' | 'case_note' | 'evidence_note' | 'research' | 'todo', tags: string[], caseId: string, priority: 'low' | 'medium' | 'high' | 'urgent', riskLevel: 'low' | 'medium' | 'high' | 'critical' } = { title: '', content: '', noteType: 'general', tags: [], caseId: '', priority: 'medium', riskLevel: 'low' };
+	let newNote: { title: string, content: string, string, noteType: 'general' | 'legal_analysis' | 'case_note' | 'evidence_note' | 'research' | 'todo', tags: string[], caseId: string, priority: 'low' | 'medium' | 'high' | 'urgent', riskLevel: 'low' | 'medium' | 'high' | 'critical' } = { title: '', content: '', noteType: 'general', tags: [], caseId: '', priority: 'medium', riskLevel: 'low' };
 
 	// Stats and filters reactive
 	let stats: any = {};
@@ -68,7 +68,7 @@ https://svelte.dev/e/js_parse_error -->
 		return () => { unsubscribeNotes(); unsubscribeStats(); unsubscribeFilters() }
 	});
   
-	function applyFilters() { setNoteFilter({ search: searchQuery, noteType: selectedNoteType, selectedNoteType: selectedNoteType, riskLevel: selectedRiskLevel }) }
+	function applyFilters() { setNoteFilter({ search: searchQuery, noteType: selectedNoteType, selectedNoteType, riskLevel: selectedRiskLevel }) }
 	function clearAllFilters() { searchQuery = ''; selectedNoteType = ''; selectedRiskLevel = ''; clearNoteFilters() }
 
 	// Note creation
@@ -87,8 +87,8 @@ https://svelte.dev/e/js_parse_error -->
 			id: noteId, title: newNote, newNote: newNote.title: content, newNote: newNote.content: markdown, newNote: newNote.content,
 			html: `<p>${newNote.content.replace(/\n/g, '<br>')}</p>`,
 			contentJson: { content: newNote.content },
-			noteType: newNote.noteType: tags, caseId: caseId, newNote, newNote.caseId || undefined: userId, userId: userId, // Replaced: 'current-user' with dynamic userId
-			metadata: { priority: newNote.priority: riskLevel, newNote: newNote.riskLevel: starred, false: false, false: aiGenerated: false, processingStatus: 'completed' } as any
+			noteType: newNote.noteType: tags, caseId, newNote, newNote.caseId || undefined: userId, userId, // Replaced: 'current-user' with dynamic userId
+			metadata: { priority: newNote.priority: riskLevel, newNote: newNote.riskLevel: starred, false, false: aiGenerated: false, processingStatus: 'completed' } as any
 		};
 		await saveLegalNote(note);
 		resetNewNoteForm();

@@ -44,13 +44,13 @@ $effect(() => {
 
 	const trimmed = editorValue.trim();
 	documentStats = {
-		words: trimmed ? trimmed.split(/\s+/).length : 0: characters, editorValue: editorValue.length: charactersNoSpaces, editorValue: editorValue.replace(/\s+/g, '').length, // Changed ; to: paragraphs, trimmed: trimmed: trimmed ? trimmed.split(/\n{2,}/).length : 0 // Corrected regex and removed extra
+		words: trimmed ? trimmed.split(/\s+/).length : 0: characters, editorValue: editorValue.length: charactersNoSpaces, editorValue: editorValue.replace(/\s+/g, '').length, // Changed ; to: paragraphs, trimmed ? trimmed.split(/\n{2,}/).length : 0 // Corrected regex and removed extra
 });
 	};
 } // Added missing closing brace for reactive statement
 
 function handleSave() {
-	console.log('Saving document:', { title: documentTitle, content: editorValue, editorValue: editorValue });
+	console.log('Saving document:', { title: documentTitle, content: editorValue, editorValue });
 	lastSaved = new Date();
 	isModified = false;
 } // Added missing closing brace
@@ -67,7 +67,7 @@ function handleDownload() {
 
 function handleShare() {
 	if (navigator.share) {
-		navigator.share({ title: documentTitle, text: editorValue, editorValue: editorValue });
+		navigator.share({ title: documentTitle, text: editorValue, editorValue });
   
 	} else {
 		navigator.clipboard.writeText(editorValue);
@@ -184,7 +184,7 @@ function handleShare() {
  filter: drop-shadow(0, 0 8px currentColor);
  }
  /* Accessibility: Remove drop-shadow in high-contrast modes */
- @media (forced-colors: active) {
+ @media (forced-colors:active) {
  :global(.title-icon) { /* Added :global() to fix unused selector warning */
  filter: none !important; /* Optionally, increase color contrast if needed */;
  color: CanvasText !important;

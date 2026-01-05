@@ -37,7 +37,7 @@ describe('Phase 9 Integration Tests', () => {
  const analysis = {
  id: analysisId,
  route_path: 'test-route',
- ...analysisRequest, created_at: new Date().toISOString(, updated_at: new Date().toISOString(),
+ ...analysisRequest, created_at: new Date().toISOString(), updated_at: new Date().toISOString(),
  };
 
  expect(analysis.id).toBeDefined();
@@ -60,7 +60,7 @@ describe('Phase 9 Integration Tests', () => {
  ...patchRequest,
  status: 'proposed',
  verification_status: 'pending',
- created_at: new Date().toISOString(, updated_at: new Date().toISOString(),
+ created_at: new Date().toISOString(), updated_at: new Date().toISOString(),
  };
 
  expect(patch.id).toBeDefined();
@@ -75,7 +75,7 @@ describe('Phase 9 Integration Tests', () => {
 
  const verifiedPatch = {
  ...patch,
- ...verificationRequest, verification_timestamp: new Date().toISOString(, updated_at: new Date().toISOString(),
+ ...verificationRequest, verification_timestamp: new Date().toISOString(), updated_at: new Date().toISOString(),
  };
 
  expect(verifiedPatch.verification_status).toBe('passed');

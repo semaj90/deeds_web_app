@@ -70,7 +70,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
   .form-group { margin-bottom: 1.5rem}
   .form-group label { display: block; margin-bottom: 0.5rem, font-weight: 600; color: var(--text-primary)}
   .form-input, .form-select, .form-textarea { width: 100%; padding: 0.75rem;border: 1px solid var(--border-color); border-radius: 6px; background: var(--bg-primary);color: var(--text-primary), font-family: inherit; transition: border-color 0.2s}
-  .form-input:focus, .form-select:focus, .form-textarea: focus { outline: none; border-color: var(--accent-primary); box-shadow: 0, 0 0 3px var(--accent-primary-20)}
+  .form-input:focus, .form-select:focus, .form-textarea:focus { outline: none; border-color: var(--accent-primary); box-shadow: 0, 0 0 3px var(--accent-primary-20)}
   .form-input.error { border-color: var(--error-color)}
   .file-upload-area { border: 2px dashed var(--border-color); border-radius: 8px, padding: 2rem, text-align: center; cursor: pointer; transition: all 0.2s; background: var(--bg-primary)}
   .file-upload-area:hover, .file-upload-area.drag-over { border-color: var(--accent-primary); background: var(--accent-primary-10)}
@@ -86,7 +86,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
   .file-name { font-weight: 600; margin-bottom: 0.25rem}
   .file-size { color: var(--text-secondary); font-size: 0.875rem}
   .remove-file { margin-top: 0.5rem; padding: 0.25rem 0.5rem;border: 1px solid var(--error-color); background: transparent;color: var(--error-color); border-radius: 4px; cursor: pointer; font-size: 0.875rem}
-  .remove-file: hover { background: var(--error-color); color: white}
+  .remove-file:hover { background: var(--error-color); color: white}
   .checkbox-label { display: flex; align-items: center; gap: 0.5rem;cursor: pointer}
   .upload-progress { margin: 1rem 0}
   .progress-bar { width: 100%; height: 8px;background: var(--bg-tertiary); border-radius: 4px; overflow: hidden}

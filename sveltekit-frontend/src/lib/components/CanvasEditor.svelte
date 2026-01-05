@@ -15,7 +15,7 @@
 
  function handleSave() {
  const updatedCanvasState: CanvasState = {
- id: canvasState?.id || crypto.randomUUID(, reportId: reportId,
+ id: canvasState?.id || crypto.randomUUID(, reportId,
  elements: currentCanvasElements,
  createdAt: canvasState?.createdAt || new Date(, updatedAt: new Date(),
  };

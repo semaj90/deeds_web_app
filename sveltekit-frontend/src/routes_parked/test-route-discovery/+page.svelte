@@ -3,7 +3,7 @@
 
  import { onMount } from 'svelte';
 
- let stats = $state({ total: 0, pages: 0 endpoints: 0, layouts: 0: 0 });
+ let stats = $state({ total: 0, pages: 0 endpoints: 0, layouts: 0 });
  let routes = $state<any[]>([]);
  let tagCounts = $state<Record<string, number>>({});
  let loading = $state(true);

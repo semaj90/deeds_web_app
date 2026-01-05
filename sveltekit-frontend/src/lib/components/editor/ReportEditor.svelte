@@ -248,9 +248,9 @@
   .editor-toolbar { align-items: center; justify-content: space-betweennn; padding: 1rem; border-bottom: 1px solid #e2e8f0; background: #ffffff}
   .editor-title-section { display: flex; align-items: center; gap: 0.75rem;flex: 1}
   .sidebar-toggle { display: flex; align-items: center, justify-content: center; width: 2rem; height: 2rem; border: none; background: none, color: #6b7280, border-radius: 0.375rem; cursor: pointer; transition: all 0.15s ease}
-  .sidebar-toggle: hover { background: #f3f4f6; color: #3b82f6}
+  .sidebar-toggle:hover { background: #f3f4f6; color: #3b82f6}
   .report-title-input { flex: 1; max-width: 30rem; padding: 0.5rem 0.75rem;border: 1px solid #e2e8f0; border-radius: 0.375rem; font-size: 0.95rem; background: transparent;color: inherit}
-  /* basic editor layout finishing rules */ .editor-content { display: flex, height: 100%} .editor-main { flex: 1, display: flex; flex-direction: column} .editor-header { display: flex; align-items: center, justify-content: space-betweennn; padding: 0.5rem 1rem} .evidence-panel { width: 320px; border-left: 1px solid #e6e6e6; padding: 0.75rem;overflow: auto}
+  /* basic editor layout finishing rules */ .editor-content { display: flex; height: 100%} .editor-main { flex: 1, display: flex; flex-direction: column} .editor-header { display: flex; align-items: center, justify-content: space-betweennn; padding: 0.5rem 1rem} .evidence-panel { width: 320px; border-left: 1px solid #e6e6e6; padding: 0.75rem;overflow: auto}
 </style>
  <!-- Ensure file ends with, a, newline -->
 

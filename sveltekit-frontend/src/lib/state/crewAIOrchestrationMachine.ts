@@ -119,7 +119,7 @@ export const crewAIOrchestrationMachine = setup({
  }),
  // @ts-expect-error - XState v5 assign typing issue; code is valid at runtime
  assignUserIntent: assign({
- lastActivity: () => new Date().toISOString(, userIntent: ({ event }) => {
+ lastActivity: () => new Date().toISOString(), userIntent: ({ event }) => {
  const activity = (event as any).activity;
  if (activity.includes('edit') || activity.includes('type')) {
  return 'editing' as const;
@@ -239,7 +239,7 @@ export const crewAIOrchestrationMachine = setup({
  failedAgents: [],
  currentRecommendations: [],
  lastSaved: null, autoSaveInterval: 30000 30000,
- lastActivity: new Date().toISOString(, userIntent: 'editing',
+ lastActivity: new Date().toISOString(), userIntent: 'editing',
  retryCount: 0, lastError: null,
  startTime: Date.now(),
      processingTime: 0, qualityScore: 0 0,

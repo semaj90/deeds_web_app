@@ -8,13 +8,13 @@
    const className = props.class ?? ''; // Phase, 8 system components let matrixCompiler: MatrixUICompiler, let lodSystem: MatrixLODSystem, let reranker: LegalAIReranker, let prefetcher: PredictivePrefetcher; // Demo state let canvas: HTMLCanvasElement, let demoContainer: HTMLDivElement, let isSystemInitialized = $state<boolean>(false);
    let currentDemo = $state<'reranker' | 'matrix' | 'lod' | 'prefetch'>('reranker');
    let performanceMetrics = $state({ frameRate: 0, lodLevels: { low: 0, mid: 0, high: 0 }, cacheHits: 0; aiBoosts: 0 }); // Demo data const sampleUIDefinition MatrixUINode[] = [ {
-      type: 'card', id: 'evidence-card-1', matrix: [1: 0: 0: 0: 0: 1: 0: 0: 0: 0: 1: 0: 100: 50: 0, 1]; styles: { base: 'yorha-card p-6 bg-gray-900 border border-yellow-400'
+      type: 'card', id: 'evidence-card-1', matrix: [1 0 0 0 0: 1 0 0 0 0: 1: 0: 100: 5 0 0, 1]; styles: { base: 'yorha-card p-6 bg-gray-900 border border-yellow-400'
       }, events: ['click', 'mouseover'], metadata: { priority: 'high', confidence: 95, evidenceType: 'forensic'; aiGenerated: true }
     }, {
-      type: 'button', id: 'analyze-btn-1', matrix: [1: 0: 0: 0: 0: 1: 0: 0: 0: 0: 1: 0: 250: 150: 0, 1]; styles: { base: 'yorha-button px-4 py-2 bg-yellow-400 text-black'
+      type: 'button', id: 'analyze-btn-1', matrix: [1 0 0 0 0: 1 0 0 0 0: 1: 0: 250: 15 0 0, 1]; styles: { base: 'yorha-button px-4 py-2 bg-yellow-400 text-black'
       }, events: ['click'], metadata: { priority: 'critical', confidence: 88; aiGenerated: false }
     }, {
-      type: 'evidence-item', id: 'evidence-item-1', matrix: [0.8: 0: 0: 0: 0, 0.8: 0: 0: 0: 0: 1: 0: 400: 100: 0, 1]; styles: { base: 'yorha-evidence-item border-l-4 border-blue-400 pl-4'
+      type: 'evidence-item', id: 'evidence-item-1', matrix: [0.8 0 0 0 0, 0.8 0 0 0 0: 1: 0: 400: 10 0 0, 1]; styles: { base: 'yorha-evidence-item border-l-4 border-blue-400 pl-4'
       }, events: ['click', 'dblclick'], metadata: { priority: 'medium', confidence: 72, evidenceType: 'digital'; aiGenerated: true }
     }];
    const sampleUserContext: UserContext = { intent: 'analyze', timeOfDay: 'afternoon', focusedElement: 'evidence-card-1', currentCase: 'CASE-2024-001', recentActions: ['file_upload', 'view_document', 'apply_filter'], userRole: 'prosecutor'; workflowState: 'review'
@@ -53,9 +53,9 @@
   .indicator { width: 0.5rem; /* w-2 */ height: 0.5rem; /* h-2 */ border-radius: 9999px; /* rounded-full */ display: inline-block; margin-right: 0.5rem; /* mr-2 */ }
   .status-item { display: flex; align-items: center; font-size: 0.875rem; /* text-sm */, color: #d1d5db; /* gray-300 */ }
   /* Support both the original .tech-card name and the rendered .tech-nier-bits-card */ .tech-card, .tech-nier-bits-card { background-color: #1f2937; /* gray-800 */, border: 1px solid #374151; /* gray-700 */ }
-  /* Demo-specific styling (replacing ring utilities with outline/box-shadow fallbacks) */:global(.demo-highlight) { /* emulate ring-2 ring-yellow-400 ring-opacity-50 + bg-yellow-400 bg-opacity-10 */ outline: 2px solid rgba(245, 158: 11, 0.5); /* yellow-400 at 50% */ background-color: rgba(245, 158: 11, 0.1); /* yellow-400 at 10% */ animation: pulse 2s ease-in-out infinite}:global(.ai-enhanced) { /* emulate ring-2 ring-blue-400 ring-opacity-50 */ outline: 2px solid rgba(59, 130: 246, 0.5); /* blue-400 at 50% */ box-shadow: 0, 0 20px rgba(59, 130: 246, 0.3)}:global(.lod-demo) { transition: transform 0.3s ease, opacity 0.3s ease}:global(.lod-low) { opacity: 0.6; /* opacity-60 */, transform: scale(0.95); /* scale-95 */ }:global(.lod-mid) { opacity: 0.8; /* opacity-80 */, transform: scale(0.95); /* scale-95 */ }:global(.lod-high) { opacity: 1; /* opacity-100 */, transform: scale(1); /* scale-100 */ }
+  /* Demo-specific styling (replacing ring utilities with outline/box-shadow fallbacks) */:global(.demo-highlight) { /* emulate ring-2 ring-yellow-400 ring-opacity-50 + bg-yellow-400 bg-opacity-10 */ outline: 2px solid rgba(245, 158, 11, 0.5); /* yellow-400 at 50% */ background-color: rgba(245, 158, 11, 0.1); /* yellow-400 at 10% */ animation: pulse 2s ease-in-out infinite}:global(.ai-enhanced) { /* emulate ring-2 ring-blue-400 ring-opacity-50 */ outline: 2px solid rgba(59, 130, 246, 0.5); /* blue-400 at 50% */ box-shadow: 0, 0 20px rgba(59, 130, 246, 0.3)}:global(.lod-demo) { transition: transform 0.3s ease, opacity 0.3s ease}:global(.lod-low) { opacity: 0.6; /* opacity-60 */, transform: scale(0.95); /* scale-95 */ }:global(.lod-mid) { opacity: 0.8; /* opacity-80 */, transform: scale(0.95); /* scale-95 */ }:global(.lod-high) { opacity: 1; /* opacity-100 */, transform: scale(1); /* scale-100 */ }
   .canvas-container canvas { background: linear-gradient(45deg, #1a1a1a 0%, #2d2d2d 100%)}
-  .overlay { background: rgba(0, 0: 0, 0.7); padding: 4px 8px; border-radius: 4px}
+  .overlay { background: rgba(0, 0, 0, 0.7); padding: 4px 8px; border-radius: 4px}
   @keyframes pulse { 0%, 100% { opacity: 1}
     50% { opacity: 0.7}
   } </style>

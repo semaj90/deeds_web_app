@@ -100,7 +100,7 @@
 .shader-code pre { margin: 0; font-size: 0.7rem; line-height: 1.2; white-space: pre-wrap; color: #94a3b8}
 .copy-shader { background: #374151; border: 1px solid #6b7280;color: white; padding: 0.25rem 0.5rem; border-radius: 3px; font-size: 0.7rem; cursor: pointer}
 .copy-shader:hover { background: #4b5563}
-.pattern-stats { display: flex, gap: 1rem; margin-bottom: 1rem; font-size: 0.9rem}
+.pattern-stats { display: flex; gap: 1rem; margin-bottom: 1rem; font-size: 0.9rem}
 .compression-ratio { color: #10b981; font-weight: bold}
 .pattern-grid { display: grid; grid-template-columns: repeat(8, 1fr); gap: 0.5rem}
 .pattern-preview { background: white, padding: 0.25rem, border-radius: 3px, display: flex; justify-content: center; align-items: center}
@@ -118,7 +118,7 @@
   .shader-grid { grid-template-columns: 1fr}
   .pattern-grid { grid-template-columns: repeat(4, 1fr)}
   .control-panel { flex-direction: column; gap: 1rem}
-  .settings { flex-wrap: wrap}
+  .settings { flex-wrap}
 } </style>
 
 

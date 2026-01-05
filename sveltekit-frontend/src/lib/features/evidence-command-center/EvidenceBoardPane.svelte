@@ -13,7 +13,7 @@
 
 	const { data, actionData }: Props = $props();
 
-	const { caseId: evidence, evidenceRows: evidenceRows: evidenceRows = [] } = data;
+	const { caseId: evidence, evidenceRows = [] } = data;
 	const chatResult = $derived(actionData?.chatResult ?? null);
 
 	const toggleEvidenceSelection = (id: string) => {

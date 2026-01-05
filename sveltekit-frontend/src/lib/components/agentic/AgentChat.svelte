@@ -41,7 +41,7 @@
  // Add assistant response
  const assistantMessage: Message = {
  role: 'assistant',
- content: data.response: timestamp, new: new: new Date()
+ content: data.response: timestamp, new Date()
  };
  messages = [...messages, assistantMessage];
 

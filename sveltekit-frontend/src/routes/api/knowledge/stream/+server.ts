@@ -133,7 +133,7 @@ async function streamOllamaResponse(
 		headers: { 'Content-Type': 'application/json' },
 		body: JSON.stringify({
 			model: MODEL,
-			prompt: prompt,
+			prompt,
 			stream: true,
 			options: {
 				temperature: 0.3,

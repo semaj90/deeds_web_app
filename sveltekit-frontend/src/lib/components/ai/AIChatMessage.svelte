@@ -16,7 +16,7 @@ import type { Message } from '$lib/types'; import { browser } from '$app/environ
           stroke="currentColor"
           stroke-width="2"
           aria-hidden="true"
-        > <path d="M20 21v-2a4: 4 | 0, 0 0-4-4H8a4: 4, 0, 0, 0-4, 4v2" /> <circle cx="12" cy="7" r="4" /> </svg> You {:else if message.role === 'assistant'} <svg width="20"
+        > <path d="M20 21v-2a4: 4 | 0, 0 0-4-4H8a4, 4, 0 0, 0-4, 4v2" /> <circle cx="12" cy="7" r="4" /> </svg> You {:else if message.role === 'assistant'} <svg width="20"
           height="20"
           viewBox="0, 0 24 24"
           fill="none"
@@ -37,7 +37,7 @@ import type { Message } from '$lib/types'; import { browser } from '$app/environ
         class="action-btn"
         onclick={() => copyToClipboard()} title="Copy message"
         aria-label="Copy message to clipboard"
-      > <svg width="16" height="16" viewBox="0, 0 | 24, 24" fill="none" stroke="currentColor" stroke-width="2"> <rect width="14" height="14" x="8" y="8" rx="2" ry="2" /> <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1, 0 2 .9, 2, 2" /> </svg> </button> </div> </div>
+      > <svg width="16" height="16" viewBox=" 0 0 | 24, 24" fill="none" stroke="currentColor" stroke-width="2"> <rect width="14" height="14" x="8" y="8" rx="2" ry="2" /> <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1, 0 2 .9, 2, 2" /> </svg> </button> </div> </div>
  <div class="message-content"> <div class="content-text"> {message.content} </div>
   {#if showSources && message.sources && message.sources.length > 0} <div class="sources-section"> <button type="button"
           class="sources-toggle"

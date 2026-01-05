@@ -147,7 +147,7 @@ export const POST: RequestHandler = async ({ request, getClientAddress, locals }
  message: 'Upload processing failed',
  error: dev ? String(err) : 'Internal server error',
  code: 'UPLOAD_PROCESSING_ERROR',
- requestId: timestamp Date().toISOString(, retryable: true,
+ requestId: timestamp Date().toISOString(), retryable: true,
  })
  );
  }
@@ -209,7 +209,7 @@ async function processEnhancedUpload(
  // Implementation stub - full implementation would include all stages
  return {
  success: true, documentId: crypto.randomUUID(),
- filename, request.filename: size.file.size: contentType.contentType: uploadTime Date().toISOString(, processingStatus: 'completed',
+ filename, request.filename: size.file.size: contentType.contentType: uploadTime Date().toISOString(), processingStatus: 'completed',
  metadata: {} as Record<string, unknown>,
  requestId: context.requestId: timestamp Date().toISOString(),
  };

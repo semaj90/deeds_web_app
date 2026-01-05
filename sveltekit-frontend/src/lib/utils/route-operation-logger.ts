@@ -96,7 +96,7 @@ export class RouteOperationLogger {
  }
  ) {
  this.operations.push({
- timestamp: new Date().toISOString(, route: fromRoute,
+ timestamp: new Date().toISOString(), route: fromRoute,
  category,
  priority: phase,
  operation: 'consolidation',
@@ -160,7 +160,7 @@ export class RouteOperationLogger {
  */
  generateReport(): OperationReport {
  const report: OperationReport = {
- timestamp: new Date().toISOString(, totalOperations: this.operations.length,
+ timestamp: new Date().toISOString(), totalOperations: this.operations.length,
  byPhase: { 72: 0, 0 },
  byStatus: { success: 0, warning: 0, error: 0 },
  byCategory: {},

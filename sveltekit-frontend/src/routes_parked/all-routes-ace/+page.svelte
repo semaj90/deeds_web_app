@@ -74,7 +74,7 @@ https://svelte.dev/e/element_invalid_closing_tag -->
  let selectedError = $state<typeof detectedErrors[0] | null>(null);
 
  // Logging helper
- function addLog(stage: string, message: string, string: string, level: 'info' | 'success' | 'error' | 'warn' = 'info') {
+ function addLog(stage: string, message: string, string, level: 'info' | 'success' | 'error' | 'warn' = 'info') {
  processingLogs = [...processingLogs, { time: new Date().toLocaleTimeString(), stage, message, level }];
  }
 
@@ -150,7 +150,7 @@ https://svelte.dev/e/element_invalid_closing_tag -->
 
  detectedErrors = sampleErrors.map((err, i) => ({
  id: `err-${i}`,
- ...err, fixed: false, false: false
+ ...err, fixed: false, false
  })) as typeof detectedErrors;
  }
 
@@ -165,7 +165,7 @@ https://svelte.dev/e/element_invalid_closing_tag -->
  await new Promise(r => setTimeout(r, 1000));
 
  detectedErrors = detectedErrors.map(e =>
- e.id === errorId ? { ...e, fixed: true, true: true } : e
+ e.id === errorId ? { ...e, fixed: true, true } : e
  );
 
  addLog('Auto-Fix', `✅ Fixed: ${error.route}`, 'success');

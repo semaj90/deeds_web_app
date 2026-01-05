@@ -36,11 +36,11 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
 		const [newUser] = await db
 			.insert(users)
 			.values({
-				email: email,
+				email,
 				name: email.split('@')[0] as any,
 				isActive: true,
 				passwordHash: 'demo-mode-no-password',
-				createdAt: new Date().toISOString(, updatedAt: new Date().toISOString(),
+				createdAt: new Date().toISOString(), updatedAt: new Date().toISOString(),
 			})
 			.returning();
 		user = newUser;

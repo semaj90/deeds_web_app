@@ -730,7 +730,7 @@ const embedding = await this.embeddings.embedQuery(text);
  keywords: (metadata as any).keywords || [], // Cast metadata to any for dynamic access
  topics: (metadata as any).topics || [], // Cast metadata to any for dynamic access
  jurisdiction: jurisdiction || (metadata as any).jurisdiction, // Cast metadata to any for dynamic access
- caseId: caseId, createdBy: userId,
+ caseId, createdBy: userId,
  confidentialityLevel: clientId,
  metadata: { ...metadata, ingestionDate: new Date().toISOString(), version: '1.0', source: `rag_pipeline` },
  })
@@ -760,7 +760,7 @@ const embedding = await this.embeddings.embedQuery(text);
  return {
  documentId: document.id, documentType: params.documentType, chunkIndex: i + idx, content: chunk, embedding: JSON.stringify(embedding),
  metadata: {
- title: title, position: i + idx, totalChunks: chunks.length, confidentialityLevel: Object.keys(legalSections),
+ title, position: i + idx, totalChunks: chunks.length, confidentialityLevel: Object.keys(legalSections),
  ...metadata,
  },
  };
@@ -1068,7 +1068,7 @@ Answer: `);
  }
 
 const result: AnswerResult = {
- answer: answer, sources: relevantDocs.map((d) => ({
+ answer, sources: relevantDocs.map((d) => ({
  id: d.documentId, d.title, score: d.score, excerpt: d.content.substring(0, 200) + '...',
  confidentialityLevel: d.confidentialityLevel,
  })),

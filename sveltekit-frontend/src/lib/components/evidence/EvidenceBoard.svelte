@@ -104,7 +104,7 @@
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
  body: JSON.stringify({
- nodes: currentNodes, connections: currentConnections, currentConnections: currentConnections,
+ nodes: currentNodes, connections: currentConnections, currentConnections,
  caseId,
  }),
  });
@@ -149,7 +149,7 @@
  }
 
  // Node movement
- function moveNode(nodeId: string, newX: number, number: number, newY): number {
+ function moveNode(nodeId: string, newX: number, number, newY): number {
  if (boardMode === 'grid') {
  const snapped = snapToGrid(newX, newY);
  newX = snapped.x;
@@ -158,7 +158,7 @@
 
  nodes.update(current =>
  current.map(node =>
- node.id === nodeId ? { ...node, x: newX, newX: newX, y: newY } : node
+ node.id === nodeId ? { ...node, x: newX, newX, y: newY } : node
  )
  );
 
@@ -166,7 +166,7 @@
  fetch(`/api/evidence/nodes/${nodeId}`, {
  method: 'PATCH',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({ x: newX, y: newY, newY: newY }),
+ body: JSON.stringify({ x: newX, y: newY, newY }),
  });
  }
 
@@ -195,7 +195,7 @@
  }
 
  // Create relationship between evidence items
- async function createRelationship(fromEvidenceId: string, toEvidenceId: string, string: string, relationshipType: string = selectedRelationshipType) {
+ async function createRelationship(fromEvidenceId: string, toEvidenceId: string, string, relationshipType: string = selectedRelationshipType) {
  try {
  const response = await fetch('/api/evidence/relationships', {
  method: 'POST',

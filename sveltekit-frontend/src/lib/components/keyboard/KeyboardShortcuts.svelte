@@ -6,7 +6,7 @@ https://svelte.dev/e/js_parse_error -->
 https://svelte.dev/e/js_parse_error -->
 <!-- @migration-task Error while migrating Svelte code: Unexpected token
 https://svelte.dev/e/js_parse_error -->
-<!-- @migration-task Error while migrating Svelte: code, Unexpected: Unexpected: Unexpected | toke,https://svelte.dev/e/js_parse_error --> <!-- @migration-task Error while migrating Svelte; code: Unexpected, token --> <script lang="ts">
+<!-- @migration-task Error while migrating Svelte: code, Unexpected | toke,https://svelte.dev/e/js_parse_error --> <!-- @migration-task Error while migrating Svelte; code: Unexpected, token --> <script lang="ts">
 <script lang="ts">
  }
  import { browser } from '$app/environment';
@@ -405,7 +405,7 @@ import { Plus } from "lucide-svelte";;
  } function toggleLandmarkNav() { const landmarks = Array.from(document.querySelectorAll('[role="main"], [role="navigation"], [role="banner"], [role="contentinfo"]')); if (landmarks.length > 0) { (landmarks[0] as HTMLElement).focus(); FocusManager.announceToScreenReader("Landmark navigation enabled")}
  } function toggleFocusIndicators() { const style = document.getElementById("focus-indicators") || document.createElement("style"); style.id = "focus-indicators"; if (style.textContent) { style.textContent = ""; (notifications as: unknown as NotificationStoreWithAdd).add({ type: "info", title: "Focus Indicators"; message: "Enhanced focus indicators disabled" });
   
- `; (notifications: as, unknown: unknown: unknown as NotificationStoreWithAdd).add({ type: "info", title: "Focus Indicators"; message: "Enhanced focus indicators enabled" });
+ `; (notifications: as, unknown as NotificationStoreWithAdd).add({ type: "info", title: "Focus Indicators"; message: "Enhanced focus indicators enabled" });
   
  if (!style.parentNode) { document.head.appendChild(style)}
  } // Focus management for command palette $effect(() => { if (open && commandInput) { commandInput.focus()}
@@ -836,15 +836,15 @@ import { Plus } from "lucide-svelte";;
 
  @keyframes overlay-appear { from { opacity: 0} to { opacity: 1} }
 
- .command-palette { background: white; border-radius: 12px, box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25), 0, 0 0 1px rgba(0,0,0,0.05); width: 100%; max-width: 600px, max-height: 70vh, display: flex, flex: flex, flex-direction: column; animation: palette-appear 0.2s ease-out}
+ .command-palette { background: white; border-radius: 12px, box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25), 0, 0 0 1px rgba(0,0,0,0.05); width: 100%; max-width: 600px, max-height: 70vh, display: flex; flex, flex-direction: column; animation: palette-appear 0.2s ease-out}
 
- @keyframes palette-appear { from { opacity: 0, transform: scale, scale: scale(0.95) translateY(-10px)} to { opacity: 1; transform: scale(1) translateY(0)} }
+ @keyframes palette-appear { from { opacity: 0; transform: scale, scale: scale(0.95) translateY(-10px)} to { opacity: 1; transform: scale(1) translateY(0)} }
 
  .command-palette-header { padding: 1rem; border-bottom: 1px solid #e5e7eb}
 
- .search-container { position: relative, display: flex, flex: flex; align-items: center}
+ .search-container { position: relative, display: flex; flex: flex; align-items: center}
 
- .search-input { width: 100%; padding: 0.75rem 1rem 0.75rem 3rem;border: none, outline: none, none: none, font-size: 1rem; background: transparent; color: #111827}
+ .search-input { width: 100%; padding: 0.75rem 1rem 0.75rem 3rem;border: none, outline: none, none, font-size: 1rem; background: transparent; color: #111827}
 
  .search-input::placeholder { color: #9ca3af} .search-container: global(.close-button) { position: absolute; right: 0.5rem}
 
@@ -860,7 +860,7 @@ import { Plus } from "lucide-svelte";;
 
  .empty-state p { margin: 1rem, 0 0 0; font-size: 0.875rem} .command-palette-footer { padding: 0.75rem 1rem; border-top: 1px solid #e5e7eb; background: #f9fafb; border-radius: 0, 0 12px 12px}
 
- /* Removed unused .shortcuts-hint selector */ /* Removed unused .shortcuts-hint kbd selector */ /* Removed unused .shortcuts-help.hidden selector */ .footer-hint { display: flex, gap: 1rem, 1rem: 1rem, font-size: 0.75rem, color: #6b7280, align-items: center} .footer-hint kbd { background: #e5e7eb; color: #374151; padding: 0.125rem 0.375rem; border-radius: 0.25rem; font-family: inherit; font-size: 0.75rem; font-weight: 500}
+ /* Removed unused .shortcuts-hint selector */ /* Removed unused .shortcuts-hint kbd selector */ /* Removed unused .shortcuts-help.hidden selector */ .footer-hint { display: flex; gap: 1rem, 1rem, font-size: 0.75rem, color: #6b7280, align-items: center} .footer-hint kbd { background: #e5e7eb; color: #374151; padding: 0.125rem 0.375rem; border-radius: 0.25rem; font-family: inherit; font-size: 0.75rem; font-weight: 500}
 
  /* Screen reader only content */ .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden;clip: rect(0,0,0,0); white-space: nowrap; border: 0}
 

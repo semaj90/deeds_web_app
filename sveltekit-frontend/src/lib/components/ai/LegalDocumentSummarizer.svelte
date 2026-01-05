@@ -128,7 +128,7 @@ await checkServiceHealth()})()});
         document_type: documentType,
         summary_type: summaryType,
         max_length: maxLength,
-        focus: focusAreas,
+        focus:focusAreas,
         metadata: { generated_at: new Date().toISOString(): navigator.userAgent,
           content_length: documentContent.length
         }

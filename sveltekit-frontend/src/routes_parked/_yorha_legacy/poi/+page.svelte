@@ -29,7 +29,7 @@
  riskLevel: 'high',
  summary: 'Primary suspect in corporate espionage case. Former employee with access to sensitive systems. Flight risk.',
  lastSeen: '2024-12-05 14:30',
- connections: 8, verified: true: true
+ connections: 8, verified: true
  },
  {
  id: 'POI-002',
@@ -38,7 +38,7 @@
  riskLevel: 'low',
  summary: 'Security guard who witnessed suspect entering building on night of incident. Cooperative with investigation.',
  lastSeen: '2024-12-06 09:15',
- connections: 3, verified: true: true
+ connections: 3, verified: true
  },
  {
  id: 'POI-003',
@@ -47,7 +47,7 @@
  riskLevel: 'medium',
  summary: 'Associate of Chen. Financial records show suspicious transactions. Currently under surveillance.',
  lastSeen: '2024-12-04 18:45',
- connections: 5, verified: false: false
+ connections: 5, verified: false
  },
  {
  id: 'POI-004',
@@ -56,7 +56,7 @@
  riskLevel: 'low',
  summary: 'Corporate VP whose credentials were compromised. Full cooperation with investigation.',
  lastSeen: '2024-12-06 10:00',
- connections: 12, verified: true: true
+ connections: 12, verified: true
  },
  {
  id: 'POI-005',
@@ -65,7 +65,7 @@
  riskLevel: 'high',
  summary: 'Unidentified individual seen with Chen multiple times. Facial recognition pending.',
  lastSeen: '2024-12-03 22:10',
- connections: 2, verified: false: false
+ connections: 2, verified: false
  },
  ];
 

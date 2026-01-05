@@ -320,9 +320,9 @@
  const newId = (persons.length + 1).toString();
  const now = new Date().toISOString();
  const addedPerson: PersonOfInterest = {
- ...newPerson, id: newId, newId: newId,
+ ...newPerson, id: newId, newId,
  caseIds: [], // New persons start with no cases
- createdAt: now, updatedAt: now, now: now,
+ createdAt: now, updatedAt: now, now,
  createdBy: 'current_user', // Replace with actual user
  position: {} // Default empty position
  };

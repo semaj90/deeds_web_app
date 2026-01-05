@@ -472,7 +472,7 @@ const data: EmbeddingAPIResponse = await response.json(); // Type data as Embedd
  if (!this.webgpuDevice) {
  // Fallback to CPU processing
  return {
- embeddings: embeddings, dimensions: embeddings.length,
+ embeddings, dimensions: embeddings.length,
  metadata: {
  source: 'ocr',
  processed_at: Date.now(),
@@ -526,7 +526,7 @@ const data: EmbeddingAPIResponse = await response.json(); // Type data as Embedd
  } catch (error) {
  console.warn('WebGPU tensor processing failed, using CPU fallback: ', error);
  return {
- embeddings: embeddings, dimensions: embeddings.length,
+ embeddings, dimensions: embeddings.length,
  metadata: {
  source: 'ocr',
  processed_at: Date.now(),
@@ -562,7 +562,7 @@ const data: EmbeddingAPIResponse = await response.json(); // Type data as Embedd
 
  // Create processing queue with priority scheduling
  const processingQueue: Array = images.map((image, index) => ({
- image: image, priority: this.calculateProcessingPriority(image, index),
+ image, priority: this.calculateProcessingPriority(image, index),
  }));
 
  // Sort by priority (higher priority first)

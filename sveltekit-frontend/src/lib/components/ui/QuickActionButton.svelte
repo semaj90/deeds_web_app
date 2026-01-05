@@ -31,8 +31,8 @@
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          model: model,
-          prompt: prompt,
+          model,
+          prompt,
           stream: false, // For a quick action, we might not want streaming
         }),
       });

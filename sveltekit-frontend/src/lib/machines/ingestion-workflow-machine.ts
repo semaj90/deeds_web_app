@@ -169,7 +169,7 @@ export const ingestionWorkflowMachine = setup({
  metadata: {
  ...job.metadata, backend: result.backend,
 // REMOVED: result.model || 'unknown', // @ts-expect-error - Model property access
- chunkId: chunkId, confidence: Math.random() * 0.3 + 0.7, // Mock confidence score
+ chunkId, confidence: Math.random() * 0.3 + 0.7, // Mock confidence score
  }}})
  );
  chunks.push(...batchResults);

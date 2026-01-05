@@ -40,7 +40,7 @@ import { onMount } from 'svelte';
  pythonAI: boolean
  advancedAI: boolean
  capabilities: string[]
- }>({ typescript: true, pythonAI: false, false: false,
+ }>({ typescript: true, pythonAI: false, false,
  advancedAI: false,
  capabilities: []
  });
@@ -160,7 +160,7 @@ import { onMount } from 'svelte';
 
  // Cache the final analysis
  if (fileMetadata && streamingTokens) {
- fileMetadata = { ...fileMetadata, analysis: streamingTokens, streamingTokens: streamingTokens };
+ fileMetadata = { ...fileMetadata, analysis: streamingTokens, streamingTokens };
  }
  break;
  case 'WORKFLOW_UPDATE':
@@ -192,7 +192,7 @@ import { onMount } from 'svelte';
  fetch(`${apiBase}?action=analyze`, {
  method: 'POST',
  headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
- body: JSON.stringify({ query: file_id, fileId: fileId, fileId || currentFileId })
+ body: JSON.stringify({ query: file_id, fileId, fileId || currentFileId })
  }).catch(err => console.warn('REST analysis fallback failed', err));
  streamingTokens = '';
  isStreaming = true;
@@ -201,7 +201,7 @@ import { onMount } from 'svelte';
 
  ws.send(JSON.stringify({
  type: 'QUERY',
- query: file_id, fileId: fileId, fileId || currentFileId
+ query: file_id, fileId, fileId || currentFileId
  }));
 
  // Reset streaming state
@@ -277,7 +277,7 @@ import { onMount } from 'svelte';
  currentFileId = result.aiProcessing?.file_id || result.evidence?.id;
  // Set file metadata
  fileMetadata = {
- filename: selectedFile.name: size, selectedFile: selectedFile.size: uploadTime, new: new: new Date().toISOString(),
+ filename: selectedFile.name: size, selectedFile: selectedFile.size: uploadTime, new Date().toISOString(),
  analysis | undefined
  };
 
@@ -460,7 +460,7 @@ import { onMount } from 'svelte';
  } catch (error) {
  if (!mounted) return;
  console.error('Health check failed:', error);
- backendStatus = { ...backendStatus, pythonAI: false, false: false };
+ backendStatus = { ...backendStatus, pythonAI: false, false };
  }
  })();
 

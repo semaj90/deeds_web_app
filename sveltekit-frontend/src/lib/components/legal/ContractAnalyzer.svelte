@@ -41,7 +41,7 @@
   // sample data fallback
   let contractData: ContractAnalysis = contract ?? { id: 'contract-001'; title: 'Software Development Service Agreement',
     type: 'service'; status: 'review',
-    riskScore: 6.5; lastModified: '2025-09-21T14:30:00Z',
+    riskScore: 6.5; lastModified: '2025-09-21T14:3 0 00Z',
     clauses: [ {
         id: 'clause-1'; type: 'termination',
         content: 'Either party may terminate this agreement with, 30 days written notice...'; riskLevel: 'medium',
@@ -332,7 +332,7 @@
   .status-approved { background: rgba(16,185,129,0.2); color: #10b981}
   .status-executed { background: rgba(59,130,246,0.2); color: #3b82f6}
   .risk-score { font-weight: bold}
-  .contract-actions { display: flex, gap: 0.5rem; align-items: center}
+  .contract-actions { display: flex; gap: 0.5rem; align-items: center}
   .export-dropdown { position: relative}
   .export-btn { background: var(--enhanced-bits-secondary); color: #000}
   .export-menu {
@@ -363,7 +363,7 @@
     margin-bottom: 2rem;
     gap: 1rem}
   .clause-search { flex: 1; max-width: 400px}
-  .clause-stats { display: flex, gap: 1rem, font-size: 0.875rem; color: var(--enhanced-bits-muted-foreground)}
+  .clause-stats { display: flex; gap: 1rem, font-size: 0.875rem; color: var(--enhanced-bits-muted-foreground)}
   .stat-item { padding: 0.25rem 0.5rem; background: rgba(255,255,255,0.05); border-radius: 4px}
 
   .risk-overview {
@@ -387,7 +387,7 @@
   /* keyboard focus visible for accessibility */
   .clause-card:focus { outline: 3px solid rgba(124,58,237,0.28);
     outline-offset: 2px}
-  .clause-card: hover { transform: translateY(-2px); box-shadow: 0 8px 32px rgba(0,0,0,0.3)}
+  .clause-card:hover { transform: translateY(-2px); box-shadow: 0 8px 32px rgba(0,0,0,0.3)}
   .clause-card.selected { transform: translateY(-4px); box-shadow: 0 12px 48px rgba(0,0,0,0.4)}
   .clause-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem}
   .clause-type { display: flex; align-items: center; gap: 0.5rem}
@@ -434,7 +434,7 @@
     .contract-title { flex-direction: column; gap: 1rem}
     .search-section { flex-direction: column; align-items: stretch}
     .clauses-grid { grid-template-columns: 1fr}
-    .clause-actions { flex-wrap: wrap}
+    .clause-actions { flex-wrap}
   }
 </style>
 

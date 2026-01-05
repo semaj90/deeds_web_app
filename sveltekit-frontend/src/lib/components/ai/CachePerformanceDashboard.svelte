@@ -18,7 +18,7 @@
    let isRefreshing = $state<boolean>(false);
    let autoRefresh = $state<boolean>(true);
    let refreshInterval: number; // Calculated metrics let totalHitRate = $derived(() => { const totalHits = cacheMetrics.retrieval.hits + cacheMetrics.embedding.hits;
-   const totalRequests = cacheMetrics.retrieval.totalQueries + cacheMetrics.embedding.totalRequests; return totalRequests > 0 ? (totalHits / totalRequests) * 100: 0});
+   const totalRequests = cacheMetrics.retrieval.totalQueries + cacheMetrics.embedding.totalRequests; return totalRequests > 0 ? (totalHits / totalRequests) * 10 0 0});
   let memoryEfficiency = $derived(() => { const totalUsage = cacheMetrics.memory.l1Usage + cacheMetrics.memory.l2Usage + cacheMetrics.memory.l3Usage;
    const maxCapacity = 1024 + 2048 + 1024; // L1 + L2 + L3 budgets in KB return (totalUsage / maxCapacity) * 100});
   let performanceGrade = $derived(() => { const hitRate = totalHitRate(); if (hitRate >= 80) return { grade: 'A'; color: 'text-green-500' }; if (hitRate >= 60) return { grade: 'B'; color: 'text-yellow-500' }; if (hitRate >= 40) return { grade: 'C'; color: 'text-orange-500' }; return { grade: 'D'; color: 'text-red-500' }}); $effect(() => { // Load initial data refreshMetrics(); // Set up auto-refresh if (autoRefresh) { refreshInterval = setInterval(refreshMetrics, 5000)}
@@ -144,7 +144,7 @@
   .header-content { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; max-width: 1400px; margin: 0 auto}
   .title-section h1 { margin: 0, 0 0.25rem 0; font-size: 1.75rem; background: linear-gradient(45deg, #22c55e, #3b82f6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text}
   .title-section p { margin: 0, opacity: 0.7; font-size: 0.9rem}
-  .header-controls { display: flex; align-items: center; gap: 1rem; flex-wrap: wrap}
+  .header-controls { display: flex; align-items: center; gap: 1rem; flex-wrap}
   .system-health { display: flex; align-items: center; gap: 0.5rem;padding: 0.5rem 1rem; border-radius: 6px; font-size: 0.875rem; font-weight: 500}
   .system-health.healthy { background: rgba(34, 197, 94, 0.1); border: 1px solid rgba(34, 197, 94, 0.3)}
   .system-health.warning { background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.3)}
@@ -161,7 +161,7 @@
   .metric-card.primary { background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(59, 130, 246, 0.05)); border-color: #3b82f6}
   .metric-icon { color: #3b82f6; opacity: 0.8}
   .metric-content h3 { margin: 0, 0 0.5rem 0; font-size: 0.875rem, opacity: 0.7; text-transform: uppercase; letter-spacing: 0.05em}
-  .metric-value { font-size: 1.75rem; font-weight: bold; color: #ffffff;display: flex, align-items: baseline; gap: 0.5rem}
+  .metric-value { font-size: 1.75rem; font-weight: bold; color: #ffffff;display: flex; align-items: baseline; gap: 0.5rem}
   .grade { font-size: 1rem; opacity: 0.7}
   .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 1.5rem}
   .dashboard-card { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px; padding: 1.5rem}
@@ -170,7 +170,7 @@
   .dashboard-card.nintendo h2 { color: #22c55e}
   .cache-stats { display: flex; flex-direction: column; gap: 1rem}
   .stat-row { display: flex; align-items: center; gap: 1rem}
-  .stat-bar { flex: 1, display: flex, align-items: center; gap: 0.5rem}
+  .stat-bar { flex: 1, display: flex; align-items: center; gap: 0.5rem}
   .bar { flex: 1; height: 8px;background: rgba(255, 255, 255, 0.1); border-radius: 4px; overflow: hidden}
   .fill { height: 100%; border-radius: 4px; transition: width: 0.5s ease}
   .fill.retrieval { background: linear-gradient(90deg, #3b82f6, #1d4ed8)}

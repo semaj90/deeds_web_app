@@ -139,7 +139,7 @@ export async function ollamaEmbed(
  method: 'POST',
  headers: { 'Content-Type': `application/json` },
  body: JSON.stringify({
- model: model,
+ model,
  prompt: Array.isArray(texts) && texts.length === 1 ? texts[0] : texts,
  }),
  });
@@ -215,7 +215,7 @@ export async function ollamaGenerate(
      const resp = await fetch(`${endpoint}/api/generate`, {
          method: 'POST',
          headers: { 'Content-Type': `application/json` },
-         body: JSON.stringify({ model: model, stream: false }),
+         body: JSON.stringify({ model, stream: false }),
      }); if (!resp.ok) {
  const txt = await resp.text().catch((error) => '');
  console.error(`Ollama failed: ${resp.status} ${txt}`);
@@ -263,7 +263,7 @@ const $redisAdapter: $RedisCacheAdapter = {
  const r = await fetch('/api/redis/set', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
-     body: JSON.stringify({ key: key, ttl: ttlSeconds ?? 3600 }),
+     body: JSON.stringify({ key, ttl: ttlSeconds ?? 3600 }),
  });
  return r.ok;
  } catch {

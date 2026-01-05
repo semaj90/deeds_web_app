@@ -1,5 +1,4 @@
 <script lang="ts">
-	let disabled = $state<any>(undefined);
 
 	interface JurisdictionSelectorProps {
 		value: string;

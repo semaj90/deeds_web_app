@@ -206,7 +206,7 @@ export const actions: Actions = {
   
  await db
  .update(users)
- .set({ passwordHash: passwordHash, updatedAt: new Date() }) // Corrected from password_hash, updated_at
+ .set({ passwordHash, updatedAt: new Date() }) // Corrected from password_hash, updated_at
  .where(eq(users.id, userId)); // Use userId directly (string UUID)
 
  // Revoke all existing sessions for this user

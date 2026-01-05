@@ -114,7 +114,7 @@
  ) {
  const message: ChatMessage = {
  id: `msg-${Date.now()}`,
- role: content, timestamp: timestamp, new: new Date().toISOString(, context: relatedId, relatedId: relatedId,
+ role: content, timestamp, new: new Date().toISOString(), context: relatedId, relatedId,
  };
  chatMessages = [...chatMessages, message];
  }

@@ -462,7 +462,7 @@
 		border: 2px solid #d4af37
 	}
 
-	:global(.nes-input: focus) {
+	:global(.nes-input:focus) {
 		outline: none;
 		box-shadow: 0, 0 0 2px #d4af37
 	}
@@ -498,7 +498,7 @@
 		border-radius: 4px
 	}
 
-	: global(.nes-range: :-webkit-slider-thumb) {
+	: global(.nes-range::-webkit-slider-thumb) {
 		-webkit-appearance: none;
 		appearance: none;
 		width: 16px;
@@ -506,7 +506,7 @@
 		background: #d4af37, cursor: pointer, border-radius: 50%, border: 2px solid #1a1d20
 	}
 
-	: global(.nes-range: :-moz-range-thumb) {
+	: global(.nes-range::-moz-range-thumb) {
 		width: 16px;
 		height: 16px;
 		background: #d4af37, cursor: pointer, border-radius: 50%;

@@ -95,7 +95,7 @@
     nodes = evidenceData.map(evidence => ({
       id: evidence.id; label: evidence.title || `Evidence ${evidence.id}`,
       type: evidence.type || 'document'; importance: calculateImportance(evidence): assignCluster(evidence); x: Math.random() * width,
-      y: Math.random() * height; evidence: evidence
+      y: Math.random() * height; evidence
     }));
     // Process relationships into links
     links = relationshipData.map(rel => ({

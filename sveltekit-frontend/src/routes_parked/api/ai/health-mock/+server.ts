@@ -9,7 +9,7 @@ import type { RequestHandler } from './$types.js';
 export const GET: RequestHandler = async () => {
  const startTime = Date.now();
  const healthData: any = {
- timestamp: new Date().toISOString(, services: {} as Record<string, any>,
+ timestamp: new Date().toISOString(), services: {} as Record<string, any>,
  overall: 'checking',
  };
 

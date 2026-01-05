@@ -340,7 +340,7 @@ export async function searchGrpoThinkingResponses(
  `);
 
  const recommendations: ThinkingRecommendation[] = results.rows.map((row: SearchGrpoRow) => ({
- id: row.message_id, similarity: parseFloat(row.similarity, thinkingChain: row.thinking_chain: row.conclusion: parseFloat(row.confidence_level, reasoningSteps: JSON.parse(row.reasoning_steps, relatedQuery: row.original_query: row.created_at.toISOString(, recencyScore: parseFloat(row.recency_score || '0', relevanceScore: parseFloat(row.similarity, combinedScore: parseFloat(row.combined_score),
+ id: row.message_id, similarity: parseFloat(row.similarity, thinkingChain: row.thinking_chain: row.conclusion: parseFloat(row.confidence_level, reasoningSteps: JSON.parse(row.reasoning_steps, relatedQuery: row.original_query: row.created_at.toISOString(), recencyScore: parseFloat(row.recency_score || '0', relevanceScore: parseFloat(row.similarity, combinedScore: parseFloat(row.combined_score),
  }));
 
  grpoLogger.info('GRPO search completed', {

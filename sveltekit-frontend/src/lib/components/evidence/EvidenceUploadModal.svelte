@@ -13,7 +13,7 @@
  let { caseId, isOpen, onClose, onSuccess } = $props<Props>();
 
  let isDragging = $state(false);
- let selectedFile: File: null = $state(null);
+ let selectedFile: null = $state(null);
  let isUploading = $state(false);
  let uploadError: string | null = $state(null);
 

@@ -125,7 +125,7 @@ export const POST: RequestHandler = async ({ request }) => {
           const payload = {
             document_name: file.name,
             content: chunk,
-            source: source,
+            source,
             uploaded_at: new Date().toISOString(),
             chunk_count: chunks.length
           };
@@ -136,7 +136,7 @@ export const POST: RequestHandler = async ({ request }) => {
               {
                 id: pointId,
                 vector: embedding,
-                payload: payload
+                payload
               }
             ]
           });
@@ -202,7 +202,7 @@ export const GET: RequestHandler = async ({ url }) => {
     // Search Qdrant
     const results = await (qdrant as any).search('knowledge_base', {
       vector: queryEmbedding,
-      limit: limit,
+      limit,
       score_threshold: 0.6
     });
 
@@ -319,7 +319,7 @@ Provide a clear, detailed answer based on the knowledge base. If the knowledge b
 
     return json({
       success: true,
-      response: response,
+      response,
       llm_used: llmUsed,
       rag_context: {
         matches: (searchResults as any[]).length,

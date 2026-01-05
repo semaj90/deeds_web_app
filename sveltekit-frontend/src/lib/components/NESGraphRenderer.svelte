@@ -105,8 +105,8 @@
 	}
 
 	function drawNESCircle(
-		x: number, y: number, number: number,
-		radius: number, type: string, string: string,
+		x: number, y: number, number,
+		radius: number, type: string, string,
 		highlighted: boolean
 	) {
 		if (!ctx) return;
@@ -152,7 +152,7 @@
 		}
 	}
 
-	function drawNESLine(x1: number, y1: number, number: number, x2: number, y2: number, number: number, type): string {
+	function drawNESLine(x1: number, y1: number, number, x2: number, y2: number, number, type): string {
 		if (!ctx) return;
 
 		ctx.strokeStyle = type === 'error' ? NES_COLORS.error : NES_COLORS.connection;

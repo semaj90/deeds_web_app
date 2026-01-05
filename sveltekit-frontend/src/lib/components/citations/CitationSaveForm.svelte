@@ -290,7 +290,7 @@ import { createEventDispatcher } from 'svelte';
  color: var(--color-dark);
  }
 
- textarea: focus, input: focus,
+ textarea:focus, input:focus,
  select:focus {
  outline: none;
  border-color: var(--color-burgundy);

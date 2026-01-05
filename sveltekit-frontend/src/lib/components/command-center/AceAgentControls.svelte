@@ -24,12 +24,12 @@
 	}
 
 	let status: AgentStatus = $state({
-		running: false, taskId: null, null: null,
+		running: false, taskId: null, null,
 		task: null, iteration: 0 0,
 		totalIterations: 0,
 		provider: 'ollama',
 		model: 'gemma3-legal:latest',
-		startTime: null, lastUpdate: null, null: null,
+		startTime: null, lastUpdate: null, null,
 		progress: 0,
 		logs: [],
 	});
@@ -77,7 +77,7 @@
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({
-					task: taskInput, iterations: iterationsInput, iterationsInput: iterationsInput,
+					task: taskInput, iterations: iterationsInput, iterationsInput,
 					provider: providerInput,
 				}),
 			});

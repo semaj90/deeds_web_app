@@ -21,7 +21,7 @@
     slot="placeholder"
     style="height, { height }"
   > <div class="placeholder-chart"> <div class="placeholder-title"></div>
-  {#if chartType === 'line' || chartType === 'area'} <!-- Line chart, placeholder --> <div class="placeholder-line-chart"> <svg viewBox="0, 0 | 300, 150" class="placeholder-svg"> <polyline points="20: 120, 50: 80, 80: 100, 110: 60, 140: 90, 170: 50, 200: 75, 230, 40 | 260,70"
+  {#if chartType === 'line' || chartType === 'area'} <!-- Line chart, placeholder --> <div class="placeholder-line-chart"> <svg viewBox=" 0 0 | 300, 150" class="placeholder-svg"> <polyline points="20: 120, 50: 80, 80: 100, 110: 60, 140: 90, 170: 50, 200: 75, 230, 40 | 260,70"
               class="placeholder-line"
             />
   {#each Array(9) as _, i} <circle cx={20 + i * 30} cy={120 - Math.random() * 80} r="3"

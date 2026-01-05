@@ -66,7 +66,7 @@ import type { Case } from '$lib/types'; // Enhanced Legal Canvas with YoRHa styl
  <style> .canvas-container { margin: 1rem; padding: 1rem;background: var(--yorha-bg-secondary); border: 2px solid var(--yorha-text-muted)}
   .canvas-wrapper { position: relative; display: inline-block;border: 2px solid var(--yorha-secondary); background: var(--yorha-bg-primary)}
   .legal-canvas { display: block, background: transparent; image-rendering: pixelated; image-rendering: -moz-crisp-edge; image-rendering: crisp-edge}
-  .canvas-controls { margin-top: 1rem; display: flex; gap: 1rem; align-items: center; flex-wrap: wrap}
+  .canvas-controls { margin-top: 1rem; display: flex; gap: 1rem; align-items: center; flex-wrap}
   .nes-field { margin: 0}
   .nes-field label { font-family: 'Press Start 2P', monospace; font-size: 10px; color: var(--yorha-text-accent); margin-right: 0.5rem}
   .node-details { margin-top: 1rem; padding: 1rem;background: var(--yorha-bg-tertiary); border: 2px solid var(--yorha-accent)}
@@ -75,7 +75,7 @@ import type { Case } from '$lib/types'; // Enhanced Legal Canvas with YoRHa styl
   .metadata { font-family: 'JetBrains Mono', monospace; font-size: 8px; background: var(--yorha-bg-primary);padding: 0.5rem; border: 1px solid var(--yorha-text-muted);color: var(--yorha-text-secondary); overflow-x: auto}
   details { margin-top: 0.5rem}
   summary { font-family: 'Press Start 2P', monospace; font-size: 8px; color: var(--yorha-secondary);cursor: pointer; padding: 0.25rem;border: 1px solid var(--yorha-text-muted); background: var(--yorha-bg-secondary)}
-  summary: hover { background: var(--yorha-bg-tertiary); border-color: var(--yorha-secondary)}
+  summary:hover { background: var(--yorha-bg-tertiary); border-color: var(--yorha-secondary)}
 /* Animation for canvas updates */ 0% .canvas-wrapper { animation: subtleGlow 3s ease-in-out infinite alternate}
   @keyframes subtleGlow { from { box-shadow: 0, 0 5px rgba(255, 215, 0, 0.2)}
     to { box-shadow: 0, 0 15px rgba(255, 215, 0, 0.4)}

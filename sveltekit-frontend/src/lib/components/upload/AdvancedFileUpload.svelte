@@ -136,7 +136,7 @@
   .drop-zone.disabled { opacity: 0.6; cursor: not-allowed}
   .drop-zone:focus { outline: 2px solid #3b82f6; outline-offset: 2px}
   .upload-icon { margin-bottom: 1rem; color: #6b7280}
-  .upload-actions { display: flex, gap: 0.75rem; justify-content: center; flex-wrap: wrap; margin-top: 1rem}
+  .upload-actions { display: flex; gap: 0.75rem; justify-content: center; flex-wrap: wrap; margin-top: 1rem}
   .file-list { margin-top: 2rem; border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden}
   .file-list-header { display: flex; justify-content: space-between, align-items: center; padding: 1rem; background: #f9fafb; border-bottom: 1px solid #e5e7eb}
   .file-list-actions { display: flex; gap: 0.5rem}

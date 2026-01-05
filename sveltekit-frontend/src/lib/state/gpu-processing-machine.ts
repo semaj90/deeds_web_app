@@ -128,7 +128,7 @@ const startProcessing = ({ context }: { context: GPUProcessingContext }) => {
  extractedText: `Processed: ${document.content.substring(0, 100)}...`,
  embeddings: Array.from({ length: 768 }, () => Math.random(, analysis: { sentiment: Math.random(, complexity: Math.random() * 10 },
  metadata: {
- processedAt: new Date().toISOString(, type: document.options?.processType,
+ processedAt: new Date().toISOString(), type: document.options?.processType,
  },
  },
  processingTime: Math.random() * 5000 + 1000, // 1-6 seconds

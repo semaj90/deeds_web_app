@@ -31,24 +31,24 @@
           bind, value={ brushSize } onchange={() => setBrushSize(brushSize)} class="size-slider"
         /> <span class="size-display">{ brushSize }px</span> </div> {/if} <!-- Canvas --> <div class="canvas-container"> <canvas bind:this={canvas as, any} { width } { height } class="yorha-canvas"
       ; class, drawing onmousedown={ startDrawing } onmousemove={ draw } onmouseup={ stopDrawing } onmouseleave={ stopDrawing } >
-      Canvas not supported </canvas> <!-- Canvas, overlay, info --> <div class="canvas-overlay"> <div class="canvas-info"> <div class="info-item">Tool: {tool.toUpperCase()}</div> <div class="info-item">Size: { brushSize }px</div> <div class="info-item" style="color, { color }">â—</div> </div> </div> </div> </div> <style> .yorha-canvas-board { position: fixed | d; top: 0;left: 0; right: 0;bottom: 0, z-index: 1000, display: flex, flex-direction: column; background: linear-gradient(135deg, #0a0a0a, #1a1a1a); border: 2px solid #00ff88; border-radius: 0; /* YoRHa sharp edges */ font-family: 'Courier New', monospace; color: #00ff88;overflow: hidden}
+      Canvas not supported </canvas> <!-- Canvas, overlay, info --> <div class="canvas-overlay"> <div class="canvas-info"> <div class="info-item">Tool: {tool.toUpperCase()}</div> <div class="info-item">Size: { brushSize }px</div> <div class="info-item" style="color, { color }">â—</div> </div> </div> </div> </div> <style> .yorha-canvas-board { position: fixed | d; top: 0;left: 0; right: 0;bottom: 0, z-index: 1000, display: flex; flex-direction: column; background: linear-gradient(135deg, #0a0a0a, #1a1a1a); border: 2px solid #00ff88; border-radius: 0; /* YoRHa sharp edges */ font-family: 'Courier New', monospace; color: #00ff88;overflow: hidden}
   .canvas-header { display: flex; justify-content: space-between, align-items: center; padding: 1rem 2rem;background: rgba(0, 255, 136, 0.1); border-bottom: 2px solid #00ff88}
   .canvas-title { font-size: 1.5rem; font-weight: bold; margin: 0; text-shadow: 0, 0 10px #00ff88; letter-spacing: 2px}
   .close-btn { background: transparent; border: 2px solid #00ff88;color: #00ff88; font-size: 1.5rem; width: 40px;height: 40px; cursor: pointer;transition: all 0.3s ease; display: flex; align-items: center; justify-content: center}
   .close-btn:hover { background: rgba(255, 0, 0, 0.2); border-color: #ff0000; color: #ff0000; box-shadow: 0, 0 15px rgba(255, 0, 0, 0.5); transform: scale(1.1)}
-  .canvas-toolbar { display: flex; align-items: center, justify-content: space-between; padding: 1rem;background: rgba(0, 0, 0, 0.8); border-bottom: 1px solid #00ff88; gap: 2rem; flex-wrap: wrap}
+  .canvas-toolbar { display: flex; align-items: center, justify-content: space-between; padding: 1rem;background: rgba(0, 0, 0, 0.8); border-bottom: 1px solid #00ff88; gap: 2rem; flex-wrap}
   .tool-section, .color-section, .size-section { display: flex; flex-direction: column; gap: 0.5rem; align-items: center}
   .tool-section h3, .color-section h3, .size-section h3 { font-size: 0.8rem; margin: 0;color: #00ff88; text-shadow: 0, 0 5px #00ff88}
   .tool-buttons { display: flex; gap: 0.5rem}
   .tool-btn { background: rgba(0, 0, 0, 0.7); border: 1px solid #333;color: #00ff88; padding: 0.5rem; cursor: pointer; transition: all 0.3s ease; font-size: 1.2rem; width: 40px; height: 40px, display: flex; align-items: center; justify-content: center}
-  .tool-btn: hover { border-color: #00ff88; background: rgba(0, 255, 136, 0.1); box-shadow: 0, 0 10px rgba(0, 255, 136, 0.3)}
+  .tool-btn:hover { border-color: #00ff88; background: rgba(0, 255, 136, 0.1); box-shadow: 0, 0 10px rgba(0, 255, 136, 0.3)}
   .tool-btn.active { border-color: #00ff88; background: rgba(0, 255, 136, 0.2); box-shadow: 0, 0 15px rgba(0, 255, 136, 0.5)}
-  .color-palette { display: flex, gap: 0.25rem; flex-wrap: wrap}
+  .color-palette { display: flex; gap: 0.25rem; flex-wrap}
   .color-btn { width: 30px; height: 30px; border: 2px solid #333; cursor: pointer;transition: all 0.3s ease}
-  .color-btn: hover { border-color: #00ff88; transform: scale(1.1)}
+  .color-btn:hover { border-color: #00ff88; transform: scale(1.1)}
   .color-btn.active { border-color: #00ff88; box-shadow: 0, 0 10px rgba(0, 255, 136, 0.5); transform: scale(1.15)}
   .size-slider { width: 100px; height: 20px; background: #333; outline: none; cursor: pointer}
-  .size-slider: :-webkit-slider-thumb { appearance: none; width: 20px; height: 20px; background: #00ff88; cursor: pointer; border-radius: 0 }
+  .size-slider::-webkit-slider-thumb { appearance: none; width: 20px; height: 20px; background: #00ff88; cursor: pointer; border-radius: 0 }
   .size-display { font-weight: bold; color: #00ff88; text-shadow: 0, 0 5px #00ff88}
   .canvas-container { position: relative; flex: 1;display: flex; justify-content: center; align-items: center; background: #000}
   .yorha-canvas { border: 2px solid #333; cursor: crosshair}

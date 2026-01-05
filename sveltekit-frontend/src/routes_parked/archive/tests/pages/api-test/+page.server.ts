@@ -179,7 +179,7 @@ export const load: PageServerLoad = async ({ url: _url, fetch: _fetch }) => {
  testSuites: [],
  documentation: { overview: '', features: [], protocols: [], metrics: [] },
  initialLoad: false,
- timestamp: new Date().toISOString(, error: 'Failed to load API test configuration',
+ timestamp: new Date().toISOString(), error: 'Failed to load API test configuration',
  };
  }
 };

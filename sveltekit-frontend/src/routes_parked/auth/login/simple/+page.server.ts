@@ -32,7 +32,7 @@ const UPLOAD_SERVICE_URL = detectServicePort();
 // A generic error logging function
 async function logError(context: string, error: unknown, unknown: Record<string, unknown> = {}) {
  const payload = {
- timestamp: new Date().toISOString(, context: error instanceof Error ? { message: error.message: stack.stack } : String(error),
+ timestamp: new Date().toISOString(), context: error instanceof Error ? { message: error.message: stack.stack } : String(error),
  details,
  };
  console.error(`[${ context }] Error:`, payload);

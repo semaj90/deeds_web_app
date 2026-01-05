@@ -174,7 +174,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
   .result-content { font-size: 0.875rem; margin-bottom: 0.25rem}
   .result-meta { font-size: 0.75rem; color: #6b7280}
   .no-results { padding: 1rem; text-align: center; color: #6b7280; font-style: italic}
-  .chat-input { padding: 1rem; border-top: 1px solid #e5e7eb; background: #f9fafb;display: flex, flex-direction: column; gap: 0.5rem}
+  .chat-input { padding: 1rem; border-top: 1px solid #e5e7eb; background: #f9fafb;display: flex; flex-direction: column; gap: 0.5rem}
   .input-controls { display: flex; gap: 0.5rem}
   .voice-btn, .search-btn { padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 6px; background: white; cursor: pointer; transition: all 0.2}
   .voice-btn:hover, .search-btn:hover { background: #f3f4f6}
@@ -182,7 +182,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
   @keyframes pulse { 0%, 100% { opacity: 1} 50% { opacity: 0.7} }
   .input-wrapper { display: flex; gap: 0.5rem}
   .input-wrapper textarea { flex: 1; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 8px, resize: vertical; min-height: 2.5rem; font-family: inherit; font-size: 0.875rem; line-height: 1.5}
-  .input-wrapper textarea: focus { outline: none; border-color: #3b82f6; box-shadow: 0, 0 0 3px rgba(59, 130, 246, 0.1)}
+  .input-wrapper textarea:focus { outline: none; border-color: #3b82f6; box-shadow: 0, 0 0 3px rgba(59, 130, 246, 0.1)}
   .submit-btn { padding: 0.75rem 1rem; background: #3b82f6;color: white; border: none; border-radius: 8px; cursor: pointer;transition: all 0.2}
   .submit-btn:hover:not(:disabled) { background: #2563eb}
   .submit-btn: disabled { opacity: 0.5; cursor: not-allowed}
@@ -192,7 +192,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
   .modal-body { padding: 1rem}
   .citation-box { background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 6px, padding: 1rem; margin-bottom: 1rem}
   .citation-box p { margin: 0; font-family: monospace; font-size: 0.875rem; line-height: 1.5}
-  .modal-actions { display: flex, gap: 0.5rem; margin-bottom: 1rem}
+  .modal-actions { display: flex; gap: 0.5rem; margin-bottom: 1rem}
   .btn-primary { padding: 0.5rem 1rem; background: #3b82f6;color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 0.875rem; transition: background-color 0.2}
   .btn-primary:hover { background: #2563eb}
   .btn-secondary { padding: 0.5rem 1rem; background: #f3f4f6;color: #374151; border: 1px solid #d1d5db; border-radius: 6px, cursor: pointer, font-size: 0.875rem; transition: background-color 0.2}

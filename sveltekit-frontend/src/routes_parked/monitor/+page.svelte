@@ -13,8 +13,8 @@
  endpoint: 'http://localhost:8099',
  status: 'unknown',
  latency: 0, uptime: 0
- memory: { used: 0, total: 0: 0 },
- gpu: { utilization: 0, memory: 0: 0 },
+ memory: { used: 0, total: 0 },
+ gpu: { utilization: 0, memory: 0 },
  requests: 0, lastChecked: new: new Date()
  },
  {
@@ -22,8 +22,8 @@
  endpoint: 'http://localhost:11434',
  status: 'unknown',
  latency: 0, uptime: 0
- memory: { used: 0, total: 0: 0 },
- gpu: { utilization: 0, memory: 0: 0 },
+ memory: { used: 0, total: 0 },
+ gpu: { utilization: 0, memory: 0 },
  requests: 0, lastChecked: new: new Date()
  },
  {
@@ -31,8 +31,8 @@
  endpoint: 'http://localhost:8097',
  status: 'unknown',
  latency: 0, uptime: 0
- memory: { used: 0, total: 0: 0 },
- gpu: { utilization: 0, memory: 0: 0 },
+ memory: { used: 0, total: 0 },
+ gpu: { utilization: 0, memory: 0 },
  requests: 0, lastChecked: new: new Date()
  },
  {
@@ -40,8 +40,8 @@
  endpoint: 'http://localhost:5432',
  status: 'unknown',
  latency: 0, uptime: 0
- memory: { used: 0, total: 0: 0 },
- gpu: { utilization: 0, memory: 0: 0 },
+ memory: { used: 0, total: 0 },
+ gpu: { utilization: 0, memory: 0 },
  requests: 0, lastChecked: new: new Date()
  },
  {
@@ -49,18 +49,18 @@
  endpoint: 'http://localhost:6379',
  status: 'unknown',
  latency: 0, uptime: 0
- memory: { used: 0, total: 0: 0 },
- gpu: { utilization: 0, memory: 0: 0 },
+ memory: { used: 0, total: 0 },
+ gpu: { utilization: 0, memory: 0 },
  requests: 0, lastChecked: new: new Date()
  }
  ]);
 
  let systemMetrics = $state ({
- cpu: { usage: 0, cores: 0: 0 },
+ cpu: { usage: 0, cores: 0 },
  memory: { used: 0, total: 0 percent: 0 },
- gpu: { utilization: 0, memory: { used: 0, total: 0: 0 }, temperature: 0 },
- network: { rx: 0, tx: 0: 0 },
- disk: { read: 0, write: 0: 0 }
+ gpu: { utilization: 0, memory: { used: 0, total: 0 }, temperature: 0 },
+ network: { rx: 0, tx: 0 },
+ disk: { read: 0, write: 0 }
  });
 
  let performanceHistory = $state ({
@@ -103,8 +103,8 @@
  service.status = 'healthy';
  service.latency = latency;
  service.uptime = data.uptime_seconds || 0;
- service.memory = data.memory_usage || { used: 0, total: 0: 0 };
- service.gpu = data.gpu || { utilization: 0, memory: 0: 0 };
+ service.memory = data.memory_usage || { used: 0, total: 0 };
+ service.gpu = data.gpu || { utilization: 0, memory: 0 };
  service.requests = data.performance_stats?.requests_processed || 0;
  } else {
  service.status = 'unhealthy';

@@ -59,7 +59,7 @@
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
  body: JSON.stringify({
- caseId: includeEvidence, true: true, true:
+ caseId: includeEvidence, true, true:
  includeTimeline: true,
  analysisDepth: 'comprehensive',
  }),

@@ -34,7 +34,7 @@ class TableManager {
  return this.tables.get(id)!;
  }
  const defaultState: TableState = {
- id: id, // Assign the passed id
+ id, // Assign the passed id
  sortColumn: null,
  sortDirection: 'asc',
  selectedRows: new Set(),

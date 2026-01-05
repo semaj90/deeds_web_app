@@ -174,14 +174,14 @@ describe('ErrorBrainModal Component', () => {
  route_path: TEST_ROUTE_PATH,
  suggestions: [{ title: 'Fix 1', description: 'Desc 1' }],
  phase: 'suggesting',
- created_at: new Date().toISOString(, patches: [],
+ created_at: new Date().toISOString(), patches: [],
  },
  {
  id: '2',
  route_path: TEST_ROUTE_PATH,
  suggestions: [{ title: 'Fix 2', description: 'Desc 2' }],
  phase: 'verifying',
- created_at: new Date().toISOString(, patches: [],
+ created_at: new Date().toISOString(), patches: [],
  },
  ];
 
@@ -210,7 +210,7 @@ describe('ErrorBrainModal Component', () => {
  route_path: TEST_ROUTE_PATH,
  suggestions: [{ title: 'Fix', description: 'Desc' }],
  phase: 'suggesting',
- created_at: new Date().toISOString(, patches: [
+ created_at: new Date().toISOString(), patches: [
  {
  id: 'p1',
  file_path: 'src/test.ts',
@@ -259,7 +259,7 @@ describe('ErrorBrainModal Component', () => {
  ],
  phase: 'suggesting',
  error_message: 'Type error on line 42',
- created_at: new Date().toISOString(, patches: [],
+ created_at: new Date().toISOString(), patches: [],
  },
  ];
 

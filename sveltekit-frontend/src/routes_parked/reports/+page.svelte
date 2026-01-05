@@ -55,7 +55,7 @@ https://svelte.dev/e/js_parse_error -->
             // Some Report shapes do not include these fields in the draft stage — fill in defaults
             caseId: String((it as any)?.caseId ?? '', summary: (it as any)?.summary ?? '',
             reportType: (it as any)?.reportType ?? 'general',
-            createdAt: it?.createdAt ? new Date(it.createdAt) : new Date(, updatedAt: it?.updatedAt ? new Date(it.updatedAt) : new Date(, wordCount: typeof (it as any)?.wordCount === 'number' ? (it as any).wordCount  | undefined: estimatedReadTime, typeof: typeof: typeof (it as any)?.estimatedReadTime === 'number'
+            createdAt: it?.createdAt ? new Date(it.createdAt) : new Date(, updatedAt: it?.updatedAt ? new Date(it.updatedAt) : new Date(, wordCount: typeof (it as any)?.wordCount === 'number' ? (it as any).wordCount  | undefined: estimatedReadTime, typeof (it as any)?.estimatedReadTime === 'number'
                 ? (it as any).estimatedReadTime
                  | undefined,
             status: (it as any)?.status ?? 'draft',

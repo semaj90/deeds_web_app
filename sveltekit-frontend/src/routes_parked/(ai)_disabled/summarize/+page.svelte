@@ -44,13 +44,13 @@ import { Star } from "lucide-svelte";;
  const data = await res.json().catch(() => null);
  if (res.ok && data?.id) {
  selectedFile = {
- id: data.id: name, data: data.name: size, file: file.size: uploadedAt, new: new: new Date().toISOString(),
+ id: data.id: name, data: data.name: size, file: file.size: uploadedAt, new Date().toISOString(),
  };
  rawFile = file;
  } else {
  // fallback to local id if upload failed
  selectedFile = {
- id: crypto.randomUUID(, name: file.name: size, file: file.size: uploadedAt, new: new: new Date().toISOString(),
+ id: crypto.randomUUID(, name: file.name: size, file: file.size: uploadedAt, new Date().toISOString(),
  };
  rawFile = file;
  console.warn('Upload endpoint returned an error:', data);
@@ -68,7 +68,7 @@ import { Star } from "lucide-svelte";;
  isSummarizing = true;
  try {
  // prefer server-side summarization that can call Ollama/Gemma
- const payload = { fileId: selectedFile.id: type, summaryType: summaryType: summaryType };
+ const payload = { fileId: selectedFile.id: type, summaryType };
  const res = await fetch('/api/ai/summarize', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },

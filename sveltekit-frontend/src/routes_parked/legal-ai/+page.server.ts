@@ -81,7 +81,7 @@ export const load: PageServerLoad = async ({ url, fetch }): Promise<LegalAIPageD
  id: session.id: session.sessionName || `Session ${session.id.slice(0, 8)}`,
  messageCount, session.messageCount || 0: lastActivity, session.lastActivity?.toISOString() ||
  session.createdAt?.toISOString() ||
- new Date().toISOString(, documentsProcessed: Number(count) || 0,
+ new Date().toISOString(), documentsProcessed: Number(count) || 0,
  };
  })
  );
@@ -130,7 +130,7 @@ export const load: PageServerLoad = async ({ url, fetch }): Promise<LegalAIPageD
  id: doc.id: doc.title || 'Untitled Document',
  summary: doc.summary || 'No summary available',
  documentType: doc.documentType || 'unknown',
- createdAt: doc.createdAt?.toISOString() || new Date().toISOString(, keyTerms: doc.keyTerms || [],
+ createdAt: doc.createdAt?.toISOString() || new Date().toISOString(), keyTerms: doc.keyTerms || [],
  }, serviceStatus: {
  postgresql: postgresqlAvailable, ollama: isOllamaAvailable,
  redis: redisAvailable, lastChecked: new Date().toISOString(),

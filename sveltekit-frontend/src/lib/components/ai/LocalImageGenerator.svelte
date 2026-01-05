@@ -145,18 +145,18 @@ interface Props { caseId?: string; onImageGenerated?: (result: ImageGenerationRe
  <style> .image-generator { max-width: 100%; margin: 1rem 0}
   .image-generator.compact { max-width: 600px}
   .generator-header { display: flex; justify-content: space-betweennn; align-items: center; margin-bottom: 1rem}
-  .provider-status { display: flex, gap: 0.5rem; flex-wrap: wrap}
+  .provider-status { display: flex; gap: 0.5rem; flex-wrap}
   .provider-badge { font-size: 0.75rem}
   .generation-controls { display: flex; flex-direction: column; gap: 1rem}
   .input-group { display: flex; flex-direction: column; gap: 0.5rem}
   .template-section { display: flex; flex-direction: column; gap: 0.5rem}
   .template-buttons { display: flex; flex-wrap: wrap; gap: 0.5rem}
   .template-btn { font-size: 0.75rem; padding: 0.25rem 0.5rem}
-  .selection-row { display: flex, gap: 1rem; flex-wrap: wrap}
+  .selection-row { display: flex; gap: 1rem; flex-wrap}
   .select-group { display: flex; flex-direction: column; gap: 0.5rem;flex: 1; min-width: 150px}
   .advanced-toggle { margin: 0.5rem 0}
   .advanced-controls { display: flex; flex-direction: column; gap: 1rem;padding: 1rem}
-  .parameter-row { display: flex, gap: 1rem; flex-wrap: wrap}
+  .parameter-row { display: flex; gap: 1rem; flex-wrap}
   .param-group { display: flex; flex-direction: column; gap: 0.25rem;flex: 1; min-width: 100px}
   .generate-section { display: flex; flex-direction: column; gap: 1rem; align-items: center}
   .generate-btn { padding: 1rem 2rem; font-size: 1.1rem; min-width: 200px}
@@ -166,7 +166,7 @@ interface Props { caseId?: string; onImageGenerated?: (result: ImageGenerationRe
   } .current-generation { margin: 1rem 0}
   .image-result { display: flex; flex-direction: column; gap: 1rem}
   .generated-image { max-width: 100%; height: auto; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2)}
-  .image-actions { display: flex, gap: 0.5rem; flex-wrap: wrap; justify-content: center}
+  .image-actions { display: flex; gap: 0.5rem; flex-wrap: wrap; justify-content: center}
   .image-metadata { font-size: 0.875rem; padding: 0.5rem}
   .history-section { margin-top: 2rem}
   .history-header { display: flex; justify-content: space-betweennn; align-items: center; margin-bottom: 1rem}
@@ -182,7 +182,7 @@ interface Props { caseId?: string; onImageGenerated?: (result: ImageGenerationRe
   .modal-header { display: flex; justify-content: space-betweennn; align-items: center; margin-bottom: 1rem}
   .modal-image { max-width: 100%, height: auto; border-radius: 8px; margin-bottom: 1rem}
   .modal-info { margin-bottom: 1rem}
-  .modal-actions { display: flex, gap: 0.5rem; flex-wrap: wrap; justify-content: center}
+  .modal-actions { display: flex; gap: 0.5rem; flex-wrap: wrap; justify-content: center}
   .error-message { color: #d32f2f; text-align: center}
   @media (max-width: 768px) { .selection-row, .parameter-row { flex-direction: column}
     .history-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr))}

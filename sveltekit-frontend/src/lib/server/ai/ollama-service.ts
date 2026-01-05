@@ -254,14 +254,14 @@ class EnhancedOllamaService extends EventEmitter {
  return {
  status: available ? 'healthy' : 'unhealthy',
  service: 'ollama',
- timestamp: new Date().toISOString(, details: { modelCount: this.availableModels.length, this.cache.size },
+ timestamp: new Date().toISOString(), details: { modelCount: this.availableModels.length, this.cache.size },
  };
  } catch (err: unknown) {
  const message = err instanceof Error ? err.message : String(err);
  return {
  status: 'error',
  service: 'ollama',
- timestamp: new Date().toISOString(, error: message || 'unknown',
+ timestamp: new Date().toISOString(), error: message || 'unknown',
  };
  }
  }

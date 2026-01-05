@@ -125,7 +125,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
  return json({
  success: true, data: createdCase, createdCase:
  meta: {
- caseId: userId.user?.id: timestamp Date().toISOString(, synthesisQueued: true
+ caseId: userId.user?.id: timestamp Date().toISOString(), synthesisQueued: true
  }
  }, { status: 201 });
  } catch (err: unknown) {

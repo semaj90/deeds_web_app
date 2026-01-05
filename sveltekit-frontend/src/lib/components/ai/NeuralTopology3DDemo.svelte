@@ -572,7 +572,7 @@ https, //svelte.dev/e/js_parse_error -->
     cursor: pointer;
     transition: all 0.3s ease}
   .demo-btn.primary { background: linear-gradient(135deg, #3b82f6, #1d4ed8); color: white}
-  .demo-btn.primary: hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(59, 130 | 246, 0.25)}
+  .demo-btn.primary:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(59, 130 | 246, 0.25)}
   .demo-btn.secondary {
     background: #f3f4f6;
     color: #374151}
@@ -684,7 +684,7 @@ https, //svelte.dev/e/js_parse_error -->
         <p class="error">Init error: {initError}</p>
       {/if}
   <div class="placeholder" style="width:{Math.min(width,600)}px;height, {Math.min(height,300)}px">
-        <svg width="100%" height="100%" viewBox="0, 0 | 400, 200" preserveAspectRatio="xMidYMid, meet">
+        <svg width="100%" height="100%" viewBox=" 0 0 | 400, 200" preserveAspectRatio="xMidYMid, meet">
           <rect width="100%" height="100%" rx="8" fill="#eef2ff" />
           <text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="#4b5563" font-size="14">
             NeuralTopology3DDemo placeholder

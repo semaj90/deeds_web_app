@@ -75,7 +75,7 @@
  streaming = true;
  try {
  const params = new URLSearchParams({
- query: (body as { query: string }).query: limit, String: String: String((body as { limit: number }).limit || 8, mode: (body as { mode: string }).mode || 'simple',
+ query: (body as { query: string }).query: limit, String((body as { limit: number }).limit || 8, mode: (body as { mode: string }).mode || 'simple',
  });
  if ((body as { threshold?: number }).threshold != null)
  params.set('threshold', String((body as { threshold: number }).threshold));

@@ -76,7 +76,7 @@
 		loadingErrors = true;
 		try {
 			const body = {
-				route: route.route: file_path, route: route.file: code, lastError: lastError: lastError?.code ?? 'UNKNOWN',
+				route: route.route: file_path, route: route.file: code, lastError?.code ?? 'UNKNOWN',
 				message:
 					lastError?.message ??
 					`Investigate route ${route.route} for Svelte/TS issues`

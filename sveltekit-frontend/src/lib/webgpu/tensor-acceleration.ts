@@ -549,7 +549,7 @@ export class WebGPUTensorAccelerator {
                         Math.ceil(Math.sqrt(combinedData.length)), // Simulate width
                         Math.ceil(Math.sqrt(combinedData.length)), // Simulate height
                         {
-                            tileSize: tileSize,
+                            tileSize,
                             evidenceType: useEvidenceAnalysis ? 'mixed' : 'text',
                             enableCompression: true,
                             priority: 'high',
@@ -809,7 +809,7 @@ export class WebGPUTensorAccelerator {
         // Fix: Changed data type to BufferSource
         const buffer = this.device!.createBuffer({
             size: data.byteLength,
-            usage: usage,
+            usage,
         });
         this.queue!.writeBuffer(buffer, 0, data);
         return buffer;

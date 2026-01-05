@@ -45,7 +45,7 @@
  dispatch('filter', {
  search: searchQuery, status: statusFilter,
  priority: priorityFilter, assignee: assigneeFilter,
- dateRange: dateRange
+ dateRange
  });
  }
 

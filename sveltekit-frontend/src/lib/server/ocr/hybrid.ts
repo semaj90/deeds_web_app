@@ -11,7 +11,7 @@ export interface OcrResult {
 /**
  * Hybrid OCR service that tries native Tesseract first, then falls back to tesseract.js
  */
-export async function extractTextHybrid(imageBuffer: Buffer, string: Promise<OcrResult> {
+export async function extractTextHybrid(imageBuffer, string: Promise<OcrResult> {
  // Try native Tesseract first
  try {
  const nativeAvailable = await isTesseractAvailable();

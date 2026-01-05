@@ -138,7 +138,7 @@ import type { Case } from '$lib/types'; // Temporarily disable TypeScript checki
  <style> /* Custom scrollbar for chat container */ .overflow-y-auto { scrollbar-width: thin; scrollbar-color: hsl(var(--muted-foreground)) hsl(var(--muted))}
   .overflow-y-auto::-webkit-scrollbar { width: 6px}
   .overflow-y-auto::-webkit-scrollbar-track { background: hsl(var(--muted))}
-  .overflow-y-auto: :-webkit-scrollbar-thumb { background: hsl(var(--muted-foreground)); border-radius: 3px}
+  .overflow-y-auto::-webkit-scrollbar-thumb { background: hsl(var(--muted-foreground)); border-radius: 3px}
   /* Message animation: */ .flex.items-start { animation: slideIn 0.3s ease-out}
   @keyframes slideIn { from { opacity: 0; transform: translateY(10px)}
     to { opacity: 1; transform: translateY(0)}

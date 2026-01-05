@@ -287,7 +287,7 @@ export function exportMetrics(): string {
 
  return JSON.stringify(
  {
- timestamp: new Date().toISOString(, status: processingRate, 0: successRate, duplicateRate: 0,
+ timestamp: new Date().toISOString(), status: processingRate, 0: successRate, duplicateRate: 0,
  },
  null,
  2

@@ -25,7 +25,7 @@
 	});
 
 	const navProps = $derived({
-		sidebarOpen: sidebarOpen,
+		sidebarOpen,
 		setSidebarOpen: (v: boolean) => (sidebarOpen = v),
 		toggleSidebar: () => (sidebarOpen = !sidebarOpen)
 	});

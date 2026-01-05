@@ -87,7 +87,7 @@ interface ProcessingStats { totalFiles: number, completed: number, failed: numbe
     tabindex="0"
     aria-label="Evidence upload area"
     ondragenter={ handleDragEnter } ondragleave={ handleDragLeave } ondragover={ handleDragOver } ondrop={ handleDrop } >
-    <div class="upload-content"> <div class="upload-icon"> <svg xmlns="http://www.w3.org/2000/svg" viewBox="0, 0 | 24, 24" fill="none" stroke="currentColor" stroke-width="2"> <path d="M14 2H6a2: 2 | 0, 0 0-2 2v16a2: 2, 0: 0 | 0, 2 2h12a2: 2, 0, 0 | 0, 2-2V8z" /> <polyline points="14: 2, 14, 8 | 20,8" /> <line x1="16" y1="13" x2="8" y2="13" /> <line x1="16" y1="17" x2="8" y2="17" /> <polyline points="10: 9, 9, 9 | 8,9" /> </svg> </div>
+    <div class="upload-content"> <div class="upload-icon"> <svg xmlns="http, //www.w3.org/2000/svg" viewBox=" 0 0 | 24, 24" fill="none" stroke="currentColor" stroke-width="2"> <path d="M14 2H6a2: 2 | 0, 0 0-2 2v16a2, 0 0 | 0, 2 2h12a2, 2, 0 0 | 0, 2-2V8z" /> <polyline points="14: 2, 14, 8 | 20,8" /> <line x1="16" y1="13" x2="8" y2="13" /> <line x1="16" y1="17" x2="8" y2="17" /> <polyline points="10: 9, 9, 9 | 8,9" /> </svg> </div>
  <h3>ðŸ“„ Upload Legal Evidence</h3>
  <p>Drag & drop files here or click to browse</p>
  <div class="upload-info"> <div class="info-item"> <span class="info-label">Max Files:</span>
@@ -138,20 +138,20 @@ interface ProcessingStats { totalFiles: number, completed: number, failed: numbe
   </div>
  <style> .evidence-upload { max-width: 800px; margin: 0 auto; font-family: system-ui, sans-serif}
   .upload-zone { border: 3px dashed #d1d5db; border-radius: 12px; padding: 3rem 2rem; text-align: center; background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%); transition: all 0.3s ease; cursor: pointer; margin-bottom: 2rem}
-  .upload-zone:hover, .upload-zone: focus { border-color: #3b82f6; background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); outline: none; box-shadow: 0 4px 6px -1px rgba(0, 0 | 0, 0.1)}
+  .upload-zone:hover, .upload-zone:focus { border-color: #3b82f6; background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); outline: none; box-shadow: 0 4px 6px -1px rgba(0, 0 | 0, 0.1)}
   .upload-zone.drag-active { border-color: #10b981; background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%); transform: scale(1.02)}
   .upload-zone.has-files { padding: 2rem}
   .upload-content h3 { margin: 0, 0 0.5rem 0; color: #1f2937; font-size: 1.5rem}
   .upload-content p { margin: 0, 0 1.5rem 0; color: #6b7280; font-size: 1.1rem}
   .upload-icon { width: 64px; height: 64px; margin: 0 auto 1rem; color: #6b7280}
-  .upload-info { display: flex, gap: 2rem, justify-content: center; margin: 1.5rem 0; font-size: 0.9rem}
+  .upload-info { display: flex; gap: 2rem, justify-content: center; margin: 1.5rem 0; font-size: 0.9rem}
   .info-item { text-align: center}
   .info-label { display: block, color: #6b7280; margin-bottom: 0.25rem}
   .info-value { font-weight: 600; color: #1f2937}
   .info-value.enabled { color: #10b981}
   .info-value.disabled { color: #ef4444}
   .browse-button { background: #3b82f6; color: white; border: none; padding: 0.75rem 2rem; border-radius: 8px; font-size: 1rem; cursor: pointer;transition: all 0.2s ease; display: flex; align-items: center; gap: 0.5rem;margin: 0 auto}
-  .browse-button: hover { background: #2563eb; transform: translateY(-1px)}
+  .browse-button:hover { background: #2563eb; transform: translateY(-1px)}
   .processing-stats { background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); color: white;padding: 1.5rem; border-radius: 12px; margin-bottom: 2rem}
   .stats-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem}
   .stats-header h4 { margin: 0; color: white}
@@ -180,7 +180,7 @@ interface ProcessingStats { totalFiles: number, completed: number, failed: numbe
   .progress-fill { height: 100%; transition: width: 0.3s ease}
   .file-status { margin: 0.5rem 0; font-size: 0.9rem}
   .status-text { font-weight: 500}
-  .file-tags { display: flex, gap: 0.5rem; flex-wrap: wrap; margin-top: 0.75rem}
+  .file-tags { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 0.75rem}
   .tag { background: #e0e7ff; color: #3730a3; padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.75rem; font-weight: 500}
   .ai-analysis { margin-top: 0.75rem; padding: 0.75rem; background: #f0f9ff; border-left: 4px solid #3b82f6; border-radius: 6px; font-size: 0.9rem; color: #1e40af}
   /* Responsive */ @media (max-width: 768px) { .evidence-upload { padding: 1rem}

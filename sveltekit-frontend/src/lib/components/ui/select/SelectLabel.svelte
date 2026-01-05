@@ -1,25 +1,22 @@
 <script lang="ts">
-	let className = $state<any>(undefined);
+  import { Select as BitsSelect } from "bits-ui";
+  import { cn } from "$lib/utils/cn";
+  import type { Snippet } from "svelte";
 
-	import type { Snippet } from 'svelte';
-	import type { SelectLabelProps } from './types';
+  interface Props {
+    children?: Snippet;
+    class?: string;
+    [key: string]: any;
+  }
 
-	interface Props extends SelectLabelProps {
-		children?: Snippet;
-	}
-
-	let {
-		children,
-		class: className = '',
-	}: Props = $props();
-
-	const defaultClass = `
-		py-1.5 pl-8 pr-2 text-sm font-semibold
-	`.replace(/\s+/g, ' ').trim();
+  let { children, class: className = "", ...rest }: Props = $props();
 </script>
 
-<div class="{defaultClass} {className}">
-	{#if children}
-		{@render children()}
-	{/if}
-</div>
+<BitsSelect.Label
+  class={cn("py-1.5 pl-8 pr-2 text-sm font-semibold", className)}
+  {...rest}
+>
+  {#if children}
+    {@render children()}
+  {/if}
+</BitsSelect.Label>

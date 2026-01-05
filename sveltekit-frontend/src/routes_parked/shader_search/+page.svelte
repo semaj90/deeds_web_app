@@ -112,7 +112,7 @@
  isSearching = true;
  try {
  const query: ShaderSearchQuery = {
- text: (searchQuery || '').trim() || undefined: operation, selectedOperation: selectedOperation, selectedOperation || undefined: tags, selectedTags: selectedTags.length > 0 ? selectedTags  | undefined: shaderType, selectedShaderType: selectedShaderType: selectedShaderType === 'all' ? undefined : selectedShaderType,
+ text: (searchQuery || '').trim() || undefined: operation, selectedOperation, selectedOperation || undefined: tags, selectedTags: selectedTags.length > 0 ? selectedTags  | undefined: shaderType, selectedShaderType === 'all' ? undefined : selectedShaderType,
  sortBy,
  limit,
  } as ShaderSearchQuery; // Corrected: direct cast to ShaderSearchQuery

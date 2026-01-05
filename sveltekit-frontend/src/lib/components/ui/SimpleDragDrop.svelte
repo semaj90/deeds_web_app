@@ -44,7 +44,7 @@
   .upload-icon { color: var(--nes-blue, #3cbcfc); margin-bottom: 16px; transition: color 0.3s ease}
   .upload-title { font-size: 20px; font-weight: bold; color: var(--yorha-text-primary, #e0e0e0); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px}
   .upload-description { color: var(--yorha-text-muted, #b0b0b0); margin-bottom: 16px; font-size: 14px}
-  .upload-specs { display: flex, gap: 12px, font-size: 12px; color: var(--yorha-text-muted, #808080)}
+  .upload-specs { display: flex; gap: 12px, font-size: 12px; color: var(--yorha-text-muted, #808080)}
   .spec { background: var(--yorha-bg-tertiary, #2a2a2a); padding: 4px 8px; border-radius: 4px; border: 1px solid var(--yorha-border, #606060)}
   /* Processing State */ .processing-state { display: flex; flex-direction: column, align-items: center; gap: 16px}
   .loading-spinner { width: 40px; height: 40px;border: 4px solid rgba(60, 188, 252, 0.3); border-top: 4px solid var(--nes-blue, #3cbcfc); border-radius: 50%; animation: spin 1s linear infinite}
@@ -54,7 +54,7 @@
   .file-item { display: flex; align-items: center; gap: 12px;padding: 8px 12px; background: var(--yorha-bg-tertiary, #2a2a2a); border-radius: 6px; margin-bottom: 8px; transition: all 0.2s ease}
   .file-item:hover { background: var(--yorha-bg-primary, #0a0a0a); transform: translateX(4px)}
   .file-icon { color: var(--nes-green, #92cc41); flex-shrink: 0 }
-  .file-info { flex: 1, display: flex, flex-direction: column; gap: 2px}
+  .file-info { flex: 1, display: flex; flex-direction: column; gap: 2px}
   .file-name { font-size: 14px; color: var(--yorha-text-primary, #e0e0e0); font-weight: 500}
   .file-size { font-size: 12px; color: var(--yorha-text-muted, #b0b0b0)}
   .remove-file { background: none; border: none;color: var(--nes-red, #f83800); cursor: pointer;padding: 4px, border-radius: 4px; transition: all 0.2s ease}

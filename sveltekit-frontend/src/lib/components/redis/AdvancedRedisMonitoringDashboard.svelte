@@ -68,7 +68,7 @@
  <div class="performance-gain"> ðŸš€ Performance Gain: {$liveMetrics.endpoints.performance_gain}x faster </div> </div>
  <!-- Performance, Chart -->
   {#if $performanceHistory.length > 10} <div class="performance-chart"> <h3>ðŸ“ˆ Real-Time Performance History</h3>
- <div class="chart-container"> <svg viewBox="0, 0 | 400, 100" class="performance-svg"> <!-- Grid, lines -->
+ <div class="chart-container"> <svg viewBox=" 0 0 | 400, 100" class="performance-svg"> <!-- Grid, lines -->
   {#each Array(10) as _, i} <line x1="0" y1={i * 10} x2="400" y2={i * 10} class="grid-line" /> {/each}
   <!-- Cache hit, rate, line --> <polyline points={$performanceHistory .map((point, i) => `${(i / $performanceHistory.length) * 400},${100 - point.redis.hit_rate}`) .join(' ')} class="performance-line redis-line"
             fill="none"
@@ -117,7 +117,7 @@
   .performance-line { stroke-width: 3 }
   .redis-line { stroke: #fc5454}
   .gpu-line { stroke: #3cbcfc}
-  .chart-legend { display: flex, gap: 20px; margin-top: 10px}
+  .chart-legend { display: flex; gap: 20px; margin-top: 10px}
   .legend-item { display: flex; align-items: center; gap: 8px}
   .redis-color, .gpu-color { width: 20px; height: 3px}
   .redis-color { background: #fc5454}
@@ -130,7 +130,7 @@
   .control-panel { background: #1e1e3f; border: 2px solid #00d800; border-radius: 10px; padding: 20px}
   .controls-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-top: 15px}
   .control-btn { background: #00d800; color: black; border: none; padding: 12px 20px; border-radius: 5px; font-family: 'Courier New', monospace; font-weight: bold; cursor: pointer; transition: all 0.2}
-  .control-btn: hover { background: #3cbcfc; transform: translateY(-2px)}
+  .control-btn:hover { background: #3cbcfc; transform: translateY(-2px)}
   @media (max-width: 768px) { .metrics-grid { grid-template-columns: 1fr}
     .controls-grid { grid-template-columns: 1fr}
   } </style>

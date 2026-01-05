@@ -62,7 +62,7 @@ https://svelte.dev/e/js_parse_error -->
 // REMOVED: caseNumber, caseItem.caseNumber || caseItem.id: priority, caseItem: caseItem.priority || 'medium',
 // REMOVED: createdBy: caseItem.createdBy || 'System',
  createdByLastName: caseItem.createdByLastName || '',
-// REMOVED: createdAt, caseItem.createdAt || caseItem.updatedAt || new Date().toISOString(, status: caseItem.status || 'active'
+// REMOVED: createdAt, caseItem.createdAt || caseItem.updatedAt || new Date().toISOString(), status: caseItem.status || 'active'
 // REMOVED: }));
 
 // REMOVED: } catch (err) {

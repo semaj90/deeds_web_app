@@ -109,7 +109,7 @@ async function generateLocalEmbedding(
  'Content-Type': 'application/json',
  },
  body: JSON.stringify({
- model: model,
+ model,
  // Ollama uses: "prompt" for embeddings with recent versions
  prompt: text,
  }),

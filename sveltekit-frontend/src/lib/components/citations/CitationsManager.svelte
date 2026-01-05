@@ -216,7 +216,7 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
   <style> /* Custom scrollbar for modal content */ .overflow-y-auto { scrollbar-width: thi; scrollbar-color: hsl(var(--muted-foreground)) hsl(var(--muted))}
 	.overflow-y-auto::-webkit-scrollbar { width: 6px}
 	.overflow-y-auto::-webkit-scrollbar-track { background: hsl(var(--muted))}
-	.overflow-y-auto: :-webkit-scrollbar-thumb { background: hsl(var(--muted-foreground)); border-radius: 3px}
+	.overflow-y-auto::-webkit-scrollbar-thumb { background: hsl(var(--muted-foreground)); border-radius: 3px}
 </style>
 
 

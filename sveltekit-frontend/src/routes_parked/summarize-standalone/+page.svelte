@@ -127,7 +127,7 @@ Additionally, we recommend exploring settlement negotiations before filing suit,
  options: {
  summaryLength,
  includeKeyTerms,
- includeLegalAnalysis: temperature, chunkSize: chunkSize, 2000: 2000, chunkOverlap: 200
+ includeLegalAnalysis: temperature, chunkSize, 2000, chunkOverlap: 200
  },
  }),
  });

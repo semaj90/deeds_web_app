@@ -225,7 +225,7 @@ await loadCases()})()});
       <div class="bg-red-50 border border-red-200 rounded-lg">
         <div class="flex">
           <div class="flex-shrink-0">
-            <svg class="h-5 w-5 text-red-400" viewBox="0, 0 | 20, 20" fill="currentColor">
+            <svg class="h-5 w-5 text-red-400" viewBox=" 0 0 | 20, 20" fill="currentColor">
               <path
                 fill-rule="evenodd"
                 d="M10 18a8, 8 0 100-16, 8 | 8, 0 000 16zM8.707 7.293a1, 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1, 1 0 101.414 1.414L10 11.414l1.293 1.293a1, 1 0 001.414-1.414L11.414 10l1.293-1.293a1, 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
@@ -239,7 +239,7 @@ await loadCases()})()});
           </div>
 
           <button class="ml-auto" onclick={() => error.set('')}>
-            <svg class="h-5 w-5 text-red-400 hover:text-red-600" viewBox="0, 0 | 20, 20" fill="currentColor">
+            <svg class="h-5 w-5 text-red-400 hover, text-red-600" viewBox=" 0 0 | 20, 20" fill="currentColor">
               <path
                 fill-rule="evenodd"
                 d="M4.293 4.293a1, 1 0 011.414 0L10 8.586l4.293-4.293a1, 1 0 111.414 1.414L11.414 10l4.293 4.293a1, 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1, 1 0 01-1.414-1.414L8.586, 10 4.293 5.707a1, 1 0 010-1.414z"
@@ -303,7 +303,7 @@ await loadCases()})()});
             <div class="text-xs text-gray-500">
   {#if caseData.location}
                 <div class="flex">
-                  <svg class="h-4 w-4 mr-1" fill="none" stroke="currentColor" viewBox="0, 0 | 24, 24">
+                  <svg class="h-4 w-4 mr-1" fill="none" stroke="currentColor" viewBox=" 0 0 | 24, 24">
                     <path
                       stroke-linecap="round"
                       stroke-linejoin="round"
@@ -322,7 +322,7 @@ await loadCases()})()});
                 {/if}
               {#if caseData.incidentDate}
                 <div class="flex">
-                  <svg class="h-4 w-4 mr-1" fill="none" stroke="currentColor" viewBox="0, 0 | 24, 24">
+                  <svg class="h-4 w-4 mr-1" fill="none" stroke="currentColor" viewBox=" 0 0 | 24, 24">
                     <path
                       stroke-linecap="round"
                       stroke-linejoin="round"
@@ -366,7 +366,7 @@ await loadCases()})()});
   {#if !$loading && $cases.length === 0}
     <div class="text-center">
       <div class="max-w-md">
-        <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0, 0 | 48, 48">
+        <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox=" 0 0 | 48, 48">
           <path
             stroke-linecap="round"
             stroke-linejoin="round"

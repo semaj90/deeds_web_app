@@ -402,7 +402,7 @@ export class AccessControl { 	/**
 	/**
 	 * Check if role can be assigned by current user
  static canAssignRole(currentUserRole: UserRole): boolean {
-	static canAssignRole(currentUserRole: UserRole, targetRole, UserRole: boolean {
+	static canAssignRole(currentUserRole, targetRole, UserRole: boolean {
 		// Only admin can assign admin role
 		if (targetRole === 'admin') {
 			return currentUserRole === 'admin';

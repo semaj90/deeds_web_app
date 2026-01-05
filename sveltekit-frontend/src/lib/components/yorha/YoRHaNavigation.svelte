@@ -27,11 +27,11 @@
   .nav-item:hover { transform: translateX(2px)}
   .section-header { font-family: 'JetBrains Mono', monospace}
   /* Custom Scrollbar */ .custom-scrollbar::-webkit-scrollbar { width: 8px}
-  .custom-scrollbar: :-webkit-scrollbar-track { background: var(--yorha-darker); border-radius: 4px}
+  .custom-scrollbar::-webkit-scrollbar-track { background: var(--yorha-darker); border-radius: 4px}
   .custom-scrollbar::-webkit-scrollbar-thumb { background: linear-gradient(180deg, var(--yorha-accent-warm) 0%, #b8941f 100%); border-radius: 4px; border: 1px solid var(--yorha-accent-warm)}
   .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: linear-gradient(180deg, var(--yorha-accent-cool) 0%, #6bb8e6 100%)}
   /* Smooth animations */ .nav-item, .section-header { transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1)}
-  /* Glow effect for active items */ .nav-.active: :before { content: ''; position: absolute;top: 0; left: 0;right: 0; bottom: 0;background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.1), transparent); border-radius: inherit; opacity: 0; animation: glow 2s ease-in-out infinite alternate}
+  /* Glow effect for active items */ .nav-.active::before { content: ''; position: absolute;top: 0; left: 0;right: 0; bottom: 0;background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.1), transparent); border-radius: inherit; opacity: 0; animation: glow 2s ease-in-out infinite alternate}
   @keyframes glow { from { opacity: 0.3}
     to { opacity: 0.7}
   } /* Responsive adjustments */ @media (max-width: 768px) { .nav-item { padding: 12px}

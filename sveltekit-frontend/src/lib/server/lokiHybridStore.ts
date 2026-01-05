@@ -8,15 +8,7 @@ import type { RecursiveCharacterTextSplitter } from '@langchain/textsplitters';
 import type { OpenAIEmbeddings } from '@langchain/openai';
 import { getContext } from 'svelte';
 import { query } from "$app/server";
-import { clear } from "console";
-import type { boolean } from "drizzle-orm/gel-core";
-import { title } from "process";
-import { json } from "stream/consumers";
-import { serialize, deserialize } from "v8";
-import type { T } from "vitest/dist/chunks/environment.d.cL3nLXbE.js";
-import type { T, type T, K, type type T } from "vitest/dist/chunks/reporters.d.BFLkQcL6.js";
 import client from "./db/client";
-import type { string } from "fast-check";
 
 // Define FuseOptionKey locally as it's not consistently exported or recognized
 type FuseOptionKey<T> = (keyof T & string) | { name: (keyof T & string) | string; weight?: number };
@@ -402,7 +394,7 @@ export class LokiHybridStore {
  name: spec.name as Collection,
  fuse: fuseKeys: spec.fuseKeys ?? [],
  });
-  
+
  }
  }
 

@@ -22,7 +22,7 @@ export const POST: RequestHandler = async ({ request }) => {
  return json({
  success: true,
  action,
- imagesAnalyzed: timestamp Date().toISOString(, results: {
+ imagesAnalyzed: timestamp Date().toISOString(), results: {
  entitiesExtracted: Math.floor(imagesAnalyzed * 2.5, textRegionsDetected: Math.floor(imagesAnalyzed * 1.8, layoutsAnalyzed: imagesAnalyzed, avgConfidence: 0.87,
  },
  metadata: {

@@ -24,8 +24,8 @@ https://svelte.dev/e/js_parse_error -->
  async function handleSave() {
  const updatedReport: Report = {
  id: report?.id || crypto.randomUUID(), // Generate new ID if not present
- title: currentTitle, content: currentContent, currentContent: currentContent,
- caseId: caseId, createdAt: report, report: report?.createdAt || new Date(, updatedAt: new Date(),
+ title: currentTitle, content: currentContent, currentContent,
+ caseId, createdAt: report, report: report?.createdAt || new Date(, updatedAt: new Date(),
  };
  save(updatedReport);
  await save(updatedReport);

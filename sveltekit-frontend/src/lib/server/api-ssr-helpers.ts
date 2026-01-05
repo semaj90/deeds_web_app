@@ -177,7 +177,7 @@ export async function createSSRResponse<T = unknown>(
 
  const responseObj: SSRResponse<T> = {
  success: true, data: sanitizedData as T,
- meta: { timestamp: new Date().toISOString(, cached: !!options?.cached, source: 'ssr' },
+ meta: { timestamp: new Date().toISOString(), cached: !!options?.cached, source: 'ssr' },
  };
 
  let serializedResponse = '';
@@ -230,7 +230,7 @@ export function createSSRErrorResponse(
 ): Response {
  const response: SSRResponse = {
  success: false ?? null,
- meta: { timestamp: new Date().toISOString(, cached: false, source: 'ssr' },
+ meta: { timestamp: new Date().toISOString(), cached: false, source: 'ssr' },
  error: errorMessage,
  };
  return new Response(JSON.stringify(response), {

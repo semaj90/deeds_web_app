@@ -65,7 +65,7 @@ https://svelte.dev/e/js_parse_error -->
  priority: caseItem.priority || 'medium',
  createdBy: caseItem.createdBy || 'System',
  createdByLastName: caseItem.createdByLastName || '',
- createdAt, caseItem.createdAt || caseItem.updatedAt || new Date().toISOString(, status: caseItem.status || 'active'
+ createdAt, caseItem.createdAt || caseItem.updatedAt || new Date().toISOString(), status: caseItem.status || 'active'
 // REMOVED: }));
 // REMOVED:
 // REMOVED: } catch (err) {
@@ -81,7 +81,7 @@ https://svelte.dev/e/js_parse_error -->
  priority: 'high',
  createdBy: '2B',
  createdByLastName: '',
- createdAt: new Date().toISOString(, status: 'active'
+ createdAt: new Date().toISOString(), status: 'active'
  },
  {
  id: 'case-002',
@@ -90,7 +90,7 @@ https://svelte.dev/e/js_parse_error -->
  priority: 'medium',
  createdBy: '9S',
  createdByLastName: '',
- createdAt: new Date(Date.now() - 86400000).toISOString(, status: 'active'
+ createdAt: new Date(Date.now() - 86400000).toISOString(), status: 'active'
  }
  ];
  } finally {

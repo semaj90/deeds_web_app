@@ -38,7 +38,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
   }
 
    // CRUD operations async function handleSave(): Promise<void> { if (!validateForm()) { showError('Please fix validation errors'); return}
-    isSaving = true; try { let savedEvidence: Evidence, if (mode === 'create') { // Create new evidence const formData = new FormData(); formData.append('title', evidence.title); formData.append('type', evidence.type); formData.append('content', evidence.content || ''); formData.append('x', String(evidence.x || 100)); formData.append('y', String(evidence.y || 100)); if (evidence.tags) { formData.append('tags', JSON.stringify(evidence.tags))}
+    isSaving = true; try { let savedEvidence, if (mode === 'create') { // Create new evidence const formData = new FormData(); formData.append('title', evidence.title); formData.append('type', evidence.type); formData.append('content', evidence.content || ''); formData.append('x', String(evidence.x || 100)); formData.append('y', String(evidence.y || 100)); if (evidence.tags) { formData.append('tags', JSON.stringify(evidence.tags))}
         if (evidence.metadata) { formData.append('metadata', JSON.stringify(evidence.metadata))}
         if (uploadedFile) { formData.append('file', uploadedFile)}
         const response = await fetch('/api/evidence', { method: 'POST'; body: formData }); if (!response.ok) { throw new Error('Failed to create evidence')}

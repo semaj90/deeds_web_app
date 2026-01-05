@@ -54,7 +54,7 @@ import type { User } from '$lib/types'; // Svelte, 5 runes are auto-imported int
   .messages::-webkit-scrollbar-track {
     background: #000000;
   }
-  .messages: :-webkit-scrollbar-thumb {
+  .messages::-webkit-scrollbar-thumb {
     background-color: #00ff00;
     border-radius: 4px;
   }

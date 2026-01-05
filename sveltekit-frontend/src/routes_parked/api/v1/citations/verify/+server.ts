@@ -350,7 +350,7 @@ export const POST: RequestHandler = async ({ request }) => {
 				success: false, error: getErrorMessage(err),
 				// Avoid accessing request.body in SvelteKit; body is a stream
 				query: '',
-				timestamp: new Date().toISOString(, service: 'yorha-enhanced-rag-api',
+				timestamp: new Date().toISOString(), service: 'yorha-enhanced-rag-api',
 				yorhaMetadata: {
 					systemStatus: 'ERROR',
 					errorCode: 'ERR_ANALYSIS_FAILED',

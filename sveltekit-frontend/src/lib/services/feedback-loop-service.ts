@@ -250,7 +250,7 @@ export class FeedbackLoopService {
                 const userRole = user?.role || 'user'; // Access role safely
 
                 pattern = {
-                    userId: userId,
+                    userId,
                     commonQueries: [],
                     preferredFeatures: [],
                     responseTimeThreshold: 2000, // Default 2 seconds

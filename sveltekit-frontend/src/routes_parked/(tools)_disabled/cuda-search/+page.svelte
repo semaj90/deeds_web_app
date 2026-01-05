@@ -190,7 +190,7 @@ Content-Type: application/json {
  padding: 15px}
  .status-item a {
  text-decoration none}
- .status-item: a, hover: hover {
+ .status-item: a, hover:hover {
  text-decoration underline}
  /* Responsive design */
  @media (max-width: 768px) {

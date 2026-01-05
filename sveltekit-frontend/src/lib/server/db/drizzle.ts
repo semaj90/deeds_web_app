@@ -147,7 +147,7 @@ function makeMinioClient(): Client {
 
  return new Client({
  endPoint: host, // Corrected: use host
- port: port,
+ port,
  useSSL,
  accessKey,
  secretKey,

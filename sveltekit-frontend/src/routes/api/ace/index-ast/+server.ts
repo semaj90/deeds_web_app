@@ -40,7 +40,7 @@ export const POST: RequestHandler = async ({ request }) => {
 
     indexingStatus = {
       isRunning: true,
-      lastRun: new Date().toISOString(, indexed: 0,
+      lastRun: new Date().toISOString(), indexed: 0,
       failed: 0,
       error: null
     };

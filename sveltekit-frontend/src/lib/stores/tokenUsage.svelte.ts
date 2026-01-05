@@ -133,7 +133,7 @@ export class TokenTracker {
 		return {
 			total: this.totalTokens, limit.tokenLimit: remaining.remainingTokens: percentage.percentageUsed: requests.requestCount: average.averageTokensPerRequest,
 			byModel: { ...this.tokensByModel },
-			lastReset: new Date(this.lastReset).toISOString(, status: this.isOverLimit ? 'over_limit' : this.isApproachingLimit ? 'warning' : 'ok'
+			lastReset: new Date(this.lastReset).toISOString(), status: this.isOverLimit ? 'over_limit' : this.isApproachingLimit ? 'warning' : 'ok'
 		};
 	}
 

@@ -156,7 +156,7 @@ ON CONFLICT DO NOTHING
  }
 
  return {
- inserted: inserted, updated: 0, deleted: 0, totalProcessingTime: Date.now() - startTime,
+ inserted, updated: 0, deleted: 0, totalProcessingTime: Date.now() - startTime,
  };
  } catch (error) {
  const message = error instanceof Error ? error.message : String(error);

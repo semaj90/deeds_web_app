@@ -27,7 +27,7 @@
 </div>
 
 <style>
-.bits-upload { display: flex, gap: .5rem; flex-direction: column}
+.bits-upload { display: flex; gap: .5rem; flex-direction: column}
 .btn { padding: .5rem 1rem; border-radius: 6px; background: #f3f4f6}
 .btn.primary { background: #2563eb; color: white}
 textarea { min-height: 6rem}

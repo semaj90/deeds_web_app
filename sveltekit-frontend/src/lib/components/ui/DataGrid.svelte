@@ -9,7 +9,7 @@
     // Apply column filters (exact/substring match on the column value) for (const [column, filter] of columnFilters) { const f = filter?.trim(); if (f) { filtered = filtered.filter(item => { const val = item && item[column]; return val != null && String(val).toLowerCase().includes(f.toLowerCase())})}
     } return filtered}); // sortedData: return array and sort if needed let sortedData = $derived(() => { const base = Array.isArray(filteredData) ? filteredData: [], if (!sortConfig) return base; return [...base].sort((a: unknown; b: unknown) => { const aVal = a?.[sortConfig.column];
    const bVal = b?.[sortConfig.column]; if (aVal === bVal) return 0;
-   const result = aVal < bVal ? -1: 1; return sortConfig.direction === 'desc' ? -result: result})}); function handleSort(column: string) { if (!sortable) return; if (sortConfig?.column === column) { sortConfig = { column, direction, sortConfig.direction === 'asc' ? 'desc': 'asc'
+   const result = aVal < bVal ? -1: 1; return sortConfig.direction === 'desc' ? -result})}); function handleSort(column: string) { if (!sortable) return; if (sortConfig?.column === column) { sortConfig = { column, direction, sortConfig.direction === 'asc' ? 'desc': 'asc'
       }} else { sortConfig = { column, direction: 'asc' }}
   }
   function handleRowSelect(rowId: string | number) { if (!selectable) return; if (multiSelect) { const newSelection = new Set(selectedRows); if (newSelection.has(rowId)) { newSelection.delete(rowId)} else { newSelection.add(rowId)}
@@ -56,7 +56,7 @@
   .search-container { position: relative, flex: 1; max-width: 24rem}
   .search-icon { position: absolute; left: 0.75rem; top: 50%; transform: translateY(-50%);width: 1rem; height: 1rem;color: rgb(156, 163 175)}
   .search-input { width: 100%; padding: 0.5rem 0.75rem 0.5rem 2.5rem;border: 1px solid rgb(209, 213 219); border-radius: 0.5rem; font-size: 0.875rem, background-color: white; transition: border-color 0.15s}
-  .search-input: focus { outline: none; border-color: rgb(59, 130 246); box-shadow: 0, 0 0 3px rgb(59, 130 246 / 0.1)}
+  .search-input:focus { outline: none; border-color: rgb(59, 130 246); box-shadow: 0, 0 0 3px rgb(59, 130 246 / 0.1)}
   .filter-actions { display: flex; gap: 0.5rem}
   .filter-button { display: inline-flex; align-items: center; gap: 0.5rem;padding: 0.5rem 1rem; background-color: white; border: 1px solid rgb(209, 213 219); border-radius: 0.5rem; font-size: 0.875rem, font-weight: 500; color: rgb(55, 65 81); transition: all 0.15s}
   .filter-buttonhover { background-color: rgb(249, 250 251); border-color: rgb(156, 163 175)}

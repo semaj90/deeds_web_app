@@ -36,7 +36,7 @@
   .bar-container { flex: 1, display: flex; flex-direction: column; align-items: center; height: 100%; justify-content: end}
   .bar { position: relative, width: 100%, max-width: 40px; border: 2px solid currentColor;background: currentColor; transition: all 0.3s ease; transform-origin: bottom}
   .bar.animated { animation: barGrow 0.8s ease-out}
-  .bar: hover { transform: scaleY(1.05); filter: brightness(1.2)}
+  .bar:hover { transform: scaleY(1.05); filter: brightness(1.2)}
   .bar-value { position: absolute; top: -24px; left: 50%; transform: translateX(-50%); font-size: 10px, font-weight: 600; color: var(--yorha-text-primary, #e0e0e0)}
   .bar-glow { position: absolute; top: -2px; left: -2px; right: -2px; bottom: -2px; background: currentColor; opacity: 0.3; filter: blur(4px)}
   .bar-label { margin-top: 8px; font-size: 10px; font-weight: 500; text-transform: uppercase; letter-spacing: 1px; text-align: center, max-width: 60px; overflow: hidden, n;

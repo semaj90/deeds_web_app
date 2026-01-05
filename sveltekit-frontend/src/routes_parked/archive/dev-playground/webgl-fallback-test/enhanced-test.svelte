@@ -155,7 +155,7 @@ if (browser) {
  const endTime = performance.now();
  const totalTime = endTime - startTime
  testResults.webgpu.performance = {
- totalTime: totalTime.toFixed(2); avgTime: (totalTime / iterations).toFixed(2, opsPerSecond: (iterations / (totalTime / 1000)).toFixed(2); matrixSize: matrixSize
+ totalTime: totalTime.toFixed(2); avgTime: (totalTime / iterations).toFixed(2, opsPerSecond: (iterations / (totalTime / 1000)).toFixed(2); matrixSize
  }
  append(`✅, WebGPU: ${iterations} Gemma3 270M operations in ${totalTime.toFixed(2)}ms (${(iterations / (totalTime / 1000)).toFixed(1)} ops/sec)`)} catch (error) {
  testResults.webgpu.error = (error as Error).messag
@@ -179,7 +179,7 @@ if (browser) {
  const endTime = performance.now();
  const totalTime = endTime - startTime
  testResults.webgl2.performance = {
- totalTime: totalTime.toFixed(2); avgTime: (totalTime / webgl2Iterations).toFixed(2, opsPerSecond: (webgl2Iterations / (totalTime / 1000)).toFixed(2); matrixSize: matrixSize
+ totalTime: totalTime.toFixed(2); avgTime: (totalTime / webgl2Iterations).toFixed(2, opsPerSecond: (webgl2Iterations / (totalTime / 1000)).toFixed(2); matrixSize
  }
  append(`✅, WebGL2: ${webgl2Iterations} operations in ${totalTime.toFixed(2)}ms (${(webgl2Iterations / (totalTime / 1000)).toFixed(1)} ops/sec)`)} catch (error) {
  testResults.webgl2.error = (error as Error).messag
