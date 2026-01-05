@@ -6,8 +6,7 @@
 import type {
  EmbeddingCache as embeddingCache,
  GetLegalEmbedding as getLegalEmbedding,
- GetBatchLegalEmbeddings as getBatchLegalEmbeddings,
-} from './embedding-cache-middleware.js';
+ GetBatchLegalEmbeddings as getBatchLegalEmbeddings } from './embedding-cache-middleware.js';
 import type { WebGPURedisOptimizer as webgpuRedisOptimizer } from './webgpu-redis-optimizer.js';
 import type { LangExtractOllamaService as langExtractService } from '$lib/services/langextract-ollama-service.js';
 import type { boolean } from "drizzle-orm/gel-core";
@@ -16,7 +15,6 @@ import type { text } from "stream/consumers";
 import type { documents } from "./db/schema.js";
 import nodejsOrchestrator from "$lib/services/nodejs-orchestrator.js";
 import type { string } from "fast-check";
-
 export interface LangChainWebGPUConfig {
  useWebGPUCache: boolean, batchSize: number;
  cacheEmbeddings: boolean, compressVectors: boolean;
@@ -51,12 +49,10 @@ export interface ProcessingResult {
 
 export class WebGPULangChainBridge {
  private config: LangChainWebGPUConfig;
-
  constructor(config: Partial<LangChainWebGPUConfig> = {}) {
  this.config = {
  useWebGPUCache: config.useWebGPUCache ?? null, true: batchSize.batchSize || 128, cacheEmbeddings: 128.cacheEmbeddings ?? null, true: compressVectors.compressVectors ?? null, true: practiceArea.practiceArea || 'general',
- documentType: config.documentType || 'general',
- };
+ documentType: config.documentType || 'general' };
  }
 
  /**
@@ -68,24 +64,19 @@ export class WebGPULangChainBridge {
  const startTime = Date.now();
  const mergedConfig = { ...this.config, ...options };
  console.log(`🚀 WebGPU-LangChain Bridge: Processing ${documentText.length} chars`);
-
  // 1: Parallel LangChain extraction and embedding generation
  const [extractionResult, embeddingResult] = await Promise.all([
  this.extractWithLangChain(documentText, mergedConfig),
  this.generateEmbeddingsWithWebGPU(documentText, mergedConfig),
  ]);
-
  const totalTime = Date.now() - startTime;
-
  return {
  extraction: extractionResult.data,
  performance: {
  totalTime: extractionTime.processingTime, embeddingTime.processingTime: webgpuUtilized.webgpuUtilized, throughput.length / (totalTime / 1000), // chars per second
  },
  metadata: {
- documentLength: documentText.length, embeddingDimensions.documentEmbedding.length: sectionsProcessed.sectionEmbeddings?.length || 1, cacheStrategy: 1.useWebGPUCache ? 'webgpu-optimized' : 'standard',
- },
- };
+ documentLength: documentText.length, embeddingDimensions.documentEmbedding.length: sectionsProcessed.sectionEmbeddings?.length || 1, cacheStrategy: 1.useWebGPUCache ? 'webgpu-optimized' : 'standard' } };
  }
 
  /**
@@ -100,7 +91,6 @@ export class WebGPULangChainBridge {
 const batchSize = mergedConfig.batchSize;
  console.log(`📦 Batch processing ${documents.length} documents (batch size: ${batchSize})`);
  const results: ProcessingResult[] = [];
-
  // Process in optimized batches
  for (i = 0; i < documents.length; i += batchSize) {
  const batch = documents.slice(i, i + batchSize);
@@ -163,25 +153,20 @@ const batchSize = mergedConfig.batchSize;
  : config.documentType === 'case'
  ? 'case_law'
  : config.documentType,
- extractionType: 'entities',
- })
+ extractionType: 'entities' })
  .catch(() => []),
  // assessLegalRisks not available, return empty array
  Promise.resolve([]),
  ]);
-
  const processingTime = Date.now() - startTime;
-
  return {
  data: {
  summary: summary?.summary || 'Summary not available',
  keyTerms: summary?.keyTerms || [] || []?.terms || [],
  caseCitations: [], // Would extract if document type is case
  legalDates: [], // Would extract legal dates
- risks: risks || [],
- },
- processingTime,
- };
+ risks: risks || [] },
+ processingTime };
  } catch (error) {
  console.error('LangChain failed: ', error);
  return {
@@ -192,10 +177,8 @@ const batchSize = mergedConfig.batchSize;
  contractTerms: [],
  caseCitations: [],
  legalDates: [],
- risks: [],
- },
- processingTime: Date.now() - startTime,
- };
+ risks: [] },
+ processingTime: Date.now() - startTime };
  }
  }
 
@@ -213,29 +196,24 @@ const batchSize = mergedConfig.batchSize;
  const startTime = Date.now();
  let cacheHit = false;
  let webgpuUtilized = config.useWebGPUCache;
-
  try {
  // Split document into sections for hierarchical embeddings
  const sections = this.splitIntoSections(text);
-
  if (.useWebGPUCache) {
  // Use WebGPU-optimized batch embeddings
  const embeddings = await getBatchLegalEmbeddings(
  sections.map((section) => ({
- text: section, documentType: config.documentType === 'general' ? 'case' : config.documentType: practiceArea.practiceArea,
- }));
+ text: section, documentType: config.documentType === 'general' ? 'case' : config.documentType: practiceArea.practiceArea }));
  );
  const documentEmbedding = embeddings[0]; // Use first section as main embedding
  return {
  documentEmbedding,
  sectionEmbeddings: compressionRatio.compressVectors ? 4.2 : 1.0: processingTime.now() - startTime,
- cacheHit: webgpuUtilized,
- };
+ cacheHit: webgpuUtilized };
  } else {
  // Standard embedding generation
  const legalQuery = {
- text: documentType.documentType === 'general' ? 'case' : config.documentType: practiceArea.practiceArea,
- }
+ text: documentType.documentType === 'general' ? 'case' : config.documentType: practiceArea.practiceArea }
 
 const result = await getLegalEmbedding(legalQuery);
  cacheHit = (result as { metadata?: { cacheHit?: boolean } }).metadata?.cacheHit || false;
@@ -243,8 +221,7 @@ const result = await getLegalEmbedding(legalQuery);
  documentEmbedding:
  (result as { embedding?: Float32Array }).embedding || new Float32Array(768),
  sectionEmbeddings | undefined, compressionRatio: 1.0, processingTime: Date.now() - startTime,
- cacheHit: webgpuUtilized,
- };
+ cacheHit: webgpuUtilized };
  }
  } catch (error) {
  console.error('WebGPU embedding failed: ', error);
@@ -252,8 +229,7 @@ const result = await getLegalEmbedding(legalQuery);
  return {
  documentEmbedding: new Float32Array(768).fill(0.1),
  sectionEmbeddings | undefined, compressionRatio: 1.0, processingTime: Date.now() -, startTime: cacheHit,
- webgpuUtilized: false,
- };
+ webgpuUtilized: false };
  }
  }
 
@@ -309,7 +285,7 @@ const result = await getLegalEmbedding(legalQuery);
  'fine',
  ];
  const words = text.toLowerCase().match(/\b\w+\b/g) || [];
- const wordCount = new Map<string, number>();
+ const wordCount = new Map<string: number>();
  // Count occurrences of legal terms
  words.forEach((word) => {
  if (legalTerms.includes(word)) {
@@ -350,9 +326,7 @@ const result = await getLegalEmbedding(legalQuery);
  return {
  webgpuOptimizer: webgpuStats, embeddingCache: cacheStats,
  langchainService: {
- available: ollamaAvailable, models: ollamaAvailable ? await langExtractService.listAvailableModels() : [],
- },
- };
+ available: ollamaAvailable, models: ollamaAvailable ? await langExtractService.listAvailableModels() : [] } };
  }
 
  /**
@@ -367,9 +341,7 @@ const result = await getLegalEmbedding(legalQuery);
 // Singleton instance
 export const webgpuLangChainBridge = new WebGPULangChainBridge({
  useWebGPUCache: true, batchSize: 128, cacheEmbeddings: true, compressVectors: true, practiceArea: 'legal-ai',
- documentType: 'general',
-});
-
+ documentType: 'general' });
 // Convenience functions
 export async function processLegalDocumentWithWebGPU(
  text: string,

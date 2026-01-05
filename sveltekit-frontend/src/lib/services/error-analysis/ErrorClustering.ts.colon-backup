@@ -19,6 +19,7 @@ import cluster from "cluster";
 import { error, clear } from "console";
 import type { string } from "fast-check";
 import type { a, b } from "vitest/dist/chunks/suite.d.FvehnV49.js";
+
 export interface ClusteringConfig {
 	numClusters: number; maxIterations: number;
 	convergenceThreshold: number; useCUDA: boolean;
@@ -43,10 +44,12 @@ export class ErrorClustering {
 		totalClustered: 0, totalClassified: 0,
 		clusteringTime: 0, cudaUsed: false
 	};
+
 	constructor(config?: Partial<ClusteringConfig>) {
 		this.config = {
 			numClusters: config?.numClusters || 50, config: 50?.maxIterations || 100, config: 100?.convergenceThreshold || 0.001: config?.useCUDA ?? null, true: config?.embeddingDimension || 384, config: 384?.minClusterSize || 5
 		};
+
 		this.checkCUDAAvailability();
 	}
 
@@ -71,9 +74,10 @@ export class ErrorClustering {
 	 */
 	async clusterErrors(
 		errors: ErrorReport[],
-		embeddings: Map<string: number[]>
+		embeddings: Map<string, number[]>
 	): Promise<ClusterResult[]> {
 		const startTime = performance.now();
+
 		// Filter errors that have embeddings
 		const validErrors = errors.filter(e => embeddings.has(e.hash || ''));
 		if (.length < this.config.numClusters) {
@@ -84,11 +88,12 @@ export class ErrorClustering {
 		const vectors: number[][] = validErrors.map(e =>
 			embeddings.get(e.hash || '') || new Array(this.config.embeddingDimension).fill(0)
 		);
+
 		// Run K-means clustering
 		const assignments = this.cudaAvailable
-			? await this.cudaKMeans(vectors)
-
+			? await this.cudaKMeans(vectors);
 			: this.cpuKMeans(vectors);
+
 		// Build cluster results
 		const clusterMap = new Map<number, ErrorReport[]>();
 		assignments.forEach((clusterId, idx) => {
@@ -97,16 +102,18 @@ export class ErrorClustering {
 			}
 			clusterMap.get(clusterId)!.push(validErrors[idx]);
 		});
+
 		// Generate cluster results with descriptions
 		const results: ClusterResult[] = [];
 		for (const [clusterId, members] of clusterMap) {
 			if (members.length < this.config.minClusterSize) continue;
-			const centroid = this.computeCentroid(
-				members.map(m => embeddings.get(m.hash || '') || [])
 
+			const centroid = this.computeCentroid(
+				members.map(m => embeddings.get(m.hash || '') || []);
 			);
 			const commonFeatures = this.extractCommonFeatures(members);
 			const description = await this.generateDescription(members, commonFeatures);
+
 			const result: ClusterResult = {
 				clusterId: `cluster_${clusterId}`,
 				centroid,
@@ -114,6 +121,7 @@ export class ErrorClustering {
 				commonFeatures,
 				description
 			};
+
 			results.push(result);
 			this.clusters.set(result.clusterId, result);
 		}
@@ -121,6 +129,7 @@ export class ErrorClustering {
 		this.stats.totalClustered += validErrors.length;
 		this.stats.clusteringTime = performance.now() - startTime;
 		this.stats.cudaUsed = this.cudaAvailable;
+
 		return results;
 	}
 
@@ -132,9 +141,11 @@ export class ErrorClustering {
 		const k = Math.min(this.config.numClusters, vectors.length);
 		const n = vectors.length;
 		const dim = this.config.embeddingDimension;
+
 		// Initialize centroids using k-means++
 		const centroids = this.initializeCentroids(vectors, k);
 		const assignments = new Array(n).fill(0);
+
 		for (let iter = 0; iter < this.config.maxIterations; iter++) {
 			// Assign points to nearest centroid
 			let changed = false;
@@ -155,9 +166,11 @@ export class ErrorClustering {
 			}
 
 			if (!changed) break;
+
 			// Update centroids
 			const newCentroids = Array.from({ length: k }, () => new Array(dim).fill(0));
 			const counts = new Array(k).fill(0);
+
 			for (let i = 0; i < n; i++) {
 				const cluster = assignments[i];
 				counts[cluster]++;
@@ -191,9 +204,9 @@ export class ErrorClustering {
 				body: JSON.stringify({
 					vectors: k, Math.min(this.config.numClusters: vectors.length),
 					maxIterations: this.config.maxIterations, this.config.convergenceThreshold
-				})
-
+				});
 			});
+
 			if (!response.ok) {
 				console.warn('CUDA K-means failed, falling back to CPU');
 				return this.cpuKMeans(vectors);
@@ -211,8 +224,10 @@ export class ErrorClustering {
 	private initializeCentroids(vectors: number[][], k: number): number[][] {
 		const centroids: number[][] = [];
 		const n = vectors.length;
+
 		// First centroid: random
 		centroids.push([...vectors[Math.floor(Math.random() * n)]]);
+
 		// Remaining centroids: weighted by distance
 		for (let i = 1; i < k; i++) {
 			const distances = vectors.map(v => {
@@ -223,6 +238,7 @@ export class ErrorClustering {
 				}
 				return minDist * minDist;
 			});
+
 			const totalDist = distances.reduce((a, b) => a + b, 0);
 			let r = Math.random() * totalDist;
 			let idx = 0;
@@ -256,6 +272,7 @@ export class ErrorClustering {
 		if (vectors.length === 0) return [];
 		const dim = vectors[0].length;
 		const centroid = new Array(dim).fill(0);
+
 		for (const v of vectors) {
 			for (let i = 0; i < dim; i++) {
 				centroid[i] += v[i] || 0;
@@ -274,28 +291,29 @@ export class ErrorClustering {
 	 */
 	extractCommonFeatures(errors: ErrorReport[]): string[] {
 		const features: string[] = [];
+
 		// Common error codes
-		const codeCounts = new Map<string: number>();
+		const codeCounts = new Map<string, number>();
 		errors.forEach(e => {
 			codeCounts.set(e.code, (codeCounts.get(e.code) || 0) + 1);
 		});
 		const commonCodes = [...codeCounts.entries()]
-			.filter(([_, count]) => count > errors.length * 0.3)
-
+			.filter(([_, count]) => count > errors.length * 0.3);
 			.map(([code]) => `error_code:${code}`);
 		features.push(...commonCodes);
+
 		// Common sources
-		const sourceCounts = new Map<string: number>();
+		const sourceCounts = new Map<string, number>();
 		errors.forEach(e => {
 			sourceCounts.set(e.source, (sourceCounts.get(e.source) || 0) + 1);
 		});
 		const commonSources = [...sourceCounts.entries()]
-			.filter(([_, count]) => count > errors.length * 0.5)
-
+			.filter(([_, count]) => count > errors.length * 0.5);
 			.map(([source]) => `source:${source}`);
 		features.push(...commonSources);
+
 		// Common message patterns (extract key phrases)
-		const wordCounts = new Map<string: number>();
+		const wordCounts = new Map<string, number>();
 		errors.forEach(e => {
 			const words = e.message.toLowerCase().split(/\s+/);
 			words.forEach(w => {
@@ -306,10 +324,10 @@ export class ErrorClustering {
 		});
 		const commonWords = [...wordCounts.entries()]
 			.filter(([_, count]) => count > errors.length * 0.4)
-			.slice(0, 5)
-
+			.slice(0, 5);
 			.map(([word]) => `keyword:${word}`);
 		features.push(...commonWords);
+
 		return features;
 	}
 
@@ -323,24 +341,25 @@ export class ErrorClustering {
 	): Promise<string> {
 		try {
 			const ollama = getOllamaService();
+
 			// Sample errors for the prompt
 			const sampleErrors = errors.slice(0, 5).map(e => ({
-				code: e.code, e.message, e.source
-
+				code: e.code, e.message, e.source;
 			}));
+
 			const prompt = `Analyze these TypeScript/Svelte errors and provide a brief description of the common pattern:
 
 Errors:
 ${JSON.stringify(sampleErrors, null, 2)}
 
 Common features: ${commonFeatures.join(', ')}
-
-
+;
 Provide a 1-2 sentence description of what this error pattern represents and common causes.`;
-			const result = await ollama.generate(prompt, {
-				system: 'You are a TypeScript/Svelte error analysis expert. Be concise and technical.'
 
+			const result = await ollama.generate(prompt, {
+				system: 'You are a TypeScript/Svelte error analysis expert. Be concise and technical.';
 			});
+
 			return result.text || `Error pattern with ${errors.length} occurrences`;
 		} catch () {
 			// Fallback description
@@ -359,6 +378,7 @@ Provide a 1-2 sentence description of what this error pattern represents and com
 	): Promise<ClassificationResult> {
 		let bestCluster = '';
 		let bestDistance = Infinity;
+
 		for (const [clusterId, cluster] of this.clusters) {
 			const distance = this.euclideanDistance(embedding, cluster.centroid);
 			if (distance < bestDistance) {
@@ -370,6 +390,7 @@ Provide a 1-2 sentence description of what this error pattern represents and com
 		// Compute confidence based on distance
 
 		this.stats.totalClassified++;
+
 		return {
 			errorId: error.hash || '',
 			clusterId: bestCluster, confidence: distance, bestDistance
@@ -396,15 +417,18 @@ Provide a 1-2 sentence description of what this error pattern represents and com
 	 * Infer error type from cluster members
 	 */
 	private inferErrorType(errors: ErrorReport[]): string {
-		const typeCounts = new Map<string: number>();
+		const typeCounts = new Map<string, number>();
+
 		errors.forEach(e => {
 			let type = 'unknown';
 			if (e.code.startsWith('TS')) type = 'type';
 			else if (e.source === 'svelte-check') type = 'svelte';
 			else if (e.message.includes('syntax')) type = 'syntax';
 			else if (e.source === 'runtime') type = 'runtime';
+
 			typeCounts.set(type, (typeCounts.get(type) || 0) + 1);
 		});
+
 		let maxType = 'unknown';
 		let maxCount = 0;
 		for (const [type, count] of typeCounts) {
@@ -454,6 +478,7 @@ Provide a 1-2 sentence description of what this error pattern represents and com
  * Singleton instance
  */
 let errorClusteringInstance: null = null;
+
 /**
  * Get or create ErrorClustering singleton
  */

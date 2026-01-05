@@ -19,6 +19,11 @@ const targetFiles = [
     'src/lib/services/error-analysis/ErrorClustering.ts',
     'src/lib/state/evidenceCustodyMachine.ts',
     'src/lib/services/gguf-runtime.ts',
+    'src/lib/workers/recursive-evidence-chain-worker.ts',
+    'src/lib/services/nodejs-orchestrator.ts',
+    'src/lib/services/knowledge-search/KnowledgeIndexer.ts',
+    'src/lib/server/db/schema-phase90-hardened.ts',
+    'src/lib/services/qlora-rl-langextract-integration.ts',
 ];
 
 function fixColonCorruption(content) {

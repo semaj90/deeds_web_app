@@ -378,3 +378,162 @@ npm run check -- --threshold error
 # Clear caches
 rm -rf .svelte-kit node_modules/.vite
 ```
+
+
+---
+
+## 🚀 Phase 2 Knowledge Base Update (Jan 5, 2026)
+
+### WebGPU Scalar Array Pattern (2025)
+**Source**: WebGPU Best Practices
+**Pattern**: Use `array<f32>` with manual vector reconstruction
+**Example**:
+```wgsl
+@group(0) @binding(0) var<storage, read> positions: array<f32>;
+
+fn getPosition(index: u32, stride: u32, offset: u32) -> vec3f {
+  let i = index * stride + offset;
+  return vec3f(positions[i], positions[i + 1u], positions[i + 2u]);
+}
+```
+**Rationale**: Avoids 16-byte alignment issues with vec3<f32>
+**Tags**: #webgpu #alignment #compute-shader #gpu #scalar-array
+
+### LangChain v1.0 createAgent Pattern
+**Source**: LangChain v1.0 Documentation
+**Pattern**: Use `createAgent()` with middleware hooks
+**Example**:
+```typescript
+import { createAgent } from 'langchain/agents';
+
+const agent = await createAgent({
+  llm: new ChatOpenAI({ modelName: 'gpt-4' }),
+  tools: [/* tools */],
+  beforeModel: async (input) => input,
+  wrapModelCall: async (call) => await call(),
+});
+```
+**Rationale**: Replaces deprecated chain patterns
+**Tags**: #langchain #v1.0 #createAgent #middleware
+
+### TypeScript 5.x Null Safety Pattern
+**Source**: TypeScript 5.x Documentation
+**Pattern**: Optional chaining + nullish coalescing
+**Example**:
+```typescript
+function getUserAvatar(user: User | null | undefined): string {
+  return user?.profile?.avatar ?? '/default-avatar.png';
+}
+```
+**Rationale**: Type-safe null handling
+**Tags**: #typescript #5.x #null-safety #optional-chaining
+
+### Drizzle ORM 0.44 Array Syntax Pattern
+**Source**: Drizzle ORM 0.44 Documentation
+**Pattern**: Return array from table callback, not object
+**Example**:
+```typescript
+export const documents = pgTable('documents', {
+  id: uuid('id').primaryKey(),
+  title: text('title').notNull(),
+}, (table) => [
+  index('documents_title_idx').on(table.title),
+  foreignKey({
+    columns: [table.caseId],
+    foreignColumns: [cases.id],
+  }).onDelete('cascade'),
+]);
+```
+**Rationale**: Required syntax for Drizzle 0.31+
+**Tags**: #drizzle #orm #0.44 #schema #array-syntax
+
+### Bits UI v2.0 Import Pattern
+**Source**: Bits UI v2.0 Documentation
+**Pattern**: Import from `bits-ui` package
+**Example**:
+```svelte
+<script lang="ts">
+  import { Dialog, Button } from 'bits-ui';
+
+  let isOpen = $state(false);
+</script>
+
+<Button.Root onclick={() => isOpen = true}>Open</Button.Root>
+```
+**Rationale**: Replaces @melt-ui/svelte
+**Tags**: #bits-ui #v2.0 #svelte5 #headless
+
+### Svelte 5 Runes Pattern
+**Source**: Svelte 5 Documentation
+**Pattern**: Use $state, $derived, $effect, $props
+**Example**:
+```svelte
+<script lang="ts">
+  let count = $state(0);
+  let doubled = $derived(count * 2);
+
+  $effect(() => {
+    console.log('Count:', count);
+  });
+
+  let { title } = $props<{ title: string }>();
+</script>
+```
+**Rationale**: Replaces export let, $:, and reactive declarations
+**Tags**: #svelte5 #runes #$state #$derived #$effect
+
+### SvelteKit 2.0 Load Function Pattern
+**Source**: SvelteKit 2.0 Documentation
+**Pattern**: Typed load functions with PageServerLoad
+**Example**:
+```typescript
+import type { PageServerLoad } from './$types';
+
+export const load: PageServerLoad = async ({ params, fetch }) => {
+  const data = await fetch(`/api/data/${params.id}`).then(r => r.json());
+  return { data };
+};
+```
+**Rationale**: Type-safe data loading
+**Tags**: #sveltekit #2.0 #load-functions #types
+
+### Go 1.25 Generics Pattern
+**Source**: Go 1.25 Documentation
+**Pattern**: Generic functions with type parameters
+**Example**:
+```go
+func Map[T, U any](slice []T, fn func(T) U) []U {
+    result := make([]U, len(slice))
+    for i, v := range slice {
+        result[i] = fn(v)
+    }
+    return result
+}
+```
+**Rationale**: Type-safe generic operations
+**Tags**: #go #1.25 #generics #type-parameters
+
+### Python 3.12+ Type Hints Pattern
+**Source**: Python 3.12 Documentation
+**Pattern**: Modern type annotations with list[T] syntax
+**Example**:
+```python
+def process_items(items: list[str], count: int) -> dict[str, int]:
+    return {item: count for item in items}
+```
+**Rationale**: Simplified type hint syntax
+**Tags**: #python #3.12 #type-hints #modern-syntax
+
+### CUDA 12.x Unified Memory Pattern
+**Source**: CUDA 12.x Documentation
+**Pattern**: Use cudaMallocManaged for unified memory
+**Example**:
+```cpp
+float *data;
+cudaMallocManaged(&data, bytes);
+// Use on both host and device
+cudaDeviceSynchronize();
+cudaFree(data);
+```
+**Rationale**: Simplified memory management
+**Tags**: #cuda #12.x #unified-memory #gpu
