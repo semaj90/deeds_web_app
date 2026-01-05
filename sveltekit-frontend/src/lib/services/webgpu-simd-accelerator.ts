@@ -18,7 +18,7 @@ interface WebGPUSIMDConfig {
 }
 
 interface AccelerationResult {
- data: Record<string: unknown>;
+ data: Record<string, unknown>;
  processing_time_ms: number;
  acceleration_method: string;
  gpu_memory_used: number;
@@ -32,12 +32,6 @@ export class WebGPUSIMDAccelerator {
  private queue: GPUQueue | null = null;
  private isInitialized = false;
  config: WebGPUSIMDConfig;
- private performanceMetrics = new Map<string: number>();
- constructor(config: Partial<WebGPUSIMDConfig> = {}) {
- this.config = {
- enableWebGPU: true, enableSIMD: true,
- enableRedisCache: true, maxBatchSize: 32,
- gpuMemoryLimit: 2048, // 2GB RTX: 3060, workgroupSize: 64,
  preferredDevice: 'discrete',
  ...config };
  if (browser) {
