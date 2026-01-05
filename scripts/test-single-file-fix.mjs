@@ -1,140 +1,74 @@
 #!/usr/bin/env node
 /**
- * Test Script - Dry Run on Single File
- *
- * Tests the Bits UI fix on a single file without modifying it
+ * Test fix on a single file
  */
 
-import fs from 'fs';
-import path from 'path';
-import { fileURLToPath } from 'url';
+import { readFileSync, writeFileSync } from 'fs';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-const BITS_UI_COMPONENTS = {
-  Dialog: ['Root', 'Portal', 'Overlay', 'Content', 'Title', 'Description', 'Close'],
-  Select: ['Root', 'Trigger', 'Content', 'Item', 'Value', 'Label', 'Group'],
-  Popover: ['Root', 'Trigger', 'Content', 'Close'],
-  Tooltip: ['Root', 'Trigger', 'Content'],
-};
-
-function testBitsUIFix(filePath) {
-  console.log(`\n${'='.repeat(70)}`);
-  console.log(`Testing: ${filePath}`);
-  console.log('='.repeat(70));
-
-  if (!fs.existsSync(filePath)) {
-    console.error(`❌ File not found: ${filePath}`);
-    return;
-  }
-
-  const content = fs.readFileSync(filePath, 'utf8');
-  let newContent = content;
-  let fixCount = 0;
-  const usedComponents = new Set();
-  const changes = [];
-
-  // Fix component usage in markup
-  for (const [component, subComponents] of Object.entries(BITS_UI_COMPONENTS)) {
-    for (const subComponent of subComponents) {
-      const dotPattern = new RegExp(`<${component}\\.${subComponent}([\\s>])`, 'g');
-      const closingPattern = new RegExp(`</${component}\\.${subComponent}>`, 'g');
-
-      let match;
-      while ((match = dotPattern.exec(content)) !== null) {
-        const newName = `${component}${subComponent}`;
-        usedComponents.add(newName);
-        fixCount++;
-        changes.push({
-          line: content.substring(0, match.index).split('\n').length,
-          old: `<${component}.${subComponent}`,
-          new: `<${newName}`
-        });
-      }
-
-      while ((match = closingPattern.exec(content)) !== null) {
-        const newName = `${component}${subComponent}`;
-        changes.push({
-          line: content.substring(0, match.index).split('\n').length,
-          old: `</${component}.${subComponent}>`,
-          new: `</${newName}>`
-        });
-      }
-
-      if (dotPattern.test(content) || closingPattern.test(content)) {
-        const newName = `${component}${subComponent}`;
-        newContent = newContent.replace(dotPattern, `<${newName}$1`);
-        newContent = newContent.replace(closingPattern, `</${newName}>`);
-      }
-    }
-  }
-
-  // Show results
-  if (fixCount > 0) {
-    console.log(`\n✓ Found ${fixCount} fixes needed`);
-    console.log(`\nComponents that need importing:`);
-    console.log(`  ${[...usedComponents].sort().join(', ')}`);
-
-    console.log(`\nChanges to be made:`);
-    changes.forEach((change, i) => {
-      console.log(`  ${i + 1}. Line ${change.line}: ${change.old} → ${change.new}`);
-    });
-
-    // Show import fix
-    const importRegex = /import\s+\{([^}]+)\}\s+from\s+['"]bits-ui['"]/;
-    const match = content.match(importRegex);
-
-    console.log(`\nImport statement:`);
-    if (match) {
-      const existingImports = match[1]
-        .split(',')
-        .map(s => s.trim())
-        .filter(s => s && !s.includes('.'));
-
-      const allImports = [...new Set([...existingImports, ...usedComponents])].sort();
-      const newImport = `import { ${allImports.join(', ')} } from 'bits-ui'`;
-
-      console.log(`  OLD: ${match[0]}`);
-      console.log(`  NEW: ${newImport}`);
-    } else {
-      console.log(`  NEW: import { ${[...usedComponents].sort().join(', ')} } from 'bits-ui';`);
-    }
-
-    // Show diff preview (first 10 lines of changes)
-    console.log(`\n📝 Preview of changes (first 200 chars):`);
-    const lines = newContent.split('\n');
-    const changedLines = changes.slice(0, 3).map(c => c.line);
-    changedLines.forEach(lineNum => {
-      const line = lines[lineNum - 1];
-      if (line) {
-        console.log(`  Line ${lineNum}: ${line.trim().substring(0, 80)}...`);
-      }
-    });
-
-    return { success: true, fixCount, usedComponents: [...usedComponents] };
-  } else {
-    console.log(`\n✓ No Bits UI fixes needed in this file`);
-    return { success: true, fixCount: 0, usedComponents: [] };
-  }
+const filePath = process.argv[2];
+if (!filePath) {
+  console.error('Usage: node test-single-file-fix.mjs <filepath>');
+  process.exit(1);
 }
 
-// Test on a specific file
-const testFile = process.argv[2] || 'sveltekit-frontend/src/lib/components/ui/dialog/Dialog.svelte';
-const fullPath = path.join(__dirname, '..', testFile);
+let content = readFileSync(filePath, 'utf-8');
+const originalContent = content;
+let fixes = [];
 
-console.log('╔════════════════════════════════════════════════════════════════════╗');
-console.log('║         DRY RUN: Test Bits UI Fix on Single File                  ║');
-console.log('╚════════════════════════════════════════════════════════════════════╝');
+// Pattern 1: Leading semicolons at start of lines
+const leadingSemicolonPattern = /^;\s+(export|import|const|let|var|function|class|interface|type|async|private|protected|public|readonly|static|abstract|if|for|while|return|throw|try|catch|this|super)/gm;
+const leadingMatches = content.match(leadingSemicolonPattern);
+if (leadingMatches) {
+  content = content.replace(leadingSemicolonPattern, '$1');
+  fixes.push(`Leading semicolons: ${leadingMatches.length}`);
+}
 
-const result = testBitsUIFix(fullPath);
+// Pattern 2: Type annotations with comma instead of colon
+const typeAnnotationPattern = /\b(const|let|var|private|protected|public|readonly)\s+(\w+),\s*([A-Z]\w*(?:<[^>]+>)?(?:\s*\|\s*\w+(?:<[^>]+>)?)*)\s*(;|=|\))/g;
+const typeMatches = content.match(typeAnnotationPattern);
+if (typeMatches) {
+  content = content.replace(typeAnnotationPattern, '$1 $2: $3$4');
+  fixes.push(`Type annotations: ${typeMatches.length}`);
+}
 
-if (result.success && result.fixCount > 0) {
-  console.log(`\n✅ Test successful! Found ${result.fixCount} fixes.`);
-  console.log(`\n💡 To apply these fixes, run:`);
-  console.log(`   node scripts/phase2-fix-bits-ui-components.mjs`);
-} else if (result.success) {
-  console.log(`\n✅ File is already correct or doesn't use Bits UI components.`);
+// Pattern 3: Method return types with comma instead of colon
+const methodReturnTypePattern = /(\w+)\s*\(\s*([^)]*)\s*\)\s*,\s*(void|Promise<[^>]+>|[A-Z]\w*(?:<[^>]+>)?)\s*\{/g;
+const methodMatches = content.match(methodReturnTypePattern);
+if (methodMatches) {
+  content = content.replace(methodReturnTypePattern, '$1($2): $3 {');
+  fixes.push(`Method return types: ${methodMatches.length}`);
+}
+
+// Pattern 4: Interface/type property with comma instead of colon
+const interfacePropertyPattern = /^(\s*)(\w+)(\?)?(?:,)\s*([A-Z]\w*(?:<[^>]+>)?(?:\s*\|\s*\w+(?:<[^>]+>)?)*)\s*;/gm;
+const interfaceMatches = content.match(interfacePropertyPattern);
+if (interfaceMatches) {
+  content = content.replace(interfacePropertyPattern, '$1$2$3: $4;');
+  fixes.push(`Interface properties: ${interfaceMatches.length}`);
+}
+
+// Pattern 5: Object literal properties with comma instead of colon (hex values)
+const objectPropertyPattern = /(\{[^}]*?)(\w+),\s*(0x[0-9a-fA-F]+|\d+|true|false|null|undefined|'[^']*'|"[^"]*")\s*([,}])/g;
+const objectMatches = content.match(objectPropertyPattern);
+if (objectMatches) {
+  content = content.replace(objectPropertyPattern, '$1$2: $3$4');
+  fixes.push(`Object properties: ${objectMatches.length}`);
+}
+
+// Pattern 6: Fix `[key, string]` in index signatures → `[key: string]`
+const indexSignaturePattern = /\[(\w+),\s*(string|number|symbol)\]/g;
+const indexMatches = content.match(indexSignaturePattern);
+if (indexMatches) {
+  content = content.replace(indexSignaturePattern, '[$1: $2]');
+  fixes.push(`Index signatures: ${indexMatches.length}`);
+}
+
+console.log('Fixes applied:');
+fixes.forEach(f => console.log(`  - ${f}`));
+
+if (content !== originalContent) {
+  writeFileSync(filePath, content, 'utf-8');
+  console.log(`\nFile updated: ${filePath}`);
 } else {
-  console.log(`\n❌ Test failed.`);
+  console.log('\nNo changes made.');
 }

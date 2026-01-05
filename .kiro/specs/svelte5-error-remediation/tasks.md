@@ -1,9 +1,9 @@
 # Svelte5 Error Remediation - Tasks
 
-**Feature:** Systematic remediation of 70,232 TypeScript/Svelte errors
-**Status:** Ready for Implementation
+**Feature:** Systematic remediation of TypeScript/Svelte errors
+**Status:** Phase 2 In Progress
 **Priority:** CRITICAL - Blocks all development
-**Date:** January 4, 2026
+**Date:** January 5, 2026 (Updated)
 
 ---
 
@@ -13,15 +13,15 @@
 |-------|-------|----------|--------|
 | Phase 0: Setup | 4 tasks | 110 min | ✅ COMPLETE |
 | Phase 1: Syntax | 3 tasks | 10 min | ✅ COMPLETE |
-| Phase 2: Types | 5 tasks | 1 hour | ⏳ TODO |
+| Phase 2: Types | 5 tasks | 1 hour | 🔄 IN PROGRESS |
 | Phase 3: Migration | 5 tasks | 2 hours | ⏳ TODO |
 | Phase 4: Imports | 4 tasks | 3 hours | ⏳ TODO |
 | Phase 5: Verification | 3 tasks | 30 min | ⏳ TODO |
 | **TOTAL** | **24 tasks** | **7.3 hours** | **29% COMPLETE** |
 
 **Progress:** 7/24 tasks complete (Phases 0-1 ✅)
-**Current Error Count:** 36,823 (down from 44,906)
-**Phase 2 Target:** ~26,823 errors (10,000 reduction needed)
+**Current Error Count:** 36,662 (down from 70,232 - 48% reduction)
+**Phase 2 Target:** ~20,000 errors (16,662 reduction needed)
 
 ---
 
@@ -232,78 +232,148 @@
 
 ---
 
-## Phase 2: Type System Fixes (1 hour)
+## Phase 2: Type System Fixes (1 hour) 🔄 IN PROGRESS
 
-### Task 2.1: Implement bits-ui Import Fix Script
-**Requirement:** 2.1 - bits-ui import remediation
-**Duration:** 15 minutes
-**Status:** ⏳
+**Current Error Breakdown:**
+- TS1005 (',' or ':' expected): 24,106 errors
+- TS1128 (Declaration expected): 4,217 errors
+- TS1135 (Argument expression expected): 1,187 errors
 
-**Implementation:**
-Create `scripts/error-fixes/fix-bits-ui-imports.mjs`
-
-**Acceptance Criteria:**
-- [ ] Script created
-- [ ] bits-ui imports fixed (~5,000 errors)
-
----
-
-### Task 2.2: Implement Null Safety Fix Script
-**Requirement:** 2.2 - Null safety remediation
-**Duration:** 15 minutes
-**Status:** ⏳
-
-**Implementation:**
-Create `scripts/error-fixes/fix-null-safety.mjs`
-
-**Acceptance Criteria:**
-- [ ] Script created
-- [ ] Null safety errors fixed (~4,000 errors)
-
----
-
-### Task 2.3: Implement Missing Property Fix Script
-**Requirement:** 2.3 - Missing property remediation
+### Task 2.1: Fix Object Literal Syntax Corruption 🔄 NEXT
+**Requirement:** 2.1 - Object literal remediation
 **Duration:** 20 minutes
-**Status:** ⏳
+**Status:** 🔄 READY TO EXECUTE
 
-**Implementation:**
-Create `scripts/error-fixes/fix-missing-properties.mjs` with RAG integration
+**Problem Pattern:**
+```typescript
+// CORRUPTED (TS1005: ',' expected)
+const obj = {
+  prop1: value1, prop2: value2;  // comma where colon should be
+  method() { return data.field, otherField; }  // comma in return
+};
+
+// FIXED
+const obj = {
+  prop1: value1,
+  prop2: value2,
+  method() { return { field: data.field, otherField }; }
+};
+```
+
+**Files to Fix (High Priority):**
+1. `src/lib/actors/xstate-actor-wrapper.ts` - 22 errors
+2. `src/lib/adapters/wasm-rabbitmq-bridge.ts` - 8 errors
+3. `src/lib/3d/memory-palace-engine.ts` - 1 error
+4. `src/lib/actions/accessibility-actions.ts` - 1 error
+
+**Script:** `scripts/phase2-fix-object-literals.mjs`
 
 **Acceptance Criteria:**
-- [ ] Script created
-- [ ] RAG queries working
-- [ ] Missing properties fixed (~10,000 errors)
+- [ ] Object literal syntax fixed in all affected files
+- [ ] TS1005 errors reduced by ~5,000
+- [ ] No new errors introduced
+- [ ] Validated with `npx tsc --noEmit`
 
 ---
 
-### Task 2.4: Implement Type Mismatch Fix Script
-**Requirement:** 2.4 - Type mismatch remediation
+### Task 2.2: Fix Return Statement Corruption
+**Requirement:** 2.2 - Return statement remediation
 **Duration:** 15 minutes
-**Status:** ⏳
+**Status:** ⏳ TODO
 
-**Implementation:**
-Create `scripts/error-fixes/fix-type-mismatches.mjs`
+**Problem Pattern:**
+```typescript
+// CORRUPTED
+return {
+  data.field, data.other,  // missing property names
+  processingTime: Date.now() -, startTime,  // malformed expression
+};
+
+// FIXED
+return {
+  field: data.field,
+  other: data.other,
+  processingTime: Date.now() - startTime,
+};
+```
 
 **Acceptance Criteria:**
-- [ ] Script created
-- [ ] Type mismatches fixed (~8,000 errors)
+- [ ] Return statements fixed
+- [ ] TS1135 errors reduced by ~1,000
+- [ ] No new errors introduced
 
 ---
 
-### Task 2.5: Run Phase 2 Fixes and Verify
+### Task 2.3: Fix Function Signature Corruption
+**Requirement:** 2.3 - Function signature remediation
+**Duration:** 15 minutes
+**Status:** ⏳ TODO
+
+**Problem Pattern:**
+```typescript
+// CORRUPTED
+export function createWASMHandler(
+  baseHandler: MessageHandler,
+  wasmOperations?: {
+    vectorSimilarity?: boolean;
+  }
+return async (message: unknown) => {  // missing closing brace
+
+// FIXED
+export function createWASMHandler(
+  baseHandler: MessageHandler,
+  wasmOperations?: {
+    vectorSimilarity?: boolean;
+  }
+): (message: unknown) => Promise<void> {
+  return async (message: unknown) => {
+```
+
+**Acceptance Criteria:**
+- [ ] Function signatures fixed
+- [ ] TS1128 errors reduced by ~2,000
+- [ ] No new errors introduced
+
+---
+
+### Task 2.4: Fix Import Statement Corruption
+**Requirement:** 2.4 - Import statement remediation
+**Duration:** 10 minutes
+**Status:** ⏳ TODO
+
+**Problem Pattern:**
+```typescript
+// CORRUPTED
+import { createActor, fromPromise, type, ActorRefFrom } from 'xstate';
+
+// FIXED
+import { createActor, fromPromise, type ActorRefFrom } from 'xstate';
+```
+
+**Acceptance Criteria:**
+- [ ] Import statements fixed
+- [ ] Import-related errors reduced
+- [ ] No new errors introduced
+
+---
+
+### Task 2.5: Run Phase 2 Verification
 **Requirement:** Phase 2 completion
 **Duration:** 10 minutes
-**Status:** ⏳
+**Status:** ⏳ TODO
 
 **Steps:**
-1. Run all Phase 2 scripts
-2. Verify: `npx tsc --noEmit > logs/fix-reports/phase2-errors.txt`
-3. Count errors
+1. Run: `npx tsc --noEmit 2>&1 | Select-String "error TS" | Measure-Object`
+2. Compare error count before/after
+3. Generate Phase 2 report
+4. Git commit changes
+
+**Expected Result:** 36,662 → ~20,000 errors (45% reduction)
 
 **Acceptance Criteria:**
-- [ ] Error count: ~65,000 → ~40,000
+- [ ] Error count reduced by ~16,000
 - [ ] Phase 2 report generated
+- [ ] Git commit created
 
 ---
 
