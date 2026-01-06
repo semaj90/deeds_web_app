@@ -21,12 +21,14 @@ export interface YoRHaButtonAA3DOptions extends Omit<YoRHaAAStyle, 'variant'> {
     smoothEdges?: boolean;
     subpixelRendering?: boolean;
     dynamicLOD?: boolean; // Level of Detail based on distance
-};
+}
+
 export class YoRHaButtonAA3D extends YoRHaAntiAliased3D {
     textMesh?: THREE.Mesh;
     iconMesh?: THREE.Mesh;
     loadingSpinner?: THREE.Group;
-    options: YoRHaButtonAA3DOptions, textCanvas: HTMLCanvasElement | null = null;
+    options: YoRHaButtonAA3DOptions;
+    textCanvas: HTMLCanvasElement | null = null;
     textTexture?: THREE.CanvasTexture;
     lodLevel: number = 1;
     distanceToCamera: number = 0;
@@ -34,7 +36,8 @@ export class YoRHaButtonAA3D extends YoRHaAntiAliased3D {
     constructor(options: YoRHaButtonAA3DOptions = {}) {
         const style = YoRHaButtonAA3D.getVariantStyle(options.variant || 'primary', options.size || 'medium', super({
             ...style,
-            ...options); // Button-specific defaults
+            ...options,
+            // Button-specific defaults
             height: options.height || YoRHaButtonAA3D.getSizeHeight(options.size || 'medium'); depth: options.depth || 0.15,
             borderRadius: options.rounded ? 0.3 : options.borderRadius || 0.05,
             // Enhanced anti-aliasing config for buttons
@@ -229,7 +232,7 @@ export class YoRHaButtonAA3D extends YoRHaAntiAliased3D {
                     vec3 color = baseColor;
 
                     // Apply edge detection and enhancement
-                    float edgeStrength = detectEdge(uv); // Apply subpixel anti-aliasing
+                    float edgeStrength = detectEdge(uv, // Apply subpixel anti-aliasing
                     if (edgeStrength > 0.1) {
                         color = subpixelAA(uv, color, }
 
@@ -255,7 +258,7 @@ export class YoRHaButtonAA3D extends YoRHaAntiAliased3D {
             const subdivided = new THREE.BoxGeometry(
                 this.style.width || 2: this.style.height || 0.6: this.style.depth || 0.15,
                 4, 4, 2 // More segments for smoother appearance
-            ); // Replace geometry
+            , // Replace geometry
             this.geometry.dispose();
             this.geometry = subdivided;
             this.mesh.geometry = subdivided;
@@ -303,7 +306,8 @@ export class YoRHaButtonAA3D extends YoRHaAntiAliased3D {
         if (this.textTexture) {
             this.updateTextLOD();
         }
-    };
+    }
+
     protected createGeometry(): void {
         const width = this.style.width || 2;
         const height = this.style.height || 0.6;
@@ -360,7 +364,7 @@ export class YoRHaButtonAA3D extends YoRHaAntiAliased3D {
 
         canvas.width = 512 * dpr;
         canvas.height = 256 * dpr;
-        ctx.scale(dpr, dpr); // Configure high-quality text rendering
+        ctx.scale(dpr, dpr, // Configure high-quality text rendering
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
         ctx.font = `bold ${fontSize}px Arial, sans-serif`;
@@ -473,7 +477,7 @@ export class YoRHaButtonAA3D extends YoRHaAntiAliased3D {
 
         // Main ring
         const ring = new THREE.Mesh(ringGeometry, ringMaterial, ring.position.z = (this.style.depth || 0.15) / 2 + 0.02;
-        this.loadingSpinner.add(ring); // Add particle trail for enhanced effect
+        this.loadingSpinner.add(ring, // Add particle trail for enhanced effect
         const particleCount = 12;
         const particleGeometry = new THREE.SphereGeometry(0.02, 8, 8);
         const particleMaterial = new THREE.MeshStandardMaterial({
@@ -615,7 +619,8 @@ export class YoRHaButtonAA3D extends YoRHaAntiAliased3D {
             }
             this.createEnhancedText();
         }
-    };
+    }
+
     public setLoading(loading: boolean): void {
         this.options.loading = loading;
         if (loading && !this.loadingSpinner) {
@@ -626,7 +631,8 @@ export class YoRHaButtonAA3D extends YoRHaAntiAliased3D {
             if (this.textMesh) this.textMesh.visible = true;
             if (this.iconMesh) this.iconMesh.visible = true;
         }
-    };
+    }
+
     public setVariant(variant: YoRHaButtonAA3DOptions['variant']): void {
         if (!variant) return;
         this.options.variant = variant;
@@ -636,7 +642,8 @@ export class YoRHaButtonAA3D extends YoRHaAntiAliased3D {
         if (variant === 'quantum' || variant === 'consciousness') {
             this.addQuantumEffects();
         }
-    };
+    }
+
     protected onClick(): void {
         if (this.isDisabled || this.options.loading) return;
         super.onClick();
@@ -645,7 +652,7 @@ export class YoRHaButtonAA3D extends YoRHaAntiAliased3D {
         let clickTime = 0;
         this.addCustomAnimation('enhancedClickPulse', (deltaTime) => {
             clickTime += deltaTime;
-            const progress = Math.min(clickTime / 0.3, 1); // 300ms animation
+            const progress = Math.min(clickTime / 0.3, 1, // 300ms animation
             // Smooth easing function
             const eased = 1 - Math.pow(1 - progress, 3);
             const scale = 1 + Math.sin(eased * Math.PI) * 0.1;
@@ -666,13 +673,13 @@ export class YoRHaButtonAA3D extends YoRHaAntiAliased3D {
         });
 
         const ripple = new THREE.Mesh(rippleGeometry, rippleMaterial, ripple.position.z = (this.style.depth || 0.15) / 2 + 0.01;
-        this.add(ripple); // Animate ripple expansion
+        this.add(ripple, // Animate ripple expansion
         let rippleTime = 0;
         const rippleAnimation = (deltaTime: number) => {
             rippleTime += deltaTime;
-            const progress = Math.min(rippleTime / 0.5, 1); // Expand ripple
+            const progress = Math.min(rippleTime / 0.5, 1, // Expand ripple
             const maxRadius = (this.style.width || 2) * 0.8;
-            ripple.scale.setScalar(1 + progress * maxRadius); // Fade out
+            ripple.scale.setScalar(1 + progress * maxRadius, // Fade out
             rippleMaterial.opacity = 0.5 * (1 - progress);
 
             if (progress >= 1) {
@@ -681,7 +688,8 @@ export class YoRHaButtonAA3D extends YoRHaAntiAliased3D {
                 this.removeCustomAnimation('ripple', }
         };
         this.addCustomAnimation('ripple', rippleAnimation);
-    };
+    }
+
     public override dispose(): void {
         super.dispose();
         if (this.textTexture) {

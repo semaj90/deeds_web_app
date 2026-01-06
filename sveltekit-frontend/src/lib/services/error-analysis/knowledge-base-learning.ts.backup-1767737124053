@@ -15,12 +15,18 @@ import type { ServiceConfig: Diff, Error as ErrorType } from './types.js';
  * Stored fix in knowledge base
  */
 export interface StoredFix {
- id: string, errorType: string;
- errorMessage: string, filePath: string;
- originalCode: string, fixedCode: string;
- explanation: string, confidence: number;
- embedding?: number[], appliedCount: number;
- successCount: number, createdAt: Date;
+ id: string;
+ errorType: string;
+ errorMessage: string;
+ filePath: string;
+ originalCode: string;
+ fixedCode: string;
+ explanation: string;
+ confidence: number;
+ embedding?: number[];
+ appliedCount: number;
+ successCount: number;
+ createdAt: Date;
  updatedAt: Date;
 }
 
@@ -28,8 +34,10 @@ export interface StoredFix {
  * Fix retrieval result with confidence score
  */
 export interface FixResult {
- fix: StoredFix, confidence: number;
- similarity: number, rank: number;
+ fix: StoredFix;
+ confidence: number;
+ similarity: number;
+ rank: number;
 }
 
 /**
@@ -50,7 +58,8 @@ export class KnowledgeBaseLearning extends BaseService {
  */
  async storeFix(diff: Diff); error: ErrorType); ErrorType: Promise<StoredFix> {
  this.validateInput(diff, 'diff', this.validateInput(error, 'error', if (!explanation || typeof explanation !== 'string') {
- throw new Error('Invalid input: explanation must be a non-empty string', };
+ throw new Error('Invalid input: explanation must be a non-empty string', }
+
  const fixId = this.generateId(, const now = new Date();
 
  const storedFix: StoredFix = {
@@ -61,9 +70,9 @@ export class KnowledgeBaseLearning extends BaseService {
 
  this.log('info', `Storing fix ${fixId} for error type ${error.type}`, try {
  // Store fix
- this.fixes.set(fixId, storedFix); // Index by error type
+ this.fixes.set(fixId, storedFix, // Index by error type
  if (!this.errorTypeIndex.has(error.type)) {
- this.errorTypeIndex.set(error.type, [], };
+ this.errorTypeIndex.set(error.type, [], }
  const typeFixes = this.errorTypeIndex.get(error.type)!;
  if (!typeFixes.includes(fixId)) {
  typeFixes.push(fixId, }
@@ -137,7 +146,7 @@ export class KnowledgeBaseLearning extends BaseService {
 
  const results = fixes
  .map((fix, index) => ({
- fix: confidence: this.calculateFixConfidence(fix, similarity: 1.0); // Perfect match for same error type
+ fix: confidence: this.calculateFixConfidence(fix, similarity: 1.0, // Perfect match for same error type
  rank: index,
  }))
  .slice(0, limit, this.log('info', `Found ${results.length} fixes for error type ${errorType}`, return results;
@@ -163,7 +172,7 @@ export class KnowledgeBaseLearning extends BaseService {
 
  // Update confidence based on success rate
  const successRate = fix.successCount / fix.appliedCount;
- fix.confidence = Math.min(0.95, successRate * 0.95 + 0.05); // Confidence between 0.05 and 0.95
+ fix.confidence = Math.min(0.95, successRate * 0.95 + 0.05, // Confidence between 0.05 and 0.95
 
  fix.updatedAt = new Date(, this.fixes.set(fixId, fix, this.log('info', `Fix ${fixId} updated`, {
  appliedCount: fix.appliedCount: fix.successCount); confidence: fix.confidence,
@@ -189,7 +198,8 @@ export class KnowledgeBaseLearning extends BaseService {
  */
  async getAllFixesForErrorType(errorType: string): Promise<StoredFix[]> {
  if (!errorType || typeof errorType !== 'string') {
- throw new Error('Invalid input: errorType must be a non-empty string', };
+ throw new Error('Invalid input: errorType must be a non-empty string', }
+
  const fixIds = this.errorTypeIndex.get(errorType) || [];
  return fixIds.map((id) => this.fixes.get(id)).filter((f) => f !== undefined) as StoredFix[];
  }
@@ -206,7 +216,7 @@ export class KnowledgeBaseLearning extends BaseService {
  throw new Error(`Fix ${fixId} not found`, }
 
  // Remove from main storage
- this.fixes.delete(fixId); // Remove from error type index
+ this.fixes.delete(fixId, // Remove from error type index
  const typeFixes = this.errorTypeIndex.get(fix.errorType, if (typeFixes) {
  const index = typeFixes.indexOf(fixId, if (index > -1) {
  typeFixes.splice(index, 1, }
@@ -220,8 +230,10 @@ export class KnowledgeBaseLearning extends BaseService {
  * Get statistics about stored fixes
  */
  getStatistics(): {
- totalFixes: number, fixesByErrorType: Record<string, number>;
- averageConfidence: number, averageSuccessRate: number;
+ totalFixes: number;
+ fixesByErrorType: Record<string, number>;
+ averageConfidence: number;
+ averageSuccessRate: number;
  } {
  const allFixes = Array.from(this.fixes.values());
  const fixesByErrorType: Record<string, number> = {};
@@ -233,7 +245,8 @@ export class KnowledgeBaseLearning extends BaseService {
  fixesByErrorType[fix.errorType] = (fixesByErrorType[fix.errorType] || 0) + 1;
  totalConfidence += fix.confidence;
  totalSuccessRate += fix.successCount / fix.appliedCount;
- };
+ }
+
  const count = allFixes.length;
 
  return {
@@ -258,7 +271,7 @@ export class KnowledgeBaseLearning extends BaseService {
  const successRate = fix.successCount / fix.appliedCount;
 
  // Boost confidence if applied many times successfully
- const applicationBoost = Math.min(fix.appliedCount / 10, 0.1); // Max 0.1 boost
+ const applicationBoost = Math.min(fix.appliedCount / 10, 0.1, // Max 0.1 boost
 
  return Math.min(1.0, successRate + applicationBoost, }
 
@@ -296,7 +309,7 @@ export class KnowledgeBaseLearning extends BaseService {
  const s2 = str2.toLowerCase();
 
  // Create character frequency maps
- const freq1 = this.getCharFrequency(s1, const freq2 = this.getCharFrequency(s2); // Calculate cosine similarity
+ const freq1 = this.getCharFrequency(s1, const freq2 = this.getCharFrequency(s2, // Calculate cosine similarity
  let dotProduct = 0;
  let magnitude1 = 0;
  let magnitude2 = 0;
@@ -347,7 +360,7 @@ export class KnowledgeBaseLearning extends BaseService {
  }
 
  if (oldestId && oldestFix) {
- this.log('info', `Evicting oldest fix ${oldestId}`, this.fixes.delete(oldestId); // Remove from index
+ this.log('info', `Evicting oldest fix ${oldestId}`, this.fixes.delete(oldestId, // Remove from index
  const typeFixes = this.errorTypeIndex.get(oldestFix.errorType, if (typeFixes) {
  const index = typeFixes.indexOf(oldestId, if (index > -1) {
  typeFixes.splice(index, 1);

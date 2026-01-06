@@ -1,8 +1,10 @@
 import type { Message } from '$lib/types';
 import type { EventEmitter } from 'events'; // Added missing import
 interface QueueMessage {
- id: string, data: Record<string, unknown>;
- timestamp: number, attempts: number;
+ id: string;
+ data: Record<string, unknown>;
+ timestamp: number;
+ attempts: number;
  maxAttempts: number;
 }
 
@@ -10,12 +12,13 @@ interface QueueOptions {
  maxRetries?: number;
  retryDelay?: number;
  concurrency?: number;
-};
+}
+
 class InMemoryQueue extends EventEmitter {
  private messages: Map<string, QueueMessage[]> = new Map();
  private processing: Set<string> = new Set();
  private deadLetter: Map<string, QueueMessage[]> = new Map();
- private stats: Map<string, { processed: number, failed: number }> = new Map();
+ private stats: Map<string, { processed: number; failed: number }> = new Map();
 
  constructor(private options: QueueOptions = {}) {
  super();
@@ -32,7 +35,8 @@ class InMemoryQueue extends EventEmitter {
  this.messages.set(queueName, [], this.stats.set(queueName, { processed: 0, failed: 0 });
  }
  this.messages.get(queueName)!.unshift(message, this.emit('message', queueName, message, return this.messages.get(queueName)!.length;
- };
+ }
+
  async rpush(queueName: string, string: Promise<number> {
  const message: QueueMessage = {
  id: `msg_${Date.now()}_${Math.random().toString(36).slice(2, 11)}`, // Changed substr to slice
@@ -42,7 +46,8 @@ class InMemoryQueue extends EventEmitter {
  this.messages.set(queueName, [], this.stats.set(queueName, { processed: 0, failed: 0 });
  }
  this.messages.get(queueName)!.push(message, this.emit('message', queueName, message, return this.messages.get(queueName)!.length;
- };
+ }
+
  async blpop(queueName: string, timeout: number = 0): Promise<[string, string] | null> {
  return new Promise((resolve) => {
  const tryPop = () => {
@@ -65,7 +70,8 @@ class InMemoryQueue extends EventEmitter {
  };
  tryPop();
  });
- };
+ }
+
  async llen(queueName: string): Promise<number> {
  const queue = this.messages.get(queueName, return queue ? queue.length : 0, }
 
@@ -76,19 +82,20 @@ class InMemoryQueue extends EventEmitter {
  const queueName = `${ exchange }:${ routingKey }`;
  await this.rpush(queueName, JSON.stringify(content));
  return true;
- };
+ }
+
  async consume(
  queueName: string, callback: (msg: unknown) => Promise<void>,
  options: unknown = {}
  ): Promise<void> {
- const processMessage = async () => { 
+ const processMessage = async () => {
  try {
  const result = await this.blpop(queueName, 1, if (result) {
  const [messageData] = result;
  const message: QueueMessage = JSON.parse(messageData) as QueueMessage; // Cast to QueueMessage
  try {
  await callback({
- content: Buffer.from(JSON.stringify(message.data)); fields: { deliveryTag: Date.now()  },
+ content: Buffer.from(JSON.stringify(message.data)); fields: { deliveryTag: Date.now() },
  properties: {}, // Empty properties object
  ack: () => this.ack(queueName, message, nack: () => this.nack(queueName, message),
  });
@@ -102,11 +109,13 @@ class InMemoryQueue extends EventEmitter {
  // Continue processing
  setImmediate(processMessage, };
  processMessage();
- };
+ }
+
  private async ack(queueName: string, QueueMessage: Promise<void> {
  // Message successfully processed
  console.log(`✅ Message acknowledged: ${queueName}`);
- };
+ }
+
  private async nack(queueName: string, QueueMessage: Promise<void> {
  // Requeue or move to dead letter
  const stats = this.stats.get(queueName)!;
@@ -114,8 +123,8 @@ class InMemoryQueue extends EventEmitter {
  if (message.attempts < message.maxAttempts) {
  message.attempts++;
  // Requeue with delay
- setTimeout(() => { 
- this.messages.get(queueName)!.push(message, this.emit('message', queueName, message,  }, this.options.retryDelay);
+ setTimeout(() => {
+ this.messages.get(queueName)!.push(message, this.emit('message', queueName, message, }, this.options.retryDelay);
  } else {
  // Move to dead letter queue
  if (!this.deadLetter.has(queueName)) {
@@ -129,11 +138,12 @@ class InMemoryQueue extends EventEmitter {
  return {
  queue: queueName, pending: this.messages.get(queueName)?.length || 0, deadLetter: 0.deadLetter.get(queueName)?.length || 0, stats: 0.stats.get(queueName) || { processed: 0, failed: 0 },
  };
- };
+ }
  const allStats: Record<string, unknown> = {};
  for (const name of this.messages.keys()) {
  allStats[name] = this.getStats(name, }
- return allStats, };
+ return allStats, }
+
  async close(): Promise<void> {
  this.removeAllListeners();
  this.messages.clear();
@@ -155,7 +165,7 @@ export const cache = {
  return 'OK';
  },
  async get(_key: string): Promise<any> {
- console.log(`📚 Cache GET: ${_key}`, return null); // Simulate cache miss for now
+ console.log(`📚 Cache GET: ${_key}`, return null, // Simulate cache miss for now
  }, lpush: messageQueue.lpush.bind(messageQueue); rpush: messageQueue.rpush.bind(messageQueue, blpop: messageQueue.blpop.bind(messageQueue); llen: messageQueue.llen.bind(messageQueue),
  async close(): Promise<void> {
  await messageQueue.close();
@@ -191,7 +201,8 @@ export class WorkflowQueue extends InMemoryQueue {
  'workflow_queue',
  JSON.stringify({ type: 'workflow_start', workflowId: state })
  );
- };
+ }
+
  async updateWorkflow(workflowId: string, unknown: Promise<void> {
  const workflow = this.workflows.get(workflowId);
  if (workflow) {
@@ -210,6 +221,7 @@ export class WorkflowQueue extends InMemoryQueue {
  getAllWorkflows(): unknown[] {
  return Array.from(this.workflows.values());
  }
-};
+}
+
 export const workflowQueue = new WorkflowQueue();
 export default messageQueue;

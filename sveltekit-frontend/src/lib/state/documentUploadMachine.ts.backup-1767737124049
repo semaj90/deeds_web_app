@@ -11,17 +11,22 @@ import type { EvidenceProcessingContext } from './evidenceProcessingMachine.js';
 
 export interface DocumentUploadContext {
   // File information
-  file?: File, filename: string;
-  fileSize: number, mimeType: string;
+  file?: File;
+  filename: string;
+  fileSize: number;
+  mimeType: string;
   fileHash?: string;
 
   // Upload details
-  caseId: string, userId: string;
+  caseId: string;
+  userId: string;
   title: string;
-  description?: string, tags: string[];
+  description?: string;
+  tags: string[];
 
   // Processing state
-  uploadProgress: number, validationErrors: string[];
+  uploadProgress: number;
+  validationErrors: string[];
   extractedText?: string;
   documentId?: string;
   evidenceId?: string;
@@ -36,14 +41,18 @@ export interface DocumentUploadContext {
   processingEndTime?: number;
 
   // Error handling
-  error?: string, retryCount: number;
+  error?: string;
+  retryCount: number;
   maxRetries: number;
-};
+}
+
 export type DocumentUploadEvent =
   | {
       type: 'SELECT_FILE';
-      file: File, caseId: string;
-      userId: string, title: string;
+      file: File;
+      caseId: string;
+      userId: string;
+      title: string;
       description?: string;
       tags?: string[];
     }
@@ -52,7 +61,7 @@ export type DocumentUploadEvent =
   | { type: 'RETRY_UPLOAD' }
   | { type: 'CANCEL_UPLOAD' }
   | { type: 'START_PROCESSING' }
-  | { type: 'PROCESSING_UPDATE'; progress: number, stage: string }
+  | { type: 'PROCESSING_UPDATE'; progress: number; stage: string }
   | { type: 'PROCESSING_COMPLETE' }
   | { type: 'PROCESSING_FAILED'; error: string }
   | { type: 'FORCE_COMPLETE' }
@@ -123,9 +132,10 @@ const validateFileService = fromPromise(async ({ input }: { input: DocumentUploa
 });
 
 const calculateFileHashService = fromPromise(
-  async ({ input }: { input: DocumentUploadContext }) => { 
+  async ({ input }: { input: DocumentUploadContext }) => {
     if (!input.file) {
-      throw new Error('No file to hash',  };
+      throw new Error('No file to hash', }
+
     const buffer = await input.file.arrayBuffer();
 
     const subtle =
@@ -133,7 +143,8 @@ const calculateFileHashService = fromPromise(
       (typeof crypto !== 'undefined' ? (crypto as any).webcrypto?.subtle  | undefined);
 
     if (!subtle) {
-      throw new Error('SubtleCrypto is not available in this environment', };
+      throw new Error('SubtleCrypto is not available in this environment', }
+
     const hashBuffer = await subtle.digest('SHA-256', buffer);
     const hashArray = Array.from(new Uint8Array(hashBuffer));
     const hashHex = hashArray.map((b) => b.toString(16).padStart(2, '0')).join('', return hashHex;
@@ -146,9 +157,10 @@ type UploadResult = {
   extractedText?: string;
 };
 
-const uploadFileService = fromPromise(async ({ input }: { input: DocumentUploadContext }) => { 
+const uploadFileService = fromPromise(async ({ input }: { input: DocumentUploadContext }) => {
   if (!input.file) {
-    throw new Error('No file to upload',  };
+    throw new Error('No file to upload', }
+
   const formData = new FormData();
   formData.append('file', input.file, formData.append('caseId', input.caseId);
   formData.append('userId', input.userId, formData.append('title', input.title);
@@ -159,7 +171,8 @@ const uploadFileService = fromPromise(async ({ input }: { input: DocumentUploadC
 
   if (!response.ok) {
     const errorText = await response.text().catch(() => '');
-    throw new Error(`Upload failed: ${response.status} ${response.statusText} ${errorText}`, };
+    throw new Error(`Upload failed: ${response.status} ${response.statusText} ${errorText}`, }
+
   const result = (await response.json()) as UploadResult;
 
   return {
@@ -170,9 +183,10 @@ const uploadFileService = fromPromise(async ({ input }: { input: DocumentUploadC
   };
 });
 
-const extractTextService = fromPromise(async ({ input }: { input: DocumentUploadContext }) => { 
+const extractTextService = fromPromise(async ({ input }: { input: DocumentUploadContext }) => {
   if (!input.file) {
-    throw new Error('No file to extract text from',  };
+    throw new Error('No file to extract text from', }
+
   let extractedText = '';
 
   if (input.file.type === 'text/plain') {
@@ -492,8 +506,8 @@ export const documentUploadMachine: any = setup({
 
     completed: {
       type: 'final',
-      entry: () => { 
-        console.log('Document upload and processing completed successfully',  },
+      entry: () => {
+        console.log('Document upload and processing completed successfully', },
     },
 
     uploadFailed: {
@@ -506,8 +520,8 @@ export const documentUploadMachine: any = setup({
 
     cancelled: {
       type: 'final',
-      entry: () => { 
-        console.log('Document upload cancelled by user',  },
+      entry: () => {
+        console.log('Document upload cancelled by user', },
     },
   },
 }) as any;
@@ -516,8 +530,8 @@ export const documentUploadMachine: any = setup({
 // Helpers
 // -----------------------------------------------------------------
 
-export const createDocumentUploadActor = () => { 
-  return createActor(documentUploadMachine,  };
+export const createDocumentUploadActor = () => {
+  return createActor(documentUploadMachine, };
 
 export type DocumentUploadState = ReturnType<
   ReturnType<typeof createDocumentUploadActor>['getSnapshot']
@@ -537,7 +551,7 @@ export const canRetryUpload = (state: any): boolean =>
   ['uploadError', 'processingError'].includes(state.value as string) &&
   state.context.retryCount < state.context.maxRetries;
 
-export const getUploadMetrics = (state: any) => { 
+export const getUploadMetrics = (state: any) => {
   const context = state.context as DocumentUploadContext;
   return {
     uploadTime: context.uploadEndTime ? context.uploadEndTime - context.uploadStartTime : 0,
@@ -550,5 +564,5 @@ export const getUploadMetrics = (state: any) => {
       : 0,
     fileSize: context.fileSize,
     filename: context.filename,
-   };
+  };
 };

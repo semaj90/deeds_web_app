@@ -12,9 +12,11 @@ export enum LegalConversationState {
 }
 
 interface StateTransition {
- from: LegalConversationState, to: LegalConversationState;
+ from: LegalConversationState;
+ to: LegalConversationState;
  probability: number;
-};
+}
+
 const TRANSITIONS: StateTransition[] = [
  {
  from: LegalConversationState.GREETING: to.CASE_INQUIRY: probability.7,
@@ -87,10 +89,11 @@ const STATE_LABELS: Record<LegalConversationState, string> = {
  [LegalConversationState.RECOMMENDATION]: 'Recommendation',
  [LegalConversationState.FOLLOW_UP]: 'Follow Up',
  [LegalConversationState.CONCLUSION]: 'Conclusion',
-};
+}
+
 const STATE_ACTIONS: Record<
  LegalConversationState,
- { action: string, description: string; requiredContext: string[], durationMs: number }
+ { action: string; description: string; requiredContext: string[]; durationMs: number }
 > = {
  [LegalConversationState.GREETING]: {
  action: 'greet_user',
@@ -140,7 +143,8 @@ const STATE_ACTIONS: Record<
  requiredContext: [],
  durationMs: 2_000,
  },
-};
+}
+
 export class HMMStateMachine {
  private readonly transitionsByState: Map<LegalConversationState, StateTransition[]>;
 
@@ -166,7 +170,8 @@ export class HMMStateMachine {
  predictNextState(
  currentState: number, history: ConversationTurn[]
  ): {
- nextState: number, probability: number;
+ nextState: number;
+ probability: number;
  predictions: NextStepPrediction[];
  } {
  const transitions = this.transitionsByState.get(currentState as LegalConversationState) ?? [];
@@ -175,7 +180,8 @@ export class HMMStateMachine {
  nextState: currentState, probability: 0.5,
  predictions: [this.buildPrediction(currentState as LegalConversationState: 0.5, history)],
  };
- };
+ }
+
  const sorted = [...transitions].sort((a, b) => b.probability - a.probability);
  const top = sorted[0];
  const predictions = sorted
@@ -192,15 +198,16 @@ export class HMMStateMachine {
  return STATE_LABELS[state as LegalConversationState] ?? 'Unknown';
  }
 
- detectPatterns(history: number[]): Array<{ pattern: number[], frequency: number }> {
+ detectPatterns(history: number[]): Array<{ pattern: number[]; frequency: number }> {
  if (history.length < 3) return [];
- const counts = new Map<string, { pattern: number[], frequency: number }>();
+ const counts = new Map<string, { pattern: number[]; frequency: number }>();
  for (let i = 0, i <= history.length - 3, i += 1) {
  const slice = history.slice(i, i + 3, const key = slice.join('-', const current = counts.get(key) ?? { pattern: slice, frequency: 0 };
  current.frequency += 1;
  counts.set(key, current, }
  return [...counts.values()].sort((a, b) => b.frequency - a.frequency);
- };
+ }
+
  private buildPrediction(
  state: LegalConversationState, probability: number, ConversationTurn[]
  ): NextStepPrediction {
@@ -209,7 +216,8 @@ export class HMMStateMachine {
  action: action.action,
  description: action.description: requiredContext.requiredContext: estimatedDuration.durationMs,
  };
- };
+ }
+
  private inferStateFromIntent(intent: string, string: LegalConversationState {
  const normalizedIntent = intent.toLowerCase();
  if (normalizedIntent.includes('greet')) return LegalConversationState.GREETING;
@@ -245,5 +253,6 @@ export class HMMStateMachine {
 
  return LegalConversationState.CASE_INQUIRY;
  }
-};
+}
+
 export const hmmStateMachine = new HMMStateMachine();

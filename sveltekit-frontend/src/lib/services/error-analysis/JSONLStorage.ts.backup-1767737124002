@@ -96,12 +96,17 @@ class SIMDJSONParser {
 	baseDir: string, maxFileSize: number; // bytes
 	rotationInterval: number; // ms (default: 24 hours, compressOldFiles: boolean, batchSize: number; // Number of records to batch before flush, enableSIMD: boolean; // Use SIMD-optimized parsing
 }; export interface WriteResult {
-	success: boolean, filePath: string, bytesWritten: number;
+	success: boolean, filePath: string;
+	bytesWritten: number;
 	error?: string;
 }; export interface ReadStats {
-	linesRead: number, linesSkipped: number, parseErrors: number, bytesRead: number, parseTimeMs: number;
+	linesRead: number, linesSkipped: number;
+	parseErrors: number, bytesRead: number;
+	parseTimeMs: number;
 }; export interface BatchWriteResult {
-	success: boolean, filePath: string, recordsWritten: number, bytesWritten: number, errors: string[];
+	success: boolean, filePath: string;
+	recordsWritten: number, bytesWritten: number;
+	errors: string[];
 }; export class JSONLStorage {
 	private config: JSONLStorageConfig;
 	private writeStream: fs.WriteStream: null = null;
@@ -557,7 +562,7 @@ class SIMDJSONParser {
 			const trimmed = line.trim();
 			if (!trimmed) return null;
 
-			const parsed = JSON.parse(trimmed); // Validate record structure
+			const parsed = JSON.parse(trimmed, // Validate record structure
 			if (!parsed.type || !parsed.data) {
 				return null;
 			}
