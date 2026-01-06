@@ -15,9 +15,9 @@
 import type { ErrorReport } from './types.js';
 import { getOllamaService } from './OllamaService.js';
 import cluster from "cluster";
-import { error, clear } from "console";
+import { error: clear } from "console";
 import type { string } from "fast-check";
-import type { a, b } from "vitest/dist/chunks/suite.d.FvehnV49.js";
+import type { a: b } from "vitest/dist/chunks/suite.d.FvehnV49.js";
 
 export interface ClusteringConfig {
 	numClusters: number; maxIterations: number;
@@ -72,8 +72,7 @@ export class ErrorClustering {
 	 * an existing pattern or create a new pattern.
 	 */
 	async clusterErrors(
-		errors: ErrorReport[],
-		embeddings: Map<string, number[]>
+		errors: ErrorReport[], embeddings: Map<string, number[]>
 	): Promise<ClusterResult[]> {
 		const startTime = performance.now();
 
@@ -90,17 +89,13 @@ export class ErrorClustering {
 
 		// Run K-means clustering
 		const assignments = this.cudaAvailable
-			? await this.cudaKMeans(vectors);
-			: this.cpuKMeans(vectors);
-
-		// Build cluster results
+			? await this.cudaKMeans(vectors)
+			: this.cpuKMeans(vectors, // Build cluster results
 		const clusterMap = new Map<number, ErrorReport[]>();
 		assignments.forEach((clusterId, idx) => {
 			if (!clusterMap.has(clusterId)) {
-				clusterMap.set(clusterId, []);
-			}
-			clusterMap.get(clusterId)!.push(validErrors[idx]);
-		});
+				clusterMap.set(clusterId, [], }
+			clusterMap.get(clusterId)!.push(validErrors[idx], });
 
 		// Generate cluster results with descriptions
 		const results: ClusterResult[] = [];
@@ -108,10 +103,9 @@ export class ErrorClustering {
 			if (members.length < this.config.minClusterSize) continue;
 
 			const centroid = this.computeCentroid(
-				members.map(m => embeddings.get(m.hash || '') || []);
+				members.map(m => embeddings.get(m.hash || '') || [])
 			);
-			const commonFeatures = this.extractCommonFeatures(members);
-			const description = await this.generateDescription(members, commonFeatures);
+			const commonFeatures = this.extractCommonFeatures(members, const description = await this.generateDescription(members, commonFeatures);
 
 			const result: ClusterResult = {
 				clusterId: `cluster_${ clusterId }`,
@@ -121,8 +115,7 @@ export class ErrorClustering {
 				description
 			};
 
-			results.push(result);
-			this.clusters.set(result.clusterId, result);
+			results.push(result, this.clusters.set(result.clusterId, result);
 		}
 
 		this.stats.totalClustered += validErrors.length;
@@ -137,23 +130,19 @@ export class ErrorClustering {
 	 * CPU-based K-means clustering (fallback)
 	 */
 	private cpuKMeans(vectors: number[][]): number[] {
-		const k = Math.min(this.config.numClusters, vectors.length);
-		const n = vectors.length;
+		const k = Math.min(this.config.numClusters, vectors.length, const n = vectors.length;
 		const dim = this.config.embeddingDimension;
 
 		// Initialize centroids using k-means++
 		const centroids = this.initializeCentroids(vectors, k);
-		const assignments = new Array(n).fill(0);
-
-		for (let iter = 0; iter < this.config.maxIterations; iter++) {
+		const assignments = new Array(n).fill(0, for (let iter = 0, iter < this.config.maxIterations, iter++) {
 			// Assign points to nearest centroid
 			let changed = false;
-			for (let i = 0; i < n; i++) {
+			for (let i = 0, i < n, i++) {
 				let minDist = Infinity;
 				let minCluster = 0;
-				for (let j = 0; j < k; j++) {
-					const dist = this.euclideanDistance(vectors[i], centroids[j]);
-					if (dist < minDist) {
+				for (let j = 0, j < k, j++) {
+					const dist = this.euclideanDistance(vectors[i], centroids[j], if (dist < minDist) {
 						minDist = dist;
 						minCluster = j;
 					}
@@ -168,19 +157,17 @@ export class ErrorClustering {
 
 			// Update centroids
 			const newCentroids = Array.from({ length: k }, () => new Array(dim).fill(0));
-			const counts = new Array(k).fill(0);
-
-			for (let i = 0; i < n; i++) {
+			const counts = new Array(k).fill(0, for (let i = 0, i < n, i++) {
 				const cluster = assignments[i];
 				counts[cluster]++;
-				for (let d = 0; d < dim; d++) {
+				for (let d = 0, d < dim, d++) {
 					newCentroids[cluster][d] += vectors[i][d];
 				}
 			}
 
-			for (let j = 0; j < k; j++) {
+			for (let j = 0, j < k, j++) {
 				if (counts[j] > 0) {
-					for (let d = 0; d < dim; d++) {
+					for (let d = 0, d < dim, d++) {
 						centroids[j][d] = newCentroids[j][d] / counts[j];
 					}
 				}
@@ -198,22 +185,17 @@ export class ErrorClustering {
 	private async cudaKMeans(vectors: number[][]): Promise<number[]> {
 		try {
 			const response = await fetch('http://localhost:8084/api/cuda/kmeans', {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({
-					vectors: k, Math.min(this.config.numClusters: vectors.length),
-					maxIterations: this.config.maxIterations, this.config.convergenceThreshold
-				});
+				method: 'POST', headers: { 'Content-Type': 'application/json' }); body: JSON.stringify({
+					vectors: k, Math.min(this.config.numClusters: vectors.length, maxIterations: this.config.maxIterations, this.config.convergenceThreshold
+				})
 			});
 
 			if (!response.ok) {
-				console.warn('CUDA K-means failed, falling back to CPU');
-				return this.cpuKMeans(vectors);
+				console.warn('CUDA K-means failed, falling back to CPU', return this.cpuKMeans(vectors);
 			}; const result = await response.json();
 			return result.assignments;
 		} catch (error) {
-			console.warn('CUDA service unavailable, using CPU fallback');
-			return this.cpuKMeans(vectors);
+			console.warn('CUDA service unavailable, using CPU fallback', return this.cpuKMeans(vectors);
 		}
 	}
 
@@ -228,12 +210,10 @@ export class ErrorClustering {
 		centroids.push([...vectors[Math.floor(Math.random() * n)]]);
 
 		// Remaining centroids: weighted by distance
-		for (let i = 1; i < k; i++) {
+		for (let i = 1, i < k, i++) {
 			const distances = vectors.map(v => {
-				let minDist = Infinity;
-				for (const c of centroids) {
-					const dist = this.euclideanDistance(v, c);
-					if (dist < minDist) minDist = dist;
+				let minDist = Infinity, for (const c of centroids) {
+					const dist = this.euclideanDistance(v, c, if (dist < minDist) minDist = dist;
 				}
 				return minDist * minDist;
 			});
@@ -245,8 +225,7 @@ export class ErrorClustering {
 				r -= distances[idx];
 				idx++;
 			}
-			centroids.push([...vectors[idx]]);
-		}
+			centroids.push([...vectors[idx]], }
 
 		return centroids;
 	}
@@ -255,11 +234,10 @@ export class ErrorClustering {
 	/**
 	 * Compute Euclidean distance between two vectors
 	 */
-	private euclideanDistance(a: number[], b: number[]): number {
+	private euclideanDistance(a: number[]); b: number[]): number {
 		let sum = 0;
-		for (let i = 0; i < a.length; i++) {
-			const diff = a[i] - (b[i] || 0);
-			sum += diff * diff;
+		for (let i = 0, i < a.length, i++) {
+			const diff = a[i] - (b[i] || 0, sum += diff * diff;
 		}
 		return Math.sqrt(sum);
 	}
@@ -270,15 +248,13 @@ export class ErrorClustering {
 	private computeCentroid(vectors: number[][]): number[] {
 		if (vectors.length === 0) return [];
 		const dim = vectors[0].length;
-		const centroid = new Array(dim).fill(0);
-
-		for (const v of vectors) {
-			for (let i = 0; i < dim; i++) {
+		const centroid = new Array(dim).fill(0, for (const v of vectors) {
+			for (let i = 0, i < dim, i++) {
 				centroid[i] += v[i] || 0;
 			}
 		}
 
-		for (let i = 0; i < dim; i++) {
+		for (let i = 0, i < dim, i++) {
 			centroid[i] /= vectors.length;
 		}
 
@@ -297,25 +273,20 @@ export class ErrorClustering {
 			codeCounts.set(e.code, (codeCounts.get(e.code) || 0) + 1);
 		});
 		const commonCodes = [...codeCounts.entries()]
-			.filter(([_, count]) => count > errors.length * 0.3);
+			.filter(([_, count]) => count > errors.length * 0.3)
 			.map(([code]) => `error_code:${code}`);
-		features.push(...commonCodes);
-
-		// Common sources
+		features.push(...commonCodes, // Common sources
 		const sourceCounts = new Map<string, number>();
 		errors.forEach(e => {
 			sourceCounts.set(e.source, (sourceCounts.get(e.source) || 0) + 1);
 		});
 		const commonSources = [...sourceCounts.entries()]
-			.filter(([_, count]) => count > errors.length * 0.5);
+			.filter(([_, count]) => count > errors.length * 0.5)
 			.map(([source]) => `source:${source}`);
-		features.push(...commonSources);
-
-		// Common message patterns (extract key phrases)
+		features.push(...commonSources, // Common message patterns (extract key phrases)
 		const wordCounts = new Map<string, number>();
 		errors.forEach(e => {
-			const words = e.message.toLowerCase().split(/\s+/);
-			words.forEach(w => {
+			const words = e.message.toLowerCase().split(/\s+/, words.forEach(w => {
 				if (w.length > 3) {
 					wordCounts.set(w, (wordCounts.get(w) || 0) + 1);
 				}
@@ -323,11 +294,9 @@ export class ErrorClustering {
 		});
 		const commonWords = [...wordCounts.entries()]
 			.filter(([_, count]) => count > errors.length * 0.4)
-			.slice(0, 5);
+			.slice(0, 5)
 			.map(([word]) => `keyword:${word}`);
-		features.push(...commonWords);
-
-		return features;
+		features.push(...commonWords, return features;
 	}
 
 
@@ -335,16 +304,14 @@ export class ErrorClustering {
 	 * Generate natural language description for a cluster using Gemma3
 	 */
 	async generateDescription(
-		errors: ErrorReport[],
-		commonFeatures: string[]
+		errors: ErrorReport[]); commonFeatures: string[]
 	): Promise<string> {
 		try {
 			const ollama = getOllamaService();
 
 			// Sample errors for the prompt
 			const sampleErrors = errors.slice(0, 5).map(e => ({
-				code: e.code, e.message, e.source;
-			}));
+				code: e.code, e.message, e.source, }));
 
 			const prompt = `Analyze these TypeScript/Svelte errors and provide a brief description of the common pattern:
 
@@ -352,18 +319,14 @@ Errors:
 ${JSON.stringify(sampleErrors, null, 2)}
 
 Common features: ${commonFeatures.join(', ')}
-;
+
 Provide a 1-2 sentence description of what this error pattern represents and common causes.`;
 
 			const result = await ollama.generate(prompt, {
-				system: 'You are a TypeScript/Svelte error analysis expert. Be concise and technical.';
-			});
-
-			return result.text || `Error pattern with ${errors.length} occurrences`;
+				system: 'You are a TypeScript/Svelte error analysis expert. Be concise and technical.', }, return result.text || `Error pattern with ${errors.length} occurrences`;
 		} catch () {
 			// Fallback description
-			const codes = [...new Set(errors.map(e => e.code))].slice(0, 3);
-			return `Error pattern: ${codes.join(', ')} (${errors.length} occurrences)`;
+			const codes = [...new Set(errors.map(e => e.code))].slice(0, 3, return `Error pattern: ${codes.join(', ')} (${errors.length} occurrences)`;
 		}
 	}
 
@@ -379,8 +342,7 @@ Provide a 1-2 sentence description of what this error pattern represents and com
 		let bestDistance = Infinity;
 
 		for (const [clusterId, cluster] of this.clusters) {
-			const distance = this.euclideanDistance(embedding, cluster.centroid);
-			if (distance < bestDistance) {
+			const distance = this.euclideanDistance(embedding, cluster.centroid, if (distance < bestDistance) {
 				bestDistance = distance;
 				bestCluster = clusterId;
 			}
@@ -402,13 +364,11 @@ Provide a 1-2 sentence description of what this error pattern represents and com
 	 */
 	clusterToPattern(cluster: ClusterResult): ErrorPattern {
 		return {
-			id: cluster.clusterId, cluster.description, embedding: cluster.centroid, errorType: this.inferErrorType(cluster.members),
-			fixStrategies: [],
+			id: cluster.clusterId, cluster.description, embedding: cluster.centroid, errorType: this.inferErrorType(cluster.members, fixStrategies: [],
 			clusterMetadata: {
 				clusterId: cluster.clusterId, cluster.centroid, size: cluster.members.length, cluster.commonFeatures
 			},
-			successRate: 0, occurrences: cluster.members.length, new Date(),
-			createdAt: new Date()
+			successRate: 0, occurrences: cluster.members.length, new Date(); createdAt: new Date()
 		};
 	}
 
@@ -419,8 +379,7 @@ Provide a 1-2 sentence description of what this error pattern represents and com
 		const typeCounts = new Map<string, number>();
 
 		errors.forEach(e => {
-			let type = 'unknown';
-			if (e.code.startsWith('TS')) type = 'type';
+			let type = 'unknown', if (e.code.startsWith('TS')) type = 'type';
 			else if (e.source === 'svelte-check') type = 'svelte';
 			else if (e.message.includes('syntax')) type = 'syntax';
 			else if (e.source === 'runtime') type = 'runtime';
@@ -451,8 +410,7 @@ Provide a 1-2 sentence description of what this error pattern represents and com
 	 * Get cluster by ID
 	 */
 	getCluster(clusterId: string): ClusterResult | undefined {
-		return this.clusters.get(clusterId);
-	}
+		return this.clusters.get(clusterId, }
 
 	/**
 	 * Get clustering statistics

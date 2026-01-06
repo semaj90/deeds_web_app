@@ -1,5 +1,4 @@
 <script lang="ts">
-	let className = $state<any>(undefined);
 
 /**
  * Svelte 5 + bits-ui Component Template

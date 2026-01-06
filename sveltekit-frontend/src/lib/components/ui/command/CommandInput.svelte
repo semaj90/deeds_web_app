@@ -1,5 +1,4 @@
 <script lang="ts">
-	let value = $state<any>(undefined);
 	let className = $state<any>(undefined);
 
 	import { getContext } from 'svelte';

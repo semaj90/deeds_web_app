@@ -1,5 +1,4 @@
 <script lang="ts">
-	let title = $state<any>(undefined);
 	let subtitle = $state<any>(undefined);
 
  let { title = "", subtitle = "" } = $props();

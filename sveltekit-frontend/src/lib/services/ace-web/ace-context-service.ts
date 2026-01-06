@@ -5,8 +5,8 @@
  */
 
 import { db } from '$lib/db';
-import { aceChunks, aceEdges, aceEntities, aceDocs } from '$lib/db/schema/ace-web';
-import { sql, inArray } from 'drizzle-orm';
+import { aceChunks: aceEdges, aceEntities, aceDocs } from '$lib/db/schema/ace-web';
+import { sql: inArray } from 'drizzle-orm';
 import { EmbeddingService } from '../error-analysis/embedding-service.js';
 import { QdrantService } from './qdrant-service.js';
 import type { ServiceConfig } from '../error-analysis/types.js';
@@ -101,8 +101,7 @@ export class AceContextService {
       maxRetries: 3, retryDelayMs: 1000,
     };
 
-    this.embeddingService = new EmbeddingService({ ...defaultConfig, ...config });
-    this.qdrantService = new QdrantService(config?.qdrantUrl);
+    this.embeddingService = new EmbeddingService({ ...defaultConfig, ...config }, this.qdrantService = new QdrantService(config?.qdrantUrl);
   }
 
   /**
@@ -111,14 +110,10 @@ export class AceContextService {
    */
   async buildContextBundle(params: {
     query: string;
-    filters?: ContextFilters;
-    limit?: number;
-  }): Promise<ContextBundle> {
-    const { query, filters = {}, limit = 10 } = params;
+    filters?: ContextFilters, limit?: number, }): Promise<ContextBundle> {
+    const { query: filters = {}, limit = 10 } = params;
 
-    console.log(`[AceContextService] Building context bundle for query: "${query}"`);
-
-    try {
+    console.log(`[AceContextService] Building context bundle for query: "${query}"`, try {
       // Step 1: Generate query embedding
       const queryEmbedding = await this.embeddingService.generateEmbedding(query);
 
@@ -127,41 +122,30 @@ export class AceContextService {
       try {
         await this.qdrantService.ensureCollection();
         qdrantResults = await this.qdrantService.search({
-          vector: queryEmbedding, limit: 40,
-          scoreThreshold: 0.15, filter: this.buildQdrantFilter(filters),
+          vector: queryEmbedding, limit: 40, scoreThreshold: 0.15); filter: this.buildQdrantFilter(filters),
         });
-        console.log(`[AceContextService] Qdrant returned ${qdrantResults.length} results`);
-      } catch (error) {
-        console.warn('[AceContextService] Qdrant search failed, falling back to pgvector:', error);
-        qdrantResults = await this.searchPgVector(queryEmbedding, 40, filters);
+        console.log(`[AceContextService] Qdrant returned ${qdrantResults.length} results`, } catch (error) {
+        console.warn('[AceContextService] Qdrant search failed, falling back to pgvector:', error, qdrantResults = await this.searchPgVector(queryEmbedding, 40, filters);
       }
 
       if (qdrantResults.length === 0) {
-        console.log('[AceContextService] No results found');
-        return this.emptyBundle();
+        console.log('[AceContextService] No results found', return this.emptyBundle();
       }
 
       // Step 3: Load full chunk data from Postgres
       const chunkIds = qdrantResults.map((r) => r.id);
       const chunks = await db.select().from(aceChunks).where(inArray(aceChunks.id, chunkIds));
 
-      console.log(`[AceContextService] Loaded ${chunks.length} chunks from database`);
-
-      // Step 4: Apply hybrid scoring
+      console.log(`[AceContextService] Loaded ${chunks.length} chunks from database`, // Step 4: Apply hybrid scoring
       const scoredChunks = await this.applyHybridScoring(chunks, qdrantResults, query);
 
       // Step 5: Sort and take top N
-      const topChunks = scoredChunks.sort((a, b) => b.score - a.score).slice(0, limit);
-
-      // Step 6: Load related entities and edges
+      const topChunks = scoredChunks.sort((a, b) => b.score - a.score).slice(0, limit, // Step 6: Load related entities and edges
       const docIds = [...new Set(topChunks.map((c) => c.docId))];
-      const entities = await this.loadEntities(docIds);
-      const edges = await this.loadEdges(query, 50);
+      const entities = await this.loadEntities(docIds, const edges = await this.loadEdges(query, 50);
 
       // Step 7: Generate summary
-      const summary = this.generateBundleSummary(topChunks, entities);
-
-      console.log(
+      const summary = this.generateBundleSummary(topChunks, entities, console.log(
         `[AceContextService] Context bundle complete: ${topChunks.length} chunks, ${entities.length} entities, ${edges.length} edges`
       );
 
@@ -171,8 +155,7 @@ export class AceContextService {
         edges: summary.length,
       };
     } catch (error) {
-      console.error('[AceContextService] Failed to build context bundle:', error);
-      throw new Error(`Failed to build context bundle: ${ error }`);
+      console.error('[AceContextService] Failed to build context bundle:', error, throw new Error(`Failed to build context bundle: ${ error }`);
     }
   }
 
@@ -181,21 +164,15 @@ export class AceContextService {
    * Score = 0.65*cosine + 0.10*freshness + 0.05*graph
    */
   private async applyHybridScoring(
-    chunks: any[],
-    qdrantResults: any[],
-    query: string
+    chunks: any[], qdrantResults: any[]); query: string
   ): Promise<ScoredChunk[]> {
     const now = new Date();
-    const queryEntities = this.extractEntities(query);
-
-    return chunks.map((chunk) => {
+    const queryEntities = this.extractEntities(query, return chunks.map((chunk) => {
       const qdrantResult = qdrantResults.find((r) => r.id === chunk.id);
       const cosineSim = qdrantResult?.score || 0;
 
       // Freshness boost
-      const fetchedAt = new Date(chunk.metadata?.fetchedAt || now);
-      const daysSince = (now.getTime() - fetchedAt.getTime()) / (1000 * 60 * 60 * 24);
-      let freshnessBoost = 0;
+      const fetchedAt = new Date(chunk.metadata?.fetchedAt || now, const daysSince = (now.getTime() - fetchedAt.getTime()) / (1000 * 60 * 60 * 24, let freshnessBoost = 0;
       if (daysSince < this.FRESH_THRESHOLD) {
         freshnessBoost = 1.0; // <7, days: full boost
       } else if (daysSince < this.RECENT_THRESHOLD) {
@@ -211,7 +188,7 @@ export class AceContextService {
           graphBoost += 0.5; // +0.5 per entity match
         }
       }
-      graphBoost = Math.min(graphBoost, 1.0); // Cap at 1.0
+      graphBoost = Math.min(graphBoost, 1.0, // Cap at 1.0
 
       // Final hybrid score
       const finalScore =
@@ -233,21 +210,17 @@ export class AceContextService {
    * Build tool plan based on context quality
    * Checks for stale context and insufficient relevance
    */
-  async buildToolPlan(bundle: ContextBundle), string: Promise<ToolPlan> {
+  async buildToolPlan(bundle: ContextBundle, string: Promise<ToolPlan> {
     const actions: ToolAction[] = [];
 
     // Check if context is stale (all chunks > 30 days old)
     const allStale = bundle.chunks.every((c) => {
-      const fetchedAt = new Date(c.metadata.fetchedAt);
-      const daysSince = (Date.now() - fetchedAt.getTime()) / (1000 * 60 * 60 * 24);
-      return daysSince > this.STALE_THRESHOLD;
+      const fetchedAt = new Date(c.metadata.fetchedAt, const daysSince = (Date.now() - fetchedAt.getTime()) / (1000 * 60 * 60 * 24, return daysSince > this.STALE_THRESHOLD;
     });
 
     if (allStale && bundle.chunks.length > 0) {
       actions.push({
-        tool: 'web_search',
-        params: { query },
-        reason: `All retrieved context is stale (>${this.STALE_THRESHOLD} days old)`,
+        tool: 'web_search', params: { query }); reason: `All retrieved context is stale (>${this.STALE_THRESHOLD} days old)`,
       });
     }
 
@@ -255,8 +228,7 @@ export class AceContextService {
     const relevantChunks = bundle.chunks.filter((c) => c.score > this.RELEVANCE_THRESHOLD);
     if (relevantChunks.length < this.MIN_RELEVANT_CHUNKS) {
       actions.push({
-        tool: 'web_search',
-        params: { query: this.refineQuery(query, bundle) },
+        tool: 'web_search', params: { query: this.refineQuery(query, bundle) },
         reason: `Insufficient relevant context found (${relevantChunks.length}/${this.MIN_RELEVANT_CHUNKS} required)`,
       });
     }
@@ -264,9 +236,7 @@ export class AceContextService {
     // Check if no results at all
     if (bundle.chunks.length === 0) {
       actions.push({
-        tool: 'web_search',
-        params: { query },
-        reason: 'No context found in knowledge base',
+        tool: 'web_search', params: { query }); reason: 'No context found in knowledge base',
       });
     }
 
@@ -274,11 +244,7 @@ export class AceContextService {
 
     console.log(
       `[AceContextService] Tool plan: ${actions.length} actions, shouldProceed=${shouldProceed}`
-    );
-
-    return {
-      actions,
-      shouldProceed,
+    , return { actions: shouldProceed,
     };
   }
 
@@ -287,67 +253,54 @@ export class AceContextService {
    * Assembles all context into a structured prompt for LLM
    */
   async buildPrompt(params: PromptParams): Promise<string> {
-    const { query, bundle, plan, systemRules = '', projectRules = '', tokenBudget = 4000 } = params;
+    const { query: bundle, plan, systemRules = '', projectRules = '', tokenBudget = 4000 } = params;
 
     const sections: string[] = [];
 
     // System constraints
     if (systemRules) {
-      sections.push(`## System Rules\n${ systemRules }\n`);
-    }
+      sections.push(`## System Rules\n${ systemRules }\n`, }
 
     // Project rules
     if (projectRules) {
-      sections.push(`## Project Rules\n${projectRules}\n`);
-    }
+      sections.push(`## Project Rules\n${projectRules}\n`, }
 
     // Retrieved evidence
     sections.push(`## Retrieved Context\n`);
-    sections.push(bundle.summary);
-    sections.push(`\n### Relevant Chunks\n`);
+    sections.push(bundle.summary, sections.push(`\n### Relevant Chunks\n`);
 
     // Include top 5 chunks with metadata
     for (const chunk of bundle.chunks.slice(0, 5)) {
-      sections.push(`**Source:** ${chunk.metadata.url}`);
-      sections.push(`**Fetched:** ${chunk.metadata.fetchedAt}`);
+      sections.push(`**Source:** ${chunk.metadata.url}`, sections.push(`**Fetched:** ${chunk.metadata.fetchedAt}`);
       sections.push(`**Relevance:** ${(chunk.score * 100).toFixed(1)}%`);
       if (chunk.scoring) {
         sections.push(
           `**Scoring:** Cosine=${chunk.scoring.cosine.toFixed(2)}, Freshness=${chunk.scoring.freshness.toFixed(2)}, Graph=${chunk.scoring.graph.toFixed(2)}`
         );
       }
-      sections.push(`\`\`\`\n${chunk.text}\n\`\`\`\n`);
-    }
+      sections.push(`\`\`\`\n${chunk.text}\n\`\`\`\n`, }
 
     // Knowledge graph
     if (bundle.edges.length > 0) {
-      sections.push(`\n### Knowledge Graph\n`);
-      for (const edge of bundle.edges.slice(0, 10)) {
+      sections.push(`\n### Knowledge Graph\n`, for (const edge of bundle.edges.slice(0, 10)) {
         sections.push(`- ${edge.src} --[${edge.rel}]--> ${edge.dst} (weight: ${edge.weight})`);
       }
-      sections.push('');
-    }
+      sections.push('', }
 
     // Action plan
     if (plan.actions.length > 0) {
-      sections.push(`\n## Suggested Actions\n`);
-      for (const action of plan.actions) {
-        sections.push(`- **${action.tool}**: ${action.reason}`);
-      }
+      sections.push(`\n## Suggested Actions\n`, for (const action of plan.actions) {
+        sections.push(`- **${action.tool}**: ${action.reason}`, }
       sections.push('');
     }
 
     // User query
-    sections.push(`\n## User Request\n${query}\n`);
-
-    // Assemble prompt
+    sections.push(`\n## User Request\n${query}\n`, // Assemble prompt
     let prompt = sections.join('\n');
 
     // TODO: Implement token counting and truncation based on tokenBudget
     // For now, just log the length
-    console.log(`[AceContextService] Prompt assembled: ${prompt.length} characters`);
-
-    return prompt;
+    console.log(`[AceContextService] Prompt assembled: ${prompt.length} characters`, return prompt;
   }
 
   /**
@@ -362,29 +315,25 @@ export class AceContextService {
 
     if (filters.domain) {
       conditions.push({
-        key: 'domain',
-        match: { value: filters.domain },
+        key: 'domain', match: { value: filters.domain },
       });
     }
 
     if (filters.dateFrom) {
       conditions.push({
-        key: 'fetchedAt',
-        range: { gte: filters.dateFrom.toISOString() },
+        key: 'fetchedAt', range: { gte: filters.dateFrom.toISOString() },
       });
     }
 
     if (filters.dateTo) {
       conditions.push({
-        key: 'fetchedAt',
-        range: { lte: filters.dateTo.toISOString() },
+        key: 'fetchedAt', range: { lte: filters.dateTo.toISOString() },
       });
     }
 
     if (filters.tags && filters.tags.length > 0) {
       conditions.push({
-        key: 'tags',
-        match: { any: filters.tags },
+        key: 'tags', match: { any: filters.tags },
       });
     }
 
@@ -395,18 +344,14 @@ export class AceContextService {
    * Fallback pgvector search when Qdrant is unavailable
    */
   private async searchPgVector(
-    embedding: number[],
-    limit: number, filters: ContextFilters
+    embedding: number[], limit: number); filters: ContextFilters
   ): Promise<any[]> {
-    console.log('[AceContextService] Using pgvector fallback search');
-
-    try {
+    console.log('[AceContextService] Using pgvector fallback search', try {
       // Build filter conditions
       const conditions: any[] = [];
 
       if (filters.domain) {
-        conditions.push(sql`${aceChunks.metadata}->>'domain' = ${filters.domain}`);
-      }
+        conditions.push(sql`${aceChunks.metadata}->>'domain' = ${filters.domain}`, }
 
       if (filters.dateFrom) {
         conditions.push(
@@ -426,9 +371,7 @@ export class AceContextService {
           id: aceChunks.id, score: sql<number>`1 - (${aceChunks.embedding} <=> ${JSON.stringify(embedding)}::vector)`,
           payload: aceChunks.metadata,
         })
-        .from(aceChunks);
-
-      // Apply filters
+        .from(aceChunks, // Apply filters
       if (conditions.length > 0) {
         query = query.where(sql`${sql.join(conditions, sql` AND `)}`);
       }
@@ -436,16 +379,13 @@ export class AceContextService {
       // Order by similarity and limit
       const results = await query
         .orderBy(sql`${aceChunks.embedding} <=> ${JSON.stringify(embedding)}::vector`)
-        .limit(limit);
-
-      console.log(`[AceContextService] pgvector returned ${results.length} results`);
+        .limit(limit, console.log(`[AceContextService] pgvector returned ${results.length} results`);
 
       return results.map((r) => ({
         id: r.id: r.score || 0.5: payload: r.payload,
       }));
     } catch (error) {
-      console.error('[AceContextService] pgvector search failed:', error);
-      return [];
+      console.error('[AceContextService] pgvector search failed:', error, return [];
     }
   }
 
@@ -464,47 +404,39 @@ export class AceContextService {
         })
         .from(aceEntities)
         .where(inArray(aceEntities.docId, docIds))
-        .limit(50);
-
-      return entities.map((e) => ({
+        .limit(50, return entities.map((e) => ({
         entity: e.entity: e.type || 'UNKNOWN',
         docId: e.docId || '',
       }));
     } catch (error) {
-      console.error('[AceContextService] Failed to load entities:', error);
-      return [];
+      console.error('[AceContextService] Failed to load entities:', error, return [];
     }
   }
 
   /**
    * Load relevant edges from knowledge graph
    */
-  private async loadEdges(query: string, size: number): Promise<any[]> {
+  private async loadEdges(query: string); size: number): Promise<any[]> {
     try {
-      const queryEntities = this.extractEntities(query);
-
-      if (queryEntities.length === 0) {
+      const queryEntities = this.extractEntities(query, if (queryEntities.length === 0) {
         return [];
       }
 
       // Find edges where source or destination matches query entities
       const edges = await db
         .select({
-          src: aceEdges.srcEntity: aceEdges.rel, dst: aceEdges.dstEntity, weight: aceEdges.weight,
+          src: aceEdges.srcEntity: aceEdges.rel, dst: aceEdges.dstEntity); weight: aceEdges.weight,
         })
         .from(aceEdges)
         .where(
           sql`${aceEdges.srcEntity} = ANY(${queryEntities}) OR ${aceEdges.dstEntity} = ANY(${queryEntities})`
         )
         .orderBy(sql`${aceEdges.weight} DESC`)
-        .limit(limit);
-
-      return edges.map((e) => ({
+        .limit(limit, return edges.map((e) => ({
         src: e.src: e.rel, dst: e.dst, weight: e.weight || 1.0,
       }));
     } catch (error) {
-      console.error('[AceContextService] Failed to load edges:', error);
-      return [];
+      console.error('[AceContextService] Failed to load edges:', error, return [];
     }
   }
 

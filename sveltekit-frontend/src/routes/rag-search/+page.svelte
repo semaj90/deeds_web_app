@@ -25,7 +25,9 @@ import {
   type AnswerWithCitations as AnswerData,
   type ApprovedContext,
   type Citation,
-  type RetrievedChunk
+  type RetrievedChunk,
+  type SourceValidation,
+  type ValidationStatus
 } from '$lib/types/rag-source-validation';
 
 // State
@@ -102,9 +104,9 @@ async function handleValidate(approvedIds: string[]) {
   error = null;
 
   try {
-    const validations = chunks.map(chunk => ({
+    const validations: SourceValidation[] = chunks.map(chunk => ({
       chunk_id: chunk.chunk_id,
-      status: approvedIds.includes(chunk.chunk_id) ? 'approved' : 'rejected' as const,
+      status: (approvedIds.includes(chunk.chunk_id) ? 'approved' : 'rejected') as ValidationStatus,
     }));
 
     context = await validateSources({

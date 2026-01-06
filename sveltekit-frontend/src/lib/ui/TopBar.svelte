@@ -1,5 +1,4 @@
 <script>
-	let title = $state<any>(undefined);
 
 let { title = 'YORHA COMMAND CENTER' } = $props();
 

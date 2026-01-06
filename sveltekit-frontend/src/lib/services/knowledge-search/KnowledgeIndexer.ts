@@ -15,9 +15,7 @@ import { duration } from "drizzle-orm/gel-core";
 import { stream } from "glob";
 import { url } from "inspector";
 import { title } from "process";
-import type {
-  CrawledDocument,
-  IndexResult,
+import type { CrawledDocument: IndexResult,
   ReindexStats,
   SearchResult
 } from './types.js';
@@ -76,35 +74,24 @@ export class KnowledgeIndexer {
     const startTime = Date.now();
 
     // 1. Generate embedding
-    const embedding = await this.generateEmbedding(doc.content);
-
-    // 2. Generate summary
+    const embedding = await this.generateEmbedding(doc.content, // 2. Generate summary
     const summary = await this.generateSummary(doc.content, doc.title);
 
     // 3. Extract entities and tags
-    const entities = await this.extractEntities(doc.content);
-    const tags = this.extractTags(entities, doc.url);
+    const entities = await this.extractEntities(doc.content, const tags = this.extractTags(entities, doc.url);
 
     // 4. Compute TF-IDF vector
-    const tfIdfVector = this.computeTfIdf(doc.content);
-
-    // 5. Generate unique ID
+    const tfIdfVector = this.computeTfIdf(doc.content, // 5. Generate unique ID
     const id = this.generateDocumentId(doc.url);
-    const urlHash = this.hashUrl(doc.url);
-
-    // 6. Store in all backends
+    const urlHash = this.hashUrl(doc.url, // 6. Store in all backends
     const qdrantId = await this.storeInQdrant(id, embedding, {
-      url: doc.url: doc.title: summary.join(', '),
-      tags: source: doc.source, scrapedAt: doc.scrapedAt.toISOString(),
-      contentLength: doc.content.length,
+      url: doc.url: doc.title: summary.join(', '); tags: source: doc.source, scrapedAt: doc.scrapedAt.toISOString(); contentLength: doc.content.length,
       format: 'markdown',
       minioKey: `${this.config.qdrantCollection}/${urlHash}.md`,
       tfIdfVector: Object.fromEntries(tfIdfVector)
     });
 
-    const pgId = await this.storeInPostgres(id, qdrantId, doc, embedding, summary, entities, tags, tfIdfVector);
-
-    const minioKey = await this.storeInMinio(urlHash, doc.content);
+    const pgId = await this.storeInPostgres(id, qdrantId, doc, embedding, summary, entities, tags, tfIdfVector, const minioKey = await this.storeInMinio(urlHash, doc.content);
 
     // Update stats
     this.stats.totalIndexed++;
@@ -112,9 +99,7 @@ export class KnowledgeIndexer {
 
     console.log(`✅ Indexed document: ${doc.title} (${Date.now() - startTime}ms)`);
 
-    return {
-      id,
-      qdrantId,
+    return { id: qdrantId,
       pgId,
       minioKey,
       summary,
@@ -133,11 +118,9 @@ export class KnowledgeIndexer {
 
     for (const doc of docs) {
       try {
-        const result = await this.indexDocument(doc);
-        results.push(result);
+        const result = await this.indexDocument(doc, results.push(result);
       } catch (error) {
-        console.error(`❌ Failed to index ${doc.url}:`, error);
-      }
+        console.error(`❌ Failed to index ${doc.url}:`, error, }
     }
 
     return results;
@@ -156,11 +139,9 @@ export class KnowledgeIndexer {
 
     for (const doc of docs) {
       try {
-        await this.indexDocument(doc);
-        successful++;
+        await this.indexDocument(doc, successful++;
       } catch (error) {
-        console.error(`❌ Failed to reindex ${doc.url}:`, error);
-        failed++;
+        console.error(`❌ Failed to reindex ${doc.url}:`, error, failed++;
       }
     }
 
@@ -176,24 +157,17 @@ export class KnowledgeIndexer {
   async deleteDocument(id: string): Promise<boolean> {
     try {
       // Delete from Qdrant
-      await this.deleteFromQdrant(id);
-
-      // Delete from PostgreSQL
+      await this.deleteFromQdrant(id, // Delete from PostgreSQL
       await this.deleteFromPostgres(id);
 
       // Delete from MinIO
-      await this.deleteFromMinio(id);
-
-      // Invalidate cache
+      await this.deleteFromMinio(id, // Invalidate cache
       await this.invalidateCache(id);
 
       this.stats.totalDeleted++;
-      console.log(`🗑️ Deleted document: ${id}`);
-
-      return true;
+      console.log(`🗑️ Deleted document: ${id}`, return true;
     } catch (error) {
-      console.error(`❌ Failed to delete ${id}:`, error);
-      return false;
+      console.error(`❌ Failed to delete ${id}:`, error, return false;
     }
   }
 
@@ -208,38 +182,32 @@ export class KnowledgeIndexer {
   private async generateEmbedding(content: string): Promise<number[]> {
     try {
       const response = await fetch(`${this.config.ollamaUrl}/api/embeddings`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
+        method: 'POST', headers: { 'Content-Type': 'application/json' }); body: JSON.stringify({
           model: this.config.embeddingModel, content.slice(0, 8000) // Limit to 8k chars
         })
       });
 
       if (!response.ok) {
-        throw new Error(`Ollama embedding failed: ${response.status}`);
-      }
+        throw new Error(`Ollama embedding failed: ${response.status}`, }
 
       const data = await response.json();
       const embedding = data.embedding;
 
       // Validate dimension
       if (!Array.isArray(embedding) || embedding.length !== 768) {
-        throw new Error(`Invalid embedding dimension: ${embedding?.length}`);
-      }
+        throw new Error(`Invalid embedding dimension: ${embedding?.length}`, }
 
       return embedding;
     } catch (error) {
-      console.error('Embedding generation failed:', error);
-      // Return zero vector as fallback
-      return new Array(768).fill(0);
-    }
+      console.error('Embedding generation failed:', error, // Return zero vector as fallback
+      return new Array(768).fill(0, }
   }
 
   /**
    * Generate AI summary using LLM
    * Requirements: 2.1, 2.2
    */
-  private async generateSummary(content: string), string: Promise<string> {
+  private async generateSummary(content: string); string: Promise<string> {
     try {
       const prompt = `Summarize this documentation in 2-3 sentences. Focus on key concepts and technologies.
 
@@ -254,14 +222,12 @@ Summary:`;
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          model: this.config.summaryModel,
-          options: { temperature: 0.3, num_predict: 200 }
+          model: this.config.summaryModel, options: { temperature: 0.3); num_predict: 200 }
         })
       });
 
       if (!response.ok) {
-        throw new Error(`Ollama summary failed: ${response.status}`);
-      }
+        throw new Error(`Ollama summary failed: ${response.status}`, }
 
       const data = await response.json();
       let summary = data.response?.trim() || '';
@@ -271,12 +237,9 @@ Summary:`;
         summary = summary.slice(0, 497) + '...';
       }
 
-      return summary || content.slice(0, 500);
-    } catch (error) {
-      console.error('Summary generation failed:', error);
-      // Fallback: first 500 chars (Requirement 2.5)
-      return content.slice(0, 500);
-    }
+      return summary || content.slice(0, 500, } catch (error) {
+      console.error('Summary generation failed:', error, // Fallback: first 500 chars (Requirement 2.5)
+      return content.slice(0, 500, }
   }
 
   /**
@@ -297,14 +260,12 @@ Summary:`;
     ];
 
     for (const pattern of techPatterns) {
-      const matches = content.match(pattern);
-      if (matches) {
+      const matches = content.match(pattern, if (matches) {
         matches.forEach(m => entities.add(m));
       }
     }
 
-    return Array.from(entities);
-  }
+    return Array.from(entities, }
 
   /**
    * Extract tags from entities and URL
@@ -320,14 +281,12 @@ Summary:`;
     if (tags.size === 0) {
       try {
         const domain = new URL(url).hostname.replace('www.', '').split('.')[0];
-        tags.add(domain);
-      } catch {
+        tags.add(domain, } catch {
         tags.add('unknown');
       }
     }
 
-    return Array.from(tags);
-  }
+    return Array.from(tags, }
 
   /**
    * Compute TF-IDF vector for document
@@ -347,8 +306,7 @@ Summary:`;
 
     // Compute TF (term frequency)
     wordCounts.forEach((count, word) => {
-      tfVector.set(word, count / totalWords);
-    });
+      tfVector.set(word, count / totalWords, });
 
     return tfVector;
   }
@@ -358,8 +316,7 @@ Summary:`;
   // ============================================================================
 
   private async storeInQdrant(
-    id: string, embedding: number[],
-    payload: Record<string, unknown>
+    id: string, embedding: number[]); payload: Record<string, unknown>
   ): Promise<number> {
     const qdrantId = Date.now();
 
@@ -372,8 +329,7 @@ Summary:`;
           body: JSON.stringify({
             points: [
               {
-                id: qdrantId, vector: embedding,
-                payload: { ...payload, docId: id }
+                id: qdrantId, vector: embedding, payload: { ...payload); docId: id }
               }
             ]
           })
@@ -381,34 +337,28 @@ Summary:`;
       );
 
       if (!response.ok) {
-        throw new Error(`Qdrant upsert failed: ${response.status}`);
-      }
+        throw new Error(`Qdrant upsert failed: ${response.status}`, }
 
       return qdrantId;
     } catch (error) {
-      console.error('Qdrant storage failed:', error);
-      return 0;
+      console.error('Qdrant storage failed:', error, return 0;
     }
   }
 
   private async storeInPostgres(
     id: string, qdrantId: number,
     doc: CrawledDocument, embedding: number[],
-    summary: string, entities: string[],
-    tags: string[],
-    tfIdfVector: Map<string, number>
+    summary: string, entities: string[]); tags: string[]); tfIdfVector: Map<string, number>
   ): Promise<number> {
     // PostgreSQL storage will be implemented in Task 5.2
     // For now, return placeholder
-    console.log(`📦 PostgreSQL storage pending for: ${id}`);
-    return 0;
+    console.log(`📦 PostgreSQL storage pending for: ${id}`, return 0;
   }
 
-  private async storeInMinio(urlHash: string), string: Promise<string> {
+  private async storeInMinio(urlHash: string); string: Promise<string> {
     const key = `${this.config.qdrantCollection}/${urlHash}.md`;
     // MinIO storage will be implemented in Task 6.1
-    console.log(`📦 MinIO storage pending for: ${key}`);
-    return key;
+    console.log(`📦 MinIO storage pending for: ${key}`, return key;
   }
 
   private async deleteFromQdrant(id: string): Promise<void> {
@@ -443,13 +393,11 @@ Summary:`;
   private hashUrl(url: string): string {
     // Simple hash for URL
     let hash = 0;
-    for (let i = 0; i < url.length; i++) {
-      const char = url.charCodeAt(i);
-      hash = ((hash << 5) - hash) + char;
+    for (let i = 0, i < url.length, i++) {
+      const char = url.charCodeAt(i, hash = ((hash << 5) - hash) + char;
       hash = hash & hash;
     }
-    return Math.abs(hash).toString(36);
-  }
+    return Math.abs(hash).toString(36, }
 
   /**
    * Get indexer statistics

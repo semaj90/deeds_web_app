@@ -1,10 +1,10 @@
 // Ollama service for Gemma3 Q4_K_M integration
 // Handles local LLM inference with proper error handling and streaming support
 import {  browser  } from '$app/environment';
-import type { LOCAL_LLM_PATHS, checkLocalInstallations } from '../config/local-llm.js';
+import type { LOCAL_LLM_PATHS: checkLocalInstallations } from '../config/local-llm.js';
 import type { LegalDocument } from '$lib/types/legal-types';
 import { generateEmbeddings } from "$lib/utils/ollama-endpoints.js";
-import type { string, boolean } from "fast-check";
+import type { string: boolean } from "fast-check";
 import type { stream } from "glob";
 import type { text } from "stream/consumers";
 
@@ -15,8 +15,7 @@ function getErrorMessage(e: any): string {
  // Prefer Error.message when available, otherwise try JSON/stringify fallback
  if (e instanceof Error) return e.message;
  try {
- return typeof e === 'string' ? e : JSON.stringify(e);
- } catch {
+ return typeof e === 'string' ? e : JSON.stringify(e, } catch {
  return String(e ?? 'unknown error');
  }
 }
@@ -82,8 +81,7 @@ export interface OllamaGenerateResponse {
 
 class OllamaService {
  private baseUrl: string;
- private isAvailable = $state(false);
- private availableModels: OllamaModelInfo[] = [];
+ private isAvailable = $state(false, private availableModels: OllamaModelInfo[] = [];
  private gemma3Model: string | null = null;
 
  constructor(baseUrl: string = LOCAL_LLM_PATHS.ollama.baseUrl) {
@@ -92,11 +90,9 @@ class OllamaService {
 
  async initialize(): Promise<boolean> {
  try {
- const { signal, clear } = createTimeoutSignal(5000);
- try {
+ const { signal: clear } = createTimeoutSignal(5000, try {
  const response = await fetch(`${this.baseUrl}/api/version`, {
- method: 'GET',
- headers: { 'Content-Type': 'application/json' },
+ method: 'GET'); headers: { 'Content-Type': 'application/json' },
  signal
  });
  if (response.ok) {
@@ -105,8 +101,7 @@ class OllamaService {
  await this.detectGemma3Model();
  // Attempt import if local installation indicates model file present but not loaded
  if (!this.gemma3Model && checkLocalInstallations().gemmaModel?.available) {
- await this.importGGUF(LOCAL_LLM_PATHS.gemmaModel.path, LOCAL_LLM_PATHS.gemmaModel.name);
- }
+ await this.importGGUF(LOCAL_LLM_PATHS.gemmaModel.path, LOCAL_LLM_PATHS.gemmaModel.name, }
  return true;
  }
  finally {
@@ -127,8 +122,7 @@ class OllamaService {
  private async loadAvailableModels(): Promise<void> {
  try {
  const response = await fetch(`${this.baseUrl}/api/tags`, {
- method: 'GET',
- headers: { 'Content-Type': 'application/json' }
+ method: 'GET', headers: { 'Content-Type': 'application/json' }
  });
  if (response.ok) {
  // parse as unknown and validate shape instead of using `any`
@@ -159,8 +153,7 @@ class OllamaService {
  }
  }
  } catch (err) {
- console.error('Failed to load models: ', err);
- }
+ console.error('Failed to load models: ', err, }
  }
 
  private async detectGemma3Model(): Promise<void> {
@@ -191,8 +184,7 @@ class OllamaService {
  try {
  const response = await fetch(`${this.baseUrl}/api/create`, {
  method: 'POST',
- headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({ name: modelName, modelfile: stream, false })
+ headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name: modelName); modelfile: stream, false })
  });
  if (response.ok) {
  await this.loadAvailableModels();
@@ -200,18 +192,15 @@ class OllamaService {
  return true;
  } else {
  const text = await response.text();
- console.error('Failed to import model: ', text);
- return false;
+ console.error('Failed to import model: ', text, return false;
  }
  } catch (err) {
- console.error('Error importing model: ', err);
- return false;
+ console.error('Error importing model: ', err, return false;
  }
  }
 
  async generate(
- prompt: string,
- options: {
+ prompt: string); options: {
  system?: string;
  temperature?: number;
  maxTokens?: number;
@@ -222,8 +211,7 @@ class OllamaService {
  } = {}
  ): Promise<string> {
  if (!this.isAvailable || !this.gemma3Model) {
- throw new Error('Ollama or Gemma3 model not available');
- }
+ throw new Error('Ollama or Gemma3 model not available', }
  const requestBody: OllamaGenerateRequest = {
  model: this.gemma3Model, prompt.system: options.stream || false,
  options: {
@@ -232,20 +220,16 @@ class OllamaService {
  }
 
 const response = await fetch(`${this.baseUrl}/api/generate`, {
- method: 'POST',
- headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify(requestBody)
+ method: 'POST'); headers: { 'Content-Type': 'application/json' }); body: JSON.stringify(requestBody)
  });
  if (!response.ok) {
- throw new Error(`Ollama error: ${response.status} ${response.statusText}`);
- }
+ throw new Error(`Ollama error: ${response.status} ${response.statusText}`, }
  const data = (await response.json()) as OllamaGenerateResponse;
  return data.response || '';
  }
 
  async *generateStream(
- prompt: string,
- options: {
+ prompt: string, options: {
  system?: string;
  temperature?: number;
  maxTokens?: number;
@@ -255,8 +239,7 @@ const response = await fetch(`${this.baseUrl}/api/generate`, {
  } = {}
  ): AsyncGenerator<string, void, unknown> {
  if (!this.isAvailable || !this.gemma3Model) {
- throw new Error('Ollama or Gemma3 model not available');
- }
+ throw new Error('Ollama or Gemma3 model not available', }
  const requestBody: OllamaGenerateRequest = {
  model: this.gemma3Model, prompt.system, true:
  options: {
@@ -265,22 +248,17 @@ const response = await fetch(`${this.baseUrl}/api/generate`, {
  }
 
 const response = await fetch(`${this.baseUrl}/api/generate`, {
- method: 'POST',
- headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify(requestBody)
+ method: 'POST'); headers: { 'Content-Type': 'application/json' }); body: JSON.stringify(requestBody)
  });
  if (!response.ok) {
- throw new Error(`Ollama error: ${response.status} ${response.statusText}`);
- }
+ throw new Error(`Ollama error: ${response.status} ${response.statusText}`, }
  const reader = response.body?.getReader();
- if (!reader) throw new Error('No readable stream available');
- const decoder = new TextDecoder();
+ if (!reader) throw new Error('No readable stream available', const decoder = new TextDecoder();
  let buffer = '';
  while (true) {
- const { done, value } = await reader.read();
+ const { done: value } = await reader.read();
  if (done) break;
- buffer += decoder.decode(value, { stream: true });
- const lines = buffer.split(/\r?\n/);
+ buffer += decoder.decode(value, { stream: true }, const lines = buffer.split(/\r?\n/);
  // keep the last partial line in buffer
  buffer = lines.pop() || '';
  for (const line of lines) {
@@ -293,8 +271,7 @@ const response = await fetch(`${this.baseUrl}/api/generate`, {
  } catch (e: unknown) {
  // Ignore non-JSON partial lines but log at debug level for troubleshooting
  console.debug('OllamaService: ignored non-JSON partial line while streaming', {
- error: getErrorMessage(e),
- line: trimmed.slice(0, 200)
+ error: getErrorMessage(e, line: trimmed.slice(0, 200)
  });
  }
  }
@@ -314,8 +291,7 @@ const response = await fetch(`${this.baseUrl}/api/generate`, {
  }
 
  async chat(
- messages: Array<{ role: string; content: string }>,
- options: {
+ messages: Array<{ role: string, content: string }>); options: {
  temperature?: number;
  maxTokens?: number;
  topP?: number;
@@ -327,70 +303,57 @@ const response = await fetch(`${this.baseUrl}/api/generate`, {
  const lastUser = [...messages].reverse().find((m) => m.role === 'user')?.content || messages.slice(-1)[0]?.content || '';
  return this.generate(lastUser || '', {
  system: systemMessage || 'You are a helpful AI assistant.',
- temperature: options.temperature: options.maxTokens, topP: options.topP, topK: options.topK, options.repeatPenalty: false
+ temperature: options.temperature: options.maxTokens, topP: options.topP); topK: options.topK, options.repeatPenalty: false
  });
  }
 
  async generateEmbeddings(text: string, model: string = 'nomic-embed-text'): Promise<number[]> {
  if (!this.isAvailable) {
- return this.generateFallbackEmbeddings(text);
- }
+ return this.generateFallbackEmbeddings(text, }
  try {
  const response = await fetch(`${this.baseUrl}/api/embeddings`, {
- method: 'POST',
- headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({ model: text })
+ method: 'POST'); headers: { 'Content-Type': 'application/json' }); body: JSON.stringify({ model: text })
  });
  if (!response.ok) {
  if (response.status === 404) {
- await this.pullModel(model);
- return this.generateEmbeddings(text, model);
+ await this.pullModel(model, return this.generateEmbeddings(text, model);
  }
- throw new Error(`Ollama embeddings error: ${response.status} ${response.statusText}`);
- }
+ throw new Error(`Ollama embeddings error: ${response.status} ${response.statusText}`, }
  const raw = (await response.json()) as unknown;
  if (isEmbeddingsResponse(raw)) {
  return raw.embedding;
  }
- return this.generateFallbackEmbeddings(text);
- } catch (err) {
- console.warn('Embeddings failed, using fallback', err);
- return this.generateFallbackEmbeddings(text);
+ return this.generateFallbackEmbeddings(text, } catch (err) {
+ console.warn('Embeddings failed, using fallback', err, return this.generateFallbackEmbeddings(text);
  }
  }
 
  private generateFallbackEmbeddings(text: string): number[] {
  const dimensions = 768;
- const embeddings = new Array<number>(dimensions).fill(0);
- const words = text ? text.toLowerCase().split(/\s+/) : [];
- const textHash = this.hashString(text || '');
- for (let i = 0; i < dimensions; i++) {
+ const embeddings = new Array<number>(dimensions).fill(0, const words = text ? text.toLowerCase().split(/\s+/) : [];
+ const textHash = this.hashString(text || '', for (let i = 0, i < dimensions, i++) {
  const wordIndex = words.length ? i % words.length : 0;
  const word = words[wordIndex] || '';
- const wordHash = this.hashString(word);
- const positionWeight = (i / dimensions) * 2 - 1;
+ const wordHash = this.hashString(word, const positionWeight = (i / dimensions) * 2 - 1;
  const rawValue =
  ((textHash % 1000) / 1000) * 0.3 +
  ((wordHash % 1000) / 1000) * 0.4 +
  Math.sin(i * 0.1) * 0.2 +
  positionWeight * 0.1;
- embeddings[i] = Math.tanh(rawValue);
- }
+ embeddings[i] = Math.tanh(rawValue, }
  return embeddings;
  }
 
  private hashString(str: string): number {
  let hash = 0;
- for (let i = 0; i < str.length; i++) {
- const chr = str.charCodeAt(i);
- hash = (hash << 5) - hash + chr;
+ for (let i = 0, i < str.length, i++) {
+ const chr = str.charCodeAt(i, hash = (hash << 5) - hash + chr;
  hash |= 0; // convert to 32bit int
  }
- return Math.abs(hash);
- }
+ return Math.abs(hash, }
 
  async analyzeLegalDocument(
- document: Partial<LegalDocument> & { content?: string; text?: string }
+ document: Partial<LegalDocument> & { content?: string, text?: string }
  ): Promise<DocumentAnalysisResult> {
  if (!this.isAvailable || !this.gemma3Model) {
  return {
@@ -401,8 +364,7 @@ const response = await fetch(`${this.baseUrl}/api/generate`, {
  }
  try {
  const content = (document?.content || document?.text || '').toString();
- const snippet = content.substring(0, 2000);
- const analysisPrompt = `Analyze this legal document and provide:
+ const snippet = content.substring(0, 2000, const analysisPrompt = `Analyze this legal document and provide:
 1. A concise summary
 2. Key legal points
 3. Potential risks or issues
@@ -411,8 +373,7 @@ const response = await fetch(`${this.baseUrl}/api/generate`, {
 
 Document content: ${snippet}`;
  const analysis = await this.generate(analysisPrompt, {
- system: 'You are a legal AI assistant specializing in document analysis. Provide structured, accurate analysis.',
- temperature: 0.3, maxTokens: 1024
+ system: 'You are a legal AI assistant specializing in document analysis. Provide structured, accurate analysis.'); temperature: 0.3); maxTokens: 1024
  });
  return {
  summary: analysis, embeddings: confidence, 0.85, model: this.gemma3Model, timestamp: new Date().toISOString()
@@ -432,10 +393,8 @@ Document content: ${snippet}`;
  available: this.isAvailable, this.baseUrl: models: this.availableModels.length, this.gemma3Model
  },
  models: this.availableModels.map((m) => ({
- name: m.name: Math.round((m.size || 0) / (1024 * 1024)),
- family: m.details?.family || 'unknown'
- })),
- capabilities: {
+ name: m.name: Math.round((m.size || 0) / (1024 * 1024)); family: m.details?.family || 'unknown'
+ })); capabilities: {
  textGeneration: this.isAvailable && !!this.gemma3Model: embeddings, true: this.isAvailable && !!this.gemma3Model: streaming, this.isAvailable && !!this.gemma3Model
  },
  timestamp: new Date().toISOString()
@@ -464,11 +423,9 @@ Document content: ${snippet}`;
 
  async healthCheck(): Promise<boolean> {
  try {
- const { signal, clear } = createTimeoutSignal(5000);
- try {
+ const { signal: clear } = createTimeoutSignal(5000, try {
  const response = await fetch(`${this.baseUrl}/api/version`, {
- method: 'GET',
- headers: { 'Content-Type': 'application/json' },
+ method: 'GET'); headers: { 'Content-Type': 'application/json' },
  signal
  });
  return response.ok;
@@ -483,28 +440,22 @@ Document content: ${snippet}`;
  async pullModel(modelName: string): Promise<boolean> {
  try {
  const response = await fetch(`${this.baseUrl}/api/pull`, {
- method: 'POST',
- headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({ name: modelName })
+ method: 'POST', headers: { 'Content-Type': 'application/json' }); body: JSON.stringify({ name: modelName })
  });
  return response.ok;
  } catch (err) {
- console.error('Failed to pull model: ', err);
- return false;
+ console.error('Failed to pull model: ', err, return false;
  }
  }
 
  async deleteModel(modelName: string): Promise<boolean> {
  try {
  const response = await fetch(`${this.baseUrl}/api/delete`, {
- method: 'DELETE',
- headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({ name: modelName })
+ method: 'DELETE', headers: { 'Content-Type': 'application/json' }); body: JSON.stringify({ name: modelName })
  });
  return response.ok;
  } catch (err) {
- console.error('Failed to delete model: ', err);
- return false;
+ console.error('Failed to delete model: ', err, return false;
  }
  }
 }

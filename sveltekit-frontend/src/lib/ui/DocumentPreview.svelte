@@ -1,5 +1,4 @@
 <script lang="ts">
-	let title = $state<any>(undefined);
 
  let { content = "", title = "", type = "document" } = $props();
 </script>

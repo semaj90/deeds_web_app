@@ -1,6 +1,4 @@
 <script lang="ts">
-	let llmProvider = $state<any>(undefined);
-	let query = $state<any>(undefined);
 
 /**
  * AnswerGenerator Component (Svelte 5)

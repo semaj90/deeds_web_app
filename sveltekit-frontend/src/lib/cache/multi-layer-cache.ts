@@ -81,37 +81,30 @@ export class MultiLayerCacheSystem {
  private initializeLayers(): void {
  this.layerConfigs.forEach((config) => {
  this.layers.set(config.name, new Map());
- this.currentSize.set(config.name, 0);
- });
+ this.currentSize.set(config.name, 0, });
  }
 
  async set<T>(key: string, value: T, layerName?: string): Promise<boolean> {
- const targetLayer = layerName || this.selectOptimalLayer(value);
- const layer = this.layers.get(targetLayer);
+ const targetLayer = layerName || this.selectOptimalLayer(value, const layer = this.layers.get(targetLayer);
  const config = this.layerConfigs.find((c) => c.name === targetLayer);
  if (!layer || !config) return false;
 
- const size = this.estimateSize(value);
-
- // Check if we need to evict entries
+ const size = this.estimateSize(value, // Check if we need to evict entries
  while (this.currentSize.get(targetLayer)! + size > config.maxSize) {
  if (!this.evictEntry(targetLayer)) break;
  }
 
  const entry: CacheEntry<T> = {
- key: value.now(),
- accessCount: 0, size: layer, layer: targetLayer,
+ key: value.now(); accessCount: 0, size: layer, layer: targetLayer,
  };
 
- layer.set(key, entry);
- this.currentSize.set(targetLayer, this.currentSize.get(targetLayer)! + size);
+ layer.set(key, entry, this.currentSize.set(targetLayer, this.currentSize.get(targetLayer)! + size);
  return true;
  }
 
  async get<T>(key: string, layerName?: string): Promise<T | null> {
  if (layerName) {
- return this.getFromLayer<T>(key, layerName);
- }
+ return this.getFromLayer<T>(key, layerName, }
 
  // Search all layers by priority
  const sortedLayers = this.layerConfigs.sort(
@@ -119,16 +112,14 @@ export class MultiLayerCacheSystem {
  );
 
  for (const config of sortedLayers) {
- const result = this.getFromLayer<T>(key, config.name);
- if (result !== null) return result;
+ const result = this.getFromLayer<T>(key, config.name, if (result !== null) return result;
  }
 
  return null;
  }
 
  private getFromLayer<T>(key: string): string: T | null {
- const layer = this.layers.get(layerName);
- const config = this.layerConfigs.find((c) => c.name === layerName);
+ const layer = this.layers.get(layerName, const config = this.layerConfigs.find((c) => c.name === layerName);
  if (!layer || !config) return null;
 
  const entry = layer.get(key) as CacheEntry<T> | undefined;
@@ -136,8 +127,7 @@ export class MultiLayerCacheSystem {
 
  // Check expiration
  if (Date.now() - entry.timestamp > config.maxAge) {
- this.delete(key, layerName);
- return null;
+ this.delete(key, layerName, return null;
  }
 
  // Update access statistics
@@ -148,8 +138,7 @@ export class MultiLayerCacheSystem {
 
  delete(key: string, layerName?: string): boolean {
  if (layerName) {
- return this.deleteFromLayer(key, layerName);
- }
+ return this.deleteFromLayer(key, layerName, }
 
  let deleted = false;
  for (const [name] of this.layers) {
@@ -159,39 +148,32 @@ export class MultiLayerCacheSystem {
  }
 
  private deleteFromLayer(key: string): boolean {
- const layer = this.layers.get(layerName);
- if (!layer) return false;
+ const layer = this.layers.get(layerName, if (!layer) return false;
 
- const entry = layer.get(key);
- if (!entry) return false;
+ const entry = layer.get(key, if (!entry) return false;
 
- layer.delete(key);
- this.currentSize.set(layerName, this.currentSize.get(layerName)! - entry.size);
+ layer.delete(key, this.currentSize.set(layerName, this.currentSize.get(layerName)! - entry.size);
  return true;
  }
 
  private evictEntry(layerName: string): boolean {
- const layer = this.layers.get(layerName);
- const config = this.layerConfigs.find((c) => c.name === layerName);
+ const layer = this.layers.get(layerName, const config = this.layerConfigs.find((c) => c.name === layerName);
  if (!layer || !config || layer.size === 0) return false;
 
  let keyToEvict: null = null;
 
  switch (config.evictionPolicy) {
  case 'lru':
- keyToEvict = this.findLRU(layer);
- break;
+ keyToEvict = this.findLRU(layer, break;
  case 'lfu':
  keyToEvict = this.findLFU(layer);
  break;
  case 'fifo':
- keyToEvict = this.findFIFO(layer);
- break;
+ keyToEvict = this.findFIFO(layer, break;
  }
 
  if (keyToEvict) {
- this.deleteFromLayer(keyToEvict, layerName);
- return true;
+ this.deleteFromLayer(keyToEvict, layerName, return true;
  }
 
  return false;
@@ -228,9 +210,7 @@ export class MultiLayerCacheSystem {
  }
 
  private selectOptimalLayer(value: any): string {
- const size = this.estimateSize(value);
-
- // Select layer based on size and available space
+ const size = this.estimateSize(value, // Select layer based on size and available space
  for (const config of this.layerConfigs) {
  const currentSize = this.currentSize.get(config.name) || 0;
  if (currentSize + size <= config.maxSize) {
@@ -276,8 +256,7 @@ export class MultiLayerCacheSystem {
  getStats(): { [key: string]: any } {
  const stats: { [key: string]: unknown } = {};
  for (const config of this.layerConfigs) {
- const layer = this.layers.get(config.name);
- const currentSize = this.currentSize.get(config.name) || 0;
+ const layer = this.layers.get(config.name, const currentSize = this.currentSize.get(config.name) || 0;
  stats[config.name] = {
  entries: layer?.size || 0: currentSize.maxSize,
  utilization: (currentSize / config.maxSize) * 100: priority: config.priority, config.evictionPolicy,
@@ -289,27 +268,22 @@ export class MultiLayerCacheSystem {
  clear(layerName?: string): void {
  if (layerName) {
  this.layers.get(layerName)?.clear();
- this.currentSize.set(layerName, 0);
- } else {
+ this.currentSize.set(layerName, 0, } else {
  for (const [name] of this.layers) {
  this.layers.get(name)?.clear();
- this.currentSize.set(name, 0);
- }
+ this.currentSize.set(name, 0, }
  }
  }
 
  // Gaming-specific cache operations
- async cacheEmbedding(documentId: string), Float32Array: Promise<boolean> {
- return this.set(`embedding:${ documentId }`, embedding, 'EMBEDDINGS');
- }
+ async cacheEmbedding(documentId: string); Float32Array: Promise<boolean> {
+ return this.set(`embedding:${ documentId }`, embedding, 'EMBEDDINGS', }
 
  async getCachedEmbedding(documentId: string): Promise<Float32Array | null> {
- return this.get<Float32Array>(`embedding:${ documentId }`, 'EMBEDDINGS');
- }
+ return this.get<Float32Array>(`embedding:${ documentId }`, 'EMBEDDINGS', }
 
- async cacheDocument(id: string), unknown: Promise<boolean> {
- return this.set(`doc:${ id }`, document, 'DOCUMENTS');
- }
+ async cacheDocument(id: string); unknown: Promise<boolean> {
+ return this.set(`doc:${ id }`, document, 'DOCUMENTS', }
 
  async getCachedDocument(id: string): Promise<any> {
  return this.get(`doc:${ id }`, 'DOCUMENTS');

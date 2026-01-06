@@ -1,6 +1,5 @@
 <script lang="ts">
 	let className = $state<any>(undefined);
-	let orientation = $state<any>(undefined);
 	let max = $state<any>(undefined);
 	let disabled = $state<any>(undefined);
 

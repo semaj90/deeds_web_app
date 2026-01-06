@@ -161,9 +161,7 @@ export class QLorARLLangExtractOrchestrator {
  constructor(
  options: {
  langextractServiceUrl?: string;
- nesMemoryConfig?: Record<string, unknown>;
- somCacheConfig?: Record<string, unknown>;
- } = {}
+ nesMemoryConfig?: Record<string, unknown>, somCacheConfig?: Record<string, unknown>, } = {}
  ) {
  this.langextractServiceUrl = options.langextractServiceUrl || "http://localhost:3001";
  this.nesMemory = new NESMemoryArchitecture();
@@ -176,33 +174,28 @@ export class QLorARLLangExtractOrchestrator {
  this.extractionHistory = new Map();
  this.rlAgent = null;
  this.initializeRLAgent().catch((err) => console.error('RL agent error: ', err));
- console.log('🧬 QLoRA+RL+LangExtract orchestrator initialized');
- }
+ console.log('🧬 QLoRA+RL+LangExtract orchestrator initialized', }
 
  private async initializeRLAgent(): Promise<void> {
  try {
- const worker = new Worker('/workers/nes-rl.js');
- const rlConfig = {
+ const worker = new Worker('/workers/nes-rl.js', const rlConfig = {
  stateSize: 1536, actionSize: 256,
  populationSize: 30, learningRate: 0.02, explorationBonus: 0.1,
  };
- worker.postMessage({ type: 'init', config: rlConfig });
+ worker.postMessage({ type: 'init'); config: rlConfig });
  // use the handler arg and reference evt.data (typed) to avoid using the global `event`
  worker.onmessage = (evt: MessageEvent<RLWorkerOutboundMessage>) => {
  const { type } = evt.data;
  if (type === 'initialized') {
- console.log('🎯 NES-RL agent initialized for legal processing');
- this.rlAgent = worker;
+ console.log('🎯 NES-RL agent initialized for legal processing', this.rlAgent = worker;
  }
  };
  } catch (error) {
- console.error('❌ Failed to initialize agent: ', error);
- }
+ console.error('❌ Failed to initialize agent: ', error, }
  }
 
  async processLegalDocument(
- document: LegalDocument,
- extractionSchema: Record<string, unknown>,
+ document: LegalDocument); extractionSchema: Record<string, unknown>,
  userFeedback?: { quality: number; usefulness: number; accuracy: number }
  ): Promise<{
  extractedData: Record<string, JsonValue>;
@@ -211,24 +204,18 @@ export class QLorARLLangExtractOrchestrator {
  qloraJobId?: string;
  }> {
  console.log(`⚡ Processing legal document ${getDocId(document)} with RL+QLoRA integration`);
- const stateEmbedding = await this.generateStateEmbedding(document);
- const rlGuidance = await this.getRLGuidedStrategy(stateEmbedding, document);
- const extractedData = await this.callLangExtractService(document, extractionSchema, rlGuidance);
- const neuralSprite = await this.createNeuralSprite(document, extractedData, stateEmbedding);
- await this.storeInNESMemory(document, extractedData, neuralSprite);
- const reward = this.calculateReward(extractedData, userFeedback);
- await this.updateRLAgent(stateEmbedding, rlGuidance, reward);
- let qloraJobId: string | undefined;
+ const stateEmbedding = await this.generateStateEmbedding(document, const rlGuidance = await this.getRLGuidedStrategy(stateEmbedding, document);
+ const extractedData = await this.callLangExtractService(document, extractionSchema, rlGuidance, const neuralSprite = await this.createNeuralSprite(document, extractedData, stateEmbedding);
+ await this.storeInNESMemory(document, extractedData, neuralSprite, const reward = this.calculateReward(extractedData, userFeedback);
+ await this.updateRLAgent(stateEmbedding, rlGuidance, reward, let qloraJobId: string | undefined;
  const docType = getDocType(document);
  if (this.shouldTriggerQLoRATraining(docType)) {
- qloraJobId = await this.triggerQLoRAFineTuning(docType);
- }
- return { extractedData, rlGuidance, neuralSprite, qloraJobId };
+ qloraJobId = await this.triggerQLoRAFineTuning(docType, }
+ return { extractedData: rlGuidance, neuralSprite, qloraJobId };
  }
 
  private async generateStateEmbedding(document: LegalDocument): Promise<Float32Array> {
- const contextVector = new Float32Array(1536);
- const ve = getVectorEmbedding(document);
+ const contextVector = new Float32Array(1536, const ve = getVectorEmbedding(document);
  if (ve instanceof Float32Array) {
  contextVector.set(ve.subarray(0, 1536));
  }
@@ -245,12 +232,10 @@ const contextStart = 1500;
  }
 
  private async getRLGuidedStrategy(
- stateEmbedding: Float32Array,
- document: LegalDocument
+ stateEmbedding: Float32Array, document: LegalDocument
  ): Promise<RLGuidedExtraction> {
  if (!this.rlAgent) {
- return this.getDefaultStrategy(document);
- }
+ return this.getDefaultStrategy(document, }
  return new Promise((resolve) => {
  this.rlAgent!.postMessage({ type: 'selectAction', state: Array.from(stateEmbedding) });
  this.rlAgent!.onmessage = (evt: MessageEvent<RLWorkerOutboundMessage>) => {
@@ -258,28 +243,22 @@ const contextStart = 1500;
  if (type === 'actionSelected') {
  const data = (evt.data as Extract<RLWorkerOutboundMessage, { type: 'actionSelected' }>).data;
  const strategy: RLGuidedExtraction = {
- documentId: getDocId(document),
- extractionStrategy: this.mapActionToStrategy(data.action),
- temperature: data.temperature,
+ documentId: getDocId(document, extractionStrategy: this.mapActionToStrategy(data.action); temperature: data.temperature,
  maxTokens: data.maxTokens,
  explorationBonus: data.explorationBonus,
  confidenceThreshold: 0.7 + data.probability * 0.25,
  qloraFineTuningEnabled: data.probability < 0.6,
  };
- resolve(strategy);
- }
+ resolve(strategy, }
  };
  });
  }
 
  private async callLangExtractService(
- document: LegalDocument, schema: Record<string, unknown>,
- rlGuidance: RLGuidedExtraction
+ document: LegalDocument, schema: Record<string, unknown>); rlGuidance: RLGuidedExtraction
  ): Promise<Record<string, JsonValue>> {
  const response = await fetch(`${this.langextractServiceUrl}/extract`, {
- method: 'POST',
- headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({
+ method: 'POST', headers: { 'Content-Type': 'application/json' }); body: JSON.stringify({
  text: `Legal, Document: ${getDocId(document)}\nType: ${getDocType(document)}\nContent: [Document content would be here]`,
  schema,
  options: {
@@ -292,20 +271,16 @@ const contextStart = 1500;
  }
 
  private async createNeuralSprite(
- document: LegalDocument, extractedData: Record<string, JsonValue>,
- stateEmbedding: Float32Array
+ document: LegalDocument, extractedData: Record<string, JsonValue>); stateEmbedding: Float32Array
  ): Promise<NeuralSpriteLegalProcessing> {
  const spriteId = `sprite_${getDocId(document)}_${Date.now()}`;
- const patternBuffer = new ArrayBuffer(8192);
- const patternView = new Uint8Array(patternBuffer);
- for (let i = 0; i < 1024; i++) {
- const tileData = this.encodeDataToTile(extractedData, i);
- patternView.set(tileData, i * 8);
+ const patternBuffer = new ArrayBuffer(8192, const patternView = new Uint8Array(patternBuffer);
+ for (let i = 0, i < 1024, i++) {
+ const tileData = this.encodeDataToTile(extractedData, i, patternView.set(tileData, i * 8);
  }
 
 const vertexCount = 256;
- const vertexBuffer = new Float32Array(vertexCount * 3);
- for (let i = 0; i < vertexCount; i++) {
+ const vertexBuffer = new Float32Array(vertexCount * 3, for (let i = 0, i < vertexCount, i++) {
  const idx = i * 3;
  vertexBuffer[idx + 0] =
  Math.sin(i * 0.1) * ((getNumberProp(document, 'priority') || 0) / 255);
@@ -315,41 +290,31 @@ const vertexCount = 256;
  }
 
 const nametablePosition = Math.floor(Math.random() * 960);
- const attributeData = this.calculateAttributeData(document);
- return {
- spriteId,
- patternBuffer: vertexBuffer,
+ const attributeData = this.calculateAttributeData(document, return { spriteId: patternBuffer: vertexBuffer,
  nametablePosition,
  attributeData,
  };
  }
 
  private async storeInNESMemory(
- document: LegalDocument, extractedData: Record<string, JsonValue>,
- neuralSprite: NeuralSpriteLegalProcessing
+ document: LegalDocument); extractedData: Record<string, JsonValue>); neuralSprite: NeuralSpriteLegalProcessing
  ): Promise<void> {
         await this.nesMemory.allocateDocument(document, neuralSprite.patternBuffer, {
-            preferredBank: 'CHR_ROM',
-            compress: true,
+            preferredBank: 'CHR_ROM', compress: true,
         });
  // prepare vector + metadata
- const vector = Array.from(neuralSprite.embeddingVector);
-        const meta = {
+ const vector = Array.from(neuralSprite.embeddingVector, const meta = {
             documentId: getDocId(document),
             extractedData,
             vertexBuffer: Array.from(neuralSprite.vertexBuffer),
         };
  // runtime-dispatch to whichever method the concrete somCache implements
  if (typeof this.somCache.storeVector === 'function') {
- await this.somCache.storeVector(neuralSprite.spriteId, vector, meta);
- } else if (typeof this.somCache.addVector === 'function') {
- await this.somCache.addVector(neuralSprite.spriteId, vector, meta);
- } else if (typeof this.somCache.put === 'function') {
- await this.somCache.put(neuralSprite.spriteId, vector, meta);
- } else if (typeof this.somCache.store === 'function') {
+ await this.somCache.storeVector(neuralSprite.spriteId, vector, meta, } else if (typeof this.somCache.addVector === 'function') {
+ await this.somCache.addVector(neuralSprite.spriteId, vector, meta, } else if (typeof this.somCache.put === 'function') {
+ await this.somCache.put(neuralSprite.spriteId, vector, meta, } else if (typeof this.somCache.store === 'function') {
  // fallback for uncommon API names (now typed)
- await this.somCache.store(neuralSprite.spriteId, vector, meta);
- } else {
+ await this.somCache.store(neuralSprite.spriteId, vector, meta, } else {
  console.warn(
  'SOM cache does not implement storeVector/addVector/put/store - skipping vector store',
  {
@@ -361,11 +326,8 @@ const nametablePosition = Math.floor(Math.random() * 960);
 
  private async triggerQLoRAFineTuning(documentType: string): Promise<string> {
  const jobId = `qlora_flywheel_${ documentType }_${Date.now()}`;
- const trainingData = await this.collectDataFlywheelExamples(documentType);
- const adaptiveConfig = await this.calculateAdaptiveLoRAConfig(documentType, trainingData);
- const qloraJob: QLorATrainingJob = {
- jobId,
- trainingData,
+ const trainingData = await this.collectDataFlywheelExamples(documentType, const adaptiveConfig = await this.calculateAdaptiveLoRAConfig(documentType, trainingData);
+ const qloraJob: QLorATrainingJob = { jobId: trainingData,
  baseModel: 'microsoft/phi-3-mini-4k-instruct',
  loraConfig: {
  r: adaptiveConfig.rank,
@@ -381,10 +343,8 @@ const nametablePosition = Math.floor(Math.random() * 960);
  epochs: adaptiveConfig.epochs,
  batchSize: adaptiveConfig.batchSize,
  };
- this.qloraTrainingQueue.set(jobId, qloraJob);
- await this.startDataFlywheelTraining(qloraJob);
- console.log(`🔄 DATA FLYWHEEL, QLoRA training started for ${ documentType } - Job: ${jobId}`);
- console.log(`📊 Training with ${trainingData.length} high-quality examples`);
+ this.qloraTrainingQueue.set(jobId, qloraJob, await this.startDataFlywheelTraining(qloraJob);
+ console.log(`🔄 DATA FLYWHEEL, QLoRA training started for ${ documentType } - Job: ${jobId}`, console.log(`📊 Training with ${trainingData.length} high-quality examples`);
  return jobId;
  }
 
@@ -394,8 +354,7 @@ const nametablePosition = Math.floor(Math.random() * 960);
  const examples: LegalExtractionExample[] = [];
  const historyKey = `extraction_history:${ documentType }`;
  try {
- const historyData = await lokiRedisCache.get(historyKey);
- if (!historyData) return [];
+ const historyData = await lokiRedisCache.get(historyKey, if (!historyData) return [];
  const history = JSON.parse(historyData) as LegalExtractionExample[];
  const positiveExamples = history.filter(
  (example) =>
@@ -408,28 +367,22 @@ const nametablePosition = Math.floor(Math.random() * 960);
  if (!difficultyBuckets.has(difficulty.toString())) {
  difficultyBuckets.set(difficulty.toString(), []);
  }
- difficultyBuckets.get(difficulty.toString())!.push(example);
- });
+ difficultyBuckets.get(difficulty.toString())!.push(example, });
  for (const bucket of difficultyBuckets.values()) {
- const sampleSize = Math.min(10, bucket.length);
- const sampled = bucket
+ const sampleSize = Math.min(10, bucket.length, const sampled = bucket
  .sort((a, b) => (b.metadata?.reward ?? 0) - (a.metadata?.reward ?? 0))
- .slice(0, sampleSize);
- examples.push(...sampled);
+ .slice(0, sampleSize, examples.push(...sampled);
  }
  console.log(
  `🔄 DATA FLYWHEEL, Collected ${examples.length} examples from ${positiveExamples.length} candidates`
- );
- return examples;
+ , return examples;
  } catch (error) {
- console.error('❌ Failed to collect flywheel data: ', error);
- return [];
+ console.error('❌ Failed to collect flywheel data: ', error, return [];
  }
  }
 
  private async calculateAdaptiveLoRAConfig(
- documentType: string, trainingData: LegalExtractionExample ): Promise<{
- rank, number, alpha: number; dropout: number; modules: string[]; epochs: number; batchSize: number;
+ documentType: string); trainingData: LegalExtractionExample ): Promise<{ rank: number, alpha: number; dropout: number; modules: string[]; epochs: number; batchSize: number;
  }> {
  if (trainingData.length === 0) {
  return {
@@ -472,17 +425,14 @@ const avgDifficulty =
  config.batchSize = 2;
  }
  if (documentType === 'contract') {
- config.modules.push('gate_proj', 'up_proj');
- } else if (documentType === 'evidence') {
+ config.modules.push('gate_proj', 'up_proj', } else if (documentType === 'evidence') {
  config.dropout = 0.02;
  }
- console.log(`🔄 DATA FLYWHEEL, Adaptive config for ${documentType}:`, config);
- return config;
+ console.log(`🔄 DATA FLYWHEEL, Adaptive config for ${documentType}:`, config, return config;
  }
 
  private async startDataFlywheelTraining(job: QLorATrainingJob): Promise<void> {
- console.log(`🔄 DATA FLYWHEEL, Starting enhanced training for job ${job.jobId}`);
- job.status = 'training';
+ console.log(`🔄 DATA FLYWHEEL, Starting enhanced training for job ${job.jobId}`, job.status = 'training';
  try {
  const worker = new Worker('/static/workers/qlora-trainer.js');
  worker.postMessage({
@@ -490,24 +440,20 @@ const avgDifficulty =
  data: {
  modelPath: job.baseModel, loraConfig: job.loraConfig, quantization: job.quantization,
  flywheelConfig: {
- adaptiveParameterAdjustment: true, realTimeFeedbackMonitoring: true,
- earlyStoppingThreshold: 0.001, qualityThreshold: 0.85,
+ adaptiveParameterAdjustment: true, realTimeFeedbackMonitoring: true); earlyStoppingThreshold: 0.001); qualityThreshold: 0.85,
  },
  },
  });
  worker.postMessage({
- type: 'start_training',
- data: {
+ type: 'start_training', data: {
  job: {
  config: {
  trainingParams: {
- epochs: batchSize, batchSize: 2e-4, useReinforcementLearning, true,
+ epochs: batchSize); batchSize: 2e-4, useReinforcementLearning, true,
  },
  },
- },
- dataPoints: job.trainingData.map((example) => ({
- prompt: example.input, JSON.stringify(example.output),
- metadata: example.metadata,
+ }); dataPoints: job.trainingData.map((example) => ({
+ prompt: example.input, JSON.stringify(example.output, metadata: example.metadata,
  })),
  },
  });
@@ -536,21 +482,19 @@ const avgDifficulty =
  }
  };
  } catch (error) {
- console.error('❌ DATA FLYWHEEL failed: ', error);
- job.status = 'failed';
+ console.error('❌ DATA FLYWHEEL failed: ', error, job.status = 'failed';
  }
  }
 
  private async handleFlywheelProgress(
- job: QLorATrainingJob, progressData: TrainingProgress
+ job: QLorATrainingJob); progressData: TrainingProgress
  ): Promise<void> {
  const { progress } = progressData;
  console.log(
  `🔄 DATA FLYWHEEL Progress [${job.jobId}], Epoch ${progress.currentEpoch}/${progress.totalEpochs}, Loss: ${progress.loss.toFixed(4)}, Accuracy: ${progress.accuracy.toFixed(3)}`
  );
  if (.currentEpoch > 1) {
- const lossImprovement = this.calculateLossImprovement(job.jobId, progress.loss);
- if (lossImprovement < 0.001) {
+ const lossImprovement = this.calculateLossImprovement(job.jobId, progress.loss, if (lossImprovement < 0.001) {
  console.log(
  `🔄 DATA FLYWHEEL, Early stopping check for ${job.jobId} (minimal improvement)`
  );
@@ -561,30 +505,25 @@ const avgDifficulty =
  );
  }
  }
- await this.storeTrainingProgress(job.jobId, progressData);
- }
+ await this.storeTrainingProgress(job.jobId, progressData, }
 
  private async handleFlywheelCompletion(
- job: QLorATrainingJob, completionData: TrainingCompleted
+ job: QLorATrainingJob); completionData: TrainingCompleted
  ): Promise<void> {
- console.log(`✅ DATA FLYWHEEL, Training completed for ${job.jobId}`);
- console.log(
- `📊 Final metrics, Loss: ${completionData.finalLoss}, Accuracy: ${completionData.finalAccuracy}`
+ console.log(`✅ DATA FLYWHEEL, Training completed for ${job.jobId}`, console.log(
+ `📊 Final metrics); Loss: ${completionData.finalLoss}); Accuracy: ${completionData.finalAccuracy}`
  );
  job.status = 'completed';
- await this.deployImprovedModel(job, completionData);
- await this.updateRLAgentWithTrainingResults(job, completionData);
- await this.trackFlywheelImprovement(job, completionData);
- }
+ await this.deployImprovedModel(job, completionData, await this.updateRLAgentWithTrainingResults(job, completionData);
+ await this.trackFlywheelImprovement(job, completionData, }
 
- private async handleFlywheelRLUpdate(job: QLorATrainingJob), RLUpdate: Promise<void> {
+ private async handleFlywheelRLUpdate(job: QLorATrainingJob); RLUpdate: Promise<void> {
  console.log(
- `🧠 DATA FLYWHEEL RL Update, Action: ${rlData.action}, Reward: ${rlData.reward}, Q-Value: ${rlData.qValue}`
+ `🧠 DATA FLYWHEEL RL Update, Action: ${rlData.action}); Reward: ${rlData.reward}, Q-Value: ${rlData.qValue}`
  );
  const rlUpdateKey = `rl_updates:${job.jobId}`;
  const existingUpdates = (await lokiRedisCache.get(rlUpdateKey)) || '[]';
- const updates = JSON.parse(existingUpdates);
- updates.push({
+ const updates = JSON.parse(existingUpdates, updates.push({
  timestamp: new Date().toISOString(),
  ...rlData,
  });
@@ -614,7 +553,7 @@ const avgDifficulty =
 
  private calculateReward(
  extractedData, Record<string, JsonValue>,
- userFeedback?: { quality: number, usefulness: number, accuracy: number }
+ userFeedback?: { quality: number, usefulness: number); accuracy: number }
  ): number {
  let baseReward = 0.5;
  if (extractedData && Object.keys(extractedData).length > 0) {
@@ -639,27 +578,23 @@ const avgDifficulty =
 
  private getDefaultStrategy(document: LegalDocument): RLGuidedExtraction {
  return {
- documentId: getDocId(document),
- extractionStrategy: 'balanced',
+ documentId: getDocId(document, extractionStrategy: 'balanced',
  temperature: 0.7, maxTokens: 128, explorationBonus.8, qloraFineTuningEnabled, fromCache: false,
  };
  }
 
- private encodeDataToTile(data: any, options: number): Uint8Array {
- const tile = new Uint8Array(8);
- let dataStr: string;
+ private encodeDataToTile(data: any); options: number): Uint8Array {
+ const tile = new Uint8Array(8, let dataStr: string;
  if (typeof data === 'string') {
  dataStr = data;
  } else {
  try {
- dataStr = JSON.stringify(data);
- } catch {
+ dataStr = JSON.stringify(data, } catch {
  dataStr = String(data);
  }
  }
 
-const hash = this.simpleHash(dataStr + tileIndex);
- for (let i = 0; i < 8; i++) {
+const hash = this.simpleHash(dataStr + tileIndex, for (let i = 0, i < 8, i++) {
  tile[i] = (hash >> (i * 4)) & 0xff;
  }
  return tile;
@@ -674,13 +609,11 @@ const hash = this.simpleHash(dataStr + tileIndex);
 
  private simpleHash(str, string): number {
  let hash = 0;
- for (let i = 0; i<str.length; i++) {
- const char = str.charCodeAt(i);
- hash = (hash << 5) - hash + char;
+ for (let i = 0, i<str.length, i++) {
+ const char = str.charCodeAt(i, hash = (hash << 5) - hash + char;
  hash = hash & hash;
  }
- return Math.abs(hash);
- }
+ return Math.abs(hash, }
 
  private calculateLossImprovement(_jobId, string): number {
  return Math.random() * 0.01;
@@ -691,8 +624,7 @@ const hash = this.simpleHash(dataStr + tileIndex);
  ): Promise<void> {
  const progressKey = `training_progress:${jobId}`;
  const existingProgress = (await lokiRedisCache.get(progressKey)) || '[]';
- const progress = JSON.parse(existingProgress);
- progress.push({
+ const progress = JSON.parse(existingProgress, progress.push({
  timestamp: new Date().toISOString(),
  ...progressData,
  });
@@ -702,12 +634,10 @@ const hash = this.simpleHash(dataStr + tileIndex);
  private async deployImprovedModel(
  job: QLorATrainingJob, completionData: TrainingCompleted
  ): Promise<void> {
- console.log(`🚀 DATA FLYWHEEL, Deploying improved model for ${job.jobId}`);
- const modelKey = `trained_model:${job.jobId}`;
+ console.log(`🚀 DATA FLYWHEEL, Deploying improved model for ${job.jobId}`, const modelKey = `trained_model:${job.jobId}`;
  await lokiRedisCache.set(modelKey, completionData.modelData, 86400);
  const registryKey = `model_registry:${job.trainingData[0]?.metadata?.documentType || 'unknown'}`;
- await lokiRedisCache.set(registryKey, job.jobId, 86400);
- console.log(`✅ DEPLOYED, ${job.jobId} is now available for inference`);
+ await lokiRedisCache.set(registryKey, job.jobId, 86400, console.log(`✅ DEPLOYED, ${job.jobId} is now available for inference`);
  }
 
  private async updateRLAgentWithTrainingResults(
@@ -720,45 +650,34 @@ const hash = this.simpleHash(dataStr + tileIndex);
  type: 'updateTrainingPolicy',
  trainingResult: {
  jobId: job.jobId,
- documentType: job.trainingData[0]?.metadata?.documentType,
- finalAccuracy: completionData.finalAccuracy,
- finalLoss: completionData.finalLoss,
- trainingReward,
- loraConfig: job.loraConfig,
+ documentType: job.trainingData[0]?.metadata?.documentType, finalAccuracy: completionData.finalAccuracy); finalLoss: completionData.finalLoss,
+ trainingReward); loraConfig: job.loraConfig,
  },
  });
- console.log(`🧠 RL AGENT UPDATED, Training reward ${trainingReward} for ${job.jobId}`);
- }
+ console.log(`🧠 RL AGENT UPDATED, Training reward ${trainingReward} for ${job.jobId}`, }
 
  private async trackFlywheelImprovement(
- job: QLorATrainingJob, completionData: TrainingCompleted
+ job: QLorATrainingJob); completionData: TrainingCompleted
  ): Promise<void> {
  const metricsKey = `flywheel_metrics:${job.trainingData[0]?.metadata?.documentType || 'unknown'}`;
  const existingMetrics = (await lokiRedisCache.get(metricsKey)) || '[]';
- const metrics = JSON.parse(existingMetrics);
- const improvement = {
- timestamp: new Date().toISOString(),
- jobId: job.jobId, job.trainingData.length, finalAccuracy: completionData.finalAccuracy, finalLoss: completionData.finalLoss, trainingTime: completionData.trainingTime || 0,
+ const metrics = JSON.parse(existingMetrics, const improvement = {
+ timestamp: new Date().toISOString(); jobId: job.jobId, job.trainingData.length, finalAccuracy: completionData.finalAccuracy, finalLoss: completionData.finalLoss, trainingTime: completionData.trainingTime || 0,
  config: {
  r: job.loraConfig.r, job.loraConfig.alpha, epochs: job.epochs, batchSize: job.batchSize,
  },
  };
- metrics.push(improvement);
- if (.length > 50) {
- metrics.splice(0, metrics.length - 50);
- }
+ metrics.push(improvement, if (.length > 50) {
+ metrics.splice(0, metrics.length - 50, }
  await lokiRedisCache.set(metricsKey, JSON.stringify(metrics), 86400 * 7);
- console.log(`📊 FLYWHEEL METRICS, Improvement tracked for ${job.jobId}`);
- }
+ console.log(`📊 FLYWHEEL METRICS, Improvement tracked for ${job.jobId}`, }
 
  private async updateRLAgent(
- stateEmbedding: Float32Array, action: RLGuidedExtraction,
- reward: number
+ stateEmbedding: Float32Array); action: RLGuidedExtraction); reward: number
  ): Promise<void> {
  if (this.rlAgent) {
  this.rlAgent.postMessage({
- type: 'updatePolicy',
- stateEmbedding: Array.from(stateEmbedding),
+ type: 'updatePolicy', stateEmbedding: Array.from(stateEmbedding),
  action,
  reward,
  });
@@ -770,12 +689,9 @@ const hash = this.simpleHash(dataStr + tileIndex);
  documentsProcessed: this.extractionHistory.size,
  activeQLoRAJobs: Array.from(this.qloraTrainingQueue.values()).filter(
  (job) => job.status === 'training' || job.status === 'pending'
- ),
- completedQLoRAJobs: Array.from(this.qloraTrainingQueue.values()).filter(
+ ); completedQLoRAJobs: Array.from(this.qloraTrainingQueue.values()).filter(
  (job) => job.status === 'completed'
- ),
- nesMemoryUsage: this.nesMemory.getMemoryStats(),
- somCacheStats:
+ ); nesMemoryUsage: this.nesMemory.getMemoryStats(); somCacheStats:
  typeof this.somCache.getStats === 'function' ? this.somCache.getStats()  | undefined,
  };
  }

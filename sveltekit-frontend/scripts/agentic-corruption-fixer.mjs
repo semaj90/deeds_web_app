@@ -83,6 +83,32 @@ const CORRUPTION_PATTERNS = [
 		name: 'statement_paren_comma',
 		pattern: /\),\s*([a-zA-Z0-9_]+):/g,
 		fix: (match, next) => `); ${next}:`
+	},
+
+	// Pattern 11: Interface property corruption - "key?, type;" instead of "key?: type;"
+	{
+		name: 'interface_prop_comma',
+		pattern: /([a-zA-Z0-9_]+\??)\s*,\s*([a-zA-Z0-9_\[\]\|]+)\s*;/g,
+		fix: (match, key, type) => `${key}: ${type};`
+	},
+
+	// Pattern 12: Method/Function argument corruption - "func(a: T); b: T)" or "func(a); b)"
+	{
+		name: 'arg_separator_semicolon',
+		pattern: /\(([^)]+);\s*([^)]+)\)/g,
+		fix: (match, arg1, arg2) => `(${arg1}, ${arg2})`
+	},
+	{
+		name: 'arg_separator_semicolon_split',
+		pattern: /\(([^)]+)\);\s*([^)]+)\)/g,
+		fix: (match, arg1, arg2) => `(${arg1}, ${arg2})`
+	},
+
+	// Pattern 13: Stray leading semicolons
+	{
+		name: 'stray_leading_semicolon',
+		pattern: /^\s*;\s+/gm, // Match valid indentation followed by semicolon at start of line
+		fix: (match) => match.replace(';', '')
 	}
 ];
 

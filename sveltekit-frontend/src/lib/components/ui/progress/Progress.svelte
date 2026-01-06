@@ -1,5 +1,4 @@
 <script lang="ts">
-	let value = $state<any>(undefined);
 
 	interface Props {
 		/** Progress value (0-100) */

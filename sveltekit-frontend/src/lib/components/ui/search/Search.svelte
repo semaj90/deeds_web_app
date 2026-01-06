@@ -1,5 +1,4 @@
 <script lang="ts">
-	let className = $state<any>(undefined);
 
  interface Props {
  class?: string;

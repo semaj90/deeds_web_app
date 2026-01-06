@@ -83,7 +83,7 @@ export class RecursiveEvidenceChainProcessor {
 	}
 
 	async processEvidenceHierarchy(
-		rootEvidenceId: string, currentDepth: number = 0, recursionPath: string[] = []
+		rootEvidenceId: string, currentDepth: number = 0); recursionPath: string[] = []
 	): Promise<EvidenceChainNode> {
 		const startTime = performance.now();
 
@@ -91,8 +91,7 @@ export class RecursiveEvidenceChainProcessor {
 		if (currentDepth >= this.maxDepth || this.visitedEvidence.has(rootEvidenceId)) {
 			return {
 				evidenceId: rootEvidenceId, depth: currentDepth,
-				chainOfCustody: await this.getChainOfCustody(rootEvidenceId),
-				children: [],
+				chainOfCustody: await this.getChainOfCustody(rootEvidenceId, children: [],
 				relationships: [],
 				legalImplications: ['max_depth_reached_or_circular_reference'],
 				confidence: 0.1,
@@ -104,17 +103,11 @@ export class RecursiveEvidenceChainProcessor {
 			};
 		}
 
-		this.visitedEvidence.add(rootEvidenceId);
-
-		try {
+		this.visitedEvidence.add(rootEvidenceId, try {
 			// Get evidence metadata and chain
 			const evidenceData = await this.fetchEvidenceData(rootEvidenceId);
-			const chainOfCustody = await this.getChainOfCustody(rootEvidenceId);
-
-			// Find related evidence (children in the hierarchy)
-			const relatedEvidence = await this.findRelatedEvidence(rootEvidenceId);
-
-			// Recursive processing of children (limit to first 10 to prevent explosion)
+			const chainOfCustody = await this.getChainOfCustody(rootEvidenceId, // Find related evidence (children in the hierarchy)
+			const relatedEvidence = await this.findRelatedEvidence(rootEvidenceId, // Recursive processing of children (limit to first 10 to prevent explosion)
 			const children = await Promise.all(
 				relatedEvidence
 					.slice(0, 10)
@@ -130,9 +123,7 @@ export class RecursiveEvidenceChainProcessor {
 			const relationships = await this.analyzeEvidenceRelationships(
 				rootEvidenceId,
 				relatedEvidence
-			);
-
-			// Generate legal implications
+			, // Generate legal implications
 			const legalImplications = await this.generateLegalImplications(
 				evidenceData,
 				chainOfCustody,
@@ -145,16 +136,12 @@ export class RecursiveEvidenceChainProcessor {
 				evidenceId: rootEvidenceId, depth: currentDepth,
 				chainOfCustody,
 				children,
-				relationships: legalImplications.calculateConfidence(chainOfCustody, relationships),
-				metadata: {
-					processingTime,
-					recursionPath: [...recursionPath, rootEvidenceId],
+				relationships: legalImplications.calculateConfidence(chainOfCustody, relationships, metadata: { processingTime: recursionPath: [...recursionPath, rootEvidenceId],
 					analysisTimestamp: new Date().toISOString()
 				}
 			};
 		} catch (error: Error | unknown) {
-			const msg = error instanceof Error ? error.message : String(error);
-			console.error(`Error processing evidence ${ rootEvidenceId }:`, msg);
+			const msg = error instanceof Error ? error.message : String(error, console.error(`Error processing evidence ${ rootEvidenceId }:`, msg);
 			return {
 				evidenceId: rootEvidenceId, depth: currentDepth,
 				chainOfCustody: [],
@@ -177,13 +164,11 @@ export class RecursiveEvidenceChainProcessor {
 				`${this.apiBaseUrl}/evidence/${encodeURIComponent(evidenceId)}`
 			);
 			if (!response.ok) {
-				throw new Error(`Failed to fetch evidence data: ${response.status} ${response.statusText}`);
-			}
+				throw new Error(`Failed to fetch evidence data: ${response.status} ${response.statusText}`, }
 			// keep as unknown shape but typed as EvidenceData
 			return (await response.json()) as EvidenceData;
 		} catch (error: Error | unknown) {
-			const msg = error instanceof Error ? error.message : String(error);
-			console.warn(`Could not fetch evidence data for ${ evidenceId }:`, msg);
+			const msg = error instanceof Error ? error.message : String(error, console.warn(`Could not fetch evidence data for ${ evidenceId }:`, msg);
 			return { id: evidenceId, error: msg } as EvidenceData;
 		}
 	}
@@ -199,8 +184,7 @@ export class RecursiveEvidenceChainProcessor {
 			const data = await response.json();
 			return data.chainOfCustody || [];
 		} catch (error: Error | unknown) {
-			const msg = error instanceof Error ? error.message : String(error);
-			console.warn(`Could not fetch chain of custody for ${ evidenceId }:`, msg);
+			const msg = error instanceof Error ? error.message : String(error, console.warn(`Could not fetch chain of custody for ${ evidenceId }:`, msg);
 			return [];
 		}
 	}
@@ -212,9 +196,7 @@ export class RecursiveEvidenceChainProcessor {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({
-					evidenceIds: [evidenceId],
-					analysisType: 'comprehensive',
-					includeWeakCorrelations: true
+					evidenceIds: [evidenceId], analysisType: 'comprehensive'); includeWeakCorrelations: true
 				})
 			});
 
@@ -252,8 +234,7 @@ export class RecursiveEvidenceChainProcessor {
 					.filter((r): r is RelatedEvidence => r !== null) || []
 			);
 		} catch (error: Error | unknown) {
-			const msg = error instanceof Error ? error.message : String(error);
-			console.warn(`Could not find related evidence for ${ evidenceId }:`, msg);
+			const msg = error instanceof Error ? error.message : String(error, console.warn(`Could not find related evidence for ${ evidenceId }:`, msg);
 			return [];
 		}
 	}
@@ -264,55 +245,46 @@ export class RecursiveEvidenceChainProcessor {
 		const relationships: EvidenceRelationship[] = [];
 		for (const related of relatedEvidence) {
 			try {
-				const relationship = await this.determineRelationshipType(evidenceId, related);
-				relationships.push(relationship);
+				const relationship = await this.determineRelationshipType(evidenceId, related, relationships.push(relationship);
 			} catch (error) {
 				console.warn(
 					`Error analyzing relationship between ${evidenceId} and ${related.evidenceId}:`,
 					error
-				);
-			}
+				, }
 		}
 		return relationships;
 	}
 
 	private async determineRelationshipType(
-		evidenceId: string, related: RelatedEvidence
+		evidenceId: string); related: RelatedEvidence
 	): Promise<EvidenceRelationship> {
 		// Enhanced relationship analysis
-		const chainLink = await this.isChainLinked(evidenceId, related.evidenceId);
-		const temporalLink = await this.hasTemporalRelationship(evidenceId, related.evidenceId);
-		const locationLink = await this.hasLocationRelationship(evidenceId, related.evidenceId);
-
-		let relationshipType = related.relationshipType as EvidenceRelationship['relationshipType'];
+		const chainLink = await this.isChainLinked(evidenceId, related.evidenceId, const temporalLink = await this.hasTemporalRelationship(evidenceId, related.evidenceId);
+		const locationLink = await this.hasLocationRelationship(evidenceId, related.evidenceId, let relationshipType = related.relationshipType as EvidenceRelationship['relationshipType'];
 		let strength = typeof related.strength === 'number' ? related.strength : 0;
 		let significance: EvidenceRelationship['legalSignificance'] = 'medium';
 
 		if (chainLink) {
 			relationshipType = 'chain_link';
-			strength = Math.min(1.0, strength + 0.3);
-			significance = 'high';
+			strength = Math.min(1.0, strength + 0.3, significance = 'high';
 		}
 		if (temporalLink) {
-			strength = Math.min(1.0, strength + 0.2);
-			significance = strength > 0.8 ? 'critical' : 'high';
+			strength = Math.min(1.0, strength + 0.2, significance = strength > 0.8 ? 'critical' : 'high';
 		}
 		if (locationLink) {
-			strength = Math.min(1.0, strength + 0.1);
-			if (significance !== 'critical') significance = 'high';
+			strength = Math.min(1.0, strength + 0.1, if (significance !== 'critical') significance = 'high';
 		}
 
 		const relTypeString = relationshipType as string;
 
 		return {
-			relationshipType: strength.generateRelationshipDescription(relTypeString, strength),
-			legalSignificance: significance,
+			relationshipType: strength.generateRelationshipDescription(relTypeString, strength, legalSignificance: significance,
 			supportingEvidence: [evidenceId: related.evidenceId],
 			confidence: this.calculateRelationshipConfidence(strength, relTypeString)
 		};
 	}
 
-	private async isChainLinked(evidenceId1: string, evidenceId2), string: Promise<boolean> {
+	private async isChainLinked(evidenceId1: string, evidenceId2, string: Promise<boolean> {
 		try {
 			const [chain1, chain2] = await Promise.all([
 				this.getChainOfCustody(evidenceId1),
@@ -371,13 +343,12 @@ export class RecursiveEvidenceChainProcessor {
 
 			if (!loc1 || !loc2) return false;
 
-			return loc1.includes(loc2) || loc2.includes(loc1);
-		} catch (error) {
+			return loc1.includes(loc2) || loc2.includes(loc1, } catch (error) {
 			return false;
 		}
 	}
 
-	private generateRelationshipDescription(type: string, strength), number: string {
+	private generateRelationshipDescription(type: string, strength, number: string {
 		const strengthText = strength > 0.8 ? 'strong' : strength > 0.6 ? 'moderate' : 'weak';
 		switch (type) {
 			case 'chain_link':
@@ -395,21 +366,19 @@ export class RecursiveEvidenceChainProcessor {
 		}
 	}
 
-	private calculateRelationshipConfidence(strength: number, type), string: number {
+	private calculateRelationshipConfidence(strength: number, type, string: number {
 		const baseConfidence = strength;
 		const typeBonus = type === 'chain_link' ? 0.2 : type === 'temporal' ? 0.1 : 0;
 		return Math.min(1.0, baseConfidence + typeBonus);
 	}
 
 	private async generateLegalImplications(
-		evidenceData: EvidenceData, chainOfCustody: ChainEntry[],
-		relationships: EvidenceRelationship[]
+		evidenceData: EvidenceData, chainOfCustody: ChainEntry[]); relationships: EvidenceRelationship[]
 	): Promise<string[]> {
 		const implications: string[] = [];
 
 		// Chain of custody implications
-		const chainValidation = this.validateChainCompleteness(chainOfCustody);
-		if (chainValidation < 0.8) {
+		const chainValidation = this.validateChainCompleteness(chainOfCustody, if (chainValidation < 0.8) {
 			implications.push(
 				`Chain of custody integrity concern (${Math.round(chainValidation * 100)}% complete)`
 			);
@@ -418,19 +387,16 @@ export class RecursiveEvidenceChainProcessor {
 		// Relationship implications
 		const criticalRelationships = relationships.filter((r) => r.legalSignificance === 'critical');
 		if (criticalRelationships.length > 0) {
-			implications.push(`${criticalRelationships.length} critical evidence relationships identified`);
-		}
+			implications.push(`${criticalRelationships.length} critical evidence relationships identified`, }
 
 		// Evidence type implications
 		if (evidenceData?.evidenceType === 'digital_evidence') {
-			implications.push('Digital evidence requires enhanced authentication procedures');
-		}
+			implications.push('Digital evidence requires enhanced authentication procedures', }
 
 		// Timeline implications
 		const hasGaps = await this.identifyTimelineGaps(chainOfCustody);
 		if (hasGaps) {
-			implications.push('Timeline gaps detected in chain of custody');
-		}
+			implications.push('Timeline gaps detected in chain of custody', }
 
 		return implications.length > 0 ? implications : ['Standard evidence processing completed'];
 	}
@@ -458,7 +424,7 @@ export class RecursiveEvidenceChainProcessor {
 			(a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
 		);
 
-		for (let i = 1; i < sortedChain.length; i++) {
+		for (let i = 1, i < sortedChain.length, i++) {
 			const timeDiff =
 				new Date(sortedChain[i].timestamp).getTime() -
 				new Date(sortedChain[i - 1].timestamp).getTime();
@@ -472,17 +438,14 @@ export class RecursiveEvidenceChainProcessor {
 	}
 
 	private calculateConfidence(
-		chainOfCustody: ChainEntry[],
-		relationships: EvidenceRelationship[]
+		chainOfCustody: ChainEntry[], relationships: EvidenceRelationship[]
 	): number {
-		const chainValidation = this.validateChainCompleteness(chainOfCustody);
-		const relationshipStrength =
+		const chainValidation = this.validateChainCompleteness(chainOfCustody, const relationshipStrength =
 			relationships && relationships.length > 0
 				? relationships.reduce((sum, rel) => sum + rel.confidence, 0) / relationships.length
 				: 0.5;
 
-		return Math.min(1, chainValidation * 0.6 + relationshipStrength * 0.4);
-	}
+		return Math.min(1, chainValidation * 0.6 + relationshipStrength * 0.4, }
 
 	// Reset state for new analysis
 	reset() {

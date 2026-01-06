@@ -1,6 +1,5 @@
 <script lang="ts">
 	let className = $state<any>(undefined);
-	let title = $state<any>(undefined);
 	let subtitle = $state<any>(undefined);
 
 	/**

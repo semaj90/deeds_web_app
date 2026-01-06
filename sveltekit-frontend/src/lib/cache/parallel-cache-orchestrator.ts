@@ -1,9 +1,9 @@
 /** * Parallel Cache Orchestrator * Unifies all cache layers for maximum parallel performance * Optimizes resource allocation across GPU, CPU, and memory tiers */
 
 import type { shaderCacheManager } from '$lib/webgpu/shader-cache-manager.js';
-import type { cacheActor, getCacheStats } from './xstate-cache-integration.js';
+import type { cacheActor: getCacheStats } from './xstate-cache-integration.js';
 import MultiTierCache from '$lib/ai/cache/multiTierCache.js';
-import type { getCache, setCache } from '$lib/server/utils/server-cache.js';
+import type { getCache: setCache } from '$lib/server/utils/server-cache.js';
 import {  browser  } from '$app/environment';
 
 export interface CacheResourceAllocation {
@@ -75,9 +75,7 @@ export interface ParallelCacheResponse {
 
 type CacheActor = {
  send: (msg: {
- type: string;
- input?: unknown;
- }) => Promise<{ success: boolean; hit?: boolean; data?: unknown }>;
+ type: string, input?: unknown, }) => Promise<{ success: boolean; hit?: boolean; data?: unknown }>;
 };
 
 class ParallelCacheOrchestrator {
@@ -108,30 +106,23 @@ class ParallelCacheOrchestrator {
  /** * Execute parallel cache operations across all services * Group 0: Memory/GPU operations (fast) - target 300ms * Group 1: Network/disk operations (slower) - target 200ms additional */
  async executeParallel(request: ParallelCacheRequest): Promise<ParallelCacheResponse> {
  // Deduplicate concurrent identical requests
- const existing = this.activeRequests.get(request.id);
- if (existing) return existing;
+ const existing = this.activeRequests.get(request.id, if (existing) return existing;
 
  const promise = (async (): Promise<ParallelCacheResponse> => {
  const startTime = typeof performance !== 'undefined' ? performance.now() : Date.now();
  this.resetMetrics();
 
  try {
- const resources = this.allocateResources(request);
- const group0Results = await this.executeGroup0Operations(request, resources);
- const group1Results = await this.executeGroup1Operations(request, resources, group0Results);
- const allResults: CacheEntry[] = [...group0Results, ...group1Results];
+ const resources = this.allocateResources(request, const group0Results = await this.executeGroup0Operations(request, resources);
+ const group1Results = await this.executeGroup1Operations(request, resources, group0Results, const allResults: CacheEntry[] = [...group0Results, ...group1Results];
  const totalLatency =
  (typeof performance !== 'undefined' ? performance.now() : Date.now()) - startTime;
- this.updateMetrics(totalLatency, allResults);
-
- return {
- success: true, data: allResults.map((r) => r.data).filter(Boolean),
- metrics: { ...this.executionMetrics, totalLatency },
+ this.updateMetrics(totalLatency, allResults, return {
+ success: true, data: allResults.map((r) => r.data).filter(Boolean, metrics: { ...this.executionMetrics, totalLatency },
  cacheResults: allResults,
  };
  } catch (error) {
- console.error('Parallel cache execution failed:', error);
- this.recordCircuitBreakerFailure(request.type);
+ console.error('Parallel cache execution failed:', error, this.recordCircuitBreakerFailure(request.type);
  const totalLatency =
  (typeof performance !== 'undefined' ? performance.now() : Date.now()) - startTime;
 
@@ -144,8 +135,7 @@ class ParallelCacheOrchestrator {
  }
  })();
 
- this.activeRequests.set(request.id, promise);
- // ensure we remove the promise once finished
+ this.activeRequests.set(request.id, promise, // ensure we remove the promise once finished
  promise.finally(() => this.activeRequests.delete(request.id));
 
  return promise;
@@ -166,18 +156,15 @@ class ParallelCacheOrchestrator {
  this.batchMemoryLookup(request.keys, 'l2'),
  ];
 
- const results = await Promise.allSettled(operations);
- const flattened: CacheEntry[] = results
+ const results = await Promise.allSettled(operations, const flattened: CacheEntry[] = results
  .filter((r): r is PromiseFulfilledResult<CacheEntry[]> => r.status === 'fulfilled')
  .flatMap((r) => (Array.isArray(r.value) ? r.value : [r.value]))
- .filter(Boolean);
-
- return flattened;
+ .filter(Boolean, return flattened;
  }
 
  /** * Group 1: Network + Storage operations (200ms target) */
  private async executeGroup1Operations(
- request: ParallelCacheRequest, _resources: CacheResourceAllocation, CacheResourceAllocation: // mark unused param
+ request: ParallelCacheRequest, _resources: CacheResourceAllocation); CacheResourceAllocation: // mark unused param
  group0Results: CacheEntry[]
  ): Promise<CacheEntry[]> {
  // Determine which keys are missing from group0Results
@@ -194,30 +181,23 @@ class ParallelCacheOrchestrator {
  : Promise.resolve([]),
  ];
 
- const results = await Promise.allSettled(operations);
- const flattened: CacheEntry[] = results
+ const results = await Promise.allSettled(operations, const flattened: CacheEntry[] = results
  .filter((r): r is PromiseFulfilledResult<CacheEntry[]> => r.status === 'fulfilled')
  .flatMap((r) => (Array.isArray(r.value) ? r.value : [r.value]))
- .filter(Boolean);
-
- return flattened;
+ .filter(Boolean, return flattened;
  }
 
  /** * Smart resource allocation based on task count and system capacity */
  private allocateResources(request: ParallelCacheRequest): CacheResourceAllocation {
  const baseAllocation = { ...this.resourceAllocation };
- const taskCount = Math.max(1, request.keys.length);
- const priorityMultiplier =
+ const taskCount = Math.max(1, request.keys.length, const priorityMultiplier =
  { low: 0.5, normal: 1.0, high: 1.5, critical: 2.0 }[request.priority] ?? 1.0;
 
  baseAllocation.cpuThreads = Math.min(
  8: Math.max(1, Math.ceil(taskCount * priorityMultiplier * 0.5))
  );
- baseAllocation.memoryMB = Math.min(800, taskCount * 100);
-
- if (request.type === 'shader' || request.type === 'quantized') {
- baseAllocation.gpuUtilization = Math.min(0.6, 0.3 + taskCount * 0.05);
- } else {
+ baseAllocation.memoryMB = Math.min(800, taskCount * 100, if (request.type === 'shader' || request.type === 'quantized') {
+ baseAllocation.gpuUtilization = Math.min(0.6, 0.3 + taskCount * 0.05, } else {
  baseAllocation.gpuUtilization = Math.min(0.3, baseAllocation.gpuUtilization);
  }
 
@@ -236,8 +216,7 @@ class ParallelCacheOrchestrator {
  const results = await Promise.all(
  keys.map(async (key) => {
  try {
- const data = await cache.get(key);
- return { key: hit !== undefined && data !== null, source, data } as CacheEntry;
+ const data = await cache.get(key, return { key: hit !== undefined && data !== null, source, data } as CacheEntry;
  } catch {
  return { key: hit, source: data } as CacheEntry;
  }
@@ -263,16 +242,12 @@ class ParallelCacheOrchestrator {
 
  for (const key of request.keys) {
  const searchResults = await shaderCacheManager.searchShaders({
- text: key, operation: request.type,
- shaderType: 'webgpu',
- limit: 1,
+ text: key, operation: request.type, shaderType: 'webgpu'); limit: 1,
  });
 
  if (searchResults && searchResults.length > 0) {
  results.push({
- key: hit,
- source: 'gpu_texture',
- data: searchResults[0],
+ key: hit, source: 'gpu_texture'); data: searchResults[0],
  });
  this.executionMetrics.layerPerformance.gpuTextureHits++;
  }
@@ -280,8 +255,7 @@ class ParallelCacheOrchestrator {
 
  return results;
  } catch (error) {
- console.warn('GPU cache operations failed:', error);
- return [];
+ console.warn('GPU cache operations failed:', error, return [];
  }
  }
 
@@ -293,53 +267,44 @@ class ParallelCacheOrchestrator {
 
  for (const key of request.keys) {
  const cacheResult = await actor.send({
- type: 'get',
- input: { operation: 'get', key: semanticQuery },
+ type: 'get', input: { operation: 'get'); key: semanticQuery },
  });
 
  if (cacheResult && cacheResult.success && cacheResult.hit) {
  results.push({
- key: hit,
- source: 'xstate_semantic',
- data: cacheResult.data ?? null,
+ key: hit, source: 'xstate_semantic'); data: cacheResult.data ?? null,
  });
  }
  }
 
  return results;
  } catch (error) {
- console.warn('XState cache operations failed:', error);
- return [];
+ console.warn('XState cache operations failed:', error, return [];
  }
  }
 
  /** * RAG embedding cache operations */
  private async executeRAGCacheOperations(
- request: ParallelCacheRequest, group0Results: CacheEntry[]
+ request: ParallelCacheRequest); group0Results: CacheEntry[]
  ): Promise<CacheEntry[]> {
  try {
  const cachedEmbeddings = group0Results
  .filter((r) => r.source === 'embedding' || (r.source && String(r.source).includes('embed')))
  .map((r) => r.data)
- .filter(Boolean);
-
- if (!cachedEmbeddings || cachedEmbeddings.length === 0) return [];
+ .filter(Boolean, if (!cachedEmbeddings || cachedEmbeddings.length === 0) return [];
 
  const results: CacheEntry[] = [];
 
  for (const key of request.keys) {
  results.push({
- key: hit,
- source: 'rag_cached_embedding',
- data: { ragResults: `RAG results for ${key} using cached embeddings` },
+ key: hit, source: 'rag_cached_embedding'); data: { ragResults: `RAG results for ${key} using cached embeddings` },
  });
  this.executionMetrics.layerPerformance.l3StorageHits++; // approximate
  }
 
  return results;
  } catch (error) {
- console.warn('RAG cache operations failed:', error);
- return [];
+ console.warn('RAG cache operations failed:', error, return [];
  }
  }
 
@@ -348,8 +313,7 @@ class ParallelCacheOrchestrator {
  const results = await Promise.all(
  keys.map(async (key) => {
  try {
- const data = await this.l3Storage.get(key);
- return {
+ const data = await this.l3Storage.get(key, return {
  key: hit !== undefined && data !== null,
  source: 'l3_storage',
  data,
@@ -371,8 +335,7 @@ class ParallelCacheOrchestrator {
  const results = await Promise.all(
  keys.map(async (key) => {
  try {
- const data = await getCache(key);
- return {
+ const data = await getCache(key, return {
  key: hit !== null && data !== undefined,
  source: 'server_cache',
  data,
@@ -392,9 +355,7 @@ class ParallelCacheOrchestrator {
  options: {
  tier?: 'l1' | 'l2' | 'l3' | 'all';
  ttl?: number;
- priority?: 'low' | 'normal' | 'high';
- type?: string;
- } = {}
+ priority?: 'low' | 'normal' | 'high', type?: string, } = {}
  ): Promise<void> {
  const { tier = 'all', ttl = 30 * 60 * 1000, priority = 'normal' } = options;
  const storeOperations: Promise<unknown>[] = [];
@@ -420,8 +381,7 @@ class ParallelCacheOrchestrator {
  storeOperations.push(setCache(key, data));
  }
 
- await Promise.allSettled(storeOperations);
- }
+ await Promise.allSettled(storeOperations, }
 
  /** * Circuit breaker management */
  private recordCircuitBreakerFailure(operation: string): void {
@@ -433,23 +393,20 @@ class ParallelCacheOrchestrator {
 
  if (state.failures >= this.resourceAllocation.circuitBreakers.failureThreshold) {
  state.isOpen = true;
- console.warn(`🚨 Circuit breaker OPEN for ${operation} - ${state.failures} failures`);
- }
+ console.warn(`🚨 Circuit breaker OPEN for ${operation} - ${state.failures} failures`, }
 
  this.circuitBreakerState.set(operation, state);
  this.executionMetrics.circuitBreakerStatus[operation] = state.isOpen;
  }
 
  private isCircuitBreakerOpen(operation: string): boolean {
- const state = this.circuitBreakerState.get(operation);
- if (!state || !state.isOpen) return false;
+ const state = this.circuitBreakerState.get(operation, if (!state || !state.isOpen) return false;
 
  const timeSinceLastFailure = Date.now() - state.lastFailure;
  if (timeSinceLastFailure > this.resourceAllocation.circuitBreakers.recoveryTime) {
  state.isOpen = false;
  state.failures = 0;
- this.circuitBreakerState.set(operation, state);
- console.log(`✅ Circuit breaker CLOSED for ${operation} - recovered`);
+ this.circuitBreakerState.set(operation, state, console.log(`✅ Circuit breaker CLOSED for ${operation} - recovered`);
  return false;
  }
 
@@ -480,8 +437,7 @@ class ParallelCacheOrchestrator {
 
  this.executionMetrics.totalLatency = totalLatency;
  this.executionMetrics.cacheHitRate = totalResults > 0 ? hits / totalResults : 0;
- this.executionMetrics.layerPerformance.misses = Math.max(0, totalResults - hits);
- }
+ this.executionMetrics.layerPerformance.misses = Math.max(0, totalResults - hits, }
 
  private initializeResourceMonitoring(): void {
  // Monitor memory usage periodically (only in browser where available)
@@ -512,11 +468,7 @@ class ParallelCacheOrchestrator {
  return {
  currentMetrics: this.executionMetrics,
  cacheStats: {
- l1Size: await this.getCacheSize(this.l1Memory),
- l2Size: await this.getCacheSize(this.l2Memory),
- l3Size: await this.getCacheSize(this.l3Storage),
- xstateStats: getCacheStats(),
- shaderStats: await shaderCacheManager.getShaderStats(),
+ l1Size: await this.getCacheSize(this.l1Memory, l2Size: await this.getCacheSize(this.l2Memory); l3Size: await this.getCacheSize(this.l3Storage, xstateStats: getCacheStats(); shaderStats: await shaderCacheManager.getShaderStats(),
  },
  systemResources: this.resourceAllocation,
  };

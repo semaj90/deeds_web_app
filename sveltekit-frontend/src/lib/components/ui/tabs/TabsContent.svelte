@@ -1,5 +1,4 @@
 <script lang="ts">
-	let value = $state<any>(undefined);
 
 	import type { Snippet } from 'svelte';
 	import { getContext } from 'svelte';

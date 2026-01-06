@@ -1,6 +1,5 @@
 import { createEventDispatcher } from 'svelte';
 <script lang="ts">
-	let currentPhase = $state<any>(undefined);
 	let algorithm = $state<any>(undefined);
 
  // Migrated from createEventDispatcher to callback props;

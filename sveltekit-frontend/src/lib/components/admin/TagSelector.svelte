@@ -1,6 +1,4 @@
 <script lang="ts">
-	let disabled = $state<any>(undefined);
-
 	interface Tag {
 		id: string;
 		name: string;

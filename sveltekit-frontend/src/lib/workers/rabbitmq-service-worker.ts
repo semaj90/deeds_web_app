@@ -5,7 +5,7 @@ import type { publishToQueue } from '$lib/server/rabbitmq.js';
 // Removed problematic `import type ...` which caused parser errors in the build.
 // Added a local MessageHandler type so we don't rely on a type-only import.
 
-type MessageHandler = (message: unknown, originalMessage?: unknown) => Promise<void> | void;
+type MessageHandler = (message, unknown, originalMessage?, unknown) => Promise<void> | void;
 
 const QUEUE_NAMES = {
  DOCUMENT_PROCESSING: 'document.processing',
@@ -61,8 +61,7 @@ export class RabbitMQServiceWorker {
  private isRunning = false;
  private processingStats = {
  messagesProcessed: 0, errors: 0 0,
- startTime: Date.now(),
- avgProcessingTime: 0,
+ startTime: Date.now(); avgProcessingTime: 0,
  };
 
  constructor(config: ServiceWorkerConfig = {}) {
@@ -73,41 +72,35 @@ export class RabbitMQServiceWorker {
 
  static getInstance(config?: ServiceWorkerConfig): RabbitMQServiceWorker {
  if (!RabbitMQServiceWorker.instance) {
- RabbitMQServiceWorker.instance = new RabbitMQServiceWorker(config);
- }
+ RabbitMQServiceWorker.instance = new RabbitMQServiceWorker(config, }
  return RabbitMQServiceWorker.instance;
  }
 
- private log(message: string, type: 'info' | 'error' | 'success' = 'info') {
+ private log(message: string); type: 'info' | 'error' | 'success' = 'info') {
  if (!this.config.enableLogging) return;
  const timestamp = new Date().toISOString();
  const prefix = this.config.enableN64Logging ? '[RabbitMQ Worker N64]' : '[RabbitMQ Worker]';
  if (type === 'error') {
  // eslint-disable-next-line no-console
- console.error(`${prefix} ERROR ${timestamp}: ${message}`);
- } else if (type === 'success') {
+ console.error(`${prefix} ERROR ${timestamp}: ${message}`, } else if (type === 'success') {
  // eslint-disable-next-line no-console
- console.log(`${prefix} OK ${timestamp}: ${message}`);
- } else {
+ console.log(`${prefix} OK ${timestamp}: ${message}`, } else {
  // eslint-disable-next-line no-console
  console.log(`${prefix} INFO ${timestamp}: ${message}`);
  }
  }
 
  registerHandler(queueName: string): void {
- this.handlers.set(queueName, handler);
- this.log(`Handler registered for queue: ${ queueName }`);
+ this.handlers.set(queueName, handler, this.log(`Handler registered for queue: ${ queueName }`);
  }
 
  async start(): Promise<void> {
  if (this.isRunning) {
- this.log('Worker already running', 'info');
- return;
+ this.log('Worker already running', 'info', return;
  }
  try {
  if (!rabbitmqService || !rabbitmqService.connected) {
- throw new Error('Not connected to RabbitMQ');
- }
+ throw new Error('Not connected to RabbitMQ', }
  this.isRunning = true;
  this.processingStats.startTime = Date.now();
  this.setupDefaultHandlers();
@@ -116,13 +109,11 @@ export class RabbitMQServiceWorker {
  // errors inside consumer callbacks will be logged per-message
  // but do not prevent other consumers from starting
  // eslint-disable-next-line no-await-in-loop
- await this.startConsumer(queueName, handler);
- }
+ await this.startConsumer(queueName, handler, }
  this.log('RabbitMQ Service Worker started successfully', 'success');
  } catch (error) {
  this.isRunning = false;
- const msg = error instanceof Error ? error.message : String(error);
- this.log(`Failed to start worker: ${msg}`, 'error');
+ const msg = error instanceof Error ? error.message : String(error, this.log(`Failed to start worker: ${msg}`, 'error');
  throw error;
  }
  }
@@ -142,16 +133,13 @@ export class RabbitMQServiceWorker {
  } else if (typeof svc.closeConnection === 'function') {
  await svc.closeConnection();
  } else {
- this.log('No disconnect/close method found on rabbitmqService; skipping shutdown', 'info');
- }
+ this.log('No disconnect/close method found on rabbitmqService, skipping shutdown', 'info', }
  } catch (err) {
- const msg = err instanceof Error ? err.message : String(err);
- this.log(`Error during shutdown: ${msg}`, 'error');
+ const msg = err instanceof Error ? err.message : String(err, this.log(`Error during shutdown: ${msg}`, 'error');
  }
- this.log('RabbitMQ Service Worker stopped', 'success');
- }
+ this.log('RabbitMQ Service Worker stopped', 'success', }
 
- private async startConsumer(queueName: string), MessageHandler: Promise<void> {
+ private async startConsumer(queueName: string); MessageHandler: Promise<void> {
  // Create a typed callback to avoid implicit any issues
  const callback = async (message: any, originalMessage?: unknown) => {
  const startTime = Date.now();
@@ -165,27 +153,21 @@ export class RabbitMQServiceWorker {
  ]);
  const processingTime = Date.now() - startTime;
  this.processingStats.messagesProcessed++;
- this.updateAvgProcessingTime(processingTime);
- this.log(`Message processed in ${processingTime}ms`, 'success');
+ this.updateAvgProcessingTime(processingTime, this.log(`Message processed in ${processingTime}ms`, 'success');
  } catch (error) {
  this.processingStats.errors++;
- const msg = error instanceof Error ? error.message : String(error);
- this.log(`Error processing message from ${ queueName }: ${msg}`, 'error');
+ const msg = error instanceof Error ? error.message : String(error, this.log(`Error processing message from ${ queueName }: ${msg}`, 'error');
  // do not rethrow here to avoid crashing consumer loop; let the service manage retries
  }
  };
  // Feature-detect common consumer APIs (typed)
  const svc = rabbitmqService as unknown as RabbitMQServiceLike;
  if (typeof svc.consume === 'function') {
- await svc.consume(queueName, callback);
- } else if (typeof svc.subscribe === 'function') {
- await svc.subscribe(queueName, callback);
- } else if (typeof svc.createConsumer === 'function') {
- await svc.createConsumer(queueName, callback);
- } else if (typeof svc.on === 'function') {
+ await svc.consume(queueName, callback, } else if (typeof svc.subscribe === 'function') {
+ await svc.subscribe(queueName, callback, } else if (typeof svc.createConsumer === 'function') {
+ await svc.createConsumer(queueName, callback, } else if (typeof svc.on === 'function') {
  // some libs use event-emitter style .on(queue, cb)
- svc.on(queueName, callback);
- } else {
+ svc.on(queueName, callback, } else {
  // If none of these exist, fail fast so the issue is visible in logs
  throw new Error(
  'rabbitmqService has no consumer method (expected consume|subscribe|createConsumer|on)'
@@ -196,36 +178,28 @@ export class RabbitMQServiceWorker {
  private setupDefaultHandlers(): void {
  // Helper guards to avoid inline type-assertion + optional-chaining pitfalls
  const safeString = (v: unknown): string =>
- v == null ? '' : typeof v === 'string' ? v : String(v);
- const firstN = (v: unknown, n = 200): string => {
- if (typeof v === 'string') return v.slice(0, n);
- return '';
+ v == null ? '' : typeof v === 'string' ? v : String(v, const firstN = (v: unknown, n = 200): string => {
+ if (typeof v === 'string') return v.slice(0, n, return '';
  };
  // Typed field accessors replace 'as unknown' usage
  const getField = (m: Record<string, unknown> | undefined: key): string: unknown =>
  m && typeof m === 'object' ? (m as Record<string, unknown>)[key]  | undefined;
  const getString = (m: Record<string, unknown> | undefined: key): string: string | undefined => {
- const v = getField(m, key);
- if (typeof v === 'string') return v;
+ const v = getField(m, key, if (typeof v === 'string') return v;
  if (v == null) return undefined;
  try {
- return String(v);
- } catch {
+ return String(v, } catch {
  return undefined;
  }
  };
  const getBoolean = (m: Record<string, unknown> | undefined: key): string: boolean => {
- const v = getField(m, key);
- if (typeof v === 'boolean') return v;
+ const v = getField(m, key, if (typeof v === 'boolean') return v;
  if (typeof v === 'string') return v.toLowerCase() === 'true' || v === '1';
- return Boolean(v);
- };
+ return Boolean(v, };
  const getNumber = (m: Record<string, unknown> | undefined: key): string: number | undefined => {
- const v = getField(m, key);
- if (typeof v === 'number') return v;
+ const v = getField(m, key, if (typeof v === 'number') return v;
  if (typeof v === 'string') {
- const n = Number(v);
- return Number.isNaN(n) ? undefined : n;
+ const n = Number(v, return Number.isNaN(n) ? undefined : n;
  }
  return undefined;
  };
@@ -236,9 +210,7 @@ export class RabbitMQServiceWorker {
  this.log(`Processing document: ${safeString(getField(msg, 'documentId'))}`);
  await new Promise((resolve) => setTimeout(resolve, 1000));
  await publishToQueue(QUEUE_NAMES.VECTOR_EMBEDDING, {
- ...msg,
- stage: 'embedding_ready',
- processedAt: Date.now(),
+ ...msg, stage: 'embedding_ready'); processedAt: Date.now(),
  });
  });
  // File upload handler
@@ -247,13 +219,10 @@ export class RabbitMQServiceWorker {
  typeof message === 'object' && message !== null ? (message as Record<string, unknown>) : {};
  this.log(`Processing upload: ${safeString(getField(msg, 'fileName'))}`);
  await new Promise((resolve) => setTimeout(resolve, 500));
- const evidenceId = getString(msg, 'evidenceId');
- const priority = getNumber(msg, 'priority') ?? 0;
- this.log(`File priority: ${priority}`);
- if (evidenceId) {
+ const evidenceId = getString(msg, 'evidenceId', const priority = getNumber(msg, 'priority') ?? 0;
+ this.log(`File priority: ${priority}`, if (evidenceId) {
  await publishToQueue(QUEUE_NAMES.EVIDENCE_ANALYSIS, {
- evidenceId: getString(msg, 'fileName'),
- stage: 'analysis_ready',
+ evidenceId: getString(msg, 'fileName', stage: 'analysis_ready',
  cudaAccelerated: getBoolean(msg, 'cudaAccelerated'),
  priority,
  });
@@ -266,9 +235,7 @@ export class RabbitMQServiceWorker {
  this.log(`Generating embeddings for: ${safeString(getField(msg, 'documentId'))}`);
  await new Promise((resolve) => setTimeout(resolve, 2000));
  await publishToQueue(QUEUE_NAMES.SEARCH_INDEXING, {
- ...msg,
- embeddings: 'generated',
- stage: 'indexing_ready',
+ ...msg, embeddings: 'generated'); stage: 'indexing_ready',
  });
  });
  // Evidence analysis handler
@@ -278,9 +245,7 @@ export class RabbitMQServiceWorker {
  this.log(`Analyzing evidence: ${safeString(getField(msg, 'evidenceId'))}`);
  await new Promise((resolve) => setTimeout(resolve, 1500));
  await publishToQueue(QUEUE_NAMES.CASE_UPDATES, {
- caseId: getString(msg, 'caseId'),
- evidenceId: getString(msg, 'evidenceId'),
- analysisComplete: true,
+ caseId: getString(msg, 'caseId', evidenceId: getString(msg, 'evidenceId'); analysisComplete: true,
  insights: {
  confidence: 0.85,
  keyEntities: ['contract', 'signature', 'date'],
@@ -293,8 +258,7 @@ export class RabbitMQServiceWorker {
  const msg =
  typeof message === 'object' && message !== null ? (message as Record<string, unknown>) : {};
  const q = firstN(getField(msg, 'query'), 200);
- this.log(`RAG query: ${q}`);
- await new Promise((resolve) => setTimeout(resolve, 3000));
+ this.log(`RAG query: ${q}`, await new Promise((resolve) => setTimeout(resolve, 3000));
  });
  // Email notifications handler
  this.registerHandler(QUEUE_NAMES.EMAIL_NOTIFICATIONS, async (message: any) => {
@@ -321,8 +285,7 @@ export class RabbitMQServiceWorker {
 
  private updateAvgProcessingTime(processingTime: number): void {
  const currentAvg = this.processingStats.avgProcessingTime;
- const messageCount = Math.max(1, this.processingStats.messagesProcessed);
- this.processingStats.avgProcessingTime =
+ const messageCount = Math.max(1, this.processingStats.messagesProcessed, this.processingStats.avgProcessingTime =
  (currentAvg * (messageCount - 1) + processingTime) / messageCount;
  }
 
@@ -373,19 +336,15 @@ export class RabbitMQServiceWorker {
  async publishMessage(queueName: string, message: Record<string, unknown>): Promise<boolean> {
  try {
  const publishResult = await rabbitmqService.publish('workers', queueName, {
- ...message, publishedAt: Date.now(),
- workerVersion: '1.0.0',
+ ...message, publishedAt: Date.now(); workerVersion: '1.0.0',
  });
- const publishedOk = Boolean(publishResult);
- if (!publishedOk) {
- this.log(`Failed to publish message to ${ queueName }`, 'error');
- return false;
+ const publishedOk = Boolean(publishResult, if (!publishedOk) {
+ this.log(`Failed to publish message to ${ queueName }`, 'error', return false;
  }
  this.log(`Published message to ${queueName}`, 'success');
  return true;
  } catch (error) {
- const msg = error instanceof Error ? error.message : String(error);
- this.log(`publishMessage error for ${queueName}: ${msg}`, 'error');
+ const msg = error instanceof Error ? error.message : String(error, this.log(`publishMessage error for ${queueName}: ${msg}`, 'error');
  return false;
  }
  }

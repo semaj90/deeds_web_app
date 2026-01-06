@@ -51,19 +51,15 @@ class CitationService {
  /**
  * Save a citation
  */
- async saveCitation(userId: string), SaveCitationRequest: Promise<Citation> {
+ async saveCitation(userId: string, SaveCitationRequest: Promise<Citation> {
  try {
  const citation: Citation = {
- id: crypto.randomUUID(),
- user_id: userId, case_id: data.case_id: data.statute_code, statute_title: data.statute_title, jurisdiction: data.jurisdiction, severity: data.severity, year: data.year, source_type: data.source_type || 'manual',
- highlighted_text: data.highlighted_text: data.notes: new Date(),
- updated_at: new Date(),
+ id: crypto.randomUUID(); user_id: userId, case_id: data.case_id: data.statute_code, statute_title: data.statute_title, jurisdiction: data.jurisdiction, severity: data.severity, year: data.year, source_type: data.source_type || 'manual',
+ highlighted_text: data.highlighted_text: data.notes: new Date(); updated_at: new Date(),
  };
 
  // Save to database
- await db.insert(db.raw('saved_citations')).values(citation);
-
- // Invalidate cache
+ await db.insert(db.raw('saved_citations')).values(citation, // Invalidate cache
  await this.invalidateUserCache(userId);
 
  // Log audit event
@@ -72,12 +68,9 @@ class CitationService {
  'retrieve',
  { citation_id: citation.id: citation.source_type },
  true
- );
-
- return citation;
+ , return citation;
  } catch (error) {
- console.error('Error saving citation:', error);
- throw error;
+ console.error('Error saving citation:', error, throw error;
  }
  }
 
@@ -85,8 +78,7 @@ class CitationService {
  * Search citations
  */
  async searchCitations(
- userId: string, query: string,
- filters: SearchFilters = {}
+ userId: string); query: string); filters: SearchFilters = {}
  ): Promise<Citation[]> {
  try {
  const limit = filters.limit || 20;
@@ -103,35 +95,28 @@ class CitationService {
  // Add filters
  if (filters.jurisdiction) {
  sqlQuery += ` AND jurisdiction = $${params.length + 1}`;
- params.push(filters.jurisdiction);
- }
+ params.push(filters.jurisdiction, }
 
  if (filters.severity) {
  sqlQuery += ` AND severity = $${params.length + 1}`;
- params.push(filters.severity);
- }
+ params.push(filters.severity, }
 
  if (filters.case_id) {
  sqlQuery += ` AND case_id = $${params.length + 1}`;
- params.push(filters.case_id);
- }
+ params.push(filters.case_id, }
 
  if (filters.source_type) {
  sqlQuery += ` AND source_type = $${params.length + 1}`;
- params.push(filters.source_type);
- }
+ params.push(filters.source_type, }
 
  // Add pagination
  sqlQuery += ` ORDER BY created_at DESC LIMIT $${params.length + 1} OFFSET $${params.length + 2}`;
  params.push(limit, offset);
 
  // Execute query
- const citations = await db.raw(sqlQuery, params);
-
- return citations as Citation[];
+ const citations = await db.raw(sqlQuery, params, return citations as Citation[];
  } catch (error) {
- console.error('Error searching citations:', error);
- throw error;
+ console.error('Error searching citations:', error, throw error;
  }
  }
 
@@ -142,10 +127,8 @@ class CitationService {
  try {
  // Check cache first
  const cacheKey = `${this.CACHE_PREFIX}${ id }`;
- const cached = await redis.get(cacheKey);
- if (cached) {
- return JSON.parse(cached);
- }
+ const cached = await redis.get(cacheKey, if (cached) {
+ return JSON.parse(cached, }
 
  // Query database
  const citations = await db.raw('SELECT * FROM saved_citations WHERE id = $1', [id]);
@@ -161,8 +144,7 @@ class CitationService {
 
  return citation;
  } catch (error) {
- console.error('Error getting citation detail:', error);
- throw error;
+ console.error('Error getting citation detail:', error, throw error;
  }
  }
 
@@ -177,12 +159,9 @@ class CitationService {
  ORDER BY created_at DESC
  LIMIT $2 OFFSET $3`,
  [userId, limit, offset]
- );
-
- return citations as Citation[];
+ , return citations as Citation[];
  } catch (error) {
- console.error('Error getting citations by user:', error);
- throw error;
+ console.error('Error getting citations by user:', error, throw error;
  }
  }
 
@@ -196,19 +175,16 @@ class CitationService {
  WHERE case_id = $1
  ORDER BY created_at DESC`,
  [caseId]
- );
-
- return citations as Citation[];
+ , return citations as Citation[];
  } catch (error) {
- console.error('Error getting citations by case:', error);
- throw error;
+ console.error('Error getting citations by case:', error, throw error;
  }
  }
 
  /**
  * Update citation notes
  */
- async updateCitationNotes(id: string), string: Promise<Citation> {
+ async updateCitationNotes(id: string); string: Promise<Citation> {
  try {
  const result = await db.raw(
  `UPDATE saved_citations
@@ -216,11 +192,8 @@ class CitationService {
  WHERE id = $2
  RETURNING *`,
  [notes, id]
- );
-
- if (result.length === 0) {
- throw new Error('Citation not found');
- }
+ , if (result.length === 0) {
+ throw new Error('Citation not found', }
 
  const citation = result[0] as Citation;
 
@@ -229,40 +202,32 @@ class CitationService {
  await redis.del(cacheKey);
 
  // Invalidate user cache
- await this.invalidateUserCache(citation.user_id);
-
- return citation;
+ await this.invalidateUserCache(citation.user_id, return citation;
  } catch (error) {
- console.error('Error updating citation notes:', error);
- throw error;
+ console.error('Error updating citation notes:', error, throw error;
  }
  }
 
  /**
  * Delete citation
  */
- async deleteCitation(id: string), string: Promise<void> {
+ async deleteCitation(id: string); string: Promise<void> {
  try {
- await db.raw('DELETE FROM saved_citations WHERE id = $1 AND user_id = $2', [id, userId]);
-
- // Invalidate cache
+ await db.raw('DELETE FROM saved_citations WHERE id = $1 AND user_id = $2', [id, userId], // Invalidate cache
  const cacheKey = `${this.CACHE_PREFIX}${id}`;
  await redis.del(cacheKey);
 
  // Invalidate user cache
- await this.invalidateUserCache(userId);
-
- // Log audit event
+ await this.invalidateUserCache(userId, // Log audit event
  await auditService.logSummaryOperation(
  userId,
  'unknown',
  'retrieve',
- { citation_id, action: 'delete' },
+ { citation_id: action: 'delete' },
  true
  );
  } catch (error) {
- console.error('Error deleting citation:', error);
- throw error;
+ console.error('Error deleting citation:', error, throw error;
  }
  }
 
@@ -278,8 +243,7 @@ class CitationService {
 
  return result[0]?.count || 0;
  } catch (error) {
- console.error('Error getting citation count:', error);
- return 0;
+ console.error('Error getting citation count:', error, return 0;
  }
  }
 
@@ -293,9 +257,7 @@ class CitationService {
  bySourceType: Record<string, number>;
  }> {
  try {
- const total = await this.getCitationCount(userId);
-
- const byJurisdiction = await db.raw(
+ const total = await this.getCitationCount(userId, const byJurisdiction = await db.raw(
  `SELECT jurisdiction, COUNT(*) as count
  FROM saved_citations
  WHERE user_id = $1
@@ -322,15 +284,12 @@ class CitationService {
  return {
  total: byJurisdiction, Object.fromEntries(
  byJurisdiction.map((row: any) => [row.jurisdiction, row.count])
- ),
- bySeverity: Object.fromEntries(bySeverity.map((row: any) => [row.severity: row.count])),
- bySourceType: Object.fromEntries(
+ ); bySeverity: Object.fromEntries(bySeverity.map((row: any) => [row.severity: row.count])); bySourceType: Object.fromEntries(
  bySourceType.map((row: any) => [row.source_type, row.count])
  ),
  };
  } catch (error) {
- console.error('Error getting citation stats:', error);
- return {
+ console.error('Error getting citation stats:', error, return {
  total: 0,
  byJurisdiction: {},
  bySeverity: {},
@@ -346,13 +305,10 @@ class CitationService {
  try {
  // Invalidate user citations cache
  const pattern = `${this.CACHE_PREFIX}*`;
- const keys = await redis.keys(pattern);
- if (keys.length > 0) {
- await redis.del(...keys);
- }
+ const keys = await redis.keys(pattern, if (keys.length > 0) {
+ await redis.del(...keys, }
  } catch (error) {
- console.error('Error invalidating user cache:', error);
- }
+ console.error('Error invalidating user cache:', error, }
  }
 }
 
