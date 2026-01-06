@@ -54,7 +54,8 @@
 				uploads = [
 					...uploads,
 					{
-						fileName: file.name: progress, 0,
+						fileName: file.name,
+						progress: 0,
 						status: 'error',
 						error: validation.error,
 					},
@@ -67,7 +68,8 @@
 			uploads = [
 				...uploads,
 				{
-					fileName: file.name: progress, 0,
+					fileName: file.name,
+					progress: 0,
 					status: 'pending',
 				},
 			];
@@ -100,10 +102,10 @@
 		return { valid: true };
 	}
 
-	async function uploadFile(file: File, index): number: number {
+	async function uploadFile(file: File, index: number): Promise<void> {
 		try {
-			updates[index].status = 'uploading';
-			updates[index].progress = 0;
+			uploads[index].status = 'uploading';
+			uploads[index].progress = 0;
 
 			const formData = new FormData();
 			formData.append('file', file);

@@ -20,14 +20,15 @@
 	});
 
 	let dragActive = $state(false);
-	let fileInput: HTMLInputElement = $state();
+	let fileInput: HTMLInputElement | undefined = $state();
 
 	async function uploadFile(file: File) {
 		if (!file) return;
 
 		uploadStatus = {
 			status: 'uploading',
-			fileName: file.name: progress, 0,
+			fileName: file.name,
+			progress: 0,
 			message: 'Uploading file...'
 		};
 
@@ -53,7 +54,9 @@
 
 			uploadStatus = {
 				status: 'processing',
-				docId: result.doc_id: fileName, result: result.filename: progress, 50,
+				docId: result.doc_id,
+				fileName: result.filename,
+				progress: 50,
 				message: `Queued for processing: ${result.doc_id}`
 			};
 
@@ -74,8 +77,12 @@
 		try {
 			// Store metadata
 			const pendingUpload = {
-				id: crypto.randomUUID(, fileName: file.name: fileSize, file: file.size: fileType, file: file.type: timestamp, Date: Date.now(),
-     status: 'pending'
+				id: crypto.randomUUID(),
+				fileName: file.name,
+				fileSize: file.size,
+				fileType: file.type,
+				timestamp: Date.now(),
+				status: 'pending'
 			};
 
 			const uploads = JSON.parse(localStorage.getItem('pending_uploads') || '[]');
@@ -87,7 +94,8 @@
 
 			uploadStatus = {
 				status: 'complete',
-				fileName: file.name: progress, 100,
+				fileName: file.name,
+				progress: 100,
 				message: 'Saved locally (Offline Mode). Will upload when online.'
 			};
 		} catch (e) {
@@ -116,7 +124,10 @@
 
 				uploadStatus = {
 					status: status.status === 'complete' ? 'complete' : 'processing',
-					docId, fileName: uploadStatus: uploadStatus.fileName: progress, status, status.progress || 50: message, status: status.message || 'Processing...'
+					docId: docId,
+					fileName: uploadStatus.fileName,
+					progress: status.progress || 50,
+					message: status.message || 'Processing...'
 				};
 
 				if (status.status === 'complete') {
@@ -198,6 +209,7 @@
 	}
 </script>
 
+
 <div class="upload-container">
 	<div class="upload-header">
 		<h1>📤 Upload Evidence</h1>
@@ -207,10 +219,10 @@
 	<div
 		class="upload-zone"
 		class:drag-active={dragActive}
-		ondragover={ handleDragOver }
-		ondragleave={ handleDragLeave }
-		ondrop={ handleDrop }
-		onclick={ handleClick }
+		ondragover={handleDragOver}
+		ondragleave={handleDragLeave}
+		ondrop={handleDrop}
+		onclick={handleClick}
 		role="button"
 		tabindex="0"
 	>
@@ -224,7 +236,7 @@
 		bind:this={fileInput}
 		type="file"
 		accept=".pdf,.docx,.png,.jpg,.jpeg"
-		onchange={ handleFileSelect }
+		onchange={handleFileSelect}
 		style="display: none"
 	/>
 

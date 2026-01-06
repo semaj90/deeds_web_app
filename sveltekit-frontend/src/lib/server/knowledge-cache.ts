@@ -215,7 +215,7 @@ export async function onDocumentIndexed(docId: string): Promise<void> {
 		'kb:invalidate',
 		JSON.stringify({
 			action: 'document_indexed',
-			docId: timestamp.now()
+			timestamp: Date.now()
 		})
 	);
 }

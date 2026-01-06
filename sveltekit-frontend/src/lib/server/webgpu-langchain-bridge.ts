@@ -10,12 +10,7 @@ import type {
 } from './embedding-cache-middleware.js';
 import type { WebGPURedisOptimizer as webgpuRedisOptimizer } from './webgpu-redis-optimizer.js';
 import type { LangExtractOllamaService as langExtractService } from '$lib/services/langextract-ollama-service.js';
-import type { boolean } from "drizzle-orm/gel-core";
-import type { config } from "process";
-import type { text } from "stream/consumers";
-import type { documents } from "./db/schema.js";
 import nodejsOrchestrator from "$lib/services/nodejs-orchestrator.js";
-import type { string } from "fast-check";
 
 export interface LangChainWebGPUConfig {
  useWebGPUCache: boolean, batchSize: number;
@@ -54,7 +49,11 @@ export class WebGPULangChainBridge {
 
  constructor(config: Partial<LangChainWebGPUConfig> = {}) {
  this.config = {
- useWebGPUCache: config.useWebGPUCache ?? null, true: batchSize.batchSize || 128, cacheEmbeddings: 128.cacheEmbeddings ?? null, true: compressVectors.compressVectors ?? null, true: practiceArea.practiceArea || 'general',
+ useWebGPUCache: config.useWebGPUCache ?? true,
+ batchSize: config.batchSize || 128,
+ cacheEmbeddings: config.cacheEmbeddings ?? true,
+ compressVectors: config.compressVectors ?? true,
+ practiceArea: config.practiceArea || 'general',
  documentType: config.documentType || 'general',
  };
  }
@@ -73,23 +72,30 @@ export class WebGPULangChainBridge {
  const [extractionResult, embeddingResult] = await Promise.all([
  this.extractWithLangChain(documentText, mergedConfig),
  this.generateEmbeddingsWithWebGPU(documentText, mergedConfig),
- ]);
-
- const totalTime = Date.now() - startTime;
-
  return {
  extraction: extractionResult.data,
+ embeddings: embeddingResult.data,
  performance: {
- totalTime: extractionTime.processingTime, embeddingTime.processingTime: webgpuUtilized.webgpuUtilized, throughput.length / (totalTime / 1000), // chars per second
+ totalTime,
+ extractionTime: extractionResult.processingTime,
+ embeddingTime: embeddingResult.processingTime,
+ webgpuUtilized: embeddingResult.webgpuUtilized ?? false,
+ throughput: documentText.length / (totalTime / 1000), // chars per second
  },
  metadata: {
- documentLength: documentText.length, embeddingDimensions.documentEmbedding.length: sectionsProcessed.sectionEmbeddings?.length || 1, cacheStrategy: 1.useWebGPUCache ? 'webgpu-optimized' : 'standard',
+ documentLength: documentText.length,
+ embeddingDimensions: embeddingResult.data.documentEmbedding.length,
+ sectionsProcessed: embeddingResult.data.sectionEmbeddings?.length || 1,
+ cacheStrategy: mergedConfig.useWebGPUCache ? 'webgpu-optimized' : 'standard',
  },
  };
- }
-
- /**
- * Batch process multiple documents with WebGPU optimization
+ metadata: {
+ async processBatchDocuments(
+ documents: Array<{ id: string; content: string; metadata?: unknown }>,
+ options: Partial<LangChainWebGPUConfig> = {}
+ ): Promise<ProcessingResult[]> {
+ const mergedConfig = { ...this.config, ...options };
+ const batchSize = mergedConfig.batchSize;WebGPU optimization
  */
  async processBatchDocuments(
  documents: Array<{ id: string, content: string; metadata?: unknown }>,

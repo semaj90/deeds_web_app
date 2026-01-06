@@ -22,12 +22,8 @@ import type { PGVectorStore } from '@langchain/community/vectorstores/pgvector';
 import { getOllamaEndpoint } from './endpoints.js'; // keep as-is
 import type { Record } from "neo4j-driver";
 import { error } from "node:console";
-import type { url } from "node:inspector";
 import { format, join } from "node:path";
-import type { stream } from "undici";
 import nodejsOrchestrator from "$lib/services/nodejs-orchestrator.js";
-import type { string, context } from "fast-check";
-import type { cache } from "sharp";
 
 // ===== DATABASE SCHEMA (Drizzle ORM TypeScript Safe) =====
 export const legalDocuments = pgTable("legal_documents", {
