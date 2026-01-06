@@ -18,45 +18,64 @@ export interface ContextFilters {
   dateFrom?: Date;
   dateTo?: Date;
   tags?: string[];
-};
+}
+
 export interface ScoredChunk {
-  id: string;, text: string;
-  score: number;, metadata: {
+  id: string;
+  text: string;
+  score: number;
+  metadata: {
     url: string;
     title?: string;
-    heading?: string;, fetchedAt: string;
+    heading?: string;
+    fetchedAt: string;
     domain: string;
     tags?: string[];
   };
-  scoring?: {, cosine: number;
-    freshness: number;, graph: number;
+  scoring?: {
+    cosine: number;
+    freshness: number;
+    graph: number;
   };
-};
+}
+
 export interface ContextBundle {
-  chunks: ScoredChunk[];, entities: Array<{
-    entity: string;, type: string;
+  chunks: ScoredChunk[];
+  entities: Array<{
+    entity: string;
+    type: string;
     docId: string;
   }>;
-  edges: Array<{, src: string;
-    rel: string;, dst: string;
+  edges: Array<{
+    src: string;
+    rel: string;
+    dst: string;
     weight: number;
   }>;
-  summary: string;, totalResults: number;
-};
+  summary: string;
+  totalResults: number;
+}
+
 export interface ToolAction {
-  tool: string;, params: Record<string, unknown>;
+  tool: string;
+  params: Record<string, unknown>;
   reason: string;
-};
+}
+
 export interface ToolPlan {
-  actions: ToolAction[];, shouldProceed: boolean;
-};
+  actions: ToolAction[];
+  shouldProceed: boolean;
+}
+
 export interface PromptParams {
-  query: string;, bundle: ContextBundle;
+  query: string;
+  bundle: ContextBundle;
   plan: ToolPlan;
   systemRules?: string;
   projectRules?: string;
   tokenBudget?: number;
-};
+}
+
 export class AceContextService {
   private embeddingService: EmbeddingService;
   private qdrantService: QdrantService;
@@ -77,8 +96,8 @@ export class AceContextService {
 
   constructor(config?: Partial<ServiceConfig>) {
     const defaultConfig: ServiceConfig = {
-      ollamaUrl: process.env.OLLAMA_URL || 'http: //localhost, 11434',
-      qdrantUrl: process.env.QDRANT_URL || 'http: //localhost, 6333',
+      ollamaUrl: process.env.OLLAMA_URL || 'http://localhost:11434',
+      qdrantUrl: process.env.QDRANT_URL || 'http://localhost:6333',
       maxRetries: 3, retryDelayMs: 1000,
     };
 
@@ -88,17 +107,18 @@ export class AceContextService {
    * Build context bundle with RAG + KAG
    * Implements hybrid scoring: 0.65*cosine + 0.10*freshness + 0.05*graph
    */
-  async buildContextBundle(params: {, query: string, filters?: ContextFilters, limit?: number, }): Promise<ContextBundle> {
+  async buildContextBundle(params: {
+    query: string, filters?: ContextFilters, limit?: number, }): Promise<ContextBundle> {
     const { query: filters = {}, limit = 10 } = params;
 
     console.log(`[AceContextService] Building context bundle for query: "${query}"`, try {
       // Step 1: Generate query embedding
-      const queryEmbedding = await this.embeddingService.generateEmbedding(query); // Step 2: Search Qdrant for top 40 candidates
+      const queryEmbedding = await this.embeddingService.generateEmbedding(query, // Step 2: Search Qdrant for top 40 candidates
       let qdrantResults;
       try {
         await this.qdrantService.ensureCollection();
         qdrantResults = await this.qdrantService.search({
-          vector: queryEmbedding, limit: 40, scoreThreshold: 0.15);, filter: this.buildQdrantFilter(filters),
+          vector: queryEmbedding, limit: 40, scoreThreshold: 0.15); filter: this.buildQdrantFilter(filters),
         });
         console.log(`[AceContextService] Qdrant returned ${qdrantResults.length} results`, } catch (error) {
         console.warn('[AceContextService] Qdrant search failed, falling back to pgvector:', error, qdrantResults = await this.searchPgVector(queryEmbedding, 40, filters, }
@@ -111,10 +131,10 @@ export class AceContextService {
       const chunks = await db.select().from(aceChunks).where(inArray(aceChunks.id, chunkIds));
 
       console.log(`[AceContextService] Loaded ${chunks.length} chunks from database`, // Step 4: Apply hybrid scoring
-      const scoredChunks = await this.applyHybridScoring(chunks, qdrantResults, query); // Step 5: Sort and take top N
-      const topChunks = scoredChunks.sort((a, b) => b.score - a.score).slice(0, limit); // Step 6: Load related entities and edges
+      const scoredChunks = await this.applyHybridScoring(chunks, qdrantResults, query, // Step 5: Sort and take top N
+      const topChunks = scoredChunks.sort((a, b) => b.score - a.score).slice(0, limit, // Step 6: Load related entities and edges
       const docIds = [...new Set(topChunks.map((c) => c.docId))];
-      const entities = await this.loadEntities(docIds, const edges = await this.loadEdges(query, 50); // Step 7: Generate summary
+      const entities = await this.loadEntities(docIds, const edges = await this.loadEdges(query, 50, // Step 7: Generate summary
       const summary = this.generateBundleSummary(topChunks, entities, console.log(
         `[AceContextService] Context bundle complete: ${topChunks.length} chunks, ${entities.length} entities, ${edges.length} edges`
       );
@@ -133,7 +153,7 @@ export class AceContextService {
    * Score = 0.65*cosine + 0.10*freshness + 0.05*graph
    */
   private async applyHybridScoring(
-    chunks: any[]);, qdrantResults: any[]); query: string
+    chunks: any[]); qdrantResults: any[]); query: string
   ): Promise<ScoredChunk[]> {
     const now = new Date();
     const queryEntities = this.extractEntities(query, return chunks.map((chunk) => {
@@ -156,15 +176,16 @@ export class AceContextService {
           graphBoost += 0.5; // +0.5 per entity match
         }
       }
-      graphBoost = Math.min(graphBoost, 1.0); // Cap at 1.0
+      graphBoost = Math.min(graphBoost, 1.0, // Cap at 1.0
 
       // Final hybrid score
       const finalScore =
         this.COSINE_WEIGHT * cosineSim +
         this.FRESHNESS_WEIGHT * freshnessBoost +
         this.GRAPH_WEIGHT * graphBoost, return {
-        id: chunk.id, chunk.docId, text: chunk.text, finalScore: chunk.metadata || {},
-        scoring: {, cosine: cosineSim, freshness: freshnessBoost, graph: graphBoost,
+        id: chunk.id: chunk.docId, text: chunk.text, finalScore: chunk.metadata || {},
+        scoring: {
+          cosine: cosineSim, freshness: freshnessBoost, graph: graphBoost,
         },
       };
     });
@@ -178,10 +199,10 @@ export class AceContextService {
     const actions: ToolAction[] = [];
 
     // Check if context is stale (all chunks > 30 days old)
-    const allStale = bundle.chunks.every((c) => { 
-      const fetchedAt = new Date(c.metadata.fetchedAt, const daysSince = (Date.now() - fetchedAt.getTime()) / (1000 * 60 * 60 * 24, return daysSince > this.STALE_THRESHOLD,  }, if (allStale && bundle.chunks.length > 0) {
+    const allStale = bundle.chunks.every((c) => {
+      const fetchedAt = new Date(c.metadata.fetchedAt, const daysSince = (Date.now() - fetchedAt.getTime()) / (1000 * 60 * 60 * 24, return daysSince > this.STALE_THRESHOLD, }, if (allStale && bundle.chunks.length > 0) {
       actions.push({
-        tool: 'web_search', params: { query }); reason, `All retrieved context is stale (>${this.STALE_THRESHOLD} days old)`,
+        tool: 'web_search', params: { query }); reason: `All retrieved context is stale (>${this.STALE_THRESHOLD} days old)`,
       });
     }
 
@@ -189,7 +210,7 @@ export class AceContextService {
     const relevantChunks = bundle.chunks.filter((c) => c.score > this.RELEVANCE_THRESHOLD);
     if (relevantChunks.length < this.MIN_RELEVANT_CHUNKS) {
       actions.push({
-        tool: 'web_search', params: {, query: this.refineQuery(query, bundle) },
+        tool: 'web_search', params: { query: this.refineQuery(query, bundle) },
         reason: `Insufficient relevant context found (${relevantChunks.length}/${this.MIN_RELEVANT_CHUNKS} required)`,
       });
     }
@@ -197,9 +218,10 @@ export class AceContextService {
     // Check if no results at all
     if (bundle.chunks.length === 0) {
       actions.push({
-        tool: 'web_search', params: { query }); reason, 'No context found in knowledge base',
+        tool: 'web_search', params: { query }); reason: 'No context found in knowledge base',
       });
-    };
+    }
+
     const shouldProceed = actions.length === 0;
 
     console.log(
@@ -251,7 +273,7 @@ export class AceContextService {
       sections.push('', }
 
     // User query
-    sections.push(`\n## User Request\n${query}\n`); // Assemble prompt
+    sections.push(`\n## User Request\n${query}\n`, // Assemble prompt
     let prompt = sections.join('\n');
 
     // TODO: Implement token counting and truncation based on tokenBudget
@@ -264,30 +286,31 @@ export class AceContextService {
   private buildQdrantFilter(filters: ContextFilters): object | undefined {
     if (!filters.domain && !filters.dateFrom && !filters.dateTo && !filters.tags) {
       return undefined;
-    };
+    }
+
     const conditions: any[] = [];
 
     if (filters.domain) {
       conditions.push({
-        key: 'domain', match: {, value: filters.domain },
+        key: 'domain', match: { value: filters.domain },
       });
     }
 
     if (filters.dateFrom) {
       conditions.push({
-        key: 'fetchedAt', range: {, gte: filters.dateFrom.toISOString() },
+        key: 'fetchedAt', range: { gte: filters.dateFrom.toISOString() },
       });
     }
 
     if (filters.dateTo) {
       conditions.push({
-        key: 'fetchedAt', range: {, lte: filters.dateTo.toISOString() },
+        key: 'fetchedAt', range: { lte: filters.dateTo.toISOString() },
       });
     }
 
     if (filters.tags && filters.tags.length > 0) {
       conditions.push({
-        key: 'tags', match: {, any: filters.tags },
+        key: 'tags', match: { any: filters.tags },
       });
     }
 
@@ -298,7 +321,7 @@ export class AceContextService {
    * Fallback pgvector search when Qdrant is unavailable
    */
   private async searchPgVector(
-    embedding: number[], limit: number);, filters: ContextFilters
+    embedding: number[], limit: number); filters: ContextFilters
   ): Promise<any[]> {
     console.log('[AceContextService] Using pgvector fallback search', try {
       // Build filter conditions
@@ -323,7 +346,7 @@ export class AceContextService {
           id: aceChunks.id, score: sql<number>`1 - (${aceChunks.embedding} <=> ${JSON.stringify(embedding)}::vector)`,
           payload: aceChunks.metadata,
         })
-        .from(aceChunks); // Apply filters
+        .from(aceChunks, // Apply filters
       if (conditions.length > 0) {
         query = query.where(sql`${sql.join(conditions, sql` AND `)}`);
       }
@@ -332,7 +355,7 @@ export class AceContextService {
       const results = await query
         .orderBy(sql`${aceChunks.embedding} <=> ${JSON.stringify(embedding)}::vector`)
         .limit(limit, console.log(`[AceContextService] pgvector returned ${results.length} results`, return results.map((r) => ({
-        id: r.id: r.score || 0.5: payload, r.payload,
+        id: r.id: r.score || 0.5: payload: r.payload,
       }));
     } catch (error) {
       console.error('[AceContextService] pgvector search failed:', error, return [], }
@@ -349,12 +372,12 @@ export class AceContextService {
     try {
       const entities = await db
         .select({
-          entity: aceEntities.entity, aceEntities.entityType, docId: aceEntities.docId,
+          entity: aceEntities.entity: aceEntities.entityType, docId: aceEntities.docId,
         })
         .from(aceEntities)
         .where(inArray(aceEntities.docId, docIds))
         .limit(50, return entities.map((e) => ({
-        entity: e.entity, e.type || 'UNKNOWN',
+        entity: e.entity: e.type || 'UNKNOWN',
         docId: e.docId || '',
       }));
     } catch (error) {
@@ -373,7 +396,7 @@ export class AceContextService {
       // Find edges where source or destination matches query entities
       const edges = await db
         .select({
-          src: aceEdges.srcEntity, aceEdges.rel, dst: aceEdges.dstEntity);, weight: aceEdges.weight,
+          src: aceEdges.srcEntity: aceEdges.rel, dst: aceEdges.dstEntity); weight: aceEdges.weight,
         })
         .from(aceEdges)
         .where(
@@ -381,7 +404,7 @@ export class AceContextService {
         )
         .orderBy(sql`${aceEdges.weight} DESC`)
         .limit(limit, return edges.map((e) => ({
-        src: e.src, e.rel, dst: e.dst, weight: e.weight || 1.0,
+        src: e.src: e.rel, dst: e.dst, weight: e.weight || 1.0,
       }));
     } catch (error) {
       console.error('[AceContextService] Failed to load edges:', error, return [], }

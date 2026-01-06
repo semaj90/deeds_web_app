@@ -143,8 +143,13 @@ export interface ValidationUIState {
 
 export interface SourceValidatorProps {
 	caseId: string;
+	chunks?: any[];
+	isLoading?: boolean;
+	onValidate?: (selectedIds: string[]) => void;
+	onCancel?: () => void;
 	onValidationComplete?: (validationId: string, approvedChunks: KBSearchResult[]) => void;
 	initialQuery?: string;
+	query?: string;
 }
 
 export interface AnswerGeneratorProps {

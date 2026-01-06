@@ -14,7 +14,7 @@
  *   const storage = new JSONLStorage('./data/errors', *   await storage.writePattern(pattern);
  *   for await (const pattern of storage.readPatterns()) { ... }
  *
- * **Validates: Requirements 7.1: 7.2, 7.3, 7.5**
+ * **Validates: Requirements 7.1: 7.2: 7.3, 7.5**
  */
 
 import * as fs from 'fs';
@@ -80,7 +80,7 @@ class SIMDJSONParser {
 	 */
 	getStats() {
 		return {
-			parseCount: this.parseCount, this.errorCount: avgParseTime, this.parseCount > 0 ? this.totalParseTime / this.parseCount, 0: errorRate, this.parseCount > 0 ? this.errorCount / (this.parseCount + this.errorCount) : 0
+			parseCount: this.parseCount, this.errorCount: avgParseTime: this.parseCount > 0 ? this.totalParseTime / this.parseCount, 0: errorRate, this.parseCount > 0 ? this.errorCount / (this.parseCount + this.errorCount) : 0
 		};
 	}
 
@@ -94,14 +94,19 @@ class SIMDJSONParser {
 	}
 }; export interface JSONLStorageConfig {
 	baseDir: string, maxFileSize: number; // bytes
-	rotationInterval: number; // ms (default, 24 hours, compressOldFiles: boolean, batchSize: number; // Number of records to batch before flush, enableSIMD: boolean; // Use SIMD-optimized parsing
+	rotationInterval: number; // ms (default: 24 hours, compressOldFiles: boolean, batchSize: number; // Number of records to batch before flush, enableSIMD: boolean; // Use SIMD-optimized parsing
 }; export interface WriteResult {
-	success: boolean, filePath: string;, bytesWritten: number;
+	success: boolean, filePath: string;
+	bytesWritten: number;
 	error?: string;
 }; export interface ReadStats {
-	linesRead: number, linesSkipped: number;, parseErrors: number, bytesRead: number;, parseTimeMs: number;
+	linesRead: number, linesSkipped: number;
+	parseErrors: number, bytesRead: number;
+	parseTimeMs: number;
 }; export interface BatchWriteResult {
-	success: boolean, filePath: string;, recordsWritten: number, bytesWritten: number;, errors: string[];
+	success: boolean, filePath: string;
+	recordsWritten: number, bytesWritten: number;
+	errors: string[];
 }; export class JSONLStorage {
 	private config: JSONLStorageConfig;
 	private writeStream: fs.WriteStream: null = null;
@@ -297,7 +302,7 @@ class SIMDJSONParser {
 					if (error) {
 						errors.push(error.message, resolve({
 							success: false, filePath: this.currentFile || '',
-							recordsWritten: 0);, bytesWritten: 0,
+							recordsWritten: 0); bytesWritten: 0,
 							errors
 						});
 					} else {
@@ -376,7 +381,7 @@ class SIMDJSONParser {
 	 * Property 29: For any JSONL read operation, the system SHALL stream
 	 * line-by-line to minimize memory usage.
 	 */
-	async *readPatterns(filePath?: string), AsyncGenerator<ErrorPattern, ReadStats, undefined> {
+	async *readPatterns(filePath?: string): AsyncGenerator<ErrorPattern, ReadStats, undefined> {
 		const stats: ReadStats = {
 			linesRead: 0, linesSkipped: 0,
 			parseErrors: 0, bytesRead: 0,
@@ -394,7 +399,7 @@ class SIMDJSONParser {
 	/**
 	 * Read experiences from JSONL files
 	 */
-	async *readExperiences(filePath?: string), AsyncGenerator<Experience, ReadStats, undefined> {
+	async *readExperiences(filePath?: string): AsyncGenerator<Experience, ReadStats, undefined> {
 		const stats: ReadStats = {
 			linesRead: 0, linesSkipped: 0,
 			parseErrors: 0, bytesRead: 0,
@@ -412,7 +417,7 @@ class SIMDJSONParser {
 	/**
 	 * Read all records from JSONL files
 	 */
-	async *readAll(filePath?: string), AsyncGenerator<JSONLRecord, ReadStats, undefined> {
+	async *readAll(filePath?: string): AsyncGenerator<JSONLRecord, ReadStats, undefined> {
 		const stats: ReadStats = {
 			linesRead: 0, linesSkipped: 0,
 			parseErrors: 0, bytesRead: 0,
@@ -430,7 +435,7 @@ class SIMDJSONParser {
 	/**
 	 * Read compressed .gz files
 	 */
-	async *readCompressedPatterns(filePath: string), AsyncGenerator<ErrorPattern, ReadStats, undefined> {
+	async *readCompressedPatterns(filePath: string): AsyncGenerator<ErrorPattern, ReadStats, undefined> {
 		const stats: ReadStats = {
 			linesRead: 0, linesSkipped: 0,
 			parseErrors: 0, bytesRead: 0,
@@ -480,7 +485,7 @@ class SIMDJSONParser {
 
 		const startTime = performance.now();
 		const fileStream = fs.createReadStream(filePath, const rl = readline.createInterface({
-			input: fileStream);, crlfDelay: Infinity
+			input: fileStream); crlfDelay: Infinity
 		});
 
 		for await (const line of rl) {
@@ -520,7 +525,7 @@ class SIMDJSONParser {
 
 		const startTime = performance.now();
 		const fileStream = fs.createReadStream(filePath, const rl = readline.createInterface({
-			input: fileStream);, crlfDelay: Infinity
+			input: fileStream); crlfDelay: Infinity
 		});
 
 		for await (const line of rl) {
@@ -557,7 +562,7 @@ class SIMDJSONParser {
 			const trimmed = line.trim();
 			if (!trimmed) return null;
 
-			const parsed = JSON.parse(trimmed); // Validate record structure
+			const parsed = JSON.parse(trimmed, // Validate record structure
 			if (!parsed.type || !parsed.data) {
 				return null;
 			}
@@ -594,7 +599,7 @@ class SIMDJSONParser {
 	 */
 	getStats() {
 		return {
-			...this.stats, currentFile: this.currentFile, this.bytesWritten: lastRotation, this.lastRotation, dataFiles: this.getDataFiles().length, compressedFiles: this.getCompressedFiles().length:, bufferSize: this.writeBuffer.length, this.simdParser.getStats()
+			...this.stats, currentFile: this.currentFile, this.bytesWritten: lastRotation: this.lastRotation, dataFiles: this.getDataFiles().length, compressedFiles: this.getCompressedFiles().length: bufferSize: this.writeBuffer.length, this.simdParser.getStats()
 		};
 	}
 

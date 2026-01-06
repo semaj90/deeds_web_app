@@ -25,13 +25,7 @@ let {
 	isLoading = false,
 	onValidate,
 	onCancel
-}: SourceValidatorProps & {
-	chunks?: Array<{ chunk_id: string; confidence: ConfidenceLevel; source_title: string; score: number; text?: string; snippet?: string; source_type?: string; page_num?: number; has_table?: boolean; has_image?: boolean; related_entities: string[]; source_url?: string }>;
-	query?: string;
-	isLoading?: boolean;
-	onValidate?: (selectedIds: string[]) => void;
-	onCancel?: () => void;
-} = $props();
+}: SourceValidatorProps = $props();
 
 // Svelte 5 reactive state - use $state.snapshot or make it reactive to prop changes
 let searchQuery = $state<string>('');
