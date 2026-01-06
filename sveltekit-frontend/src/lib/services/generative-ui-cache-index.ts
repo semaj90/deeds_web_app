@@ -1,7 +1,6 @@
 import BitmapHMMSOMPredictor from '$lib/ai/bitmap-hmm-som-predictor.js';
-import { createRedisInstance } from '$lib/server/redis.js';
+import Redis from 'ioredis';
 import { QLoRAReinforcementLearningService } from '$lib/services/qlora-rl-training-service.js';
-import type Redis from 'ioredis';
 
 // Generative UI component metadata
 export interface UIComponentMetadata {
@@ -62,7 +61,7 @@ export interface IndexStats {
 
 export class GenerativeUICacheIndex {
     private redis: Redis;
-    private hmmPredictor: BitmapHMMSOMPredictor;
+    private hmmPredictor: any;
     private qloraService: QLoRAReinforcementLearningService;
     private componentIndex: Map<string, CachedUIComponent> = new Map();
     private embeddings: Map<string, number[]> = new Map();
@@ -71,13 +70,13 @@ export class GenerativeUICacheIndex {
     private isInitialized = false;
 
     constructor(
-        hmmPredictor?: BitmapHMMSOMPredictor,
+        hmmPredictor?: any,
         qloraService?: QLoRAReinforcementLearningService,
         redis?: Redis
     ) {
-        this.redis = redis || createRedisInstance();
+        this.redis = redis || new Redis();
         this.hmmPredictor = hmmPredictor || new BitmapHMMSOMPredictor();
-        this.qloraService = qloraService || new QLoRAReinforcementLearningService(this.hmmPredictor);
+        this.qloraService = qloraService || new QLoRAReinforcementLearningService();
     }
 
     /**
@@ -89,7 +88,6 @@ export class GenerativeUICacheIndex {
 
         // Initialize all subsystems
         await this.hmmPredictor.initialize();
-        await this.qloraService.initialize();
 
         // Setup WebGPU for compute acceleration
         if (typeof navigator !== 'undefined') {

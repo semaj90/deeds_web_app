@@ -110,7 +110,7 @@
             </div>
             <div class="nes-row px-0 py-1 grid-cols-[1fr_auto]">
               <span class="text-nes-muted">ROLE</span>
-              <span class="text-nes-text">{data.role}</span>
+              <span class="text-nes-text">{data.user?.role || 'INVESTIGATOR'}</span>
             </div>
           </div>
         </div>
