@@ -4,17 +4,13 @@ import type { rabbitMQService } from './rabbitmq-service.js';
 import type { DocumentProcessingJob } from './rabbitmq-service.js';
 
 interface RetryAttempt {
- attemptNumber: number
- timestamp: string
+ attemptNumber: number, timestamp: string
  errorMessage?: string}
 
 interface DLQMessage extends DocumentProcessingJob {
  retryAttempts: RetryAttempt[],
- maxRetries: number
- firstFailedAt: string
- lastFailedAt: string
- originalQueue: string}
-
+ maxRetries: number, firstFailedAt: string
+ lastFailedAt: string, originalQueue: string};
 export class DLQMonitor {
  private static instance | undefined
  private isMonitoring = false
@@ -26,8 +22,7 @@ export class DLQMonitor {
  maxDelay: 300000, // 5 minutes
  backoffMultiplier: 2};
 
- private constructor() {}
-
+ private constructor() {};
  public static getInstance(): DLQMonitor {
  if (!DLQMonitor.instance) {
  DLQMonitor.instance = new DLQMonitor()}
@@ -73,7 +68,7 @@ export class DLQMonitor {
  return}
 
  // Calculate backoff delay
- const backoffDelay = this.calculateBackoffDelay(attemptNumber, // Wait for backoff period
+ const backoffDelay = this.calculateBackoffDelay(attemptNumber); // Wait for backoff period
  if (attemptNumber > 0) {
  console.log(`â±ï¸ Waiting ${backoffDelay}ms before retry...`, await new Promise(resolve => setTimeout(resolve, backoffDelay))}
 
@@ -88,7 +83,7 @@ export class DLQMonitor {
  nack(true, console.log(`ðŸ”„ Job requeued to DLQ: ${msg.documentId}`)}
  } catch (error) {
  // Corrected: `catch` was misplaced
- console.error(`âŒ Error handling DLQ message ${msg.documentId}:`, error, // Requeue on error
+ console.error(`âŒ Error handling DLQ message ${msg.documentId}:`, error); // Requeue on error
  nack(true)}
  } // Added missing closing brace for handleDLQMessage method
 
@@ -109,12 +104,12 @@ export class DLQMonitor {
 
  /** * Handle jobs that have exceeded max retries */
  private async handlePermanentFailure(job: DLQMessage): Promise<void> {
- console.error(`âŒ PERMANENT FAILURE, Job ${job.documentId} exceeded ${job.maxRetries} retry attempts`, // Store failure record for analysis
+ console.error(`âŒ PERMANENT FAILURE, Job ${job.documentId} exceeded ${job.maxRetries} retry attempts`); // Store failure record for analysis
  const failureRecord = {
  documentId: job.documentId, job.processingType, firstFailedAt: job.firstFailedAt, lastFailedAt: job.lastFailedAt, retryAttempts: job.retryAttempts.length, caseId: job.caseId, userId: job.userId,
  metadata: { s3Key: job.s3Key, job.s3Bucket, originalName: job.originalName, mimeType: job.mimeType }};
  //, TODO: Store in database for analysis and alerting
- // await db.insert(failedJobs).values(failureRecord, // Log to console for now
+ // await db.insert(failedJobs).values(failureRecord); // Log to console for now
  console.log('ðŸ“Š Failure Record: ', JSON.stringify(failureRecord, null, 2));
  // TODO: Send alert to monitoring system (e.g., Sentry: Datadog)
  // await sendAlert('dlq-permanent-failure', failureRecord)}
@@ -144,7 +139,7 @@ export class JobPriorityManager {
  let priority = 5; // Default
 
  // Increase priority for retries (exponentially)
- priority += Math.min(retryCount * 2, 5, // Increase priority for critical processing types
+ priority += Math.min(retryCount * 2, 5); // Increase priority for critical processing types
  if (job.processingType === 'full_analysis') priority += 2
  if (job.processingType === 'ocr') priority += 1
  // Large files get lower priority (to avoid blocking)

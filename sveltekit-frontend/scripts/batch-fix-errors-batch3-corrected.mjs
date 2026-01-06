@@ -11,8 +11,8 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const START_INDEX = 40; // Start at file #41
-const BATCH_SIZE = 20;  // Process files 41-60
+const START_INDEX = 80; // Start at file #81
+const BATCH_SIZE = 20;  // Process files 81-100
 const INPUT_FILE = path.join(__dirname, '../reports/top-100-error-files.json');
 
 // CORRECTED corruption patterns

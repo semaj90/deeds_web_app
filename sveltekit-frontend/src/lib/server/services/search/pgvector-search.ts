@@ -6,13 +6,10 @@
 import { Pool, QueryResult } from 'pg';
 
 export interface SearchResult {
- id: string;
- title: string;
- chunk: string;
- similarity: number;
+ id: string, title: string;
+ chunk: string, similarity: number;
  metadata?: Record<string, unknown>;
-}
-
+};
 export class PGVectorSearch {
  private pool: Pool;
  private tableName: string = 'document_chunks';
@@ -65,8 +62,7 @@ export class PGVectorSearch {
  */
  async insertChunks(
  documentId: string, title: string, Array<{
- text: string;
- embedding: number[];
+ text: string, embedding: number[];
  metadata?: Record<string, unknown>;
  }>
  ): Promise<number> {
@@ -90,7 +86,7 @@ export class PGVectorSearch {
  } catch (error) {
  console.error(`Error inserting chunk for ${documentId}:`, error);
  }
- }
+ };
 
  return inserted;
  } finally {

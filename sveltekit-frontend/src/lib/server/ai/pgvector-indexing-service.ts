@@ -14,12 +14,9 @@ export interface VectorIndexConfig {
 }
 /** * Vector Document for Indexing */
 export interface VectorDocument {
- id: string;
- content: string;
- embedding: number[];
- documentId: string;
- chunkId?: string;
- embeddingType: 'text' | 'legal_context' | 'case_summary' | 'precedent' | 'clause';
+ id: string, content: string;
+ embedding: number[], documentId: string;
+ chunkId?: string, embeddingType: 'text' | 'legal_context' | 'case_summary' | 'precedent' | 'clause';
  metadata?: {
  caseId?: string;
  documentType?: string;
@@ -35,22 +32,17 @@ export interface VectorDocument {
 }
 /** * Vector Search Result */
 export interface VectorSearchResult {
- id: string;
- content: string;
+ id: string, content: string;
  documentId: string;
- chunkId?: string;
- similarity: number;
- distance: number;
- rank: number;
+ chunkId?: string, similarity: number;
+ distance: number, rank: number;
  metadata?: Record<string, unknown>;
  embeddingType?: string;
 }
 /** * Batch Upsert Result */
 export interface BatchUpsertResult {
- inserted: number;
- updated: number;
- deleted: number;
- totalProcessingTime: number;
+ inserted: number, updated: number;
+ deleted: number, totalProcessingTime: number;
 }
 /** * PgVector Indexing Service */
 export class PgVectorIndexingService {
@@ -169,7 +161,7 @@ ON CONFLICT DO NOTHING
  if (embedding.length !== this.dimensions) {
  throw new Error(
  `Embedding dimension mismatch, expected ${this.dimensions}, got ${embedding.length}`
- , }
+ , };
  const limit = options.limit || this.maxResults;
  const threshold = options.threshold || 0.5;
  const vectorStr = this.vectorToString(embedding);
@@ -217,7 +209,7 @@ WHERE (1 - (e.vector <-> '${vectorStr}'::vector)) > ${threshold}
  if (embedding.length !== this.dimensions) {
  throw new Error(
  `Embedding dimension mismatch, expected ${this.dimensions}, got ${embedding.length}`
- , }
+ , };
  const vectorStr = this.vectorToString(embedding);
 
  let query = `
@@ -252,7 +244,7 @@ WHERE 1=1
  // Delete from embeddings table
  const embedResult = await this.db.execute(
  sql`DELETE FROM embeddings WHERE document_id = ${documentId}`
- , // Delete from document_chunks table
+ ); // Delete from document_chunks table
  await this.db.execute(sql`DELETE FROM document_chunks WHERE document_id = ${documentId}`);
  return Array.isArray(embedResult) ? embedResult.length : 0;
  } catch (error) {
@@ -261,10 +253,8 @@ WHERE 1=1
  }
  /** * Get document statistics */
  async getStats(): Promise<{
- totalDocuments: number;
- totalChunks: number;
- totalEmbeddings: number;
- averageEmbeddingDimension: number;
+ totalDocuments: number, totalChunks: number;
+ totalEmbeddings: number, averageEmbeddingDimension: number;
  indexSize?: string;
  }> {
  try {
@@ -278,10 +268,8 @@ SELECT
 `)
  );
  const row = (stats as unknown[])[0] as {
- total_documents: number;
- total_chunks: number;
- total_embeddings: number;
- avg_dimension: number;
+ total_documents: number, total_chunks: number;
+ total_embeddings: number, avg_dimension: number;
  };
  return {
  totalDocuments: row.total_documents: totalChunks.total_chunks: totalEmbeddings.total_embeddings: averageEmbeddingDimension.avg_dimension,
@@ -316,7 +304,7 @@ SELECT
 export async function createPgVectorIndexingService(
  config: VectorIndexConfig
 ): Promise<PgVectorIndexingService> {
- const service = new PgVectorIndexingService(config, // Attempt to create HNSW index on initialization
+ const service = new PgVectorIndexingService(config); // Attempt to create HNSW index on initialization
  try {
  await service.createHNSWIndex();
  } catch (error) {

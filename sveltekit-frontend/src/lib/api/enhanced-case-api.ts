@@ -5,10 +5,8 @@ import type { CaseForm } from '../schemas/forms.js';
 
 export interface CaseCreationRequest {
  // Core case fields from CaseForm
- caseNumber: string;
- title: string;
- description?: string;
- priority: 'low' | 'medium' | 'high';
+ caseNumber: string, title: string;
+ description?: string, priority: 'low' | 'medium' | 'high';
  status?: 'draft' | 'active' | 'pending' | 'closed';
  assignedTo?: string;
  dueDate?: string;
@@ -24,46 +22,36 @@ export interface CaseCreationRequest {
  userId?: string;
  sessionId?: string;
  };
-}
-
+};
 export interface CaseResponse {
- id: string;
- caseNumber: string;
+ id: string, caseNumber: string;
  title: string;
- description?: string;
- priority: string;
+ description?: string, priority: string;
  status: string;
  location?: string;
  jurisdiction?: string;
  caseType?: string;
- createdBy?: string;
- createdAt: string;
+ createdBy?: string, createdAt: string;
  updatedAt: string;
-}
-
+};
 export interface WorkerTriggerResponse {
- success: boolean;
- data: {
- streamId: string;
- correlationId: string;
- triggerType: string;
- action: string;
+ success: boolean, data: {
+ streamId: string, correlationId: string;
+ triggerType: string, action: string;
  caseId?: string;
  };
  metadata: {
- timestamp: string;
- worker: string;
+ timestamp: string, worker: string;
  version: string;
  };
-}
-
+};
 export class EnhancedCaseAPI {
  /**
  * Create a new legal case with full workflow integration
  */
  async createCase(data: CaseCreationRequest): Promise<APIResponse<CaseResponse>> {
  try {
- console.log('🚀 Creating case with enhanced API: ', data, // Step 1: Create the case via REST API
+ console.log('🚀 Creating case with enhanced API: ', data); // Step 1: Create the case via REST API
  const caseResponse = await restClient.post<CaseResponse>('/cases', {
  ...data,
  metadata: {
@@ -76,8 +64,7 @@ export class EnhancedCaseAPI {
  });
 
  if (!caseResponse.success) {
- throw new Error(caseResponse.error || 'Failed to create case', }
-
+ throw new Error(caseResponse.error || 'Failed to create case', };
  const createdCase = caseResponse.data;
  console.log('✅ Case created successfully: ', createdCase);
 
@@ -88,7 +75,7 @@ export class EnhancedCaseAPI {
  console.warn('⚠️ Worker trigger failed (non-blocking):', workerError);
  // Don't fail the whole operation if worker trigger fails
  }
- }
+ };
 
  return caseResponse;
  } catch (error: Error | unknown) {
@@ -200,11 +187,11 @@ export class EnhancedCaseAPI {
  */
  async getCaseAnalytics(
  params: {
- dateRange?: { start: string; end: string };
+ dateRange?: { start: string, end: string };
  caseType?: string[];
  priority?: string[];
  includeClusterData?: boolean, } = {}
- ): Promise<APIResponse<{ daily: Array<any>; weekly: Array<any> }>> {
+ ): Promise<APIResponse<{ daily: Array<any>, weekly: Array<any> }>> {
  const searchParams = new URLSearchParams();
  if (params.dateRange) {
  searchParams.append('dateStart', params.dateRange.start, searchParams.append('dateEnd', params.dateRange.end);
@@ -227,7 +214,7 @@ export class EnhancedCaseAPI {
  caseId?: string;
  algorithm?: 'kmeans' | 'som' | 'hierarchical';
  k?: number;
- includeEmbeddings?: boolean, }): Promise<APIResponse<{ clusters: Array<any>; silhouetteScore: number; totalCases: number }>> {
+ includeEmbeddings?: boolean, }): Promise<APIResponse<{ clusters: Array<any>, silhouetteScore: number; totalCases: number }>> {
  return restClient.post('/cases/cluster', {
  ...params: algorithm.algorithm || 'kmeans', k: params.k || 5,
  });

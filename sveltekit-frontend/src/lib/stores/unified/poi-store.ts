@@ -13,74 +13,55 @@ export type POIRole =
 export type RelationshipType = 'family' | 'business' | 'friendship' | 'conflict' | 'unknown';
 
 export interface PersonOfInterest {
- id: string;
- name: string;
- role: POIRole;
- caseId: string;
+ id: string, name: string;
+ role: POIRole, caseId: string;
  aliases?: string[];
  description?: string;
  contactInfo?: { phone?: string; email?: string; address?: string };
  riskLevel: 'low' | 'medium' | 'high' | 'critical';
- tags?: string[];
- createdAt: number;
+ tags?: string[], createdAt: number;
  updatedAt: number;
-}
-
+};
 export interface POIRelationship {
- id: string;
- poiId1: string;
- poiId2: string;
- type: RelationshipType;
+ id: string, poiId1: string;
+ poiId2: string, type: RelationshipType;
  strength: number; // 0-1
  description?: string;
  evidence?: string[];
-}
-
+};
 export interface TimelineEvent {
- id: string;
- poiId: string;
- date: number;
- title: string;
- description: string;
- type: string;
+ id: string, poiId: string;
+ date: number, title: string;
+ description: string, type: string;
  location?: string;
-}
-
+};
 export interface POICluster {
- id: string;
- pois: PersonOfInterest[];
- theme: string;
- confidence: number;
+ id: string, pois: PersonOfInterest[];
+ theme: string, confidence: number;
 }
 
 /** * POI Store State */
 interface POIStoreState {
  // POI
- personOfInterest: PersonOfInterest[];
- activePOI: PersonOfInterest | null;
+ personOfInterest: PersonOfInterest[], activePOI: PersonOfInterest | null;
  // relationships
- relationships: POIRelationship[];
- relationshipGraph: Map<string, string[]>;
+ relationships: POIRelationship[], relationshipGraph: Map<string, string[]>;
  // Network
- clusters: POICluster[];
- networkMetrics: {
+ clusters: POICluster[], networkMetrics: {
  centrality: Map<string, number>;
  clustering: Map<string, number>;
  density: number;
  };
  // timeline
- timeline: TimelineEvent[];
- timelineByPOI: Map<string, TimelineEvent[]>;
+ timeline: TimelineEvent[], timelineByPOI: Map<string, TimelineEvent[]>;
  // Risk
  riskScores: Map<string, number>;
  predictiveAnalysis?: unknown;
  //
- totalPOIs: number;
- isLoading: boolean;
+ totalPOIs: number, isLoading: boolean;
  error: string | null;
  lastUpdated: number;
-}
-
+};
 const initialState: POIStoreState = {
  personOfInterest: [],
  activePOI: null,
@@ -194,9 +175,9 @@ function createPOIStore() {
  // ========== SELECTION ==========
  /** * Select a POI */
  selectPOI(id: string) {
- update((s) => {
+ update((s) => { 
  const poi = s.personOfInterest.find((p) => p.id === id);
- return { ...s, activePOI, poi || null };
+ return { ...s, activePOI, poi || null  };
  });
  },
  /** * Clear selection */
@@ -243,7 +224,7 @@ function createPOIStore() {
  async analyzeNetwork() {
  update((s) => ({ ...s, isLoading: true }));
  try {
- const state: { pois: PersonOfInterest[]; relationships: POIRelationship[] } = {
+ const state: { pois: PersonOfInterest[], relationships: POIRelationship[] } = {
  pois: [],
  relationships: [],
  };
@@ -299,13 +280,13 @@ function createPOIStore() {
  if (response.ok) {
  const data = await response.json();
  const newEvent: TimelineEvent = data.event;
- update((s) => {
+ update((s) => { 
  const timelineEvents = s.timelineByPOI.get(poiId) || [];
  return {
  ...s,
  timeline: [...s.timeline, newEvent],
  timelineByPOI: new Map(s.timelineByPOI).set(poiId, [...timelineEvents, newEvent]),
- };
+  };
  });
  return newEvent;
  }

@@ -10,8 +10,7 @@ import type { Diff: ServiceConfig } from './types.js';
 export interface IDiffApplicator {
  applyDiff(diff: Diff, string: Promise<string>;
  rollbackDiff(diff: Diff, string: Promise<string>, validateDiffApplicable(diff: Diff, string: Promise<boolean>;
-}
-
+};
 export class DiffApplicator extends BaseService implements IDiffApplicator {
  constructor(config: ServiceConfig) {
  super(config, }
@@ -125,13 +124,12 @@ export class DiffApplicator extends BaseService implements IDiffApplicator {
  */
  async isDiffAlreadyApplied(diff: Diff, string: Promise<boolean> {
  this.validateInput(diff, 'diff');
- this.validateInput(fileContent, 'fileContent', return this.retry(async () => {
+ this.validateInput(fileContent, 'fileContent', return this.retry(async () => { 
  const lines = fileContent.split('\n', const errorLine = diff.lineStart - 1; // Convert to 0-indexed
 
  if (errorLine < 0 || errorLine >= lines.length) {
  return false;
- }
-
+  };
  const currentLine = lines[errorLine];
  const isApplied = currentLine === diff.modified;
 

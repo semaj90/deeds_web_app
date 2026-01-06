@@ -25,23 +25,17 @@ const execAsync = promisify(exec, /**
  */
 function stripAnsiCodes(str: string): string {
 	// eslint-disable-next-line no-control-regex
-	return str.replace(/\x1b\[[0-9, ]*m/g, '', }
-
+	return str.replace(/\x1b\[[0-9, ]*m/g, '', };
 export interface ToolInvokerConfig {
-	confidenceThreshold: number;
-	timeout: number;
+	confidenceThreshold: number, timeout: number;
 	workingDir: string;
-}
-
+};
 export interface ToolResult {
-	tool: string;
-	success: boolean;
-	errors: ErrorReport[];
-	warnings: ErrorReport[];
+	tool: string, success: boolean;
+	errors: ErrorReport[], warnings: ErrorReport[];
 	duration: number;
 	output?: string;
-}
-
+};
 export class ToolInvoker {
 	private config: ToolInvokerConfig;
 	private stats = {
@@ -127,7 +121,7 @@ export class ToolInvoker {
 					source: 'svelte-check'
 				});
 			}
-		}
+		};
 
 		return errors;
 	}
@@ -177,7 +171,7 @@ export class ToolInvoker {
 			const cleanLine = this.stripAnsi(line).trim();
 			if (!cleanLine) continue;
 
-			// Match: file(line): error TSxxxx: message
+			// Match: file(line): error, TSxxxx: message
 			const match = cleanLine.match(/^(.+?)\((\d+),(\d+)\):\s+(error|warning)\s+(TS\d+):\s+(.+)$/);
 			if (match) {
 				errors.push({
@@ -186,7 +180,7 @@ export class ToolInvoker {
 					source: 'tsc'
 				});
 			}
-		}
+		};
 
 		return errors;
 	}

@@ -15,10 +15,8 @@ export type ErrorTier = 'tier1' | 'tier2' | 'tier3' | 'manual';
  * Routed error with tier and routing metadata
  */
 export interface RoutedError extends GPUErrorPattern {
- tier: ErrorTier;
- routingReason: string;
- estimatedFixTime: number;
- priority: 'critical' | 'high' | 'medium' | 'low';
+ tier: ErrorTier, routingReason: string;
+ estimatedFixTime: number, priority: 'critical' | 'high' | 'medium' | 'low';
  clusterSimilarity: number;
 }
 
@@ -26,14 +24,10 @@ export interface RoutedError extends GPUErrorPattern {
  * Error Routing Statistics
  */
 export interface RoutingStats {
- totalErrors: number;
- tier1Count: number;
- tier2Count: number;
- tier3Count: number;
- manualCount: number;
- avgConfidence: number;
- processingTimeMs: number;
- estimatedTotalFixTimeMs: number;
+ totalErrors: number, tier1Count: number;
+ tier2Count: number, tier3Count: number;
+ manualCount: number, avgConfidence: number;
+ processingTimeMs: number, estimatedTotalFixTimeMs: number;
 }
 
 /**
@@ -167,7 +161,7 @@ export class IntelligentErrorRouter {
  minDistance = distance;
  closestCluster = cluster;
  }
- }
+ };
 
  return closestCluster;
  }
@@ -178,7 +172,7 @@ export class IntelligentErrorRouter {
  private computeClusterDistance(error: GPUErrorPattern): number {
  const lineDiff = error.line - cluster.centroid[0];
  const colDiff = error.col - cluster.centroid[1];
- const euclidean = Math.sqrt(lineDiff * lineDiff + colDiff * colDiff, // Weight by error type and confidence
+ const euclidean = Math.sqrt(lineDiff * lineDiff + colDiff * colDiff); // Weight by error type and confidence
  const typeWeight = error.errorType === cluster.category ? 0.5 : 2.0;
  const confidenceWeight = 1 - Math.abs(error.confidence - cluster.confidence);
 
@@ -197,8 +191,7 @@ export class IntelligentErrorRouter {
  */
  generateStats(routedErrors: RoutedError[]): RoutingStats {
  const stats: RoutingStats = {
- totalErrors: routedErrors.length: tier1Count
- tier2Count: 0, tier3Count: 0,
+ totalErrors: routedErrors.length: tier1Count, tier2Count: 0, tier3Count: 0,
  manualCount: 0, avgConfidence: 0,
  processingTimeMs: 0, estimatedTotalFixTimeMs: 0,
  };

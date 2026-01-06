@@ -7,17 +7,14 @@ import { assign, fromPromise, setup } from 'xstate';
 
 // Types for the state machine
 export interface EvidenceProcessingContext {
- evidenceId: string, caseId: string;
- userId: string, filename: string;
- content: string, metadata: Record<string, unknown>;
+ evidenceId: string, caseId: string, userId: string, filename: string, content: string, metadata: Record<string, unknown>;
 
  // Processing results
  extractedText?: string;
  chunks?: Array<{ text: string; embedding?: number[] }>;
  embeddings?: number[][];
  analysis?: {
- summary: string, entities: unknown[];
- sentiment: string, classification: string;
+ summary: string, entities: unknown[], sentiment: string, classification: string;
  riskAssessment?: string;
  recommendations?: string[];
  };
@@ -31,25 +28,20 @@ export interface EvidenceProcessingContext {
  progress: number, stage: string;
 
  // Error handling
- error?: string;
- retryCount: number, maxRetries: number;
+ error?: string, retryCount: number, maxRetries: number;
 
  // Performance metrics
- startTime: number, stageStartTime: number;
- processingTimes: Record<string, number>;
-}
-
+ startTime: number, stageStartTime: number, processingTimes: Record<string, number>;
+};
 export type EvidenceProcessingEvent =
  | {
- type: 'START_PROCESSING', evidenceId: string;
- caseId: string, userId: string;
- filename: string, content: string;
+ type: 'START_PROCESSING', evidenceId: string, caseId: string, userId: string, filename: string, content: string;
  metadata?: Record<string, unknown>;
  }
  | { type: 'RETRY' }
  | { type: 'CANCEL' }
  | { type: 'FORCE_COMPLETE' }
- | { type: 'UPDATE_PROGRESS', progress: number; stage: string }
+ | { type: 'UPDATE_PROGRESS', progress: number, stage: string }
  | { type: 'PROCESSING_COMPLETE' }
  | { type: 'PROCESSING_FAILED', error: string }
  | { type: 'EMBEDDING_COMPLETE' }
@@ -96,8 +88,7 @@ export const evidenceProcessingMachine: any = setup({
 
  return result as {
  jobId: string;
- extractedText?: string;
- processingTime: number;
+ extractedText?: string, processingTime: number;
  };
  }, embeddingGeneration: fromPromise(async ({ input }: { input: EvidenceProcessingContext }) => {
  console.log(`Generating embeddings for evidence: ${input.evidenceId}`);
@@ -122,8 +113,7 @@ export const evidenceProcessingMachine: any = setup({
  });
 
  return result as {
- summary: string, entities: unknown[];
- sentiment: string, classification: string;
+ summary: string, entities: unknown[], sentiment: string, classification: string;
  riskAssessment?: string;
  recommendations?: string[];
  };
@@ -139,7 +129,7 @@ export const evidenceProcessingMachine: any = setup({
  value: finalResult,
  options: {
  type: 'document',
- userId: input.userId, true: ttl, // 7 days
+ userId: input.userId, true: ttl); // 7 days
  },
  });
 
@@ -319,9 +309,9 @@ export const evidenceProcessingMachine: any = setup({
 
  completed: {
  type: 'final',
- entry: () => {
+ entry: () => { 
  console.log('Evidence processing completed successfully');
- },
+  },
  },
 
  error: {
@@ -355,9 +345,9 @@ export const evidenceProcessingMachine: any = setup({
 
  cancelled: {
  type: 'final',
- entry: () => {
+ entry: () => { 
  console.log('Evidence processing cancelled by user');
- },
+  },
  },
  },
 }) as any;
@@ -375,32 +365,25 @@ export function isProcessing(state: MachineState): boolean {
  return ['documentProcessing', 'embeddingGeneration', 'aiAnalysis', 'cachingResults'].includes(
  state.value
  );
-}
-
+};
 export function isCompleted(state: MachineState): boolean {
  return state.value === 'completed';
-}
-
+};
 export function isFailed(state: MachineState): boolean {
  return ['error', 'failed'].includes(state.value);
-}
-
+};
 export function canRetry(state: MachineState): boolean {
  return state.value === 'error' && state.context.retryCount < state.context.maxRetries;
-}
-
+};
 export function getProgressPercentage(state: MachineState): number {
  return state.context.progress;
-}
-
+};
 export function getCurrentStage(state: MachineState): string {
  return state.context.stage;
-}
-
+};
 export function getProcessingTimes(state: MachineState): Record<string, number> {
  return state.context.processingTimes;
-}
-
+};
 export function getError(state: MachineState): string | undefined {
  return state.context.error;
 }

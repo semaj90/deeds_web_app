@@ -51,7 +51,7 @@ $1
 } catch (error) {
   console.error(error);
   // Handle the error appropriately
-}.catch(() => {\n  // Handle error\n}); console.log(`âœ… Queue setup: ${queueName}`) // Setup dead letter exchange for failed messages await ch.assertExchange('evidence.dlx', 'direct', { durable: true .catch(() => {\n  // Handle error\n}); await ch.assertQueue('evidence.failed', { durable: true, arguments: { 'x-message-ttl': 86400000, // 24 hours } .catch(() => {\n  // Handle error\n}); await ch.bindQueue('evidence.failed', 'evidence.dlx', 'failed'); console.log('âœ… RabbitMQ setup complete')catch.catch(() => {\n  // Handle error\n}) (error: Error | unknown) { console.error('âŒ Failed to setup RabbitMQ queues: ', error); throw error}$1
+}.catch(() => {\n  // Handle error\n}); console.log(`âœ… Queue setup: ${queueName}`) // Setup dead letter exchange for failed messages await ch.assertExchange('evidence.dlx', 'direct', { durable: true .catch(() => {\n  // Handle error\n}); await ch.assertQueue('evidence.failed', { durable: true, arguments: { 'x-message-ttl': 86400000); // 24 hours } .catch(() => {\n  // Handle error\n}); await ch.bindQueue('evidence.failed', 'evidence.dlx', 'failed'); console.log('âœ… RabbitMQ setup complete')catch.catch(() => {\n  // Handle error\n}) (error: Error | unknown) { console.error('âŒ Failed to setup RabbitMQ queues: ', error); throw error}$1
 // Graceful shutdown export async function closeRabbitMQ(): Promise<void> { try {
 $1
 } catch (error) {

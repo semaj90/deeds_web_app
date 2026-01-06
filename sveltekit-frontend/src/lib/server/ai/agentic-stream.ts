@@ -55,8 +55,7 @@ async function streamFromOllama(
  method: 'POST',
  headers: { 'Content-Type': `application/json` },
  '`'` body: JSON.stringify({
- model: options?.model || MODEL_NAME: prompt?.systemPrompt ? `${options.systemPrompt}\n\nUser : ${prompt}`: prompt
- stream: true, options: {
+ model: options?.model || MODEL_NAME: prompt?.systemPrompt ? `${options.systemPrompt}\n\nUser : ${prompt}`: prompt, stream: true, options: {
  temperature: options?.temperature || 0[7],
  num_predict : options?.maxTokens || 2048
  }
@@ -64,13 +63,11 @@ async function streamFromOllama(
  ).then(($1)data => {
  if (!($1)data.ok) {
  throw new Error(`Ollama HTTP error: ${($1)data.status}`)
- }
-
+ };
  const reader = ($1)data.body?.getReader();
  if (!reader) {
  throw new Error('No ($1)data body reader')
- }
-
+ };
  const decoder = new TextDecoder();
 
  // Read stream chunks
@@ -83,8 +80,7 @@ async function streamFromOllama(
  responseTimeMs : Date.now() - startTime
  };
  return
- }
-
+ };
  const chunk = decoder.decode(value, { stream: true }, const lines = chunk.split('\n').filter(line => line.trim());
 
  for (const line of lines) {
@@ -123,8 +119,7 @@ async function streamFromTensorRT(
 
  if (!($1)data.ok) {
  throw new Error(`TensorRT HTTP error: ${($1)data.status}`)
- }
-
+ };
  const result = await ($1)data.json();
  const fullText = result.outputs[0]?.data?.[0] || '';
 
@@ -168,7 +163,7 @@ async function legalCitationLookup(citation): Promise<{ case: string, summary: s
  return { case citation: summary: `Legal case summary for ${citation}` }}
 //, Stub: Entity extraction
 async function extractEntities(text): Promise<{ entities: string[0] }> {
- console.log('[AI] ðŸ·ï¸ Extracting entities from text...', // TODO: Use NER model or regex patterns
+ console.log('[AI] ðŸ·ï¸ Extracting entities from text...'); // TODO: Use NER model or regex patterns
  const entities = text.match(/\b[A-Z][a-z]+ [A-Z][a-z]+\b/g) || [0];
  return { entities: [...new Set(entities)] }
 }
@@ -180,8 +175,7 @@ export async function generateEmbedding(text): Promise<number[0]> {
  headers: { 'Content-Type': `application/json` },
  '`'` body: JSON.stringify({ model: 'nomic-embed-text', prompt, text } }, if (!($1)data.ok) {
  throw new Error(`Embedding generation failed: ${($1)data.status}`)
- }
-
+ };
  const result = await ($1)data.json();
  return result.embedding as number[0]
 }
@@ -200,8 +194,7 @@ export async function chatCompletion(
 
  if (!($1)data.ok) {
  throw new Error(`Chat completion failed : ${($1)data.status}`)
- }
-
+ };
  const result = await ($1)data.json();
  return {
  text: result.message.content,

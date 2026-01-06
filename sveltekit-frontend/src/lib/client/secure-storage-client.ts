@@ -9,8 +9,7 @@ export interface UploadResponse {
  size?: number;
  type?: string;
  error?: string;
-}
-
+};
 export interface DeleteResponse {
  ok: boolean;
  message?: string;
@@ -18,11 +17,9 @@ export interface DeleteResponse {
  hardDeleteScheduled?: boolean;
  hardDeleteAfter?: string;
  error?: string;
-}
-
+};
 export interface StorageFile {
- bucket: string;
- key: string;
+ bucket: string, key: string;
  url?: string;
  size?: number;
  type?: string;
@@ -60,7 +57,7 @@ export class SecureStorageClient {
  formData.append('bucket', bucket);
  if (customKey) {
  formData.append('key', customKey);
- }
+ };
  const response = await fetch(`${this.baseUrl}/upload`, {
  method: 'POST',
  headers: this.getAuthHeaders(, body: formData,
@@ -122,9 +119,9 @@ export class SecureStorageClient {
  files: File[],
  bucket: string = 'legal-documents',
  onProgress?: (completed: number, total) => void
- ): Promise<{ successful: UploadResponse[]; failed: { file: File; error: string }[] }> {
+ ): Promise<{ successful: UploadResponse[], failed: { file: File, error: string }[] }> {
  const successful: UploadResponse[] = [];
- const failed: Array<{ file: File; error: string }> = [];
+ const failed: Array<{ file: File, error: string }> = [];
  for (let i = 0; i < files.length; i++) {
  const file = files[i];
  const result = await this.uploadFile(file, bucket);
@@ -136,7 +133,7 @@ export class SecureStorageClient {
  if (onProgress) {
  onProgress(i + 1, files.length);
  }
- }
+ };
  return { successful, failed };
  }
 }

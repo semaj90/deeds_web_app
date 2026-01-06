@@ -7,51 +7,36 @@
 import { assign, fromPromise, setup } from 'xstate';
 
 export interface AgentResponse {
- agentId: string;
- analysis: {
- confidence: number;
- findings: string[];
+ agentId: string, analysis: {
+ confidence: number, findings: string[];
  recommendations: string[];
  };
  completedAt: number;
-}
-
+};
 export interface DocumentReviewTask {
- taskId: string;
- documentId: string;
- assignedAgents: string[];
- priority: number;
-}
-
+ taskId: string, documentId: string;
+ assignedAgents: string[], priority: number;
+};
 export interface CrewAIContext {
  currentTask: DocumentReviewTask | null;
- taskQueue: DocumentReviewTask[];
- completedTasks: string[];
- activeAgents: string[];
- agentResponses: AgentResponse[];
- failedAgents: string[];
- currentRecommendations: Array<{
- id: string;
- type: string;
- text: string;
- confidence: number;
+ taskQueue: DocumentReviewTask[], completedTasks: string[];
+ activeAgents: string[], agentResponses: AgentResponse[];
+ failedAgents: string[], currentRecommendations: Array<{
+ id: string, type: string;
+ text: string, confidence: number;
  accepted: boolean;
  }>;
  lastSaved: string | null;
- autoSaveInterval: number;
- lastActivity: string;
+ autoSaveInterval: number, lastActivity: string;
  userIntent: 'editing' | 'reviewing' | 'idle' | 'away';
- retryCount: number;
- lastError: string | null;
- startTime: number;
- processingTime: number;
+ retryCount: number, lastError: string | null;
+ startTime: number, processingTime: number;
  qualityScore: number;
-}
-
+};
 export type CrewAIEvent =
  | { type: 'START_REVIEW'; task: DocumentReviewTask }
- | { type: 'AGENT_COMPLETED'; agentId: string; response: AgentResponse }
- | { type: 'AGENT_FAILED'; agentId: string; error: string }
+ | { type: 'AGENT_COMPLETED'; agentId: string, response: AgentResponse }
+ | { type: 'AGENT_FAILED'; agentId: string, error: string }
  | { type: 'USER_ACTIVITY'; activity: string }
  | { type: 'USER_IDLE' }
  | { type: 'ACCEPT_RECOMMENDATION'; recommendationId: string }
@@ -67,7 +52,7 @@ async function startAgentReview({ input }: { input: { task: DocumentReviewTask }
 }
 
 // Auto-save document changes
-async function autoSaveDocument({ input }: { input: { documentId: string; content: string } }) {
+async function autoSaveDocument({ input }: { input: { documentId: string, content: string } }) {
  await new Promise((resolve) => setTimeout(resolve, 500));
  return { saved: true, timestamp: new Date().toISOString() };
 }
@@ -95,8 +80,7 @@ async function generateSelfPrompt({ input }: { input: { context: CrewAIContext }
  }
 
  return { recommendations };
-}
-
+};
 export const crewAIOrchestrationMachine = setup({
  types: {
  context: {} as CrewAIContext,
@@ -172,7 +156,7 @@ export const crewAIOrchestrationMachine = setup({
  context.currentTask
  ? [...context.completedTasks, context.currentTask.taskId]
  : context.completedTasks,
- qualityScore: ({ context }) => {
+ qualityScore: ({ context }) => { 
  if (context.agentResponses.length === 0) return 0;
  const avgConfidence =
  context.agentResponses.reduce(
@@ -180,7 +164,7 @@ export const crewAIOrchestrationMachine = setup({
  0
  ) / context.agentResponses.length;
  return Math.round(avgConfidence * 100);
- },
+  },
  processingTime: ({ context }) => Date.now() - context.startTime,
  }),
  // @ts-expect-error - XState v5 assign typing issue; code is valid at runtime
@@ -220,12 +204,12 @@ export const crewAIOrchestrationMachine = setup({
  : false,
  shouldRetryAgents: (args) =>
  args.context.failedAgents.length > 0 && args.context.retryCount < 3,
- needsAutoSave: (args) => {
+ needsAutoSave: (args) => { 
  if (!args.context.lastSaved) return true;
  const now = Date.now();
  const lastSaved = new Date(args.context.lastSaved).getTime();
  return now - lastSaved > args.context.autoSaveInterval;
- },
+  },
  },
 }).createMachine({
  id: 'crewAIOrchestration',

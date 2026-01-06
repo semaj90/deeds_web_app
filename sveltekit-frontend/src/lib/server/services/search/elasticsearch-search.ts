@@ -6,13 +6,10 @@
 import { Client } from '@elastic/elasticsearch';
 
 export interface KeywordSearchResult {
- id: string;
- title: string;
- chunk: string;
- score: number;
+ id: string, title: string;
+ chunk: string, score: number;
  metadata?: Record<string, unknown>;
-}
-
+};
 export class ElasticsearchSearch {
  private client: Client;
  private indexName: string = 'legal_documents';
@@ -138,8 +135,7 @@ export class ElasticsearchSearch {
  must.push({ term: { document_id: filters.documentId } }, }
 
  if (filters?.title) {
- must.push({ match: { title: filters.title } }, }
-
+ must.push({ match: { title: filters.title } }, };
  const result = await this.client.search({
  index: this.indexName,
  body: {

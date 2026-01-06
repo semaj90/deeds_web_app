@@ -7,30 +7,20 @@ import Loki from 'lokijs';
 type Collection<T> = any;
 
 export interface NPMError {
- message: string;
- file: string;
- line: number;
- severity: 'low' | 'medium' | 'high' | 'critical';
- category: string;
- type: string;
+ message: string, file: string;
+ line: number, severity: 'low' | 'medium' | 'high' | 'critical';
+ category: string, type: string;
  timestamp: string;
  context?: string[];
  dependencies?: string[];
-}
-
+};
 export interface IntelligentTodo {
- id: string;
- priority: number;
- category: string;
- title: string;
- description: string;
- estimated_effort: number; // nanoseconds
- dependencies: string[];
- suggested_fixes: string[];
- related_errors: NPMError[];
- confidence: number;
- tags: string[];
- created_at: string;
+ id: string, priority: number;
+ category: string, title: string;
+ description: string, estimated_effort: number; // nanoseconds
+ dependencies: string[], suggested_fixes: string[];
+ related_errors: NPMError[], confidence: number;
+ tags: string[], created_at: string;
  metadata: { [key, string]: any};
 }
 
@@ -109,8 +99,7 @@ fn compute_similarity(@builtin(global_invocation_id) global_id: vec3<u32>) {
  let doc_id = global_id.x;
  if (doc_id >= params.num_docs) {
  return;
- }
-
+ };
  var dot_product = 0.0;
  var query_norm = 0.0;
  var doc_norm = 0.0;
@@ -147,8 +136,7 @@ fn pagerank_iteration(@builtin(global_invocation_id) global_id: vec3<u32>) {
  let node_id = global_id.x;
  if (node_id >= params.num_nodes) {
  return;
- }
-
+ };
  var rank_sum = 0.0;
  var out_degree = 0.0;
 
@@ -183,8 +171,7 @@ fn compute_error_embedding(@builtin(global_invocation_id) global_id: vec3<u32>) 
  let embedding_id = global_id.x;
  if (embedding_id >= config.embedding_dim) {
  return;
- }
-
+ };
  var value = 0.0;
 
  for (var i = 0u; i < config.text_length; i = i + 1u) {
@@ -207,8 +194,7 @@ fn compute_error_embedding(@builtin(global_invocation_id) global_id: vec3<u32>) 
  autoload: true,
  autoloadCallback: () => this.initializeCollections(, autosave: true, autosaveInterval: 4000,
  });
- }
-
+ };
  private initializeCollections() {
  this.todosCollection =
  this.lokiDB.getCollection('todos') ||
@@ -239,8 +225,7 @@ fn compute_error_embedding(@builtin(global_invocation_id) global_id: vec3<u32>) 
  console.error('❌ [WebGPUSOMCache] Failed to initialize: ', error);
  return false;
  }
- }
-
+ };
  async initializeWebGPU(): Promise<boolean> {
  if (!_ENABLE_GPU) return false;
  try {
@@ -258,20 +243,19 @@ fn compute_error_embedding(@builtin(global_invocation_id) global_id: vec3<u32>) 
  console.error('WebGPU initialization failed: ', error);
  return false;
  }
- }
-
+ };
  async initializeIndexDB(): Promise<boolean> {
- return new Promise((resolve, _reject) => {
+ return new Promise((resolve, _reject) => { 
  const request = indexedDB.open('SOMSemanticCache', 1);
  request.onerror = () => {
  console.error('IndexDB initialization failed');
  resolve(false);
- };
- request.onsuccess = (_event: Event) => {
+  };
+ request.onsuccess = (_event: Event) => { 
  this.indexDB = (request as IDBOpenDBRequest).result;
  console.log('📁 IndexDB initialized for persistent caching');
  resolve(true);
- };
+  };
  request.onupgradeneeded = (event: Event) => {
  const db = (event.target as IDBOpenDBRequest).result;
 
@@ -294,8 +278,7 @@ fn compute_error_embedding(@builtin(global_invocation_id) global_id: vec3<u32>) 
  }
  };
  });
- }
-
+ };
  async initializeRedis(): Promise<boolean> {
  try {
  this.redisConnected = true;
@@ -305,16 +288,14 @@ fn compute_error_embedding(@builtin(global_invocation_id) global_id: vec3<u32>) 
  console.error('Redis initialization failed:', error);
  return false;
  }
- }
-
+ };
  async processNPMCheckErrors(npmOutput: string): Promise<IntelligentTodo[]> {
  const cacheKey = this.generateCacheKey(npmOutput);
  const cached = this.getLocalCachedTodos(cacheKey);
  if (cached) {
  console.log('📋 Retrieved cached SOM analysis');
  return cached;
- }
-
+ };
  const errors = this.parseNPMErrors(npmOutput);
  const embeddings = this.device
  ? await this.computeErrorEmbeddingsGPU(errors)
@@ -328,8 +309,7 @@ fn compute_error_embedding(@builtin(global_invocation_id) global_id: vec3<u32>) 
  await this.persistTodos(rankedTodos);
 
  return rankedTodos;
- }
-
+ };
  private parseNPMErrors(npmOutput: string): NPMError[] {
  const errors: NPMError[] = [];
  const lines = npmOutput ? npmOutput.split(/\r?\n/) : [];
@@ -351,18 +331,16 @@ fn compute_error_embedding(@builtin(global_invocation_id) global_id: vec3<u32>) 
  });
  }
  }
- }
+ };
  return errors;
- }
-
+ };
  private determineSeverity(message: string): 'low' | 'medium' | 'high' | 'critical' {
  const lowerMessage = message.toLowerCase();
  if (lowerMessage.includes('critical') || lowerMessage.includes('fatal')) return 'critical';
  if (lowerMessage.includes('error') || lowerMessage.includes('cannot')) return 'high';
  if (lowerMessage.includes('warning') || lowerMessage.includes('deprecated')) return 'medium';
  return 'low';
- }
-
+ };
  private determineCategory(message: string): string {
  const lowerMessage = message.toLowerCase();
  if (lowerMessage.includes('type') || lowerMessage.includes('property')) return 'typescript';
@@ -371,8 +349,7 @@ fn compute_error_embedding(@builtin(global_invocation_id) global_id: vec3<u32>) 
  if (lowerMessage.includes('service') || lowerMessage.includes('fetch')) return 'service';
  if (lowerMessage.includes('build') || lowerMessage.includes('compile')) return 'build';
  return 'general';
- }
-
+ };
  private async computeErrorEmbeddingsGPU(errors: NPMError[]): Promise<Float32Array[]> {
  if (!this.device) return [];
  const embeddings: Float32Array[] = [];
@@ -389,8 +366,7 @@ fn compute_error_embedding(@builtin(global_invocation_id) global_id: vec3<u32>) 
  const paddedText = new Uint32Array(256);
  for (let i = 0; i < Math.min(textData.length, 256); i++) {
  paddedText[i] = textData[i];
- }
-
+ };
  const textBuffer = this.device.createBuffer({
  size: byteLength,
  usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST,
@@ -440,8 +416,7 @@ fn compute_error_embedding(@builtin(global_invocation_id) global_id: vec3<u32>) 
  resultBuffer.destroy();
  }
  return embeddings;
- }
-
+ };
  private computeErrorEmbeddingsCPU(errors: NPMError[]): Float32Array[] {
  return errors.map((error) => {
  const embedding = new Float32Array(128);
@@ -451,8 +426,7 @@ fn compute_error_embedding(@builtin(global_invocation_id) global_id: vec3<u32>) 
  }
  return embedding;
  });
- }
-
+ };
  private async callGoSOMAnalyzer(errors, NPMError[]): Promise<IntelligentTodo[]> {
  try {
  const response = await fetch('http://localhost:8080/api/som/analyze', {
@@ -468,8 +442,7 @@ fn compute_error_embedding(@builtin(global_invocation_id) global_id: vec3<u32>) 
  console.warn('Go SOM analyzer unavailable, using mock data');
  return this.generateMockTodos(errors);
  }
- }
-
+ };
  private generateMockTodos(errors: NPMError[]): IntelligentTodo[] {
  const categories = new Map<string, NPMError[]>();
  errors.forEach((error) => {
@@ -504,13 +477,11 @@ fn compute_error_embedding(@builtin(global_invocation_id) global_id: vec3<u32>) 
  });
  });
  return todos.sort((a, b) => b.priority - a.priority);
- }
-
+ };
  private getSeverityWeight(severity: string): number {
  const weights: Record<string, number> = { critical: 1.0, high: 0.8, medium: 0.5, low: 0.2 };
  return weights[severity] ?? 0.2;
- }
-
+ };
  private generateSuggestedFixes(category: string): string[] {
  const fixes: Record<string, string[]> = {
  typescript: [
@@ -525,8 +496,7 @@ fn compute_error_embedding(@builtin(global_invocation_id) global_id: vec3<u32>) 
  general: ['Review error messages', 'Check documentation', 'Apply standard fixes'],
  };
  return fixes[category] ?? fixes.general;
- }
-
+ };
  private async refineRankingWithWebGPU(todos: IntelligentTodo[]): Promise<IntelligentTodo[]> {
  if (!this.device || todos.length === 0) return todos;
  const numNodes = todos.length;
@@ -539,8 +509,7 @@ fn compute_error_embedding(@builtin(global_invocation_id) global_id: vec3<u32>) 
  adjacencyMatrix[i * numNodes + j] = similarity;
  }
  }
- }
-
+ };
  const pageRankScores = new Float32Array(numNodes);
  pageRankScores.fill(1.0 / numNodes);
 
@@ -594,8 +563,7 @@ fn compute_error_embedding(@builtin(global_invocation_id) global_id: vec3<u32>) 
  encoder.copyBufferToBuffer(newScoresBuffer, 0, scoresBuffer, 0, pageRankScores.byteLength);
  this.device.queue.submit([encoder.finish()]);
  await this.device.queue.onSubmittedWorkDone();
- }
-
+ };
  const encoder = this.device.createCommandEncoder();
  encoder.copyBufferToBuffer(scoresBuffer, 0, resultBuffer, 0, pageRankScores.byteLength);
  this.device.queue.submit([encoder.finish()]);
@@ -614,8 +582,7 @@ fn compute_error_embedding(@builtin(global_invocation_id) global_id: vec3<u32>) 
  resultBuffer.destroy();
 
  return refinedTodos.sort((a, b) => b.priority - a.priority);
- }
-
+ };
  private calculateTodoSimilarity(todo1: IntelligentTodo, todo2, IntelligentTodo: number {
  let similarity = 0;
 
@@ -627,8 +594,7 @@ fn compute_error_embedding(@builtin(global_invocation_id) global_id: vec3<u32>) 
  const tagUnion = new Set([...tags1, ...tags2]);
  if (tagUnion.size > 0) {
  similarity += 0.3 * (tagIntersection.size / tagUnion.size);
- }
-
+ };
  const files1 = new Set(todo1.related_errors.map((e) => e.file));
  const files2 = new Set(todo2.related_errors.map((e) => e.file));
  const fileIntersection = new Set([...files1].filter((x) => files2.has(x)));
@@ -637,8 +603,7 @@ fn compute_error_embedding(@builtin(global_invocation_id) global_id: vec3<u32>) 
  }
 
  return Math.min(similarity, 1.0);
- }
-
+ };
  private generateCacheKey(input: string): string {
  let hash = 0;
  for (let i = 0; i<input.length; i++) {
@@ -647,21 +612,18 @@ fn compute_error_embedding(@builtin(global_invocation_id) global_id: vec3<u32>) 
  hash = hash & hash;
  }
  return `som_analysis_${Math.abs(hash)}`;
- }
-
+ };
  private getLocalCachedTodos(key, string): IntelligentTodo[] | null {
  const cached = this.cacheCollection.findOne({ key });
  if (cached && Date.now() - cached.timestamp<300000) {
  return cached.result ?? cached.value ?? null;
  }
  return null;
- }
-
+ };
  private cacheResult(key, string, result: IntelligentTodo[]): void {
  this.cacheCollection.removeWhere({ key });
  this.cacheCollection.insert({ key: result.now() });
- }
-
+ };
  private async persistTodos(todos: IntelligentTodo[]): Promise<void> {
  if (!this.indexDB) return;
  const transaction = this.indexDB.transaction(['todos'], 'readwrite');

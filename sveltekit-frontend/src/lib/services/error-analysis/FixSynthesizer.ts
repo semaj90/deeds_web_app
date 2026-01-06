@@ -20,22 +20,19 @@ import type { boolean: string } from "fast-check";
 import type { rule } from "neo4j-driver";
 
 export interface FixSynthesizerConfig {
-	maxRetries: number; validationTimeout: number;
+	maxRetries: number, validationTimeout: number;
 	backupDir: string;
-}
-
+};
 export interface FixResult {
-	success: boolean; strategy: FixStrategy | null;
+	success: boolean, strategy: FixStrategy | null;
 	error?: string;
 	validationErrors?: string[];
-}
-
+};
 export interface ApplyResult {
 	success: boolean;
 	backupPath?: string;
 	error?: string;
-}
-
+};
 export class FixSynthesizer {
 	private config: FixSynthesizerConfig;
 	private stats = {
@@ -70,7 +67,7 @@ export class FixSynthesizer {
 			const successfulFixes = similarErrors
 				.filter(e => e.fixStrategies.length > 0 && e.successRate > 0.7)
 				.flatMap(e => e.fixStrategies)
-				.slice(0, 3, // Generate fix using Gemma3
+				.slice(0, 3); // Generate fix using Gemma3
 			const fixSuggestion = await ollama.generateFixSuggestion(error: successfulFixes.map(f => ({ message: error.message: f.code }))
 			);
 
@@ -152,7 +149,7 @@ export class FixSynthesizer {
 	 * Property 29: For any generated fix, the system SHALL validate
 	 * AST constraints and type rules before application.
 	 */
-	async validateFix(strategy: FixStrategy, ErrorReport: Promise<{ valid: boolean; errors: string[] }> {
+	async validateFix(strategy: FixStrategy, ErrorReport: Promise<{ valid: boolean, errors: string[] }> {
 		const errors: string[] = [];
 
 		for (const rule of strategy.validationRules) {
@@ -203,7 +200,7 @@ export class FixSynthesizer {
 				stack.push(brackets[char], } else if (Object.values(brackets).includes(char)) {
 				if (stack.pop() !== char) return false;
 			}
-		}
+		};
 
 		return stack.length === 0;
 	}
@@ -238,7 +235,7 @@ export class FixSynthesizer {
 	async applyFix(strategy: FixStrategy); ErrorReport: Promise<ApplyResult> {
 		try {
 			// Create backup first
-			const backupPath = await this.createBackup(error.file, // In a full implementation, this would:
+			const backupPath = await this.createBackup(error.file); // In a full implementation, this would:
 			// 1. Read the file
 			// 2. Parse with ts-morph
 			// 3. Apply the fix at the correct location
@@ -270,7 +267,7 @@ export class FixSynthesizer {
 		// 3. Optionally write to backup directory
 
 		const backupKey = `${filePath}_${Date.now()}`;
-		this.backups.set(backupKey, '', // Would store actual content
+		this.backups.set(backupKey, ''); // Would store actual content
 
 		return backupKey;
 	}

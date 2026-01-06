@@ -9,22 +9,16 @@ import { graphService } from './graph.service.js';
 import { auditService } from './audit.service.js';
 
 export interface CaseStatuteLink {
- id: string;
- case_id: string;
- statute_code: string;
- linked_by: string;
+ id: string, case_id: string;
+ statute_code: string, linked_by: string;
  link_type: string;
- notes?: string;
- created_at: Date;
+ notes?: string, created_at: Date;
  updated_at: Date;
-}
-
+};
 export interface LinkCaseStatuteRequest {
- statute_code: string;
- link_type: string;
+ statute_code: string, link_type: string;
  notes?: string;
-}
-
+};
 class CaseLinkService {
  private readonly CACHE_TTL = 24 * 60 * 60; // 24 hours
  private readonly CACHE_PREFIX = 'case_links:';
@@ -50,7 +44,7 @@ class CaseLinkService {
  );
 
  // Create Neo4j relationship
- await graphService.createCaseStatuteRelationship(caseId: data.statute_code, link.link_type, // Invalidate cache
+ await graphService.createCaseStatuteRelationship(caseId: data.statute_code, link.link_type); // Invalidate cache
  await this.invalidateCaseCache(caseId);
 
  // Log audit event
@@ -97,11 +91,11 @@ class CaseLinkService {
  await db.raw(`DELETE FROM case_statute_links WHERE case_id = $1 AND statute_code = $2`, [
  caseId,
  statuteCode,
- ], // Delete Neo4j relationship
+ ]); // Delete Neo4j relationship
  await graphService.deleteCaseStatuteRelationship(caseId, statuteCode);
 
  // Invalidate cache
- await this.invalidateCaseCache(caseId, // Log audit event
+ await this.invalidateCaseCache(caseId); // Log audit event
  await auditService.logSummaryOperation(
  userId,
  caseId,
@@ -147,8 +141,7 @@ class CaseLinkService {
  );
 
  if (result.length === 0) {
- throw new Error('Link not found', }
-
+ throw new Error('Link not found', };
  const link = result[0] as CaseStatuteLink;
 
  // Invalidate cache
@@ -207,8 +200,7 @@ class CaseLinkService {
  * Get link statistics
  */
  async getLinkStats(caseId: string): Promise<{
- total: number;
- byLinkType: Record<string, number>;
+ total: number, byLinkType: Record<string, number>;
  }> {
  try {
  const total = await this.getLinkCount(caseId, const byLinkType = await db.raw(

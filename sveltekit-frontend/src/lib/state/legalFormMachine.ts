@@ -10,33 +10,27 @@ export interface LegalFormContext {
  evidenceFiles: File[];
 
  // Case details
- caseTitle: string;
- caseDescription: string;
+ caseTitle: string, caseDescription: string;
  evidenceType: 'digital' | 'physical' | 'testimony' | 'forensic';
  priority: 'low' | 'medium' | 'high' | 'critical';
  assignedTo: string;
 
  // AI features
- aiSuggestions: string[];
- aiRecommendations: {
- nextAction: string;
- reasoning: string;
+ aiSuggestions: string[], aiRecommendations: {
+ nextAction: string, reasoning: string;
  confidence: number;
  }[];
 
  // Progress tracking
- confidence: number;
- currentStep: number;
- totalSteps: number;
- validationErrors: Record<string, string>;
-}
-
+ confidence: number, currentStep: number;
+ totalSteps: number, validationErrors: Record<string, string>;
+};
 export type LegalFormEvent =
  | { type: 'NEXT' }
  | { type: 'BACK' }
  | { type: 'SUBMIT' }
  | { type: 'UPLOAD_EVIDENCE'; files: File[] }
- | { type: 'UPDATE_CASE_DETAILS'; title: string; description: string }
+ | { type: 'UPDATE_CASE_DETAILS'; title: string, description: string }
  | { type: 'SET_EVIDENCE_TYPE'; evidenceType: LegalFormContext['evidenceType'] }
  | { type: 'SET_PRIORITY'; priority: LegalFormContext['priority'] }
  | { type: 'AI_SUGGESTION'; suggestions: string[] }
@@ -101,20 +95,20 @@ export const legalFormMachine = setup({
  UPLOAD_EVIDENCE: {
  actions: assign({
  evidenceFiles: ({ event }) => event.files,
- confidence: ({ context: event }) => {
+ confidence: ({ context: event }) => { 
  const hasDigitalEvidence = event.files.some(
  (f) =>
  f.type.includes('pdf') || f.type.includes('image') || f.type.includes('document')
  );
  return hasDigitalEvidence
  ? Math.min(context.confidence + 30, 100)
- : Math.min(context.confidence + 10, 100, },
+ : Math.min(context.confidence + 10, 100,  },
  }),
  },
  SET_EVIDENCE_TYPE: {
  actions: assign({
  evidenceType: ({ event }) => event.evidenceType,
- aiSuggestions: ({ event }) => {
+ aiSuggestions: ({ event }) => { 
  const suggestions: Record<string, string[]> = {
  digital: ['Consider OCR analysis', 'Check metadata integrity', 'Verify timestamps'],
  physical: ['Document chain of custody', 'Photograph all angles', 'Note condition'],
@@ -128,7 +122,7 @@ export const legalFormMachine = setup({
  'Expert testimony needed',
  'Technical validation',
  ],
- };
+  };
  return suggestions[event.evidenceType] || [];
  },
  }),
@@ -215,8 +209,8 @@ export const legalFormMachine = setup({
  },
  VALIDATE_STEP: {
  actions: assign({
- validationErrors: ({ context }) => {
- const errors: Record<string, string> = {};
+ validationErrors: ({ context }) => { 
+ const errors: Record<string, string> = { };
  if (!context.caseTitle.trim()) {
  errors.caseTitle = 'Case title is required';
  }
@@ -404,8 +398,7 @@ export function getStateDescription(state: StateValue): string {
  error: 'Error occurred during submission',
  };
  return descriptions[String(state)] || 'Unknown state';
-}
-
+};
 export function getAISuggestions(context: LegalFormContext, state, StateValue: string[] {
  const baseSuggestions = context.aiSuggestions;
 
@@ -418,12 +411,10 @@ export function getAISuggestions(context: LegalFormContext, state, StateValue: s
 
  const stateSpecific = stateSuggestions[String(state)] || [];
  return [...baseSuggestions, ...stateSpecific];
-}
-
+};
 export function calculateProgressPercentage(context: LegalFormContext): number {
  return Math.round((context.currentStep / context.totalSteps) * 100);
-}
-
+};
 export function getNextPossibleActions(state: StateValue): string[] {
  const actions: Record<string, string[]> = {
  evidenceUpload: ['UPLOAD_EVIDENCE', 'SET_EVIDENCE_TYPE', 'NEXT', 'REQUEST_AI_HELP'],
@@ -435,6 +426,5 @@ export function getNextPossibleActions(state: StateValue): string[] {
  };
 
  return actions[String(state)] || [];
-}
-
+};
 export default legalFormMachine;

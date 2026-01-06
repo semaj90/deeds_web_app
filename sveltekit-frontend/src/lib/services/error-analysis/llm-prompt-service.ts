@@ -16,9 +16,8 @@ export interface ILLMPromptService {
  retrievePromptHistory(limit?: number, offset?: number): Promise<LLMPrompt[]>;
  updatePrompt(promptId: string, updates: Partial<LLMPrompt>): Promise<LLMPrompt>;
  deletePrompt(promptId: string): Promise<void>;
- getPromptStats(): Promise<{ total: number; byModel: Record<string, number> }>;
-}
-
+ getPromptStats(): Promise<{ total: number, byModel: Record<string, number> }>;
+};
 export class LLMPromptService extends BaseService implements ILLMPromptService {
  private prompts: Map<string, LLMPrompt> = new Map();
  private errorIdIndex: Map<string, string[]> = new Map();
@@ -48,7 +47,7 @@ export class LLMPromptService extends BaseService implements ILLMPromptService {
  };
 
  // Store in memory
- this.prompts.set(promptRecord.id, promptRecord, // Index by error ID
+ this.prompts.set(promptRecord.id, promptRecord); // Index by error ID
  if (!this.errorIdIndex.has(errorId)) {
  this.errorIdIndex.set(errorId, [], }
  this.errorIdIndex.get(errorId)!.push(promptRecord.id, this.log('info', `Prompt ${promptRecord.id} stored successfully`);
@@ -143,12 +142,11 @@ export class LLMPromptService extends BaseService implements ILLMPromptService {
  this.log('info', `Updating prompt ${promptId}`, try {
  const existing = this.prompts.get(promptId);
  if (!existing) {
- throw new Error(`Prompt ${promptId} not found`, }
-
+ throw new Error(`Prompt ${promptId} not found`, };
  const updated: LLMPrompt = {
  ...existing,
  ...updates, id: existing.id, // Don't allow ID changes
- errorId: existing.errorId, // Don't allow error ID changes
+ errorId: existing.errorId); // Don't allow error ID changes
  createdAt: existing.createdAt, // Don't allow creation date changes
  updatedAt: new Date(),
  };
@@ -191,15 +189,14 @@ export class LLMPromptService extends BaseService implements ILLMPromptService {
  /**
  * Get statistics about stored prompts
  */
- async getPromptStats(): Promise<{ total: number; byModel: Record<string, number> }> {
+ async getPromptStats(): Promise<{ total: number, byModel: Record<string, number> }> {
  this.log('info', 'Calculating prompt statistics', try {
  const allPrompts = Array.from(this.prompts.values());
  const byModel: Record<string, number> = {};
 
  for (const prompt of allPrompts) {
  byModel[prompt.model] = (byModel[prompt.model] || 0) + 1;
- }
-
+ };
  const stats = {
  total: allPrompts.length,
  byModel,
