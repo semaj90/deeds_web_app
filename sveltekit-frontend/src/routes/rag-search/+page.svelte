@@ -18,7 +18,9 @@
 import { page } from '$app/stores';
 import AnswerWithCitations from '$lib/components/rag/AnswerWithCitations.svelte';
 import SourceValidator from '$lib/components/rag/SourceValidator.svelte';
-import { generateAnswer: searchKnowledgeBase,
+import {
+  generateAnswer,
+  searchKnowledgeBase,
   validateSources,
   type AnswerWithCitations as AnswerData,
   type ApprovedContext,
@@ -153,7 +155,8 @@ function handleCancel() {
 
 function handlePinToCanvas(citation: Citation) {
   // TODO: Integrate with case canvas
-  console.log('Pin to canvas:', citation, alert(`Would pin "${citation.source_title}" to canvas for case ${caseId || 'current'}`);
+  console.log('Pin to canvas:', citation);
+  alert(`Would pin "${citation.source_title}" to canvas for case ${caseId || 'current'}`);
 }
 
 function startNewSearch() {
@@ -298,6 +301,7 @@ function startNewSearch() {
       <div class="card-body">
         <SourceValidator
           {chunks}
+          caseId={caseId || ''}
           initialQuery={query}
           isLoading={isValidating}
           onValidate={handleValidate}

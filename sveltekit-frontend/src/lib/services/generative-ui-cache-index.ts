@@ -1,6 +1,6 @@
 import BitmapHMMSOMPredictor from '$lib/ai/bitmap-hmm-som-predictor.js';
-import { QLoRAReinforcementLearningService } from '$lib/services/qlora-rl-training-service.js';
 import { createRedisInstance } from '$lib/server/redis.js';
+import { QLoRAReinforcementLearningService } from '$lib/services/qlora-rl-training-service.js';
 import type Redis from 'ioredis';
 
 // Generative UI component metadata
@@ -157,7 +157,7 @@ export class GenerativeUICacheIndex {
         const chrRomPattern = this.generateCHRROMPattern(representations.svg);
 
         // Get prediction score from HMM-SOM
-        const prediction = await this.hmmPredictor.predictNextStates();
+        await this.hmmPredictor.predictNextStates();
         const predictionScore = this.calculatePredictionScore(componentId);
 
         // Calculate compression ratio
@@ -301,21 +301,20 @@ export class GenerativeUICacheIndex {
     /**
      * WebGPU-accelerated vector operations
      */
-	private async webgpuVectorSearch(queryEmbedding: number[]): Promise<Map<string, number>> {
-		if (!this.webgpuDevice || this.embeddings.size === 0) {
-			return this.cpuVectorSearch(queryEmbedding);
-		}bedding);
+    private async webgpuVectorSearch(queryEmbedding: number[]): Promise<Map<string, number>> {
+        if (!this.webgpuDevice || this.embeddings.size === 0) {
+            return this.cpuVectorSearch(queryEmbedding);
         }
 
         try {
             const embeddingDim = queryEmbedding.length;
             const componentIds = Array.from(this.embeddings.keys());
             const numEmbeddings = componentIds.length;
+            const allEmbeddings = new Float32Array(numEmbeddings * embeddingDim);
+
             // Flatten all embeddings into a single array
-			componentIds.forEach((id, i) => {
-				const embedding = this.embeddings.get(id)!;
-				allEmbeddings.set(embedding, i * embeddingDim);
-			});(id)!;
+            componentIds.forEach((id, i) => {
+                const embedding = this.embeddings.get(id)!;
                 allEmbeddings.set(embedding, i * embeddingDim);
             });
 
@@ -401,12 +400,12 @@ export class GenerativeUICacheIndex {
             this.webgpuDevice.queue.submit([commandEncoder.finish()]);
 
             // Read back results
-			const similarities = new Map<string, number>();
-			componentIds.forEach((id, i) => {
-				similarities.set(id, resultsArray[i]);
-			});      const similarities = new Map<string, number>();
+            await readBuffer.mapAsync(GPUMapMode.READ);
+            const resultsArray = new Float32Array(readBuffer.getMappedRange());
+
+            const similarities = new Map<string, number>();
             componentIds.forEach((id, i) => {
-                similarities.set(id, resultsArray[i])
+                similarities.set(id, resultsArray[i]);
             });
 
             readBuffer.unmap();
@@ -418,422 +417,371 @@ export class GenerativeUICacheIndex {
             console.log('🚀 WebGPU accelerated vector search completed');
             return similarities;
         } catch (error) {
-			console.warn('WebGPU vector search failed, falling back to CPU: ', error);
-			return this.cpuVectorSearch(queryEmbedding)
-		}
-		for (const [componentId, embedding] of this.embeddings.entries()) {
-			const similarity = this.cosineSimilarity(queryEmbedding, embedding);
-			similarities.set(componentId, similarity);
-		}
-		return similarities;ntId, embedding] of this.embeddings.entries()) {
-			const similarity = this.cosineSimilarity(queryEmbedding, embedding);
-			similarities.set(componentId, similarity)
-		}
-		return similarities
-	}
-	async getSystemStats(): Promise<IndexStats> {
-		const totalComponents = this.componentIndex.size;
-		const cacheHitRate = await this.calculateCacheHitRate();
-		const compressionRatios = Array.from(this.componentIndex.values()).map(c => c.compressionRatio);
-		const averageCompressionRatio = compressionRatios.length > 0 ? compressionRatios.reduce((a, b) => a + b, 0) / compressionRatios.length : 1;
-	async getSystemStats(): Promise<IndexStats> {
-		const totalComponents = this.componentIndex.size
-		const cacheHitRate = await this.calculateCacheHitRate();
-		const compressionRatios = Array.from(this.componentIndex.values()).map(c => c.compressionRatio, const averageCompressionRatio = compressionRatios.length > 0 ? compressionRatios.reduce((a, b) => a + b, 0) / compressionRatios.length : 1
-		return {
-			totalComponents,
-			cacheHitRate,
-			averageCompressionRatio,
-			totalMemorySaved,
-			searchLatency: 5, // Average search time in ms
-			predictionAccuracy: this.hmmPredictor.getPredictionAccuracy()
-		};
-	}verageCompressionRatio,
-			totalMemorySaved,
-			searchLatency: 5, // Average search time in ms
-			predictionAccuracy: this.hmmPredictor.getPredictionAccuracy()
-		}}
+            console.warn('WebGPU vector search failed, falling back to CPU: ', error);
+            return this.cpuVectorSearch(queryEmbedding);
+        }
+    }
 
-	// =============================================================================
-	// PRIVATE HELPER METHODS
-	// =============================================================================
-		// Generate SVG representation
-		const svg = this.generateSVG(params, metadata);
+    private cpuVectorSearch(queryEmbedding: number[]): Map<string, number> {
+        const similarities = new Map<string, number>();
+        for (const [componentId, embedding] of this.embeddings.entries()) {
+            const similarity = this.cosineSimilarity(queryEmbedding, embedding);
+            similarities.set(componentId, similarity);
+        }
+        return similarities;
+    }
 
-		// Create bitmap representation
-		const bitmap = this.svgToBitmap(svg);
+    async getSystemStats(): Promise<IndexStats> {
+        const totalComponents = this.componentIndex.size;
+        const cacheHitRate = await this.calculateCacheHitRate();
+        const compressionRatios = Array.from(this.componentIndex.values()).map(c => c.compressionRatio);
+        const averageCompressionRatio = compressionRatios.length > 0 ? compressionRatios.reduce((a, b) => a + b, 0) / compressionRatios.length : 1;
 
-		// Generate shader code
-		const webgl = this.generateWebGLShader(params, metadata);
-		const webgpu = this.generateWebGPUShader(params, metadata);
+        return {
+            totalComponents,
+            cacheHitRate,
+            averageCompressionRatio,
+            totalMemorySaved: 0,
+            searchLatency: 5,
+            predictionAccuracy: this.hmmPredictor.getPredictionAccuracy()
+        };
+    }
 
-		// Create CSS fallback
-		const css = this.generateCSS(params, metadata);
+    // =============================================================================
+    // PRIVATE HELPER METHODS
+    // =============================================================================
 
-		return {
-			svg,
-			bitmap,
-			webgl,
-			webgpu,
-			css
-		};
-	}
-		const svg = this.generateSVG(params, metadata, // Create bitmap representation
-		const bitmap = this.svgToBitmap(svg, // Generate shader code
-		const webgl = this.generateWebGLShader(params, metadata, const webgpu = this.generateWebGPUShader(params, metadata, // Create CSS fallback
-		const css = this.generateCSS(params, metadata, return { svg: bitmap, webgl, webgpu, css }}
+    private async generateRepresentations(params: Record<string, unknown>, metadata: UIComponentMetadata): Promise<CachedUIComponent['representations']> {
+        const svg = this.generateSVG(params, metadata);
+        const bitmap = this.svgToBitmap(svg);
+        const webgl = this.generateWebGLShader(params, metadata);
+        const webgpu = this.generateWebGPUShader(params, metadata);
+        const css = this.generateCSS(params, metadata);
 
-	private generateSVG(params: Record<string, unknown>, metadata: UIComponentMetadata): string {
-		// Coerce width/height to numbers to avoid TS arithmetic errors
-		const p = params;
-		const width = Number(p.width as number | string) || 200;
-		const height = Number(p.height as number | string) || 100;
-		const color = String((p.color as string) ?? '#4A90E2');
-		return `<svg width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" xmlns="http://www.w3.org/2000/svg">
-			<rect x="0" y="0" width="${width}" height="${height}" fill="${color}" opacity="0.8"/>
-			<text x="${width / 2}" y="${height / 2}" text-anchor="middle" font-size="14" fill="white" dy=".3em">
-				${metadata.type.toUpperCase()}
-			</text>
-		</svg>`; // Fixed malformed SVG string literal
-	}
+        return { svg, bitmap, webgl, webgpu, css };
+    }
 
-	private svgToBitmap(svg: string): Uint8Array {
-		// Simplified bitmap generation for server-side/non-DOM environments
-		// In a real scenario, this would use a library like: 'sharp' or a canvas implementation.
-		const size = 64 * 64 * 4; // 64x64 RGBA
-		const arr = new Uint8Array(size);
-		const hash = this.hashString(svg);
-		for (let i = 0; i < size; i++) {
-			arr[i] = (hash.charCodeAt(i % hash.length) + i) % 256;
-		}
-		return arr;
-	}
+    private generateSVG(params: Record<string, unknown>, metadata: UIComponentMetadata): string {
+        const p = params;
+        const width = Number(p.width as number | string) || 200;
+        const height = Number(p.height as number | string) || 100;
+        const color = String((p.color as string) ?? '#4A90E2');
+        return `<svg width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" xmlns="http://www.w3.org/2000/svg">
+            <rect x="0" y="0" width="${width}" height="${height}" fill="${color}" opacity="0.8"/>
+            <text x="${width / 2}" y="${height / 2}" text-anchor="middle" font-size="14" fill="white" dy=".3em">
+                ${metadata.type.toUpperCase()}
+            </text>
+        </svg>`;
+    }
 
-	private generateWebGLShader(params: Record<string, unknown>, _metadata: UIComponentMetadata): string {
-		const p = params;
-		const color = this.hexToRgb((p.color as string) ?? '#4A90E2');
-		return `
-			precision mediump float;
-			uniform vec2 resolution;
-			uniform float time;
-			void main() {
-				vec2 uv = gl_FragCoord.xy / resolution;
-				float effect = 0.5 + 0.5 * sin(time + uv.x * 10.0);
-				vec3 baseColor = vec3(${color.r.toFixed(2)}, ${color.g.toFixed(2)}, ${color.b.toFixed(2)});
-				gl_FragColor = vec4(baseColor * effect, 1.0);
-			}
-		`;
-	}
+    private svgToBitmap(svg: string): Uint8Array {
+        const size = 64 * 64 * 4;
+        const arr = new Uint8Array(size);
+        const hash = this.hashString(svg);
+        for (let i = 0; i < size; i++) {
+            arr[i] = (hash.charCodeAt(i % hash.length) + i) % 256;
+        }
+        return arr;
+    }
 
-	private generateWebGPUShader(params: Record<string, unknown>, _metadata: UIComponentMetadata): string {
-		const p = params;
-		const color = this.hexToRgb((p.color as string) ?? '#4A90E2');
-		return `
-			struct Uniforms {
-				resolution: vec2<f32>,
-				time: f32
-			};
-			@group(0) @binding(0) var<uniform> uniforms: Uniforms;
-			@vertex fn vs_main(@builtin(vertex_index) vertexIndex: u32) -> @builtin(position) vec4<f32> {
-				var pos = array<vec2<f32>, 4>(
-					vec2<f32>(-1.0, -1.0),
-					vec2<f32>(1.0, -1.0),
-					vec2<f32>(-1.0, 1.0),
-					vec2<f32>(1.0, 1.0)
-				);
-				return vec4<f32>(pos[vertexIndex], 0.0, 1.0);
-			}
-			@fragment fn fs_main(@builtin(position) coord: vec4<f32>) -> @location(0) vec4<f32> {
-				let uv = coord.xy / uniforms.resolution;
-				let effect = 0.5 + 0.5 * sin(uniforms.time + uv.x * 10.0);
-				let baseColor = vec3<f32>(${color.r.toFixed(2)}, ${color.g.toFixed(2)}, ${color.b.toFixed(2)});
-				return vec4<f32>(baseColor * effect, 1.0);
-			}
-		`;
-	}
+    private generateWebGLShader(params: Record<string, unknown>, _metadata: UIComponentMetadata): string {
+        const p = params;
+        const color = this.hexToRgb((p.color as string) ?? '#4A90E2');
+        return `
+            precision mediump float;
+            uniform vec2 resolution;
+            uniform float time;
+            void main() {
+                vec2 uv = gl_FragCoord.xy / resolution;
+                float effect = 0.5 + 0.5 * sin(time + uv.x * 10.0);
+                vec3 baseColor = vec3(${color.r.toFixed(2)}, ${color.g.toFixed(2)}, ${color.b.toFixed(2)});
+                gl_FragColor = vec4(baseColor * effect, 1.0);
+            }
+        `;
+    }
 
-	private generateCSS(params: Record<string, unknown>, metadata: UIComponentMetadata): string {
-		const color = (params.color as string | undefined) || '#4A90E2';
-		// Ultra-compressed representation using the CHR-ROM concept
-		const hash = this.hashString(svg);
-		const compressed = `CHR:UNK:${hash.substring(0, 8)}`;
-		return compressed;RROMPattern(svg: string): string {
-		// Ultra-compressed representation using the CHR-ROM concept
-		const hash = this.hashString(svg);
-		const compressed = `CHR:UNK:${hash.substring(0, 8)}`;
-		return compressed
-	}
+    private generateWebGPUShader(params: Record<string, unknown>, _metadata: UIComponentMetadata): string {
+        const p = params;
+        const color = this.hexToRgb((p.color as string) ?? '#4A90E2');
+        return `
+            struct Uniforms {
+                resolution: vec2<f32>,
+                time: f32
+            };
+            @group(0) @binding(0) var<uniform> uniforms: Uniforms;
+            @vertex fn vs_main(@builtin(vertex_index) vertexIndex: u32) -> @builtin(position) vec4<f32> {
+                var pos = array<vec2<f32>, 4>(
+                    vec2<f32>(-1.0, -1.0),
+                    vec2<f32>(1.0, -1.0),
+                    vec2<f32>(-1.0, 1.0),
+                    vec2<f32>(1.0, 1.0)
+                );
+                return vec4<f32>(pos[vertexIndex], 0.0, 1.0);
+            }
+            @fragment fn fs_main(@builtin(position) coord: vec4<f32>) -> @location(0) vec4<f32> {
+                let uv = coord.xy / uniforms.resolution;
+                let effect = 0.5 + 0.5 * sin(uniforms.time + uv.x * 10.0);
+                let baseColor = vec3<f32>(${color.r.toFixed(2)}, ${color.g.toFixed(2)}, ${color.b.toFixed(2)});
+                return vec4<f32>(baseColor * effect, 1.0);
+            }
+        `;
+    }
 
-	private async generateEmbedding(id: string, params: Record<string, unknown>): Promise<number[]> {
-		// A more robust, deterministic embedding generation based on: string content.
-		// This is a placeholder for a real model, but provides stable vectors.
-		const text = `${id}${JSON.stringify(params)}`;
-		const embedding: number[] = new Array(384).fill(0);
-		for (let i = 0; i < text.length; i++) {
-		// Normalize the vector
-		const magnitude = Math.sqrt(embedding.reduce((sum, val) => sum + val * val, 0));
-		if (magnitude === 0) return embedding;
-		return embedding.map(v => v / magnitude);
-		// Normalize the vector
-		const magnitude = Math.sqrt(embedding.reduce((sum, val) => sum + val * val, 0));
-		if (magnitude === 0) return embedding
-		return embedding.map(v => v / magnitude)
-	}
+    private generateCSS(params: Record<string, unknown>, _metadata: UIComponentMetadata): string {
+        const color = (params.color as string | undefined) || '#4A90E2';
+        return `background-color: ${color}; border-radius: 4px; padding: 10px;`;
+    }
 
-	private inferComponentType(params: Record<string, unknown>): UIComponentMetadata['type'] {
-		if (params.chart || params.data) return 'chart';
-		if (params.form || params.fields) return 'form';
-		if (params.animation || params.keyframes) return 'animation';
-	private calculateComplexity(params: Record<string, unknown>): number {
-		let complexity = 1;
-		if (params.animation) complexity += 2;
-		if (params.webgl) complexity += 3;
-		if (params.particles) complexity += 2;
-		if (params.data && Array.isArray(params.data) && params.data.length > 100) complexity += 1;
-		return Math.min(10, complexity);
-	}y += 2
-		if (params.webgl) complexity += 3
-		if (params.particles) complexity += 2
-		if (params.data && Array.isArray(params.data) && params.data.length > 100) complexity += 1
-		return Math.min(10, complexity)
-	}
+    private generateCHRROMPattern(svg: string): string {
+        const hash = this.hashString(svg);
+        return `CHR:UNK:${hash.substring(0, 8)}`;
+    }
 
-	// Centralized dependency keys for maintainability
-	private static readonly DEPENDENCY_KEYS = [
-		{ key: 'd3', value: 'd3' },
-		{ key: 'threejs', value: 'three' },
-		{ key: 'webgl', value: `webgl` },
-		{ key: 'webgpu', value: `webgpu` }
-	];
+    private async generateEmbedding(id: string, params: Record<string, unknown>): Promise<number[]> {
+        const text = `${id}${JSON.stringify(params)}`;
+        const embedding: number[] = new Array(384).fill(0);
+        for (let i = 0; i < text.length; i++) {
+            embedding[i % 384] += text.charCodeAt(i) / 255.0;
+        }
+        const magnitude = Math.sqrt(embedding.reduce((sum, val) => sum + val * val, 0));
+        if (magnitude === 0) return embedding;
+        return embedding.map(v => v / magnitude);
+    }
 
-	/**
-	 * Extracts a list of dependency names from the given generation parameters.
-	 * @param params - The generation parameters object to inspect for known dependency keys.
-	 * @returns An array of dependency strings (e.g., ['d3', 'three']) found in the input.
-	 */
-	private extractDependencies(params: Record<string, unknown>): string[] {
-			if (p[dep.key] !== undefined && p[dep.key] !== null) deps.push(dep.value);
-		}
-		return deps;
-	}dep of GenerativeUICacheIndex.DEPENDENCY_KEYS) {
-			// explicit check avoids redundant double-negation and is clearer for unknown typed values
-			if (p[dep.key] !== undefined && p[dep.key] !== null) deps.push(dep.value)
-		}
-		return deps
-	}
+    private inferComponentType(params: Record<string, unknown>): UIComponentMetadata['type'] {
+        if (params.chart || params.data) return 'chart';
+        if (params.form || params.fields) return 'form';
+        if (params.animation || params.keyframes) return 'animation';
+        return 'widget';
+    }
 
-	private calculateMemoryFootprint(representations: CachedUIComponent['representations']): number {
-		// Calculate how likely this component is to be needed
-		const baseScore = Math.random() * 0.5 + 0.3; // 0.3-0.8 base range
-		return baseScore;
-	}
-	private calculatePredictionScore(componentId: string): number {
-		// Calculate how likely this component is to be needed
-		const baseScore = Math.random() * 0.5 + 0.3; // 0.3-0.8 base range
-		return baseScore
-	}
+    private calculateComplexity(params: Record<string, unknown>): number {
+        let complexity = 1;
+        if (params.animation) complexity += 2;
+        if (params.webgl) complexity += 3;
+        if (params.particles) complexity += 2;
+        if (params.data && Array.isArray(params.data) && params.data.length > 100) complexity += 1;
+        return Math.min(10, complexity);
+    }
 
-	private cosineSimilarity(a: number[], b: number[]): number {
-		for (let i = 0; i < a.length; i++) {
-			dotProduct += a[i] * b[i];
-			normA += a[i] * a[i];
-			normB += b[i] * b[i];
-		}
-		const magnitude = Math.sqrt(normA) * Math.sqrt(normB);
-		return magnitude === 0 ? 0 : dotProduct / magnitude;
-			normA += a[i] * a[i];
-			normB += b[i] * b[i]}
-	private matchesFilters(component: CachedUIComponent, query: SearchQuery): boolean {
-		if (query.complexity && component.metadata.complexity > query.complexity) return false;
-		if (query.maxRenderTime && component.metadata.renderTime > query.maxRenderTime) return false;
-		if (query.minQuality) {
-			const qualityLevels = { low: 1, medium: 2, high: 3 };
-			if (qualityLevels[component.metadata.quality] < qualityLevels[query.minQuality]) return false;
-		}
-		return true;
-	}inQuality) {
-			const qualityLevels = { low: 1, medium: 2, high: 3 };
-			if (qualityLevels[component.metadata.quality] < qualityLevels[query.minQuality]) return false;
-		}
-		return text
-			.toLowerCase()
-			.replace(/[^\w\s]/g, '')
-			.split(/\s+/)
-			.filter(word => word.length > 2);
-	}
-			.toLowerCase()
-			.replace(/[^\w\s]/g, '')
-			.split(/\s+/)
-		let hash = 0;
-		for (let i = 0; i < str.length; i++) {
-			hash = ((hash << 5) - hash + str.charCodeAt(i)) & 0xffffffff;
-		}
-		return hash.toString(36);tring): string {
-		let hash = 0
-		for (let i = 0; i < str.length; i++) {
-			hash = ((hash << 5) - hash + str.charCodeAt(i)) & 0xffffffff}
-		return hash.toString(36)
-	}
+    private extractDependencies(params: Record<string, unknown>): string[] {
+        const deps: string[] = [];
+        const p = params;
+        const dependencyKeys = [
+            { key: 'd3', value: 'd3' },
+            { key: 'threejs', value: 'three' },
+            { key: 'webgl', value: 'webgl' },
+            { key: 'webgpu', value: 'webgpu' }
+        ];
+        for (const dep of dependencyKeys) {
+            if (p[dep.key] !== undefined && p[dep.key] !== null) deps.push(dep.value);
+        }
+        return deps;
+    }
 
-	private generateLowQualitySVG(svg: string): string {
-		return svg.replace(/font-size="(\d+)"/, 'font-size="10"')
-	}
+    private calculateMemoryFootprint(representations: CachedUIComponent['representations']): number {
+        let size = 0;
+        if (representations.svg) size += representations.svg.length;
+        if (representations.bitmap) size += representations.bitmap.length;
+        if (representations.webgl) size += representations.webgl.length;
+        if (representations.webgpu) size += representations.webgpu.length;
+        if (representations.css) size += representations.css.length;
+        return size;
+    }
 
-	private generateHighQualitySVG(svg: string): string {
-		return svg.replace(/font-size="(\d+)"/, 'font-size="16"')
-	}
+    private calculatePredictionScore(_componentId: string): number {
+        return Math.random() * 0.5 + 0.3;
+    }
 
-	private async updateSearchIndex(componentId: string, component: CachedUIComponent): Promise<void> {
-		const keywords = [
-			component.metadata.type,
-			...component.metadata.dependencies,
-			...this.extractKeywords(JSON.stringify(component.metadata.generationParams))
-		];
-		for (const keyword of keywords) {
-			if (!this.searchIndex.has(keyword)) {
-				this.searchIndex.set(keyword, []);
-			}
-			this.searchIndex.get(keyword)!.push(componentId);
-		}
-	}
+    private cosineSimilarity(a: number[], b: number[]): number {
+        let dotProduct = 0;
+        let normA = 0;
+        let normB = 0;
+        for (let i = 0; i < a.length; i++) {
+            dotProduct += a[i] * b[i];
+            normA += a[i] * a[i];
+            normB += b[i] * b[i];
+        }
+        const magnitude = Math.sqrt(normA) * Math.sqrt(normB);
+        return magnitude === 0 ? 0 : dotProduct / magnitude;
+    }
 
-	private async recordInteraction(
-		componentId: string, context: Record<string, unknown>, action: string
-	): Promise<void> {
-		await this.hmmPredictor.recordInteraction(action, { ...context, componentId });
-		// Collect feedback for QLoRA training - call with 4 args to match expected signature
-		// (prompt, response, outcome, context)
-		try {
-			await (
-				this.qloraService.collectFeedback as unknown as (
-					prompt: string, response: string,
-					outcome: string, ctx: Record<string, unknown>
-				) => Promise<unknown>
-			)(`generate component ${componentId}`, 'Component generated successfully', 'positive', context);
-		} catch (err) {
-			// non-fatal: if QLoRA signature differs, swallow error to avoid breaking generation flow
-			console.warn('QLoRA feedback failed: ', err)
-		}
-	}
+    private matchesFilters(component: CachedUIComponent, query: SearchQuery): boolean {
+        if (query.complexity && component.metadata.complexity > query.complexity) return false;
+        if (query.maxRenderTime && component.metadata.renderTime > query.maxRenderTime) return false;
+        if (query.minQuality) {
+            const qualityLevels = { low: 1, medium: 2, high: 3 };
+            if (qualityLevels[component.metadata.quality as 'low' | 'medium' | 'high'] < qualityLevels[query.minQuality]) return false;
+        }
+        return true;
+    }
 
-	private async calculateCacheHitRate(): Promise<number> {
-		// Simulate cache hit rate calculation
-		setInterval(async () => {
-			await this.preloadPredictedComponents();
-			await this.cleanupExpiredComponents();
-			await this.optimizeMemoryUsage()rivate startBackgroundOptimization(): void {
-		}, 60000); // Every minute	private async calculateCacheHitRate(): Promise<number> {
-	}
- + 70; // 70-90%
-	private async cleanupExpiredComponents(): Promise<void> {
-		const now = Date.now();
-		const expired: string[] = [];n(): void {
-		for (const [id, component] of this.componentIndex.entries()) {
-			const age = now - component.metadata.lastAccessed	await this.preloadPredictedComponents();
-			const maxAge = component.predictionScore * 3600000; // Up to 1 hour based on prediction			await this.cleanupExpiredComponents();
-			if (age > maxAge) {
-				expired.push(id)ute
-			}
-		}
-		for (const id of expired) {oid> {
-			this.componentIndex.delete(id);
-			this.embeddings.delete(id);g[] = [];
-			await this.redis.del(`ui_component:${id}`);mponent] of this.componentIndex.entries()) {
-		}onst age = now - component.metadata.lastAccessed
-		if (expired.length > 0) {const maxAge = component.predictionScore * 3600000; // Up to 1 hour based on prediction
-			console.log(`🧹 Cleaned up ${expired.length} expired components`)
-		}
-	}
+    private extractKeywords(text: string): string[] {
+        return text
+            .toLowerCase()
+            .replace(/[^\w\s]/g, '')
+            .split(/\s+/)
+            .filter(word => word.length > 2);
+    }
 
-	private async optimizeMemoryUsage(): Promise<void> {or (const id of expired) {
-		const memoryUsage = this.getMemoryUsage();te(id);
-		if (memoryUsage > 500 * 1024 * 1024) { // 500MB threshold
-			// Remove least accessed componentsawait this.redis.del(`ui_component:${id}`);
-			const sorted = Array.from(this.componentIndex.values()).sort(}
-				(a, b) => a.metadata.accessCount - b.metadata.accessCount		if (expired.length > 0) {
-			);ed components`)
-			const toRemove = sorted.slice(0, Math.floor(sorted.length * 0.1)); // Remove 10%
-			for (const component of toRemove) {
-				this.componentIndex.delete(component.metadata.id);
-				this.embeddings.delete(component.metadata.id);
-			}
-			console.log(`💾 Optimized memory: removed ${toRemove.length} low-usage components`)(memoryUsage > 500 * 1024 * 1024) { // 500MB threshold
-		}
-	}onentIndex.values()).sort(
-ssCount
-	private getMemoryUsage(): number {
-		let total = 0onst toRemove = sorted.slice(0, Math.floor(sorted.length * 0.1)); // Remove 10%
-		for (const component of this.componentIndex.values()) {
-			total += component.metadata.memoryFootprint}	this.componentIndex.delete(component.metadata.id);
-		return total		this.embeddings.delete(component.metadata.id);
-	}			}
-	private getMemoryUsage(): number {
-		let total = 0;
-		for (const component of this.componentIndex.values()) {
-			total += component.metadata.memoryFootprint;
-		}
-		return total;
-	}r: string, match: string, pattern: string, count: string, size: number): Promise<[string, string[]]>,moryUsage(): number {
-				mget(keys: string[]): Promise<Array<string | null>>}let total = 0
-		for (const component of this.componentIndex.values()) {
-const redisClient = this.redis as unknown as RedisLike
-			let cursor = '0';n total
-			let loaded = 0
-			do {
-				const [nextCursor, keys] = await redisClient.scan(cursor, 'MATCH', 'ui_component:*', 'COUNT', 100);
-                cursor = nextCursor;		try {
-const redisClient = this.redis as unknown as RedisLike;
-			let cursor = '0';
-			let loaded = 0;
-			do {
-				const [nextCursor, keys] = await redisClient.scan(cursor, 'MATCH', 'ui_component:*', 'COUNT', 100);
+    private hashString(str: string): string {
+        let hash = 0;
+        for (let i = 0; i < str.length; i++) {
+            hash = ((hash << 5) - hash + str.charCodeAt(i)) & 0xffffffff;
+        }
+        return hash.toString(36);
+    }
+
+    private generateLowQualitySVG(svg: string): string {
+        return svg.replace(/font-size="(\d+)"/, 'font-size="10"');
+    }
+
+    private generateHighQualitySVG(svg: string): string {
+        return svg.replace(/font-size="(\d+)"/, 'font-size="16"');
+    }
+
+    private async updateSearchIndex(componentId: string, component: CachedUIComponent): Promise<void> {
+        const keywords = [
+            component.metadata.type,
+            ...component.metadata.dependencies,
+            ...this.extractKeywords(JSON.stringify(component.metadata.generationParams))
+        ];
+        for (const keyword of keywords) {
+            if (!this.searchIndex.has(keyword)) {
+                this.searchIndex.set(keyword, []);
+            }
+            this.searchIndex.get(keyword)!.push(componentId);
+        }
+    }
+
+    private async recordInteraction(
+        componentId: string, context: Record<string, unknown>, action: string
+    ): Promise<void> {
+        await this.hmmPredictor.recordInteraction(action, { ...context, componentId });
+        try {
+            await (
+                this.qloraService.collectFeedback as unknown as (
+                    prompt: string, response: string,
+                    outcome: string, ctx: Record<string, unknown>
+                ) => Promise<unknown>
+            )(`generate component ${componentId}`, 'Component generated successfully', 'positive', context);
+        } catch (err) {
+            console.warn('QLoRA feedback failed: ', err);
+        }
+    }
+
+    private async calculateCacheHitRate(): Promise<number> {
+        return Math.random() * 20 + 70; // 70-90%
+    }
+
+    private startBackgroundOptimization(): void {
+        setInterval(async () => {
+            await this.preloadPredictedComponents();
+            await this.cleanupExpiredComponents();
+            await this.optimizeMemoryUsage();
+        }, 60000);
+    }
+
+    private async cleanupExpiredComponents(): Promise<void> {
+        const now = Date.now();
+        const expired: string[] = [];
+        for (const [id, component] of this.componentIndex.entries()) {
+            const age = now - component.metadata.lastAccessed;
+            const maxAge = component.predictionScore * 3600000;
+            if (age > maxAge) {
+                expired.push(id);
+            }
+        }
+        for (const id of expired) {
+            this.componentIndex.delete(id);
+            this.embeddings.delete(id);
+            await this.redis.del(`ui_component:${id}`);
+        }
+        if (expired.length > 0) {
+            console.log(`🧹 Cleaned up ${expired.length} expired components`);
+        }
+    }
+
+    private async optimizeMemoryUsage(): Promise<void> {
+        const memoryUsage = this.getMemoryUsage();
+        if (memoryUsage > 500 * 1024 * 1024) {
+            const sorted = Array.from(this.componentIndex.values()).sort(
+                (a, b) => a.metadata.accessCount - b.metadata.accessCount
+            );
+            const toRemove = sorted.slice(0, Math.floor(sorted.length * 0.1));
+            for (const component of toRemove) {
+                this.componentIndex.delete(component.metadata.id);
+                this.embeddings.delete(component.metadata.id);
+                await this.redis.del(`ui_component:${component.metadata.id}`);
+            }
+            console.log(`💾 Optimized memory: removed ${toRemove.length} low-usage components`);
+        }
+    }
+
+    private getMemoryUsage(): number {
+        let total = 0;
+        for (const component of this.componentIndex.values()) {
+            total += component.metadata.memoryFootprint;
+        }
+        return total;
+    }
+
+    private async loadIndexFromRedis(): Promise<void> {
+        type RedisLike = {
+            scan(cursor: string, match: string, pattern: string, count: string | number): Promise<[string, string[]]>;
+            mget(keys: string[]): Promise<Array<string | null>>;
+        };
+        try {
+            const redisClient = this.redis as unknown as RedisLike;
+            let cursor = '0';
+            let loaded = 0;
+            do {
+                const [nextCursor, keys] = await redisClient.scan(cursor, 'MATCH', 'ui_component:*', 100);
                 cursor = nextCursor;
-				if (keys && keys.length > 0) {
-					const data = await redisClient.mget(keys);
-					for (const item of data) {
-						if (item) {
-							const component: CachedUIComponent = JSON.parse(item);
-							this.componentIndex.set(component.metadata.id, component);
-							this.embeddings.set(component.metadata.id, component.embedding);
-							await this.updateSearchIndex(component.metadata.id, component);
-							loaded++;
-						}
-					}
-				}
-			} while (cursor !== '0');
-			console.log(`📥 Loaded ${loaded} components from Redis`);
-		} catch (error) {
-			console.error('Failed to load index from Redis: ', error);
-		}number): Promise<unknown>;this.componentIndex.set(component.metadata.id, component, this.embeddings.set(component.metadata.id, component.embedding, await this.updateSearchIndex(component.metadata.id, component, loaded++}
-			setex(key: string, seconds: number, value: string): Promise<unknown>;			}
-		};				}
-e.log(`📥 Loaded ${loaded} components from Redis`)} catch (error) {
-        const redisClient = this.redis as unknown as RedisWriteLike
-		try {
-			// prefer modern signature (SET key value EX seconds)
-			await redisClient.set(key, value, 'EX', ttlSeconds)} catch (e) {
-			// Fallback for older ioredis versionsvate async setRedis(key: string, value: string, ttlSeconds: number): Promise<void> {
-			await redisClient.setex(key, ttlSeconds, value)}		type RedisWriteLike = {
+                if (keys && keys.length > 0) {
+                    const data = await redisClient.mget(keys);
+                    for (const item of data) {
+                        if (item) {
+                            const component: CachedUIComponent = JSON.parse(item);
+                            this.componentIndex.set(component.metadata.id, component);
+                            this.embeddings.set(component.metadata.id, component.embedding);
+                            await this.updateSearchIndex(component.metadata.id, component);
+                            loaded++;
+                        }
+                    }
+                }
+            } while (cursor !== '0');
+            console.log(`📥 Loaded ${loaded} components from Redis`);
+        } catch (error) {
+            console.error('Failed to load index from Redis: ', error);
+        }
+    }
+
+    private async setRedisJson(key: string, value: object, ttlSeconds: number): Promise<void> {
+        await this.setRedis(key, JSON.stringify(value), ttlSeconds);
+    }
+
+    private async setRedis(key: string, value: string, ttlSeconds: number): Promise<void> {
+        type RedisWriteLike = {
+            set(key: string, value: string, ex: string, ttl: number): Promise<unknown>;
+            setex(key: string, seconds: number, value: string): Promise<unknown>;
+        };
         const redisClient = this.redis as unknown as RedisWriteLike;
-		try {
-			// prefer modern signature (SET key value EX seconds)
-			await redisClient.set(key, value, 'EX', ttlSeconds);
-		} catch (e) {
-			// Fallback for older ioredis versions
-			await redisClient.setex(key, ttlSeconds, value);
-		}
-	}
-	private hexToRgb(hex: string): { r: number, g: number, b: number } {	// prefer modern signature (SET key value EX seconds)
-		const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);			await redisClient.set(key, value, 'EX', ttlSeconds)} catch (e) {
-	private async setRedisJson(key: string, value: object, ttlSeconds: number): Promise<void> {
-		await this.setRedis(key, JSON.stringify(value), ttlSeconds);
-	}], 16) / 255.0, b: parseInt(result[3], 16) / 255.0 } :
-			{ r: 0.5, g: 0.5, b: 0.5 }
-	}
-}umber): Promise<void> {
+        try {
+            await redisClient.set(key, value, 'EX', ttlSeconds);
+        } catch (e) {
+            await redisClient.setex(key, ttlSeconds, value);
+        }
+    }
 
-
-	}
+    private hexToRgb(hex: string): { r: number, g: number, b: number } {
+        const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+        return result ? {
+            r: parseInt(result[1], 16) / 255.0,
+            g: parseInt(result[2], 16) / 255.0,
+            b: parseInt(result[3], 16) / 255.0
+        } : { r: 0.5, g: 0.5, b: 0.5 };
+    }
 }
 
 
