@@ -18,7 +18,9 @@
 import { page } from '$app/stores';
 import AnswerWithCitations from '$lib/components/rag/AnswerWithCitations.svelte';
 import SourceValidator from '$lib/components/rag/SourceValidator.svelte';
-import { generateAnswer: searchKnowledgeBase,
+import {
+  generateAnswer,
+  searchKnowledgeBase,
   validateSources,
   type AnswerWithCitations as AnswerData,
   type ApprovedContext,
@@ -135,7 +137,8 @@ async function handleGenerateAnswer() {
       context_id: context.context_id,
       query,
       case_id: context.case_id,
-      include_citations: true, include_todos: true,
+      include_citations: true,
+      include_todos: true,
     });
   } catch (e) {
     error = e instanceof Error ? e.message : 'Answer generation failed';
@@ -153,7 +156,8 @@ function handleCancel() {
 
 function handlePinToCanvas(citation: Citation) {
   // TODO: Integrate with case canvas
-  console.log('Pin to canvas:', citation, alert(`Would pin "${citation.source_title}" to canvas for case ${caseId || 'current'}`);
+  console.log('Pin to canvas:', citation);
+  alert(`Would pin "${citation.source_title}" to canvas for case ${caseId || 'current'}`);
 }
 
 function startNewSearch() {
