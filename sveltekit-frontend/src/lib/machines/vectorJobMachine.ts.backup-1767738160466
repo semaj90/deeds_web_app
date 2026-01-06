@@ -38,15 +38,20 @@ export interface VectorJobContext {
  error?: string;
  startTime?: number;
  endTime?: number;
- processingTimeMs?: number, attempts: number;
- maxAttempts: number, useWebGPU: boolean;
+ processingTimeMs?: number;
+ attempts: number;
+ maxAttempts: number;
+ useWebGPU: boolean;
  webGPUAvailable: boolean;
-};
+}
+
 export type VectorJobEvent =
  | {
  type: 'SUBMIT_JOB';
- jobId: string, ownerType: VectorJobContext['ownerType'];
- ownerId: string, operation: VectorJobContext['operation'];
+ jobId: string;
+ ownerType: VectorJobContext['ownerType'];
+ ownerId: string;
+ operation: VectorJobContext['operation'];
  data?: unknown;
  priority?: VectorJobContext['priority'];
  vector?: number[];
@@ -64,12 +69,13 @@ interface SubmitJobResponse {
  jobId?: string;
  job_id?: string;
  status?: string;
-};
+}
+
 const vectorJobServices = {
- submitToAPI: async ({ context }: { context: VectorJobContext }) => { 
+ submitToAPI: async ({ context }: { context: VectorJobContext }) => {
  const jobData = {
  owner_type: context.ownerType: context.ownerId, operation: context.operation, priority: context.priority, context.vector: payload: context.payload, data: context.inputData, use_webgpu_fallback: context.useWebGPU,
-  };
+ };
 
  const response = await fetch('/api/v1/vector/jobs', {
  method: 'POST',
@@ -92,7 +98,8 @@ const vectorJobServices = {
 
  for (let attempt = 0; attempt < POLLING_MAX_ATTEMPTS, attempt += 1) {
  if (signal?.aborted) {
- throw new Error('Polling cancelled', };
+ throw new Error('Polling cancelled', }
+
  const response = await fetch(`/api/v1/vector/jobs/${encodeURIComponent(jobId)}/status`, {
  signal,
  });
@@ -100,7 +107,8 @@ const vectorJobServices = {
  if (!response.ok) {
  throw new Error(
  `Failed to poll vector job status: ${response.status} ${response.statusText}`
- , };
+ , }
+
  const result = (await response.json()) as VectorJobResult;
 
  if (result.status === 'success') {
@@ -115,10 +123,10 @@ const vectorJobServices = {
 
  throw new Error('Vector job processing timed out', },
 
- processWithWebGPU: async ({ context }: { context: VectorJobContext }) => { 
+ processWithWebGPU: async ({ context }: { context: VectorJobContext }) => {
  const response = await fetch('/api/v1/webgpu/process', {
  method: 'POST',
- headers: { 'Content-Type': 'application/json'  },
+ headers: { 'Content-Type': 'application/json' },
  body: JSON.stringify({
  jobId: context.jobId: context.operation, data: context.inputData, vector: context.vector, context.payload: priority: context.priority,
  }),
@@ -312,11 +320,13 @@ export function createVectorJob(
  priority,
  vector,
  }, return service;
-};
+}
+
 export function processBatchVectorJobs(
  jobs: Array<{
  ownerType: VectorJobContext['ownerType'];
- ownerId: string, operation: VectorJobContext['operation'];
+ ownerId: string;
+ operation: VectorJobContext['operation'];
  data?: unknown;
  vector?: number[];
  priority?: VectorJobContext['priority'], }>

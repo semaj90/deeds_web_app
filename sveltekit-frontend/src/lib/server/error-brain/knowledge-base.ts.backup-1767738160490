@@ -16,27 +16,40 @@ import { sql } from 'drizzle-orm';
 
 // Types
 export interface ErrorPattern {
- id: string, errorMessage: string;
- errorCode?: string, filePath: string;
+ id: string;
+ errorMessage: string;
+ errorCode?: string;
+ filePath: string;
  lineNumber?: number;
- embedding?: number[], fixCount: number;
- successRate: number, lastSeen: Date;
+ embedding?: number[];
+ fixCount: number;
+ successRate: number;
+ lastSeen: Date;
  metadata?: Record<string, unknown>;
-};
+}
+
 export interface PatchKnowledge {
- id: string, patchContent: string;
- targetFile: string, errorFixed: string;
- embedding?: number[], applied: boolean;
- successful?: boolean, timestamp: Date;
+ id: string;
+ patchContent: string;
+ targetFile: string;
+ errorFixed: string;
+ embedding?: number[];
+ applied: boolean;
+ successful?: boolean;
+ timestamp: Date;
  runId: string;
-};
+}
+
 export interface KnowledgeSearchResult {
  pattern: ErrorPattern | PatchKnowledge;
- similarity: number, relevance: number;
-};
+ similarity: number;
+ relevance: number;
+}
+
 export interface LearningContext {
  errorMessage: string;
- errorCode?: string, filePath: string;
+ errorCode?: string;
+ filePath: string;
  codeContext?: string;
 }
 
@@ -120,7 +133,8 @@ export class KnowledgeBase {
  });
 
  if (!response.ok) {
- throw new Error(`Ollama embedding failed: ${response.status}`, };
+ throw new Error(`Ollama embedding failed: ${response.status}`, }
+
  const data = await response.json(, return data.embedding;
  } catch (error) {
  console.error('Failed to generate embedding:', error, throw error, }
@@ -141,7 +155,7 @@ export class KnowledgeBase {
 
  try {
  // Generate embeddings
- const errorEmbedding = await this.generateEmbedding(`Error: ${ errorMessage } in ${ filePath }`, const patchEmbedding = await this.generateEmbedding(`Patch: ${patch} for ${ errorMessage }`); // Update or create error pattern
+ const errorEmbedding = await this.generateEmbedding(`Error: ${ errorMessage } in ${ filePath }`, const patchEmbedding = await this.generateEmbedding(`Patch: ${patch} for ${ errorMessage }`, // Update or create error pattern
  const patternId = `${errorCode || 'unknown'}-${filePath}`;
  await db.execute(sql`
 				INSERT INTO error_patterns (
@@ -196,7 +210,7 @@ export class KnowledgeBase {
  try {
  // Generate query embedding
  const queryText = `Error: ${context.errorMessage} in ${context.filePath}`;
- const queryEmbedding = await this.generateEmbedding(queryText); // Search for similar patterns
+ const queryEmbedding = await this.generateEmbedding(queryText, // Search for similar patterns
  const results = await db.execute<ErrorPattern>(sql`
 				SELECT
 					id, error_message, error_code, file_path, line_number,
@@ -235,7 +249,7 @@ export class KnowledgeBase {
  try {
  // Generate query embedding
  const queryText = `Fix for: ${context.errorMessage} in ${context.filePath}`;
- const queryEmbedding = await this.generateEmbedding(queryText); // Search for successful patches
+ const queryEmbedding = await this.generateEmbedding(queryText, // Search for successful patches
  const results = await db.execute<PatchKnowledge>(sql`
 				SELECT
 					id, patch_content, target_file, error_fixed,
@@ -262,7 +276,8 @@ export class KnowledgeBase {
  * Get learning suggestions for an error
  */
  async getSuggestions(context: LearningContext): Promise<{
- similarErrors: KnowledgeSearchResult[], suggestedPatches: KnowledgeSearchResult[];
+ similarErrors: KnowledgeSearchResult[];
+ suggestedPatches: KnowledgeSearchResult[];
  confidence: number;
  }> {
  const [similarErrors, suggestedPatches] = await Promise.all([
@@ -285,8 +300,10 @@ export class KnowledgeBase {
  * Get knowledge base statistics
  */
  async getStats(): Promise<{
- totalPatterns: number, totalPatches: number;
- successfulFixes: number, averageSuccessRate: number;
+ totalPatterns: number;
+ totalPatches: number;
+ successfulFixes: number;
+ averageSuccessRate: number;
  }> {
  await this.initialize();
 

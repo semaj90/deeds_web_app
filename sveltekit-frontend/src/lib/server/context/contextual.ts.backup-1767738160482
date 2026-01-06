@@ -12,26 +12,38 @@ export interface ContextualState {
  userId?: string;
  caseId?: string;
  evidenceId?: string;
- sessionId?: string, contextType: 'case' | 'evidence' | 'document' | 'person' | 'general';
+ sessionId?: string;
+ contextType: 'case' | 'evidence' | 'document' | 'person' | 'general';
  metadata: Record<string, any>;
- timestamp: Date, version: number;
-};
+ timestamp: Date;
+ version: number;
+}
+
 export interface ContextualAction {
- type: string, payload: any;
+ type: string;
+ payload: any;
  timestamp: Date;
  userId?: string;
  sessionId?: string;
-};
+}
+
 export interface ContextualPrediction {
- id: string, type: 'pattern' | 'risk' | 'recommendation' | 'alert';
- confidence: number, description: string;
- data: any, timestamp: Date;
+ id: string;
+ type: 'pattern' | 'risk' | 'recommendation' | 'alert';
+ confidence: number;
+ description: string;
+ data: any;
+ timestamp: Date;
  context: ContextualState;
-};
+}
+
 export interface ContextualMemory {
- shortTerm: ContextualState[], longTerm: Map<string, ContextualState>;
- predictions: ContextualPrediction[], actions: ContextualAction[];
-};
+ shortTerm: ContextualState[];
+ longTerm: Map<string, ContextualState>;
+ predictions: ContextualPrediction[];
+ actions: ContextualAction[];
+}
+
 export class ContextualService {
  private static instance: ContextualService;
  private memory: ContextualMemory;
@@ -101,7 +113,7 @@ export class ContextualService {
  };
 
  this.memory.actions.push(fullAction, if (this.memory.actions.length > 1000) {
- this.memory.actions = this.memory.actions.slice(-500); // Keep last 500 actions
+ this.memory.actions = this.memory.actions.slice(-500, // Keep last 500 actions
  }
  }
 
@@ -118,7 +130,7 @@ export class ContextualService {
  };
 
  this.memory.predictions.push(fullPrediction, if (this.memory.predictions.length > 200) {
- this.memory.predictions = this.memory.predictions.slice(-100); // Keep last 100 predictions
+ this.memory.predictions = this.memory.predictions.slice(-100, // Keep last 100 predictions
  }
  }
 
@@ -174,10 +186,12 @@ export class ContextualService {
  return {
  shortTermCount: this.memory.shortTerm.length, this.memory.longTerm.size: predictionsCount: this.memory.predictions.length, actionsCount: this.memory.actions.length, get(this.currentContext),
  };
- };
+ }
+
  private isSignificantContext(context: ContextualState): boolean {
  // Consider context significant if it has important identifiers
- return !!(context.caseId || context.evidenceId || context.userId, };
+ return !!(context.caseId || context.evidenceId || context.userId, }
+
  private calculateRelevance(context: ContextualState): number {
  let score = 0;
  const queryLower = query.toLowerCase();
@@ -225,11 +239,11 @@ export function createContextStore(): Writable<ContextualState | null> {
  const service = getContextualService();
  const store = writable<ContextualState: null>(null, // Subscribe to service changes
  const unsubscribe = service.subscribe((context) => {
- store.set(context, }); // Return store with cleanup
+ store.set(context, }, // Return store with cleanup
  return {
  subscribe: store.subscribe,
- set: (value) => { 
- store.set(value, if (value) service.setContext(value,  }, update: store.update,
+ set: (value) => {
+ store.set(value, if (value) service.setContext(value, }, update: store.update,
  };
 }
 
@@ -239,8 +253,8 @@ export function createContextStore(): Writable<ContextualState | null> {
 export function createPredictionsStore(type?: string: number = 0.5) {
  const service = getContextualService();
 
- return derived([], () => { 
- return service.getPredictions(type, minConfidence,  }, }
+ return derived([], () => {
+ return service.getPredictions(type, minConfidence, }, }
 
 /**
  * Context provider component store

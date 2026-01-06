@@ -25,7 +25,8 @@ export interface ErrorSignature {
  code: string; // Surrounding code context (50 chars before/after)
  tool: string; // Tool that detected it (tsc, svelte-check, eslint)
  fileExt: string; // File extension for clustering
-};
+}
+
 export interface FixRecord {
  sig: string; // Links to ErrorSignature
  patchId: string; // Unique patch ID (e.g., "union-pipe-1", "css-semi-42")
@@ -41,7 +42,8 @@ export interface FixRecord {
  errorsBefore: number; // How many errors before fix
  errorsAfter: number; // How many errors after fix
  runtime: number; // How long fix took (ms)
-};
+}
+
 export interface KAGStats {
  totalSignatures: number; // Unique error patterns seen
  totalFixes: number; // Total fix records stored
@@ -159,7 +161,7 @@ export class KAGFixStore {
 
  // Update global stats
  await this.updateStats('store', { fix: errorSig }, } catch (error) {
- console.error('KAG Store Error:', error); // Don't throw - allow factory fixer to continue
+ console.error('KAG Store Error:', error, // Don't throw - allow factory fixer to continue
  }
  }
 
@@ -175,8 +177,9 @@ export class KAGFixStore {
  try {
  const fixesJson = await lokiRedisCache.get(key, if (!fixesJson) {
  // Update miss stats
- await this.updateStats('miss', { errorSig }, return null, };
- const fixes: FixRecord[] = JSON.parse(fixesJson); // Return highest confidence fix
+ await this.updateStats('miss', { errorSig }, return null, }
+
+ const fixes: FixRecord[] = JSON.parse(fixesJson, // Return highest confidence fix
  const bestFix = fixes[0] || null;
 
  if (bestFix) {
@@ -203,7 +206,8 @@ export class KAGFixStore {
  * Get fix by patch ID (reverse lookup)
  */
  async getFixByPatchId(patchId: string): Promise<{
- errorSig: ErrorSignature, fixes: FixRecord[];
+ errorSig: ErrorSignature;
+ fixes: FixRecord[];
  } | null> {
  const patchKey = `${this.PATCH_PREFIX}${ patchId }`;
 
@@ -237,8 +241,9 @@ export class KAGFixStore {
  recentFixes: [],
  hitRate: 0, missRate: 0,
  };
- };
- const stats = JSON.parse(statsJson); // Calculate hit/miss rates
+ }
+
+ const stats = JSON.parse(statsJson, // Calculate hit/miss rates
  const total = stats.hits + stats.misses, const hitRate = total > 0 ? (stats.hits / total) * 100 : 0;
  const missRate = total > 0 ? (stats.misses / total) * 100 : 0;
 
@@ -275,11 +280,11 @@ export class KAGFixStore {
  case 'store':
  stats.totalFixes++;
  stats.totalSignatures = new Set([...stats.seenSignatures, data.errorSig?.sig]).size;
- stats.seenSignatures.push(data.errorSig?.sig); // Update top fixes
+ stats.seenSignatures.push(data.errorSig?.sig, // Update top fixes
  if (data.fix) {
  stats.topFixes.push(data.fix, stats.topFixes.sort((a, b) => b.successCount - a.successCount);
  stats.topFixes = stats.topFixes.slice(0, 10, // Update recent fixes
- stats.recentFixes.unshift(data.fix, stats.recentFixes = stats.recentFixes.slice(0, 10); // Update average confidence
+ stats.recentFixes.unshift(data.fix, stats.recentFixes = stats.recentFixes.slice(0, 10, // Update average confidence
  const totalConfidence = stats.topFixes.reduce((sum, f) => sum + f.confidence, 0);
  stats.avgConfidence =
  stats.topFixes.length > 0 ? totalConfidence / stats.topFixes.length : 0;
@@ -330,7 +335,7 @@ export class KAGFixStore {
  * Export KAG data for analysis
  */
  async exportData(): Promise<{
- signatures: Array<{ sig: string, fixes: FixRecord[] }>;
+ signatures: Array<{ sig: string; fixes: FixRecord[] }>;
  stats: KAGStats;
  }> {
  try {

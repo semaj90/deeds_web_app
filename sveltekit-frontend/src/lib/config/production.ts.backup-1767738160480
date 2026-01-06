@@ -99,14 +99,17 @@ export const CONFIG = {
  documents: getEnv('MINIO_BUCKET_NAME', 'legal-documents', evidence: 'evidence',
  uploads: 'uploads',
  },
- }); // ========================================================================
+ },
+
+ // ========================================================================
  // MESSAGE QUEUE (RabbitMQ)
  // ========================================================================
  rabbitmq: {
  url: getEnv('RABBITMQ_URL', 'amqp://legal_admin:123456@localhost:5672', host: ENV.isDocker ? 'rabbitmq' : 'localhost',
  port: 5672, managementPort: 15672, user: 'legal_admin',
  password: '123456',
- vhost: '/'); // Queue configuration
+ vhost: '/',
+ // Queue configuration
  queues: {
  documentProcessing: 'document_processing',
  embedding: 'embedding_generation',

@@ -22,35 +22,48 @@ import type { UploadedFile: AIResults,
 export interface DocumentUploadContext {
  formData: z.infer<typeof DocumentUploadSchema> | null;
  validationErrors: Record<string, string[]>;
- uploadProgress: number, uploadedFile: UploadedFile | null;
- processingProgress: number, aiResults: AIResults | null;
+ uploadProgress: number;
+ uploadedFile: UploadedFile | null;
+ processingProgress: number;
+ aiResults: AIResults | null;
  error: string | null;
- retryCount: number, maxRetries: number;
-};
+ retryCount: number;
+ maxRetries: number;
+}
+
 export interface CaseCreationContext {
  formData: z.infer<typeof CaseCreationSchema> | null;
  validationErrors: Record<string, string[]>;
  createdCase: CreatedCase | null;
- relatedDocuments: UploadedFile[], error: string | null;
- isAutoSaving: boolean, lastSaved: Date | null;
-};
+ relatedDocuments: UploadedFile[];
+ error: string | null;
+ isAutoSaving: boolean;
+ lastSaved: Date | null;
+}
+
 export interface SearchContext {
  query: z.infer<typeof SearchQuerySchema> | null;
- results: SearchResult[], validationErrors: Record<string, string[]>;
- isSearching: boolean, searchHistory: string[];
+ results: SearchResult[];
+ validationErrors: Record<string, string[]>;
+ isSearching: boolean;
+ searchHistory: string[];
  filters: z.infer<typeof SearchQuerySchema>['filters'];
- pagination: { page: number, pageSize: number; total: number };
- analytics: { searchTime: number, resultCount: number; cacheHit: boolean } | null;
+ pagination: { page: number; pageSize: number; total: number };
+ analytics: { searchTime: number; resultCount: number; cacheHit: boolean } | null;
  error: string | null;
-};
+}
+
 export interface AIAnalysisContext {
  analysisData: z.infer<typeof AIAnalysisSchema> | null;
  validationErrors: Record<string, string[]>;
  analysisResults: AIAnalysisResult | null;
- confidence: number, processingTime: number;
- tokensUsed: number, model: string;
+ confidence: number;
+ processingTime: number;
+ tokensUsed: number;
+ model: string;
  error: string | null;
- isStreaming: boolean, streamedContent: string;
+ isStreaming: boolean;
+ streamedContent: string;
 }
 
 // ============================================================================
@@ -72,14 +85,16 @@ interface ProcessDocumentOutput {
 }
 
 interface PerformSearchOutput {
- results: SearchResult[], analytics: SearchContext['analytics'];
+ results: SearchResult[];
+ analytics: SearchContext['analytics'];
  pagination: SearchContext['pagination'];
  query: string;
 }
 
 interface PerformAnalysisOutput {
  results: AIAnalysisResult | null;
- confidence: number, processingTime: number;
+ confidence: number;
+ processingTime: number;
  tokensUsed: number;
 }
 
@@ -137,7 +152,7 @@ export const documentUploadMachine = createMachine(
  onDone: {
  target: 'uploading',
  actions: assign({
- validationErrors: {}); // Clear errors on success
+ validationErrors: {}, // Clear errors on success
  }),
  },
  onError: {
@@ -297,7 +312,7 @@ export const documentUploadMachine = createMachine(
  throw new Error(`Upload failed: ${response.statusText}`, }
  return await response.json();
  }); processDocument: fromPromise(
- async ({ input }: { input: ProcessDocumentActorInput }): Promise<ProcessDocumentOutput> => { 
+ async ({ input }: { input: ProcessDocumentActorInput }): Promise<ProcessDocumentOutput> => {
  const started = Date.now();
  let baseResults: null = null;
 
@@ -305,7 +320,7 @@ export const documentUploadMachine = createMachine(
  try {
  const resp = await fetch('/api/ai/process-document', {
  method: 'POST',
- headers: { 'Content-Type': 'application/json'  }, body: JSON.stringify({
+ headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({
  documentId: input?.documentId: input?.options,
  }),
  });
@@ -455,17 +470,17 @@ export const caseCreationMachine = createMachine(
  onError: {
  target: 'editing',
  actions: assign({
- validationErrors: ({ event }) => { 
+ validationErrors: ({ event }) => {
  const error = (event as ErrorActorEvent<Record<string, string[]> | z.ZodError>)
  .error;
  if (error instanceof z.ZodError) {
  const fieldErrors = error.flatten().fieldErrors;
- const cleanedErrors: Record<string, string[]> = { };
+ const cleanedErrors: Record<string, string[]> = {};
  for (const key in fieldErrors) {
  if (Object.prototype.hasOwnProperty.call(fieldErrors, key)) {
  cleanedErrors[key] = fieldErrors[key] || [];
  }
- };
+ }
  return cleanedErrors;
  }
  if (error && typeof error === 'object' && !Array.isArray(error)) {
@@ -474,7 +489,7 @@ export const caseCreationMachine = createMachine(
  if (Object.prototype.hasOwnProperty.call(error, key)) {
  cleanedErrors[key] = (error[key] || []) as string[];
  }
- };
+ }
  return cleanedErrors;
  }
  return {};
@@ -537,10 +552,10 @@ export const caseCreationMachine = createMachine(
  }
  throw error;
  }
- }); createCase: fromPromise(async ({ input }) => { 
+ }); createCase: fromPromise(async ({ input }) => {
  const response = await fetch('/api/cases', {
  method: 'POST',
- headers: { 'Content-Type': 'application/json'  }, body: JSON.stringify(input),
+ headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(input),
  });
  if (!response.ok) {
  throw new Error(`Case creation failed: ${response.statusText}`, }
@@ -610,17 +625,17 @@ export const searchMachine = createMachine(
  onError: {
  target: 'idle',
  actions: assign({
- validationErrors: ({ event }) => { 
+ validationErrors: ({ event }) => {
  const error = (event as ErrorActorEvent<Record<string, string[]> | z.ZodError>)
  .error;
  if (error instanceof z.ZodError) {
  const fieldErrors = error.flatten().fieldErrors;
- const cleanedErrors: Record<string, string[]> = { };
+ const cleanedErrors: Record<string, string[]> = {};
  for (const key in fieldErrors) {
  if (Object.prototype.hasOwnProperty.call(fieldErrors, key)) {
  cleanedErrors[key] = fieldErrors[key] || [];
  }
- };
+ }
  return cleanedErrors;
  }
  if (error && typeof error === 'object' && !Array.isArray(error)) {
@@ -629,7 +644,7 @@ export const searchMachine = createMachine(
  if (Object.prototype.hasOwnProperty.call(error, key)) {
  cleanedErrors[key] = (error[key] || []) as string[];
  }
- };
+ }
  return cleanedErrors;
  }
  return {};
@@ -655,12 +670,12 @@ export const searchMachine = createMachine(
  page: 1, pageSize: 20 20,
  total: 0,
  },
- searchHistory: ({ context: event }) => { 
+ searchHistory: ({ context: event }) => {
  const outQuery = (event as DoneActorEvent<PerformSearchOutput>).output.query ?? '';
  return [
  outQuery,
  ...context.searchHistory.filter((q: string) => q !== outQuery),
- ].slice(0, 10,  },
+ ].slice(0, 10, },
  }),
  },
  onError: {
@@ -744,14 +759,14 @@ export const searchMachine = createMachine(
  async ({
  input,
  }: {
- input: z.infer<typeof SearchQuerySchema> | null, }): Promise<PerformSearchOutput> => { 
+ input: z.infer<typeof SearchQuerySchema> | null, }): Promise<PerformSearchOutput> => {
  const query = input?.query || '';
  const response = await fetch('/api/search/vector', {
  method: 'POST',
- headers: { 'Content-Type': 'application/json'  }, body: JSON.stringify(input),
+ headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(input),
  });
  if (!response.ok) {
- throw new Error(`Search failed: ${response.statusText}`, };
+ throw new Error(`Search failed: ${response.statusText}`, }
  const data = await response.json();
  if (typeof localStorage !== 'undefined') {
  const history = JSON.parse(localStorage.getItem('search-history') || '[]');
@@ -766,8 +781,8 @@ export const searchMachine = createMachine(
  async ({
  input,
  }: {
- input: { query: z.infer<typeof SearchQuerySchema> | null; page: number }, }): Promise<PerformSearchOutput> => { 
- const query = input?.query || { };
+ input: { query: z.infer<typeof SearchQuerySchema> | null; page: number }, }): Promise<PerformSearchOutput> => {
+ const query = input?.query || {};
  const page = input?.page || 1;
  const response = await fetch('/api/search/vector', {
  method: 'POST',
@@ -775,7 +790,7 @@ export const searchMachine = createMachine(
  body: JSON.stringify({ ...query, pagination: { page } }),
  });
  if (!response.ok) {
- throw new Error(`Load more failed: ${response.statusText}`, };
+ throw new Error(`Load more failed: ${response.statusText}`, }
  const data = await response.json();
  return { ...data, query: input.query?.query || '' };
  }
@@ -828,17 +843,17 @@ export const aiAnalysisMachine = createMachine(
  onError: {
  target: 'idle',
  actions: assign({
- validationErrors: ({ event }) => { 
+ validationErrors: ({ event }) => {
  const error = (event as ErrorActorEvent<Record<string, string[]> | z.ZodError>)
  .error;
  if (error instanceof z.ZodError) {
  const fieldErrors = error.flatten().fieldErrors;
- const cleanedErrors: Record<string, string[]> = { };
+ const cleanedErrors: Record<string, string[]> = {};
  for (const key in fieldErrors) {
  if (Object.prototype.hasOwnProperty.call(fieldErrors, key)) {
  cleanedErrors[key] = fieldErrors[key] || [];
  }
- };
+ }
  return cleanedErrors;
  }
  if (error && typeof error === 'object' && !Array.isArray(error)) {
@@ -847,7 +862,7 @@ export const aiAnalysisMachine = createMachine(
  if (Object.prototype.hasOwnProperty.call(error, key)) {
  cleanedErrors[key] = (error[key] || []) as string[];
  }
- };
+ }
  return cleanedErrors;
  }
  return {};
@@ -893,7 +908,8 @@ export const aiAnalysisMachine = createMachine(
  actions: assign({
  streamedContent: ({ context: event,
  }, {
- context: AIAnalysisContext, event: { type: 'STREAM_CONTENT'; content: string }, }) => context.streamedContent + (event.content ?? '', isStreaming: () => true,
+ context: AIAnalysisContext;
+ event: { type: 'STREAM_CONTENT'; content: string }, }) => context.streamedContent + (event.content ?? '', isStreaming: () => true,
  }),
  },
  },
@@ -923,14 +939,14 @@ export const aiAnalysisMachine = createMachine(
  }
  throw error;
  }
- }); performAnalysis: fromPromise(async ({ input }) => { 
+ }); performAnalysis: fromPromise(async ({ input }) => {
  const startTime = Date.now();
  const response = await fetch('/api/ai/analyze', {
  method: 'POST',
- headers: { 'Content-Type': 'application/json'  }, body: JSON.stringify(input),
+ headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(input),
  });
  if (!response.ok) {
- throw new Error(`Analysis failed: ${response.statusText}`, };
+ throw new Error(`Analysis failed: ${response.statusText}`, }
  const data = await response.json();
  return {
  ...data, processingTime: Date.now() - startTime,

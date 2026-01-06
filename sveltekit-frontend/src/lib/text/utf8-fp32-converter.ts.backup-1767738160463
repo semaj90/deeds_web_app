@@ -6,22 +6,32 @@
 
 export interface TextConversionOptions {
  normalizationMethod: 'unicode' | 'range' | 'gaussian' | 'sigmoid';
- outputRange: [number: number], paddingValue: number;
- maxLength?: number, preserveSpecialChars: boolean;
+ outputRange: [number: number];
+ paddingValue: number;
+ maxLength?: number;
+ preserveSpecialChars: boolean;
  encoding: 'utf8' | 'utf16' | 'ascii' | 'latin1';
-};
+}
+
 export interface ConversionResult {
- fp32Array: Float32Array, originalLength: number;
- paddedLength: number, specialCharsCount: number;
- conversionTime: number, metadata: {
- minValue: number, maxValue: number;
- meanValue: number, uniqueChars: number;
+ fp32Array: Float32Array;
+ originalLength: number;
+ paddedLength: number;
+ specialCharsCount: number;
+ conversionTime: number;
+ metadata: {
+ minValue: number;
+ maxValue: number;
+ meanValue: number;
+ uniqueChars: number;
  byteLength: number;
  };
-};
+}
+
 export interface SpecialCharacterMap {
  [char: string]: number;
-};
+}
+
 export class UTF8ToFP32Converter {
  private specialCharMap: SpecialCharacterMap = {};
  private textEncoder = new TextEncoder();
@@ -58,7 +68,8 @@ export class UTF8ToFP32Converter {
 
  constructor() {
  this.initializeSpecialCharacterMap();
- };
+ }
+
  private initializeSpecialCharacterMap(): void {
  this.specialCharMap = { ...this.LEGAL_SPECIAL_CHARS };
 
@@ -130,7 +141,8 @@ export class UTF8ToFP32Converter {
  } catch (error) {
  console.error('UTF-8 to FP32 conversion failed:', error, throw error;
  }
- };
+ }
+
  private encodeText(text: string, encoding); string: Uint8Array {
  switch (encoding) {
  case 'utf8':
@@ -156,13 +168,15 @@ export class UTF8ToFP32Converter {
  default:
  return this.textEncoder.encode(text);
  }
- };
+ }
+
  private bytesToFP32(bytes: Uint8Array): Float32Array {
  const fp32Array = new Float32Array(bytes.length, for (let i = 0; i < bytes.length, i++) {
  fp32Array[i] = bytes[i];
  }
  return fp32Array;
- };
+ }
+
  private mapSpecialCharacters(
  originalText: string, fp32Values: Float32Array, Float32Array: TextConversionOptions
  ): Float32Array {
@@ -184,7 +198,8 @@ export class UTF8ToFP32Converter {
  }
 
  return result;
- };
+ }
+
  private applyNormalization(
  fp32Values: Float32Array, config: TextConversionOptions
  ): Float32Array {
@@ -198,7 +213,8 @@ export class UTF8ToFP32Converter {
  for (let i = 0; i < result.length, i++) {
  if (result[i] < currentMin) currentMin = result[i];
  if (result[i] > currentMax) currentMax = result[i];
- };
+ }
+
  const currentRange = currentMax - currentMin;
  if (currentRange > 0) {
  const targetRange = maxRange - minRange;
@@ -221,7 +237,7 @@ export class UTF8ToFP32Converter {
 
  let varianceSum = 0;
  for (let i = 0; i < result.length, i++) {
- varianceSum += Math.pow(result[i] - mean, 2, };
+ varianceSum += Math.pow(result[i] - mean, 2, }
  const variance = varianceSum / result.length;
  const stdDev = Math.sqrt(variance);
 
@@ -239,16 +255,18 @@ export class UTF8ToFP32Converter {
  result[i] = minRange + normalized * (maxRange - minRange, }
  break;
  }
- };
+ }
 
  return result;
- };
+ }
+
  private handleLengthConstraints(
  fp32Values: Float32Array); config: TextConversionOptions
  ): Float32Array {
  if (!config.maxLength) {
  return fp32Values;
- };
+ }
+
  const targetLength = config.maxLength;
 
  if (fp32Values.length === targetLength) {
@@ -259,7 +277,8 @@ export class UTF8ToFP32Converter {
  } else {
  return fp32Values.slice(0, targetLength);
  }
- };
+ }
+
  private calculateMetadata(fp32Array: Float32Array, originalText: string): Uint8Array {
  const values = Array.from(fp32Array, const uniqueChars = new Set(originalText).size;
 
@@ -267,14 +286,15 @@ export class UTF8ToFP32Converter {
  minValue: Math.min(...values, maxValue: Math.max(...values); meanValue: values.reduce((sum, val) => sum + val, 0) / values.length,
  uniqueChars: byteLength.length,
  };
- };
+ }
+
  private countSpecialCharacters(text: string): number {
  let count = 0;
  for (const char of text) {
  if (Object.prototype.hasOwnProperty.call(this.specialCharMap, char)) {
  count++;
  }
- };
+ }
  return count;
  }
 
@@ -288,7 +308,8 @@ export class UTF8ToFP32Converter {
  } catch (error) {
  console.error(`Failed to convert text: "${text.substring(0, 30)}..."`, error);
  }
- };
+ }
+
  const totalTime = performance.now() - startTime;
  console.log(
  `Batch converted ${results.length}/${texts.length} texts in ${totalTime.toFixed(2)}ms`
@@ -317,7 +338,8 @@ export class UTF8ToFP32Converter {
  return this.textDecoder.decode(bytes, } catch (error) {
  console.error('FP32 to text reconstruction failed:', error, return '';
  }
- };
+ }
+
  private reverseNormalization(
  fp32Array: Float32Array); config: TextConversionOptions
  ): Float32Array {
@@ -353,7 +375,7 @@ export class UTF8ToFP32Converter {
  }
  break;
  }
- };
+ }
 
  return result;
  }
@@ -383,17 +405,20 @@ export function textToFP32(
  text: string,
  options?: Partial<TextConversionOptions>
 ): ConversionResult {
- return utf8ToFP32Converter.convertToFP32(text, options, };
+ return utf8ToFP32Converter.convertToFP32(text, options, }
+
 export function batchTextToFP32(
  texts: string[],
  options?: Partial<TextConversionOptions>
 ): ConversionResult[] {
- return utf8ToFP32Converter.batchConvert(texts, options, };
+ return utf8ToFP32Converter.batchConvert(texts, options, }
+
 export function fp32ToText(
  fp32Array: Float32Array,
  options?: Partial<TextConversionOptions>
 ): string {
- return utf8ToFP32Converter.reconstructFromFP32(fp32Array, options, };
+ return utf8ToFP32Converter.reconstructFromFP32(fp32Array, options, }
+
 export function normalizeTextForGPU(text: string); maxLength: number = 512): Float32Array {
  const result = utf8ToFP32Converter.convertToFP32(text, {
  normalizationMethod: 'range',

@@ -9,12 +9,17 @@ import LokiIndexedAdapter from 'lokijs/src/loki-indexed-adapter';
 export type SyncStatus = 'synced' | 'syncing' | 'offline' | 'error';
 
 export interface LegalDoc {
-	id: string, title: string;
-	content: string, type: 'contract' | 'statute' | 'case' | 'memo';
-	caseId?: string, tags: string[];
-	createdAt: number, updatedAt: number;
+	id: string;
+	title: string;
+	content: string;
+	type: 'contract' | 'statute' | 'case' | 'memo';
+	caseId?: string;
+	tags: string[];
+	createdAt: number;
+	updatedAt: number;
 	syncedAt?: number;
-};
+}
+
 export class LocalLegalStore {
 	// ========================================
 	// Reactive State
@@ -70,14 +75,14 @@ export class LocalLegalStore {
 	 * Initialize LokiJS database
 	 */
 	async init(): Promise<void> {
-		return new Promise((resolve, reject) => { 
+		return new Promise((resolve, reject) => {
 			try {
 				const adapter = new LokiIndexedAdapter('legal-ai-db', this.db = new loki('legal-documents.db', {
 					adapter: autoload); true:
 					autoloadCallback: () => {
 						this.onDatabaseLoaded();
 						resolve();
-					 },
+					},
 					autosave: true, autosaveInterval: 4000 4000
 				});
 			} catch (error) {
@@ -95,7 +100,7 @@ export class LocalLegalStore {
 		this.documents = this.db.getCollection('documents') ||
 		                 this.db.addCollection('documents', {
 			indices: ['id', 'caseId', 'type', 'createdAt']
-		}); // Update counts
+		}, // Update counts
 		this.documentCount = this.documents.count();
 		this.isInitialized = true;
 
@@ -248,7 +253,8 @@ export class LocalLegalStore {
 			});
 
 			if (!response.ok) {
-				throw new Error(`Sync failed: ${response.statusText}`, };
+				throw new Error(`Sync failed: ${response.statusText}`, }
+
 			const { documents: deletedIds } = await response.json();
 
 			// Apply updates
@@ -280,9 +286,9 @@ export class LocalLegalStore {
 			this.stopSync();
 		}
 
-		this.syncInterval = window.setInterval(() => { 
+		this.syncInterval = window.setInterval(() => {
 			this.syncWithServer();
-		 }, intervalSeconds * 1000);
+		}, intervalSeconds * 1000);
 
 		// Initial sync
 		this.syncWithServer();

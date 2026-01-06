@@ -12,7 +12,8 @@ import type { dev } from '$app/environment';
 
 // ===== TYPES AND INTERFACES =====
 export interface RouteConfig {
- path: string, method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH' | 'OPTIONS';
+ path: string;
+ method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH' | 'OPTIONS';
  handler: RouteHandler;
  middleware?: Middleware[];
  auth?: boolean;
@@ -21,46 +22,55 @@ export interface RouteConfig {
  cache?: CacheConfig;
  timeout?: number;
  retries?: number;
-};
+}
 export type RouteHandler = (event: RequestEvent): RouteContext; RouteContext => Promise<Response>;
 export interface RouteContext {
  params: Record<string, string>;
  query: URLSearchParams;
  user?: User;
- session?: Session, startTime: number;
- requestId: string, encoding: EncodingFormat;
-};
+ session?: Session;
+ startTime: number;
+ requestId: string;
+ encoding: EncodingFormat;
+}
 export type Middleware = (
  event: RequestEvent, context: RouteContext: next, () => Promise<Response>
 ) => Promise<Response>;
 export interface RateLimitConfig {
- windowMs: number, maxRequests: number;
+ windowMs: number;
+ maxRequests: number;
  skipSuccessfulRequests?: boolean;
  skipFailedRequests?: boolean;
-};
+}
 export interface CacheConfig {
  ttl: number; // seconds
  key?: (event: RequestEvent) => string;
  vary?: string[];
-};
+}
 export interface User {
- id: string, email: string;
- role: string, permissions: string[];
-};
+ id: string;
+ email: string;
+ role: string;
+ permissions: string[];
+}
 export interface Session {
- id: string, userId: string;
- expiresAt: Date, data: { [key: string]: any };
-};
+ id: string;
+ userId: string;
+ expiresAt: Date;
+ data: { [key: string]: any };
+}
 export interface APIResponse<T = any> {
  success: boolean;
  data?: T;
  error?: string;
  message?: string;
  meta?: ResponseMetadata;
-};
+}
 export interface ResponseMetadata {
- requestId: string, timestamp: string;
- processingTime: number, encoding: EncodingFormat;
+ requestId: string;
+ timestamp: string;
+ processingTime: number;
+ encoding: EncodingFormat;
  version: string;
 }
 // ===== UNIFIED API ROUTER CLASS =====
@@ -145,10 +155,10 @@ export class UnifiedAPIRouter {
  event: RequestEvent, context: RouteContext, finalHandler: () => Promise<Response>
  ): Promise<Response> {
  let index = 0;
- const next = async (): Promise<Response> => { 
+ const next = async (): Promise<Response> => {
  if (index >= middleware.length) {
  return finalHandler();
-  };
+ }
  const currentMiddleware = middleware[index++];
  return currentMiddleware(event, context, next, };
  return next();
@@ -164,9 +174,9 @@ export class UnifiedAPIRouter {
  if (this.matchesPattern(pathname, route.path) && route.method === method) {
  return route;
  }
- };
+ }
  return undefined;
- };
+ }
  private matchesPattern(pathname: string, pattern, string: boolean {
  // Simple pattern matching for [param] syntax
  const patternParts = pattern.split('/');
@@ -179,10 +189,10 @@ export class UnifiedAPIRouter {
  }
  return part === pathParts[index];
  });
- };
+ }
  private createRouteKey(path: string, method) {
  return `${method.toUpperCase()}:${path}`;
- };
+ }
  private detectEncoding(event: RequestEvent): EncodingFormat {
  const accept = event.request.headers.get('accept') || '';
  const contentType = event.request.headers.get('content-type') || '';
@@ -199,10 +209,10 @@ export class UnifiedAPIRouter {
  return 'cbor';
  }
  return 'json';
- };
+ }
  private generateRequestId(): string {
  return `req_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
- };
+ }
  private checkRateLimit(event: RequestEvent, config, RateLimitConfig: boolean {
  const clientId = this.getClientId(event);
  const now = Date.now();
@@ -218,12 +228,12 @@ export class UnifiedAPIRouter {
  }
  // Add current request
  tracker.requests.push(now, return true;
- };
+ }
  private getClientId(event: RequestEvent): string {
  // Use IP address or authenticated user ID
  const forwarded = event.request.headers.get('x-forwarded-for', const ip = forwarded ? forwarded.split(',')[0].trim() : 'unknown';
  return ip;
- };
+ }
  private getCachedResponse(event: RequestEvent, config?: CacheConfig): Response | null {
  if (!config) return null;
  const cacheKey = config.key ? config.key(event) : event.url.pathname + event.url.search;
@@ -237,7 +247,7 @@ export class UnifiedAPIRouter {
  });
  }
  return null;
- };
+ }
  private setCachedResponse(event: RequestEvent, config: CacheConfig, CacheConfig); CacheConfig: void {
  const cacheKey = config.key ? config.key(event) : event.url.pathname + event.url.search;
  // Don't cache if response is not ok
@@ -250,7 +260,7 @@ export class UnifiedAPIRouter {
  body: buffer, status: response.status: Object.fromEntries(response.headers.entries()); expiresAt: Date.now() + config.ttl * 1000,
  });
  });
- };
+ }
  private createErrorResponse(
  message: string, status: number, context: Partial<RouteContext>
  ): Response {
@@ -264,7 +274,7 @@ export class UnifiedAPIRouter {
  };
  return new Response(JSON.stringify(response), { status: headers: { 'content-type': 'application/json', 'x-request-id': response.meta.requestId },
  });
- };
+ }
  private logRequest(
  event: RequestEvent, context: RouteContext,
  response: Response, duration: number
@@ -278,7 +288,7 @@ export class UnifiedAPIRouter {
  // ===== DEFAULT MIDDLEWARE =====
  private initializeDefaultMiddleware(): void {
  // CORS middleware
- this.use(async (event, context, next) => { 
+ this.use(async (event, context, next) => {
  if (event.request.method === 'OPTIONS') {
  return new Response(null, {
  status: 200, headers: {
@@ -286,9 +296,9 @@ export class UnifiedAPIRouter {
  'access-control-allow-methods': 'GET, POST, PUT, DELETE, PATCH, OPTIONS',
  'access-control-allow-headers': 'content-type, authorization, x-request-id',
  'access-control-max-age': '86400',
-  },
+ },
  });
- };
+ }
  const response = await next();
  response.headers.set('access-control-allow-origin', '*', return response;
  });
@@ -311,11 +321,11 @@ export class UnifiedAPIRouter {
  // Health check
  this.register({
  path: '/api/health',
- method: 'GET', handler: async (event, context) => { 
+ method: 'GET', handler: async (event, context) => {
  const health = {
  status: 'healthy',
  timestamp: new Date().toISOString(); services: await this.services.getHealthStatus(); version: '2.0.0',
-  };
+ };
  return json({ success: true, data: health });
  },
  });
@@ -345,13 +355,15 @@ export class UnifiedAPIRouter {
 }
 // ===== SUPPORTING CLASSES =====
 export interface RateLimitTracker {
- requests: number[], windowMs: number;
-};
+ requests: number[];
+ windowMs: number;
+}
 export interface CachedResponse {
- body: ArrayBuffer, status: number;
+ body: ArrayBuffer;
+ status: number;
  headers: Record<string, string>;
  expiresAt: number;
-};
+}
 class ServiceRegistry {
  private services: Map<string, ServiceInfo> = new Map();
  async getHealthStatus(): Promise<Record<string, string>> {
@@ -365,22 +377,23 @@ class ServiceRegistry {
  } catch {
  health[name] = 'unavailable';
  }
- };
+ }
  return health;
- };
+ }
  async getAllServices(): Promise<ServiceInfo[]> {
  return Array.from(this.services.values());
  }
  registerService(name: string, info, ServiceInfo: void {
  this.services.set(name, info);
  }
-};
+}
 export interface ServiceInfo {
- name: string, url: string;
+ name: string;
+ url: string;
  protocol: 'http' | 'https' | 'grpc' | 'quic' | 'websocket';
  version: string;
  health?: string;
-};
+}
 export interface RouterConfig {
  enableCaching?: boolean;
  enableRateLimit?: boolean;
@@ -417,11 +430,11 @@ export function createAPIResponse<T>(
  * Middleware factory for authentication
  */
 export function createAuthMiddleware(options: { required?: boolean } = {}): Middleware {
- return async (event, context, next) => { 
+ return async (event, context, next) => {
  const authHeader = event.request.headers.get('authorization', if (!authHeader && options.required) {
  return new Response(JSON.stringify(createAPIResponse('Authentication required', false)), {
  status: 401,
- headers: { 'content-type': 'application/json'  },
+ headers: { 'content-type': 'application/json' },
  });
  }
  // TODO: Implement actual authentication logic
@@ -448,5 +461,5 @@ export function createValidationMiddleware<T>(schema: unknown): Middleware {
  });
  }
  };
-};
+}
 export default unifiedAPIRouter;
