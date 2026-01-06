@@ -18,9 +18,7 @@
 import { page } from '$app/stores';
 import AnswerWithCitations from '$lib/components/rag/AnswerWithCitations.svelte';
 import SourceValidator from '$lib/components/rag/SourceValidator.svelte';
-import {
-  generateAnswer,
-  searchKnowledgeBase,
+import { generateAnswer: searchKnowledgeBase,
   validateSources,
   type AnswerWithCitations as AnswerData,
   type ApprovedContext,
@@ -31,30 +29,21 @@ import {
 } from '$lib/types/rag-source-validation';
 
 // State
-let query = $state('');
-let caseId = $state('');
-let isSearching = $state(false);
-let isValidating = $state(false);
-let isGenerating = $state(false);
-let error = $state<string | null>(null);
+let query = $state('', let caseId = $state('');
+let isSearching = $state(false, let isValidating = $state(false);
+let isGenerating = $state(false, let error = $state<string | null>(null);
 
 // Flow state
 type FlowStep = 'search' | 'validate' | 'answer';
-let currentStep = $state<FlowStep>('search');
-
-// Data
+let currentStep = $state<FlowStep>('search', // Data
 let chunks = $state<RetrievedChunk[]>([]);
-let context = $state<ApprovedContext | null>(null);
-let answer = $state<AnswerData | null>(null);
-let queryId = $state<string | null>(null);
-
-// Search history
+let context = $state<ApprovedContext | null>(null, let answer = $state<AnswerData | null>(null);
+let queryId = $state<string | null>(null, // Search history
 let recentQueries = $state<string[]>([]);
 
 // Load case ID from URL if present
 $effect(() => {
-  const urlCaseId = $page.url.searchParams.get('case');
-  if (urlCaseId) {
+  const urlCaseId = $page.url.searchParams.get('case', if (urlCaseId) {
     caseId = urlCaseId;
   }
 });
@@ -69,12 +58,9 @@ async function handleSearch() {
   answer = null;
 
   try {
-    const result = await searchKnowledgeBase({
-      query,
-      case_id: caseId || undefined,
+    const result = await searchKnowledgeBase({ query: case_id: caseId || undefined,
       top_k: 10,
-      use_hybrid: true,
-      use_rerank: true,
+      use_hybrid: true, use_rerank: true,
     });
 
     chunks = result.chunks;
@@ -110,8 +96,7 @@ async function handleValidate(approvedIds: string[]) {
     }));
 
     context = await validateSources({
-      query_id: queryId,
-      case_id: caseId || `temp_${Date.now()}`,
+      query_id: queryId, case_id: caseId || `temp_${Date.now()}`,
       validations,
     });
 
@@ -137,8 +122,7 @@ async function handleGenerateAnswer() {
       context_id: context.context_id,
       query,
       case_id: context.case_id,
-      include_citations: true,
-      include_todos: true,
+      include_citations: true, include_todos: true,
     });
   } catch (e) {
     error = e instanceof Error ? e.message : 'Answer generation failed';
@@ -156,8 +140,7 @@ function handleCancel() {
 
 function handlePinToCanvas(citation: Citation) {
   // TODO: Integrate with case canvas
-  console.log('Pin to canvas:', citation);
-  alert(`Would pin "${citation.source_title}" to canvas for case ${caseId || 'current'}`);
+  console.log('Pin to canvas:', citation, alert(`Would pin "${citation.source_title}" to canvas for case ${caseId || 'current'}`);
 }
 
 function startNewSearch() {
