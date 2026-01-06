@@ -11,7 +11,7 @@
 import { query } from "$app/server";
 import type { QdrantSearchResult } from '$lib/types/qdrant';
 import crypto from 'crypto';
-import { timestamp } from "drizzle-orm/gel-core";
+// import { timestamp } from "drizzle-orm/gel-core";
 import Redis from 'ioredis';
 
 // Redis connection
@@ -30,7 +30,7 @@ redis.on('error', (err) => {
 redis.on('connect', () => {
 	console.log('✅ Redis connected for knowledge cache');
 });
-  
+
 const TTL = {
 	embeddings: 3600, // 1 hour - embeddings are deterministic
 	search: 1800, // 30 minutes - results may change with new data
@@ -39,7 +39,7 @@ const TTL = {
 };
 
 // Cache key generators
-function getEmbeddingCacheKey(text: string): string {
+function getEmbeddingCacheKey(text: string, model: string = 'text-embedding-3-small'): string {
 	const hash = crypto.createHash('sha256').update(`${ model }:${ text }`).digest('hex');
 	return `emb:${ model }:${hash.substring(0, 16)}`;
 }

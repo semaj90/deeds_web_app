@@ -1,7 +1,7 @@
 // Simple in-memory queue for RAG processing
 // In production, replace with RabbitMQ/NATS
 
-import type { timestamp } from "drizzle-orm/gel-core";
+// import type { timestamp } from "drizzle-orm/gel-core";
 
 interface QueueJob {
  id: string;
@@ -17,7 +17,8 @@ export async function enqueueJob(queueName: string, options: any): Promise<void>
  const job: QueueJob = {
  id: crypto.randomUUID(),
  queueName,
- payload: timestamp.now(),
+ payload: options,
+ timestamp: Date.now(),
  };
 
  jobQueue.push(job);
@@ -117,7 +118,7 @@ async function processRagIndexingJob(payload: any): Promise<void> {
  },
  ],
  });
-  
+
  const { sql } = await import('$lib/server/db');
  try {
  await sql`UPDATE evidence_files SET extracted_text = ${text}, updated_at = NOW() WHERE chat_turn_id = ${ chatTurnId } AND minio_object_name = ${obj.objectName}`;
