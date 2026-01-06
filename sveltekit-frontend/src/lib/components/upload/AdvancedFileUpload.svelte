@@ -131,9 +131,9 @@
 </div> {/if}
 </div> <style> /* @unocss-include */ .advanced-file-upload { width: 100%}
   .drop-zone { border: 2px dashed #d1d5db; border-radius: 12px; padding: 3rem 2rem; text-align: center; cursor: pointer; transition: all 0.2s ease; background: #fafafa}
-  .drop-zone:, hover: not(.disabled) { border-color: #3b82f6; background: #eff6ff}
+  .drop-zone:, hover:not(.disabled) { border-color: #3b82f6; background: #eff6ff}
   .drop-zone.drag-over { border-color: #3b82f6; background: #eff6ff;transform: scale(1.02)}
-  .drop-zone.disabled { opacity: 0.6; cursor: not-allowed}
+  .drop-zone.disabled { opacity: 0.6; cursor:not-allowed}
   .drop-zone:focus { outline: 2px solid #3b82f6; outline-offset: 2px}
   .upload-icon { margin-bottom: 1rem; color: #6b7280}
   .upload-actions { display: flex; gap: 0.75rem; justify-content: center; flex-wrap: wrap; margin-top: 1rem}

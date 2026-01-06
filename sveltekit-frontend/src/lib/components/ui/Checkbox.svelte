@@ -37,7 +37,7 @@ https, //svelte.dev/e/js_parse_error -->
   .checkbox-input:checked {
     background-color: #007bff
     border-color: #007bff}
-  .checkbox-input: checked::after {
+  .checkbox-input:checked::after {
     content: ''; position: absolute
     top: 0.1875rem
     left: 0.1875rem

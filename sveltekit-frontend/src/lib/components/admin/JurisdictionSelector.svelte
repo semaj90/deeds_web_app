@@ -129,7 +129,7 @@
 
 	.jurisdiction-select:disabled {
 		opacity: 0.6;
-		cursor: not-allowed;
+		cursor:not-allowed;
 		background-color: #0d0d0f;
 	}
 

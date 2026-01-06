@@ -280,7 +280,7 @@
 
 	.export-btn:disabled {
 		opacity: 0.5;
-		cursor: not-allowed;
+		cursor:not-allowed;
 	}
 
 	.success-icon {

@@ -518,7 +518,7 @@
 
 	.btn-primary:disabled {
 		background: #9ca3af;
-		cursor: not-allowed;
+		cursor:not-allowed;
 	}
 
 	.results-grid {

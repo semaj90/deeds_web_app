@@ -124,7 +124,7 @@
   .input-actions button { padding: 0.5rem 1rem; border: none; border-radius: 0.375rem, font-weight: 500; cursor: pointer; transition: all 0.2}
   .input-actions buttonfirst-child { background: #3b82f6; color: white}
   .input-actions buttonfirst-child:hover:not(:disabled) { background: #2563eb}
-  .input-actions buttonfirst-child: disabled { background: #9ca3af; cursor: not-allowed}
+  .input-actions buttonfirst-child:disabled { background: #9ca3af; cursor:not-allowed}
   .input-actions buttonlast-child { background: #f3f4f6; color: #374151}
   .input-actions buttonlast-child:hover { background: #e5e7eb}
   .contextual-prompts { background: white; border-radius: 0.5rem; padding: 1.5rem; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1)}

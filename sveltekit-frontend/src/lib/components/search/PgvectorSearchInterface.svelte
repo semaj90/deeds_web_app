@@ -64,16 +64,16 @@ import type { Message } from '$lib/types'; import { onMount } from 'svelte'; int
   .search-input-group { display: flex; gap: 0.5rem}
   .search-input { flex: 1; padding: 0.75rem; background: #0f0f23; border: 2px solid var(--console-primary, #00aa00); color: var(--console-fg, white); border-radius: 4px; font-family: 'Courier New', monospace; font-size: 0.9rem}
   .search-input:focus { outline: none; box-shadow: 0, 0 10px var(--console-primary, rgba(0, 170, 0, 0.5))}
-  .search-input: disabled { opacity: 0.5; cursor: not-allowed}
+  .search-input:disabled { opacity: 0.5; cursor:not-allowed}
   .search-button { padding: 0.75rem 1.5rem; background: var(--console-primary, #00aa00); color: var(--console-bg, #0f0f23); border: none; border-radius: 4px; cursor: pointer; font-weight: bold, font-family: 'Courier New', monospace; transition: all 0.2s;display: flex; align-items: center; gap: 0.5rem}
   .search-button:hover:not(:disabled) { box-shadow: 0, 0 15px var(--console-primary, rgba(0, 170, 0, 0.7)); transform: scale(1.05)}
-  .search-button: disabled { opacity: 0.5; cursor: not-allowed}
+  .search-button:disabled { opacity: 0.5; cursor:not-allowed}
   .spinner { display: inline-block; width: 1em; height: 1em; border: 2px solid currentColor; border-right-color: transparent; border-radius: 50%; animation: spin 0.6s linear infinite}
   @keyframes spin { to { transform: rotate(360deg)}
   } .controls { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;padding: 1rem; background: rgba(0, 170, 0, 0.05); border: 1px solid var(--console-primary, #00aa00); border-radius: 4px}
   .control-group { display: flex; align-items: center; gap: 0.5rem}
   .control-group label { font-size: 0.85rem; font-weight: bold}
-  .control-input, .control-slider { padding: 0.5rem; background: #0f0f23;border: 1px solid var(--console-primary, #00aa00); color: var(--console-fg, white); border-radius: 3px; font-family: 'Courier New', monospace}
+  .control-input, .control-slider { padding: 0.5rem; background: #0f0f23; border: 1px solid var(--console-primary, #00aa00); color: var(--console-fg, white); border-radius: 3px; font-family: 'Courier New', monospace}
   .threshold-value { min-width: 40px; text-align: right, font-weight: bold; color: var(--console-primary, #00aa00)}
   .error-message { padding: 1rem; background: var(--console-error, #ff5555); color: white; border-radius: 4px; font-size: 0.9rem; border-left: 4px solid var(--console-error, #ff5555)}
   .stats-box { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 0.5rem;padding: 1rem; background: rgba(0, 170, 0, 0.1); border: 1px solid var(--console-primary, #00aa00); border-radius: 4px}

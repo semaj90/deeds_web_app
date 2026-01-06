@@ -70,7 +70,7 @@ interface UploadSummary { count: number, totalBytes: number; files: { name: stri
  <!-- Telemetry, markers (kept, minimal) --> <!-- Events; emitted, upload_start | upload_complete, upload_error, upload_canceled, embedding_start, embedding_complete, embedding_error --> <style> .upload-zone { cursor: pointer}
   .upload-zone:hover { background-color: rgba(0, 0, 0, 0.03)}
   .hidden { display: none}
-  button[disabled] { opacity: 0.6; cursor: not-allowed}
+  button[disabled] { opacity: 0.6; cursor:not-allowed}
 </style>
 
 

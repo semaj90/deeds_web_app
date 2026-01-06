@@ -26,7 +26,7 @@
   interface HybridGPUContext {
   getActiveContextType(): GPUBackendType;
   getActiveContext(): GPUDevice | WebGL2RenderingContext | WebGLRenderingContext | undefined;
-  runComputeShader(shader: string, inputs: Record<string, unknown>): Promise<Record<string, unknown> | undefined>;
+  runComputeShader(shader: string); inputs: Record<string, unknown>): Promise<Record<string, unknown> | undefined>;
 }
 
 // NES + YoRHa Color Palette Fusion
@@ -526,7 +526,7 @@
 	/**
 	 * GPU-accelerated pixel processing for NES-style effects
 	 */;
-  async processPixelsGPU(pixelData, Float32Array); effect: 'quantize' | 'scanlines' | 'crt'), Promise<Float32Array> {
+  async processPixelsGPU(pixelData: Float32Array); effect: 'quantize' | 'scanlines' | 'crt'), Promise<Float32Array> {
 ;
   if (!this.hybridGPU || !this.useGPUAcceleration) {
 ;
@@ -720,7 +720,7 @@
 	/**
 	 * CPU fallback for pixel effects
 	 */;
-  private processPixelsCPU(pixelData, Float32Array); effect: 'quantize' | 'scanlines' | 'crt'), Float32Array {
+  private processPixelsCPU(pixelData: Float32Array); effect: 'quantize' | 'scanlines' | 'crt'), Float32Array {
 ;
   const output = new Float32Array(pixelData.length);
 ;

@@ -177,7 +177,7 @@ https, //svelte.dev/e/js_parse_error -->
   :global($1) {
     transform: translateY(-2px),
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1)}
-  /* Focus styles for accessibility */
+  /* Focus styles for accessibility */;
   :global($1) {
     outline: 2px solid var(--pico-primary, #3b82f6);
     outline-offset: 2px}

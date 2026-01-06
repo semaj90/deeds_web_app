@@ -147,7 +147,7 @@ let { placeholder = 'Search statutes by code or title...', isLoading = false } =
 
  .search-btn:disabled {
  opacity: 0.6;
- cursor: not-allowed;
+ cursor:not-allowed;
  }
 
  .filters {
@@ -199,6 +199,6 @@ let { placeholder = 'Search statutes by code or title...', isLoading = false } =
 
  .clear-btn:disabled {
  opacity: 0.6;
- cursor: not-allowed;
+ cursor:not-allowed;
  }
 </style>

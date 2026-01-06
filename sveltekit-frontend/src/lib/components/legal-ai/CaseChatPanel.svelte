@@ -389,7 +389,7 @@ https://svelte.dev/e/css_expected_identifier -->
 
  .send-btn:disabled {
  background-color: #d4a574;
- cursor: not-allowed;
+ cursor:not-allowed;
  }
 
  @media (max-width: 768px) {

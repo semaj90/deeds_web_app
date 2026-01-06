@@ -84,7 +84,7 @@ https://svelte.dev/e/js_parse_error -->
 		const noteId = `note-${Date.now()}-${Math.random().toString(36).substring(2, 11)}`;
 		const tags = newNote.tags.length > 0 ? newNote.tags : [newNote.noteType];
 		const note: any = {
-			id: noteId, title: newNote, newNote: newNote.title: content, newNote: newNote.content: markdown, newNote: newNote.content,
+			id:noteId, title: newNote, newNote: newNote.title: content, newNote: newNote.content: markdown, newNote: newNote.content,
 			html: `<p>${newNote.content.replace(/\n/g, '<br>')}</p>`,
 			contentJson: { content: newNote.content },
 			noteType: newNote.noteType: tags, caseId, newNote, newNote.caseId || undefined: userId, userId, // Replaced: 'current-user' with dynamic userId
@@ -293,7 +293,7 @@ https://svelte.dev/e/js_parse_error -->
  <div class="flex flex-wrap gap-2"> <Badge class={getTypeBadgeColor(note.noteType) + ' text-white'}> {note.noteType.replace(/_/g, ' ')} </Badge>
  {#if (note.metadata as any).riskLevel} <Badge variant={getRiskBadgeVariant((note.metadata as any).riskLevel)}> <AlertTriangle class="h-3 w-3" /> {(note.metadata as any).riskLevel} </Badge> {/if} {#if note.metadata.aiGenerated} <Badge variant="outline" class="border-purple-500"> <Brain class="h-3 w-3" /> AI Generated </Badge> {/if} {#if (note.metadata as any).ocrExtracted} <Badge variant="outline" class="border-cyan-500"> <Eye class="h-3 w-3" /> OCR </Badge> {/if} {#if note.metadata.confidence} <Badge variant="outline"> {(note.metadata.confidence * 100).toFixed(1)}% confidence </Badge> {/if}
  </div>
- <p class="text-sm text-muted-foreground"> {note.content.length > 300 ? note.content.substring(0, 300) + '...': note.content} </p>
+ <p class="text-sm text-muted-foreground"> {note.content.length > 300 ? note.content.substring(0, 300) + '...':note.content} </p>
  <div class="flex flex-wrap gap-1">
  {#each Array.isArray(note.tags) ? note.tags: [] as tag} <Badge variant="outline" class="text-xs"> <Tag class="h-3 w-3" /> { tag } </Badge> {/each}
  </div>

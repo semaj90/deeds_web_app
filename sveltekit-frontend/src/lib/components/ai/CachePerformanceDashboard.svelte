@@ -152,7 +152,7 @@
   .control-buttons { display: flex; gap: 0.5rem}
   .control-buttons button { display: flex; align-items: center; gap: 0.5rem;padding: 0.5rem 1rem; background: rgba(255, 255, 255, 0.1); color: white; border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 6px, cursor: pointer; font-family: inherit; font-size: 0.875rem; transition: all 0.2s}
   .control-buttons button:hover { background: rgba(255, 255, 255, 0.15); border-color: rgba(255, 255, 255, 0.3)}
-  .control-buttons button: disabled { opacity: 0.5; cursor: not-allowed}
+  .control-buttons button:disabled { opacity: 0.5; cursor:not-allowed}
   .auto-refresh-btn.active { background: rgba(34, 197, 94, 0.2); border-color: #22c55e}
   .clear-cache-btn { background: rgba(239, 68, 68, 0.2) !important; border-color: #ef4444 !important}
   .dashboard-content { padding: 2rem; max-width: 1400px; margin: 0 auto}

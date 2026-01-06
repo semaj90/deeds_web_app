@@ -34,7 +34,7 @@
         > <X size={ 14 } /> </button> </div> {/each} {/if} <style> .drag-drop-zone { position: relative; min-height: 200px; border: 3px dashed var(--nes-blue, #3cbcfc); border-radius: 8px; background: var(--yorha-bg-secondary, #1a1a1a); cursor: pointer; transition: all 0.3s ease;overflow: hidden}
   .drag-drop-zone:hover:not(.disabled) { border-color: var(--nes-green, #92cc41); background: var(--yorha-bg-tertiary, #2a2a2a); transform: translateY(-2px); box-shadow: 0 4px 20px rgba(0, 255, 65, 0.2)}
   .drag-drop-zone.drag-over { border-color: var(--nes-yellow, #f7d51d); background: var(--yorha-bg-tertiary, #2a2a2a); animation: pulse-glow 1s ease-in-out infinite alternate}
-  .drag-drop-zone.disabled { opacity: 0.5; cursor: not-allowed;filter: grayscale(100%)}
+  .drag-drop-zone.disabled { opacity: 0.5; cursor:not-allowed;filter: grayscale(100%)}
   .drag-drop-zone.processing { cursor: wait}
   /* Drag Overlay */ .drag-overlay { position: absolute; inset: 0;background: linear-gradient(135deg, rgba(255, 215, 0, 0.1) 0%, rgba(0, 255, 65, 0.1) 100%); display: flex; align-items: center; justify-content: center; z-index: 2 }
   .drag-content { text-align: center; animation: float-glow 2s ease-in-out infinite alternate}

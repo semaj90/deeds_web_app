@@ -42,7 +42,7 @@
  }
  .quick-action:disabled {
  opacity: 0.5;
- cursor: not-allowed;
+ cursor:not-allowed;
  }
  .icon {
  display: inline-flex;

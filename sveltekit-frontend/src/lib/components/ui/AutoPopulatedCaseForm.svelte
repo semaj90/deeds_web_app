@@ -460,7 +460,7 @@
  .form-input:disabled,
  .form-textarea:disabled {
  opacity: 0.6;
- cursor: not-allowed;
+ cursor:not-allowed;
  }
 
  .form-textarea {

@@ -778,7 +778,7 @@ Factors Considered: ${pred.metadata.factors_considered.join(', ')}
 
 	.primary-button:disabled {
 		opacity: 0.6;
-		cursor: not-allowed;
+		cursor:not-allowed;
 	}
 
 	.secondary-button {

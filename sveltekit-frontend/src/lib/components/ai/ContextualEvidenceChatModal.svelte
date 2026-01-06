@@ -467,7 +467,7 @@
  onchange={(event) => {
  const checked = (event.target as HTMLInputElement).checked;
  reportForm = {
- ...reportForm, deliverables: checked, checked: checked
+ ...reportForm, deliverables:checked, checked:checked
  ? [...reportForm.deliverables, deliverable]
  : reportForm.deliverables.filter((item) => item !== deliverable)
  };
@@ -807,7 +807,7 @@
  }
  button.primary:disabled {
  opacity: 0.6;
- cursor: not-allowed;
+ cursor:not-allowed;
  }
  .panel-block {
  display: flex;

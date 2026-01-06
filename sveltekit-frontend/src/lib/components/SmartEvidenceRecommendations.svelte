@@ -238,7 +238,7 @@ import { Target } from "lucide-svelte";;
 
 	.generate-btn:disabled {
 		opacity: 0.5;
-		cursor: not-allowed;
+		cursor:not-allowed;
 	}
 
 	.btn-icon {

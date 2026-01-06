@@ -172,7 +172,7 @@
 
  button:disabled {
  background: #9ca3af;
- cursor: not-allowed;
+ cursor:not-allowed;
  }
 
  .status-card {

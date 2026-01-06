@@ -287,7 +287,7 @@
 
 	.close-btn:disabled {
 		opacity: 0.5;
-		cursor: not-allowed;
+		cursor:not-allowed;
 	}
 
 	.dialog-content {
@@ -354,7 +354,7 @@
 
 	.name-input:disabled {
 		opacity: 0.5;
-		cursor: not-allowed;
+		cursor:not-allowed;
 	}
 
 	.validation-message {
@@ -462,7 +462,7 @@
 
 	.btn:disabled {
 		opacity: 0.5;
-		cursor: not-allowed;
+		cursor:not-allowed;
 	}
 
 	:global(.animate-spin) {

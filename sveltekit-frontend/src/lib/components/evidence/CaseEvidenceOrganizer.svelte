@@ -185,7 +185,7 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
   .case-info { display: flex; gap: 1rem; align-items: center; font-size: 0.875rem; color: #64748b}
   .collaboration-status { color: #059669; font-weight: 500}
   .mode-selector { display: flex; gap: 0.5rem; flex-wrap}
-  .mode-button { display: flex; align-items: center; gap: 0.5rem;padding: 0.75rem 1rem; background: #f1f5f9;border: 1px solid #e2e8f0; border-radius: 0.5rem; cursor: pointer; transition: all 0.2s; /* Added: 's' for transition duration */ }
+  .mode-button { display: flex; align-items: center; gap: 0.5rem;padding: 0.75rem 1rem; background: #f1f5f9; border: 1px solid #e2e8f0; border-radius: 0.5rem; cursor: pointer; transition: all 0.2s; /* Added: 's' for transition duration */ }
   .mode-button:hover { /* Fixed typo */ background: #e2e8f0}
   .mode-button.active { background: #3b82f6, color: white; border-color: #3b82f6}
   .mode-icon { font-size: 1.25rem}

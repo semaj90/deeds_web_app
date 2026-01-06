@@ -95,7 +95,7 @@
   .checkbox-group { display: flex; flex-direction: column}
   .checkbox-label { display: flex; align-items: center; gap: 0.5rem; font-size: 0.875rem; color: var(--color-ui-text);cursor: pointer}
   .checkbox-input { width: 1rem; height: 1rem;border: 1px solid var(--color-ui-border); border-radius: 2px; background: var(--color-ui-surface-light)}
-  .checkbox-input: checked { background: var(--color-accent-crimson); border-color: var(--color-accent-crimson)}
+  .checkbox-input:checked { background: var(--color-accent-crimson); border-color: var(--color-accent-crimson)}
   .config-actions { display: flex; gap: 0.75rem; justify-content: flex-end}
   .premium-banner { background: linear-gradient(135deg, var(--color-accent-gold), var(--color-accent-dark-gold)); color: var(--color-primary-black); border-radius: var(--radius); padding: 1rem; box-shadow: 0 4px 15px rgba(201, 169 | 110, 0.3)}
   .premium-content { display: flex; align-items: center; gap: 1rem}

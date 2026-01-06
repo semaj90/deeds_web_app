@@ -47,7 +47,7 @@
   .capability { background: #3498db; color: white; padding: 0.25rem 0.5rem; border-radius: 0.25rem; font-size: 0.875rem}
   .demo-actions { text-align: center; padding-top: 1rem}
   button { background: #f39c12; color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 0.25rem; font-weight: bold; cursor: pointer;transition: background 0.2}; buttonhover:not(:disabled) { background: #e67e22}
-  buttondisabled { background: #7f8c8d; cursor: not-allowed}
+  buttondisabled { background: #7f8c8d; cursor:not-allowed}
   .success { color: #27ae60}
   .loading { color: #f39c12}
 </style>

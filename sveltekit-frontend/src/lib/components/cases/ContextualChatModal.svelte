@@ -359,7 +359,7 @@
 
  .input-field:disabled {
  opacity: 0.5;
- cursor: not-allowed;
+ cursor:not-allowed;
  }
 
  .send-button {
@@ -381,7 +381,7 @@
 
  .send-button:disabled {
  opacity: 0.5;
- cursor: not-allowed;
+ cursor:not-allowed;
  }
 
  /* Scrollbar styling */

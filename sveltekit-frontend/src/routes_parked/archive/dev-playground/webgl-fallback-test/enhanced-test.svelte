@@ -414,7 +414,7 @@ if (browser) {
  }
  .test-buttondisabled {
  background: #6b7280;
- cursor: not-allowed;
+ cursor:not-allowed;
  transform: none;
  }
  .progress-container {

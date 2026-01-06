@@ -44,10 +44,10 @@ let labelSizeClasses = $derived({
 
 // Variant classes
 let trackVariants = $derived({
-	default: checked
+	default:checked
 		? 'bg-blue-600'
 		: 'bg-slate-600',
-	nes: checked
+	nes:checked
 		? 'bg-green-500 border-4 border-white'
 		: 'bg-red-500 border-4 border-white'
 }[variant]);

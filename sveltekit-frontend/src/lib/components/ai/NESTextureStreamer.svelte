@@ -433,7 +433,7 @@ import type { Document } from '$lib/types';
     border-color: #22c55e}
   .lod-button:disabled {
     opacity: 0.5
-    cursor: not-allowed}
+    cursor:not-allowed}
   .zoom-controls {
     display: flex
     align-items: center

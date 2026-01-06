@@ -227,7 +227,7 @@ https://svelte.dev/e/attribute_invalid_name -->
 
 	.config-section input:disabled {
 		opacity: 0.6;
-		cursor: not-allowed;
+		cursor:not-allowed;
 	}
 
 	.upload-area {

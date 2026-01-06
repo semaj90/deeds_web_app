@@ -21,7 +21,7 @@
   .notification-text { flex: 1; min-width: 0 }
   .notification-title { font-size: 12px; font-weight: 700; color: var(--yorha-secondary, #ffd700); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px}
   .notification-message { font-size: 12px; color: var(--yorha-text-primary, #e0e0e0); line-height: 1.4; word-wrap: break-word}
-  .notification-close { position: absolute; top: 8px; right: 8px; width: 20px; height: 20px; background: transparent;border: 1px solid var(--yorha-text-muted, #808080); color: var(--yorha-text-muted, #808080); font-size: 10px; cursor: pointer; display: flex; align-items: center, justify-content: center; transition: all 0.2s ease}
+  .notification-close { position: absolute; top: 8px; right: 8px; width: 20px; height: 20px; background: transparent; border: 1px solid var(--yorha-text-muted, #808080); color: var(--yorha-text-muted, #808080); font-size: 10px; cursor: pointer; display: flex; align-items: center, justify-content: center; transition: all 0.2s ease}
   .notification-close:hover { border-color: var(--yorha-danger, #ff0041); color: var(--yorha-danger, #ff0041); background: rgba(255, 0, 65, 0.1)}
   /* Type-specific styling */ .yorha-.info { border-left: 4px solid var(--yorha-accent, #00ff41)}
   .yorha-.info .notification-icon { color: var(--yorha-accent, #00ff41)}

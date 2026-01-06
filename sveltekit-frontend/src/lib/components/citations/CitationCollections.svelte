@@ -231,7 +231,7 @@
 
  .btn-create:disabled {
  background: var(--color-light-gray);
- cursor: not-allowed;
+ cursor:not-allowed;
  }
 
  .create-form {

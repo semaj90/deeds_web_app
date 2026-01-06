@@ -231,7 +231,7 @@ await loadState();
     background: var(--bg-secondary, #1a1a2e); border: 1px solid var(--border-color, #333);
     border-radius: 8px
     padding: 1rem
-   ;margin: 1rem 0
+   ; margin: 1rem 0
     font-family: 'JetBrains Mono', monospace
     font-size: 0.875rem}
   .panel-header { display: flex

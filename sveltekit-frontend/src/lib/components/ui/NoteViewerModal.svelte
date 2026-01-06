@@ -15,7 +15,7 @@
    let editedContent = content;
    let editedTitle = titl;
    let editedTags: string[] = [...tags];
-   let newTag = ""; // Reactive display HTML from html or markdown //, TODO: Convert to $derived: displayHtml = html || (markdown ? marked.parse(markdown): "") async function handleSaveForLater(): Promise<void> { try { await, saveNoteForLater({ id: noteId title, content, markdown, html, contentJson, noteType, tags, userId, caseId }); isSaved = true; setTimeout(() => (isSaved = false), 2000)} catch (error) { console.error("Failed to save note:", error)}
+   let newTag = ""; // Reactive display HTML from html or markdown //, TODO: Convert to $derived: displayHtml = html || (markdown ? marked.parse(markdown): "") async function handleSaveForLater(): Promise<void> { try { await, saveNoteForLater({ id:noteId title, content, markdown, html, contentJson, noteType, tags, userId, caseId }); isSaved = true; setTimeout(() => (isSaved = false), 2000)} catch (error) { console.error("Failed to save note:", error)}
   }
   async function handleRemoveFromSaved(): Promise<void> { try { await removeSavedNote(noteId); isSaved = false} catch (error) { console.error("Failed to remove note:", error)}
   }
@@ -23,7 +23,7 @@
   }
   function removeTag(tag: string) { editedTags = editedTags.filter((t) => t !== tag)}
   function handleEditorSave(_event: CustomEvent) { const { html: newHtml, markdown: newMarkdown, json newJson} = e(vent as CustomEvent).detail;
-   const updatedNote = { id: noteId, title: editedTitle content: newMarkdown || newHtml markdown: newMarkdown, html: newHtml contentJson newJson noteType, tags: editedTags userId, caseId }
+   const updatedNote = { id:noteId, title: editedTitle content: newMarkdown || newHtml markdown: newMarkdown, html: newHtml contentJson newJson noteType, tags: editedTags userId, caseId }
     onSave?.(updatedNote); localMode = "view"; // Update local data localTitle = editedTitl; localContent = newMarkdown || newHtml; localMarkdown = newMarkdow; localHtml = newHtml; localContentJson = newJso; localTags = [...editedTags]}
   function startEdit() { localMode = "edit"; editedContent = content; editedTitle = titl; editedTags = [...tags]}
   function cancelEdit() { localMode = "view"; editedContent = content; editedTitle = titl; editedTags = [...tags]}

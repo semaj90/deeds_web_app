@@ -110,7 +110,7 @@ interface Props { evidence: EvidenceNod, depth?: number; maxDepth?: number; visi
   .implications-list { display: flex; flex-wrap: wrap; gap: 6px}
   .implication-tag { display: inline-flex; align-items: center; gap: 4px;background: #1f2937; color: white;padding: 4px 8px; border-radius: 12px; font-size: 10px; font-weight: 500}
   .more-implications { background: #6b7280; color: white; padding: 4px 8px; border-radius: 12px; font-size: 10px; font-weight: 500}
-  .critical-implications { display: flex; align-items: center; gap: 8px;padding: 8px 12px; background: #fef2f2;border: 1px solid #fecaca; border-radius: 6px; margin-bottom: 12px}
+  .critical-implications { display: flex; align-items: center; gap: 8px;padding: 8px 12px; background: #fef2f2; border: 1px solid #fecaca; border-radius: 6px; margin-bottom: 12px}
   .critical-icon { font-size: 16px}
   .critical-implications strong { color: #dc2626}
   .chain-section, .relationships-section { margin-top: 12px; border-top: 1px solid #e5e7eb; padding-top: 12px}
@@ -138,8 +138,8 @@ interface Props { evidence: EvidenceNod, depth?: number; maxDepth?: number; visi
   .relationship-significance.medium { background: #e0f2f; color: #0c4a6}
   .more-relationships { font-size: 11px, color: #6b7280; font-style: italic}
   .evidence-children { border-left: 2px solid #e5e7eb; margin-top: 16px; padding-left: 16px; position: relative}
-  .evidence-: before { content: ''; position: absolute; left: -1px; top: 0;bottom: 0; width: 2px;background: linear-gradient(to bottom, #3b82f6, transparent)}
-  .circular-warning, .max-depth-warning { display: flex; align-items: center; gap: 12px;padding: 12px; background: #fef3c7;border: 1px solid #fbbf24; border-radius: 8px; margin-bottom: 8px}
+  .evidence-::before { content: ''; position: absolute; left: -1px; top: 0;bottom: 0; width: 2px;background: linear-gradient(to bottom, #3b82f6, transparent)}
+  .circular-warning, .max-depth-warning { display: flex; align-items: center; gap: 12px;padding: 12px; background: #fef3c7; border: 1px solid #fbbf24; border-radius: 8px; margin-bottom: 8px}
   .warning-icon { font-size: 20px}
   .warning-content h5 { margin: 0, 0 4px 0; color: #92400; font-size: 14px}
   .warning-content p { margin: 0, 0 4px 0; color: #92400; font-size: 12px}

@@ -297,10 +297,10 @@ import { createEventDispatcher } from 'svelte';
  box-shadow: 0 0 0 3px rgba(139, 35, 50, 0.1);
  }
 
- textarea: disabled, input: disabled,
+ textarea:disabled, input:disabled,
  select:disabled {
  background: var(--color-light-gray);
- cursor: not-allowed;
+ cursor:not-allowed;
  }
 
  .tag-input-group {
@@ -345,7 +345,7 @@ import { createEventDispatcher } from 'svelte';
  }
 
  .tag-remove:disabled {
- cursor: not-allowed;
+ cursor:not-allowed;
  opacity: 0.6;
  }
 
@@ -364,7 +364,7 @@ import { createEventDispatcher } from 'svelte';
  }
 
  .btn-link:disabled {
- cursor: not-allowed;
+ cursor:not-allowed;
  opacity: 0.6;
  }
 
@@ -409,7 +409,7 @@ import { createEventDispatcher } from 'svelte';
  .btn-primary:disabled {
  background: var(--color-light-gray);
  color: var(--color-medium-gray);
- cursor: not-allowed;
+ cursor:not-allowed;
  }
 
  .btn-secondary {
@@ -424,6 +424,6 @@ import { createEventDispatcher } from 'svelte';
  .btn-secondary:disabled {
  background: var(--color-light-gray);
  color: var(--color-medium-gray);
- cursor: not-allowed;
+ cursor:not-allowed;
  }
 </style>

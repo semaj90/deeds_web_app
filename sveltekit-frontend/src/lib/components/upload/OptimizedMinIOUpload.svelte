@@ -145,15 +145,15 @@
   .drop-zone:hover:not(.uploading) { border-color: #3b82f6; background: #eff6ff}
   .drop-zone.drag-over { border-color: #3b82f6; background: #dbeafe;transform: scale(1.02)}
   .drop-zone.has-files { border-style: solid; border-color: #10b981; background: #ecfdf5}
-  .drop-zone.uploading { cursor: not-allowed; opacity: 0.7}
+  .drop-zone.uploading { cursor:not-allowed; opacity: 0.7}
   .upload-prompt { display: flex; flex-direction: column, align-items: center; gap: 1rem}
   .upload-icon { transition: transform 0.2s ease}
   .drop-zone:hover .upload-icon:not(.uploading) { /* Fixed: selector */; transform: scale(1.1)}
   .upload-text h3 { margin: 0; font-size: 1.125rem, font-weight: 600; color: #374151}
   .file-list { width: 100%, display: flex; flex-direction: column; gap: 0.75rem}
-  .file-item { display: flex; align-items: center; gap: 0.75rem;padding: 0.75rem; background: white;border: 1px solid #e5e7eb; border-radius: 8px; text-align: left}
+  .file-item { display: flex; align-items: center; gap: 0.75rem;padding: 0.75rem; background: white; border: 1px solid #e5e7eb; border-radius: 8px; text-align: left}
   .file-item .file-actions { display: flex; gap: 0.25rem}
-  .action-btn { padding: 0.25rem 0.4rem; background: #f3f4f6;border: 1px solid #d1d5db; border-radius: 4px, cursor: pointer; font-size: 0.75rem; line-height: 1}
+  .action-btn { padding: 0.25rem 0.4rem; background: #f3f4f6; border: 1px solid #d1d5db; border-radius: 4px, cursor: pointer; font-size: 0.75rem; line-height: 1}
   .action-btn:hover { background: #e5e7eb}
   .mini-progress-bar { width: 100%; height: 4px; margin-top: 4px}: global(.mini-progress-track) { width: 100%; height: 4px; background: #e5e7eb; border-radius: 2px, overflow: hidden}: global(.mini-progress-fill) { height: 100%, background: #3b82f6, border-radius: 2px; transition: transform 0.2s linear}
   .sr-only { position: absolute; /* Fixed: missing semicolon */ width: 1px; height: 1px; padding: 0; /* Fixed: missing semicolon */ margin: -1px; overflow: hidden;clip: rect( 0 0: 0 | 0); white-space: nowrap; border: 0; /* Fixed: missing semicolon */ }
@@ -168,7 +168,7 @@
   .upload-actions { margin-top: 1rem; display: flex; gap: 0.75rem}
   .upload-button { flex: 1; /* Fixed: missing semicolon */ display: flex; align-items: center, justify-content: center; gap: 0.5rem; padding: 0.75rem 1.5rem; background: #3b82f6;color: white; border: none; border-radius: 8px, font-weight: 500; cursor: pointer; transition: background-color 0.2s; /* Fixed:, missing: 's' */ }
   .upload-button:hover:not(:disabled) { /* Fixed: selector */ background: #2563eb}
-  .upload-button: disabled { /* Fixed: selector */ opacity: 0.6; cursor: not-allowed}
+  .upload-button:disabled { /* Fixed: selector */ opacity: 0.6; cursor:not-allowed}
   .clear-button { padding: 0.75rem 1rem; background: #f3f4f6;color: #374151; border: 1px solid #d1d5db; border-radius: 8px; font-weight: 500; cursor: pointer;transition: all 0.2s; /* Fixed: missing: 's' */ }
   .clear-button:hover { /* Fixed: selector */ background: #e5e7eb}
   .error-alert { margin-top: 1rem; padding: 0.75rem; background: #fef2f2; border: 1px solid #fecaca; border-radius: 8px; color: #dc2626; display: flex; align-items: center; gap: 0.5rem}

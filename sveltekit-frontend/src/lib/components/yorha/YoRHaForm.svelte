@@ -54,13 +54,13 @@
   .field-checkbox { display: none}
   .checkbox-indicator { width: 18px; height: 18px;border: 2px solid var(--yorha-text-muted, #808080); background: var(--yorha-bg-primary, #0a0a0a); position: relative; transition: all 0.2s ease}
   .field-checkbox:checked + .checkbox-indicator { border-color: var(--yorha-secondary, #ffd700); background: var(--yorha-secondary, #ffd700)}
-  .field-checkbox: checked + .checkbox-indicator::after { content: 'âœ“'; position: absolute; top: 50%; left: 50%;transform: translate(-50%, -50%); color: var(--yorha-bg-primary, #0a0a0a); font-weight: 700; font-size: 12px}
+  .field-checkbox:checked + .checkbox-indicator::after { content: 'âœ“'; position: absolute; top: 50%; left: 50%;transform: translate(-50%, -50%); color: var(--yorha-bg-primary, #0a0a0a); font-weight: 700; font-size: 12px}
   /* Radio Styling */ .radio-group { display: flex; flex-direction: column; gap: 12px}
   .radio-wrapper { display: flex; align-items: center; gap: 12px;cursor: pointer; font-size: 14px}
   .field-radio { display: none}
   .radio-indicator { width: 18px; height: 18px;border: 2px solid var(--yorha-text-muted, #808080); background: var(--yorha-bg-primary, #0a0a0a); border-radius: 50%; position: relative;transition: all 0.2s ease}
   .field-radio:checked + .radio-indicator { border-color: var(--yorha-secondary, #ffd700)}
-  .field-radio: checked + .radio-indicator::after { content: ''; position: absolute; top: 50%; left: 50%;transform: translate(-50%, -50%); width: 8px;height: 8px; background: var(--yorha-secondary, #ffd700); border-radius: 50%}
+  .field-radio:checked + .radio-indicator::after { content: ''; position: absolute; top: 50%; left: 50%;transform: translate(-50%, -50%); width: 8px;height: 8px; background: var(--yorha-secondary, #ffd700); border-radius: 50%}
   /* File Input Styling */ .field-file { width: 100%; padding: 12px 16px;background: var(--yorha-bg-primary, #0a0a0a); border: 2px solid var(--yorha-text-muted, #808080); color: var(--yorha-text-primary, #e0e0e0); font-family: inherit; cursor: pointer}
   .field-file::-webkit-file-upload-button { background: var(--yorha-secondary, #ffd700); color: var(--yorha-bg-primary, #0a0a0a); border: none; padding: 8px 12px; font-family: inherit; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; margin-right: 12px}
   /* Error Styling */ .form-field.has-error .field-input, .form-field.has-error .field-textarea, .form-field.has-error .field-select { border-color: var(--yorha-danger, #ff0041); box-shadow: 0, 0 0 1px var(--yorha-danger, #ff0041)}
@@ -74,7 +74,7 @@
   .form-button.submit:hover:not(:disabled) { background: var(--yorha-secondary, #ffd700); color: var(--yorha-bg-primary, #0a0a0a); box-shadow: 0, 0 0 1px var(--yorha-secondary, #ffd700)}
   .form-button.cancel { border-color: var(--yorha-danger, #ff0041); color: var(--yorha-danger, #ff0041)}
   .form-button.cancel:hover:not(:disabled) { background: var(--yorha-danger, #ff0041); color: var(--yorha-text-primary, #e0e0e0)}
-  .form-buttondisabled { opacity: 0.5; cursor: not-allowed; transform: none !important}
+  .form-buttondisabled { opacity: 0.5; cursor:not-allowed; transform: none !important}
   .button-spinner { animation: spin 1s linear infinite}
   .form-hints { display: flex; gap: 16px, font-size: 10px; color: var(--yorha-text-muted, #808080)}
   .hint-key { color: var(--yorha-secondary, #ffd700); font-weight: 600}

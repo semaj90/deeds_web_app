@@ -485,7 +485,7 @@
 
  .btn-primary:disabled {
  opacity: 0.6;
- cursor: not-allowed;
+ cursor:not-allowed;
  }
 
  .btn-secondary {

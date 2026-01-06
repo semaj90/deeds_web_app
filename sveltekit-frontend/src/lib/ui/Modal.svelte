@@ -314,7 +314,7 @@ import { X } from "lucide-svelte";;
  }
 
  .close-btn:disabled {
- cursor: not-allowed;
+ cursor:not-allowed;
  opacity: 0.5;
  }
 
@@ -374,11 +374,11 @@ import { X } from "lucide-svelte";;
 
  .confirm-btn.loading {
  opacity: 0.7;
- cursor: not-allowed;
+ cursor:not-allowed;
  }
 
  .btn:disabled {
- cursor: not-allowed;
+ cursor:not-allowed;
  opacity: 0.5;
  }
 

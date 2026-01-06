@@ -85,7 +85,7 @@ interface FixSuggestion { suggestion: string, successRate: number, similarError:
   .agentic-subtitle { font-size: 0.9rem; color: var(--nier-text-muted, #999); margin-left: 1rem}
   .refresh-btn { padding: 0.5rem 1rem; background: var(--nier-bg-secondary, #1a1a1a); border: 1px solid var(--nier-accent-cool, #00ccff); color: var(--nier-accent-cool, #00ccff); border-radius: 0.5rem; cursor: pointer;transition: all 0.3s ease}
   .refresh-btn:hover:not(:disabled) { background: var(--nier-accent-cool, #00ccff); color: var(--nier-bg-primary, #0a0a0a); box-shadow: 0, 0 10px rgba(0, 204, 255, 0.5)}
-  .refresh-btn: disabled { opacity: 0.5; cursor: not-allowed}
+  .refresh-btn:disabled { opacity: 0.5; cursor:not-allowed}
   .error-alert { background: rgba(255, 0, 0, 0.1); border: 1px solid #ff4444;color: #ff6666, padding: 1rem; border-radius: 0.5rem; margin-bottom: 1rem; display: flex; justify-content: space-between; align-items: center}
   .error-alert button { background: none; border: none; color: #ff6666; font-size: 1.2rem; cursor: pointer}
   .status-card { background: var(--nier-bg-secondary, #1a1a1a); border: 1px solid var(--nier-border-primary, #333); border-radius: 0.5rem, padding: 1.5rem; margin-bottom: 2rem}
@@ -106,7 +106,7 @@ interface FixSuggestion { suggestion: string, successRate: number, similarError:
   .file-input-label input { display: none}
   .upload-btn, .query-btn { padding: 0.75rem 1.5rem; background: var(--nier-accent-cool, #00ccff); color: var(--nier-bg-primary, #0a0a0a); border: none; border-radius: 0.5rem, font-weight: bold; cursor: pointer;transition: all 0.3s ease}
   .upload-btn:hover:not(:disabled), .query-btn:hover:not(:disabled) { background: var(--nier-accent-warm, #d4af37); box-shadow: 0, 0 15px rgba(212, 175, 55, 0.5)}
-  .upload-btn:disabled, .query-btn: disabled { opacity: 0.5; cursor: not-allowed}
+  .upload-btn:disabled, .query-btn:disabled { opacity: 0.5; cursor:not-allowed}
   .query-input-group { display: flex; gap: 1rem; margin-bottom: 1rem}
   .query-input { flex: 1; padding: 0.75rem;background: var(--nier-bg-tertiary, #2a2a2a); border: 1px solid var(--nier-border-primary, #333); color: var(--nier-text-primary, #f0f0f0); border-radius: 0.5rem; font-family: inherit}
   .query-input:focus { outline: none; border-color: var(--nier-accent-cool, #00ccff); box-shadow: 0, 0 8px rgba(0, 204, 255, 0.3)}

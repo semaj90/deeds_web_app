@@ -129,7 +129,7 @@ interface Props { open: boolean}
   .collaborator-chip { padding: 0.25rem 0.5rem, background: rgba(138, 43, 226, 0.2); border: 1px solid rgba(138, 43, 226, 0.3); border-radius: 12px; font-size: 0.75rem; color: rgba(255, 255, 255, 0.9)}
   .work-actions { display: flex; gap: 0.5rem; flex-wrap}
   .action-btn { padding: 0.5rem 1rem; border: 1px solid; border-radius: 6px; font-size: 0.8rem; cursor: pointer;transition: all 0.2}
-  .action-btn: disabled { opacity: 0.5; cursor: not-allowed}
+  .action-btn:disabled { opacity: 0.5; cursor:not-allowed}
   .action-btn.primary { background: rgba(138, 43, 226, 0.2); border-color: rgba(138, 43, 226, 0.4); color: #fff}
   .action-btn.secondary { background: rgba(33, 150, 243, 0.2); border-color: rgba(33, 150, 243, 0.4); color: #fff}
   .action-btn.tertiary { background: rgba(255, 152, 0, 0.2); border-color: rgba(255, 152, 0, 0.4); color: #fff}

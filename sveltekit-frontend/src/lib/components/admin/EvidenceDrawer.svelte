@@ -380,7 +380,7 @@
 
 	.close-btn:disabled {
 		opacity: 0.5;
-		cursor: not-allowed;
+		cursor:not-allowed;
 	}
 
 	.drawer-content {
@@ -511,7 +511,7 @@
 	.form-select:disabled,
 	.form-textarea:disabled {
 		opacity: 0.6;
-		cursor: not-allowed;
+		cursor:not-allowed;
 	}
 
 	.form-input.error,
@@ -594,7 +594,7 @@
 
 	.btn:disabled {
 		opacity: 0.5;
-		cursor: not-allowed;
+		cursor:not-allowed;
 	}
 
 	/* Modal */

@@ -459,7 +459,7 @@
 
  .btn-primary:disabled {
  opacity: 0.6;
- cursor: not-allowed;
+ cursor:not-allowed;
  }
 
  .btn-secondary {
@@ -473,7 +473,7 @@
 
  .btn-secondary:disabled {
  opacity: 0.6;
- cursor: not-allowed;
+ cursor:not-allowed;
  }
 
  .notes-display {

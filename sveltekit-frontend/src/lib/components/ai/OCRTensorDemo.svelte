@@ -91,7 +91,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
   .file-info { margin: 1rem 0; padding: 0.75rem;background: #f3f4f6; border-radius: 0.5rem}
   .action-buttons { display: flex; gap: 1rem; flex-wrap}
   .action-buttons button { padding: 0.75rem 1.5rem; border: none; border-radius: 0.5rem, font-weight: 500; cursor: pointer; transition: all 0.2}
-  .action-buttons buttondisabled { opacity: 0.6; cursor: not-allowed}
+  .action-buttons buttondisabled { opacity: 0.6; cursor:not-allowed}
   .action-buttons buttonfirst-child { background: #3b82f6; color: white}
   .action-buttons buttonfirst-child:hover:not(:disabled) { background: #2563eb}
   .metrics-grid, .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem}

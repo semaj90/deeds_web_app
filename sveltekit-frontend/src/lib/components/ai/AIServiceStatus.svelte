@@ -55,7 +55,7 @@ import type { Document } from '$lib/types'; /** * AI Service Status Component wi
   .last-update { font-size: 0.75rem; color: var(--text-secondary, #6c757d)}
   .refresh-button { display: flex; align-items: center; gap: 0.5rem;padding: 0.5rem 1rem; background: var(--accent-primary, #0d6efd); color: white, border: none, border-radius: 6px, cursor: pointer; font-size: 0.875rem; font-weight: 500; transition: background-color 0.2s}
   .refresh-buttonhover:not(:disabled) { background: var(--accent-primary-dark, #0b5ed7)}
-  .refresh-buttondisabled { opacity: 0.6; cursor: not-allowed}
+  .refresh-buttondisabled { opacity: 0.6; cursor:not-allowed}
   .refresh-button.spinning:global(svg) { animation: spin 1s linear infinite}
   @keyframes spin { from { transform: rotate(0deg)} to { transform: rotate(360deg)} }
   .overall-status { display: flex; align-items: center; gap: 0.75rem;padding: 1rem; border-radius: 6px; margin-bottom: 1.5rem; font-weight: 500}

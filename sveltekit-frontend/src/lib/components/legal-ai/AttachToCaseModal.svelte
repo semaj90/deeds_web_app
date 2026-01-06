@@ -370,6 +370,6 @@ https://svelte.dev/e/attribute_invalid_event_handler -->
  .btn-cancel:disabled,
  .btn-attach:disabled {
  opacity: 0.6;
- cursor: not-allowed;
+ cursor:not-allowed;
  }
 </style>

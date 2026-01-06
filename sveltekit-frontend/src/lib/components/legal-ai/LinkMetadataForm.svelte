@@ -244,7 +244,7 @@
 	.btn-save:disabled,
 	.btn-cancel:disabled {
 		opacity: 0.6;
-		cursor: not-allowed;
+		cursor:not-allowed;
 	}
 
 	.display-content {

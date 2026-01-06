@@ -428,7 +428,7 @@
   .ai-analyze-btn[disabled],
   .ai-analyze-btn[aria-disabled="true"] {
     opacity: 0.6
-   ;cursor: not-allowed}
+   ;cursor:not-allowed}
 
   @media (max-width: 768px) {
     .contract-title { flex-direction: column; gap: 1rem}

@@ -39,7 +39,7 @@
 
 	.input:disabled {
 		background-color: #f3f4f6;
-		cursor: not-allowed;
+		cursor:not-allowed;
 	}
 
 	:global(.dark) .input {

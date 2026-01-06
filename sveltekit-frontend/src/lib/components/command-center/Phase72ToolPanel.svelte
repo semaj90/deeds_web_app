@@ -398,7 +398,7 @@
 
 	.run-btn:disabled {
 		opacity: 0.5;
-		cursor: not-allowed;
+		cursor:not-allowed;
 	}
 
 	.view-btn {
@@ -527,6 +527,6 @@
 
 	.rerun-btn:disabled {
 		opacity: 0.5;
-		cursor: not-allowed;
+		cursor:not-allowed;
 	}
 </style>

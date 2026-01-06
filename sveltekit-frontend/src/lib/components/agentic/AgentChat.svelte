@@ -260,7 +260,7 @@
 
  textarea:disabled {
  opacity: 0.5;
- cursor: not-allowed;
+ cursor:not-allowed;
  }
 
  button {
@@ -282,6 +282,6 @@
 
  button:disabled {
  opacity: 0.5;
- cursor: not-allowed;
+ cursor:not-allowed;
  }
 </style>

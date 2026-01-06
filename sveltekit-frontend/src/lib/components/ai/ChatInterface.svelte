@@ -399,7 +399,7 @@ import type { Case } from '$lib/types';
     font-family: "Courier New", monospace}
   :global(.message-content h1, .message-content h2, .message-content h3) {
     font-weight: 600
-   ;margin: 1rem, 0 0.5rem 0}
+   ; margin: 1rem, 0 0.5rem 0}
   :global(.message-content h1) {
     font-size: 1.25rem}
   :global(.message-content h2) {

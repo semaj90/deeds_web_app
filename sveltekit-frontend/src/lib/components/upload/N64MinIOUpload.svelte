@@ -79,7 +79,7 @@
   .n64-drop-zone:hover:not(.uploading) { border-color: #FFA500; transform: scale(1.02); box-shadow: inset 0 0 30px rgba(255, 165, 0, 0.2), 0, 0 30px rgba(255, 165, 0, 0.5)}
   .n64-drop-zone.drag-over { border-color: #FF6B35; background: linear-gradient(135deg, #2e1a1a 0%, #3e1616 100%); transform: scale(1.05); box-shadow: inset 0 0 40px rgba(255, 107, 53, 0.3), 0, 0 40px rgba(255, 107, 53, 0.7)}
   .n64-drop-zone.has-files { border-color: #40FF40; background: linear-gradient(135deg, #1a2e1a 0%, #163e16 100%)}
-  .n64-drop-zone.uploading { cursor: not-allowed; opacity: 0.8;animation: pulse 2s infinite}
+  .n64-drop-zone.uploading { cursor:not-allowed; opacity: 0.8;animation: pulse 2s infinite}
   @keyframes pulse { 0%, 100% { opacity: 0.8} 50% { opacity: 1} }
   /* Theme-specific styles */ .theme-nes { border-color: #FF3030 !important; background: linear-gradient(135deg, #2e1a1a 0%, #3e1616 100%) !important}
   .theme-snes { border-color: #4090FF !important; background: linear-gradient(135deg, #1a1a2e 0%, #161636 100%) !important}
@@ -121,14 +121,14 @@
   .n64-gpu-indicator { font-size: 0.8rem; color: #40FF40; font-weight: bold; text-shadow: 1px 1px 0 #000; letter-spacing: 0.5px}
   .n64-upload-actions { margin-top: 1.5rem; display: flex; gap: 1rem}
   .n64-upload-button { flex: 1; display: flex; align-items: center; justify-content: center; gap: 0.75rem;padding: 1rem 1.5rem; background: #FFD700;color: #000; border: 3px solid #FFA500; font-family: 'Courier New', monospace; font-weight: bold; cursor: pointer;transition: all 0.3s ease; font-size: 0.9rem; letter-spacing: 0.5px; box-shadow: inset 2px 2px 0 rgba(255, 255, 255, 0.3), inset -2px -2px, 0 rgba(0, 0, 0, 0.3), 0 4px 8px rgba(0, 0, 0, 0.5)}
-  .n64-upload-buttonhover: not(:disabled) { background: #FFA500; transform: translateY(-2px); box-shadow: inset 2px 2px 0 rgba(255, 255, 255, 0.3), inset -2px -2px, 0 rgba(0, 0, 0, 0.3), 0 6px 12px rgba(0, 0, 0, 0.7)}
-  .n64-upload-buttondisabled { opacity: 0.6; cursor: not-allowed; transform: none}
+  .n64-upload-buttonhover:not(:disabled) { background: #FFA500; transform: translateY(-2px); box-shadow: inset 2px 2px 0 rgba(255, 255, 255, 0.3), inset -2px -2px, 0 rgba(0, 0, 0, 0.3), 0 6px 12px rgba(0, 0, 0, 0.7)}
+  .n64-upload-buttondisabled { opacity: 0.6; cursor:not-allowed; transform: none}
   .n64-clear-button { padding: 1rem; background: #666666; color: #FFF; border: 2px solid #444444; font-family: 'Courier New', monospace; font-weight: bold; cursor: pointer;transition: all 0.2s ease; font-size: 0.8rem; letter-spacing: 0.5px; box-shadow: inset 1px 1px 0 rgba(255, 255, 255, 0.2), inset -1px -1px, 0 rgba(0, 0, 0, 0.3)}
   .n64-clear-buttonhover { background: #777777; transform: translateY(-1px)}
   .n64-clear-button.cancel { background: #FF3030; border-color: #CC0000}
   .n64-clear-button.cancel:hover { background: #FF5555}
   .n64-error-alert { margin-top: 1rem; padding: 1rem;background: linear-gradient(135deg, #2e1a1a 0%, #1a0a0a 100%); border: 2px solid #FF3030;color: #FF6666, display: flex; align-items: center; gap: 0.75rem; font-weight: bold; text-shadow: 1px 1px 0 #000; box-shadow: inset 0 0 10px rgba(255, 48, 48, 0.1), 0, 0 10px rgba(255, 48, 48, 0.3)}
-  .sr-only { position: absolute; width: 1px; height: 1px; padding: 0;margin: -1px; overflow: hidden;clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0 }
+  .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden;clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0 }
   /* Responsive adjustments */ @media (max-width: 640px) { .n64-upload-container { max-width: 100%}
     .n64-drop-zone { padding: 1.5rem; min-height: 180px}
     .n64-metrics-grid { grid-template-columns: 1fr 1fr}

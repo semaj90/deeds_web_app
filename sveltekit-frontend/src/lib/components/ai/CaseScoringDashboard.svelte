@@ -168,7 +168,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
   .dashboard-title { font-size: 2rem; font-weight: 700; color: #1e293b;margin: 0}
   .dashboard-subtitle { color: #64748b; margin: 0.5rem, 0 0 0}
   .header-actions { display: flex; gap: 1rem; align-items: center}
-  .demo-toggle { display: flex; align-items: center; gap: 0.5rem;padding: 0.5rem 1rem; background: #f0f9ff;border: 1px solid #3b82f6; border-radius: 0.375rem; font-size: 0.875rem; cursor: pointer}
+  .demo-toggle { display: flex; align-items: center; gap: 0.5rem;padding: 0.5rem 1rem; background: #f0f9ff; border: 1px solid #3b82f6; border-radius: 0.375rem; font-size: 0.875rem; cursor: pointer}
   .demo-toggle input[type='checkbox'] { cursor: pointer}
   .demo-toggle span { color: #1e40af; font-weight: 500}
   .controls-section { margin-bottom: 2rem}

@@ -169,7 +169,7 @@ import type { Message } from '$lib/types';
     overflow-y: auto
     scrollbar-width: thin}
   .chat-input::placeholder { color: var(--text-placeholder, #94a3b8)}
-  .chat-input:disabled { color: var(--text-disabled, #94a3b8); cursor: not-allowed}
+  .chat-input:disabled { color: var(--text-disabled, #94a3b8); cursor:not-allowed}
   .chat-input.near-limit { color: var(--text-warning, #d97706)}
   .chat-input.at-limit {
     color: var(--text-error, #dc2626)}
@@ -206,7 +206,7 @@ import type { Message } from '$lib/types';
     background: var(--accent-hover, #2563eb)}
   .send-button:disabled { /* Corrected selector for disabled state */
     opacity: 0.5
-    cursor: not-allowed}
+    cursor:not-allowed}
   .input-hint {
     margin-top: 8px
     padding: 0 12px}

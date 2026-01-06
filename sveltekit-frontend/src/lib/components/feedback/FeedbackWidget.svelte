@@ -47,8 +47,8 @@ import type { User } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
   .feedback-textarea:focus { outline: none; border-color: #4f46e5; box-shadow: 0, 0 0 3px rgba(79, 70, 229, 0.1)}
   .feedback-actions { display: flex; justify-content: flex-end}
   .submit-button { background: #4f46e5; color: white; border: none; padding: 12px 24px; border-radius: 8px; font-size: 14px, font-weight: 600; cursor: pointer;transition: background-color 0.2s, transform 0.1}
-  .submit-buttonhover: not(:disabled) { background: #4338ca; transform: translateY(-1px)}
-  .submit-buttondisabled { background: #9ca3af; cursor: not-allowed; transform: none}
+  .submit-buttonhover:not(:disabled) { background: #4338ca; transform: translateY(-1px)}
+  .submit-buttondisabled { background: #9ca3af; cursor:not-allowed; transform: none}
   .feedback-success { text-align: center; padding: 20px 0}
   .success-icon { font-size: 48px, color: #10b981; margin-bottom: 12px}
   .success-title { margin: 0, 0 8px 0; color: #333; font-size: 18px; font-weight: 600}

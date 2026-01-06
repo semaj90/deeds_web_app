@@ -40,7 +40,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
   .processing-panel, .bulk-panel { grid-column: 1 / -1}
   .processing-controls, .bulk-controls { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap}
   .btn { padding: 10px 20px; border: none; border-radius: 8px, font-weight: 500; cursor: pointer; transition: all 0.2s ease; font-size: 14px}
-  .btn: disabled { opacity: 0.5; cursor: not-allowed}
+  .btn:disabled { opacity: 0.5; cursor:not-allowed}
   .btn-primary { background: #3b82f6; color: white}
   .btn-primary:hover:not(:disabled) { background: #2563eb}
   .btn-secondary { background: #f3f4f6; color: #374151}

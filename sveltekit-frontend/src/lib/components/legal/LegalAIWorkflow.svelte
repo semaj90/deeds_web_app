@@ -446,7 +446,7 @@
         background: #2563eb}
     .process-btn:disabled {
         background: #9ca3af
-        cursor: not-allowed}
+        cursor:not-allowed}
     .progress-section {
         margin: 2rem 0}
     .progress-bar {

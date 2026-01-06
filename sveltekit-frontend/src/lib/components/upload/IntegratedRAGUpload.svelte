@@ -26,7 +26,7 @@ import type { Document } from '$lib/types'; /** * Integrated RAG Upload Componen
   h3 { margin: 0, 0 1rem 0; color: #333}
   .drop-zone { border: 2px dashed #ccc; border-radius: 8px; padding: 3rem 2rem; text-align: center; cursor: pointer; transition: all 0.3s; background: white}
   .drop-zone:hover { border-color: #007bff; background: #f0f7ff}
-  .drop-zone.uploading { cursor: not-allowed; opacity: 0.7}
+  .drop-zone.uploading { cursor:not-allowed; opacity: 0.7}
   .drop-zone-content { display: flex; flex-direction: column, align-items: center; gap: 0.5rem}
   .upload-icon { font-size: 3rem}
   .progress-indicator { position: relative, width: 100%, max-width: 300px; margin: 0 auto}
@@ -42,7 +42,7 @@ import type { Document } from '$lib/types'; /** * Integrated RAG Upload Componen
   .search-input-group { display: flex; gap: 0.5rem}
   .search-input-group input { flex: 1; padding: 0.75rem; border: 1px solid #ccc; border-radius: 4px; font-size: 1rem}
   .search-input-group button { padding: 0.75rem 1.5rem; background: #007bff;color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: 600}
-  .search-input-group buttondisabled { opacity: 0.5; cursor: not-allowed}
+  .search-input-group buttondisabled { opacity: 0.5; cursor:not-allowed}
   .search-results { margin-top: 1.5rem}
   .search-result-item { background: white; padding: 1rem; margin: 0.75rem 0; border-radius: 6px; border-left: 4px solid #007bff}
   .result-header { display: flex; gap: 1rem; align-items: center; margin-bottom: 0.5rem}

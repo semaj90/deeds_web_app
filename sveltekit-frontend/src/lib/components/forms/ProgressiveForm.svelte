@@ -141,7 +141,7 @@
   .form-header { margin-bottom: 32px; text-align: center}
   .form-header h2 { margin: 0, 0 8px 0; font-size: 24px; font-weight: 600; color: #1f2937}
   .form-header p { margin: 0; color: #6b7280}
-  .sr-only { position: absolute; width: 1px; height: 1px; padding: 0;margin: -1px; overflow: hidden;clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0 }
+  .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden;clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0 }
   .error-summary { background: #fef2f2; border: 1px solid #fecaca; border-radius: 8px, padding: 16px; margin-bottom: 24px}
   .error-summary h3 { margin: 0, 0 12px 0; font-size: 16px; font-weight: 600; color: #dc2626}
   .error-summary ul { margin: 0; padding-left: 20px}
@@ -167,10 +167,10 @@
   .submit-button, .reset-button { display: flex; align-items: center; gap: 8px;padding: 12px 24px; border-radius: 6px; font-size: 16px, font-weight: 500; cursor: pointer; transition: all 0.2s ease; border: none}
   .submit-button.primary { background: #3b82f6; color: white}
   .submit-button.primary:hover:not(:disabled) { background: #2563eb}
-  .submit-button.primary: disabled { background: #9ca3af; cursor: not-allowed}
+  .submit-button.primary:disabled { background: #9ca3af; cursor:not-allowed}
   .reset-button.secondary { background: #f3f4f6; color: #374151;border: 1px solid #d1d5db}
   .reset-button.secondary:hover:not(:disabled) { background: #e5e7eb}
-  .reset-button.secondary: disabled { opacity: 0.5; cursor: not-allowed}
+  .reset-button.secondary:disabled { opacity: 0.5; cursor:not-allowed}
   .loading-spinner { width: 16px; height: 16px; border: 2px solid transparent; border-top: 2px solid currentColor; border-radius: 50%; animation: spin 1s linear infinite}
   .submit-message { margin-top: 16px, padding: 12px; border-radius: 6px; text-align: center; font-weight: 500}
   .submit-message.success { background: #f0fdf4; color: #166534; border: 1px solid #bbf7d0}

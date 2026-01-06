@@ -296,7 +296,7 @@
 
  .quick-button:disabled {
  opacity: 0.5;
- cursor: not-allowed;
+ cursor:not-allowed;
  }
 
  .chat-container {
@@ -439,7 +439,7 @@
 
  .send-button:disabled {
  opacity: 0.5;
- cursor: not-allowed;
+ cursor:not-allowed;
  }
 
  .capabilities {

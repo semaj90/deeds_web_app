@@ -31,7 +31,7 @@
   .nes-buttonhover { background: #74d3fc}
   .nes-button.danger { background: #f83800; color: white}
   .nes-button.danger:hover { background: #ff5722}
-  .nes-buttondisabled { background: #7c7c7c; cursor: not-allowed}
+  .nes-buttondisabled { background: #7c7c7c; cursor:not-allowed}
   .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-bottom: 30px}
   .stat-panel { background: #1a1a2; border: 2px solid #3cbcfc;padding: 15px}
   .panel-header { display: flex; align-items: center, margin-bottom: 15px, color: #3cbcfc; font-weight: bold; font-size: 14px}

@@ -314,7 +314,7 @@
 
 	function markNotificationRead(notificationId: string) {
 		notifications = notifications.map(notif =>
-			notif.id === notificationId ? { ...notif, read: true } : notif
+			notif.id === notificationId ? { ...notif, read: true } :notif
 		);
 	}
 
@@ -871,7 +871,7 @@
 
 	.refresh-btn:disabled {
 		opacity: 0.6;
-		cursor: not-allowed;
+		cursor:not-allowed;
 	}
 
 	/* Quick Actions Dropdown */

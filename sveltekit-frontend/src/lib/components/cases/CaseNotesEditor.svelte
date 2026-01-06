@@ -223,8 +223,8 @@
 					method: 'POST',
 					headers: { 'Content-Type': 'application/json' },
 					body: JSON.stringify({
-						title: noteTitle.trim() || null,
-						content: noteContent.trim(),
+						title:noteTitle.trim() || null,
+						content:noteContent.trim(),
 					}),
 				});
 
@@ -243,8 +243,8 @@
 					method: 'PATCH',
 					headers: { 'Content-Type': 'application/json' },
 					body: JSON.stringify({
-						title: noteTitle.trim() || null,
-						content: noteContent.trim(),
+						title:noteTitle.trim() || null,
+						content:noteContent.trim(),
 					}),
 				});
 
@@ -720,7 +720,7 @@
 
  .btn-export:disabled {
  opacity: 0.5;
- cursor: not-allowed;
+ cursor:not-allowed;
  }
 
  .btn-close {
@@ -978,7 +978,7 @@
 
  .btn-save:disabled {
  opacity: 0.5;
- cursor: not-allowed;
+ cursor:not-allowed;
  }
 
  .btn-delete {

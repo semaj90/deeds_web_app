@@ -850,7 +850,7 @@ import { Plus } from "lucide-svelte";;
 
  .command-palette-body { flex: 1; overflow-y: auto; max-height: 400px}
 
- .command-list { list-style: none; padding: 0.5rem 0;margin: 0}
+ .command-list { list-style: none; padding: 0.5rem 0; margin: 0}
 
  .command-item { display: flex; align-items: center; gap: 0.75rem;padding: 0.75rem 1rem; cursor: pointer;transition: background-color 0.1s ease}
 

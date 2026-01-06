@@ -428,7 +428,7 @@
 
 	.create-tag button:disabled {
 		opacity: 0.5;
-		cursor: not-allowed;
+		cursor:not-allowed;
 	}
 
 	.no-jurisdiction {

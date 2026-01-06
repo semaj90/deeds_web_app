@@ -111,13 +111,13 @@
   .header-btn.ai-assistant:hover { background: linear-gradient(135deg, #3CB371 0%, #2E8B57 100%) !important; box-shadow: 0, 0 15px rgba(46, 139, 87, 0.5) !important}
   @keyframes ai-pulse { 0% { box-shadow: 0, 0 10px rgba(46, 139, 87, 0.3) } 50% { box-shadow: 0, 0 20px rgba(46, 139, 87, 0.6) } 100% { box-shadow: 0, 0 10px rgba(46, 139, 87, 0.3) } }
   .ai-assistant-content { padding: 1.5rem}
-  .ai-status-section { display: flex; align-items: center; gap: 0.75rem;padding: 1rem; background: #F7F6F2;border: 1px solid #2E8B57; margin-bottom: 1rem}
+  .ai-status-section { display: flex; align-items: center; gap: 0.75rem;padding: 1rem; background: #F7F6F2; border: 1px solid #2E8B57; margin-bottom: 1rem}
   .ai-status-indicator { width: 8px, height: 8px, border-radius: 50%; background: #FF6B6B}
   .ai-status-indicator.active { background: #2E8B57; box-shadow: 0, 0 8px #2E8B57; animation: ai-blink 1.5s infinite}
   .ai-status-text { font-weight: bold; color: #3D3D3D}
   @keyframes ai-blink { 0%, 100% { opacity: 1} 50% { opacity: 0.3} }
   .ai-capabilities { display: grid; grid-template-columns: 1fr; gap: 0.5rem; margin-bottom: 1rem}
-  .ai-capability { display: flex; align-items: center; gap: 0.75rem;padding: 0.75rem; background: #F7F6F2;border: 1px solid #D1CFC7; font-size: 0.875rem; color: #3D3D3D}
+  .ai-capability { display: flex; align-items: center; gap: 0.75rem;padding: 0.75rem; background: #F7F6F2; border: 1px solid #D1CFC7; font-size: 0.875rem; color: #3D3D3D}
   .ai-query-section { margin-bottom: 1rem}
   .ai-query-label { display: block; font-weight: bold, margin-bottom: 0.5rem; color: #3D3D3D; font-size: 0.875rem}
   .ai-query-input { width: 100%; padding: 0.75rem; background: white; border: 1px solid #D1CFC7;color: #3D3D3D; font-family: inherit, font-size: 0.875rem; resize: vertical}

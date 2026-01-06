@@ -255,7 +255,7 @@
  .nes-btn.is-disabled {
  background: #6c757d;
  color: #adb5bd;
- cursor: not-allowed;
+ cursor:not-allowed;
  }
 
  .output-section {

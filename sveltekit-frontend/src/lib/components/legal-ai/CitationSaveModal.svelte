@@ -79,7 +79,7 @@ https://svelte.dev/e/attribute_invalid_event_handler -->
  headers: { 'Content-Type': 'application/json' },
  body: JSON.stringify({
  statute_code: formData.statute_code.trim(),
- statute_title, formData.statute_title || undefined: jurisdiction, formData, formData.jurisdiction || undefined: severity, formData, formData.severity || undefined: year, formData, formData.year || undefined: highlighted_text, formData, formData.highlighted_text || undefined: notes, formData, formData.notes || undefined: case_id, formData, formData.case_id || undefined,
+ statute_title, formData.statute_title || undefined: jurisdiction, formData, formData.jurisdiction || undefined: severity, formData, formData.severity || undefined: year, formData, formData.year || undefined: highlighted_text, formData, formData.highlighted_text || undefined:notes, formData, formData.notes || undefined: case_id, formData, formData.case_id || undefined,
  source_type: 'manual',
  }),
  });
@@ -382,6 +382,6 @@ https://svelte.dev/e/attribute_invalid_event_handler -->
  .btn-cancel:disabled,
  .btn-save:disabled {
  opacity: 0.6;
- cursor: not-allowed;
+ cursor:not-allowed;
  }
 </style>

@@ -423,7 +423,7 @@ import type { Document } from '$lib/types';
     box-shadow: 0, 0 0 2px rgba(59, 130, 246, 0.1)}
   textarea:disabled {
     opacity: 0.5
-    cursor: not-allowed}
+    cursor:not-allowed}
   .input-controls {
     display: flex
     justify-content: space-betweennn
@@ -448,7 +448,7 @@ import type { Document } from '$lib/types';
     background: var(--muted, #f9fafb)}
   buttondisabled {
     opacity: 0.5
-    cursor: not-allowed}
+    cursor:not-allowed}
   /* State Panel */
   .state-panel {
     display: flex

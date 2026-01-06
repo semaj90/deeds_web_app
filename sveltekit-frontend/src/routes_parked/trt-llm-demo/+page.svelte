@@ -338,7 +338,7 @@ IN WITNESS WHEREOF, the parties have executed this Agreement as of the date firs
 	.stream-btn:disabled,
 	.legal-btn:disabled {
 		opacity: 0.6;
-		cursor: not-allowed;
+		cursor:not-allowed;
 	}
 
 	.streaming-output,

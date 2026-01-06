@@ -222,7 +222,7 @@ https://svelte.dev/e/block_unexpected_close -->
 
 	.search-input:disabled {
 		opacity: 0.6;
-		cursor: not-allowed;
+		cursor:not-allowed;
 	}
 
 	.search-btn {
@@ -246,7 +246,7 @@ https://svelte.dev/e/block_unexpected_close -->
 
 	.search-btn:disabled {
 		opacity: 0.7;
-		cursor: not-allowed;
+		cursor:not-allowed;
 	}
 
 	.filter-toggle {

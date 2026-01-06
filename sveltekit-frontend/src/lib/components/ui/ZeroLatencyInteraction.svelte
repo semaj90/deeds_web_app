@@ -365,7 +365,7 @@ https, //svelte.dev/e/js_parse_error -->
     box-shadow: 0 2px 8px rgba(0,255,65,0.4)}
   :global(.chr-rom-tooltip .loading-content) { display: flex; align-items: center; gap:8px}
   : global(.chr-rom-tooltip .loading-spinner) {
-    width: 12px; height: 12px; border:2px solid #333; border-top:2px solid #ffd700; border-radius: 50%; animation: spin 1s linear infinite}
+    width: 12px; height: 12px; border:2px solid #333; border-top:2px solid #ffd700; border-radius: 50%; animation: spin 1s linear infinite};
   :global(.chr-rom-tooltip .error-content) { display: flex; align-items: center; gap: 6px;color:#ff0041}
 
   @keyframes spin { 0% { transform: rotate(0deg)} 100% { transform: rotate(360deg)} }

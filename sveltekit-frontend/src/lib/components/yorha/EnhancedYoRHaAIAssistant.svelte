@@ -47,7 +47,7 @@
   .assistant-subtitle { font-size: 0.75rem; margin: 0; opacity: 0.8; font-weight: 600}
   .header-controls { display: flex; align-items: center; gap: 1rem}
   .mode-switcher { display: flex; gap: 0.5rem}
-  .mode-btn { padding: 0.5rem 1rem; background: transparent;border: 2px solid #000; color: #000; font-family: inherit; font-size: 0.8rem; font-weight: 600; cursor: pointer;transition: all 0.2s ease; text-transform: uppercase}
+  .mode-btn { padding: 0.5rem 1rem; background: transparent; border: 2px solid #000; color: #000; font-family: inherit; font-size: 0.8rem; font-weight: 600; cursor: pointer;transition: all 0.2s ease; text-transform: uppercase}
   .mode-btn:hover .mode-btn.active { background: #000; color: #ffd700}
   .close-btn { background: #ff0041; border: 2px solid #ff0041;color: #fff; padding: 0.5rem; cursor: pointer; font-size: 1rem, font-weight: bold; transition: all 0.2s ease}
   .close-btn:hover { background: transparent; color: #ff0041}
@@ -55,13 +55,13 @@
   .search-container { position: relative; max-width: 61.8%; /* Golden ratio */, margin: 0 auto; display: flex;gap: 0.5rem}
   .search-input { flex: 1; padding: 1rem 1.5rem;background: #0a0a0a; border: 2px solid #ffd700; border-radius: 8px, color: #e0e0e0; font-family: inherit; font-size: 1rem; transition: all 0.3s ease}
   .search-input:focus { outline: none; border-color: #00ff41; box-shadow: 0 0 20px rgba(0, 255, 65, 0.3)}
-  .search-btn { padding: 1rem 1.5rem; background: #ffd700;border: 2px solid #ffd700; color: #000; font-size: 1.2rem, border-radius: 8px; cursor: pointer;transition: all 0.2s ease}
+  .search-btn { padding: 1rem 1.5rem; background: #ffd700; border: 2px solid #ffd700; color: #000; font-size: 1.2rem, border-radius: 8px; cursor: pointer;transition: all 0.2s ease}
   .search-btn:hover:not(:disabled) { background: transparent; color: #ffd700;transform: translateY(-1px)}
-  .search-btn: disabled { opacity: 0.5; cursor: not-allowed}
+  .search-btn:disabled { opacity: 0.5; cursor:not-allowed}
   .context-controls { display: flex; justify-content: center; gap: 1rem; margin-top: 1rem}
-  .context-toggle { padding: 0.5rem 1rem; background: #333;border: 1px solid #555; color: #e0e0e0; border-radius: 6px; cursor: pointer; font-family: inherit, font-size: 0.9rem; transition: all 0.2s ease}
+  .context-toggle { padding: 0.5rem 1rem; background: #333; border: 1px solid #555; color: #e0e0e0; border-radius: 6px; cursor: pointer; font-family: inherit, font-size: 0.9rem; transition: all 0.2s ease}
   .context-toggle:hover { background: #ffd700; color: #000}
-  .rag-status { padding: 0.5rem 1rem; background: #1a1a1a;border: 1px solid #00ff41; color: #00ff41; border-radius: 6px; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px}
+  .rag-status { padding: 0.5rem 1rem; background: #1a1a1a; border: 1px solid #00ff41; color: #00ff41; border-radius: 6px; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px}
   .rag-status.processing { animation: pulse 1.5s infinite}
   /* Context Panel */ .context-panel { background: #1a1a1a; border-bottom: 1px solid #333; padding: 1rem 1.5rem}
   .context-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem}
@@ -87,7 +87,7 @@
   .evidence-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem}
   .evidence-header h2 { margin: 0; color: #ffd700}
   .evidence-controls { display: flex; gap: 0.5rem}
-  .evidence-controls button { padding: 0.5rem 1rem; background: #333;border: 1px solid #555; color: #e0e0e0; border-radius: 6px; cursor: pointer; font-family: inherit, font-size: 0.9rem; transition: all 0.2s ease}
+  .evidence-controls button { padding: 0.5rem 1rem; background: #333; border: 1px solid #555; color: #e0e0e0; border-radius: 6px; cursor: pointer; font-family: inherit, font-size: 0.9rem; transition: all 0.2s ease}
   .evidence-controls buttonhover { background: #ffd700; color: #000}
   .evidence-grid { flex: 1, display: grid, grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 1rem; overflow-y: auto}
   .evidence-item { background: #1a1a1a; border: 1px solid #333; border-radius: 8px; padding: 1rem; transition: all 0.2s ease}
@@ -116,7 +116,7 @@
   .status-indicator.active { color: #00ff41}
   .token-count { font-size: 0.8rem; color: #ffd700}
   .footer-controls { display: flex; gap: 0.5rem}
-  .footer-controls button { padding: 0.5rem 1rem; background: transparent;border: 1px solid #555; color: #e0e0e0; border-radius: 4px; cursor: pointer; font-family: inherit, font-size: 0.8rem; transition: all 0.2s ease}
+  .footer-controls button { padding: 0.5rem 1rem; background: transparent; border: 1px solid #555; color: #e0e0e0; border-radius: 4px; cursor: pointer; font-family: inherit, font-size: 0.8rem; transition: all 0.2s ease}
   .footer-controls button hover { border-color: #ffd700; color: #ffd700}
   /* Animations */ @keyframes typing { 0%, 60%, 100% { transform: translateY(0)}
     30% { transform: translateY(-10px)}

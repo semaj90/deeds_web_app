@@ -433,7 +433,7 @@ import type { Document } from '$lib/types';
     background: linear-gradient(135deg, rgba(138, 43, 226, 0.4), rgba(138, 43, 226, 0.6)); transform: translateY(-1px)}
   .analyze-btn:disabled {
     opacity: 0.6
-    cursor: not-allowed}
+    cursor:not-allowed}
   .ai-thinking { background: rgba(138, 43, 226, 0.1); border: 1px solid rgba(138, 43, 226, 0.3);
     border-radius: 12px
     padding: 1.5rem
@@ -643,7 +643,7 @@ import type { Document } from '$lib/types';
     background: rgba(76, 175, 80, 0.3); transform: translateY(-1px)}
   .execute-btn:disabled {
     opacity: 0.6
-    cursor: not-allowed}
+    cursor:not-allowed}
   .topics-tags {
     display: flex
     flex-wrap: wrap

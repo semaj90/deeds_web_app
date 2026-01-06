@@ -456,9 +456,9 @@
   .form-actions button.primary:hover {
     background: #2563eb
     border-color: #2563eb}
-  .form-actions button: disabled {
+  .form-actions button:disabled {
     opacity: 0.5
-   ;cursor: not-allowed}
+   ;cursor:not-allowed}
   @media (max-width: 768px) {
     .enhanced-case-form {
       padding: 1rem}

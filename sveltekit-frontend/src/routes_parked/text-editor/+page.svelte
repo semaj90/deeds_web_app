@@ -234,7 +234,7 @@ function handleShare() {
  }
  .action-btn:disabled {
  opacity: 0.5;
- cursor: not-allowed;
+ cursor:not-allowed;
  }
  .save-btn:not(:disabled) {
  background: var(--nes-green, #92cc41);

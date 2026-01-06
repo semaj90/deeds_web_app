@@ -135,6 +135,6 @@
  }
  .chat-input button:disabled {
  background-color: #ccc;
- cursor: not-allowed;
+ cursor:not-allowed;
  }
 </style>

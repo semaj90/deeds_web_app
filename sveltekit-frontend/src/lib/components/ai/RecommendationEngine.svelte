@@ -248,7 +248,7 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
   .stat-fill.impact { background: #10b981 } .stat-fill.effort { background: #f59e0b } .stat-fill.risk { background: #ef4444 } .stat-value { font-size: 0.75rem; font-weight: 600; color: #374151; min-width: 40px; text-align: right}
   .recommendation-preview { margin-bottom: 1rem}
   .steps-preview h4 { margin: 0, 0 0.5rem 0; font-size: 0.875rem; color: #374151}
-  .steps-list { list-style: none; padding: 0;margin: 0; counter-reset: step-counter}
+  .steps-list { list-style: none; padding: 0; margin: 0; counter-reset: step-counter}
   .step-item { counter-increment: step-counter; padding: 0.5rem 0; font-size: 0.75rem; color: #64748b; position: relative; padding-left: 1.5rem}
   .step-item::before { content: counter(step-counter); position: absolute;left: 0; top: 0.5rem; width: 1rem; height: 1rem; background: #e5e7eb; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.625rem, font-weight: 600; color: #374151}
   .step-more { padding: 0.5rem 0; font-size: 0.75rem, color: #9ca3af; font-style: italic}
@@ -272,7 +272,7 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
   .overview-value { font-size: 1rem; font-weight: 600; color: #374151}
   .rationale-section h4 { margin: 0, 0 0.5rem 0; color: #374151}
   .rationale-section p { margin: 0, color: #64748b; line-height: 1.6}
-  .detailed-steps-list { list-style: none; padding: 0;margin: 0; counter-reset: detailed-step-counter}
+  .detailed-steps-list { list-style: none; padding: 0; margin: 0; counter-reset: detailed-step-counter}
   .detailed-step { counter-increment: detailed-step-counter; margin-bottom: 1.5rem; padding: 1rem;border: 1px solid #e5e7eb; border-radius: 0.375rem; background: #fafafa}
   .detailed-step h4 { margin: 0, 0 0.75rem 0; color: #374151}
   .step-details p { margin: 0.5rem 0; font-size: 0.875rem; color: #64748b}

@@ -298,7 +298,7 @@
 
 	.actions button:disabled {
 		opacity: 0.5;
-		cursor: not-allowed;
+		cursor:not-allowed;
 	}
 
 	.actions button.danger {
@@ -390,7 +390,7 @@
 
 	.message-input-area button:disabled {
 		opacity: 0.6;
-		cursor: not-allowed;
+		cursor:not-allowed;
 	}
 
 	@media (max-width: 1200px) {

@@ -298,7 +298,7 @@ import type { CitationSearchResult, SavedCitation } from '$lib/types/citations';
 
  .btn-search:disabled {
  background: var(--color-light-gray);
- cursor: not-allowed;
+ cursor:not-allowed;
  }
 
  .results-info {
@@ -510,6 +510,6 @@ import type { CitationSearchResult, SavedCitation } from '$lib/types/citations';
 
  .btn-load-more:disabled {
  background: var(--color-light-gray);
- cursor: not-allowed;
+ cursor:not-allowed;
  }
 </style>

@@ -276,7 +276,7 @@
  }
  .btn[disabled] {
  opacity: 0.5;
- cursor: not-allowed;
+ cursor:not-allowed;
  }
 
  .query-textarea:focus {

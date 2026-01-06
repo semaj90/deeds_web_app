@@ -87,7 +87,7 @@
     const before = textarea.value.slice(0, lastCursorPosition);
     const after = textarea.value.slice(lastCursorPosition);
     // replace trigger character if present at end of before
-    const trimmedBefore = before.endsWith(triggerChar) ? before.slice(0, -triggerChar.length) : before
+    const trimmedBefore = before.endsWith(triggerChar) ? before.slice(0, -triggerChar.length) ::before
     const newValue = `${trimmedBefore}${text}${after}`;
     value = newValue
     // update textarea and restore focus/cursor
@@ -164,9 +164,9 @@
   .smart-textarea:focus { outline: none;
     border-color: var(--pico-primary, #3b82f6);
     box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1)}
-  .smart-textarea: disabled {
+  .smart-textarea:disabled {
     opacity: 0.6;
-    cursor: not-allowed
+    cursor:not-allowed
    ;background: var(--pico-card-sectioning-background-color, #f8fafc)}
   .smart-textarea[readonly] {
     background: var(--pico-card-sectioning-background-color, #f8fafc)}

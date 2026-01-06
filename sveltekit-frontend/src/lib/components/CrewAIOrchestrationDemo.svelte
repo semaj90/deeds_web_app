@@ -387,7 +387,7 @@
 
  .btn-primary:disabled {
  background: #ccc;
- cursor: not-allowed;
+ cursor:not-allowed;
  }
 
  .btn-secondary {

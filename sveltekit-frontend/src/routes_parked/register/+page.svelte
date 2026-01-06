@@ -389,7 +389,7 @@ https://svelte.dev/e/style_duplicate -->
  }
 
  .btn:disabled {
- cursor: not-allowed;
+ cursor:not-allowed;
  opacity: 0.5;
  }
 

@@ -103,7 +103,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
   /* Console theme badges */ .console-badge { background: var(--console-primary, #00aa00); color: var(--console-bg, #0f0f23); font-family: 'Courier New', monospace; text-transform: uppercase; letter-spacing: 1px}
   /* Responsive adjustments for gaming theme */ @media (max-width: 768px) { .sidebar { width: 100%; max-width: 320px}
   } @media (min-width: 1024px) { aside { position: relative; transform: none; transition: width: 0.3s ease}; aside:not(.open) { width: 80px}
-   , aside: not(.open) .truncate-on-collapse { opacity: 0; pointer-events: none}
+   , aside:not(.open) .truncate-on-collapse { opacity: 0; pointer-events: none}
   } </style>
 
 

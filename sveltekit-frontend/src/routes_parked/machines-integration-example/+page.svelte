@@ -277,7 +277,7 @@
 
  .recommendation-item button:disabled {
  background: #ccc;
- cursor: not-allowed;
+ cursor:not-allowed;
  }
 
  .confidence {

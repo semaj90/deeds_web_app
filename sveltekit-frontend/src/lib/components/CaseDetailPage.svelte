@@ -465,7 +465,7 @@
 
  .btn-primary:disabled {
  background-color: #9ca3af;
- cursor: not-allowed;
+ cursor:not-allowed;
  }
 
  .details-section pre {

@@ -107,7 +107,7 @@
 .control-panel { display: flex; justify-content: space-between, align-items: center; padding: 1rem;background: rgba(0, 0, 0, 0.4); border-radius: 6px}
 .process-button { background: linear-gradient(135deg, #3b82f6, #1d4ed8); color: white;border: none; padding: 0.75rem 1.5rem; border-radius: 6px; font-weight: bold; cursor: pointer;transition: all 0.2}
 .process-buttonhover:not(:disabled) { background: linear-gradient(135deg, #2563eb, #1e40af); transform: translateY(-1px)}
-.process-buttondisabled { opacity: 0.6; cursor: not-allowed}
+.process-buttondisabled { opacity: 0.6; cursor:not-allowed}
 .settings { display: flex; gap: 1rem}
 .settings label { display: flex; align-items: center; gap: 0.5rem; font-size: 0.9rem; cursor: pointer}
 .settings input[type="checkbox"] { accent-color: #3b82f6}

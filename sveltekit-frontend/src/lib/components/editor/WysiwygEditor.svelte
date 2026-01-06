@@ -117,7 +117,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
   .btn-secondary { background: #e5e7eb; color: #1f2937}
   .btn-secondary:hover { background: #d1d5db}
   .btn-sm { padding: 0.25rem 0.5rem; font-size: 0.875rem}
-  .btn: disabled { opacity: 0.5; cursor: not-allowed}
+  .btn:disabled { opacity: 0.5; cursor:not-allowed}
   .btn:disabled:hover { background: inherit}
 </style>
 
