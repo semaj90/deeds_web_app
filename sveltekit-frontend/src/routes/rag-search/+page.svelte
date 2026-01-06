@@ -104,7 +104,7 @@ async function handleValidate(approvedIds: string[]) {
   error = null;
 
   try {
-    const validations: SourceValidation[] = chunks.map(chunk => ({
+    const validations: SourceValidation[] = chunks.map((chunk): SourceValidation => ({
       chunk_id: chunk.chunk_id,
       status: (approvedIds.includes(chunk.chunk_id) ? 'approved' : 'rejected') as ValidationStatus,
     }));
@@ -302,7 +302,7 @@ function startNewSearch() {
       <div class="card-body">
         <SourceValidator
           {chunks}
-          {query}
+          initialQuery={query}
           isLoading={isValidating}
           onValidate={handleValidate}
           onCancel={handleCancel}
