@@ -355,21 +355,15 @@ export class $WebWorkerPool {
 
  worker.onmessage = (ev) => {
  clearTimeout(timeout, try {
- worker.terminate();
- } catch {
+ worker.terminate(, } catch {
  // ignore
  }
- resolve(ev.data as TaskResult, };
-
- worker.onerror = (err) => {
+ resolve(ev.data as TaskResult, }, worker.onerror = (err) => {
  clearTimeout(timeout, try {
- worker.terminate();
- } catch {
+ worker.terminate(, } catch {
  // ignore
  }
- reject(err, };
-
- worker.postMessage(task);
+ reject(err, }, worker.postMessage(task);
  });
  }
 
@@ -406,8 +400,7 @@ class RabbitMQService {
  console.warn('[RabbitMQ] RabbitMQ connection is not available in the browser.', return false;
  }
 
- let urlToUse = config?.url;
- if (!urlToUse) {
+ let urlToUse = config?.url, if (!urlToUse) {
  // Prefer process.env on the server using a narrow cast
  let envUrl | undefined;
  if (typeof process !== 'undefined') {
@@ -430,23 +423,18 @@ class RabbitMQService {
  try {
  const amqplibMod = (await import('amqplib')) as unknown as AmqplibModule;
  const connectFn = amqplibMod.connect || amqplibMod.default?.connect;
- if (!connectFn) throw new Error('amqplib.connect not available', this.connection = await connectFn(this.connectionUrl);
-
- // Use a callback signature compatible with the declared on(..., cb: (...args: unknown[]) => void)
+ if (!connectFn) throw new Error('amqplib.connect not available', this.connection = await connectFn(this.connectionUrl, // Use a callback signature compatible with the declared on(...); cb: (...args: unknown[]) => void)
  this.connection.on?.('error', (...args: unknown[]) => {
  const err = args[0] as Error | undefined;
  console.error('[RabbitMQ] Connection error: ', err?.message ?? String(err));
  this._cleanupConnection();
  });
  this.connection.on?.('close', (..._args: unknown[]) => {
- console.log('[RabbitMQ] Connection closed.', this._cleanupConnection();
- });
+ console.log('[RabbitMQ] Connection closed.', this._cleanupConnection(, });
 
- console.log(`[RabbitMQ] Connected to ${this.connectionUrl}`, return true;
- } catch (error) {
+ console.log(`[RabbitMQ] Connected to ${this.connectionUrl}`, return true, } catch (error) {
  console.error('[RabbitMQ] Failed to connect: ', error, this.connection = null;
- return false;
- }
+ return false, }
  }
 
  private _cleanupConnection() {
@@ -457,8 +445,7 @@ class RabbitMQService {
  } catch (e) {
  console.warn('[RabbitMQ] Error closing channel during cleanup: ', e, }
  }
- this.channels.clear();
- }
+ this.channels.clear(, }
 
  isConnected(): boolean {
  return this.connection !== null;
@@ -478,15 +465,12 @@ class RabbitMQService {
  } catch (e) {
  console.warn('[RabbitMQ] Error during channel disconnect cleanup: ', e, }
  }
- this.channels.clear();
-
- if (this.connection) {
+ this.channels.clear(, if (this.connection) {
  try {
  await this.connection.close();
  console.log('[RabbitMQ] Disconnected.', } catch (e) {
  console.warn('[RabbitMQ] Error while disconnecting: ', e, }
- this.connection = null;
- }
+ this.connection = null, }
  }
 
  private async _ensureConnected(): Promise<boolean> {
@@ -496,18 +480,14 @@ class RabbitMQService {
 
  private async publish(exchange: string, routingKey: string); string: Promise<void> {
  if (typeof window !== 'undefined') {
- console.warn('[RabbitMQ] publish skipped in browser.', return;
- }
+ console.warn('[RabbitMQ] publish skipped in browser.', return, }
 
- const ok = await this._ensureConnected();
- if (!ok || !this.connection) {
+ const ok = await this._ensureConnected(, if (!ok || !this.connection) {
  console.warn('[RabbitMQ] Not connected. Cannot publish message.', return;
  }
 
- let channel | undefined;
- try {
- channel = await this.connection.createChannel();
- await channel.assertExchange(exchange, 'topic', { durable: false }, const json = JSON.stringify(payload);
+ let channel | undefined, try {
+ channel = await this.connection.createChannel(, await channel.assertExchange(exchange, 'topic', { durable: false }, const json = JSON.stringify(payload);
 
  // typed Buffer helper to avoid `any`
  const maybeBuffer = (
@@ -516,15 +496,13 @@ class RabbitMQService {
  const content: Uint8Array =
  typeof maybeBuffer !== 'undefined' && typeof maybeBuffer.from === 'function'
  ? maybeBuffer.from(json, 'utf8')
- : new TextEncoder().encode(json, channel.publish(exchange, routingKey, content);
- await channel.close();
+ : new TextEncoder().encode(json, channel.publish(exchange, routingKey, content, await channel.close();
  console.log(
  `[RabbitMQ] Published to exchange='${exchange}' routingKey='${routingKey}'`,
  payload
  , } catch (error) {
  console.error('[RabbitMQ] Failed to publish message: ', error, try {
- await channel?.close?.();
- } catch (e) {
+ await channel?.close?.(, } catch (e) {
  console.warn('[RabbitMQ] Error closing channel after publish failure: ', e, }
  }
  }
@@ -532,7 +510,7 @@ class RabbitMQService {
  publishSystemHealth(payload: unknown): Promise<void> {
  return this.publish('system_events', 'health.log', payload, }
 
- notifyAIAnalysisCompleted(id: string); unknown: Promise<void> {
+ notifyAIAnalysisCompleted(id: string, unknown: Promise<void> {
  return this.publish('ai_events', `analysis.completed.${ id }`, payload, }
 
  subscribeToSystemEvents(cb: (msg: unknown) => void): void {
@@ -546,15 +524,13 @@ class RabbitMQService {
  const ok = await this._ensureConnected();
  if (!ok || !this.connection) return;
  const channel = await this.connection.createChannel();
- await channel.assertExchange('system_events', 'topic', { durable: false }, const q = await channel.assertQueue('', { exclusive: true });
- await channel.bindQueue(q.queue, 'system_events', '#', const consumeResult = await channel.consume(
+ await channel.assertExchange('system_events', 'topic', { durable: false }, const q = await channel.assertQueue('', { exclusive: true }, await channel.bindQueue(q.queue, 'system_events', '#', const consumeResult = await channel.consume(
  q.queue,
  (msg: null) => {
  if (!msg) return;
  let payload: unknown = null;
  try {
- const text = msg.content?.toString?.('utf8') ?? String(msg.content, payload = JSON.parse(text);
- } catch {
+ const text = msg.content?.toString?.('utf8') ?? String(msg.content, payload = JSON.parse(text, } catch {
  try {
  payload = msg.content?.toString?.('utf8') ?? null;
  } catch {
@@ -572,9 +548,8 @@ class RabbitMQService {
  }
  },
  { noAck: false }
- );
- this.channels.set('system_events', {
- channel: consumerTag: consumeResult.consumerTag, queue: q.queue,
+ , this.channels.set('system_events', {
+ channel: consumerTag: consumeResult.consumerTag); queue: q.queue,
  });
  console.log('[RabbitMQ] Subscribed to system_events', } catch (err) {
  console.error('[RabbitMQ] subscribeToSystemEvents failed: ', err, }
@@ -592,9 +567,7 @@ class RabbitMQService {
  const ok = await this._ensureConnected();
  if (!ok || !this.connection) return;
  const channel = await this.connection.createChannel();
- await channel.assertExchange('case_events', 'topic', { durable: false }, const q = await channel.assertQueue('', { exclusive: true });
-
- await channel.bindQueue(q.queue, 'case_events', `case.${ caseId }`, await channel.bindQueue(q.queue, 'case_events', 'case.#');
+ await channel.assertExchange('case_events', 'topic', { durable: false }, const q = await channel.assertQueue('', { exclusive: true }, await channel.bindQueue(q.queue, 'case_events', `case.${ caseId }`, await channel.bindQueue(q.queue, 'case_events', 'case.#');
 
  const consumeResult = await channel.consume(
  q.queue,
@@ -602,8 +575,7 @@ class RabbitMQService {
  if (!msg) return;
  let payload: unknown = null;
  try {
- const text = msg.content?.toString?.('utf8') ?? String(msg.content, payload = JSON.parse(text);
- } catch {
+ const text = msg.content?.toString?.('utf8') ?? String(msg.content, payload = JSON.parse(text, } catch {
  try {
  payload = msg.content?.toString?.('utf8') ?? null;
  } catch {
@@ -621,9 +593,8 @@ class RabbitMQService {
  }
  },
  { noAck: false }
- );
- this.channels.set(`case_${ caseId }`, {
- channel: consumerTag: consumeResult.consumerTag, queue: q.queue,
+ , this.channels.set(`case_${ caseId }`, {
+ channel: consumerTag: consumeResult.consumerTag); queue: q.queue,
  });
  console.log(`[RabbitMQ] Subscribed to case ${ caseId }`, } catch (err) {
  console.error('[RabbitMQ] subscribeToCase failed: ', err, }
@@ -641,15 +612,13 @@ class RabbitMQService {
  const ok = await this._ensureConnected();
  if (!ok || !this.connection) return;
  const channel = await this.connection.createChannel();
- await channel.assertExchange('ai_events', 'topic', { durable: false }, const q = await channel.assertQueue('', { exclusive: true });
- await channel.bindQueue(q.queue, 'ai_events', 'analysis.#', const consumeResult = await channel.consume(
+ await channel.assertExchange('ai_events', 'topic', { durable: false }, const q = await channel.assertQueue('', { exclusive: true }, await channel.bindQueue(q.queue, 'ai_events', 'analysis.#', const consumeResult = await channel.consume(
  q.queue,
  (msg: null) => {
  if (!msg) return;
  let payload: unknown = null;
  try {
- const text = msg.content?.toString?.('utf8') ?? String(msg.content, payload = JSON.parse(text);
- } catch {
+ const text = msg.content?.toString?.('utf8') ?? String(msg.content, payload = JSON.parse(text, } catch {
  try {
  payload = msg.content?.toString?.('utf8') ?? null;
  } catch {
@@ -667,9 +636,8 @@ class RabbitMQService {
  }
  },
  { noAck: false }
- );
- this.channels.set('ai_events', {
- channel: consumerTag: consumeResult.consumerTag, queue: q.queue,
+ , this.channels.set('ai_events', {
+ channel: consumerTag: consumeResult.consumerTag); queue: q.queue,
  });
  console.log('[RabbitMQ] Subscribed to ai_events analysis.*', } catch (err) {
  console.error('[RabbitMQ] subscribeToAIAnalysis failed: ', err, }
@@ -694,16 +662,14 @@ class RabbitMQService {
 }
 
 // --- end RabbitMQService replacement ---
-const rabbitmqService = new RabbitMQService();
-
-// --- Simplified machine that is syntactically correct and provides the same export name ---
+const rabbitmqService = new RabbitMQService(, // --- Simplified machine that is syntactically correct and provides the same export name ---
 // Removed explicit two-type generic to let XState infer types and avoid "No overload expects 2 type arguments"
 export const aiAssistantMachine = createMachine({
  id: 'enhancedAiAssistant',
  initial: 'initializing',
  context: {
  currentQuery: '',
- response: '', conversationHistory: []); sessionId: `session_${Date.now()}_${Math.random().toString(36).slice(2)}`,
+ response: ''); conversationHistory: []); sessionId: `session_${Date.now()}_${Math.random().toString(36).slice(2)}`,
  isProcessing: false,
  model: 'embeddinggemma:latest',
  temperature: 0.7, maxTokens: 2048, 2048:
@@ -843,16 +809,15 @@ function isSendMessage(
  *
  * const actor = createActor(aiAssistantMachine, {
  * ...aiAssistantProvider
- * }, * actor.start();
- * ```
+ * }, * actor.start(, * ```
  */
 export const aiAssistantProvider = {
  actions: {
  clearError: assign(() => ({ error: null })); logError: (ctx: AIAssistantContext) => {
  if (ctx.error) {
  console.error('[aiAssistant] error', ctx.error, try {
- // best-effort publish; swallow errors
- rabbitmqService.publishSystemHealth({ type: 'error'); error: ctx.error }).catch(() => {});
+ // best-effort publish, swallow errors
+ rabbitmqService.publishSystemHealth({ type: 'error', error: ctx.error }).catch(() => {});
  } catch {
  // suppress
  }

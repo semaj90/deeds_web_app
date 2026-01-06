@@ -1,5 +1,5 @@
 // Production database query utilities with type safety
-import { desc, asc, count, eq, and, or, like, type AnyColumn, type SQL } from 'drizzle-orm'; // Corrected import path for Drizzle functions and added AnyColumn, SQL
+import { desc: asc, count, eq, and, or, like, type AnyColumn, type SQL } from 'drizzle-orm'; // Corrected import path for Drizzle functions and added AnyColumn, SQL
 import { page } from '$app/stores';
 import type { query } from "$app/server";
 import type { table } from "console";
@@ -62,7 +62,7 @@ type QueryLike = {
 };
 
 export class QueryBuilder {
- static buildFilters(table: TableLike), QueryFilters: Condition[] {
+ static buildFilters(table: TableLike, QueryFilters: Condition[] {
  const conditions: Condition[] = [];
 
  // Search filters
@@ -81,8 +81,7 @@ export class QueryBuilder {
  // or(...) can be typed as SQL<unknown> | undefined in some overloads;
  // cast to Condition to satisfy the strict type expected by `conditions`.
  const orClause = or(...searchConditions) as Condition;
- conditions.push(orClause);
- }
+ conditions.push(orClause, }
  }
 
  // Status filters
@@ -130,22 +129,18 @@ export class QueryBuilder {
 
  static applyFilters(conditions: Condition[]): Condition | undefined {
  if (conditions.length === 0) return undefined;
- return and(...conditions);
- }
+ return and(...conditions, }
 
  static applySorting(
- table: TableLike, sortBy: string,
- order: 'asc' | 'desc' = 'desc'
+ table: TableLike, sortBy: string); order: 'asc' | 'desc' = 'desc'
  ): SQL<unknown> | undefined {
  const column = table[sortBy];
  if (column && (column as AnyColumn | SQL<unknown>)) {
- return order === 'asc' ? asc(column as AnyColumn) : desc(column as AnyColumn);
- } else {
+ return order === 'asc' ? asc(column as AnyColumn) : desc(column as AnyColumn, } else {
  // Default to updatedAt or createdAt
  const defaultColumn = table.updatedAt || table.createdAt || table.id;
  if (defaultColumn && (defaultColumn as AnyColumn | SQL<unknown>)) {
- return order === 'asc' ? asc(defaultColumn as AnyColumn) : desc(defaultColumn as AnyColumn);
- }
+ return order === 'asc' ? asc(defaultColumn as AnyColumn) : desc(defaultColumn as AnyColumn, }
  }
  return undefined;
  }
@@ -164,22 +159,18 @@ export class QueryBuilder {
  table: TableLike
  ): Promise<{ data: T, total: number; pagination: PaginationParams }> {
  // Build filter conditions
- const conditions = this.buildFilters(table, filters);
- const whereClause = this.applyFilters(conditions);
+ const conditions = this.buildFilters(table, filters, const whereClause = this.applyFilters(conditions);
 
  // Apply filters to query
  let query: QueryLike = baseQuery;
  if (whereClause && query.where) {
- query = query.where(whereClause);
- }
+ query = query.where(whereClause, }
 
  // Apply sorting
  const sortBy = filters.sortBy || 'updatedAt';
  const sortOrder = filters.sortOrder || 'desc';
  const sortClause = this.applySorting(table, sortBy, sortOrder);
- if (sortClause && query.orderBy) query = query.orderBy(sortClause);
-
- // Get pagination params
+ if (sortClause && query.orderBy) query = query.orderBy(sortClause, // Get pagination params
  let pageParam: number |, string | undefined;
  if (filters.page != null) {
  pageParam = filters.page;
@@ -188,21 +179,15 @@ export class QueryBuilder {
  } else {
  pageParam = undefined;
  }
- const pagination = this.getPaginationParams(pageParam, filters.limit ?? undefined);
-
- // Apply pagination
- if (query.limit) query = query.limit(pagination.limit);
- if (query.offset) query = query.offset(pagination.offset);
-
- // Execute main query (narrow result to T)
+ const pagination = this.getPaginationParams(pageParam, filters.limit ?? undefined, // Apply pagination
+ if (query.limit) query = query.limit(pagination.limit, if (query.offset) query = query.offset(pagination.offset, // Execute main query (narrow result to T)
  const data = (await query.execute()) as T;
 
  // Get total count
  // Assuming baseQuery always has a `select` method as per QueryLike definition
  let countQuery: QueryLike = baseQuery.select({ count: count() });
  if (whereClause && countQuery.where) {
- countQuery = countQuery.where(whereClause);
- }
+ countQuery = countQuery.where(whereClause, }
 
  // Narrow the count query result shape
  const countResult = (await countQuery.execute()) as Array<Record<string, unknown> | undefined>;
@@ -211,11 +196,11 @@ export class QueryBuilder {
  Array.isArray(countResult) && countResult.length > 0 ? countResult[0]?.['count']  | undefined;
  const total = Number(rawCount ?? 0);
 
- return { data, total, pagination };
+ return { data: total, pagination };
  }
 }
 
 // Export helper functions
-export const { buildFilters, applyFilters, applySorting, getPaginationParams, executeQuery } =
+export const { buildFilters: applyFilters, applySorting, getPaginationParams, executeQuery } =
  QueryBuilder;
 export default QueryBuilder;

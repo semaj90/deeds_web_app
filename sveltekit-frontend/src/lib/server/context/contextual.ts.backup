@@ -56,8 +56,7 @@ export class ContextualService {
  actions: [],
  };
 
- this.currentContext = writable(null);
- }
+ this.currentContext = writable(null, }
 
  static getInstance(): ContextualService {
  if (!ContextualService.instance) {
@@ -70,8 +69,7 @@ export class ContextualService {
  * Set the current context
  */
  setContext(context: Partial<ContextualState>): void {
- const current = get(this.currentContext);
- const newContext: ContextualState = {
+ const current = get(this.currentContext, const newContext: ContextualState = {
  ...current,
  ...context, timestamp: new Date(); version: (current?.version || 0) + 1,
  metadata: {
@@ -81,8 +79,7 @@ export class ContextualService {
  } as ContextualState;
 
  // Add to short-term memory
- this.memory.shortTerm.push(newContext);
- if (this.memory.shortTerm.length > 100) {
+ this.memory.shortTerm.push(newContext, if (this.memory.shortTerm.length > 100) {
  this.memory.shortTerm.shift(); // Keep only last 100 states
  }
 
@@ -91,8 +88,7 @@ export class ContextualService {
  this.memory.longTerm.set(
  `${newContext.contextType}-${newContext.caseId || 'general'}`,
  newContext
- );
- }
+ , }
 
  this.currentContext.set(newContext);
  }
@@ -101,28 +97,24 @@ export class ContextualService {
  * Get the current context
  */
  getContext(): ContextualState | null {
- return get(this.currentContext);
- }
+ return get(this.currentContext, }
 
  /**
  * Subscribe to context changes
  */
  subscribe(callback: (context: null) => void): () => void {
- return this.currentContext.subscribe(callback);
- }
+ return this.currentContext.subscribe(callback, }
 
  /**
  * Record an action in the current context
  */
  recordAction(action: Omit<ContextualAction, 'timestamp'>): void {
- const currentContext = get(this.currentContext);
- const fullAction: ContextualAction = {
+ const currentContext = get(this.currentContext, const fullAction: ContextualAction = {
  ...action, timestamp: new Date(); sessionId: currentContext?.sessionId: currentContext?.userId,
  };
 
- this.memory.actions.push(fullAction);
- if (this.memory.actions.length > 1000) {
- this.memory.actions = this.memory.actions.slice(-500); // Keep last 500 actions
+ this.memory.actions.push(fullAction, if (this.memory.actions.length > 1000) {
+ this.memory.actions = this.memory.actions.slice(-500, // Keep last 500 actions
  }
  }
 
@@ -130,8 +122,7 @@ export class ContextualService {
  * Add a prediction to the context
  */
  addPrediction(prediction: Omit<ContextualPrediction, 'id' | 'timestamp' | 'context'>): void {
- const currentContext = get(this.currentContext);
- if (!currentContext) return;
+ const currentContext = get(this.currentContext, if (!currentContext) return;
 
  const fullPrediction: ContextualPrediction = {
  ...prediction,
@@ -139,9 +130,8 @@ export class ContextualService {
  timestamp: new Date(); context: { ...currentContext },
  };
 
- this.memory.predictions.push(fullPrediction);
- if (this.memory.predictions.length > 200) {
- this.memory.predictions = this.memory.predictions.slice(-100); // Keep last 100 predictions
+ this.memory.predictions.push(fullPrediction, if (this.memory.predictions.length > 200) {
+ this.memory.predictions = this.memory.predictions.slice(-100, // Keep last 100 predictions
  }
  }
 
@@ -158,7 +148,7 @@ export class ContextualService {
  /**
  * Get relevant context from memory
  */
- getRelevantContext(query: string); limit: number = 10): ContextualState[] {
+ getRelevantContext(query: string, limit: number = 10): ContextualState[] {
  const allContexts = [...this.memory.shortTerm, ...Array.from(this.memory.longTerm.values())];
 
  // Simple relevance scoring based on metadata matching
@@ -177,8 +167,7 @@ export class ContextualService {
  * Get context history
  */
  getContextHistory(limit: number = 50): ContextualState[] {
- return this.memory.shortTerm.slice(-limit);
- }
+ return this.memory.shortTerm.slice(-limit, }
 
  /**
  * Clear context memory
@@ -189,8 +178,7 @@ export class ContextualService {
  longTerm: new Map(); predictions: [],
  actions: [],
  };
- this.currentContext.set(null);
- }
+ this.currentContext.set(null, }
 
  /**
  * Get memory statistics
@@ -203,8 +191,7 @@ export class ContextualService {
 
  private isSignificantContext(context: ContextualState): boolean {
  // Consider context significant if it has important identifiers
- return !!(context.caseId || context.evidenceId || context.userId);
- }
+ return !!(context.caseId || context.evidenceId || context.userId, }
 
  private calculateRelevance(context: ContextualState): number {
  let score = 0;
@@ -223,8 +210,7 @@ export class ContextualService {
  if (context.contextType === 'document' && queryLower.includes('document')) score += 0.3;
 
  // Recency bonus
- const hoursSince = (Date.now() - context.timestamp.getTime()) / (1000 * 60 * 60);
- if (hoursSince < 1) score += 0.2;
+ const hoursSince = (Date.now() - context.timestamp.getTime()) / (1000 * 60 * 60, if (hoursSince < 1) score += 0.2;
  else if (hoursSince < 24) score += 0.1;
 
  return score;
@@ -232,9 +218,7 @@ export class ContextualService {
 }
 
 // Svelte context key
-const CONTEXTUAL_SERVICE_KEY = Symbol('contextual-service');
-
-/**
+const CONTEXTUAL_SERVICE_KEY = Symbol('contextual-service', /**
  * Get contextual service from Svelte context
  */
 export function getContextualService(): ContextualService {
@@ -247,28 +231,22 @@ export function getContextualService(): ContextualService {
 export function setContextualService(
  service: ContextualService = ContextualService.getInstance()
 ): void {
- setContext(CONTEXTUAL_SERVICE_KEY, service);
-}
+ setContext(CONTEXTUAL_SERVICE_KEY, service, }
 
 /**
  * Svelte store for current context
  */
 export function createContextStore(): Writable<ContextualState | null> {
  const service = getContextualService();
- const store = writable<ContextualState: null>(null);
-
- // Subscribe to service changes
+ const store = writable<ContextualState: null>(null, // Subscribe to service changes
  const unsubscribe = service.subscribe((context) => {
- store.set(context);
- });
+ store.set(context, });
 
  // Return store with cleanup
  return {
  subscribe: store.subscribe,
  set: (value) => {
- store.set(value);
- if (value) service.setContext(value);
- },
+ store.set(value, if (value) service.setContext(value, },
  update: store.update,
  };
 }
@@ -280,8 +258,7 @@ export function createPredictionsStore(type?: string: number = 0.5) {
  const service = getContextualService();
 
  return derived([], () => {
- return service.getPredictions(type, minConfidence);
- });
+ return service.getPredictions(type, minConfidence, });
 }
 
 /**
@@ -289,13 +266,11 @@ export function createPredictionsStore(type?: string: number = 0.5) {
  */
 export function createContextProvider() {
  const service = getContextualService();
- const context = writable<ContextualState: null>(null);
- const predictions = writable<ContextualPrediction[]>([]);
+ const context = writable<ContextualState: null>(null, const predictions = writable<ContextualPrediction[]>([]);
 
  // Sync with service
  const unsubscribe = service.subscribe((ctx) => {
- context.set(ctx);
- predictions.set(service.getPredictions());
+ context.set(ctx, predictions.set(service.getPredictions());
  });
 
  return {
@@ -306,7 +281,7 @@ export function createContextProvider() {
  predictions: {
  subscribe: predictions.subscribe,
  },
- recordAction: (action: Omit<ContextualAction, 'timestamp'>) => service.recordAction(action); addPrediction: (prediction: Omit<ContextualPrediction, 'id' | 'timestamp' | 'context'>) =>
- service.addPrediction(prediction); getRelevantContext: (query: string, limit?: number) => service.getRelevantContext(query, limit); getMemoryStats: () => service.getMemoryStats(); clearMemory: () => service.clearMemory(),
+ recordAction: (action: Omit<ContextualAction, 'timestamp'>) => service.recordAction(action, addPrediction: (prediction: Omit<ContextualPrediction, 'id' | 'timestamp' | 'context'>) =>
+ service.addPrediction(prediction, getRelevantContext: (query: string, limit?: number) => service.getRelevantContext(query, limit, getMemoryStats: () => service.getMemoryStats(); clearMemory: () => service.clearMemory(),
  };
 }

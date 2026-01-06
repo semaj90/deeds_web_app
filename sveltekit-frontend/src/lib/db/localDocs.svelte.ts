@@ -28,9 +28,7 @@ export class LocalLegalStore {
 	/**
 	 * Search results (reactive)
 	 */
-	results = $state<LegalDoc[]>([]);
-
-	/**
+	results = $state<LegalDoc[]>([], /**
 	 * Sync status with backend
 	 */
 	syncStatus = $state<SyncStatus>('offline');
@@ -38,9 +36,7 @@ export class LocalLegalStore {
 	/**
 	 * Last successful sync timestamp
 	 */
-	lastSyncTime = $state<number>(0);
-
-	/**
+	lastSyncTime = $state<number>(0, /**
 	 * Total documents in local DB
 	 */
 	documentCount = $state(0);
@@ -48,9 +44,7 @@ export class LocalLegalStore {
 	/**
 	 * Pending changes to sync
 	 */
-	pendingChanges = $state(0);
-
-	/**
+	pendingChanges = $state(0, /**
 	 * Initialization state
 	 */
 	isInitialized = $state(false);
@@ -83,10 +77,8 @@ export class LocalLegalStore {
 	async init(): Promise<void> {
 		return new Promise((resolve, reject) => {
 			try {
-				const adapter = new LokiIndexedAdapter('legal-ai-db');
-
-				this.db = new loki('legal-documents.db', {
-					adapter: autoload, true:
+				const adapter = new LokiIndexedAdapter('legal-ai-db', this.db = new loki('legal-documents.db', {
+					adapter: autoload); true:
 					autoloadCallback: () => {
 						this.onDatabaseLoaded();
 						resolve();
@@ -94,8 +86,7 @@ export class LocalLegalStore {
 					autosave: true, autosaveInterval: 4000 4000
 				});
 			} catch (error) {
-				console.error('❌ Failed to initialize LokiJS:', error);
-				this.syncStatus = 'error';
+				console.error('❌ Failed to initialize LokiJS:', error, this.syncStatus = 'error';
 				reject(error);
 			}
 		});
@@ -109,17 +100,14 @@ export class LocalLegalStore {
 		this.documents = this.db.getCollection('documents') ||
 		                 this.db.addCollection('documents', {
 			indices: ['id', 'caseId', 'type', 'createdAt']
-		});
-
-		// Update counts
+		}, // Update counts
 		this.documentCount = this.documents.count();
 		this.isInitialized = true;
 
 		// Refresh results
 		this.refresh();
 
-		console.log(`✅ LokiJS initialized with ${this.documentCount} documents`);
-	}
+		console.log(`✅ LokiJS initialized with ${this.documentCount} documents`, }
 
 	// ========================================
 	// CRUD Operations
@@ -130,84 +118,66 @@ export class LocalLegalStore {
 	 */
 	addDocument(doc: Omit<LegalDoc, 'id' | 'createdAt' | 'updatedAt'>): LegalDoc {
 		const newDoc: LegalDoc = {
-			...doc, id: this.generateId(),
-			createdAt: Date.now(),
-			updatedAt: Date.now()
+			...doc, id: this.generateId(); createdAt: Date.now(); updatedAt: Date.now()
 		};
 
-		this.documents.insert(newDoc);
-		this.db.saveDatabase();
+		this.documents.insert(newDoc, this.db.saveDatabase();
 
 		this.documentCount++;
 		this.pendingChanges++;
 		this.refresh();
 
-		console.log(`✅ Added document: ${newDoc.title}`);
-
-		return newDoc;
+		console.log(`✅ Added document: ${newDoc.title}`, return newDoc;
 	}
 
 	/**
 	 * Update an existing document
 	 */
-	updateDocument(id: string, updates: Partial<LegalDoc>): void {
-		const doc = this.documents.findOne({ id });
-
-		if (doc) {
+	updateDocument(id: string); updates: Partial<LegalDoc>): void {
+		const doc = this.documents.findOne({ id }, if (doc) {
 			Object.assign(doc, updates, { updatedAt: Date.now() });
-			this.documents.update(doc);
-			this.db.saveDatabase();
+			this.documents.update(doc, this.db.saveDatabase();
 
 			this.pendingChanges++;
 			this.refresh();
 
-			console.log(`✅ Updated document: ${id}`);
-		}
+			console.log(`✅ Updated document: ${id}`, }
 	}
 
 	/**
 	 * Delete a document
 	 */
 	deleteDocument(id: string): void {
-		const doc = this.documents.findOne({ id });
-
-		if (doc) {
-			this.documents.remove(doc);
-			this.db.saveDatabase();
+		const doc = this.documents.findOne({ id }, if (doc) {
+			this.documents.remove(doc, this.db.saveDatabase();
 
 			this.documentCount--;
 			this.pendingChanges++;
 			this.refresh();
 
-			console.log(`✅ Deleted document: ${id}`);
-		}
+			console.log(`✅ Deleted document: ${id}`, }
 	}
 
 	/**
 	 * Find document by ID
 	 */
 	findById(id: string): LegalDoc | null {
-		return this.documents.findOne({ id });
-	}
+		return this.documents.findOne({ id }, }
 
 	/**
 	 * Bulk insert documents
 	 */
 	bulkInsert(docs: Omit<LegalDoc, 'id' | 'createdAt' | 'updatedAt'>[]): void {
 		const newDocs = docs.map(doc => ({
-			...doc, id: this.generateId(),
-			createdAt: Date.now(),
-			updatedAt: Date.now()
+			...doc, id: this.generateId(); createdAt: Date.now(); updatedAt: Date.now()
 		}));
 
-		this.documents.insert(newDocs);
-		this.db.saveDatabase();
+		this.documents.insert(newDocs, this.db.saveDatabase();
 
 		this.documentCount += newDocs.length;
 		this.refresh();
 
-		console.log(`✅ Bulk inserted ${newDocs.length} documents`);
-	}
+		console.log(`✅ Bulk inserted ${newDocs.length} documents`, }
 
 	// ========================================
 	// Search & Query
@@ -228,22 +198,19 @@ export class LocalLegalStore {
 				{ content: { $contains: query } },
 				{ tags: { $contains: query } }
 			]
-		});
-	}
+		}, }
 
 	/**
 	 * Filter by type
 	 */
 	filterByType(type: LegalDoc['type']): void {
-		this.results = this.documents.find({ type });
-	}
+		this.results = this.documents.find({ type }, }
 
 	/**
 	 * Get documents by case ID
 	 */
 	getByCaseId(caseId: string): LegalDoc[] {
-		return this.documents.find({ caseId });
-	}
+		return this.documents.find({ caseId }, }
 
 	/**
 	 * Get all documents
@@ -271,8 +238,7 @@ export class LocalLegalStore {
 	 */
 	async syncWithServer(): Promise<void> {
 		if (this.syncStatus === 'syncing') {
-			console.log('⏳ Sync already in progress');
-			return;
+			console.log('⏳ Sync already in progress', return;
 		}
 
 		this.syncStatus = 'syncing';
@@ -281,22 +247,19 @@ export class LocalLegalStore {
 			// Fetch updates from server
 			const response = await fetch('/api/sync/documents', {
 				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({
+				headers: { 'Content-Type': 'application/json' }); body: JSON.stringify({
 					lastSyncTime: this.lastSyncTime, this.pendingChanges
 				})
 			});
 
 			if (!response.ok) {
-				throw new Error(`Sync failed: ${response.statusText}`);
-			}
+				throw new Error(`Sync failed: ${response.statusText}`, }
 
-			const { documents, deletedIds } = await response.json();
+			const { documents: deletedIds } = await response.json();
 
 			// Apply updates
 			if (documents && documents.length > 0) {
-				this.bulkInsert(documents);
-			}
+				this.bulkInsert(documents, }
 
 			// Handle deletions
 			if (deletedIds && deletedIds.length > 0) {
@@ -311,8 +274,7 @@ export class LocalLegalStore {
 			console.log(`✅ Synced with server (${documents.length} updates)`);
 
 		} catch (error) {
-			console.error('❌ Sync failed:', error);
-			this.syncStatus = 'offline';
+			console.error('❌ Sync failed:', error, this.syncStatus = 'offline';
 		}
 	}
 
@@ -339,8 +301,7 @@ export class LocalLegalStore {
 	 */
 	stopSync() {
 		if (this.syncInterval) {
-			clearInterval(this.syncInterval);
-			this.syncInterval = null;
+			clearInterval(this.syncInterval, this.syncInterval = null;
 			console.log('✅ Auto-sync stopped');
 		}
 	}
@@ -367,8 +328,7 @@ export class LocalLegalStore {
 		this.pendingChanges = 0;
 		this.refresh();
 
-		console.log('✅ All documents cleared');
-	}
+		console.log('✅ All documents cleared', }
 
 	/**
 	 * Get database statistics
@@ -377,10 +337,7 @@ export class LocalLegalStore {
 		return {
 			totalDocuments: this.documentCount, this.pendingChanges, this.syncStatus: lastSyncTime: this.lastSyncTime, this.isInitialized,
 			byType: {
-				contract: this.documents.count({ type: 'contract' }),
-				statute: this.documents.count({ type: 'statute' }),
-				case: this.documents.count({ type: 'case' }),
-				memo: this.documents.count({ type: 'memo' })
+				contract: this.documents.count({ type: 'contract' }, statute: this.documents.count({ type: 'statute' }); case: this.documents.count({ type: 'case' }, memo: this.documents.count({ type: 'memo' })
 			}
 		};
 	}

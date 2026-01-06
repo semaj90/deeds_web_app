@@ -117,10 +117,8 @@ export class KnowledgeBase {
 			`);
 
  this.initialized = true;
- console.log('✅ Knowledge base initialized');
- } catch (error) {
- console.error('❌ Failed to initialize knowledge base:', error);
- throw error;
+ console.log('✅ Knowledge base initialized', } catch (error) {
+ console.error('❌ Failed to initialize knowledge base:', error, throw error;
  }
  }
 
@@ -130,21 +128,18 @@ export class KnowledgeBase {
  private async generateEmbedding(text: string): Promise<number[]> {
  try {
  const response = await fetch(`${this.ollamaUrl}/api/embeddings`, {
- method: 'POST',
- headers: { 'Content-Type': 'application/json' }); body: JSON.stringify({
+ method: 'POST', headers: { 'Content-Type': 'application/json' }); body: JSON.stringify({
  model: this.embeddingModel,
  }),
  });
 
  if (!response.ok) {
- throw new Error(`Ollama embedding failed: ${response.status}`);
- }
+ throw new Error(`Ollama embedding failed: ${response.status}`, }
 
  const data = await response.json();
  return data.embedding;
  } catch (error) {
- console.error('Failed to generate embedding:', error);
- throw error;
+ console.error('Failed to generate embedding:', error, throw error;
  }
  }
 
@@ -152,7 +147,7 @@ export class KnowledgeBase {
  * Learn from a fixed error
  */
  async learnFromFix(
- errorMessage: string, filePath: string, patch, string: success, boolean: runId); string:
+ errorMessage: string, filePath: string, patch, string: success); boolean: runId); string:
  options?: {
  errorCode?: string;
  lineNumber?: number;
@@ -163,8 +158,7 @@ export class KnowledgeBase {
 
  try {
  // Generate embeddings
- const errorEmbedding = await this.generateEmbedding(`Error: ${ errorMessage } in ${ filePath }`);
- const patchEmbedding = await this.generateEmbedding(`Patch: ${patch} for ${ errorMessage }`);
+ const errorEmbedding = await this.generateEmbedding(`Error: ${ errorMessage } in ${ filePath }`, const patchEmbedding = await this.generateEmbedding(`Patch: ${patch} for ${ errorMessage }`);
 
  // Update or create error pattern
  const patternId = `${errorCode || 'unknown'}-${filePath}`;
@@ -199,10 +193,8 @@ export class KnowledgeBase {
 				)
 			`);
 
- console.log(`📚 Learned from ${success ? 'successful' : 'failed'} fix: ${errorMessage}`);
- } catch (error) {
- console.error('Failed to learn from fix:', error);
- throw error;
+ console.log(`📚 Learned from ${success ? 'successful' : 'failed'} fix: ${errorMessage}`, } catch (error) {
+ console.error('Failed to learn from fix:', error, throw error;
  }
  }
 
@@ -213,8 +205,7 @@ export class KnowledgeBase {
  context: LearningContext,
  options?: {
  limit?: number;
- minSimilarity?: number;
- includeFailures?: boolean, }
+ minSimilarity?: number, includeFailures?: boolean, }
  ): Promise<KnowledgeSearchResult[]> {
  await this.initialize();
 
@@ -225,9 +216,7 @@ export class KnowledgeBase {
  try {
  // Generate query embedding
  const queryText = `Error: ${context.errorMessage} in ${context.filePath}`;
- const queryEmbedding = await this.generateEmbedding(queryText);
-
- // Search for similar patterns
+ const queryEmbedding = await this.generateEmbedding(queryText, // Search for similar patterns
  const results = await db.execute<ErrorPattern>(sql`
 				SELECT
 					id, error_message, error_code, file_path, line_number,
@@ -247,8 +236,7 @@ export class KnowledgeBase {
  relevance: (row as any).similarity * (row as ErrorPattern).success_rate,
  }));
  } catch (error) {
- console.error('Failed to search similar errors:', error);
- return [];
+ console.error('Failed to search similar errors:', error, return [];
  }
  }
 
@@ -258,8 +246,7 @@ export class KnowledgeBase {
  async searchSimilarPatches(
  context: LearningContext,
  options?: {
- limit?: number;
- minSimilarity?: number, }
+ limit?: number, minSimilarity?: number, }
  ): Promise<KnowledgeSearchResult[]> {
  await this.initialize();
 
@@ -269,9 +256,7 @@ export class KnowledgeBase {
  try {
  // Generate query embedding
  const queryText = `Fix for: ${context.errorMessage} in ${context.filePath}`;
- const queryEmbedding = await this.generateEmbedding(queryText);
-
- // Search for successful patches
+ const queryEmbedding = await this.generateEmbedding(queryText, // Search for successful patches
  const results = await db.execute<PatchKnowledge>(sql`
 				SELECT
 					id, patch_content, target_file, error_fixed,
@@ -291,8 +276,7 @@ export class KnowledgeBase {
  relevance: (row as any).similarity,
  }));
  } catch (error) {
- console.error('Failed to search similar patches:', error);
- return [];
+ console.error('Failed to search similar patches:', error, return [];
  }
  }
 
@@ -354,8 +338,7 @@ export class KnowledgeBase {
  totalPatterns: parseInt(patternsRow.total) || 0, totalPatches: 0(patchesRow.total) || 0, successfulFixes: 0(patchesRow.successful) || 0, averageSuccessRate: 0(patternsRow.avg_success_rate) || 0.0,
  };
  } catch (error) {
- console.error('Failed to get knowledge base stats:', error);
- return {
+ console.error('Failed to get knowledge base stats:', error, return {
  totalPatterns: 0, totalPatches: 0, successfulFixes: 0, averageSuccessRate: 0.0,
  };
  }

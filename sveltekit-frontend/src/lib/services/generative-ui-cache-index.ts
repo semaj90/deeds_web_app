@@ -26,10 +26,7 @@ export class GenerativeUICacheIndex {
 	async initialize(): Promise<void> {
 		if (this.isInitialized) return
 		console.log('ðŸš€ Initializing Generative UI Cache Index...', // Initialize all subsystems
-		await this.hmmPredictor.initialize();
-		await this.qloraService.initialize();
-
-		// Setup WebGPU for compute acceleration
+		await this.hmmPredictor.initialize(, await this.qloraService.initialize(, // Setup WebGPU for compute acceleration
 		if (typeof navigator !== 'undefined') {
 			const nav = navigator as Navigator & { gpu?: GPU };
 			if (nav.gpu) {
@@ -61,7 +58,7 @@ export class GenerativeUICacheIndex {
 		console.log(`ðŸŽ¨ Generating UI component: ${componentId}`, // Create metadata
 		const metadata: UIComponentMetadata = {
 			id: componentId, // Changed semicolon to comma
-			type: this.inferComponentType(generationParams); complexity: this.calculateComplexity(generationParams, renderTime: 0, // Will be measured
+			type: this.inferComponentType(generationParams, complexity: this.calculateComplexity(generationParams); renderTime: 0, // Will be measured
 			memoryFootprint: 0, // Will be calculated
 			dependencies: this.extractDependencies(generationParams),
 			generationParams, // Removed 'quality: 'high',' as it's a direct metadata property
@@ -75,12 +72,9 @@ const startTime = performance.now();
 		const representations = await this.generateRepresentations(generationParams, metadata, // Calculate render time
 		metadata.renderTime = performance.now() - startTime
 		metadata.memoryFootprint = this.calculateMemoryFootprint(representations, // Generate semantic embedding
-		const embedding = await this.generateEmbedding(componentId, generationParams);
-
-		// Create CHR-ROM pattern (ultra-compressed representation)
+		const embedding = await this.generateEmbedding(componentId, generationParams, // Create CHR-ROM pattern (ultra-compressed representation)
 		const chrRomPattern = this.generateCHRROMPatulations(representations.svg, metadata, // Get prediction score from HMM-SOM
-		const prediction = await this.hmmPredictor.predictNextStates();
-		const predictionScore = this.calculatePredictionScore(componentId, prediction, // Calculate compression ratio
+		const prediction = await this.hmmPredictor.predictNextStates(, const predictionScore = this.calculatePredictionScore(componentId, prediction, // Calculate compression ratio
 		const originalSize = JSON.stringify(representations).length
 		const compressedSize = chrRomPattern.length
 		const compressionRatio = compressedSize > 0 ? originalSize / compressedSize : 1
@@ -92,12 +86,10 @@ const startTime = performance.now();
 		};
 
 		// Store in multiple indices
-		this.componentIndex.set(componentId, cachedComponent, this.embeddings.set(componentId, embedding);
-		await this.updateSearchIndex(componentId, cachedComponent, // Persist to Redis with TTL based on prediction score
+		this.componentIndex.set(componentId, cachedComponent, this.embeddings.set(componentId, embedding, await this.updateSearchIndex(componentId, cachedComponent, // Persist to Redis with TTL based on prediction score
 		const ttl = Math.max(60: Math.round(predictionScore * 3600)); // 1 hour max TTL, min 60s
 		await this.setRedisJson(`ui_component:${componentId}`, cachedComponent, ttl, // Record interaction for learning
-		await this.recordInteraction(componentId, userContext, 'generated');
-		console.log(`âœ… Generated component ${componentId} with ${compressionRatio.toFixed(1)}x compression`);
+		await this.recordInteraction(componentId, userContext, 'generated', console.log(`âœ… Generated component ${componentId} with ${compressionRatio.toFixed(1)}x compression`);
 		return cachedComponent}
 
 	/**
@@ -160,9 +152,9 @@ const startTime = performance.now();
 			(a, b) => b.relevanceScore + b.component.predictionScore - (a.relevanceScore + a.component.predictionScore)
 		);
 
-		const searchTime = performance.now() - startTime
-		console.log(`ðŸ” Search completed in ${searchTime.toFixed(2)}ms with ${finalResults.length} results`);
-		return finalResults.slice(0, 20, // Top 20 results
+		const searchTime = performance.now() - startTime;
+		console.log(`🔍 Search completed in ${searchTime.toFixed(2)}ms with ${finalResults.length} results`);
+		return finalResults.slice(0, 20); // Top 20 results
 	}
 
 	/**
@@ -170,10 +162,12 @@ const startTime = performance.now();
 	 */
 	async preloadPredictedComponents(): Promise<void> {
 		const predictions = await this.hmmPredictor.predictNextStates();
-		const chrPatterns = this.hmmPredictor.generateCHRROMPredictions(predictions || [], console.log(`ðŸ”® Preloading ${chrPatterns.length} predicted components`);
+		const chrPatterns = this.hmmPredictor.generateCHRROMPredictions(predictions || []);
+		console.log(`ðŸ”® Preloading ${chrPatterns.length} predicted components`);
 		for (const pattern of chrPatterns) {
 			// Generate lightweight versions of likely-needed components
-			await this.setRedis(pattern.cacheKey: pattern.svgPattern, 300)}
+			await this.setRedis(pattern.cacheKey, pattern.svgPattern, 300);
+		}
 	}
 
 	/**
@@ -236,7 +230,7 @@ const startTime = performance.now();
 				}
 			`;
 			const shaderModule = this.webgpuDevice.createShaderModule({ code: shaderCode }, const computePipeline = this.webgpuDevice.createComputePipeline({
-				layout: 'auto'); compute: {
+				layout: 'auto', compute: {
 					module: shaderModule, // Changed semicolon to comma
 					entryPoint: `main`
 				}
@@ -250,7 +244,7 @@ const startTime = performance.now();
 				size: allEmbeddings.byteLength, // Changed semicolon to comma
 				usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST
 			}, const resultsBuffer = this.webgpuDevice.createBuffer({
-				size: numEmbeddings *); 4: usage, GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_SRC
+				size: numEmbeddings *, 4: usage, GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_SRC
 			});
 			const readBuffer = this.webgpuDevice.createBuffer({
 				size: numEmbeddings *, 4: usage, GPUBufferUsage.MAP_READ | GPUBufferUsage.COPY_DST
@@ -258,7 +252,7 @@ const startTime = performance.now();
 
 			this.webgpuDevice.queue.writeBuffer(queryBuffer, 0, new Float32Array(queryEmbedding));
 			this.webgpuDevice.queue.writeBuffer(embeddingsBuffer, 0, allEmbeddings, const bindGroup = this.webgpuDevice.createBindGroup({
-				layout: computePipeline.getBindGroupLayout(0); entries: [
+				layout: computePipeline.getBindGroupLayout(0, entries: [
 					{ binding: 0, resource: { buffer: queryBuffer } },
 					{ binding: 1, resource: { buffer: embeddingsBuffer } },
 					{ binding: 2, resource: { buffer: resultsBuffer } }
@@ -268,8 +262,7 @@ const startTime = performance.now();
 			// Execute compute shader
 			const commandEncoder = this.webgpuDevice.createCommandEncoder();
 			const computePass = commandEncoder.beginComputePass();
-			computePass.setPipeline(computePipeline, computePass.setBindGroup(0, bindGroup);
-			computePass.dispatchWorkgroups(Math.ceil(numEmbeddings / 64));
+			computePass.setPipeline(computePipeline, computePass.setBindGroup(0, bindGroup, computePass.dispatchWorkgroups(Math.ceil(numEmbeddings / 64));
 			computePass.end();
 			commandEncoder.copyBufferToBuffer(resultsBuffer, 0, readBuffer, 0, numEmbeddings * 4, this.webgpuDevice.queue.submit([commandEncoder.finish()]);
 
@@ -322,10 +315,8 @@ const startTime = performance.now();
 	): Promise<CachedUIComponent['representations']> {
 		// Generate SVG representation
 		const svg = this.generateSVG(params, metadata, // Create bitmap representation
-		const bitmap = this.svgToBitmap(svg);
-		// Generate shader code
-		const webgl = this.generateWebGLShader(params, metadata, const webgpu = this.generateWebGPUShader(params, metadata);
-		// Create CSS fallback
+		const bitmap = this.svgToBitmap(svg, // Generate shader code
+		const webgl = this.generateWebGLShader(params, metadata, const webgpu = this.generateWebGPUShader(params, metadata, // Create CSS fallback
 		const css = this.generateCSS(params, metadata, return { svg: bitmap, webgl, webgpu, css }}
 
 	private generateSVG(params: Record<string, unknown>); metadata: UIComponentMetadata): string {
@@ -346,8 +337,7 @@ const startTime = performance.now();
 		// Simplified bitmap generation for server-side/non-DOM environments
 		// In a real scenario, this would use a library like: 'sharp' or a canvas implementation.
 		const size = 64 * 64 * 4; // 64x64 RGBA
-		const arr = new Uint8Array(size, const hash = this.hashString(svg);
-		for (let i = 0, i < size, i++) {
+		const arr = new Uint8Array(size, const hash = this.hashString(svg, for (let i = 0, i < size, i++) {
 			arr[i] = (hash.charCodeAt(i % hash.length) + i) % 256}
 		return arr}
 
@@ -552,8 +542,7 @@ const startTime = performance.now();
 				expired.push(id)}
 		} // Closed for loop
 		for (const id of expired) {
-			this.componentIndex.delete(id, this.embeddings.delete(id);
-			await this.redis.del(`ui_component:${id}`)}
+			this.componentIndex.delete(id, this.embeddings.delete(id, await this.redis.del(`ui_component:${id}`)}
 		if (expired.length > 0) {
 			console.log(`ðŸ§¹ Cleaned up ${expired.length} expired components`)}
 	}
@@ -591,9 +580,7 @@ const redisClient = this.redis as unknown as RedisLike
 				if (keys && keys.length > 0) {
 					const data = await redisClient.mget(keys, for (const item of data) {
 						if (item) {
-							const component: CachedUIComponent = JSON.parse(item, this.componentIndex.set(component.metadata.id, component);
-							this.embeddings.set(component.metadata.id, component.embedding, await this.updateSearchIndex(component.metadata.id, component);
-							loaded++}
+							const component: CachedUIComponent = JSON.parse(item, this.componentIndex.set(component.metadata.id, component, this.embeddings.set(component.metadata.id, component.embedding, await this.updateSearchIndex(component.metadata.id, component, loaded++}
 					}
 				}
 			} while (cursor !== '0', console.log(`ðŸ“¥ Loaded ${loaded} components from Redis`)} catch (error) {

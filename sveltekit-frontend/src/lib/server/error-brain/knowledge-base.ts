@@ -118,8 +118,7 @@ export class KnowledgeBase {
 
  this.initialized = true;
  console.log('✅ Knowledge base initialized', } catch (error) {
- console.error('❌ Failed to initialize knowledge base:', error, throw error;
- }
+ console.error('❌ Failed to initialize knowledge base:', error, throw error, }
  }
 
  /**
@@ -136,11 +135,9 @@ export class KnowledgeBase {
  if (!response.ok) {
  throw new Error(`Ollama embedding failed: ${response.status}`, }
 
- const data = await response.json();
- return data.embedding;
+ const data = await response.json(, return data.embedding;
  } catch (error) {
- console.error('Failed to generate embedding:', error, throw error;
- }
+ console.error('Failed to generate embedding:', error, throw error, }
  }
 
  /**
@@ -158,9 +155,7 @@ export class KnowledgeBase {
 
  try {
  // Generate embeddings
- const errorEmbedding = await this.generateEmbedding(`Error: ${ errorMessage } in ${ filePath }`, const patchEmbedding = await this.generateEmbedding(`Patch: ${patch} for ${ errorMessage }`);
-
- // Update or create error pattern
+ const errorEmbedding = await this.generateEmbedding(`Error: ${ errorMessage } in ${ filePath }`, const patchEmbedding = await this.generateEmbedding(`Patch: ${patch} for ${ errorMessage }`, // Update or create error pattern
  const patternId = `${errorCode || 'unknown'}-${filePath}`;
  await db.execute(sql`
 				INSERT INTO error_patterns (
@@ -204,8 +199,7 @@ export class KnowledgeBase {
  async searchSimilarErrors(
  context: LearningContext,
  options?: {
- limit?: number;
- minSimilarity?: number, includeFailures?: boolean, }
+ limit?: number, minSimilarity?: number, includeFailures?: boolean, }
  ): Promise<KnowledgeSearchResult[]> {
  await this.initialize();
 
@@ -236,8 +230,7 @@ export class KnowledgeBase {
  relevance: (row as any).similarity * (row as ErrorPattern).success_rate,
  }));
  } catch (error) {
- console.error('Failed to search similar errors:', error, return [];
- }
+ console.error('Failed to search similar errors:', error, return [], }
  }
 
  /**
@@ -276,8 +269,7 @@ export class KnowledgeBase {
  relevance: (row as any).similarity,
  }));
  } catch (error) {
- console.error('Failed to search similar patches:', error, return [];
- }
+ console.error('Failed to search similar patches:', error, return [], }
  }
 
  /**

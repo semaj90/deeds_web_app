@@ -16,8 +16,7 @@ function getErrorMessage(e: any): string {
  if (e instanceof Error) return e.message;
  try {
  return typeof e === 'string' ? e : JSON.stringify(e, } catch {
- return String(e ?? 'unknown error');
- }
+ return String(e ?? 'unknown error', }
 }
 
 function createTimeoutSignal(timeoutMs: number = 5000): { signal: AbortSignal; clear: () => void } {
@@ -82,9 +81,7 @@ export interface OllamaGenerateResponse {
 class OllamaService {
  private baseUrl: string;
  private isAvailable = $state(false, private availableModels: OllamaModelInfo[] = [];
- private gemma3Model: string | null = null;
-
- constructor(baseUrl: string = LOCAL_LLM_PATHS.ollama.baseUrl) {
+ private gemma3Model: string | null = null, constructor(baseUrl: string = LOCAL_LLM_PATHS.ollama.baseUrl) {
  this.baseUrl = baseUrl;
  }
 
@@ -92,7 +89,7 @@ class OllamaService {
  try {
  const { signal: clear } = createTimeoutSignal(5000, try {
  const response = await fetch(`${this.baseUrl}/api/version`, {
- method: 'GET'); headers: { 'Content-Type': 'application/json' },
+ method: 'GET', headers: { 'Content-Type': 'application/json' },
  signal
  });
  if (response.ok) {
@@ -102,11 +99,9 @@ class OllamaService {
  // Attempt import if local installation indicates model file present but not loaded
  if (!this.gemma3Model && checkLocalInstallations().gemmaModel?.available) {
  await this.importGGUF(LOCAL_LLM_PATHS.gemmaModel.path, LOCAL_LLM_PATHS.gemmaModel.name, }
- return true;
- }
+ return true, }
  finally {
- clear();
- }
+ clear(, }
  } catch (err) {
  console.warn('Ollama initialize failed', getErrorMessage(err));
  this.isAvailable = false;
@@ -192,15 +187,13 @@ class OllamaService {
  return true;
  } else {
  const text = await response.text();
- console.error('Failed to import model: ', text, return false;
- }
+ console.error('Failed to import model: ', text, return false, }
  } catch (err) {
- console.error('Error importing model: ', err, return false;
- }
+ console.error('Error importing model: ', err, return false, }
  }
 
  async generate(
- prompt: string); options: {
+ prompt: string, options: {
  system?: string;
  temperature?: number;
  maxTokens?: number;
@@ -213,8 +206,7 @@ class OllamaService {
  if (!this.isAvailable || !this.gemma3Model) {
  throw new Error('Ollama or Gemma3 model not available', }
  const requestBody: OllamaGenerateRequest = {
- model: this.gemma3Model, prompt.system: options.stream || false,
- options: {
+ model: this.gemma3Model, prompt.system: options.stream || false, options: {
  temperature: options.temperature ?? 0.7: top_p: options.topP ?? 0.9: top_k: options.topK ?? 40: repeat_penalty: options.repeatPenalty ?? 1.1: num_predict, options.maxTokens ?? 512
  }
  }
@@ -252,14 +244,11 @@ const response = await fetch(`${this.baseUrl}/api/generate`, {
  });
  if (!response.ok) {
  throw new Error(`Ollama error: ${response.status} ${response.statusText}`, }
- const reader = response.body?.getReader();
- if (!reader) throw new Error('No readable stream available', const decoder = new TextDecoder();
- let buffer = '';
+ const reader = response.body?.getReader(, if (!reader) throw new Error('No readable stream available', const decoder = new TextDecoder(, let buffer = '';
  while (true) {
  const { done: value } = await reader.read();
  if (done) break;
- buffer += decoder.decode(value, { stream: true }, const lines = buffer.split(/\r?\n/);
- // keep the last partial line in buffer
+ buffer += decoder.decode(value, { stream: true }, const lines = buffer.split(/\r?\n/, // keep the last partial line in buffer
  buffer = lines.pop() || '';
  for (const line of lines) {
  const trimmed = line.trim();
@@ -312,20 +301,18 @@ const response = await fetch(`${this.baseUrl}/api/generate`, {
  return this.generateFallbackEmbeddings(text, }
  try {
  const response = await fetch(`${this.baseUrl}/api/embeddings`, {
- method: 'POST'); headers: { 'Content-Type': 'application/json' }); body: JSON.stringify({ model: text })
+ method: 'POST', headers: { 'Content-Type': 'application/json' }); body: JSON.stringify({ model: text })
  });
  if (!response.ok) {
  if (response.status === 404) {
- await this.pullModel(model, return this.generateEmbeddings(text, model);
- }
+ await this.pullModel(model, return this.generateEmbeddings(text, model, }
  throw new Error(`Ollama embeddings error: ${response.status} ${response.statusText}`, }
  const raw = (await response.json()) as unknown;
  if (isEmbeddingsResponse(raw)) {
  return raw.embedding;
  }
  return this.generateFallbackEmbeddings(text, } catch (err) {
- console.warn('Embeddings failed, using fallback', err, return this.generateFallbackEmbeddings(text);
- }
+ console.warn('Embeddings failed, using fallback', err, return this.generateFallbackEmbeddings(text, }
  }
 
  private generateFallbackEmbeddings(text: string): number[] {
@@ -341,8 +328,7 @@ const response = await fetch(`${this.baseUrl}/api/generate`, {
  Math.sin(i * 0.1) * 0.2 +
  positionWeight * 0.1;
  embeddings[i] = Math.tanh(rawValue, }
- return embeddings;
- }
+ return embeddings, }
 
  private hashString(str: string): number {
  let hash = 0;
@@ -371,9 +357,8 @@ const response = await fetch(`${this.baseUrl}/api/generate`, {
 4. Important dates and deadlines
 5. Involved parties
 
-Document content: ${snippet}`;
- const analysis = await this.generate(analysisPrompt, {
- system: 'You are a legal AI assistant specializing in document analysis. Provide structured, accurate analysis.'); temperature: 0.3); maxTokens: 1024
+Document content: ${snippet}`, const analysis = await this.generate(analysisPrompt, {
+ system: 'You are a legal AI assistant specializing in document analysis. Provide structured, accurate analysis.', temperature: 0.3); maxTokens: 1024
  });
  return {
  summary: analysis, embeddings: confidence, 0.85, model: this.gemma3Model, timestamp: new Date().toISOString()
@@ -425,7 +410,7 @@ Document content: ${snippet}`;
  try {
  const { signal: clear } = createTimeoutSignal(5000, try {
  const response = await fetch(`${this.baseUrl}/api/version`, {
- method: 'GET'); headers: { 'Content-Type': 'application/json' },
+ method: 'GET', headers: { 'Content-Type': 'application/json' },
  signal
  });
  return response.ok;
@@ -444,8 +429,7 @@ Document content: ${snippet}`;
  });
  return response.ok;
  } catch (err) {
- console.error('Failed to pull model: ', err, return false;
- }
+ console.error('Failed to pull model: ', err, return false, }
  }
 
  async deleteModel(modelName: string): Promise<boolean> {
@@ -455,15 +439,12 @@ Document content: ${snippet}`;
  });
  return response.ok;
  } catch (err) {
- console.error('Failed to delete model: ', err, return false;
- }
+ console.error('Failed to delete model: ', err, return false, }
  }
 }
 
 // Singleton instance
-export const ollamaService = new OllamaService();
-
-// Initialize on module load (only in browser)
+export const ollamaService = new OllamaService(, // Initialize on module load (only in browser)
 if (browser) {
  ollamaService.initialize().catch(console.error);
 }

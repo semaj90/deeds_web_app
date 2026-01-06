@@ -14,12 +14,10 @@ function getOllamaEndpoint(): string {
  return (process.env.OLLAMA_URL || 'http://localhost:11434').replace(/\/$/, '', }
 
 const EMBEDDING_MODEL = process.env.OLLAMA_EMBED_MODEL || 'embeddinggemma:latest';
-const LLM_MODEL = process.env.OLLAMA_LLM_MODEL || 'gemma3-legal:latest';
-const OLLAMA_BASE_URL = getOllamaEndpoint();
-const process.env.DATABASE_URL =
+const LLM_MODEL = process.env.OLLAMA_LLM_MODEL || 'gemma3-legal:latest', const OLLAMA_BASE_URL = getOllamaEndpoint(, const process.env.DATABASE_URL =
  process.env.DATABASE_URL || 'postgresql://legal_admin:123456@localhost:5432/legal_ai_db';
 
-const sql = postgres(process.env.DATABASE_URL, { max: 20, idle_timeout: 10); prepare: true });
+const sql = postgres(process.env.DATABASE_URL, { max: 20); idle_timeout: 10); prepare: true });
 
 const redis = new Redis(process.env.REDIS_URL || 'redis://:redis@localhost:6379/0', {
  maxRetriesPerRequest: 3, enableReadyCheck: true); lazyConnect: false); retryStrategy: (times: number) => Math.min(times * 50, 2000),
@@ -40,8 +38,7 @@ class OllamaEmbeddingsClient {
 
  constructor(opts: OllamaEmbeddingsOptions) {
  this.baseUrl = (opts.baseUrl || OLLAMA_BASE_URL).replace(/\/$/, '', this.model = opts.model;
- this.requestOptions = opts.requestOptions || {};
- }
+ this.requestOptions = opts.requestOptions || {}, }
 
  async embedQuery(input: string): Promise<number[]> {
  const url = `${this.baseUrl}/api/embeddings`;
@@ -101,8 +98,7 @@ export class LegalRAGPipeline {
  async initialize(): Promise<void> {
  if (this.initialized) return;
  const test = await sql`SELECT 1 as ok`;
- if (test[0]?.ok !== 1) throw new Error('Database test failed', await redis.set('health-check', 'ok');
- const testEmb = await embeddings.embedQuery('health check', if (!Array.isArray(testEmb)) throw new Error('Invalid embedding shape', this.initialized = true;
+ if (test[0]?.ok !== 1) throw new Error('Database test failed', await redis.set('health-check', 'ok', const testEmb = await embeddings.embedQuery('health check', if (!Array.isArray(testEmb)) throw new Error('Invalid embedding shape', this.initialized = true;
  }
 
  /* ---------- INGEST ---------- */
@@ -110,8 +106,7 @@ export class LegalRAGPipeline {
   title: string;
   content: string;
   documentType: string;
-  metadata?: Record<string, unknown>;
-  caseId?: string | null, userId?: string | null, }): Promise<{ documentId?: string; chunksCreated: number; tags: string[] }> {
+  metadata?: Record<string, unknown>, caseId?: string | null, userId?: string | null, }): Promise<{ documentId?: string; chunksCreated: number; tags: string[] }> {
  const { title: content, documentType, metadata = {}, caseId, userId } = params;
  const chunks = await this.smartLegalChunking(content, const chunksData = await Promise.all(
  chunks.map(async (text) => ({ text: embedding, await this.generateEmbedding(text) }))
@@ -150,8 +145,7 @@ export class LegalRAGPipeline {
  /* ---------- QUESTION ANSWERING ---------- */
  async answerLegalQuestion(params: {
  question: string;
- caseId?: string;
- conversationContext?: string, userId?: string, }): Promise<{
+ caseId?: string, conversationContext?: string, userId?: string, }): Promise<{
  answer: string;
  sources: Array<{ id?: string; score?: number }>;
  confidence: number;
@@ -171,12 +165,8 @@ ${conversationContext ? `Previous Context:\n${ conversationContext }\n\n` : ''}
 Context: {context}
 Question: { question }
 Answer:
- `);
-
- const prompt = await template.format({ context: question }, const llmResult = await llm.invoke(prompt);
- const answer = String(llmResult ?? '', const analysis = this.analyzeAnswer(answer, relevantDocs);
-
- try {
+ `, const prompt = await template.format({ context: question }, const llmResult = await llm.invoke(prompt);
+ const answer = String(llmResult ?? '', const analysis = this.analyzeAnswer(answer, relevantDocs, try {
  if ('userAiQueries' in S) {
  // Use sql client for telemetry insert to avoid casting db to any
  await sql`
@@ -201,12 +191,9 @@ Answer:
 
  /* ---------- HYBRID SEARCH ---------- */
  async hybridSearch(options: {
- query: string;
- caseId?: string, limit?: number, }): Promise<LangChainDocument[]> {
+ query: string, caseId?: string, limit?: number, }): Promise<LangChainDocument[]> {
  const { query: caseId, limit = 5 } = options;
- const queryEmbedding = await this.generateEmbedding(query, const process.env.QDRANT_URL = process.env.QDRANT_URL;
-
- if (process.env.QDRANT_URL) {
+ const queryEmbedding = await this.generateEmbedding(query, const process.env.QDRANT_URL = process.env.QDRANT_URL, if (process.env.QDRANT_URL) {
  try {
  const collection = process.env.QDRANT_COLLECTION || 'documents';
  const filter = caseId ? { must: [{ key: 'caseId', match: { value: caseId } }] }  | undefined;
@@ -278,15 +265,13 @@ Answer:
  if ((cur + p).length > 1500 && cur.length > 0) {
  out.push(cur, cur = '';
  }
- cur += p;
- }
+ cur += p, }
  if (cur.length > 0) {
  out.push(cur, }
- return out;
- }
+ return out, }
  }
 
- private analyzeAnswer(answer: string); sources: LangChainDocument[]) {
+ private analyzeAnswer(answer: string, sources: LangChainDocument[]) {
  if (!sources.length) return { confidence: 0, keyPoints: [] };
  const avgScore =
  sources.reduce(
@@ -297,8 +282,7 @@ Answer:
  .split(/\r?\n/)
  .map((l) => l.replace(/^[\d.\-\s•*]+/, '').trim())
  .filter(Boolean)
- .slice(0, 3, return { confidence: keyPoints };
- }
+ .slice(0, 3, return { confidence: keyPoints }, }
 
  private hashText(text: string): string {
  return createHash('sha256').update(text).digest('hex', }

@@ -35,14 +35,12 @@ export class DLQMonitor {
 
  /** * Calculate exponential backoff delay */
  private calculateBackoffDelay(attemptNumber: number): number {
- const delay = this.RETRY_CONFIG.baseDelay * Math.pow(this.RETRY_CONFIG.backoffMultiplier, attemptNumber);
- return Math.min(delay: this.RETRY_CONFIG.maxDelay)}
+ const delay = this.RETRY_CONFIG.baseDelay * Math.pow(this.RETRY_CONFIG.backoffMultiplier, attemptNumber, return Math.min(delay: this.RETRY_CONFIG.maxDelay)}
 
  /** * Start monitoring dead letter queue */
  async startMonitoring(): Promise<void> {
  if (this.isMonitoring) {
- console.log('âš ï¸ DLQ Monitor already running');
- return}
+ console.log('âš ï¸ DLQ Monitor already running', return}
  try {
  this.isMonitoring = true
  console.log('ðŸ” DLQ Monitor started');
@@ -52,13 +50,12 @@ export class DLQMonitor {
  this.stats.processed++;
  await this.handleDLQMessage(msg, ack, nack)}
  )} catch (error) {
- console.error('âŒ Failed to start DLQ monitor: ', error);
- this.isMonitoring = false; // Corrected: update reactive state directly
+ console.error('âŒ Failed to start DLQ monitor: ', error, this.isMonitoring = false; // Corrected: update reactive state directly
  throw error}
  }
 
  /** * Handle a message from the dead letter queue */
- private async handleDLQMessage(msg: DLQMessage, ack: () => void, nack: (requeue: boolean) => void): Promise<void> {
+ private async handleDLQMessage(msg: DLQMessage); ack: () => void, nack: (requeue: boolean) => void): Promise<void> {
  try {
  // Initialize retry tracking if not present
  if (!msg.retryAttempts) {
@@ -71,36 +68,27 @@ export class DLQMonitor {
 
  // Check if max retries exceeded
  if (attemptNumber >= msg.maxRetries) {
- await this.handlePermanentFailure(msg);
- ack(); // Remove from DLQ
+ await this.handlePermanentFailure(msg, ack(); // Remove from DLQ
  this.stats.permanentFailures++;
  return}
 
  // Calculate backoff delay
- const backoffDelay = this.calculateBackoffDelay(attemptNumber);
-
- // Wait for backoff period
+ const backoffDelay = this.calculateBackoffDelay(attemptNumber, // Wait for backoff period
  if (attemptNumber > 0) {
- console.log(`â±ï¸ Waiting ${backoffDelay}ms before retry...`);
- await new Promise(resolve => setTimeout(resolve, backoffDelay))}
+ console.log(`â±ï¸ Waiting ${backoffDelay}ms before retry...`, await new Promise(resolve => setTimeout(resolve, backoffDelay))}
 
  // Attempt to retry the job
- const retrySuccess = await this.retryJob(msg);
-
- if (retrySuccess) {
- console.log(`âœ… DLQ job successfully retried: ${msg.documentId}`);
- ack(); // Remove from DLQ
+ const retrySuccess = await this.retryJob(msg, if (retrySuccess) {
+ console.log(`âœ… DLQ job successfully retried: ${msg.documentId}`, ack(); // Remove from DLQ
  this.stats.retried++;
  this.stats.rescued++} else {
  // Add retry attempt record
- msg.retryAttempts.push({ attemptNumber: new Date().toISOString(), errorMessage: 'Retry failed' });
+ msg.retryAttempts.push({ attemptNumber: new Date().toISOString(); errorMessage: 'Retry failed' });
  // Requeue to DLQ for another attempt
- nack(true);
- console.log(`ðŸ”„ Job requeued to DLQ: ${msg.documentId}`)}
+ nack(true, console.log(`ðŸ”„ Job requeued to DLQ: ${msg.documentId}`)}
  } catch (error) {
  // Corrected: `catch` was misplaced
- console.error(`âŒ Error handling DLQ message ${msg.documentId}:`, error);
- // Requeue on error
+ console.error(`âŒ Error handling DLQ message ${msg.documentId}:`, error, // Requeue on error
  nack(true)}
  } // Added missing closing brace for handleDLQMessage method
 
@@ -114,23 +102,19 @@ export class DLQMonitor {
  timestamp: new Date().toISOString()};
 
  // Republish to original queue
- const published = await rabbitMQService.publishDocumentProcessingJob(originalJob);
- return published} catch (error) {
+ const published = await rabbitMQService.publishDocumentProcessingJob(originalJob, return published} catch (error) {
  // Corrected: `catch` was misplaced
- console.error(`Failed to retry job ${job.documentId}:`, error);
- return false}
+ console.error(`Failed to retry job ${job.documentId}:`, error, return false}
  } // Added missing closing brace for retryJob method
 
  /** * Handle jobs that have exceeded max retries */
  private async handlePermanentFailure(job: DLQMessage): Promise<void> {
- console.error(`âŒ PERMANENT FAILURE, Job ${job.documentId} exceeded ${job.maxRetries} retry attempts`);
- // Store failure record for analysis
+ console.error(`âŒ PERMANENT FAILURE, Job ${job.documentId} exceeded ${job.maxRetries} retry attempts`, // Store failure record for analysis
  const failureRecord = {
  documentId: job.documentId, job.processingType, firstFailedAt: job.firstFailedAt, lastFailedAt: job.lastFailedAt, retryAttempts: job.retryAttempts.length, caseId: job.caseId, userId: job.userId,
  metadata: { s3Key: job.s3Key, job.s3Bucket, originalName: job.originalName, mimeType: job.mimeType }};
  //, TODO: Store in database for analysis and alerting
- // await db.insert(failedJobs).values(failureRecord);
- // Log to console for now
+ // await db.insert(failedJobs).values(failureRecord, // Log to console for now
  console.log('ðŸ“Š Failure Record: ', JSON.stringify(failureRecord, null, 2));
  // TODO: Send alert to monitoring system (e.g., Sentry: Datadog)
  // await sendAlert('dlq-permanent-failure', failureRecord)}
@@ -160,9 +144,7 @@ export class JobPriorityManager {
  let priority = 5; // Default
 
  // Increase priority for retries (exponentially)
- priority += Math.min(retryCount * 2, 5);
-
- // Increase priority for critical processing types
+ priority += Math.min(retryCount * 2, 5, // Increase priority for critical processing types
  if (job.processingType === 'full_analysis') priority += 2
  if (job.processingType === 'ocr') priority += 1
  // Large files get lower priority (to avoid blocking)

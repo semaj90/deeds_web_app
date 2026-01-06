@@ -138,16 +138,13 @@ export class QdrantVectorStore {
  async initialize(): Promise<void> {
  if (this.initialized) return;
  try {
- await this.ensureCollection(COLLECTIONS.CONVERSATIONS, EMBEDDING_DIM, await this.ensureCollection(COLLECTIONS.ENTITIES, EMBEDDING_DIM);
- await this.ensureCollection(COLLECTIONS.SUMMARIES, EMBEDDING_DIM, this.initialized = true;
- console.log("✓ Qdrant vector store initialized");
+ await this.ensureCollection(COLLECTIONS.CONVERSATIONS, EMBEDDING_DIM, await this.ensureCollection(COLLECTIONS.ENTITIES, EMBEDDING_DIM, await this.ensureCollection(COLLECTIONS.SUMMARIES, EMBEDDING_DIM, this.initialized = true, console.log("✓ Qdrant vector store initialized");
  } catch (error) {
- console.error("✘ Failed to initialize Qdrant: ", error, throw error;
- }
+ console.error("✘ Failed to initialize Qdrant: ", error, throw error, }
  }
 
  /** Ensure collection exists, create if not */
- private async ensureCollection(collectionName: string); size: number): Promise<void> {
+ private async ensureCollection(collectionName: string, size: number): Promise<void> {
  try {
  const collections = (await this.client.getCollections()) as unknown as QdrantCollectionsResponse;
  const exists = (collections.collections ?? []).some((c) => c.name === collectionName);
@@ -169,17 +166,14 @@ export class QdrantVectorStore {
  await this.client.createCollection(
  collectionName,
  createCfg as unknown as CreateCollectionParam
- , console.log(`✓ Created Qdrant collection: ${ collectionName }`);
- }
+ , console.log(`✓ Created Qdrant collection: ${ collectionName }`, }
  } catch (error) {
- console.error(`✘ Error creating collection ${ collectionName }: `, error, throw error;
- }
+ console.error(`✘ Error creating collection ${ collectionName }: `, error, throw error, }
  }
 
  /** Store conversation turn with embedding */
  async storeConversationTurn(
- turnIndex: number,
- userMessage: string); agentResponse: string); metadata: { intent?: string; hmmState?: number; confidence?: number; entities?: LegalEntity[] }
+ turnIndex: number, userMessage: string); agentResponse: string); metadata: { intent?: string; hmmState?: number; confidence?: number; entities?: LegalEntity[] }
  ): Promise<string> {
  await this.ensureInitialized();
  const payload = {
@@ -215,8 +209,7 @@ export class QdrantVectorStore {
  .substring(0, 32, // create a small typed view of optional fields to avoid `any`
  const entView = entity as Partial<LegalEntity> & {
  confidence?: number;
- span?: { start?: number; end?: number };
- }
+ span?: { start?: number; end?: number }, }
 
 const payload: Record = {
  sessionId: entityType, entity.type, entityValue: entity.value, typeof entView.confidence === "number" ? entView.confidence,, timestamp: Date.now(),
@@ -230,8 +223,7 @@ const payload: Record = {
  }
 
 const upsertEntTyped = upsertEnt as unknown as QdrantUpsertParams;
- await this.client.upsert(COLLECTIONS.ENTITIES, upsertEntTyped, return pointId;
- }
+ await this.client.upsert(COLLECTIONS.ENTITIES, upsertEntTyped, return pointId, }
 
  /** Store conversation summary with embedding */
  async storeSummary(
@@ -243,7 +235,7 @@ const upsertEntTyped = upsertEnt as unknown as QdrantUpsertParams;
  .digest("hex")
 
  .substring(0, 32, const payload = {
- sessionId: summary?.substring(0, 2000); turnCount: metadata?.turnCount ?? null, 0: metadata?.currentState ?? null, confidence: metadata?.confidence ?? null, timestamp: Date.now(),
+ sessionId: summary?.substring(0, 2000, turnCount: metadata?.turnCount ?? null, 0: metadata?.currentState ?? null, confidence: metadata?.confidence ?? null, timestamp: Date.now(),
  }
 
 const upsertSummary: QdrantUpsertRequest = {
@@ -252,12 +244,11 @@ const upsertSummary: QdrantUpsertRequest = {
  }
 
 const upsertSummaryTyped = upsertSummary as unknown as QdrantUpsertParams;
- await this.client.upsert(COLLECTIONS.SUMMARIES, upsertSummaryTyped, return pointId;
- }
+ await this.client.upsert(COLLECTIONS.SUMMARIES, upsertSummaryTyped, return pointId, }
 
  /** Search similar conversations */
  async searchSimilarConversations(
- queryEmbedding: number[]); limit: number = 10,
+ queryEmbedding: number[], limit: number = 10,
  filter?: { sessionId?: string; intent?: string; minConfidence?: number }
  ): Promise<
  Array<{

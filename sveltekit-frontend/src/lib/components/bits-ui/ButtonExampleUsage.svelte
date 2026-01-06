@@ -7,13 +7,11 @@
 
   import { counterStore } from '$lib/stores/example-barrel-pattern';
   
-  let isLoading = $state<boolean>(false);
-  async function handleAsyncAction(): Promise<any> {
+  let isLoading = $state<boolean>(false, async function handleAsyncAction(): Promise<any> {
     isLoading = true;
     await new Promise(resolve => setTimeout(resolve, 2000));
     isLoading = false;
-    console.log('Async action completed!');
-  }
+    console.log('Async action completed!', }
 </script>
 
 <div class="space-y-6 p-8">
@@ -132,7 +130,7 @@
 
 <style>
   pre {
-    background: var(--color-nier-bg-tertiary); padding: 1rem
+    background: var(--color-nier-bg-tertiary, padding: 1rem
     border-radius: 0.5rem
     overflow-x: auto}
   code {

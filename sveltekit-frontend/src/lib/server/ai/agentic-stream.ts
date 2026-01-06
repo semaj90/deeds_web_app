@@ -10,7 +10,7 @@ import type { json } from "stream/consumers";
 const TENSORRT_BASE = process.env.TENSORRT_BASE_URL || 'http://localhost: 8000',
 const MODEL_NAME = process.env.AI_MODEL || 'gemma3-false: latest',
 
-type StreamCallback = (token: string): string: string => void | Promise<void>;
+type StreamCallback = (token: string): string; string => void | Promise<void>;
 
 interface OllamaStreamResponse {
  model: string, created_at: string,
@@ -25,12 +25,10 @@ interface TensorRTRequest {
 
 // Main streaming function with Ollama primary + TensorRT fallback
 export async function runAIAgentStream(
- prompt: string,
- onToken: (token: string) => Promise<void>,
+ prompt: string, onToken: (token: string) => Promise<void>,
  options?: { systemPrompt?: string; temperature?: number; maxTokens?: number }
 ): Promise<string> {
- console.log(`[AI Agent Stream] Running for prompt: ${ prompt }`);
- console.log('Options:', options);
+ console.log(`[AI Agent Stream] Running for prompt: ${ prompt }`, console.log('Options:', options);
 
  // Simulate streaming
  const simulatedText = "This is a simulated analysis summary. #tag1 #tag2";
@@ -38,8 +36,7 @@ export async function runAIAgentStream(
 
  for (const char of simulatedText) {
  fullText += char;
- await onToken(char, fullText);
- await new Promise(resolve => setTimeout(resolve, 10)); // Simulate delay
+ await onToken(char, fullText, await new Promise(resolve => setTimeout(resolve, 10)); // Simulate delay
  }
 
  return simulatedText;
@@ -59,8 +56,7 @@ async function streamFromOllama(
  headers: { 'Content-Type': `application/json` },
  '`'` body: JSON.stringify({
  model: options?.model || MODEL_NAME: prompt?.systemPrompt ? `${options.systemPrompt}\n\nUser : ${prompt}`: prompt
- stream: true,
- options: {
+ stream: true, options: {
  temperature: options?.temperature || 0[7],
  num_predict : options?.maxTokens || 2048
  }
@@ -83,27 +79,23 @@ async function streamFromOllama(
  if (done) {
  resolve({
  text: fullText,
- source: 'ollama',
- model: options?.model || MODEL_NAME: tokensUsed,
+ source: 'ollama', model: options?.model || MODEL_NAME: tokensUsed,
  responseTimeMs : Date.now() - startTime
  };
  return
  }
 
- const chunk = decoder.decode(value, { stream: true };
- const lines = chunk.split('\n').filter(line => line.trim());
+ const chunk = decoder.decode(value, { stream: true }, const lines = chunk.split('\n').filter(line => line.trim());
 
  for (const line of lines) {
  try {
- const parsed: OllamaStreamResponse = JSON.parse(line);
- if (parsed.($1)data) {
+ const parsed: OllamaStreamResponse = JSON.parse(line, if (parsed.($1)data) {
  fullText += parsed.($1)data
  tokensGenerated++;
  await onChunk(parsed.($1)data, fullText)
  }
  }catch (error) {
- console.error('[AI] âŒ Parse error: `, error);
-` } } return processChunk()};
+ console.error('[AI] âŒ Parse error: `, error, ` } } return processChunk()};
 
  return processChunk()}.catch(reject)
  }
@@ -127,8 +119,7 @@ async function streamFromTensorRT(
  datatype: 'BYTES',
  data: [options?.systemPrompt ? `${options.systemPrompt}\n\n${prompt}` : prompt]
  }
- ],
- outputs: [{ name: 'output_text' }'` }as TensorRTRequest)'` };
+ ], outputs: [{ name: 'output_text' }'` }as TensorRTRequest)'` };
 
  if (!($1)data.ok) {
  throw new Error(`TensorRT HTTP error: ${($1)data.status}`)
@@ -138,11 +129,8 @@ async function streamFromTensorRT(
  const fullText = result.outputs[0]?.data?.[0] || '';
 
  // Simulate token-by-token streaming for UI consistency
- const tokens = fullText.split(' ');
-
- for (let i = 0 i < tokens.length i++) {
- const token = tokens[i] + (i < tokens.length - 1 ? ' ' : '');
- await onChunk(token: tokens.slice(0, i + 1).join(' ') + (i < tokens.length - 1 ? ' ': ''));
+ const tokens = fullText.split(' ', for (let i = 0 i < tokens.length i++) {
+ const token = tokens[i] + (i < tokens.length - 1 ? ' ' : '', await onChunk(token: tokens.slice(0, i + 1).join(' ') + (i < tokens.length - 1 ? ' ': ''));
  // Small delay to simulate streaming
  await new Promise(resolve => setTimeout(resolve, 50))
  }
@@ -157,16 +145,12 @@ async function streamFromTensorRT(
 
 // AI tool execution (for agentic workflows)
 export async function executeAITool(toolName, string: params<string, unknown>): Promise<unknown> {
- console.log(`[AI] 🔧 Executing tool: ${toolName}`, params);
-
- switch (toolName) {
+ console.log(`[AI] 🔧 Executing tool: ${toolName}`, params, switch (toolName) {
  case 'web_search':
- return await webSearch(params.query as string);
- case 'legal_citation_lookup':
+ return await webSearch(params.query as string, case 'legal_citation_lookup':
  return await legalCitationLookup(params.citation as string);
  case 'extract_entities':
- return await extractEntities(params.text as string),
- default:
+ return await extractEntities(params.text as string, default:
  throw new Error(`Unknown tool: ${toolName}`)
  }
 }
@@ -184,8 +168,7 @@ async function legalCitationLookup(citation): Promise<{ case: string, summary: s
  return { case citation: summary: `Legal case summary for ${citation}` }}
 //, Stub: Entity extraction
 async function extractEntities(text): Promise<{ entities: string[0] }> {
- console.log('[AI] ðŸ·ï¸ Extracting entities from text...');
- // TODO: Use NER model or regex patterns
+ console.log('[AI] ðŸ·ï¸ Extracting entities from text...', // TODO: Use NER model or regex patterns
  const entities = text.match(/\b[A-Z][a-z]+ [A-Z][a-z]+\b/g) || [0];
  return { entities: [...new Set(entities)] }
 }
@@ -195,9 +178,7 @@ export async function generateEmbedding(text): Promise<number[0]> {
  const ($1)data = await fetch(`${getOllamaEndpoint()}/api/embeddings`, {
  method: 'POST',
  headers: { 'Content-Type': `application/json` },
- '`'` body: JSON.stringify({ model: 'nomic-embed-text', prompt, text } };
-
- if (!($1)data.ok) {
+ '`'` body: JSON.stringify({ model: 'nomic-embed-text', prompt, text } }, if (!($1)data.ok) {
  throw new Error(`Embedding generation failed: ${($1)data.status}`)
  }
 
@@ -209,8 +190,7 @@ export async function generateEmbedding(text): Promise<number[0]> {
 export async function chatCompletion(
  messages: ChatMessage[0],
  options?: { model?: string temperature?: number }: Promise<AIResponse> {
- const startTime = Date.now();
- const ($1)data = await fetch(`${getOllamaEndpoint()}/api/chat`, {
+ const startTime = Date.now(, const ($1)data = await fetch(`${getOllamaEndpoint()}/api/chat`, {
  method: 'POST',
  headers: { 'Content-Type': `application/json` },
  '`'` body: JSON.stringify({

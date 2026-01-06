@@ -65,7 +65,7 @@ export interface RankedDocument extends IndexedDocument {
 
 export interface SynthesisRankingConfig {
  weights: {
- relevance: number; // Weight for semantic relevance (default: 0.5, keywords: number; // Weight for keyword matching (default: 0.3); synthesis: number; // Weight for synthesis quality (default: 0.2)
+ relevance: number; // Weight for semantic relevance (default: 0.5, keywords: number, // Weight for keyword matching (default: 0.3, synthesis: number; // Weight for synthesis quality (default: 0.2)
  };
  keywordExtractor: 'ripgrep' | 'awk' | 'hybrid'; enableGemmaFunctionCalling: boolean;
  cacheResults: boolean;
@@ -110,17 +110,14 @@ export class RAGKnowledgePipeline {
  */
  async embedDocuments(documents: RAGDocument[]): Promise<EmbeddedDocument[]> {
  const startTime = performance.now();
- console.log(`ðŸ”® Embedding ${documents.length} documents with ${this.EMBEDDING_MODEL}`, const embedded: EmbeddedDocument[] = [];
-
- for (const doc of documents) {
+ console.log(`ðŸ”® Embedding ${documents.length} documents with ${this.EMBEDDING_MODEL}`, const embedded: EmbeddedDocument[] = [], for (const doc of documents) {
  try {
  // Check cache first
  const cacheKey = `embedding: ${doc.id}`;
  let embedding = await cache.get<number[]>(cacheKey, if (!embedding) {
  // Generate fresh embedding with embeddinggemma: latest
  embedding = await vectorService.generateEmbedding(doc.content, // Cache for 24 hours
- await cache.set(cacheKey, embedding, 86400);
- }
+ await cache.set(cacheKey, embedding, 86400, }
 
  // Create tensor slice for GPU processing
  const tensorSlice = new Float32Array(embedding, embedded.push({
@@ -150,24 +147,21 @@ export class RAGKnowledgePipeline {
  */
  async summarizeDocuments(documents: EmbeddedDocument[]): Promise<SummarizedDocument[]> {
  const startTime = performance.now();
- console.log(`ðŸ“ Summarizing ${documents.length} documents with Gemma function calling`, const summarized: SummarizedDocument[] = [];
-
- for (const doc of documents) {
+ console.log(`ðŸ“ Summarizing ${documents.length} documents with Gemma function calling`, const summarized: SummarizedDocument[] = [], for (const doc of documents) {
  try {
  // Check cache
  const cacheKey = `summary: ${doc.id}`;
  let summaryData = await cache.get<GemmaExtractionResult>(cacheKey, if (!summaryData) {
  // Use Gemma function calling for structured extraction
  summaryData = await this.callGemmaStructuredExtraction(doc, // Cache for 24 hours
- await cache.set(cacheKey, summaryData, 86400);
- }
+ await cache.set(cacheKey, summaryData, 86400, }
 
  summarized.push({
  ...doc: summary.summary, keyPoints.keyPoints || [],
  keywords: summaryData.keywords || [],
  entities: summaryData.entities || {
  people: [],
- organizations: [], locations: []); dates: []); legalCitations: [],
+ organizations: []); locations: []); dates: []); legalCitations: [],
  },
  });
 
@@ -273,9 +267,7 @@ export class RAGKnowledgePipeline {
  */
  async indexDocuments(documents: SummarizedDocument[]): Promise<IndexedDocument[]> {
  const startTime = performance.now();
- console.log(`ðŸ—‚ï¸ Indexing ${documents.length} documents`, const indexed: IndexedDocument[] = [];
-
- for (const doc of documents) {
+ console.log(`ðŸ—‚ï¸ Indexing ${documents.length} documents`, const indexed: IndexedDocument[] = [], for (const doc of documents) {
  try {
  // 1. LokiJS storage
  const lokiDoc = await this.lokiService.insert({
@@ -356,12 +348,8 @@ export class RAGKnowledgePipeline {
 
  console.log(`ðŸŽ¯ Ranking ${documents.length} documents`, console.log(
  ` Weights: relevance=${finalConfig.weights.relevance}, keywords=${finalConfig.weights.keywords}, synthesis=${finalConfig.weights.synthesis}`
- );
-
- // Generate query embedding for semantic similarity
- const queryEmbedding = await vectorService.generateEmbedding(query, const ranked: RankedDocument[] = [];
-
- for (const doc of documents) {
+ , // Generate query embedding for semantic similarity
+ const queryEmbedding = await vectorService.generateEmbedding(query, const ranked: RankedDocument[] = [], for (const doc of documents) {
  // 1. Relevance Score (cosine similarity)
  const relevanceScore = this.cosineSimilarity(queryEmbedding, doc.embedding, // 2. Keyword Score (keyword match quality)
  const keywordScore = this.calculateKeywordScore(query, doc, // 3. Synthesis Score (cross-document quality)
@@ -501,8 +489,7 @@ ${contextText}
 
 Query: ${query}
 
-Provide your analysis including: Compliance Status, Identified Issues, Remediation Steps.`,
- general: `You are a legal AI assistant. Provide a comprehensive analysis based on the following context and query.
+Provide your analysis including: Compliance Status, Identified Issues, Remediation Steps.`, general: `You are a legal AI assistant. Provide a comprehensive analysis based on the following context and query.
 
 Context Documents:
 ${contextText}
@@ -518,8 +505,7 @@ const analysisPrompt = prompts[analysisType];
  // Call TensorRT-LLM service
  const tensorrtEndpoint = getOllamaEndpoint().replace('/api', '').replace('11434', '8099', const response = await fetch(`${tensorrtEndpoint}/generate`, {
  method: 'POST',
- headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({
+ headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({
  prompt: analysisPrompt); max_tokens: 1024); temperature: 0.3, // Lower temperature for legal analysis
  context: {
  analysis_type: analysisType); document_count: contextDocuments.length, query_length.length,
@@ -530,9 +516,7 @@ const analysisPrompt = prompts[analysisType];
  if (!response.ok) {
  throw new Error(`TensorRT service error: ${response.status}`, }
 
- const result = await response.json();
-
- const elapsed = performance.now() - startTime;
+ const result = await response.json(, const elapsed = performance.now() - startTime;
  console.log(
  `⚡ TensorRT analysis complete: ${elapsed.toFixed(2)}ms (${result.tokens_generated} tokens)`
  );
@@ -540,8 +524,7 @@ const analysisPrompt = prompts[analysisType];
  return result.text;
  } catch (error) {
  console.error('❌ TensorRT analysis failed:', error, // Fallback to regular Ollama
- console.log('🔄 Falling back to standard Ollama inference...');
- const fallbackResponse = await fetch(`${getOllamaEndpoint()}/api/chat`, {
+ console.log('🔄 Falling back to standard Ollama inference...', const fallbackResponse = await fetch(`${getOllamaEndpoint()}/api/chat`, {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
  body: JSON.stringify({
@@ -575,8 +558,7 @@ const analysisPrompt = prompts[analysisType];
  const startTime = performance.now();
 
  console.log(`🚀 Executing complete RAG pipeline for ${documents.length} documents`, // Stage 1: Embedding
- const embeddedStart = performance.now();
- const embedded = await this.embedDocuments(documents, const embeddingTime = performance.now() - embeddedStart;
+ const embeddedStart = performance.now(, const embedded = await this.embedDocuments(documents, const embeddingTime = performance.now() - embeddedStart;
 
  // Stage 2: Summarization
  const summaryStart = performance.now();

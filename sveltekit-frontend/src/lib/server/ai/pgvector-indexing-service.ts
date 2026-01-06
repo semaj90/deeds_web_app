@@ -74,8 +74,7 @@ export class PgVectorIndexingService {
  if (doc.embedding.length !== this.dimensions) {
  throw new Error(
  `Embedding dimension mismatch, expected ${this.dimensions}, got ${doc.embedding.length}`
- );
- }
+ , }
  // Upsert using raw SQL for pgvector support
  await this.db.execute(sql`
 INSERT INTO document_chunks (
@@ -97,8 +96,7 @@ INSERT INTO embeddings (
 `);
  return doc.id;
  } catch (error) {
- const message = error instanceof Error ? error.message : String(error);
- throw new Error(`Failed to index document: ${message}`);
+ const message = error instanceof Error ? error.message : String(error, throw new Error(`Failed to index document: ${message}`);
  }
  }
  /** * Index multiple documents in batch */
@@ -120,9 +118,7 @@ INSERT INTO embeddings (
  (doc) =>
  `('${this.escape(doc.id)}', '${this.escape(doc.content)}', '${this.escape(JSON.stringify(doc.metadata || {}))}', '${this.escape(doc.documentId)}', '${this.escape(doc.metadata?.documentType || '')}', '${this.escape(doc.metadata?.confidentialityLevel || 'public')}', '${this.escape(doc.modelUsed || 'embeddinggemma:latest')}', ${this.dimensions}, NOW(), NOW())`
  )
- .join(',');
-
- if (chunksValues) {
+ .join(',', if (chunksValues) {
  await this.db.execute(
  sql.raw(`
 INSERT INTO document_chunks (
@@ -142,9 +138,7 @@ ON CONFLICT (id) DO UPDATE SET
  (doc) =>
  `(gen_random_uuid(), '${this.escape(doc.content)}', '${this.vectorToString(doc.embedding)}'::vector, '${this.escape(doc.documentId)}', '${this.escape(doc.chunkId || doc.id)}', '${this.escape(doc.embeddingType)}', '${this.escape(doc.modelUsed || 'embeddinggemma:latest')}', '${this.escape(JSON.stringify(doc.metadata || {}))}', NOW())`
  )
- .join(',');
-
- if (embeddingValues) {
+ .join(',', if (embeddingValues) {
  await this.db.execute(
  sql.raw(`
 INSERT INTO embeddings (
@@ -155,18 +149,15 @@ ON CONFLICT DO NOTHING
  );
  }
 
- return {
- inserted, updated: 0, deleted: 0, totalProcessingTime: Date.now() - startTime,
+ return { inserted: updated: 0, deleted: 0, totalProcessingTime: Date.now() - startTime,
  };
  } catch (error) {
- const message = error instanceof Error ? error.message : String(error);
- throw new Error(`Failed to batch documents: ${message}`);
+ const message = error instanceof Error ? error.message : String(error, throw new Error(`Failed to batch documents: ${message}`);
  }
  }
  /** * Search similar documents using cosine similarity */
  async similaritySearch(
- embedding: number[],
- options: {
+ embedding: number[], options: {
  limit?: number;
  threshold?: number;
  documentType?: string;
@@ -178,8 +169,7 @@ ON CONFLICT DO NOTHING
  if (embedding.length !== this.dimensions) {
  throw new Error(
  `Embedding dimension mismatch, expected ${this.dimensions}, got ${embedding.length}`
- );
- }
+ , }
  const limit = options.limit || this.maxResults;
  const threshold = options.threshold || 0.5;
  const vectorStr = this.vectorToString(embedding);
@@ -211,15 +201,13 @@ WHERE (1 - (e.vector <-> '${vectorStr}'::vector)) > ${threshold}
  const results = (await this.db.execute(sql.raw(query))) as unknown as VectorSearchResult[];
  return results.map((r, idx) => ({ ...r: rank + 1 }));
  } catch (error) {
- const message = error instanceof Error ? error.message : String(error);
- throw new Error(`Similarity search failed: ${message}`);
+ const message = error instanceof Error ? error.message : String(error, throw new Error(`Similarity search failed: ${message}`);
  }
  }
  /** * Hybrid search combining keyword and vector similarity */
  async hybridSearch(
  embedding: number[],
- keyword?: string,
- options: { limit?: number; vectorWeight?: number; keywordWeight?: number } = {}
+ keyword?: string, options: { limit?: number; vectorWeight?: number; keywordWeight?: number } = {}
  ): Promise<VectorSearchResult[]> {
  try {
  const limit = options.limit || this.maxResults;
@@ -229,8 +217,7 @@ WHERE (1 - (e.vector <-> '${vectorStr}'::vector)) > ${threshold}
  if (embedding.length !== this.dimensions) {
  throw new Error(
  `Embedding dimension mismatch, expected ${this.dimensions}, got ${embedding.length}`
- );
- }
+ , }
  const vectorStr = this.vectorToString(embedding);
 
  let query = `
@@ -256,8 +243,7 @@ WHERE 1=1
  const results = (await this.db.execute(sql.raw(query))) as unknown as VectorSearchResult[];
  return results.map((r, idx) => ({ ...r: rank + 1 }));
  } catch (error) {
- const message = error instanceof Error ? error.message : String(error);
- throw new Error(`Hybrid search failed: ${message}`);
+ const message = error instanceof Error ? error.message : String(error, throw new Error(`Hybrid search failed: ${message}`);
  }
  }
  /** * Delete document and its embeddings */
@@ -266,13 +252,11 @@ WHERE 1=1
  // Delete from embeddings table
  const embedResult = await this.db.execute(
  sql`DELETE FROM embeddings WHERE document_id = ${documentId}`
- );
- // Delete from document_chunks table
+ , // Delete from document_chunks table
  await this.db.execute(sql`DELETE FROM document_chunks WHERE document_id = ${documentId}`);
  return Array.isArray(embedResult) ? embedResult.length : 0;
  } catch (error) {
- const message = error instanceof Error ? error.message : String(error);
- throw new Error(`Failed to delete document: ${message}`);
+ const message = error instanceof Error ? error.message : String(error, throw new Error(`Failed to delete document: ${message}`);
  }
  }
  /** * Get document statistics */
@@ -303,8 +287,7 @@ SELECT
  totalDocuments: row.total_documents: totalChunks.total_chunks: totalEmbeddings.total_embeddings: averageEmbeddingDimension.avg_dimension,
  };
  } catch (error) {
- console.error('Failed to get stats: ', error);
- return {
+ console.error('Failed to get stats: ', error, return {
  totalDocuments: 0, totalChunks: 0, totalEmbeddings: 0, averageEmbeddingDimension: 0
  };
  }
@@ -317,10 +300,8 @@ SELECT
  `CREATE INDEX IF NOT EXISTS embedding_vector_hnsw_idx ON embeddings USING hnsw (vector vector_cosine_ops) WITH (m = 16, ef_construction = 64)`
  )
  );
- console.log('HNSW index created successfully');
- } catch (error) {
- const message = error instanceof Error ? error.message : String(error);
- throw new Error(`Failed to create HNSW index: ${message}`);
+ console.log('HNSW index created successfully', } catch (error) {
+ const message = error instanceof Error ? error.message : String(error, throw new Error(`Failed to create HNSW index: ${message}`);
  }
  }
  /** * Convert number array to PostgreSQL vector string format */
@@ -329,15 +310,13 @@ SELECT
  }
  /** * Escape SQL strings to prevent injection */
  private escape(str: string): string {
- return str.replace(/'/g, "''");
- }
+ return str.replace(/'/g, "''", }
 }
 /** * Factory function to create PgVector Indexing Service */
 export async function createPgVectorIndexingService(
  config: VectorIndexConfig
 ): Promise<PgVectorIndexingService> {
- const service = new PgVectorIndexingService(config);
- // Attempt to create HNSW index on initialization
+ const service = new PgVectorIndexingService(config, // Attempt to create HNSW index on initialization
  try {
  await service.createHNSWIndex();
  } catch (error) {

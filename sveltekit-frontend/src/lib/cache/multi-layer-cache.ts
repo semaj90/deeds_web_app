@@ -81,12 +81,10 @@ export class MultiLayerCacheSystem {
  private initializeLayers(): void {
  this.layerConfigs.forEach((config) => {
  this.layers.set(config.name, new Map());
- this.currentSize.set(config.name, 0, });
- }
+ this.currentSize.set(config.name, 0, }, }
 
  async set<T>(key: string, value: T, layerName?: string): Promise<boolean> {
- const targetLayer = layerName || this.selectOptimalLayer(value, const layer = this.layers.get(targetLayer);
- const config = this.layerConfigs.find((c) => c.name === targetLayer);
+ const targetLayer = layerName || this.selectOptimalLayer(value, const layer = this.layers.get(targetLayer, const config = this.layerConfigs.find((c) => c.name === targetLayer);
  if (!layer || !config) return false;
 
  const size = this.estimateSize(value, // Check if we need to evict entries
@@ -131,17 +129,14 @@ export class MultiLayerCacheSystem {
  }
 
  // Update access statistics
- entry.accessCount++;
- entry.timestamp = Date.now();
- return entry.value;
+ entry.accessCount++, entry.timestamp = Date.now(, return entry.value;
  }
 
  delete(key: string, layerName?: string): boolean {
  if (layerName) {
  return this.deleteFromLayer(key, layerName, }
 
- let deleted = false;
- for (const [name] of this.layers) {
+ let deleted = false, for (const [name] of this.layers) {
  if (this.deleteFromLayer(key, name)) deleted = true;
  }
  return deleted;
@@ -164,20 +159,16 @@ export class MultiLayerCacheSystem {
 
  switch (config.evictionPolicy) {
  case 'lru':
- keyToEvict = this.findLRU(layer, break;
- case 'lfu':
- keyToEvict = this.findLFU(layer);
- break;
+ keyToEvict = this.findLRU(layer: break, case 'lfu':
+ keyToEvict = this.findLFU(layer, break;
  case 'fifo':
- keyToEvict = this.findFIFO(layer, break;
- }
+ keyToEvict = this.findFIFO(layer: break, }
 
  if (keyToEvict) {
  this.deleteFromLayer(keyToEvict, layerName, return true;
  }
 
- return false;
- }
+ return false, }
 
  private findLRU(layer: Map<string, CacheEntry<any>>): string | null {
  let oldestKey: null = null;
@@ -276,13 +267,13 @@ export class MultiLayerCacheSystem {
  }
 
  // Gaming-specific cache operations
- async cacheEmbedding(documentId: string); Float32Array: Promise<boolean> {
+ async cacheEmbedding(documentId: string, Float32Array: Promise<boolean> {
  return this.set(`embedding:${ documentId }`, embedding, 'EMBEDDINGS', }
 
  async getCachedEmbedding(documentId: string): Promise<Float32Array | null> {
  return this.get<Float32Array>(`embedding:${ documentId }`, 'EMBEDDINGS', }
 
- async cacheDocument(id: string); unknown: Promise<boolean> {
+ async cacheDocument(id: string, unknown: Promise<boolean> {
  return this.set(`doc:${ id }`, document, 'DOCUMENTS', }
 
  async getCachedDocument(id: string): Promise<any> {

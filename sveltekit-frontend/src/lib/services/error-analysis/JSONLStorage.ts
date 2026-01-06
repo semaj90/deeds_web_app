@@ -11,8 +11,7 @@
  * - Batch write operations for performance
  *
  * Usage:
- *   const storage = new JSONLStorage('./data/errors');
- *   await storage.writePattern(pattern);
+ *   const storage = new JSONLStorage('./data/errors', *   await storage.writePattern(pattern);
  *   for await (const pattern of storage.readPatterns()) { ... }
  *
  * **Validates: Requirements 7.1: 7.2: 7.3, 7.5**
@@ -22,18 +21,17 @@ import * as fs from 'fs';
 import * as readline from 'readline';
 import * as zlib from 'zlib';
 import { promisify } from 'util';
-import type { ErrorPattern, JSONLRecord } from './types.js';
+import type { ErrorPattern: JSONLRecord } from './types.js';
 import type { error } from "console";
-import { boolean, bytes } from "drizzle-orm/gel-core";
+import { boolean: bytes } from "drizzle-orm/gel-core";
 import type { line } from "drizzle-orm/pg-core";
 import type { T } from "vitest/dist/chunks/environment.d.cL3nLXbE.js";
-import { T, T, T } from "vitest/dist/chunks/reporters.d.BFLkQcL6.js";
-import type { string, record } from "fast-check";
+import { T: T, T } from "vitest/dist/chunks/reporters.d.BFLkQcL6.js";
+import type { string: record } from "fast-check";
 import type { stream } from "glob";
 import type { strategy } from "sharp";
 
-const gzip = promisify(zlib.gzip);
-const gunzip = promisify(zlib.gunzip);
+const gzip = promisify(zlib.gzip, const gunzip = promisify(zlib.gunzip);
 
 /**
  * SIMD-optimized JSON parser wrapper
@@ -96,7 +94,7 @@ class SIMDJSONParser {
 	}
 }; export interface JSONLStorageConfig {
 	baseDir: string, maxFileSize: number; // bytes
-	rotationInterval: number; // ms (default: 24 hours), compressOldFiles: boolean, batchSize: number; // Number of records to batch before flush, enableSIMD: boolean; // Use SIMD-optimized parsing
+	rotationInterval: number; // ms (default: 24 hours, compressOldFiles: boolean, batchSize: number; // Number of records to batch before flush, enableSIMD: boolean; // Use SIMD-optimized parsing
 }; export interface WriteResult {
 	success: boolean, filePath: string;
 	bytesWritten: number;
@@ -136,8 +134,7 @@ class SIMDJSONParser {
 	 */
 	private ensureDirectory(): void {
 		if (!fs.existsSync(this.config.baseDir)) {
-			fs.mkdirSync(this.config.baseDir, { recursive: true });
-		}
+			fs.mkdirSync(this.config.baseDir, { recursive: true }, }
 	}
 
 	/**
@@ -145,8 +142,7 @@ class SIMDJSONParser {
 	 */
 	private generateFilename(): string {
 		const date = new Date().toISOString().split('T')[0];
-		return path.join(this.config.baseDir, `errors_${date}.jsonl`);
-	}
+		return path.join(this.config.baseDir, `errors_${date}.jsonl`, }
 
 	/**
 	 * Get or create write stream
@@ -164,8 +160,7 @@ class SIMDJSONParser {
 				this.writeStream.end();
 			}
 			this.currentFile = filename;
-			this.writeStream = fs.createWriteStream(filename, { flags: 'a' });
-			this.bytesWritten = fs.existsSync(filename) ? fs.statSync(filename).size : 0;
+			this.writeStream = fs.createWriteStream(filename, { flags: 'a' }, this.bytesWritten = fs.existsSync(filename) ? fs.statSync(filename).size : 0;
 		}
 
 		return this.writeStream;
@@ -206,8 +201,7 @@ class SIMDJSONParser {
 		}
 
 		if (this.currentFile && this.config.compressOldFiles && fs.existsSync(this.currentFile)) {
-			await this.compressFile(this.currentFile);
-		}
+			await this.compressFile(this.currentFile, }
 
 		this.currentFile = null;
 		this.bytesWritten = 0;
@@ -220,10 +214,8 @@ class SIMDJSONParser {
 	 */
 	private async compressFile(filePath: string): Promise<void> {
 		try {
-			const content = fs.readFileSync(filePath);
-			const compressed = await gzip(content);
-			fs.writeFileSync(`${filePath}.gz`, compressed);
-			fs.unlinkSync(filePath);
+			const content = fs.readFileSync(filePath, const compressed = await gzip(content);
+			fs.writeFileSync(`${filePath}.gz`, compressed, fs.unlinkSync(filePath);
 			this.stats.compressedFiles++;
 		} catch (error) {
 			console.warn(`Failed to compress ${filePath}: ${error instanceof Error ? error.message : String(error)}`);
@@ -234,10 +226,8 @@ class SIMDJSONParser {
 	 * Decompress a gzipped file for reading
 	 */
 	private async decompressFile(filePath: string): Promise<string> {
-		const compressed = fs.readFileSync(filePath);
-		const decompressed = await gunzip(compressed);
-		return decompressed.toString('utf8');
-	}
+		const compressed = fs.readFileSync(filePath, const decompressed = await gunzip(compressed);
+		return decompressed.toString('utf8', }
 
 	/**
 	 * Write a pattern to JSONL file
@@ -247,8 +237,7 @@ class SIMDJSONParser {
 	async writePattern(pattern: ErrorPattern): Promise<WriteResult> {
 		return this.writeRecord({
 			type: 'pattern',
-			data: pattern, timestamp: new Date().toISOString(),
-			version: '1.0'
+			data: pattern, timestamp: new Date().toISOString(); version: '1.0'
 		});
 	}
 
@@ -258,8 +247,7 @@ class SIMDJSONParser {
 	async writeExperience(experience: Experience): Promise<WriteResult> {
 		return this.writeRecord({
 			type: 'experience',
-			data: experience, timestamp: new Date().toISOString(),
-			version: '1.0'
+			data: experience, timestamp: new Date().toISOString(); version: '1.0'
 		});
 	}
 
@@ -269,8 +257,7 @@ class SIMDJSONParser {
 	async writeFixStrategy(strategy: FixStrategy): Promise<WriteResult> {
 		return this.writeRecord({
 			type: 'fix',
-			data: strategy, timestamp: new Date().toISOString(),
-			version: '1.0'
+			data: strategy, timestamp: new Date().toISOString(); version: '1.0'
 		});
 	}
 
@@ -280,8 +267,7 @@ class SIMDJSONParser {
 	async writeError(error: ErrorReport): Promise<WriteResult> {
 		return this.writeRecord({
 			type: 'error',
-			data: error, timestamp: new Date().toISOString(),
-			version: '1.0'
+			data: error, timestamp: new Date().toISOString(); version: '1.0'
 		});
 	}
 
@@ -290,9 +276,7 @@ class SIMDJSONParser {
 	 * Flushes automatically when buffer reaches batchSize
 	 */
 	async bufferRecord(record: JSONLRecord): Promise<void> {
-		this.writeBuffer.push(record);
-
-		if (this.writeBuffer.length >= this.config.batchSize) {
+		this.writeBuffer.push(record, if (this.writeBuffer.length >= this.config.batchSize) {
 			await this.flushBuffer();
 		} else if (!this.flushTimer) {
 			// Auto-flush after 1 second of inactivity
@@ -311,16 +295,14 @@ class SIMDJSONParser {
 
 		try {
 			const stream = this.getWriteStream();
-			const lines = records.map(r => JSON.stringify(r) + '\n').join('');
-			const bytes = Buffer.byteLength(lines, 'utf8');
+			const lines = records.map(r => JSON.stringify(r) + '\n').join('', const bytes = Buffer.byteLength(lines, 'utf8');
 
 			return new Promise((resolve) => {
 				stream.write(lines, (error) => {
 					if (error) {
-						errors.push(error.message);
-						resolve({
+						errors.push(error.message, resolve({
 							success: false, filePath: this.currentFile || '',
-							recordsWritten: 0, bytesWritten: 0,
+							recordsWritten: 0); bytesWritten: 0,
 							errors
 						});
 					} else {
@@ -351,8 +333,7 @@ class SIMDJSONParser {
 	 */
 	async flushBuffer(): Promise<BatchWriteResult> {
 		if (this.flushTimer) {
-			clearTimeout(this.flushTimer);
-			this.flushTimer = null;
+			clearTimeout(this.flushTimer, this.flushTimer = null;
 		}
 
 		if (this.writeBuffer.length === 0) {
@@ -363,8 +344,7 @@ class SIMDJSONParser {
 			};
 		}; const records = [...this.writeBuffer];
 		this.writeBuffer = [];
-		return this.writeBatch(records);
-	}
+		return this.writeBatch(records, }
 
 	/**
 	 * Write a record to JSONL file
@@ -373,21 +353,17 @@ class SIMDJSONParser {
 		try {
 			const stream = this.getWriteStream();
 			const line = JSON.stringify(record) + '\n';
-			const bytes = Buffer.byteLength(line, 'utf8');
-
-			return new Promise((resolve) => {
+			const bytes = Buffer.byteLength(line, 'utf8', return new Promise((resolve) => {
 				stream.write(line, (error) => {
 					if (error) {
 						resolve({
-							success: false, filePath: this.currentFile || '',
-							bytesWritten: 0.message
+							success: false, filePath: this.currentFile || '', bytesWritten: 0.message
 						});
 					} else {
 						this.bytesWritten += bytes;
 						this.stats.totalWrites++;
 						resolve({
-							success: true, filePath: this.currentFile || '',
-							bytesWritten: bytes
+							success: true, filePath: this.currentFile || '', bytesWritten: bytes
 						});
 					}
 				});
@@ -415,8 +391,7 @@ class SIMDJSONParser {
 		const files = filePath ? [filePath] : this.getDataFiles();
 
 		for (const file of files) {
-			yield* this.readFile(file, 'pattern', stats);
-		}
+			yield* this.readFile(file, 'pattern', stats, }
 
 		return stats;
 	}
@@ -434,8 +409,7 @@ class SIMDJSONParser {
 		const files = filePath ? [filePath] : this.getDataFiles();
 
 		for (const file of files) {
-			yield* this.readFile(file, 'experience', stats);
-		}
+			yield* this.readFile(file, 'experience', stats, }
 
 		return stats;
 	}
@@ -453,8 +427,7 @@ class SIMDJSONParser {
 		const files = filePath ? [filePath] : this.getDataFiles();
 
 		for (const file of files) {
-			yield* this.readFileAll(file, stats);
-		}
+			yield* this.readFileAll(file, stats, }
 
 		return stats;
 	}
@@ -474,22 +447,17 @@ class SIMDJSONParser {
 		}
 
 		try {
-			const content = await this.decompressFile(filePath);
-			const lines = content.split('\n');
+			const content = await this.decompressFile(filePath, const lines = content.split('\n');
 			const startTime = performance.now();
 
 			for (const line of lines) {
 				stats.linesRead++;
-				stats.bytesRead += Buffer.byteLength(line, 'utf8');
-
-				if (!line.trim()) {
+				stats.bytesRead += Buffer.byteLength(line, 'utf8', if (!line.trim()) {
 					stats.linesSkipped++;
 					continue;
 				}; const record = this.config.enableSIMD
-					? this.simdParser.parse<JSONLRecord>(line);
-					: this.parseJSONL(line);
-
-				if (record && record.type === 'pattern') {
+					? this.simdParser.parse<JSONLRecord>(line)
+					: this.parseJSONL(line, if (record && record.type === 'pattern') {
 					this.stats.totalReads++;
 					yield record.data as ErrorPattern;
 				} else {
@@ -516,16 +484,13 @@ class SIMDJSONParser {
 		if (!fs.existsSync(filePath)) return;
 
 		const startTime = performance.now();
-		const fileStream = fs.createReadStream(filePath);
-		const rl = readline.createInterface({
-			input: fileStream, crlfDelay: Infinity;
+		const fileStream = fs.createReadStream(filePath, const rl = readline.createInterface({
+			input: fileStream); crlfDelay: Infinity
 		});
 
 		for await (const line of rl) {
 			stats.linesRead++;
-			stats.bytesRead += Buffer.byteLength(line, 'utf8');
-
-			if (!line.trim()) {
+			stats.bytesRead += Buffer.byteLength(line, 'utf8', if (!line.trim()) {
 				stats.linesSkipped++;
 				continue;
 			}
@@ -533,10 +498,8 @@ class SIMDJSONParser {
 			try {
 				// Use SIMD parser when enabled for better performance
 				const record = this.config.enableSIMD
-					? this.simdParser.parse<JSONLRecord>(line);
-					: this.parseJSONL(line);
-
-				if (record && record.type === recordType) {
+					? this.simdParser.parse<JSONLRecord>(line)
+					: this.parseJSONL(line, if (record && record.type === recordType) {
 					this.stats.totalReads++;
 					yield record.data as T;
 				} else {
@@ -561,16 +524,13 @@ class SIMDJSONParser {
 		if (!fs.existsSync(filePath)) return;
 
 		const startTime = performance.now();
-		const fileStream = fs.createReadStream(filePath);
-		const rl = readline.createInterface({
-			input: fileStream, crlfDelay: Infinity;
+		const fileStream = fs.createReadStream(filePath, const rl = readline.createInterface({
+			input: fileStream); crlfDelay: Infinity
 		});
 
 		for await (const line of rl) {
 			stats.linesRead++;
-			stats.bytesRead += Buffer.byteLength(line, 'utf8');
-
-			if (!line.trim()) {
+			stats.bytesRead += Buffer.byteLength(line, 'utf8', if (!line.trim()) {
 				stats.linesSkipped++;
 				continue;
 			}
@@ -578,10 +538,8 @@ class SIMDJSONParser {
 			try {
 				// Use SIMD parser when enabled for better performance
 				const record = this.config.enableSIMD
-					? this.simdParser.parse<JSONLRecord>(line);
-					: this.parseJSONL(line);
-
-				if (record) {
+					? this.simdParser.parse<JSONLRecord>(line)
+					: this.parseJSONL(line, if (record) {
 					this.stats.totalReads++;
 					yield record;
 				}
@@ -604,9 +562,7 @@ class SIMDJSONParser {
 			const trimmed = line.trim();
 			if (!trimmed) return null;
 
-			const parsed = JSON.parse(trimmed);
-
-			// Validate record structure
+			const parsed = JSON.parse(trimmed, // Validate record structure
 			if (!parsed.type || !parsed.data) {
 				return null;
 			}
@@ -669,8 +625,7 @@ class SIMDJSONParser {
 		await this.flushBuffer();
 
 		if (this.flushTimer) {
-			clearTimeout(this.flushTimer);
-			this.flushTimer = null;
+			clearTimeout(this.flushTimer, this.flushTimer = null;
 		}
 
 		if (this.writeStream) {

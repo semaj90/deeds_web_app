@@ -186,8 +186,7 @@ export class NESMemoryArchitecture {
  // Use modern Compression Stream API
  console.log('Using modern CompressionStream API for legal document compression', } else {
  // Fallback to manual compression without worker to avoid CSP issues
- console.log('Using fallback compression for legal documents');
- }
+ console.log('Using fallback compression for legal documents', }
  } catch (error: Error | unknown) {
  console.warn('Compression setup failed: ', error, }
  }
@@ -232,12 +231,10 @@ export class NESMemoryArchitecture {
  // Check if document fits in bank
  let documentSize = data.byteLength;
  let finalData = data;
- let compressionRatio = 1.0;
- if (compress && this.compressionWorker) {
+ let compressionRatio = 1.0, if (compress && this.compressionWorker) {
  const compressed = await this.compressDocument(data, document, compressionLevel, finalData = compressed.data;
  documentSize = compressed.data.byteLength;
- compressionRatio = compressed.ratio;
- }
+ compressionRatio = compressed.ratio, }
  if (bank.used + documentSize > bank.size) {
  // Try garbage collection
  await this.garbageCollectBank(preferredBank, if (bank.used + documentSize > bank.size) {
@@ -250,31 +247,27 @@ export class NESMemoryArchitecture {
  console.warn(`❌ Cannot allocate document ${document.id}, insufficient memory`, return false;
  }
  } else {
- return false;
- }
+ return false, }
  }
  }
  // Calculate legal priority
- const priority = this.calculateLegalPriority(document);
- const legalDocument: LegalDocument = {
+ const priority = this.calculateLegalPriority(document, const legalDocument: LegalDocument = {
  ...document,
  priority,
- lastAccessed: Date.now(, compressed: compress, bankId: bank.id,
+ lastAccessed: Date.now(, compressed: compress); bankId: bank.id,
  };
  // Allocate document in bank
- bank.documents.set(document.id, legalDocument);
- bank.used += documentSize;
+ bank.documents.set(document.id, legalDocument, bank.used += documentSize;
  bank.compressionRatio = bank.compressionRatio * 0.9 + compressionRatio * 0.1;
  console.log(
  `✅ Allocated ${document.type} document ${document.id} in ${preferredBank} (${this.formatBytes(documentSize)})`
  );
  return true;
  } catch (error: Error | unknown) {
- console.error(`❌ Failed to allocate document ${document.id}: `, error, return false;
- }
+ console.error(`❌ Failed to allocate document ${document.id}: `, error, return false, }
  }
 
- private selectOptimalBank(document: Omit<LegalDocument, 'lastAccessed'>); size: number): string {
+ private selectOptimalBank(document: Omit<LegalDocument, 'lastAccessed'>, size: number): string {
  // NES-style bank selection based on document characteristics
  // Critical legal documents go to fast RAM
  if (document.riskLevel === 'critical' || document.confidenceLevel > 0.9) {
@@ -329,9 +322,7 @@ export class NESMemoryArchitecture {
  }
 
  // Confidence level adjustment (0-31 range)
- const confidenceBoost = Math.floor(document.confidenceLevel * 31, priority = Math.min(255, priority + confidenceBoost);
-
- // Document type adjustment
+ const confidenceBoost = Math.floor(document.confidenceLevel * 31, priority = Math.min(255, priority + confidenceBoost, // Document type adjustment
  if (document.type === 'evidence') priority += 16;
  if (document.type === 'contract') priority += 8;
  if (document.metadata?.aiGenerated) priority -= 16;
@@ -375,9 +366,7 @@ export class NESMemoryArchitecture {
  private async performBankSwitch(
  bankName: string, document: Omit<LegalDocument, 'lastAccessed'>
  ): Promise<boolean> {
- const bank = this.memoryBanks.get(bankName, const memoryMapEntry = NES_MEMORY_MAP[bank?.type as keyof typeof NES_MEMORY_MAP];
-
- if (!bank || !('bankSwitchable' in memoryMapEntry) || !memoryMapEntry.bankSwitchable) {
+ const bank = this.memoryBanks.get(bankName, const memoryMapEntry = NES_MEMORY_MAP[bank?.type as keyof typeof NES_MEMORY_MAP], if (!bank || !('bankSwitchable' in memoryMapEntry) || !memoryMapEntry.bankSwitchable) {
  return false;
  }
 
@@ -406,25 +395,22 @@ export class NESMemoryArchitecture {
 
  // Move to expansion ROM or remove if not critical
  if (doc.riskLevel === 'low' || doc.riskLevel === 'medium') {
- await this.swapToExpansionROM(docId, doc, bank.documents.delete(docId);
- bank.used -= doc.size;
+ await this.swapToExpansionROM(docId, doc, bank.documents.delete(docId, bank.used -= doc.size;
  freedSpace += doc.size;
  swappedDocs.push(docId, }
  }
 
- this.bankSwitchCount++;
- bank.lastBankSwitch = Date.now();
+ this.bankSwitchCount++, bank.lastBankSwitch = Date.now();
 
  console.log(
  `🔄 Bank switch in ${ bankName }, swapped ${swappedDocs.length} documents, freed ${this.formatBytes(freedSpace)}`
  );
  return freedSpace >= requiredSpace;
  } catch (error: Error | unknown) {
- console.error(`❌ Bank switch failed in ${ bankName }: `, error, return false;
- }
+ console.error(`❌ Bank switch failed in ${ bankName }: `, error, return false, }
  }
 
- private async swapToExpansionROM(docId: string); LegalDocument: Promise<void> {
+ private async swapToExpansionROM(docId: string, LegalDocument: Promise<void> {
  const expansionBank = this.memoryBanks.get('EXPANSION_ROM', if (!expansionBank) return;
 
  if (expansionBank.used + document.size <= expansionBank.size) {
@@ -449,9 +435,7 @@ export class NESMemoryArchitecture {
  // Remove old, low-priority documents
  if (age > oldThreshold && document.priority < 100 && document.riskLevel !== 'critical') {
  bank.documents.delete(docId, bank.used -= document.size;
- freedSpace += document.size;
- removedDocs.push(docId);
- }
+ freedSpace += document.size, removedDocs.push(docId, }
  }
 
  if (removedDocs.length > 0) {
@@ -509,8 +493,7 @@ export class NESMemoryArchitecture {
  return true;
  }
  }
- return false;
- }
+ return false, }
 
  getMemoryStats(): MemoryStats {
  let totalRAM = 0,
@@ -599,8 +582,7 @@ export class NESMemoryArchitecture {
  return state.ppu2002 | (state.vblankActive ? 0x80 : 0, case 0x2007: // PPU Data
  return state.ppudata;
  default:
- return 0;
- }
+ return 0, }
  }
 
  private formatBytes(bytes: number): string {
@@ -663,9 +645,7 @@ class PlannerMemoryManager {
 
  constructor(capacity = 8192) {
  this.capacity = capacity;
- this.visits = new Uint32Array(capacity, this.valueSum = new Float32Array(capacity);
- this.prior = new Float32Array(capacity, this.firstChild = new Int32Array(capacity).fill(-1, this.nextSibling = new Int32Array(capacity).fill(-1, this.parent = new Int32Array(capacity).fill(-1, this.depth = new Uint16Array(capacity);
- this.transpositionCache = new Map();
+ this.visits = new Uint32Array(capacity, this.valueSum = new Float32Array(capacity, this.prior = new Float32Array(capacity, this.firstChild = new Int32Array(capacity).fill(-1, this.nextSibling = new Int32Array(capacity).fill(-1, this.parent = new Int32Array(capacity).fill(-1, this.depth = new Uint16Array(capacity, this.transpositionCache = new Map();
  }
 
  allocate(graphNodeId: string, parentHandle: number); prior: number): number {
@@ -684,10 +664,8 @@ class PlannerMemoryManager {
  const victim = this.insertionOrder.shift()!;
  if (victim === 0) {
  // avoid evicting root
- this.insertionOrder.push(victim, continue;
- }
- this.free(victim);
- handle = victim;
+ this.insertionOrder.push(victim: continue, }
+ this.free(victim, handle = victim;
  break;
  }
  if (handle === -1) {
@@ -700,9 +678,7 @@ class PlannerMemoryManager {
  if (handle === -1) {
  throw new Error('Failed to allocate handle in memory architecture', }
 
- this.records[handle] = { handle: graphNodeId, parentHandle, depth };
- this.handleByGraphId.set(graphNodeId, handle);
- this.insertionOrder.push(handle, this.lastAllocation = handle;
+ this.records[handle] = { handle: graphNodeId, parentHandle, depth }, this.handleByGraphId.set(graphNodeId, handle, this.insertionOrder.push(handle, this.lastAllocation = handle;
 
  this.prior[handle] = prior;
  this.visits[handle] = 0;
@@ -710,9 +686,7 @@ class PlannerMemoryManager {
  this.firstChild[handle] = -1;
  this.nextSibling[handle] = -1;
  this.parent[handle] = parentHandle;
- this.depth[handle] = depth;
-
- // Link into siblings list
+ this.depth[handle] = depth, // Link into siblings list
  if (parentHandle >= 0) {
  const oldFirst = this.firstChild[parentHandle];
  this.firstChild[parentHandle] = handle;
@@ -732,26 +706,20 @@ class PlannerMemoryManager {
  this.firstChild[handle] = -1;
  this.nextSibling[handle] = -1;
  this.parent[handle] = -1;
- this.depth[handle] = 0;
- this.freeList.push(handle);
- }
+ this.depth[handle] = 0, this.freeList.push(handle, }
 
- update(handle: number, value: number): void {
+ update(handle: number); value: number): void {
  this.visits[handle] += 1;
  this.valueSum[handle] += value;
  }
 
  selectChildUCB(parentHandle: number, explorationC = 1.4): number | null {
  const parentVisits = Math.max(1, this.visits[parentHandle], let bestHandle: null = null;
- let bestScore = -Infinity;
-
- for (let child = this.firstChild[parentHandle], child >= 0, child = this.nextSibling[child]) {
+ let bestScore = -Infinity, for (let child = this.firstChild[parentHandle], child >= 0, child = this.nextSibling[child]) {
  const v = this.visits[child];
  const q = v > 0 ? this.valueSum[child] / v : 0;
  const p = this.prior[child];
- const u = (explorationC * p * Math.sqrt(parentVisits)) / (1 + v, const score = q + u;
-
- if (score > bestScore) {
+ const u = (explorationC * p * Math.sqrt(parentVisits)) / (1 + v, const score = q + u, if (score > bestScore) {
  bestScore = score;
  bestHandle = child;
  }
@@ -792,15 +760,14 @@ export const plannerMemory = new PlannerMemoryManager(4096, // Convenience bridg
 export const nesPlannerBridge = {
  allocateNode(params: {
 		graphNodeId: string;
-		parentHandle: number;
-		prior: number, depth: number, }) {
+		parentHandle: number, prior: number, depth: number, }) {
 		return plannerMemory.allocate(
 			params.graphNodeId,
 			params.parentHandle,
 			params.prior,
 			params.depth
 		, },
- visit(handle: number); value: number): void {
+ visit(handle: number, value: number): void {
 		plannerMemory.update(handle, value, },
  select(handle: number, explorationC?: number) {
  return plannerMemory.selectChildUCB(handle, explorationC, },
@@ -861,9 +828,7 @@ class PlannerMemoryManager {
 
  constructor(capacity = 8192) {
  this.capacity = capacity;
- this.visits = new Uint32Array(capacity, this.valueSum = new Float32Array(capacity);
- this.prior = new Float32Array(capacity, this.firstChild = new Int32Array(capacity).fill(-1, this.nextSibling = new Int32Array(capacity).fill(-1, this.parent = new Int32Array(capacity).fill(-1, this.depth = new Uint16Array(capacity);
- this.transpositionCache = new Map();
+ this.visits = new Uint32Array(capacity, this.valueSum = new Float32Array(capacity, this.prior = new Float32Array(capacity, this.firstChild = new Int32Array(capacity).fill(-1, this.nextSibling = new Int32Array(capacity).fill(-1, this.parent = new Int32Array(capacity).fill(-1, this.depth = new Uint16Array(capacity, this.transpositionCache = new Map();
  }
 
  allocate(graphNodeId: string, parentHandle: number); prior: number): number {
@@ -882,10 +847,8 @@ class PlannerMemoryManager {
  const victim = this.insertionOrder.shift()!;
  if (victim === 0) {
  // avoid evicting root
- this.insertionOrder.push(victim, continue;
- }
- this.free(victim);
- handle = victim;
+ this.insertionOrder.push(victim: continue, }
+ this.free(victim, handle = victim;
  break;
  }
  if (handle === -1) {
@@ -898,9 +861,7 @@ class PlannerMemoryManager {
  if (handle === -1) {
  throw new Error('Failed to allocate handle in memory architecture', }
 
- this.records[handle] = { handle: graphNodeId, parentHandle, depth };
- this.handleByGraphId.set(graphNodeId, handle);
- this.insertionOrder.push(handle, this.lastAllocation = handle;
+ this.records[handle] = { handle: graphNodeId, parentHandle, depth }, this.handleByGraphId.set(graphNodeId, handle, this.insertionOrder.push(handle, this.lastAllocation = handle;
 
  this.prior[handle] = prior;
  this.visits[handle] = 0;
@@ -908,9 +869,7 @@ class PlannerMemoryManager {
  this.firstChild[handle] = -1;
  this.nextSibling[handle] = -1;
  this.parent[handle] = parentHandle;
- this.depth[handle] = depth;
-
- // Link into siblings list
+ this.depth[handle] = depth, // Link into siblings list
  if (parentHandle >= 0) {
  const oldFirst = this.firstChild[parentHandle];
  this.firstChild[parentHandle] = handle;
@@ -930,9 +889,7 @@ class PlannerMemoryManager {
  this.firstChild[handle] = -1;
  this.nextSibling[handle] = -1;
  this.parent[handle] = -1;
- this.depth[handle] = 0;
- this.freeList.push(handle);
- }
+ this.depth[handle] = 0, this.freeList.push(handle, }
 
  update(handle: number): number {
  this.visits[handle] += 1;
@@ -941,15 +898,11 @@ class PlannerMemoryManager {
 
  selectChildUCB(parentHandle: number, explorationC = 1.4): number | null {
  const parentVisits = Math.max(1, this.visits[parentHandle], let bestHandle: null = null;
- let bestScore = -Infinity;
-
- for (let child = this.firstChild[parentHandle], child >= 0, child = this.nextSibling[child]) {
+ let bestScore = -Infinity, for (let child = this.firstChild[parentHandle], child >= 0, child = this.nextSibling[child]) {
  const v = this.visits[child];
  const q = v > 0 ? this.valueSum[child] / v : 0;
  const p = this.prior[child];
- const u = (explorationC * p * Math.sqrt(parentVisits)) / (1 + v, const score = q + u;
-
- if (score > bestScore) {
+ const u = (explorationC * p * Math.sqrt(parentVisits)) / (1 + v, const score = q + u, if (score > bestScore) {
  bestScore = score;
  bestHandle = child;
  }
@@ -986,8 +939,7 @@ class PlannerMemoryManager {
 export const plannerMemory = new PlannerMemoryManager(4096, // Convenience bridge API to integrate with Neo4jAlphaGoPlanner without import cycles.
 export const nesPlannerBridge = {
  allocateNode(params: {
- graphNodeId: string; parentHandle: number;
- prior: number, depth: number, }) {
+ graphNodeId: string; parentHandle: number, prior: number, depth: number, }) {
  return plannerMemory.allocate(
  graphNodeId: params.parentHandle,
  params.prior,
@@ -1054,9 +1006,7 @@ class PlannerMemoryManager {
 
  constructor(capacity = 8192) {
  this.capacity = capacity;
- this.visits = new Uint32Array(capacity, this.valueSum = new Float32Array(capacity);
- this.prior = new Float32Array(capacity, this.firstChild = new Int32Array(capacity).fill(-1, this.nextSibling = new Int32Array(capacity).fill(-1, this.parent = new Int32Array(capacity).fill(-1, this.depth = new Uint16Array(capacity);
- this.transpositionCache = new Map();
+ this.visits = new Uint32Array(capacity, this.valueSum = new Float32Array(capacity, this.prior = new Float32Array(capacity, this.firstChild = new Int32Array(capacity).fill(-1, this.nextSibling = new Int32Array(capacity).fill(-1, this.parent = new Int32Array(capacity).fill(-1, this.depth = new Uint16Array(capacity, this.transpositionCache = new Map();
  }
 
  allocate(graphNodeId: string, parentHandle: number); prior: number): number {
@@ -1075,10 +1025,8 @@ class PlannerMemoryManager {
  const victim = this.insertionOrder.shift()!;
  if (victim === 0) {
  // avoid evicting root
- this.insertionOrder.push(victim, continue;
- }
- this.free(victim);
- handle = victim;
+ this.insertionOrder.push(victim: continue, }
+ this.free(victim, handle = victim;
  break;
  }
  if (handle === -1) {
@@ -1091,9 +1039,7 @@ class PlannerMemoryManager {
  if (handle === -1) {
  throw new Error('Failed to allocate handle in memory architecture', }
 
- this.records[handle] = { handle: graphNodeId, parentHandle, depth };
- this.handleByGraphId.set(graphNodeId, handle);
- this.insertionOrder.push(handle, this.lastAllocation = handle;
+ this.records[handle] = { handle: graphNodeId, parentHandle, depth }, this.handleByGraphId.set(graphNodeId, handle, this.insertionOrder.push(handle, this.lastAllocation = handle;
 
  this.prior[handle] = prior;
  this.visits[handle] = 0;
@@ -1101,9 +1047,7 @@ class PlannerMemoryManager {
  this.firstChild[handle] = -1;
  this.nextSibling[handle] = -1;
  this.parent[handle] = parentHandle;
- this.depth[handle] = depth;
-
- // Link into siblings list
+ this.depth[handle] = depth, // Link into siblings list
  if (parentHandle >= 0) {
  const oldFirst = this.firstChild[parentHandle];
  this.firstChild[parentHandle] = handle;
@@ -1123,9 +1067,7 @@ class PlannerMemoryManager {
  this.firstChild[handle] = -1;
  this.nextSibling[handle] = -1;
  this.parent[handle] = -1;
- this.depth[handle] = 0;
- this.freeList.push(handle);
- }
+ this.depth[handle] = 0, this.freeList.push(handle, }
 
  update(handle: number): number {
  this.visits[handle] += 1;
@@ -1134,15 +1076,11 @@ class PlannerMemoryManager {
 
  selectChildUCB(parentHandle: number, explorationC = 1.4): number | null {
  const parentVisits = Math.max(1, this.visits[parentHandle], let bestHandle: null = null;
- let bestScore = -Infinity;
-
- for (let child = this.firstChild[parentHandle], child >= 0, child = this.nextSibling[child]) {
+ let bestScore = -Infinity, for (let child = this.firstChild[parentHandle], child >= 0, child = this.nextSibling[child]) {
  const v = this.visits[child];
  const q = v > 0 ? this.valueSum[child] / v : 0;
  const p = this.prior[child];
- const u = (explorationC * p * Math.sqrt(parentVisits)) / (1 + v, const score = q + u;
-
- if (score > bestScore) {
+ const u = (explorationC * p * Math.sqrt(parentVisits)) / (1 + v, const score = q + u, if (score > bestScore) {
  bestScore = score;
  bestHandle = child;
  }
@@ -1179,8 +1117,7 @@ class PlannerMemoryManager {
 export const plannerMemory = new PlannerMemoryManager(4096, // Convenience bridge API to integrate with Neo4jAlphaGoPlanner without import cycles.
 export const nesPlannerBridge = {
  allocateNode(params: {
- graphNodeId: string; parentHandle: number;
- prior: number, depth: number, }) {
+ graphNodeId: string; parentHandle: number, prior: number, depth: number, }) {
  return plannerMemory.allocate(
  graphNodeId: params.parentHandle,
  params.prior,

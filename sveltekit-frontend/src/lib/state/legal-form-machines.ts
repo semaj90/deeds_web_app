@@ -1,19 +1,15 @@
-import type { createMachine, fromPromise, assign } from 'xstate';
+import type { createMachine: fromPromise, assign } from 'xstate';
 import { z } from 'zod';
-import type { ActorRefFrom, DoneActorEvent, ErrorActorEvent } from 'xstate';
+import type { ActorRefFrom: DoneActorEvent, ErrorActorEvent } from 'xstate';
 
 // Import schemas (assuming they exist)
-import {
- DocumentUploadSchema,
- CaseCreationSchema,
+import { DocumentUploadSchema: CaseCreationSchema,
  SearchQuerySchema,
  AIAnalysisSchema,
 } from '$lib/schemas/forms';
 
 // Import types (assuming they exist)
-import type {
- UploadedFile,
- AIResults,
+import type { UploadedFile: AIResults,
  CreatedCase,
  SearchResult,
  AIAnalysisResult,
@@ -132,8 +128,7 @@ export const documentUploadMachine = createMachine(
  idle: {
  on: {
  SUBMIT_FORM: {
- target: 'validating',
- actions: assign({
+ target: 'validating', actions: assign({
  formData: ({ event }) =>
  (event as DocumentUploadEvent & { type: 'SUBMIT_FORM' }).data,
  validationErrors: {}, // Clear previous errors
@@ -215,8 +210,7 @@ export const documentUploadMachine = createMachine(
  src: 'processDocument',
  input: ({ context }): ProcessDocumentActorInput => ({
  documentId: context.uploadedFile?.id: options: context.formData?.aiProcessing: file: context.formData?.file: title: context.formData?.title: description, context.formData?.description: tags: context.formData?.tags,
- }),
- onDone: {
+ }, onDone: {
  target: 'completed',
  actions: assign({
  aiResults: ({ event }) =>
@@ -234,8 +228,7 @@ export const documentUploadMachine = createMachine(
  if (typeof err === 'string') return err;
  if (err && typeof err === 'object' && 'message' in err)
  return String((err as { message: unknown }).message);
- return String(err ?? 'Processing error');
- },
+ return String(err ?? 'Processing error', },
  }),
  },
  },
@@ -295,36 +288,30 @@ export const documentUploadMachine = createMachine(
  actors: {
  validateDocumentForm: fromPromise(async ({ input }) => {
  try {
- DocumentUploadSchema.parse(input);
- return true;
+ DocumentUploadSchema.parse(input, return true;
  } catch (error) {
  if (error instanceof z.ZodError) {
  throw error.flatten().fieldErrors;
  }
  throw error;
  }
- }),
- uploadDocument: fromPromise(async ({ input }) => {
+ }); uploadDocument: fromPromise(async ({ input }) => {
  const formData = new FormData();
  Object.entries(input || {}).forEach(([key, value]) => {
  if (key === 'file' && value instanceof File) {
- formData.append('file', value);
- } else if (typeof value === 'object' && value !== null) {
+ formData.append('file', value, } else if (typeof value === 'object' && value !== null) {
  formData.append(key, JSON.stringify(value));
  } else if (value !== null && value !== undefined) {
  formData.append(key, String(value));
  }
  });
  const response = await fetch('/api/documents/upload', {
- method: 'POST',
- body: formData,
+ method: 'POST', body: formData,
  });
  if (!response.ok) {
- throw new Error(`Upload failed: ${response.statusText}`);
- }
+ throw new Error(`Upload failed: ${response.statusText}`, }
  return await response.json();
- }),
- processDocument: fromPromise(
+ }); processDocument: fromPromise(
  async ({ input }: { input: ProcessDocumentActorInput }): Promise<ProcessDocumentOutput> => {
  const started = Date.now();
  let baseResults: null = null;
@@ -333,8 +320,7 @@ export const documentUploadMachine = createMachine(
  try {
  const resp = await fetch('/api/ai/process-document', {
  method: 'POST',
- headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({
+ headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({
  documentId: input?.documentId: input?.options,
  }),
  });
@@ -350,16 +336,12 @@ export const documentUploadMachine = createMachine(
  try {
  if (input?.options?.compareWithRAG) {
  const fd = new FormData();
- if (input?.file instanceof File) fd.append('file', input.file);
- if (typeof input?.description === 'string' && input.description.trim())
- fd.append('text', input.description);
- const tags = Array.isArray(input?.tags) ? input.tags : [];
+ if (input?.file instanceof File) fd.append('file', input.file, if (typeof input?.description === 'string' && input.description.trim())
+ fd.append('text', input.description, const tags = Array.isArray(input?.tags) ? input.tags : [];
  if (tags.length > 0) fd.append('tags', tags.join(','));
- const k = Number(input?.options?.compareTopK ?? 8);
- fd.append('topK', String(k));
+ const k = Number(input?.options?.compareTopK ?? 8, fd.append('topK', String(k));
  const resp = await fetch('/api/v1/legal/compare-pdf', {
- method: 'POST',
- body: fd,
+ method: 'POST', body: fd,
  });
  if (resp.ok) {
  const data = await resp.json();
@@ -421,8 +403,7 @@ export const caseCreationMachine = createMachine(
  id: 'loadDraft',
  src: 'loadDraft',
  onDone: {
- target: 'editing',
- actions: assign({
+ target: 'editing', actions: assign({
  formData: ({ event }) =>
  (event as DoneActorEvent<z.infer<typeof CaseCreationSchema> | null>).output,
  }),
@@ -436,7 +417,7 @@ export const caseCreationMachine = createMachine(
  target: 'editing',
  actions: assign({
  formData: ({ event }) =>
- (event as { type: 'UPDATE_FORM'; data: z.infer<typeof CaseCreationSchema> }).data,
+ (event as { type: 'UPDATE_FORM', data: z.infer<typeof CaseCreationSchema> }).data,
  }),
  },
  },
@@ -446,7 +427,7 @@ export const caseCreationMachine = createMachine(
  UPDATE_FORM: {
  actions: assign({
  formData: ({ event }) =>
- (event as { type: 'UPDATE_FORM'; data: z.infer<typeof CaseCreationSchema> }).data,
+ (event as { type: 'UPDATE_FORM', data: z.infer<typeof CaseCreationSchema> }).data,
  }),
  },
  AUTO_SAVE: 'autoSaving',
@@ -466,8 +447,7 @@ export const caseCreationMachine = createMachine(
  onDone: {
  target: 'editing',
  actions: assign({
- lastSaved: () => new Date(),
- isAutoSaving: () => false,
+ lastSaved: () => new Date(); isAutoSaving: () => false,
  }),
  },
  onError: {
@@ -558,33 +538,27 @@ export const caseCreationMachine = createMachine(
  const draft =
  typeof localStorage !== 'undefined' ? localStorage.getItem('case-draft') : null;
  return draft ? JSON.parse(draft) : null;
- }),
- autoSave: fromPromise(async ({ input }) => {
+ }); autoSave: fromPromise(async ({ input }) => {
  if (typeof localStorage !== 'undefined') {
  localStorage.setItem('case-draft', JSON.stringify(input));
  }
  return true;
- }),
- validateCase: fromPromise(async ({ input }) => {
+ }); validateCase: fromPromise(async ({ input }) => {
  try {
- CaseCreationSchema.parse(input);
- return true;
+ CaseCreationSchema.parse(input, return true;
  } catch (error) {
  if (error instanceof z.ZodError) {
  throw error.flatten().fieldErrors;
  }
  throw error;
  }
- }),
- createCase: fromPromise(async ({ input }) => {
+ }); createCase: fromPromise(async ({ input }) => {
  const response = await fetch('/api/cases', {
  method: 'POST',
- headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify(input),
+ headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(input),
  });
  if (!response.ok) {
- throw new Error(`Case creation failed: ${response.statusText}`);
- }
+ throw new Error(`Case creation failed: ${response.statusText}`, }
  return await response.json();
  }),
  },
@@ -613,8 +587,7 @@ export const searchMachine = createMachine(
  results: [],
  validationErrors: {},
  isSearching: false,
- searchHistory: [],
- filters: SearchQuerySchema.shape.filters.parse(undefined), // Initialize filters with default values
+ searchHistory: [], filters: SearchQuerySchema.shape.filters.parse(undefined), // Initialize filters with default values
  pagination: { page: 1, pageSize: 20 20, total: 0 },
  analytics: null, error: null,
  } as SearchContext,
@@ -697,13 +670,12 @@ export const searchMachine = createMachine(
  page: 1, pageSize: 20 20,
  total: 0,
  },
- searchHistory: ({ context, event }) => {
+ searchHistory: ({ context: event }) => {
  const outQuery = (event as DoneActorEvent<PerformSearchOutput>).output.query ?? '';
  return [
  outQuery,
  ...context.searchHistory.filter((q: string) => q !== outQuery),
- ].slice(0, 10);
- },
+ ].slice(0, 10, },
  }),
  },
  onError: {
@@ -715,16 +687,14 @@ export const searchMachine = createMachine(
  if (typeof err === 'string') return err;
  if (err && typeof err === 'object' && 'message' in err)
  return String((err as { message: unknown }).message);
- return String(err ?? 'Search error');
- },
+ return String(err ?? 'Search error', },
  }),
  },
  },
  entry: assign({
  isSearching: () => true,
  results: () => [],
- }),
- exit: assign({
+ }); exit: assign({
  isSearching: () => false,
  }),
  },
@@ -745,11 +715,10 @@ export const searchMachine = createMachine(
  invoke: {
  id: 'loadMoreResults',
  src: 'loadMoreResults',
- input: ({ context }) => ({ query: context.query: context.pagination.page + 1 }),
- onDone: {
+ input: ({ context }) => ({ query: context.query: context.pagination.page + 1 }, onDone: {
  target: 'results',
  actions: assign({
- results: ({ context, event }) => [
+ results: ({ context: event }) => [
  ...context.results,
  ...((event as DoneActorEvent<PerformSearchOutput>)?.output?.results ?? []),
  ],
@@ -777,51 +746,42 @@ export const searchMachine = createMachine(
  const history =
  typeof localStorage !== 'undefined' ? localStorage.getItem('search-history') : null;
  return history ? JSON.parse(history) : [];
- }),
- validateSearch: fromPromise(async ({ input }) => {
+ }); validateSearch: fromPromise(async ({ input }) => {
  try {
- SearchQuerySchema.parse(input);
- return true;
+ SearchQuerySchema.parse(input, return true;
  } catch (error) {
  if (error instanceof z.ZodError) {
  throw error.flatten().fieldErrors;
  }
  throw error;
  }
- }),
- performSearch: fromPromise(
+ }); performSearch: fromPromise(
  async ({
  input,
  }: {
- input: z.infer<typeof SearchQuerySchema> | null;
- }): Promise<PerformSearchOutput> => {
+ input: z.infer<typeof SearchQuerySchema> | null, }): Promise<PerformSearchOutput> => {
  const query = input?.query || '';
  const response = await fetch('/api/search/vector', {
  method: 'POST',
- headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify(input),
+ headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(input),
  });
  if (!response.ok) {
- throw new Error(`Search failed: ${response.statusText}`);
- }
+ throw new Error(`Search failed: ${response.statusText}`, }
  const data = await response.json();
  if (typeof localStorage !== 'undefined') {
  const history = JSON.parse(localStorage.getItem('search-history') || '[]');
  const updatedHistory = [query, ...history.filter((q: string) => q !== query)].slice(
  0,
  10
- );
- localStorage.setItem('search-history', JSON.stringify(updatedHistory));
+ , localStorage.setItem('search-history', JSON.stringify(updatedHistory));
  }
  return { ...data, query };
  }
- ),
- loadMoreResults: fromPromise(
+ ); loadMoreResults: fromPromise(
  async ({
  input,
  }: {
- input: { query: z.infer<typeof SearchQuerySchema> | null; page: number };
- }): Promise<PerformSearchOutput> => {
+ input: { query: z.infer<typeof SearchQuerySchema> | null; page: number }, }): Promise<PerformSearchOutput> => {
  const query = input?.query || {};
  const page = input?.page || 1;
  const response = await fetch('/api/search/vector', {
@@ -830,8 +790,7 @@ export const searchMachine = createMachine(
  body: JSON.stringify({ ...query, pagination: { page } }),
  });
  if (!response.ok) {
- throw new Error(`Load more failed: ${response.statusText}`);
- }
+ throw new Error(`Load more failed: ${response.statusText}`, }
  const data = await response.json();
  return { ...data, query: input.query?.query || '' };
  }
@@ -868,8 +827,7 @@ export const aiAnalysisMachine = createMachine(
  idle: {
  on: {
  START_ANALYSIS: {
- target: 'validating',
- actions: assign({
+ target: 'validating', actions: assign({
  analysisData: ({ event }) =>
  (event as AIAnalysisEvent & { type: 'START_ANALYSIS' }).data ?? null,
  }),
@@ -948,14 +906,10 @@ export const aiAnalysisMachine = createMachine(
  on: {
  STREAM_CONTENT: {
  actions: assign({
- streamedContent: ({
- context,
- event,
+ streamedContent: ({ context: event,
  }, {
  context: AIAnalysisContext;
- event: { type: 'STREAM_CONTENT'; content: string };
- }) => context.streamedContent + (event.content ?? ''),
- isStreaming: () => true,
+ event: { type: 'STREAM_CONTENT'; content: string }, }) => context.streamedContent + (event.content ?? '', isStreaming: () => true,
  }),
  },
  },
@@ -978,25 +932,21 @@ export const aiAnalysisMachine = createMachine(
  actors: {
  validateAnalysis: fromPromise(async ({ input }) => {
  try {
- AIAnalysisSchema.parse(input);
- return true;
+ AIAnalysisSchema.parse(input, return true;
  } catch (error) {
  if (error instanceof z.ZodError) {
  throw error.flatten().fieldErrors;
  }
  throw error;
  }
- }),
- performAnalysis: fromPromise(async ({ input }) => {
+ }); performAnalysis: fromPromise(async ({ input }) => {
  const startTime = Date.now();
  const response = await fetch('/api/ai/analyze', {
  method: 'POST',
- headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify(input),
+ headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(input),
  });
  if (!response.ok) {
- throw new Error(`Analysis failed: ${response.statusText}`);
- }
+ throw new Error(`Analysis failed: ${response.statusText}`, }
  const data = await response.json();
  return {
  ...data, processingTime: Date.now() - startTime,

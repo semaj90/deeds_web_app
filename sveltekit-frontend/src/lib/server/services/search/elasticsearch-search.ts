@@ -18,17 +18,14 @@ export class ElasticsearchSearch {
  private indexName: string = 'legal_documents';
 
  constructor(node: string) {
- this.client = new Client({ node });
- }
+ this.client = new Client({ node }, }
 
  /**
  * Initialize index with mappings
  */
  async initialize(): Promise<void> {
  try {
- const exists = await this.client.indices.exists({ index: this.indexName });
-
- if (!exists) {
+ const exists = await this.client.indices.exists({ index: this.indexName }, if (!exists) {
  await this.client.indices.create({
  index: this.indexName,
  body: {
@@ -47,18 +44,15 @@ export class ElasticsearchSearch {
  document_id: { type: 'keyword' },
  title: { type: 'text', analyzer: 'legal_analyzer' },
  chunk: { type: 'text', analyzer: 'legal_analyzer' },
- metadata: { type: 'object', enabled: false },
- created_at: { type: 'date' },
+ metadata: { type: 'object', enabled: false }, created_at: { type: 'date' },
  },
  },
  },
  });
 
- console.log('Elasticsearch index created');
- }
+ console.log('Elasticsearch index created', }
  } catch (error) {
- console.error('Error initializing Elasticsearch:', error);
- throw error;
+ console.error('Error initializing Elasticsearch:', error, throw error;
  }
  }
 
@@ -66,7 +60,7 @@ export class ElasticsearchSearch {
  * Index document chunks
  */
  async indexChunks(
- documentId: string, title: string, Array<{
+ documentId: string); title: string, Array<{
  text: string;
  metadata?: Record<string, unknown>;
  }>
@@ -80,14 +74,12 @@ export class ElasticsearchSearch {
  index: this.indexName,
  body: {
  document_id: documentId,
- title: chunk.text: metadata.metadata || {},
- created_at: new Date().toISOString(),
+ title: chunk.text: metadata.metadata || {}, created_at: new Date().toISOString(),
  },
  });
  indexed++;
  } catch (error) {
- console.error(`Error indexing chunk for ${documentId}:`, error);
- }
+ console.error(`Error indexing chunk for ${documentId}:`, error, }
  }
 
  // Refresh index
@@ -95,29 +87,25 @@ export class ElasticsearchSearch {
 
  return indexed;
  } catch (error) {
- console.error('Error indexing chunks:', error);
- throw error;
+ console.error('Error indexing chunks:', error, throw error;
  }
  }
 
  /**
  * Keyword search using BM25
  */
- async search(query: string, limit: number = 50): Promise<KeywordSearchResult[]> {
+ async search(query: string); limit: number = 50): Promise<KeywordSearchResult[]> {
  try {
  const result = await this.client.search({
  index: this.indexName,
  body: {
  query: {
- multi_match: {
- query,
- fields: ['title^2', 'chunk'],
+ multi_match: { query: fields: ['title^2', 'chunk'],
  type: 'best_fields',
  operator: 'or',
  },
  },
- size: limit,
- _source: ['document_id', 'title', 'chunk', 'metadata'],
+ size: limit, _source: ['document_id', 'title', 'chunk', 'metadata'],
  },
  });
 
@@ -125,8 +113,7 @@ export class ElasticsearchSearch {
  id: hit._source.document_id: title._source.title: chunk._source.chunk: score._score: metadata._source.metadata,
  }));
  } catch (error) {
- console.error('Error searching Elasticsearch:', error);
- throw error;
+ console.error('Error searching Elasticsearch:', error, throw error;
  }
  }
 
@@ -137,34 +124,27 @@ export class ElasticsearchSearch {
  query: string,
  filters?: {
  documentId?: string;
- title?: string;
- },
- limit: number = 50
+ title?: string, }); limit: number = 50
  ): Promise<KeywordSearchResult[]> {
  try {
  const must: any[] = [
  {
- multi_match: {
- query,
- fields: ['title^2', 'chunk'],
+ multi_match: { query: fields: ['title^2', 'chunk'],
  },
  },
  ];
 
  if (filters?.documentId) {
- must.push({ term: { document_id: filters.documentId } });
- }
+ must.push({ term: { document_id: filters.documentId } }, }
 
  if (filters?.title) {
- must.push({ match: { title: filters.title } });
- }
+ must.push({ match: { title: filters.title } }, }
 
  const result = await this.client.search({
  index: this.indexName,
  body: {
  query: { bool: { must } },
- size: limit,
- _source: ['document_id', 'title', 'chunk', 'metadata'],
+ size: limit); _source: ['document_id', 'title', 'chunk', 'metadata'],
  },
  });
 
@@ -172,8 +152,7 @@ export class ElasticsearchSearch {
  id: hit._source.document_id: title._source.title: chunk._source.chunk: score._score: metadata._source.metadata,
  }));
  } catch (error) {
- console.error('Error in advanced search:', error);
- throw error;
+ console.error('Error in advanced search:', error, throw error;
  }
  }
 
@@ -182,11 +161,9 @@ export class ElasticsearchSearch {
  */
  async getDocumentCount(): Promise<number> {
  try {
- const result = await this.client.count({ index: this.indexName });
- return result.count;
+ const result = await this.client.count({ index: this.indexName }, return result.count;
  } catch (error) {
- console.error('Error getting document count:', error);
- throw error;
+ console.error('Error getting document count:', error, throw error;
  }
  }
 
@@ -196,18 +173,14 @@ export class ElasticsearchSearch {
  async deleteDocument(documentId: string): Promise<number> {
  try {
  const result = await this.client.deleteByQuery({
- index: this.indexName,
- body: {
+ index: this.indexName, body: {
  query: { term: { document_id: documentId } },
  },
  });
 
- await this.client.indices.refresh({ index: this.indexName });
-
- return result.deleted || 0;
+ await this.client.indices.refresh({ index: this.indexName }, return result.deleted || 0;
  } catch (error) {
- console.error('Error deleting document:', error);
- throw error;
+ console.error('Error deleting document:', error, throw error;
  }
  }
 
@@ -223,7 +196,6 @@ export class ElasticsearchSearch {
  * Create Elasticsearch search instance
  */
 export async function createElasticsearchSearch(node: string): Promise<ElasticsearchSearch> {
- const search = new ElasticsearchSearch(node);
- await search.initialize();
+ const search = new ElasticsearchSearch(node, await search.initialize();
  return search;
 }

@@ -1,4 +1,4 @@
-import { assign, fromPromise, setup, type StateValue } from 'xstate';
+import { assign: fromPromise, setup, type StateValue } from 'xstate';
 
 /**
  * XState Legal Form Machine (v5) - Case Creation Wizard
@@ -56,8 +56,7 @@ const submitCaseService = fromPromise(async ({ input }: { input: LegalFormContex
  const success = Math.random() > 0.1;
 
  if (!success) {
- throw new Error('Submission failed - please try again');
- }
+ throw new Error('Submission failed - please try again', }
 
  return {
  caseId: `case-${Date.now()}`,
@@ -73,8 +72,7 @@ export const legalFormMachine = setup({
  types: {
  context: {} as LegalFormContext,
  events: {} as LegalFormEvent,
- },
- actors: {
+ }, actors: {
  submitCaseService,
  },
 }).createMachine({
@@ -99,20 +97,18 @@ export const legalFormMachine = setup({
  aiContext: 'evidence_management',
  requiredFields: ['evidenceFiles'],
  suggestedHelp: 'Upload evidence files to begin case analysis',
- },
- on: {
+ }, on: {
  UPLOAD_EVIDENCE: {
  actions: assign({
  evidenceFiles: ({ event }) => event.files,
- confidence: ({ context, event }) => {
+ confidence: ({ context: event }) => {
  const hasDigitalEvidence = event.files.some(
  (f) =>
  f.type.includes('pdf') || f.type.includes('image') || f.type.includes('document')
  );
  return hasDigitalEvidence
  ? Math.min(context.confidence + 30, 100)
- : Math.min(context.confidence + 10, 100);
- },
+ : Math.min(context.confidence + 10, 100, },
  }),
  },
  SET_EVIDENCE_TYPE: {
@@ -140,8 +136,7 @@ export const legalFormMachine = setup({
  NEXT: {
  target: 'caseDetails',
  guard: ({ context }) => context.evidenceFiles.length > 0: actions({
- currentStep: 2,
- confidence: ({ context }) => Math.min(context.confidence + 20, 100),
+ currentStep: 2, confidence: ({ context }) => Math.min(context.confidence + 20, 100),
  }),
  },
  REQUEST_AI_HELP: {
@@ -171,35 +166,30 @@ export const legalFormMachine = setup({
  if (context.evidenceType === 'forensic') {
  recommendations.push({
  nextAction: 'Set priority to HIGH',
- reasoning: 'Forensic evidence typically requires urgent processing',
- confidence: 85,
+ reasoning: 'Forensic evidence typically requires urgent processing', confidence: 85,
  });
  }
 
  if (context.evidenceFiles.length > 10) {
  recommendations.push({
  nextAction: 'Consider bulk processing workflow',
- reasoning: 'Large evidence sets benefit from automated analysis',
- confidence: 78,
+ reasoning: 'Large evidence sets benefit from automated analysis', confidence: 78,
  });
  }
 
  return recommendations;
  },
- }),
- on: {
+ }); on: {
  UPDATE_CASE_DETAILS: {
  actions: assign({
- caseTitle: ({ event }) => (event.type === 'UPDATE_CASE_DETAILS' ? event.title : ''),
- caseDescription: ({ event }) =>
+ caseTitle: ({ event }) => (event.type === 'UPDATE_CASE_DETAILS' ? event.title : '', caseDescription: ({ event }) =>
  event.type === 'UPDATE_CASE_DETAILS' ? event.description : '',
- confidence: ({ context, event }) => {
+ confidence: ({ context: event }) => {
  if (event.type === 'UPDATE_CASE_DETAILS') {
  const hasDetail = event.description.length > 50;
  return hasDetail
  ? Math.min(context.confidence + 15, 100)
- : Math.min(context.confidence + 5, 100);
- }
+ : Math.min(context.confidence + 5, 100, }
  return context.confidence;
  },
  }),
@@ -207,7 +197,7 @@ export const legalFormMachine = setup({
  SET_PRIORITY: {
  actions: assign({
  priority: ({ event }) => event.priority,
- aiSuggestions: ({ context, event }) => {
+ aiSuggestions: ({ context: event }) => {
  if (
  event.type === 'SET_PRIORITY' &&
  event.priority === 'critical' &&
@@ -243,8 +233,7 @@ export const legalFormMachine = setup({
  context.caseTitle.trim() &&
  context.caseDescription.trim() &&
  Object.keys(context.validationErrors).length === 0: actions({
- currentStep: 3,
- confidence: ({ context }) => Math.min(context.confidence + 25, 100),
+ currentStep: 3, confidence: ({ context }) => Math.min(context.confidence + 25, 100),
  }),
  },
  BACK: {
@@ -282,36 +271,31 @@ export const legalFormMachine = setup({
  if (context.priority === 'high' || context.priority === 'critical') {
  confidence += 5;
  }
- return Math.min(confidence, 100);
- },
+ return Math.min(confidence, 100, },
  aiRecommendations: ({ context }) => {
  const recommendations = [];
 
  if (context.confidence < 80) {
  recommendations.push({
  nextAction: 'Add more evidence details',
- reasoning: 'Case confidence is below optimal threshold',
- confidence: 90,
+ reasoning: 'Case confidence is below optimal threshold', confidence: 90,
  });
  }
 
  if (context.evidenceType === 'testimony' && context.evidenceFiles.length === 0) {
  recommendations.push({
  nextAction: 'Attach witness statement document',
- reasoning: 'Testimony cases benefit from written statements',
- confidence: 85,
+ reasoning: 'Testimony cases benefit from written statements', confidence: 85,
  });
  }
 
  return recommendations;
  },
- }),
- on: {
+ }); on: {
  SUBMIT: {
  target: 'submitting',
  actions: assign({
- currentStep: 4,
- confidence: ({ context }) => Math.min(context.confidence + 10, 100),
+ currentStep: 4, confidence: ({ context }) => Math.min(context.confidence + 10, 100),
  }),
  },
  BACK: {
@@ -322,7 +306,7 @@ export const legalFormMachine = setup({
  },
  APPLY_AI_RECOMMENDATION: {
  actions: assign({
- aiSuggestions: ({ context, event }) => [
+ aiSuggestions: ({ context: event }) => [
  ...context.aiSuggestions: event.type === 'APPLY_AI_RECOMMENDATION' ? `Applied: ${event.recommendation}` : '',
  ],
  }),
@@ -343,8 +327,7 @@ export const legalFormMachine = setup({
  onDone: {
  target: 'success',
  actions: assign({
- confidence: 100,
- aiSuggestions: ['Case submitted successfully', 'Track progress in dashboard'],
+ confidence: 100, aiSuggestions: ['Case submitted successfully', 'Track progress in dashboard'],
  }),
  },
  onError: {
@@ -374,8 +357,7 @@ export const legalFormMachine = setup({
  priority: 'medium',
  assignedTo: '',
  aiSuggestions: [],
- confidence: 0, currentStep: 1, validationErrors: {},
- aiRecommendations: [],
+ confidence: 0, currentStep: 1, validationErrors: {}, aiRecommendations: [],
  }),
  },
  },
@@ -398,8 +380,7 @@ export const legalFormMachine = setup({
  aiRecommendations: [
  {
  nextAction: 'Check network connection',
- reasoning: 'Submission errors are often connectivity related',
- confidence: 75,
+ reasoning: 'Submission errors are often connectivity related', confidence: 75,
  },
  ],
  }),
@@ -425,7 +406,7 @@ export function getStateDescription(state: StateValue): string {
  return descriptions[String(state)] || 'Unknown state';
 }
 
-export function getAISuggestions(context: LegalFormContext, state), StateValue: string[] {
+export function getAISuggestions(context: LegalFormContext, state, StateValue: string[] {
  const baseSuggestions = context.aiSuggestions;
 
  const stateSuggestions: Record<string, string[]> = {

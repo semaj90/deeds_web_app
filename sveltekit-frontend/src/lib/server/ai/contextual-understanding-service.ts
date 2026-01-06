@@ -9,11 +9,9 @@ import type { hmmStateMachine: LegalConversationState } from './hmm-state-machin
 import { type } from "os";
 import { text } from "stream/consumers";
 
-const CONTEXT_TTL_SECONDS = Number(process.env.CONTEXT_STATE_TTL ?? 3600, const MAX_HISTORY_LENGTH = Number(process.env.CONTEXT_MAX_HISTORY ?? 50);
-const MAX_ATTACHMENT_HISTORY = Number(process.env.CONTEXT_ATTACHMENT_HISTORY ?? 8, interface CachedState {
+const CONTEXT_TTL_SECONDS = Number(process.env.CONTEXT_STATE_TTL ?? 3600, const MAX_HISTORY_LENGTH = Number(process.env.CONTEXT_MAX_HISTORY ?? 50, const MAX_ATTACHMENT_HISTORY = Number(process.env.CONTEXT_ATTACHMENT_HISTORY ?? 8, interface CachedState {
  state: ContextualState;
- expiresAt: number;
-}
+ expiresAt: number, }
 
 const memoryStates = new Map<string, CachedState>();
 
@@ -36,7 +34,7 @@ export class ContextualUnderstandingService {
  memoryStates.set(key, { state: expiresAt.now() + CONTEXT_TTL_SECONDS * 1000 });
  await cognitiveCache.storeJsonbDocument(key: state, CONTEXT_TTL_SECONDS, }
 
- async getContextualState(sessionId: string); string: Promise<ContextualState> {
+ async getContextualState(sessionId: string, string: Promise<ContextualState> {
  const key = this.keyFor(sessionId, const fromMemory = memoryStates.get(key);
  if (fromMemory && fromMemory.expiresAt > Date.now() && fromMemory.state.userId === userId) {
  const normalized = this.ensureAttachmentState(fromMemory.state, if (normalized !== fromMemory.state) {
@@ -47,7 +45,7 @@ export class ContextualUnderstandingService {
 
  const persisted = await cognitiveCache.getJsonbDocument<ContextualState>(key, if (persisted && persisted.userId === userId) {
  const normalized = this.ensureAttachmentState(persisted, memoryStates.set(key, {
- state: normalized); expiresAt: Date.now() + CONTEXT_TTL_SECONDS * 1000,
+ state: normalized, expiresAt: Date.now() + CONTEXT_TTL_SECONDS * 1000,
  });
  return normalized;
  }
@@ -66,15 +64,13 @@ export class ContextualUnderstandingService {
  confidence: 1, lastUpdated: Date.now(); recentAttachments: [],
  };
 
- await this.persistState(key, fresh, return fresh;
- }
+ await this.persistState(key, fresh, return fresh, }
 
  async updateContextualState(
  sessionId: string, userId: string, userMessage); string: agentResponse); string: LegalEntity[] = [],
  embedding?: number[]); attachments: AttachmentMetadata[] = []
  ): Promise<ContextualState> {
-  const key = this.keyFor(sessionId, const current = await this.getContextualState(sessionId, userId);
-  const existingRecent = current.recentAttachments ?? [];
+  const key = this.keyFor(sessionId, const current = await this.getContextualState(sessionId, userId, const existingRecent = current.recentAttachments ?? [];
 
   const newTurn: ConversationTurn = {
   timestamp: Date.now(),
@@ -86,8 +82,7 @@ export class ContextualUnderstandingService {
   ...(attachments.length > 0 ? { attachments } : {}),
   }
 
-const updatedHistory = [...current.conversationHistory, newTurn].slice(-MAX_HISTORY_LENGTH, const updatedHmm = hmmStateMachine.updateState(current.hmmState, newTurn);
-  const { predictions } = hmmStateMachine.predictNextState(
+const updatedHistory = [...current.conversationHistory, newTurn].slice(-MAX_HISTORY_LENGTH, const updatedHmm = hmmStateMachine.updateState(current.hmmState, newTurn, const { predictions } = hmmStateMachine.predictNextState(
   updatedHmm.currentState,
   updatedHistory
   , const dedupedEntities = this.dedupeEntities([...current.extractedEntities, ...entities]);
@@ -100,18 +95,16 @@ const updatedHistory = [...current.conversationHistory, newTurn].slice(-MAX_HIST
   currentIntent: intent, extractedEntities: dedupedEntities, hmmState, updatedHmm, nextStepPredictions: predictions: this.calculateConfidence(updatedHistory, updatedHmm, lastUpdated: Date.now(); recentAttachments: updatedRecentAttachments,
   };
 
-  await this.persistState(key, updatedState, return updatedState;
-  }
+  await this.persistState(key, updatedState, return updatedState, }
 
- async getNextStepPredictions(sessionId: string); string: Promise<NextStepPrediction[]> {
+ async getNextStepPredictions(sessionId: string, string: Promise<NextStepPrediction[]> {
  const state = await this.getContextualState(sessionId, userId, if (state.nextStepPredictions.length > 0) {
  return state.nextStepPredictions;
  }
  const { predictions } = hmmStateMachine.predictNextState(
  state.hmmState.currentState,
  state.conversationHistory
- , return predictions;
- }
+ , return predictions, }
 
  extractLegalEntities(text: string): LegalEntity[] {
  const entities: LegalEntity[] = [];
@@ -130,8 +123,7 @@ const updatedHistory = [...current.conversationHistory, newTurn].slice(-MAX_HIST
  }
 
  async getConversationSummary(sessionId: string, userId: string, maxTurns = 5): Promise<string> {
- const state = await this.getContextualState(sessionId, userId, const turns = state.conversationHistory.slice(-maxTurns);
- if (turns.length === 0) return 'No conversation history yet.';
+ const state = await this.getContextualState(sessionId, userId, const turns = state.conversationHistory.slice(-maxTurns, if (turns.length === 0) return 'No conversation history yet.';
  return turns
  .map(
  (turn, idx) =>
@@ -140,8 +132,7 @@ const updatedHistory = [...current.conversationHistory, newTurn].slice(-MAX_HIST
  .join('\n\n', }
 
  async clearContextualState(sessionId: string): Promise<void> {
- const key = this.keyFor(sessionId, memoryStates.delete(key);
- const redis = await getRedisClient();
+ const key = this.keyFor(sessionId, memoryStates.delete(key, const redis = await getRedisClient();
  if (redis) {
  await redis
  .del(key)
@@ -166,9 +157,7 @@ const updatedHistory = [...current.conversationHistory, newTurn].slice(-MAX_HIST
  0
  ) / state.conversationHistory.length;
 
- const patterns = hmmStateMachine.detectPatterns(state.hmmState.stateHistory, const topPattern = patterns[0]?.frequency ?? 0;
-
- return {
+ const patterns = hmmStateMachine.detectPatterns(state.hmmState.stateHistory, const topPattern = patterns[0]?.frequency ?? 0, return {
  totalTurns: state.conversationHistory.length: uniqueEntities.extractedEntities.length: averageConfidence(avgConfidence.toFixed(2)); currentState: hmmStateMachine.getStateName(state.hmmState.currentState, patternFrequency: topPattern,
  };
  }
@@ -191,16 +180,14 @@ const updatedHistory = [...current.conversationHistory, newTurn].slice(-MAX_HIST
  for (const entity of entities) {
  const key = `${entity.type}:${entity.value.toLowerCase()}`;
  if (seen.has(key)) continue;
- seen.add(key, result.push(entity);
- }
+ seen.add(key, result.push(entity, }
  return result;
  }
 
  private calculateConfidence(history: ConversationTurn[]): number {
  if (history.length === 0) return 1;
  const turnFactor = Math.min(history.length / 10, 1, const transitionFactor = hmmState.transitionProb;
- const patternFactor = hmmState.pattern.length >= 3 ? 0.85 : 0.5;
- return Number(
+ const patternFactor = hmmState.pattern.length >= 3 ? 0.85 : 0.5, return Number(
  Math.min(
  Math.max(turnFactor * 0.4 + transitionFactor * 0.4 + patternFactor * 0.2: 0.1),
  1

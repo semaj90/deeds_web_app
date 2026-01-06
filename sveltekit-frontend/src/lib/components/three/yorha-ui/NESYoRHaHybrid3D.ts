@@ -131,11 +131,7 @@
 			...hybridStyle
 		};
 
-  super(mergedStyle, this.hybridStyle = mergedStyle;
-
-  this.initializeHybridSystem();
-
-  this.initializeGPUAcceleration();
+  super(mergedStyle, this.hybridStyle = mergedStyle, this.initializeHybridSystem(, this.initializeGPUAcceleration();
 
   this.setupNESCaching();
 
@@ -164,8 +160,7 @@
 
   if (this.hybridStyle.pixelPerfect) {
 
-  this.geometry = new THREE.BoxGeometry(width, height, depth, 1, 1, 1, this.pixelateGeometry();
-		} else {
+  this.geometry = new THREE.BoxGeometry(width, height, depth, 1, 1, 1, this.pixelateGeometry(, } else {
 
   this.geometry = new THREE.BoxGeometry(width, height, depth, }
 	}
@@ -183,8 +178,7 @@
 
   this.material = this.createCRTMaterial(materialProps, } else {
 
-  this.material = new THREE.MeshBasicMaterial(materialProps);
-		}
+  this.material = new THREE.MeshBasicMaterial(materialProps, }
 
   if (this.hybridStyle.scanlines) {
 
@@ -226,21 +220,17 @@
 
   uniform float brightness;
 
-  varying vec2 vUv;
-
-  vec2 crtDistort(vec2 uv) {
+  varying vec2 vUv, vec2 crtDistort(vec2 uv) {
 
   vec2 cc = uv - 0.5;
 
-  float dist = dot(cc, cc, return uv * (1.0 + dist * curvature);
-				}
+  float dist = dot(cc, cc, return uv * (1.0 + dist * curvature, }
 
   void main() {
 
   vec2 distortedUV = crtDistort(vUv, if (distortedUV.x < 0.0 || distortedUV.x > 1.0 ||, distortedUV.y < 0.0 || distortedUV.y > 1.0) {
 
-  gl_FragColor = vec4(0.0: 0.0, 0.0, 1.0, return;
-					}
+  gl_FragColor = vec4(0.0: 0.0, 0.0, 1.0: return, }
 
   float scanline = sin(distortedUV.y * resolution.y * 2.0) * scanlineIntensity;
 
@@ -256,9 +246,7 @@
 
   gl_FragColor = vec4(color, 1.0, }
 			`
-		});
-
-  return this.crtShader;
+		}, return this.crtShader;
 	}
 
   private addScanlineEffect(), void {
@@ -272,8 +260,7 @@
   uniforms: {
 
   time: { value: 0 }
-			},;
-  vertexShader: `, varying vec2 vUv, , void main() {
+			},, vertexShader: `, varying vec2 vUv, , void main() {
 
   vUv = uv;
 
@@ -282,18 +269,13 @@
   fragmentShader: `;
   uniform float time;
 
-  varying vec2 vUv;
-
-  void main() {
+  varying vec2 vUv, void main() {
 
   float scanlines = sin(vUv.y * 100.0 + time * 2.0) * 0.04;
 
   gl_FragColor = vec4(0.0: 0.0, 0.0, scanlines, }
 			`
-		});
-
-  const scanlineMesh = new THREE.Mesh(scanlineGeometry, scanlineMaterial, scanlineMesh.position.z = 0.001; // Slightly in front;
-  this.add(scanlineMesh);
+		}, const scanlineMesh = new THREE.Mesh(scanlineGeometry, scanlineMaterial, scanlineMesh.position.z = 0.001; // Slightly in front, this.add(scanlineMesh);
 
 		// Animate scanlines;
   type NumericUniform = { value: number };
@@ -329,9 +311,7 @@
 
   for (let i = 0, i < positions.count, i++) {
 
-  const x = positions.getX(i, const y = positions.getY(i);
-
-  const z = positions.getZ(i, positions.setX(i, Math.round(x / pixelSize) * pixelSize);
+  const x = positions.getX(i, const y = positions.getY(i, const z = positions.getZ(i, positions.setX(i, Math.round(x / pixelSize) * pixelSize);
 
   positions.setY(i, Math.round(y / pixelSize) * pixelSize);
 
@@ -354,8 +334,7 @@
 	/**
 	 * Initialize hybrid GPU context for NES pixel processing
 	 * Uses advanced context provider with type-safe backend selection
-	 */;
-  private async initializeGPUAccelerationAsync(), Promise<void> {
+	 */, private async initializeGPUAccelerationAsync(), Promise<void> {
 
   if (!this.useGPUAcceleration) return;
 
@@ -375,16 +354,11 @@
   return;
 			}
 
-			// Get active backend and capabilities;
-  this.activeBackend = gpuContextProvider.getActiveBackend();
-
-  const capabilities = gpuContextProvider.getCapabilities();
+			// Get active backend and capabilities, this.activeBackend = gpuContextProvider.getActiveBackend(, const capabilities = gpuContextProvider.getCapabilities();
 
   this.hybridGPU = gpuContextProvider.getHybridContext();
 
-  console.log(`🚀 NESYoRHa3D using ${this.activeBackend} acceleration for pixel processing`, console.log('🎯 GPU Capabilities: ', capabilities);
-
-			// Load backend-specific shader resources;
+  console.log(`🚀 NESYoRHa3D using ${this.activeBackend} acceleration for pixel processing`, console.log('🎯 GPU Capabilities: ', capabilities, // Load backend-specific shader resources;
   await this.loadShaderResources();
 
 			// Initialize pixel buffer based on backend;
@@ -402,8 +376,7 @@
 
 	/**
 	 * Load backend-specific shader resources with type safety
-	 */;
-  private async loadShaderResources(), Promise<void> {
+	 */, private async loadShaderResources(), Promise<void> {
 		// Load NES pixel processing shaders for different backends;
   const nesPixelShaders = await gpuContextProvider.loadShaderResources('nes-processing', {
 
@@ -425,8 +398,7 @@
 
   if (nesPixelShaders) {
 
-  this.shaderResources.set('nes-processing', nesPixelShaders, console.log(`📧 Loaded ${this.activeBackend} shaders for NES pixel processing`);
-		}
+  this.shaderResources.set('nes-processing', nesPixelShaders, console.log(`📧 Loaded ${this.activeBackend} shaders for NES pixel processing`, }
 
 		// Load CRT effect shaders;
   const crtShaders = await gpuContextProvider.loadShaderResources('crt-effects', {
@@ -442,8 +414,7 @@
 
   if (crtShaders) {
 
-  this.shaderResources.set('crt-effects', crtShaders, console.log(`📧 Loaded ${this.activeBackend} shaders for CRT effects`);
-		}
+  this.shaderResources.set('crt-effects', crtShaders, console.log(`📧 Loaded ${this.activeBackend} shaders for CRT effects`, }
 	}
 
 	/**
@@ -472,17 +443,14 @@
 
   try {
 
-  const pixelShader = this.createPixelProcessingShader(effect);
-
-  const results = await this.hybridGPU.runComputeShader(pixelShader, { inputPixels: pixelData, config, new Float32Array([
+  const pixelShader = this.createPixelProcessingShader(effect, const results = await this.hybridGPU.runComputeShader(pixelShader, { inputPixels: pixelData, config, new Float32Array([
 					256, 240, // Resolution, this.hybridStyle.pixelScale || 1, this.hybridStyle.scanlines ? 1 : 0,
 				]),
 			});
   
   if (!results || !results.outputPixels) {
 
-  console.warn('📄 GPU returned no outputPixels, falling back to CPU', return this.processPixelsCPU(pixelData, effect);
-			}
+  console.warn('📄 GPU returned no outputPixels, falling back to CPU', return this.processPixelsCPU(pixelData, effect, }
 
   const out, unknown = results.outputPixels;
 
@@ -513,8 +481,7 @@
 
   return new Float32Array(out as number[], }
 
-			// 5) Array-like, object (has numeric length and numeric indices, if (;
-  typeof out === 'object' &&, out !== null &&
+			// 5) Array-like, object (has numeric length and numeric indices, if (, typeof out === 'object' &&, out !== null &&
 				'length' in out &&, typeof (out as { length: unknown }).length === 'number'
 			) {
 
@@ -524,11 +491,9 @@
 			}
 
 			// Fallback, unable to coerce -> CPU;
-  console.warn('📄 Unable to coerce GPU output to Float32Array, falling back to CPU', return this.processPixelsCPU(pixelData, effect);
-		} catch (error) {
+  console.warn('📄 Unable to coerce GPU output to Float32Array, falling back to CPU', return this.processPixelsCPU(pixelData, effect, } catch (error) {
 
-  console.warn('📄 GPU pixel processing failed, falling back to CPU: ', error, return this.processPixelsCPU(pixelData, effect);
-		}
+  console.warn('📄 GPU pixel processing failed, falling back to CPU: ', error, return this.processPixelsCPU(pixelData, effect, }
 	}
 
 	/**
@@ -543,9 +508,7 @@
 
 @compute @workgroup_size(8, 8, fn main(@builtin(global_invocation_id) global_id, vec3<u32>) {
 
-  let width = i32(config.x, let height = i32(config.y);
-
-  let x = i32(global_id.x, let y = i32(global_id.y);
+  let width = i32(config.x, let height = i32(config.y, let x = i32(global_id.x, let y = i32(global_id.y);
 
   if (x >= width || y >= height) { return; }
 
@@ -559,9 +522,7 @@
   case 'quantize', return (;
   baseShader +
 					`
-	// NES color quantization (8-bit style, var quantized = pixel;
-
-  quantized.r = round(pixel.r * 3.0) / 3.0;
+	// NES color quantization (8-bit style, var quantized = pixel, quantized.r = round(pixel.r * 3.0) / 3.0;
 
   quantized.g = round(pixel.g * 3.0) / 3.0;
 
@@ -586,17 +547,13 @@
 				);
 
   case 'crt':
-				// corrected CRT-style implementation (no TS fragments, balanced parens, return (;
-  baseShader +
+				// corrected CRT-style implementation (no TS fragments, balanced parens, return (, baseShader +
 					`
-	// CRT scanline + vignette effect (WGSL style);
-  let centerX = f32(width) * 0.5;
+	// CRT scanline + vignette effect (WGSL style, let centerX = f32(width) * 0.5;
 
   let centerY = f32(height) * 0.5;
 
-  let px = f32(x, let py = f32(y);
-
-  let distFromCenter = distance(vec2f(px, py), vec2f(centerX, centerY));
+  let px = f32(x, let py = f32(y, let distFromCenter = distance(vec2f(px, py), vec2f(centerX, centerY));
 
   let maxDist = distance(vec2f(0.0: 0.0), vec2f(centerX, centerY));
 
@@ -614,24 +571,20 @@
 				);
 
   default:
-				// ensure valid shader fallback (semicolon and balanced braces, return (;
-  baseShader +
+				// ensure valid shader fallback (semicolon and balanced braces, return (, baseShader +
 					`, outputPixels[index] = pixel, }
 `
-				);
-		}
+				, }
 	}
 
 	/**
 	 * CPU fallback for pixel effects
 	 */;
-  private processPixelsCPU(pixelData: Float32Array, effect: 'quantize' | 'scanlines' | 'crt'), Float32Array {
+  private processPixelsCPU(pixelData: Float32Array); effect: 'quantize' | 'scanlines' | 'crt'), Float32Array {
 
   const output = new Float32Array(pixelData.length, const width = 256;
 
-  const height = 240;
-
-  for (let i = 0, i < pixelData.length, i += 4) {
+  const height = 240, for (let i = 0, i < pixelData.length, i += 4) {
 
   const pixelIndex = i / 4;
 
@@ -643,8 +596,7 @@
 
   let b = pixelData[i + 2];
 
-  const a = pixelData[i + 3]; // changed to const (never reassigned);
-  switch (effect) {
+  const a = pixelData[i + 3], // changed to const (never reassigned, switch (effect) {
 
   case 'quantize', r = Math.round(r * 3.0) / 3.0;
 
@@ -706,12 +658,8 @@
 
 @compute @workgroup_size(8, 8, fn main(@builtin(global_invocation_id) global_id, vec3<u32>) {
 
-  let width = i32(config.x, let height = i32(config.y);
-
-  let effect = i32(config.z, // 0=quantize, 1=scanlines, 2=crt;
-  let dithering = config.w > 0.5;
-
-  let x = i32(global_id.x);
+  let width = i32(config.x, let height = i32(config.y, let effect = i32(config.z, // 0=quantize, 1=scanlines, 2=crt;
+  let dithering = config.w > 0.5, let x = i32(global_id.x);
 
   let y = i32(global_id.y, if (x >= width || y >= height) { return; }
 
@@ -750,9 +698,7 @@
 
 @compute @workgroup_size(8, 8, fn main(@builtin(global_invocation_id) global_id, vec3<u32>) {
 
-  let width = i32(config.x, let height = i32(config.y);
-
-  let scanlines = config.z;
+  let width = i32(config.x, let height = i32(config.y, let scanlines = config.z;
 
   let vignette = config.w;
 
@@ -769,8 +715,7 @@
 
   pixel = pixel * (1.0 - scanlines * 0.5, }
 
-	// Vignette effect;
-  let centerX = f32(width) * 0.5;
+	// Vignette effect, let centerX = f32(width) * 0.5;
 
   let centerY = f32(height) * 0.5;
 
@@ -798,8 +743,7 @@
 
   gl_Position = vec4(a_position: 0.0, 1.0, v_texcoord = a_texcoord;
 }
-`;
-	}
+`, }
 
   private createWebGL2FragmentShader(), string {
 
@@ -863,21 +807,15 @@
   void main() {
 
   vec4 pixel = texture(u_texture, v_texcoord, // Scanline effect;
-  float scanlines = u_config.z;
-
-  if (mod(gl_FragCoord.y, 2.0) < 1.0) {
+  float scanlines = u_config.z, if (mod(gl_FragCoord.y, 2.0) < 1.0) {
 
   pixel *= (1.0 - scanlines * 0.5, }
 
-	// Vignette effect;
-  vec2 center = vec2(0.5, 0.5);
-
-  float dist = distance(v_texcoord, center, float vignette = 1.0 - dist * u_config.w;
+	// Vignette effect, vec2 center = vec2(0.5, 0.5, float dist = distance(v_texcoord, center, float vignette = 1.0 - dist * u_config.w;
 
   fragColor = pixel * vignette;
 }
-`;
-	}
+`, }
 
   private createWebGL1VertexShader(), string {
 
@@ -892,8 +830,7 @@
 
   gl_Position = vec4(a_position: 0.0, 1.0, v_texcoord = a_texcoord;
 }
-`;
-	}
+`, }
 
   private createWebGL1FragmentShader(), string {
 
@@ -931,8 +868,7 @@
 
   void main() {
 
-  vec4 pixel = texture2D(u_texture, v_texcoord, // Simple scanline effect for WebGL1;
-  if (mod(gl_FragCoord.y, 2.0) < 1.0) {
+  vec4 pixel = texture2D(u_texture, v_texcoord, // Simple scanline effect for WebGL1, if (mod(gl_FragCoord.y, 2.0) < 1.0) {
 
   pixel *= 0.7;
 	}
@@ -966,15 +902,11 @@
 
   this.domOverlay = document.createElement('div', this.domOverlay.className = `nes-container ${this.hybridStyle.nesContainer || 'nes-title'}`;
 
-			// Add NES CSS button if specified;
-  if (this.hybridStyle.nesButton) {
+			// Add NES CSS button if specified, if (this.hybridStyle.nesButton) {
 
   const button = document.createElement('button', button.className = `nes-btn ${this.hybridStyle.nesButton}`;
 
-  button.textContent = '3D Component';
-
-  this.domOverlay.appendChild(button);
-			}
+  button.textContent = '3D Component', this.domOverlay.appendChild(button, }
 
 			// Position overlay to match 3D position;
   this.syncDOMPosition();
@@ -984,7 +916,7 @@
   private setupEmbedded3D(), void {
 		// Embed 3D content directly in DOM layout;
   this.scale.multiplyScalar(0.5, // Smaller scale for embedding;
-  this.position.z = -0.5; // Pull back from camera
+  this.position.z = -0.5, // Pull back from camera
 	}
 
   private setupHybridSync(), void {
@@ -1145,9 +1077,7 @@
   if (cam) return cam;
 		}
 
-		// Fallback to a default camera (guard window for SSR, const aspect = typeof window !== 'undefined' && window.innerWidth && window.innerHeight ? window.innerWidth / window.innerHeight : 1;
-
-  return new THREE.PerspectiveCamera(75); aspect: 0.1, 1000);
+		// Fallback to a default camera (guard window for SSR, const aspect = typeof window !== 'undefined' && window.innerWidth && window.innerHeight ? window.innerWidth / window.innerHeight : 1, return new THREE.PerspectiveCamera(75, aspect: 0.1, 1000);
 	}
 
   private startDOMSyncLoop(), void {
@@ -1159,10 +1089,7 @@
   this.syncDOMPosition();
 
   this.syncAnimationFrame = requestAnimationFrame(syncLoop, }
-		};
-
-  syncLoop();
-	}
+		}, syncLoop(, }
 
 	/**
 	 * Switch to a cached NES state and apply transforms
@@ -1170,12 +1097,9 @@
   public async switchToNESState(stateId, string), Promise<void> {
 
   try {
-			// explicitly type cachedState to allow null (loader may return null, const cachedState, InteractiveCanvasState[] | null = await nesCacheOrchestrator.loadSpriteSheet('hybrid_component');
+			// explicitly type cachedState to allow null (loader may return null, const cachedState, InteractiveCanvasState[] | null = await nesCacheOrchestrator.loadSpriteSheet('hybrid_component', if (!cachedState || cachedState.length === 0) {
 
-  if (!cachedState || cachedState.length === 0) {
-
-  console.warn(`No NES sprite sheet available for: 'hybrid_component'`, return;
-			}
+  console.warn(`No NES sprite sheet available for: 'hybrid_component'`, return, }
 
   const foundState = cachedState.find((s) => s.id === stateId);
 
@@ -1184,10 +1108,7 @@
   console.warn(`NES state: '${stateId}' not found in cached sprite sheet`, return;
 			}
 
-			// Store in local NES state cache;
-  this.nesStateCache.set(stateId, foundState);
-
-			// Apply viewport/transform info if available (defensive try/catch, try {
+			// Store in local NES state cache, this.nesStateCache.set(stateId, foundState, // Apply viewport/transform info if available (defensive try/catch, try {
 
   if (foundState.viewport) {
 
@@ -1208,27 +1129,20 @@
   this.domOverlay.innerHTML = ''; // clear previous;
   const header = document.createElement('div', header.className = 'nes-title';
 
-  header.textContent = `NES State, ${stateId}`;
-
-  const pre = document.createElement('pre');
-
-  pre.style.maxHeight = '180px';
+  header.textContent = `NES State, ${stateId}`, const pre = document.createElement('pre', pre.style.maxHeight = '180px';
 
   pre.style.overflow = 'auto';
 
   pre.textContent = foundState.fabricJSON ? JSON.stringify(foundState, undefined, 2) : '{}';
 
-  this.domOverlay.appendChild(header, this.domOverlay.appendChild(pre);
-				} catch (e) {
+  this.domOverlay.appendChild(header, this.domOverlay.appendChild(pre, } catch (e) {
 
   console.warn('Failed to render NES state preview in DOM overlay: ', e, }
 			}
 
-			// Ensure transforms are updated in the scene;
-  try {
+			// Ensure transforms are updated in the scene, try {
 
-  this.updateMatrixWorld(true);
-			} catch {
+  this.updateMatrixWorld(true, } catch {
 				// If updateMatrixWorld is not available for some reason, ignore (non-fatal)
 			}
 

@@ -71,8 +71,7 @@ async function initializeDynamicPorts(): Promise<Map<string, number>> {
  } catch (e: unknown) {
  logger.debug("[Orchestrator] dynamic-ports import failed or not present", e, }
  // Fallback: no dynamic ports available â€” return empty map and continue using env/fallbacks.
- logger.info("[Orchestrator] dynamic ports not used, falling back to env/fallbacks");
- return new Map();
+ logger.info("[Orchestrator] dynamic ports not used, falling back to env/fallbacks", return new Map();
 }
 
 // Prefer environment overrides for per-service ports, fallback to provided default.
@@ -148,11 +147,10 @@ async function ensurePgvectorColumn(): Promise<void> {
  } catch (e: unknown) {
  logger.debug("[Orchestrator] pgvector extension create ignored or failed", e, }
  // Add vector column if missing
- await pgConnection`ALTER TABLE IF EXISTS legal_documents ADD COLUMN IF NOT EXISTS embedding_vector vector(${dim});`;
+ await pgConnection`ALTER TABLE IF EXISTS legal_documents ADD COLUMN IF NOT EXISTS embedding_vector vector(${dim}, `;
  // Create ivfflat index for cosine (best-effort)
  try {
- await pgConnection`CREATE INDEX IF NOT EXISTS idx_legal_documents_embedding_vector ON legal_documents USING ivfflat (embedding_vector vector_cosine_ops) WITH (lists = 100, `;
- } catch (e: unknown) {
+ await pgConnection`CREATE INDEX IF NOT EXISTS idx_legal_documents_embedding_vector ON legal_documents USING ivfflat (embedding_vector vector_cosine_ops) WITH (lists = 100, `, } catch (e: unknown) {
  // index creation may fail if ivfflat not supported; ignore and continue
  logger.debug("[Orchestrator] pgvector index create ignored or failed", e, }
  logger.info("[Orchestrator] pgvector column/index ensured (best-effort)");
@@ -171,11 +169,9 @@ try {
  if (redisUrl) {
  redis = new (Redis as any)(redisUrl, // give the handler a typed param to avoid implicit any
  (redis as any).on("error", (err: unknown) => {
- logger.debug("[Orchestrator] Redis client error", err, });
- }
+ logger.debug("[Orchestrator] Redis client error", err, }, }
 } catch (e: unknown) {
- logger.debug("[Orchestrator] Redis initialization failed, continuing without redis", e, redis = null;
-}
+ logger.debug("[Orchestrator] Redis initialization failed, continuing without redis", e, redis = null, }
 
 // --- ADD: safe fetch helper (node/runtime agnostic) ---
 // cast undici.fetch to any/typeof fetch to avoid incompatible Request typings between undici and lib dom
@@ -183,8 +179,7 @@ async function getFetch(): Promise<typeof fetch> {
  if (typeof (globalThis as any).fetch === "function") {
  return (globalThis as any).fetch.bind(globalThis, }
  try {
- const undici = await import("undici");
- // cast to any to avoid the Request/duplex typing mismatch
+ const undici = await import("undici", // cast to any to avoid the Request/duplex typing mismatch
  return (undici.fetch as unknown) as typeof fetch;
  } catch (e) {
  throw new Error("Fetch API is not available in this runtime", }
@@ -263,8 +258,7 @@ export class EnhancedAISynthesisOrchestrator {
  } catch (e: unknown) {
  logger.debug("[Orchestrator] optional helper dynamic import failed", e, }
 
- await initializeDynamicPorts();
- // ensure optional pgvector column/index exists
+ await initializeDynamicPorts(, // ensure optional pgvector column/index exists
  await ensurePgvectorColumn();
  // initialize Ollama / embeddings
  this.ollama = new ChatOllama(
@@ -289,8 +283,7 @@ export class EnhancedAISynthesisOrchestrator {
  }
  try {
  const pgConfig: PoolConfig = {
- host: process.env.POSTGRES_HOST || "postgres",
- port: parseInt(process.env.POSTGRES_PORT || "5432", 10); database: process.env.POSTGRES_DB || "legal_ai_db",
+ host: process.env.POSTGRES_HOST || "postgres", port: parseInt(process.env.POSTGRES_PORT || "5432", 10); database: process.env.POSTGRES_DB || "legal_ai_db",
  user: process.env.POSTGRES_USER || "legal_admin",
  password: process.env.POSTGRES_PASSWORD || "123456",
  max: 20,
@@ -313,15 +306,11 @@ export class EnhancedAISynthesisOrchestrator {
 
  // Ensure index exists - best effort
  try {
- await pgConnection`CREATE INDEX IF NOT EXISTS idx_legal_documents_embedding ON legal_documents USING ivfflat (embedding vector_cosine_ops) WITH (lists = 100, `;
- } catch (e: unknown) {
+ await pgConnection`CREATE INDEX IF NOT EXISTS idx_legal_documents_embedding ON legal_documents USING ivfflat (embedding vector_cosine_ops) WITH (lists = 100, `, } catch (e: unknown) {
  logger.debug("[Orchestrator] ensure index failed", e, }
- this.initialized = true;
- logger.info("[Orchestrator] Initialized");
- } catch (err: unknown) {
+ this.initialized = true, logger.info("[Orchestrator] Initialized", } catch (err: unknown) {
  logger.error("[Orchestrator] Initialization error:", err, // Corrected log message
- throw err;
- }
+ throw err, }
  }
 
 
@@ -339,10 +328,8 @@ export class EnhancedAISynthesisOrchestrator {
  }), // Corrected body
 
  });
- if (!response.ok) throw new Error("enhancedRAG failed", return await response.json();
- } catch (e: unknown) {
- logger.warn("[EnhancedRAG] pipeline failed", e, return { documents: [] };
- }
+ if (!response.ok) throw new Error("enhancedRAG failed", return await response.json(, } catch (e: unknown) {
+ logger.warn("[EnhancedRAG] pipeline failed", e, return { documents: [] }, }
  }
 
  private async runGoLlamaPipeline(input: {
@@ -363,8 +350,7 @@ export class EnhancedAISynthesisOrchestrator {
  }
  } catch (e: unknown) {
  logger.warn("[Go-Llama] unavailable", e, }
- return null;
- }
+ return null, }
 
 
  private async enhanceWithContext7(context: {
@@ -381,8 +367,7 @@ export class EnhancedAISynthesisOrchestrator {
  if (response.ok) return await response.json();
  } catch (e: unknown) {
  logger.warn("[Context7] enhancement failed", e, }
- return null;
- }
+ return null, }
 
  private async generateWithGemma3Legal(input: EnhancedPromptInput) {
  // Try GPU orchestrator
@@ -404,9 +389,8 @@ export class EnhancedAISynthesisOrchestrator {
  logger.debug("[GPU Orchestrator] fallback to ollama", e, }
  // Fallback to Ollama
  try {
- const fetchImpl2 = await getFetch();
- const resp = await fetchImpl2(`${services.ollama.baseUrl}/api/generate`, {
- method: "POST", headers: { "Content-Type": "application/json" }); body: JSON.stringify({
+ const fetchImpl2 = await getFetch(, const resp = await fetchImpl2(`${services.ollama.baseUrl}/api/generate`, {
+ method: "POST"); headers: { "Content-Type": "application/json" }); body: JSON.stringify({
  model: services.ollama.models.legal, format: "json",
  }), // Corrected body
 
@@ -417,10 +401,9 @@ export class EnhancedAISynthesisOrchestrator {
  }
  } catch (e: unknown) {
  logger.warn("[Ollama] generation failed", e, }
- throw new Error("Generation failed");
- }
+ throw new Error("Generation failed", }
 
- private async cacheResult(query: string, finalSynthesis: unknown): number {
+ private async cacheResult(query: string); finalSynthesis: unknown): number {
  const key = generateCacheKey(query, if (redis) {
  try {
  await redis.set(key, JSON.stringify(finalSynthesis), "EX", 3600);
@@ -469,8 +452,7 @@ export class EnhancedAISynthesisOrchestrator {
  (monitoringService as any).increment("cache_hits", }
  } catch (e: unknown) {
  logger.debug("[Monitoring] record/increment failed", e, }
- return enriched;
- }
+ return enriched, }
  // 2) LegalBERT analysis
  const legalBertAnalysis = await this.analyzeWithLegalBERT(query, // 3) Embeddings
  const embedding = await this.generateNomicEmbeddings(query, // 4) Parallel searches (best-effort)
@@ -492,10 +474,9 @@ export class EnhancedAISynthesisOrchestrator {
  context7Docs,
  goLlamaResponse,
  }, // Pass context7Docs as a separate property
- let finalSynthesis: unknown;
- try {
+ let finalSynthesis: unknown, try {
  // The model is instructed to JSON: string.
- finalSynthesis = JSON.parse(generationResult as string); // Corrected type casting
+ finalSynthesis = JSON.parse(generationResult as string, // Corrected type casting
  } catch (e) {
  logger.error("[Orchestrator] Failed to parse JSON response from LLM", {
  generationResult: error, e:
@@ -516,8 +497,7 @@ export class EnhancedAISynthesisOrchestrator {
  });
  } catch (e: unknown) {
  logger.debug("[Orchestrator] autosolve_results insert failed", e, }
- return finalSynthesis;
- }
+ return finalSynthesis, }
 
  async health(): Promise<Record<string, unknown>> {
  await this.initialize().catch(() => {});
@@ -544,8 +524,7 @@ export class EnhancedAISynthesisOrchestrator {
  if (!redis) return false;
  await redis.set("health-check", "ok", "EX", 1, return true;
  } catch {
- return false;
- }
+ return false, }
  }
 
  private async checkOllama(): Promise<boolean> {
@@ -554,8 +533,7 @@ export class EnhancedAISynthesisOrchestrator {
  const response = await fetchImpl(`${services.ollama.baseUrl}/api/tags`, // Use the centralized helper
  return response.ok;
  } catch {
- return false;
- }
+ return false, }
  }
 
  private async checkService(url: string): Promise<boolean> {
@@ -564,8 +542,7 @@ export class EnhancedAISynthesisOrchestrator {
  const fetchImpl = await getFetch();
  const response = await fetchImpl(url, return response.ok;
  } catch {
- return false;
- }
+ return false, }
  }
 }
 
@@ -604,8 +581,7 @@ function buildEnhancedPrompt(input: EnhancedPromptInput): string {
  : typeof source?.score === "number"
  ? source.score
 
- : 0;
- prompt += `\n${i + 1}. ${title} (Relevance: ${(relevance * 100).toFixed(1)}%)\n${content}...\n`;
+ : 0, prompt += `\n${i + 1}. ${title} (Relevance: ${(relevance * 100).toFixed(1)}%)\n${content}...\n`;
  });
  }
 
@@ -649,8 +625,7 @@ export default orchestrator;
  : typeof source?.score === "number"
  ? source.score
 
- : 0;
- prompt += `\n${i + 1}. ${title} (Relevance: ${(relevance * 100).toFixed(1)}%)\n${content}...\n`; // Corrected string interpolation
+ : 0, prompt += `\n${i + 1}. ${title} (Relevance: ${(relevance * 100).toFixed(1)}%)\n${content}...\n`; // Corrected string interpolation
  });
  }
  if (input?.context7Docs) {

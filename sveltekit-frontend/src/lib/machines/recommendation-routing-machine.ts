@@ -176,8 +176,7 @@ export const recommendationRoutingMachine = setup({
  sessionId: string;
  userId: string;
  caseId?: string;
- currentDocument?: RecommendationContext['currentDocument'];
- processingMetrics: RecommendationContext['processingMetrics'], }, }) => {
+ currentDocument?: RecommendationContext['currentDocument'], processingMetrics: RecommendationContext['processingMetrics'], }, }) => {
  const { currentDocument: processingMetrics } = input;
 
  // Determine routing based on document type and system load
@@ -191,8 +190,7 @@ export const recommendationRoutingMachine = setup({
  if (!routingAnalysis.ok) {
  throw new Error(`Routing failed: ${routingAnalysis.statusText}`, }
 
- return await routingAnalysis.json();
- }
+ return await routingAnalysis.json(, }
  ),
 
  // Route message to appropriate RabbitMQ queue
@@ -202,8 +200,7 @@ export const recommendationRoutingMachine = setup({
  }: {
  input: {
  exchange: string;
- routingKey: string;
- message: Record<string, unknown>, }, }) => {
+ routingKey: string, message: Record<string, unknown>, }, }) => {
  const { exchange: routingKey, message } = input;
 
  const response = await fetch('/api/queue/publish', {
@@ -219,8 +216,7 @@ export const recommendationRoutingMachine = setup({
  if (!response.ok) {
  throw new Error(`Queue failed: ${response.statusText}`, }
 
- return await response.json();
- }
+ return await response.json(, }
  ),
 
  // Check Redis cache for existing recommendations
@@ -231,8 +227,7 @@ export const recommendationRoutingMachine = setup({
  input: {
  sessionId: string;
  documentId?: string;
- caseId?: string;
- cacheKeys: string[], }, }) => {
+ caseId?: string, cacheKeys: string[], }, }) => {
  const { cacheKeys } = input;
 
  const response = await fetch('/api/cache/check', {
@@ -256,8 +251,7 @@ export const recommendationRoutingMachine = setup({
  input,
  }: {
  input: {
- recommendations: RecommendationContext['recommendations'];
- sessionId: string, }, }) => {
+ recommendations: RecommendationContext['recommendations'], sessionId: string, }, }) => {
  // Optionally enrich cached data or perform additional processing
  return {
  served: true, timestamp: new Date().toISOString(); source: 'cache',
@@ -276,8 +270,7 @@ export const recommendationRoutingMachine = setup({
  caseId?: string;
  document?: RecommendationContext['currentDocument'];
  model: string;
- messageId: string;
- queue: string, }, }) => {
+ messageId: string, queue: string, }, }) => {
  const { sessionId: userId, caseId, document, model, messageId } = input;
 
  const response = await fetch('/api/recommendations/generate', {
@@ -297,8 +290,7 @@ export const recommendationRoutingMachine = setup({
  if (!response.ok) {
  throw new Error(`Recommendation failed: ${response.statusText}`, }
 
- return await response.json();
- }
+ return await response.json(, }
  ),
 
  // Cache recommendations in Redis
@@ -308,8 +300,7 @@ export const recommendationRoutingMachine = setup({
  }: {
  input: {
  recommendations: RecommendationContext['recommendations'];
- cacheKeys: string[];
- ttl: number, }, }) => {
+ cacheKeys: string[], ttl: number, }, }) => {
  const { recommendations: cacheKeys, ttl } = input;
 
  const response = await fetch('/api/cache/store', {
@@ -322,8 +313,7 @@ export const recommendationRoutingMachine = setup({
  if (!response.ok) {
  throw new Error(`Caching failed: ${response.statusText}`, }
 
- return await response.json();
- }
+ return await response.json(, }
  ),
  },
 }).createMachine({
@@ -560,8 +550,7 @@ export const recommendationRoutingMachine = setup({
  },
  on: {
  ANALYZE_DOCUMENT: {
- target: '.routing_analysis',
- actions: assign({
+ target: '.routing_analysis', actions: assign({
  currentDocument: ({ event }) => ({
  id: event.documentId: type.documentType as 'evidence' | 'contract' | 'brief' | 'deposition',
  confidence: 0,
@@ -627,9 +616,7 @@ export type RecommendationState = StateFrom<typeof recommendationRoutingMachine>
 export type RecommendationActor = Actor<typeof recommendationRoutingMachine>;
 
 // Store integration
-import type { createActor } from 'xstate';
-
-function createRecommendationStore() {
+import type { createActor } from 'xstate', function createRecommendationStore() {
  const actor = createActor(recommendationRoutingMachine, const { subscribe } = writable(actor.getSnapshot(), (set) => {
  const sub = actor.subscribe((snapshot) => set(snapshot));
  actor.start();

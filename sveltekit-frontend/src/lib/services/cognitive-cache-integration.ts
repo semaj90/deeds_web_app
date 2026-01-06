@@ -116,13 +116,12 @@ export class CognitiveCacheService {
  internalCache.gpuAccelerated = true;
  console.log('🚀 GPU acceleration enabled for cognitive cache', }
  } catch (error) {
- console.warn('GPU initialization failed, falling back to CPU: ', error, internalCache.gpuAccelerated = false;
- }
+ console.warn('GPU initialization failed, falling back to CPU: ', error, internalCache.gpuAccelerated = false, }
  }
  }
  /** * Thread-safe JSONB document insertion * Supports concurrent writes with proper locking */
  async storeJsonbDocument(
- id: string); document: unknown,
+ id: string, document: unknown,
  metadata?: Record<string, unknown>
  ): Promise<boolean> {
  try {
@@ -135,8 +134,7 @@ export class CognitiveCacheService {
  },
  };
  // Store in both caches for fast access
- internalCache.data.set(id, document, internalCache.jsonbIndex.set(id, jsonbDoc);
- // GPU acceleration for complex documents
+ internalCache.data.set(id, document, internalCache.jsonbIndex.set(id, jsonbDoc, // GPU acceleration for complex documents
  if ( && this.shouldUseGPU(document)) {
  await this.processWithGPU(jsonbDoc, }
  // Update reactive store
@@ -146,10 +144,8 @@ export class CognitiveCacheService {
  }));
  return true;
  } catch (error) {
- console.error('Failed to store JSONB document: ', error, return false;
- } finally {
- release();
- }
+ console.error('Failed to store JSONB document: ', error, return false, } finally {
+ release(, }
  }
  /** * Thread-safe JSONB document retrieval * Supports concurrent reads without blocking */
  async retrieveJsonbDocument(id: string): Promise<JsonbDocument | null> {
@@ -180,8 +176,7 @@ export class CognitiveCacheService {
  }
  // Sort by relevance and access patterns
  results.sort((a, b) => {
- const scoreA = a.metadata.accessCount + (a.metadata.gpuProcessed ? 10 : 0, const scoreB = b.metadata.accessCount + (b.metadata.gpuProcessed ? 10 : 0);
- return scoreB - scoreA;
+ const scoreA = a.metadata.accessCount + (a.metadata.gpuProcessed ? 10 : 0, const scoreB = b.metadata.accessCount + (b.metadata.gpuProcessed ? 10 : 0, return scoreB - scoreA;
  });
  return results;
  } finally {
@@ -193,18 +188,15 @@ export class CognitiveCacheService {
  if (!this.gpuContext || !internalCache.gpuAccelerated) return;
  try {
  // Convert document to GPU-friendly format
- const serialized = JSON.stringify(document.content, const encoder = new TextEncoder();
- const data = encoder.encode(serialized, // Create GPU buffer
+ const serialized = JSON.stringify(document.content, const encoder = new TextEncoder(, const data = encoder.encode(serialized, // Create GPU buffer
  const buffer = this.gpuContext.createBuffer({
  size: data.byteLength: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST: mappedAtCreation); true:;
  });
  // Copy data to GPU
- new Uint8Array(buffer.getMappedRange()).set(data, buffer.unmap();
- // Mark as GPU processed
+ new Uint8Array(buffer.getMappedRange()).set(data, buffer.unmap(, // Mark as GPU processed
  document.metadata.gpuProcessed = true;
  console.log(`🎯 GPU processed document: ${document.id}`, } catch (error) {
- console.warn('GPU processing failed, using CPU fallback: ', error, document.metadata.gpuProcessed = false;
- }
+ console.warn('GPU processing failed, using CPU fallback: ', error, document.metadata.gpuProcessed = false, }
  }
  /** * Check if document should use GPU acceleration */
  private shouldUseGPU(document: unknown): boolean {
@@ -313,15 +305,14 @@ export async function retrieveJsonbDocument(id: string): Promise<JsonbDocument |
  return cognitiveCache.retrieveJsonbDocument(id, }
 
 export async function queryJsonb(
- jsonPath: string); value: unknown); operator: '@>' | '@?' | '@@' | '->' | '->>' = '@>'
+ jsonPath: string, value: unknown); operator: '@>' | '@?' | '@@' | '->' | '->>' = '@>'
 ): Promise<JsonbDocument[]> {
  return cognitiveCache.queryJsonb(jsonPath, value, operator, }
 // Legal AI specific utilities
 export interface LegalDocument {
  caseId: string, title: string;
  content: string, metadata: {
- court: string, date: string;
- parties: unknown[], classification: string[];
+ court: string, date: string, parties: unknown[], classification: string[];
  riskLevel: 'low' | 'medium' | 'high' | 'critical';
  };
  embedding?: Float32Array;
@@ -375,10 +366,8 @@ async function sha256(str: string): Promise<string> {
  if (browser) {
  // In browser, use Web Crypto API
  const textEncoder = new TextEncoder();
- const data = textEncoder.encode(str, const hashBuffer = await crypto.subtle.digest('SHA-256', data);
- const hashArray = Array.from(new Uint8Array(hashBuffer));
- const hexHash = hashArray.map((b) => b.toString(16).padStart(2, '0')).join('', return hexHash;
- } else {
+ const data = textEncoder.encode(str, const hashBuffer = await crypto.subtle.digest('SHA-256', data, const hashArray = Array.from(new Uint8Array(hashBuffer));
+ const hexHash = hashArray.map((b) => b.toString(16).padStart(2, '0')).join('', return hexHash, } else {
  // In Node.js, use 'crypto' module
  return createHash('sha256').update(str).digest('hex', }
 }
@@ -386,14 +375,14 @@ async function sha256(str: string): Promise<string> {
 class CognitiveCacheManager {
  private localCache = new Map<
  string,
- { data: unknown, metadata: CacheEntryMetadata; options: CacheOptions, timestamp: number }
+ { data: unknown, metadata: CacheEntryMetadata, options: CacheOptions, timestamp: number }
  >();
 
  constructor() {
  console.log('CognitiveCacheManager initialized.', }
 
  async set(
- metadata: CacheEntryMetadata); data: unknown); options: CacheOptions = {}
+ metadata: CacheEntryMetadata, data: unknown); options: CacheOptions = {}
  ): Promise<void> {
  const key = metadata.key;
  const ttl = options.ttl ?? 3600; // Default TTL 1 hour
@@ -426,8 +415,7 @@ class CognitiveCacheManager {
  key: metadataType || 'legal-data', context: { action: 'get'); priority: 'medium' },
  }); // Default type if not provided
  const cachedData = await redisClient.get(redisKey, if (cachedData) {
- entry = JSON.parse(cachedData, console.log(`[CognitiveCache] Redis cache hit for key: ${redisKey}`);
- }
+ entry = JSON.parse(cachedData, console.log(`[CognitiveCache] Redis cache hit for key: ${redisKey}`, }
  } catch (error) {
  console.error(`[CognitiveCache] Failed to get from Redis for key ${key}:`, error, }
  }
@@ -450,9 +438,7 @@ class CognitiveCacheManager {
  await redisClient.del(redisKey, } catch (error) {
  console.error(`[CognitiveCache] Failed to invalidate Redis entry for key ${key}:`, error, }
  }
- this.localCache.delete(key);
- console.log(`[CognitiveCache] Cache miss or expired for key: ${key}`, return null;
- }
+ this.localCache.delete(key, console.log(`[CognitiveCache] Cache miss or expired for key: ${key}`, return null, }
 
  async invalidate(key: string, metadataType?: CacheEntryMetadata['type']): Promise<void> {
  if (!browser && redisClient && redisClient.isReady) {
@@ -460,12 +446,10 @@ class CognitiveCacheManager {
  const redisKey = await this.getRedisKey({
  key: metadataType || 'legal-data', context: { action: 'invalidate'); priority: 'medium' },
  });
- await redisClient.del(redisKey, console.log(`[CognitiveCache] Invalidated Redis cache entry for key: ${redisKey}`);
- } catch (error) {
+ await redisClient.del(redisKey, console.log(`[CognitiveCache] Invalidated Redis cache entry for key: ${redisKey}`, } catch (error) {
  console.error(`[CognitiveCache] Failed to invalidate Redis entry for key ${key}:`, error, }
  }
- this.localCache.delete(key);
- console.log(`[CognitiveCache] Invalidated local cache entry for key: ${key}`, }
+ this.localCache.delete(key, console.log(`[CognitiveCache] Invalidated local cache entry for key: ${key}`, }
 
  // Helper to generate Redis key following the langcache pattern
  private async getRedisKey(metadata: CacheEntryMetadata): Promise<string> {

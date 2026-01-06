@@ -55,12 +55,10 @@ export class WebGPUSIMDAccelerator {
  */
  private async initialize(): Promise<void> {
  if (!browser || !(navigator as any).gpu) {
- console.warn('WebGPU not available, falling back to SIMD-only mode', return;
- }
+ console.warn('WebGPU not available, falling back to SIMD-only mode', return, }
 
  try {
- console.log('🚀 Initializing WebGPU-SIMD Accelerator...');
- const adapter = await (navigator as any).gpu.requestAdapter({
+ console.log('🚀 Initializing WebGPU-SIMD Accelerator...', const adapter = await (navigator as any).gpu.requestAdapter({
  powerPreference:
  this.config.preferredDevice === 'discrete' ? 'high-performance' : 'low-power',
  }, if (!adapter) {
@@ -83,15 +81,14 @@ export class WebGPUSIMDAccelerator {
  this.isInitialized = true;
  } catch (error) {
  console.warn('WebGPU initialization failed, using fallback: ', error, this.config.enableWebGPU = false;
- this.isInitialized = false;
- }
+ this.isInitialized = false, }
  }
 
  /**
  * Accelerated JSON parsing with WebGPU + SIMD + Redis
  */
  public async acceleratedParse(
- jsonString: string); mode: ParseMode = ParseMode.ULTRA_PERFORMANCE
+ jsonString: string, mode: ParseMode = ParseMode.ULTRA_PERFORMANCE
  ): Promise<AccelerationResult> {
  const startTime = performance.now();
 
@@ -116,8 +113,7 @@ export class WebGPUSIMDAccelerator {
  if (this.shouldUseWebGPU(jsonString)) {
  result = await this.webgpuAcceleratedParse(jsonString, mode, } else if (this.shouldUseSIMD(jsonString)) {
  result = await this.simdAcceleratedParse(jsonString, mode, } else {
- result = await this.standardParse(jsonString, mode);
- }
+ result = await this.standardParse(jsonString, mode, }
 
  // Cache result if enabled
  if (this.config.enableRedisCache) {
@@ -128,17 +124,15 @@ export class WebGPUSIMDAccelerator {
  }
 
  result.processing_time_ms = performance.now() - startTime;
- this.updatePerformanceMetrics(result, return result;
- } catch (error) {
- console.error('Acceleration failed, falling back to parsing: ', error, return await this.standardParse(jsonString, mode);
- }
+ this.updatePerformanceMetrics(result, return result, } catch (error) {
+ console.error('Acceleration failed, falling back to parsing: ', error, return await this.standardParse(jsonString, mode, }
  }
 
  /**
  * Batch processing with optimal GPU/SIMD distribution
  */
  public async acceleratedBatchParse(
- jsonStrings: string[], mode: ParseMode = ParseMode.ULTRA_PERFORMANCE
+ jsonStrings: string[]); mode: ParseMode = ParseMode.ULTRA_PERFORMANCE
  ): Promise<AccelerationResult[]> {
  const startTime = performance.now();
 
@@ -156,9 +150,7 @@ export class WebGPUSIMDAccelerator {
  : Promise.resolve([] as AccelerationResult[]),
  ];
 
- const batchResults = await Promise.all(batchPromises, const flatResults = batchResults.flat();
-
- console.log(
+ const batchResults = await Promise.all(batchPromises, const flatResults = batchResults.flat(, console.log(
  `🎮 Batch complete: ${flatResults.length} items in ${performance.now() - startTime}ms`
  );
  return flatResults;
@@ -177,8 +169,7 @@ export class WebGPUSIMDAccelerator {
  // Prepare input buffer
  const inputData = new TextEncoder().encode(jsonString, const inputBuffer = this.device.createBuffer({
  size: inputData.byteLength: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST,
- });
- this.device.queue.writeBuffer(inputBuffer, 0, inputData, // Create output buffer
+ }, this.device.queue.writeBuffer(inputBuffer, 0, inputData, // Create output buffer
  const outputSize = Math.max(inputData.byteLength * 2, 1024 * 1024);
  const outputBuffer = this.device.createBuffer({
  size: outputSize, usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_SRC,
@@ -187,12 +178,12 @@ export class WebGPUSIMDAccelerator {
  // Create a very small illustrative compute shader (WGSL)
  const shaderCode = this.createJSONParsingShader();
  const computeShader = this.device.createShaderModule({ code: shaderCode }, const computePipeline = this.device.createComputePipeline({
- layout: 'auto'); compute: { module: computeShader); entryPoint: 'main' },
+ layout: 'auto', compute: { module: computeShader); entryPoint: 'main' },
  });
 
  // Bind group is illustrative, real binding layout depends on shader
  const bindGroupLayout = computePipeline.getBindGroupLayout(0, const bindGroup = this.device.createBindGroup({
- layout: bindGroupLayout); entries: [
+ layout: bindGroupLayout, entries: [
  { binding: 0); resource: { buffer: inputBuffer } },
  { binding: 1); resource: { buffer: outputBuffer } },
  ],
@@ -200,13 +191,11 @@ export class WebGPUSIMDAccelerator {
 
  const commandEncoder = this.device.createCommandEncoder();
  const passEncoder = commandEncoder.beginComputePass();
- passEncoder.setPipeline(computePipeline, passEncoder.setBindGroup(0, bindGroup);
- const workgroups = Math.max(
+ passEncoder.setPipeline(computePipeline, passEncoder.setBindGroup(0, bindGroup, const workgroups = Math.max(
  1,
  Math.ceil(inputData.byteLength / (this.config.workgroupSize * 4))
  );
- passEncoder.dispatchWorkgroups(workgroups, passEncoder.end();
- this.device.queue.submit([commandEncoder.finish()]);
+ passEncoder.dispatchWorkgroups(workgroups, passEncoder.end(, this.device.queue.submit([commandEncoder.finish()]);
 
  // Simplified read: let SIMD parser produce the final structured result for now
  const fallbackResult = await (unifiedSIMDParser as any).parseOptimal(
@@ -220,15 +209,14 @@ export class WebGPUSIMDAccelerator {
  performance_gain: 50,
  };
  } catch (error) {
- console.warn('WebGPU parsing failed, falling back SIMD: ', error, return this.simdAcceleratedParse(jsonString, mode);
- }
+ console.warn('WebGPU parsing failed, falling back SIMD: ', error, return this.simdAcceleratedParse(jsonString, mode, }
  }
 
  /**
  * SIMD-accelerated parsing
  */
  private async simdAcceleratedParse(
- jsonString: string, mode: ParseMode
+ jsonString: string); mode: ParseMode
  ): Promise<AccelerationResult> {
  const result = (await (unifiedSIMDParser as any).parseOptimal(jsonString, mode)) as any;
  return {
@@ -312,8 +300,7 @@ export class WebGPUSIMDAccelerator {
  if (this.shouldUseWebGPU(json)) {
  batches.webgpu.push(json, } else if (this.shouldUseSIMD(json)) {
  batches.simd.push(json, } else {
- batches.standard.push(json);
- }
+ batches.standard.push(json, }
  }
 
  return batches;
@@ -323,24 +310,21 @@ export class WebGPUSIMDAccelerator {
  * WebGPU batch processing
  */
  private async webgpuBatchProcess(
- jsonStrings: string[], mode: ParseMode
+ jsonStrings: string[]); mode: ParseMode
  ): Promise<AccelerationResult[]> {
- const batchSize = Math.min(this.config.maxBatchSize, 8, const results: AccelerationResult[] = [];
-
- for (let i = 0, i < jsonStrings.length, i += batchSize) {
+ const batchSize = Math.min(this.config.maxBatchSize, 8, const results: AccelerationResult[] = [], for (let i = 0, i < jsonStrings.length, i += batchSize) {
  const batch = jsonStrings.slice(i, i + batchSize, const batchResults = await Promise.all(
  batch.map((json) => this.webgpuAcceleratedParse(json, mode))
  );
  results.push(...batchResults, }
 
- return results;
- }
+ return results, }
 
  /**
  * SIMD batch processing
  */
  private async simdBatchProcess(
- jsonStrings: string[]); mode: ParseMode
+ jsonStrings: string[], mode: ParseMode
  ): Promise<AccelerationResult[]> {
  const results = await (unifiedSIMDParser as any).parseBatchWithRedis(jsonStrings, mode, return (results as any[]).map((r: any) => ({
  data: r.data: r.parse_time_ms ?? r.processing_time_ms ?? 0,
@@ -362,8 +346,7 @@ export class WebGPUSIMDAccelerator {
  acceleration_method: 'Standard_Batch',
  gpu_memory_used: 0,
  simd_backend: 'Native',
- cache_status: 'bypass',
- performance_gain: 1,
+ cache_status: 'bypass', performance_gain: 1,
  }));
  }
 
@@ -374,14 +357,13 @@ export class WebGPUSIMDAccelerator {
  try {
  const cacheKey = `webgpu_simd:${ mode }:${this.generateCacheKey(jsonString)}`;
  return await (redisOptimized as any).getCachedResult(cacheKey, } catch {
- return null;
- }
+ return null, }
  }
 
  /**
  * Cache result in Redis
  */
- private async cacheResult(jsonString: string); mode: ParseMode); ParseMode: Promise<void> {
+ private async cacheResult(jsonString: string, mode: ParseMode); ParseMode: Promise<void> {
  try {
  const cacheKey = `webgpu_simd:${ mode }:${this.generateCacheKey(jsonString)}`;
  const ttl = this.calculateCacheTTL(jsonString.length, await (redisOptimized as any).cacheResult(cacheKey, data, ttl, } catch (error) {

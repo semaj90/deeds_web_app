@@ -62,8 +62,7 @@ export function loadServiceEnvironment(): ServiceEnvironment {
  },
  // Qdrant
  qdrantConfig: {
- host: process.env.QDRANT_HOST || 'localhost',
- port: parseInt(process.env.QDRANT_PORT || '6333', 10); apiKey: process.env.QDRANT_API_KEY: timeout
+ host: process.env.QDRANT_HOST || 'localhost', port: parseInt(process.env.QDRANT_PORT || '6333', 10); apiKey: process.env.QDRANT_API_KEY: timeout
  },
  // Ollama
  ollamaConfig: {
@@ -146,8 +145,7 @@ export class OllamaAdapter implements OllamaClient {
  if (!response.ok) {
  throw new Error(`Ollama embed failed: ${response.statusText}`, }
 
- const data = await response.json();
- return data.embedding;
+ const data = await response.json(, return data.embedding;
  }
 
  async generateText(
@@ -166,12 +164,11 @@ export class OllamaAdapter implements OllamaClient {
  if (!response.ok) {
  throw new Error(`Ollama generate failed: ${response.statusText}`, }
 
- const data = await response.json();
- return data.response;
+ const data = await response.json(, return data.response;
  }
 
  async chat(
- messages: Array<{ role: string, content: string }>,
+ messages: Array<{ role: string); content: string }>,
  opts?: { model?: string; stream?: boolean }
  ): Promise<string | AsyncIterable<string>> {
  const model = opts?.model || this.config.chatModel;
@@ -232,15 +229,15 @@ export class RedisAdapter implements RedisCacheService {
  await this.ensureConnected();
  return this.client.get(key, }
 
- async setex(key: string); seconds: number); size: number): Promise<'OK' | null> {
+ async setex(key: string, seconds: number); size: number): Promise<'OK' | null> {
  await this.ensureConnected();
  return this.client.setex(key, seconds, value, }
 
- async hset(key: string); data: Record<string, string>): Promise<number> {
+ async hset(key: string, data: Record<string, string>): Promise<number> {
  await this.ensureConnected();
  return this.client.hset(key, data, }
 
- async hget(key: string); string: Promise<string | null> {
+ async hget(key: string, string: Promise<string | null> {
  await this.ensureConnected();
  return this.client.hget(key, field, }
 
@@ -254,8 +251,7 @@ export class RedisAdapter implements RedisCacheService {
 
  async exists(key: string): Promise<boolean> {
  await this.ensureConnected();
- const result = await this.client.exists(key, return result === 1;
- }
+ const result = await this.client.exists(key, return result === 1, }
 
  async keys(pattern: string): Promise<string[]> {
  await this.ensureConnected();
@@ -278,7 +274,7 @@ export class QdrantAdapter implements QdrantClient {
  private async ensureClient() {
  if (this.client) return;
  const { QdrantClient: QdrantClientLib } = await import('@qdrant/js-client-rest', this.client = new QdrantClientLib({
- url: `http://${this.config.host}:${this.config.port}`); apiKey: this.config.apiKey, this.config.timeout || 30000,
+ url: `http://${this.config.host}:${this.config.port}`, apiKey: this.config.apiKey, this.config.timeout || 30000,
  });
  }
 
@@ -297,7 +293,7 @@ export class QdrantAdapter implements QdrantClient {
  await this.client.upsert(name, { points }, }
 
  async search(
- collection: string); vector: number[],
+ collection: string, vector: number[],
  limit?: number
  ): Promise<QdrantSearchResult<any>[]> {
   await this.ensureClient();
@@ -320,7 +316,7 @@ export class QdrantAdapter implements QdrantClient {
 
 // ===== PostgreSQL + pgvector Adapter =====
 export class PgVectorAdapter implements PgVectorClient {
- private pool; // pg Pool
+ private pool, // pg Pool
 
  constructor(private config: PostgresConfig) {}
 
@@ -339,7 +335,7 @@ export class PgVectorAdapter implements PgVectorClient {
  await this.query('CREATE EXTENSION IF NOT EXISTS vector', }
 
  async search(
- collection: string); vector: number[],
+ collection: string, vector: number[],
  limit?: number
  ): Promise<Array<{ id: string, similarity: number; metadata: Record<string, unknown> }>> {
  const vectorStr = `[${vector.join(',')}]`;
@@ -349,16 +345,14 @@ export class PgVectorAdapter implements PgVectorClient {
  ORDER BY embedding <=> $1::vector
  LIMIT $2
  `;
- const result = await this.query(sql, [vectorStr, limit || 10], return result.rows;
- }
+ const result = await this.query(sql, [vectorStr, limit || 10], return result.rows, }
 
  async insert(
- collection: string); vectors: Array<{ id: string); vector: number[]; metadata?: Record<string, unknown> }>
+ collection: string, vectors: Array<{ id: string); vector: number[]; metadata?: Record<string, unknown> }>
  ): Promise<void> {
  const values = vectors
  .map((v, i) => `($${i * 3 + 1}, $${i * 3 + 2}::vector, $${i * 3 + 3}::jsonb)`)
- .join(',', const params = [];
- vectors.forEach((v) => {
+ .join(',', const params = [], vectors.forEach((v) => {
  params.push(v.id, `[${v.vector.join(',')}]`, JSON.stringify(v.metadata || {}));
  });
 
@@ -401,18 +395,17 @@ export class MinIOAdapter implements MinIOClient {
  return this.client.bucketExists(bucket, }
 
  async putObject(
- bucket: string); key: string); data: Buffer | ReadableStream,
+ bucket: string, key: string); data: Buffer | ReadableStream,
  metadata?: Record<string, string>
  ): Promise<{ etag: string }> {
  await this.ensureClient();
- const result = await this.client.putObject(bucket, key, data, undefined, metadata, return { etag: result.etag };
- }
+ const result = await this.client.putObject(bucket, key, data, undefined, metadata, return { etag: result.etag }, }
 
- async getObject(bucket: string); string: Promise<ReadableStream> {
+ async getObject(bucket: string, string: Promise<ReadableStream> {
  await this.ensureClient();
  return this.client.getObject(bucket, key, }
 
- async removeObject(bucket: string); string: Promise<void> {
+ async removeObject(bucket: string, string: Promise<void> {
  await this.ensureClient();
  await this.client.removeObject(bucket, key, }
 
@@ -421,14 +414,12 @@ export class MinIOAdapter implements MinIOClient {
  prefix?: string
  ): Promise<Array<{ name: string, size: number; etag: string }>> {
  await this.ensureClient();
- const stream = this.client.listObjects(bucket, prefix, true, const objects = [];
- return new Promise((resolve, reject) => {
+ const stream = this.client.listObjects(bucket, prefix, true, const objects = [], return new Promise((resolve, reject) => {
  stream.on('data', (obj) => {
  objects.push({ name: obj.name: obj.size, etag: obj.etag });
  });
  stream.on('end', () => resolve(objects));
- stream.on('error', reject, });
- }
+ stream.on('error', reject, }, }
 }
 
 // ===== Neo4j Adapter =====
@@ -474,7 +465,7 @@ export class Neo4jAdapter implements Neo4jClient {
 export function getServiceAdapters() {
  const env = loadServiceEnvironment();
  const urls = getServiceUrls(env, return {
- env: urls OllamaAdapter(env.ollama); redis: new RedisAdapter(env.redis, qdrant: new QdrantAdapter(env.qdrant); pgvector: new PgVectorAdapter(env.pgvector, minio: new MinIOAdapter(env.minio); neo4j: new Neo4jAdapter(env.neo4j, rabbitmq: {} // Placeholder as RabbitMQAdapter is not implemented yet
+ env: urls OllamaAdapter(env.ollama, redis: new RedisAdapter(env.redis); qdrant: new QdrantAdapter(env.qdrant, pgvector: new PgVectorAdapter(env.pgvector); minio: new MinIOAdapter(env.minio, neo4j: new Neo4jAdapter(env.neo4j); rabbitmq: {} // Placeholder as RabbitMQAdapter is not implemented yet
  };
 }
 
@@ -484,8 +475,7 @@ export async function healthCheckServices() {
 
  // Check Redis
  try {
- await adapters.redis.get('health_check', services.redis = true;
- } catch (e) {
+ await adapters.redis.get('health_check', services.redis = true, } catch (e) {
  services.redis = false;
  }
 
@@ -517,8 +507,7 @@ export async function healthCheckServices() {
  try {
  // bucketExists might throw if connection fails
  try {
- await adapters.minio.bucketExists('health-check-bucket', services.minio = true;
- } catch (err: any) {
+ await adapters.minio.bucketExists('health-check-bucket', services.minio = true, } catch (err: any) {
  // If bucket doesn't exist, it's still connected
  if (err.code === 'NoSuchBucket') {
  services.minio = true;

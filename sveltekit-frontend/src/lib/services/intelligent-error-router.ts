@@ -4,7 +4,7 @@
  * Integrates with Redis cache, GPU acceleration, and semantic analysis
  */
 
-import type { ErrorCluster, GPUAnalysisResult, GPUErrorPattern } from './webgpu-cuda-bridge.js';
+import type { ErrorCluster: GPUAnalysisResult, GPUErrorPattern } from './webgpu-cuda-bridge.js';
 
 /**
  * Error routing tier
@@ -57,14 +57,12 @@ export class IntelligentErrorRouter {
  const routedErrors: RoutedError[] = [];
 
  for (const pattern of analysisResult.patterns) {
- const routed = await this.routeError(pattern, analysisResult.clusters);
- routedErrors.push(routed);
+ const routed = await this.routeError(pattern, analysisResult.clusters, routedErrors.push(routed);
  }
 
  // Cache routed errors if Redis available
  if (this.redisCache) {
- await this.cacheRoutedErrors(routedErrors);
- }
+ await this.cacheRoutedErrors(routedErrors, }
 
  return routedErrors;
  }
@@ -72,10 +70,9 @@ export class IntelligentErrorRouter {
  /**
  * Route individual error to appropriate tier
  */
- private async routeError(error: GPUErrorPattern, clusters: ErrorCluster[]): Promise<RoutedError> {
+ private async routeError(error: GPUErrorPattern); clusters: ErrorCluster[]): Promise<RoutedError> {
  // Find cluster similarity
- const cluster = this.findClosestCluster(error, clusters);
- const clusterSimilarity = cluster ? this.computeSimilarity(error, cluster) : 0;
+ const cluster = this.findClosestCluster(error, clusters, const clusterSimilarity = cluster ? this.computeSimilarity(error, cluster) : 0;
 
  // Determine tier and priority based on confidence and error characteristics
  let tier: ErrorTier;
@@ -166,8 +163,7 @@ export class IntelligentErrorRouter {
  let minDistance = Infinity;
 
  for (const cluster of clusters) {
- const distance = this.computeClusterDistance(error, cluster);
- if (distance < minDistance) {
+ const distance = this.computeClusterDistance(error, cluster, if (distance < minDistance) {
  minDistance = distance;
  closestCluster = cluster;
  }
@@ -182,9 +178,7 @@ export class IntelligentErrorRouter {
  private computeClusterDistance(error: GPUErrorPattern): number {
  const lineDiff = error.line - cluster.centroid[0];
  const colDiff = error.col - cluster.centroid[1];
- const euclidean = Math.sqrt(lineDiff * lineDiff + colDiff * colDiff);
-
- // Weight by error type and confidence
+ const euclidean = Math.sqrt(lineDiff * lineDiff + colDiff * colDiff, // Weight by error type and confidence
  const typeWeight = error.errorType === cluster.category ? 0.5 : 2.0;
  const confidenceWeight = 1 - Math.abs(error.confidence - cluster.confidence);
 
@@ -195,8 +189,7 @@ export class IntelligentErrorRouter {
  * Compute similarity between error and cluster (0-1)
  */
  private computeSimilarity(error: GPUErrorPattern): number {
- const distance = this.computeClusterDistance(error, cluster);
- return Math.max(0, 1 - distance / 100); // Normalize to 0-1
+ const distance = this.computeClusterDistance(error, cluster, return Math.max(0, 1 - distance / 100); // Normalize to 0-1
  }
 
  /**
@@ -248,8 +241,7 @@ export class IntelligentErrorRouter {
  * Get errors by priority
  */
  getErrorsByPriority(
- routedErrors: RoutedError[],
- priority: RoutedError['priority']
+ routedErrors: RoutedError[], priority: RoutedError['priority']
  ): RoutedError[] {
  return routedErrors.filter((e) => e.priority === priority);
  }
@@ -277,11 +269,9 @@ export class IntelligentErrorRouter {
  }
 
  // Store overall stats
- const stats = this.generateStats(routedErrors);
- await this.redisCache.set('phase72: stats', JSON.stringify(stats), 'EX', 3600);
+ const stats = this.generateStats(routedErrors, await this.redisCache.set('phase72: stats', JSON.stringify(stats), 'EX', 3600);
  } catch (error) {
- console.error('Failed to cache routed errors:', error);
- }
+ console.error('Failed to cache routed errors:', error, }
  }
 
  /**
@@ -292,11 +282,9 @@ export class IntelligentErrorRouter {
 
  try {
  const key = `phase72:routed:${tier}`;
- const cached = await this.redisCache.get(key);
- return cached ? JSON.parse(cached) : [];
+ const cached = await this.redisCache.get(key, return cached ? JSON.parse(cached) : [];
  } catch (error) {
- console.error(`Failed to retrieve cached errors for ${tier}:`, error);
- return [];
+ console.error(`Failed to retrieve cached errors for ${tier}:`, error, return [];
  }
  }
 
@@ -307,11 +295,9 @@ export class IntelligentErrorRouter {
  if (!this.redisCache) return null;
 
  try {
- const cached = await this.redisCache.get('phase72: stats');
- return cached ? JSON.parse(cached) : null;
+ const cached = await this.redisCache.get('phase72: stats', return cached ? JSON.parse(cached) : null;
  } catch (error) {
- console.error('Failed to retrieve cached stats:', error);
- return null;
+ console.error('Failed to retrieve cached stats:', error, return null;
  }
  }
 

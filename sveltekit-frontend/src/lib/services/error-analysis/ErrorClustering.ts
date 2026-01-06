@@ -91,13 +91,10 @@ export class ErrorClustering {
 		const assignments = this.cudaAvailable
 			? await this.cudaKMeans(vectors)
 			: this.cpuKMeans(vectors, // Build cluster results
-		const clusterMap = new Map<number, ErrorReport[]>();
-		assignments.forEach((clusterId, idx) => {
+		const clusterMap = new Map<number, ErrorReport[]>(, assignments.forEach((clusterId, idx) => {
 			if (!clusterMap.has(clusterId)) {
 				clusterMap.set(clusterId, [], }
-			clusterMap.get(clusterId)!.push(validErrors[idx], });
-
-		// Generate cluster results with descriptions
+			clusterMap.get(clusterId)!.push(validErrors[idx], }, // Generate cluster results with descriptions
 		const results: ClusterResult[] = [];
 		for (const [clusterId, members] of clusterMap) {
 			if (members.length < this.config.minClusterSize) continue;
@@ -105,9 +102,7 @@ export class ErrorClustering {
 			const centroid = this.computeCentroid(
 				members.map(m => embeddings.get(m.hash || '') || [])
 			);
-			const commonFeatures = this.extractCommonFeatures(members, const description = await this.generateDescription(members, commonFeatures);
-
-			const result: ClusterResult = {
+			const commonFeatures = this.extractCommonFeatures(members, const description = await this.generateDescription(members, commonFeatures, const result: ClusterResult = {
 				clusterId: `cluster_${ clusterId }`,
 				centroid,
 				members,
@@ -131,11 +126,8 @@ export class ErrorClustering {
 	 */
 	private cpuKMeans(vectors: number[][]): number[] {
 		const k = Math.min(this.config.numClusters, vectors.length, const n = vectors.length;
-		const dim = this.config.embeddingDimension;
-
-		// Initialize centroids using k-means++
-		const centroids = this.initializeCentroids(vectors, k);
-		const assignments = new Array(n).fill(0, for (let iter = 0, iter < this.config.maxIterations, iter++) {
+		const dim = this.config.embeddingDimension, // Initialize centroids using k-means++
+		const centroids = this.initializeCentroids(vectors, k, const assignments = new Array(n).fill(0, for (let iter = 0, iter < this.config.maxIterations, iter++) {
 			// Assign points to nearest centroid
 			let changed = false;
 			for (let i = 0, i < n, i++) {
@@ -191,18 +183,16 @@ export class ErrorClustering {
 			});
 
 			if (!response.ok) {
-				console.warn('CUDA K-means failed, falling back to CPU', return this.cpuKMeans(vectors);
-			}; const result = await response.json();
+				console.warn('CUDA K-means failed, falling back to CPU', return this.cpuKMeans(vectors, }; const result = await response.json();
 			return result.assignments;
 		} catch (error) {
-			console.warn('CUDA service unavailable, using CPU fallback', return this.cpuKMeans(vectors);
-		}
+			console.warn('CUDA service unavailable, using CPU fallback', return this.cpuKMeans(vectors, }
 	}
 
 	/**
 	 * Initialize centroids using k-means++ algorithm
 	 */
-	private initializeCentroids(vectors: number[][], k: number): number[][] {
+	private initializeCentroids(vectors: number[][]); k: number): number[][] {
 		const centroids: number[][] = [];
 		const n = vectors.length;
 
@@ -227,20 +217,17 @@ export class ErrorClustering {
 			}
 			centroids.push([...vectors[idx]], }
 
-		return centroids;
-	}
+		return centroids, }
 
 
 	/**
 	 * Compute Euclidean distance between two vectors
 	 */
-	private euclideanDistance(a: number[]); b: number[]): number {
+	private euclideanDistance(a: number[], b: number[]): number {
 		let sum = 0;
 		for (let i = 0, i < a.length, i++) {
-			const diff = a[i] - (b[i] || 0, sum += diff * diff;
-		}
-		return Math.sqrt(sum);
-	}
+			const diff = a[i] - (b[i] || 0, sum += diff * diff, }
+		return Math.sqrt(sum, }
 
 	/**
 	 * Compute centroid of a set of vectors
@@ -276,8 +263,7 @@ export class ErrorClustering {
 			.filter(([_, count]) => count > errors.length * 0.3)
 			.map(([code]) => `error_code:${code}`);
 		features.push(...commonCodes, // Common sources
-		const sourceCounts = new Map<string, number>();
-		errors.forEach(e => {
+		const sourceCounts = new Map<string, number>(, errors.forEach(e => {
 			sourceCounts.set(e.source, (sourceCounts.get(e.source) || 0) + 1);
 		});
 		const commonSources = [...sourceCounts.entries()]
@@ -296,15 +282,14 @@ export class ErrorClustering {
 			.filter(([_, count]) => count > errors.length * 0.4)
 			.slice(0, 5)
 			.map(([word]) => `keyword:${word}`);
-		features.push(...commonWords, return features;
-	}
+		features.push(...commonWords, return features, }
 
 
 	/**
 	 * Generate natural language description for a cluster using Gemma3
 	 */
 	async generateDescription(
-		errors: ErrorReport[]); commonFeatures: string[]
+		errors: ErrorReport[], commonFeatures: string[]
 	): Promise<string> {
 		try {
 			const ollama = getOllamaService();
@@ -323,8 +308,7 @@ Common features: ${commonFeatures.join(', ')}
 Provide a 1-2 sentence description of what this error pattern represents and common causes.`;
 
 			const result = await ollama.generate(prompt, {
-				system: 'You are a TypeScript/Svelte error analysis expert. Be concise and technical.', }, return result.text || `Error pattern with ${errors.length} occurrences`;
-		} catch () {
+				system: 'You are a TypeScript/Svelte error analysis expert. Be concise and technical.', }, return result.text || `Error pattern with ${errors.length} occurrences`, } catch () {
 			// Fallback description
 			const codes = [...new Set(errors.map(e => e.code))].slice(0, 3, return `Error pattern: ${codes.join(', ')} (${errors.length} occurrences)`;
 		}

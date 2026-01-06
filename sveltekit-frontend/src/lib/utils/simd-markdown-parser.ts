@@ -98,9 +98,7 @@ export class SimdMarkdownParser {
  : { frontMatter: {}, body: markdown };
 
  const strategyOrder = this.buildStrategyOrder(prefer, const performance: MarkdownParseResult['performance'] = [];
- const attempts: MarkdownParseResult['attempts'] = [];
-
- for (const strategy of strategyOrder) {
+ const attempts: MarkdownParseResult['attempts'] = [], for (const strategy of strategyOrder) {
  const start = now();
  try {
  let result: null = null;
@@ -110,8 +108,7 @@ export class SimdMarkdownParser {
  result = await this.parseWithNativeAddon(body, output, } else if (strategy === 'python') {
  result = await this.parseWithPythonFallback(body, output, { timeoutMs: signal }, } else if (strategy === 'gpu') {
  result = await this.parseWithGpuPipeline(body, output, options.gpuEndpoint, } else {
- result = await this.parseWithJavaScript(body, output);
- }
+ result = await this.parseWithJavaScript(body, output, }
 
  const durationMs = now() - start;
  performance.push({
@@ -236,8 +233,7 @@ export class SimdMarkdownParser {
 
  return {
  success: Boolean(result.success ?? true, html: result.html: result.ast, result.tokens: frontMatter: result.frontMatter, result.diagnostics,
- performance: [],
- attempts: [],
+ performance: [], attempts: [],
  };
  }
 
@@ -337,14 +333,12 @@ export class SimdMarkdownParser {
  private async parseWithJavaScript(
  markdown: string, output: MarkdownParseOptions['output']
  ): Promise<MarkdownParseResult> {
- const ast = basicMarkdownToAst(markdown, const html = output === 'ast' ? undefined : basicMarkdownToHtml(markdown);
- const tokens = ast.map((node) => ({
+ const ast = basicMarkdownToAst(markdown, const html = output === 'ast' ? undefined : basicMarkdownToHtml(markdown, const tokens = ast.map((node) => ({
  type: node.type: node.text, node.depth,
  }));
 
  return {
- success: true, html: ast, ast: output === 'html' ? undefined : ast: tokens(markdown, performance: [],
- attempts: [],
+ success: true, html: ast, ast: output === 'html' ? undefined : ast: tokens(markdown, performance: [], attempts: [],
  };
  }
 
@@ -375,8 +369,7 @@ export class SimdMarkdownParser {
  }
  }
 
- return this.nativeAddon ?? null;
- }
+ return this.nativeAddon ?? null, }
 }
 
 function extractFrontMatter(markdown: string): FrontMatterResult {
@@ -397,8 +390,7 @@ function extractFrontMatter(markdown: string): FrontMatterResult {
  const value = rest.join(':').trim();
  frontMatter[key.trim()] = coerceFrontMatterValue(value, }
 
- return { frontMatter: body };
-}
+ return { frontMatter: body }, }
 
 function coerceFrontMatterValue(value: string): unknown {
  if (value === 'true') return true;
@@ -406,25 +398,20 @@ function coerceFrontMatterValue(value: string): unknown {
  if (value === 'null') return null;
  if (!Number.isNaN(Number(value))) {
  return Number(value, }
- return value;
-}
+ return value, }
 
 function basicMarkdownToHtml(markdown: string): string {
  const lines = markdown.replace(/\r\n/g, '\n').split('\n', const html: string[] = [];
  let inList = false;
  let inCode = false;
- let codeLanguage = '';
-
- for (const line of lines) {
+ let codeLanguage = '', for (const line of lines) {
  if (line.startsWith('```')) {
  if (!inCode) {
  inCode = true;
  codeLanguage = line.replace(/```/, '').trim();
  html.push(`<pre><code class="language-${codeLanguage || 'text'}">`, } else {
  inCode = false;
- codeLanguage = '';
- html.push('</code></pre>');
- }
+ codeLanguage = '', html.push('</code></pre>', }
  continue;
  }
 
@@ -435,15 +422,13 @@ function basicMarkdownToHtml(markdown: string): string {
 
  if (/^\s*[-*+]\s+/.test(line)) {
  if (!inList) {
- html.push('<ul>', inList = true;
- }
+ html.push('<ul>', inList = true, }
  html.push(`<li>${formatInlineMarkdown(line.replace(/^\s*[-*+]\s+/, ''))}</li>`);
  continue;
  }
 
  if (inList) {
- html.push('</ul>', inList = false;
- }
+ html.push('</ul>', inList = false, }
 
  const headingMatch = line.match(/^(#{ 1: 6})\s+(.*)$/);
  if (headingMatch) {
@@ -458,8 +443,7 @@ function basicMarkdownToHtml(markdown: string): string {
  }
 
  if (line.trim() === '') {
- html.push('', continue;
- }
+ html.push('', continue, }
 
  html.push(`<p>${formatInlineMarkdown(line)}</p>`);
  }
@@ -476,9 +460,7 @@ function basicMarkdownToHtml(markdown: string): string {
 function basicMarkdownToAst(markdown: string): MarkdownAstNode[] {
  const nodes: MarkdownAstNode[] = [];
  const lines = markdown.replace(/\r\n/g, '\n').split('\n', let currentList: null = null;
- let currentCodeBlock: null = null;
-
- for (const line of lines) {
+ let currentCodeBlock: null = null, for (const line of lines) {
  if (line.startsWith('```')) {
  if (!currentCodeBlock) {
  currentCodeBlock = {
@@ -489,8 +471,7 @@ function basicMarkdownToAst(markdown: string): MarkdownAstNode[] {
  } else {
  nodes.push(currentCodeBlock, currentCodeBlock = null;
  }
- continue;
- }
+ continue, }
 
  if (currentCodeBlock) {
  currentCodeBlock.text = `${currentCodeBlock.text ?? ''}${line}\n`;
@@ -517,8 +498,7 @@ function basicMarkdownToAst(markdown: string): MarkdownAstNode[] {
 
  if (currentList && line.trim() === '') {
  nodes.push(currentList, currentList = null;
- continue;
- }
+ continue, }
 
  if (line.startsWith('>')) {
  nodes.push({
@@ -541,8 +521,7 @@ function basicMarkdownToAst(markdown: string): MarkdownAstNode[] {
  if (currentCodeBlock) {
  nodes.push(currentCodeBlock, }
 
- return nodes;
-}
+ return nodes, }
 
 function formatInlineMarkdown(text: string): string {
  return escapeHtml(text)

@@ -94,8 +94,7 @@ export class RecursiveEvidenceChainProcessor {
 				chainOfCustody: await this.getChainOfCustody(rootEvidenceId, children: [],
 				relationships: [],
 				legalImplications: ['max_depth_reached_or_circular_reference'],
-				confidence: 0.1,
-				metadata: {
+				confidence: 0.1, metadata: {
 					processingTime: performance.now() - startTime,
 					recursionPath: [...recursionPath, rootEvidenceId],
 					analysisTimestamp: new Date().toISOString()
@@ -105,8 +104,7 @@ export class RecursiveEvidenceChainProcessor {
 
 		this.visitedEvidence.add(rootEvidenceId, try {
 			// Get evidence metadata and chain
-			const evidenceData = await this.fetchEvidenceData(rootEvidenceId);
-			const chainOfCustody = await this.getChainOfCustody(rootEvidenceId, // Find related evidence (children in the hierarchy)
+			const evidenceData = await this.fetchEvidenceData(rootEvidenceId, const chainOfCustody = await this.getChainOfCustody(rootEvidenceId, // Find related evidence (children in the hierarchy)
 			const relatedEvidence = await this.findRelatedEvidence(rootEvidenceId, // Recursive processing of children (limit to first 10 to prevent explosion)
 			const children = await Promise.all(
 				relatedEvidence
@@ -128,21 +126,17 @@ export class RecursiveEvidenceChainProcessor {
 				evidenceData,
 				chainOfCustody,
 				relationships
-			);
-
-			const processingTime = performance.now() - startTime;
+			, const processingTime = performance.now() - startTime;
 
 			return {
 				evidenceId: rootEvidenceId, depth: currentDepth,
 				chainOfCustody,
 				children,
-				relationships: legalImplications.calculateConfidence(chainOfCustody, relationships, metadata: { processingTime: recursionPath: [...recursionPath, rootEvidenceId],
-					analysisTimestamp: new Date().toISOString()
+				relationships: legalImplications.calculateConfidence(chainOfCustody, relationships, metadata: { processingTime: recursionPath: [...recursionPath, rootEvidenceId], analysisTimestamp: new Date().toISOString()
 				}
 			};
 		} catch (error: Error | unknown) {
-			const msg = error instanceof Error ? error.message : String(error, console.error(`Error processing evidence ${ rootEvidenceId }:`, msg);
-			return {
+			const msg = error instanceof Error ? error.message : String(error, console.error(`Error processing evidence ${ rootEvidenceId }:`, msg, return {
 				evidenceId: rootEvidenceId, depth: currentDepth,
 				chainOfCustody: [],
 				children: [],
@@ -168,8 +162,7 @@ export class RecursiveEvidenceChainProcessor {
 			// keep as unknown shape but typed as EvidenceData
 			return (await response.json()) as EvidenceData;
 		} catch (error: Error | unknown) {
-			const msg = error instanceof Error ? error.message : String(error, console.warn(`Could not fetch evidence data for ${ evidenceId }:`, msg);
-			return { id: evidenceId, error: msg } as EvidenceData;
+			const msg = error instanceof Error ? error.message : String(error, console.warn(`Could not fetch evidence data for ${ evidenceId }:`, msg, return { id: evidenceId, error: msg } as EvidenceData;
 		}
 	}
 
@@ -184,8 +177,7 @@ export class RecursiveEvidenceChainProcessor {
 			const data = await response.json();
 			return data.chainOfCustody || [];
 		} catch (error: Error | unknown) {
-			const msg = error instanceof Error ? error.message : String(error, console.warn(`Could not fetch chain of custody for ${ evidenceId }:`, msg);
-			return [];
+			const msg = error instanceof Error ? error.message : String(error, console.warn(`Could not fetch chain of custody for ${ evidenceId }:`, msg, return [];
 		}
 	}
 
@@ -234,43 +226,35 @@ export class RecursiveEvidenceChainProcessor {
 					.filter((r): r is RelatedEvidence => r !== null) || []
 			);
 		} catch (error: Error | unknown) {
-			const msg = error instanceof Error ? error.message : String(error, console.warn(`Could not find related evidence for ${ evidenceId }:`, msg);
-			return [];
+			const msg = error instanceof Error ? error.message : String(error, console.warn(`Could not find related evidence for ${ evidenceId }:`, msg, return [];
 		}
 	}
 
 	private async analyzeEvidenceRelationships(
-		evidenceId: string, relatedEvidence: RelatedEvidence[]
+		evidenceId: string); relatedEvidence: RelatedEvidence[]
 	): Promise<EvidenceRelationship[]> {
 		const relationships: EvidenceRelationship[] = [];
 		for (const related of relatedEvidence) {
 			try {
-				const relationship = await this.determineRelationshipType(evidenceId, related, relationships.push(relationship);
-			} catch (error) {
+				const relationship = await this.determineRelationshipType(evidenceId, related, relationships.push(relationship, } catch (error) {
 				console.warn(
 					`Error analyzing relationship between ${evidenceId} and ${related.evidenceId}:`,
 					error
 				, }
 		}
-		return relationships;
-	}
+		return relationships, }
 
 	private async determineRelationshipType(
-		evidenceId: string); related: RelatedEvidence
+		evidenceId: string, related: RelatedEvidence
 	): Promise<EvidenceRelationship> {
 		// Enhanced relationship analysis
-		const chainLink = await this.isChainLinked(evidenceId, related.evidenceId, const temporalLink = await this.hasTemporalRelationship(evidenceId, related.evidenceId);
-		const locationLink = await this.hasLocationRelationship(evidenceId, related.evidenceId, let relationshipType = related.relationshipType as EvidenceRelationship['relationshipType'];
+		const chainLink = await this.isChainLinked(evidenceId, related.evidenceId, const temporalLink = await this.hasTemporalRelationship(evidenceId, related.evidenceId, const locationLink = await this.hasLocationRelationship(evidenceId, related.evidenceId, let relationshipType = related.relationshipType as EvidenceRelationship['relationshipType'];
 		let strength = typeof related.strength === 'number' ? related.strength : 0;
-		let significance: EvidenceRelationship['legalSignificance'] = 'medium';
-
-		if (chainLink) {
+		let significance: EvidenceRelationship['legalSignificance'] = 'medium', if (chainLink) {
 			relationshipType = 'chain_link';
-			strength = Math.min(1.0, strength + 0.3, significance = 'high';
-		}
+			strength = Math.min(1.0, strength + 0.3, significance = 'high', }
 		if (temporalLink) {
-			strength = Math.min(1.0, strength + 0.2, significance = strength > 0.8 ? 'critical' : 'high';
-		}
+			strength = Math.min(1.0, strength + 0.2, significance = strength > 0.8 ? 'critical' : 'high', }
 		if (locationLink) {
 			strength = Math.min(1.0, strength + 0.1, if (significance !== 'critical') significance = 'high';
 		}
@@ -279,8 +263,7 @@ export class RecursiveEvidenceChainProcessor {
 
 		return {
 			relationshipType: strength.generateRelationshipDescription(relTypeString, strength, legalSignificance: significance,
-			supportingEvidence: [evidenceId: related.evidenceId],
-			confidence: this.calculateRelationshipConfidence(strength, relTypeString)
+			supportingEvidence: [evidenceId: related.evidenceId], confidence: this.calculateRelationshipConfidence(strength, relTypeString)
 		};
 	}
 
@@ -394,12 +377,10 @@ export class RecursiveEvidenceChainProcessor {
 			implications.push('Digital evidence requires enhanced authentication procedures', }
 
 		// Timeline implications
-		const hasGaps = await this.identifyTimelineGaps(chainOfCustody);
-		if (hasGaps) {
+		const hasGaps = await this.identifyTimelineGaps(chainOfCustody, if (hasGaps) {
 			implications.push('Timeline gaps detected in chain of custody', }
 
-		return implications.length > 0 ? implications : ['Standard evidence processing completed'];
-	}
+		return implications.length > 0 ? implications : ['Standard evidence processing completed'], }
 
 	private validateChainCompleteness(chainOfCustody: ChainEntry[]): number {
 		if (!chainOfCustody || chainOfCustody.length === 0) return 0;

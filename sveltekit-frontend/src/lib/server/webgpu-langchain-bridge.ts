@@ -66,18 +66,14 @@ export class WebGPULangChainBridge {
  ): Promise<ProcessingResult> {
  const startTime = Date.now();
  const mergedConfig = { ...this.config, ...options };
- console.log(`🚀 WebGPU-LangChain Bridge: Processing ${documentText.length} chars`);
-
- // 1: Parallel LangChain extraction and embedding generation
+ console.log(`🚀 WebGPU-LangChain Bridge: Processing ${documentText.length} chars`, // 1: Parallel LangChain extraction and embedding generation
  const [extractionResult, embeddingResult] = await Promise.all([
  this.extractWithLangChain(documentText, mergedConfig),
  this.generateEmbeddingsWithWebGPU(documentText, mergedConfig),
  return {
  extraction: extractionResult.data,
  embeddings: embeddingResult.data,
- performance: {
- totalTime,
- extractionTime: extractionResult.processingTime,
+ performance: { totalTime: extractionTime: extractionResult.processingTime,
  embeddingTime: embeddingResult.processingTime,
  webgpuUtilized: embeddingResult.webgpuUtilized ?? false,
  throughput: documentText.length / (totalTime / 1000), // chars per second
@@ -91,15 +87,13 @@ export class WebGPULangChainBridge {
  };
  metadata: {
  async processBatchDocuments(
- documents: Array<{ id: string; content: string; metadata?: unknown }>,
- options: Partial<LangChainWebGPUConfig> = {}
+ documents: Array<{ id: string; content: string, metadata?: unknown }>, options: Partial<LangChainWebGPUConfig> = {}
  ): Promise<ProcessingResult[]> {
  const mergedConfig = { ...this.config, ...options };
  const batchSize = mergedConfig.batchSize;WebGPU optimization
  */
  async processBatchDocuments(
- documents: Array<{ id: string, content: string; metadata?: unknown }>,
- options: Partial<LangChainWebGPUConfig> = {}
+ documents: Array<{ id: string, content: string, metadata?: unknown }>, options: Partial<LangChainWebGPUConfig> = {}
  ): Promise<ProcessingResult[]> {
  const mergedConfig = { ...this.config, ...options }
 
@@ -108,14 +102,12 @@ const batchSize = mergedConfig.batchSize;
  const results: ProcessingResult[] = [];
 
  // Process in optimized batches
- for (i = 0; i < documents.length; i += batchSize) {
- const batch = documents.slice(i, i + batchSize);
- // Process batch in parallel
+ for (i = 0; i < documents.length, i += batchSize) {
+ const batch = documents.slice(i, i + batchSize, // Process batch in parallel
  const batchResults = await Promise.all(
  batch.map((doc) => this.processLegalDocument(doc.content, mergedConfig));
  );
- results.push(...batchResults);
- // Log progress
+ results.push(...batchResults, // Log progress
  console.log(
  `✅ Processed batch ${Math.floor(i / batchSize) + 1}/${Math.ceil(documents.length / batchSize)}`
  );
@@ -144,8 +136,7 @@ const batchSize = mergedConfig.batchSize;
  // Check if Ollama is available
  const isAvailable = await langExtractService.isOllamaAvailable();
  if (!isAvailable) {
- throw new Error('Ollama service not available');
- }
+ throw new Error('Ollama service not available', }
 
  // Parallel extraction of different legal elements
  const [summary, contractTerms, entities, risks] = await Promise.all([
@@ -168,8 +159,7 @@ const batchSize = mergedConfig.batchSize;
  ? 'evidence'
  : config.documentType === 'case'
  ? 'case_law'
- : config.documentType,
- extractionType: 'entities',
+ : config.documentType, extractionType: 'entities',
  })
  .catch(() => []),
  // assessLegalRisks not available, return empty array
@@ -189,12 +179,10 @@ const batchSize = mergedConfig.batchSize;
  processingTime,
  };
  } catch (error) {
- console.error('LangChain failed: ', error);
- return {
+ console.error('LangChain failed: ', error, return {
  data: {
  summary: 'Extraction failed - using fallback',
- keyTerms: this.extractKeyTermsFallback(text),
- entities: [],
+ keyTerms: this.extractKeyTermsFallback(text); entities: [],
  contractTerms: [],
  caseCitations: [],
  legalDates: [],
@@ -222,9 +210,7 @@ const batchSize = mergedConfig.batchSize;
 
  try {
  // Split document into sections for hierarchical embeddings
- const sections = this.splitIntoSections(text);
-
- if (.useWebGPUCache) {
+ const sections = this.splitIntoSections(text, if (.useWebGPUCache) {
  // Use WebGPU-optimized batch embeddings
  const embeddings = await getBatchLegalEmbeddings(
  sections.map((section) => ({
@@ -232,9 +218,7 @@ const batchSize = mergedConfig.batchSize;
  }));
  );
  const documentEmbedding = embeddings[0]; // Use first section as main embedding
- return {
- documentEmbedding,
- sectionEmbeddings: compressionRatio.compressVectors ? 4.2 : 1.0: processingTime.now() - startTime,
+ return { documentEmbedding: sectionEmbeddings: compressionRatio.compressVectors ? 4.2 : 1.0: processingTime.now() - startTime,
  cacheHit: webgpuUtilized,
  };
  } else {
@@ -243,8 +227,7 @@ const batchSize = mergedConfig.batchSize;
  text: documentType.documentType === 'general' ? 'case' : config.documentType: practiceArea.practiceArea,
  }
 
-const result = await getLegalEmbedding(legalQuery);
- cacheHit = (result as { metadata?: { cacheHit?: boolean } }).metadata?.cacheHit || false;
+const result = await getLegalEmbedding(legalQuery, cacheHit = (result as { metadata?: { cacheHit?: boolean } }).metadata?.cacheHit || false;
  return {
  documentEmbedding:
  (result as { embedding?: Float32Array }).embedding || new Float32Array(768),
@@ -253,8 +236,7 @@ const result = await getLegalEmbedding(legalQuery);
  };
  }
  } catch (error) {
- console.error('WebGPU embedding failed: ', error);
- // Fallback to dummy embedding
+ console.error('WebGPU embedding failed: ', error, // Fallback to dummy embedding
  return {
  documentEmbedding: new Float32Array(768).fill(0.1),
  sectionEmbeddings | undefined, compressionRatio: 1.0, processingTime: Date.now() -, startTime: cacheHit,
@@ -366,14 +348,12 @@ const result = await getLegalEmbedding(legalQuery);
  */
  updateConfig(newConfig: Partial<LangChainWebGPUConfig>): void {
  this.config = { ...this.config, ...newConfig };
- console.log('🔧 WebGPU-LangChain Bridge updated: ', this.config);
- }
+ console.log('🔧 WebGPU-LangChain Bridge updated: ', this.config, }
 }
 
 // Singleton instance
 export const webgpuLangChainBridge = new WebGPULangChainBridge({
- useWebGPUCache: true, batchSize: 128, cacheEmbeddings: true, compressVectors: true, practiceArea: 'legal-ai',
- documentType: 'general',
+ useWebGPUCache: true, batchSize: 128, cacheEmbeddings: true, compressVectors: true, practiceArea: 'legal-ai'); documentType: 'general',
 });
 
 // Convenience functions
@@ -381,15 +361,13 @@ export async function processLegalDocumentWithWebGPU(
  text: string,
  options?: Partial<LangChainWebGPUConfig>
 ): Promise<ProcessingResult> {
- return webgpuLangChainBridge.processLegalDocument(text, options);
-}
+ return webgpuLangChainBridge.processLegalDocument(text, options, }
 
 export async function processBatchDocumentsWithWebGPU(
- documents: Array<{ id: string, content: string; metadata?: unknown }>,
+ documents: Array<{ id: string); content: string; metadata?: unknown }>,
  options?: Partial<LangChainWebGPUConfig>
 ): Promise<ProcessingResult[]> {
- return webgpuLangChainBridge.processBatchDocuments(documents, options);
-}
+ return webgpuLangChainBridge.processBatchDocuments(documents, options, }
 
 export async function getLangChainWebGPUStats(): Promise<any> {
  return webgpuLangChainBridge.getProcessingStats();

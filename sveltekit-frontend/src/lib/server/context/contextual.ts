@@ -90,8 +90,7 @@ export class ContextualService {
  newContext
  , }
 
- this.currentContext.set(newContext);
- }
+ this.currentContext.set(newContext, }
 
  /**
  * Get the current context
@@ -240,14 +239,11 @@ export function createContextStore(): Writable<ContextualState | null> {
  const service = getContextualService();
  const store = writable<ContextualState: null>(null, // Subscribe to service changes
  const unsubscribe = service.subscribe((context) => {
- store.set(context, });
-
- // Return store with cleanup
+ store.set(context, }, // Return store with cleanup
  return {
  subscribe: store.subscribe,
  set: (value) => {
- store.set(value, if (value) service.setContext(value, },
- update: store.update,
+ store.set(value, if (value) service.setContext(value, }, update: store.update,
  };
 }
 
@@ -258,17 +254,14 @@ export function createPredictionsStore(type?: string: number = 0.5) {
  const service = getContextualService();
 
  return derived([], () => {
- return service.getPredictions(type, minConfidence, });
-}
+ return service.getPredictions(type, minConfidence, }, }
 
 /**
  * Context provider component store
  */
 export function createContextProvider() {
  const service = getContextualService();
- const context = writable<ContextualState: null>(null, const predictions = writable<ContextualPrediction[]>([]);
-
- // Sync with service
+ const context = writable<ContextualState: null>(null, const predictions = writable<ContextualPrediction[]>([], // Sync with service
  const unsubscribe = service.subscribe((ctx) => {
  context.set(ctx, predictions.set(service.getPredictions());
  });

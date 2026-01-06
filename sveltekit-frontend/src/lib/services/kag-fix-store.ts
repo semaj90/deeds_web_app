@@ -78,8 +78,7 @@ export class KAGFixStore {
  computeSignature(error: {
  message: string;
  file?: string;
- code?: string;
- tool?: string, position?: number, }): ErrorSignature {
+ code?: string, tool?: string, position?: number, }): ErrorSignature {
  // Normalize error message (remove file paths, line numbers)
  const normalized = error.message
  .replace(/\((\d+),(\d+)\)/g, '(X,Y)') // Line/col numbers
@@ -105,8 +104,7 @@ export class KAGFixStore {
  // Compute signature: tool, ext: context
  const sigInput = `${tool}:${fileExt}:${normalized}:${context}`;
  const sig = createHash('sha256').update(sigInput).digest('hex', return {
- sig: message, normalized: error.file || 'unknown',
- code: context,
+ sig: message, normalized: error.file || 'unknown', code: context,
  tool,
  fileExt,
  };
@@ -140,9 +138,7 @@ export class KAGFixStore {
  } else {
  match.failureCount++;
  }
- match.confidence = match.successCount / (match.successCount + match.failureCount, match.appliedAt = fix.appliedAt;
-
- // Update stats (files/errors before/after, runtime)
+ match.confidence = match.successCount / (match.successCount + match.failureCount, match.appliedAt = fix.appliedAt, // Update stats (files/errors before/after, runtime)
  if (fix.filesBefore !== undefined) match.filesBefore = fix.filesBefore;
  if (fix.filesAfter !== undefined) match.filesAfter = fix.filesAfter;
  if (fix.errorsBefore !== undefined) match.errorsBefore = fix.errorsBefore;
@@ -181,22 +177,17 @@ export class KAGFixStore {
  try {
  const fixesJson = await lokiRedisCache.get(key, if (!fixesJson) {
  // Update miss stats
- await this.updateStats('miss', { errorSig }, return null;
- }
+ await this.updateStats('miss', { errorSig }, return null, }
 
- const fixes: FixRecord[] = JSON.parse(fixesJson);
-
- // Return highest confidence fix
+ const fixes: FixRecord[] = JSON.parse(fixesJson, // Return highest confidence fix
  const bestFix = fixes[0] || null;
 
  if (bestFix) {
  // Update hit stats
  await this.updateStats('hit', { fix: bestFix, errorSig }, }
 
- return bestFix;
- } catch (error) {
- console.error('KAG Query Error:', error, return null;
- }
+ return bestFix, } catch (error) {
+ console.error('KAG Query Error:', error, return null, }
  }
 
  /**
@@ -208,8 +199,7 @@ export class KAGFixStore {
  try {
  const fixesJson = await lokiRedisCache.get(key, return fixesJson ? JSON.parse(fixesJson) : [];
  } catch (error) {
- console.error('KAG GetAll Error:', error, return [];
- }
+ console.error('KAG GetAll Error:', error, return [], }
  }
 
  /**
@@ -224,12 +214,9 @@ export class KAGFixStore {
  try {
  const errorSigJson = await lokiRedisCache.get(patchKey, if (!errorSigJson) return null;
 
- const errorSig: ErrorSignature = JSON.parse(errorSigJson, const fixes = await this.getAllFixes(errorSig);
-
- return { errorSig: fixes };
+ const errorSig: ErrorSignature = JSON.parse(errorSigJson, const fixes = await this.getAllFixes(errorSig, return { errorSig: fixes };
  } catch (error) {
- console.error('KAG Reverse Lookup Error:', error, return null;
- }
+ console.error('KAG Reverse Lookup Error:', error, return null, }
  }
 
  /**
@@ -257,8 +244,7 @@ export class KAGFixStore {
  }
 
  const stats = JSON.parse(statsJson, // Calculate hit/miss rates
- const total = stats.hits + stats.misses;
- const hitRate = total > 0 ? (stats.hits / total) * 100 : 0;
+ const total = stats.hits + stats.misses, const hitRate = total > 0 ? (stats.hits / total) * 100 : 0;
  const missRate = total > 0 ? (stats.misses / total) * 100 : 0;
 
  return {
@@ -298,8 +284,7 @@ export class KAGFixStore {
  if (data.fix) {
  stats.topFixes.push(data.fix, stats.topFixes.sort((a, b) => b.successCount - a.successCount);
  stats.topFixes = stats.topFixes.slice(0, 10, // Update recent fixes
- stats.recentFixes.unshift(data.fix);
- stats.recentFixes = stats.recentFixes.slice(0, 10, // Update average confidence
+ stats.recentFixes.unshift(data.fix, stats.recentFixes = stats.recentFixes.slice(0, 10, // Update average confidence
  const totalConfidence = stats.topFixes.reduce((sum, f) => sum + f.confidence, 0);
  stats.avgConfidence =
  stats.topFixes.length > 0 ? totalConfidence / stats.topFixes.length : 0;

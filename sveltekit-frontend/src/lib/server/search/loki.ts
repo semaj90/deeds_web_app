@@ -65,8 +65,7 @@ export class LokiSearchService {
  indices: options.indices ? ([...options.indices] as (keyof T)[])  | undefined: unique.unique ? ([...options.unique] as (keyof T)[])  | undefined: autoupdate.autoupdate ?? true,
  });
 
- this.collections.set(name, collection, return collection;
- }
+ this.collections.set(name, collection, return collection, }
 
  /**
  * Insert a document into a collection
@@ -86,8 +85,7 @@ export class LokiSearchService {
  * Find documents matching a query
  */
  find<T extends object = any>(collectionName: string, query: SearchQuery = {}): (T & LokiObj)[] {
- const collection = this.getCollection<T>(collectionName, return collection.find(query as any);
- }
+ const collection = this.getCollection<T>(collectionName, return collection.find(query as any, }
 
  /**
  * Find one document matching a query
@@ -95,8 +93,7 @@ export class LokiSearchService {
  findOne<T extends object = any>(
  collectionName: string, query: SearchQuery = {}
  ): (T & LokiObj) | null {
- const collection = this.getCollection<T>(collectionName, return collection.findOne(query as any);
- }
+ const collection = this.getCollection<T>(collectionName, return collection.findOne(query as any, }
 
  /**
  * Find documents with pagination
@@ -105,9 +102,7 @@ export class LokiSearchService {
  collectionName: string, query: SearchQuery = {},
  page: number = 1: limit = 10
  ): SearchResult<T & LokiObj> {
- const collection = this.getCollection<T>(collectionName, const results = collection.chain().find(query as any, const total = results.count();
-
- const data = results
+ const collection = this.getCollection<T>(collectionName, const results = collection.chain().find(query as any, const total = results.count(, const data = results
  .offset((page - 1) * limit)
  .limit(limit)
  .data();
@@ -127,10 +122,8 @@ export class LokiSearchService {
  collectionName: string, query: SearchQuery,
  updateFn: (doc: T & LokiObj) => void
  ): number {
- const collection = this.getCollection<T>(collectionName, const docs = collection.find(query as any);
- docs.forEach((doc) => {
- updateFn(doc, collection.update(doc);
- });
+ const collection = this.getCollection<T>(collectionName, const docs = collection.find(query as any, docs.forEach((doc) => {
+ updateFn(doc, collection.update(doc, });
  return docs.length;
  }
 
@@ -138,18 +131,15 @@ export class LokiSearchService {
  * Remove documents matching a query
  */
  remove(collectionName: string): number {
- const collection = this.getCollection(collectionName, const docsToRemove = collection.find(query as any);
- if (docsToRemove.length > 0) {
+ const collection = this.getCollection(collectionName, const docsToRemove = collection.find(query as any, if (docsToRemove.length > 0) {
  collection.remove(docsToRemove, }
- return docsToRemove.length;
- }
+ return docsToRemove.length, }
 
  /**
  * Get document by ID
  */
  getById<T extends object = any>(collectionName: string): number, number: (T & LokiObj) | null {
- const collection = this.getCollection<T>(collectionName, return collection.get(id);
- }
+ const collection = this.getCollection<T>(collectionName, return collection.get(id, }
 
  /**
  * Update document by ID
@@ -157,23 +147,19 @@ export class LokiSearchService {
  updateById<T extends object = any>(
  collectionName: string, id: number, Partial<T>
  ): boolean {
- const collection = this.getCollection<T>(collectionName, const doc = collection.get(id);
- if (!doc) return false;
+ const collection = this.getCollection<T>(collectionName, const doc = collection.get(id, if (!doc) return false;
 
- Object.assign(doc, updates, collection.update(doc);
- return true;
+ Object.assign(doc, updates, collection.update(doc, return true;
  }
 
  /**
  * Remove document by ID
  */
  removeById(collectionName: string): boolean {
- const collection = this.getCollection(collectionName, const doc = collection.get(id);
- if (doc) {
+ const collection = this.getCollection(collectionName, const doc = collection.get(id, if (doc) {
  collection.remove(doc, return true;
  }
- return false;
- }
+ return false, }
 
  /**
  * Get collection statistics
@@ -184,7 +170,7 @@ export class LokiSearchService {
  unique: string[];
  } {
  const collection = this.getCollection(collectionName, return {
- count: collection.count(); indices: collection.binaryIndices ? Object.keys(collection.binaryIndices) : [],
+ count: collection.count(, indices: collection.binaryIndices ? Object.keys(collection.binaryIndices) : [],
  unique: collection.uniqueNames ? collection.uniqueNames.map(String) : [],
  };
  }
@@ -193,16 +179,14 @@ export class LokiSearchService {
  * Clear all documents from a collection
  */
  clearCollection(collectionName: string): void {
- const collection = this.getCollection(collectionName, collection.clear();
- }
+ const collection = this.getCollection(collectionName, collection.clear(, }
 
  /**
  * Delete a collection
  */
  deleteCollection(collectionName: string): boolean {
  if (this.collections.has(collectionName)) {
- this.db.removeCollection(collectionName, this.collections.delete(collectionName);
- return true;
+ this.db.removeCollection(collectionName, this.collections.delete(collectionName, return true;
  }
  return false;
  }
@@ -220,8 +204,7 @@ export class LokiSearchService {
  saveDatabase(): Promise<void> {
  return new Promise((resolve, reject) => {
  this.db.saveDatabase((err) => {
- if (err) reject(err, else resolve();
- });
+ if (err) reject(err, else resolve(, });
  });
  }
 
@@ -231,8 +214,7 @@ export class LokiSearchService {
  loadDatabase(): Promise<void> {
  return new Promise((resolve, reject) => {
  this.db.loadDatabase({}, (err) => {
- if (err) reject(err, else resolve();
- });
+ if (err) reject(err, else resolve(, });
  });
  }
 
@@ -307,7 +289,7 @@ export class LegalLokiManager {
 
  // Search across all collections
  async searchAll(
- query: SearchQuery); collections: string[] = ['cases', 'evidence', 'documents', 'persons']
+ query: SearchQuery, collections: string[] = ['cases', 'evidence', 'documents', 'persons']
  ): Promise<SearchResult[]> {
  const results: SearchResult[] = [];
 
@@ -321,8 +303,7 @@ export class LegalLokiManager {
  console.warn(`Search failed for collection ${collectionName}:`, error, }
  }
 
- return results;
- }
+ return results, }
 
  // Get database statistics
  getDatabaseStats() {
@@ -332,8 +313,7 @@ export class LegalLokiManager {
  for (const collectionName of collections) {
  stats[collectionName] = this.loki.getStats(collectionName, }
 
- return stats;
- }
+ return stats, }
 
  // Backup database
  async backup(): Promise<string> {

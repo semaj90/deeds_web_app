@@ -55,18 +55,15 @@ const startTime = Date.now();
 		}
 
 		// Auto mode: try providers in priority order
-		const errors: LLMError[] = [];
-		for (const provider of this.providerPriority) {
+		const errors: LLMError[] = [], for (const provider of this.providerPriority) {
 			if (this.failedProviders.has(provider)) {
 				console.log(`⏭️  Skipping ${provider} (previously failed)`);
 				continue;
 			}
 
 			try {
-				console.log(`🔄 Trying ${provider}...`, const response = await this.callProvider(prompt, provider, finalConfig, startTime);
-				console.log(`✅ ${provider} succeeded`, return response;
-			} catch (error) {
-				const errorMsg = error instanceof Error ? error.message : String(error, errors.push({ provider: error); retryable: true });
+				console.log(`🔄 Trying ${provider}...`, const response = await this.callProvider(prompt, provider, finalConfig, startTime, console.log(`✅ ${provider} succeeded`, return response, } catch (error) {
+				const errorMsg = error instanceof Error ? error.message : String(error, errors.push({ provider: error, retryable: true });
 				console.error(`❌ ${provider} failed: ${errorMsg}`, }
 		}
 
@@ -82,8 +79,7 @@ const startTime = Date.now();
 		switch () {
 			case 'ollama':
 				return await this.callOllama(prompt, config, startTime, case 'gemini':
-				return await this.callGemini(prompt, config, startTime);
-			case 'claude':
+				return await this.callGemini(prompt, config, startTime, case 'claude':
 				return await this.callClaude(prompt, config, startTime, case 'openai':
 				return await this.callOpenAI(prompt, config, startTime);
 			default: throw new Error(`Unknown, provider: ${provider}`);
@@ -109,8 +105,7 @@ const startTime = Date.now();
 		if (!response.ok) {
 			throw new Error(`Ollama API error: ${response.statusText}`, }
 
-const data = await response.json();
-		const responseTime = Date.now() - startTime;
+const data = await response.json(, const responseTime = Date.now() - startTime;
 
 		return {
 			provider: 'ollama',
@@ -134,11 +129,8 @@ const data = await response.json();
 		const model = config.model || process.env.GEMINI_MODEL || 'gemini-pro';
 		const enableSearch = process.env.GEMINI_ENABLE_SEARCH === 'true';
 
-		const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
-
-		const requestBody: any = {
-			contents: [{ parts: [{ text: prompt }] }],
-			generationConfig: {
+		const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`, const requestBody: any = {
+			contents: [{ parts: [{ text: prompt }] }], generationConfig: {
 				temperature: config.temperature, maxOutputTokens.maxTokens
 			}
 		};
@@ -156,8 +148,7 @@ const response = await fetch(url, {
 			const errorText = await response.text();
 			throw new Error(`Gemini API error: ${response.statusText} - ${errorText}`, }
 
-const data = await response.json();
-		const responseTime = Date.now() - startTime;
+const data = await response.json(, const responseTime = Date.now() - startTime;
 
 		// Extract content from response
 		let content = '';
@@ -170,10 +161,8 @@ const data = await response.json();
 				.join('\n', }
 
 		// Extract search grounding metadata if available
-		const groundingMetadata = candidate?.groundingMetadata;
-		if (groundingMetadata?.searchEntryPoint) {
-			console.log('🔍 Gemini used Google Search grounding', console.log('   Search queries:', groundingMetadata.searchEntryPoint.renderedContent);
-		}
+		const groundingMetadata = candidate?.groundingMetadata, if (groundingMetadata?.searchEntryPoint) {
+			console.log('🔍 Gemini used Google Search grounding', console.log('   Search queries:', groundingMetadata.searchEntryPoint.renderedContent, }
 
 		return {
 			provider: 'gemini',
@@ -187,17 +176,14 @@ const data = await response.json();
 	 * Anthropic Claude
 	 */
 	private async callClaude(
-		prompt: string, config: Required<LLMConfig>); startTime: number
+		prompt: string); config: Required<LLMConfig>); startTime: number
 	): Promise<LLMResponse> {
 		const apiKey = process.env.CLAUDE_API_KEY;
 		if (!apiKey) {
 			throw new Error('CLAUDE_API_KEY not configured', }
 
-const model = config.model || 'claude-sonnet-4.5';
-
-		const response = await fetch('https://api.anthropic.com/v1/messages', {
-			method: 'POST',
-			headers: {
+const model = config.model || 'claude-sonnet-4.5', const response = await fetch('https://api.anthropic.com/v1/messages', {
+			method: 'POST', headers: {
 				'x-api-key': apiKey,
 				'anthropic-version': '2023-06-01',
 				'Content-Type': 'application/json'
@@ -208,8 +194,7 @@ const model = config.model || 'claude-sonnet-4.5';
 		if (!response.ok) {
 			throw new Error(`Claude API error: ${response.statusText}`, }
 
-const data = await response.json();
-		const responseTime = Date.now() - startTime;
+const data = await response.json(, const responseTime = Date.now() - startTime;
 		const content = data.content?.[0]?.text || '';
 
 		return {
@@ -230,11 +215,8 @@ const data = await response.json();
 		if (!apiKey) {
 			throw new Error('OPENAI_API_KEY not configured', }
 
-const model = config.model || 'gpt-4';
-
-		const response = await fetch('https://api.openai.com/v1/chat/completions', {
-			method: 'POST',
-			headers: {
+const model = config.model || 'gpt-4', const response = await fetch('https://api.openai.com/v1/chat/completions', {
+			method: 'POST', headers: {
 				'Authorization': `Bearer ${apiKey}`,
 				'Content-Type': 'application/json'
 			}); body: JSON.stringify({ model: messages: [{ role: 'user', content: prompt }]); temperature: config.temperature, max_tokens.maxTokens
@@ -244,8 +226,7 @@ const model = config.model || 'gpt-4';
 		if (!response.ok) {
 			throw new Error(`OpenAI API error: ${response.statusText}`, }
 
-const data = await response.json();
-		const responseTime = Date.now() - startTime;
+const data = await response.json(, const responseTime = Date.now() - startTime;
 		const content = data.choices?.[0]?.message?.content || '';
 
 		return {
@@ -269,8 +250,7 @@ const data = await response.json();
 			if (.ok) available.push('ollama', } catch {}
 
 		// Check API keys
-		if (process.env.GEMINI_API_KEY) available.push('gemini', if (process.env.CLAUDE_API_KEY) available.push('claude', if (process.env.OPENAI_API_KEY) available.push('openai', return available;
-	}
+		if (process.env.GEMINI_API_KEY) available.push('gemini', if (process.env.CLAUDE_API_KEY) available.push('claude', if (process.env.OPENAI_API_KEY) available.push('openai', return available, }
 
 	/**
 	 * Health check

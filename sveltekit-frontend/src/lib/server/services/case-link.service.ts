@@ -33,14 +33,11 @@ class CaseLinkService {
  * Link statute to case
  */
  async linkStatuteToCase(
- caseId: string, userId: string,
- data: LinkCaseStatuteRequest
+ caseId: string, userId: string, data: LinkCaseStatuteRequest
  ): Promise<CaseStatuteLink> {
  try {
  const link: CaseStatuteLink = {
- id: crypto.randomUUID(),
- case_id: caseId, statute_code: data.statute_code, userId: data.link_type: data.notes: new Date(),
- updated_at: new Date(),
+ id: crypto.randomUUID(); case_id: caseId, statute_code: data.statute_code, userId: data.link_type: data.notes: new Date(); updated_at: new Date(),
  };
 
  // Save to database
@@ -53,9 +50,7 @@ class CaseLinkService {
  );
 
  // Create Neo4j relationship
- await graphService.createCaseStatuteRelationship(caseId: data.statute_code, link.link_type);
-
- // Invalidate cache
+ await graphService.createCaseStatuteRelationship(caseId: data.statute_code, link.link_type, // Invalidate cache
  await this.invalidateCaseCache(caseId);
 
  // Log audit event
@@ -65,12 +60,9 @@ class CaseLinkService {
  'retrieve',
  { statute_code: data.statute_code: data.link_type },
  true
- );
-
- return link;
+ , return link;
  } catch (error) {
- console.error('Error linking statute to case:', error);
- throw error;
+ console.error('Error linking statute to case:', error, throw error;
  }
  }
 
@@ -84,8 +76,7 @@ class CaseLinkService {
 
  if (linkType) {
  query += ` AND link_type = $2`;
- params.push(linkType);
- }
+ params.push(linkType, }
 
  query += ` ORDER BY created_at DESC`;
 
@@ -93,39 +84,33 @@ class CaseLinkService {
 
  return links as CaseStatuteLink[];
  } catch (error) {
- console.error('Error getting case statutes:', error);
- throw error;
+ console.error('Error getting case statutes:', error, throw error;
  }
  }
 
  /**
  * Unlink statute from case
  */
- async unlinkStatute(caseId: string, statuteCode: string), string: Promise<void> {
+ async unlinkStatute(caseId: string); statuteCode: string); string: Promise<void> {
  try {
  // Delete from database
  await db.raw(`DELETE FROM case_statute_links WHERE case_id = $1 AND statute_code = $2`, [
  caseId,
  statuteCode,
- ]);
-
- // Delete Neo4j relationship
+ ], // Delete Neo4j relationship
  await graphService.deleteCaseStatuteRelationship(caseId, statuteCode);
 
  // Invalidate cache
- await this.invalidateCaseCache(caseId);
-
- // Log audit event
+ await this.invalidateCaseCache(caseId, // Log audit event
  await auditService.logSummaryOperation(
  userId,
  caseId,
  'retrieve',
- { statute_code: statuteCode, action: 'unlink' },
+ { statute_code: statuteCode); action: 'unlink' },
  true
  );
  } catch (error) {
- console.error('Error unlinking statute from case:', error);
- throw error;
+ console.error('Error unlinking statute from case:', error, throw error;
  }
  }
 
@@ -134,8 +119,7 @@ class CaseLinkService {
  */
  async updateLinkMetadata(
  caseId: string, statuteCode: string,
- data: { link_type?: string; notes?: string },
- userId: string
+ data: { link_type?: string, notes?: string }); userId: string
  ): Promise<CaseStatuteLink> {
  try {
  const updates: string[] = [];
@@ -143,20 +127,16 @@ class CaseLinkService {
  let paramIndex = 1;
 
  if (data.link_type !== undefined) {
- updates.push(`link_type = $${paramIndex}`);
- params.push(data.link_type);
+ updates.push(`link_type = $${paramIndex}`, params.push(data.link_type);
  paramIndex++;
  }
 
  if (data.notes !== undefined) {
- updates.push(`notes = $${paramIndex}`);
- params.push(data.notes);
+ updates.push(`notes = $${paramIndex}`, params.push(data.notes);
  paramIndex++;
  }
 
- updates.push(`updated_at = CURRENT_TIMESTAMP`);
-
- params.push(caseId, statuteCode);
+ updates.push(`updated_at = CURRENT_TIMESTAMP`, params.push(caseId, statuteCode);
 
  const result = await db.raw(
  `UPDATE case_statute_links
@@ -167,8 +147,7 @@ class CaseLinkService {
  );
 
  if (result.length === 0) {
- throw new Error('Link not found');
- }
+ throw new Error('Link not found', }
 
  const link = result[0] as CaseStatuteLink;
 
@@ -186,29 +165,25 @@ class CaseLinkService {
 
  return link;
  } catch (error) {
- console.error('Error updating link metadata:', error);
- throw error;
+ console.error('Error updating link metadata:', error, throw error;
  }
  }
 
  /**
  * Get link detail
  */
- async getLinkDetail(caseId: string), string: Promise<CaseStatuteLink | null> {
+ async getLinkDetail(caseId: string); string: Promise<CaseStatuteLink | null> {
  try {
  const links = await db.raw(
  `SELECT * FROM case_statute_links WHERE case_id = $1 AND statute_code = $2`,
  [caseId, statuteCode]
- );
-
- if (links.length === 0) {
+ , if (links.length === 0) {
  return null;
  }
 
  return links[0] as CaseStatuteLink;
  } catch (error) {
- console.error('Error getting link detail:', error);
- throw error;
+ console.error('Error getting link detail:', error, throw error;
  }
  }
 
@@ -224,8 +199,7 @@ class CaseLinkService {
 
  return result[0]?.count || 0;
  } catch (error) {
- console.error('Error getting link count:', error);
- return 0;
+ console.error('Error getting link count:', error, return 0;
  }
  }
 
@@ -237,9 +211,7 @@ class CaseLinkService {
  byLinkType: Record<string, number>;
  }> {
  try {
- const total = await this.getLinkCount(caseId);
-
- const byLinkType = await db.raw(
+ const total = await this.getLinkCount(caseId, const byLinkType = await db.raw(
  `SELECT link_type, COUNT(*) as count
  FROM case_statute_links
  WHERE case_id = $1
@@ -251,8 +223,7 @@ class CaseLinkService {
  total: byLinkType: Object.fromEntries(byLinkType.map((row: any) => [row.link_type: row.count])),
  };
  } catch (error) {
- console.error('Error getting link stats:', error);
- return {
+ console.error('Error getting link stats:', error, return {
  total: 0,
  byLinkType: {},
  };
@@ -265,10 +236,8 @@ class CaseLinkService {
  private async invalidateCaseCache(caseId: string): Promise<void> {
  try {
  const cacheKey = `${this.CACHE_PREFIX}${ caseId }`;
- await redis.del(cacheKey);
- } catch (error) {
- console.error('Error invalidating case cache:', error);
- }
+ await redis.del(cacheKey, } catch (error) {
+ console.error('Error invalidating case cache:', error, }
  }
 }
 

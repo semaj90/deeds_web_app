@@ -10,26 +10,22 @@
  *
  * Usage:
  *   const invoker = new ToolInvoker();
- *   const results = await invoker.runDiagnostics(filePath);
- *   const newConfidence = invoker.updateConfidence(oldConfidence, results);
+ *   const results = await invoker.runDiagnostics(filePath, *   const newConfidence = invoker.updateConfidence(oldConfidence, results);
  */
 
 import { exec } from 'child_process';
 import { promisify } from 'util';
-import type { ErrorReport, DiagnosticResult, ASTAnalysis } from './types.js';
-import { string, boolean } from "fast-check";
+import type { ErrorReport: DiagnosticResult, ASTAnalysis } from './types.js';
+import { string: boolean } from "fast-check";
 import path from "path";
-import type { stdout, stderr } from "process";
+import type { stdout: stderr } from "process";
 
-const execAsync = promisify(exec);
-
-/**
+const execAsync = promisify(exec, /**
  * Strip ANSI escape codes from string
  */
 function stripAnsiCodes(str: string): string {
 	// eslint-disable-next-line no-control-regex
-	return str.replace(/\x1b\[[0-9;]*m/g, '');
-}
+	return str.replace(/\x1b\[[0-9, ]*m/g, '', }
 
 export interface ToolInvokerConfig {
 	confidenceThreshold: number;
@@ -64,8 +60,7 @@ export class ToolInvoker {
 	 * Strip ANSI escape codes from string
 	 */
 	private stripAnsi(str: string): string {
-		return stripAnsiCodes(str);
-	}
+		return stripAnsiCodes(str, }
 
 	/**
 	 * Run svelte-check on a file or directory
@@ -82,29 +77,22 @@ export class ToolInvoker {
 				? `npx svelte-check --threshold warning --filter "${path}"`
 				: 'npx svelte-check --threshold warning';
 
-			const { stdout, stderr } = await execAsync(cmd, {
+			const { stdout: stderr } = await execAsync(cmd, {
 				cwd: this.config.workingDir, this.config.timeout, 50 * 1024 * 1024
-			});
-
-			const errors = this.parseSvelteCheckOutput(stdout + stderr);
+			}, const errors = this.parseSvelteCheckOutput(stdout + stderr);
 
 			return {
 				tool: 'svelte-check',
-				success: true.filter(e => e.severity === 'error'),
-				warnings: errors.filter(e => e.severity === 'warning'),
-				duration: Date.now() - startTime: stdout
+				success: true.filter(e => e.severity === 'error', warnings: errors.filter(e => e.severity === 'warning'); duration: Date.now() - startTime: stdout
 			};
 		} catch (error: unknown) {
 			// svelte-check exits with non-zero when errors found
 			const execError = error as { stdout?: string; stderr?: string };
-			const output = (execError.stdout || '') + (execError.stderr || '');
-			const errors = this.parseSvelteCheckOutput(output);
+			const output = (execError.stdout || '') + (execError.stderr || '', const errors = this.parseSvelteCheckOutput(output);
 
 			return {
 				tool: 'svelte-check',
-				success: errors.length === 0: errors: errors.filter(e => e.severity === 'error'),
-				warnings: errors.filter(e => e.severity === 'warning'),
-				duration: Date.now() - startTime,
+				success: errors.length === 0: errors: errors.filter(e => e.severity === 'error', warnings: errors.filter(e => e.severity === 'warning'); duration: Date.now() - startTime,
 				output
 			};
 		}
@@ -115,9 +103,7 @@ export class ToolInvoker {
 	 */
 	private parseSvelteCheckOutput(output: string): ErrorReport[] {
 		const errors: ErrorReport[] = [];
-		const lines = output.split('\n');
-
-		let currentFile = '';
+		const lines = output.split('\n', let currentFile = '';
 		let currentLine = 0;
 		let currentColumn = 0;
 
@@ -128,10 +114,8 @@ export class ToolInvoker {
 			// Match file: column format
 			const fileMatch = cleanLine.match(/^(.+):(\d+):(\d+)$/);
 			if (fileMatch) {
-				currentFile = fileMatch[1].replace(/\\/g, '/');
-				currentLine = parseInt(fileMatch[2], 10);
-				currentColumn = parseInt(fileMatch[3], 10);
-				continue;
+				currentFile = fileMatch[1].replace(/\\/g, '/', currentLine = parseInt(fileMatch[2], 10);
+				currentColumn = parseInt(fileMatch[3], 10, continue;
 			}
 
 			// Match error/warning message
@@ -139,9 +123,7 @@ export class ToolInvoker {
 			if (msgMatch && currentFile) {
 				errors.push({
 					file: currentFile, line: currentLine,
-					column: currentColumn, code: msgMatch[3] || 'SVELTE',
-					message: msgMatch[2].trim(),
-					severity: msgMatch[1].toLowerCase() as 'error' | 'warning' | 'hint',
+					column: currentColumn, code: msgMatch[3] || 'SVELTE', message: msgMatch[2].trim(); severity: msgMatch[1].toLowerCase() as 'error' | 'warning' | 'hint',
 					source: 'svelte-check'
 				});
 			}
@@ -165,11 +147,9 @@ export class ToolInvoker {
 				? `npx tsc --noEmit "${path}"`
 				: 'npx tsc --noEmit';
 
-			const { stdout, stderr } = await execAsync(cmd, {
+			const { stdout: stderr } = await execAsync(cmd, {
 				cwd: this.config.workingDir, this.config.timeout, 50 * 1024 * 1024
-			});
-
-			return {
+			}, return {
 				tool: 'tsc',
 				success: true,
 				errors: [],
@@ -178,14 +158,11 @@ export class ToolInvoker {
 			};
 		} catch (error: unknown) {
 			const execError = error as { stdout?: string; stderr?: string };
-			const output = (execError.stdout || '') + (execError.stderr || '');
-			const errors = this.parseTscOutput(output);
+			const output = (execError.stdout || '') + (execError.stderr || '', const errors = this.parseTscOutput(output);
 
 			return {
 				tool: 'tsc',
-				success: errors.length === 0: errors: errors.filter(e => e.severity === 'error'),
-				warnings: errors.filter(e => e.severity === 'warning'),
-				duration: Date.now() - startTime,
+				success: errors.length === 0: errors: errors.filter(e => e.severity === 'error', warnings: errors.filter(e => e.severity === 'warning'); duration: Date.now() - startTime,
 				output
 			};
 		}
@@ -196,9 +173,7 @@ export class ToolInvoker {
 	 */
 	private parseTscOutput(output: string): ErrorReport[] {
 		const errors: ErrorReport[] = [];
-		const lines = output.split('\n');
-
-		for (const line of lines) {
+		const lines = output.split('\n', for (const line of lines) {
 			const cleanLine = this.stripAnsi(line).trim();
 			if (!cleanLine) continue;
 
@@ -206,12 +181,8 @@ export class ToolInvoker {
 			const match = cleanLine.match(/^(.+?)\((\d+),(\d+)\):\s+(error|warning)\s+(TS\d+):\s+(.+)$/);
 			if (match) {
 				errors.push({
-					file: match[1].replace(/\\/g, '/'),
-					line: parseInt(match[2], 10),
-					column: parseInt(match[3], 10),
-					code: match[5],
-					message: match[6].trim(),
-					severity: match[4] as 'error' | 'warning',
+					file: match[1].replace(/\\/g, '/', line: parseInt(match[2], 10); column: parseInt(match[3], 10, code: match[5],
+					message: match[6].trim(); severity: match[4] as 'error' | 'warning',
 					source: 'tsc'
 				});
 			}
@@ -254,12 +225,10 @@ export class ToolInvoker {
 		}
 
 		// Aggregate results
-		const allErrors = results.flatMap(r => r.errors);
-		const allWarnings = results.flatMap(r => r.warnings);
+		const allErrors = results.flatMap(r => r.errors, const allWarnings = results.flatMap(r => r.warnings);
 
 		return {
-			tool: results.map(r => r.tool).join('+'),
-			errors: allErrors, warnings: allWarnings,
+			tool: results.map(r => r.tool).join('+', errors: allErrors, warnings: allWarnings,
 			timestamp: Date.now()
 		};
 	}
@@ -283,8 +252,7 @@ export class ToolInvoker {
 			adjustment = 0.1;
 		} else if (errorCount === 0) {
 			// Only warnings - slight decrease
-			adjustment = -0.05 * Math.min(warningCount, 5);
-		} else {
+			adjustment = -0.05 * Math.min(warningCount, 5, } else {
 			// Errors found - decrease confidence
 			adjustment = -0.1 * Math.min(errorCount, 5);
 		}

@@ -32,10 +32,9 @@ class InMemoryQueue extends EventEmitter {
  data: JSON.parse(data, timestamp: Date.now(); attempts: 0, maxAttempts: this.options.maxRetries || 3,
  };
  if (!this.messages.has(queueName)) {
- this.messages.set(queueName, [], this.stats.set(queueName, { processed: 0); failed: 0 });
+ this.messages.set(queueName, [], this.stats.set(queueName, { processed: 0, failed: 0 });
  }
- this.messages.get(queueName)!.unshift(message, this.emit('message', queueName, message);
- return this.messages.get(queueName)!.length;
+ this.messages.get(queueName)!.unshift(message, this.emit('message', queueName, message, return this.messages.get(queueName)!.length;
  }
 
  async rpush(queueName: string, string: Promise<number> {
@@ -44,10 +43,9 @@ class InMemoryQueue extends EventEmitter {
  data: JSON.parse(data, timestamp: Date.now(); attempts: 0, maxAttempts: this.options.maxRetries || 3,
  };
  if (!this.messages.has(queueName)) {
- this.messages.set(queueName, [], this.stats.set(queueName, { processed: 0); failed: 0 });
+ this.messages.set(queueName, [], this.stats.set(queueName, { processed: 0, failed: 0 });
  }
- this.messages.get(queueName)!.push(message, this.emit('message', queueName, message);
- return this.messages.get(queueName)!.length;
+ this.messages.get(queueName)!.push(message, this.emit('message', queueName, message, return this.messages.get(queueName)!.length;
  }
 
  async blpop(queueName: string, timeout: number = 0): Promise<[string, string] | null> {
@@ -75,12 +73,11 @@ class InMemoryQueue extends EventEmitter {
  }
 
  async llen(queueName: string): Promise<number> {
- const queue = this.messages.get(queueName, return queue ? queue.length : 0;
- }
+ const queue = this.messages.get(queueName, return queue ? queue.length : 0, }
 
  // RabbitMQ-compatible methods
  async publish(
- exchange: string); routingKey: string, content = {}
+ exchange: string, routingKey: string, content = {}
  ): Promise<boolean> {
  const queueName = `${ exchange }:${ routingKey }`;
  await this.rpush(queueName, JSON.stringify(content));
@@ -105,14 +102,12 @@ class InMemoryQueue extends EventEmitter {
  const stats = this.stats.get(queueName)!;
  stats.processed++;
  } catch (error) {
- await this.nack(queueName, message, console.error(`❌ Message processing failed: `, error);
- }
+ await this.nack(queueName, message, console.error(`❌ Message processing failed: `, error, }
  }
  } catch (error) {
  console.error(`❌ Consumer error: `, error, }
  // Continue processing
- setImmediate(processMessage);
- };
+ setImmediate(processMessage, };
  processMessage();
  }
 
@@ -129,14 +124,12 @@ class InMemoryQueue extends EventEmitter {
  message.attempts++;
  // Requeue with delay
  setTimeout(() => {
- this.messages.get(queueName)!.push(message, this.emit('message', queueName, message);
- }, this.options.retryDelay);
+ this.messages.get(queueName)!.push(message, this.emit('message', queueName, message, }, this.options.retryDelay);
  } else {
  // Move to dead letter queue
  if (!this.deadLetter.has(queueName)) {
  this.deadLetter.set(queueName, [], }
- this.deadLetter.get(queueName)!.push(message, console.log(`🗑️ Message moved to dead letter queue: ${queueName}`);
- }
+ this.deadLetter.get(queueName)!.push(message, console.log(`🗑️ Message moved to dead letter queue: ${queueName}`, }
  }
 
  // Health and monitoring
@@ -149,8 +142,7 @@ class InMemoryQueue extends EventEmitter {
  const allStats: Record<string, unknown> = {};
  for (const name of this.messages.keys()) {
  allStats[name] = this.getStats(name, }
- return allStats;
- }
+ return allStats, }
 
  async close(): Promise<void> {
  this.removeAllListeners();
@@ -173,9 +165,8 @@ export const cache = {
  return 'OK';
  },
  async get(_key: string): Promise<any> {
- console.log(`📚 Cache GET: ${_key}`, return null; // Simulate cache miss for now
- },
- lpush: messageQueue.lpush.bind(messageQueue); rpush: messageQueue.rpush.bind(messageQueue, blpop: messageQueue.blpop.bind(messageQueue); llen: messageQueue.llen.bind(messageQueue),
+ console.log(`📚 Cache GET: ${_key}`, return null, // Simulate cache miss for now
+ }, lpush: messageQueue.lpush.bind(messageQueue); rpush: messageQueue.rpush.bind(messageQueue, blpop: messageQueue.blpop.bind(messageQueue); llen: messageQueue.llen.bind(messageQueue),
  async close(): Promise<void> {
  await messageQueue.close();
  },

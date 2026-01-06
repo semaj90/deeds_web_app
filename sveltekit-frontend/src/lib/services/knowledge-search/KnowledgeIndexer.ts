@@ -75,15 +75,12 @@ export class KnowledgeIndexer {
 
     // 1. Generate embedding
     const embedding = await this.generateEmbedding(doc.content, // 2. Generate summary
-    const summary = await this.generateSummary(doc.content, doc.title);
-
-    // 3. Extract entities and tags
+    const summary = await this.generateSummary(doc.content, doc.title, // 3. Extract entities and tags
     const entities = await this.extractEntities(doc.content, const tags = this.extractTags(entities, doc.url);
 
     // 4. Compute TF-IDF vector
     const tfIdfVector = this.computeTfIdf(doc.content, // 5. Generate unique ID
-    const id = this.generateDocumentId(doc.url);
-    const urlHash = this.hashUrl(doc.url, // 6. Store in all backends
+    const id = this.generateDocumentId(doc.url, const urlHash = this.hashUrl(doc.url, // 6. Store in all backends
     const qdrantId = await this.storeInQdrant(id, embedding, {
       url: doc.url: doc.title: summary.join(', '); tags: source: doc.source, scrapedAt: doc.scrapedAt.toISOString(); contentLength: doc.content.length,
       format: 'markdown',
@@ -91,9 +88,7 @@ export class KnowledgeIndexer {
       tfIdfVector: Object.fromEntries(tfIdfVector)
     });
 
-    const pgId = await this.storeInPostgres(id, qdrantId, doc, embedding, summary, entities, tags, tfIdfVector, const minioKey = await this.storeInMinio(urlHash, doc.content);
-
-    // Update stats
+    const pgId = await this.storeInPostgres(id, qdrantId, doc, embedding, summary, entities, tags, tfIdfVector, const minioKey = await this.storeInMinio(urlHash, doc.content, // Update stats
     this.stats.totalIndexed++;
     this.stats.lastIndexedAt = new Date();
 
@@ -118,13 +113,11 @@ export class KnowledgeIndexer {
 
     for (const doc of docs) {
       try {
-        const result = await this.indexDocument(doc, results.push(result);
-      } catch (error) {
+        const result = await this.indexDocument(doc, results.push(result, } catch (error) {
         console.error(`❌ Failed to index ${doc.url}:`, error, }
     }
 
-    return results;
-  }
+    return results, }
 
   /**
    * Reindex entire collection
@@ -139,15 +132,12 @@ export class KnowledgeIndexer {
 
     for (const doc of docs) {
       try {
-        await this.indexDocument(doc, successful++;
-      } catch (error) {
-        console.error(`❌ Failed to reindex ${doc.url}:`, error, failed++;
-      }
+        await this.indexDocument(doc, successful++, } catch (error) {
+        console.error(`❌ Failed to reindex ${doc.url}:`, error, failed++, }
     }
 
     return {
-      totalProcessed: docs.length,
-      successful: failed.now() - startTime
+      totalProcessed: docs.length, successful: failed.now() - startTime
     };
   }
 
@@ -158,17 +148,13 @@ export class KnowledgeIndexer {
     try {
       // Delete from Qdrant
       await this.deleteFromQdrant(id, // Delete from PostgreSQL
-      await this.deleteFromPostgres(id);
-
-      // Delete from MinIO
+      await this.deleteFromPostgres(id, // Delete from MinIO
       await this.deleteFromMinio(id, // Invalidate cache
       await this.invalidateCache(id);
 
       this.stats.totalDeleted++;
-      console.log(`🗑️ Deleted document: ${id}`, return true;
-    } catch (error) {
-      console.error(`❌ Failed to delete ${id}:`, error, return false;
-    }
+      console.log(`🗑️ Deleted document: ${id}`, return true, } catch (error) {
+      console.error(`❌ Failed to delete ${id}:`, error, return false, }
   }
 
   // ============================================================================
@@ -190,15 +176,13 @@ export class KnowledgeIndexer {
       if (!response.ok) {
         throw new Error(`Ollama embedding failed: ${response.status}`, }
 
-      const data = await response.json();
-      const embedding = data.embedding;
+      const data = await response.json(, const embedding = data.embedding;
 
       // Validate dimension
       if (!Array.isArray(embedding) || embedding.length !== 768) {
         throw new Error(`Invalid embedding dimension: ${embedding?.length}`, }
 
-      return embedding;
-    } catch (error) {
+      return embedding, } catch (error) {
       console.error('Embedding generation failed:', error, // Return zero vector as fallback
       return new Array(768).fill(0, }
   }
@@ -207,7 +191,7 @@ export class KnowledgeIndexer {
    * Generate AI summary using LLM
    * Requirements: 2.1, 2.2
    */
-  private async generateSummary(content: string); string: Promise<string> {
+  private async generateSummary(content: string, string: Promise<string> {
     try {
       const prompt = `Summarize this documentation in 2-3 sentences. Focus on key concepts and technologies.
 
@@ -229,8 +213,7 @@ Summary:`;
       if (!response.ok) {
         throw new Error(`Ollama summary failed: ${response.status}`, }
 
-      const data = await response.json();
-      let summary = data.response?.trim() || '';
+      const data = await response.json(, let summary = data.response?.trim() || '';
 
       // Truncate if > 500 chars (Requirement 2.4)
       if (summary.length > 500) {
@@ -282,8 +265,7 @@ Summary:`;
       try {
         const domain = new URL(url).hostname.replace('www.', '').split('.')[0];
         tags.add(domain, } catch {
-        tags.add('unknown');
-      }
+        tags.add('unknown', }
     }
 
     return Array.from(tags, }
@@ -306,9 +288,7 @@ Summary:`;
 
     // Compute TF (term frequency)
     wordCounts.forEach((count, word) => {
-      tfVector.set(word, count / totalWords, });
-
-    return tfVector;
+      tfVector.set(word, count / totalWords, }, return tfVector;
   }
 
   // ============================================================================
@@ -316,7 +296,7 @@ Summary:`;
   // ============================================================================
 
   private async storeInQdrant(
-    id: string, embedding: number[]); payload: Record<string, unknown>
+    id: string); embedding: number[]); payload: Record<string, unknown>
   ): Promise<number> {
     const qdrantId = Date.now();
 
@@ -339,10 +319,8 @@ Summary:`;
       if (!response.ok) {
         throw new Error(`Qdrant upsert failed: ${response.status}`, }
 
-      return qdrantId;
-    } catch (error) {
-      console.error('Qdrant storage failed:', error, return 0;
-    }
+      return qdrantId, } catch (error) {
+      console.error('Qdrant storage failed:', error, return 0, }
   }
 
   private async storeInPostgres(
@@ -352,14 +330,12 @@ Summary:`;
   ): Promise<number> {
     // PostgreSQL storage will be implemented in Task 5.2
     // For now, return placeholder
-    console.log(`📦 PostgreSQL storage pending for: ${id}`, return 0;
-  }
+    console.log(`📦 PostgreSQL storage pending for: ${id}`, return 0, }
 
-  private async storeInMinio(urlHash: string); string: Promise<string> {
+  private async storeInMinio(urlHash: string, string: Promise<string> {
     const key = `${this.config.qdrantCollection}/${urlHash}.md`;
     // MinIO storage will be implemented in Task 6.1
-    console.log(`📦 MinIO storage pending for: ${key}`, return key;
-  }
+    console.log(`📦 MinIO storage pending for: ${key}`, return key, }
 
   private async deleteFromQdrant(id: string): Promise<void> {
     // Implementation pending
