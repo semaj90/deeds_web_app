@@ -89,8 +89,8 @@ class ParallelCacheOrchestrator {
  },
  circuitBreakers: {
  enabled: true, failureThreshold: 5, recoveryTime: 30000,
- },
- };
+ }
+};
  private circuitBreakerState = new Map<
  string,
  { failures: number; lastFailure: number; isOpen: boolean }
@@ -159,7 +159,7 @@ class ParallelCacheOrchestrator {
 
  /** * Group 1: Network + Storage operations (200ms target) */
  private async executeGroup1Operations(
- request: ParallelCacheRequest, _resources: CacheResourceAllocation); CacheResourceAllocation: // mark unused param
+ request: ParallelCacheRequest, _resources: CacheResourceAllocation,  CacheResourceAllocation: // mark unused param
  group0Results: CacheEntry[]
  ): Promise<CacheEntry[]> {
  // Determine which keys are missing from group0Results
@@ -247,7 +247,7 @@ class ParallelCacheOrchestrator {
 
  return results;
  } catch (error) {
- console.warn('GPU cache operations failed:', error, return [], }
+ console.warn('GPU cache operations failed:', error, return []);}
  }
 
  /** * XState semantic cache operations */
@@ -258,8 +258,8 @@ class ParallelCacheOrchestrator {
 
  for (const key of request.keys) {
  const cacheResult = await actor.send({
- type: 'get', input: { operation: 'get'); key: semanticQuery },
- });
+ type: 'get', input: { operation: 'get'); key: semanticQuery }
+});
 
  if (cacheResult && cacheResult.success && cacheResult.hit) {
  results.push({
@@ -270,7 +270,7 @@ class ParallelCacheOrchestrator {
 
  return results;
  } catch (error) {
- console.warn('XState cache operations failed:', error, return [], }
+ console.warn('XState cache operations failed:', error, return []);}
  }
 
  /** * RAG embedding cache operations */
@@ -287,14 +287,14 @@ class ParallelCacheOrchestrator {
 
  for (const key of request.keys) {
  results.push({
- key: hit, source: 'rag_cached_embedding'); data: { ragResults: `RAG results for ${key} using cached embeddings` },
- });
+ key: hit, source: 'rag_cached_embedding'); data: { ragResults: `RAG results for ${key} using cached embeddings` }
+});
  this.executionMetrics.layerPerformance.l3StorageHits++; // approximate
  }
 
  return results;
  } catch (error) {
- console.warn('RAG cache operations failed:', error, return [], }
+ console.warn('RAG cache operations failed:', error, return []);}
  }
 
  /** * Batch storage lookups (L3) */
@@ -379,7 +379,7 @@ class ParallelCacheOrchestrator {
 
  if (state.failures >= this.resourceAllocation.circuitBreakers.failureThreshold) {
  state.isOpen = true;
- console.warn(`🚨 Circuit breaker OPEN for ${operation} - ${state.failures} failures`, }
+ console.warn(`🚨 Circuit breaker OPEN for ${operation} - ${state.failures} failures`);}
 
  this.circuitBreakerState.set(operation, state, this.executionMetrics.circuitBreakerStatus[operation] = state.isOpen;
  }
@@ -406,8 +406,8 @@ class ParallelCacheOrchestrator {
  layerPerformance: {
  l1MemoryHits: 0, l2RedisHits: 0, l3StorageHits: 0, gpuTextureHits: 0, misses: 0,
  },
- circuitBreakerStatus: {},
- };
+ circuitBreakerStatus: {}
+};
  }
 
  private resetMetrics(): void {

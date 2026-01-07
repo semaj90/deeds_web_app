@@ -81,12 +81,12 @@
   opacity?: number;
 
   variant?: string;
-	[key, string], unknown;
+	[key: string]: unknown;
 }
 
-  export interface DOMSyncData { domElement: HTMLElement, position, THREE.Vector3;
+  export interface DOMSyncData { domElement: HTMLElement, position: THREE.Vector3;
 
-  rotation, THREE.Euler, scale, THREE.Vector3;
+  rotation, THREE.Euler, scale: THREE.Vector3;
 
   opacity, number, nesCssClasses: string[];
 
@@ -97,23 +97,23 @@
 
   protected hybridStyle: NESYoRHaHybridStyle;
 
-  protected domOverlay | undefined;
+  protected domOverlay: any | undefined;
 
-  protected domSyncData | undefined;
+  protected domSyncData: any | undefined;
 
-  protected pixelCanvas | undefined;
+  protected pixelCanvas: any | undefined;
 
   protected crtShader, THREE.ShaderMaterial | undefined;
 
   protected nesStateCache, Map<string: InteractiveCanvasState> = new Map();
 
-  protected syncAnimationFrame | undefined;
+  protected syncAnimationFrame: any | undefined;
 
-  protected hybridGPU | undefined;
+  protected hybridGPU: any | undefined;
 
   protected useGPUAcceleration = true;
 
-  protected gpuPixelBuffer | undefined;
+  protected gpuPixelBuffer: any | undefined;
 
   protected activeBackend: GPUBackendType = 'cpu';
 
@@ -167,9 +167,9 @@
 
   protected createMaterial(), void {
 
-  const colorValue, THREE.ColorRepresentation = (this.hybridStyle.backgroundColor ?? NES_YORHA_PALETTE.yorhaBeige) as unknown as THREE.ColorRepresentation;
+  const colorValue: THREE.ColorRepresentation = (this.hybridStyle.backgroundColor ?? NES_YORHA_PALETTE.yorhaBeige) as unknown as THREE.ColorRepresentation;
 
-  const materialProps, THREE.MeshStandardMaterialParameters = { color: colorValue, opacity, this.hybridStyle.opacity ?? 1,;
+  const materialProps: THREE.MeshStandardMaterialParameters = { color: colorValue, opacity, this.hybridStyle.opacity ?? 1,;
   transparent: (this.hybridStyle.opacity ?? 1) <, 1, metalness,;
   roughness: 1
 		};
@@ -392,13 +392,13 @@
   uniforms: {
 
   processingMode: 'nes-quantization',
-				},
-			},
+				}
+},
 		});
 
   if (nesPixelShaders) {
 
-  this.shaderResources.set('nes-processing', nesPixelShaders, console.log(`📧 Loaded ${this.activeBackend} shaders for NES pixel processing`, }
+  this.shaderResources.set('nes-processing', nesPixelShaders, console.log(`📧 Loaded ${this.activeBackend} shaders for NES pixel processing`);}
 
 		// Load CRT effect shaders;
   const crtShaders = await gpuContextProvider.loadShaderResources('crt-effects', {
@@ -409,12 +409,12 @@
   webgl2: { vertex: this.createWebGL2VertexShader(, fragment, this.createWebGL2CRTFragmentShader(),
 			},;
   webgl1: { vertex: this.createWebGL1VertexShader(, fragment, this.createWebGL1CRTFragmentShader(),
-			},
-		});
+			}
+});
 
   if (crtShaders) {
 
-  this.shaderResources.set('crt-effects', crtShaders, console.log(`📧 Loaded ${this.activeBackend} shaders for CRT effects`, }
+  this.shaderResources.set('crt-effects', crtShaders, console.log(`📧 Loaded ${this.activeBackend} shaders for CRT effects`);}
 	}
 
 	/**
@@ -450,9 +450,9 @@
   
   if (!results || !results.outputPixels) {
 
-  console.warn('📄 GPU returned no outputPixels, falling back to CPU', return this.processPixelsCPU(pixelData, effect, }
+  console.warn('📄 GPU returned no outputPixels, falling back to CPU', return this.processPixelsCPU(pixelData, effect);}
 
-  const out, unknown = results.outputPixels;
+  const out: unknown = results.outputPixels;
 
 			// 1) Already a Float32Array;
   if (out instanceof Float32Array) {
@@ -491,9 +491,9 @@
 			}
 
 			// Fallback, unable to coerce -> CPU;
-  console.warn('📄 Unable to coerce GPU output to Float32Array, falling back to CPU', return this.processPixelsCPU(pixelData, effect, } catch (error) {
+  console.warn('📄 Unable to coerce GPU output to Float32Array, falling back to CPU', return this.processPixelsCPU(pixelData, effect);} catch (error) {
 
-  console.warn('📄 GPU pixel processing failed, falling back to CPU: ', error, return this.processPixelsCPU(pixelData, effect, }
+  console.warn('📄 GPU pixel processing failed, falling back to CPU: ', error, return this.processPixelsCPU(pixelData, effect);}
 	}
 
 	/**
@@ -502,8 +502,8 @@
   private createPixelProcessingShader(effect: 'quantize' | 'scanlines' | 'crt'), string {
 
   const baseShader = `
-@group(0) @binding(0) var<storage, read> inputPixels, array<vec4f>;
-@group(0) @binding(1) var<storage, read_write> outputPixels, array<vec4f>;
+@group(0) @binding(0) var<storage, read> inputPixels: array<vec4f>;
+@group(0) @binding(1) var<storage, read_write> outputPixels: array<vec4f>;
 @group(0) @binding(2) var<uniform> config: vec4f; // width, height, pixelScale, scanlines
 
 @compute @workgroup_size(8, 8, fn main(@builtin(global_invocation_id) global_id, vec3<u32>) {
@@ -651,9 +651,9 @@
   private createWebGPUPixelShader(), string {
 
   return `
-@group(0) @binding(0) var<storage, read> inputPixels, array<vec4f>;
-@group(0) @binding(1) var<storage, read_write> outputPixels, array<vec4f>;
-@group(0) @binding(2) var<storage, read> nesPalette, array<vec4f>;
+@group(0) @binding(0) var<storage, read> inputPixels: array<vec4f>;
+@group(0) @binding(1) var<storage, read_write> outputPixels: array<vec4f>;
+@group(0) @binding(2) var<storage, read> nesPalette: array<vec4f>;
 @group(0) @binding(3) var<uniform> config: vec4f; // width, height, effect, dithering
 
 @compute @workgroup_size(8, 8, fn main(@builtin(global_invocation_id) global_id, vec3<u32>) {
@@ -692,8 +692,8 @@
   private createWebGPUCRTShader(), string {
 
   return `
-@group(0) @binding(0) var<storage, read> inputPixels, array<vec4f>;
-@group(0) @binding(1) var<storage, read_write> outputPixels, array<vec4f>;
+@group(0) @binding(0) var<storage, read> inputPixels: array<vec4f>;
+@group(0) @binding(1) var<storage, read_write> outputPixels: array<vec4f>;
 @group(0) @binding(2) var<uniform> config: vec4f; // width, height, scanlineIntensity, vignette
 
 @compute @workgroup_size(8, 8, fn main(@builtin(global_invocation_id) global_id, vec3<u32>) {
@@ -944,8 +944,8 @@
   viewport: { x: 0, y: 0 0, zoom: 1 },;
   animation: 'hybrid_component',;
   frame: 0, fabricJSON, this.serializeToFabricJSON(, metadata: { renderMode: this.hybridStyle.renderMode, this.hybridStyle.nesCssClass, this.hybridStyle.variant,, cacheRegion: 'CHR_ROM',
-			},
-		}, try {
+			}
+}, try {
 
   await nesCacheOrchestrator.cacheCanvasStateAsSprite,('hybrid_component', [canvasState], {
 , priority: 2, compression, true,
@@ -953,7 +953,7 @@
 
   this.nesStateCache.set(stateId, canvasState, } catch (err) {
 
-  console.warn('Failed to cache NES state: ', err, }
+  console.warn('Failed to cache NES state: ', err);}
 	}
 
   private colorToHex(color, number |, string | undefined, fallback = 'd4c5a9'), string {
@@ -978,8 +978,8 @@
   stroke: `#${this.colorToHex(this.hybridStyle.borderColor)}`,;
   strokeWidth: (this.hybridStyle.borderWidth || 0) * 100,;
   nesStyle: { cssClass: this.hybridStyle.nesCssClass, this.hybridStyle.nesContainer, this.hybridStyle.pixelPerfect,
-					},
-				},
+					}
+},
 			],
 		};
 
@@ -1003,7 +1003,7 @@
 			};
 
 			// Ensure key is a confirmed string before using as Map key;
-  const key, string = predictiveState.id ?? `hybrid_${variant}_predicted`;
+  const key: string = predictiveState.id ?? `hybrid_${variant}_predicted`;
 
   predictiveState.id = key;
 
@@ -1013,7 +1013,7 @@
 
   private generateVariantFabricJSON(variant, string), object {
 
-  const colorMap, Record<string, number> = { primary: NES_YORHA_PALETTE.yorhaGold, NES_YORHA_PALETTE.nesGray, NES_YORHA_PALETTE.hybridAccent, hover, NES_YORHA_PALETTE.nesLightGray, NES_YORHA_PALETTE.nesSuccess,
+  const colorMap: Record<string, number> = { primary: NES_YORHA_PALETTE.yorhaGold, NES_YORHA_PALETTE.nesGray, NES_YORHA_PALETTE.hybridAccent, hover, NES_YORHA_PALETTE.nesLightGray, NES_YORHA_PALETTE.nesSuccess,
 		};
 
   const baseJSON = JSON.parse(this.serializeToFabricJSON());
@@ -1053,7 +1053,7 @@
 
   private getCamera(), THREE.Camera {
 		// Simplified camera lookup; fallback to a default camera;
-  let current, THREE.Object3D | null = this.parent as THREE.Object3D | null;
+  let current: THREE.Object3D | null = this.parent as THREE.Object3D | null;
 
   while (current && !(current instanceof THREE.Scene)) {
 
@@ -1067,7 +1067,7 @@
   if (found) return found;
 
 			// Traverse scene to find nested camera;
-  let cam, THREE.Camera | null = null;
+  let cam: THREE.Camera | null = null;
 
   current.traverse((obj) => {
 
@@ -1097,7 +1097,7 @@
   public async switchToNESState(stateId, string), Promise<void> {
 
   try {
-			// explicitly type cachedState to allow null (loader may return null, const cachedState, InteractiveCanvasState[] | null = await nesCacheOrchestrator.loadSpriteSheet('hybrid_component', if (!cachedState || cachedState.length === 0) {
+			// explicitly type cachedState to allow null (loader may return null, const cachedState: InteractiveCanvasState[] | null = await nesCacheOrchestrator.loadSpriteSheet('hybrid_component', if (!cachedState || cachedState.length === 0) {
 
   console.warn,(`No NES sprite sheet available for: 'hybrid_component'`, return, }
 
@@ -1137,7 +1137,7 @@
 
   this.domOverlay.appendChild(header, this.domOverlay.appendChild(pre, } catch (e) {
 
-  console.warn('Failed to render NES state preview in DOM overlay: ', e, }
+  console.warn('Failed to render NES state preview in DOM overlay: ', e);}
 			}
 
 			// Ensure transforms are updated in the scene, try {

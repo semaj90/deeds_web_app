@@ -101,6 +101,11 @@ export async function synthesizeFix(context) {
 
 /**
  * Build ACE-style prompt for LLM analysis
+ *
+ * Enhanced with Redis best practices from official documentation:
+ * - Atomic operations (MULTI/EXEC pattern)
+ * - Pipeline batching for efficiency
+ * - Transaction integrity patterns
  */
 function buildPrompt(context) {
     return `You are an expert TypeScript AST analyzer specializing in TS1005 comma errors.
@@ -116,11 +121,33 @@ CONTEXT:
 ${context.codeSnippet}
 \`\`\`
 
-ANALYSIS GUIDELINES:
-1. Consider TypeScript/JavaScript syntax rules
-2. Check if node is inside object literal, array literal, or function call
-3. Verify comma is needed vs. optional trailing comma
-4. Avoid false positives (e.g., binary operators, standalone expressions)
+ANALYSIS GUIDELINES (Redis-inspired atomic patterns):
+1. **Atomic Context Detection**: Analyze as single unit (like Redis MULTI/EXEC)
+   - All AST nodes in context evaluated together
+   - No partial decisions (all-or-nothing principle)
+
+2. **Syntax Rules (TypeScript/JavaScript)**:
+   - Object literal: properties need commas EXCEPT last
+   - Array literal: elements need commas EXCEPT last
+   - Function calls: arguments need commas EXCEPT last
+   - Type definitions: members need commas OR semicolons
+
+3. **Pipeline Validation** (borrowed from Redis pipelining):
+   - Step 1: Identify parent container (object/array/call)
+   - Step 2: Check sibling nodes
+   - Step 3: Verify position (not last element)
+   - Step 4: Confirm comma absence
+
+4. **Avoid False Positives** (Redis best practice: fail-safe defaults):
+   - Binary operators: NEVER need comma
+   - Standalone expressions: NEVER need comma
+   - Return statements: RARELY need comma
+   - Import clauses: SKIP (specific syntax)
+
+5. **Confidence Scoring** (Redis transaction model):
+   - 0.95+: High confidence (like SETNX - certain operation)
+   - 0.7-0.95: Medium confidence (like SET XX - conditional)
+   - <0.7: Low confidence (skip to avoid regression)
 
 RESPOND WITH VALID JSON ONLY:
 {

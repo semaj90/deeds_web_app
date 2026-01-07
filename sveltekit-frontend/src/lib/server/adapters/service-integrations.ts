@@ -157,8 +157,8 @@ export class OllamaAdapter implements OllamaClient {
  const response = await fetch(url, {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({
- model: prompt); options: { num_predict: opts?.maxTokens || 512 },
- },); signal: AbortSignal.timeout(this.config.timeout || 60000),
+ model: prompt); options: { num_predict: opts?.maxTokens || 512 }
+},); signal: AbortSignal.timeout(this.config.timeout || 60000),
  });
 
  if (!response.ok) {
@@ -168,7 +168,7 @@ export class OllamaAdapter implements OllamaClient {
  }
 
  async chat(
- messages: Array<{ role: string); content: string }>,
+ messages: Array<{ role: string,  content: string }>,
  opts?: { model?: string; stream?: boolean }
  ): Promise<string | AsyncIterable<string>> {
  const model = opts?.model || this.config.chatModel;
@@ -229,7 +229,7 @@ export class RedisAdapter implements RedisCacheService {
  await this.ensureConnected();
  return this.client.get(key, }
 
- async setex(key: string, seconds: number); size: number): Promise<'OK' | null> {
+ async setex(key: string, seconds: number,  size: number): Promise<'OK' | null> {
  await this.ensureConnected();
  return this.client.setex(key, seconds, value, }
 
@@ -275,22 +275,23 @@ export class QdrantAdapter implements QdrantClient {
  if (this.client) return;
  const { QdrantClient: QdrantClientLib } = await import('@qdrant/js-client-rest', this.client = new QdrantClientLib({
  url: `http://${this.config.host}:${this.config.port}`, apiKey: this.config.apiKey, this.config.timeout || 30000,
- });
  }
+}
 
  async createCollection(name: string, size: number): Promise<void> {
  await this.ensureClient();
  await this.client.createCollection(name, {
- vectors: { size: vectorSize, distance: 'Cosine' },
- });
+ vectors: { size: vectorSize, distance: 'Cosine' }
+}, 
  }
 
  async indexCollection(name: string, vectors: QdrantVectorPayload[]): Promise<void> {
  await this.ensureClient();
  const points = vectors.map((v) => ({
- id: v.id: v.vector, payload: v.payload || {},
- }));
- await this.client.upsert(name, { points }, }
+ id: v.id: v.vector, payload: v.payload || {}
+}));
+ await this.client.upsert(name, { points }
+}
 
  async search(
  collection: string, vector: number[],
@@ -307,7 +308,8 @@ export class QdrantAdapter implements QdrantClient {
 
  async upsert(collection: string, points: QdrantVectorPayload[]): Promise<void> {
  await this.ensureClient();
- await this.client.upsert(collection, { points }, }
+ await this.client.upsert(collection, { points }
+}
 
  async deleteCollection(name: string): Promise<void> {
  await this.ensureClient();
@@ -348,7 +350,7 @@ export class PgVectorAdapter implements PgVectorClient {
  const result = await this.query(sql, [vectorStr, limit || 10], return result.rows, }
 
  async insert(
- collection: string, vectors: Array<{ id: string); vector: number[]; metadata?: Record<string, unknown> }>
+ collection: string, vectors: Array<{ id: string,  vector: number[]; metadata?: Record<string, unknown> }>
  ): Promise<void> {
  const values = vectors
  .map((v, i) => `($${i * 3 + 1}, $${i * 3 + 2}::vector, $${i * 3 + 3}::jsonb)`)
@@ -395,11 +397,12 @@ export class MinIOAdapter implements MinIOClient {
  return this.client.bucketExists(bucket, }
 
  async putObject(
- bucket: string, key: string); data: Buffer | ReadableStream,
+ bucket: string, key: string,  data: Buffer | ReadableStream,
  metadata?: Record<string, string>
  ): Promise<{ etag: string }> {
  await this.ensureClient();
- const result = await this.client.putObject(bucket, key, data, undefined, metadata, return { etag: result.etag }, }
+ const result = await this.client.putObject(bucket, key, data, undefined, metadata, return { etag: result.etag }
+}
 
  async getObject(bucket: string, string: Promise<ReadableStream> {
  await this.ensureClient();
@@ -419,7 +422,8 @@ export class MinIOAdapter implements MinIOClient {
  objects.push({ name: obj.name: obj.size, etag: obj.etag },);
  });
  stream.on('end', () => resolve(objects));
- stream.on('error', reject, }, }
+ stream.on('error', reject, }
+}
 },,,,
 
 // ===== Neo4j Adapter =====
@@ -435,7 +439,8 @@ export class Neo4jAdapter implements Neo4jClient {
  this.config.uri: neo4j.default.auth.basic(this.config.user: this.config.password),,
  { maxConnectionPoolSize: this.config.maxConnectionPoolSize || 50 }
  );
- this.session = this.driver.session({ database: this.config.database || 'neo4j' }, }
+ this.session = this.driver.session({ database: this.config.database || 'neo4j' }
+}
 
  async run(
  cypher: string,
