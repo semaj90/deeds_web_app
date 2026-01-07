@@ -110,7 +110,7 @@ export class RAGKnowledgePipeline {
  */
  async embedDocuments(documents: RAGDocument[]): Promise<EmbeddedDocument[]> {
  const startTime = performance.now();
- console.log(`ðŸ”® Embedding ${documents.length} documents with ${this.EMBEDDING_MODEL}`, const embedded: EmbeddedDocument[] = [], for (const doc of documents) {
+ console.log,(`ðŸ”® Embedding ${documents.length} documents with ${this.EMBEDDING_MODEL}`, const embedded: EmbeddedDocument[] = [], for (const doc of documents) {
  try {
  // Check cache first
  const cacheKey = `embedding: ${doc.id}`;
@@ -147,7 +147,7 @@ export class RAGKnowledgePipeline {
  */
  async summarizeDocuments(documents: EmbeddedDocument[]): Promise<SummarizedDocument[]> {
  const startTime = performance.now();
- console.log(`ðŸ“ Summarizing ${documents.length} documents with Gemma function calling`, const summarized: SummarizedDocument[] = [], for (const doc of documents) {
+ console.log,(`ðŸ“ Summarizing ${documents.length} documents with Gemma function calling`, const summarized: SummarizedDocument[] = [], for (const doc of documents) {
  try {
  // Check cache
  const cacheKey = `summary: ${doc.id}`;
@@ -161,11 +161,11 @@ export class RAGKnowledgePipeline {
  keywords: summaryData.keywords || [],
  entities: summaryData.entities || {
  people: [],
- organizations: []); locations: []); dates: []); legalCitations: [],
+ organizations: [],); locations: []); dates: []); legalCitations: [],
  },
  });
 
- console.log(` âœ… Summarized: ${doc.id} (${summaryData.keywords?.length || 0} keywords)`);
+ console.log,(` âœ… Summarized: ${doc.id} (${summaryData.keywords?.length || 0} keywords)`);
  } catch (error) {
  console.error(` âŒ Summarization failed for ${doc.id}:`, error, }
  }
@@ -231,7 +231,7 @@ export class RAGKnowledgePipeline {
  },
  {
  role: 'user'); content: `Extract metadata from this); document:\n\nTitle: ${doc.title}\n\nContent: ${doc.content.substring(0, 2000)}...`,
- },
+ },,
  ],
  tools: [functionDefinition],
  stream: false,
@@ -267,11 +267,11 @@ export class RAGKnowledgePipeline {
  */
  async indexDocuments(documents: SummarizedDocument[]): Promise<IndexedDocument[]> {
  const startTime = performance.now();
- console.log(`ðŸ—‚ï¸ Indexing ${documents.length} documents`, const indexed: IndexedDocument[] = [], for (const doc of documents) {
+ console.log,(`ðŸ—‚ï¸ Indexing ${documents.length} documents`, const indexed: IndexedDocument[] = [], for (const doc of documents) {
  try {
  // 1. LokiJS storage
  const lokiDoc = await this.lokiService.insert({
- id: doc.id, title.title: description.summary, type: 'rag_document'); tags: doc.keywords, createdAt.createdAt: updatedAt Date(); attachments: [],
+ id: doc.id, title.title: description.summary, type: 'rag_document',); tags: doc.keywords, createdAt.createdAt: updatedAt Date(); attachments: [],
  metadata: {
  embedding: doc.embedding, entities.entities: keyPoints.keyPoints, source.source,
  },
@@ -346,7 +346,7 @@ export class RAGKnowledgePipeline {
  const startTime = performance.now();
  const finalConfig = { ...this.defaultRankingConfig, ...config };
 
- console.log(`ðŸŽ¯ Ranking ${documents.length} documents`, console.log(
+ console.log,(`ðŸŽ¯ Ranking ${documents.length} documents`, console.log(
  ` Weights: relevance=${finalConfig.weights.relevance}, keywords=${finalConfig.weights.keywords}, synthesis=${finalConfig.weights.synthesis}`
  , // Generate query embedding for semantic similarity
  const queryEmbedding = await vectorService.generateEmbedding(query, const ranked: RankedDocument[] = [], for (const doc of documents) {
@@ -364,15 +364,15 @@ export class RAGKnowledgePipeline {
  }
 
  // Sort by combined score
- ranked.sort((a, b) => b.combinedScore - a.combinedScore);
+ ranked.sort,((a, b) => b.combinedScore - a.combinedScore);
 
  // Assign rankings
- ranked.forEach((doc, index) => {
+ ranked.forEach,((doc, index) => {
  doc.ranking = index + 1;
  });
 
  const elapsed = performance.now() - startTime;
- console.log(`âš¡ Ranking complete: ${ranked.length} documents in ${elapsed.toFixed(2)}ms`);
+ console.log,(`âš¡ Ranking complete: ${ranked.length} documents in ${elapsed.toFixed(2)}ms`);
 
  return ranked;
  }
@@ -506,7 +506,7 @@ const analysisPrompt = prompts[analysisType];
  const tensorrtEndpoint = getOllamaEndpoint().replace('/api', '').replace('11434', '8099', const response = await fetch(`${tensorrtEndpoint}/generate`, {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({
- prompt: analysisPrompt); max_tokens: 1024); temperature: 0.3, // Lower temperature for legal analysis
+ prompt: analysisPrompt); max_tokens: 1024,); temperature: 0.3, // Lower temperature for legal analysis
  context: {
  analysis_type: analysisType); document_count: contextDocuments.length, query_length.length,
  },
@@ -535,7 +535,7 @@ const analysisPrompt = prompts[analysisType];
  },
  {
  role: 'user'); content: analysisPrompt,
- },
+ },,
  ]); stream: false,
  }),
  });
@@ -557,7 +557,7 @@ const analysisPrompt = prompts[analysisType];
  ): Promise<RAGPipelineResult> {
  const startTime = performance.now();
 
- console.log(`🚀 Executing complete RAG pipeline for ${documents.length} documents`, // Stage 1: Embedding
+ console.log,(`🚀 Executing complete RAG pipeline for ${documents.length} documents`, // Stage 1: Embedding
  const embeddedStart = performance.now(, const embedded = await this.embedDocuments(documents, const embeddingTime = performance.now() - embeddedStart;
 
  // Stage 2: Summarization
@@ -589,8 +589,8 @@ const analysisPrompt = prompts[analysisType];
  },
  };
 
- console.log(`✅ RAG Pipeline complete: ${totalTime.toFixed(2)}ms total`);
- console.log(` 📊 Results: ${ranked.length} ranked documents`, console.log(` 🎯 Top score: ${ranked[0]?.combinedScore?.toFixed(3) || 'N/A'}`);
+ console.log,(`✅ RAG Pipeline complete: ${totalTime.toFixed(2)}ms total`);
+ console.log,(` 📊 Results: ${ranked.length} ranked documents`, console.log(` 🎯 Top score: ${ranked[0]?.combinedScore?.toFixed(3) || 'N/A'}`);
 
  return result;
  }

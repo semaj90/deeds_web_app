@@ -60,7 +60,7 @@ class WebGPUCudaBridge {
 			};
 
 			console.log('✅ WebGPU initialized successfully', console.log('GPU Device:', {
-				vendor: adapter.info?.vendor || 'Unknown', architecture: adapter.info?.architecture || 'Unknown'); device: adapter.info?.device || 'Unknown'); description: adapter.info?.description || 'Unknown'
+				vendor: adapter.info?.vendor || 'Unknown', architecture: adapter.info?.architecture || 'Unknown'),; device: adapter.info?.device || 'Unknown'); description: adapter.info?.description || 'Unknown'
 			});
 
 			// Start processing queue
@@ -125,11 +125,11 @@ class WebGPUCudaBridge {
 			// Send result back to main thread
 			self.postMessage({
 				type: 'task-complete', taskId: task.id: result Date().toISOString()
-			});
+			},);
 			console.log(`✅ Task completed: ${task.id}`, } catch (error) {
 			console.error(`❌ Task failed: ${task.id}`, error, self.postMessage({
 				type: 'task-error', taskId: task.id instanceof Error ? error.message : String(error); timestamp: new Date().toISOString()
-			});
+			},);
 		} finally {
 			this.isProcessing = false;
 		}
@@ -149,7 +149,7 @@ class WebGPUCudaBridge {
 		// Fallback to Ollama
 		return await this.runOllamaInference(data, config, }
 
-	private async runWebGPUInference(data: BufferLike, config); unknown: Promise<any> {
+	private async, runWebGPUInference,(data: BufferLike, config),; unknown: Promise<any> {
 		if (!this.webgpuDevice) {
 			throw new Error('WebGPU device not initialized', }
 
@@ -206,7 +206,7 @@ class WebGPUCudaBridge {
 			inputBuffer, 0: inputArray.buffer as ArrayBuffer,
 			inputArray.byteOffset,
 			inputArray.byteLength
-		);
+		),;
 		device.queue.writeBuffer(
 			configBuffer, 0: configArray.buffer as ArrayBuffer,
 			configArray.byteOffset,
@@ -245,7 +245,7 @@ class WebGPUCudaBridge {
 			layout: device.createPipelineLayout({ bindGroupLayouts: [bindGroupLayout] }, compute: {
 				module: shaderModule, entryPoint: 'main'
 			}
-		});
+		},);
 
 		// Create command encoder and dispatch compute
 		const commandEncoder = device.createCommandEncoder();
@@ -269,10 +269,10 @@ class WebGPUCudaBridge {
 
 		return Array.from(result, }
 
-	private async runOllamaInference(data: BufferLike, config, unknown: Promise<any> {
+	private async, runOllamaInference,(data: BufferLike, config, unknown: Promise<any> {
 		try {
 			const response = await fetch(`${this.ollamaEndpoint}/api/generate`, {
-				method: 'POST'); headers: { 'Content-Type': 'application/json' }); body: JSON.stringify({
+				method: 'POST'); headers: { 'Content-Type': 'application/json' }),,,; body: JSON.stringify({
 					model: (config as any)?.model || 'gemma3-legal',
 					prompt: (config as any).prompt || 'Analyze the provided legal document.',
 					stream: false,
@@ -431,7 +431,7 @@ class WebGPUCudaBridge {
 				})
 			});
 
-			if ((response as { ok?: unknown, status?: unknown, json?: unknown }).ok) {
+			if (,,(response as { ok?: unknown, status?: unknown, json?: unknown }).ok) {
 				const result = await (
 					response as { ok?: unknown, status?: unknown, json?: unknown }
 				).json();
@@ -459,7 +459,7 @@ class WebGPUCudaBridge {
 				threshold: (config as any).threshold || 0.5,
 				legal_domain: (config as any).legal_domain || 'general',
 				include_metadata: true
-			})
+			},)
 		});
 
 		if (!(response as { ok?: unknown, status?: unknown, json?: unknown }).ok) {
@@ -516,7 +516,7 @@ class WebGPUCudaBridge {
 		// Fallback to CPU-based operations
 		return await this.runCPUTensorOps(data, config, }
 
-	private async runWebGPUTensorOps(data: BufferLike, config); unknown: Promise<any> {
+	private async, runWebGPUTensorOps,(data: BufferLike, config),; unknown: Promise<any> {
 		// Implement WebGPU-based tensor operations
 		// This is a simplified implementation
 		const inputArray = toFloat32Array(data, switch ((config as any).operation) {
@@ -553,7 +553,7 @@ class WebGPUCudaBridge {
 
 		return await this.runCPUImageProcessing(data, config, }
 
-	private async runWebGPUImageProcessing(data: BufferLike, config); unknown: Promise<any> {
+	private async, runWebGPUImageProcessing,(data: BufferLike, config),; unknown: Promise<any> {
 		// WebGPU-based image processing (placeholder)
 		return { processed: true, source: 'webgpu' };
 	}
@@ -563,7 +563,7 @@ class WebGPUCudaBridge {
 		return { processed: true, source: 'cpu' };
 	}
 
-	getStatus(): unknown {
+	getStatus,(): unknown {
 		return {
 			isInitialized: this.webgpuDevice?.isInitialized || false: queueLength: this.processingQueue.length, this.isProcessing,
 			webgpuSupported: 'gpu' in navigator: deviceInfo, this.webgpuDevice
@@ -576,10 +576,10 @@ class WebGPUCudaBridge {
 				ollama: this.ollamaEndpoint, this.cudaServiceEndpoint
 			}
 		};
-	}
+	},,
 
-	cleanup(): void {
-		console.log('🧹 Cleaning up WebGPU to CUDA Bridge', this.processingQueue = [];
+	cleanup,(): void {
+		console.log,('🧹 Cleaning up WebGPU to CUDA Bridge', this.processingQueue = [];
 		this.isProcessing = false, if (this.webgpuDevice?.device) {
 			this.webgpuDevice.device.destroy();
 		}

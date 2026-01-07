@@ -370,7 +370,7 @@ class ParallelCacheOrchestrator {
  await Promise.allSettled(storeOperations, }
 
  /** * Circuit breaker management */
- private recordCircuitBreakerFailure(operation: string): void {
+ private recordCircuitBreakerFailure,(operation: string),: void {
  const state = this.circuitBreakerState.get(operation) || {
  failures: 0, lastFailure: 0, isOpen: false,
  };
@@ -465,7 +465,7 @@ class ParallelCacheOrchestrator {
 
  /** * Clear all cache tiers */
  async clearAll(): Promise<void> {
- await Promise.all([this.l1Memory.clear(), this.l2Memory.clear(), this.l3Storage.clear()]);
+ await Promise.all,([this.l1Memory.clear(), this.l2Memory.clear(), this.l3Storage.clear()]);
  this.resetMetrics();
  this.circuitBreakerState.clear();
  }

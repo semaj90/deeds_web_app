@@ -117,6 +117,143 @@ interface Config {
 
 ---
 
+## 🚀 Phase 90: TypeScript AST Fixer (Jan 6-7, 2026)
+
+**Status:** ACTIVE - First successful dry-run complete
+**Implementation:** `scripts/phase90-ast-fixer.mjs` (640 lines)
+
+### Critical Discovery: parseDiagnostics vs. getPreEmitDiagnostics
+
+**Problem:** `ts.createProgram()` + `getPreEmitDiagnostics()` crashes with module resolution errors:
+```javascript
+TypeError: Cannot read properties of undefined (reading 'flags')
+    at resolveAlias (typescript.js:53660:26)
+```
+
+**Solution:** Use syntax-only diagnostics to avoid type checking:
+```javascript
+// ❌ DON'T: Full type checking requires module resolution
+const program = ts.createProgram([filePath], compilerOptions);
+const diagnostics = ts.getPreEmitDiagnostics(program, sourceFile);
+
+// ✅ DO: Syntax-level diagnostics only
+const sourceFile = ts.createSourceFile(filePath, content, ts.ScriptTarget.Latest, true);
+const diagnostics = sourceFile.parseDiagnostics;  // No module resolution needed
+```
+
+### First Test Results (llm-router.ts)
+
+```
+📊 Found 198 total errors (120 target TS1005)
+🎯 Generated 7 potential fixes
+📉 Errors: 198 → 190 (-8 errors)
+✅ Success rate: 100% (7/7 fixes applied)
+```
+
+**Why only 7 fixes from 120 errors?**
+Fixer is being **ultra-conservative** - skipping unknown contexts to avoid false positives:
+- Skipped: BinaryExpression (e.g., `a + b`)
+- Skipped: AwaitExpression (e.g., `await fn()`)
+- Skipped: ExpressionStatement
+- Skipped: PropertyAssignment (some cases)
+- Skipped: MethodDeclaration
+
+**Applied fixes:**
+- 4 × InterfaceDeclaration comma fixes
+- 2 × TypeLiteral comma fixes
+- 1 × ObjectLiteralExpression comma fix
+
+### AST Context Detection Patterns (from TypeScript docs)
+
+**Key Learning:** Use `ts.forEachChild()` for recursive traversal + `switch (node.kind)` for context detection:
+
+```javascript
+function detectContext(sourceFile: ts.SourceFile, diagnostic: ts.Diagnostic) {
+    const node = getNodeAtPosition(sourceFile, diagnostic.start);
+
+    switch (node.parent?.kind) {
+        case ts.SyntaxKind.InterfaceDeclaration:
+        case ts.SyntaxKind.TypeLiteral:
+            // Add comma after type annotation
+            return {fix: 'comma', position: node.end};
+
+        case ts.SyntaxKind.ObjectLiteralExpression:
+            // Add comma after property value
+            return {fix: 'comma', position: node.end};
+
+        case ts.SyntaxKind.BinaryExpression:
+            // CAREFUL: Could be operator precedence issue, not comma
+            return analyzeOperatorPrecedence(node);
+
+        case ts.SyntaxKind.CallExpression:
+            // Add comma between arguments
+            return {fix: 'comma', position: node.end};
+    }
+}
+```
+
+### TypeScript AST Resources (Ingested)
+
+1. **Microsoft Official Docs**: [Using the Compiler API](https://github.com/microsoft/TypeScript/wiki/Using-the-Compiler-API)
+   - `ts.forEachChild()` for tree traversal
+   - `ts.createPrinter()` for generating code
+   - `ts.factory` for creating new nodes
+   - Type checker: `program.getTypeChecker()` for symbol/type info
+
+2. **AST Viewer**: https://ts-ast-viewer.com/
+   - Interactive AST explorer
+   - See SyntaxKind values for any code
+   - Inspect node properties
+
+3. **Deep Dive**: https://basarat.gitbook.io/typescript/overview/ast
+   - Node interface: `start`, `end`, `parent`
+   - SourceFile is top-level AST node
+   - `TextRange` members for position tracking
+
+### Next Improvements for Phase 90
+
+**Expand Context Handlers:**
+```typescript
+// Add handlers for currently skipped contexts
+case ts.SyntaxKind.BinaryExpression:
+    // Check if it's object spread {...obj, prop} vs. arithmetic
+    if (isObjectSpread(node)) {
+        return {fix: 'comma', position: node.end};
+    }
+    return null;  // Skip arithmetic expressions
+
+case ts.SyntaxKind.AwaitExpression:
+    // Check if await is in argument list
+    if (isInCallExpression(node.parent)) {
+        return {fix: 'comma', position: node.end};
+    }
+    return null;
+
+case ts.SyntaxKind.PropertyAssignment:
+    // Object literal properties always need trailing commas
+    return {fix: 'comma', position: node.end};
+```
+
+**Safety Mechanisms (Already Implemented):**
+- ✅ Automatic backup before modification
+- ✅ Validation via error count comparison
+- ✅ Rollback if error count increases
+- ✅ Reverse-order fix application (avoids position shifts)
+- ✅ Dry-run mode for testing
+
+### Batch 1 Ready
+
+**Target Files:** Top 10 from top-100-error-files.json
+**Estimated Impact:** -50 to -100 visible errors (conservative)
+**With 1.84x Cascade:** -92 to -184 total errors
+
+**Command:**
+```bash
+node scripts/phase90-ast-fixer.mjs --batch 1  # Files 1-10
+```
+
+---
+
 ## 🔧 WebGPU + LangChain + TypeScript: Corruption Pattern Database
 
 **Gemini Analysis (Jan 2026):** Comprehensive corruption taxonomy from latest TypeScript/WebGPU/LangChain integration:

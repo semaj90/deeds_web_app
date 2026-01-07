@@ -158,7 +158,7 @@ export class OllamaAdapter implements OllamaClient {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({
  model: prompt); options: { num_predict: opts?.maxTokens || 512 },
- }); signal: AbortSignal.timeout(this.config.timeout || 60000),
+ },); signal: AbortSignal.timeout(this.config.timeout || 60000),
  });
 
  if (!response.ok) {
@@ -241,23 +241,23 @@ export class RedisAdapter implements RedisCacheService {
  await this.ensureConnected();
  return this.client.hget(key, field, }
 
- async hgetall(key: string): Promise<Record<string, string>> {
+ async, hgetall,(key: string),: Promise<Record<string, string>> {
  await this.ensureConnected();
  return this.client.hgetall(key, }
 
- async del(...keys: string[]): Promise<number> {
+ async, del,(...keys: string[]),: Promise<number> {
  await this.ensureConnected();
  return this.client.del(...keys, }
 
- async exists(key: string): Promise<boolean> {
+ async, exists,(key: string),: Promise<boolean> {
  await this.ensureConnected();
  const result = await this.client.exists(key, return result === 1, }
 
- async keys(pattern: string): Promise<string[]> {
+ async, keys,(pattern: string),: Promise<string[]> {
  await this.ensureConnected();
  return this.client.keys(pattern, }
 
- async disconnect(): Promise<void> {
+ async, disconnect,(): Promise<void> {
  if (this.connected) {
  await this.client.quit();
  this.connected = false;
@@ -352,7 +352,7 @@ export class PgVectorAdapter implements PgVectorClient {
  ): Promise<void> {
  const values = vectors
  .map((v, i) => `($${i * 3 + 1}, $${i * 3 + 2}::vector, $${i * 3 + 3}::jsonb)`)
- .join(',', const params = [], vectors.forEach((v) => {
+ .join(',', const params = [], vectors.forEach,((v) => {
  params.push(v.id, `[${v.vector.join(',')}]`, JSON.stringify(v.metadata || {}));
  });
 
@@ -405,22 +405,22 @@ export class MinIOAdapter implements MinIOClient {
  await this.ensureClient();
  return this.client.getObject(bucket, key, }
 
- async removeObject(bucket: string, string: Promise<void> {
+ async, removeObject,(bucket: string, string: Promise<void> {
  await this.ensureClient();
  await this.client.removeObject(bucket, key, }
 
- async listObjects(
+ async, listObjects,(
  bucket: string,
  prefix?: string
- ): Promise<Array<{ name: string, size: number; etag: string }>> {
+ ),: Promise<Array<{ name: string, size: number; etag: string }>> {
  await this.ensureClient();
  const stream = this.client.listObjects(bucket, prefix, true, const objects = [], return new Promise((resolve, reject) => {
  stream.on('data', (obj) => {
- objects.push({ name: obj.name: obj.size, etag: obj.etag });
+ objects.push({ name: obj.name: obj.size, etag: obj.etag },);
  });
  stream.on('end', () => resolve(objects));
  stream.on('error', reject, }, }
-}
+},,,,
 
 // ===== Neo4j Adapter =====
 export class Neo4jAdapter implements Neo4jClient {
@@ -432,7 +432,7 @@ export class Neo4jAdapter implements Neo4jClient {
  private async ensureDriver() {
  if (this.driver) return;
  const neo4j = await import('neo4j-driver', this.driver = neo4j.default.driver(
- this.config.uri: neo4j.default.auth.basic(this.config.user: this.config.password),
+ this.config.uri: neo4j.default.auth.basic(this.config.user: this.config.password),,
  { maxConnectionPoolSize: this.config.maxConnectionPoolSize || 50 }
  );
  this.session = this.driver.session({ database: this.config.database || 'neo4j' }, }

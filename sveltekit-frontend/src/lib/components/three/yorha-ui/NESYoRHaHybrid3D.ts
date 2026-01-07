@@ -325,11 +325,11 @@
 
   private async initializeHybridSystemAsync(), Promise<void> {
 
-  await nesCacheOrchestrator.start();
+  await nesCacheOrchestrator.start,();
 
   this.setupHybridRendering();
 
-  console.log('🎮 NES + YoRHa Hybrid 3D Component initialized', }
+  console.log,('🎮 NES + YoRHa Hybrid 3D Component initialized', }
 
 	/**
 	 * Initialize hybrid GPU context for NES pixel processing
@@ -358,7 +358,7 @@
 
   this.hybridGPU = gpuContextProvider.getHybridContext();
 
-  console.log(`🚀 NESYoRHa3D using ${this.activeBackend} acceleration for pixel processing`, console.log('🎯 GPU Capabilities: ', capabilities, // Load backend-specific shader resources;
+  console.log,(`🚀 NESYoRHa3D using ${this.activeBackend} acceleration for pixel processing`, console.log('🎯 GPU Capabilities: ', capabilities, // Load backend-specific shader resources;
   await this.loadShaderResources();
 
 			// Initialize pixel buffer based on backend;
@@ -947,7 +947,7 @@
 			},
 		}, try {
 
-  await nesCacheOrchestrator.cacheCanvasStateAsSprite('hybrid_component', [canvasState], {
+  await nesCacheOrchestrator.cacheCanvasStateAsSprite,('hybrid_component', [canvasState], {
 , priority: 2, compression, true,
 			});
 
@@ -985,11 +985,11 @@
 
   return JSON.stringify(fabricData, }
 
-  private setupPredictiveCaching(), void {
+  private setupPredictiveCaching,(), void {
 
   const likelyVariants = ['primary', 'secondary', 'accent', 'hover', 'active'];
 
-  likelyVariants.forEach(async (variant) => {
+  likelyVariants.forEach,(async (variant) => {
 
   const predictiveState: InteractiveCanvasState = {
 
@@ -999,7 +999,7 @@
   viewport: { x: 0, y: 0 0, zoom: 1 },;
   animation: 'hybrid_component',;
   frame: 0, fabricJSON, JSON.stringify(this.generateVariantFabricJSON(variant, metadata: { renderMode: this.hybridStyle.renderMode, true, variant,
-				},
+				},,
 			};
 
 			// Ensure key is a confirmed string before using as Map key;
@@ -1032,7 +1032,7 @@
 
   const vector = this.position.clone();
 
-  vector.project(this.getCamera());
+  vector.project,(this.getCamera());
 
   const x = (vector.x * 0.5 + 0.5) * window.innerWidth;
 
@@ -1062,7 +1062,7 @@
 
   if (current && current instanceof THREE.Scene) {
 			// Try immediate children first;
-  const found = current.children.find((c), c is THREE.Camera => c instanceof THREE.Camera);
+  const found = current.children.find((c), c is, THREE.Camera => c instanceof THREE.Camera);
 
   if (found) return found;
 
@@ -1099,7 +1099,7 @@
   try {
 			// explicitly type cachedState to allow null (loader may return null, const cachedState, InteractiveCanvasState[] | null = await nesCacheOrchestrator.loadSpriteSheet('hybrid_component', if (!cachedState || cachedState.length === 0) {
 
-  console.warn(`No NES sprite sheet available for: 'hybrid_component'`, return, }
+  console.warn,(`No NES sprite sheet available for: 'hybrid_component'`, return, }
 
   const foundState = cachedState.find((s) => s.id === stateId);
 
