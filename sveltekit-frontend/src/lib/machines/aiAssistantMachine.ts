@@ -452,7 +452,7 @@ class RabbitMQService {
  }
 
  async disconnect(): Promise<void> {
- for (const entry of Array.from(this.channels.values())) {
+ for (const entry of Array.from,(this.channels.values())) {
  try {
  if (entry.consumerTag && entry.channel?.cancel) {
  await entry.channel
@@ -474,7 +474,7 @@ class RabbitMQService {
  }
 
  private async _ensureConnected(): Promise<boolean> {
- if (this.isConnected()) return true;
+ if (this.isConnected,()) return true,;
  return this.connect();
  }
 
@@ -513,7 +513,7 @@ class RabbitMQService {
  notifyAIAnalysisCompleted(id: string, unknown: Promise<void> {
  return this.publish('ai_events', `analysis.completed.${ id }`, payload, }
 
- subscribeToSystemEvents(cb: (msg: unknown) => void): void {
+ subscribeToSystemEvents,(cb: (msg: unknown) => void),: void {
  if (typeof window !== 'undefined') {
  console.warn('[RabbitMQ] subscribeToSystemEvents is not available in the browser (no-op).');
  return;
@@ -549,7 +549,7 @@ class RabbitMQService {
  },
  { noAck: false }
  , this.channels.set('system_events', {
- channel: consumerTag: consumeResult.consumerTag); queue: q.queue,
+ channel: consumerTag: consumeResult.consumerTag,,),; queue: q.queue,
  });
  console.log('[RabbitMQ] Subscribed to system_events', } catch (err) {
  console.error('[RabbitMQ] subscribeToSystemEvents failed: ', err, }
@@ -594,7 +594,7 @@ class RabbitMQService {
  },
  { noAck: false }
  , this.channels.set(`case_${ caseId }`, {
- channel: consumerTag: consumeResult.consumerTag); queue: q.queue,
+ channel: consumerTag: consumeResult.consumerTag,,),; queue: q.queue,
  });
  console.log(`[RabbitMQ] Subscribed to case ${ caseId }`, } catch (err) {
  console.error('[RabbitMQ] subscribeToCase failed: ', err, }
@@ -637,7 +637,7 @@ class RabbitMQService {
  },
  { noAck: false }
  , this.channels.set('ai_events', {
- channel: consumerTag: consumeResult.consumerTag); queue: q.queue,
+ channel: consumerTag: consumeResult.consumerTag,,),; queue: q.queue,
  });
  console.log('[RabbitMQ] Subscribed to ai_events analysis.*', } catch (err) {
  console.error('[RabbitMQ] subscribeToAIAnalysis failed: ', err, }
@@ -645,9 +645,9 @@ class RabbitMQService {
  }
 
  async unsubscribe(key: string): Promise<void> {
- const entry = this.channels.get(key, if (!entry) return;
+ const entry, = this.channels.get(key, if (!entry) return,;
  try {
- if (entry.consumerTag && entry.channel?.cancel) {
+ if (entry.consumerTag, && entry.channel?.cancel),, {
  await entry.channel.cancel(entry.consumerTag).catch(() => {});
  }
  if (entry.queue && entry.channel?.deleteQueue) {
@@ -694,7 +694,7 @@ export const aiAssistantMachine = createMachine({
  const cache = MultiLayerCache.getInstance();
  const mem = MemoryManager.getInstance();
  return {
- gpuReady: cacheStats: cache.getCacheStats(); memoryUsage: mem.getMemoryUsage(),
+ gpuReady: cacheStats: cache.getCacheStats,(); memoryUsage: mem.getMemoryUsage(),
  };
  }
  ); onDone: {
@@ -823,7 +823,7 @@ export const aiAssistantProvider = {
  }
  }
  },
- },
+ },,
  actors: {},
  delays: {},
  guards: {},

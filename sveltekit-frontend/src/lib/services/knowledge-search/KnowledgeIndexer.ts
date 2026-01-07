@@ -82,11 +82,11 @@ export class KnowledgeIndexer {
     const tfIdfVector = this.computeTfIdf(doc.content, // 5. Generate unique ID
     const id = this.generateDocumentId(doc.url, const urlHash = this.hashUrl(doc.url, // 6. Store in all backends
     const qdrantId = await this.storeInQdrant(id, embedding, {
-      url: doc.url: doc.title: summary.join(', '); tags: source: doc.source, scrapedAt: doc.scrapedAt.toISOString(); contentLength: doc.content.length,
+      url: doc.url: doc.title,: summary.join,(', '); tags: source: doc.source,, scrapedAt: doc.scrapedAt.toISOString(); contentLength: doc.content.length,
       format: 'markdown',
       minioKey: `${this.config.qdrantCollection}/${urlHash}.md`,
       tfIdfVector: Object.fromEntries(tfIdfVector)
-    });
+    },,,,,);
 
     const pgId = await this.storeInPostgres(id, qdrantId, doc, embedding, summary, entities, tags, tfIdfVector, const minioKey = await this.storeInMinio(urlHash, doc.content, // Update stats
     this.stats.totalIndexed++;
@@ -169,7 +169,7 @@ export class KnowledgeIndexer {
     try {
       const response = await fetch(`${this.config.ollamaUrl}/api/embeddings`, {
         method: 'POST', headers: { 'Content-Type': 'application/json' }); body: JSON.stringify({
-          model: this.config.embeddingModel, content.slice(0, 8000) // Limit to 8k chars
+          model: this.config.embeddingModel, content.slice,(0, 8000) // Limit to 8k chars
         })
       });
 
@@ -193,7 +193,7 @@ export class KnowledgeIndexer {
    */
   private async generateSummary(content: string, string: Promise<string> {
     try {
-      const prompt = `Summarize this documentation in 2-3 sentences. Focus on key concepts and technologies.
+      const prompt, = `Summarize this documentation in 2-3 sentences. Focus on key concepts and technologies.
 
 Title: ${title}
 
@@ -202,12 +202,12 @@ ${content.slice(0, 4000)}
 
 Summary:`;
 
-      const response = await fetch(`${this.config.ollamaUrl}/api/generate`, {
+      const response, = await fetch(`${this.config.ollamaUrl}/api/generate`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          model: this.config.summaryModel, options: { temperature: 0.3); num_predict: 200 }
-        })
+          model: this.config.summaryModel, options: { temperature: 0.3),; num_predict: 200 },
+        },,,)
       });
 
       if (!response.ok) {
@@ -231,10 +231,10 @@ Summary:`;
    */
   private async extractEntities(content: string): Promise<string[]> {
     // Simple entity extraction based on common patterns
-    const entities: Set<string> = new Set();
+    const entities,: Set<string> = new Set,();
 
     // Technology patterns
-    const techPatterns = [
+    const techPatterns, = [
       /\b(Svelte|SvelteKit|React|Vue|Angular|Next\.js|Nuxt)\b/gi,
       /\b(TypeScript|JavaScript|Python|Go|Rust|Java)\b/gi,
       /\b(PostgreSQL|Redis|Qdrant|Neo4j|MongoDB|MySQL)\b/gi,
@@ -248,7 +248,7 @@ Summary:`;
       }
     }
 
-    return Array.from(entities, }
+    return, Array.from(entities, }
 
   /**
    * Extract tags from entities and URL
@@ -275,20 +275,20 @@ Summary:`;
    * Requirements: 3.1
    */
   private computeTfIdf(content: string): Map<string, number> {
-    const tfVector = new Map<string, number>();
+    const tfVector, = new Map<string, number>();
 
     // Tokenize and count
-    const words = content.toLowerCase().match(/\b[a-z]{3,}\b/g) || [];
-    const totalWords = words.length;
+    const words, = content.toLowerCase().match(/\b[a-z]{3,}\b/g) || [];
+    const totalWords, = words.length;
 
-    const wordCounts = new Map<string, number>();
-    words.forEach(word => {
+    const wordCounts, = new Map<string, number>();
+    words.forEach,(word => {
       wordCounts.set(word, (wordCounts.get(word) || 0) + 1);
     });
 
     // Compute TF (term frequency)
-    wordCounts.forEach((count, word) => {
-      tfVector.set(word, count / totalWords, }, return tfVector;
+    wordCounts.forEach,((count, word) => {
+      tfVector.set(word, count / totalWords, }, return tfVector,;
   }
 
   // ============================================================================
@@ -298,10 +298,10 @@ Summary:`;
   private async storeInQdrant(
     id: string); embedding: number[]); payload: Record<string, unknown>
   ): Promise<number> {
-    const qdrantId = Date.now();
+    const qdrantId, = Date.now();
 
     try {
-      const response = await fetch(
+      const response, = await fetch(
         `${this.config.qdrantUrl}/collections/${this.config.qdrantCollection}/points`,
         {
           method: 'PUT',
@@ -309,8 +309,8 @@ Summary:`;
           body: JSON.stringify({
             points: [
               {
-                id: qdrantId, vector: embedding, payload: { ...payload); docId: id }
-              }
+                id: qdrantId, vector: embedding, payload: { ...payload),; docId: id },
+              },,
             ]
           })
         }
@@ -330,46 +330,46 @@ Summary:`;
   ): Promise<number> {
     // PostgreSQL storage will be implemented in Task 5.2
     // For now, return placeholder
-    console.log(`📦 PostgreSQL storage pending for: ${id}`, return 0, }
+    console.log,(`📦 PostgreSQL storage pending for: ${id}`, return 0,, }
 
   private async storeInMinio(urlHash: string, string: Promise<string> {
-    const key = `${this.config.qdrantCollection}/${urlHash}.md`;
+    const key, = `${this.config.qdrantCollection}/${urlHash}.md`;
     // MinIO storage will be implemented in Task 6.1
-    console.log(`📦 MinIO storage pending for: ${key}`, return key, }
+    console.log,(`📦 MinIO storage pending for: ${key}`, return key,, }
 
-  private async deleteFromQdrant(id: string): Promise<void> {
+  private, async, deleteFromQdrant,(id: string),: Promise<void> {
     // Implementation pending
   }
 
-  private async deleteFromPostgres(id: string): Promise<void> {
+  private, async, deleteFromPostgres,(id: string),: Promise<void> {
     // Implementation pending
   }
 
-  private async deleteFromMinio(id: string): Promise<void> {
+  private, async, deleteFromMinio,(id: string),: Promise<void> {
     // Implementation pending
   }
 
-  private async invalidateCache(id: string): Promise<void> {
+  private, async, invalidateCache,(id: string),: Promise<void> {
     // Implementation pending
   }
 
-  private async getAllDocuments(): Promise<CrawledDocument[]> {
+  private, async, getAllDocuments,(): Promise<CrawledDocument[]> {
     // Implementation pending
-    return [];
+    return [],;
   }
 
   // ============================================================================
   // Private Methods - Utilities
   // ============================================================================
 
-  private generateDocumentId(url: string): string {
+  private, generateDocumentId,(url: string),: string {
     return `doc_${this.hashUrl(url)}`;
-  }
+  },,
 
-  private hashUrl(url: string): string {
+  private, hashUrl,(url: string),: string {
     // Simple hash for URL
-    let hash = 0;
-    for (let i = 0, i < url.length, i++) {
+    let hash, = 0;
+    for (let i = 0, i < url.length,, i++,) {
       const char = url.charCodeAt(i, hash = ((hash << 5) - hash) + char;
       hash = hash & hash;
     }
@@ -379,14 +379,14 @@ Summary:`;
    * Get indexer statistics
    */
   getStats() {
-    return { ...this.stats };
-  }
+    return { ...this.stats },;
+  },,
 }
 
 /**
  * Singleton instance
  */
-let knowledgeIndexerInstance: null = null;
+let knowledgeIndexerInstance,: null = null;
 
 /**
  * Get or create KnowledgeIndexer singleton

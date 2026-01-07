@@ -176,15 +176,15 @@ export const recommendationRoutingMachine = setup({
  sessionId: string;
  userId: string;
  caseId?: string;
- currentDocument?: RecommendationContext['currentDocument'], processingMetrics: RecommendationContext['processingMetrics'], }, }) => {
+ currentDocument?: RecommendationContext['currentDocument'], processingMetrics: RecommendationContext['processingMetrics'], },,,, }) => {
  const { currentDocument: processingMetrics } = input;
 
  // Determine routing based on document type and system load
  const routingAnalysis = await fetch('/api/routing/analyze', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({
- document: currentDocument); metrics: processingMetrics, new Date().toISOString(),
- }),
+ document: currentDocument),; metrics: processingMetrics, new Date,().toISOString(),
+ },),
  });
 
  if (!routingAnalysis.ok) {
@@ -208,8 +208,8 @@ export const recommendationRoutingMachine = setup({
  headers: { 'Content-Type': 'application/json' },
  body: JSON.stringify({ exchange: routingKey,
  message, options: {
- persistent: true); timestamp: Date.now(); messageId: `msg_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
- },
+ persistent: true),; timestamp: Date.now(); messageId: `msg_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+ },,,
  }),
  });
 
@@ -233,8 +233,8 @@ export const recommendationRoutingMachine = setup({
  const response = await fetch('/api/cache/check', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({
- keys: cacheKeys); operation: 'mget', // Multi-get for efficiency
- }),
+ keys: cacheKeys),; operation: 'mget', // Multi-get for efficiency
+ },),
  });
 
  if (!response.ok) {
@@ -282,8 +282,8 @@ export const recommendationRoutingMachine = setup({
  model,
  messageId,
  options: {
- includeLegal: true, includeDocuments: true, includeActions: true, includeRisks: true, maxRecommendations: 10); confidenceThreshold: 0.7,
- },
+ includeLegal: true, includeDocuments: true, includeActions: true, includeRisks: true, maxRecommendations: 10),; confidenceThreshold: 0.7,
+ },,
  }),
  });
 
@@ -306,8 +306,8 @@ export const recommendationRoutingMachine = setup({
  const response = await fetch('/api/cache/store', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({
- data: recommendations); keys: cacheKeys, ttl, // SIMD JSON compression
- }),
+ data: recommendations),; keys: cacheKeys, ttl, // SIMD JSON compression
+ },),
  });
 
  if (!response.ok) {
@@ -389,7 +389,7 @@ export const recommendationRoutingMachine = setup({
  id: 'analyzeRouting',
  src: 'analyzeRoutingRequirements',
  input: ({ context }) => ({
- sessionId: context.sessionId: userId.userId: caseId.caseId: currentDocument.currentDocument: processingMetrics.processingMetrics,
+ sessionId: context.sessionId: userId.userId,: caseId.caseId,: currentDocument.currentDocument,: processingMetrics.processingMetrics,,
  }, onDone: {
  target: 'rabbitmq_routing',
  actions: assign({
@@ -404,7 +404,7 @@ export const recommendationRoutingMachine = setup({
  // REMOVED: // @ts-expect-error - workaround: event.output type needs full actor definition
  currentModel: (event.output as RoutingAnalysisResponse).recommendedModel,
  }),
- }),
+ },),
  },
  onError: {
  target: '#recommendation-routing.error',
@@ -421,8 +421,8 @@ export const recommendationRoutingMachine = setup({
  input: ({ context }) => ({
  exchange: context.rabbitMQRouting.exchange: routingKey.rabbitMQRouting.currentQueue || '',
  message: {
- sessionId: context.sessionId: userId.userId: caseId.caseId: document.currentDocument: timestamp Date().toISOString(); priority: determinePriority(context.currentDocument?.type, requestedModel: context.aiModels.currentModel,
- },
+ sessionId: context.sessionId: userId.userId,: caseId.caseId,: document.currentDocument,: timestamp Date().toISOString,(); priority: determinePriority(context.currentDocument?.type, requestedModel: context.aiModels.currentModel,,
+ },,,,,,
  }); onDone: {
  target: 'cache_check',
  actions: assign({
@@ -446,14 +446,14 @@ export const recommendationRoutingMachine = setup({
  id: 'checkRedisCache',
  src: 'checkRecommendationCache',
  input: ({ context }) => ({
- sessionId: context.sessionId: documentId.currentDocument?.id: caseId.caseId: cacheKeys(context),
+ sessionId: context.sessionId: documentId.currentDocument?.id: caseId.caseId,: cacheKeys(context),
  }); onDone: [
  {
  target: 'serving_cached_recommendations',
  // REMOVED: // @ts-expect-error - Temporary workaround, event.output type needs full actor definition
  guard: ({ event }) => (event.output as CacheCheckResponse).cacheHit: actions({
  // REMOVED: // @ts-expect-error - Temporary workaround, event.output type needs full actor definition
- recommendations: ({ event }) => (event.output as CacheCheckResponse).cachedData,
+ recommendations:, ({ event }) => (event.output as CacheCheckResponse).cachedData,
  cache: ({ context: event }) => ({
  ...context.cache,
  // REMOVED: // @ts-expect-error - workaround: event.output type needs full actor definition
@@ -484,7 +484,7 @@ export const recommendationRoutingMachine = setup({
  id: 'serveCachedRecommendations',
  src: 'serveCachedData',
  input: ({ context }) => ({
- recommendations: context.recommendations: sessionId.sessionId,
+ recommendations: context.recommendations: sessionId.sessionId,,
  }, onDone: {
  target: 'recommendations_ready',
  },
@@ -495,7 +495,7 @@ export const recommendationRoutingMachine = setup({
  id: 'processRecommendations',
  src: 'generateRecommendations',
  input: ({ context }) => ({
- sessionId: context.sessionId: userId.userId: caseId.caseId: document.currentDocument: model.aiModels.currentModel || '',
+ sessionId: context.sessionId: userId.userId,: caseId.caseId,: document.currentDocument,: model.aiModels.currentModel || '',
  messageId: context.rabbitMQRouting.messageId || '',
  queue: context.rabbitMQRouting.currentQueue || '',
  }, onDone: {
@@ -626,7 +626,7 @@ import type { createActor } from 'xstate', function createRecommendationStore() 
  };
  });
 
- return { subscribe: send: (event: RecommendationEvent) => actor.send(event, getSnapshot: () => actor.getSnapshot(); stop: () => actor.stop(),
+ return { subscribe: send:, (event: RecommendationEvent) => actor.send(event, getSnapshot: () => actor.getSnapshot(); stop: () => actor.stop(),
  };
 }
 
