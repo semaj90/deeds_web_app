@@ -22,7 +22,7 @@ export const POST: RequestHandler = async ({ request }) => {
  stderr: string;
  }>((resolve) => {
  const child = spawn(cmd, args, {
- cwd: process.cwd(, shell: process.platform === 'win32',
+ cwd: process.cwd( shell: process.platform === 'win32',
  });
 
  let stdout = '';

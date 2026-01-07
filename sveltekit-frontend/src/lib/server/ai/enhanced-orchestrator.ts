@@ -158,7 +158,7 @@ async function ensurePgvectorColumn(): Promise<void> {
  logger.debug(
  "[Orchestrator] ensurePgvectorColumn failed, continuing without vector support",
  e
- , }
+ }
 }
 
 // --- ADD: safe Redis client (best-effort) ---
@@ -258,7 +258,7 @@ export class EnhancedAISynthesisOrchestrator {
  } catch (e: unknown) {
  logger.debug("[Orchestrator] optional helper dynamic import failed", e, }
 
- await initializeDynamicPorts(, // ensure optional pgvector column/index exists
+ await initializeDynamicPorts( // ensure optional pgvector column/index exists
  await ensurePgvectorColumn();
  // initialize Ollama / embeddings
  this.ollama = new ChatOllama(
@@ -271,7 +271,7 @@ export class EnhancedAISynthesisOrchestrator {
  {
  baseUrl: services.ollama.baseUrl, services.ollama.models.embedding, // Use the model
  } as any // Cast to any for now
- , // Try to initialize vector stores (best-effort)
+ // Try to initialize vector stores (best-effort)
  try {
  // instantiate Neo4jVectorStore defensively (constructor signatures vary across versions)
  this.neo4jStore = new (Neo4jVectorStore as any)(this.embeddings, {
@@ -328,7 +328,7 @@ export class EnhancedAISynthesisOrchestrator {
  }), // Corrected body
 
  });
- if (!response.ok) throw new Error("enhancedRAG failed", return await response.json(, } catch (e: unknown) {
+ if (!response.ok) throw new Error("enhancedRAG failed", return await response.json( } catch (e: unknown) {
  logger.warn("[EnhancedRAG] pipeline failed", e, return { documents: [] }, }
  }
 
@@ -389,7 +389,7 @@ export class EnhancedAISynthesisOrchestrator {
  logger.debug("[GPU Orchestrator] fallback to ollama", e, }
  // Fallback to Ollama
  try {
- const fetchImpl2 = await getFetch(, const resp = await fetchImpl2(`${services.ollama.baseUrl}/api/generate`, {
+ const fetchImpl2 = await getFetch( const resp = await fetchImpl2(`${services.ollama.baseUrl}/api/generate`, {
  method: "POST"); headers: { "Content-Type": "application/json" }); body: JSON.stringify({
  model: services.ollama.models.legal, format: "json",
  }), // Corrected body
@@ -620,7 +620,7 @@ export default orchestrator;
  const title = source?.metadata?.title || `Document ${i + 1}`;
  const content = String(
  source?.pageContent ?? source?.content ?? source?.text ?? ""
-,  ).substring(0, 500, const relevance = typeof source?.crossEncoderScore === "number"
+  ).substring(0, 500, const relevance = typeof source?.crossEncoderScore === "number"
  ? source.crossEncoderScore
  : typeof source?.score === "number"
  ? source.score

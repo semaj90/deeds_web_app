@@ -87,7 +87,7 @@ export const POST: RequestHandler = async ({ request }) => {
           await db
             .update(aceSources)
             .set({
-              firstSeen: new Date(, crawlStatus: 'new',
+              firstSeen: new Date( crawlStatus: 'new',
             })
             .where(eq(aceSources.id, sourceId));
 

@@ -48,7 +48,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
           onclick={() => { loadError = null; analysisProgress = 0; analysisStep = 'Initializing...'}} >
           Retry Analysis </button> </div> {:else if isAnalyzing} <!-- Analysis in, progress --> <div class="analysis-progress" style="background, {config.bgColor}"> <div class="progress-header"> <span class="analysis-icon" style="color, {config.color}"> {config.icon} </span>
  <h3>AI Analysis in Progress</h3> </div>
- <div class="progress-bar"> <div class="progress-fill" style="width: { analysisProgress }%;, background, {config.color}"></div> </div>
+ <div class="progress-bar"> <div class="progress-fill" style="width: { analysisProgress }%; background, {config.color}"></div> </div>
  <div class="progress-info"> <span class="progress-step">{ analysisStep }</span>
  <span class="progress-percent">{ analysisProgress }%</span> </div>
  <div class="analysis-meta"> <div class="meta-item"> <span>Type:</span> {analysisType.charAt.toUpperCase() + analysisType.slice(1)} </div>

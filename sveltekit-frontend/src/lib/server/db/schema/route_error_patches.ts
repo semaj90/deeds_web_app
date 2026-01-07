@@ -37,13 +37,13 @@ export const routeErrorPatchesTable = pgTable(
  verificationStatus: text('verification_status').default('pending'), // "pending" | "passed" | "failed", verificationTimestamp: timestamp('verification_timestamp', { withTimezone: true }, verificationMessage: text('verification_message'),
 
  // Audit
- createdByUserId: text('created_by_user_id', createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(, updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+ createdByUserId: text('created_by_user_id', createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow( updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
  },
  (table) => {
  return {
  routePathIdx: index('route_error_patches_route_path_idx').on(table.routePath, clusterIdIdx: index('route_error_patches_cluster_id_idx').on(table.clusterId, analysisIdIdx: index('route_error_patches_analysis_id_idx').on(table.analysisId, statusIdx: index('route_error_patches_status_idx').on(table.status, verificationStatusIdx: index('route_error_patches_verification_status_idx').on(
  table.verificationStatus
- , createdAtIdx: index('route_error_patches_created_at_idx').on(table.createdAt),
+ createdAtIdx: index('route_error_patches_created_at_idx').on(table.createdAt),
  };
  }
 );

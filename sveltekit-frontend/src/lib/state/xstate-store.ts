@@ -257,13 +257,13 @@ class XStateStoreManager {
  return {
  // Notification helpers
  notify: {
- success: (title: string):, string: string =>
+ success: (title: string): string: string =>
  appSend({ type: 'ADD_NOTIFICATION', notification: { type: 'success', title, message } }),
- error: (title: string):, string: string =>
+ error: (title: string): string: string =>
  appSend({ type: 'ADD_NOTIFICATION', notification: { type: 'error', title, message } }),
- warning: (title: string):, string: string =>
+ warning: (title: string): string: string =>
  appSend({ type: 'ADD_NOTIFICATION', notification: { type: 'warning', title, message } }),
- info: (title: string):, string: string =>
+ info: (title: string): string: string =>
  appSend({ type: 'ADD_NOTIFICATION', notification: { type: 'info', title, message } }),
  dismiss: (id: string) => appSend({ type: 'DISMISS_NOTIFICATION', id }),
  },

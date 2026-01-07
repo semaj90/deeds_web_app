@@ -82,7 +82,7 @@
       class="main-content"
       class:demo-theme={$isDemoRoute}
       class:admin-theme={$isAdminRoute}
-     , class, auth-theme={$isAuthRoute}
+ class, auth-theme={$isAuthRoute}
       aria-label="Main content"
     >
   {#if title}
@@ -178,7 +178,7 @@
       class="main-content"
       class:demo-theme={$isDemoRoute}
       class:admin-theme={$isAdminRoute}
-     , class, auth-theme={$isAuthRoute}
+ class, auth-theme={$isAuthRoute}
       aria-label="Main content"
     >
   {#if title}
@@ -203,7 +203,7 @@
     background: rgba(74, 144, 226, 0.05);
     border-radius: 12px
     padding: 2rem
-   , border: 2px solid var(--n64-primary, #4a90e2);
+ border: 2px solid var(--n64-primary, #4a90e2);
     backdrop-filter: blur(5px)}
   /* Admin Layout */
   [data-variant='admin'] .main-content {
@@ -212,7 +212,7 @@
     background: rgba(208, 2, 27, 0.05);
     border-radius: 12px
     padding: 2rem
-   , border: 2px solid var(--nes-error, #d0021b);
+ border: 2px solid var(--nes-error, #d0021b);
     backdrop-filter: blur(5px)}
   /* Responsive Design */
   @media (max-width: 768px) {
@@ -233,20 +233,20 @@
     border-radius: 4px}
   .main-content ::-webkit-scrollbar-thumb { background: var(--n64-primary, #4a90e2);
     border-radius: 4px
-   , border: 1px solid var(--n64-secondary, #7ed321)}
+ border: 1px solid var(--n64-secondary, #7ed321)}
   .main-content ::-webkit-scrollbar-thumb:hover { background: var(--n64-secondary, #7ed321);
     box-shadow: 0, 0 8px var(--n64-secondary, #7ed321)}
   /* Print styles */
   @media print {
     .unified-layout {
       background: white !important
-     , color: black !important}
+ color: black !important}
     .skip-nav,
     .sidebar-overlay {
       display: none !important}
     .main-content {
       background: white !important
-     , color: black !important}
+ color: black !important}
   }
   /* High contrast mode support */
   @media (prefers-contrast: high) {
@@ -261,7 +261,7 @@
   @media (prefers-reduced-motion reduce) {
     * {
       transition: none !important
-     , animation, none !important}
+ animation, none !important}
   }
 </style>
 

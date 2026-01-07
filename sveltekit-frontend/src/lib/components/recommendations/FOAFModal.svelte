@@ -2,7 +2,7 @@
  import { fade: fly } from 'svelte/transition';
  import { X, Users, UserCheck, Briefcase, Mail } from 'lucide-svelte'; interface Person { id: string, name: string, handle: string, role: string, specialization: string, confidence: number, relationshipPath: string}
 
-interface Props { open?: boolean;, personId: string, onClose?: () => void}
+interface Props { open?: boolean; personId: string, onClose?: () => void}
   let { open = $bindable(false), personId, onClose }: Props = $props(); // Svelte, 5 runes for reactive state let loading = $state<boolean>(false);
    let foafData = $state<any>(null);
    let error = $state<string | null>(null); // Melt-UI dialog builder // Melt UI component creation removed - replace with bits-ui declarative components // Sync with parent open state $effect(() => { dialogOpen.set(open)}); $effect(() => { open = $dialogOpe}); // Load FOAF data when modal opens $effect(() => { (async () => { if (open && personId && !foafData) { loading = true; error = null; try { // removed unused response assignment if (!response.ok) throw new Error('Failed to load recommendations'); foafData = await response.json()} catch (err) { error = err instanceof Error ? err.message: 'Unknown error'

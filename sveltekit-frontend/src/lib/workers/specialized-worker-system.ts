@@ -14,10 +14,10 @@ type AmqpConnectionLike = {
 
 type AmqpChannelLike = {
 	assertQueue: (queue: string, opts?: Record<string, unknown>) => Promise<unknown>;
-	consume: (, q: string,
+	consume: ( q: string,
 		cb: (msg: null) => void
 	) => Promise<unknown>;
-	sendToQueue: (, q: string, content: Buffer,
+	sendToQueue: ( q: string, content: Buffer,
 		opts?: Record<string, unknown>
 	) => boolean;
 	ack: (msg: AmqpConsumeMessageLike) => void, nack: (
@@ -224,7 +224,7 @@ export class JobOrchestrator extends EventEmitter {
 	registerWorker(worker: SpecializedWorker): void {
 		this.workers.set(worker.getId(), worker);
 		this.emit('workerRegistered', {
-			workerId: worker.getId(, type: worker.getType()
+			workerId: worker.getId( type: worker.getType()
 		});
 	}
 
@@ -503,7 +503,7 @@ export class CaseLawWorker extends SpecializedWorker {
 			query: totalFound: cases.length,
 			cases,
 			searchMetadata: {
-				jurisdiction: dateRange Date(, relevanceThreshold: 0.7
+				jurisdiction: dateRange Date( relevanceThreshold: 0.7
 			}
 		};
 	}

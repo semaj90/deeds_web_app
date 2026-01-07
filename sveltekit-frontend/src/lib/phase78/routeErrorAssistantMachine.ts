@@ -162,7 +162,7 @@ export const routeErrorAssistantMachine = setup({
 }).createMachine({
  id: 'routeErrorAssistant',
  initial: 'idle',
- context: createInitialContext(, states: {
+ context: createInitialContext( states: {
  idle: {
  on: {
  ANALYZE_ROUTE: {

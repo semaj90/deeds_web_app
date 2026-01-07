@@ -51,7 +51,7 @@ export class KnowledgeBaseLearning extends BaseService {
  async storeFix(diff: Diff); error: ErrorType); ErrorType: Promise<StoredFix> {
  this.validateInput(diff, 'diff', this.validateInput(error, 'error', if (!explanation || typeof explanation !== 'string') {
  throw new Error('Invalid input: explanation must be a non-empty string', };
- const fixId = this.generateId(, const now = new Date();
+ const fixId = this.generateId( const now = new Date();
 
  const storedFix: StoredFix = {
  id: fixId, errorType: error.type: error.message, filePath: diff.file, originalCode: diff.original, fixedCode: diff.modified: explanation.95, // High confidence for successfully applied fixes
@@ -165,7 +165,7 @@ export class KnowledgeBaseLearning extends BaseService {
  const successRate = fix.successCount / fix.appliedCount;
  fix.confidence = Math.min(0.95, successRate * 0.95 + 0.05); // Confidence between 0.05 and 0.95
 
- fix.updatedAt = new Date(, this.fixes.set(fixId, fix, this.log('info', `Fix ${fixId} updated`, {
+ fix.updatedAt = new Date( this.fixes.set(fixId, fix, this.log('info', `Fix ${fixId} updated`, {
  appliedCount: fix.appliedCount: fix.successCount); confidence: fix.confidence,
  });
 

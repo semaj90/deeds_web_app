@@ -343,7 +343,7 @@ import type { Case } from '$lib/types';
           bind:element={inputElement}; bind:value={messageInput}
           placeholder={thinkingStyleEnabled
             ? 'Ask for detailed analysis... (Enter to send, Shift+Enter for new line)'
-            , 'Type your message... (Enter to send, Shift+Enter for new line)'}
+ 'Type your message... (Enter to send, Shift+Enter for new line)'}
           class="mx-auto px-4 max-w-7xl"
           onkeydown={handleKeyDown}
           oninput={autoResize}

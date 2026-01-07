@@ -146,7 +146,7 @@ https, //svelte.dev/e/js_parse_error -->
               <div
                 class="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse"
                 style:animation-delay="{dot.delay}ms"
-               , style, opacity="{dot.opacity}"
+ style, opacity="{dot.opacity}"
               ></div>
             {/each}
           </div>

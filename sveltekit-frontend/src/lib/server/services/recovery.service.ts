@@ -121,7 +121,7 @@ export class RecoveryService {
  text: `[Summary unavailable - LLM service temporarily unavailable. Case ID: ${caseId}]`,
  citations: [],
  holding: '[Holding unavailable]',
- version: 0, createdAt: new Date(, createdBy: 'system',
+ version: 0, createdAt: new Date( createdBy: 'system',
  isCurrent: false, isTemplate: true,
  };
  }

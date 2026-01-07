@@ -97,7 +97,7 @@ import { Upload } from "lucide-svelte";;
  role: 'assistant',
  content: data.response,
  toolCalls: data.toolCalls || [],
- timestamp: new Date(, summary: data.summary,
+ timestamp: new Date( summary: data.summary,
  },
  ];
  } else {
@@ -109,7 +109,7 @@ import { Upload } from "lucide-svelte";;
  {
  role: 'system',
  content: `Error: ${error.message}`,
- timestamp: new Date(, error: true,
+ timestamp: new Date( error: true,
  },
  ];
  } finally {

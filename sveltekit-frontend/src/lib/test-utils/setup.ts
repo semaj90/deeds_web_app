@@ -162,7 +162,7 @@ export async function initializeOllamaMocks(): Promise<void> {
 
   mockOllama.setResponse(
     'How to migrate to Svelte 5?',
-    'Replace export let with $props(, on:click with onclick, and $: with $derived.'
+    'Replace export let with $props( on:click with onclick, and $: with $derived.'
   );
 }
 

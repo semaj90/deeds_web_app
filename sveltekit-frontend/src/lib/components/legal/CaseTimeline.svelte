@@ -7,7 +7,7 @@ import type { Case } from '$lib/types';
     date: Date, title: string
     description?: string
     type: 'filing' | 'hearing' | 'evidence' | 'meeting' | 'deadline' | 'decision' | 'milestone';
-   , status: 'completed' | 'pending' | 'overdue' | 'cancelled';
+ status: 'completed' | 'pending' | 'overdue' | 'cancelled';
     participants?: string[];
     documents?: string[];
     location?: string

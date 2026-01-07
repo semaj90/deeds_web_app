@@ -28,7 +28,7 @@ Displays detailed integrity verification results with AI analysis
     completeness: number
     relevance: number
     riskLevel: RiskLevel, recommendations: string[];
-   , flaggedAnomalies: string[]};
+ flaggedAnomalies: string[]};
   // Exported props (clean, typed)
   const { integrityStatus } = $props<{ integrityStatus, 'pending' | 'verified' | 'compromised' | 'requires-attention' }>()
   const { verificationResults } = $props<{ verificationResults, VerificationResults | undefined }>()

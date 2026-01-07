@@ -26,7 +26,7 @@
  text: 'What about Case #2025-CR-001234... "State v. Johnson"?',
  caseId: '2025-CR-001234',
  caseName: 'State v. Johnson',
- timestamp: new Date(, isTyping: false,
+ timestamp: new Date( isTyping: false,
  displayedText: ''
  },
  {
@@ -34,7 +34,7 @@
  text: 'Have you reviewed the evidence from Case #2025-CV-005678?',
  caseId: '2025-CV-005678',
  caseName: 'Smith v. Corp Inc',
- timestamp: new Date(, isTyping: false,
+ timestamp: new Date( isTyping: false,
  displayedText: ''
  }
  ]);

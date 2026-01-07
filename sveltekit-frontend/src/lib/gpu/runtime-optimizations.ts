@@ -54,7 +54,7 @@ export const GPU_MARKDOWN_ENV = {
  PYTHON_SIMD_ENDPOINT: 'http://localhost:8097',
 
  // Performance tuning
- GPU_BATCH_SIZE: NODE_RUNTIME_CONFIG.gpuBatchSize.toString(, GPU_CONCURRENCY_LIMIT: NODE_RUNTIME_CONFIG.gpuConcurrencyLimit.toString(, GPU_MEMORY_POOL_SIZE: NODE_RUNTIME_CONFIG.gpuMemoryPoolSize.toString(),
+ GPU_BATCH_SIZE: NODE_RUNTIME_CONFIG.gpuBatchSize.toString( GPU_CONCURRENCY_LIMIT: NODE_RUNTIME_CONFIG.gpuConcurrencyLimit.toString( GPU_MEMORY_POOL_SIZE: NODE_RUNTIME_CONFIG.gpuMemoryPoolSize.toString(),
 
  // Caching and optimization
  MARKDOWN_CACHE_SIZE: '100',
@@ -268,7 +268,7 @@ export class OptimizedGPUMarkdownProcessor {
 
  getMemoryUsage() {
  return {
- ...this.monitor.getMemoryUsage(, gpuAllocated: this.memoryManager.getTotalAllocated(),
+ ...this.monitor.getMemoryUsage( gpuAllocated: this.memoryManager.getTotalAllocated(),
  };
  }
 

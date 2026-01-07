@@ -8,13 +8,13 @@ import { POST, PUT, GET } from './+server.js';
 // Mock the middleware and services
 vi.mock('$lib/middleware/featureFlagEnforcer', () => ({
  FeatureFlagEnforcer: {
- checkRequest: vi.fn(, createErrorResponse: vi.fn(),
+ checkRequest: vi.fn( createErrorResponse: vi.fn(),
  },
 }));
 
 vi.mock('$lib/middleware/authSeparation', () => ({
  AuthSeparation: {
- extractToken: vi.fn(, extractUserId: vi.fn(, checkAuth: vi.fn(, createAuthErrorResponse: vi.fn(),
+ extractToken: vi.fn( extractUserId: vi.fn( checkAuth: vi.fn( createAuthErrorResponse: vi.fn(),
  },
 }));
 

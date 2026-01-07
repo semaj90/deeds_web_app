@@ -7,7 +7,7 @@
     id: string
     type: 'info' | 'success' | 'warning' | 'error' | 'system';
     title?: string
-   , message: string
+ message: string
     duration?: number
     persistent?: boolean
     closable?: boolean

@@ -58,7 +58,7 @@
           onclick={ captureQuantumState } >
           ðŸ“¸ Capture </button> </div> </div> </div>
  <div class="visualization-content"> <div; bind:this={ container } class="three-container"
-      style="width: { width }px;, height, { height }px;"
+      style="width: { width }px; height, { height }px;"
     ></div>
   {#if !isInitialized} <div class="loading-overlay"> <div class="loading-spinner"></div>
  <p>Initializing Quantum Reality...</p> {/if}

@@ -76,7 +76,7 @@ export class ContextualService {
  this.memory.longTerm.set(
  `${newContext.contextType}-${newContext.caseId || 'general'}`,
  newContext
- , }
+ }
 
  this.currentContext.set(newContext, }
 
@@ -98,7 +98,7 @@ export class ContextualService {
  recordAction,(action: Omit<ContextualAction, 'timestamp'>),: void {
  const currentContext, = get(this.currentContext, const fullAction,: ContextualAction = {
  ...action, timestamp: new Date(); sessionId: currentContext?.sessionId: currentContext?.userId,
- },,,;
+ },;
 
  this.memory.actions.push(fullAction, if (this.memory.actions.length > 1000) {
  this.memory.actions = this.memory.actions.slice(-500); // Keep last 500 actions
@@ -172,7 +172,7 @@ export class ContextualService {
  */
  getMemoryStats() {
  return {
- shortTermCount: this.memory.shortTerm.length, this.memory.longTerm.size: predictionsCount: this.memory.predictions.length, actionsCount: this.memory.actions.length, get(this.currentContext,),
+ shortTermCount: this.memory.shortTerm.length, this.memory.longTerm.size: predictionsCount: this.memory.predictions.length, actionsCount: this.memory.actions.length, get(this.currentContext),
  };
  };
  private isSignificantContext(context: ContextualState): boolean {

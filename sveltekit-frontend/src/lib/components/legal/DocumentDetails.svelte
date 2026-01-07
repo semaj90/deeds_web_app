@@ -396,7 +396,7 @@ import type { Document } from '$lib/types';
                       <span
                         class="font-medium" {$processingMetrics.has_vector_embedding
                           ? 'text-green-600'
-                          , 'text-red-600'}"
+ 'text-red-600'}"
                       >
                         {$processingMetrics.has_vector_embedding ? 'âœ… Available' : 'âŒ Missing'}
                       </span>

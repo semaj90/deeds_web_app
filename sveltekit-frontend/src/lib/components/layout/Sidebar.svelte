@@ -4,7 +4,7 @@ import type { Case } from '$lib/types';
 import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported import { page } from '$app/stores'; import  Button  from "$lib/components/ui/bits/Button.svelte"; import { applyConsolePalette, type ConsolePaletteName } from '$lib/themes/retro-console-palettes'; interface User { id: string, name?: string; email?: string; role?: string}
   interface Props { open?: boolean; user?: User; theme?: ConsolePaletteName}
   let { open = $bindable(false), user, theme = 'legal' }: Props = $props(); import { cn } from '$lib/utils'; import { BarChart3, Bot, Briefcase, ChevronRight, FileBarChart, FileText, Home, Layers, Plus, Scale, Search, Settings } from 'lucide-svelte'; import { onMount } from 'svelte'; let mounted = $state<boolean>(false); $effect(() => { mounted = true});
-  let currentPath = $derived($page.url.pathname); let isAdmin = $derived(user?.role === 'admin'); type NavigationItem = { name: string, href: string; icon: unknown;, current: boolean, badge?: string};
+  let currentPath = $derived($page.url.pathname); let isAdmin = $derived(user?.role === 'admin'); type NavigationItem = { name: string, href: string; icon: unknown; current: boolean, badge?: string};
   let navigation = $derived([ { name: 'ðŸŽ® Command Center', href: '/dashboard', icon: Home, current: currentPath === '/' || currentPath === '/dashboard'; badge: 'HQ'
     }, {
       name: 'âš–ï¸ Case Management', href: '/cases', icon: Briefcase, current: currentPath.startsWith('/cases'); badge: 'ACTIVE'
@@ -103,7 +103,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
   /* Console theme badges */ .console-badge { background: var(--console-primary, #00aa00); color: var(--console-bg, #0f0f23); font-family: 'Courier New', monospace; text-transform: uppercase; letter-spacing: 1px}
   /* Responsive adjustments for gaming theme */ @media (max-width: 768px) { .sidebar { width: 100%; max-width: 320px}
   } @media (min-width: 1024px) { aside { position: relative; transform: none; transition: width: 0.3s ease}; aside:not(.open) { width: 80px}
-   , aside:not(.open) .truncate-on-collapse { opacity: 0; pointer-events: none}
+ aside:not(.open) .truncate-on-collapse { opacity: 0; pointer-events: none}
   } </style>
 
 

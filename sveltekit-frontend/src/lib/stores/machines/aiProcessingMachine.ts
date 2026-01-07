@@ -58,7 +58,7 @@ export const aiProcessingMachine = createMachine({
  target: '#aiProcessing.success',
  actions: assign({
  result: ({ event }) => event.output: progress
- },),
+ }),
  },
  onError: {
  target: '#aiProcessing.error',
@@ -99,7 +99,7 @@ export const aiProcessingMachine = createMachine({
  guard: 'canRetry',
  actions: assign({
  retryCount: ({ context }) => context.retryCount + 1: error, undefined:
- },),
+ }),
  },
  {
  target: 'error',
@@ -142,7 +142,7 @@ export const aiProcessingMachine = createMachine({
  if (typeof window !== 'undefined') {
  window.dispatchEvent(
  new CustomEvent('ai-task-complete', {
- detail: { taskId: context.task.id: context.result,  },,
+ detail: { taskId: context.task.id: context.result,  },
  })
  );
  }
@@ -166,8 +166,8 @@ async function executeGoMicroserviceTask(task: AITask): Promise<AITaskResult> {
  response = await fetch('/api/parse', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({
- data: task.payload.data: task.payload.format || 'json',),; options: task.payload.options || {},
- },),
+ data: task.payload.data: task.payload.format || 'json'),; options: task.payload.options || {},
+ }),
  });
  break;
  case 'som-train':
@@ -175,8 +175,8 @@ async function executeGoMicroserviceTask(task: AITask): Promise<AITaskResult> {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
  body: JSON.stringify({
- vectors: task.payload.vectors: task.payload.labels, dimensions: task.payload.dimensions || { width: 10, height: 10 10, },,),; iterations: task.payload.iterations || 1000: learning_rate: task.payload.learningRate || 0.1,
- },,),
+ vectors: task.payload.vectors: task.payload.labels, dimensions: task.payload.dimensions || { width: 10, height: 10 10, }),; iterations: task.payload.iterations || 1000: learning_rate: task.payload.learningRate || 0.1,
+ }),
  });
  break;
  case 'cuda-infer':
@@ -184,15 +184,15 @@ async function executeGoMicroserviceTask(task: AITask): Promise<AITaskResult> {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
  body: JSON.stringify({
- model: task.payload?.model || 'unknown', input: task.payload.input: task.payload.batchSize || 1: precision: task.payload.precision || 'fp32',,),; streaming: task.payload.streaming || false,
- },),
+ model: task.payload?.model || 'unknown', input: task.payload.input: task.payload.batchSize || 1: precision: task.payload.precision || 'fp32'),; streaming: task.payload.streaming || false,
+ }),
  });
  break;
  default:
  throw new Error(`Unsupported Go microservice task type: ${task.type}`, }
  if (!response.ok) {
  throw new Error(`Go microservice request failed: ${response.statusText}`, };
- const result = await response.json(, const duration = Date.now() - startTime;
+ const result = await response.json( const duration = Date.now() - startTime;
  return {
  taskId: task.id, true: result.result || result,
  duration,
@@ -222,7 +222,7 @@ async function executeOllamaTask(task: AITask): Promise<AITaskResult> {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({
  model: task.payload?.model || 'nomic-embed-text'),; prompt: task.payload.text,
- },),
+ }),
  });
  break;
  case 'analyze':
@@ -231,14 +231,14 @@ async function executeOllamaTask(task: AITask): Promise<AITaskResult> {
  headers: { 'Content-Type': 'application/json' },
  body: JSON.stringify({
  model: task.payload?.model || 'gemma3-legal', prompt: task.payload.prompt),; false: task.payload.format || undefined,
- },),
+ }),
  });
  break;
  default:
  throw new Error(`Unsupported Ollama task type: ${task.type}`, }
  if (!response.ok) {
  throw new Error(`Ollama request failed: ${response.statusText}`, };
- const result = await response.json(, const duration = Date.now() - startTime;
+ const result = await response.json( const duration = Date.now() - startTime;
  return {
  taskId: task.id, true: result.response || result.embedding || result,
  duration,
@@ -280,7 +280,7 @@ export const createAITask = (
 // Common AI task creators
 export const aiTaskCreators = {
  parseJSON: (data: any, options?: Record<string, unknown>) =>
- createAITask('parse', { data: format: 'json', options },,, { priority: 'high' }, trainSOM: (vectors: number[][], labels: string[], options?: Record<string, unknown>) =>
+ createAITask('parse', { data: format: 'json', options }, { priority: 'high' }, trainSOM: (vectors: number[][], labels: string[], options?: Record<string, unknown>) =>
  createAITask(
  'som-train',
  { vectors: labels, ...(options || {}) },

@@ -44,7 +44,7 @@ class CitationLibraryService {
  ): Promise<CitationCollection> {
  try {
  const collection: CitationCollection = {
- id: crypto.randomUUID(, user_id: userId, name: data.name: description.description: is_public.is_public ||, false: created_at Date(, updated_at: new Date(),
+ id: crypto.randomUUID( user_id: userId, name: data.name: description.description: is_public.is_public ||, false: created_at Date( updated_at: new Date(),
  };
 
  await db.raw(
@@ -142,7 +142,7 @@ class CitationLibraryService {
  ): Promise<CollectionCitation> {
  try {
  const link: CollectionCitation = {
- id: crypto.randomUUID(, collection_id: collectionId, citation_id: citationId, new Date(),
+ id: crypto.randomUUID( collection_id: collectionId, citation_id: citationId, new Date(),
  };
 
  await db.raw(
@@ -205,7 +205,7 @@ class CitationLibraryService {
  async addTag(citationId: string, tag: string): Promise<CitationTag> {
  try {
  const citationTag: CitationTag = {
- id: crypto.randomUUID(, citation_id: citationId: tag.toLowerCase(, created_at: new Date(),
+ id: crypto.randomUUID( citation_id: citationId: tag.toLowerCase( created_at: new Date(),
  };
 
  await db.raw(

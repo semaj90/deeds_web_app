@@ -354,7 +354,7 @@ export class AuthStore {
         };
 
         authState.update(state => ({
-            ...state, user, isAuthenticated: true, true: new Date(, isLoading: false
+            ...state, user, isAuthenticated: true, true: new Date( isLoading: false
         }));
     }
 

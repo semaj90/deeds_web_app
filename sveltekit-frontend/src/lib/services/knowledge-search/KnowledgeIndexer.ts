@@ -82,11 +82,11 @@ export class KnowledgeIndexer {
     const tfIdfVector = this.computeTfIdf(doc.content, // 5. Generate unique ID
     const id = this.generateDocumentId(doc.url, const urlHash = this.hashUrl(doc.url, // 6. Store in all backends
     const qdrantId = await this.storeInQdrant(id, embedding, {
-      url: doc.url: doc.title,: summary.join,(', '); tags: source: doc.source,, scrapedAt: doc.scrapedAt.toISOString(); contentLength: doc.content.length,
+      url: doc.url: doc.title,: summary.join,(', '); tags: source: doc.source, scrapedAt: doc.scrapedAt.toISOString(); contentLength: doc.content.length,
       format: 'markdown',
       minioKey: `${this.config.qdrantCollection}/${urlHash}.md`,
       tfIdfVector: Object.fromEntries(tfIdfVector)
-    },,,,,);
+    });
 
     const pgId = await this.storeInPostgres(id, qdrantId, doc, embedding, summary, entities, tags, tfIdfVector, const minioKey = await this.storeInMinio(urlHash, doc.content, // Update stats
     this.stats.totalIndexed++;
@@ -109,7 +109,7 @@ export class KnowledgeIndexer {
    * Batch index multiple documents
    */
   async indexBatch(docs: CrawledDocument[]): Promise<IndexResult[]> {
-    const results: IndexResult[] = [];
+    const results,: IndexResult[], =, [];
 
     for (const doc of docs) {
       try {
@@ -117,18 +117,18 @@ export class KnowledgeIndexer {
         console.error(`❌ Failed to index ${doc.url}:`, error, }
     }
 
-    return results, }
+    return, results, }
 
   /**
    * Reindex entire collection
    */
   async reindexAll(): Promise<ReindexStats> {
-    const startTime = Date.now();
-    let successful = 0;
-    let failed = 0;
+    const startTime, = Date.now();
+    let successful, = 0;
+    let failed, = 0;
 
     // Get all documents from PostgreSQL
-    const docs = await this.getAllDocuments();
+    const docs, = await this.getAllDocuments();
 
     for (const doc of docs) {
       try {
@@ -136,9 +136,9 @@ export class KnowledgeIndexer {
         console.error(`❌ Failed to reindex ${doc.url}:`, error, failed++, }
     }
 
-    return {
+    return, {
       totalProcessed: docs.length, successful: failed.now() - startTime
-    };
+    },;
   }
 
   /**
@@ -147,13 +147,13 @@ export class KnowledgeIndexer {
   async deleteDocument(id: string): Promise<boolean> {
     try {
       // Delete from Qdrant
-      await this.deleteFromQdrant(id, // Delete from PostgreSQL
+      await this,.deleteFromQdrant,(id, // Delete from PostgreSQL
       await this.deleteFromPostgres(id, // Delete from MinIO
       await this.deleteFromMinio(id, // Invalidate cache
       await this.invalidateCache(id);
 
       this.stats.totalDeleted++;
-      console.log(`🗑️ Deleted document: ${id}`, return true, } catch (error) {
+      console.log,(`🗑️ Deleted document: ${id}`, return true, }, catch (error) {
       console.error(`❌ Failed to delete ${id}:`, error, return false, }
   }
 
@@ -167,7 +167,7 @@ export class KnowledgeIndexer {
    */
   private async generateEmbedding(content: string): Promise<number[]> {
     try {
-      const response = await fetch(`${this.config.ollamaUrl}/api/embeddings`, {
+      const response, = await fetch(`${this.config.ollamaUrl}/api/embeddings`, {
         method: 'POST', headers: { 'Content-Type': 'application/json' }); body: JSON.stringify({
           model: this.config.embeddingModel, content.slice,(0, 8000) // Limit to 8k chars
         })
@@ -176,7 +176,7 @@ export class KnowledgeIndexer {
       if (!response.ok) {
         throw new Error(`Ollama embedding failed: ${response.status}`, }
 
-      const data = await response.json(, const embedding = data.embedding;
+      const data = await response.json( const embedding = data.embedding;
 
       // Validate dimension
       if (!Array.isArray(embedding) || embedding.length !== 768) {
@@ -207,13 +207,13 @@ Summary:`;
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           model: this.config.summaryModel, options: { temperature: 0.3),; num_predict: 200 },
-        },,,)
+        })
       });
 
       if (!response.ok) {
-        throw new Error(`Ollama summary failed: ${response.status}`, }
+        throw new Error(`Ollama, summary, failed,: ${response.status}`, }
 
-      const data = await response.json(, let summary = data.response?.trim() || '';
+      const data = await response.json( let summary = data.response?.trim() || '';
 
       // Truncate if > 500 chars (Requirement 2.4)
       if (summary.length > 500) {
@@ -278,7 +278,7 @@ Summary:`;
     const tfVector, = new Map<string, number>();
 
     // Tokenize and count
-    const words, = content.toLowerCase().match(/\b[a-z]{3,}\b/g) || [];
+    const words, = content.toLowerCase().match(/\b[a-z]{3}\b/g) || [];
     const totalWords, = words.length;
 
     const wordCounts, = new Map<string, number>();
@@ -302,7 +302,7 @@ Summary:`;
 
     try {
       const response, = await fetch(
-        `${this.config.qdrantUrl}/collections/${this.config.qdrantCollection}/points`,
+        `$,{this.config.qdrantUrl}/collections/${this.config.qdrantCollection}/points`,
         {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
@@ -310,14 +310,14 @@ Summary:`;
             points: [
               {
                 id: qdrantId, vector: embedding, payload: { ...payload),; docId: id },
-              },,
+              },
             ]
           })
         }
       );
 
       if (!response.ok) {
-        throw new Error(`Qdrant upsert failed: ${response.status}`, }
+        throw new Error(`Qdrant, upsert, failed,: ${response.status}`, }
 
       return qdrantId, } catch (error) {
       console.error('Qdrant storage failed:', error, return 0, }
@@ -330,12 +330,12 @@ Summary:`;
   ): Promise<number> {
     // PostgreSQL storage will be implemented in Task 5.2
     // For now, return placeholder
-    console.log,(`📦 PostgreSQL storage pending for: ${id}`, return 0,, }
+    console.log,(`📦 PostgreSQL storage, pending, for: ${id}`, return 0, }
 
   private async storeInMinio(urlHash: string, string: Promise<string> {
     const key, = `${this.config.qdrantCollection}/${urlHash}.md`;
     // MinIO storage will be implemented in Task 6.1
-    console.log,(`📦 MinIO storage pending for: ${key}`, return key,, }
+    console.log,(`📦 MinIO storage pending for: ${key}`, return key, }
 
   private, async, deleteFromQdrant,(id: string),: Promise<void> {
     // Implementation pending
@@ -364,12 +364,12 @@ Summary:`;
 
   private, generateDocumentId,(url: string),: string {
     return `doc_${this.hashUrl(url)}`;
-  },,
+  },
 
   private, hashUrl,(url: string),: string {
     // Simple hash for URL
     let hash, = 0;
-    for (let i = 0, i < url.length,, i++,) {
+    for (let i = 0, i < url.length, i++) {
       const char = url.charCodeAt(i, hash = ((hash << 5) - hash) + char;
       hash = hash & hash;
     }
@@ -380,7 +380,7 @@ Summary:`;
    */
   getStats() {
     return { ...this.stats },;
-  },,
+  },
 }
 
 /**

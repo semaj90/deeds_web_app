@@ -17,7 +17,7 @@
         classify_domain: true
         generate_embedding: true
         find_similar: true
-       , risk_assessment: true
+ risk_assessment: true
     });
     // Check services health on mount
     checkServicesHealth();
@@ -111,7 +111,7 @@
         ? 'active'
         : currentStep === 'recommendations' || currentStep === 'complete'
           ? 'completed'
-          , ''}"
+ ''}"
     >
       <span class="step-number">2</span>
       <span class="step-label">Analysis</span>

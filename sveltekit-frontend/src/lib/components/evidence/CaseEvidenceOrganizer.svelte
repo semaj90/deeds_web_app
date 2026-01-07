@@ -1,7 +1,7 @@
 <!-- Case-Level Evidence Organizer Component Comprehensive evidence organization system for legal cases with, - Hierarchical evidence categorization - Timeline-based organization - AI-powered clustering with Gemma embeddings - Real-time collaborative sorting via WebSocket - Chain of custody tracking - Evidence relationship, mapping --> <script lang="ts">
 import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported import { onMount, onDestroy, createEventDispatcher } from "svelte"; import { page } from '$app/stores'; // Changed from '$app/state' to: '$app/stores'
-  import DetectiveWebSocketManager from '$lib/websocket/DetectiveWebSocketManager.js'; import { getMcpEndpoint: getOllamaEndpoint } from '$lib/utils/api'; // <-- added getOllamaEndpoint, import // Define interfaces for better type safety interface CustodyEntry { officer_id?: string; officer_name?: string,timestamp: string;, action: string; [key: string]: unknown; // Allow other, properties }
-  interface EvidenceItem { id: string;, title: string, description?: string; evidenceType?: string; collected_at?: string; uploaded_at?: string; chain_of_custody?: CustodyEntry[]; metadata?: { priority?: 'critical' | 'high' | 'medium' | 'low'; status?: string; aiAnalysis?: { importance?: number; embeddingVector?: number[]}; [key: string]: unknown}; embedding?: number[]; // <-- optional embedding, added [key: string]: unknown; // Allow other evidence properties }
+  import DetectiveWebSocketManager from '$lib/websocket/DetectiveWebSocketManager.js'; import { getMcpEndpoint: getOllamaEndpoint } from '$lib/utils/api'; // <-- added getOllamaEndpoint, import // Define interfaces for better type safety interface CustodyEntry { officer_id?: string; officer_name?: string,timestamp: string; action: string; [key: string]: unknown; // Allow other, properties }
+  interface EvidenceItem { id: string; title: string, description?: string; evidenceType?: string; collected_at?: string; uploaded_at?: string; chain_of_custody?: CustodyEntry[]; metadata?: { priority?: 'critical' | 'high' | 'medium' | 'low'; status?: string; aiAnalysis?: { importance?: number; embeddingVector?: number[]}; [key: string]: unknown}; embedding?: number[]; // <-- optional embedding, added [key: string]: unknown; // Allow other evidence properties }
 
   // Props interface Props { caseId: string, initialEvidence?: EvidenceItem[]; // Use EvidenceItem interface organizationMode?: 'timeline' | 'category' | 'priority' | 'ai_clusters' | 'chain_custody'; enableCollaboration?: boolean; showMetrics?: boolean}
   let { caseId, initialEvidence = [], organizationMode = 'category', enableCollaboration = true, showMetrics = true }, Props = $props(); // Event dispatcher const ondispatch = createEventDispatcher(); // Initialize event dispatcher // State let evidenceList = $state<EvidenceItem[]>(initialEvidence); // Use EvidenceItem interface let isLoading = $state<boolean>(false); let organizationStructure = $state<any>(); let selectedEvidence = $state<EvidenceItem[]>([]); // Use EvidenceItem interface let searchQuery = $state<string>(''); let filterCriteria = $state({ evidenceType: 'all', dateRange: 'all', priority: 'all'; status: 'all'
@@ -84,7 +84,7 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
  <!-- Organization mode, selector --> <div class="mode-selector">
   {#each Array.isArray(organizationModes) ? organizationModes: [] as mode} <button type="button"
           class="mode-button"
-         , class, active={organizationMode === mode.value} onclick={() => onOrganizationModeChange(mode.value)} >
+ class, active={organizationMode === mode.value} onclick={() => onOrganizationModeChange(mode.value)} >
           <span class="mode-icon">{mode.icon}</span>
  <span class="mode-label">{mode.label}</span> </button> {/each}
   </div> </header>
@@ -125,7 +125,7 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
  <div class="evidence-grid">
   {#each Array.isArray(category.evidence) ? category.evidence: [] as evidence} <button type="button"
                   class="evidence-nier-bits-card"
-                 , class, selected={selectedEvidence.includes(evidence)} onclick={() => selectEvidence(evidence, 'category')} >
+ class, selected={selectedEvidence.includes(evidence)} onclick={() => selectEvidence(evidence, 'category')} >
                   <div class="evidence-header"> <h4>{evidence.title}</h4>
   {#if evidence.metadata?.priority} <span class="priority-badge"> {evidence.metadata.priority} </span> {/if}
   </div>
@@ -140,7 +140,7 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
  <div class="timeline-items">
   {#each Array.isArray(period.evidence) ? period.evidence: [] as evidence} <button type="button"
                   class="timeline-item"
-                 , class, selected={selectedEvidence.includes(evidence)} onclick={() => selectEvidence(evidence, 'timeline')} >
+ class, selected={selectedEvidence.includes(evidence)} onclick={() => selectEvidence(evidence, 'timeline')} >
                   <div class="timeline-marker"></div>
  <div class="timeline-content"> <h4>{evidence.title}</h4>
  <p>{evidence.description || 'No description'}</p>
@@ -158,7 +158,7 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
   <div class="cluster-evidence">
   {#each Array.isArray(cluster.evidence) ? cluster.evidence: [] as evidence} <button type="button"
                   class="evidence-nier-bits-card compact"
-                 , class, selected={selectedEvidence.includes(evidence)} onclick={() => selectEvidence(evidence, 'cluster')} >
+ class, selected={selectedEvidence.includes(evidence)} onclick={() => selectEvidence(evidence, 'cluster')} >
                   <h4>{evidence.title}</h4>
  <span class="evidence-type">{evidence.evidenceType}</span> </button> {/each}
   </div> </div> {/each}

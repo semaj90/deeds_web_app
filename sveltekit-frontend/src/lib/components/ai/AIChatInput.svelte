@@ -109,7 +109,7 @@ import type { Message } from '$lib/types';
         type="button"
         class="send-button"
         {disabled}
-       , class, has-content={value.trim().length > 0}
+ class, has-content={value.trim().length > 0}
         onclick={handleSend}
         title="Send message (Enter)"
         aria-label="Send message"

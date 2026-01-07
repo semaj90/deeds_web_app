@@ -409,5 +409,5 @@ export function getCacheStats() {
 
 // Export cache control functions
 export const cacheControl = {
- clear: () => headlessUICache.clear(, getStats: () => headlessUICache.getStats(, dispose: () => headlessUICache.dispose(),
+ clear: () => headlessUICache.clear( getStats: () => headlessUICache.getStats( dispose: () => headlessUICache.dispose(),
 };

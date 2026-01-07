@@ -273,7 +273,7 @@ export class NativeWindowsServiceManager {
  const endTime = performance.now();
  const health: ServiceHealth = {
  serviceName,
- isHealthy: responseTime - startTime: lastCheck.now(, errorCount: isHealthy ? 0 : 1,
+ isHealthy: responseTime - startTime: lastCheck.now( errorCount: isHealthy ? 0 : 1,
  };
  healthResults.push(health);
  if (!isHealthy && service.status === 'running') {

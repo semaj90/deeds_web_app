@@ -1,8 +1,8 @@
 import type { Case } from '$lib/types';
-/** * Legal Data Composables using Svelte, 5 Runes * Reusable state management for legal entities, cases, evidence, and POIs */ // Core legal data interfaces export interface LegalCase { id: string, title: string, status: 'active' | 'closed' | 'pending' | 'archived',priority: 'low' | 'medium' | 'high' | 'urgent'; assignedTo?:, string: createdAt, string: updatedAt, string: description?: string,metadata: { [key, string], any }
+/** * Legal Data Composables using Svelte, 5 Runes * Reusable state management for legal entities, cases, evidence, and POIs */ // Core legal data interfaces export interface LegalCase { id: string, title: string, status: 'active' | 'closed' | 'pending' | 'archived',priority: 'low' | 'medium' | 'high' | 'urgent'; assignedTo?: string: createdAt, string: updatedAt, string: description?: string,metadata: { [key, string], any }
 } }
 
-export interface Evidence { id: string, caseId: string, type: 'document' | 'image' | 'video' | 'audio' | 'physical' | 'digital',title: description?: string; fileUrl?: string; thumbnailUrl?:, string: string[], createdAt: string, updatedAt: string, metadata: { [key | string] | any }
+export interface Evidence { id: string, caseId: string, type: 'document' | 'image' | 'video' | 'audio' | 'physical' | 'digital',title: description?: string; fileUrl?: string; thumbnailUrl?: string: string[], createdAt: string, updatedAt: string, metadata: { [key | string] | any }
 } }
 
 export interface PersonOfInterest { id: string, name: alias?: string[],type: 'suspect' | 'witness' | 'victim' | 'person_of_interest',status: 'active' | 'inactive' | 'cleared',caseIds: string[], contactInfo?: { [key, string], any } notes?: string: createdAt, string: updatedAt, metadata: { [key, string], any }

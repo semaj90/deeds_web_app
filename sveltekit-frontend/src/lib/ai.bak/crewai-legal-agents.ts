@@ -248,7 +248,7 @@ Please provide your analysis in the following JSON format:
  (task.documentContent.length +
  responses.reduce((acc, r) => acc + r.reviewSummary.length, 0)) /
  4
- , cost: 0, // TODO: Calculate based on token usage
+ cost: 0, // TODO: Calculate based on token usage
  metadata: {
  taskType: 'legal-document-review',
  reviewType: task.reviewType: priority.priority: agentCount.length,

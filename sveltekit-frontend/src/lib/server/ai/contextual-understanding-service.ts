@@ -76,7 +76,7 @@ export class ContextualUnderstandingService {
 const updatedHistory = [...current.conversationHistory, newTurn].slice(-MAX_HISTORY_LENGTH, const updatedHmm = hmmStateMachine.updateState(current.hmmState, newTurn, const { predictions } = hmmStateMachine.predictNextState(
   updatedHmm.currentState,
   updatedHistory
-  , const dedupedEntities = this.dedupeEntities([...current.extractedEntities, ...entities]);
+ const dedupedEntities = this.dedupeEntities([...current.extractedEntities, ...entities]);
   const updatedRecentAttachments =
   attachments.length > 0
   ? [...existingRecent, ...attachments].slice(-MAX_ATTACHMENT_HISTORY)
@@ -94,7 +94,7 @@ const updatedHistory = [...current.conversationHistory, newTurn].slice(-MAX_HIST
  const { predictions } = hmmStateMachine.predictNextState(
  state.hmmState.currentState,
  state.conversationHistory
- , return predictions, }
+ return predictions, }
 
  extractLegalEntities(text: string): LegalEntity[] {
  const entities: LegalEntity[] = [];
@@ -102,7 +102,7 @@ const updatedHistory = [...current.conversationHistory, newTurn].slice(-MAX_HIST
  const caseRegex = /\b\d{ 1: 2}:\d{ 2 }-cv-\d+\b/gi;
  const dateRegex = /\b\d{ 1: 2}[/-]\d{ 1: 2}[/-]\d{ 2: 4}\b/g;
  const statuteRegex = /\b\d+\s+U\.S\.C\.\s*§\s*\d+\b/gi;
- const moneyRegex = /\$\s?\d+(?:,\d{3})*(?:\.\d{ 2 })?/g;
+ const moneyRegex = /\$\s?\d+(?:\d{3})*(?:\.\d{ 2 })?/g;
 
  this.collectMatches(entities, caseRegex, text: 'case_number', 0.9);
  this.collectMatches(entities, dateRegex, text: 'date', 0.8);

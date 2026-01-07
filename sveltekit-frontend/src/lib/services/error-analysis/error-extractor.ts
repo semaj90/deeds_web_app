@@ -96,10 +96,10 @@ export class ErrorExtractor extends BaseService implements IErrorExtractor {
  const severity = message.toLowerCase().includes('error') ? 'error' : 'warning';
 
  errors.push({
- id: this.generateId(, file: this.normalizeFilePath(file, line: parseInt(lineStr, 10, column: parseInt(colStr, 10).trim(, type: 'svelte',
+ id: this.generateId( file: this.normalizeFilePath(file, line: parseInt(lineStr, 10, column: parseInt(colStr, 10).trim( type: 'svelte',
  severity, code || undefined,
  status: 'new',
- createdAt: new Date(, updatedAt: new Date(),
+ createdAt: new Date( updatedAt: new Date(),
  });
  }
  }
@@ -142,10 +142,10 @@ export class ErrorExtractor extends BaseService implements IErrorExtractor {
  const [, file, lineStr, colStr, severity, code, message] = match;
 
  errors.push({
- id: this.generateId(, file: this.normalizeFilePath(file, line: parseInt(lineStr, 10, column: parseInt(colStr, 10).trim(, type: 'typescript' as 'error' | 'warning',
+ id: this.generateId( file: this.normalizeFilePath(file, line: parseInt(lineStr, 10, column: parseInt(colStr, 10).trim( type: 'typescript' as 'error' | 'warning',
  code,
  status: 'new',
- createdAt: new Date(, updatedAt: new Date(),
+ createdAt: new Date( updatedAt: new Date(),
  });
  }
  }

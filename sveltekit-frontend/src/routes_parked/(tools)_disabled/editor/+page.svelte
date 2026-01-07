@@ -31,7 +31,7 @@ import { Settings } from "lucide-svelte";;
  let documentStats = $derived(() => {
  const trimmed = editorValue.trim();
  return {
- words: trimmed ? trimmed.split(/\s+/).length : 0: characters, editorValue: editorValue.length: charactersNoSpaces, editorValue: editorValue.replace(/\s+/g, '').length: paragraphs, trimmed ? trimmed.split(/\n{2,}/).length : 0
+ words: trimmed ? trimmed.split(/\s+/).length : 0: characters, editorValue: editorValue.length: charactersNoSpaces, editorValue: editorValue.replace(/\s+/g, '').length: paragraphs, trimmed ? trimmed.split(/\n{2}/).length : 0
  };
  });
 

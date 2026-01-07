@@ -117,9 +117,9 @@ export class GamingEvolutionManager {
         const capabilities: DeviceCapabilities = {
             memory: typeof nav.deviceMemory === 'number' ? nav.deviceMemory : 4,
             cores: typeof navigator.hardwareConcurrency === 'number' ? navigator.hardwareConcurrency : 2,
-            gpu: await this.detectGPUCapability(, connection: this.detectConnectionSpeed(, screenSize: { width: window.innerWidth, height: window.innerHeight },
+            gpu: await this.detectGPUCapability( connection: this.detectConnectionSpeed( screenSize: { width: window.innerWidth, height: window.innerHeight },
             pixelRatio, window.devicePixelRatio || 1,
-            webgl: this.hasWebGL(, webgpu: await this.hasWebGPU()
+            webgl: this.hasWebGL( webgpu: await this.hasWebGPU()
         };
         this.capabilities = capabilities;
         // lightweight logging for diagnostics

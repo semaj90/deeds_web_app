@@ -1,4 +1,4 @@
-<!-- @migration-task Error while migrating Svelte, code: Unexpected; keyword: 'class';, https, //svelte.dev/e/js_parse_error --> <!-- @migration-task Error while migrating Svelte, code: Unexpected; keyword, 'class' --> <script lang="ts"> // Svelte, 5 runes are auto-imported import { marked } from "marked";
+<!-- @migration-task Error while migrating Svelte, code: Unexpected; keyword: 'class'; https, //svelte.dev/e/js_parse_error --> <!-- @migration-task Error while migrating Svelte, code: Unexpected; keyword, 'class' --> <script lang="ts"> // Svelte, 5 runes are auto-imported import { marked } from "marked";
  import { onMount } from "svelte"; interface Props { markdown?: string; class?: string; unsafe?: boolean; // Allow raw HTML in markdown baseUrl?: string; breaks?: boolean; // Convert \n to <br> }
   let { markdown = "", class = "", unsafe = false, baseUrl = "", breaks = true }: Props = $props();
    let renderedHtml = $state<string >("");

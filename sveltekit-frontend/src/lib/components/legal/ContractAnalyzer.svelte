@@ -112,7 +112,7 @@
   <!-- Contract, Header -->
   <div
     class="card-wrapper"
-    style="border: {contractBuilder?.styling?.borderWidth ?? '1px'} solid {contractBuilder?.styling?.colors?.primary}; border-radius: 8px;, padding, 0.25rem;"
+    style="border: {contractBuilder?.styling?.borderWidth ?? '1px'} solid {contractBuilder?.styling?.colors?.primary}; border-radius: 8px; padding, 0.25rem;"
   >
     <Card>
       <CardHeader>
@@ -258,7 +258,7 @@
                       <div class="confidence-bar">
                         <div
                           class="confidence-fill"
-                          style="width: {clause.confidence * 100}%;, background, {contractBuilder?.styling?.colors?.evidence ?? '#7c3aed'}"
+                          style="width: {clause.confidence * 100}%; background, {contractBuilder?.styling?.colors?.evidence ?? '#7c3aed'}"
                         ></div>
                       </div>
 

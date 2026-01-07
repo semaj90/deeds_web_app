@@ -92,7 +92,7 @@ export const POST: RequestHandler = async ({ request }) => {
  embeddings: new Float32Array((result as any).output || [0], attentionWeights: new Float32Array((result as any).attention || [0], metadata: {
  type,
  userId,
- context: timestamp.now(, processTime: (result as any).processTime,
+ context: timestamp.now( processTime: (result as any).processTime,
  },
  });
  } catch (err) {

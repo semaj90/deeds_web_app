@@ -71,7 +71,7 @@ export class ChatStore {
         if (!this.session) return null;
         const sessionMessages = this.messages.filter(m => m.session_id === this.session!.id);
         return {
-            messageCount: sessionMessages.length, tokensUsed: sessionMessages.reduce((sum, m) => sum + (m.token_count || 0), 0, duration: Date.now() - new Date(this.session!.start_time).getTime(, lastActivity: this.session!.last_activity
+            messageCount: sessionMessages.length, tokensUsed: sessionMessages.reduce((sum, m) => sum + (m.token_count || 0), 0, duration: Date.now() - new Date(this.session!.start_time).getTime( lastActivity: this.session!.last_activity
         };
     });
 
@@ -213,7 +213,7 @@ export class ChatStore {
     trackActivity(userId: string, sessionId: string, isTyping: boolean = false): void {
         const activity: UserActivity = {
             userId,
-            sessionId: isTyping.now(, status: 'online'
+            sessionId: isTyping.now( status: 'online'
         };
         const updated = [...this.userActivities, activity];
         // Keep only last 100 activities
@@ -231,7 +231,7 @@ export class ChatStore {
     }
 
     addError(message: string, context?: any): void {
-        const error = { timestamp: new Date(, error: message, context };
+        const error = { timestamp: new Date( error: message, context };
         this.lastError = message;
         this.errorHistory = [...this.errorHistory, error].slice(-50); // Keep last 50 errors
     }

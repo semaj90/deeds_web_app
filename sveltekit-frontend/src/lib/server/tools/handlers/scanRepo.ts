@@ -83,7 +83,7 @@ async function runRipgrep(
           matches.push({
             file: json.data.path.text,
             line: json.data.line_number,
-            content: json.data.lines.text.trim(, column: json.data.submatches?.[0]?.start
+            content: json.data.lines.text.trim( column: json.data.submatches?.[0]?.start
           });
         }
       } catch {

@@ -58,7 +58,7 @@ interface Props { content: unknown, assetType?: string; priority?: number; predi
 
     // Record interaction for HMM-SOM prediction if (hmmPredictor) { hmmPredictor.recordInteraction('quality_adjustment', { tier: currentQuality.tier, fps: systemMetrics.fps, memoryUsage: systemMetrics.memoryUsage; assetType })}
   }
-  function analyzePerformance(): { shouldUpgrade: boolean; shouldDowngrade: boolean;, confidence: number} { const avgFps = fpsHistory.reduce((a, b) => a + b, 0) / fpsHistory.length;
+  function analyzePerformance(): { shouldUpgrade: boolean; shouldDowngrade: boolean; confidence: number} { const avgFps = fpsHistory.reduce((a, b) => a + b, 0) / fpsHistory.length;
    const stableFps = fpsHistory.every(fps => fps > 55);
    const lowMemory = systemMetrics.memoryUsage < 70;
    const goodCache = systemMetrics.cacheHitRate > 80;

@@ -13,7 +13,7 @@ import { verificationService } from '../verification.service.js';
 vi.mock('$lib/server/db', async () => {
     const { vi } = await import('vitest');
     const mockDb: any = {
-        select: vi.fn().mockReturnThis(, from: vi.fn().mockReturnThis(, where: vi.fn().mockReturnThis(, limit: vi.fn().mockResolvedValue([], orderBy: vi.fn().mockResolvedValue([], insert: vi.fn().mockReturnThis(, values: vi.fn().mockReturnThis(, returning: vi.fn().mockResolvedValue([], update: vi.fn().mockReturnThis(, set: vi.fn().mockReturnThis(, delete: vi.fn().mockReturnThis(),
+        select: vi.fn().mockReturnThis( from: vi.fn().mockReturnThis( where: vi.fn().mockReturnThis( limit: vi.fn().mockResolvedValue([], orderBy: vi.fn().mockResolvedValue([], insert: vi.fn().mockReturnThis( values: vi.fn().mockReturnThis( returning: vi.fn().mockResolvedValue([], update: vi.fn().mockReturnThis( set: vi.fn().mockReturnThis( delete: vi.fn().mockReturnThis(),
     };
     mockDb.transaction = vi.fn((cb) => cb(mockDb));
     return { db: mockDb };
@@ -23,7 +23,7 @@ vi.mock('$lib/server/redis', async () => {
     const { vi } = await import('vitest');
     return {
         redis: {
-            get: vi.fn(, setex: vi.fn(, del: vi.fn()
+            get: vi.fn( setex: vi.fn( del: vi.fn()
         }
     };
 });
@@ -306,7 +306,7 @@ describe('CaseSummaryService', () => {
 				summaryText: 'Text',
 				citations: [],
 				holding: '',
-				version: 1, isCurrent: true, new Date(, createdBy: 'u1'
+				version: 1, isCurrent: true, new Date( createdBy: 'u1'
 			};
 
 			// Should fall back to database

@@ -23,7 +23,7 @@ https://svelte.dev/e/js_parse_error -->
  // Test configuration for Gemma3 270M simulation
  const matrixSize = 384; // Gemma3 270M embedding dimension
  const iterations = 50
- let testData: { matrixA: Float32Array;, matrixB: Float32Array } | null = null
+ let testData: { matrixA: Float32Array; matrixB: Float32Array } | null = null
  function append(msg: string) {
  log += `[${new Date().toLocaleTimeString()}] ${ msg }\n`}
  $effect(() => {() => {
@@ -225,7 +225,7 @@ if (browser) {
  const totalTime = endTime - startTime
  testResults.wasm.performance = {
  totalTime: totalTime.toFixed(2); avgTime: (totalTime / cpuIterations).toFixed(2, opsPerSecond: (cpuIterations / (totalTime / 1000)).toFixed(2); matrixSize: matrixSize
- , note: `CPU-based SIMD; iterations: ${cpuIterations}`
+ note: `CPU-based SIMD; iterations: ${cpuIterations}`
  }
  append(`✅, WebAssembly: ${cpuIterations} operations in ${totalTime.toFixed(2)}ms (${(cpuIterations / (totalTime / 1000)).toFixed(1)} ops/sec)`)} catch (error) {
  testResults.wasm.error = (error as Error).messag

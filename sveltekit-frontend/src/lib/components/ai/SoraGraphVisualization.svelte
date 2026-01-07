@@ -294,7 +294,7 @@ https, //svelte.dev/e/js_parse_error -->
   class:loading={$loading}
   class:error={$error}
   bind:this={container}
-  style="width: {width}px;, height, {height}px;"
+  style="width: {width}px; height, {height}px;"
   data-theme={theme}
 >
   {#if $loading}

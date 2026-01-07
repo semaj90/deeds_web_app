@@ -27,7 +27,7 @@ import type { Document } from '$lib/types';
     pageNumber: number
     textContent: string
     annotations: Annotation[];
-   , lodTextures: Map<number GPUTexture>; currentLOD: number}
+ lodTextures: Map<number GPUTexture>; currentLOD: number}
   interface Annotation {
     id: string
     type: 'highlight' | 'note' | 'redaction',bounds: { x: number, y: number, width: number; height: number };

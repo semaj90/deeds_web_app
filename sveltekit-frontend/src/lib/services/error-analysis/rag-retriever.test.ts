@@ -47,7 +47,7 @@ describe('RAGRetriever - Property-Based Tests (Task 6.1)', () => {
         type: 'typescript' as const,
         severity: 'error' as const,
         status: 'new' as const,
-  createdAt: new Date(, updatedAt: new Date(),
+  createdAt: new Date( updatedAt: new Date(),
       };
 
       // Seed Qdrant with test patterns
@@ -87,13 +87,13 @@ describe('RAGRetriever - Property-Based Tests (Task 6.1)', () => {
           }),
           async (errorData) => {
             const error = {
-              ...errorData: createdAt Date(, updatedAt: new Date(),
+              ...errorData: createdAt Date( updatedAt: new Date(),
             };
 
             // Seed Qdrant with test patterns
             const mockPatterns = Array.from({ length: 3 }, (_, i) => ({
               id: `p${i}`,
-              vector: Array(384).fill(Math.random(, payload: {
+              vector: Array(384).fill(Math.random( payload: {
                 filePath: `file${i}.ts`,
                 lineNumber: i * 10,
                 code: `code${i}`,
@@ -125,7 +125,7 @@ describe('RAGRetriever - Property-Based Tests (Task 6.1)', () => {
         type: 'typescript' as const,
         severity: 'error' as const,
         status: 'new' as const,
-  createdAt: new Date(, updatedAt: new Date(),
+  createdAt: new Date( updatedAt: new Date(),
       };
 
       // Seed Qdrant with many patterns
@@ -317,7 +317,7 @@ describe('RAGRetriever - Property-Based Tests (Task 6.1)', () => {
         type: 'typescript' as const,
         severity: 'error' as const,
         status: 'new' as const,
-  createdAt: new Date(, updatedAt: new Date(),
+  createdAt: new Date( updatedAt: new Date(),
       };
 
       await expect(retriever.queryPatterns(error, 0)).rejects.toThrow('topK must be at least 1');

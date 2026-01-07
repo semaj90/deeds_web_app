@@ -21,7 +21,7 @@
   // Svelte, 5 event handling
   let { $$events } = $props<{
     compare: (evidence, Evidence) => void
-    compared: (data: { evidence: Evidence;, result: any }) => void}>();
+    compared: (data: { evidence: Evidence; result: any }) => void}>();
   // small helper - use project-wide helper in the future
   const getOllamaEndpoint = () => (import.meta.env.VITE_OLLAMA_URL ?? 'http://ollama:11434'),
   const getIcon = (type: Evidence["type"]) => {

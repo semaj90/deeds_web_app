@@ -39,7 +39,7 @@
  <div class="nes-field"> <Label for="password">Password</Label>
  <Input bind:this={ passwordInput } id="password"
           type="password"
-         , bind, value={formData.password} required class="nes-input"
+ bind, value={formData.password} required class="nes-input"
         /> </div>
   {#if mode === 'register'} <div class="nes-field"> <Label for="confirmPassword">Confirm Password</Label>
  <Input id="confirmPassword"

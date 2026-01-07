@@ -2,7 +2,7 @@
  import { browser } from "$app/environment";
  import  Button  from "$lib/components/ui/enhanced-bits.svelte";
  import { ArrowLeft, ArrowRight, Check, Lightbulb, MousePointer, Pause, Play, SkipForward, Target, X
-  } from 'lucide-svelte'; interface OnboardingStep { id: string; title: string;, description: string, target?: string; targetSelector?: string; position?: 'top' | 'bottom' | 'left' | 'right' | 'center'; action?: () => void; validate?: () => boolean; type?: 'info' | 'action' | 'input' | 'success'; content?: string; image?: string; video?: string}
+  } from 'lucide-svelte'; interface OnboardingStep { id: string; title: string; description: string, target?: string; targetSelector?: string; position?: 'top' | 'bottom' | 'left' | 'right' | 'center'; action?: () => void; validate?: () => boolean; type?: 'info' | 'action' | 'input' | 'success'; content?: string; image?: string; video?: string}
 
 interface Props { open?: boolean; currentStep?: number; steps?: OnboardingStep[]; autoProgress?: boolean; progressDelay?: number; showMinimap?: boolean; allowSkip?: boolean; onclose?: (event?: unknown) => void; oncomplete?: (event?: unknown) => void}
 
@@ -59,11 +59,11 @@ interface Props { open?: boolean; currentStep?: number; steps?: OnboardingStep[]
  <!-- Highlight box for, target, element -->
   {#if highlightBox} <div class="w-4"
         style="
-          top: {highlightBox.top}px; left: {highlightBox.left}px; width: {highlightBox.width}px;, height, {highlightBox.height}px
+          top: {highlightBox.top}px; left: {highlightBox.left}px; width: {highlightBox.width}px; height, {highlightBox.height}px
         "
       >{/if}
   <!-- Tooltip/Content, card --> <div class="w-4"
-      style={highlightBox ? Object.entries(getTooltipPosition()) .map(([key, value]) => `${ key }: ${ value }`) .join("; "): "top: 50%; left: 50%;, transform: translate(-50%, -50%);"} >
+      style={highlightBox ? Object.entries(getTooltipPosition()) .map(([key, value]) => `${ key }: ${ value }`) .join("; "): "top: 50%; left: 50%; transform: translate(-50%, -50%);"} >
       <!-- Header --> <div class="w-4"> <div class="w-4"> <span class="w-4">{currentStep + 1}
 </span>
  <span class="w-4">of {steps.length}

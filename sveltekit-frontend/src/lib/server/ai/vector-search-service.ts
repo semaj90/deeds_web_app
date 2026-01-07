@@ -96,7 +96,7 @@ export class VectorSearchService {
     pgvectorStatus: VectorStoreStatus = {
         provider: 'pgvector',
         status: 'unavailable',
-        lastCheck: new Date(, responseTime: 0,
+        lastCheck: new Date( responseTime: 0,
         errorCount: 0,
         successCount: 0,
         successRate: 0
@@ -105,7 +105,7 @@ export class VectorSearchService {
     qdrantStatus: VectorStoreStatus = {
         provider: 'qdrant',
         status: 'unavailable',
-        lastCheck: new Date(, responseTime: 0,
+        lastCheck: new Date( responseTime: 0,
         errorCount: 0,
         successCount: 0,
         successRate: 0
@@ -461,14 +461,14 @@ export class VectorSearchService {
             this.pgvectorStatus = {
                 ...this.pgvectorStatus,
                 status: 'healthy',
-                lastCheck: new Date(, responseTime: Date.now() - startTime
+                lastCheck: new Date( responseTime: Date.now() - startTime
             };
         } catch (error) {
             console.warn('[VectorSearchService] pgvector health check failed:', error);
             this.pgvectorStatus = {
                 ...this.pgvectorStatus,
                 status: 'unhealthy',
-                lastCheck: new Date(, responseTime: Date.now() - startTime,
+                lastCheck: new Date( responseTime: Date.now() - startTime,
                 errorCount: this.pgvectorStatus.errorCount + 1
             };
         }
@@ -481,14 +481,14 @@ export class VectorSearchService {
             this.qdrantStatus = {
                 ...this.qdrantStatus,
                 status: response.ok ? 'healthy' : 'unhealthy',
-                lastCheck: new Date(, responseTime: Date.now() - startTime
+                lastCheck: new Date( responseTime: Date.now() - startTime
             };
         } catch (error) {
             console.warn('[VectorSearchService] Qdrant health check failed:', error);
             this.qdrantStatus = {
                 ...this.qdrantStatus,
                 status: 'unhealthy',
-                lastCheck: new Date(, responseTime: Date.now() - startTime,
+                lastCheck: new Date( responseTime: Date.now() - startTime,
                 errorCount: this.qdrantStatus.errorCount + 1
             };
         }

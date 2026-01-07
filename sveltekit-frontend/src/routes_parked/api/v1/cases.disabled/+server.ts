@@ -19,7 +19,7 @@ const getUserId = (locals: App.Locals) => locals.session?.user?.id;
 
 // Query parameters schema for GET requests
 const CasesQuerySchema = z.object({
- page: z.coerce.number().min(1).default(1, limit: z.coerce.number().min(1).max(100).default(20, sortBy: z.enum(['title', 'created_at', 'updated_at', 'status', 'priority']).default('created_at', sortOrder: z.enum(['asc', 'desc']).default('desc', status: z.enum(['open', 'closed', 'pending', 'archived']).optional(, priority: z.enum(['low', 'medium', 'high', 'urgent']).optional()
+ page: z.coerce.number().min(1).default(1, limit: z.coerce.number().min(1).max(100).default(20, sortBy: z.enum(['title', 'created_at', 'updated_at', 'status', 'priority']).default('created_at', sortOrder: z.enum(['asc', 'desc']).default('desc', status: z.enum(['open', 'closed', 'pending', 'archived']).optional( priority: z.enum(['low', 'medium', 'high', 'urgent']).optional()
 });
 
 /*
@@ -48,12 +48,12 @@ export const GET: RequestHandler = async ({ request, locals }) => {
   
  // Validate response shape with zod before returning
  const CaseItemSchema = z.object({
- id: z.string(, title: z.string().optional(, description: z.any().optional(, status: z.string().optional(, priority: z.string().optional(, caseNumber: z.string().optional(, createdAt: z.string().optional(, updatedAt: z.string().optional()
+ id: z.string( title: z.string().optional( description: z.any().optional( status: z.string().optional( priority: z.string().optional( caseNumber: z.string().optional( createdAt: z.string().optional( updatedAt: z.string().optional()
  }).passthrough();
 
  const CasesListResponse = z.object({
  success: z.literal(true, data: z.array(CaseItemSchema, pagination: z.object({
- page: z.number(, limit: z.number(, total: z.number(, totalPages: z.number(, hasNext: z.boolean(, hasPrev: z.boolean()
+ page: z.number( limit: z.number( total: z.number( totalPages: z.number( hasNext: z.boolean( hasPrev: z.boolean()
  }, meta: z.record(z.any()).optional()
  }).passthrough();
 

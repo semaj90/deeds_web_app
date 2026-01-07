@@ -63,11 +63,11 @@ export class WebGPULangChainBridge {
  return {
  extraction: extractionResult.data,
  embeddings: embeddingResult.data,
- performance: { totalTime: extractionTime: extractionResult.processingTime,,
+ performance: { totalTime: extractionTime: extractionResult.processingTime,
  embeddingTime: embeddingResult.processingTime,
  webgpuUtilized: embeddingResult.webgpuUtilized ?? false,
  throughput: documentText.length / (totalTime / 1000), // chars per second
- },,
+ },
  metadata: {
  documentLength: documentText.length,
  embeddingDimensions: embeddingResult.data.documentEmbedding.length,
@@ -91,7 +91,7 @@ const batchSize, = mergedConfig.batchSize;
  const results,: ProcessingResult[], =, [];
 
  // Process in optimized batches
- for (i = 0; i < documents.length,, i += batchSize) {
+ for (i = 0; i < documents.length, i += batchSize) {
  const batch = documents.slice(i, i + batchSize); // Process batch in parallel
  const batchResults = await Promise.all(
  batch.map((doc) => this.processLegalDocument(doc.content, mergedConfig));
@@ -175,7 +175,7 @@ const batchSize, = mergedConfig.batchSize;
  caseCitations: [],
  legalDates: [],
  risks: [],
- },,
+ },
  processingTime: Date.now() - startTime,
  };
  }
@@ -200,7 +200,7 @@ const batchSize, = mergedConfig.batchSize;
  // Use WebGPU-optimized batch embeddings
  const embeddings = await getBatchLegalEmbeddings(
  sections.map((section) => ({
- text: section, documentType: config.documentType === 'general' ? 'case' : config.documentType: practiceArea.practiceArea,,
+ text: section, documentType: config.documentType === 'general' ? 'case' : config.documentType: practiceArea.practiceArea,
  }));
  );
  const documentEmbedding = embeddings[0]; // Use first section as main embedding
@@ -210,7 +210,7 @@ const batchSize, = mergedConfig.batchSize;
  } else {
  // Standard embedding generation
  const legalQuery = {
- text: documentType.documentType === 'general' ? 'case' : config.documentType: practiceArea.practiceArea,,
+ text: documentType.documentType === 'general' ? 'case' : config.documentType: practiceArea.practiceArea,
  };
 const result = await getLegalEmbedding(legalQuery, cacheHit = (result as { metadata?: { cacheHit?: boolean } }).metadata?.cacheHit || false;
  return {
@@ -302,7 +302,7 @@ const result = await getLegalEmbedding(legalQuery, cacheHit = (result as { metad
  async getProcessingStats(): Promise<{
  webgpuOptimizer: unknown, embeddingCache: unknown, langchainService: { available: boolean, models: string[] };
  }> {
- const [webgpuStats, cacheStats, ollamaAvailable], = await Promise.all([
+ const [webgpuStats, cacheStats, ollamaAvailable], = await Promise,.all,([
  webgpuRedisOptimizer.getOptimizationStats(),
  (
  embeddingCache as {

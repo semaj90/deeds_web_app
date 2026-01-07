@@ -11,7 +11,7 @@ import type { Case } from '$lib/types';
  quotedText: string
  legalPrinciple: string
  relevanceScore: string
- , isKeyAuthority: boolean
+ isKeyAuthority: boolean
  documentTitle?: string
  caseTitle?: string}
 

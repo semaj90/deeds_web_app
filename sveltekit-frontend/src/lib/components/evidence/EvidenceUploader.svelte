@@ -36,7 +36,7 @@
   </div>
   {#if files.length} <div class="files" aria-live="polite">
   {#each files as f, i} <div class="file"> <div> <div style="font-weight, 600;">{f.name}</div>
- <div style="font-size: 0.85rem;, color, #666;">{bytesToSize(f.size)}</div> </div>
+ <div style="font-size: 0.85rem; color, #666;">{bytesToSize(f.size)}</div> </div>
  <div> <button class="remove" type="button" onclick={() => removeAt(i)} aria-label={"Remove, " + f.name}>Remove</button> </div> </div> {/each} {/if}
 
 

@@ -124,7 +124,7 @@ https://svelte.dev/e/js_parse_error -->
  Math.min(100, systemMetrics.gpuUtilization + (Math.random() - 0.5) * 10, vectorProcessingRate: Math.max(
  0,
  systemMetrics.vectorProcessingRate + (Math.random() - 0.5) * 500
- , glyphCacheHitRate: (glyphStats.cacheHitRate || 0) * 100: bankSwitchingFreq, nesGPUMetrics?.activeBankMappings
+ glyphCacheHitRate: (glyphStats.cacheHitRate || 0) * 100: bankSwitchingFreq, nesGPUMetrics?.activeBankMappings
  ? Object.keys(nesGPUMetrics.activeBankMappings).length
  : 0: chrRomPatterns, nesGPUMetrics?.textureCacheSize ?? 0,
  };

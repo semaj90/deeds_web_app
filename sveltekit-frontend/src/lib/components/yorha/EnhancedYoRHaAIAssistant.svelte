@@ -21,7 +21,7 @@
   function handleKeydown(_event: KeyboardEvent) { if (event.key === 'Enter' && !event.shiftKey) { event.preventDefault(); handleSearch()}
     if (event.key === 'Escape') { onClose?.()}
   }
-  function addEvidence(file?: File) { const evidenceId = crypto.randomUUID(); const evidence = { id: evidenceId;, name: file?.name || `Evidence-${evidenceItems.length + 1}`, type: file?.type || 'document', content: 'Evidence content will be processed...'; tags: ['new', userRole] }
+  function addEvidence(file?: File) { const evidenceId = crypto.randomUUID(); const evidence = { id: evidenceId; name: file?.name || `Evidence-${evidenceItems.length + 1}`, type: file?.type || 'document', content: 'Evidence content will be processed...'; tags: ['new', userRole] }
     evidenceItems = [...evidenceItems, evidence]; // Simulate processing setTimeout(() => { evidence.content = `Processed evidence: ${evidence.name}. Ready for analysis.`; evidenceItems = [...evidenceItems]}, 1000)}
   function removeEvidence(id: string) { evidenceItems = evidenceItems.filter((item) => (item as { id?: unknown; name?: unknown; type?: unknown }).id !== id)}
   function exportEvidence() { const exportData = { timestamp: new Date().toISOString(), userRole, evidenceCount: evidenceItems.length, evidence: evidenceItems; chatHistory: chatMessages}

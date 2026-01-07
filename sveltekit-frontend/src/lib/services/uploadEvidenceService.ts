@@ -74,7 +74,7 @@ export async function initiateUpload(
  fileSize: number, contentType: string
 ): Promise<UploadInitiation> {
  const params = new URLSearchParams({
- case_id: caseId, filename: file_size, fileSize.toString(, content_type: contentType,
+ case_id: caseId, filename: file_size, fileSize.toString( content_type: contentType,
  });
 
  const response = await fetch(`${API_BASE}/upload/initiate?${params}`, {

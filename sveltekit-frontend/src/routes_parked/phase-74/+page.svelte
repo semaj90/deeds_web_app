@@ -32,7 +32,7 @@
  text: 'What about Case #2025-CR-001234... "State v. Johnson"?',
  caseId: '2025-CR-001234',
  caseName: 'State v. Johnson',
- timestamp: new Date(, isTyping: false,
+ timestamp: new Date( isTyping: false,
  displayedText: ''
  };
 

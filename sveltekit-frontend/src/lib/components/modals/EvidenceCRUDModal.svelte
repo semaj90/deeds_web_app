@@ -1,6 +1,6 @@
 <!-- Evidence CRUD Modal - SPA-style with, Svelte, 5 + Drizzle + PostgreSQL --> <script lang="ts">
 import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported import { onMount } from 'svelte'; import { evidenceStore } from '$lib/stores/unified'; import { embeddingsService } from '$lib/services/embeddings-service'; import { showSuccess: showError } from '$lib/stores/unified'; import  Button, Card, CardContent, CardHeader, CardTitle, Input, Label  from "$lib/components/ui/enhanced-bits.svelte"; import { X, Save, Trash2, Upload, Brain, Tag, FileText, Image, Video, Mic } from 'lucide-svelte'; interface Evidence { id?: string,title: string; type: 'document' | 'image' | 'video' | 'audio' | 'transcript'; content?: string; file_url?: string; file_size?: number; mime_type?: string; case_id?: string; extracted_text?: string; embeddings?: number[]; metadata?: { [key: string]: any } tags?: string[]; x?: number; y?: number; created_at?: string; updated_at?: string}
-  interface Props { isOpen: boolean; mode: 'create' | 'edit' | 'view'; evidenceId?: string;, onClose: () => void; onSave?: (evidence: Evidence) => void; onDelete?: (evidenceId: string) => void}
+  interface Props { isOpen: boolean; mode: 'create' | 'edit' | 'view'; evidenceId?: string; onClose: () => void; onSave?: (evidence: Evidence) => void; onDelete?: (evidenceId: string) => void}
   let { isOpen = $bindable(), mode = 'create', evidenceId, onClose, onSave, onDelete }: Props = $props(); // Svelte, 5 state let evidence = $state<Evidence>({ title: '', type: 'document', content: '', tags: [], x: 100; y: 100 });
   let originalEvidence = $state<Evidence | null>(null); let isLoading = $state<boolean>(false); let isSaving = $state<boolean>(false); let isDeleting = $state<boolean>(false); let isAnalyzing = $state<boolean>(false); let uploadedFile = $state<File | null>(null); let tagInput = $state<string>(''); let errors = $state<Record<string, string>( ); // File upload state let uploadProgress = $state<number>(0); let dragOver = $state<boolean>(false); // Modal management let modalElement = $state<HTMLDivElement>(); let isClosing = $state<boolean>(false); // Load evidence when modal opens $effect(() => { if (isOpen && mode !== 'create' && evidenceId) { loadEvidence()} else if (isOpen && mode === 'create') { resetForm()}
   });
@@ -58,7 +58,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
   // Keyboard handling function handleKeydown(_event: KeyboardEvent) { if (event.key === 'Escape') { handleClose()} else if (event.key === 's' && (event.ctrlKey || event.metaKey)) { event.preventDefault(); handleSave()}
   }
 
-   // Icon mapping const typeIcons = { document: FileText, image: Image, video: Video; audio: Mic;, transcript: FileText}
+   // Icon mapping const typeIcons = { document: FileText, image: Image, video: Video; audio: Mic; transcript: FileText}
 </script>
  <!-- Modal, Backdrop -->
   {#if isOpen} <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/60"
@@ -93,7 +93,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
                   bind:value={evidence.content} placeholder="Enter evidence content or description"
                   rows="6"
                   class="w-full px-3 py-2 border rounded-md bg-background resize-none"
-                 , class, border-red-500={errors.content} disabled={mode === 'view'} ></textarea>
+ class, border-red-500={errors.content} disabled={mode === 'view'} ></textarea>
   {#if errors.content} <p class="text-sm text-red-500">{errors.content}</p> {/if}
   </div>
  <!-- Tags --> <div> <Label for="tags">Tags</Label>

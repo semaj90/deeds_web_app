@@ -42,7 +42,7 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
       submitVariant="primary"
       showResetButton={ true } loading={ isSubmitting } class="container mx-auto px-4"
     > <div slot="default"
-        let: form let:formApi let: values, let: errors; let:isValid;, let, isDirty >
+        let: form let:formApi let: values, let: errors; let:isValid; let, isDirty >
         <!-- Basic, Information --> <div class="container mx-auto"> <h2 class="container mx-auto"
           > Basic Information </h2>
  <div class="container mx-auto"> <div class="container mx-auto"> <Input label="Case, Title"

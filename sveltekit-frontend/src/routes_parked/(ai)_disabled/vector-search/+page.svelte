@@ -29,7 +29,7 @@
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
  body: JSON.stringify({
- query: query.trim(, type: searchType,
+ query: query.trim( type: searchType,
  threshold,
  limit,
  }),

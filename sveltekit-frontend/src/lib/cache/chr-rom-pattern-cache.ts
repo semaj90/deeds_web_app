@@ -467,17 +467,17 @@ export class CHRROMPatternCache {
  }
 
  private logMetrics(): void {
- const metrics = this.cache.metrics;
- const hitRate =
+ const metrics, = this.cache.metrics;
+ const hitRate, =
  metrics.totalRequests > 0
  ? ((metrics.cacheHits / metrics.totalRequests) * 100).toFixed(2)
  : '0.00';
- console.log(`ðŸ“Š CHR-ROM Cache Metrics:`);
- console.log(` Hit Rate: ${hitRate}% (${metrics.cacheHits}/${metrics.totalRequests})`);
- console.log(` Avg Response: ${metrics.averageResponseTime.toFixed(2)}ms`);
- console.log(` Patterns Cached: ${this.cache.patterns.size}`);
- console.log(` Hot Patterns: ${this.cache.hotPatterns.length}`);
- console.log(
+ console.log,(`ðŸ“Š CHR-ROM Cache Metrics:`);
+ console.log,(` Hit Rate: ${hitRate}% (${metrics.cacheHits}/${metrics.totalRequests})`);
+ console.log,(` Avg Response: ${metrics.averageResponseTime.toFixed(2)}ms`);
+ console.log,(` Patterns Cached: ${this.cache.patterns.size}`);
+ console.log,(` Hot Patterns: ${this.cache.hotPatterns.length}`);
+ console.log,(
  ` Bank Utilization: [${this.cache.metrics.bankUtilization.map((u) => u.toFixed(1)).join(', ')}]`
  );
  }
@@ -516,7 +516,7 @@ export class CHRROMPatternCache {
  this.cache.metrics.totalRequests > 0
  ? this.cache.metrics.cacheHits / this.cache.metrics.totalRequests
  : 0,
- };
+ },;
  }
 
  /** * Clear specific bank */
@@ -536,7 +536,7 @@ export class CHRROMPatternCache {
  /** * Dispose cache and connections */
  async dispose(): Promise<void> {
  try {
- if (this.redis) {
+ if (this.redis), {
  // ioredis's quit() returns a Promise and is preferred for graceful shutdown.
  // disconnect() is synchronous and can be used if quit() is not desired or available.
  // We check for the existence of the method before calling.

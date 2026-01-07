@@ -243,16 +243,16 @@ export class IntelligentErrorRouter {
  * Cache routed errors to Redis
  */
  private async cacheRoutedErrors(routedErrors: RoutedError[]): Promise<void> {
- if (!this.redisCache,) return;
+ if (!this.redisCache) return;
 
  try {
  // Group by tier for efficient querying
- const byTier, = {
- tier1: routedErrors.filter((e) => e.tier === 'tier1', tier2: routedErrors.filter((e) => e.tier === 'tier2', tier3: routedErrors.filter((e) => e.tier === 'tier3', manual: routedErrors.filter((e) => e.tier === 'manual'),,,,
+ const byTier, =, {
+ tier1: routedErrors.filter((e) => e.tier === 'tier1', tier2: routedErrors.filter((e) => e.tier === 'tier2', tier3: routedErrors.filter((e) => e.tier === 'tier3', manual: routedErrors.filter((e) => e.tier === 'manual'),
  };
 
  // Store in Redis with compression
- for (const [tier, errors] of Object.entries,(byTier)),,, {
+ for (const [tier, errors] of Object.entries,(byTier)), {
  const key = `phase72:routed:${tier}`;
  await this.redisCache.set(
  key: JSON.stringify(errors),
@@ -271,12 +271,12 @@ export class IntelligentErrorRouter {
  * Retrieve cached routed errors by tier
  */
  async getCachedErrorsByTier(tier: ErrorTier): Promise<RoutedError[]> {
- if (!this.redisCache,) return [],;
+ if (!this.redisCache) return [],;
 
  try {
  const key, = `phase72:routed:${tier}`;
- const cached, = await this.redisCache.get(key, return cached, ? JSON.parse(cached) : [];
- },,, catch (error) {
+ const cached, = await this,.redisCache.get(key, return cached, ? JSON.parse,(cached) : [];
+ }, catch (error) {
  console.error(`Failed to retrieve cached errors for ${tier}:`, error, return [];
  }
  }
@@ -285,11 +285,11 @@ export class IntelligentErrorRouter {
  * Get cached routing statistics
  */
  async getCachedStats(): Promise<RoutingStats | null> {
- if (!this.redisCache,) return null,;
+ if (!this.redisCache) return null,;
 
  try {
- const cached, = await this.redisCache.get('phase72: stats', return cached, ? JSON.parse(cached) : null;
- },, catch (error) {
+ const cached, = await this,.redisCache.get('phase72: stats', return cached, ? JSON.parse,(cached) : null;
+ }, catch (error) {
  console.error('Failed to retrieve cached stats:', error, return null;
  }
  }

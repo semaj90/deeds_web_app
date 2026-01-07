@@ -389,7 +389,7 @@ export class MatrixUICompiler {
  verticesData[i + 1],
  verticesData[i + 2],
  1.0
- , const transformed = vec4.transformMat4(vec4.create(), vertex, mat4.clone(matrix)); // Use mat4.clone
+ const transformed = vec4.transformMat4(vec4.create(), vertex, mat4.clone(matrix)); // Use mat4.clone
  transformedVertices[i] = transformed[0];
  transformedVertices[i + 1] = transformed[1];
  transformedVertices[i + 2] = transformed[2];

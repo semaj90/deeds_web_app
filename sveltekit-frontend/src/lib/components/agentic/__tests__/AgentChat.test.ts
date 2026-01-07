@@ -378,7 +378,7 @@ describe('AgentChat Component', () => {
  id: '1',
  role: 'assistant',
  content: 'Searching for documents...',
- timestamp: new Date(, toolCalls: [
+ timestamp: new Date( toolCalls: [
  {
  toolName: 'rag_lookup',
  arguments: { query: 'contract law' },
@@ -667,7 +667,7 @@ describe('AgentChat Component', () => {
  id: '1',
  role: 'assistant',
  content: 'Searching and summarizing...',
- timestamp: new Date(, toolCalls: [
+ timestamp: new Date( toolCalls: [
  { toolName: 'rag_lookup', arguments: { query: 'contract' } },
  { toolName: 'web_doc_summary', arguments: { url: 'https://example.com' } },
  ],

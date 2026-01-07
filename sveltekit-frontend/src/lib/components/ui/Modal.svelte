@@ -34,6 +34,6 @@
   .modal-close:hover { color: #374151}
   .modal-body { padding: 1.5rem; overflow-y: auto; flex: 1}
   .modal-footer { padding: 1.5rem; border-top: 1px solid #e5e7eb; display: flex; justify-content: flex-end; gap: 0.5rem}
-</style> padding: 1.5rem, border-top: 1px solid #e5e7eb, display: flex; justify-content: flex-end;, gap: 0.5rem; </style>
+</style> padding: 1.5rem, border-top: 1px solid #e5e7eb, display: flex; justify-content: flex-end; gap: 0.5rem; </style>
 
 

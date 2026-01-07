@@ -96,8 +96,8 @@ https://svelte.dev/e/js_parse_error -->
  if (!currentMessage.trim() || isLoading) return;
 
  const userMessage: ChatMessage = {
- id: crypto.randomUUID(, role: 'user',
- content: currentMessage.trim(, timestamp: new Date(),
+ id: crypto.randomUUID( role: 'user',
+ content: currentMessage.trim( timestamp: new Date(),
  };
  messages = [...messages, userMessage];
 
@@ -108,7 +108,7 @@ https://svelte.dev/e/js_parse_error -->
 
  // Create assistant message placeholder
  const assistantMessage: ChatMessage = {
- id: crypto.randomUUID(, role: 'assistant',
+ id: crypto.randomUUID( role: 'assistant',
  content: '',
  timestamp: new Date(),
  };
@@ -196,7 +196,7 @@ https://svelte.dev/e/js_parse_error -->
  ];
  const randomResponse = mockResponses[Math.floor(Math.random() * mockResponses.length)];
  const mockMessage: ChatMessage = {
- id: crypto.randomUUID(, role: 'assistant',
+ id: crypto.randomUUID( role: 'assistant',
  content: `🤖 ${randomResponse} [Fallback Response - Ollama unavailable]`,
  timestamp: new Date(),
  };

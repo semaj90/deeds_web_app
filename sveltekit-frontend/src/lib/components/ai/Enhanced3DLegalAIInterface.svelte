@@ -1,5 +1,5 @@
 <!-- Enhanced 3D Legal AI Interface Integrates all systems: vLLM CUDA, SIMD Parser, Neo4j Recommendations, XState, RabbitMQ Features, 3D headless vertex buffer, progress animations, bit-encoding, QUIC streaming --> <script lang="ts"> // Svelte, 5 runes are auto-imported import { onDestroy } from 'svelte';
- import { browser } from '$app/environment'; // --- Heavy integrations are commented out for degraded mode operation --- // import createIdleDetectionService, { type IdleDetectionActor } from '$lib/machines/idle-detection-rabbitmq-machine'; // import { EnhancedVLLMCudaIntegration, type StreamingRequest } from '$lib/services/enhanced-vllm-cuda-integration'; // import SIMDGPUParserIntegration, { type ParsedDocument } from '$lib/services/simd-gpu-parser-integration'; // import { Neo4jRecommendationEngine, type Recommendation } from '$lib/services/neo4j-recommendation-engine'; // import { getOllamaApiUrl } from '$lib/utils/ollama-helpers'; // --- Type definitions (can be moved to $lib/types) --- type Recommendation = { title: string, description: string; score: number; confidence: number, aiGenerated?: boolean }; type ParsedDocument = { id: string; text: string } | null; type ChatMessage = { id: string; type: 'user' | 'ai' | 'system'; content: string;, timestamp: number }; // --- Props for component configuration (Svelte 5) --- interface Props { enableGPUAcceleration?: boolean; enableAIRecommendations?: boolean; enableIdleProcessing?: boolean; theme?: 'yorha' | string; maxConcurrentStreams?: number; progressAnimationSpeed?: number}
+ import { browser } from '$app/environment'; // --- Heavy integrations are commented out for degraded mode operation --- // import createIdleDetectionService, { type IdleDetectionActor } from '$lib/machines/idle-detection-rabbitmq-machine'; // import { EnhancedVLLMCudaIntegration, type StreamingRequest } from '$lib/services/enhanced-vllm-cuda-integration'; // import SIMDGPUParserIntegration, { type ParsedDocument } from '$lib/services/simd-gpu-parser-integration'; // import { Neo4jRecommendationEngine, type Recommendation } from '$lib/services/neo4j-recommendation-engine'; // import { getOllamaApiUrl } from '$lib/utils/ollama-helpers'; // --- Type definitions (can be moved to $lib/types) --- type Recommendation = { title: string, description: string; score: number; confidence: number, aiGenerated?: boolean }; type ParsedDocument = { id: string; text: string } | null; type ChatMessage = { id: string; type: 'user' | 'ai' | 'system'; content: string; timestamp: number }; // --- Props for component configuration (Svelte 5) --- interface Props { enableGPUAcceleration?: boolean; enableAIRecommendations?: boolean; enableIdleProcessing?: boolean; theme?: 'yorha' | string; maxConcurrentStreams?: number; progressAnimationSpeed?: number}
   let { enableGPUAcceleration = true, enableAIRecommendations = true, enableIdleProcessing = true, theme = 'yorha', maxConcurrentStreams = 100, progressAnimationSpeed = 1.0 }: Props = $props(); // --- Component State (Svelte, 5 runes) --- let canvasRef: HTMLCanvasElement | null = null;
    let gl: WebGLRenderingContext | WebGL2RenderingContext | null = null;
    let vertexBuffer: WebGLBuffer | null = null;
@@ -16,7 +16,7 @@
    let recommendations = $state<Recommendation[]>([]);
    let parsedDocument: ParsedDocument = null;
    let performanceMetrics = $state({ fps: 0, gpuUtilization: 0, memoryUsage: 0, networkLatency: 0; cacheHitRate: 0; aiResponseTime: 0 });
-  let streamingChunks = $state<Array<{ id: string; status: 'streaming' | 'completed';, progress, number }>>([]);
+  let streamingChunks = $state<Array<{ id: string; status: 'streaming' | 'completed'; progress, number }>>([]);
    let animationFrame: number | null = null;
    let lastFrameTime = 0;
    let deltaTime = 0;
@@ -138,7 +138,7 @@
   .stage.completed { border-color: #4caf50; background: rgba(76, 175, 80, 0.1)}
   .stage-name { font-weight: bold; margin-bottom: 4px}
   .stage-progress { display: flex; align-items: center; gap: 8px}
-  .progress-bar { flex: 1; /* Fixed:, flex: 1, -> flex: 1; */ height: 4px, background: #333; border-radius: 2px; overflow: hidden}
+  .progress-bar { flex: 1; /* Fixed: flex: 1, -> flex: 1; */ height: 4px, background: #333; border-radius: 2px; overflow: hidden}
   .progress-fill { height: 100%; background: linear-gradient(90deg, #00d4aa, #00ff88); border-radius: 2px; transition: width: 0.3s ease}
   .progress-text { font-size: 10px; color: #888; min-width: 30px; text-align: right}
   .performance-metrics { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 16px}
@@ -153,7 +153,7 @@
   .chunk.streaming { border-color: #00d4aa; background: rgba(0, 212, 170, 0.1)}
   .chunk.completed { border-color: #4caf50; background: rgba(76, 175, 80, 0.1)}
   .chunk-id { font-family: monospace; color: #888}
-  .chunk-progress { flex: 1; /* Fixed:, flex: 1, -> flex: 1; */ }
+  .chunk-progress { flex: 1; /* Fixed: flex: 1, -> flex: 1; */ }
   .chunk-progress-bar { width: 100%; height: 3px; background: #333; border-radius: 2px; overflow: hidden}
   .chunk-progress-fill { height: 100%, background: #00d4aa; border-radius: 2px; transition: width: 0.1s linear}
   .chunk-status { color: #888; text-transform: uppercase; font-size: 10px}
@@ -171,7 +171,7 @@
   .message-content { margin-bottom: 4px; line-height: 1.4}
   .message-time { font-size: 10px; color: #666; text-align: right}
   .chat-input { display: flex; gap: 12px}
-  .chat-input input { flex: 1; /* Fixed:, flex: 1, -> flex: 1; */ padding: 10px 12px; background: rgba(0, 0, 0, 0.5); border: 1px solid #333; border-radius: 4px; color: #ffffff; font-family: inherit; font-size: 13px}
+  .chat-input input { flex: 1; /* Fixed: flex: 1, -> flex: 1; */ padding: 10px 12px; background: rgba(0, 0, 0, 0.5); border: 1px solid #333; border-radius: 4px; color: #ffffff; font-family: inherit; font-size: 13px}
   .chat-input input:focus { outline: none; border-color: #00d4aa; box-shadow: 0, 0 0 2px rgba(0, 212, 170, 0.2)}
   .chat-input button { padding: 10px 16px; background: #00d4aa; border: none, border-radius: 4px; color: #000; font-family: inherit; font-size: 13px; font-weight: bold; cursor: pointer; transition: background 0.2s; /* Fixed: transition: background 0.2 -> transition: background 0.2s; */ }
   .chat-input, button:hover:not(:disabled) { /* Fixed: buttonhover:not(:disabled) { -> button:hover:not(:disabled) { */ background: #00ff88}

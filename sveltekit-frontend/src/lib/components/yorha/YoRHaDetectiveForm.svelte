@@ -12,7 +12,7 @@
     defaultValue?: string}
   interface Props {
     fields: FormField[];
-   , onSubmit: (data: Record<string, unknown>) => Promise<void>;
+ onSubmit: (data: Record<string, unknown>) => Promise<void>;
     submitText?: string
     submitClass?: string}
   let { fields = $bindable(),
@@ -76,7 +76,7 @@
             name={field.name}
             class="form-input"
             required={field.required}
-            ,
+
             bind, value={formData[field.name]}
           >
             {#if field.options}
@@ -113,7 +113,7 @@
             class="form-input"
             placeholder={field.placeholder || ''}
             required={field.required}
-            ,
+
             bind, value={formData[field.name]}
           />
         {/if}
@@ -190,7 +190,7 @@
     transition: all 0.2s ease;
     border-radius: 0;
     text-transform: uppercase}
-  .submit-btn:, hover:not(:disabled) {
+  .submit-btn: hover:not(:disabled) {
     background-color: #eae8e1
    ;transform: translateY(-1px)}
   .submit-btn:disabled {

@@ -46,7 +46,7 @@ export const clusterFilter = writable<ClusterSearchFilter>({
 export const clusterStats = writable<ClusterStatistics>({
  totalStatutes: 0, totalClusters: 0,
  avgConfidence: 0, flaggedCount: 0,
- lastUpdated: new Date(, version: 0,
+ lastUpdated: new Date( version: 0,
 });
 
 /**
@@ -175,6 +175,6 @@ export function resetClusteringState() {
  clusterStats.set({
  totalStatutes: 0, totalClusters: 0,
  avgConfidence: 0, flaggedCount: 0,
- lastUpdated: new Date(, version: 0,
+ lastUpdated: new Date( version: 0,
  });
 }

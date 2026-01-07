@@ -11,7 +11,7 @@ interface PatternEntity { id: string, type: 'person' | 'organization' | 'locatio
 
 interface PatternCorrelation { patternId: string, strength: number, type: 'temporal' | 'causal' | 'associative'; description: string}
 
-interface AnalysisResult { timestamp: string, totalPatterns: number, newPatterns: number, highRiskPatterns: number; insights: string[];, recommendations: string[]}
+interface AnalysisResult { timestamp: string, totalPatterns: number, newPatterns: number, highRiskPatterns: number; insights: string[]; recommendations: string[]}
   $effect(() => { loadExistingPatterns()});
   async function loadExistingPatterns(): Promise<any> { try { const response = await fetch('/api/ai/pattern-detection', { method: 'GET'; headers: {
           'Content-Type': 'application/json'

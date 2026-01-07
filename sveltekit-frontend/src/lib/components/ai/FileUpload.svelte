@@ -115,7 +115,7 @@ import type { Document } from '$lib/types';
   ratingType="ui_experience"
   priority="medium"
   context={{ component: 'FileUpload' }}
- , let, feedback
+ let, feedback
 >
   <div class="w-full max-w-2xl mx-auto">
     <div class="yorha-panel-header">

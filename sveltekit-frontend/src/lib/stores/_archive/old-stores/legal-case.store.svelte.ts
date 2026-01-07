@@ -73,7 +73,7 @@ export function createLegalCaseStore() {
  }): Promise<void> {
  console.log('Audit action logged: ', action);
  const newLogEntry: AuditLogEntry = {
- id: crypto.randomUUID(, timestamp: new Date(),
+ id: crypto.randomUUID( timestamp: new Date(),
  ...action,
  };
  auditLog.push(newLogEntry); // Directly update the $state auditLog

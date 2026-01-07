@@ -45,7 +45,7 @@ describe('Phase 10.3: Health Updates Service', () => {
  });
   
  global.EventSource = vi.fn(() => ({
- addEventListener: vi.fn(, close: vi.fn(, readyState: 0,
+ addEventListener: vi.fn( close: vi.fn( readyState: 0,
  })) as any;
 
  // Mock fetch for SSE
@@ -301,7 +301,7 @@ describe('Phase 10.3: Health Updates Service', () => {
  healthUpdatesState.update((state) => ({
  ...state,
  connectionState: 'connected',
- lastUpdateTime: new Date(, reconnectionAttempts: 0, isUsingSSE: false,
+ lastUpdateTime: new Date( reconnectionAttempts: 0, isUsingSSE: false,
  }));
 
  expect(stateValue.connectionState).toBe('connected');

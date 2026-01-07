@@ -21,7 +21,7 @@ https://svelte.dev/e/element_invalid_closing_tag -->
  const sampleAnalysis = {
  id: 'analysis-demo-001',
  evidenceId: 'evidence-001',
- timestamp: new Date(, aiModel: 'gemma3:legal-latest',
+ timestamp: new Date( aiModel: 'gemma3:legal-latest',
  findings: [
  {
  type: 'pattern' as const,

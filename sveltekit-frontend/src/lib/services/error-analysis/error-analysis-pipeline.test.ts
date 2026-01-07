@@ -44,7 +44,7 @@ describe('ErrorAnalysisPipeline - Integration Tests (Task 13.1)', () => {
           type: 'typescript',
           severity: 'error',
           status: 'new',
-          createdAt: new Date(, updatedAt: new Date(),
+          createdAt: new Date( updatedAt: new Date(),
         },
       ];
 
@@ -66,7 +66,7 @@ describe('ErrorAnalysisPipeline - Integration Tests (Task 13.1)', () => {
           type: 'typescript',
           severity: 'error',
           status: 'new',
-          createdAt: new Date(, updatedAt: new Date(),
+          createdAt: new Date( updatedAt: new Date(),
         },
       ];
 
@@ -95,7 +95,7 @@ describe('ErrorAnalysisPipeline - Integration Tests (Task 13.1)', () => {
           type: 'typescript',
           severity: 'error',
           status: 'new',
-          createdAt: new Date(, updatedAt: new Date(),
+          createdAt: new Date( updatedAt: new Date(),
         },
         {
           id: 'error-2',
@@ -104,7 +104,7 @@ describe('ErrorAnalysisPipeline - Integration Tests (Task 13.1)', () => {
           type: 'typescript',
           severity: 'error',
           status: 'new',
-          createdAt: new Date(, updatedAt: new Date(),
+          createdAt: new Date( updatedAt: new Date(),
         },
         {
           id: 'error-3',
@@ -113,7 +113,7 @@ describe('ErrorAnalysisPipeline - Integration Tests (Task 13.1)', () => {
           type: 'svelte',
           severity: 'warning',
           status: 'new',
-          createdAt: new Date(, updatedAt: new Date(),
+          createdAt: new Date( updatedAt: new Date(),
         },
       ];
 
@@ -134,7 +134,7 @@ describe('ErrorAnalysisPipeline - Integration Tests (Task 13.1)', () => {
           type: 'typescript',
           severity: 'error',
           status: 'new',
-          createdAt: new Date(, updatedAt: new Date(),
+          createdAt: new Date( updatedAt: new Date(),
         },
       ];
 
@@ -159,7 +159,7 @@ describe('ErrorAnalysisPipeline - Integration Tests (Task 13.1)', () => {
         type: 'typescript',
         severity: 'error',
         status: 'new',
-        createdAt: new Date(, updatedAt: new Date(),
+        createdAt: new Date( updatedAt: new Date(),
       };
 
       await expect(pipeline.analyzeError('', error)).rejects.toThrow('Invalid input');
@@ -178,7 +178,7 @@ describe('ErrorAnalysisPipeline - Integration Tests (Task 13.1)', () => {
           type: 'typescript',
           severity: 'error',
           status: 'new',
-          createdAt: new Date(, updatedAt: new Date(),
+          createdAt: new Date( updatedAt: new Date(),
         },
       ];
 
@@ -215,7 +215,7 @@ describe('ErrorAnalysisPipeline - Integration Tests (Task 13.1)', () => {
           type: 'typescript',
           severity: 'error',
           status: 'new',
-          createdAt: new Date(, updatedAt: new Date(),
+          createdAt: new Date( updatedAt: new Date(),
         },
       ];
 
@@ -238,7 +238,7 @@ describe('ErrorAnalysisPipeline - Integration Tests (Task 13.1)', () => {
           type: 'typescript',
           severity: 'error',
           status: 'new',
-          createdAt: new Date(, updatedAt: new Date(),
+          createdAt: new Date( updatedAt: new Date(),
         },
       ];
 
@@ -268,7 +268,7 @@ describe('ErrorAnalysisPipeline - Integration Tests (Task 13.1)', () => {
           type: 'typescript',
           severity: 'error',
           status: 'new',
-          createdAt: new Date(, updatedAt: new Date(),
+          createdAt: new Date( updatedAt: new Date(),
         },
       ];
 

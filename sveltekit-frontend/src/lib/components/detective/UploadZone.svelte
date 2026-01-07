@@ -2,7 +2,7 @@
  import { postgresqlVectorService, as vectorService } from '$lib/services/postgresql-vector-service';
  import { telemetry } from '$lib/services/telemetry-service'; interface Props { minimal?: boolean; onupload?: (summary?: UploadSummary) => void; bucket?: string; enableEmbedding?: boolean; enableTelemetry?: boolean; maxRetries?: number}
 
-interface UploadSummary { count: number, totalBytes: number; files: { name: string;, size: number, url?: string; id?: string; embeddingDims?: number }[] } const __props = $props();
+interface UploadSummary { count: number, totalBytes: number; files: { name: string; size: number, url?: string; id?: string; embeddingDims?: number }[] } const __props = $props();
    let minimal: boolean = __props.minimal ?? false;
    let onupload: Props['onupload'] = __props.onupload;
    let bucket: string | undefined = __props.bucket;

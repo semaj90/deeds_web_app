@@ -445,5 +445,5 @@ export async function checkAIServices(): Promise<ServiceStatus> {
 
 // Export cache utilities
 export const cacheUtils = {
-	clear: () => aiPipelineClient.clearCache(, processQueue: () => aiPipelineClient.processOfflineQueue()
+	clear: () => aiPipelineClient.clearCache( processQueue: () => aiPipelineClient.processOfflineQueue()
 };

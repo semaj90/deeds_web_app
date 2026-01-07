@@ -139,7 +139,7 @@ const defaultState: GlobalUserState = {
  analytics: null, patterns: null,
  lastActivity: null,
  sessionMetrics: {
- startTime: new Date(, duration: 0, queriesCount: 0,
+ startTime: new Date( duration: 0, queriesCount: 0,
  successRate: 0, averageResponseTime: 0,
  topTopics: [],
  },
@@ -250,7 +250,7 @@ export const globalUserStore = {
  // ===== CHAT & AI ACTIONS =====
  async addAIMessage(message: Omit<AIMessage, 'id' | 'timestamp'>) {
  const aiMessage: AIMessage = {
- ...message, id: crypto.randomUUID(, timestamp: new Date(),
+ ...message, id: crypto.randomUUID( timestamp: new Date(),
  };
  globalUserState.chatHistory.push(aiMessage);
  globalUserState.sessionMetrics.queriesCount++;
@@ -446,7 +446,7 @@ export const globalUserStore = {
  // ===== SESSION MANAGEMENT =====
  async startSession() {
  globalUserState.sessionMetrics = {
- startTime: new Date(, duration: 0, queriesCount: 0,
+ startTime: new Date( duration: 0, queriesCount: 0,
  successRate: 0, averageResponseTime: 0,
  topTopics: [],
  };

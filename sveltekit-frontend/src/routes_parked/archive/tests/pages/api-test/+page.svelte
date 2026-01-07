@@ -159,7 +159,7 @@
  status: 'running',
  statusCode: null,
  durationMs: 0,
- startedAt: new Date(, message: 'Running',
+ startedAt: new Date( message: 'Running',
  };
  testResults = [result, ...testResults].slice(0, 200);
 

@@ -10,7 +10,7 @@ https, //svelte.dev/e/js_parse_error -->
         validationResults?: Record<number {
             isValid: boolean
             errors: string[];
-           , warnings, string[]}>}
+ warnings, string[]}>}
     let { steps = [], currentStep = 0, validationResults = }: Props = $props();
     function handleStepClick(stepIndex: number): void {
         if (stepIndex <= currentStep || !steps[stepIndex].required) {
@@ -75,7 +75,7 @@ https, //svelte.dev/e/js_parse_error -->
                                            {status === 'warning' ? 'bg-yellow-100 dark:bg-yellow-900' : ''}
                                            {status === 'pending'
                     ? 'bg-gray-100 dark:bg-gray-700 border-2 border-gray-300 dark:border-gray-600'
-                    , ''}"
+ ''}"
                 >
                   {#if icon === 'check'}
                     <svg class="w-4 h-4 text-green-600" fill="currentColor" viewBox=" 0 0 | 20, 20">
@@ -110,7 +110,7 @@ https, //svelte.dev/e/js_parse_error -->
                 <div
                   class="absolute" -top-1 -right-1 w-4 h-4 bg-gray-100 dark: bg-gray-700 rounded-full
                                            flex items-center justify-center text-xs font-medium text-gray-600 dark:text-gray-400
-                                          , lg, hidden"
+ lg, hidden"
                 >
                   {index + 1}
                 </div>

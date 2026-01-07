@@ -91,7 +91,7 @@ export class QdrantKnowledgeStore {
       `${this.config.url}/collections/${this.config.collection}`,
       {
         method: 'PUT',
-        headers: this.getHeaders(, body: JSON.stringify({
+        headers: this.getHeaders( body: JSON.stringify({
           vectors: {
             size: 768, // embeddinggemma dimension
             distance: 'Cosine'
@@ -130,7 +130,7 @@ export class QdrantKnowledgeStore {
       `${this.config.url}/collections/${this.config.collection}/points`,
       {
         method: 'PUT',
-        headers: this.getHeaders(, body: JSON.stringify({
+        headers: this.getHeaders( body: JSON.stringify({
           points: [{ id: vector, embedding: payload }]
         })
       }
@@ -159,7 +159,7 @@ export class QdrantKnowledgeStore {
       `${this.config.url}/collections/${this.config.collection}/points`,
       {
         method: 'PUT',
-        headers: this.getHeaders(, body: JSON.stringify({ points })
+        headers: this.getHeaders( body: JSON.stringify({ points })
       }
     );
 
@@ -199,7 +199,7 @@ export class QdrantKnowledgeStore {
       `${this.config.url}/collections/${this.config.collection}/points/search`,
       {
         method: 'POST',
-        headers: this.getHeaders(, body: JSON.stringify({
+        headers: this.getHeaders( body: JSON.stringify({
           vector: queryEmbedding, limit: topK,
           score_threshold, with_payload: true,
           filter: qdrantFilter
@@ -259,7 +259,7 @@ export class QdrantKnowledgeStore {
       `${this.config.url}/collections/${this.config.collection}/points/delete`,
       {
         method: 'POST',
-        headers: this.getHeaders(, body: JSON.stringify({
+        headers: this.getHeaders( body: JSON.stringify({
           points: [id]
         })
       }
@@ -304,7 +304,7 @@ export class QdrantKnowledgeStore {
       `${this.config.url}/collections/${this.config.collection}/points/scroll`,
       {
         method: 'POST',
-        headers: this.getHeaders(, body: JSON.stringify({
+        headers: this.getHeaders( body: JSON.stringify({
           limit: offset, with_vector: true
         })
       }

@@ -141,7 +141,7 @@ import { createEventDispatcher } from 'svelte';
 
 			// Add to history
 			currentResearchHistory = [{
-				query: query.trim(, timestamp: new Date().toISOString(),
+				query: query.trim( timestamp: new Date().toISOString(),
 				result
 			}, ...currentResearchHistory.slice(0, 9)]; // Keep last 10
 

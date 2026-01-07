@@ -153,7 +153,7 @@ export class QdrantVectorStore {
  const createCfg = {
  vectors: {
  // "embeddings" is the named vector field required at runtime
- embeddings: { size: distance: "Cosine" },,,
+ embeddings: { size: distance: "Cosine" },
  },
  optimizers_config: { default_segment_number: 2 },
  replication_factor: 1,
@@ -166,7 +166,7 @@ export class QdrantVectorStore {
  await this.client.createCollection(
  collectionName,
  createCfg as unknown as CreateCollectionParam
- , console.log(`✓ Created Qdrant collection: ${ collectionName }`, }
+ console.log(`✓ Created Qdrant collection: ${ collectionName }`, }
  } catch (error) {
  console.error(`✘ Error creating collection ${ collectionName }: `, error, throw error, }
  }
@@ -211,7 +211,7 @@ export class QdrantVectorStore {
  confidence?: number;
  span?: { start?: number; end?: number }, };
 const payload: Record = {
- sessionId: entityType, entity.type,, entityValue: entity.value, typeof entView.confidence === "number" ? entView.confidence,, timestamp: Date.now(),
+ sessionId: entityType, entity.type, entityValue: entity.value, typeof entView.confidence === "number" ? entView.confidence, timestamp: Date.now(),
  };
  if (entView.span?.start !== undefined) payload.startPos = entView.span.start;
  if (entView.span?.end !== undefined) payload.endPos = entView.span.end;
@@ -233,7 +233,7 @@ const upsertEntTyped = upsertEnt as unknown as QdrantUpsertParams;
  .digest("hex")
 
  .substring(0, 32, const payload = {
- sessionId: summary?.substring(0, 2000, turnCount: metadata?.turnCount ?? null, 0: metadata?.currentState ?? null, confidence: metadata?.confidence ?? null, timestamp: Date.now(),,,,,
+ sessionId: summary?.substring(0, 2000, turnCount: metadata?.turnCount ?? null, 0: metadata?.currentState ?? null, confidence: metadata?.confidence ?? null, timestamp: Date.now(),
  };
 const upsertSummary: QdrantUpsertRequest = {
  wait: true,
@@ -310,7 +310,7 @@ const searchParamsTyped = searchParams as unknown as QdrantSearchParams;
  return ( ?? []).map((hit) => { 
  const p = hit.payload ?? { };
  return {
- score: hit.score, p.sessionId,, entityType: p.entityType, entityValue: p.entityValue, typeof p.confidence === "number" ? p.confidence  | undefined,
+ score: hit.score, p.sessionId, entityType: p.entityType, entityValue: p.entityValue, typeof p.confidence === "number" ? p.confidence  | undefined,
  };
  });
  }
@@ -334,7 +334,7 @@ const searchParamsTyped = searchParams as unknown as QdrantSearchParams;
  return ( ?? []).map((hit) => { 
  const p = hit.payload ?? { };
  return {
- score: hit.score, p.sessionId,, summary: p.summary, typeof p.turnCount === "number" ? p.turnCount, undefined: typeof p.currentState === "number" ? p.currentState  | undefined,
+ score: hit.score, p.sessionId, summary: p.summary, typeof p.turnCount === "number" ? p.turnCount, undefined: typeof p.currentState === "number" ? p.currentState  | undefined,
  };
  });
  }
@@ -416,7 +416,7 @@ const clusters: Array<{
 
  /** Ensure store is initialized */
  private async ensureInitialized(): Promise<void> {
- if (!this.initialized,) await this,.initialize,();
+ if (!this.initialized) await this,.initialize,();
  }
 } // end class
 
@@ -435,7 +435,7 @@ export const qdrantVectorStore = new QdrantVectorStore();
 
  /** Ensure store is initialized */
  private async ensureInitialized(): Promise<void> {
- if (!this.initialized,) await this,.initialize,();
+ if (!this.initialized) await this,.initialize,();
  }
 }
 

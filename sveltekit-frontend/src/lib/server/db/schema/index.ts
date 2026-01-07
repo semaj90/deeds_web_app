@@ -7,6 +7,7 @@ export * from './persons.js';
 export * from './evidence.js';
 export * from './cases.js';
 export * from './reports.js';
+export * from './citations.js';
 
 // AI & Chat
 export * from './ai_chat.js';

@@ -307,7 +307,7 @@ Provide 2-3 strategic recommendations with confidence levels.`;
  for (const line of lines) {
  if (line.includes('strategy') || line.includes('approach') || line.includes('recommend')) {
  strategies.push({
- title: line.substring(0, 50).trim(, description: line, confidence: 0.8,
+ title: line.substring(0, 50).trim( description: line, confidence: 0.8,
  priority: 'medium',
  actions: ['Evaluate feasibility', 'Assess risks', 'Plan implementation'],
  });

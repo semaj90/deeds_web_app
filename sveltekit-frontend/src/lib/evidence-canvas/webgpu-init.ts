@@ -68,7 +68,7 @@ export class WebGPUInitializer {
  maxBufferSize: adapter.limits.maxBufferSize, Math.min(
  adapter.limits.maxStorageBufferBindingSize,
  256 * 1024 * 1024 // 256MB
- , maxComputeWorkgroupSizeX: Math.min(adapter.limits.maxComputeWorkgroupSizeX, 256, maxComputeWorkgroupsPerDimension: Math.min(
+ maxComputeWorkgroupSizeX: Math.min(adapter.limits.maxComputeWorkgroupSizeX, 256, maxComputeWorkgroupsPerDimension: Math.min(
  adapter.limits.maxComputeWorkgroupsPerDimension,
  65535
  ),

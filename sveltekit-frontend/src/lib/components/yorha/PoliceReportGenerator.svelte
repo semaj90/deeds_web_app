@@ -52,7 +52,7 @@ import { createEventDispatcher } from 'svelte';
  'Content-Type': 'application/json'
  },
  body: JSON.stringify({
- narrative: narrative.trim(, evidence: selectedEvidence,
+ narrative: narrative.trim( evidence: selectedEvidence,
  caseId
  })
  });

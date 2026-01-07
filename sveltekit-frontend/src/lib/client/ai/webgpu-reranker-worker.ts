@@ -51,7 +51,7 @@ type GPUAdapterLike = { requestDevice?: () => Promise<GPUDeviceLike | undefined>
 type GPUDeviceLike = {
  createBuffer: (desc: { size: number, usage: number }) => unknown;
  queue: {
- writeBuffer: (, buffer: unknown, bufferOffset: number,
+ writeBuffer: ( buffer: unknown, bufferOffset: number,
  data: ArrayBuffer | SharedArrayBuffer | Uint8Array,
  dataOffset?: number,
  size?: number
@@ -68,7 +68,7 @@ type GPUDeviceLike = {
  createCommandEncoder: () => unknown;
 };
 type ComputePassLike = {
- setPipeline: (pipeline: unknown) => void, setBindGroup: (index: number):, unknown: unknown => void;
+ setPipeline: (pipeline: unknown) => void, setBindGroup: (index: number): unknown: unknown => void;
  dispatchWorkgroups: (x: number) => void, end: () => void;
 };
 
@@ -91,7 +91,7 @@ const embedLocally = (text: string, dim: number = FALLBACK_EMBED_DIM): Float32Ar
  return vec;
 };
 
-const cosine = (a: Float32Array):, Float32Array: number => {
+const cosine = (a: Float32Array): Float32Array: number => {
  let dot = 0;
  let na = 0;
  let nb = 0;
@@ -280,7 +280,7 @@ self.addEventListener('message', async (event: MessageEvent) => {
 
  (
  encoder as unknown as {
- copyBufferToBuffer: (, src: unknown, srcOffset: number,
+ copyBufferToBuffer: ( src: unknown, srcOffset: number,
  dst: unknown, dstOffset: number,
  size: number
  ) => void;

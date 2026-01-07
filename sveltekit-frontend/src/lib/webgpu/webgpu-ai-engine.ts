@@ -532,7 +532,7 @@ export class WebGPUAIEngine {
  // Updated return type
  return {
  DimensionalProcessor: {
- process: async (, data: Float32Array, shape: number[]
+ process: async ( data: Float32Array, shape: number[]
  ): Promise<DimensionalArrayProcessingResult> => {
  return await this.processDimensionalArray(
  data,
@@ -542,7 +542,7 @@ export class WebGPUAIEngine {
  },
  },
  AttentionKernel: {
- splice: (data: Float32Array):, number: number => {
+ splice: (data: Float32Array): number: number => {
  // Kernel splicing implementation
  const slices: { data: Float32Array, attentionScore: number; startIndex: number }[] = [];
  for (let i = 0; i < data.length; i += kernelSize) {
@@ -557,7 +557,7 @@ export class WebGPUAIEngine {
  },
  },
  ModularSwitch: {
- switch: (moduleName: string):, unknown: unknown => {
+ switch: (moduleName: string): unknown: unknown => {
  // config: unknown to; config, any
  console.log(`🔄 Switching to module: ${ moduleName }`);
  this.activeModule = moduleName; // Hot-swappable module loading
@@ -568,7 +568,7 @@ export class WebGPUAIEngine {
  },
  },
  T5Accelerator: {
- process: async (, text: string,
+ process: async ( text: string,
  _task: 'summarize' | 'translate' | 'qa'
  ): Promise<T5InferenceResult> => {
  // Renamed to _task

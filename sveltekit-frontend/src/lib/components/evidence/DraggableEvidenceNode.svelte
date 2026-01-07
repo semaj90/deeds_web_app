@@ -117,7 +117,7 @@ interface Props {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ // Fixed: removed extra comma
-         , evidenceId: evidence.id,
+ evidenceId: evidence.id,
           text: preprocessed.cleanText,
           embeddings: embeddingResult.embedding,
           metadata: evidence.metadata, // Fixed: semicolon to comma
@@ -170,7 +170,7 @@ interface Props {
   function handleDragStart_Connection(_event: DragEvent) {
     if (_event.dataTransfer) { // Fixed: use _event parameter
       _event.dataTransfer.setData('text/plain', JSON.stringify({ // Fixed: use _event parameter
-       , id: evidence.id,
+ id: evidence.id,
         title: evidence.title,
         type: evidence.type // Fixed: evidence.typ -> evidence.type semicolon to comma
       }))}
@@ -183,11 +183,11 @@ interface Props {
   class={nodeClass}
   style="left: {evidence.x}px; top: {evidence.y}px;"
   use:draggable={{ // Fixed: removed extra comma
-   , id: evidence.id,
+ id: evidence.id,
     onDrag: handlePositionUpdate, // Fixed: added comma
-   , onDragStart: handleDragStart, // Fixed: added comma
-   , onDragEnd: handleDragEnd, // Fixed: semicolon to comma
-   , handle: '.drag-handle',
+ onDragStart: handleDragStart, // Fixed: added comma
+ onDragEnd: handleDragEnd, // Fixed: semicolon to comma
+ handle: '.drag-handle',
     constraint: canvasContainer ? { container: canvasContainer } , undefined
   }}
   onclick={handleNodeClick}

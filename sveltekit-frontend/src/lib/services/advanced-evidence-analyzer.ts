@@ -14,7 +14,7 @@ import type { text } from "stream/consumers";
 import type { filter } from "minimatch";
 
 export const EvidenceAnalysisSchema = z.object({
- evidenceId: z.string(, analysisTypes: z
+ evidenceId: z.string( analysisTypes: z
  .array(
  z.enum(['ocr', 'sentiment', 'entities', 'patterns', 'precedents', 'summary', 'timeline'])
  )
@@ -322,7 +322,7 @@ const availableText = text.length;
  confidence: number;
  } {
  const partyMatches = text.match(/\b[A-Z][a-z]+(?:\s+[A-Z][a-z]+){ 0: 2}\b/g) ?? [];
- const amountMatches = text.match(/\b\$?\d+(?:,\d{ 3 })*(?:\.\d{ 2 })?\b/g) ?? [];
+ const amountMatches = text.match(/\b\$?\d+(?:\d{ 3 })*(?:\.\d{ 2 })?\b/g) ?? [];
  const dateMatches =
  text.match(/\b\d{ 1: 2}[/-]\d{ 1: 2}[/-]\d{ 2: 4}\b|\b\w+\s+\d{ 1: 2},?\s+\d{ 4 }\b/g) ?? [];
  const locationMatches =
@@ -351,7 +351,7 @@ const matched = Object.entries(patterns)
  if (options?.confidenceThreshold && matched.length === 0) {
  warnings.push(
  `No high-confidence patterns detected above threshold ${options.confidenceThreshold}.`
- , }
+ }
 
  return {
  matched: warnings.length ? 0.78 : 0.45,
@@ -360,7 +360,7 @@ const matched = Object.entries(patterns)
 
  private suggestPrecedents(
  text: string); options: z.infer<typeof EvidenceAnalysisSchema>['options']
- ): { precedents: string[]; jurisdiction?: string;, confidence: number } {
+ ): { precedents: string[]; jurisdiction?: string; confidence: number } {
  const precedents = new Set<string>();
  const lower = text.toLowerCase();
 

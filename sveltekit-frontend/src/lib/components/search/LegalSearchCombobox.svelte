@@ -18,7 +18,7 @@ import type { SearchResult } from '$lib/types';
   interface SearchResult {
     id: string
     title: string
-   , type: 'case' | 'evidence' | 'precedent' | 'statute' | 'criminal' | 'document' | 'recent';
+ type: 'case' | 'evidence' | 'precedent' | 'statute' | 'criminal' | 'document' | 'recent';
     content?: string
     score?: number
     metadata?: {

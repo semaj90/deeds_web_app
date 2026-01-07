@@ -40,7 +40,7 @@ export const POST: RequestHandler = async (event) => {
 
  return createErrorBrainResponse(
  {
- runId: tracker.getRunId(, state: tracker.getMetadata().state,
+ runId: tracker.getRunId( state: tracker.getMetadata().state,
  message: 'Run created successfully',
  },
  201

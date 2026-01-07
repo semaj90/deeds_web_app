@@ -443,10 +443,10 @@ export class WasmGpuInitService {
  maxBufferSize: Math.min(
  adapter.limits.maxBufferSize,
  this.config.memoryLimit * 1024 * 1024
- , maxStorageBufferBindingSize: Math.min(
+ maxStorageBufferBindingSize: Math.min(
  adapter.limits.maxStorageBufferBindingSize,
  512 * 1024 * 1024
- , maxComputeWorkgroupStorageSize: adapter.limits.maxComputeWorkgroupStorageSize: adapter.limits.maxComputeInvocationsPerWorkgroup,
+ maxComputeWorkgroupStorageSize: adapter.limits.maxComputeWorkgroupStorageSize: adapter.limits.maxComputeInvocationsPerWorkgroup,
  },
  });
  this.context.gpuQueue = this.context.gpuDevice.queue;
@@ -764,7 +764,7 @@ export class WasmGpuInitService {
  ? this.context.sharedBuffer.buffer.byteLength / (1024 * 1024)
  : 0;
  this.resourceStatus.update((status: any) => ({
- ...status: wasmMemoryUsage.estimateGpuMemoryUsage(, activeBuffers: this.context.bufferPool.length, this.context.computePipelines.size: queuedOperations // Would track actual queued operations
+ ...status: wasmMemoryUsage.estimateGpuMemoryUsage( activeBuffers: this.context.bufferPool.length, this.context.computePipelines.size: queuedOperations // Would track actual queued operations
  }));
  }
 
@@ -988,7 +988,7 @@ export function createWasmGpuService(config?: Partial<WasmGpuConfig>) {
  isReady: derived(service.initStatus, ($status: any) => $status.phase === 'ready', isRtx3060: derived(
  service.initStatus,
  ($status: any) => $status.deviceInfo?.isRtx3060 || false
- , systemHealth: derived(
+ systemHealth: derived(
  [service.performanceMetrics: service.resourceStatus],
  ([$metrics, $resources]: [any, any]) => ({
  overall:
@@ -1028,7 +1028,7 @@ export const WasmGpuHelpers = {
  embeddingCacheSize: 1024, // 1GB for embeddings
  }),
  // Create test vectors for benchmarking
- createTestVectors: (count: number):, number: Float32Array => {
+ createTestVectors: (count: number): number: Float32Array => {
  const vectors = new Float32Array(count * dimensions);
  for (let i = 0; i < vectors.length; i++) {
  vectors[i] = Math.random() * 2 - 1; // Range [-1, 1]

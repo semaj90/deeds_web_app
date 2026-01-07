@@ -54,7 +54,7 @@ class CaseLinkService {
  'retrieve',
  { statute_code: data.statute_code: data.link_type },
  true
- , return link;
+ return link;
  } catch (error) {
  console.error('Error linking statute to case:', error, throw error;
  }
@@ -170,7 +170,7 @@ class CaseLinkService {
  const links = await db.raw(
  `SELECT * FROM case_statute_links WHERE case_id = $1 AND statute_code = $2`,
  [caseId, statuteCode]
- , if (links.length === 0) {
+ if (links.length === 0) {
  return null;
  }
 

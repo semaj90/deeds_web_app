@@ -131,7 +131,7 @@ export class ErrorBrainMiddleware extends BaseService implements IErrorBrainMidd
  flagStatus: Record<string, boolean>;
  } {
  return {
- enabled: this.checkErrorBrainEnabled(, namespace: this.errorBrainPrefix, this.featureFlags.getAllFlags(),
+ enabled: this.checkErrorBrainEnabled( namespace: this.errorBrainPrefix, this.featureFlags.getAllFlags(),
  };
  }
 

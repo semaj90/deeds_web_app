@@ -7,7 +7,7 @@ import type { SearchResult } from '$lib/types'; // Svelte, 5 runes are auto-impo
   interface EmbeddingStatsResponse { success: boolean; stats: EmbeddingStats, error?: string}
   interface UploadResponse { success: boolean, duplicate?: boolean; error?: string; // Add other properties if the API returns them, e.g., uploadedFile: EvidenceFile}
   interface BackfillResponse { success: boolean, result: { processed: number, success: number; failed: number}; error?: string}
-  interface SearchResponse { success: boolean;, result: SearchResult[], error?: string}
+  interface SearchResponse { success: boolean; result: SearchResult[], error?: string}
 
   // Props interface Props { caseId?: string; showUpload?: boolean; showSearch?: boolean}
 

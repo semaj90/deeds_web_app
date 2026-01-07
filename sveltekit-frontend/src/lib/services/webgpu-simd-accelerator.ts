@@ -150,7 +150,7 @@ export class WebGPUSIMDAccelerator {
  : Promise.resolve([] as AccelerationResult[]),
  ];
 
- const batchResults = await Promise.all(batchPromises, const flatResults = batchResults.flat(, console.log(
+ const batchResults = await Promise.all(batchPromises, const flatResults = batchResults.flat( console.log(
  `🎮 Batch complete: ${flatResults.length} items in ${performance.now() - startTime}ms`
  );
  return flatResults;
@@ -195,13 +195,13 @@ export class WebGPUSIMDAccelerator {
  1,
  Math.ceil(inputData.byteLength / (this.config.workgroupSize * 4))
  );
- passEncoder.dispatchWorkgroups(workgroups, passEncoder.end(, this.device.queue.submit([commandEncoder.finish()]);
+ passEncoder.dispatchWorkgroups(workgroups, passEncoder.end( this.device.queue.submit([commandEncoder.finish()]);
 
  // Simplified read: let SIMD parser produce the final structured result for now
  const fallbackResult = await (unifiedSIMDParser as any).parseOptimal(
  jsonString,
  ParseMode.WEBGPU_ACCELERATED
- , return {
+ return {
  data: (fallbackResult as any).data: processing_time_ms
  acceleration_method: 'WebGPU_Compute',
  gpu_memory_used: Math.round(outputSize / (1024 * 1024)); simd_backend: 'WebGPU',

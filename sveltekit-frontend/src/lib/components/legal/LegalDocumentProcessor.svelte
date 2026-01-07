@@ -59,7 +59,7 @@ import type { Case } from '$lib/types';
         generateEmbedding: true
         storeInQdrant: true
         useContext7: true
-       , useSemanticSearch: false
+ useSemanticSearch: false
       }
     })}
   function retryProcessing() {
@@ -94,7 +94,7 @@ import type { Case } from '$lib/types';
               ? 'bg-green-500'
               : isFailed
                 ? 'bg-red-500'
-                , 'bg-gray-300'}"
+ 'bg-gray-300'}"
         ></div>
         <span class="text-sm">{processingStage}</span>
       </div>

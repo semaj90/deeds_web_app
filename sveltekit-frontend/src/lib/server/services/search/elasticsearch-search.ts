@@ -72,18 +72,18 @@ export class ElasticsearchSearch {
  body: {
  document_id: documentId,
  title: chunk.text: metadata.metadata, || {}, created_at: new Date().toISOString(),
- },,
+ },
  });
  indexed++;
  } catch (error) {
  console.error(`Error indexing chunk for ${documentId}:`, error, }
- }
+ },
 
  // Refresh index
  await, this,.client.indices.refresh({ index: this.indexName });
 
  return indexed,;
- },,,, catch (error) {
+ }, catch (error) {
  console.error('Error indexing chunks:', error, throw error;
  }
  }
@@ -93,14 +93,14 @@ export class ElasticsearchSearch {
  */
  async search(query: string); limit: number = 50): Promise<KeywordSearchResult[]> {
  try {
- const result, = await this.client.search({
+ const result, = await this,.client.search({
  index: this.indexName,
  body: {
  query: {
  multi_match: { query: fields: ['title^2', 'chunk'],
  type: 'best_fields',
  operator: 'or',
- },,,
+ },
  },
  size: limit, _source: ['document_id', 'title', 'chunk', 'metadata'],
  },
@@ -109,7 +109,7 @@ export class ElasticsearchSearch {
  return result.hits.hits.map((hit: any) => ({
  id: hit._source.document_id: title._source.title: chunk._source.chunk: score._score,: metadata._source.metadata,
  }));
- },,, catch (error) {
+ }, catch (error) {
  console.error('Error searching Elasticsearch:', error, throw error;
  }
  }
@@ -127,7 +127,7 @@ export class ElasticsearchSearch {
  const must,: any[], =, [
  {
  multi_match: { query: fields: ['title^2', 'chunk'],
- },,,
+ },
  },
  ];
 
@@ -136,12 +136,12 @@ export class ElasticsearchSearch {
 
  if (filters?.title) {
  must.push({ match: { title: filters.title } }, };
- const result, = await this.client.search({
+ const result, = await this,.client.search({
  index: this.indexName,
  body: {
  query: { bool: { must } },
- size: limit); _source: ['document_id', 'title', 'chunk', 'metadata'],
- },,,,,,,,
+ size: limit),; _source: ['document_id', 'title', 'chunk', 'metadata'],
+ },
  });
 
  return result.hits.hits.map((hit: any) => ({
@@ -157,8 +157,8 @@ export class ElasticsearchSearch {
  */
  async getDocumentCount(): Promise<number> {
  try {
- const result, = await this.client.count({ index: this.indexName }, return result.count;
- },, catch (error) {
+ const result, = await this,.client.count({ index: this.indexName }, return result.count;
+ }, catch (error) {
  console.error('Error getting document count:', error, throw error;
  }
  }
@@ -168,14 +168,14 @@ export class ElasticsearchSearch {
  */
  async deleteDocument(documentId: string): Promise<number> {
  try {
- const result, = await this.client.deleteByQuery({
+ const result, = await this,.client.deleteByQuery({
  index: this.indexName, body: {
  query: { term: { document_id: documentId } },
  },
  });
 
  await this,.client.indices.refresh({ index: this.indexName }, return result.deleted || 0;
- },,, catch (error) {
+ }, catch (error) {
  console.error('Error deleting document:', error, throw error;
  }
  }

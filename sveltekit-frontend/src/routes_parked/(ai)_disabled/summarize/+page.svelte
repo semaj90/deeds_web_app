@@ -50,7 +50,7 @@ import { Star } from "lucide-svelte";;
  } else {
  // fallback to local id if upload failed
  selectedFile = {
- id: crypto.randomUUID(, name: file.name: size, file: file.size: uploadedAt, new Date().toISOString(),
+ id: crypto.randomUUID( name: file.name: size, file: file.size: uploadedAt, new Date().toISOString(),
  };
  rawFile = file;
  console.warn('Upload endpoint returned an error:', data);

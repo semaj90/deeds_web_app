@@ -319,7 +319,7 @@ describe('Property 3: Search Result Schema Completeness', () => {
     fc.assert(
       fc.property(
         fc.record({
-          id: fc.string({ minLength: 1 }, title: fc.string(, url: fc.webUrl(, summary: fc.string(, tags: fc.array(fc.string(, semantic: fc.float({ min: 0, max: 1, noNaN: true }, tfidf: fc.float({ min: 0, max: 1, noNaN: true })
+          id: fc.string({ minLength: 1 }, title: fc.string( url: fc.webUrl( summary: fc.string( tags: fc.array(fc.string( semantic: fc.float({ min: 0, max: 1, noNaN: true }, tfidf: fc.float({ min: 0, max: 1, noNaN: true })
         }),
         (data) => {
           const ranker = new TfIdfRanker();
@@ -619,7 +619,7 @@ describe('Property 8: Cache Hit Behavior', () => {
       fc.property(
         fc.array(
           fc.record({
-            id: fc.string({ minLength: 1 }, title: fc.string(, url: fc.webUrl(, summary: fc.string(, tags: fc.array(fc.string(, semantic: fc.float({ min: 0, max: 1, noNaN: true }, tfidf: fc.float({ min: 0, max: 1, noNaN: true })
+            id: fc.string({ minLength: 1 }, title: fc.string( url: fc.webUrl( summary: fc.string( tags: fc.array(fc.string( semantic: fc.float({ min: 0, max: 1, noNaN: true }, tfidf: fc.float({ min: 0, max: 1, noNaN: true })
           }),
           { minLength: 0, maxLength: 10 }
         ),
@@ -683,7 +683,7 @@ describe('Property 16: LLM Synthesis Context Injection', () => {
         fc.string({ minLength: 5, maxLength: 100 }), // query
         fc.array(
           fc.record({
-            id: fc.string({ minLength: 1 }, title: fc.string({ minLength: 1 }, url: fc.webUrl(, summary: fc.string({ minLength: 10, maxLength: 200 }, tags: fc.array(fc.string(, semantic: fc.float({ min: 0.5, max: 1, noNaN: true }, tfidf: fc.float({ min: 0, max: 1, noNaN: true })
+            id: fc.string({ minLength: 1 }, title: fc.string({ minLength: 1 }, url: fc.webUrl( summary: fc.string({ minLength: 10, maxLength: 200 }, tags: fc.array(fc.string( semantic: fc.float({ min: 0.5, max: 1, noNaN: true }, tfidf: fc.float({ min: 0, max: 1, noNaN: true })
           }),
           { minLength: 1, maxLength: 10 }
         ),
@@ -757,7 +757,7 @@ Answer:`;
     fc.assert(
       fc.property(
         fc.record({
-          id: fc.string({ minLength: 1 }, title: fc.string(, url: fc.webUrl(, summary: fc.string(, tags: fc.array(fc.string(, semantic: fc.float({ min: 0, max: 1, noNaN: true }, tfidf: fc.float({ min: 0, max: 1, noNaN: true }, synthesizedAnswer: fc.string({ minLength: 10, maxLength: 500 })
+          id: fc.string({ minLength: 1 }, title: fc.string( url: fc.webUrl( summary: fc.string( tags: fc.array(fc.string( semantic: fc.float({ min: 0, max: 1, noNaN: true }, tfidf: fc.float({ min: 0, max: 1, noNaN: true }, synthesizedAnswer: fc.string({ minLength: 10, maxLength: 500 })
         }),
         (data) => {
           const result: SearchResult = {
@@ -1008,7 +1008,7 @@ describe('Property 11: API Response Schema Validation', () => {
         fc.string({ minLength: 1, maxLength: 100 }),
         fc.array(
           fc.record({
-            id: fc.string({ minLength: 1 }, title: fc.string(, url: fc.webUrl(, summary: fc.string(, tags: fc.array(fc.string(, semantic: fc.float({ min: 0, max: 1, noNaN: true }, tfidf: fc.float({ min: 0, max: 1, noNaN: true })
+            id: fc.string({ minLength: 1 }, title: fc.string( url: fc.webUrl( summary: fc.string( tags: fc.array(fc.string( semantic: fc.float({ min: 0, max: 1, noNaN: true }, tfidf: fc.float({ min: 0, max: 1, noNaN: true })
           }),
           { minLength: 0, maxLength: 10 }
         ),

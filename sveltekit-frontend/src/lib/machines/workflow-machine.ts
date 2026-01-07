@@ -193,7 +193,7 @@ export const caseWorkflowMachine = setup({
 		priority: 'medium',
 		documents: [],
 		evidence: [],
-		lastActivity: new Date(, reviewers: [],
+		lastActivity: new Date( reviewers: [],
 		approvals: 0, requiredApprovals: 0
 	},
 	states: {

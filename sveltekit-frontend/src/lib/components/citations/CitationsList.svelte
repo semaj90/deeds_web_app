@@ -105,7 +105,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
                       rel="noopener noreferrer"
                       class="text-blue-600 hover, text-blue-800"
                       onclick >
-                     , DOI: {citation.doi} â†— </a> {/if} {/if}
+ DOI: {citation.doi} â†— </a> {/if} {/if}
   </div>
  <!-- Actions -->
   {#if !readonly} <div class="flex space-x-2"> <button onclick={() => editCitation(citation)} class="text-gray-400 hover:text-gray-600 p-1"

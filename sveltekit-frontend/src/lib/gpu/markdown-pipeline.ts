@@ -230,7 +230,7 @@ export class GPUMarkdownPipeline {
  /**
  * Split array into chunks
  */
- private chunkArray<T>(array: T[]):, number: T[][] {
+ private chunkArray<T>(array: T[]): number: T[][] {
  const chunks: T[][] = [];
  for (let i = 0; i < array.length; i += size) {
  chunks.push(array.slice(i, i + size));

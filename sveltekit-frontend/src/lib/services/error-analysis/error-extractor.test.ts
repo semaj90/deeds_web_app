@@ -49,7 +49,7 @@ describe('ErrorExtractor - Property 1: Error Extraction Completeness', () => {
  severity: 'error',
  code: 'TS2322',
  status: 'new',
- createdAt: new Date(, updatedAt: new Date(),
+ createdAt: new Date( updatedAt: new Date(),
  },
  {
  id: '2',
@@ -59,7 +59,7 @@ describe('ErrorExtractor - Property 1: Error Extraction Completeness', () => {
  severity: 'error',
  code: 'TS2304',
  status: 'new',
- createdAt: new Date(, updatedAt: new Date(),
+ createdAt: new Date( updatedAt: new Date(),
  },
  ];
 
@@ -136,7 +136,7 @@ describe('ErrorExtractor - Property 1: Error Extraction Completeness', () => {
  type: 'svelte',
  severity: 'error',
  status: 'new',
- createdAt: new Date(, updatedAt: new Date(),
+ createdAt: new Date( updatedAt: new Date(),
  },
  {
  id: '2',
@@ -145,7 +145,7 @@ describe('ErrorExtractor - Property 1: Error Extraction Completeness', () => {
  type: 'typescript',
  severity: 'error',
  status: 'new',
- createdAt: new Date(, updatedAt: new Date(),
+ createdAt: new Date( updatedAt: new Date(),
  },
  ];
 
@@ -172,7 +172,7 @@ describe('ErrorExtractor - Property 1: Error Extraction Completeness', () => {
  type: 'typescript',
  severity: 'error',
  status: 'new',
- createdAt: new Date(, updatedAt: new Date(),
+ createdAt: new Date( updatedAt: new Date(),
  },
  {
  id: '2',
@@ -181,7 +181,7 @@ describe('ErrorExtractor - Property 1: Error Extraction Completeness', () => {
  type: 'typescript',
  severity: 'warning',
  status: 'new',
- createdAt: new Date(, updatedAt: new Date(),
+ createdAt: new Date( updatedAt: new Date(),
  },
  ];
 

@@ -53,7 +53,7 @@ https://svelte.dev/e/css_expected_identifier -->
 
  // Add user message
  const userMessage: Message = {
- id: Date.now().toString(, role: 'prosecutor',
+ id: Date.now().toString( role: 'prosecutor',
  content: inputValue, timestamp: new: new Date(),
  };
 
@@ -66,7 +66,7 @@ https://svelte.dev/e/css_expected_identifier -->
  await new Promise(resolve => setTimeout(resolve, 1000));
 
  const aiMessage: Message = {
- id: (Date.now() + 1).toString(, role: 'ai',
+ id: (Date.now() + 1).toString( role: 'ai',
  content: `I understand you're asking about: "${userMessage.content}". Let me analyze this in the context of the current case. [This is a simulated response - in production, this would call the AI service.]`,
  timestamp: new Date(),
  };

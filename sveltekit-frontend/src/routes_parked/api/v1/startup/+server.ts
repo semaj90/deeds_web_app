@@ -13,13 +13,13 @@ export const GET: RequestHandler = async ({ url }) => {
  switch (action) {
  case 'status':
  return json({
- ready: await startupFlagService.isReady(, summary: startupFlagService.getServiceSummary(, timestamp: Date.now(),
+ ready: await startupFlagService.isReady( summary: startupFlagService.getServiceSummary( timestamp: Date.now(),
  });
  case 'health': {
  const summary: StartupServiceSummary = startupFlagService.getServiceSummary();
  const healthGrade = calculateOverallHealth(summary);
  return json({
- health: healthGrade, ready: await startupFlagService.isReady(, criticalServices: Object.entries(summary.services)
+ health: healthGrade, ready: await startupFlagService.isReady( criticalServices: Object.entries(summary.services)
  .filter(([name, service]) => !service.isOptional)
  .reduce<Record<string, { status: string; health: string; startupTime?: number }>>(
  (acc, [name, service]) => {
@@ -29,7 +29,7 @@ export const GET: RequestHandler = async ({ url }) => {
  return acc;
  },
  {}
- , timestamp: Date.now(),
+ timestamp: Date.now(),
  });
  }
  case 'diff':

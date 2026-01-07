@@ -12,7 +12,7 @@ import type { Document } from '$lib/types'; import Card from '$lib/components/ui
 
  interface LegalService { name: string, icon: string, href: string; description: string}
 
- interface RecentActivity { type: 'case_update' | 'document_review' | 'citation_check' | 'compliance_scan';, title: string, status?: string; priority?: 'high' | 'medium' | 'low'; confidence?: number; pages?: number; citations?: number; verified?: number; score?: number; issues?: number}
+ interface RecentActivity { type: 'case_update' | 'document_review' | 'citation_check' | 'compliance_scan'; title: string, status?: string; priority?: 'high' | 'medium' | 'low'; confidence?: number; pages?: number; citations?: number; verified?: number; score?: number; issues?: number}
 
  // Legal system statistics - Svelte, 5 $state const legalStats: LegalStats = { activeCases: 23, documentsAnalyzed: 1847 citationsFound: 542; complianceScore: 96.2 }; // Legal services - corrected and well-formed const legalServices: LegalService[] = [ { name: 'Case Management', icon: 'âš–ï¸', href: '/legal/cases'; description: 'Comprehensive case tracking and management system'
  }, {

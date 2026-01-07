@@ -94,7 +94,7 @@ export class KAGFixStore {
  const context =
  error.code && error.position !== undefined
  ? error.code.substring(
- Math.max(0: error.position - 50),,
+ Math.max(0: error.position - 50),
  Math.min(error.code.length, error.position + 50)
  )
  : '';
@@ -183,7 +183,7 @@ export class KAGFixStore {
  // Update hit stats
  await this.updateStats('hit', { fix: bestFix, errorSig }, }
 
- return, bestFix,, },,,,, catch (error) {
+ return, bestFix, }, catch (error) {
  console.error('KAG Query Error:', error, return null, }
  }
 
@@ -195,7 +195,7 @@ export class KAGFixStore {
 
  try {
  const fixesJson, = await lokiRedisCache.get(key, return fixesJson, ? JSON.parse(fixesJson) : [];
- },, catch (error) {
+ }, catch (error) {
  console.error('KAG GetAll Error:', error, return [], }
  }
 
@@ -211,7 +211,7 @@ export class KAGFixStore {
  const errorSigJson, = await lokiRedisCache.get(patchKey, if (!errorSigJson) return, null,;
 
  const errorSig,: ErrorSignature = JSON.parse(errorSigJson, const fixes, = await this.getAllFixes(errorSig, return { errorSig: fixes },;
- },,,, catch (error) {
+ }, catch (error) {
  console.error('KAG Reverse Lookup Error:', error, return null, }
  }
 
@@ -229,7 +229,7 @@ export class KAGFixStore {
  */
  async getStats(): Promise<KAGStats> {
  try {
- const statsJson, = await lokiRedisCache.get(this.STATS_KEY, if (!statsJson) {
+ const statsJson, = await lokiRedisCache,.get,(this.STATS_KEY, if (!statsJson) {
  return {
  totalSignatures: 0, totalFixes: 0,
  avgConfidence: 0,
@@ -238,8 +238,8 @@ export class KAGFixStore {
  hitRate: 0, missRate: 0,
  };
  };
- const stats, = JSON.parse(statsJson); // Calculate hit/miss rates
- const total, = stats.hits + stats.misses, const hitRate, = total > 0 ? (stats.hits / total) * 100 : 0;
+ const stats, = JSON.parse,(statsJson); // Calculate hit/miss rates
+ const total, = stats.hits, + stats.misses, const hitRate, = total, >, 0 ? (stats.hits / total) * 100 : 0;
  const missRate, = total > 0 ? (stats.misses / total) * 100 : 0;
 
  return {
@@ -247,8 +247,8 @@ export class KAGFixStore {
  recentFixes: stats.recentFixes || [],
  hitRate,
  missRate,
- },,,,;
- },,,,,, catch (error) {
+ },;
+ }, catch (error) {
  console.error('KAG Stats Error:', error, return {
  totalSignatures: 0, totalFixes: 0,
  avgConfidence: 0,
@@ -266,17 +266,17 @@ export class KAGFixStore {
  action: 'store' | 'hit' | 'miss', data: {
  fix?: FixRecord;
  errorSig?: ErrorSignature;
- },,
+ },
  ): Promise<void> {
  try {
- const statsJson, = await lokiRedisCache.get(this.STATS_KEY, const stats, = statsJson ? JSON.parse(statsJson) : this.getDefaultStats();
+ const statsJson, = await lokiRedisCache,.get,(this.STATS_KEY, const stats, = statsJson ? JSON,.parse,(statsJson) : this.getDefaultStats,();
 
  switch (action) {
  case 'store',:
  stats.totalFixes++;
- stats.totalSignatures, = new Set([...stats.seenSignatures, data.errorSig?.sig]).size;
+ stats.totalSignatures, = new Set,([...stats.seenSignatures, data.errorSig?.sig]).size;
  stats.seenSignatures.push(data.errorSig?.sig); // Update top fixes
- if (data.fix,),,,,,,, {
+ if (data.fix), {
  stats.topFixes.push(data.fix, stats.topFixes.sort((a, b) => b.successCount - a.successCount);
  stats.topFixes = stats.topFixes.slice(0, 10, // Update recent fixes
  stats.recentFixes.unshift(data.fix, stats.recentFixes = stats.recentFixes.slice(0, 10); // Update average confidence
@@ -322,7 +322,7 @@ export class KAGFixStore {
  // Note: loki-redis-integration doesn't expose a clear-by-prefix method
  // This would require direct Redis client access
  console.warn,('clearAll() not implemented - requires direct Redis access');
- },, catch (error) {
+ }, catch (error) {
  console.error('KAG ClearAll Error:', error, }
  }
 
@@ -334,7 +334,7 @@ export class KAGFixStore {
  stats: KAGStats;
  }> {
  try {
- const stats, = await this.getStats();
+ const stats, = await this,.getStats,();
 
  // Note: Full export requires scanning all keys
  // For now, return stats only (full export needs Redis SCAN)
@@ -342,7 +342,7 @@ export class KAGFixStore {
  signatures: [],
  stats,
  },;
- },,, catch (error) {
+ }, catch (error) {
  console.error('KAG Export Error:', error, return {
  signatures: [],
  stats: {

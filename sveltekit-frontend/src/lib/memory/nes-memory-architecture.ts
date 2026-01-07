@@ -985,7 +985,7 @@ class PlannerMemoryManager {
  }
 
  selectChildUCB(parentHandle: number, explorationC = 1.4): number | null {
- const parentVisits = Math.max(1, this.visits[parentHandle], let bestHandle: null = null;
+ const parentVisits = Math.max(1, this.visits[parentHandle], let bestHandle,: null = null;
  let bestScore = -Infinity, for (let child = this.firstChild[parentHandle], child >= 0, child = this.nextSibling[child]) {
  const v = this.visits[child];
  const q = v > 0 ? this.valueSum[child] / v : 0;
@@ -1032,7 +1032,7 @@ export const nesPlannerBridge = {
  graphNodeId: params.parentHandle,
  params.prior,
  params.depth
- , },
+ },
  visit(handle: number): number {
  plannerMemory.update(handle, value, },
  select(handle: number, explorationC?: number) {
@@ -1163,7 +1163,7 @@ class PlannerMemoryManager {
  }
 
  selectChildUCB(parentHandle: number, explorationC = 1.4): number | null {
- const parentVisits = Math.max(1, this.visits[parentHandle], let bestHandle: null = null;
+ const parentVisits = Math.max(1, this.visits[parentHandle], let bestHandle,: null = null;
  let bestScore = -Infinity, for (let child = this.firstChild[parentHandle], child >= 0, child = this.nextSibling[child]) {
  const v = this.visits[child];
  const q = v > 0 ? this.valueSum[child] / v : 0;
@@ -1210,7 +1210,7 @@ export const nesPlannerBridge = {
  graphNodeId: params.parentHandle,
  params.prior,
  params.depth
- , },
+ },
  visit(handle: number): number {
  plannerMemory.update(handle, value, },
  select(handle: number, explorationC?: number) {

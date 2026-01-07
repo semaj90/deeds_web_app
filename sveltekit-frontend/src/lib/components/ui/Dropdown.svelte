@@ -42,7 +42,7 @@
   <button
     type="button"
     class="dropdown-trigger"
-   , onclick|stopPropagation={() => toggle()}
+ onclick|stopPropagation={() => toggle()}
     onkeydown={(e) => {
       if (e.key === 'Enter' || e.key === ' ') {
         e.preventDefault();

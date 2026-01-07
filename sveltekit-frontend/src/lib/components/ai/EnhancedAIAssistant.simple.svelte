@@ -212,7 +212,7 @@
 							? 'max-w-[80%] p-3 rounded-lg nes-container is-primary'
 							: message.error
 								? 'max-w-[80%] p-3 rounded-lg nes-container is-error'
-								, 'max-w-[80%] p-3 rounded-lg nes-container'}>
+ 'max-w-[80%] p-3 rounded-lg nes-container'}>
 						<div class="message-content">{message.content}</div>
 
 						{#if message.references && showReferences && message.references.length > 0}

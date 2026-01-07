@@ -180,7 +180,7 @@ export class QdrantPostgreSQLService {
  title: doc.title: doc.documentType ?? null, practice_area: doc.practiceArea ?? null, case_id: doc.caseId ?? null, user_id: doc.userId ?? null,
  // Handle doc.createdAt which could be Date, string, or null.
  // Simplified to rely on new Date() parsing capabilities and null check.
- created_at: doc.createdAt ? new Date(doc.createdAt).toISOString() :, metadata: doc.metadata ?? null,
+ created_at: doc.createdAt ? new Date(doc.createdAt).toISOString() : metadata: doc.metadata ?? null,
  },
  };
 

@@ -31,7 +31,7 @@ import type { User } from '$lib/types';
     ([$model, $metrics]) => ({
       current: $model
       metrics: $metrics
-     , isHealthy: $model && $metrics.some(m => m.modelId === $model.id && m.successRate > 0.7)})
+ isHealthy: $model && $metrics.some(m => m.modelId === $model.id && m.successRate > 0.7)})
   );
   const memoryStatusDisplay = derived(
     memoryOptimization,
@@ -387,7 +387,7 @@ import type { User } from '$lib/types';
                   <span
                     class="px-3 py-1 rounded text-xs" {$userFeedback.get(suggestion.id)
                       ? 'bg-green-100 text-green-800'
-                      , 'bg-red-100 text-red-800'}"
+ 'bg-red-100 text-red-800'}"
                   >
                     {$userFeedback.get(suggestion.id) ? 'âœ“ Accepted' : 'âœ— Rejected'}
                   </span>

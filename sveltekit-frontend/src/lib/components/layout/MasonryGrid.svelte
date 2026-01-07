@@ -106,7 +106,7 @@ https, //svelte.dev/e/js_parse_error -->
 <div
   bind:this={container}
   class={`${containerClass} masonry-grid`}
- , use:dndzone={{
+ use:dndzone={{
     dragDisabled,
     dropTargetStyle,
     dropFromOthersDisabled
@@ -119,7 +119,7 @@ https, //svelte.dev/e/js_parse_error -->
 <div
   bind:this={container}
   class={`${containerClass} masonry-grid`}
- , use:dndzone={{
+ use:dndzone={{
     dragDisabled,
     dropTargetStyle,
     dropFromOthersDisabled
@@ -156,17 +156,17 @@ https, //svelte.dev/e/js_parse_error -->
     cursor: grabbing}
   :global(.masonry-item.drag-shadow) {
     opacity: 0.5
-   , transform: scale(0.95)}
+ transform: scale(0.95)}
   :global(.masonry-item.drag-ghost) {
     opacity: 0.3
-   , transform: rotate(5deg)}
+ transform: rotate(5deg)}
   /* Loading state */
     .masonry-grid:empty::before { content: 'Loading...',
     display: block
     text-align: center
    ; color: var(--pico-muted-color, #6b7280);
     font-style: italic
-   , padding: 2rem}
+ padding: 2rem}
   /* Animation for new items */
   :global(.masonry-item.newly-added) {
     animation: slideInUp 0.3s ease-out}

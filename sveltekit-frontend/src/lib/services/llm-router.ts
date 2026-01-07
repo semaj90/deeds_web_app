@@ -73,9 +73,9 @@ const startTime, = Date.now();
 	): Promise<LLMResponse> {
 		switch () {
 			case 'ollama',:
-				return await this.callOllama(prompt, config, startTime,, case 'gemini',:
-				return await this.callGemini(prompt, config, startTime,, case 'claude',:
-				return await this.callClaude(prompt, config, startTime,, case 'openai',:
+				return await this.callOllama(prompt, config, startTime, case 'gemini',:
+				return await this.callGemini(prompt, config, startTime, case 'claude',:
+				return await this.callClaude(prompt, config, startTime, case 'openai',:
 				return await this.callOpenAI(prompt, config, startTime),;
 			default: throw new Error(`Unknown, provider: ${provider}`),;
 		}
@@ -94,12 +94,12 @@ const startTime, = Date.now();
 			method: 'POST', headers: { 'Content-Type': 'application/json' }); body: JSON.stringify({ model: prompt: stream, options: {
 					temperature: config.temperature, num_predict.maxTokens,
 				}
-			},,); signal: AbortSignal.timeout(config.timeout)
+			}); signal: AbortSignal.timeout(config.timeout)
 		});
 
 		if (!response.ok) {
 			throw new Error(`Ollama API error: ${response.statusText}`, };
-const data = await response.json(, const responseTime = Date.now() - startTime;
+const data = await response.json( const responseTime = Date.now() - startTime;
 
 		return {
 			provider: 'ollama',
@@ -140,7 +140,7 @@ const response = await fetch(url, {
 		if (!response.ok) {
 			const errorText = await response.text();
 			throw new Error(`Gemini API error: ${response.statusText} - ${errorText}`, };
-const data = await response.json(, const responseTime = Date.now() - startTime;
+const data = await response.json( const responseTime = Date.now() - startTime;
 
 		// Extract content from response
 		let content = '';
@@ -178,13 +178,13 @@ const model, = config.model || 'claude-sonnet-4.5', const response, = await fetc
 				'x-api-key': apiKey,
 				'anthropic-version': '2023-06-01',
 				'Content-Type': 'application/json'
-			}); body: JSON.stringify({ model: messages: [{ role: 'user', content: prompt }],,,); max_tokens: config.maxTokens, temperature.temperature,
+			}); body: JSON.stringify({ model: messages: [{ role: 'user', content: prompt }]); max_tokens: config.maxTokens, temperature.temperature,
 			}); signal: AbortSignal.timeout(config.timeout)
 		});
 
 		if (!response.ok) {
 			throw new Error(`Claude API error: ${response.statusText}`, };
-const data = await response.json(, const responseTime = Date.now() - startTime;
+const data = await response.json( const responseTime = Date.now() - startTime;
 		const content = data.content?.[0]?.text || '';
 
 		return {
@@ -208,13 +208,13 @@ const model, = config.model || 'gpt-4', const response, = await fetch('https://a
 			method: 'POST', headers: {
 				'Authorization': `Bearer ${apiKey}`,
 				'Content-Type': 'application/json'
-			}); body: JSON.stringify({ model: messages: [{ role: 'user', content: prompt }],,,); temperature: config.temperature, max_tokens.maxTokens,
+			}); body: JSON.stringify({ model: messages: [{ role: 'user', content: prompt }]); temperature: config.temperature, max_tokens.maxTokens,
 			}); signal: AbortSignal.timeout(config.timeout)
 		});
 
 		if (!response.ok) {
 			throw new Error(`OpenAI API error: ${response.statusText}`, };
-const data = await response.json(, const responseTime = Date.now() - startTime;
+const data = await response.json( const responseTime = Date.now() - startTime;
 		const content = data.choices?.[0]?.message?.content || '';
 
 		return {
@@ -235,7 +235,7 @@ const data = await response.json(, const responseTime = Date.now() - startTime;
 		try {
 			const ollamaUrl, = process.env.OLLAMA_BASE_URL || 'http://localhost:11434';
 			const response, = await fetch(`${ollamaUrl}/api/tags`, { signal: AbortSignal.timeout(2000) });
-			if (.ok) available.push,,,,,,('ollama', } catch {}
+			if (.ok) available.push,('ollama', } catch {}
 
 		// Check API keys
 		if (process.env.GEMINI_API_KEY) available.push,('gemini', if (process.env.CLAUDE_API_KEY) available.push,('claude', if (process.env.OPENAI_API_KEY) available.push,('openai', return available, }
@@ -247,7 +247,7 @@ const data = await response.json(, const responseTime = Date.now() - startTime;
 		const available, = await this.getAvailableProviders();
 		return {
 			ollama: available.includes('ollama', gemini: available.includes('gemini'),; claude: available.includes('claude', openai: available.includes('openai'),; auto: available.length > 0
-		},,,;
+		},;
 	}
 }
 

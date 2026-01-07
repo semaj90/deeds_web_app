@@ -105,7 +105,7 @@ export async function chatCompletion(
  * Legal-domain RAG prompt builder
  */
 export function buildLegalRAGPrompt(
- question: string, sources: Array<{ text: string; filename?: string; page?: number;, n: number }>
+ question: string, sources: Array<{ text: string; filename?: string; page?: number; n: number }>
 ): string {
  const sourcesBlock = sources
  .map((s) => {

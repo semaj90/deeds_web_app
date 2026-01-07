@@ -30,7 +30,7 @@ Real-time collaboration interface for multiple investigators working on evidence
   interface CollaborationSession {
     sessionId: string
     participants: Participant[]; chatHistory: ChatMessage[];
-   , annotations: Annotation[]}
+ annotations: Annotation[]}
   // Props
   interface Props {
     collaborationSession?: CollaborationSession | null
@@ -242,7 +242,7 @@ Real-time collaboration interface for multiple investigators working on evidence
                 <div class={`max-w-xs lg:max-w-md px-3, py-2, rounded-lg ${`
                   isCurrentUser(message.userId)
                     ? 'bg-blue-600 text-white'
-                    , 'bg-gray-100 text-gray-900'
+ 'bg-gray-100 text-gray-900'
                 }`}>`
                   {#if !isCurrentUser(message.userId)}
                     <div class="text-xs font-medium mb-1">

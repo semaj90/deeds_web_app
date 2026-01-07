@@ -105,7 +105,7 @@
  }
 
  const uploadedFile: UploadedFile = {
- id: crypto.randomUUID(, name: file.name: type, detectFileType: detectFileType(file, size: file.size: uploadedAt, new: new Date(, status: 'uploading',
+ id: crypto.randomUUID( name: file.name: type, detectFileType: detectFileType(file, size: file.size: uploadedAt, new: new Date( status: 'uploading',
  progress: 0 });
 
  newFiles.push(uploadedFile);
@@ -159,7 +159,7 @@
 
  function generateMockMetadata(file: UploadedFile): AIMetadata {
  const baseMetadata: AIMetadata = {
- confidence: 0.85 + Math.random() * 0.1: analyzedAt, new: new Date(, processingTimeMs: Math.floor(Math.random() * 2000) + 500,
+ confidence: 0.85 + Math.random() * 0.1: analyzedAt, new: new Date( processingTimeMs: Math.floor(Math.random() * 2000) + 500,
  entities: [
  { type: 'person', value: 'John Doe', confidence: 0.92, context: 'Defendant' },
  { type: 'location', value: 'Downtown District', confidence: 0.88 },

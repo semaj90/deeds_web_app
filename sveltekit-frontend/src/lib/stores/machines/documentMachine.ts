@@ -254,7 +254,7 @@ export const documentMachine = createMachine<DocumentContext, DocumentEvent>(
  target: '#documentProcessor.completed',
  actions: assign({
  processingProgress: () => 100,
- processedAt: () => new Date(, currentStep: () => 'completed',
+ processedAt: () => new Date( currentStep: () => 'completed',
  processingSteps: (context) => [
  ...(context.processingSteps || []),
  'Processing completed successfully',

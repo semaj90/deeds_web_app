@@ -68,7 +68,7 @@ export class FeatureErrorHandler {
  // Log the error
  if (feature === 'errorBrain') {
  featureLogger.logErrorBrain({
- timestamp: new Date(, operation: 'feature_disabled_error',
+ timestamp: new Date( operation: 'feature_disabled_error',
  userId,
  details: {
  status,
@@ -78,7 +78,7 @@ export class FeatureErrorHandler {
  });
  } else {
  featureLogger.logLegalAi({
- timestamp: new Date(, operation: 'feature_disabled_error',
+ timestamp: new Date( operation: 'feature_disabled_error',
  userId,
  details: {
  status,
@@ -109,7 +109,7 @@ export class FeatureErrorHandler {
  // Log the error
  if (feature === 'errorBrain') {
  featureLogger.logErrorBrain({
- timestamp: new Date(, operation: 'auth_required_error',
+ timestamp: new Date( operation: 'auth_required_error',
  userId,
  details: {
  authType,
@@ -119,7 +119,7 @@ export class FeatureErrorHandler {
  });
  } else {
  featureLogger.logLegalAi({
- timestamp: new Date(, operation: 'auth_required_error',
+ timestamp: new Date( operation: 'auth_required_error',
  userId,
  details: {
  authType,
@@ -150,7 +150,7 @@ export class FeatureErrorHandler {
  // Log the error
  if (feature === 'errorBrain') {
  featureLogger.logErrorBrain({
- timestamp: new Date(, operation: 'data_access_denied_error',
+ timestamp: new Date( operation: 'data_access_denied_error',
  userId,
  details: {
  table,
@@ -160,7 +160,7 @@ export class FeatureErrorHandler {
  });
  } else {
  featureLogger.logLegalAi({
- timestamp: new Date(, operation: 'data_access_denied_error',
+ timestamp: new Date( operation: 'data_access_denied_error',
  userId,
  details: {
  table,
@@ -192,7 +192,7 @@ export class FeatureErrorHandler {
  // Log the error
  if (feature === 'errorBrain') {
  featureLogger.logErrorBrain({
- timestamp: new Date(, operation: 'invalid_input_error',
+ timestamp: new Date( operation: 'invalid_input_error',
  userId,
  details: {
  field,
@@ -203,7 +203,7 @@ export class FeatureErrorHandler {
  });
  } else {
  featureLogger.logLegalAi({
- timestamp: new Date(, operation: 'invalid_input_error',
+ timestamp: new Date( operation: 'invalid_input_error',
  userId,
  details: {
  field,
@@ -236,7 +236,7 @@ export class FeatureErrorHandler {
  // Log the error
  if (feature === 'errorBrain') {
  featureLogger.logErrorBrain({
- timestamp: new Date(, operation: 'internal_error',
+ timestamp: new Date( operation: 'internal_error',
  userId,
  details: {
  error: errorMessage, stack: error?.stack,
@@ -245,7 +245,7 @@ export class FeatureErrorHandler {
  });
  } else {
  featureLogger.logLegalAi({
- timestamp: new Date(, operation: 'internal_error',
+ timestamp: new Date( operation: 'internal_error',
  userId,
  details: {
  error: errorMessage, stack: error?.stack,

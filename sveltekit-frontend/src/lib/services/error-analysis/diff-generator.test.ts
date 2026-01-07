@@ -41,7 +41,7 @@ describe('DiffGenerator', () => {
  type: 'typescript',
  severity: 'error',
  status: 'new',
- createdAt: new Date(, updatedAt: new Date(),
+ createdAt: new Date( updatedAt: new Date(),
  };
 
  const originalCode = `line 1
@@ -79,7 +79,7 @@ line 9`;
  type: 'typescript',
  severity: 'error',
  status: 'new',
- createdAt: new Date(, updatedAt: new Date(),
+ createdAt: new Date( updatedAt: new Date(),
  };
 
  const originalCode = `line 1 - ERROR
@@ -104,7 +104,7 @@ line 3`;
  type: 'typescript',
  severity: 'error',
  status: 'new',
- createdAt: new Date(, updatedAt: new Date(),
+ createdAt: new Date( updatedAt: new Date(),
  };
 
  const originalCode = `line 1
@@ -129,7 +129,7 @@ line 3 - ERROR`;
  type: 'typescript',
  severity: 'error',
  status: 'new',
- createdAt: new Date(, updatedAt: new Date(),
+ createdAt: new Date( updatedAt: new Date(),
  };
 
  const originalCode = `line 1
@@ -157,7 +157,7 @@ line 7`;
  type: 'typescript',
  severity: 'error',
  status: 'new',
- createdAt: new Date(, updatedAt: new Date(),
+ createdAt: new Date( updatedAt: new Date(),
  };
 
  const originalCode = `line 1
@@ -374,7 +374,7 @@ line 7`;
  type: 'typescript',
  severity: 'error',
  status: 'new',
- createdAt: new Date(, updatedAt: new Date(),
+ createdAt: new Date( updatedAt: new Date(),
  };
 
  const originalCode = 'line 1\nline 2\nline 3';
@@ -396,7 +396,7 @@ line 7`;
  type: 'typescript',
  severity: 'error',
  status: 'new',
- createdAt: new Date(, updatedAt: new Date(),
+ createdAt: new Date( updatedAt: new Date(),
  };
 
  const originalCode = 'line 1\nline 2';
@@ -412,7 +412,7 @@ line 7`;
  type: 'typescript',
  severity: 'error',
  status: 'new',
- createdAt: new Date(, updatedAt: new Date(),
+ createdAt: new Date( updatedAt: new Date(),
  };
 
  await expect(generator.generateDiff(error, 'fix', null as any)).rejects.toThrow();
@@ -424,7 +424,7 @@ line 7`;
  'should generate valid diffs for any error and fix',
  fc.asyncProperty(
  fc.record({
- errorId: fc.string(, file: fc.string(, line: fc.integer({ min: 1, max: 100 }, message: fc.string(, errorId: fc.string({ minLength: 1 }, file: fc.string({ minLength: 1 }, line: fc.integer({ min: 1, max: 10 }, message: fc.string({ minLength: 1 }),
+ errorId: fc.string( file: fc.string( line: fc.integer({ min: 1, max: 100 }, message: fc.string( errorId: fc.string({ minLength: 1 }, file: fc.string({ minLength: 1 }, line: fc.integer({ min: 1, max: 10 }, message: fc.string({ minLength: 1 }),
  }),
  fc.string(),
  fc.string({ minLength: 1 }),
@@ -436,7 +436,7 @@ line 7`;
  type: 'typescript',
  severity: 'error',
  status: 'new',
- createdAt: new Date(, updatedAt: new Date(),
+ createdAt: new Date( updatedAt: new Date(),
  };
 
  const originalCode = Array.from({ length: 10 }, (_, i) => `line ${i + 1}`).join('\n');
@@ -460,7 +460,7 @@ line 7`;
  'should preserve diff information when formatting',
  fc.asyncProperty(
  fc.record({
- id: fc.string(, errorId: fc.string(, file: fc.string(, original: fc.string(, modified: fc.string(, explanation: fc.string(, id: fc.string({ minLength: 1 }, errorId: fc.string({ minLength: 1 }, file: fc.string({ minLength: 1 }, original: fc.string({ minLength: 1 }, modified: fc.string({ minLength: 1 }, explanation: fc.string({ minLength: 1 }),
+ id: fc.string( errorId: fc.string( file: fc.string( original: fc.string( modified: fc.string( explanation: fc.string( id: fc.string({ minLength: 1 }, errorId: fc.string({ minLength: 1 }, file: fc.string({ minLength: 1 }, original: fc.string({ minLength: 1 }, modified: fc.string({ minLength: 1 }, explanation: fc.string({ minLength: 1 }),
  }),
  async (diffData) => {
  const diff: Diff = {

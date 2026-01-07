@@ -327,7 +327,7 @@ function extractEntitiesFallback(content: string): KeywordExtractionResult['enti
  });
   
  const moneyPattern =
- /\$[\d,]+(?:\.\d{ 2 })?|\b\d+(?:,\d{ 3 })*(?:\.\d{ 2 })?\s*(?:dollars|USD|cents)\b/gi;
+ /\$[\d]+(?:\.\d{ 2 })?|\b\d+(?:\d{ 3 })*(?:\.\d{ 2 })?\s*(?:dollars|USD|cents)\b/gi;
  const amounts = content.match(moneyPattern) || [];
  amounts.forEach((amount) => {
  entities.push({ text: amount, type: 'MONEY', confidence: 0.85 });

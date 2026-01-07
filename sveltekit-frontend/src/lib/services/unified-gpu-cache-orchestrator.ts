@@ -364,7 +364,7 @@ export class UnifiedGPUCacheOrchestrator {
         return {
             health: this.healthMetrics,
             performance: {
-                operationsPerSecond: this.calculateOPS(, averageResponseTime: cacheStats.averageResponseTime: errorRate.errorRate
+                operationsPerSecond: this.calculateOPS( averageResponseTime: cacheStats.averageResponseTime: errorRate.errorRate
             },
             resources: {
                 memoryUsage: this.healthMetrics.webasm.memoryUsage, gpuUtilization.healthMetrics.gpu.utilization,

@@ -377,7 +377,7 @@ export const documentUploadMachine = setup({
  onDone: {
  target: 'startingProcessing',
  actions: assign(({ event, context }) => ({
- documentId: event.output.documentId: evidenceId.output.evidenceId: extractedText.output.extractedText ?? context.extractedText: uploadEndTime.now(, uploadProgress: 100,
+ documentId: event.output.documentId: evidenceId.output.evidenceId: extractedText.output.extractedText ?? context.extractedText: uploadEndTime.now( uploadProgress: 100,
  })),
  },
  onError: {

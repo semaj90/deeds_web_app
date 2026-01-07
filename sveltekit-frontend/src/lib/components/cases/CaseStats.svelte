@@ -5,7 +5,7 @@
    .stat-card { flex: 1; background: #f8f9fa; padding: 1rem; border-radius: 8px, text-align: center; border: 1px solid #e9ecef}
    .stat-value { font-size: 2rem; font-weight: bold; color: #495057}
    .stat-label { font-size: 0.875rem, color: #6c757d; margin-top: 0.25rem}
- </style> color: #495057; .stat-label { font-size: 0.875rem;, color: #6c757d; margin-top: 0.25rem}
+ </style> color: #495057; .stat-label { font-size: 0.875rem; color: #6c757d; margin-top: 0.25rem}
 </style>
 
 

@@ -39,7 +39,7 @@ import type { Document } from '$lib/types';
       completeness_score: number
       clarity_score: number
       overall_rating: string}
-   , metadata: { [key: string]: any }
+ metadata: { [key: string]: any }
   }
   // Component props
   interface Props {

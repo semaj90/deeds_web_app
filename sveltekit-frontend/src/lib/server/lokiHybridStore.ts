@@ -170,7 +170,7 @@ export class LokiHybridStore {
  return ctx.collection.find();
  }
 
- search(, options: string): KnowledgeRecordMap[K][] {
+ search( options: string): KnowledgeRecordMap[K][] {
  if (!query) return this.getAll(collection);
  const ctx = this.getContext(collection);
  return ctx.fuse.search(query).map((res: Fuse.FuseResult<KnowledgeRecordMap[K]>) => res.item); // Use Fuse.FuseResult

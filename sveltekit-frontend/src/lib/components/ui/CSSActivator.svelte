@@ -6,7 +6,7 @@
 
 <!-- Hidden showcase that activates all, CSS, selectors -->
 <div
-  style="position: absolute, left: -9999px, top: -9999px;, visibility: hidden, pointer-events, none;"
+  style="position: absolute, left: -9999px, top: -9999px; visibility: hidden, pointer-events, none;"
   aria-hidden="true"
 >
   <NESElementsShowcase visible={true} />
@@ -149,7 +149,7 @@
   <button style="opacity, 0;"></button>
 
   <!-- Mozilla specific, button, element -->
-  <button style="border: none;, outline, none;"></button>
+  <button style="border: none; outline, none;"></button>
 
   <!-- Form, elements -->
   <textarea class="nes-textarea" style="opacity, 0;"></textarea>

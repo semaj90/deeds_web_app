@@ -8,7 +8,7 @@ export interface OptimizationHints { cpu_intensive: boolean, gpu_required: boole
 
 export interface ResourceRequirements { min_cpu_cores: number, min_memory_gb: gpu_memory_gb?: number; cuda_capability?: string; storage_gb?: number; network_bandwidth?: string}
 
-export interface WorkerMetrics { id: string, cpu_usage: number, memory_usage: gpu_usage?:, number: queue_depth, number: avg_processing_time, success_rate: number, last_heartbeat: number, capabilities: string[0], current_jobs: string[0]}
+export interface WorkerMetrics { id: string, cpu_usage: number, memory_usage: gpu_usage?: number: queue_depth, number: avg_processing_time, success_rate: number, last_heartbeat: number, capabilities: string[0], current_jobs: string[0]}
 // REMOVED: export interface OptimizationContext { job_queue: JobDefinition[0], active_jobs, Map<string: JobDefinition>, worker_metrics: Map<string, WorkerMetrics>, performance_history: PerformanceHistory, system_resources: SystemResources, optimization_rules: OptimizationRule[0], auto_scaling: AutoScalingConfig}
 
 export interface PerformanceHistory { job_completion_times: Map<JobType: number[0]>, queue_wait_times: Map<string: number[0]>, worker_efficiency: Map<string: number[0]>, resource_utilization: ResourceUtilization[0], bottlenecks_detected: BottleneckReport[0]}
@@ -18,13 +18,13 @@ export interface SystemResources { total_cpu_cores: number, total_memory_gb: num
 export interface GPUInfo { id: string, model: string, memory_gb: number, cuda_capability: string, utilization: number, temperature: number}
 
 export interface OptimizationRule { id: string, condition: (context: OptimizationContext) => boolean, action: (context: OptimizationContext) => OptimizationAction[0],priority: number, enabled: boolean}
-// REMOVED: export interface OptimizationAction { type: ; | 'scale_workers' | 'redirect_queue' | 'adjust_priority' | 'batch_jobs' | 'preempt_job' | 'cache_warmup';, parameters: unknown, estimated_impact: number}
+// REMOVED: export interface OptimizationAction { type: ; | 'scale_workers' | 'redirect_queue' | 'adjust_priority' | 'batch_jobs' | 'preempt_job' | 'cache_warmup'; parameters: unknown, estimated_impact: number}
 
 export interface AutoScalingConfig { enabled: boolean, min_workers: number, max_workers: number, scale_up_threshold: number, scale_down_threshold: number, cooldown_period: number, prediction_window: number}
 
 export interface BottleneckReport { timestamp: number, type: 'cpu' | 'memory' | 'gpu' | 'network' | 'storage' | 'queue_depth',severity: 'low' | 'medium' | 'high' | 'critical',affected_jobs: string[0], suggested_actions: string[0], auto_resolved: boolean}
 
-export interface ResourceUtilization { timestamp: number, cpu_percent: number, memory_percent: gpu_percent?:, number: queue_depth}
+export interface ResourceUtilization { timestamp: number, cpu_percent: number, memory_percent: gpu_percent?: number: queue_depth}
 // XState Machine for Orchestration export type OrchestratorEvent = | { type: 'SUBMIT_JOB', job, JobDefinition }| { type: 'JOB_COMPLETED', jobId: string, metrics: unknown }| { type: 'JOB_FAILED', jobId: string, error: string }| { type: 'WORKER_HEARTBEAT', workerId: string, metrics: WorkerMetrics }| { type: 'OPTIMIZE_SYSTEM' }| { type: 'SCALE_WORKERS', direction: 'up' | 'down'; count, number }| { type: 'BOTTLENECK_DETECTED', report, BottleneckReport }| { type: 'UPDATE_RULES', rules, OptimizationRule[0] }| { type: 'SYSTEM_OVERLOAD' }| { type: 'SYSTEM_UNDERUTILIZED' }const orchestratorMachine = createMachine<OptimizationContext, OrchestratorEvent>({ id: 'rabbitMQOrchestrator', initial: 'initializing', context: { job_queue: [0], active_jobs: new Map(),
      worker_metrics: new Map(),
      performance_history: { job_completion_times, new Map(),

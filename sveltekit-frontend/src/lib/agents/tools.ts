@@ -575,7 +575,7 @@ export const toolRegistry: Record<string, (args: any) => Promise<any>> = {
  const { stdout, stderr } = await execAsync(
  'npx svelte-check --fail-on-warnings false --output human',
  {
- cwd: process.cwd(, maxBuffer: 10 * 1024 * 1024
+ cwd: process.cwd( maxBuffer: 10 * 1024 * 1024
  }
  );
 

@@ -3,11 +3,11 @@ import type { pgTable, timestamp, varchar } from 'drizzle-orm/pg-core';
 import { jsonb, text } from 'drizzle-orm/pg-core';
 
 export const pois = pgTable('persons_of_interest', {
- id: varchar('id').primaryKey(, name: text('name').notNull(, aliases: jsonb('aliases').$type<string[]>().default([], threatLevel: varchar('threat_level', { enum: ['low', 'medium', 'high', 'critical'] })
+ id: varchar('id').primaryKey( name: text('name').notNull( aliases: jsonb('aliases').$type<string[]>().default([], threatLevel: varchar('threat_level', { enum: ['low', 'medium', 'high', 'critical'] })
  .default('low')
- .notNull(, status: varchar('status', { enum: ['surveillance', 'wanted', 'active', 'cleared'] })
+ .notNull( status: varchar('status', { enum: ['surveillance', 'wanted', 'active', 'cleared'] })
  .default('surveillance')
- .notNull(, description: text('description').default('', lastSeen: varchar('last_seen', lastLocation: varchar('last_location', cases: jsonb('cases').$type<string[]>().default([]),
+ .notNull( description: text('description').default('', lastSeen: varchar('last_seen', lastLocation: varchar('last_location', cases: jsonb('cases').$type<string[]>().default([]),
  // Multiple photos with forensic metadata
  photos: jsonb('photos')
  .$type<
@@ -39,7 +39,7 @@ export const pois = pgTable('persons_of_interest', {
  recommendations: string[];
  lastUpdated: string;
  }>()
- .default(null, createdAt: timestamp('created_at').defaultNow(, updatedAt: timestamp('updated_at').defaultNow(),
+ .default(null, createdAt: timestamp('created_at').defaultNow( updatedAt: timestamp('updated_at').defaultNow(),
 });
   
 export const enablePgVector = sql`CREATE EXTENSION IF NOT EXISTS vector;`;

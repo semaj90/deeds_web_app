@@ -254,7 +254,7 @@ import type { Document } from '$lib/types';
             name="message"
             bind:value={$form.message}
             class="nes-textarea"
-           , class, is-error={$errors.message}
+ class, is-error={$errors.message}
             placeholder="Ask about legal cases, documents, or risk assessment..."
             rows="3"
             disabled={$submitting}

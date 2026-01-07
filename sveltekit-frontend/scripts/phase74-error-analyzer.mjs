@@ -23,12 +23,33 @@ async function analyzeErrors(logPath) {
     let currentFile = null;
     let totalErrors = 0;
 
-    // Robust path regex that matches Windows and Linux paths followed by line:col
+    // Robust path regex that matches Windows and Linux paths followed by line:col (Human format)
     const pathRegex = /([a-zA-Z]:[\\/][^:]+|[\\/][^:]+):(\d+):(\d+)/;
+    // Machine format regex: TIMESTAMP LEVEL "PATH" LINE:COL "MESSAGE"
+    const machineRegex = /^\d+\s+(\w+)\s+"([^"]+)"\s+(\d+):(\d+)\s+"([^"]+)"/;
 
     for await (const line of rl) {
         const trimmed = line.trim();
         if (!trimmed) continue;
+
+        // Try machine format first
+        const machineMatch = trimmed.match(machineRegex);
+        if (machineMatch) {
+            const [_, level, filePath, lineNum, colNum, msg] = machineMatch;
+            if (level === 'ERROR') {
+                totalErrors++;
+                const normalizedPath = filePath.replace(/\\\\/g, '/').replace(/\\/g, '/');
+
+                fileErrors[normalizedPath] = (fileErrors[normalizedPath] || 0) + 1;
+
+                // Extract error type pattern (simple heuristic since machine format often excludes code)
+                // If message contains proper code like (ts 2304), extract it.
+                const typeMatch = msg.match(/\(ts\s+(\d+)\)|\(svelte\s+(\d+)\)|TS(\d+)|\[postcss\]/);
+                const errorType = typeMatch ? (typeMatch[1] || typeMatch[2] || typeMatch[3] || 'POSTCSS') : 'UNKNOWN';
+                errorTypes[errorType] = (errorTypes[errorType] || 0) + 1;
+            }
+            continue;
+        }
 
         const pathMatch = trimmed.match(pathRegex);
         if (pathMatch) {

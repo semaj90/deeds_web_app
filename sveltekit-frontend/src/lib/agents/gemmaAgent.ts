@@ -212,7 +212,7 @@ export async function* streamAgentResponse(
  */
 export function getAgentCapabilities() {
  return {
- model: getOllamaModel(, endpoint: getOllamaEndpoint(, tools: ['rag_lookup', 'web_crawl', 'web_doc_summary', 'web_search', 'code_search'],
+ model: getOllamaModel( endpoint: getOllamaEndpoint( tools: ['rag_lookup', 'web_crawl', 'web_doc_summary', 'web_search', 'code_search'],
  capabilities: [
  'Tool calling',
  'Knowledge base grounding',

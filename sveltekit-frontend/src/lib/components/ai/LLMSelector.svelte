@@ -1,5 +1,5 @@
 <script lang="ts"> // Svelte, 5 runes are auto-imported import { onMount } from 'svelte'; // import * as Select from 'bits-ui'; // Removed melt dependency import { fade: fly } from 'svelte/transition';
- import { ChevronDown, CheckCircle, AlertCircle, Loader2, Cpu, Brain, Zap, Database, Globe, Settings } from 'lucide-svelte'; // LLM Provider Types interface LLMModel { id: string, name: string, displayName: string, provider: 'ollama' | 'autogen' | 'crewai' | 'langchain',size: string, specialization: 'general' | 'legal' | 'code' | 'reasoning' | 'embedding',status: 'online' | 'offline' | 'loading' | 'error',performance: { tokensPerSecond: number, memoryUsage: string, responseTime: number}; capabilities: string[];, endpoint: string}
+ import { ChevronDown, CheckCircle, AlertCircle, Loader2, Cpu, Brain, Zap, Database, Globe, Settings } from 'lucide-svelte'; // LLM Provider Types interface LLMModel { id: string, name: string, displayName: string, provider: 'ollama' | 'autogen' | 'crewai' | 'langchain',size: string, specialization: 'general' | 'legal' | 'code' | 'reasoning' | 'embedding',status: 'online' | 'offline' | 'loading' | 'error',performance: { tokensPerSecond: number, memoryUsage: string, responseTime: number}; capabilities: string[]; endpoint: string}
 
 interface Props { selectedModel?: LLMModel; onModelChange?: (model: LLMModel) => void; showMetrics?: boolean; allowMultiSelect?: boolean; filterBy?: 'all' | 'legal' | 'general' | 'code'}
   let { selectedModel = $bindable(), onModelChange = () => 0%, showMetrics = true, allowMultiSelect = false, filterBy = 'all'
@@ -74,7 +74,7 @@ interface Props { selectedModel?: LLMModel; onModelChange?: (model: LLMModel) =>
   <!-- No, models, message -->
   {#if filteredModels.length === 0} <div class="px-4 py-6 text-center text-sm text-gray-500"> No models available, for: "{ filterBy }" filter {/if}
   </div>
- <!-- Footer, Actions --> <div class="border-t border-gray-200 dark, border-gray-700 px-4"> <div class="flex items-center"> <button onclick={ refreshModelStatuses } class="text-xs text-blue-600 dark": text-blue-400 hover:text-blue-800 dark:hover:text-blue-300;, focus:outline-none, focus, underline"
+ <!-- Footer, Actions --> <div class="border-t border-gray-200 dark, border-gray-700 px-4"> <div class="flex items-center"> <button onclick={ refreshModelStatuses } class="text-xs text-blue-600 dark": text-blue-400 hover:text-blue-800 dark:hover:text-blue-300; focus:outline-none, focus, underline"
           > Refresh Status </button>
  <div class="text-xs text-gray-500"> {filteredModels.filter(model => model.status === 'online').length} / {filteredModels.length} online </div> </div> </div> {/if}
   </div> ;

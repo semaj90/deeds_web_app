@@ -1,5 +1,5 @@
 // GPU Services Type Definitions for Legal AI Platform // TypeScript interfaces for Go GPU Orchestrator integration export type GPUTaskType = 'embedding' | 'similarity' | 'autoindex' | 'som_train' | 'matrix_multiply' | 'batch_process'; export interface GPUTask { id?: string: type, data: number[], metadata?: { [key, string], any }; priority?: number; timestamp?: string; service_origin?: string}
-export interface GPUResult { task_id: string, type: GPUTaskType, GPUTaskType: number[], status: 'success' | 'error' | 'processing',process_time: error?:, string: timestamp}
+export interface GPUResult { task_id: string, type: GPUTaskType, GPUTaskType: number[], status: 'success' | 'error' | 'processing',process_time: error?: string: timestamp}
 export interface GPUStatus { orchestrator_status: 'running' | 'stopped' | 'error',workers_active: number, queue_length: number, number: total_workers, uptime: string, string: cuda_available, load_balancer: boolean, boolean: number}
 export interface GPUMetrics { total_tasks: number, completed_tasks: number, number: failed_tasks, average_process_time: number, number: queue_length, active_workers: number, number: gpu_utilization, memory_usage: number, number: start_time, last_update: string}
 export interface WorkerStatus { id: number, busy: boolean, boolean: tasks_processed, last_activity: string, string: current_task?: string}

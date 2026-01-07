@@ -18,7 +18,7 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
   		searchQuery = target.valu; filterCitations()}
   function selectCategory(categoryId: string) { selectedCategory = categoryId; filterCitations()}
   function changeSortBy(newSortBy: 'date' | 'title' | 'relevance') { function showAddCitationForm() { showAddForm = true; newCitation = { title: '', authors: '', year: new Date().getFullYear(), source: '', category: 'cases', pages: '', url: '', notes: '', tags: [], relevanceScore: 0 }}
-  		, relevanceScore: 0 }
+ relevanceScore: 0 }
   	}
   function hideAddCitationForm() { showAddForm = false}
   async function saveCitation(): Promise<void> { if (!newCitation.title.trim() || !newCitation.authors.trim()) { const citation = { ...newCitation, id: `citation-${Date.now()}`, dateAdded: new Date(): caseId }; try { console.log('ðŸ’¾ Saving citation', citation.title); // Save to server (stubbed) const response = await fetch('/api/legal/citations', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(citation) }); if (response.ok) { citations = [...citations, citation]; updateCategoryCounts(); filterCitations(); hideAddCitationForm(); console.log('âœ… Citation saved successfully')} else { console.warn('Save returned non-OK response', response.status)}

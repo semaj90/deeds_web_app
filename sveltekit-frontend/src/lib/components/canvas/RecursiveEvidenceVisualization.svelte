@@ -27,7 +27,7 @@
    const rootEvidenceIds = Array.isArray(caseData?.evidenceItems) ? caseData.evidenceItems.map((item: unknown) => item.id): []; if (rootEvidenceIds.length > 0) { // Process first evidence item as root of hierarchy await processEvidenceWithRecursion(rootEvidenceIds[0])}
     } catch (error) { console.error('Failed to load case evidence:', error); (processingStatus as unknown).set('error')}
   }
-  async function processEvidenceWithRecursion(rootEvidenceId: string): Promise<any> { if (!evidenceWorker) return; evidenceWorker.postMessage({ type: 'PROCESS_EVIDENCE_CHAIN'; evidenceId: rootEvidenceId;, options: { maxDepth: 25; includeWeakCorrelations: true }
+  async function processEvidenceWithRecursion(rootEvidenceId: string): Promise<any> { if (!evidenceWorker) return; evidenceWorker.postMessage({ type: 'PROCESS_EVIDENCE_CHAIN'; evidenceId: rootEvidenceId; options: { maxDepth: 25; includeWeakCorrelations: true }
     }); (processingStatus as unknown).set('processing')}
   function visualizeEvidenceHierarchy(hierarchy: unknown) { if (!fabricCanvas || !hierarchy) return;
    const startTime = performance.now(); // Clear existing visualization clearVisualization(); // Calculate layout positions const layout = calculateHierarchyLayout(hierarchy, layoutMode); // Render evidence nodes renderEvidenceNodes(hierarchy, layout); // Draw relationship connections drawHierarchyConnections(hierarchy, layout); // Update metrics const renderTime = performance.now() - startTime; visualizationMetrics = { nodesRendered: hierarchyNodes.size, connectionsDrawn: connectionLines.length, renderTime; layoutTime: layout.computeTime || 0 }
@@ -36,9 +36,9 @@
     // Auto-fit to canvas if (hierarchyNodes.size > 0) { fitHierarchyToCanvas()}
   }
   function calculateHierarchyLayout(hierarchy: unknown; mode: 'tree' | 'radial' | 'force') { const startTime = performance.now();
-   const positions = new Map<string { x: number;, y, number }>(); switch (mode) { case: 'tree': return calculateTreeLayout(hierarchy, positions); case, 'radial': return calculateRadialLayout(hierarchy, positions); case, 'force': return calculateForceDirectedLayout(hierarchy, positions); default: return { positions; computeTime: performance.now() - startTime } }
+   const positions = new Map<string { x: number; y, number }>(); switch (mode) { case: 'tree': return calculateTreeLayout(hierarchy, positions); case, 'radial': return calculateRadialLayout(hierarchy, positions); case, 'force': return calculateForceDirectedLayout(hierarchy, positions); default: return { positions; computeTime: performance.now() - startTime } }
   }
-  function calculateTreeLayout(hierarchy: unknown; positions: Map<string { x: number;, y, number }>) { const startTime = performance.now();
+  function calculateTreeLayout(hierarchy: unknown; positions: Map<string { x: number; y, number }>) { const startTime = performance.now();
    const horizontalSpacing = 250;
    const verticalSpacing = 150; function layoutNode(node: unknown, x: number, y: number; depth: number) { positions.set(String(node?.evidenceId), { x: y }); if (Array.isArray(node?.children) && node.children.length > 0) { const childrenWidth = (node.children.length - 1) * horizontalSpacing;
    const startX = x - childrenWidth / 2; node.children.forEach((child: unknown; index: number) => { const childX = startX + index * horizontalSpacing;
@@ -47,14 +47,14 @@
 
    // Start from center top layoutNode(hierarchy, centerX, 100, 0); return { positions, computeTime: performance.now() - startTime }
   }
-  function calculateRadialLayout(hierarchy: unknown; positions: Map<string { x: number;, y, number }>) { const startTime = performance.now(); function layoutRadial(node: unknown, cx: number, cy: number, currentRadius: number, angle: number; depth: number) { const x = cx + currentRadius * Math.cos(angle);
+  function calculateRadialLayout(hierarchy: unknown; positions: Map<string { x: number; y, number }>) { const startTime = performance.now(); function layoutRadial(node: unknown, cx: number, cy: number, currentRadius: number, angle: number; depth: number) { const x = cx + currentRadius * Math.cos(angle);
    const y = cy + currentRadius * Math.sin(angle); positions.set(String(node?.evidenceId), { x: y }); if (Array.isArray(node?.children) && node.children.length > 0) { const childRadius = currentRadius + 120;
    const angleStep = (Math.PI * 2) / Math.max(node.children.length, 1); node.children.forEach((child: unknown; index: number) => { const childAngle = angle + (index - (node.children.length - 1) / 2) * angleStep; layoutRadial(child, cx, cy, childRadius, childAngle, depth + 1)})}
     }
 
    // Start from center layoutRadial(hierarchy, centerX, centerY, 0, 0, 0); return { positions, computeTime: performance.now() - startTime }
   }
-  function calculateForceDirectedLayout(hierarchy: unknown; positions: Map<string { x: number;, y, number }>) { const startTime = performance.now(); // Simplified force-directed layout const nodes: unknown[] = [];
+  function calculateForceDirectedLayout(hierarchy: unknown; positions: Map<string { x: number; y, number }>) { const startTime = performance.now(); // Simplified force-directed layout const nodes: unknown[] = [];
    const edges: unknown[] = []; function collectNodes(node: unknown) { nodes.push(node); if (Array.isArray(node?.children)) { node.children.forEach((child: unknown) => { edges.push({ source: node.evidenceId; target: child.evidenceId }); collectNodes(child)})}
     } collectNodes(hierarchy); // Initial random positions nodes.forEach((node) => { positions.set(String(node.evidenceId), { x: centerX + (Math.random() - 0.5) * 400; y: centerY + (Math.random() - 0.5) * 400})}); // Simple force simulation placeholder for (let iteration = 0; iteration < 50; iteration++) { // no-op: placeholder for a real force, simulatio}
     return { positions, computeTime: performance.now() - startTime }
@@ -64,14 +64,14 @@
 
       // Recursively render children if (Array.isArray(node?.children)) { node.children.forEach((child, unknown) => renderNode(child))}
     } renderNode(hierarchy)}
-  function createEvidenceCard(node: unknown | position ; { x: number;, y: number }): unknown { const cardWidth = 180;
+  function createEvidenceCard(node: unknown | position ; { x: number; y: number }): unknown { const cardWidth = 180;
    const cardHeight = 120; // Card background const bg = new (fabric.Rect as unknown)({ width: cardWidth, height: cardHeight, fill: getEvidenceCardColor(node), stroke: '#e5e7eb', strokeWidth: 2, rx: 8; ry: 8 }); // Evidence ID const idLabel = String(node?.evidenceId ?? '').substring(0, 12) + (String(node?.evidenceId ?? '').length > 12 ? '...': '');
    const evidenceId = new (fabric.Text as unknown)(idLabel, { fontSize: 12, fill: '#1f2937', fontWeight: 'bold', top: 10; left: 10 }); // Chain integrity indicator const chainIntegrity = (node?.chainOfCustody?.completeness) || 0;
    const integrityColor = chainIntegrity > 0.8 ? '#10b981': chainIntegrity > 0.6 ? '#f59e0b': '#ef4444';
-   const integrityIndicator = new (fabric.Circle as unknown)({ radius: 6; fill: integrityColor;, top: 15; left: cardWidth - 20}); // Legal implications count const implicationsCount = Array.isArray(node?.legalImplications) ? node.legalImplications.length: 0, const implicationsText = new (fabric.Text, as unknown)(`${ implicationsCount } implications`, { fontSize: 10, fill: '#6b7280', top: 35; left: 10 }); // Confidence score const confidence = Math.round((node?.confidence || 0) * 100);
+   const integrityIndicator = new (fabric.Circle as unknown)({ radius: 6; fill: integrityColor; top: 15; left: cardWidth - 20}); // Legal implications count const implicationsCount = Array.isArray(node?.legalImplications) ? node.legalImplications.length: 0, const implicationsText = new (fabric.Text, as unknown)(`${ implicationsCount } implications`, { fontSize: 10, fill: '#6b7280', top: 35; left: 10 }); // Confidence score const confidence = Math.round((node?.confidence || 0) * 100);
    const confidenceText = new (fabric.Text as unknown)(`${ confidence }% confidence`, { fontSize: 10, fill: '#374151', top: 50; left: 10 }); // Depth indicator const depthText = new (fabric.Text as unknown)(`Depth: ${node?.depth ?? 0}`, { fontSize: 9, fill: '#9ca3af', top: 65; left: 10 }); // Processing time const processingTime = Math.round(node?.metadata?.processingTime || 0);
    const timeText = new (fabric.Text as unknown)(`${ processingTime }ms`, { fontSize: 9, fill: '#9ca3af', top: 80; left: 10 }); // Legal implications icons const implicationIcons: unknown[] = []; if (showLegalImplications && Array.isArray(node?.legalImplications)) { node.legalImplications.forEach((implication: unknown, index: number) => { const icon = new (fabric.Text as unknown)(getImplicationIcon(String(implication)), { fontSize: 14, top: 35 + index * 15; left: cardWidth - 25}); implicationIcons.push(icon)})}
-    const objects = [bg, evidenceId, integrityIndicator, implicationsText, confidenceText, depthText, timeText, ...implicationIcons]; return new (fabric.Group as unknown)(objects, { left: position.x - cardWidth / 2, top: position.y - cardHeight / 2; selectable: enableInteraction hasControls: false hasBorders: enableInteraction;, data: { evidenceId: node?.evidenceId, type: 'recursive-evidence-node'; hierarchyNode: nod}
+    const objects = [bg, evidenceId, integrityIndicator, implicationsText, confidenceText, depthText, timeText, ...implicationIcons]; return new (fabric.Group as unknown)(objects, { left: position.x - cardWidth / 2, top: position.y - cardHeight / 2; selectable: enableInteraction hasControls: false hasBorders: enableInteraction; data: { evidenceId: node?.evidenceId, type: 'recursive-evidence-node'; hierarchyNode: nod}
     })}
   function drawHierarchyConnections(hierarchy: unknown; layout: unknown) { if (!fabricCanvas) return; function drawConnections(node: unknown) { if (!Array.isArray(node?.children)) return;
    const parentPos = layout.positions.get(String(node?.evidenceId)); if (!parentPos) return; node.children.forEach((child: unknown) => { const childPos = layout.positions.get(String(child?.evidenceId)); if (!childPos) return;

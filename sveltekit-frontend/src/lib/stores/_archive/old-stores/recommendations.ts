@@ -256,7 +256,7 @@ export const recommendationActions = {
  recommendationStore.update((state) => ({
  ...state, recommendations: state.recommendations.map((r) =>
  r.id === recommendationId ? { ...r, accepted: true } : r
- , activeRecommendations: state.activeRecommendations.filter((r) => r.id !== recommendationId),
+ activeRecommendations: state.activeRecommendations.filter((r) => r.id !== recommendationId),
  }));
  } catch (error: any) {
  console.error('Failed to accept recommendation: ', normalizeErrorMessage(error));
@@ -275,9 +275,9 @@ export const recommendationActions = {
  return {
  ...state, recommendations: state.recommendations.map((r) =>
  r.id === recommendationId ? { ...r, dismissed: true } : r
- , activeRecommendations: state.activeRecommendations.filter(
+ activeRecommendations: state.activeRecommendations.filter(
  (r) => r.id !== recommendationId
- , dismissedRecommendations: dismissedRec
+ dismissedRecommendations: dismissedRec
  ? [...state.dismissedRecommendations, dismissedRec]
  : state.dismissedRecommendations,
  };

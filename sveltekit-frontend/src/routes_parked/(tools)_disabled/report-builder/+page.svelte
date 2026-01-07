@@ -131,7 +131,7 @@ https://svelte.dev/e/js_parse_error -->
           confidentialityLevel: 'standard',
           canvasPosition: null,
           uploadedBy: '1',
-          uploadedAt: new Date(, updatedAt: new Date(),
+          uploadedAt: new Date( updatedAt: new Date(),
         },
         {
           id: '2',
@@ -158,7 +158,7 @@ https://svelte.dev/e/js_parse_error -->
           confidentialityLevel: 'standard',
           canvasPosition: null,
           uploadedBy: '1',
-          uploadedAt: new Date(, updatedAt: new Date(),
+          uploadedAt: new Date( updatedAt: new Date(),
         },
         {
           id: '3',
@@ -185,7 +185,7 @@ https://svelte.dev/e/js_parse_error -->
           confidentialityLevel: 'standard',
           canvasPosition: null,
           uploadedBy: '1',
-          uploadedAt: new Date(, updatedAt: new Date(),
+          uploadedAt: new Date( updatedAt: new Date(),
         },
       ];
     } catch (err) {

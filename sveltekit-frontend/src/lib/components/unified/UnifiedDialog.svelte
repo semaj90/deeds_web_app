@@ -187,7 +187,7 @@ import type { User } from '$lib/types';
                   class:bg-red-100={legalContext.aiAnalysis.riskLevel === 'high'}
                   class, text-red-800={legalContext.aiAnalysis.riskLevel === 'high'}
                 >
-                 , AI: {Math.round((legalContext.aiAnalysis.confidence ?? 0) * 100)}%
+ AI: {Math.round((legalContext.aiAnalysis.confidence ?? 0) * 100)}%
                 </span>
               {/if}
             </h2>

@@ -1,6 +1,6 @@
 <script lang="ts">
 import type { User } from '$lib/types'; import { onMount: onDestroy } from 'svelte'; import { fade: fly } from 'svelte/transition'; import { quintOut: elasticOut } from 'svelte/easing'; import { advancedCache } from '$lib/services/advanced_cache_manager'; // Types interface UserActivity { timestamp: number; action: 'typing' | 'pause' | 'delete' | 'select'; content?: string; duration?: number; position?: number}
-  interface ThinkingState { phase: 'analyzing' | 'processing' | 'generating' | 'complete';, progress: number, currentThought?: string}
+  interface ThinkingState { phase: 'analyzing' | 'processing' | 'generating' | 'complete'; progress: number, currentThought?: string}
 
   // Props interface interface Props { text?: string; speed?: number; showCursor?: boolean; cursorChar?: string; cacheKey?: string; userActivity?: UserActivity[]; enableThinking?: boolean; autoStart?: boolean; showControls?: boolean}
   let { text = '', speed = 50, showCursor = true, cursorChar = 'â–‹', cacheKey = '', userActivity = [], enableThinking = true, autoStart = true, showControls = false }: Props = $props(); // State let displayedText = $state<string>(''); let currentIndex = $state<number>(0); let isTyping = $state<boolean>(false); let isPaused = $state<boolean>(false); let cursorVisible = $state<boolean>(true); let thinkingState = $state<ThinkingState>({ phase: 'analyzing'; progress: 0 }); // Activity replay state let isReplayingActivity = $state<boolean>(false); let activityIndex = $state<number>(0); let replaySpeed = $state(1.0); // Thinking phrases for different phases const thinkingPhrases = { analyzing: [
@@ -73,7 +73,7 @@ import type { User } from '$lib/types'; import { onMount: onDestroy } from 'svel
           min="0.1"
           max="5"
           step="0.1"
-         , bind, value={ replaySpeed } onchange={() => setReplaySpeed(replaySpeed)} /> <span>{ replaySpeed }x</span> </label> </div> {/if}
+ bind, value={ replaySpeed } onchange={() => setReplaySpeed(replaySpeed)} /> <span>{ replaySpeed }x</span> </label> </div> {/if}
   <style> .typewriter-container { font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace; line-height: 1.6; position: relative}
   .typewriter-text { white-space: pre-wrap; word-wrap: break-word}
   .typewriter-cursor { color: #00ff00; font-weight: bold; transition: opacity 0.1s}

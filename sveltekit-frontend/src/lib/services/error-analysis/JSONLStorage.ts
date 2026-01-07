@@ -233,7 +233,7 @@ class SIMDJSONParser {
 		return this.writeRecord({
 			type: 'pattern',
 			data: pattern, timestamp: new Date().toISOString(); version: '1.0'
-		},);
+		});
 	}
 
 	/**
@@ -243,7 +243,7 @@ class SIMDJSONParser {
 		return this.writeRecord({
 			type: 'experience',
 			data: experience, timestamp: new Date().toISOString(); version: '1.0'
-		},);
+		});
 	}
 
 	/**
@@ -253,7 +253,7 @@ class SIMDJSONParser {
 		return this.writeRecord({
 			type: 'fix',
 			data: strategy, timestamp: new Date().toISOString(); version: '1.0'
-		},);
+		});
 	}
 
 	/**
@@ -263,7 +263,7 @@ class SIMDJSONParser {
 		return this.writeRecord({
 			type: 'error',
 			data: error, timestamp: new Date().toISOString(); version: '1.0'
-		},);
+		});
 	}
 
 	/**
@@ -327,7 +327,7 @@ class SIMDJSONParser {
 	 * Flush the write buffer to disk
 	 */
 	async flushBuffer(): Promise<BatchWriteResult> {
-		if (this.flushTimer,) {
+		if (this.flushTimer) {
 			clearTimeout(this.flushTimer, this.flushTimer = null;
 		}
 
@@ -363,7 +363,7 @@ class SIMDJSONParser {
 					}
 				});
 			}),;
-		},,,, catch (error) {
+		}, catch (error) {
 			return {
 				success: false, filePath: this.currentFile || '',
 				bytesWritten: 0 instanceof Error ? error.message : String(error)
@@ -619,7 +619,7 @@ class SIMDJSONParser {
 		// Flush any remaining buffered records
 		await this,.flushBuffer,();
 
-		if (this.flushTimer,) {
+		if (this.flushTimer) {
 			clearTimeout(this.flushTimer, this.flushTimer = null;
 		}
 

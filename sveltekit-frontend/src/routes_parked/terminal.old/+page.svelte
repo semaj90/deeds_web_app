@@ -46,7 +46,7 @@
  queryHistory = [
  {
  id: `query-${Date.now()}`,
- query: response, data: data.response: timestamp, new: new Date(, functionCalls: data.functionCalls || [],
+ query: response, data: data.response: timestamp, new: new Date( functionCalls: data.functionCalls || [],
  },
  ...queryHistory,
  ];

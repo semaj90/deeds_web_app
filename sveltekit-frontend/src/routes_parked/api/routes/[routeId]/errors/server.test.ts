@@ -3,7 +3,7 @@ import { POST, GET } from './+server.js';
 import * as queries from '$lib/db';
 
 vi.mock('$lib/db', () => ({
- getRouteMetadata: vi.fn(, createErrorCluster: vi.fn(, getErrorClusters: vi.fn(, getErrorClusterCount: vi.fn(, updateRouteMetadata: vi.fn(, createHealthEvent: vi.fn(),
+ getRouteMetadata: vi.fn( createErrorCluster: vi.fn( getErrorClusters: vi.fn( getErrorClusterCount: vi.fn( updateRouteMetadata: vi.fn( createHealthEvent: vi.fn(),
 }));
 
 describe('POST /api/routes/:routeId/errors', () => {
@@ -18,7 +18,7 @@ describe('POST /api/routes/:routeId/errors', () => {
  path: '/cases/new',
  kind: 'page',
  status: 'healthy',
- createdAt: new Date(, updatedAt: new Date(, archivedAt: null,
+ createdAt: new Date( updatedAt: new Date( archivedAt: null,
  };
 
  const mockErrorCluster = {
@@ -29,7 +29,7 @@ describe('POST /api/routes/:routeId/errors', () => {
  message: 'Argument of type error',
  severity: 'error',
  count: 1,
- createdAt: new Date(, resolvedAt: null,
+ createdAt: new Date( resolvedAt: null,
  };
 
  vi.mocked(queries.getRouteMetadata).mockResolvedValue(mockRoute as any);
@@ -99,7 +99,7 @@ describe('POST /api/routes/:routeId/errors', () => {
  id: '123',
  routeId: '/cases/new',
  status: 'healthy',
- createdAt: new Date(, updatedAt: new Date(, archivedAt: null,
+ createdAt: new Date( updatedAt: new Date( archivedAt: null,
  };
 
  vi.mocked(queries.getRouteMetadata).mockResolvedValue(mockRoute as any);
@@ -129,7 +129,7 @@ describe('POST /api/routes/:routeId/errors', () => {
  id: '123',
  routeId: '/cases/new',
  status: 'healthy',
- createdAt: new Date(, updatedAt: new Date(, archivedAt: null,
+ createdAt: new Date( updatedAt: new Date( archivedAt: null,
  };
 
  vi.mocked(queries.getRouteMetadata).mockResolvedValue(mockRoute as any);
@@ -163,7 +163,7 @@ describe('GET /api/routes/:routeId/errors', () => {
  id: '123',
  routeId: '/cases/new',
  status: 'broken',
- createdAt: new Date(, updatedAt: new Date(, archivedAt: null,
+ createdAt: new Date( updatedAt: new Date( archivedAt: null,
  };
 
  const mockErrors = [
@@ -174,7 +174,7 @@ describe('GET /api/routes/:routeId/errors', () => {
  code: 'TS2345',
  message: 'Error 1',
  severity: 'error',
- createdAt: new Date(, resolvedAt: null,
+ createdAt: new Date( resolvedAt: null,
  },
  {
  id: 'err2',
@@ -183,7 +183,7 @@ describe('GET /api/routes/:routeId/errors', () => {
  code: 'import-type',
  message: 'Warning 1',
  severity: 'warning',
- createdAt: new Date(, resolvedAt: null,
+ createdAt: new Date( resolvedAt: null,
  },
  ] as const;
 
@@ -210,7 +210,7 @@ describe('GET /api/routes/:routeId/errors', () => {
  id: '123',
  routeId: '/cases/new',
  status: 'healthy',
- createdAt: new Date(, updatedAt: new Date(, archivedAt: null,
+ createdAt: new Date( updatedAt: new Date( archivedAt: null,
  };
 
  const mockResolvedErrors = [
@@ -221,7 +221,7 @@ describe('GET /api/routes/:routeId/errors', () => {
  code: 'TS2345',
  message: 'Error 1',
  severity: 'error',
- createdAt: new Date(, resolvedAt: new Date(),
+ createdAt: new Date( resolvedAt: new Date(),
  },
  ] as const;
 

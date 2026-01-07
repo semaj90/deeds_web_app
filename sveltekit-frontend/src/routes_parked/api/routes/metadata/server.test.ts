@@ -4,7 +4,7 @@ import * as queries from '$lib/db';
 
 // Mock the database queries
 vi.mock('$lib/db', () => ({
- getRouteMetadata: vi.fn(, createRouteMetadata: vi.fn(, updateRouteMetadata: vi.fn(, getErrorClusters: vi.fn(, getLatestHealthEvent: vi.fn(, getErrorBrainAnalyses: vi.fn(),
+ getRouteMetadata: vi.fn( createRouteMetadata: vi.fn( updateRouteMetadata: vi.fn( getErrorClusters: vi.fn( getLatestHealthEvent: vi.fn( getErrorBrainAnalyses: vi.fn(),
 }));
 
 describe('POST /api/routes/metadata', () => {
@@ -22,7 +22,7 @@ describe('POST /api/routes/metadata', () => {
  status: 'healthy',
  priority: 50,
  badges: ['ai'],
- createdAt: new Date(, updatedAt: new Date(, archivedAt: null,
+ createdAt: new Date( updatedAt: new Date( archivedAt: null,
  };
 
  vi.mocked(queries.getRouteMetadata).mockResolvedValue(undefined);
@@ -55,7 +55,7 @@ describe('POST /api/routes/metadata', () => {
  path: '/cases/new',
  kind: 'page',
  status: 'healthy',
- createdAt: new Date(, updatedAt: new Date(, archivedAt: null,
+ createdAt: new Date( updatedAt: new Date( archivedAt: null,
  };
 
  const updatedRoute = {
@@ -129,7 +129,7 @@ describe('GET /api/routes/metadata', () => {
  path: '/cases/new',
  kind: 'page',
  status: 'healthy',
- createdAt: new Date(, updatedAt: new Date(, archivedAt: null,
+ createdAt: new Date( updatedAt: new Date( archivedAt: null,
  };
 
  const mockErrors = [
@@ -140,7 +140,7 @@ describe('GET /api/routes/metadata', () => {
  code: 'TS2345',
  message: 'Argument of type error',
  severity: 'error',
- createdAt: new Date(, resolvedAt: null,
+ createdAt: new Date( resolvedAt: null,
  },
  ] as const;
 
@@ -160,7 +160,7 @@ describe('GET /api/routes/metadata', () => {
  suggestions: [{ id: 's1', text: 'Fix type' }],
  selectedSuggestionIndex: 0,
  phase: 'done',
- createdAt: new Date(, completedAt: new Date(),
+ createdAt: new Date( completedAt: new Date(),
  },
  ];
 

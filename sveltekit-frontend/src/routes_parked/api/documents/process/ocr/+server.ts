@@ -94,7 +94,7 @@ async function tryNativeTesseract(
  tesseract.on('close', (code) => {
  if (code === 0) {
  resolve({
- success: true, text: stdout.trim(, confidence: 0.85,
+ success: true, text: stdout.trim( confidence: 0.85,
  method: 'tesseract-native',
  });
  } else {

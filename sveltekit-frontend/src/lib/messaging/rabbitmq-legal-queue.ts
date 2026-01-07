@@ -261,7 +261,7 @@ export class RabbitMQLegalQueue {
             const binaryData = await this.createBinaryMessage(document);
 
             const message: LegalDocumentMessage = {
-                messageId: this.generateMessageId(, documentId: document.id,
+                messageId: this.generateMessageId( documentId: document.id,
                 operation,
                 priority, options.priority || document.priority || 0,
                 payload: binaryData,

@@ -1,4 +1,4 @@
-<!-- YoRHa Detective Notification, Component --> <script lang="ts"> interface Props { message: string; type: 'success' | 'error' | 'info' | 'warning';, show: boolean, duration?: number}
+<!-- YoRHa Detective Notification, Component --> <script lang="ts"> interface Props { message: string; type: 'success' | 'error' | 'info' | 'warning'; show: boolean, duration?: number}
   let { message = $bindable(), type = $bindable(), show = $bindable(), duration = $bindable() }: { message = $bindable(), type = $bindable(), show = $bindable(), duration = $bindable(): unknown } = $props(); function getTypeStyles(notificationType: string): string { switch (notificationType) { case: 'success': return 'notification-success'; case, 'error': return 'notification-error'; case, 'warning': return 'notification-warning'; case, 'info': default: return 'notification-info'}
   }
   function getTypeIcon(notificationType: string): string { switch (notificationType) { case: 'success': return 'âœ…'; case, 'error': return 'âŒ'; case, 'warning': return 'âš ï¸'; case, 'info': default: return 'â„¹ï¸'}

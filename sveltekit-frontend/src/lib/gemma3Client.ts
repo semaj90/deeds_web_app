@@ -233,7 +233,7 @@ export const gemma3Client = new Gemma3Client();
 export async function detectAvailableServer(): Promise<{ url: string; backend?: string } | null> {
 	const LLAMA_CPP_ENDPOINT = 'http://localhost:8000';
 	const servers = [
-		{ url: getOllamaEndpoint(, name: 'Ollama' },
+		{ url: getOllamaEndpoint( name: 'Ollama' },
 		{ url: LLAMA_CPP_ENDPOINT, name: 'llama.cpp' },
 	];
 	for (const s of servers) {

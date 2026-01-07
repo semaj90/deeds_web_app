@@ -93,7 +93,7 @@ export const GET: RequestHandler = async ({ url }) => {
 
  const services: Record<string, string> = {
  ollama: ollamaHealthy ? 'connected' : 'unreachable',
- qdrant: await checkService('http://localhost:6333/health', redis: await checkRedis(, postgres: await checkPostgres(),
+ qdrant: await checkService('http://localhost:6333/health', redis: await checkRedis( postgres: await checkPostgres(),
  };
 
  const allHealthy = Object.values(services).every((s) => s === 'connected');

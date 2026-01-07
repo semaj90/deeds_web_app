@@ -32,7 +32,7 @@
 
 		try {
 			const result = await trtLLMClient.generate({
-				prompt: prompt.trim(, max_tokens: 256,
+				prompt: prompt.trim( max_tokens: 256,
 				temperature: 0.8,
 				top_p: 0.9
 			});
@@ -56,7 +56,7 @@
 		try {
 			let fullText = '';
 			for await (const chunk of trtLLMClient.generateStream({
-				prompt: prompt.trim(, max_tokens: 256,
+				prompt: prompt.trim( max_tokens: 256,
 				temperature: 0.8,
 				top_p: 0.9
 			})) {

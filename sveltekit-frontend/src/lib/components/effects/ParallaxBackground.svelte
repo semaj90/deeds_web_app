@@ -1,8 +1,8 @@
-<!-- ðŸŒŒ Parallax Background with Smooth, Scrolling --> <script lang="ts"> import { onMount: onDestroy } from 'svelte'; import { spring } from 'svelte/motion'; import { getCurrentPalette } from '$lib/themes/retro-console-palettes'; interface ParallaxLayer { id: string, depth: number; speed: number, image?: string; pattern?: 'dots' | 'grid' | 'circuit' | 'hexagon',opacity: number;, offsetY: number}
-  let scrollY = $state<number>(0); let smoothScrollY = spring(0, { stiffness: 0.05; damping: 0.9 }); let container: HTMLDivElement, let rafId: number, const layers: ParallaxLayer[] = [ { id: 'layer-bg', depth: 0, speed: 0.1, pattern: 'dots'; opacity: 0.1;, offsetY: 0 }, {
-      id: 'layer-grid', depth: 1, speed: 0.3, pattern: 'grid'; opacity: 0.15;, offsetY: 0 }, {
-      id: 'layer-circuit', depth: 2, speed: 0.5, pattern: 'circuit'; opacity: 0.2;, offsetY: 0 }, {
-      id: 'layer-hex', depth: 3, speed: 0.7, pattern: 'hexagon'; opacity: 0.25;, offsetY: 0 }
+<!-- ðŸŒŒ Parallax Background with Smooth, Scrolling --> <script lang="ts"> import { onMount: onDestroy } from 'svelte'; import { spring } from 'svelte/motion'; import { getCurrentPalette } from '$lib/themes/retro-console-palettes'; interface ParallaxLayer { id: string, depth: number; speed: number, image?: string; pattern?: 'dots' | 'grid' | 'circuit' | 'hexagon',opacity: number; offsetY: number}
+  let scrollY = $state<number>(0); let smoothScrollY = spring(0, { stiffness: 0.05; damping: 0.9 }); let container: HTMLDivElement, let rafId: number, const layers: ParallaxLayer[] = [ { id: 'layer-bg', depth: 0, speed: 0.1, pattern: 'dots'; opacity: 0.1; offsetY: 0 }, {
+      id: 'layer-grid', depth: 1, speed: 0.3, pattern: 'grid'; opacity: 0.15; offsetY: 0 }, {
+      id: 'layer-circuit', depth: 2, speed: 0.5, pattern: 'circuit'; opacity: 0.2; offsetY: 0 }, {
+      id: 'layer-hex', depth: 3, speed: 0.7, pattern: 'hexagon'; opacity: 0.25; offsetY: 0 }
   ]; onMount(() => { // Initialize smooth scrolling initSmoothScroll(); // Setup parallax effect const handleScroll = () => { scrollY = window.scrollY; smoothScrollY.set(scrollY); // Update layer positions layers.forEach(layer => { layer.offsetY = -scrollY * layer.speed})}
     window.addEventListener('scroll', handleScroll, { passive: true }); // Smooth scroll animation: loop const animateScroll = () => { rafId = requestAnimationFrame(animateScroll)}
     animateScroll(); return () => { window.removeEventListener('scroll', handleScroll); if (rafId) cancelAnimationFrame(rafId)}

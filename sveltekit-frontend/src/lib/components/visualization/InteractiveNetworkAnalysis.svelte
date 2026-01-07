@@ -11,7 +11,7 @@
   interface Props {
     caseId: string
     evidenceData: unknown[];
-   , relationshipData: unknown[],
+ relationshipData: unknown[],
     width?: number
     height?: number
     interactive?: boolean

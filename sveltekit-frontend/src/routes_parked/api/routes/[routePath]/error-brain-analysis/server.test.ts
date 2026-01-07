@@ -4,7 +4,7 @@ import { POST } from './+server.js';
 // Mock the database
 vi.mock('$lib/server/db', () => ({
  db: {
- insert: vi.fn().mockReturnThis(, values: vi.fn().mockReturnThis(, returning: vi.fn(),
+ insert: vi.fn().mockReturnThis( values: vi.fn().mockReturnThis( returning: vi.fn(),
  },
 }));
 

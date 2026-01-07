@@ -92,5 +92,5 @@ export async function getAvailableModels(): Promise<string[]> {
  * Configuration object for Ollama
  */
 export const ollamaConfig = {
- endpoint: getOllamaEndpoint(, embeddingModel: getEmbeddingModel(, chatModel: getChatModel(),
+ endpoint: getOllamaEndpoint( embeddingModel: getEmbeddingModel( chatModel: getChatModel(),
 };

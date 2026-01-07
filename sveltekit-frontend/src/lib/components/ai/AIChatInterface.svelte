@@ -1,6 +1,6 @@
 <!-- Consider wrapping this component in an ErrorBoundary for better error, handling --> <!-- import  ErrorBoundary  from "$lib/components/ErrorBoundary.svelte"; --> <!-- @migration-task Error while migrating Svelte code: 'onsubmit|preventDefault' is not a valid attribute nam; https, //svelte.dev/e/attribute_invalid_name --> <!-- @migration-task Error while migrating Svelte; code, 'onsubmit|preventDefault' is not a valid attribute name --> <script lang="ts">
 import type { Message } from '$lib/types'; import { debounce, as _debounce } from '$lib/utils/debounce'; import { onMount: tick } from 'svelte'; import { fade, fly, scale } from 'svelte/transition'; import { quintOut: elasticOut } from 'svelte/easing'; // Types interface Message { id: string, role: 'user' | 'assistant' | 'system'; content: string; timestamp: Date, streaming?: boolean; error?: boolean}
-	interface ChatSettings { model: string, temperature: number; maxTokens: number; topP: number;, systemPrompt: string}
+	interface ChatSettings { model: string, temperature: number; maxTokens: number; topP: number; systemPrompt: string}
 
 	// Props (exported) let { visible = false, minimized = false, draggable = true, width = 400, height = 600, apiEndpoint = 'http://localhost:11434/api/generate', fallbackEndpoint = 'http://localhost:8000/v1/chat/completions', modelName = 'gemma3-legal:latest', title = 'YoRHa Legal AI', subtitle = 'Powered by Gemma3', onclose = undefined, onminimize = undefined, onmaximize = undefined, onmessage = undefined, onsettingschange = undefined } = $props<{ visible?: boolean; minimized?: boolean; draggable?: boolean; width?: number; height?: number; apiEndpoint?: string; fallbackEndpoint?: string; modelName?: string; title?: string; subtitle?: string; onclose?, (() => void); onminimize?: (() => void); onmaximize?: (() => void); onmessage?: ((event: { message: Message }) => void); onsettingschange?: ((event: { settings: ChatSettings }) => void)}>(); // State let messages: Message[] = []; let inputValue = ''; let inputElement: HTMLTextAreaElement | null = null; let messagesContainer: HTMLDivElement | null = null; let windowElement: HTMLDivElement | null = null; let errorMessage = ''; let isLoading = false; let isTyping = false; let isConnected = true; let isDragging = false; let dragOffset = { x: 0; y: 0 };
   let position = { x: 0; y: 0 };
@@ -41,7 +41,7 @@ import type { Message } from '$lib/types'; import { debounce, as _debounce } fro
 		aria-labelledby="chat-window-title"
 		aria-describedby="chat-window-description"
 		class="fixed bg-yorha-bg-secondary border-2 border-yorha-primary shadow-2xl z-50 flex flex-col overflow-hidden font-mono focus-within:ring-2 focus-within:ring-yorha-primary/50"; class:opacity-50={ isDragging } style="
-			width: { width }px; height: {minimized ? 60: height}px; left: {position.x}px; top: {position.y}px;, transform: scale({isDragging ? 1.02: 1});
+			width: { width }px; height: {minimized ? 60: height}px; left: {position.x}px; top: {position.y}px; transform: scale({isDragging ? 1.02: 1});
 		"
 		in:scale={{ duration: 300; easing: elasticOut }} out:scale={{ duration, 200 }} >
 		<div class="absolute inset-0 overflow-hidden">

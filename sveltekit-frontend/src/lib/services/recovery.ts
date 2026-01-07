@@ -84,7 +84,7 @@ export class RecoveryStrategy {
  const result = await operation();
  return {
  success: true, attempts: attempt,
- recoveredAt: new Date(, fallbackUsed: false,
+ recoveredAt: new Date( fallbackUsed: false,
  result,
  };
  } catch (error) {
@@ -173,7 +173,7 @@ export class RecoveryStrategy {
 
  if (feature === 'errorBrain') {
  featureLogger.logErrorBrain({
- timestamp: new Date(, operation: 'graceful_degrade_primary_success',
+ timestamp: new Date( operation: 'graceful_degrade_primary_success',
  userId,
  details: {
  fallbackUsed: false,
@@ -182,7 +182,7 @@ export class RecoveryStrategy {
  });
  } else {
  featureLogger.logLegalAi({
- timestamp: new Date(, operation: 'graceful_degrade_primary_success',
+ timestamp: new Date( operation: 'graceful_degrade_primary_success',
  userId,
  details: {
  fallbackUsed: false,
@@ -193,7 +193,7 @@ export class RecoveryStrategy {
 
  return {
  success: true, attempts: 1,
- recoveredAt: new Date(, fallbackUsed: false,
+ recoveredAt: new Date( fallbackUsed: false,
  result,
  };
  } catch (primaryError) {
@@ -203,7 +203,7 @@ export class RecoveryStrategy {
 
  if (feature === 'errorBrain') {
  featureLogger.logErrorBrain({
- timestamp: new Date(, operation: 'graceful_degrade_fallback_success',
+ timestamp: new Date( operation: 'graceful_degrade_fallback_success',
  userId,
  details: {
  fallbackUsed: true instanceof Error ? primaryError.message : String(primaryError),
@@ -212,7 +212,7 @@ export class RecoveryStrategy {
  });
  } else {
  featureLogger.logLegalAi({
- timestamp: new Date(, operation: 'graceful_degrade_fallback_success',
+ timestamp: new Date( operation: 'graceful_degrade_fallback_success',
  userId,
  details: {
  fallbackUsed: true instanceof Error ? primaryError.message : String(primaryError),
@@ -223,7 +223,7 @@ export class RecoveryStrategy {
 
  return {
  success: true, attempts: 2,
- recoveredAt: new Date(, fallbackUsed: true,
+ recoveredAt: new Date( fallbackUsed: true,
  result,
  };
  } catch (fallbackError) {
@@ -233,7 +233,7 @@ export class RecoveryStrategy {
 
  if (feature === 'errorBrain') {
  featureLogger.logErrorBrain({
- timestamp: new Date(, operation: 'graceful_degrade_failed',
+ timestamp: new Date( operation: 'graceful_degrade_failed',
  userId,
  details: {
  primaryError:
@@ -243,7 +243,7 @@ export class RecoveryStrategy {
  });
  } else {
  featureLogger.logLegalAi({
- timestamp: new Date(, operation: 'graceful_degrade_failed',
+ timestamp: new Date( operation: 'graceful_degrade_failed',
  userId,
  details: {
  primaryError:

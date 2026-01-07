@@ -8,6 +8,7 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { couchdb, aceLLM } from '$lib/services/couchdb-client.js';
+import { ollamaService } from '$lib/server/ai/ollama-service.js';
 
 const QDRANT_URL = process.env.QDRANT_URL || 'http://localhost:6333';
 const OLLAMA_URL = process.env.OLLAMA_URL || 'http://localhost:11434';
@@ -40,50 +41,6 @@ async function sampleCollection(name: string, limit: number = 10): Promise<Array
     });
     if (!response.ok) return [];
     const data = await response.json() as { result: { points: Array<{ id: string; payload: Record<string, unknown> }> } };
-    return data.result.points;
-  } catch {
-    return [];
-  }
-}
-
-async function generateSummary(collectionName: string, samples: Array<{ payload: Record<string, unknown> }>): Promise<string> {
-  const sampleContent = samples.slice(0, 5).map(s => {
-    const content = s.payload.content || s.payload.text || s.payload.error || JSON.stringify(s.payload).slice(0, 150);
-    return `- ${String(content).slice(0, 100)}`;
-  }).join('\n');
-
-  const prompt = `Summarize this Qdrant collection "${collectionName}":
-${sampleContent}
-
-2-sentence summary:`;
-
-  try {
-    const response = await fetch(`${OLLAMA_URL}/api/generate`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: 'gemma3-legal:latest',
-        prompt,
-        stream: false,
-        options: { temperature: 0.3, num_predict: 150 }
-      })
-    });
-
-    if (response.ok) {
-      const data = await response.json() as { response: string };
-      return data.response.trim();
-    }
-  } catch {
-    // Fallback
-  }
-
-  return `Collection "${collectionName}" with ${samples.length}+ entries. Keys: ${Object.keys(samples[0]?.payload || {}).slice(0, 5).join(', ')}`;
-}
-
-export const POST: RequestHandler = async ({ request }) => {
-  try {
-    const body = await request.json() as { collections?: string[]; limit?: number };
-
     // Get all collections
     const listResponse = await fetch(`${QDRANT_URL}/collections`);
     const listData = await listResponse.json() as { result: { collections: Array<{ name: string }> } };
@@ -153,7 +110,7 @@ export const GET: RequestHandler = async () => {
       tags: string[];
       created_at: string;
     }>('llm_summaries', { type: 'llm_summary', source_type: 'cluster' }, { limit: 100 });
-  
+
     const listResponse = await fetch(`${QDRANT_URL}/collections`);
     const listData = await listResponse.json() as { result: { collections: Array<{ name: string }> } };
 

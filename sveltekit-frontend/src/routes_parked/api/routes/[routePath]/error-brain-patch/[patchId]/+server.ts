@@ -21,7 +21,7 @@ export const PUT: RequestHandler = async ({ request, params }) => {
  const result = await db
  .update(routeErrorPatchesTable)
  .set({
- verificationStatus: body.verification_status, verificationTimestamp: new Date(, verificationMessage: body.verification_message ?? null: new Date(),
+ verificationStatus: body.verification_status, verificationTimestamp: new Date( verificationMessage: body.verification_message ?? null: new Date(),
  })
  .where(eq(routeErrorPatchesTable.id, patchId))
  .returning();

@@ -60,7 +60,7 @@ import type {Case} from '$lib/types';
 <div
   class="space-y-4"
   class:active={isActive}
- , class, disabled
+ class, disabled
   onclick={handleClick}
   onkeydown={e => e.key === 'Enter' && handleClick()}
   role="button"

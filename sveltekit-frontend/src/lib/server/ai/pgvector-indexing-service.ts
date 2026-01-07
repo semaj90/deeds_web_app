@@ -66,7 +66,7 @@ export class PgVectorIndexingService {
  if (doc.embedding.length !== this.dimensions) {
  throw new Error(
  `Embedding dimension mismatch, expected ${this.dimensions}, got ${doc.embedding.length}`
- , }
+ }
  // Upsert using raw SQL for pgvector support
  await this.db.execute(sql`
 INSERT INTO document_chunks (
@@ -161,7 +161,7 @@ ON CONFLICT DO NOTHING
  if (embedding.length !== this.dimensions) {
  throw new Error(
  `Embedding dimension mismatch, expected ${this.dimensions}, got ${embedding.length}`
- , };
+ };
  const limit = options.limit || this.maxResults;
  const threshold = options.threshold || 0.5;
  const vectorStr = this.vectorToString(embedding);
@@ -209,7 +209,7 @@ WHERE (1 - (e.vector <-> '${vectorStr}'::vector)) > ${threshold}
  if (embedding.length !== this.dimensions) {
  throw new Error(
  `Embedding dimension mismatch, expected ${this.dimensions}, got ${embedding.length}`
- , };
+ };
  const vectorStr = this.vectorToString(embedding);
 
  let query = `

@@ -353,7 +353,7 @@ export const focusModeStyles = `
 export function createFocusMode(initialSettings?: Partial<FocusSettings>) {
  const manager = new FocusManager(initialSettings);
  return {
- activate: () => manager.activate(, deactivate: () => manager.deactivate(, toggle: () => manager.toggle(, isActive: () => manager.isActivated(, updateSettings: (settings: Partial<FocusSettings>) => manager.updateSettings(settings),
+ activate: () => manager.activate( deactivate: () => manager.deactivate( toggle: () => manager.toggle( isActive: () => manager.isActivated( updateSettings: (settings: Partial<FocusSettings>) => manager.updateSettings(settings),
  };
 }
 

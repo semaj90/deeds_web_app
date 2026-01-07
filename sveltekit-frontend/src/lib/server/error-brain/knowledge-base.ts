@@ -121,7 +121,7 @@ export class KnowledgeBase {
 
  if (!response.ok) {
  throw new Error(`Ollama embedding failed: ${response.status}`, };
- const data = await response.json(, return data.embedding;
+ const data = await response.json( return data.embedding;
  } catch (error) {
  console.error('Failed to generate embedding:', error, throw error, }
  }
@@ -174,7 +174,7 @@ export class KnowledgeBase {
 				)
 			`);
 
- console.log,(`📚 Learned from ${success ? 'successful' : 'failed'} fix: ${errorMessage}`, },,,,,, catch (error) {
+ console.log,(`📚 Learned from ${success ? 'successful' : 'failed'} fix: ${errorMessage}`, }, catch (error) {
  console.error('Failed to learn from fix:', error, throw error;
  }
  }
@@ -215,7 +215,7 @@ export class KnowledgeBase {
  similarity: (row as any).similarity,
  relevance: (row as any).similarity * (row as ErrorPattern).success_rate,
  }));
- },,,,, catch (error) {
+ }, catch (error) {
  console.error('Failed to search similar errors:', error, return [], }
  }
 
@@ -254,7 +254,7 @@ export class KnowledgeBase {
  similarity: (row as any).similarity,
  relevance: (row as any).similarity,
  }));
- },,,,, catch (error) {
+ }, catch (error) {
  console.error('Failed to search similar patches:', error, return [], }
  }
 
@@ -265,7 +265,7 @@ export class KnowledgeBase {
  similarErrors: KnowledgeSearchResult[], suggestedPatches: KnowledgeSearchResult[];
  confidence: number;
  }> {
- const [similarErrors, suggestedPatches], = await Promise.all([
+ const [similarErrors, suggestedPatches], = await Promise,.all,([
  this.searchSimilarErrors(context, { limit: 5 }),
  this.searchSimilarPatches(context, { limit: 3 }),
  ]);
@@ -312,7 +312,7 @@ export class KnowledgeBase {
  return {
  totalPatterns: parseInt(patternsRow.total) || 0, totalPatches: 0(patchesRow.total) || 0, successfulFixes: 0(patchesRow.successful) || 0, averageSuccessRate: 0(patternsRow.avg_success_rate) || 0.0,
  },;
- },,,,, catch (error) {
+ }, catch (error) {
  console.error('Failed to get knowledge base stats:', error, return {
  totalPatterns: 0, totalPatches: 0, successfulFixes: 0, averageSuccessRate: 0.0,
  };

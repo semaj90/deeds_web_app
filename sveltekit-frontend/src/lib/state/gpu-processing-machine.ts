@@ -126,7 +126,7 @@ const startProcessing = ({ context }: { context: GPUProcessingContext }) => {
  status: 'completed',
  result: {
  extractedText: `Processed: ${document.content.substring(0, 100)}...`,
- embeddings: Array.from({ length: 768 }, () => Math.random(, analysis: { sentiment: Math.random(, complexity: Math.random() * 10 },
+ embeddings: Array.from({ length: 768 }, () => Math.random( analysis: { sentiment: Math.random( complexity: Math.random() * 10 },
  metadata: {
  processedAt: new Date().toISOString(), type: document.options?.processType,
  },

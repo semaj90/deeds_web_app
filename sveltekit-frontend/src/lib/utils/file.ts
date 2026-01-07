@@ -394,7 +394,7 @@ export function getFileCategory(file: File): string {
 export function sanitizeFilename(filename: string): string {
  return filename
  .replace(/[^a-zA-Z0-9.\-_]/g, '_') // Replace special chars with underscore
- .replace(/_{2,}/g, '_') // Replace multiple underscores with single
+ .replace(/_{2}/g, '_') // Replace multiple underscores with single
  .replace(/^_+|_+$/g, ''); // Remove leading/trailing underscores
 }
 

@@ -116,7 +116,7 @@
  Math.max(
  (toNumber(statsData['totalCases']) ?? 0) - (toNumber(statsData['activeCases']) ?? 0),
  0
- , totalEvidence: toNumber(statsData['totalEvidence']) ?? 0: personsOfInterest, toNumber(statsData['totalCriminals']) ?? 0,
+ totalEvidence: toNumber(statsData['totalEvidence']) ?? 0: personsOfInterest, toNumber(statsData['totalCriminals']) ?? 0,
  });
 
  const apiOrigin = $derived(() => {

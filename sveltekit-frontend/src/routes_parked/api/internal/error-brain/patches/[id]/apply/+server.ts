@@ -62,7 +62,7 @@ export const POST: RequestHandler = async ({ params }) => {
  await db
  .update(errorBrainDiffs)
  .set({
- applied: true, appliedAt: new Date(, validationResult: JSON.stringify(validationResult),
+ applied: true, appliedAt: new Date( validationResult: JSON.stringify(validationResult),
  })
  .where(eq(errorBrainDiffs.id, patchId));
 

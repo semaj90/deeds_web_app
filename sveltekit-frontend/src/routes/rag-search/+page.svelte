@@ -19,6 +19,11 @@ import { page } from '$app/stores';
 import AnswerWithCitations from '$lib/components/rag/AnswerWithCitations.svelte';
 import SourceValidator from '$lib/components/rag/SourceValidator.svelte';
 import { default as generateAnswer, default as searchKnowledgeBase, default as validateSources } from '$lib/services/rag-source-validation';
+import type { Component } from 'svelte';
+
+// Type assertions for Svelte 5 component compatibility
+const SourceValidatorComponent = SourceValidator as unknown as Component;
+const AnswerWithCitationsComponent = AnswerWithCitations as unknown as Component;
 
 // Type definitions
 type ValidationStatus = 'approved' | 'rejected';
@@ -244,40 +249,40 @@ function startNewSearch() {
         <div class="form-control mb-4">
           <label class="label">
             <span class="label-text">Case ID (optional)</span>
+            <input
+              type="text"
+              bind:value={caseId}
+              placeholder="e.g., CASE-2024-001"
+              class="input input-bordered w-full max-w-xs"
+            />
           </label>
-          <input
-            type="text"
-            bind:value={caseId}
-            placeholder="e.g., CASE-2024-001"
-            class="input input-bordered w-full max-w-xs"
-          />
         </div>
 
         <!-- Query Input -->
         <div class="form-control">
           <label class="label">
             <span class="label-text">Your Question</span>
+            <div class="join w-full">
+              <input
+                type="text"
+                bind:value={query}
+                placeholder="e.g., What are the requirements for deed registration in Texas?"
+                class="input input-bordered join-item flex-1"
+                onkeydown={(e) => e.key === 'Enter' && handleSearch()}
+              />
+              <button
+                class="btn btn-primary join-item"
+                onclick={handleSearch}
+                disabled={isSearching || !query.trim()}
+              >
+                {#if isSearching}
+                  <span class="loading loading-spinner loading-sm"></span>
+                {:else}
+                  🔍 Search
+                {/if}
+              </button>
+            </div>
           </label>
-          <div class="join w-full">
-            <input
-              type="text"
-              bind:value={query}
-              placeholder="e.g., What are the requirements for deed registration in Texas?"
-              class="input input-bordered join-item flex-1"
-              onkeydown={(e) => e.key === 'Enter' && handleSearch()}
-            />
-            <button
-              class="btn btn-primary join-item"
-              onclick={handleSearch}
-              disabled={isSearching || !query.trim()}
-            >
-              {#if isSearching}
-                <span class="loading loading-spinner loading-sm"></span>
-              {:else}
-                🔍 Search
-              {/if}
-            </button>
-          </div>
         </div>
 
         <!-- Recent Queries -->
@@ -326,7 +331,7 @@ function startNewSearch() {
   {#if currentStep === 'validate'}
     <div class="card bg-base-100 shadow-xl">
       <div class="card-body">
-        <SourceValidator
+        <SourceValidatorComponent
           chunks={chunks}
           caseId={caseId || ''}
           initialQuery={query}
@@ -353,7 +358,7 @@ function startNewSearch() {
 
       <!-- Answer Display -->
       {#if answer}
-        <AnswerWithCitations
+        <AnswerWithCitationsComponent
           answer={answer}
           onPinToCanvas={handlePinToCanvas}
         />

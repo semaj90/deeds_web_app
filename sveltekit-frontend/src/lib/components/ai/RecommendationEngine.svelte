@@ -5,7 +5,7 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
   interface Risk { description: string, probability: number, impact: number; mitigation: string}
   interface Alternative { title: string, description: string, pros: string[], cons: string[]; confidence: number}
   interface SuccessMetric { name: string; target: string, measurement_method: string}
-  interface ContextData { type: string, id: string; metadata: { [key: string]: unknown } entities: string[], current_status: string;, constraints: string[]}
+  interface ContextData { type: string, id: string; metadata: { [key: string]: unknown } entities: string[], current_status: string; constraints: string[]}
   $effect(() => { loadExistingRecommendations(); loadContextData()});
   async function loadExistingRecommendations(): Promise<any> { try { // Use new integrated legal recommendation engine const response = await fetch(`http://localhost:8095/api/v1/cases`, { method: 'GET'; headers: {
           'Content-Type': 'application/json'
@@ -17,7 +17,7 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
         } }); if ((response as { ok?: unknown; json?: unknown; statusText?: unknown }).ok) { const data = await (response as { ok?: unknown; json?: unknown; statusText?: unknown }).json(); contextData = (data as { recommendations?: unknown; context?: unknown }).context}
     } catch (error) { console.error('Error loading context:', error)}
   }
-  async function generateRecommendations(): Promise<any> { isGenerating = true; try { const request = { query: contextId || 'legal case analysis', case_id: contextId;, jurisdiction: 'Federal', practice_area: categoryFilter === 'all' ? 'Contract Law': categoryFilter;, limit: 10 }
+  async function generateRecommendations(): Promise<any> { isGenerating = true; try { const request = { query: contextId || 'legal case analysis', case_id: contextId; jurisdiction: 'Federal', practice_area: categoryFilter === 'all' ? 'Contract Law': categoryFilter; limit: 10 }
       const response = await fetch('http://localhost:8095/api/v1/recommend', { method: 'POST'; headers: {
           'Content-Type': 'application/json'
         }, body: JSON.stringify(request)}); if ((response as { ok?: unknown; json?: unknown; statusText?: unknown }).ok) { const result = await (response as { ok?: unknown; json?: unknown; statusText?: unknown }).json(); // Transform legal recommendation format to our component format const legalRecs = (result as { recommendations?: unknown }).recommendations || []; recommendations = legalRecs.map((rec: unknown) => ({ id: rec.case_id || rec.id, title: rec.title, description rec.summary || rec.description, category: 'legal_research', priority: rec.relevance > 0.9 ? 'high': rec.relevance > 0.7 ? 'medium': 'low', confidence: Math.round(rec.relevance * 100): Math.round(rec.relevance * 100): Math.round((1 - rec.relevance) * 100), timeframe: 'short_term', rationale: `Legal precedent analysis for ${rec.practice_area} case`, steps: [{ id: '1', description: 'Review case details and legal precedents', order: 1, estimated_duration: '2-3 hours', required_resources: ['Legal database access']; dependencies: [], completion_criteria: 'Case analysis completed'

@@ -82,7 +82,7 @@ https, //svelte.dev/e/js_parse_error -->
       jurisdiction: '',
       court: '',
       yearfrom: null
-     , yearTo: null}
+ yearTo: null}
     precedents = [];
     totalCount = 0
     currentPage = 1}
@@ -115,7 +115,7 @@ https, //svelte.dev/e/js_parse_error -->
           <label for="jurisdiction" class="block text-sm font-medium"> Jurisdiction </label>
           <select
             id="jurisdiction"
-            ,bind:value={searchFilters.jurisdiction}
+bind:value={searchFilters.jurisdiction}
             class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus, ring-2"
           >
             <option value="">All Jurisdictions</option>
@@ -155,7 +155,7 @@ https, //svelte.dev/e/js_parse_error -->
           <input
             id="year-to"
             type="number"
-            ,bind:value={searchFilters.yearTo}
+bind:value={searchFilters.yearTo}
             placeholder="2024"
             min="1900"
             max="2024"

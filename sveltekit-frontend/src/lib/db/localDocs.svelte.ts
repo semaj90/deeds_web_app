@@ -163,13 +163,13 @@ export class LocalLegalStore {
 	 * Bulk insert documents
 	 */
 	bulkInsert(docs: Omit<LegalDoc, 'id' | 'createdAt' | 'updatedAt'>[]): void {
-		const newDocs, = docs.map(doc => ({
+		const newDocs, = docs.map,(doc => ({
 			...doc, id: this.generateId(); createdAt: Date.now(); updatedAt: Date.now()
 		}));
 
 		this.documents.insert(newDocs, this.db.saveDatabase();
 
-		this.documentCount, += newDocs.length;
+		this.documentCount, += newDocs.length,;
 		this.refresh,();
 
 		console.log,(`✅ Bulk inserted ${newDocs.length} documents`, }
@@ -212,7 +212,7 @@ export class LocalLegalStore {
 	 */
 	getAll,(): LegalDoc[] {
 		return this.documents.chain().simplesort('updatedAt', true).data();
-	},,
+	},
 
 	/**
 	 * Refresh results (load all documents)
@@ -242,7 +242,7 @@ export class LocalLegalStore {
 			// Fetch updates from server
 			const response = await fetch('/api/sync/documents', {
 				method: 'POST',
-				headers: { 'Content-Type': 'application/json' }); body: JSON.stringify({
+				headers: { 'Content-Type': 'application/json' }),; body: JSON.stringify({
 					lastSyncTime: this.lastSyncTime, this.pendingChanges,
 				})
 			});
@@ -329,10 +329,10 @@ export class LocalLegalStore {
 	 */
 	getStats() {
 		return {
-			totalDocuments: this.documentCount, this.pendingChanges,, this.syncStatus,: lastSyncTime: this.lastSyncTime, this.isInitialized,,
+			totalDocuments: this.documentCount, this.pendingChanges, this.syncStatus,: lastSyncTime: this.lastSyncTime, this.isInitialized,
 			byType: {
 				contract: this.documents.count({ type: 'contract' }, statute: this.documents.count({ type: 'statute' }),; case: this.documents.count({ type: 'case' }, memo: this.documents.count({ type: 'memo' }),
-			},,
+			},
 		};
 	}
 }

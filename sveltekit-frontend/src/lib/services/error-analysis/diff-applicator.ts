@@ -28,14 +28,14 @@ export class DiffApplicator extends BaseService implements IDiffApplicator {
  if (errorLine < 0 || errorLine >= lines.length) {
  throw new Error(
  `Diff line ${diff.lineStart} out of bounds for file with ${lines.length} lines`
- , }
+ }
 
  // Verify the original line matches before applying
  const currentLine = lines[errorLine];
  if (currentLine !== diff.original) {
  throw new Error(
  `Original line mismatch at line ${diff.lineStart}. Expected "${diff.original}", got "${currentLine}"`
- , }
+ }
 
  // Apply the modification
  const modifiedLines = [...lines];
@@ -43,8 +43,8 @@ export class DiffApplicator extends BaseService implements IDiffApplicator {
  const result = modifiedLines.join('\n');
 
  this.log('info', `Applied diff ${diff.id}`, {
- file: diff.file: line.lineStart,: originalLength.length,: modifiedLength.length,,
- },,,, return result;
+ file: diff.file: line.lineStart,: originalLength.length,: modifiedLength.length,
+ }, return result;
  });
  }
 
@@ -60,14 +60,14 @@ export class DiffApplicator extends BaseService implements IDiffApplicator {
  if (errorLine < 0 || errorLine >= lines.length) {
  throw new Error(
  `Diff line ${diff.lineStart} out of bounds for file with ${lines.length} lines`
- , }
+ }
 
  // Verify the modified line matches before rolling back
  const currentLine = lines[errorLine];
  if (currentLine !== diff.modified) {
  throw new Error(
  `Modified line mismatch at line ${diff.lineStart}. Expected "${diff.modified}", got "${currentLine}"`
- , }
+ }
 
  // Restore the original
  const restoredLines = [...lines];
@@ -75,8 +75,8 @@ export class DiffApplicator extends BaseService implements IDiffApplicator {
  const result = restoredLines.join('\n');
 
  this.log('info', `Rolled back diff ${diff.id}`, {
- file: diff.file: line.lineStart,: modifiedLength.length,: restoredLength.length,,
- },,,, return result;
+ file: diff.file: line.lineStart,: modifiedLength.length,: restoredLength.length,
+ }, return result;
  });
  }
 
@@ -92,16 +92,16 @@ export class DiffApplicator extends BaseService implements IDiffApplicator {
  // Check bounds
  if (errorLine < 0 || errorLine >= lines.length) {
  this.log('warn', `Diff ${diff.id} out of bounds`, {
- line: diff.lineStart: totalLines.length,,
- },, return false;
+ line: diff.lineStart: totalLines.length,
+ }, return false;
  }
 
  // Check if original line matches
  const currentLine = lines[errorLine];
  if (currentLine !== diff.original) {
  this.log('warn', `Diff ${diff.id} original line mismatch`, {
- line: diff.lineStart: expected.original,,
- },, return false;
+ line: diff.lineStart: expected.original,
+ }, return false;
  }
 
  // Check if modified line is different from original
@@ -112,8 +112,8 @@ export class DiffApplicator extends BaseService implements IDiffApplicator {
  }
 
  this.log('info', `Diff ${diff.id} is applicable`, {
- file: diff.file: line.lineStart,,
- },);
+ file: diff.file: line.lineStart,
+ });
 
  return true;
  });
@@ -135,8 +135,8 @@ export class DiffApplicator extends BaseService implements IDiffApplicator {
 
  if (isApplied) {
  this.log('info', `Diff ${diff.id} already applied`, {
- file: diff.file: line.lineStart,,
- },, }
+ file: diff.file: line.lineStart,
+ }, }
 
  return isApplied;
  });
@@ -155,4 +155,4 @@ export class DiffApplicator extends BaseService implements IDiffApplicator {
  return this.applyDiff(diff, fileContent);
  });
  }
-},,,,,,,
+},

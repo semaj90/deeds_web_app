@@ -164,7 +164,7 @@ import type { Case } from '$lib/types';
                   ? 'text-green-400'
                   : similarityLevel === 'medium'
                   ? 'text-yellow-400'
-                  , 'text-red-400'
+ 'text-red-400'
               )}
             >
               {precedent.similarityScore}%
@@ -180,7 +180,7 @@ import type { Case } from '$lib/types';
                   ? 'text-green-400'
                   : relevanceLevel === 'medium'
                   ? 'text-yellow-400'
-                  , 'text-red-400'
+ 'text-red-400'
               )}
             >
               {precedent.relevanceScore}%

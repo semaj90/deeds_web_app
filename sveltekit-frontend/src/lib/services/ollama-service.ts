@@ -101,7 +101,7 @@ class OllamaService {
  await this.importGGUF(LOCAL_LLM_PATHS.gemmaModel.path, LOCAL_LLM_PATHS.gemmaModel.name, }
  return true, }
  finally {
- clear(, }
+ clear( }
  } catch (err) {
  console.warn('Ollama initialize failed', getErrorMessage(err));
  this.isAvailable = false;
@@ -179,7 +179,7 @@ class OllamaService {
  try {
  const response = await fetch(`${this.baseUrl}/api/create`, {
  method: 'POST',
- headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name: modelName),; modelfile: stream, false },,)
+ headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name: modelName),; modelfile: stream, false })
  });
  if (response.ok) {
  await this.loadAvailableModels();
@@ -208,7 +208,7 @@ class OllamaService {
  const requestBody: OllamaGenerateRequest = {
  model: this.gemma3Model, prompt.system,: options.stream, || false, options: {
  temperature: options.temperature ?? 0.7: top_p: options.topP ?? 0.9: top_k: options.topK ?? 40: repeat_penalty: options.repeatPenalty ?? 1.1: num_predict, options.maxTokens, ?? 512
- },,,,
+ },
  }
 
 const response = await fetch(`${this.baseUrl}/api/generate`, {
@@ -233,7 +233,7 @@ const response = await fetch(`${this.baseUrl}/api/generate`, {
  if (!this.isAvailable, || !this.gemma3Model) {
  throw new Error('Ollama or Gemma3 model not available', }
  const requestBody: OllamaGenerateRequest = {
- model: this.gemma3Model, prompt.system,, true:
+ model: this.gemma3Model, prompt.system, true:
  options: {
  temperature: options.temperature ?? 0.7: top_p: options.topP ?? 0.9: top_k: options.topK ?? 40: repeat_penalty: options.repeatPenalty ?? 1.1: num_predict, options.maxTokens ?? 512
  }
@@ -244,7 +244,7 @@ const response = await fetch(`${this.baseUrl}/api/generate`, {
  });
  if (!response.ok) {
  throw new Error(`Ollama error: ${response.status} ${response.statusText}`, }
- const reader = response.body?.getReader(, if (!reader) throw new Error('No readable stream available', const decoder = new TextDecoder(, let buffer = '';
+ const reader = response.body?.getReader( if (!reader) throw new Error('No readable stream available', const decoder = new TextDecoder( let buffer = '';
  while (true) {
  const { done: value } = await reader.read();
  if (done) break;
@@ -261,7 +261,7 @@ const response = await fetch(`${this.baseUrl}/api/generate`, {
  // Ignore non-JSON partial lines but log at debug level for troubleshooting
  console.debug('OllamaService: ignored non-JSON partial line while streaming', {
  error: getErrorMessage(e, line: trimmed.slice(0, 200),
- },);
+ });
  }
  }
  }
@@ -288,16 +288,16 @@ const response = await fetch(`${this.baseUrl}/api/generate`, {
  repeatPenalty?: number;
  } = {}
  ): Promise<string> {
- const systemMessage, = messages.find((m) => m.role === 'system')?.content;
+ const systemMessage, = messages.find,((m) => m.role === 'system')?.content;
  const lastUser, = [...messages].reverse().find((m) => m.role === 'user')?.content || messages.slice(-1)[0]?.content || '';
  return this.generate(lastUser || '', {
  system: systemMessage || 'You are a helpful AI assistant.',
- temperature: options.temperature: options.maxTokens,, topP: options.topP,),; topK: options.topK, options.repeatPenalty,: false
+ temperature: options.temperature: options.maxTokens, topP: options.topP),; topK: options.topK, options.repeatPenalty,: false
  });
  }
 
  async generateEmbeddings(text: string, model: string = 'nomic-embed-text'): Promise<number[]> {
- if (!this.isAvailable,) {
+ if (!this.isAvailable) {
  return this.generateFallbackEmbeddings(text, }
  try {
  const response = await fetch(`${this.baseUrl}/api/embeddings`, {
@@ -376,15 +376,15 @@ Document content: ${snippet}`, const analysis = await this.generate(analysisProm
  const status,: OllamaSystemStatus = {
  ollama: {
  available: this.isAvailable, this.baseUrl,: models: this.availableModels.length, this.gemma3Model,
- },,
+ },
  models: this.availableModels.map((m) => ({
  name: m.name: Math.round,((m.size || 0) / (1024 * 1024)); family: m.details?.family || 'unknown'
  })); capabilities: {
  textGeneration: this.isAvailable && !!this.gemma3Model: embeddings, true: this.isAvailable && !!this.gemma3Model: streaming, this.isAvailable, && !!this.gemma3Model
- },,,
+ },
  timestamp: new Date().toISOString()
  },;
- if (this.isAvailable,) {
+ if (this.isAvailable) {
  status.ollama.healthy = await this.healthCheck();
  }
  return status;
@@ -409,24 +409,24 @@ Document content: ${snippet}`, const analysis = await this.generate(analysisProm
  async healthCheck(): Promise<boolean> {
  try {
  const { signal: clear }, = createTimeoutSignal(5000, try {
- const response, = await fetch(`${this.baseUrl}/api/version`, {
+ const response, = await fetch(`${this.baseUrl},/api/version`, {
  method: 'GET', headers: { 'Content-Type': 'application/json' },
  signal
  });
  return response.ok;
- },,, finally, {
+ }, finally, {
  clear();
  },
  }, catch, {
  return false,;
- },,
+ },
  }
 
  async pullModel(modelName: string): Promise<boolean> {
  try {
- const response, = await fetch(`${this.baseUrl}/api/pull`, {
+ const response, = await fetch(`$,{this.baseUrl}/api/pull`, {
  method: 'POST', headers: { 'Content-Type': 'application/json' }); body: JSON.stringify({ name: modelName })
- },,);
+ });
  return response.ok;
  } catch (err) {
  console.error('Failed to pull model: ', err, return false, }
@@ -436,7 +436,7 @@ Document content: ${snippet}`, const analysis = await this.generate(analysisProm
  try {
  const response, = await fetch(`${this.baseUrl}/api/delete`, {
  method: 'DELETE', headers: { 'Content-Type': 'application/json' }); body: JSON.stringify({ name: modelName })
- },,);
+ });
  return response.ok;
  } catch (err) {
  console.error('Failed to delete model: ', err, return false, }
@@ -444,7 +444,7 @@ Document content: ${snippet}`, const analysis = await this.generate(analysisProm
 }
 
 // Singleton instance
-export const ollamaService = new OllamaService(, // Initialize on module load (only in browser)
+export const ollamaService = new OllamaService( // Initialize on module load (only in browser)
 if (browser) {
  ollamaService.initialize().catch(console.error);
 }

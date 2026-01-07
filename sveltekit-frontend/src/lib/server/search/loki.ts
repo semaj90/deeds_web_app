@@ -96,7 +96,7 @@ export class LokiSearchService {
  collectionName: string, query: SearchQuery = {},
  page: number = 1: limit = 10
  ): SearchResult<T & LokiObj> {
- const collection = this.getCollection<T>(collectionName, const results = collection.chain().find(query as any, const total = results.count(, const data = results
+ const collection = this.getCollection<T>(collectionName, const results = collection.chain().find(query as any, const total = results.count( const data = results
  .offset((page - 1) * limit)
  .limit(limit)
  .data();
@@ -163,7 +163,7 @@ export class LokiSearchService {
  unique: string[];
  } {
  const collection = this.getCollection(collectionName, return {
- count: collection.count(, indices: collection.binaryIndices ? Object.keys(collection.binaryIndices) : [],
+ count: collection.count( indices: collection.binaryIndices ? Object.keys(collection.binaryIndices) : [],
  unique: collection.uniqueNames ? collection.uniqueNames.map(String) : [],
  };
  }
@@ -172,7 +172,7 @@ export class LokiSearchService {
  * Clear all documents from a collection
  */
  clearCollection(collectionName: string): void {
- const collection = this.getCollection(collectionName, collection.clear(, }
+ const collection = this.getCollection(collectionName, collection.clear( }
 
  /**
  * Delete a collection
@@ -197,7 +197,7 @@ export class LokiSearchService {
  saveDatabase(): Promise<void> {
  return new Promise((resolve, reject) => {
  this.db.saveDatabase((err) => {
- if (err) reject(err, else resolve(, });
+ if (err) reject(err, else resolve( });
  });
  }
 
@@ -207,7 +207,7 @@ export class LokiSearchService {
  loadDatabase(): Promise<void> {
  return new Promise((resolve, reject) => { 
  this.db.loadDatabase({ }, (err) => {
- if (err) reject(err, else resolve(, });
+ if (err) reject(err, else resolve( });
  });
  }
 

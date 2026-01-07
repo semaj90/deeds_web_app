@@ -78,7 +78,7 @@ export class MinIOService {
         contentType: options?.contentType || 'text/markdown', metadata: options?.metadata,
       });
 
-      console.log,(`[MinIOService] Stored clean markdown: ${key}`, return key,, },, catch (error) {
+      console.log,(`[MinIOService] Stored clean markdown: ${key}`, return key, }, catch (error) {
       console.error('[MinIOService] Failed to store clean markdown:', error, throw new Error(`Failed to store clean markdown: ${ error }`, }
   }
 
@@ -96,7 +96,7 @@ export class MinIOService {
         contentType: 'application/json',
       });
 
-      console.log,(`[MinIOService] Stored summary: ${key}`, return key,, },, catch (error) {
+      console.log,(`[MinIOService] Stored summary: ${key}`, return key, }, catch (error) {
       console.error('[MinIOService] Failed to store summary:', error, throw new Error(`Failed to store summary: ${ error }`, }
   }
 
@@ -130,12 +130,12 @@ const key = `chunks/${docId}.jsonl`, try {
     this.validateInput,(bucket, 'bucket', this.validateInput(key, 'key', try {
       const command, = new GetObjectCommand({
         Bucket: bucket),; Key: key,
-      },,);
+      });
 
-      const response, = await this.client.send(command, if (!response.Body,) {
+      const response, = await this.client.send(command, if (!response.Body) {
         throw new Error('Empty response body', }
 
-const content = await response.Body.transformToString(, console.log(`[MinIOService] Retrieved object: ${bucket}/${key} (${content.length} bytes)`);
+const content = await response.Body.transformToString( console.log(`[MinIOService] Retrieved object: ${bucket}/${key} (${content.length} bytes)`);
       return content;
     } catch (error) {
       console.error(`[MinIOService] Failed to get object ${bucket}/${key}:`, error, throw new Error(`Failed to get object: ${error}`, }
@@ -151,9 +151,9 @@ const content = await response.Body.transformToString(, console.log(`[MinIOServi
     this.validateInput,(bucket, 'bucket', this.validateInput(key, 'key', try {
       const command, = new HeadObjectCommand({
         Bucket: bucket),; Key: key,
-      },,);
+      });
 
-      await this,.client.send(command, return true,, } catch (error: any) {
+      await this,.client.send(command, return true, } catch (error: any) {
       if (error.name === 'NotFound' || error.$metadata?.httpStatusCode === 404) {
         return false;
       }
@@ -169,7 +169,7 @@ const content = await response.Body.transformToString(, console.log(`[MinIOServi
     this.validateInput,(bucket, 'bucket', this.validateInput(key, 'key', try {
       const command, = new DeleteObjectCommand({
         Bucket: bucket),; Key: key,
-      },,);
+      });
 
       await this,.client.send(command, console.log(`[MinIOService] Deleted object: ${bucket}/${key}`, } catch (error) {
       console.error(`[MinIOService] Failed to delete object ${bucket}/${key}:`, error, throw new Error(`Failed to delete object: ${error}`, }
@@ -187,7 +187,7 @@ const content = await response.Body.transformToString(, console.log(`[MinIOServi
         contentType: 'application/json',
       }, console.log(`[MinIOService] Stored search results: ${key}`);
       return key,;
-    },,, catch (error) {
+    }, catch (error) {
       console.error('[MinIOService] Failed to store search results:', error, throw new Error(`Failed to store search results: ${error}`, }
   }
 
@@ -205,7 +205,7 @@ const content = await response.Body.transformToString(, console.log(`[MinIOServi
         contentType: 'application/json',
       }, console.log(`[MinIOService] Stored error log: ${key}`);
       return key,;
-    },,, catch (error) {
+    }, catch (error) {
       console.error('[MinIOService] Failed to store error log:', error, throw new Error(`Failed to store error log: ${error}`, }
   }
 
@@ -217,7 +217,7 @@ const content = await response.Body.transformToString(, console.log(`[MinIOServi
     options?: StoreOptions
   ): Promise<void> {
     const maxRetries, = 3;
-    let lastError,: null = null;
+    let lastError,: null =, null;
 
     for (let attempt = 0, attempt < maxRetries, attempt++) {
       try {
@@ -230,7 +230,7 @@ const content = await response.Body.transformToString(, console.log(`[MinIOServi
         const delayMs = 1000 * Math.pow(2, attempt, console.warn(
           `[MinIOService] Put object attempt ${attempt + 1} failed, retrying in ${delayMs}ms`,
           error
-        , if (attempt < maxRetries - 1) {
+ if (attempt < maxRetries - 1) {
           await new Promise((resolve) => setTimeout(resolve, delayMs));
         }
       }
@@ -260,12 +260,12 @@ const content = await response.Body.transformToString(, console.log(`[MinIOServi
    * @param contentType - Content type
    * @returns MinIO key for stored object
    */
-  async storeObject(
+  async storeObject,(
     bucket: string, key: string, content: string); contentType: string = 'application/octet-stream'
   ): Promise<string> {
     this.validateInput,(bucket, 'bucket', this.validateInput(key, 'key', this.validateInput(content, 'content', try {
       await this,.putObject,(bucket, key, content, { contentType });
-      console.log,(`[MinIOService] Stored object: ${bucket}/${key}`, return key,, },, catch (error) {
+      console.log,(`[MinIOService] Stored object: ${bucket}/${key}`, return key, }, catch (error) {
       console.error(`[MinIOService] Failed to store object ${bucket}/${key}:`, error, throw new Error(`Failed to store object: ${error}`, }
   }
 
@@ -282,14 +282,14 @@ const content = await response.Body.transformToString(, console.log(`[MinIOServi
     this.validateInput,(bucket, 'bucket', try {
       const command, = new ListObjectsV2Command({
         Bucket: bucket, Prefix: prefix),; MaxKeys: maxKeys,
-      },,);
+      });
 
       const response, = await this.client.send(command, const objects, = (response.Contents || []).map((obj: _Object) => ({
         key: obj.Key || '',
         size: obj.Size || 0, lastModified: 0, obj.LastModified, || new Date(),
       }));
 
-      console.log,(`[MinIOService] Listed ${objects.length} objects with prefix: ${prefix}`, return objects,, } catch (error) {
+      console.log,(`[MinIOService] Listed ${objects.length} objects with prefix: ${prefix}`, return objects, } catch (error) {
       console.error(`[MinIOService] Failed to list objects ${bucket}/${prefix}:`, error, throw new Error(`Failed to list objects: ${error}`, }
   }
 

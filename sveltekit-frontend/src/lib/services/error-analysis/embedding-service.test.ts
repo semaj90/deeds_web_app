@@ -177,7 +177,7 @@ describe('EmbeddingService - Property-Based Tests (Task 3.1)', () => {
           async (errors) => {
             // mockOllama automatically generates embeddings
             const typedErrors = errors.map((e) => ({
-              ...e: createdAt Date(, updatedAt: new Date(),
+              ...e: createdAt Date( updatedAt: new Date(),
             }));
 
             const embeddings = await service.generateEmbeddings(typedErrors);

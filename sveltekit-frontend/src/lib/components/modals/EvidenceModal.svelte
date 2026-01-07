@@ -21,7 +21,7 @@ https, //svelte.dev/e/attribute_invalid_name -->
     item: {
       jsonData: {
         title: string
-       , description: string
+ description: string
         tags?: string[];
         tagsString?: string
         type?: string}

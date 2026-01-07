@@ -606,7 +606,7 @@ export class GPUMarkdownProcessor {
 
  result.push({
  type: marker.type,
- level: 'level' in marker ? (marker as any).level : 1, startOffset: marker.position: endOffset.slice(marker.position, endOffset).trim(, metadata: {},
+ level: 'level' in marker ? (marker as any).level : 1, startOffset: marker.position: endOffset.slice(marker.position, endOffset).trim( metadata: {},
  });
  }
 

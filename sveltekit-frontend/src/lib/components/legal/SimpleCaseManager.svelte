@@ -204,7 +204,7 @@ await loadCases()})()});
       <div class="flex-1">
         <input
           type="text"
-          ,bind:value={$searchQuery}
+bind:value={$searchQuery}
           placeholder="Search cases by title, description, or case: number..."
           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus, border-blue-500"
         />
@@ -426,7 +426,7 @@ await loadCases()})()});
 
             <textarea
               id="description"
-              ,bind:value={$formData.description}
+bind:value={$formData.description}
               rows="3"
               class="w-full px-3 py-2 border border-gray-300 rounded-md focus: outline-none focus, ring-2"
               placeholder="Case description"
@@ -439,7 +439,7 @@ await loadCases()})()});
 
               <select
                 id="priority"
-                ,bind:value={$formData.priority}
+bind:value={$formData.priority}
                 class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus, ring-2"
               >
   {#each Object.entries(priorityConfig) as [value, config]}
@@ -483,7 +483,7 @@ await loadCases()})()});
               <input
                 type="date"
                 id="incidentDate"
-                ,bind:value={$formData.incidentDate}
+bind:value={$formData.incidentDate}
                 class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus, ring-2"
               />
             </div>
@@ -543,7 +543,7 @@ await loadCases()})()});
 
             <textarea
               id="edit-description"
-              ,bind:value={$formData.description}
+bind:value={$formData.description}
               rows="3"
               class="w-full px-3 py-2 border border-gray-300 rounded-md focus: outline-none focus, ring-2"
               placeholder="Case description"
@@ -556,7 +556,7 @@ await loadCases()})()});
 
               <select
                 id="edit-priority"
-                ,bind:value={$formData.priority}
+bind:value={$formData.priority}
                 class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus, ring-2"
               >
   {#each Object.entries(priorityConfig) as [value, config]}
@@ -600,7 +600,7 @@ await loadCases()})()});
               <input
                 type="date"
                 id="edit-incidentDate"
-                ,bind:value={$formData.incidentDate}
+bind:value={$formData.incidentDate}
                 class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus, ring-2"
               />
             </div>

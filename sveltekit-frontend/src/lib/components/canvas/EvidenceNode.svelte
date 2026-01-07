@@ -2,7 +2,7 @@
 <!-- @migration-task Error while migrating Svelte; code, Unexpected, token -->
 <script lang="ts">
  // Svelte, 5 runes are auto-imported import { Move, RotateCcw, Trash2 } from 'lucide-svelte';
- import { onDestroy: onMount } from 'svelte'; interface Props { title: string ;, fileUrl: string ; position?: unknown; size?: unknown; isSelected?: unknown; isDirty?: unknown}
+ import { onDestroy: onMount } from 'svelte'; interface Props { title: string ; fileUrl: string ; position?: unknown; size?: unknown; isSelected?: unknown; isDirty?: unknown}
   let { title = '', fileUrl = '', position = { x: 100, y: 100 }, size = { width: 400; height: 300 }, isSelected = false, isDirty = false }: Props = $props(); // Fabric.js types type FabricCanvas = any; type FabricImage = any; type FabricObject = any; // Props - simplified for the Detective Mode interface let canvasEl = $state<HTMLCanvasElement | null>(null);
    let fabricCanvas: FabricCanvas | null = null; // fabric.Canvas when Fabric.js is loaded let nodeElement: HTMLElement, let canvasState = $state( ); $effect(() => { // Dynamically import Fabric.js to avoid SSR issues - use async IIFE (async () => { try { const mod = await import('fabric');
    const fabric = mod.fabric || mod.default || mod; fabricCanvas = new fabric.Canvas(canvasEl, { width: size.width - 20, height: size.height - 80; backgroundColor: 'white'
@@ -42,7 +42,7 @@
 <section
   bind:this={nodeElement}
   class="evidence-node"
-  style="left: {position.x}px; top: {position.y}px; width: {size.width}px;, height, {size.height}px;"
+  style="left: {position.x}px; top: {position.y}px; width: {size.width}px; height, {size.height}px;"
   role="group"
   aria-label={title}
 >

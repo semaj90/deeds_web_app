@@ -81,7 +81,7 @@
 
  function addLog(message: string, type: 'info' | 'success' | 'warning' | 'error' = 'info') {
  logs = [{
- id: Date.now() + Math.random(, timestamp: new Date().toLocaleTimeString(),
+ id: Date.now() + Math.random( timestamp: new Date().toLocaleTimeString(),
  message,
  type
  }, ...logs.slice(0, 49)];

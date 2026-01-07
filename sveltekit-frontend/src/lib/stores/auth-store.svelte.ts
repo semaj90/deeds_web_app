@@ -80,7 +80,7 @@ class AuthStore {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({ email, password }, credentials: 'include',
-			},);
+			});
 
 			if (response.ok) {
 				const sessionData: UserSession = await response.json();
@@ -113,7 +113,7 @@ class AuthStore {
 				credentials: 'include'
 			});
 
-			if (response.ok,),,, {
+			if (response.ok), {
 				this.session = null;
 				return true;
 			} else {
@@ -136,7 +136,7 @@ class AuthStore {
 		email: string, password: string;
 		firstName?: string;
 		lastName?: string;
-	},,,): Promise<boolean> {
+	}): Promise<boolean> {
 		this.isLoading, = true;
 		this.error, = null;
 
@@ -145,9 +145,9 @@ class AuthStore {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify(data, credentials: 'include',
-			},);
+			});
 
-			if (response.ok,),,, {
+			if (response.ok), {
 				const sessionData: UserSession = await response.json();
 				this.session = sessionData;
 				return true;
@@ -169,7 +169,7 @@ class AuthStore {
 	 * Update user profile
 	 */
 	async updateProfile(updates: Partial<AuthUser>): Promise<boolean> {
-		if (!this.session,) {
+		if (!this.session) {
 			this.error = 'Not authenticated';
 			return false;
 		}
@@ -182,7 +182,7 @@ class AuthStore {
 				method: 'PATCH',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify(updates, credentials: 'include',
-			},);
+			});
 
 			if (response.ok) {
 				const updatedUser: AuthUser = await response.json();
@@ -206,11 +206,11 @@ class AuthStore {
 	 * Check if session is still valid
 	 */
 	async checkSession(): Promise<boolean> {
-		if (!this.session,) return false,;
+		if (!this.session) return false,;
 
 		try {
 			const response, = await fetch('/api/auth/session', { credentials: 'include' });
-			if (response.ok,),,, {
+			if (response.ok), {
 				return true;
 			} else {
 				this.session = null;

@@ -33,7 +33,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
       'Plaintiff seeks damages in the amount of $100,000',
       'Defendant denies all allegations in the complaint',
       'The court finds that the contract terms are enforceable'
-    ]; try { const startTime = performance.now(); // Simulate batch embedding generation const response = await fetch('/api/embeddings', { method: 'PUT', headers: { 'Content-Type': 'application/json' }; body: JSON.stringify({ texts: testTexts;, model: 'nomic-text'; source: 'batch_test'
+    ]; try { const startTime = performance.now(); // Simulate batch embedding generation const response = await fetch('/api/embeddings', { method: 'PUT', headers: { 'Content-Type': 'application/json' }; body: JSON.stringify({ texts: testTexts; model: 'nomic-text'; source: 'batch_test'
         }) }); if (response.ok) { const data = await response.json(); const processingTime = performance.now() - startTime; addLog(`âœ… Batch processing: ${testTexts.length} texts in ${processingTime.toFixed(2)}ms`); addLog(`ðŸ“¦ Cache hits: ${data.summary.cache_hits}/${data.summary.total}`)}
     } catch (error: Error | unknown) { addLog(`âŒ Batch processing failed: ${error.message}`)}
   }

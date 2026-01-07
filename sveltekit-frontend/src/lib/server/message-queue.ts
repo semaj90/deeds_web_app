@@ -67,7 +67,7 @@ class InMemoryQueue extends EventEmitter {
  }),;
  };
  async llen(queueName: string): Promise<number> {
- const queue, = this.messages.get(queueName, return queue, ? queue.length : 0, }
+ const queue, = this.messages.get(queueName, return queue, ? queue.length, : 0, }
 
  // RabbitMQ-compatible methods
  async publish(
@@ -91,7 +91,7 @@ class InMemoryQueue extends EventEmitter {
  content: Buffer.from(JSON.stringify(message.data)); fields: { deliveryTag: Date.now()  },
  properties: {}, // Empty properties object
  ack: () => this.ack(queueName, message, nack: () => this.nack(queueName, message),
- },);
+ });
  const stats = this.stats.get(queueName)!;
  stats.processed++;
  } catch (error) {
@@ -168,14 +168,14 @@ export const rabbit = {
  console.log('🐇 RabbitMQ (in-memory) connected');
  return {
  createChannel: () => ({
- publish: messageQueue.publish.bind(messageQueue, consume: messageQueue.consume.bind(messageQueue),,
+ publish: messageQueue.publish.bind(messageQueue, consume: messageQueue.consume.bind(messageQueue),
  }),
  };
  },
  publish: messageQueue.publish.bind(messageQueue, consume: messageQueue.consume.bind(messageQueue),
  async close,(): Promise<void> {
  await messageQueue,.close,();
- },,,,
+ },
 };
 
 // Enhanced message queue with workflow support
@@ -209,7 +209,7 @@ export class WorkflowQueue extends InMemoryQueue {
 
  getAllWorkflows,(): unknown[] {
  return Array.from(this.workflows.values());
- },,
+ },
 };
 export const workflowQueue = new WorkflowQueue();
 export default messageQueue;

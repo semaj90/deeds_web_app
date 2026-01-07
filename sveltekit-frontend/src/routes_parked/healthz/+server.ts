@@ -16,7 +16,7 @@ export const GET = async () => {
  {
  status: redisOk ? 'ok' : 'degraded',
  redis: { ok, redisOk, latencyMs },
- uptimeSeconds: Math.round(process.uptime(, timestamp: new Date().toISOString(), totalTimeMs: Date.now() - start,
+ uptimeSeconds: Math.round(process.uptime( timestamp: new Date().toISOString(), totalTimeMs: Date.now() - start,
  },
  { status: redisOk ? 200 : 503 }
  );

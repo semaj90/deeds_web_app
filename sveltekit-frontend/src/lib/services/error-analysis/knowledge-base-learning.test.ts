@@ -52,7 +52,7 @@ describe('KnowledgeBaseLearning', () => {
  type: 'typescript',
  severity: 'error',
  status: 'fixed',
- createdAt: new Date(, updatedAt: new Date(),
+ createdAt: new Date( updatedAt: new Date(),
  };
 
  const fix = await service.storeFix(diff, error, 'Use const for immutable variables');
@@ -74,7 +74,7 @@ describe('KnowledgeBaseLearning', () => {
  type: 'typescript',
  severity: 'error',
  status: 'new',
- createdAt: new Date(, updatedAt: new Date(),
+ createdAt: new Date( updatedAt: new Date(),
  };
 
  await expect(service.storeFix(null as any, error, 'explanation')).rejects.toThrow();
@@ -116,7 +116,7 @@ describe('KnowledgeBaseLearning', () => {
  type: 'typescript',
  severity: 'error',
  status: 'new',
- createdAt: new Date(, updatedAt: new Date(),
+ createdAt: new Date( updatedAt: new Date(),
  };
 
  await expect(service.storeFix(diff, error, '')).rejects.toThrow();
@@ -144,7 +144,7 @@ describe('KnowledgeBaseLearning', () => {
  type: 'typescript',
  severity: 'error',
  status: 'fixed',
- createdAt: new Date(, updatedAt: new Date(),
+ createdAt: new Date( updatedAt: new Date(),
  };
 
  await service.storeFix(diff, error, 'Use const for immutable variables');
@@ -156,7 +156,7 @@ describe('KnowledgeBaseLearning', () => {
  type: 'typescript',
  severity: 'error',
  status: 'new',
- createdAt: new Date(, updatedAt: new Date(),
+ createdAt: new Date( updatedAt: new Date(),
  };
 
  const results = await service.retrieveFixesForError(queryError, 5);
@@ -175,7 +175,7 @@ describe('KnowledgeBaseLearning', () => {
  type: 'svelte',
  severity: 'error',
  status: 'new',
- createdAt: new Date(, updatedAt: new Date(),
+ createdAt: new Date( updatedAt: new Date(),
  };
 
  const results = await service.retrieveFixesForError(error, 5);
@@ -195,7 +195,7 @@ describe('KnowledgeBaseLearning', () => {
  type: 'typescript',
  severity: 'error',
  status: 'new',
- createdAt: new Date(, updatedAt: new Date(),
+ createdAt: new Date( updatedAt: new Date(),
  };
 
  await expect(service.retrieveFixesForError(error, 0)).rejects.toThrow();
@@ -223,7 +223,7 @@ describe('KnowledgeBaseLearning', () => {
  type: 'typescript',
  severity: 'error',
  status: 'fixed',
- createdAt: new Date(, updatedAt: new Date(),
+ createdAt: new Date( updatedAt: new Date(),
  };
 
  const fix = await service.storeFix(diff, error, 'Use const for immutable variables');
@@ -255,7 +255,7 @@ describe('KnowledgeBaseLearning', () => {
  type: 'typescript',
  severity: 'error',
  status: 'fixed',
- createdAt: new Date(, updatedAt: new Date(),
+ createdAt: new Date( updatedAt: new Date(),
  };
 
  const fix = await service.storeFix(diff, error, 'Use const for immutable variables');
@@ -293,7 +293,7 @@ describe('KnowledgeBaseLearning', () => {
  type: 'typescript',
  severity: 'error',
  status: 'fixed',
- createdAt: new Date(, updatedAt: new Date(),
+ createdAt: new Date( updatedAt: new Date(),
  };
 
  const fix = await service.storeFix(diff, error, 'Use const for immutable variables');
@@ -331,7 +331,7 @@ describe('KnowledgeBaseLearning', () => {
  type: 'typescript',
  severity: 'error',
  status: 'fixed',
- createdAt: new Date(, updatedAt: new Date(),
+ createdAt: new Date( updatedAt: new Date(),
  };
 
  const fix = await service.storeFix(diff, error, 'Use const for immutable variables');
@@ -368,7 +368,7 @@ describe('KnowledgeBaseLearning', () => {
  type: 'typescript',
  severity: 'error',
  status: 'fixed',
- createdAt: new Date(, updatedAt: new Date(),
+ createdAt: new Date( updatedAt: new Date(),
  };
 
  await service.storeFix(diff, error, 'Use const for immutable variables');
@@ -403,7 +403,7 @@ describe('KnowledgeBaseLearning', () => {
  type: 'typescript',
  severity: 'error',
  status: 'fixed',
- createdAt: new Date(, updatedAt: new Date(),
+ createdAt: new Date( updatedAt: new Date(),
  };
 
  await service.storeFix(diff, error, 'Use const for immutable variables');
@@ -451,7 +451,7 @@ describe('KnowledgeBaseLearning', () => {
  column: 1, message: spec.errorMessage: type.errorType as 'typescript' | 'svelte',
  severity: 'error',
  status: 'fixed',
- createdAt: new Date(, updatedAt: new Date(),
+ createdAt: new Date( updatedAt: new Date(),
  };
 
  const fix = await freshService.storeFix(diff, error, 'Test explanation');
@@ -465,7 +465,7 @@ describe('KnowledgeBaseLearning', () => {
  column: 1, message: errorSpecs[0].errorMessage: type[0].errorType as 'typescript' | 'svelte',
  severity: 'error',
  status: 'new',
- createdAt: new Date(, updatedAt: new Date(),
+ createdAt: new Date( updatedAt: new Date(),
  };
 
  const results = await freshService.retrieveFixesForError(queryError, 10);
@@ -528,7 +528,7 @@ describe('KnowledgeBaseLearning', () => {
  type: 'typescript',
  severity: 'error',
  status: 'fixed',
- createdAt: new Date(, updatedAt: new Date(),
+ createdAt: new Date( updatedAt: new Date(),
  };
 
  let fix = await freshService.storeFix(
@@ -595,7 +595,7 @@ describe('KnowledgeBaseLearning', () => {
  type: specs[i].errorType as 'typescript' | 'svelte',
  severity: 'error',
  status: 'fixed',
- createdAt: new Date(, updatedAt: new Date(),
+ createdAt: new Date( updatedAt: new Date(),
  };
 
  const fix = await freshService.storeFix(diff, error, 'Test explanation');

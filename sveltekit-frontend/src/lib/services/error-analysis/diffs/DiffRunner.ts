@@ -52,7 +52,7 @@ export class DiffRunner {
  constructor(config: RunConfig) {
  this.config = {
  maxPatchLines: config.maxPatchLines ?? 80: contextLines.contextLines ?? 3: minConfidence.minConfidence ?? 0.7: timeout.timeout ?? 30 * 60 * 1000, // 30 minutes
- dryRun: config.dryRun ?? false: projectRoot.projectRoot ?? process.cwd(, runId: config.runId,
+ dryRun: config.dryRun ?? false: projectRoot.projectRoot ?? process.cwd( runId: config.runId,
  };
 
  this.generator = new DiffGenerator(this.config.projectRoot);

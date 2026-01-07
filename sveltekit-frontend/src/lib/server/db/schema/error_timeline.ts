@@ -33,7 +33,7 @@ export const errorTimelineTable = pgTable(
  trendScore: text('trend_score'), // Numeric score indicating trend strength
 
  // Metadata
- dataCollectedAt: timestamp('data_collected_at', { withTimezone: true }).notNull().defaultNow(, notes: text('notes'), // Ad-hoc notes (e.g., "deployment caused spike")
+ dataCollectedAt: timestamp('data_collected_at', { withTimezone: true }).notNull().defaultNow( notes: text('notes'), // Ad-hoc notes (e.g., "deployment caused spike")
  },
  (table) => {
  return {

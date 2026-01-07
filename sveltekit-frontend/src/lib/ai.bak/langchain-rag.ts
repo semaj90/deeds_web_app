@@ -1249,7 +1249,7 @@ Only return the queries, one per line.`),
 // Export singleton instance with environment configuration
 export const legalRAG = new LegalRAGService({
  qdrantUrl: import.meta.env.QDRANT_URL || 'http://localhost:6333',
- ollamaGenerationUrl: getOllamaGenerationEndpoint(, ollamaEmbeddingUrl: getOllamaEmbeddingEndpoint(, collectionName: 'legal_documents', // Default collection name
+ ollamaGenerationUrl: getOllamaGenerationEndpoint( ollamaEmbeddingUrl: getOllamaEmbeddingEndpoint( collectionName: 'legal_documents', // Default collection name
  embeddingDimensions: 384, // Default embedding dimensions, adjust as needed for your model
  ollamaTemperature: 0.7, // Default temperature
  ollamaNumCtx: 2048, // Default context window
@@ -2397,7 +2397,7 @@ Only return the queries, one per line.`),
 // Export singleton instance with environment configuration
 export const legalRAG = new LegalRAGService({
  qdrantUrl: import.meta.env.QDRANT_URL || 'http://localhost:6333',
- ollamaGenerationUrl: getOllamaGenerationEndpoint(, ollamaEmbeddingUrl: getOllamaEmbeddingEndpoint(, collectionName: 'legal_documents', // Default collection name
+ ollamaGenerationUrl: getOllamaGenerationEndpoint( ollamaEmbeddingUrl: getOllamaEmbeddingEndpoint( collectionName: 'legal_documents', // Default collection name
  embeddingDimensions: 384, // Default embedding dimensions, adjust as needed for your model
  ollamaTemperature: 0.7, // Default temperature
  ollamaNumCtx: 2048, // Default context window

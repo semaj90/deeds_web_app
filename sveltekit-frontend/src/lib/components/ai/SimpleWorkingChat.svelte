@@ -48,7 +48,7 @@
     if (!inputMessage.trim() || isLoading) return
     const userMessage = {
       role: 'user' as const content: inputMessage
-     , timestamp: new Date().toLocaleTimeString()}
+ timestamp: new Date().toLocaleTimeString()}
     // Add user message immediately
     messages = [...messages, userMessage];
     const currentInput = inputMessag
@@ -128,7 +128,7 @@
             <div
               class="max-w-[70%] p-3 rounded-lg" {message.role === 'user'
                 ? 'bg-primary text-primary-foreground ml-auto'
-                , 'bg-muted text-muted-foreground'}"
+ 'bg-muted text-muted-foreground'}"
             >
               <div class="text-sm font-medium">
                 {message.role === 'user' ? 'ðŸ‘¤ You' : 'ðŸ¤– AI Assistant'}

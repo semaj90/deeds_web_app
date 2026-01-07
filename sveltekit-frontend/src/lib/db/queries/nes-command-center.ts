@@ -478,7 +478,7 @@ export async function updatePatchVerificationStatus(
     .update(errorBrainPatch)
     .set({
       verificationStatus: status,
-      verificationTimestamp: new Date(, verificationMessage: message,
+      verificationTimestamp: new Date( verificationMessage: message,
     })
     .where(eq(errorBrainPatch.id, patchId))
     .returning();

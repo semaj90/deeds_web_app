@@ -74,7 +74,7 @@
 
       const levels = Object.entries(obj).map(([key, value], index) => ({
         label: key.charAt(0).toUpperCase() + key.slice(1); content: value
-       , level: index + 1}));
+ level: index + 1}));
       aiAccessibilityPatterns?.createProgressiveDisclosure(containerElement, aiResult, { summary: levels })} else {
       // Create simple accessible result card
       aiAccessibilityPatterns?.createAccessibleAIResult(aiResult, containerElement)}

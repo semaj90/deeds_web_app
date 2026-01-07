@@ -170,7 +170,7 @@ import type { Document } from '$lib/types';
           fileInput.click()}
       }}
       on:dragover|preventDefault
-     , on:drop|preventDefault={(e: DragEvent) => {
+ on:drop|preventDefault={(e: DragEvent) => {
         if (e.dataTransfer?.files[0]) {
           send({ type: 'FILE_SELECTED', file: e.dataTransfer.files[0] })}
       }}
@@ -271,7 +271,7 @@ import type { Document } from '$lib/types';
                 class:text-green-600={$state.context.analysisResults?.riskScore < 0.5}
                 class, text-orange-600={$state.context.analysisResults?.riskScore >= 0.5 &&
                   $state.context.analysisResults?.riskScore < 0.8}
-               , class, text-red-600={$state.context.analysisResults?.riskScore >= 0.8}
+ class, text-red-600={$state.context.analysisResults?.riskScore >= 0.8}
               >
                 {($state.context.analysisResults?.riskScore * 100).toFixed(0)}%
               </span>

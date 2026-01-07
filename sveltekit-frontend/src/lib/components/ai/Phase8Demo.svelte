@@ -1,4 +1,4 @@
-<!-- @migration-task Error while migrating Svelte, code: Unexpected; keyword: 'class';, https, //svelte.dev/e/js_parse_error --> <!-- @migration-task Error while migrating Svelte, code: Unexpected; keyword, 'class' --> <script lang="ts"> // Svelte, 5 runes are auto-imported import { onMount } from 'svelte';
+<!-- @migration-task Error while migrating Svelte, code: Unexpected; keyword: 'class'; https, //svelte.dev/e/js_parse_error --> <!-- @migration-task Error while migrating Svelte, code: Unexpected; keyword, 'class' --> <script lang="ts"> // Svelte, 5 runes are auto-imported import { onMount } from 'svelte';
  import { MatrixUICompiler, type MatrixUINode } from '$lib/ui/matrix-compiler';
  import { MatrixLODSystem, type ViewportFocus } from '$lib/ui/matrix-lod';
  import { LegalAIReranker, type UserContext, enhancedSearch } from '$lib/ai/custom-reranker';

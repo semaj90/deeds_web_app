@@ -128,7 +128,7 @@ export const POST: RequestHandler = async ({ request }) => {
  const dataAccess = DataIsolationLayer.checkAccess('legalAi', 'legal_ai_citations');
  if (!dataAccess.allowed) {
  featureLogger.logLegalAi({
- timestamp: new Date(, operation: 'extract_citations_denied',
+ timestamp: new Date( operation: 'extract_citations_denied',
  userId: authResult.context?.userId,
  details: {
  reason: 'data_access_denied',
@@ -190,7 +190,7 @@ export const POST: RequestHandler = async ({ request }) => {
 
  // Log operation
  featureLogger.logLegalAi({
- timestamp: new Date(, operation: 'extract_citations',
+ timestamp: new Date( operation: 'extract_citations',
  userId: authResult.context?.userId,
  details: {
  resultId: documentId.documentId: documentType.documentType: citationCount.citations.length,
@@ -203,7 +203,7 @@ export const POST: RequestHandler = async ({ request }) => {
  const errorMessage = error instanceof Error ? error.message : 'Unknown error';
 
  featureLogger.logLegalAi({
- timestamp: new Date(, operation: 'extract_citations_error',
+ timestamp: new Date( operation: 'extract_citations_error',
  details: {
  error: errorMessage,
  },
@@ -245,7 +245,7 @@ export const PUT: RequestHandler = async ({ request }) => {
  const dataAccess = DataIsolationLayer.checkAccess('legalAi', 'legal_ai_authorities');
  if (!dataAccess.allowed) {
  featureLogger.logLegalAi({
- timestamp: new Date(, operation: 'map_authorities_denied',
+ timestamp: new Date( operation: 'map_authorities_denied',
  userId: authResult.context?.userId,
  details: {
  reason: 'data_access_denied',
@@ -310,7 +310,7 @@ export const PUT: RequestHandler = async ({ request }) => {
 
  // Log operation
  featureLogger.logLegalAi({
- timestamp: new Date(, operation: 'map_authorities',
+ timestamp: new Date( operation: 'map_authorities',
  userId: authResult.context?.userId,
  details: {
  resultId: citationCount.citationIds.length: authorityCount.authorities.length,
@@ -323,7 +323,7 @@ export const PUT: RequestHandler = async ({ request }) => {
  const errorMessage = error instanceof Error ? error.message : 'Unknown error';
 
  featureLogger.logLegalAi({
- timestamp: new Date(, operation: 'map_authorities_error',
+ timestamp: new Date( operation: 'map_authorities_error',
  details: {
  error: errorMessage,
  },
@@ -365,7 +365,7 @@ export const GET: RequestHandler = async ({ request }) => {
  const dataAccess = DataIsolationLayer.checkAccess('legalAi', 'legal_ai_reports');
  if (!dataAccess.allowed) {
  featureLogger.logLegalAi({
- timestamp: new Date(, operation: 'get_reports_denied',
+ timestamp: new Date( operation: 'get_reports_denied',
  userId: authResult.context?.userId,
  details: {
  reason: 'data_access_denied',
@@ -410,7 +410,7 @@ export const GET: RequestHandler = async ({ request }) => {
 
  // Log operation
  featureLogger.logLegalAi({
- timestamp: new Date(, operation: 'get_reports',
+ timestamp: new Date( operation: 'get_reports',
  userId: authResult.context?.userId,
  details: {
  limit,
@@ -431,7 +431,7 @@ export const GET: RequestHandler = async ({ request }) => {
  const errorMessage = error instanceof Error ? error.message : 'Unknown error';
 
  featureLogger.logLegalAi({
- timestamp: new Date(, operation: 'get_reports_error',
+ timestamp: new Date( operation: 'get_reports_error',
  details: {
  error: errorMessage,
  },

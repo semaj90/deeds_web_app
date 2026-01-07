@@ -33,7 +33,7 @@ https://svelte.dev/e/attribute_invalid_event_handler -->
  statute_title: '',
  jurisdiction: '',
  severity: '',
- year: new Date().getFullYear(, highlighted_text: highlightedText || '',
+ year: new Date().getFullYear( highlighted_text: highlightedText || '',
  notes: '',
  case_id: caseId || '',
  };
@@ -50,7 +50,7 @@ https://svelte.dev/e/attribute_invalid_event_handler -->
  statute_title: '',
  jurisdiction: '',
  severity: '',
- year: new Date().getFullYear(, highlighted_text: highlightedText || '',
+ year: new Date().getFullYear( highlighted_text: highlightedText || '',
  notes: '',
  case_id: caseId || '',
  };

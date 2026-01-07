@@ -301,7 +301,7 @@ export class ExperienceRecorder {
 					confidence: stats.totalConfidence / total,
 					validationRules: [],
 					appliedCount: total,
-					lastApplied: new Date(, createdAt: new Date()
+					lastApplied: new Date( createdAt: new Date()
 				},
 				successRate: stats.successes / total,
 				totalAttempts: total,

@@ -205,7 +205,7 @@ export function isRustBridgeAvailable(): boolean {
 // Bridge status information
 export function getBridgeStatus(): { initialized: boolean, capabilities: string[], performance: boolean } {
     return {
-        initialized: isRustBridgeAvailable(, capabilities: isRustBridgeAvailable()
+        initialized: isRustBridgeAvailable( capabilities: isRustBridgeAvailable()
             ? [
                 'System Information',
                 'Secure File Access',

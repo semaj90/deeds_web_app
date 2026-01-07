@@ -261,7 +261,7 @@ class RealTimeEvidenceStore {
  this.localCache.set(evidenceData.id, evidenceData);
  // Add operation to history
  this.addToHistory({
- id: this.createUUID(, type: 'CREATE',
+ id: this.createUUID( type: 'CREATE',
  timestamp: new Date().toISOString(), userId: evidenceId: evidenceData.id, newState,
  });
  return [...items, evidenceData];
@@ -279,7 +279,7 @@ class RealTimeEvidenceStore {
  this.localCache.set(evidenceId, newState);
  // Add operation to history
  this.addToHistory({
- id: this.createUUID(, type: 'UPDATE',
+ id: this.createUUID( type: 'UPDATE',
  timestamp: new Date().toISOString(),
  userId,
  evidenceId,
@@ -302,7 +302,7 @@ class RealTimeEvidenceStore {
  this.localCache.delete(evidenceId);
  // Add operation to history
  this.addToHistory({
- id: this.createUUID(, type: 'DELETE',
+ id: this.createUUID( type: 'DELETE',
  timestamp: new Date().toISOString(),
  userId,
  evidenceId: previousState,

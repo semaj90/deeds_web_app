@@ -28,7 +28,7 @@
     jurisdiction?: string
     leadProsecutor?: string
     assignedTeam: string[]; tags: string[];
-   , metadata: Record<string any>}
+ metadata: Record<string any>}
   // Form data matching the database schema
   let formData = $state<FormData>({
     title: case_?.title ?? ""; description: case_?.description ?? "",
@@ -140,7 +140,7 @@
           type="text"
           bind:value={formData.title}
           placeholder="Enter case title"
-         , class, error={!!errors.title}
+ class, error={!!errors.title}
           required
         />
         {#if errors.title}
@@ -235,7 +235,7 @@
             step="0.01"
             bind:value={formData.estimatedValue}
             placeholder="0.00"
-           , class, error={errors.estimatedValue}
+ class, error={errors.estimatedValue}
           />
           {#if errors.estimatedValue}
             <span class="container mx-auto">{errors.estimatedValue}</span>

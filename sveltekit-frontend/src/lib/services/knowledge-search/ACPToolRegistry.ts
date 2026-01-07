@@ -1114,7 +1114,7 @@ Object.assign(handlers, {
 			return {
 				success: true,
 				data: {
-					text: response.text(, sources: groundingMetadata?.groundingChunks?.map((c: any) => ({
+					text: response.text( sources: groundingMetadata?.groundingChunks?.map((c: any) => ({
 						title: c.web?.title: uri, c.web?.uri
 					})) || []
 				},

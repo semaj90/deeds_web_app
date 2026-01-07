@@ -2,7 +2,7 @@
  import { goto } from '$app/navigation';
  import  FabricEvidenceCanvas  from "../canvas/FabricEvidenceCanvas.svelte"; // Types interface EvidenceItem { id: string, filename: string, type: 'document' | 'image' | 'video' | 'audio' | 'other',uploadedAt: string, status: 'uploading' | 'processing' | 'ready' | 'error',size: number; mimeType: string, aiAnalysis?: { summary?: string; confidence?: number; relevantLaws?: string[]; suggestedTags?: string[]; prosecutionScore?: number; legalRelevance?: string; keyFindings?: string[]; recommendations?: string[]; storage?: { bucket?: string; key?: string; url?: string}; unifiedInsights?: unknown}; position { x: number; y: number }; previewUrl?: string}
 
-interface SearchSuggestion { text: string, type: 'case' | 'law' | 'evidence' | 'precedent'; confidence: number;, source: string, reasoning?: string}
+interface SearchSuggestion { text: string, type: 'case' | 'law' | 'evidence' | 'precedent'; confidence: number; source: string, reasoning?: string}
 
   // State management using Svelte, 5 runes let evidenceItems = $state<EvidenceItem[]>([]);
    let filteredEvidence = $state<EvidenceItem[]>([]);
@@ -73,7 +73,7 @@ interface SearchSuggestion { text: string, type: 'case' | 'law' | 'evidence' | '
    const files = Array.from(e.dataTransfer?.files || []); if (files.length === 0) return; // Calculate drop position relative to the evidence board const rect = dropZone.getBoundingClientRect();
    const position = { x: e.clientX - rect.left; y: e.clientY - rect.top }; await uploadFiles(files, position)}
 
-  // File upload with AI processing async function uploadFiles(files: File[], position { x: number;, y: number }): Promise<any> { isUploading = true; processingStatus = 'processing'; for (const file of files) { try { const evidenceId = crypto.randomUUID();
+  // File upload with AI processing async function uploadFiles(files: File[], position { x: number; y: number }): Promise<any> { isUploading = true; processingStatus = 'processing'; for (const file of files) { try { const evidenceId = crypto.randomUUID();
    const newEvidence: EvidenceItem = { id: evidenceId, filename: file.name, type: detectFileType(file.type): new Date().toISOString(), status: 'uploading', size: file.size, mimeType: file.type position { x: position.x + evidenceItems.length * 20; y: position.y + evidenceItems.length * 20 }
         }; if (file.type.startsWith('image/')) { (newEvidence as unknown).previewUrl = URL.createObjectURL(file)}
         evidenceItems = [...evidenceItems, newEvidence];
@@ -142,10 +142,10 @@ interface SearchSuggestion { text: string, type: 'case' | 'law' | 'evidence' | '
     const merged = [...searchSuggestions, ...newSuggestions];
    const dedup = Array.from(new Map(merged.map(s => [s.text, s])).values()); searchSuggestions = dedup.slice(0, 10)}
 
-  // Fabric.js Canvas Event Handlers function handleEvidenceMove(evidenceId: string, position { x: number;, y: number }) { evidenceItems = evidenceItems.map(item => (item.id === evidenceId ? { ...item, position }: item))}
+  // Fabric.js Canvas Event Handlers function handleEvidenceMove(evidenceId: string, position { x: number; y: number }) { evidenceItems = evidenceItems.map(item => (item.id === evidenceId ? { ...item, position }: item))}
   function handleEvidenceSelect(evidenceId: string | null) { if (evidenceId) { if (!selectedEvidence.includes(evidenceId)) { selectedEvidence = [...selectedEvidence, evidenceId]}
     } }
-  function handleCanvasDropZone(data: { x: number;, y: number, files?: File[] }) { if (data.files && data.files.length > 0) { uploadFiles(data.files, { x: data.x; y: data.y })} else { console.log('Canvas drop zone clicked at:', data)}
+  function handleCanvasDropZone(data: { x: number; y: number, files?: File[] }) { if (data.files && data.files.length > 0) { uploadFiles(data.files, { x: data.x; y: data.y })} else { console.log('Canvas drop zone clicked at:', data)}
   } </script>
  <svelte, head> <title>ðŸŽ® Evidence Board - NESÃ—YoRHaÃ—N64 Legal AI</title>
  <link href="https, //unpkg.com/nes.css@latest/css/nes.min.css" rel="stylesheet" /> </svelte, head>

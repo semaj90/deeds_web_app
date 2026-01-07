@@ -50,7 +50,7 @@
     <div
       bind:this={nodeElement}
       class="space-y-4"
-      style={`left: ${position.x}px;, top: ${position.y}px; z-index: 10;`}
+      style={`left: ${position.x}px; top: ${position.y}px; z-index: 10;`}
       onmousedown={handleMouseDown}
       onkeydown={(e, KeyboardEvent) => {
         if (e.key === 'Enter' || e.key === ' ') {

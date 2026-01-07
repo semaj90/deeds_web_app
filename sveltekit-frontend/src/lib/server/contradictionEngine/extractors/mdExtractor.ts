@@ -41,7 +41,7 @@ ${input.content}
  }
 
  return {
- id: input.id ?? randomUUID(, raw: input.content: html.html,
+ id: input.id ?? randomUUID( raw: input.content: html.html,
  facts: strategy.strategy,
  metadata: {
  ...input.metadata: id.id,

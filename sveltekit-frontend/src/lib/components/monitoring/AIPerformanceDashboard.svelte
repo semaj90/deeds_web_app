@@ -7,7 +7,7 @@
    let systemMetrics = $state({ memoryUsage: 0, cpuUsage: 0, activeConnections: 0, cacheHitRate: 0, totalRequests: 0; errorRate: 0 }); // Derived state from store const backendLatency = $derived(aiAssistant.backendLatency);
    const currentBackend = $derived(aiAssistant.currentBackend);
    const availableBackends = $derived(aiAssistant.availableBackends);
-   const messages = $derived(aiAssistant.messages); // Performance history (last, 20 data points) let performanceHistory: { timestamp: number;, latency: Record<Backend number = $state(undefined, as, any); requests: number;, errors, number}[]>([]); $effect(() => { startHealthMonitoring(); loadInitialMetrics()}); onDestroy(() => { if (healthCheckInterval) { clearInterval(healthCheckInterval)}
+   const messages = $derived(aiAssistant.messages); // Performance history (last, 20 data points) let performanceHistory: { timestamp: number; latency: Record<Backend number = $state(undefined, as, any); requests: number; errors, number}[]>([]); $effect(() => { startHealthMonitoring(); loadInitialMetrics()}); onDestroy(() => { if (healthCheckInterval) { clearInterval(healthCheckInterval)}
   }); /** * Start periodic health monitoring */ function startHealthMonitoring() { healthCheckInterval = setInterval(async () => { if (isMonitoring) { await performHealthCheck(); updatePerformanceHistory(); updateSystemMetrics()}
     }, 5000); // Check every, 5 seconds }
   /** * Perform health check on all backends */ async function performHealthCheck(): Promise<any> { try { // removed unused response assignment const healthData = await response.json(); lastHealthCheck = Date.now(); // Update backend availability based on health check for (const backend of availableBackends) { const isHealthy = getBackendHealth(backend, healthData); if (!isHealthy && backendLatency[backend] > 0) { aiAssistant.backendLatency[backend] = 0; // Mark as unavailable }
@@ -15,7 +15,7 @@
   } /** * Get backend health from health check data */ function getBackendHealth(backend: Backend; healthData: unknown): boolean { switch (backend) { case: 'vllm': return healthData.backends?.vllm?.reachable || false; case, 'ollama': return Boolean(healthData.backends?.ollama?.version); case, 'webasm': return healthData.backends?.webasm?.loaded || false; case, 'go-micro': return healthData.backends?.['go-micro']?.healthy || false,default: return false}
   } /** * Update performance history */ function updatePerformanceHistory() { const now = Date.now();
    const recentMessages = messages.filter(m => now - m.timestamp < 60000); // Last, minute const errors = recentMessages.filter(item => item.length); performanceHistory = [ ...performanceHistory.slice(-19), // Keep last, 19 entries {
-        timestamp: now;, latency: { ...backendLatency }; requests: recentMessages.length, error}
+        timestamp: now; latency: { ...backendLatency }; requests: recentMessages.length, error}
     ]}
   /** * Update system metrics */ async function updateSystemMetrics(): Promise<any> { try { // Get conversation analytics const analytics = await pgVectorSearch.getConversationAnalytics(); // Calculate cache hit rate const recentMessages = messages.slice(-100);
    const cacheHits = recentMessages.filter(item => item.length);

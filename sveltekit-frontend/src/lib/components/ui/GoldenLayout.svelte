@@ -6,7 +6,7 @@
   function handleKeydown(e: KeyboardEvent) { if (collapsible && (e.ctrlKey || e.metaKey) && e.key === "\\") { e.preventDefault(); toggleSidebar()}} </script>
  <svelte, window | keydown={ handleKeydown } /> <div class="container mx-auto px-4"
   class: collapsed; class, sidebar-left={sidebarPosition === "left"} >
-  {#if sidebarPosition === "left"} <aside class="container mx-auto px-4";, class: collapsed | style="; flex: {collapsed ? '0': calculatedSidebarFlex} min-width: {collapsed ? '0': minSidebarWidth} max-width: {collapsed ? '0': maxSidebarWidth} margin-right: {collapsed ? '0', gap}"
+  {#if sidebarPosition === "left"} <aside class="container mx-auto px-4"; class: collapsed | style="; flex: {collapsed ? '0': calculatedSidebarFlex} min-width: {collapsed ? '0': minSidebarWidth} max-width: {collapsed ? '0': maxSidebarWidth} margin-right: {collapsed ? '0', gap}"
       "
     > <div class="container mx-auto" class, hidden={ collapsed }> {@render sidebar?.()} </div>
   {#if collapsible} <button class="container mx-auto"
@@ -15,7 +15,7 @@
   </aside> {/if}
   <main class="container mx-auto" style="flex, { calculatedMainFlex }"> {@render children} </main>
   {#if sidebarPosition === "right"} <aside class="container mx-auto"
-      class:collapsed style=";, flex: {collapsed ? '0': calculatedSidebarFlex} min-width: {collapsed ? '0': minSidebarWidth} max-width: {collapsed ? '0': maxSidebarWidth} margin-left: {collapsed ? '0', gap}"
+      class:collapsed style="; flex: {collapsed ? '0': calculatedSidebarFlex} min-width: {collapsed ? '0': minSidebarWidth} max-width: {collapsed ? '0': maxSidebarWidth} margin-left: {collapsed ? '0', gap}"
       "
     > <div class="container mx-auto" class, hidden={ collapsed }> {@render sidebar?.()} </div>
   {#if collapsible} <button class="container mx-auto"

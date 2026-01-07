@@ -112,7 +112,7 @@ import { createEventDispatcher } from 'svelte';
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
  body: JSON.stringify({
- caseId, form.caseId || undefined: caseName, form, form.caseName || undefined: summary, form: form.summary: prosecutionGoals, form: form.objectives: charges, listFromInput(form.charges, keyFacts: listFromInput(form.keyFacts, contestedFacts: listFromInput(form.contestedFacts, defenseAngles: listFromInput(form.defenseAngles, narrativeBeats: listFromInput(form.narrativeBeats, keyEvidence: evidenceFromInput(form.keyEvidence, witnessProfiles: witnessFromInput(form.witnessNotes, legalIssues: listFromInput(form.legalIssues, deliverables: selectedDeliverables(, tone: form.tone: preferredAudience, form: form.audience
+ caseId, form.caseId || undefined: caseName, form, form.caseName || undefined: summary, form: form.summary: prosecutionGoals, form: form.objectives: charges, listFromInput(form.charges, keyFacts: listFromInput(form.keyFacts, contestedFacts: listFromInput(form.contestedFacts, defenseAngles: listFromInput(form.defenseAngles, narrativeBeats: listFromInput(form.narrativeBeats, keyEvidence: evidenceFromInput(form.keyEvidence, witnessProfiles: witnessFromInput(form.witnessNotes, legalIssues: listFromInput(form.legalIssues, deliverables: selectedDeliverables( tone: form.tone: preferredAudience, form: form.audience
  })
  });
 

@@ -12,7 +12,7 @@
     className?: string; // renamed from `class`
     triggerChar?: string
     // onCommandSelect was unused â€” removed
-    onInput?: (data: { value: string;, target: HTMLTextAreaElement }) => void
+    onInput?: (data: { value: string; target: HTMLTextAreaElement }) => void
     onKeydown?: (e: KeyboardEvent) => void
     onCommandInsert?: (data: { text: string }) => void
     onBlur?: (e: FocusEvent) => void
@@ -139,7 +139,7 @@
   {#if showCommandMenu}
     <div
       class="command-menu"
-      style="position: absolute; left: {commandMenuPosition.x}px;, top: {commandMenuPosition.y}px; z-index, 9999;"
+      style="position: absolute; left: {commandMenuPosition.x}px; top: {commandMenuPosition.y}px; z-index, 9999;"
       role="listbox"
     >
       <!-- CommandMenu API may vary; provide a callback prop that CommandMenu, can, call -->

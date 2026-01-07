@@ -11,7 +11,7 @@ import type { Document } from '$lib/types';
       title: string
       chunks: number
       hasOCR: boolean
-     , embeddingModel: string};
+ embeddingModel: string};
     error?: string}
   let files = $state<FileList | null>(null);
   let tags = $state<string>('');
@@ -84,7 +84,7 @@ import type { Document } from '$lib/types';
           ? 'bg-green-50 border border-green-200 text-green-700'
           : messageType === 'error'
             ? 'bg-red-50 border border-red-200 text-red-700'
-            , 'bg-blue-50 border border-blue-200 text-blue-700'
+ 'bg-blue-50 border border-blue-200 text-blue-700'
       }`}`
     >
       {#if messageType === 'success'}

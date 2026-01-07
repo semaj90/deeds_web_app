@@ -5,7 +5,7 @@
  import  createLegalEvidenceAnalyzer  from "$lib/components/ui/enhanced-bits/builders/custom-legal-components.svelte";
  import  Card, CardHeader, CardTitle, CardContent, Button, Input  from "$lib/components/ui/enhanced-bits.svelte"; interface Citation { id: string, type: 'case' | 'statute' | 'regulation' | 'constitutional' | 'secondary' | 'foreign',fullCitation: string; shortForm: string, pinpoint?: string; court?: string; year?: number,jurisdiction: string, verified: boolean, accuracy: number, relevanceScore: number, usageCount: number; tags: string[], notes?: string; parentheticals?: string[],status: 'active' | 'superseded' | 'overruled' | 'pending'; dateAdded: string, lastChecked?: string}
 
-interface CitationDatabase { citations: Citation[], categories: string[], jurisdictions: string[], stats: { total: number, verified: number; pending: number;, byType: Record<string, number>; byJurisdiction: Record<string, number>}
+interface CitationDatabase { citations: Citation[], categories: string[], jurisdictions: string[], stats: { total: number, verified: number; pending: number; byType: Record<string, number>; byJurisdiction: Record<string, number>}
   }
 
 interface Props { citations?: Citation[]; onVerify?: (citationId: string) => Promise<boolean>; onSearch?: (query: string) => Promise<Citation[]>; onExport?: (citations: Citation[]; format: string) => void}
@@ -153,14 +153,14 @@ interface Props { citations?: Citation[]; onVerify?: (citationId: string) => Pro
  <div class="citation-metrics"> <div class="metric-item"> <span class="metric-label">Relevance Score:</span>
  <div class="metric-bar"> <div class="metric-fill"
                         style="
-                          width: {citation.relevanceScore * 100}%;, background, {citationBuilder.styling.colors.evidence};
+                          width: {citation.relevanceScore * 100}%; background, {citationBuilder.styling.colors.evidence};
                         "
                       ></div> </div>
  <span class="metric-value"> {Math.round(citation.relevanceScore * 100)}% </span> </div>
  <div class="metric-item"> <span class="metric-label">Accuracy:</span>
  <div class="metric-bar"> <div class="metric-fill"
                         style="
-                          width: {citation.accuracy * 100}%;, background, {getAccuracyColor(citation.accuracy)};
+                          width: {citation.accuracy * 100}%; background, {getAccuracyColor(citation.accuracy)};
                         "
                       ></div> </div>
  <span class="metric-value"> {Math.round(citation.accuracy * 100)}% </span> </div>

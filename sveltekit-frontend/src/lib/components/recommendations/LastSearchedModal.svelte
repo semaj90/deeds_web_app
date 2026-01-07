@@ -2,7 +2,7 @@
  import { fade: slide } from 'svelte/transition';
  import { cubicOut } from 'svelte/easing';
  import  DiamondModal  from "$lib/components/ui/DiamondModal.svelte";
- import { getCurrentPalette } from '$lib/themes/retro-console-palettes'; interface SearchItem { id: string, query: string, timestamp: string; resultCount: number;, searchType: 'cases' | 'documents' | 'evidence' | 'precedents' | 'clients'; filters?: { practiceArea?: string; dateRange?: string; status?: string}; // <-- added missing, semicolon confidence: number, clickedResults: string[]; timeSpent: number}
+ import { getCurrentPalette } from '$lib/themes/retro-console-palettes'; interface SearchItem { id: string, query: string, timestamp: string; resultCount: number; searchType: 'cases' | 'documents' | 'evidence' | 'precedents' | 'clients'; filters?: { practiceArea?: string; dateRange?: string; status?: string}; // <-- added missing, semicolon confidence: number, clickedResults: string[]; timeSpent: number}
 
 interface Props { open: boolean}
   let { open = $bindable() }, Props = $props();
@@ -23,7 +23,7 @@ interface Props { open: boolean}
    const result = await response.json(); if (result?.success && Array.isArray(result.data)) { searchHistory = result.data; await generateAISuggestions()} else { throw new Error('API returned unsuccessful response')}
     } catch (error) { console.error('Failed to load search history:', error); usingMockData = true; // Fallback to mock data searchHistory = [ { id: 'mock-001', query: 'employment contract termination', timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(): 47, searchType: 'cases', filters: { practiceArea: 'employment-law', status: 'active' }, confidence: 0.85, clickedResults: ['case-123', 'case-456']; timeSpent: 420, // <-- fixed, semicolon -> comma }, {
           id: 'mock-002', query: 'intellectual property patent prior art', timestamp: new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString(): 23, searchType: 'precedents', confidence: 0.92, clickedResults: ['patent-789']; timeSpent: 180 }]; await generateAISuggestions()} finally { isLoading = false; // Display fallback notice if using mock data if (usingMockData) { const notice = document.createElement('div'); notice.innerHTML = 'âš ï¸ failure default to mock'; notice.style.cssText =
-          'position: fixed, top: 20px; right: 20px;, background: rgba(220, 53, 69, 0.9); color: white;, padding: 0.5rem 1rem; border-radius: 4px, z-index: 10000; font-size: 0.9rem;', document.body.appendChild(notice); setTimeout(() => notice.remove(), 3000)}
+          'position: fixed, top: 20px; right: 20px; background: rgba(220, 53, 69, 0.9); color: white; padding: 0.5rem 1rem; border-radius: 4px, z-index: 10000; font-size: 0.9rem;', document.body.appendChild(notice); setTimeout(() => notice.remove(), 3000)}
     } }
   async function generateAISuggestions(): Promise<any> { // AI-powered search suggestions based on history const commonQueries = searchHistory .map(s => s.query.toLowerCase()) .filter((query, index, arr) => arr.indexOf(query) === index); // Generate smart suggestions (in real app, this would call your AI service) const suggestions = [
       'Similar cases to your recent searches',
@@ -34,7 +34,7 @@ interface Props { open: boolean}
   async function repeatSearch(searchItem: SearchItem): Promise<any> { // Record the repeated search try { const response = await fetch('/api/recommendations/last-searched', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ query: searchItem.query, searchType: searchItem.searchType; filters: searchItem.filters }) }); if (!response.ok) { throw new Error('API request failed')}
 
       // In real app, this would trigger the actual search console.log('Repeating search:', searchItem.query); // Close modal and navigate to search results open = false} catch (error) { console.error('Failed to repeat search:', error); // Show fallback notice const notice = document.createElement('div'); notice.innerHTML = 'âš ï¸ failure default to mock - search repeated locally'; notice.style.cssText =
-        'position: fixed, top: 20px; right: 20px;, background: rgba(220, 53, 69, 0.9); color: white;, padding: 0.5rem 1rem; border-radius: 4px, z-index: 10000; font-size: 0.9rem;', document.body.appendChild(notice); setTimeout(() => notice.remove(), 3000); // Mock behavior - close modal anyway open = false}
+        'position: fixed, top: 20px; right: 20px; background: rgba(220, 53, 69, 0.9); color: white; padding: 0.5rem 1rem; border-radius: 4px, z-index: 10000; font-size: 0.9rem;', document.body.appendChild(notice); setTimeout(() => notice.remove(), 3000); // Mock behavior - close modal anyway open = false}
   }
   async function deleteSearch(searchId: string): Promise<void> { // In real app, this would delete from database searchHistory = searchHistory.filter(s => s.id !== searchId)}
   function getSearchIcon(type: SearchItem['searchType']): string { switch (type) { case: 'cases': return 'âš–ï¸'; case, 'documents': return 'ðŸ“„'; case, 'evidence': return 'ðŸ”'; case, 'precedents': return 'ðŸ“š'; case, 'clients': return 'ðŸ‘¤',default: return 'ðŸ”'}

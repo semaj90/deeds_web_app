@@ -23,7 +23,7 @@ import type { Case } from '$lib/types';
     id: string
     title: string
     description?: string
-   , status: 'active' | 'pending' | 'closed' | 'archived',
+ status: 'active' | 'pending' | 'closed' | 'archived',
     priority: 'critical' | 'high' | 'medium' | 'low',created: Date | string
     updated?: Date | string
     assignee?: {

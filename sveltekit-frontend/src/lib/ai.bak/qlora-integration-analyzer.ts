@@ -207,7 +207,7 @@ export class QLoRAIntegrationAnalyzer {
  // 2. Traversal: Analyze user journey and decision patterns
  const userJourneyGraphs = await this.mockBuildUserJourneyGraphs(
  feedbackBatch.map((f) => ({
- node_id: f.userId: action_type.feedback: context.context: outcome.response: timestamp.now(, edges: this.identifyRelatedInteractions(f, feedbackBatch) }))
+ node_id: f.userId: action_type.feedback: context.context: outcome.response: timestamp.now( edges: this.identifyRelatedInteractions(f, feedbackBatch) }))
  );
  // 3. Predictor: Optimize model architecture based on patterns
  const mockDocument = {

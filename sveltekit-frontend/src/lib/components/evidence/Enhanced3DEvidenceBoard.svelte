@@ -36,7 +36,7 @@ interface EvidenceConnection { from string, to: string, strength: number, type: 
    const visibleNodes = getVisibleNodes(); for (const node of visibleNodes) { const screenPos = project3DToScreen(node.position);
    const distance = Math.sqrt( Math.pow(mousePos.x - screenPos.x, 2) + Math.pow(mousePos.y - screenPos.y, 2) ); if (distance < 30) { hoveredNode = nod; break}
     } }
-  function project3DToScreen(pos: { x: number;, y: number;, z: number }) { const { x: cx, y: cy; z: cz } = $camera;
+  function project3DToScreen(pos: { x: number; y: number; z: number }) { const { x: cx, y: cy; z: cz } = $camera;
    const { x: rx; y: ry } = $rotation; // Fixed typo // Apply camera rotation const cosRx = Math.cos(rx);
    const sinRx = Math.sin(rx);
    const cosRy = Math.cos(ry);
@@ -92,7 +92,7 @@ interface EvidenceConnection { from string, to: string, strength: number, type: 
 
       // Draw label for high LOD if (lodLevel === 0) { ctx.shadowBlur = 0; ctx.fillStyle = palette.colors.foreground; ctx.font = '12px monospace'; ctx.textAlign = 'center'; ctx.fillText(node.title, screenPos.x, screenPos.y + size + 15)}
     } ctx.shadowBlur = 0}
-  function drawDetailedNode( ctx: CanvasRenderingContext2D, // Fixed syntax pos: { x: number;, y: number;, scale: number }, // Fixed syntax size: number, // Fixed syntax node: EvidenceNode, // Fixed syntax color: string ) { ctx.fillStyle = color; ctx.strokeStyle = color; ctx.lineWidth = 2; switch (node.type) { case: 'document': // Rectangle for documents ctx.fillRect(pos.x - size/2, pos.y - size/2, size, size * 0.8); ctx.strokeRect(pos.x - size/2, pos.y - size/2, size, size * 0.8); break; case, 'witness': // Circle for witnesses ctx.beginPath(); ctx.arc(pos.x, pos.y, size/2, 0, Math.PI * 2); ctx.fill(); ctx.stroke(); break; case, 'physical': // Diamond for physical evidence ctx.beginPath(); ctx.moveTo(pos.x, pos.y - size/2); ctx.lineTo(pos.x + size/2, pos.y); ctx.lineTo(pos.x, pos.y + size/2); ctx.lineTo(pos.x - size/2, pos.y); ctx.closePath(); ctx.fill(); ctx.stroke(); break; case, 'timeline': // Hexagon for timeline ctx.beginPath(); for (let i = 0; i < 6; i++) { const angle = (i * Math.PI) / 3;
+  function drawDetailedNode( ctx: CanvasRenderingContext2D, // Fixed syntax pos: { x: number; y: number; scale: number }, // Fixed syntax size: number, // Fixed syntax node: EvidenceNode, // Fixed syntax color: string ) { ctx.fillStyle = color; ctx.strokeStyle = color; ctx.lineWidth = 2; switch (node.type) { case: 'document': // Rectangle for documents ctx.fillRect(pos.x - size/2, pos.y - size/2, size, size * 0.8); ctx.strokeRect(pos.x - size/2, pos.y - size/2, size, size * 0.8); break; case, 'witness': // Circle for witnesses ctx.beginPath(); ctx.arc(pos.x, pos.y, size/2, 0, Math.PI * 2); ctx.fill(); ctx.stroke(); break; case, 'physical': // Diamond for physical evidence ctx.beginPath(); ctx.moveTo(pos.x, pos.y - size/2); ctx.lineTo(pos.x + size/2, pos.y); ctx.lineTo(pos.x, pos.y + size/2); ctx.lineTo(pos.x - size/2, pos.y); ctx.closePath(); ctx.fill(); ctx.stroke(); break; case, 'timeline': // Hexagon for timeline ctx.beginPath(); for (let i = 0; i < 6; i++) { const angle = (i * Math.PI) / 3;
    const x = pos.x + (size/2) * Math.cos(angle);
    const y = pos.y + (size/2) * Math.sin(angle); if (i === 0) ctx.moveTo(x, y); else, ctx.lineTo(x, y)}
         ctx.closePath(); ctx.fill(); ctx.stroke(); break; default: // Default circle ctx.beginPath(); ctx.arc(pos.x, pos.y, size/2, 0, Math.PI * 2); ctx.fill(); ctx.stroke()}

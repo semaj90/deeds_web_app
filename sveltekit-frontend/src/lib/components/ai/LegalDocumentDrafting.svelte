@@ -5,7 +5,7 @@ import type { Document } from '$lib/types'; // Note: removed unused onMount and 
   interface TemplateVariable { name: string, type: 'text' | 'date' | 'number' | 'select' | 'boolean',required: boolean; description: string, options?: string[]; default_value?: unknown}
   interface DocumentField { name: string, type: 'text' | 'textarea' | 'date' | 'select' | 'number',required: boolean; label: string, placeholder?: string; options?: string[]}
   interface DocumentDraft { id: string, title: string, type: string, content: string, metadata: { caseId?: string,createdAt: string, lastModified: string, version: number, wordCount: number; completionScore: number}; aiSuggestions: AISuggestion[], status: 'draft' | 'review' | 'finalized'; collaborators: string[]}
-  interface AISuggestion { id: string, type: 'content' | 'structure' | 'legal_point' | 'citation' | 'language',position: number, suggestion: string, reasoning: string; confidence: number;, applied: boolean}
+  interface AISuggestion { id: string, type: 'content' | 'structure' | 'legal_point' | 'citation' | 'language',position: number, suggestion: string, reasoning: string; confidence: number; applied: boolean}
   $effect(() => { loadDocumentTypes(); loadTemplates(); loadDraftHistory()});
   async function loadDocumentTypes(): Promise<any> { try { const response = await fetch('/api/ai/document-drafting/types', { method: 'GET'; headers: {
           'Content-Type': 'application/json'
@@ -93,7 +93,7 @@ import type { Document } from '$lib/types'; // Note: removed unused onMount and 
  <div class="config-form"> <div class="form-group"> <label for="doc-title">Document Title:</label>
  <input id="doc-title"
                 type="text"
-               , bind, value={ documentTitle } placeholder="Enter document title..."
+ bind, value={ documentTitle } placeholder="Enter document title..."
                 class="form-input"
               /> </div>
  <div class="form-group"> <label for="case-context">Case Context (Optional):</label>

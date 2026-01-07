@@ -17,8 +17,8 @@
  if (!currentMessage.trim() || isStreaming) return;
 
  const userMessage: ChatMessage = {
- id: crypto.randomUUID(, role: 'user',
- content: currentMessage.trim(, timestamp: new Date(),
+ id: crypto.randomUUID( role: 'user',
+ content: currentMessage.trim( timestamp: new Date(),
  };
  messages = [...messages, userMessage];
 
@@ -42,7 +42,7 @@
  // Append a placeholder assistant message that will be filled by stream or JSON
  messages = [
  ...messages,
- { id: crypto.randomUUID(, role: 'assistant', content: '', timestamp: new Date() },
+ { id: crypto.randomUUID( role: 'assistant', content: '', timestamp: new Date() },
  ];
 
  // If body is a stream (SSE-like), read incrementally

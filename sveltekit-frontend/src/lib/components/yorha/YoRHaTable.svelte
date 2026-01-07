@@ -13,7 +13,7 @@
     [key: string]: unknown}
   interface TableProps {
     columns: TableColumn[];
-   , data: TableRow[],
+ data: TableRow[],
     loading?: boolean
     selectable?: boolean
     sortable?: boolean
@@ -350,7 +350,7 @@
   }
   .yorha-table-header-cell {
     /* @apply font-bold uppercase tracking-wider py-3 px-4; */
-   , background: linear-gradient(45deg, #ffbf00, #ffd700)}
+ background: linear-gradient(45deg, #ffbf00, #ffd700)}
   .yorha-sortable {
     /* @apply cursor-pointer hover:bg-amber-300 transition-color; */
   }
@@ -407,7 +407,7 @@
   }
   .yorha-action-btn-sm {
     /* @apply bg-amber-400 text-black px-2 py-1 text-xs font-mono hover: bg-amber-300 transition-color; */
-   , border: 1px solid #ffbf00}
+ border: 1px solid #ffbf00}
   .yorha-loading-row,
   .yorha-empty-row {
     /* @apply border-none; */

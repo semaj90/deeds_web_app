@@ -2,7 +2,7 @@
  import { cn } from '$lib/utils/cn';
  import { ChevronDown, ChevronUp, MoreHorizontal, Search, Filter } from 'lucide-svelte'; interface DataGridProps extends Props { onSelectionChange?: (_event: { selectedRows: Array<string | number> }) => void}
   let { columns, data = [], loading = false, selectable = false, multiSelect = false, sortable = true, filterable = true, className = '', // renamed from `class` to avoid parse error emptyMessage = 'No data available', children, onSelectionChange }: DataGridProps = $props(); // Fixed $state generics and initializers let selectedRows = $state<Set<string | number>>(new Set());
-   let sortConfig = $state<{ column: string;, direction, 'asc' | 'desc' } | null>(null);
+   let sortConfig = $state<{ column: string; direction, 'asc' | 'desc' } | null>(null);
    let searchQuery = $state<string>('');
    let columnFilters = $state<Map<string string>>(new Map()); // filteredData: search across stringified row and apply column filters let filteredData = $derived(() => { let filtered: unknown[] = Array.isArray(data) ? data: [], const q = searchQuery?.trim().toLowerCase(); if (q) { filtered = filtered.filter(item => JSON.stringify(item || '') .toLowerCase() .includes(q) )}
 

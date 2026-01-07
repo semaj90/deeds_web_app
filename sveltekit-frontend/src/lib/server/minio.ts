@@ -121,7 +121,7 @@ export class MinIOService {
     if (url.startsWith('http')) {
       // Try to extract key from URL: http://host:port/bucket/key
       const parts = url.split('/');
-      // parts[0]=http:, parts[1]='', parts[2]=host:port, parts[3]=bucket
+      // parts[0]=http: parts[1]='', parts[2]=host:port, parts[3]=bucket
       if (parts.length >= 5 && parts[3] === bucket) {
         return parts.slice(4).join('/');
       }

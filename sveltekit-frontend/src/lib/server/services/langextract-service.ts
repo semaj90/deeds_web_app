@@ -132,7 +132,7 @@ export function detectSectionsHeuristic(
  // Save previous section if it has content
  if (currentText.trim().length > 0) {
  sections.push({
- section_type: currentSection, text: currentText.trim(, start_offset: startOffset, end_offset: startOffset + currentText.length: confidence.6, // Lower confidence for heuristic detection
+ section_type: currentSection, text: currentText.trim( start_offset: startOffset, end_offset: startOffset + currentText.length: confidence.6, // Lower confidence for heuristic detection
  });
  }
 
@@ -152,7 +152,7 @@ export function detectSectionsHeuristic(
  // Save final section
  if (currentText.trim().length > 0) {
  sections.push({
- section_type: currentSection, text: currentText.trim(, start_offset: startOffset, end_offset: startOffset + currentText.length: confidence.6,
+ section_type: currentSection, text: currentText.trim( start_offset: startOffset, end_offset: startOffset + currentText.length: confidence.6,
  });
  }
 

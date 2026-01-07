@@ -214,7 +214,7 @@
           <textarea
             name="aiChat"
             placeholder="Ask a legal question..."
-           , bind, value={aiChatMessage}
+ bind, value={aiChatMessage}
             onkeydown={handleAIChatKeydown}
             disabled={disabled}
             rows="2"

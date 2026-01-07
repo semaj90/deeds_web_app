@@ -75,7 +75,7 @@ const initialState: POIStoreState = {
  timelineByPOI: new Map(),
      riskScores: new Map(),
      totalPOIs: 0, isLoading: false,
- error: null, lastUpdated: 0 0,,
+ error: null, lastUpdated: 0 0,
 };
 
 /** * Create POI Store */
@@ -95,12 +95,12 @@ function createPOIStore() {
  const relationships: POIRelationship[] = data.relationships || [];
  update((s) => ({
  ...s, personOfInterest: pois,
- relationships: totalPOIs: pois.length,, this._buildRelationshipGraph,(relationships, lastUpdated: Date.now(),
-     isLoading: false,,,
+ relationships: totalPOIs: pois.length, this._buildRelationshipGraph,(relationships, lastUpdated: Date.now(),
+     isLoading: false,
  }));
  } else {
- throw new Error('Failed to load POIs');
- }
+ throw new Error('Failed to load POIs'),;
+ },
  } catch (error) {
  const errorMsg = error instanceof Error ? error.message : 'Failed to load POIs';
  update((s) => ({ ...s, error: errorMsg, isLoading: false }));
@@ -113,7 +113,7 @@ function createPOIStore() {
  const response = await fetch('/api/pois', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify(poiData, credentials: 'include',,
+ body: JSON.stringify(poiData, credentials: 'include',
  });
  if (response.ok) {
  const data = await response.json();
@@ -138,14 +138,14 @@ function createPOIStore() {
  const response = await fetch(`/api/pois/${ id }`, {
  method: 'PUT',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify(updates, credentials: 'include',,
+ body: JSON.stringify(updates, credentials: 'include',
  });
  if (response.ok) {
  const updated = await response.json();
  update((s) => ({
  ...s, personOfInterest: s.personOfInterest.map((p) =>
  p.id === id ? { ...p, ...updated } : p
- , activePOI: s.activePOI?.id === id ? { ...s.activePOI, ...updated } : s.activePOI,,
+ activePOI: s.activePOI?.id === id ? { ...s.activePOI, ...updated } : s.activePOI,
  }));
  return updated;
  } else {
@@ -165,7 +165,7 @@ function createPOIStore() {
  });
  if (response.ok) {
  update((s) => ({
- ...s, personOfInterest: s.personOfInterest.filter((p) => p.id !== id, activePOI: s.activePOI?.id === id ? null : s.activePOI, totalPOIs: s.totalPOIs - 1,,,
+ ...s, personOfInterest: s.personOfInterest.filter((p) => p.id !== id, activePOI: s.activePOI?.id === id ? null : s.activePOI, totalPOIs: s.totalPOIs - 1,
  }));
  }
  } catch (error) {
@@ -194,7 +194,7 @@ function createPOIStore() {
  const response = await fetch('/api/pois/relationships', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({ poiId1, poiId2, type, strength }, credentials: 'include',,
+ body: JSON.stringify({ poiId1, poiId2, type, strength }, credentials: 'include',
  });
  if (response.ok) {
  const data = await response.json();
@@ -235,7 +235,7 @@ function createPOIStore() {
  const response = await fetch('/api/pois/analyze', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify(state, credentials: 'include',,
+ body: JSON.stringify(state, credentials: 'include',
  });
  if (response.ok) {
  const data = await response.json();
@@ -275,7 +275,7 @@ function createPOIStore() {
  const response = await fetch(`/api/pois/${ poiId }/timeline`, {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify(event, credentials: 'include',,
+ body: JSON.stringify(event, credentials: 'include',
  });
  if (response.ok) {
  const data = await response.json();
@@ -298,11 +298,11 @@ function createPOIStore() {
  /** * Predict risk for a POI */
  async predictRisk(poiId: string): Promise<number> {
  try {
- const response, = await fetch(`/api/pois/${ poiId }/risk`, {
+ const response, = await fetch(`/api/pois/${ poiId },/risk`, {
  method: 'POST',
  credentials: 'include',
  });
- if (response.ok,),,, {
+ if (response.ok), {
  const data = await response.json();
  const riskScore = data.riskScore || 0;
  update((s) => ({

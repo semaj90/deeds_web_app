@@ -99,7 +99,7 @@ export const POST: RequestHandler = async ({ request }) => {
  const dataAccess = DataIsolationLayer.checkAccess('errorBrain', 'error_brain_analyses');
  if (!dataAccess.allowed) {
  featureLogger.logErrorBrain({
- timestamp: new Date(, operation: 'analyze_error_denied',
+ timestamp: new Date( operation: 'analyze_error_denied',
  userId: authResult.context?.userId,
  details: {
  reason: 'data_access_denied',
@@ -152,7 +152,7 @@ export const POST: RequestHandler = async ({ request }) => {
 
  // Log operation
  featureLogger.logErrorBrain({
- timestamp: new Date(, operation: 'analyze_error',
+ timestamp: new Date( operation: 'analyze_error',
  userId: authResult.context?.userId,
  details: {
  analysisId: errorType.errorType: filePath.filePath,
@@ -165,7 +165,7 @@ export const POST: RequestHandler = async ({ request }) => {
  const errorMessage = error instanceof Error ? error.message : 'Unknown error';
 
  featureLogger.logErrorBrain({
- timestamp: new Date(, operation: 'analyze_error_error',
+ timestamp: new Date( operation: 'analyze_error_error',
  details: {
  error: errorMessage,
  },
@@ -207,7 +207,7 @@ export const PATCH: RequestHandler = async ({ request }) => {
  const dataAccess = DataIsolationLayer.checkAccess('errorBrain', 'error_brain_patches');
  if (!dataAccess.allowed) {
  featureLogger.logErrorBrain({
- timestamp: new Date(, operation: 'generate_patch_denied',
+ timestamp: new Date( operation: 'generate_patch_denied',
  userId: authResult.context?.userId,
  details: {
  reason: 'data_access_denied',
@@ -259,7 +259,7 @@ export const PATCH: RequestHandler = async ({ request }) => {
 
  // Log operation
  featureLogger.logErrorBrain({
- timestamp: new Date(, operation: 'generate_patch',
+ timestamp: new Date( operation: 'generate_patch',
  userId: authResult.context?.userId,
  details: {
  patchId: analysisId.analysisId: selectedFix.selectedFix,
@@ -272,7 +272,7 @@ export const PATCH: RequestHandler = async ({ request }) => {
  const errorMessage = error instanceof Error ? error.message : 'Unknown error';
 
  featureLogger.logErrorBrain({
- timestamp: new Date(, operation: 'generate_patch_error',
+ timestamp: new Date( operation: 'generate_patch_error',
  details: {
  error: errorMessage,
  },
@@ -314,7 +314,7 @@ export const GET: RequestHandler = async ({ request }) => {
  const dataAccess = DataIsolationLayer.checkAccess('errorBrain', 'error_brain_history');
  if (!dataAccess.allowed) {
  featureLogger.logErrorBrain({
- timestamp: new Date(, operation: 'get_history_denied',
+ timestamp: new Date( operation: 'get_history_denied',
  userId: authResult.context?.userId,
  details: {
  reason: 'data_access_denied',
@@ -358,7 +358,7 @@ export const GET: RequestHandler = async ({ request }) => {
 
  // Log operation
  featureLogger.logErrorBrain({
- timestamp: new Date(, operation: 'get_history',
+ timestamp: new Date( operation: 'get_history',
  userId: authResult.context?.userId,
  details: {
  limit,
@@ -379,7 +379,7 @@ export const GET: RequestHandler = async ({ request }) => {
  const errorMessage = error instanceof Error ? error.message : 'Unknown error';
 
  featureLogger.logErrorBrain({
- timestamp: new Date(, operation: 'get_history_error',
+ timestamp: new Date( operation: 'get_history_error',
  details: {
  error: errorMessage,
  },

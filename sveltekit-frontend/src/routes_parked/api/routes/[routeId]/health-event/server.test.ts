@@ -3,7 +3,7 @@ import { POST, GET } from './+server.js';
 import * as queries from '$lib/db';
 
 vi.mock('$lib/db', () => ({
- getRouteMetadata: vi.fn(, createHealthEvent: vi.fn(, getHealthEvents: vi.fn(, updateRouteMetadata: vi.fn(),
+ getRouteMetadata: vi.fn( createHealthEvent: vi.fn( getHealthEvents: vi.fn( updateRouteMetadata: vi.fn(),
 }));
 
 describe('POST /api/routes/:routeId/health-event', () => {
@@ -18,7 +18,7 @@ describe('POST /api/routes/:routeId/health-event', () => {
  path: '/cases/new',
  kind: 'page',
  status: 'healthy',
- createdAt: new Date(, updatedAt: new Date(, archivedAt: null,
+ createdAt: new Date( updatedAt: new Date( archivedAt: null,
  };
 
  const mockHealthEvent = {
@@ -64,7 +64,7 @@ describe('POST /api/routes/:routeId/health-event', () => {
  id: '123',
  routeId: '/cases/new',
  status: 'healthy',
- createdAt: new Date(, updatedAt: new Date(, archivedAt: null,
+ createdAt: new Date( updatedAt: new Date( archivedAt: null,
  };
 
  const mockHealthEvent = {
@@ -126,7 +126,7 @@ describe('POST /api/routes/:routeId/health-event', () => {
  id: '123',
  routeId: '/cases/new',
  status: 'healthy',
- createdAt: new Date(, updatedAt: new Date(, archivedAt: null,
+ createdAt: new Date( updatedAt: new Date( archivedAt: null,
  };
 
  vi.mocked(queries.getRouteMetadata).mockResolvedValue(mockRoute as any);
@@ -153,7 +153,7 @@ describe('POST /api/routes/:routeId/health-event', () => {
  id: '123',
  routeId: '/cases/new',
  status: 'healthy',
- createdAt: new Date(, updatedAt: new Date(, archivedAt: null,
+ createdAt: new Date( updatedAt: new Date( archivedAt: null,
  };
 
  vi.mocked(queries.getRouteMetadata).mockResolvedValue(mockRoute as any);
@@ -186,7 +186,7 @@ describe('GET /api/routes/:routeId/health-history', () => {
  id: '123',
  routeId: '/cases/new',
  status: 'broken',
- createdAt: new Date(, updatedAt: new Date(, archivedAt: null,
+ createdAt: new Date( updatedAt: new Date( archivedAt: null,
  };
 
  const mockEvents = [
@@ -229,7 +229,7 @@ describe('GET /api/routes/:routeId/health-history', () => {
  id: '123',
  routeId: '/cases/new',
  status: 'healthy',
- createdAt: new Date(, updatedAt: new Date(, archivedAt: null,
+ createdAt: new Date( updatedAt: new Date( archivedAt: null,
  };
 
  const mockEvents = [

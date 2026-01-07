@@ -19,7 +19,7 @@ async function loadRegisterSchema() {
 
  // Minimal fallback Zod schema (safe default)
  return z.object({
- email: z.string().email(, password: z.string().min(8, confirmPassword: z.string().min(8, name: z.string().min(1, role: z.string().min(1, terms: z.boolean().optional(),
+ email: z.string().email( password: z.string().min(8, confirmPassword: z.string().min(8, name: z.string().min(1, role: z.string().min(1, terms: z.boolean().optional(),
  });
 }
 

@@ -78,7 +78,7 @@ export class UltraJSONParser {
  initialized: boolean;
  } {
  return {
- wasm: this.isWASMAvailable(, native: true,
+ wasm: this.isWASMAvailable( native: true,
  initialized: this.isInitialized,
  };
  }

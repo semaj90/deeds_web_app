@@ -496,7 +496,7 @@ import type { Case } from '$lib/types';
 										class="absolute p-4 bg-background border-2 border-border rounded-lg shadow-lg cursor-move transition-shadow nes-container is-rounded bits-draggable"
 										class:highlighted={aiHighlightedEvidence.includes(item.id)}
 										class:selected={selectedEvidenceIds.includes(item.id)}
-										style="left: {item.x || 100}px;, top: {item.y || 100}px; min-width: 200px;"
+										style="left: {item.x || 100}px; top: {item.y || 100}px; min-width: 200px;"
 										draggable="true"
 										data-evidence-id={item.id}
 										ondragstart={(e, DragEvent) => handleCanvasDragStart(e, item)}
@@ -560,7 +560,7 @@ import type { Case } from '$lib/types';
 								</div>
 							{/each}
 
-							<svg class="absolute inset-0" style="width: 100%;, height, 100%;">
+							<svg class="absolute inset-0" style="width: 100%; height, 100%;">
 								{#each Array.isArray(getConnections()) ? getConnections() : [] as connection}
 									<line x1={connection.x1} y1={connection.y1} x2={connection.x2} y2={connection.y2} stroke="currentColor" stroke-width="2" stroke-dasharray="5,5" opacity="0.3" />
 								{/each}
@@ -634,10 +634,10 @@ import type { Case } from '$lib/types';
 	{/if}
 
 {#if miniModal.show}
-	<div class="fixed" style="left: {miniModal.x}px;, top, {miniModal.y}px;">
+	<div class="fixed" style="left: {miniModal.x}px; top, {miniModal.y}px;">
 		<div class="bg-background border border-border rounded-md shadow px-3 py-2">
 {#if miniModal.show}
-	<div class="fixed" style="left: {miniModal.x}px;, top, {miniModal.y}px;">
+	<div class="fixed" style="left: {miniModal.x}px; top, {miniModal.y}px;">
 		<div class="bg-background border border-border rounded-md shadow px-3 py-2">
 			{miniModal.type}
 		</div>

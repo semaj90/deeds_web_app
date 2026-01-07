@@ -58,7 +58,7 @@
  const newItem: WorkspaceItem = {
  id: `note-${Date.now()}`,
  type: 'note',
- title: content, createdAt, new: new Date(, updatedAt: new Date(),
+ title: content, createdAt, new: new Date( updatedAt: new Date(),
  };
 
  items.update((current) => {
@@ -137,7 +137,7 @@
  id: `memo-${Date.now()}`,
  type: 'memo',
  title: `Memo - ${new Date().toLocaleDateString()}`,
- content, memoOutline: $1, createdAt:, new Date(, updatedAt: new Date(),
+ content, memoOutline: $1, createdAt: new Date( updatedAt: new Date(),
  };
 
  items.update((current) => {

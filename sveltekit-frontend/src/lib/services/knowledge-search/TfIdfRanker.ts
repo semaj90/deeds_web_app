@@ -266,7 +266,7 @@ export class TfIdfRanker {
     if (!text) return [];
 
     // Convert to lowercase and extract words
-    const words = text.toLowerCase().match(/\b[a-z]{3,}\b/g) || [];
+    const words = text.toLowerCase().match(/\b[a-z]{3}\b/g) || [];
 
     // Filter out common stop words
     const stopWords = new Set([

@@ -133,7 +133,7 @@ export class WebGPUTextTileRenderer {
  });
   
  const shaderModule = this.device.createShaderModule({
- code: this.generateShaderCode(, label: 'text-tile-shaders',
+ code: this.generateShaderCode( label: 'text-tile-shaders',
  });
  this.renderPipeline = this.device.createRenderPipeline({
  vertex: {
@@ -169,7 +169,7 @@ export class WebGPUTextTileRenderer {
  });
   
  const computeModule = this.device.createShaderModule({
- code: this.generateComputeShaderCode(, label: 'text-tile-compute',
+ code: this.generateComputeShaderCode( label: 'text-tile-compute',
  });
  this.computePipeline = this.device.createComputePipeline({
  compute: { module: computeModule, entryPoint: 'cs_main' },

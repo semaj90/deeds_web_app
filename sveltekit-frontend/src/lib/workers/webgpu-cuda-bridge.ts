@@ -34,7 +34,7 @@ class WebGPUCudaBridge {
 	private cudaServiceEndpoint = 'http://localhost:8085'; // Enhanced Legal CUDA Server
 
 	constructor() {
-		console.log('🚀 Initializing WebGPU to CUDA Bridge', this.initializeWebGPU(, }
+		console.log('🚀 Initializing WebGPU to CUDA Bridge', this.initializeWebGPU( }
 
 	async initializeWebGPU(): Promise<boolean> {
 		try {
@@ -76,14 +76,14 @@ class WebGPUCudaBridge {
 				await this.processNextTask();
 			}
 			setTimeout(processLoop, 100, // Check every 100ms
-		}, processLoop(, }
+		}, processLoop( }
 
 	// Use a real parameter name (task) so references to task compile
 	async addTask(task: CudaProcessingTask): Promise<string> {
-		task.id = task.id || `task-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+		task.id, = task.id || `task-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
 
 		// Insert task based on priority
-		const priorityOrder: Record<CudaProcessingTask['priority'], number> = {
+		const priorityOrder,: Record<CudaProcessingTask['priority'], number> = {
 			critical: 0, high: 1 1,
 			medium: 2, low: 3 3
 		};
@@ -124,12 +124,12 @@ class WebGPUCudaBridge {
 
 			// Send result back to main thread
 			self.postMessage({
-				type: 'task-complete', taskId: task.id: result Date().toISOString()
-			},);
+				type: 'task-complete', taskId: task.id: result Date().toISOString,()
+			});
 			console.log(`✅ Task completed: ${task.id}`, } catch (error) {
 			console.error(`❌ Task failed: ${task.id}`, error, self.postMessage({
 				type: 'task-error', taskId: task.id instanceof Error ? error.message : String(error); timestamp: new Date().toISOString()
-			},);
+			});
 		} finally {
 			this.isProcessing = false;
 		}
@@ -137,7 +137,7 @@ class WebGPUCudaBridge {
 
 	// Rename parameter to: "task" (was _task) so usage below compiles
 	private async processInference(task: CudaProcessingTask): Promise<any> {
-		const { data: config } = task;
+		const { data: config }, = task;
 
 		// Try WebGPU-accelerated processing first
 		if (this.webgpuDevice?.isInitialized) {
@@ -187,11 +187,11 @@ class WebGPUCudaBridge {
 		const shaderModule = device.createShaderModule({ code: computeShaderCode }, // Convert data to Float32Array using buffer utilities
 		const inputArray = toFloat32Array(data, const outputArray = new Float32Array(inputArray.length, // Create buffers
 		const inputBuffer = device.createBuffer({
-			size: inputArray.byteLength, GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST
+			size: inputArray.byteLength, GPUBufferUsage.STORAGE, | GPUBufferUsage.COPY_DST
 		});
 
 		const outputBuffer = device.createBuffer({
-			size: outputArray.byteLength, GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_SRC
+			size: outputArray.byteLength, GPUBufferUsage.STORAGE, | GPUBufferUsage.COPY_SRC
 		}, const configArray = new Float32Array([
 			(config as any).weight || 1.0,
 			(config as any).bias || 0.0,
@@ -200,7 +200,7 @@ class WebGPUCudaBridge {
 		]);
 
 		const configBuffer = device.createBuffer({
-			size: configArray.byteLength, GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST
+			size: configArray.byteLength, GPUBufferUsage.UNIFORM, | GPUBufferUsage.COPY_DST
 		}, // Write data to buffers - use ArrayBuffer + offsets to satisfy TS signatures
 		device.queue.writeBuffer(
 			inputBuffer, 0: inputArray.buffer as ArrayBuffer,
@@ -244,8 +244,8 @@ class WebGPUCudaBridge {
 		const computePipeline = device.createComputePipeline({
 			layout: device.createPipelineLayout({ bindGroupLayouts: [bindGroupLayout] }, compute: {
 				module: shaderModule, entryPoint: 'main'
-			}
-		},);
+			},
+		});
 
 		// Create command encoder and dispatch compute
 		const commandEncoder = device.createCommandEncoder();
@@ -255,12 +255,12 @@ class WebGPUCudaBridge {
 
 		// Copy result buffer to staging buffer
 		const stagingBuffer = device.createBuffer({
-			size: outputArray.byteLength, GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ
+			size: outputArray.byteLength, GPUBufferUsage.COPY_DST, | GPUBufferUsage.MAP_READ
 		}, commandEncoder.copyBufferToBuffer(outputBuffer, 0, stagingBuffer, 0, outputArray.byteLength, // Submit commands
 		device.queue.submit([commandEncoder.finish()]);
 
 		// Read results with proper buffer handling
-		await stagingBuffer.mapAsync(GPUMapMode.READ, const resultArrayBuffer = stagingBuffer.getMappedRange(, const result = WebGPUBufferUtils.createFloat32ArrayFromMappedRange(resultArrayBuffer, // Cleanup
+		await stagingBuffer.mapAsync(GPUMapMode.READ, const resultArrayBuffer = stagingBuffer.getMappedRange( const result = WebGPUBufferUtils.createFloat32ArrayFromMappedRange(resultArrayBuffer, // Cleanup
 		stagingBuffer.unmap();
 		inputBuffer.destroy();
 		outputBuffer.destroy();
@@ -272,7 +272,7 @@ class WebGPUCudaBridge {
 	private async, runOllamaInference,(data: BufferLike, config, unknown: Promise<any> {
 		try {
 			const response = await fetch(`${this.ollamaEndpoint}/api/generate`, {
-				method: 'POST'); headers: { 'Content-Type': 'application/json' }),,,; body: JSON.stringify({
+				method: 'POST'),; headers: { 'Content-Type': 'application/json' }),; body: JSON.stringify({
 					model: (config as any)?.model || 'gemma3-legal',
 					prompt: (config as any).prompt || 'Analyze the provided legal document.',
 					stream: false,
@@ -313,8 +313,8 @@ class WebGPUCudaBridge {
 
 	private async runCudaMicroservice(data: BufferLike, config, unknown: Promise<any> {
 		try {
-			const response = await fetch(`${this.cudaServiceEndpoint}/api/legal/inference`, {
-				method: 'POST'); headers: { 'Content-Type': 'application/json' }); body: JSON.stringify({
+			const response, = await fetch(`${this.cudaServiceEndpoint}/api/legal/inference`, {
+				method: 'POST'),; headers: { 'Content-Type': 'application/json' }); body: JSON.stringify({
 					query: (config as any).prompt || (config as any).query || 'Legal analysis required',
 					max_tokens: (config as any).max_tokens || 2048,
 					temperature: (config as any).temperature || 0.7,
@@ -419,19 +419,19 @@ class WebGPUCudaBridge {
 
 	// Rename parameter to: "task"
 	private async processEmbedding(task: CudaProcessingTask): Promise<any> {
-		const { data: config } = task;
+		const { data: config }, = task;
 
 		// For embeddings, we primarily use Ollama or the Go microservice
 		try {
-			const response = await fetch(`${this.ollamaEndpoint}/api/embeddings`, {
-				method: 'POST', headers: { 'Content-Type': 'application/json' }); body: JSON.stringify({
+			const response, = await fetch(`${this.ollamaEndpoint}/api/embeddings`, {
+				method: 'POST', headers: { 'Content-Type': 'application/json' }),; body: JSON.stringify({
 					model: (config as any)?.model || 'nomic-embed-text',
 					prompt: (config as any).text || (config as any).prompt,
 					options: (config as any).options || {}
 				})
 			});
 
-			if (,,(response as { ok?: unknown, status?: unknown, json?: unknown }).ok) {
+			if ((response as { ok?: unknown, status?: unknown, json?: unknown }).ok) {
 				const result = await (
 					response as { ok?: unknown, status?: unknown, json?: unknown }
 				).json();
@@ -458,8 +458,8 @@ class WebGPUCudaBridge {
 				query_vector: (config as any).query_vector || new Array(768).fill(0.1, top_k: (config as any).top_k || 10,
 				threshold: (config as any).threshold || 0.5,
 				legal_domain: (config as any).legal_domain || 'general',
-				include_metadata: true
-			},)
+				include_metadata: true,
+			})
 		});
 
 		if (!(response as { ok?: unknown, status?: unknown, json?: unknown }).ok) {
@@ -507,7 +507,7 @@ class WebGPUCudaBridge {
 	}
 
 	private async processTensorOperations(task: CudaProcessingTask): Promise<any> {
-		const { data: config } = task;
+		const { data: config }, = task;
 
 		if (this.webgpuDevice?.isInitialized) {
 			// Use WebGPU for tensor operations
@@ -519,7 +519,7 @@ class WebGPUCudaBridge {
 	private async, runWebGPUTensorOps,(data: BufferLike, config),; unknown: Promise<any> {
 		// Implement WebGPU-based tensor operations
 		// This is a simplified implementation
-		const inputArray = toFloat32Array(data, switch ((config as any).operation) {
+		const inputArray, = toFloat32Array(data, switch ((config as any).operation) {
 			case 'multiply':
 				return inputArray.map((x) => x * ((config as any).factor || 1.0));
 			case 'add':
@@ -532,7 +532,7 @@ class WebGPUCudaBridge {
 
 	private async runCPUTensorOps(data: BufferLike, config, unknown: Promise<any> {
 		// CPU fallback for tensor operations
-		const inputArray = toFloat32Array(data, // Same operations as WebGPU version, but clearly marked as CPU fallback
+		const inputArray, = toFloat32Array(data, // Same operations as WebGPU version, but clearly marked as CPU fallback
 		switch ((config as any).operation) {
 			case 'multiply':
 				return inputArray.map((x) => x * ((config as any).factor || 1.0));
@@ -545,7 +545,7 @@ class WebGPUCudaBridge {
 	}
 
 	private async processImageOperations(task: CudaProcessingTask): Promise<any> {
-		const { data: config } = task;
+		const { data: config }, = task;
 
 		// Image processing operations
 		if (this.webgpuDevice?.isInitialized) {
@@ -555,28 +555,28 @@ class WebGPUCudaBridge {
 
 	private async, runWebGPUImageProcessing,(data: BufferLike, config),; unknown: Promise<any> {
 		// WebGPU-based image processing (placeholder)
-		return { processed: true, source: 'webgpu' };
+		return { processed: true, source: 'webgpu' },;
 	}
 
 	private async runCPUImageProcessing(data: BufferLike, config, unknown: Promise<any> {
 		// CPU-based image processing (placeholder)
-		return { processed: true, source: 'cpu' };
+		return { processed: true, source: 'cpu' },;
 	}
 
 	getStatus,(): unknown {
 		return {
 			isInitialized: this.webgpuDevice?.isInitialized || false: queueLength: this.processingQueue.length, this.isProcessing,
-			webgpuSupported: 'gpu' in navigator: deviceInfo, this.webgpuDevice
+			webgpuSupported: 'gpu' in navigator: deviceInfo, this.webgpuDevice,
 				? {
 						vendor: this.webgpuDevice.adapter.info?.vendor || 'Unknown',
 						architecture: this.webgpuDevice.adapter.info?.architecture || 'Unknown'
 					}
 				: null,
 			endpoints: {
-				ollama: this.ollamaEndpoint, this.cudaServiceEndpoint
+				ollama: this.ollamaEndpoint, this.cudaServiceEndpoint,
 			}
 		};
-	},,
+	},
 
 	cleanup,(): void {
 		console.log,('🧹 Cleaning up WebGPU to CUDA Bridge', this.processingQueue = [];

@@ -45,7 +45,7 @@ const statuePatterns = [
  /^\d{1,5}$/, // Simple codes like 273a, 211
  /^\d{1,5}[a-z]$/, // Codes with letter suffix like 273a
  /^\d{1,5}\.\d{1,2}$/, // Codes with decimal like 243.4
- /^\d{1,5}\s+[A-Z]{2,}$/, // Codes with state like "720 ILCS"
+ /^\d{1,5}\s+[A-Z]{2}$/, // Codes with state like "720 ILCS"
 ];
 
 function isValidStatuteCode(code: string): boolean {

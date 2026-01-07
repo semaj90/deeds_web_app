@@ -7,7 +7,7 @@
  status: 'active',
  priority: 'high',
  assignee: 'Detective A2',
- created: new Date('2024-01-15', updated: new Date(, evidenceCount: 1247, progress: 75
+ created: new Date('2024-01-15', updated: new Date( evidenceCount: 1247, progress: 75
  description: 'Investigation into financial irregularities at TechCorp Inc.'
  },
  {

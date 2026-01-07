@@ -49,11 +49,11 @@ export const legalApiResponses = {
  apiSuccess<{ case: T; message: string }>(
  { case: caseData, message: 'Case created successfully' },
  201
- , evidenceProcessed: <T>(result: T) =>
+ evidenceProcessed: <T>(result: T) =>
  apiSuccess<{ analysis: T; message: string }>(
  { analysis: result, message: 'Evidence processed successfully' },
  200
- , aiAnalysisComplete: <T>(analysis: T) =>
+ aiAnalysisComplete: <T>(analysis: T) =>
  apiSuccess<{ analysis: T; message: string }>(
  { analysis, message: 'AI analysis completed' },
  200

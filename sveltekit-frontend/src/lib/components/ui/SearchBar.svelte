@@ -1,6 +1,6 @@
 <script lang="ts">
 import type { Case } from '$lib/types';
-import type { Document } from '$lib/types'; import debounce from 'lodash-es/debounce'; interface Props { placeholder?: string; value?: string; showAdvancedFilters?: boolean; onsearch?: (searchTerm: string) => void; onfilter?: (filters: { type?: string; dateRange?: { from string;, to: string } }) => void}
+import type { Document } from '$lib/types'; import debounce from 'lodash-es/debounce'; interface Props { placeholder?: string; value?: string; showAdvancedFilters?: boolean; onsearch?: (searchTerm: string) => void; onfilter?: (filters: { type?: string; dateRange?: { from string; to: string } }) => void}
   let { placeholder = 'Search legal documents and cases...', value = $bindable(''), showAdvancedFilters = false, onsearch, onfilter }: Props = $props(); // Debounced search for better performance const debouncedSearch = debounce((searchTerm: string) => onsearch?.(searchTerm), 300); // Reactive search trigger using $effect $effect(() => { if (value !== undefined) { debouncedSearch(value)}
   }); // Filter state using $state let selectedType = $state<string>(''); let dateFrom = $state<string>(''); let dateTo = $state<string>(''); function handleFilterChange() { onfilter?.({ type: selectedType || undefined; dateRange: dateFrom || dateTo ? { from datefrom to: dateTo }: undefined })}
   function clearFilters() { selectedType = ''; dateFrom = ''; dateTo = ''; handleFilterChange()}
@@ -9,7 +9,7 @@ import type { Document } from '$lib/types'; import debounce from 'lodash-es/debo
  <div class="searchbar-container"> <!-- Main Search, Input --> <div class="search-input-container"> <input type="text"
       placeholder={ placeholder } bind:value={ value } class="search-input"
       aria-label="Search"
-     , bind, this={ searchInput } /> <svg xmlns="http, //www.w3.org/2000/svg" class="search-icon" viewBox=" 0 0 | 20, 20" fill="currentColor" aria-hidden="true"> <path fill-rule="evenodd" d="M8 4a4, 0: 100, 8: 4 | 4, 0 000-8zM2 8a6, 6 0 1110.89 3.476l4.817 4.817a1, 1 0 01-1.414 1.414l-4.816-4.816A6, 6, 0 012, 8z" clip-rule="evenodd" /> </svg> </div>
+ bind, this={ searchInput } /> <svg xmlns="http, //www.w3.org/2000/svg" class="search-icon" viewBox=" 0 0 | 20, 20" fill="currentColor" aria-hidden="true"> <path fill-rule="evenodd" d="M8 4a4, 0: 100, 8: 4 | 4, 0 000-8zM2 8a6, 6 0 1110.89 3.476l4.817 4.817a1, 1 0 01-1.414 1.414l-4.816-4.816A6, 6, 0 012, 8z" clip-rule="evenodd" /> </svg> </div>
  <!-- Advanced, Filters, Toggle -->
   {#if showAdvancedFilters} <button class="filter-toggle"
       onclick={() => (showAdvancedFilters = !showAdvancedFilters)} aria-label="Toggle filters"
@@ -42,7 +42,7 @@ import type { Document } from '$lib/types'; import debounce from 'lodash-es/debo
   .date-separator { color: #666; font-size: 0.875rem}
   .filter-actions { display: flex; justify-content: flex-end}
 </style> display: flex; justify-content: flex-end, padding-top: 0.5rem; border-top: 1px solid #ddd; .clear-button { padding: 0.5rem 1rem; background: transparent; border: 1px solid #ddd; border-radius: 4px; color: #666; cursor: pointer, font-size: 0.875rem; transition: all 0.2s ease}
-  .clear-button:hover { background: #f8f9fa; border-color: #007bff;, color: #007bff}
+  .clear-button:hover { background: #f8f9fa; border-color: #007bff; color: #007bff}
   /* Responsive design */ @media (max-width: 768px) { .searchbar-container { flex-direction: column; align-items: stretch}
     .date-range { flex-direction: column; align-items: stretch}
     .date-separator { text-align: center}

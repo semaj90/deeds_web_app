@@ -72,7 +72,7 @@ export class AnonymousSessionManager {
 	 */
 	private createNewSession(): void {
 		this.session = {
-			sessionId: this.generateSessionId(, chats: new Map(),
+			sessionId: this.generateSessionId( chats: new Map(),
      createdAt: new Date().toISOString(), lastActivity: new Date().toISOString()
 		};
 		this.saveSession();
@@ -255,9 +255,9 @@ export function useAnonymousSession() {
 		addMessage: (chatId: string, message: Omit<ChatMessage, 'id' | 'chatId'>) =>
 			anonymousSessionManager.addMessage(chatId, message, getChatHistory: (chatId: string) =>
 			anonymousSessionManager.getChatHistory(chatId, hasUnsavedChats: () =>
-			anonymousSessionManager.hasUnsavedChats(, getUnsavedCount: () =>
-			anonymousSessionManager.getUnsavedCount(, exportForMigration: () =>
-			anonymousSessionManager.exportForMigration(, clearSession: () =>
+			anonymousSessionManager.hasUnsavedChats( getUnsavedCount: () =>
+			anonymousSessionManager.getUnsavedCount( exportForMigration: () =>
+			anonymousSessionManager.exportForMigration( clearSession: () =>
 			anonymousSessionManager.clearSession()
 	};
 }

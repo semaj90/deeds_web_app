@@ -232,10 +232,10 @@ export class FixSynthesizer {
 	 * Property 30: For any validated fix, the system SHALL apply it
 	 * using ts-morph for code changes.
 	 */
-	async, applyFix,(strategy: FixStrategy),,,; ErrorReport: Promise<ApplyResult> {
+	async, applyFix,(strategy: FixStrategy),; ErrorReport: Promise<ApplyResult> {
 		try {
 			// Create backup first
-			const backupPath, = await this.createBackup(error.file); // In a full implementation, this would:
+			const backupPath, = await this,.createBackup,(error.file); // In a full implementation, this would:
 			// 1. Read the file
 			// 2. Parse with ts-morph
 			// 3. Apply the fix at the correct location
@@ -243,14 +243,14 @@ export class FixSynthesizer {
 
 			// For now, just track the application
 			strategy.appliedCount++;
-			strategy.lastApplied, = new Date();
+			strategy.lastApplied, = new Date,();
 			this.stats.fixesApplied++;
 
 			return {
 				success: true,
 				backupPath
 			},;
-		},,,,,, catch (err) {
+		}, catch (err) {
 			return {
 				success: false, error: err instanceof Error ? err.message : String(err)
 			};

@@ -185,7 +185,7 @@ describe('Phase 9 Property-Based Tests', () => {
  it('should include optional verification_message', () => {
  const verification = {
  verification_status: 'passed',
- verification_timestamp: new Date(, verification_message: 'All tests passed',
+ verification_timestamp: new Date( verification_message: 'All tests passed',
  };
 
  expect(verification.verification_message).toBe('All tests passed');
@@ -194,7 +194,7 @@ describe('Phase 9 Property-Based Tests', () => {
  it('should handle null verification_message', () => {
  const verification = {
  verification_status: 'passed',
- verification_timestamp: new Date(, verification_message: null,
+ verification_timestamp: new Date( verification_message: null,
  };
 
  expect(verification.verification_message).toBeNull();
@@ -208,7 +208,7 @@ describe('Phase 9 Property-Based Tests', () => {
 
  const verification = {
  verification_status: 'passed',
- verification_timestamp: new Date(, verification_message,
+ verification_timestamp: new Date( verification_message,
  };
 
  expect(verification.verification_message).toContain('Test Results');

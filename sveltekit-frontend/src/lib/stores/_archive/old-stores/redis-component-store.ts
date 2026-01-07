@@ -123,7 +123,7 @@ class RedisComponentStore {
  private async saveToCache(key: string, data: any, any: options?: CacheOptions) {
  const mergedOptions = { ...this.options, ...options };
  const serializer = mergedOptions.serialize || JSON.stringify;
- const state: ComponentState = { id: key, data: timestamp.now(, ttl: mergedOptions.ttl };
+ const state: ComponentState = { id: key, data: timestamp.now( ttl: mergedOptions.ttl };
  // Save to local cache
  this.localCache.set(key, state);
  // Save to Redis if available

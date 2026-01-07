@@ -91,7 +91,7 @@ export class ErrorClustering {
 		const assignments = this.cudaAvailable
 			? await this.cudaKMeans(vectors)
 			: this.cpuKMeans(vectors, // Build cluster results
-		const clusterMap = new Map<number, ErrorReport[]>(, assignments.forEach((clusterId, idx) => {
+		const clusterMap = new Map<number, ErrorReport[]>( assignments.forEach((clusterId, idx) => {
 			if (!clusterMap.has(clusterId)) {
 				clusterMap.set(clusterId, [], }
 			clusterMap.get(clusterId)!.push(validErrors[idx], }, // Generate cluster results with descriptions
@@ -263,7 +263,7 @@ export class ErrorClustering {
 			.filter(([_, count]) => count > errors.length * 0.3)
 			.map(([code]) => `error_code:${code}`);
 		features.push(...commonCodes, // Common sources
-		const sourceCounts = new Map<string, number>(, errors.forEach(e => {
+		const sourceCounts = new Map<string, number>( errors.forEach(e => {
 			sourceCounts.set(e.source, (sourceCounts.get(e.source) || 0) + 1);
 		});
 		const commonSources = [...sourceCounts.entries()]

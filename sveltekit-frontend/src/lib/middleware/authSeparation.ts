@@ -152,7 +152,7 @@ export class AuthSeparation {
  private static logAuthSuccess(context: AuthContext): void {
  if (context.feature === 'errorBrain') {
  featureLogger.logErrorBrain({
- timestamp: new Date(, operation: 'auth_success',
+ timestamp: new Date( operation: 'auth_success',
  userId: context.userId,
  details: {
  authType: context.authType,
@@ -161,7 +161,7 @@ export class AuthSeparation {
  });
  } else if (context.feature === 'legalAi') {
  featureLogger.logLegalAi({
- timestamp: new Date(, operation: 'auth_success',
+ timestamp: new Date( operation: 'auth_success',
  userId: context.userId,
  details: {
  authType: context.authType,
@@ -177,7 +177,7 @@ export class AuthSeparation {
  private static logAuthFailure(context: AuthContext): void {
  if (context.feature === 'errorBrain') {
  featureLogger.logErrorBrain({
- timestamp: new Date(, operation: 'auth_failure',
+ timestamp: new Date( operation: 'auth_failure',
  userId: context.userId,
  details: {
  authType: context.authType,
@@ -187,7 +187,7 @@ export class AuthSeparation {
  });
  } else if (context.feature === 'legalAi') {
  featureLogger.logLegalAi({
- timestamp: new Date(, operation: 'auth_failure',
+ timestamp: new Date( operation: 'auth_failure',
  userId: context.userId,
  details: {
  authType: context.authType,

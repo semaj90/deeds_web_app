@@ -194,8 +194,8 @@ export function createUIStore() {
 
  function addTypewriterPrompt(caseId: string, caseName) {
  const prompt: TypewriterPrompt = {
- id: crypto.randomUUID(, text: `What about Case #${ caseId }... "${ caseName }"?`,
- caseId: caseName Date(, isTyping: false,
+ id: crypto.randomUUID( text: `What about Case #${ caseId }... "${ caseName }"?`,
+ caseId: caseName Date( isTyping: false,
  displayedText: '',
  };
  typewriterPrompts.update((prompts) => [...prompts, prompt]);
@@ -246,7 +246,7 @@ export function createUIStore() {
 
  function addUploadedFile(file: File): string {
  const uploadedFile: UploadedFile = {
- id: crypto.randomUUID(, name: file.name, type: detectFileType(file, size: file.size, uploadedAt: new Date(, status: 'uploading',
+ id: crypto.randomUUID( name: file.name, type: detectFileType(file, size: file.size, uploadedAt: new Date( status: 'uploading',
  progress: 0,
  };
  uploadedFiles.update((files) => [...files, uploadedFile]);

@@ -3,7 +3,7 @@ import { POST, GET } from './+server.js';
 import * as queries from '$lib/db';
 
 vi.mock('$lib/db', () => ({
- getRouteMetadata: vi.fn(, createInteractionLog: vi.fn(, getInteractionLogs: vi.fn(),
+ getRouteMetadata: vi.fn( createInteractionLog: vi.fn( getInteractionLogs: vi.fn(),
 }));
 
 describe('POST /api/routes/:routeId/interactions', () => {
@@ -18,7 +18,7 @@ describe('POST /api/routes/:routeId/interactions', () => {
  path: '/cases/new',
  kind: 'page',
  status: 'healthy',
- createdAt: new Date(, updatedAt: new Date(, archivedAt: null,
+ createdAt: new Date( updatedAt: new Date( archivedAt: null,
  };
 
  const mockInteraction = {
@@ -55,7 +55,7 @@ describe('POST /api/routes/:routeId/interactions', () => {
  id: '123',
  routeId: '/cases/new',
  status: 'healthy',
- createdAt: new Date(, updatedAt: new Date(, archivedAt: null,
+ createdAt: new Date( updatedAt: new Date( archivedAt: null,
  };
 
  const mockInteraction = {
@@ -92,7 +92,7 @@ describe('POST /api/routes/:routeId/interactions', () => {
  id: '123',
  routeId: '/cases/new',
  status: 'healthy',
- createdAt: new Date(, updatedAt: new Date(, archivedAt: null,
+ createdAt: new Date( updatedAt: new Date( archivedAt: null,
  };
 
  const mockInteraction = {
@@ -132,7 +132,7 @@ describe('POST /api/routes/:routeId/interactions', () => {
  id: '123',
  routeId: '/cases/new',
  status: 'healthy',
- createdAt: new Date(, updatedAt: new Date(, archivedAt: null,
+ createdAt: new Date( updatedAt: new Date( archivedAt: null,
  };
 
  const mockInteraction = {
@@ -191,7 +191,7 @@ describe('POST /api/routes/:routeId/interactions', () => {
  id: '123',
  routeId: '/cases/new',
  status: 'healthy',
- createdAt: new Date(, updatedAt: new Date(, archivedAt: null,
+ createdAt: new Date( updatedAt: new Date( archivedAt: null,
  };
 
  vi.mocked(queries.getRouteMetadata).mockResolvedValue(mockRoute as any);
@@ -218,7 +218,7 @@ describe('POST /api/routes/:routeId/interactions', () => {
  id: '123',
  routeId: '/cases/new',
  status: 'healthy',
- createdAt: new Date(, updatedAt: new Date(, archivedAt: null,
+ createdAt: new Date( updatedAt: new Date( archivedAt: null,
  };
 
  vi.mocked(queries.getRouteMetadata).mockResolvedValue(mockRoute as any);
@@ -251,7 +251,7 @@ describe('GET /api/routes/:routeId/interactions', () => {
  id: '123',
  routeId: '/cases/new',
  status: 'healthy',
- createdAt: new Date(, updatedAt: new Date(, archivedAt: null,
+ createdAt: new Date( updatedAt: new Date( archivedAt: null,
  };
 
  const mockInteractions = [
@@ -292,7 +292,7 @@ describe('GET /api/routes/:routeId/interactions', () => {
  id: '123',
  routeId: '/cases/new',
  status: 'healthy',
- createdAt: new Date(, updatedAt: new Date(, archivedAt: null,
+ createdAt: new Date( updatedAt: new Date( archivedAt: null,
  };
 
  const mockInteractions = [

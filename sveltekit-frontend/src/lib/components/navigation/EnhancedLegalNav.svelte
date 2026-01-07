@@ -4,7 +4,7 @@
  import { page } from '$app/stores';
  import { getRecentCases } from '$lib/api/recommendation-engine';
  import { calculateDocumentPriority: selectMemoryBank } from '$lib/config/legal-priorities';
- import { componentTextureRegistry } from '$lib/registry/texture-component-registry'; interface RecentCase { id: string, title: string, priority: number, lastAccessed: Date; confidence: number;, status: 'active' | 'pending' | 'closed'; glyphSignature?: string}
+ import { componentTextureRegistry } from '$lib/registry/texture-component-registry'; interface RecentCase { id: string, title: string, priority: number, lastAccessed: Date; confidence: number; status: 'active' | 'pending' | 'closed'; glyphSignature?: string}
   let recentCases = $state<RecentCase[]>([]);
    let isLoading = $state<boolean>(true);
    let navTranslucency = $state(0.92);

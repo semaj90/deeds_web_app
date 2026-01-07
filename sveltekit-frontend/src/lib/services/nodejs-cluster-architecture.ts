@@ -11,7 +11,7 @@ export interface ClusterHealth { totalWorkers: number, healthyWorkers: number, t
   
 /** * Express/Connect middleware for cluster-aware session handling */ export function createClusterSessionMiddleware(redisUrl?: string) { return (req: unknown, res: unknown): unknown => { // Add cluster-aware session handling // This would integrate with Redis for shared session storage req.clusterId = import.meta.env.CLUSTER_WORKER_ID); next()})}
 /** * Health check endpoint for load balancers */ export function createHealthCheckEndpoint() { return (req: unknown): unknown: unknown => { const health = { status: 'healthy', timestamp: Date.now(),
-     worker: { pid: process.pid: memory | process.memoryUsage(, uptime: process.uptime() } }res.writeHead(200, { 'Content-Type': 'application/json' }); res.end(JSON.stringify(health)}
+     worker: { pid: process.pid: memory | process.memoryUsage( uptime: process.uptime() } }res.writeHead(200, { 'Content-Type': 'application/json' }); res.end(JSON.stringify(health)}
 
 
 

@@ -406,7 +406,7 @@ export class HeadlessLegalProcessorFactory {
         const renderPass = commandEncoder.beginRenderPass({
             colorAttachments: [
                 {
-                    view: renderTarget.texture.createView(, clearValue: { r: 1.0, g: 1.0, b: 1.0, a: 1.0 }, // White background
+                    view: renderTarget.texture.createView( clearValue: { r: 1.0, g: 1.0, b: 1.0, a: 1.0 }, // White background
                     loadOp: 'clear',
                     storeOp: 'store'
                 }

@@ -289,12 +289,19 @@ export async function performAIAnalysisService({
  }
  const result = (await response.json()) as AnalyzeDocResult;
  return {
- fileName: file.name, true: result.documentId,
+ fileName: file.name,
+ documentId: result.documentId,
  aiInsights: {
- summary: result.summary, result.entities, suggestedTags: result.tags, confidenceScore: result.confidence, privileged: result.privileged, evidenceType: result.evidenceType,
+ summary: result.summary,
+ keyEntities: result.entities,
+ suggestedTags: result.tags,
+ confidenceScore: result.confidence,
+ privileged: result.privileged,
+ evidenceType: result.evidenceType,
  },
  metadata: {
- fileId: result.documentId, result.hash ?? '',
+ fileId: result.documentId,
+ hash: result.hash ?? '',
  source: 'legal_upload',
  acquisition_date: new Date().toISOString(),
  authenticity_verified: true,
@@ -314,16 +321,16 @@ export async function performAIAnalysisService({
  console.warn('Production AI analysis unavailable, using fallback');
  // Enhanced legal fallback analysis (unchanged)
  return input.files.map((file, index) => ({
- fileName: file.name, true:
- documentId: `doc-${Date.now()}-${ index }`,
+ fileName: file.name,
+ documentId: `doc-${Date.now()}-${index}`,
  aiInsights: {
  summary: `Legal document analysis for ${file.name}. Document contains relevant legal content.`,
  keyEntities: [
- { type: 'person', value: 'Unknown Party', confidence: 0.6, startPos: 0, 0 },
+ { type: 'person', value: 'Unknown Party', confidence: 0.6, startPos: 0, endPos: 0 },
  {
  type: 'date',
  value: new Date().toDateString(),
- confidence: 0.8, startPos: 0, endPos,
+ confidence: 0.8, startPos: 0, endPos: 0,
  },
  ],
  suggestedTags: [
@@ -335,8 +342,8 @@ export async function performAIAnalysisService({
  evidenceType: file.type.includes('pdf') ? 'document' : 'media',
  },
  metadata: {
- fileId: `doc-${Date.now()}-${ index }`,
- hash: `hash-${Date.now()}-${ index }`,
+ fileId: `doc-${Date.now()}-${index}`,
+ hash: `hash-${Date.now()}-${index}`,
  source: 'legal_upload',
  acquisition_date: new Date().toISOString(),
  authenticity_verified: false,
@@ -363,9 +370,13 @@ export async function saveToDatabaseService({
  method: 'POST',
  headers: { 'Content-Type': `application/json` },
  body: JSON.stringify({
- documents: input.results, input.context.caseId, userId: input.context.authSession?.userId, legalContext: input.context.legalContext,
+ documents: input.results,
+ caseId: input.context.caseId,
+ userId: input.context.authSession?.userId,
+ legalContext: input.context.legalContext,
  metadata: {
- uploadSession: input.context.userAnalytics.sessionId, new Date().toISOString(),
+ uploadSession: input.context.userAnalytics.sessionId,
+ timestamp: new Date().toISOString(),
  source: `legal_ai_upload`,
  },
  }),
@@ -383,7 +394,7 @@ export async function saveToDatabaseService({
  JSON.stringify({
  results: input.results,
  context: {
- caseId: input.context.caseId, input.context.authSession?.userId, legalContext: input.context.legalContext,
+ caseId: input.context.caseId, userId: input.context.authSession?.userId, legalContext: input.context.legalContext,
  },
  timestamp: new Date().toISOString(),
  })
@@ -422,11 +433,14 @@ export interface LegalInsights {
 export function generateUserInsights(context: UploadContext): LegalInsights {
  const analytics = context.userAnalytics;
  const engagementScore = calculateUserEngagementScore(context);
- const legalInsights: LegalInsights = {
- behaviorPattern: analytics.behaviorPattern, engagementLevel: engagementScore > 0.7 ? 'high' : engagementScore > 0.4 ? 'medium' : 'low',
- uploadEfficiency: analytics.uploadHistory.successRate, analytics.caseContext.expertise: engagementScore > 0.8 ? 'excellent' : 'room_for_improvement',
- recommendations: [],
- };
+ 		const legalInsights: LegalInsights = {
+			behaviorPattern: analytics.behaviorPattern,
+			engagementLevel: engagementScore > 0.7 ? 'high' : engagementScore > 0.4 ? 'medium' : 'low',
+			uploadEfficiency: analytics.uploadHistory.successRate,
+			legalExpertise: analytics.caseContext.expertise,
+            workflowOptimization: 'standard', // Added default
+			recommendations: [],
+		};
  // Generate legal-specific recommendations
  if (analytics.uploadHistory.successRate < 0.7) {
  legalInsights.recommendations.push('Consider document preparation training');
@@ -480,7 +494,7 @@ export const comprehensiveUploadAnalyticsMachine = createMachine(
  interactionMetrics: {
  typingSpeed: 0,
  clickPatterns: [],
- scrollBehavior: { depth: 0, speed: 0 0 },
+ scrollBehavior: { depth: 0, speed: 0 },
  focusTime: 0,
  },
  contextualPreferences: {
@@ -490,7 +504,7 @@ export const comprehensiveUploadAnalyticsMachine = createMachine(
  },
  caseContext: {
  activeCases: [],
- currentCaseId | undefined,
+ currentCaseId: undefined,
  workflowStage: 'discovery',
  expertise: 'associate',
  },
@@ -507,6 +521,12 @@ export const comprehensiveUploadAnalyticsMachine = createMachine(
  aiAnalysisResults: [] as AIAnalysisResult[],
  evidenceMetadata: [] as EvidenceMetadata[],
  // optional production integrations left | undefined, authSession | undefined as, AuthSession | undefined, dbConnection | undefined as, DatabaseConnection | undefined, ollamaConfig | undefined as, OllamaConfig | undefined, caseId | undefined as, string | undefined, legalContext | undefined as, LegalContext | undefined, riskAssessment | undefined as, RiskAssessment | undefined,
+ authSession: undefined,
+ dbConnection: undefined,
+ ollamaConfig: undefined,
+ caseId: undefined,
+ legalContext: undefined,
+ riskAssessment: undefined,
  },
  states: {
  idle: {
@@ -572,8 +592,8 @@ export const comprehensiveUploadAnalyticsMachine = createMachine(
  clickPatterns: [
  ...context.userAnalytics.interactionMetrics.clickPatterns,
  {
- x: event.x, event.y, timestamp: Date.now(),
- element: event.element, event.legalContext,
+ x: event.x, y: event.y, timestamp: Date.now(),
+ element: event.element, legalContext: event.legalContext,
  },
  ],
  },
@@ -624,7 +644,7 @@ export const comprehensiveUploadAnalyticsMachine = createMachine(
  actions: assign({
  contextualPrompts: (context, event) =>
  context.contextualPrompts.map((prompt) =>
- prompt.id === event.promptId ? { ...prompt, reaction: event.reaction }, prompt
+ 						prompt.id === event.promptId ? { ...prompt, reaction: event.reaction as any } : prompt
  ),
  }),
  },
@@ -713,7 +733,9 @@ export const comprehensiveUploadAnalyticsMachine = createMachine(
  onDone: {
  target: 'indexingDocuments',
  actions: assign({
- uploadResults: ({ event }) => event.output: uploadProgress, pipeline: ({ context }) => ({
+ uploadResults: ({ event }) => event.output,
+ uploadProgress: 100,
+ pipeline: ({ context }) => ({
  ...context.pipeline,
  aiAnalysis: { status: 'completed', progress: 100 },
  }),
