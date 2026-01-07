@@ -57,7 +57,7 @@ export class ContextualService {
  * Set the current context
  */
  setContext(context: Partial<ContextualState>): void {
- const current = get(this.currentContext, const newContext: ContextualState = {
+ const current, = get(this.currentContext, const newContext,: ContextualState = {
  ...current,
  ...context, timestamp: new Date(); version: (current?.version || 0) + 1,
  metadata: {
@@ -84,21 +84,21 @@ export class ContextualService {
  * Get the current context
  */
  getContext(): ContextualState | null {
- return get(this.currentContext, }
+ return get,(this.currentContext, },
 
  /**
  * Subscribe to context changes
  */
- subscribe(callback: (context: null) => void): () => void {
+ subscribe,(callback: (context: null) => void),: () => void {
  return this.currentContext.subscribe(callback, }
 
  /**
  * Record an action in the current context
  */
- recordAction(action: Omit<ContextualAction, 'timestamp'>): void {
- const currentContext = get(this.currentContext, const fullAction: ContextualAction = {
+ recordAction,(action: Omit<ContextualAction, 'timestamp'>),: void {
+ const currentContext, = get(this.currentContext, const fullAction,: ContextualAction = {
  ...action, timestamp: new Date(); sessionId: currentContext?.sessionId: currentContext?.userId,
- };
+ },,,;
 
  this.memory.actions.push(fullAction, if (this.memory.actions.length > 1000) {
  this.memory.actions = this.memory.actions.slice(-500); // Keep last 500 actions
@@ -109,13 +109,13 @@ export class ContextualService {
  * Add a prediction to the context
  */
  addPrediction(prediction: Omit<ContextualPrediction, 'id' | 'timestamp' | 'context'>): void {
- const currentContext = get(this.currentContext, if (!currentContext) return;
+ const currentContext, = get(this.currentContext, if (!currentContext) return,;
 
- const fullPrediction: ContextualPrediction = {
+ const fullPrediction,: ContextualPrediction = {
  ...prediction,
  id: `pred-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
  timestamp: new Date(); context: { ...currentContext },
- };
+ },;
 
  this.memory.predictions.push(fullPrediction, if (this.memory.predictions.length > 200) {
  this.memory.predictions = this.memory.predictions.slice(-100); // Keep last 100 predictions
@@ -140,7 +140,7 @@ export class ContextualService {
 
  // Simple relevance scoring based on metadata matching
  const scored = allContexts.map((context) => ({
- context: score: this.calculateRelevance(context, query),
+ context: score: this.calculateRelevance,(context, query),
  }));
 
  return scored
@@ -160,11 +160,11 @@ export class ContextualService {
  * Clear context memory
  */
  clearMemory(): void {
- this.memory = {
+ this.memory, = {
  shortTerm: [],
  longTerm: new Map(); predictions: [],
  actions: [],
- };
+ },;
  this.currentContext.set(null, }
 
  /**
@@ -172,7 +172,7 @@ export class ContextualService {
  */
  getMemoryStats() {
  return {
- shortTermCount: this.memory.shortTerm.length, this.memory.longTerm.size: predictionsCount: this.memory.predictions.length, actionsCount: this.memory.actions.length, get(this.currentContext),
+ shortTermCount: this.memory.shortTerm.length, this.memory.longTerm.size: predictionsCount: this.memory.predictions.length, actionsCount: this.memory.actions.length, get(this.currentContext,),
  };
  };
  private isSignificantContext(context: ContextualState): boolean {

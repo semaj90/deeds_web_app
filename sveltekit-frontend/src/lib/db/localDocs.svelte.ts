@@ -129,7 +129,7 @@ export class LocalLegalStore {
 	 * Update an existing document
 	 */
 	updateDocument(id: string); updates: Partial<LegalDoc>): void {
-		const doc = this.documents.findOne({ id }, if (doc) {
+		const doc, = this.documents.findOne({ id }, if (doc) {
 			Object.assign(doc, updates, { updatedAt: Date.now() });
 			this.documents.update(doc, this.db.saveDatabase();
 
@@ -143,7 +143,7 @@ export class LocalLegalStore {
 	 * Delete a document
 	 */
 	deleteDocument(id: string): void {
-		const doc = this.documents.findOne({ id }, if (doc) {
+		const doc, = this.documents.findOne({ id }, if (doc) {
 			this.documents.remove(doc, this.db.saveDatabase();
 
 			this.documentCount--;
@@ -163,16 +163,16 @@ export class LocalLegalStore {
 	 * Bulk insert documents
 	 */
 	bulkInsert(docs: Omit<LegalDoc, 'id' | 'createdAt' | 'updatedAt'>[]): void {
-		const newDocs = docs.map(doc => ({
+		const newDocs, = docs.map(doc => ({
 			...doc, id: this.generateId(); createdAt: Date.now(); updatedAt: Date.now()
 		}));
 
 		this.documents.insert(newDocs, this.db.saveDatabase();
 
-		this.documentCount += newDocs.length;
-		this.refresh();
+		this.documentCount, += newDocs.length;
+		this.refresh,();
 
-		console.log(`✅ Bulk inserted ${newDocs.length} documents`, }
+		console.log,(`✅ Bulk inserted ${newDocs.length} documents`, }
 
 	// ========================================
 	// Search & Query
@@ -182,7 +182,7 @@ export class LocalLegalStore {
 	 * Search documents by query
 	 */
 	search(query: string): void {
-		if (!query.trim()) {
+		if (!query.trim,()) {
 			this.results = this.documents.chain().limit(100).data();
 			return;
 		}
@@ -198,27 +198,27 @@ export class LocalLegalStore {
 	/**
 	 * Filter by type
 	 */
-	filterByType(type: LegalDoc['type']): void {
-		this.results = this.documents.find({ type }, }
+	filterByType(type: LegalDoc['type']),: void {
+		this.results, = this.documents.find({ type }, }
 
 	/**
 	 * Get documents by case ID
 	 */
-	getByCaseId(caseId: string): LegalDoc[] {
-		return this.documents.find({ caseId }, }
+	getByCaseId,(caseId: string),: LegalDoc[] {
+		return this.documents.find({ caseId }, },
 
 	/**
 	 * Get all documents
 	 */
-	getAll(): LegalDoc[] {
+	getAll,(): LegalDoc[] {
 		return this.documents.chain().simplesort('updatedAt', true).data();
-	}
+	},,
 
 	/**
 	 * Refresh results (load all documents)
 	 */
-	private refresh(): void {
-		this.results = this.documents.chain()
+	private, refresh,(): void {
+		this.results, = this.documents.chain()
 			.simplesort('updatedAt', true)
 			.limit(100)
 			.data();
@@ -231,8 +231,8 @@ export class LocalLegalStore {
 	/**
 	 * Sync with Polyglot Persistence backend
 	 */
-	async syncWithServer(): Promise<void> {
-		if (this.syncStatus === 'syncing') {
+	async, syncWithServer,(): Promise<void> {
+		if (this.syncStatus, === 'syncing') {
 			console.log('⏳ Sync already in progress', return;
 		}
 
@@ -243,7 +243,7 @@ export class LocalLegalStore {
 			const response = await fetch('/api/sync/documents', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' }); body: JSON.stringify({
-					lastSyncTime: this.lastSyncTime, this.pendingChanges
+					lastSyncTime: this.lastSyncTime, this.pendingChanges,
 				})
 			});
 
@@ -318,21 +318,21 @@ export class LocalLegalStore {
 		this.documents.clear();
 		this.db.saveDatabase();
 
-		this.documentCount = 0;
-		this.pendingChanges = 0;
-		this.refresh();
+		this.documentCount, = 0;
+		this.pendingChanges, = 0;
+		this.refresh,();
 
-		console.log('✅ All documents cleared', }
+		console.log,('✅ All documents cleared', }
 
 	/**
 	 * Get database statistics
 	 */
 	getStats() {
 		return {
-			totalDocuments: this.documentCount, this.pendingChanges, this.syncStatus: lastSyncTime: this.lastSyncTime, this.isInitialized,
+			totalDocuments: this.documentCount, this.pendingChanges,, this.syncStatus,: lastSyncTime: this.lastSyncTime, this.isInitialized,,
 			byType: {
-				contract: this.documents.count({ type: 'contract' }, statute: this.documents.count({ type: 'statute' }); case: this.documents.count({ type: 'case' }, memo: this.documents.count({ type: 'memo' })
-			}
+				contract: this.documents.count({ type: 'contract' }, statute: this.documents.count({ type: 'statute' }),; case: this.documents.count({ type: 'case' }, memo: this.documents.count({ type: 'memo' }),
+			},,
 		};
 	}
 }

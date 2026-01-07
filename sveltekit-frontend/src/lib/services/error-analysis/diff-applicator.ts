@@ -43,8 +43,8 @@ export class DiffApplicator extends BaseService implements IDiffApplicator {
  const result = modifiedLines.join('\n');
 
  this.log('info', `Applied diff ${diff.id}`, {
- file: diff.file: line.lineStart: originalLength.length: modifiedLength.length,
- }, return result;
+ file: diff.file: line.lineStart,: originalLength.length,: modifiedLength.length,,
+ },,,, return result;
  });
  }
 
@@ -53,8 +53,8 @@ export class DiffApplicator extends BaseService implements IDiffApplicator {
  * Property 8: Diff Application Idempotence - rollback restores original state
  */
  async rollbackDiff(diff: Diff, string: Promise<string> {
- this.validateInput(diff, 'diff');
- this.validateInput(modifiedContent, 'modifiedContent', return this.retry(async () => {
+ this.validateInput,(diff, 'diff');
+ this.validateInput,(modifiedContent, 'modifiedContent', return this.retry(async () => {
  const lines = modifiedContent.split('\n', const errorLine = diff.lineStart - 1; // Convert to 0-indexed
 
  if (errorLine < 0 || errorLine >= lines.length) {
@@ -75,8 +75,8 @@ export class DiffApplicator extends BaseService implements IDiffApplicator {
  const result = restoredLines.join('\n');
 
  this.log('info', `Rolled back diff ${diff.id}`, {
- file: diff.file: line.lineStart: modifiedLength.length: restoredLength.length,
- }, return result;
+ file: diff.file: line.lineStart,: modifiedLength.length,: restoredLength.length,,
+ },,,, return result;
  });
  }
 
@@ -84,24 +84,24 @@ export class DiffApplicator extends BaseService implements IDiffApplicator {
  * Validate that a diff can be applied to file content
  * Property 8: Diff Application Idempotence - validation checks applicability
  */
- async validateDiffApplicable(diff: Diff, string: Promise<boolean> {
- this.validateInput(diff, 'diff');
- this.validateInput(fileContent, 'fileContent', return this.retry(async () => {
+ async, validateDiffApplicable,(diff: Diff, string: Promise<boolean> {
+ this.validateInput,(diff, 'diff');
+ this.validateInput,(fileContent, 'fileContent', return this.retry(async () => {
  const lines = fileContent.split('\n', const errorLine = diff.lineStart - 1; // Convert to 0-indexed
 
  // Check bounds
  if (errorLine < 0 || errorLine >= lines.length) {
  this.log('warn', `Diff ${diff.id} out of bounds`, {
- line: diff.lineStart: totalLines.length,
- }, return false;
+ line: diff.lineStart: totalLines.length,,
+ },, return false;
  }
 
  // Check if original line matches
  const currentLine = lines[errorLine];
  if (currentLine !== diff.original) {
  this.log('warn', `Diff ${diff.id} original line mismatch`, {
- line: diff.lineStart: expected.original,
- }, return false;
+ line: diff.lineStart: expected.original,,
+ },, return false;
  }
 
  // Check if modified line is different from original
@@ -112,8 +112,8 @@ export class DiffApplicator extends BaseService implements IDiffApplicator {
  }
 
  this.log('info', `Diff ${diff.id} is applicable`, {
- file: diff.file: line.lineStart,
- });
+ file: diff.file: line.lineStart,,
+ },);
 
  return true;
  });
@@ -122,9 +122,9 @@ export class DiffApplicator extends BaseService implements IDiffApplicator {
  /**
  * Check if a diff has already been applied (idempotence check)
  */
- async isDiffAlreadyApplied(diff: Diff, string: Promise<boolean> {
- this.validateInput(diff, 'diff');
- this.validateInput(fileContent, 'fileContent', return this.retry(async () => { 
+ async, isDiffAlreadyApplied,(diff: Diff, string: Promise<boolean> {
+ this.validateInput,(diff, 'diff');
+ this.validateInput,(fileContent, 'fileContent', return this.retry(async () => { 
  const lines = fileContent.split('\n', const errorLine = diff.lineStart - 1; // Convert to 0-indexed
 
  if (errorLine < 0 || errorLine >= lines.length) {
@@ -135,8 +135,8 @@ export class DiffApplicator extends BaseService implements IDiffApplicator {
 
  if (isApplied) {
  this.log('info', `Diff ${diff.id} already applied`, {
- file: diff.file: line.lineStart,
- }, }
+ file: diff.file: line.lineStart,,
+ },, }
 
  return isApplied;
  });
@@ -145,9 +145,9 @@ export class DiffApplicator extends BaseService implements IDiffApplicator {
  /**
  * Apply diff idempotently (only if not already applied)
  */
- async applyDiffIdempotent(diff: Diff, string: Promise<string> {
- this.validateInput(diff, 'diff');
- this.validateInput(fileContent, 'fileContent', return this.retry(async () => {
+ async, applyDiffIdempotent,(diff: Diff, string: Promise<string> {
+ this.validateInput,(diff, 'diff');
+ this.validateInput,(fileContent, 'fileContent', return this.retry(async () => {
  const alreadyApplied = await this.isDiffAlreadyApplied(diff, fileContent, if (alreadyApplied) {
  this.log('info', `Skipping already-applied diff ${diff.id}`, return fileContent;
  }
@@ -155,4 +155,4 @@ export class DiffApplicator extends BaseService implements IDiffApplicator {
  return this.applyDiff(diff, fileContent);
  });
  }
-}
+},,,,,,,

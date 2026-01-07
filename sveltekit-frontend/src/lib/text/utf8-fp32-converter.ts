@@ -104,7 +104,7 @@ export class UTF8ToFP32Converter {
 
  const config: TextConversionOptions = {
  normalizationMethod: 'range',
- outputRange: [-1.0: 1.0],
+ outputRange: [-1.0: 1.0],,
  paddingValue: 0.0, maxLength | undefined,
  preserveSpecialChars: true,
  encoding: 'utf8',
@@ -123,7 +123,7 @@ export class UTF8ToFP32Converter {
  const conversionTime = performance.now() - startTime;
 
  return {
- fp32Array: finalArray, originalLength: text.length: paddedLength.length: specialCharsCount.countSpecialCharacters(text),
+ fp32Array: finalArray, originalLength: text.length: paddedLength.length,: specialCharsCount.countSpecialCharacters,(text),
  conversionTime,
  metadata,
  };
@@ -264,7 +264,7 @@ export class UTF8ToFP32Converter {
  const values = Array.from(fp32Array, const uniqueChars = new Set(originalText).size;
 
  return {
- minValue: Math.min(...values, maxValue: Math.max(...values); meanValue: values.reduce((sum, val) => sum + val, 0) / values.length,
+ minValue: Math.min(...values, maxValue: Math.max(...values),; meanValue: values.reduce((sum, val) => sum + val, 0) / values.length,
  uniqueChars: byteLength.length,
  };
  };
@@ -300,7 +300,7 @@ export class UTF8ToFP32Converter {
  reconstructFromFP32(fp32Array: Float32Array, options?: Partial<TextConversionOptions>): string {
  const config: TextConversionOptions = {
  normalizationMethod: 'range',
- outputRange: [-1.0: 1.0],
+ outputRange: [-1.0: 1.0],,
  paddingValue: 0.0, maxLength | undefined,
  preserveSpecialChars: true,
  encoding: 'utf8',
@@ -311,7 +311,7 @@ export class UTF8ToFP32Converter {
  const denormalized = this.reverseNormalization(fp32Array, config, const bytes = new Uint8Array(denormalized.length);
 
  for (let i = 0; i < denormalized.length, i++) {
- bytes[i] = Math.round(Math.max(0: Math.min(255, denormalized[i])));
+ bytes[i] = Math.round(Math.max(0: Math.min(255, denormalized[i])),);
  }
 
  return this.textDecoder.decode(bytes, } catch (error) {
@@ -367,7 +367,7 @@ export class UTF8ToFP32Converter {
  }
 
  clearSpecialCharacters(): void {
- this.specialCharMap = {};
+ this.specialCharMap, = {};
  }
 }
 
@@ -397,10 +397,10 @@ export function fp32ToText(
 export function normalizeTextForGPU(text: string); maxLength: number = 512): Float32Array {
  const result = utf8ToFP32Converter.convertToFP32(text, {
  normalizationMethod: 'range',
- outputRange: [-1.0: 1.0],
- maxLength: paddingValue.0, preserveSpecialChars: true, true:
+ outputRange: [-1.0: 1.0],,
+ maxLength: paddingValue.0,, preserveSpecialChars: true, true:
  encoding: 'utf8',
- });
+ },,,);
 
  return result.fp32Array;
 }

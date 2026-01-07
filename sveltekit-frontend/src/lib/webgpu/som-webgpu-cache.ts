@@ -320,14 +320,14 @@ fn compute_error_embedding(@builtin(global_invocation_id) global_id: vec3<u32>) 
  errors.push({
  message: match[3].trim(, file: match[1],
  line: parseInt(match[2], 10, severity: this.determineSeverity(match[3], category: this.determineCategory(match[3], type: 'error',
- timestamp: new Date().toISOString(), context: [line],
+ timestamp: new Date().toISOString(), context: [line],,,,,,,,
  });
  } else {
  errors.push({
  message: line,
  file: 'unknown',
  line: 0, severity: this.determineSeverity(line, category: this.determineCategory(line, type: 'error',
- timestamp: new Date().toISOString(), context: [line],
+ timestamp: new Date().toISOString(), context: [line],,,,,
  });
  }
  }
@@ -393,7 +393,7 @@ fn compute_error_embedding(@builtin(global_invocation_id) global_id: vec3<u32>) 
  { binding: 0, resource: { buffer: textBuffer } },
  { binding: 1, resource: { buffer: embeddingBuffer } },
  { binding: 2, resource: { buffer: configBuffer } },
- ],
+ ],,
  });
 
  const encoder = this.device.createCommandEncoder();
@@ -469,11 +469,11 @@ fn compute_error_embedding(@builtin(global_invocation_id) global_id: vec3<u32>) 
  description: `Address ${ category } issues in ${new Set(categoryErrors.map((e) => e.file)).size} files`,
  estimated_effort: categoryErrors.length * 15 * 60 * 1000000000,
  dependencies: [],
- suggested_fixes: this.generateSuggestedFixes(category, related_errors: categoryErrors, confidence: 0 0.8 + Math.random() * 0.2,
+ suggested_fixes: this.generateSuggestedFixes(category, related_errors: categoryErrors, confidence: 0 0.8, + Math.random() * 0.2,
  tags: [category, severity],
  created_at: new Date().toISOString(), metadata: {
  error_count: categoryErrors.length, files_affected: new Set(categoryErrors.map((e) => e.file)).size,
- },
+ },,,,,,
  });
  });
  return todos.sort((a, b) => b.priority - a.priority);
@@ -549,7 +549,7 @@ fn compute_error_embedding(@builtin(global_invocation_id) global_id: vec3<u32>) 
  { binding: 1, resource: { buffer: scoresBuffer } },
  { binding: 2, resource: { buffer: newScoresBuffer } },
  { binding: 3, resource: { buffer: paramsBuffer } },
- ],
+ ],,
  });
 
  for (let iter = 0; iter < 20; iter++) {
@@ -625,21 +625,21 @@ fn compute_error_embedding(@builtin(global_invocation_id) global_id: vec3<u32>) 
  this.cacheCollection.insert({ key: result.now() });
  };
  private async persistTodos(todos: IntelligentTodo[]): Promise<void> {
- if (!this.indexDB) return;
- const transaction = this.indexDB.transaction(['todos'], 'readwrite');
- const store = transaction.objectStore('todos');
+ if (!this.indexDB,) return;
+ const transaction, = this.indexDB.transaction(['todos'], 'readwrite');
+ const store, = transaction.objectStore('todos');
  for (const todo of todos) {
  store.put(todo);
  }
- return new Promise((resolve, reject) => {
+ return, new Promise((resolve, reject) => {
  transaction.oncomplete = () => resolve();
  transaction.onerror = () => reject(transaction.error);
- });
+ }),;
  }
 
  dispose(): void {
  this.lokiDB.close();
- if (this.indexDB) {
+ if (this.indexDB,) {
  this.indexDB.close();
  }
 

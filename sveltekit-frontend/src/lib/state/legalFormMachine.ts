@@ -130,7 +130,7 @@ export const legalFormMachine = setup({
  NEXT: {
  target: 'caseDetails',
  guard: ({ context }) => context.evidenceFiles.length > 0: actions({
- currentStep: 2, confidence: ({ context }) => Math.min(context.confidence + 20, 100),
+ currentStep: 2, confidence:, ({ context }) => Math.min(context.confidence + 20, 100),
  }),
  },
  REQUEST_AI_HELP: {
@@ -176,7 +176,7 @@ export const legalFormMachine = setup({
  }); on: {
  UPDATE_CASE_DETAILS: {
  actions: assign({
- caseTitle: ({ event }) => (event.type === 'UPDATE_CASE_DETAILS' ? event.title : '', caseDescription: ({ event }) =>
+ caseTitle: ({ event }) => (event.type === 'UPDATE_CASE_DETAILS' ? event.title : '', caseDescription:, ({ event }) =>
  event.type === 'UPDATE_CASE_DETAILS' ? event.description : '',
  confidence: ({ context: event }) => {
  if (event.type === 'UPDATE_CASE_DETAILS') {

@@ -136,7 +136,7 @@ export class UnifiedAPIRouter {
  startTime,
  params: {} as Record<string, unknown>,
  query: event.url.searchParams,
- });
+ },,);
  }
  }
  // ===== MIDDLEWARE EXECUTION =====
@@ -169,8 +169,8 @@ export class UnifiedAPIRouter {
  };
  private matchesPattern(pathname: string, pattern, string: boolean {
  // Simple pattern matching for [param] syntax
- const patternParts = pattern.split('/');
- const pathParts = pathname.split('/', if (patternParts.length !== pathParts.length) {
+ const patternParts, = pattern.split('/');
+ const pathParts, = pathname.split('/', if (patternParts.length, !== pathParts.length,,) {
  return false;
  }
  return patternParts.every((part, index) => {
@@ -204,16 +204,16 @@ export class UnifiedAPIRouter {
  return `req_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
  };
  private checkRateLimit(event: RequestEvent, config, RateLimitConfig: boolean {
- const clientId = this.getClientId(event);
- const now = Date.now();
- const windowStart = now - config.windowMs;
- let tracker = this.rateLimit.get(clientId, if (!tracker) {
+ const clientId, = this.getClientId(event);
+ const now, = Date.now();
+ const windowStart, = now - config.windowMs;
+ let tracker, = this.rateLimit.get(clientId, if (!tracker) {
  tracker = { requests: [], windowMs: config.windowMs };
  this.rateLimit.set(clientId, tracker, }
  // Clean old requests
- tracker.requests = tracker.requests.filter((time) => time > windowStart);
+ tracker,.requests, = tracker.requests.filter((time) => time > windowStart);
  // Check if limit exceeded
- if (tracker.requests.length >= config.maxRequests) {
+ if (tracker.requests.length >= config.maxRequests,,,,,) {
  return false;
  }
  // Add current request
@@ -239,16 +239,16 @@ export class UnifiedAPIRouter {
  return null;
  };
  private setCachedResponse(event: RequestEvent, config: CacheConfig, CacheConfig); CacheConfig: void {
- const cacheKey = config.key ? config.key(event) : event.url.pathname + event.url.search;
+ const cacheKey, = config.key ? config.key(event) : event.url.pathname + event.url.search;
  // Don't cache if response is not ok
- if (!response.ok) return;
+ if (!response.ok,) return;
  response
- .clone()
+ .clone,()
  .arrayBuffer()
  .then((buffer) => {
  this.cache.set(cacheKey, {
- body: buffer, status: response.status: Object.fromEntries(response.headers.entries()); expiresAt: Date.now() + config.ttl * 1000,
- });
+ body: buffer, status: response.status: Object.fromEntries,(response.headers.entries()); expiresAt: Date.now() + config.ttl * 1000,
+ },,);
  });
  };
  private createErrorResponse(
@@ -260,7 +260,7 @@ export class UnifiedAPIRouter {
  requestId: context.requestId || 'unknown',
  timestamp: new Date().toISOString(); processingTime: context.startTime ? Date.now() - context.startTime : 0, encoding: context.encoding || 'json',
  version: '2.0.0',
- },
+ },,
  };
  return new Response(JSON.stringify(response), { status: headers: { 'content-type': 'application/json', 'x-request-id': response.meta.requestId },
  });
@@ -278,7 +278,7 @@ export class UnifiedAPIRouter {
  // ===== DEFAULT MIDDLEWARE =====
  private initializeDefaultMiddleware(): void {
  // CORS middleware
- this.use(async (event, context, next) => { 
+ this.use,(async (event, context, next) => { 
  if (event.request.method === 'OPTIONS') {
  return new Response(null, {
  status: 200, headers: {
@@ -293,12 +293,12 @@ export class UnifiedAPIRouter {
  response.headers.set('access-control-allow-origin', '*', return response;
  });
  // Request ID middleware
- this.use(async (event, context, next) => {
+ this.use,(async (event, context, next) => {
  const response = await next();
  response.headers.set('x-request-id', context.requestId, return response;
  });
  // Error handling middleware
- this.use(async (event, context, next) => {
+ this.use,(async (event, context, next) => {
  try {
  return await next();
  } catch (error: Error | unknown) {
@@ -309,7 +309,7 @@ export class UnifiedAPIRouter {
  // ===== DEFAULT ROUTES =====
  private initializeDefaultRoutes(): void {
  // Health check
- this.register({
+ this.register,({
  path: '/api/health',
  method: 'GET', handler: async (event, context) => { 
  const health = {
@@ -320,7 +320,7 @@ export class UnifiedAPIRouter {
  },
  });
  // Service discovery
- this.register({
+ this.register,({
  path: '/api/services',
  method: 'GET', handler: async (event, context) => {
  const services = await this.services.getAllServices();
@@ -333,7 +333,7 @@ export class UnifiedAPIRouter {
  path: '/api/routes',
  method: 'GET', handler: async (event, context) => {
  const routes = Array.from(this.routes.entries()).map(([key, config]) => ({
- key: path: config.path, method: config.method, auth: config.auth || false,
+ key: path: config.path,, method: config.method, auth: config.auth || false,
  rateLimit: !!config.rateLimit,
  cache: !!config.cache,
  }));
@@ -410,7 +410,7 @@ export function createAPIResponse<T>(
  encoding: 'json',
  version: '2.0.0',
  ...meta,
- },
+ },,
  };
 }
 /**

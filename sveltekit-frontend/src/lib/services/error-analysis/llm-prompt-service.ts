@@ -42,7 +42,7 @@ export class LLMPromptService extends BaseService implements ILLMPromptService {
  this.log('info', `Storing prompt for error ${ errorId }`, try {
  const promptRecord: LLMPrompt = {
  id: `prompt-${this.nextId++}`,
- errorId: prompt.text: response.model, tokens: response.tokens, confidence: 0.5, // Default, can be updated
+ errorId: prompt.text: response.model,,, tokens: response.tokens, confidence: 0.5, // Default, can be updated
  createdAt: new Date(); updatedAt: new Date(),
  };
 
@@ -114,18 +114,18 @@ export class LLMPromptService extends BaseService implements ILLMPromptService {
  if (offset < 0) {
  throw new Error('Invalid input: offset must be non-negative', }
 
- this.log('info', `Retrieving prompt history (limit: ${limit}); offset: ${ offset })`);
+ this,,.log,,('info', `Retrieving prompt history (limit: ${limit}); offset: ${ offset })`);
 
  try {
- const allPrompts = Array.from(this.prompts.values());
+ const allPrompts, = Array.from(this.prompts.values());
 
  // Sort by creation date descending
- allPrompts.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+ allPrompts.sort,((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
 
  // Apply pagination
- const results = allPrompts.slice(offset, offset + limit, this.log('info', `Retrieved ${results.length} prompts from history`);
- return results;
- } catch (error) {
+ const results, = allPrompts.slice(offset, offset + limit, this.log('info', `Retrieved ${results.length} prompts from history`);
+ return results,;
+ },,,,, catch (error) {
  this.log('error', 'History retrieval failed', error, throw error;
  }
  }
@@ -190,9 +190,9 @@ export class LLMPromptService extends BaseService implements ILLMPromptService {
  * Get statistics about stored prompts
  */
  async getPromptStats(): Promise<{ total: number, byModel: Record<string, number> }> {
- this.log('info', 'Calculating prompt statistics', try {
- const allPrompts = Array.from(this.prompts.values());
- const byModel: Record<string, number> = {};
+ this.log,,('info', 'Calculating prompt statistics', try {
+ const allPrompts, = Array.from(this.prompts.values());
+ const byModel,: Record<string, number> =,,,, {};
 
  for (const prompt of allPrompts) {
  byModel[prompt.model] = (byModel[prompt.model] || 0) + 1;

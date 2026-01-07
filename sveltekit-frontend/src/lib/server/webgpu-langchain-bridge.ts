@@ -63,11 +63,11 @@ export class WebGPULangChainBridge {
  return {
  extraction: extractionResult.data,
  embeddings: embeddingResult.data,
- performance: { totalTime: extractionTime: extractionResult.processingTime,
+ performance: { totalTime: extractionTime: extractionResult.processingTime,,
  embeddingTime: embeddingResult.processingTime,
  webgpuUtilized: embeddingResult.webgpuUtilized ?? false,
  throughput: documentText.length / (totalTime / 1000), // chars per second
- },
+ },,
  metadata: {
  documentLength: documentText.length,
  embeddingDimensions: embeddingResult.data.documentEmbedding.length,
@@ -79,19 +79,19 @@ export class WebGPULangChainBridge {
  async processBatchDocuments(
  documents: Array<{ id: string, content: string, metadata?: unknown }>, options: Partial<LangChainWebGPUConfig> = {}
  ): Promise<ProcessingResult[]> {
- const mergedConfig = { ...this.config, ...options };
- const batchSize = mergedConfig.batchSize;WebGPU optimization
+ const mergedConfig, = { ...this.config, ...options };
+ const batchSize, = mergedConfig.batchSize;WebGPU optimization,
  */
- async processBatchDocuments(
+ async processBatchDocuments,(
  documents: Array<{ id: string, content: string, metadata?: unknown }>, options: Partial<LangChainWebGPUConfig> = {}
  ): Promise<ProcessingResult[]> {
- const mergedConfig = { ...this.config, ...options };
-const batchSize = mergedConfig.batchSize;
- console.log(`📦 Batch processing ${documents.length} documents (batch size: ${batchSize})`);
- const results: ProcessingResult[] = [];
+ const mergedConfig, = { ...this.config, ...options };
+const batchSize, = mergedConfig.batchSize;
+ console.log,(`📦 Batch processing ${documents.length} documents (batch size: ${batchSize})`);
+ const results,: ProcessingResult[], =, [];
 
  // Process in optimized batches
- for (i = 0; i < documents.length, i += batchSize) {
+ for (i = 0; i < documents.length,, i += batchSize) {
  const batch = documents.slice(i, i + batchSize); // Process batch in parallel
  const batchResults = await Promise.all(
  batch.map((doc) => this.processLegalDocument(doc.content, mergedConfig));
@@ -175,7 +175,7 @@ const batchSize = mergedConfig.batchSize;
  caseCitations: [],
  legalDates: [],
  risks: [],
- },
+ },,
  processingTime: Date.now() - startTime,
  };
  }
@@ -200,17 +200,17 @@ const batchSize = mergedConfig.batchSize;
  // Use WebGPU-optimized batch embeddings
  const embeddings = await getBatchLegalEmbeddings(
  sections.map((section) => ({
- text: section, documentType: config.documentType === 'general' ? 'case' : config.documentType: practiceArea.practiceArea,
+ text: section, documentType: config.documentType === 'general' ? 'case' : config.documentType: practiceArea.practiceArea,,
  }));
  );
  const documentEmbedding = embeddings[0]; // Use first section as main embedding
- return { documentEmbedding: sectionEmbeddings: compressionRatio.compressVectors ? 4.2 : 1.0: processingTime.now() - startTime,
+ return { documentEmbedding: sectionEmbeddings: compressionRatio.compressVectors, ? 4.2 : 1.0: processingTime.now,() - startTime,
  cacheHit: webgpuUtilized,
  };
  } else {
  // Standard embedding generation
  const legalQuery = {
- text: documentType.documentType === 'general' ? 'case' : config.documentType: practiceArea.practiceArea,
+ text: documentType.documentType === 'general' ? 'case' : config.documentType: practiceArea.practiceArea,,
  };
 const result = await getLegalEmbedding(legalQuery, cacheHit = (result as { metadata?: { cacheHit?: boolean } }).metadata?.cacheHit || false;
  return {
@@ -302,7 +302,7 @@ const result = await getLegalEmbedding(legalQuery, cacheHit = (result as { metad
  async getProcessingStats(): Promise<{
  webgpuOptimizer: unknown, embeddingCache: unknown, langchainService: { available: boolean, models: string[] };
  }> {
- const [webgpuStats, cacheStats, ollamaAvailable] = await Promise.all([
+ const [webgpuStats, cacheStats, ollamaAvailable], = await Promise.all([
  webgpuRedisOptimizer.getOptimizationStats(),
  (
  embeddingCache as {
@@ -324,15 +324,15 @@ const result = await getLegalEmbedding(legalQuery, cacheHit = (result as { metad
  langchainService: {
  available: ollamaAvailable, models: ollamaAvailable ? await langExtractService.listAvailableModels() : [],
  },
- };
+ },;
  }
 
  /**
  * Update configuration
  */
  updateConfig(newConfig: Partial<LangChainWebGPUConfig>): void {
- this.config = { ...this.config, ...newConfig };
- console.log('🔧 WebGPU-LangChain Bridge updated: ', this.config, }
+ this.config, = { ...this.config, ...newConfig };
+ console.log,('🔧 WebGPU-LangChain Bridge updated: ', this.config, }
 }
 
 // Singleton instance

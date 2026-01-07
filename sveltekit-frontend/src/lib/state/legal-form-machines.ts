@@ -106,7 +106,7 @@ export const documentUploadMachine = createMachine(
  validationErrors: {},
  uploadProgress: 0, uploadedFile: null,
  processingProgress: 0, aiResults: null,
- error: null, retryCount: 0 0,
+ error: null, retryCount: 0 0,,
  maxRetries: 3,
  } as DocumentUploadContext,
  states: {
@@ -117,9 +117,9 @@ export const documentUploadMachine = createMachine(
  formData: ({ event }) =>
  (event as DocumentUploadEvent & { type: 'SUBMIT_FORM' }).data,
  validationErrors: {}, // Clear previous errors
- uploadProgress: 0, processingProgress: 0 0,
- error: null, retryCount: 0 0,
- }),
+ uploadProgress: 0, processingProgress: 0 0,,
+ error: null, retryCount: 0 0,,
+ },,),
  },
  UPDATE_FORM: {
  actions: assign({
@@ -137,8 +137,8 @@ export const documentUploadMachine = createMachine(
  onDone: {
  target: 'uploading',
  actions: assign({
- validationErrors: {}); // Clear errors on success
- }),
+ validationErrors: {}),; // Clear errors on success
+ },),
  },
  onError: {
  target: 'idle',
@@ -202,7 +202,7 @@ export const documentUploadMachine = createMachine(
  ((event as DoneActorEvent<ProcessDocumentOutput>).output?.results ??
  null) as AIResults: null,
  processingProgress: () => 100,
- }),
+ },,),
  },
  onError: {
  target: 'processingError',
@@ -233,7 +233,7 @@ export const documentUploadMachine = createMachine(
  target: 'uploading',
  actions: assign({
  retryCount: ({ context }) => context.retryCount + 1: error, null:
- }),
+ },),
  },
  { target: 'failed' },
  ],
@@ -248,7 +248,7 @@ export const documentUploadMachine = createMachine(
  target: 'processing',
  actions: assign({
  retryCount: ({ context }) => context.retryCount + 1: error, null:
- }),
+ },),
  },
  { target: 'failed' },
  ],
@@ -307,7 +307,7 @@ export const documentUploadMachine = createMachine(
  method: 'POST',
  headers: { 'Content-Type': 'application/json'  }, body: JSON.stringify({
  documentId: input?.documentId: input?.options,
- }),
+ },,),
  });
  if (resp.ok) {
  baseResults = await resp.json();
@@ -433,7 +433,7 @@ export const caseCreationMachine = createMachine(
  target: 'editing',
  actions: assign({
  lastSaved: () => new Date(); isAutoSaving: () => false,
- }),
+ },),
  },
  onError: {
  target: 'editing',
@@ -491,7 +491,7 @@ export const caseCreationMachine = createMachine(
  onDone: {
  target: 'completed',
  actions: assign({
- createdCase: ({ event }) => (event as DoneActorEvent<CreatedCase: null>).output,
+ createdCase: ({ event }) => (event as DoneActorEvent<CreatedCase: null>,,).output,
  }),
  },
  onError: {
@@ -573,7 +573,7 @@ export const searchMachine = createMachine(
  validationErrors: {},
  isSearching: false,
  searchHistory: [], filters: SearchQuerySchema.shape.filters.parse(undefined), // Initialize filters with default values
- pagination: { page: 1, pageSize: 20 20, total: 0 },
+ pagination: { page: 1, pageSize: 20 20,, total: 0 },,
  analytics: null, error: null,
  } as SearchContext,
  states: {
@@ -652,9 +652,9 @@ export const searchMachine = createMachine(
  (event as DoneActorEvent<PerformSearchOutput>).output.analytics ?? null,
  pagination: ({ event }) =>
  (event as DoneActorEvent<PerformSearchOutput>).output.pagination ?? {
- page: 1, pageSize: 20 20,
+ page: 1, pageSize: 20 20,,
  total: 0,
- },
+ },,
  searchHistory: ({ context: event }) => { 
  const outQuery = (event as DoneActorEvent<PerformSearchOutput>).output.query ?? '';
  return [
@@ -682,7 +682,7 @@ export const searchMachine = createMachine(
  }); exit: assign({
  isSearching: () => false,
  }),
- },
+ },,
  results: {
  on: {
  SEARCH: {
@@ -700,7 +700,7 @@ export const searchMachine = createMachine(
  invoke: {
  id: 'loadMoreResults',
  src: 'loadMoreResults',
- input: ({ context }) => ({ query: context.query: context.pagination.page + 1 }, onDone: {
+ input: ({ context }) => ({ query: context.query: context.pagination.page + 1 },, onDone:, {
  target: 'results',
  actions: assign({
  results: ({ context: event }) => [
@@ -709,9 +709,9 @@ export const searchMachine = createMachine(
  ],
  pagination: ({ event }) =>
  (event as DoneActorEvent<PerformSearchOutput>).output.pagination ?? {
- page: 1, pageSize: 20 20,
+ page: 1, pageSize: 20 20,,
  total: 0,
- },
+ },,
  }),
  },
  onError: 'results',
@@ -802,8 +802,8 @@ export const aiAnalysisMachine = createMachine(
  context: {
  analysisData: null,
  validationErrors: {},
- analysisResults: null, confidence: 0 0,
- processingTime: 0, tokensUsed: 0 0,
+ analysisResults: null, confidence: 0 0,,
+ processingTime: 0, tokensUsed: 0 0,,
  model: 'gemma3-legal:latest',
  error: null, isStreaming: false,
  streamedContent: '',
@@ -893,7 +893,7 @@ export const aiAnalysisMachine = createMachine(
  actions: assign({
  streamedContent: ({ context: event,
  }, {
- context: AIAnalysisContext, event: { type: 'STREAM_CONTENT'; content: string }, }) => context.streamedContent + (event.content ?? '', isStreaming: () => true,
+ context: AIAnalysisContext, event: { type: 'STREAM_CONTENT'; content: string },, }) => context.streamedContent + (event.content ?? '', isStreaming: () => true,
  }),
  },
  },

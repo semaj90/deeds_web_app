@@ -18,17 +18,44 @@
 import { page } from '$app/stores';
 import AnswerWithCitations from '$lib/components/rag/AnswerWithCitations.svelte';
 import SourceValidator from '$lib/components/rag/SourceValidator.svelte';
-import {
-  generateAnswer,
-  searchKnowledgeBase,
-  validateSources,
-  type AnswerWithCitations as AnswerData,
-  type ApprovedContext,
-  type Citation,
-  type RetrievedChunk,
-  type SourceValidation,
-  type ValidationStatus
-} from '$lib/types/rag-source-validation';
+import { default as generateAnswer, default as searchKnowledgeBase, default as validateSources } from '$lib/services/rag-source-validation';
+
+// Type definitions
+type ValidationStatus = 'approved' | 'rejected';
+
+interface SourceValidation {
+  chunk_id: string;
+  status: ValidationStatus;
+}
+
+interface RetrievedChunk {
+  chunk_id: string;
+  content: string;
+  score: number;
+  metadata?: Record<string, any>;
+}
+
+interface ApprovedContext {
+  context_id: string;
+  case_id: string;
+  approved_chunks: RetrievedChunk[];
+}
+
+interface Citation {
+  source_title: string;
+  chunk_id: string;
+  relevance: number;
+  excerpt?: string;
+}
+
+interface AnswerData {
+  text: string;
+  citations: Citation[];
+  todos?: string[];
+}
+
+// Access page store for URL params
+const urlParams = $derived(typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null);
 
 // State
 let query = $state('');
@@ -256,9 +283,9 @@ function startNewSearch() {
         <!-- Recent Queries -->
         {#if recentQueries.length > 0}
           <div class="mt-4">
-            <label class="label">
+            <div class="mb-2">
               <span class="label-text-alt text-base-content/60">Recent searches:</span>
-            </label>
+            </div>
             <div class="flex flex-wrap gap-2">
               {#each recentQueries as recentQuery}
                 <button
@@ -300,7 +327,7 @@ function startNewSearch() {
     <div class="card bg-base-100 shadow-xl">
       <div class="card-body">
         <SourceValidator
-          {chunks}
+          chunks={chunks}
           caseId={caseId || ''}
           initialQuery={query}
           isLoading={isValidating}
@@ -327,7 +354,7 @@ function startNewSearch() {
       <!-- Answer Display -->
       {#if answer}
         <AnswerWithCitations
-          {answer}
+          answer={answer}
           onPinToCanvas={handlePinToCanvas}
         />
       {/if}

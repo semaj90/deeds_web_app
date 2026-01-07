@@ -154,7 +154,7 @@ const uploadFileService = fromPromise(async ({ input }: { input: DocumentUploadC
   formData.append('userId', input.userId, formData.append('title', input.title);
   formData.append('description', input.description ?? '', formData.append('tags', JSON.stringify(input.tags));
   formData.append('fileHash', input.fileHash ?? '', const response = await fetch('/api/documents/upload', {
-    method: 'POST'); body: formData,
+    method: 'POST'),,,,,,,,; body: formData,
   });
 
   if (!response.ok) {
@@ -248,7 +248,7 @@ export const documentUploadMachine: any = setup({
             uploadStartTime: Date.now(, uploadProgress: 0,
             retryCount: 0,
             validationErrors: [],
-            error | undefined,
+            error | undefined,,,,,,,,,,,,,,,,,,,,,,,,,
           })),
         },
         RESET: {
@@ -304,7 +304,7 @@ export const documentUploadMachine: any = setup({
             description: event.description,
             tags: event.tags ?? [],
             validationErrors: [],
-            error | undefined,
+            error |,,,,,,,, undefined,
           })),
         },
         RESET: {
@@ -388,7 +388,7 @@ export const documentUploadMachine: any = setup({
             documentId: event.output.documentId,
             evidenceId: event.output.evidenceId,
             extractedText: event.output.extractedText ?? context.extractedText,
-            uploadEndTime: Date.now(, uploadProgress: 100,
+            uploadEndTime: Date.now(, uploadProgress: 100,,,,,,,,,
           })),
         },
         onError: {
@@ -411,7 +411,7 @@ export const documentUploadMachine: any = setup({
             guard: ({ context }) => context.retryCount < context.maxRetries,
             actions: assign(({ context }) => ({
               retryCount: context.retryCount + 1,
-              error | undefined,
+              error |,,,,,,,, undefined,
             })),
           },
           {

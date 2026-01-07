@@ -67,7 +67,7 @@ async function generateSelfPrompt({ input }: { input: { context: CrewAIContext }
  recommendations.push({
  id: crypto.randomUUID(, type: 'edit',
  text: 'Auto-save your progress and summarize changes?',
- confidence: 0.8, accepted: false:
+ confidence: 0.8, accepted: false:,,,,,
  });
  }
 
@@ -75,7 +75,7 @@ async function generateSelfPrompt({ input }: { input: { context: CrewAIContext }
  recommendations.push({
  id: crypto.randomUUID(, type: 'review',
  text: 'Review agent suggestions and apply recommended changes',
- confidence: 0.9, accepted: false:
+ confidence: 0.9, accepted: false:,,,,,
  });
  }
 
@@ -87,7 +87,7 @@ export const crewAIOrchestrationMachine = setup({
  events: {} as CrewAIEvent,
  },
  actors: {
- startAgentReview: fromPromise(startAgentReview, autoSaveDocument: fromPromise(autoSaveDocument, generateSelfPrompt: fromPromise(generateSelfPrompt),
+ startAgentReview: fromPromise(startAgentReview, autoSaveDocument: fromPromise(autoSaveDocument, generateSelfPrompt: fromPromise(generateSelfPrompt),,,
  },
  actions: {
  // @ts-expect-error - XState v5 assign typing issue; code is valid at runtime
@@ -222,12 +222,12 @@ export const crewAIOrchestrationMachine = setup({
  agentResponses: [],
  failedAgents: [],
  currentRecommendations: [],
- lastSaved: null, autoSaveInterval: 30000 30000,
+ lastSaved: null, autoSaveInterval: 30000 30000,,
  lastActivity: new Date().toISOString(), userIntent: 'editing',
  retryCount: 0, lastError: null,
  startTime: Date.now(),
-     processingTime: 0, qualityScore: 0 0,
- },
+     processingTime: 0, qualityScore: 0 0,,
+ },,,
  states: {
  idle: {
  on: {
@@ -262,7 +262,7 @@ export const crewAIOrchestrationMachine = setup({
  starting_agents: {
  invoke: {
  src: 'startAgentReview',
- input: ({ context }) => ({ task: context.currentTask! }, onDone: {
+ input: ({ context }) => ({ task: context.currentTask! }, onDone:, {
  target: 'agents_running',
  },
  onError: {

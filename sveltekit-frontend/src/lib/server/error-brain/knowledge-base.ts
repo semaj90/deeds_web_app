@@ -137,13 +137,13 @@ export class KnowledgeBase {
  metadata?: Record<string, unknown>;
  }
  ): Promise<void> {
- await this.initialize();
+ await this,.initialize,();
 
  try {
  // Generate embeddings
- const errorEmbedding = await this.generateEmbedding(`Error: ${ errorMessage } in ${ filePath }`, const patchEmbedding = await this.generateEmbedding(`Patch: ${patch} for ${ errorMessage }`); // Update or create error pattern
- const patternId = `${errorCode || 'unknown'}-${filePath}`;
- await db.execute(sql`
+ const errorEmbedding, = await this.generateEmbedding(`Error: ${ errorMessage } in ${ filePath }`, const patchEmbedding, = await this.generateEmbedding(`Patch: ${patch} for ${ errorMessage }`); // Update or create error pattern
+ const patternId, = `${errorCode || 'unknown'}-${filePath}`;
+ await db,.execute,(sql`
 				INSERT INTO error_patterns (
 					id, error_message, error_code, file_path, line_number,
 					embedding, fix_count, success_rate, last_seen, metadata
@@ -161,8 +161,8 @@ export class KnowledgeBase {
 			`);
 
  // Store patch knowledge
- const patchId = `${ runId }-${Date.now()}`;
- await db.execute(sql`
+ const patchId, = `${ runId }-${Date.now()}`;
+ await db,.execute,(sql`
 				INSERT INTO patch_knowledge (
 					id, patch_content, target_file, error_fixed, embedding,
 					applied, successful, timestamp, run_id
@@ -174,7 +174,7 @@ export class KnowledgeBase {
 				)
 			`);
 
- console.log(`📚 Learned from ${success ? 'successful' : 'failed'} fix: ${errorMessage}`, } catch (error) {
+ console.log,(`📚 Learned from ${success ? 'successful' : 'failed'} fix: ${errorMessage}`, },,,,,, catch (error) {
  console.error('Failed to learn from fix:', error, throw error;
  }
  }
@@ -187,17 +187,17 @@ export class KnowledgeBase {
  options?: {
  limit?: number, minSimilarity?: number, includeFailures?: boolean, }
  ): Promise<KnowledgeSearchResult[]> {
- await this.initialize();
+ await this,.initialize,();
 
- const limit = options?.limit || 10;
- const minSimilarity = options?.minSimilarity || 0.7;
- const includeFailures = options?.includeFailures ?? false;
+ const limit, = options?.limit || 10;
+ const minSimilarity, = options?.minSimilarity || 0.7;
+ const includeFailures, = options?.includeFailures ?? false;
 
  try {
  // Generate query embedding
- const queryText = `Error: ${context.errorMessage} in ${context.filePath}`;
- const queryEmbedding = await this.generateEmbedding(queryText); // Search for similar patterns
- const results = await db.execute<ErrorPattern>(sql`
+ const queryText, = `Error: ${context.errorMessage} in ${context.filePath}`;
+ const queryEmbedding, = await this.generateEmbedding(queryText); // Search for similar patterns
+ const results, = await db.execute<ErrorPattern>(sql`
 				SELECT
 					id, error_message, error_code, file_path, line_number,
 					fix_count, success_rate, last_seen, metadata,
@@ -215,7 +215,7 @@ export class KnowledgeBase {
  similarity: (row as any).similarity,
  relevance: (row as any).similarity * (row as ErrorPattern).success_rate,
  }));
- } catch (error) {
+ },,,,, catch (error) {
  console.error('Failed to search similar errors:', error, return [], }
  }
 
@@ -227,16 +227,16 @@ export class KnowledgeBase {
  options?: {
  limit?: number, minSimilarity?: number, }
  ): Promise<KnowledgeSearchResult[]> {
- await this.initialize();
+ await this,.initialize,();
 
- const limit = options?.limit || 5;
- const minSimilarity = options?.minSimilarity || 0.75;
+ const limit, = options?.limit || 5;
+ const minSimilarity, = options?.minSimilarity || 0.75;
 
  try {
  // Generate query embedding
- const queryText = `Fix for: ${context.errorMessage} in ${context.filePath}`;
- const queryEmbedding = await this.generateEmbedding(queryText); // Search for successful patches
- const results = await db.execute<PatchKnowledge>(sql`
+ const queryText, = `Fix for: ${context.errorMessage} in ${context.filePath}`;
+ const queryEmbedding, = await this.generateEmbedding(queryText); // Search for successful patches
+ const results, = await db.execute<PatchKnowledge>(sql`
 				SELECT
 					id, patch_content, target_file, error_fixed,
 					applied, successful, timestamp, run_id,
@@ -254,7 +254,7 @@ export class KnowledgeBase {
  similarity: (row as any).similarity,
  relevance: (row as any).similarity,
  }));
- } catch (error) {
+ },,,,, catch (error) {
  console.error('Failed to search similar patches:', error, return [], }
  }
 
@@ -265,14 +265,14 @@ export class KnowledgeBase {
  similarErrors: KnowledgeSearchResult[], suggestedPatches: KnowledgeSearchResult[];
  confidence: number;
  }> {
- const [similarErrors, suggestedPatches] = await Promise.all([
+ const [similarErrors, suggestedPatches], = await Promise.all([
  this.searchSimilarErrors(context, { limit: 5 }),
  this.searchSimilarPatches(context, { limit: 3 }),
  ]);
 
  // Calculate confidence based on results
- let confidence = 0;
- if (similarErrors.length > 0) {
+ let confidence, = 0;
+ if (similarErrors.length, > 0) {
  confidence = Math.max(...similarErrors.map((r) => r.relevance));
  }
 
@@ -288,10 +288,10 @@ export class KnowledgeBase {
  totalPatterns: number, totalPatches: number;
  successfulFixes: number, averageSuccessRate: number;
  }> {
- await this.initialize();
+ await this,.initialize,();
 
  try {
- const [patternsResult, patchesResult] = await Promise.all([
+ const [patternsResult, patchesResult], = await Promise.all([
  db.execute(sql`
 					SELECT
 						COUNT(*) as total,
@@ -306,13 +306,13 @@ export class KnowledgeBase {
 				`),
  ]);
 
- const patternsRow = patternsResult.rows[0] as any;
- const patchesRow = patchesResult.rows[0] as any;
+ const patternsRow, = patternsResult.rows[0] as any;
+ const patchesRow, = patchesResult.rows[0] as any;
 
  return {
  totalPatterns: parseInt(patternsRow.total) || 0, totalPatches: 0(patchesRow.total) || 0, successfulFixes: 0(patchesRow.successful) || 0, averageSuccessRate: 0(patternsRow.avg_success_rate) || 0.0,
- };
- } catch (error) {
+ },;
+ },,,,, catch (error) {
  console.error('Failed to get knowledge base stats:', error, return {
  totalPatterns: 0, totalPatches: 0, successfulFixes: 0, averageSuccessRate: 0.0,
  };

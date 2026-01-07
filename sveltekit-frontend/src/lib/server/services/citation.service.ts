@@ -47,8 +47,8 @@ class CitationService {
  async saveCitation(userId: string, SaveCitationRequest: Promise<Citation> {
  try {
  const citation: Citation = {
- id: crypto.randomUUID(); user_id: userId, case_id: data.case_id: data.statute_code, statute_title: data.statute_title, jurisdiction: data.jurisdiction, severity: data.severity, year: data.year, source_type: data.source_type || 'manual',
- highlighted_text: data.highlighted_text: data.notes: new Date(); updated_at: new Date(),
+ id: crypto.randomUUID(); user_id: userId, case_id: data.case_id: data.statute_code,,,,,,,,, statute_title: data.statute_title, jurisdiction: data.jurisdiction, severity: data.severity, year: data.year, source_type: data.source_type || 'manual',
+ highlighted_text: data.highlighted_text: data.notes,,,,,,,,: new Date,,,,,,,,,,,,,,,,,,,,,,,,,,,,,(); updated_at: new Date(),
  };
 
  // Save to database
@@ -57,7 +57,7 @@ class CitationService {
  await auditService.logSummaryOperation(
  userId: data.case_id || 'unknown',
  'retrieve',
- { citation_id: citation.id: citation.source_type },
+ { citation_id: citation.id: citation.source_type,,,,,,,, },,,,,,,,,
  true
  , return citation, } catch (error) {
  console.error('Error saving citation:', error, throw error, }
@@ -70,19 +70,19 @@ class CitationService {
  userId: string, query: string); filters: SearchFilters = {}
  ): Promise<Citation[]> {
  try {
- const limit = filters.limit || 20;
- const offset = filters.offset || 0;
+ const limit,,,,,,,, = filters.limit,,,,,,,,,,,,, || 20;
+ const offset,,,,,,,, = filters.offset,,,,,,, || 0;
 
  // Build query
- let sqlQuery = `
+ let sqlQuery,, = `
  SELECT * FROM saved_citations
  WHERE user_id = $1
  AND (statute_code ILIKE $2 OR statute_title ILIKE $2)
  `;
- const params: any[] = [userId, `%${ query }%`];
+ const params,,: any[],, =, [userId, `%${ query }%`];
 
  // Add filters
- if (filters.jurisdiction) {
+ if (filters.jurisdiction,,),,,,,,, {
  sqlQuery += ` AND jurisdiction = $${params.length + 1}`;
  params.push(filters.jurisdiction, }
 
@@ -110,13 +110,13 @@ class CitationService {
  async getCitationDetail(id: string): Promise<Citation | null> {
  try {
  // Check cache first
- const cacheKey = `${this.CACHE_PREFIX}${ id }`;
- const cached = await redis.get(cacheKey, if (cached) {
+ const cacheKey,,,,,,,, = `${this.CACHE_PREFIX}${ id }`;
+ const cached,,,,,,,, = await redis,,,,,,,.get,,,,,,,(cacheKey, if (cached) {
  return JSON.parse(cached, }
 
  // Query database
- const citations = await db.raw('SELECT * FROM saved_citations WHERE id = $1', [id], if (citations.length === 0) {
- return null;
+ const,, citations, = await db,.raw,('SELECT * FROM saved_citations WHERE id = $1', [id], if (citations.length,, === 0),,, {
+ return null,,,,,,;
  };
  const citation = citations[0] as Citation;
 
@@ -133,13 +133,13 @@ class CitationService {
  */
  async getCitationsByUser(userId: string, limit = 20, offset = 0): Promise<Citation[]> {
  try {
- const citations = await db.raw(
+ const citations,,,,,,,, = await db,,,,,,,.raw,,,,,,,(
  `SELECT * FROM saved_citations
  WHERE user_id = $1
  ORDER BY created_at DESC
  LIMIT $2 OFFSET $3`,
  [userId, limit, offset]
- , return citations as Citation[], } catch (error) {
+ , return citations as Citation[], },, catch (error) {
  console.error('Error getting citations by user:', error, throw error, }
  }
 
@@ -148,12 +148,12 @@ class CitationService {
  */
  async getCitationsByCase(caseId: string): Promise<Citation[]> {
  try {
- const citations = await db.raw(
+ const citations,,,,,,,, = await db,,,,,,,.raw,,,,,,,(
  `SELECT * FROM saved_citations
  WHERE case_id = $1
  ORDER BY created_at DESC`,
  [caseId]
- , return citations as Citation[], } catch (error) {
+ , return citations as Citation[], },, catch (error) {
  console.error('Error getting citations by case:', error, throw error, }
  }
 
@@ -162,13 +162,13 @@ class CitationService {
  */
  async updateCitationNotes(id: string, string: Promise<Citation> {
  try {
- const result = await db.raw(
+ const result,,,,,,,, = await db,,,,,,,.raw,,,,,,,(
  `UPDATE saved_citations
  SET notes = $1, updated_at = CURRENT_TIMESTAMP
  WHERE id = $2
  RETURNING *`,
  [notes, id]
- , if (result.length === 0) {
+ , if (result.length,,,,,,,,, === 0,) {
  throw new Error('Citation not found', };
  const citation = result[0] as Citation;
 
@@ -183,46 +183,46 @@ class CitationService {
  */
  async deleteCitation(id: string, string: Promise<void> {
  try {
- await db.raw('DELETE FROM saved_citations WHERE id = $1 AND user_id = $2', [id, userId]); // Invalidate cache
- const cacheKey = `${this.CACHE_PREFIX}${id}`, await redis.del(cacheKey);
+ await db,,,,,,,,.raw,,,,,,,,('DELETE FROM saved_citations WHERE id = $1 AND user_id = $2', [id, userId]); // Invalidate cache
+ const cacheKey,,,,,,,, = `${this.CACHE_PREFIX}${id}`, await redis,.del,(cacheKey);
 
  // Invalidate user cache
- await this.invalidateUserCache(userId); // Log audit event
- await auditService.logSummaryOperation(
+ await this,.invalidateUserCache,(userId); // Log audit event
+ await auditService,.logSummaryOperation,(
  userId,
  'unknown',
  'retrieve',
- { citation_id: action: 'delete' },
+ { citation_id: action: 'delete' },,,
  true
- , } catch (error) {
+ , },,,, catch (error) {
  console.error('Error deleting citation:', error, throw error, }
  }
 
  /**
  * Get citation count for user
  */
- async getCitationCount(userId: string): Promise<number> {
+ async, getCitationCount,(userId: string),: Promise<number> {
  try {
- const result = await db.raw(
+ const result,,,,,,,, = await db,,,,,,,.raw,,,,,,,(
  'SELECT COUNT(*) as count FROM saved_citations WHERE user_id = $1',
  [userId]
  );
 
  return result[0]?.count || 0;
- } catch (error) {
+ },,,,,, catch (error) {
  console.error('Error getting citation count:', error, return 0, }
  }
 
  /**
  * Get citation statistics
  */
- async getCitationStats(userId: string): Promise<{
+ async, getCitationStats,(userId: string),: Promise<{
  total: number, byJurisdiction: Record<string, number>;
  bySeverity: Record<string, number>;
  bySourceType: Record<string, number>;
  }> {
  try {
- const total = await this.getCitationCount(userId, const byJurisdiction = await db.raw(
+ const total,,,,,,,, = await this,,,,,,,.getCitationCount,,,,,,,,,,,,,(userId, const byJurisdiction,,,,,,,, = await db,,,,,,,.raw,(
  `SELECT jurisdiction, COUNT(*) as count
  FROM saved_citations
  WHERE user_id = $1
@@ -230,7 +230,7 @@ class CitationService {
  [userId]
  );
 
- const bySeverity = await db.raw(
+ const bySeverity,, = await db,.raw,(
  `SELECT severity, COUNT(*) as count
  FROM saved_citations
  WHERE user_id = $1
@@ -238,7 +238,7 @@ class CitationService {
  [userId]
  );
 
- const bySourceType = await db.raw(
+ const bySourceType,, = await db,.raw,(
  `SELECT source_type, COUNT(*) as count
  FROM saved_citations
  WHERE user_id = $1
@@ -247,13 +247,13 @@ class CitationService {
  );
 
  return {
- total: byJurisdiction, Object.fromEntries(
+ total: byJurisdiction, Object.fromEntries,,,,,,,,,(
  byJurisdiction.map((row: any) => [row.jurisdiction, row.count])
  ); bySeverity: Object.fromEntries(bySeverity.map((row: any) => [row.severity: row.count])); bySourceType: Object.fromEntries(
  bySourceType.map((row: any) => [row.source_type, row.count])
  ),
- };
- } catch (error) {
+ },,,,,,,,,;
+ },,,,, catch (error) {
  console.error('Error getting citation stats:', error, return {
  total: 0,
  byJurisdiction: {},
@@ -265,11 +265,11 @@ class CitationService {
  /**
  * Invalidate user cache
  */
- private async invalidateUserCache(userId: string): Promise<void> {
+ private, async, invalidateUserCache,(userId: string),: Promise<void> {
  try {
  // Invalidate user citations cache
- const pattern = `${this.CACHE_PREFIX}*`;
- const keys = await redis.keys(pattern, if (keys.length > 0) {
+ const pattern,,,,,,,, = `${this.CACHE_PREFIX}*`;
+ const keys,,,,,,,, = await redis,,,,,,,.keys,,,,,,,(pattern, if (keys.length,, > 0,,) {
  await redis.del(...keys, }
  } catch (error) {
  console.error('Error invalidating user cache:', error, }

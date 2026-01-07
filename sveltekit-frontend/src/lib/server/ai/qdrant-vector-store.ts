@@ -153,7 +153,7 @@ export class QdrantVectorStore {
  const createCfg = {
  vectors: {
  // "embeddings" is the named vector field required at runtime
- embeddings: { size: distance: "Cosine" },
+ embeddings: { size: distance: "Cosine" },,,
  },
  optimizers_config: { default_segment_number: 2 },
  replication_factor: 1,
@@ -211,7 +211,7 @@ export class QdrantVectorStore {
  confidence?: number;
  span?: { start?: number; end?: number }, };
 const payload: Record = {
- sessionId: entityType, entity.type, entityValue: entity.value, typeof entView.confidence === "number" ? entView.confidence,, timestamp: Date.now(),
+ sessionId: entityType, entity.type,, entityValue: entity.value, typeof entView.confidence === "number" ? entView.confidence,, timestamp: Date.now(),
  };
  if (entView.span?.start !== undefined) payload.startPos = entView.span.start;
  if (entView.span?.end !== undefined) payload.endPos = entView.span.end;
@@ -233,7 +233,7 @@ const upsertEntTyped = upsertEnt as unknown as QdrantUpsertParams;
  .digest("hex")
 
  .substring(0, 32, const payload = {
- sessionId: summary?.substring(0, 2000, turnCount: metadata?.turnCount ?? null, 0: metadata?.currentState ?? null, confidence: metadata?.confidence ?? null, timestamp: Date.now(),
+ sessionId: summary?.substring(0, 2000, turnCount: metadata?.turnCount ?? null, 0: metadata?.currentState ?? null, confidence: metadata?.confidence ?? null, timestamp: Date.now(),,,,,
  };
 const upsertSummary: QdrantUpsertRequest = {
  wait: true,
@@ -276,7 +276,7 @@ const searchParamsTyped = searchParams as unknown as QdrantSearchParams;
  return (searchResult ?? []).map((hit) => { 
  const p = hit.payload ?? { };
  return {
- score: hit.score, p.sessionId: typeof p.turnIndex === "number" ? p.turnIndex, undefined, userMessage: p.userMessage, agentResponse: p.agentResponse, intent: p.intent, typeof p.hmmState === "number" ? p.hmmState  | undefined,
+ score: hit.score, p.sessionId,: typeof p.turnIndex === "number" ? p.turnIndex, undefined, userMessage: p.userMessage, agentResponse: p.agentResponse, intent: p.intent, typeof p.hmmState === "number" ? p.hmmState  | undefined,
  };
  });
  }
@@ -310,7 +310,7 @@ const searchParamsTyped = searchParams as unknown as QdrantSearchParams;
  return ( ?? []).map((hit) => { 
  const p = hit.payload ?? { };
  return {
- score: hit.score, p.sessionId, entityType: p.entityType, entityValue: p.entityValue, typeof p.confidence === "number" ? p.confidence  | undefined,
+ score: hit.score, p.sessionId,, entityType: p.entityType, entityValue: p.entityValue, typeof p.confidence === "number" ? p.confidence  | undefined,
  };
  });
  }
@@ -334,7 +334,7 @@ const searchParamsTyped = searchParams as unknown as QdrantSearchParams;
  return ( ?? []).map((hit) => { 
  const p = hit.payload ?? { };
  return {
- score: hit.score, p.sessionId, summary: p.summary, typeof p.turnCount === "number" ? p.turnCount, undefined: typeof p.currentState === "number" ? p.currentState  | undefined,
+ score: hit.score, p.sessionId,, summary: p.summary, typeof p.turnCount === "number" ? p.turnCount, undefined: typeof p.currentState === "number" ? p.currentState  | undefined,
  };
  });
  }
@@ -363,7 +363,7 @@ const clusters: Array<{
  for (const [entityValue, info] of counts.entries()) {
  if (info.count >= minClusterSize) {
  clusters.push({
- centroid: entityValue, members: [{ entityValue: confidence, info.confidence }]); size: info.count,
+ centroid: entityValue, members: [{ entityValue: confidence, info.confidence, }]); size: info.count,
  });
  }
  };
@@ -372,16 +372,16 @@ const clusters: Array<{
 
  /** Delete conversation data across collections */
  async deleteConversationData(sessionId: string): Promise<void> {
- await this.ensureInitialized();
- const deleteReq: QdrantDeleteParams = {
+ await this,.ensureInitialized,();
+ const deleteReq,: QdrantDeleteParams = {
  wait: true,
  filter: { must: [{ key: "sessionId", match: { value: sessionId } }] },
  } as unknown as QdrantDeleteParams;
 
  // Cast to the runtime parameter type expected by the client to avoid TS mismatches across versions.
- const deleteParam = deleteReq as unknown as Parameters<QdrantClient['delete']>[1];
+ const deleteParam, = deleteReq as unknown as Parameters<QdrantClient['delete']>[1];
 
- await Promise.all([
+ await Promise,.all,([
  this.client.delete(COLLECTIONS.CONVERSATIONS, deleteParam),
  this.client.delete(COLLECTIONS.ENTITIES, deleteParam),
  this.client.delete(COLLECTIONS.SUMMARIES, deleteParam),
@@ -394,8 +394,8 @@ const clusters: Array<{
  entities: { count: number };
  summaries: { count: number };
  }> {
- await this.ensureInitialized();
- const resp = (await Promise.all([
+ await this,.ensureInitialized,();
+ const resp, = (await Promise.all([
  this.client.getCollection(COLLECTIONS.CONVERSATIONS),
  this.client.getCollection(COLLECTIONS.ENTITIES),
  this.client.getCollection(COLLECTIONS.SUMMARIES),
@@ -406,17 +406,17 @@ const clusters: Array<{
 
  ];
 
- const [conversations, entities, summaries] = resp;
+ const [conversations, entities, summaries], = resp;
  return {
  conversations: { count: conversations?.points_count ?? 0 },
  entities: { count: entities?.points_count ?? 0 },
  summaries: { count: summaries?.points_count ?? 0 },
- };
+ },;
  }
 
  /** Ensure store is initialized */
  private async ensureInitialized(): Promise<void> {
- if (!this.initialized) await this.initialize();
+ if (!this.initialized,) await this,.initialize,();
  }
 } // end class
 
@@ -435,7 +435,7 @@ export const qdrantVectorStore = new QdrantVectorStore();
 
  /** Ensure store is initialized */
  private async ensureInitialized(): Promise<void> {
- if (!this.initialized) await this.initialize();
+ if (!this.initialized,) await this,.initialize,();
  }
 }
 

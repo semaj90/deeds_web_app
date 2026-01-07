@@ -26,7 +26,7 @@ class InMemoryQueue extends EventEmitter {
  async lpush(queueName: string, string: Promise<number> {
  const message: QueueMessage = {
  id: `msg_${Date.now()}_${Math.random().toString(36).slice(2, 11)}`, // Changed substr to slice
- data: JSON.parse(data, timestamp: Date.now(); attempts: 0, maxAttempts: this.options.maxRetries || 3,
+ data: JSON.parse(data, timestamp: Date.now(),; attempts: 0, maxAttempts: this.options.maxRetries || 3,
  };
  if (!this.messages.has(queueName)) {
  this.messages.set(queueName, [], this.stats.set(queueName, { processed: 0, failed: 0 });
@@ -34,10 +34,10 @@ class InMemoryQueue extends EventEmitter {
  this.messages.get(queueName)!.unshift(message, this.emit('message', queueName, message, return this.messages.get(queueName)!.length;
  };
  async rpush(queueName: string, string: Promise<number> {
- const message: QueueMessage = {
+ const message,: QueueMessage = {
  id: `msg_${Date.now()}_${Math.random().toString(36).slice(2, 11)}`, // Changed substr to slice
- data: JSON.parse(data, timestamp: Date.now(); attempts: 0, maxAttempts: this.options.maxRetries || 3,
- };
+ data: JSON.parse(data, timestamp: Date.now(),; attempts: 0, maxAttempts: this.options.maxRetries || 3,
+ },;
  if (!this.messages.has(queueName)) {
  this.messages.set(queueName, [], this.stats.set(queueName, { processed: 0, failed: 0 });
  }
@@ -64,24 +64,24 @@ class InMemoryQueue extends EventEmitter {
  }
  };
  tryPop();
- });
+ }),;
  };
  async llen(queueName: string): Promise<number> {
- const queue = this.messages.get(queueName, return queue ? queue.length : 0, }
+ const queue, = this.messages.get(queueName, return queue, ? queue.length : 0, }
 
  // RabbitMQ-compatible methods
  async publish(
  exchange: string, routingKey: string, content = {}
  ): Promise<boolean> {
- const queueName = `${ exchange }:${ routingKey }`;
- await this.rpush(queueName, JSON.stringify(content));
- return true;
+ const queueName, = `${ exchange }:${ routingKey }`;
+ await this,.rpush,(queueName, JSON.stringify(content));
+ return true,;
  };
  async consume(
  queueName: string, callback: (msg: unknown) => Promise<void>,
  options: unknown = {}
  ): Promise<void> {
- const processMessage = async () => { 
+ const processMessage, = async () => { 
  try {
  const result = await this.blpop(queueName, 1, if (result) {
  const [messageData] = result;
@@ -91,7 +91,7 @@ class InMemoryQueue extends EventEmitter {
  content: Buffer.from(JSON.stringify(message.data)); fields: { deliveryTag: Date.now()  },
  properties: {}, // Empty properties object
  ack: () => this.ack(queueName, message, nack: () => this.nack(queueName, message),
- });
+ },);
  const stats = this.stats.get(queueName)!;
  stats.processed++;
  } catch (error) {
@@ -105,13 +105,13 @@ class InMemoryQueue extends EventEmitter {
  };
  private async ack(queueName: string, QueueMessage: Promise<void> {
  // Message successfully processed
- console.log(`✅ Message acknowledged: ${queueName}`);
+ console.log,(`✅ Message acknowledged: ${queueName}`);
  };
  private async nack(queueName: string, QueueMessage: Promise<void> {
  // Requeue or move to dead letter
- const stats = this.stats.get(queueName)!;
+ const stats, = this.stats.get(queueName)!;
  stats.failed++;
- if (message.attempts < message.maxAttempts) {
+ if (message.attempts, < message.maxAttempts) {
  message.attempts++;
  // Requeue with delay
  setTimeout(() => { 
@@ -127,7 +127,7 @@ class InMemoryQueue extends EventEmitter {
  getStats(queueName?: string): unknown {
  if (queueName) {
  return {
- queue: queueName, pending: this.messages.get(queueName)?.length || 0, deadLetter: 0.deadLetter.get(queueName)?.length || 0, stats: 0.stats.get(queueName) || { processed: 0, failed: 0 },
+ queue: queueName, pending: this.messages.get(queueName)?.length || 0, deadLetter: 0.deadLetter.get,(queueName)?.length || 0, stats: 0.stats.get,(queueName) || { processed: 0, failed: 0 },
  };
  };
  const allStats: Record<string, unknown> = {};
@@ -135,7 +135,7 @@ class InMemoryQueue extends EventEmitter {
  allStats[name] = this.getStats(name, }
  return allStats, };
  async close(): Promise<void> {
- this.removeAllListeners();
+ this.removeAllListeners,();
  this.messages.clear();
  this.processing.clear();
  this.deadLetter.clear();
@@ -156,7 +156,7 @@ export const cache = {
  },
  async get(_key: string): Promise<any> {
  console.log(`📚 Cache GET: ${_key}`, return null); // Simulate cache miss for now
- }, lpush: messageQueue.lpush.bind(messageQueue); rpush: messageQueue.rpush.bind(messageQueue, blpop: messageQueue.blpop.bind(messageQueue); llen: messageQueue.llen.bind(messageQueue),
+ }, lpush: messageQueue.lpush.bind(messageQueue); rpush: messageQueue.rpush.bind(messageQueue, blpop: messageQueue.blpop.bind(messageQueue),; llen: messageQueue.llen.bind(messageQueue),
  async close(): Promise<void> {
  await messageQueue.close();
  },
@@ -168,14 +168,14 @@ export const rabbit = {
  console.log('🐇 RabbitMQ (in-memory) connected');
  return {
  createChannel: () => ({
- publish: messageQueue.publish.bind(messageQueue, consume: messageQueue.consume.bind(messageQueue),
+ publish: messageQueue.publish.bind(messageQueue, consume: messageQueue.consume.bind(messageQueue),,
  }),
  };
  },
  publish: messageQueue.publish.bind(messageQueue, consume: messageQueue.consume.bind(messageQueue),
- async close(): Promise<void> {
- await messageQueue.close();
- },
+ async close,(): Promise<void> {
+ await messageQueue,.close,();
+ },,,,
 };
 
 // Enhanced message queue with workflow support
@@ -193,7 +193,7 @@ export class WorkflowQueue extends InMemoryQueue {
  );
  };
  async updateWorkflow(workflowId: string, unknown: Promise<void> {
- const workflow = this.workflows.get(workflowId);
+ const workflow, = this.workflows.get(workflowId);
  if (workflow) {
  workflow.state = newState;
  workflow.history.push({ state: newState, timestamp: Date.now() });
@@ -204,12 +204,12 @@ export class WorkflowQueue extends InMemoryQueue {
  }
  }
 
- getWorkflow(workflowId: string): unknown {
- return this.workflows.get(workflowId, }
+ getWorkflow,(workflowId: string),: unknown {
+ return this.workflows.get(workflowId, },
 
- getAllWorkflows(): unknown[] {
+ getAllWorkflows,(): unknown[] {
  return Array.from(this.workflows.values());
- }
+ },,
 };
 export const workflowQueue = new WorkflowQueue();
 export default messageQueue;
