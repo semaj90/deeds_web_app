@@ -50,6 +50,169 @@ npm run phase72:gpu:pipeline
 }
 ```
 
+## TypeScript AST Fixing - Critical Learnings (Phase 90-91)
+
+### Cascade Error Pattern Recognition
+
+**Discovery Date:** January 8, 2026
+**Context:** Phase 90 Enhanced AST Fixer + Phase 91 Auto-Rollback
+
+#### The Problem: TS1005 Diagnostic Position Semantics
+
+**Critical Discovery:** When TypeScript reports `TS1005: ',' expected` at position X:
+- **Position X points to the NEXT token** (where parser expected comma)
+- **The FIX must go AFTER the PREVIOUS token** (not before current token)
+
+**Example:**
+```typescript
+// Error: TS1005 at position 34 (points to 'arg2')
+const result = foo(
+    arg1
+    arg2  // ← Error position here
+)
+
+// WRONG FIX (prepend before current):
+const result = foo(
+    arg1
+    ,arg2  // ← Creates invalid syntax
+)
+
+// CORRECT FIX (append after previous):
+const result = foo(
+    arg1,  // ← Comma goes here
+    arg2
+)
+```
+
+#### Root Cause vs Symptom Errors
+
+**Cascade Error Pattern:**
+```typescript
+// ROOT CAUSE: Wrong delimiter (semicolon instead of comma)
+const cache: ThreadSafeCache = {
+  mutex: new AsyncMutex(); // ← WRONG: semicolon
+  data: new Map();          // ← Parser confused, reports "comma expected"
+  gpuAccelerated: true,
+}
+```
+
+**Why Blind Fixing Fails:**
+1. Parser encounters semicolon in object literal
+2. Parser gets confused and enters "error recovery mode"
+3. Parser reports SYMPTOM errors ("comma expected") on FOLLOWING tokens
+4. Automated fixer inserts commas at wrong positions
+5. File now has BOTH original errors AND new syntax errors
+6. Result: Error count INCREASES instead of decreasing
+
+#### Safe AST Fixing Heuristics
+
+**Rule 1: Skip Files with High Error Density**
+```javascript
+// If file has > 50 errors per 100 lines, manual review required
+const errorDensity = syntaxErrors / (totalLines / 100);
+if (errorDensity > 50) {
+  console.log('⚠️  File needs manual review (cascade errors likely)');
+  return { action: 'skip', reason: 'error_density_too_high' };
+}
+```
+
+**Rule 2: Validate Contextual Safety**
+```javascript
+// Before inserting comma, check:
+// 1. Is there already a comma?
+// 2. Is the parent node valid for comma insertion?
+// 3. Are we in error recovery mode?
+function isSafeToInsertComma(node, prevNode, sourceFile) {
+  // Check for existing comma
+  const textBetween = sourceFile.text.substring(prevNode.end, node.getStart());
+  if (textBetween.includes(',')) return false;
+
+  // Check parent node type
+  const parent = node.parent;
+  if (!ts.isObjectLiteralExpression(parent) &&
+      !ts.isArrayLiteralExpression(parent) &&
+      !ts.isCallExpression(parent)) {
+    return false;
+  }
+
+  // Check if we're in error recovery
+  const nearbyErrors = diagnostics.filter(d =>
+    Math.abs(d.start - prevNode.end) < 100
+  );
+  if (nearbyErrors.length > 3) return false; // Too many nearby errors = cascade
+
+  return true;
+}
+```
+
+**Rule 3: Node Position API Precision**
+```javascript
+// TypeScript Node Position API:
+// - node.pos: Start of leading trivia (whitespace, comments)
+// - node.getStart(sourceFile): Start of actual token (excludes trivia)
+// - node.end: End of actual token
+
+// WRONG: Includes whitespace
+position: node.pos
+
+// WRONG: Before current token
+position: node.getStart(sourceFile)
+
+// CORRECT: After previous token
+position: prevNode.end
+```
+
+#### Phase 91 Auto-Rollback Strategy
+
+**Validation Gates:**
+1. **Syntax Check:** Compare parse diagnostic count before/after
+2. **Type Check:** Run full type checking (if syntax improved)
+3. **Auto-Rollback:** If ANY regression, restore from backup
+
+**Rollback Conditions:**
+```javascript
+if (errorsAfter.syntax > errorsBefore.syntax) {
+  console.log('⚠️  Regression detected, rolling back');
+  fs.writeFileSync(filePath, backupContent);
+  return { status: 'rolled_back', reason: 'syntax_regression' };
+}
+```
+
+#### Recommended Action for Cascade Errors
+
+**Instead of automated fixing:**
+1. Export error clusters to JSON
+2. Visualize in AST Topology Explorer (http://localhost:5175/ast-topology)
+3. Human reviews root causes
+4. Apply targeted manual fixes
+5. Re-run Phase 91 validation
+
+**Detection Script:**
+```bash
+# Detect files with cascade error patterns
+node scripts/phase90-detect-cascade-errors.mjs
+
+# Output:
+# {
+#   "cognitive-cache-integration.ts": {
+#     "errorDensity": 125,  // errors per 100 lines
+#     "cascadeRisk": "HIGH",
+#     "rootCauses": [
+#       { "line": 84, "pattern": "semicolon_in_object_literal" },
+#       { "line": 93, "pattern": "paren_instead_of_comma" }
+#     ]
+#   }
+# }
+```
+
+### References
+
+- **TypeScript Compiler API:** https://github.com/microsoft/TypeScript/wiki/Using-the-Compiler-API
+- **Parser Recovery:** https://github.com/microsoft/TypeScript/blob/main/src/compiler/parser.ts#L1234
+- **Phase 90 Script:** `scripts/phase90-enhanced-ast-fixer.mjs`
+- **Phase 91 Script:** `scripts/phase91-test-run.mjs`
+- **Test Harness:** `scripts/test-ts1005.mjs`
+
 ---
 
 ### Tool: `phase72.run_auto_iterate`

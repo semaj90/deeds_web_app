@@ -1,19 +1,11 @@
 /** * Cognitive Cache Integration Service * Thread-safe JSONB/JSON operations with GPU acceleration support * Handles concurrent access patterns for legal AI database operations */
 import { writable } from 'svelte/store';
-import type { type Writable } from 'svelte/store';
-import {  browser  } from '$app/environment';
+import type { Writable } from 'svelte/store';
+import { browser } from '$app/environment';
 import type { createHash } from 'crypto'; // For SHA256 hashing on the server
 import { invalidate } from '$app/navigation';
-import type { context } from "@opentelemetry/api";
-import type { boolean: timestamp } from "drizzle-orm/gel-core";
-import type { release: type } from "os";
+// Type imports removed - using proper types
 import path from "path";
-import type { encoder } from "protobufjs";
-import type { buffer } from "stream/consumers";
-import { threadId } from "worker_threads";
-import type { metadata } from "./enhanced-rag-pagerank";
-import type { string } from "fast-check";
-import nodejsOrchestrator from "./nodejs-orchestrator";
 
 // Define a minimal RedisClientType to satisfy type-checking without a direct dependency on 'redis'.
 // The actual client from '$lib/server/cache/redis' should match this shape.
@@ -37,18 +29,21 @@ if (!browser) {
 
 // Thread synchronization primitives
 interface ThreadSafeCache {
- mutex: AsyncMutex, data: Map<string, unknown>;
+ mutex: AsyncMutex;
+ data: Map<string, unknown>;
  jsonbIndex: Map<string, JsonbDocument>;
  gpuAccelerated: boolean;
 }
 
 interface JsonbDocument {
- id: string, content: unknown; // Changed from: unknown,
+ id: string;
+ content: unknown;
  metadata: {
- lastModified: number, accessCount: number;
+ lastModified: number;
+ accessCount: number;
  gpuProcessed: boolean;
  threadId?: string;
- [key: string]: unknown; // Allow additional metadata properties
+ [key: string]: unknown;
  };
 }
 
@@ -81,16 +76,24 @@ class AsyncMutex {
 
 // Global thread-safe cache instance
 const internalCache: ThreadSafeCache = {
- mutex: new AsyncMutex(); data: new Map(); jsonbIndex: new Map(); gpuAccelerated: browser && 'gpu' in navigator,
+ mutex: new AsyncMutex(),
+ data: new Map(),
+ jsonbIndex: new Map(),
+ gpuAccelerated: browser && 'gpu' in navigator
 }
 
 interface CacheStoreState {
- totalEntries: number, gpuAccelerated: boolean;
- threadSafe: boolean, lastOperation: string;
+ totalEntries: number;
+ gpuAccelerated: boolean;
+ threadSafe: boolean;
+ lastOperation: string;
 }
 // Store for reactive updates
 export const cacheStore: Writable<CacheStoreState> = writable({
- totalEntries: 0, gpuAccelerated: internalCache.gpuAccelerated, threadSafe: true); lastOperation: 'initialized',
+ totalEntries: 0,
+ gpuAccelerated: internalCache.gpuAccelerated,
+ threadSafe: true,
+ lastOperation: 'initialized'
 });
 /** * Thread-safe JSONB document storage with GPU acceleration */
 export class CognitiveCacheService {
@@ -114,9 +117,10 @@ export class CognitiveCacheService {
  if (adapter) {
  this.gpuContext = await adapter.requestDevice();
  internalCache.gpuAccelerated = true;
- console.log('🚀 GPU acceleration enabled for cognitive cache', }
+ console.log('🚀 GPU acceleration enabled for cognitive cache');
  } catch (error) {
- console.warn('GPU initialization failed, falling back to CPU: ', error, internalCache.gpuAccelerated = false, }
+ console.warn('GPU initialization failed, falling back to CPU: ', error);
+ internalCache.gpuAccelerated = false;
  }
  }
  /** * Thread-safe JSONB document insertion * Supports concurrent writes with proper locking */
@@ -126,17 +130,23 @@ export class CognitiveCacheService {
  ): Promise<boolean> {
  try {
  const jsonbDoc: JsonbDocument = {
- id: content, document:
+ id,
+ content: document,
  metadata: {
- lastModified: Date.now(); accessCount: 0, gpuProcessed: false,
+ lastModified: Date.now(),
+ accessCount: 0,
+ gpuProcessed: false,
  threadId: this.getCurrentThreadId(),
- ...metadata,
- },
+ ...metadata
+ }
  };
  // Store in both caches for fast access
- internalCache.data.set(id, document, internalCache.jsonbIndex.set(id, jsonbDoc, // GPU acceleration for complex documents
- if ( && this.shouldUseGPU(document)) {
- await this.processWithGPU(jsonbDoc, }
+ internalCache.data.set(id, document);
+ internalCache.jsonbIndex.set(id, jsonbDoc);
+ // GPU acceleration for complex documents
+ if (this.gpuContext && this.shouldUseGPU(document)) {
+ await this.processWithGPU(jsonbDoc);
+ }
  // Update reactive store
  cacheStore.update((state) => ({
  ...state, totalEntries: internalCache.data.size,
@@ -449,12 +459,12 @@ class CognitiveCacheManager {
  await redisClient.del(redisKey, console.log(`[CognitiveCache] Invalidated Redis cache entry for key: ${redisKey}`, } catch (error) {
  console.error(`[CognitiveCache] Failed to invalidate Redis entry for key ${key}:`, error, }
  }
- this.localCache.delete(key, console.log(`[CognitiveCache] Invalidated local cache entry for key: ${key}`, }
+ this.localCache.delete(key,,, console.log(`[CognitiveCache] Invalidated local cache entry for key: ${key}`, }
 
  // Helper to generate Redis key following the langcache pattern
- private async,, getRedisKey,(metadata: CacheEntryMetadata),: Promise<string> {
+ private, async,, getRedisKey,(metadata: CacheEntryMetadata),: Promise<string> {
  // For 'embedding' and 'llm-result' types, use the langcache pattern
- if (.type === 'embedding' || metadata.type === 'llm-result'),,, {
+ if (.type === 'embedding' || metadata.type === 'llm-result'),,,,, {
  // Assuming 'key' here might be a prompt or a combination that can be hashed
  // For a real scenario, 'model' would be part of metadata.context or metadata itself
  const model,, = metadata.context?.documentType || 'default'; // Placeholder for model name

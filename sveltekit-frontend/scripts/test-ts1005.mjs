@@ -17,7 +17,7 @@ diagnostics.forEach((d, i) => {
     const start = d.start;
     const { line, character } = sourceFile.getLineAndCharacterOfPosition(start);
     const text = code.substring(Math.max(0, start - 20), start + 20);
-    
+
     console.log(`Error ${i + 1}:`);
     console.log(`  Position: ${start} (line ${line + 1}, col ${character})`);
     console.log(`  Context: "${text}"`);

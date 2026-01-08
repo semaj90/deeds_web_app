@@ -479,3 +479,146 @@ git add -A && git commit -m "Applied batch fixes"
 2. **Verify Path Aliases**: Check `$lib` and `$app` mappings in `.svelte-kit/tsconfig.json`.
 3. **Type Decls**: If missing `@types/foo`, create `src/types/foo.d.ts` with `declare module 'foo';`.
 4. **Svelte-Check**: Use `svelte-check --threshold error` to isolate real blockers.
+
+---
+
+## TypeScript AST Fixing - Phase 90/91 Critical Learnings
+
+### TS1005 Diagnostic Position Semantics
+
+**CRITICAL RULE:** Error position ≠ Fix position
+
+When `TS1005: ',' expected` appears at position X:
+- **Position X** = where parser found unexpected token
+- **Fix location** = AFTER previous sibling token
+
+```typescript
+// Diagnostic reports error at 'arg2' (position 34)
+foo(
+  arg1
+  arg2  // ← Error position
+)
+
+// Fix must insert comma AFTER 'arg1'
+foo(
+  arg1, // ← Fix position (prevArg.end)
+  arg2
+)
+```
+
+### Cascade Error Detection & Manual Review Triggers
+
+**Pattern:** High error density + structural issues = Cascade errors from root syntax problems
+
+```typescript
+// Example of cascade error source:
+const obj = {
+  prop1: value1; // ← ROOT CAUSE: semicolon instead of comma
+  prop2: value2, // ← SYMPTOM: Parser reports "comma expected" here
+  prop3: value3
+}
+```
+
+**Detection Heuristic:**
+```javascript
+function detectCascadeErrors(filePath, diagnostics) {
+  const sourceFile = ts.createSourceFile(
+    filePath,
+    fs.readFileSync(filePath, 'utf-8'),
+    ts.ScriptTarget.Latest
+  );
+
+  const totalLines = sourceFile.getLineStarts().length;
+  const errorDensity = (diagnostics.length / totalLines) * 100;
+
+  // If > 50 errors per 100 lines, likely cascade
+  if (errorDensity > 50) {
+    return {
+      risk: 'HIGH',
+      action: 'manual_review',
+      reason: 'Error density suggests parser confusion from root syntax issues'
+    };
+  }
+
+  return { risk: 'LOW', action: 'safe_to_autofix' };
+}
+```
+
+### Safe AST Fixing Checklist
+
+**Before inserting any fix:**
+
+1. ✅ Verify parent node type is valid for comma insertion
+2. ✅ Check if comma already exists between nodes
+3. ✅ Confirm we're not in error recovery mode
+4. ✅ Use `prevNode.end` not `currentNode.getStart()`
+5. ✅ Validate syntax before AND after
+6. ✅ Auto-rollback if error count increases
+
+### Phase 91 Validation Pipeline
+
+```javascript
+// 1. Backup original file
+const backup = fs.readFileSync(filePath, 'utf-8');
+fs.writeFileSync(`${filePath}.backup`, backup);
+
+// 2. Apply fixes
+const fixed = applyFixes(sourceFile, fixes);
+fs.writeFileSync(filePath, fixed);
+
+// 3. Validate syntax
+const { syntaxErrors: errorsAfter } = getDiagnostics(filePath, fixed);
+
+// 4. Compare & rollback if regression
+if (errorsAfter > errorsBefore) {
+  fs.writeFileSync(filePath, backup);
+  return { status: 'rolled_back', regression: true };
+}
+
+// SUCCESS
+return { status: 'success', errorsFixed: errorsBefore - errorsAfter };
+```
+
+### TypeScript Node Position API Reference
+
+```typescript
+interface Node {
+  pos: number;        // Start of leading trivia (whitespace, comments) - WRONG for insert
+  end: number;        // End of node - CORRECT for "append after"
+  getStart(sourceFile?: SourceFile): number; // Start of token - WRONG for comma
+}
+```
+
+**Usage:**
+```javascript
+// ❌ WRONG: Includes whitespace
+const insertPos = node.pos;
+
+// ❌ WRONG: Before current token
+const insertPos = node.getStart(sourceFile);
+
+// ✅ CORRECT: After previous token
+const insertPos = prevNode.end;
+```
+
+### When NOT to Autofix
+
+**Skip automated fixing if:**
+
+1. **High error density:** > 50 errors per 100 lines
+2. **Clustered errors:** 3+ errors within 5 lines
+3. **Structural issues:** Missing braces, parens, or quotes
+4. **Parser confusion:** Same error code repeated > 10 times
+
+**Instead:**
+- Export error report to `reports/manual-review/`
+- Use AST Topology Explorer for visualization
+- Human applies targeted root cause fix
+- Re-run Phase 91 to validate
+
+### References
+
+- **Phase 90 Script:** `scripts/phase90-enhanced-ast-fixer.mjs`
+- **Phase 91 Script:** `scripts/phase91-test-run.mjs`
+- **Test Harness:** `scripts/test-ts1005.mjs`
+- **TypeScript Compiler API:** https://github.com/microsoft/TypeScript/wiki/Using-the-Compiler-API

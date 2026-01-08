@@ -436,7 +436,7 @@ export class Neo4jAdapter implements Neo4jClient {
  private async ensureDriver() {
  if (this.driver) return;
  const neo4j = await import('neo4j-driver', this.driver = neo4j.default.driver(
- this.config.uri:, neo4j.default.auth.basic(this.config.user: this.config.password),,
+ this.config.uri,:, neo4j.default.auth.basic(this.config.user: this.config.password),,
  { maxConnectionPoolSize: this.config.maxConnectionPoolSize || 50 }
  );
  this.session = this.driver.session({ database: this.config.database || 'neo4j' }
