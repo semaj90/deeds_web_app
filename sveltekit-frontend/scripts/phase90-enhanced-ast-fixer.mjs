@@ -448,74 +448,118 @@ function handleInterfaceComma(sourceFile, node, context) {
         return null;
     }
 
-    if (CONFIG.verbose) console.log(`   🎯 Fix from Tier 1 [InterfaceDeclaration]`);
-    return {
-        position: propertySignature.end,
-        text: ',',
-        type: 'insert',
-        context,
-        metadata: {
-            pattern: 'InterfaceDeclaration',
-            confidence: 1.0,
-            source: 'Base fixer - validated',
-        },
-    };
+    // Check if this property is not the first one
+    const parent = propertySignature.parent;
+    if (parent && (ts.isInterfaceDeclaration(parent) || ts.isTypeLiteralNode(parent))) {
+        const members = parent.members;
+        const index = members.indexOf(propertySignature);
+
+        // If not first member, insert comma/semicolon BEFORE
+        if (index > 0) {
+            if (CONFIG.verbose) console.log(`   🎯 Fix from Tier 1 [InterfaceDeclaration] (Prepend)`);
+            return {
+                position: propertySignature.pos,
+                text: ';', // Interfaces prefer semi-colons (or check multiline)
+                type: 'insert',
+                context,
+                metadata: {
+                    pattern: 'InterfaceDeclaration',
+                    confidence: 1.0,
+                    source: 'Tier 1 Prepend',
+                },
+            };
+        }
+    }
+
+    // Strict Tier 1: Do not append.
+    return null;
 }
 
 function handleObjectLiteralComma(sourceFile, node, context) {
     const propertyAssignment = getParentOfKind(node, ts.SyntaxKind.PropertyAssignment);
+    const shorthandProperty = getParentOfKind(node, ts.SyntaxKind.ShorthandPropertyAssignment);
 
-    if (!propertyAssignment) {
+    const prop = propertyAssignment || shorthandProperty;
+
+    if (!prop) {
         return null;
     }
 
-    if (CONFIG.verbose) console.log(`   🎯 Fix from Tier 1 [ObjectLiteralExpression]`);
-    return {
-        position: propertyAssignment.end,
-        text: ',',
-        type: 'insert',
-        context,
-        metadata: {
-            pattern: 'ObjectLiteralExpression',
-            confidence: 1.0,
-            source: 'Base fixer - validated',
-        },
-    };
+    const parent = prop.parent;
+    if (parent && ts.isObjectLiteralExpression(parent)) {
+        const props = parent.properties;
+        const index = props.indexOf(prop);
+
+        if (index > 0) {
+             if (CONFIG.verbose) console.log(`   🎯 Fix from Tier 1 [ObjectLiteralExpression] (Prepend)`);
+             return {
+                position: prop.pos,
+                text: ',',
+                type: 'insert',
+                context,
+                metadata: {
+                    pattern: 'ObjectLiteralExpression',
+                    confidence: 1.0,
+                    source: 'Tier 1 Prepend',
+                },
+             };
+        }
+    }
+
+    // Strict Tier 1: Do not append.
+    return null;
 }
 
 function handleArrayLiteralComma(sourceFile, node, context) {
-    if (!context.isMultiline) {
-        return null;
+    const parent = node.parent;
+    if (parent && ts.isArrayLiteralExpression(parent)) {
+        const elements = parent.elements;
+        const index = elements.indexOf(node);
+
+        if (index > 0) {
+             if (CONFIG.verbose) console.log(`   🎯 Fix from Tier 1 [ArrayLiteralExpression] (Prepend)`);
+             return {
+                position: node.pos,
+                text: ',',
+                type: 'insert',
+                context,
+                metadata: {
+                    pattern: 'ArrayLiteralExpression',
+                    confidence: 1.0,
+                    source: 'Tier 1 Prepend',
+                },
+             };
+        }
     }
 
-    if (CONFIG.verbose) console.log(`   🎯 Fix from Tier 1 [ArrayLiteralExpression]`);
-    return {
-        position: node.end,
-        text: ',',
-        type: 'insert',
-        context,
-        metadata: {
-            pattern: 'ArrayLiteralExpression',
-            confidence: 1.0,
-            source: 'Base fixer - validated',
-        },
-    };
+    // Strict Tier 1: Do not append.
+    return null;
 }
 
 function handleCallExpressionComma(sourceFile, node, context) {
-    // Basic check for call args
-    if (CONFIG.verbose) console.log(`   🎯 Fix from Tier 1 [CallExpression]`);
-    return {
-        position: node.end,
-        text: ',',
-        type: 'insert',
-        context,
-        metadata: {
-            pattern: 'CallExpression',
-            confidence: 1.0,
-            source: 'Base fixer - validated',
-        },
-    };
+    const parent = node.parent;
+    if (parent && ts.isCallExpression(parent)) {
+        const args = parent.arguments;
+        const index = args.indexOf(node);
+
+        if (index > 0) {
+             if (CONFIG.verbose) console.log(`   🎯 Fix from Tier 1 [CallExpression] (Prepend)`);
+             return {
+                position: node.pos, // Include leading whitespace
+                text: ',',
+                type: 'insert',
+                context,
+                metadata: {
+                    pattern: 'CallExpression',
+                    confidence: 1.0,
+                    source: 'Tier 1 Prepend',
+                },
+             };
+        }
+    }
+
+    // Strict Tier 1: Do not append.
+    return null;
 }
 
 // ============================================================================

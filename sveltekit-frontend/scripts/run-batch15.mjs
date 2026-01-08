@@ -24,49 +24,17 @@ import('./phase90-enhanced-ast-fixer.mjs').then(async (module) => {
     console.log('╚════════════════════════════════════════════════════════════════╝\n');
     console.log(`📁 Working Directory: ${process.cwd()}\n`);
 
-    // Load error files ranked by error count
-    const errorFilesPath = path.join(projectRoot, 'reports/top-100-error-files.json');
+    // Load pre-generated file list for Batch 15
+    const batch15FilesPath = path.join(projectRoot, 'reports/phase90-batch15-files.json');
 
-    if (!fs.existsSync(errorFilesPath)) {
-        console.error('❌ Error: top-100-error-files.json not found!');
-        console.log('Run: node scripts/generate-error-ranking.mjs');
+    if (!fs.existsSync(batch15FilesPath)) {
+        console.error('❌ Error: phase90-batch15-files.json not found!');
+        console.log('Run this command first:');
+        console.log('npx tsc --noEmit 2>&1 | Select-String "^src/" | ForEach-Object { if ($_ -match "^(src/[^(]+)") { $matches[1] } } | Group-Object | Select-Object Name, Count | Sort-Object Count -Descending | Select-Object -Skip 305 -First 50 | ForEach-Object { [PSCustomObject]@{ File = $_.Name; Errors = $_.Count } } | ConvertTo-Json > reports/phase90-batch15-files.json');
         process.exit(1);
     }
 
-    const errorData = JSON.parse(fs.readFileSync(errorFilesPath, 'utf-8'));
-
-    // We need all ranked files, not just top 100. Let's generate a fresh ranking for files 306-355
-    console.log('📊 Generating fresh error ranking for Batch 15 files...\n');
-
-    // Get all TypeScript files with errors
-    const { execSync } = await import('child_process');
-    const tscOutput = execSync('npx tsc --noEmit 2>&1', { encoding: 'utf-8', maxBuffer: 50 * 1024 * 1024 });
-
-    const errorCounts = new Map();
-    const lines = tscOutput.split('\n');
-
-    for (const line of lines) {
-        const match = line.match(/^(src\/[^(]+)\((\d+),(\d+)\): error TS(\d+):/);
-        if (match) {
-            const [, file] = match;
-            errorCounts.set(file, (errorCounts.get(file) || 0) + 1);
-        }
-    }
-
-    // Convert to array and sort by error count descending
-    const allFiles = Array.from(errorCounts.entries())
-        .map(([file, count]) => ({ File: file, Errors: count }))
-        .sort((a, b) => b.Errors - a.Errors);
-
-    console.log(`📈 Total files with errors: ${allFiles.length}`);
-
-    // Take files ranked 306-355 (indices 305-354)
-    const batch15Files = allFiles.slice(305, 355);
-
-    if (batch15Files.length === 0) {
-        console.log('✅ No files in rank 306-355 range (codebase may have < 305 error files)');
-        process.exit(0);
-    }
+    const batch15Files = JSON.parse(fs.readFileSync(batch15FilesPath, 'utf-8'));
 
     console.log(`📊 Batch 15: Processing ${batch15Files.length} files (ranks 306-${305 + batch15Files.length})\n`);
 

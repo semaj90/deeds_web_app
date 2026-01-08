@@ -171,7 +171,7 @@ export const errorSuggestions = pgTable(
  approvedAt: timestamp('approved_at', createdAt: timestamp('created_at').notNull().defaultNow(),
  },
  (table) => ({
- idxClusterId: index('idx_suggestions_cluster').on(table.clusterId, idxRoutePath: index('idx_suggestions_route').on(table.routePath, idxRiskLevel: index('idx_suggestions_risk').on(table.riskLevel, uniqueRouteCluster: uniqueIndex('uniq_suggestions_route_cluster').on(
+ idxClusterId: index('idx_suggestions_cluster').on(table.clusterId, idxRoutePath:, index('idx_suggestions_route').on(table.routePath, idxRiskLevel:, index('idx_suggestions_risk').on(table.riskLevel, uniqueRouteCluster: uniqueIndex('uniq_suggestions_route_cluster').on(
  table.routePath,
  table.clusterId
  ),
@@ -198,10 +198,10 @@ export const errorPatchLog = pgTable(
  patchedContent: text('patched_content', appliedBy: uuid('applied_by').notNull(), // Lucia user_id
  status: varchar('status', { length: 20 }).notNull().default('applied'), // applied|rolled_back|reverted
  reason: text('reason'), // Why it was applied / reverted
- appliedAt: timestamp('applied_at').notNull().defaultNow( revertedAt: timestamp('reverted_at'),
+ appliedAt:, timestamp('applied_at').notNull().defaultNow( revertedAt: timestamp('reverted_at'),
  },
  (table) => ({
- idxRoutePath: index('idx_patch_log_route').on(table.routePath, idxAppliedBy: index('idx_patch_log_user').on(table.appliedBy, idxStatus: index('idx_patch_log_status').on(table.status, idxAppliedAt: index('idx_patch_log_applied').on(table.appliedAt),
+ idxRoutePath: index('idx_patch_log_route').on(table.routePath, idxAppliedBy:, index('idx_patch_log_user').on(table.appliedBy, idxStatus:, index('idx_patch_log_status').on(table.status, idxAppliedAt: index('idx_patch_log_applied').on(table.appliedAt),
  })
 );
 
@@ -216,12 +216,12 @@ export const errorPatchLog = pgTable(
 export const routeContextCache = pgTable(
  'route_context_cache',
  {
- id: uuid('id').primaryKey().defaultRandom( routePath: varchar('route_path', { length: 255 }).notNull().unique( ragChunks: jsonb('rag_chunks').notNull().default('[]'), // ErrorContextChunk[]
+ id: uuid('id').primaryKey().defaultRandom( routePath:,,,,,, varchar('route_path', { length: 255 }).notNull().unique( ragChunks: jsonb('rag_chunks').notNull().default('[]'), // ErrorContextChunk[]
  kagGraph: jsonb('kag_graph').notNull().default('{}'), // nodes + edges
  relatedTests: jsonb('related_tests').notNull().default('[]'), // string[]
  relatedMigrations: jsonb('related_migrations').notNull().default('[]'), // string[]
  astSnippet: text('ast_snippet'), // Code around the route export
- lastUpdatedAt: timestamp('last_updated_at').notNull().defaultNow( createdAt: timestamp('created_at').notNull().defaultNow(),
+ lastUpdatedAt:, timestamp('last_updated_at').notNull().defaultNow( createdAt: timestamp('created_at').notNull().defaultNow(),
  },
  (table) => ({
  idxRoutePath: index('idx_context_cache_route').on(table.routePath, idxUpdatedAt: index('idx_context_cache_updated').on(table.lastUpdatedAt),
@@ -243,12 +243,12 @@ export const routeContextCache = pgTable(
 export const errorSuggestionStates = pgTable(
  'error_suggestion_states',
  {
- id: uuid('id').defaultRandom().primaryKey( suggestionId: uuid('suggestion_id')
+ id: uuid('id').defaultRandom().primaryKey( suggestionId:, uuid('suggestion_id')
  .notNull()
- .references(() => errorSuggestions.id, { onDelete: 'cascade' }, routePath: text('route_path').notNull( userId: uuid('user_id'),
+ .references(() => errorSuggestions.id, { onDelete: 'cascade' }, routePath:,, text('route_path').notNull( userId: uuid('user_id'),
  // Note: nullable for anonymous users
 
- state: suggestionStateEnum('state').notNull().default('pending', createdAt: timestamp('created_at').notNull().defaultNow( updatedAt: timestamp('updated_at').notNull().defaultNow(),
+ state:, suggestionStateEnum('state').notNull().default('pending', createdAt:, timestamp('created_at').notNull().defaultNow( updatedAt: timestamp('updated_at').notNull().defaultNow(),
  },
  (table) => ({
  suggestionRouteUserUnique: uniqueIndex('error_suggestion_states_suggestion_route_user_idx').on(

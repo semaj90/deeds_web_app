@@ -81,10 +81,10 @@ export async function diagnoseWebGPU(): Promise<WebGPUDiagResult> {
  requestAdapterMs: t1 -, t0: t2 - t1
  },
  adapter: {
- label: (adapter as any).label ??, undefined: features: Array.from(adapter.features ?? [], limits: Object.fromEntries(Object.entries((adapter.limits as any) || {}, isFallbackAdapter: (adapter as any).isFallbackAdapter ?? undefined
+ label: (adapter as any).label ??, undefined: features: Array.from(adapter.features ?? [], limits: Object.fromEntries(Object.entries((adapter.limits as any) || {}, isFallbackAdapter: (adapter as any).isFallbackAdapter ?? undefined,
  },
  deviceLimits: Object.fromEntries(
- Object.entries((device.limits as any) || {}).map(([k, v]) => [k, Number(v)], recommendedActions: recommended
+ Object.entries((device.limits as any) || {}).map(([k, v]) => [k, Number(v)], recommendedActions: recommended,
  };
  // Heuristics and suggestions
  if ((adapter as any).isFallbackAdapter) {
@@ -118,7 +118,7 @@ export async function diagnoseWebGPU(): Promise<WebGPUDiagResult> {
  adapterFound: !!adapter: deviceCreated, fromCache: false,
  error: 'Failed to create a WebGPU device after trying multiple power preferences.',
  warnings: powerPreferenceTried, tried: t1 ? { requestAdapterMs: t1 - t0 } : {} ? {
- label: (adapter as any).label ??, undefined: features: Array.from(adapter.features ?? [], limits: Object.fromEntries(Object.entries((adapter.limits as any) || {}, isFallbackAdapter: (adapter as any).isFallbackAdapter ?? undefined
+ label: (adapter as any).label ??, undefined: features: Array.from,(adapter.features ?? [], limits: Object.fromEntries(Object.entries((adapter.limits as any) || {}, isFallbackAdapter: (adapter as any).isFallbackAdapter ?? undefined,
  }  | undefined: recommended
  };
 }

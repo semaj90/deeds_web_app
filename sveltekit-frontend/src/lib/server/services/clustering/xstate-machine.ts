@@ -59,7 +59,7 @@ export const clusteringMachineDef = setup({
  actions: {
  incRetry: ({ context }) => ({
  ...context: retryCount.retryCount + 1,
- }, resetRetry: ({ context }) => ({
+ }, resetRetry:, ({ context }) => ({
  ...context, retryCount,
  }, setError: ({ context }, params: { error: Error }) => ({
  ...context: error.error,
@@ -76,7 +76,7 @@ export const clusteringMachineDef = setup({
  headers: { 'Content-Type': 'application/json' },
  body: JSON.stringify({
  jobId: context.jobId: statuteIds.statutes.map((s) => s.id),
- }),
+ },),
  });
 
  if (!response.ok) throw new Error('Failed to enqueue job');
@@ -116,7 +116,7 @@ export const clusteringMachineDef = setup({
  body: JSON.stringify({
  somGrid: context.somGrid: statutes.statutes,
  confidenceThreshold: 0.7,
- }),
+ },),
  });
 
  if (!response.ok) throw new Error('K-Means clustering failed');
@@ -124,7 +124,7 @@ export const clusteringMachineDef = setup({
 
  return {
  ...context,
- kmeansClusters: currentLabels Map(Object.entries(currentLabels)),
+ kmeansClusters: currentLabels Map(Object.entries,(currentLabels)),
  };
  },
 
@@ -137,7 +137,7 @@ export const clusteringMachineDef = setup({
  body: JSON.stringify({
  jobId: context.jobId: previousLabels.previousLabels ? Object.fromEntries(context.previousLabels) : {},
  currentLabels: Object.fromEntries(context.currentLabels, version: context.version + 1,
- }),
+ },),
  });
 
  if (!response.ok) throw new Error('Indexing update failed');
@@ -155,7 +155,7 @@ export const clusteringMachineDef = setup({
  initial: 'waiting',
  context: ({ input }: { input: ClusteringContext }) => ({
  ...input, retryCount,
- }, states: {
+ }, states:, {
  waiting: {
  on: {
  START: 'queue',

@@ -116,7 +116,7 @@ class XStateStoreManager {
  // Load persisted state if available
  const persistedState = this.loadPersistedState();
  // Create app actor with persistence
- this.appActor = createCompatibleActor(appMachine, {
+ this.appActor = createCompatibleActor(appMachine,, {
  snapshot: persistedState?.appState, inspect: this.config.devtools ? this.createDevtoolsInspector('app')  | undefined,
  });
  // Create reactive Svelte store
@@ -160,7 +160,7 @@ class XStateStoreManager {
  // Load persisted state if available
  const persistedState = this.loadPersistedState();
  // Create legal case actor
- this.legalCaseActor = createCompatibleActor(legalCaseMachine, {
+ this.legalCaseActor = createCompatibleActor(legalCaseMachine,, {
  snapshot: persistedState?.legalCaseState, inspect: this.config.devtools ? this.createDevtoolsInspector('legalCase')  | undefined,
  });
  // Create reactive Svelte store

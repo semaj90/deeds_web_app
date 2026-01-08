@@ -16,7 +16,7 @@ export async function storeDocumentWithEmbedding(
  validateEmbedding(embedding);
 
  // Persist to vector store and postgres JSONB first, then cache in Redis
- await Promise.all([
+ await Promise.all,([
  upsertVector(id, embedding, metadata), // adapter handles Qdrant client shapes
  saveJsonbDocument(id, metadata, embedding)
  ]);

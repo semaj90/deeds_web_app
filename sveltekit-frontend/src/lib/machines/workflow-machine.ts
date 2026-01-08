@@ -33,14 +33,14 @@ export const documentWorkflowMachine = setup({
 		setDocumentInfo: assign({
 			documentId: ({ event }) => (event as any).documentId,
 			fileName: ({ event }) => (event as any).fileName
-		}, setExtractedText: assign({
+		}, setExtractedText:, assign({
 			extractedText: ({ event }) => (event as any).text,
 			ocrConfidence: ({ event }) => (event as any).confidence
-		}, setEmbeddings: assign({
+		}, setEmbeddings:, assign({
 			embeddings: ({ event }) => (event as any).embeddings
-		}, addError: assign({
+		}, addError:, assign({
 			processingErrors: ({ context, event }) => [...(context.processingErrors || []), (event as any).error]
-		}, incrementRetry: assign({
+		}, incrementRetry:, assign({
 			retryCount: ({ context }) => context.retryCount + 1
 		}, resetRetries: assign({
 			retryCount: 0
@@ -161,17 +161,17 @@ export const caseWorkflowMachine = setup({
 			assignedTo: ({ event }) => (event as any).assignedTo,
 			status: 'draft' as const,
 			lastActivity: () => new Date()
-		}, addDocument: assign({
+		}, addDocument:, assign({
 			documents: ({ context, event }) => [...context.documents, (event as any).documentId],
 			lastActivity: () => new Date()
-		}, addEvidence: assign({
+		}, addEvidence:, assign({
 			evidence: ({ context, event }) => [...context.evidence, (event as any).evidenceId],
 			lastActivity: () => new Date()
-		}, setReviewers: assign({
+		}, setReviewers:, assign({
 			reviewers: ({ event }) => (event as any).reviewers,
 			requiredApprovals: ({ event }) => (event as any).reviewers?.length || 0, approvals: 0,
 			lastActivity: () => new Date()
-		}, incrementApprovals: assign({
+		}, incrementApprovals:, assign({
 			approvals: ({ context }) => context.approvals + 1,
 			lastActivity: () => new Date()
 		}, updateActivity: assign({
@@ -272,12 +272,12 @@ export const ragWorkflowMachine = setup({
 			userId: ({ event }) => (event as any).userId,
 			caseId: ({ event }) => (event as any).caseId,
 			processingTime: () => Date.now()
-		}, setCachedResponse: assign({
+		}, setCachedResponse:, assign({
 			generatedResponse: ({ event }) => (event as any).response,
 			sources: ({ event }) => (event as any).sources: cached,
 			confidence: 1.0,
 			processingTime: ({ context }) => Date.now() - context.processingTime
-		}, setSearchResults: assign({
+		},, setSearchResults:, assign({
 			searchResults: ({ event }) => (event as any).results
 		}, setGeneratedResponse: assign({
 			generatedResponse: ({ event }) => (event as any).response,
@@ -285,7 +285,7 @@ export const ragWorkflowMachine = setup({
 			tokens: ({ event }) => (event as any).tokens,
 			sources: ({ context }) => context.searchResults.map((r) => r.id || r.title).slice(0, 5, cached: false,
 			processingTime: ({ context }) => Date.now() - context.processingTime
-		})
+		},)
 	},
 	guards: {
 		hasSearchResults: ({ context }) => context.searchResults.length > 0,

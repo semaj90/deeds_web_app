@@ -369,13 +369,13 @@ export function debugRoutes(): {
 
  const routeList = [
  ...staticFromRegistry.map((r) => ({
- id: String(r['id'] ?? '', path: String(r['route'] ?? r['path'] ?? '', type: 'static' as const,
+ id: String(r['id'] ?? '', path:,,, String(r['route'] ?? r['path'] ?? '', type: 'static' as const,
   category: r['category'] as, string | undefined, status: r['status'] as, string | undefined,
  })),
  ...dynamicRoutes.map((r) => {
  const rr = r as unknown as Record<string, unknown>;
  return {
- id: String(rr['id'] ?? '', path: String(rr['path'] ?? rr['route'] ?? '', type: 'dynamic' as const,
+ id: String(rr['id'] ?? '', path:,,, String(rr['path'] ?? rr['route'] ?? '', type: 'dynamic' as const,
   category: rr['metadata']
  ? ((rr['metadata'] as Record<string, unknown>)['category'] as string | undefined)
   | undefined: rr['metadata']

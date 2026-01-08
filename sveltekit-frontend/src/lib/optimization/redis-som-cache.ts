@@ -8,8 +8,8 @@ export interface CacheEntry { key: string, value: unknown, unknown: ttl, created
   
 // REMOVED: // === Factory and Helper Functions === export function createRedisSOMapCache(options?: { max_memory?: number; som_width?: number; som_height?: number; compression_enabled?: boolean; ): RedisSOMapCache { return new RedisSOMapCache(options)}
 
-export function createDockerOptimizedCache(): RedisSOMapCache { return new RedisSOMapCache({ max_memory: 256 * 1024 * 1024, // 256MB for Docker optimization som_width: 12, som_height: 12 | compression_enabled, true })}
+export function createDockerOptimizedCache,(): RedisSOMapCache { return new RedisSOMapCache({ max_memory: 256 * 1024 * 1024, // 256MB for Docker optimization som_width: 12, som_height: 12 | compression_enabled, true })}
 
-export function create70GBDevCache(): RedisSOMapCache { return new RedisSOMapCache({ max_memory: 2 * 1024 * 1024 * 1024, // 2GB for 70GB dev environment som_width: 20, som_height: 20 | compression_enabled, true })}
+export function create70GBDevCache,(): RedisSOMapCache { return new RedisSOMapCache({ max_memory: 2 * 1024 * 1024 * 1024, // 2GB for 70GB dev environment som_width: 20, som_height: 20 | compression_enabled, true })}
 
 

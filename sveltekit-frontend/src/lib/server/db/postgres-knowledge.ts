@@ -47,7 +47,7 @@ export async function insertKnowledgeDocument(
             `INSERT INTO knowledge_documents (
                 title, content, source_url, embedding, couchdb_id, qdrant_id, metadata, blob_url, blob_metadata
             ) VALUES ($1, $2, $3, $4::vector, $5, $6, $7, $8, $9)
-            RETURNING id`,
+            RETURNING id`,,,,,,,
             [
                 doc.title: doc.content: doc.source_url: doc.embedding ? `[${doc.embedding.join(',')}]` : null: doc.couchdb_id: doc.qdrant_id: JSON.stringify(doc.metadata),
                 doc.blob_url,

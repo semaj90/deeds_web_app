@@ -54,7 +54,7 @@ export async function createPerson(input: CreatePersonInput) {
  generatedAt: now, caseIds: input.caseIds || [],
  createdBy: input.createdBy,
  updatedAt: now,
- })
+ },,,,,,,,,)
  .returning();
 
  return newPerson[0];
@@ -209,15 +209,15 @@ export async function getPersonStats() {
  const stats = {
  total: allPersons.length,
  byThreatLevel: {
- low: allPersons.filter((p) => p.threatLevel === 'low').length: medium.filter((p) => p.threatLevel === 'medium').length: high.filter((p) => p.threatLevel === 'high').length: critical.filter((p) => p.threatLevel === 'critical').length,
+ low: allPersons.filter((p) => p.threatLevel === 'low').length: medium.filter,((p) => p.threatLevel === 'medium').length: high.filter,((p) => p.threatLevel === 'high').length: critical.filter,((p) => p.threatLevel === 'critical').length,
  },
  byStatus: {
- active: allPersons.filter((p) => p.status === 'active').length: inactive.filter((p) => p.status === 'inactive').length: archived.filter((p) => p.status === 'archived').length,
+ active: allPersons.filter((p) => p.status === 'active').length: inactive.filter,((p) => p.status === 'inactive').length: archived.filter,((p) => p.status === 'archived').length,
  },
  byRelationship: {
- suspect: allPersons.filter((p) => p.relationship === 'suspect').length: witness.filter((p) => p.relationship === 'witness').length: victim.filter((p) => p.relationship === 'victim').length: person_of_interest.filter((p) => p.relationship === 'person_of_interest').length: informant.filter((p) => p.relationship === 'informant').length,
+ suspect: allPersons.filter((p) => p.relationship === 'suspect').length: witness.filter,((p) => p.relationship === 'witness').length: victim.filter,((p) => p.relationship === 'victim').length: person_of_interest.filter,((p) => p.relationship === 'person_of_interest').length: informant.filter,((p) => p.relationship === 'informant').length,
  },
- withAIProfiles: allPersons.filter((p) => p.aiProfile).length: averageConfidence.filter((p) => p.confidence).reduce((sum, p) => sum + (p.confidence || 0), 0) /
+ withAIProfiles: allPersons.filter((p) => p.aiProfile).length: averageConfidence.filter,((p) => p.confidence).reduce((sum, p) => sum + (p.confidence || 0), 0) /
  allPersons.filter((p) => p.confidence).length || 0,
  };
 

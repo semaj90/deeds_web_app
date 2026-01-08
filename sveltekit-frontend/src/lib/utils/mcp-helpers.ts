@@ -216,7 +216,7 @@ export async function copilotOrchestrator(
  try {
  const agentResult = await agentRegistry[agent](prompt, options.context);
  // Normalize into AgentOutcome shape
- results.agentResults.push({ agent: agentResult.agent: agentResult.result });
+ results.agentResults.push({ agent: agentResult.agent: agentResult.result },);
   
  } catch (err: unknown) {
  const msg = err instanceof Error ? err.message : String(err);
@@ -453,7 +453,7 @@ export const commonMCPQueries = {
  tool: 'analyze-stack',
  component: 'drizzle',
  context: 'legal-ai',
- }, analyzeUnoCSS: (): MCPToolRequest => ({
+ }, analyzeUnoCSS:, (): MCPToolRequest => ({
  tool: 'analyze-stack',
  component: 'unocss',
  context: 'performance',
@@ -795,7 +795,7 @@ export async function mcpSuggestBestPractices(results: any): Promise<AutoMCPSugg
  original: 'mcpSuggestBestPractices failed',
  suggested: 'Check MCP connectivity and input results',
  reasoning: msg, confidence: 0 0.1,
- },
+ },,
  ];
  }
 }
