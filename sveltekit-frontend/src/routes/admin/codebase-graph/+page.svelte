@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Button, ButtonRoot, Dialog, DialogClose, DialogContent, DialogOverlay, DialogPortal, DialogRoot, DialogTitle } from 'bits-ui';
+	import { ButtonRoot, DialogClose, DialogContent, DialogOverlay, DialogPortal, DialogRoot, DialogTitle } from 'bits-ui';
 	import { onMount } from 'svelte';
 
 	interface VectorCluster {
@@ -69,7 +69,8 @@
 		for (const cluster of clusterData) {
 			nodes.push({
 				id: `cluster-${cluster.cluster_id}`,
-				label: cluster.pattern.substring(0, 30, type: 'cluster',
+				label: cluster.pattern.substring(0, 30),
+				type: 'cluster',
 				cluster_id: cluster.cluster_id,
 				tags: cluster.tags || []
 			});
@@ -88,7 +89,7 @@
 				edges.push({
 					source: `cluster-${cluster.cluster_id}`,
 					target: fileId,
-					weight, cluster.avg_similarity || 0.5,
+					weight: cluster.avg_similarity || 0.5,
 					type: 'similarity'
 				});
 			}

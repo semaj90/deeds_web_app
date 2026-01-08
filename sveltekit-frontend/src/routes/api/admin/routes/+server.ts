@@ -35,10 +35,11 @@ export const GET: RequestHandler = async () => {
 		const errorMap = new Map();
 		errorResult.rows.forEach(row => {
 			errorMap.set(row.file_path, {
-				errors: parseInt(row.error_count, metadata: typeof row.metadata === 'string' ? JSON.parse(row.metadata) : row.metadata
+				errors: parseInt(row.error_count),
+				metadata: typeof row.metadata === 'string' ? JSON.parse(row.metadata) : row.metadata
 			});
 		});
-  
+
 		const kbCounts = await getKBCounts();
 
 		const enrichedRoutes = routes.map(route => {

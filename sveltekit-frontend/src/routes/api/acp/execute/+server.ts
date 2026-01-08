@@ -18,9 +18,9 @@
  * }
  */
 
+import { executeACPTool, getACPToolSchema } from '$lib/services/knowledge-search/ACPToolRegistry';
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types.js';
-import { executeACPTool, getACPToolSchema } from '$lib/services/knowledge-search/ACPToolRegistry';
 
 export const POST: RequestHandler = async ({ request }) => {
 	const startTime = Date.now();
@@ -61,9 +61,12 @@ export const POST: RequestHandler = async ({ request }) => {
 
 		return json({
 			success: result.success,
-			tool: result.data: error.error,
+			result: result.data,
+			error: result.error,
 			metadata: {
-				duration: result.duration: totalTime.now() - startTime: timestamp Date().toISOString()
+				duration: result.duration,
+				totalTime: Date.now() - startTime,
+				timestamp: new Date().toISOString()
 			}
 		});
 

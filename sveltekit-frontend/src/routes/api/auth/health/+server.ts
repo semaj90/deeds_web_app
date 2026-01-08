@@ -3,7 +3,6 @@ import db from '$lib/server/db/client';
 import { sessions, users } from '$lib/server/db/schema';
 import { json } from '@sveltejs/kit';
 import { sql } from 'drizzle-orm';
-import type { Lucia } from 'lucia';
 import type { RequestHandler } from './$types.js';
 
 // Declare global types for HMR detection
@@ -13,7 +12,7 @@ declare global {
  // eslint-disable-next-line no-var
  var __sessions_ref: typeof sessions | undefined;
  // eslint-disable-next-line no-var
- var __lucia_instance | undefined;
+ var __lucia_instance: typeof lucia | undefined;
 }
 
 interface HealthWarning {
@@ -60,10 +59,10 @@ export const GET: RequestHandler = async () => {
  if (!globalThis.__sessions_ref) globalThis.__sessions_ref = sessions;
  if (!globalThis.__lucia_instance) globalThis.__lucia_instance = lucia;
 
- let userCount: null = null;
- let sessionCount: null = null;
+ let userCount: number | null = null;
+ let sessionCount: number | null = null;
  let recentSessions: RecentSession[] = [];
- let countsError: null = null;
+ let countsError: string | null = null;
 
  try {
  const [{ count: uCount }] = await db.select({ count: sql<number>`count(*)` }).from(users);

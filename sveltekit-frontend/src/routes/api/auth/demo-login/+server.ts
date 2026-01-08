@@ -37,10 +37,12 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
 			.insert(users)
 			.values({
 				email,
-				name: email.split('@')[0] as any,
+				firstName: email.split('@')[0],
+				lastName: 'Demo',
 				isActive: true,
 				passwordHash: 'demo-mode-no-password',
-				createdAt: new Date().toISOString(), updatedAt: new Date().toISOString(),
+				createdAt: new Date().toISOString(),
+                updatedAt: new Date().toISOString(),
 			})
 			.returning();
 		user = newUser;
@@ -66,7 +68,8 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
  user: {
  id: user.id,
  email: user.email,
- name: user.name,
+ firstName: user.firstName,
+ lastName: user.lastName,
  role: user.role,
  isActive: user.isActive,
  },

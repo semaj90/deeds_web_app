@@ -5,10 +5,10 @@
  * GET /api/ace/summarize-clusters - Get existing summaries
  */
 
+import { ollamaService } from '$lib/server/ai/ollama-service.js';
+import { aceLLM, couchdb } from '$lib/services/couchdb-client.js';
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
-import { couchdb, aceLLM } from '$lib/services/couchdb-client.js';
-import { ollamaService } from '$lib/server/ai/ollama-service.js';
 
 const QDRANT_URL = process.env.QDRANT_URL || 'http://localhost:6333';
 const OLLAMA_URL = process.env.OLLAMA_URL || 'http://localhost:11434';
@@ -41,13 +41,40 @@ async function sampleCollection(name: string, limit: number = 10): Promise<Array
     });
     if (!response.ok) return [];
     const data = await response.json() as { result: { points: Array<{ id: string; payload: Record<string, unknown> }> } };
+    return data.result.points;
+  } catch {
+    return [];
+  }
+}
+
+async function generateSummary(name: string, samples: Array<any>): Promise<string> {
+  try {
+     const context = samples.map(s => JSON.stringify(s.payload || {})).join('\n---\n');
+     const prompt = `Analyze these code snippets from the vector cluster "${name}". Identify the common pattern, purpose, or functionality they represent.\n\nCode Samples:\n${context.substring(0, 8000)}`;
+
+     const result = await ollamaService.generateResponse({
+        model: 'gemma3-legal:latest',
+        prompt,
+        system: "You are a senior software architect analyzing code clusters."
+     });
+
+     return result || 'Analysis failed';
+  } catch (err) {
+    return 'Summary generation failed';
+  }
+}
+
+export const POST: RequestHandler = async ({ request }) => {
+  try {
+    const body = await request.json();
+
     // Get all collections
     const listResponse = await fetch(`${QDRANT_URL}/collections`);
     const listData = await listResponse.json() as { result: { collections: Array<{ name: string }> } };
 
     let targetCollections = listData.result.collections.map(c => c.name);
     if (body.collections?.length) {
-      targetCollections = targetCollections.filter(c => body.collections!.includes(c));
+      targetCollections = targetCollections.filter(c => body.collections.includes(c));
     }
 
     const summaries: CollectionSummary[] = [];

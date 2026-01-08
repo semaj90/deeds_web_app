@@ -87,7 +87,8 @@ export const GET: RequestHandler = async () => {
 									`event: route_updated\ndata: ${JSON.stringify({
 										id: row.file_path,
 										path: row.file_path,
-										errors: parseInt(row.error_count, timestamp: row.last_updated
+										errors: parseInt(row.error_count),
+										timestamp: row.last_updated
 									})}\n\n`
 								)
 							);

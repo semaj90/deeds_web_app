@@ -557,3 +557,140 @@ git add -A && git commit -m "Applied batch fixes"
 2. **Verify Path Aliases**: Check `$lib` and `$app` mappings in `.svelte-kit/tsconfig.json`.
 3. **Type Decls**: If missing `@types/foo`, create `src/types/foo.d.ts` with `declare module 'foo';`.
 4. **Svelte-Check**: Use `svelte-check --threshold error` to isolate real blockers.
+
+---
+
+## 🎯 Svelte 5 Reactive State - Quick Fix Guide (Phase 90+)
+
+### Common Error Pattern: TS2305/TS2307 (Module Not Found)
+
+**Problem:**
+```typescript
+// ❌ ERROR TS2305: Module '"svelte/store"' has no exported member 'Writable'
+import { writable, type Writable } from 'svelte/store';
+```
+
+**Root Cause:** Svelte 5 deprecates `svelte/store` in favor of built-in `$state` runes.
+
+**Quick Fix (3 Steps):**
+
+1. **Delete store imports:**
+   ```typescript
+   // DELETE:
+   import { writable, type Writable } from 'svelte/store';
+   import { derived, readable, get } from 'svelte/store';
+   ```
+
+2. **Convert to $state class:**
+   ```typescript
+   // BEFORE:
+   export const cacheStore: Writable<CacheState> = writable({
+     totalEntries: 0,
+     gpuAccelerated: false
+   });
+
+   // AFTER:
+   class CacheStoreClass {
+     state = $state<CacheState>({
+       totalEntries: 0,
+       gpuAccelerated: false
+     });
+
+     update(fn: (state: CacheState) => CacheState) {
+       this.state = fn(this.state);
+     }
+
+     get value() {
+       return this.state;
+     }
+   }
+   export const cacheStore = new CacheStoreClass();
+   ```
+
+3. **Update usage:**
+   ```typescript
+   // BEFORE:
+   cacheStore.update(state => ({ ...state, totalEntries: 100 }));
+
+   // AFTER (same API, works with $state):
+   cacheStore.update(state => ({ ...state, totalEntries: 100 }));
+
+   // Direct access:
+   console.log(cacheStore.state.totalEntries); // Reactive!
+   ```
+
+### Error Code Quick Reference
+
+| Error | Cause | Fix |
+|-------|-------|-----|
+| TS2305 | `type Writable` not found | Remove import, use `$state` |
+| TS2307 | `'svelte/store'` not resolved | Delete store imports |
+| TS2322 | Type mismatch `Writable` vs class | Remove type annotation |
+| TS2339 | Property missing on Writable | Use `.state` property |
+
+### Benefits for RAG/KAG/DAG Systems
+
+**Before (Svelte 4 - causes errors):**
+```typescript
+// ❌ TS2305/TS2307 errors
+export const cognitiveCacheStore: Writable<CacheState> = writable({
+  totalEntries: 0,
+  ragQueryCount: 0,
+  kagEmbeddingSize: 384
+});
+```
+
+**After (Svelte 5 - no errors):**
+```typescript
+// ✅ No imports needed, full TypeScript inference
+class CognitiveCacheStore {
+  state = $state({
+    totalEntries: 0,
+    ragQueryCount: 0,
+    kagEmbeddingSize: 384,
+    dagNodeCount: 0,
+    gpuAccelerated: false
+  });
+
+  incrementRAGQuery() {
+    this.state = { ...this.state, ragQueryCount: this.state.ragQueryCount + 1 };
+  }
+}
+export const cognitiveCacheStore = new CognitiveCacheStore();
+```
+
+### Validation Commands
+
+```bash
+# Before fix:
+npx svelte-check --threshold error | grep -c "TS2305\|TS2307"
+# Example output: 47 errors
+
+# After fix:
+npx svelte-check --threshold error | grep -c "TS2305\|TS2307"
+# Target: 0 errors
+
+# Error density check:
+node scripts/phase90-detect-cascade-errors.mjs --file=src/lib/services/cognitive-cache-integration.ts
+```
+
+### Integration with Copilot Workflows
+
+**When Copilot suggests fixes:**
+
+1. **Priority:** Fix TS2305/TS2307 first (blocks compilation)
+2. **Strategy:** Batch-convert all `writable()` stores to `$state` classes
+3. **Validation:** Run `svelte-check` after each batch (target: <50 errors/100 lines)
+4. **Logging:** Add `provider: "copilot"` to Phase 72 logs
+
+**Example Copilot edit command:**
+```bash
+# Convert all stores in cognitive-cache-integration.ts
+Copilot: "Convert all Svelte 4 writable stores to Svelte 5 $state runes in this file"
+```
+
+**Expected outcome:**
+- TS2305/TS2307 errors: **eliminated**
+- Error density: **62.7 → <50** errors/100 lines
+- SSR safety: **improved** (no subscription mismatches)
+

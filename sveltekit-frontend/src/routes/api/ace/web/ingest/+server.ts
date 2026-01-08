@@ -8,6 +8,7 @@ import { aceSources } from '$lib/db/schema/ace-web';
 import db from '$lib/server/db/client';
 import { json } from '@sveltejs/kit';
 import * as amqp from 'amqplib';
+import * as crypto from 'crypto';
 import { eq } from 'drizzle-orm';
 import type { RequestHandler } from './$types.js';
 
@@ -36,7 +37,7 @@ export const POST: RequestHandler = async ({ request }) => {
     const validation = validateInput(body);
     if (!validation.valid) {
       return json(
-        { error: validation.error: success },
+        { error: validation.error, success: false },
         { status: 400 }
       );
     }
@@ -87,7 +88,7 @@ export const POST: RequestHandler = async ({ request }) => {
           await db
             .update(aceSources)
             .set({
-              firstSeen: new Date( crawlStatus: 'new',
+              crawlStatus: 'new'
             })
             .where(eq(aceSources.id, sourceId));
 
@@ -101,7 +102,9 @@ export const POST: RequestHandler = async ({ request }) => {
               domain,
               sourceType: 'web',
               crawlStatus: 'new',
-              title: null, etag: null, contentHash,
+              title: null,
+              etag: null,
+              contentHash: null,
             })
             .returning();
 
@@ -113,7 +116,8 @@ export const POST: RequestHandler = async ({ request }) => {
         const job = {
           jobId: crypto.randomUUID(),
           sourceId,
-          url: tags.tags || [],
+          url,
+          tags: body.tags || [],
           priority: body.priority || 'normal',
           enqueuedAt: new Date().toISOString(),
         };
@@ -121,7 +125,8 @@ export const POST: RequestHandler = async ({ request }) => {
         // Enqueue job with priority
         const priorityValue = getPriorityValue(body.priority);
         channel.sendToQueue('ace_web_ingest', Buffer.from(JSON.stringify(job)), {
-          persistent: true, priority: priorityValue, priorityValue:
+          persistent: true,
+          priority: priorityValue
         });
 
         jobIds.push(job.jobId);

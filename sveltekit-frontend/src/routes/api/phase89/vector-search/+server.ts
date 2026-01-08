@@ -52,7 +52,7 @@ export const POST: RequestHandler = async ({ request }) => {
 		const searchResults = await qdrant.search('phase89_error_clusters', {
 			vector: queryEmbedding,
 			limit,
-			score_threshold,
+			score_threshold: threshold,
 			with_payload: true,
 			with_vector: false
 		} as any);

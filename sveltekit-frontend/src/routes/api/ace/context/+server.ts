@@ -4,10 +4,10 @@
  * Retrieves contextual information using RAG+KAG hybrid scoring
  */
 
+import type { ContextFilters } from '$lib/services/ace-web/ace-context-service';
+import { AceContextService } from '$lib/services/ace-web/ace-context-service';
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types.js';
-import { AceContextService } from '$lib/services/ace-web/ace-context-service';
-import type { ContextFilters } from '$lib/services/ace-web/ace-context-service';
 
 /**
  * GET /api/ace/context
@@ -155,7 +155,8 @@ export const GET: RequestHandler = async ({ url }) => {
       success: true,
       query,
       filters,
-      bundle: timestamp Date().toISOString(),
+      bundle,
+      timestamp: new Date().toISOString(),
     });
   } catch (error) {
     console.error('[ACE Context] Endpoint error:', error);

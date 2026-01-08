@@ -5,10 +5,10 @@
  * GET /api/ace/index-ast - Get indexing status
  */
 
+import { indexCodebaseInCouchDB } from '$lib/services/ast-parser.js';
+import { couchdb } from '$lib/services/couchdb-client.js';
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
-import { indexCodebaseInCouchDB, analyzeDirectory } from '$lib/services/ast-parser.js';
-import { couchdb } from '$lib/services/couchdb-client.js';
 
 interface IndexRequest {
   path?: string;
@@ -51,7 +51,7 @@ export const POST: RequestHandler = async ({ request }) => {
         const result = await indexCodebaseInCouchDB(targetPath, {
           extensions: body.extensions || ['.ts', '.tsx', '.js', '.svelte'],
           exclude: body.exclude || ['node_modules', '.git', 'dist', 'build', '.svelte-kit'],
-          maxFiles, body.maxFiles || 500
+          maxFiles: body.maxFiles || 500
         });
 
         indexingStatus.indexed = result.indexed;

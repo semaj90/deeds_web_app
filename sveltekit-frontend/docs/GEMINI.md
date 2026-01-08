@@ -822,3 +822,155 @@ git add -A && git commit -m "Applied batch fixes"
   - Integration of `bits-ui` for complex headless components (Dropdown, Select, Tooltip).
   - Svelte 5 Rune conversion for restored logic.
 
+---
+
+## 🎯 Svelte 5 Reactive State Management - Critical Patterns (Phase 90+)
+
+### Migrating from Svelte 4 Stores to Svelte 5 Runes
+
+**Problem:** Legacy `writable()` stores don't integrate with Svelte 5's fine-grained reactivity.
+
+**Svelte 4 Pattern (DEPRECATED):**
+```typescript
+import { writable, type Writable } from 'svelte/store';
+
+interface CacheState {
+  totalEntries: number;
+  gpuAccelerated: boolean;
+  lastOperation: string;
+}
+
+export const cacheStore: Writable<CacheState> = writable({
+  totalEntries: 0,
+  gpuAccelerated: false,
+  lastOperation: 'initialized'
+});
+
+// Usage in components:
+cacheStore.update((state) => ({ ...state, totalEntries: state.totalEntries + 1 }));
+```
+
+**Svelte 5 Pattern (CORRECT):**
+```typescript
+// ✅ Use $state rune with class wrapper for reactive state
+class CacheStoreClass {
+  state = $state<CacheState>({
+    totalEntries: 0,
+    gpuAccelerated: false,
+    lastOperation: 'initialized'
+  });
+
+  update(fn: (state: CacheState) => CacheState) {
+    this.state = fn(this.state);
+  }
+
+  get value() {
+    return this.state;
+  }
+}
+
+export const cacheStore = new CacheStoreClass();
+
+// Usage in components:
+cacheStore.update((state) => ({ ...state, totalEntries: state.totalEntries + 1 }));
+
+// Direct access to reactive state:
+console.log(cacheStore.state.totalEntries); // Fine-grained reactivity
+```
+
+### Key Benefits of Svelte 5 $state Rune Pattern
+
+1. **Fine-Grained Reactivity**: Only re-renders when specific properties change (vs entire store).
+2. **No Store Subscriptions**: Direct property access without `$` prefix in `.svelte` files.
+3. **Better TypeScript Inference**: Full type safety without manual annotations.
+4. **Simpler API**: `.value` getter for current state, `.update()` for mutations.
+5. **Server-Side Safe**: No special handling needed for SSR (unlike stores).
+
+### Common Migration Patterns
+
+| Svelte 4 Store API | Svelte 5 Rune Equivalent |
+|-------------------|-------------------------|
+| `writable(initialValue)` | `$state(initialValue)` in class |
+| `store.subscribe(callback)` | Direct property access in `$effect` |
+| `store.update(fn)` | Class method `update(fn)` |
+| `store.set(value)` | Direct assignment `state = value` |
+| `$store` (auto-subscribe) | `cacheStore.state` (reactive) |
+
+### Error Fixing Strategy for Reactive State
+
+**When fixing TypeScript errors in service files with reactive state:**
+
+1. **Remove Store Imports**: Delete `import { writable, type Writable }` (TS2305, TS2307).
+2. **Convert to $state Class**: Wrap state in class with `$state` rune.
+3. **Update Method Calls**: Ensure `.update()` calls match new API signature.
+4. **Check SSR Compatibility**: Verify no `browser` checks needed for state initialization.
+5. **Validate Reactivity**: Test component re-renders with state changes.
+
+**Example Fix for TS2305 (Module not found):**
+```typescript
+// ❌ Before (causes TS2305 if 'svelte/store' not resolved):
+import { writable, type Writable } from 'svelte/store';
+
+// ✅ After (no external imports needed):
+// Use $state rune directly (built-in to Svelte 5 compiler)
+class StateClass {
+  state = $state<MyType>({ ... });
+}
+```
+
+**Example Fix for TS2322 (Type mismatch):**
+```typescript
+// ❌ Before:
+export const cacheStore: Writable<CacheState> = writable({ ... });
+// Error: Type 'CacheStoreClass' is not assignable to type 'Writable<CacheState>'
+
+// ✅ After:
+export const cacheStore = new CacheStoreClass();
+// TypeScript infers correct type from class definition
+```
+
+### Integration with RAG/KAG/DAG Knowledge Systems
+
+**Use Case:** Reactive cache state for cognitive AI systems.
+
+```typescript
+class CognitiveCacheStore {
+  state = $state({
+    totalEntries: 0,
+    gpuAccelerated: false,
+    threadSafe: true,
+    lastOperation: 'initialized',
+    ragQueryCount: 0,
+    dagNodeCount: 0,
+    kagEmbeddingSize: 0
+  });
+
+  // Update from GPU pipeline results
+  updateFromGPUPipeline(results: GPUPipelineResult) {
+    this.state = {
+      ...this.state,
+      gpuAccelerated: results.device === 'cuda:0',
+      totalEntries: results.vectorCount,
+      lastOperation: `gpu_pipeline_${Date.now()}`
+    };
+  }
+
+  // Update from RAG query
+  updateFromRAGQuery(resultCount: number) {
+    this.state = {
+      ...this.state,
+      ragQueryCount: this.state.ragQueryCount + 1,
+      lastOperation: `rag_query_${resultCount}_results`
+    };
+  }
+}
+
+export const cognitiveCacheStore = new CognitiveCacheStore();
+```
+
+**Benefits for Error Fixing:**
+- Eliminates TS2307 (module not found) for `svelte/store`.
+- Fixes TS2322 (type mismatch) between Writable and custom classes.
+- Resolves TS2339 (property doesn't exist) with proper type inference.
+- Prevents SSR hydration errors (no store subscription mismatches).
+

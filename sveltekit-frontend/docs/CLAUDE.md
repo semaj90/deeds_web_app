@@ -622,3 +622,235 @@ const insertPos = prevNode.end;
 - **Phase 91 Script:** `scripts/phase91-test-run.mjs`
 - **Test Harness:** `scripts/test-ts1005.mjs`
 - **TypeScript Compiler API:** https://github.com/microsoft/TypeScript/wiki/Using-the-Compiler-API
+
+---
+
+## 🎯 Svelte 5 Reactive State Management - Error Fixing Patterns (Phase 90+)
+
+### Critical Migration: Svelte 4 Stores → Svelte 5 $state Runes
+
+**Root Cause of Common TypeScript Errors:**
+
+Many TS2305, TS2307, and TS2322 errors in service files stem from deprecated Svelte 4 store patterns that conflict with Svelte 5's compiler expectations.
+
+**Svelte 4 Anti-Pattern (causes TS2305/TS2307):**
+```typescript
+// ❌ DEPRECATED: Triggers module resolution errors
+import { writable, type Writable } from 'svelte/store';
+
+interface CacheState {
+  totalEntries: number;
+  gpuAccelerated: boolean;
+  threadSafe: boolean;
+  lastOperation: string;
+}
+
+// ❌ Error TS2322: Type mismatch when using class-based state management
+export const cacheStore: Writable<CacheState> = writable({
+  totalEntries: 0,
+  gpuAccelerated: false,
+  threadSafe: true,
+  lastOperation: 'initialized'
+});
+
+// ❌ Requires subscription boilerplate in components
+let entries: number;
+cacheStore.subscribe(state => entries = state.totalEntries);
+```
+
+**Svelte 5 Pattern (fixes TS2305/TS2307/TS2322):**
+```typescript
+// ✅ CORRECT: No external imports, built-in reactivity
+class CacheStoreClass {
+  state = $state<CacheState>({
+    totalEntries: 0,
+    gpuAccelerated: false,
+    threadSafe: true,
+    lastOperation: 'initialized'
+  });
+
+  update(fn: (state: CacheState) => CacheState) {
+    this.state = fn(this.state);
+  }
+
+  get value() {
+    return this.state;
+  }
+}
+
+export const cacheStore = new CacheStoreClass();
+
+// ✅ Direct reactive access in components (no subscription)
+console.log(cacheStore.state.totalEntries); // Fine-grained reactivity
+cacheStore.update(state => ({ ...state, totalEntries: state.totalEntries + 1 }));
+```
+
+### Automated Fix Strategy for Reactive State Errors
+
+**Step-by-Step Error Resolution:**
+
+1. **Identify Store-Related Errors:**
+   ```bash
+   # Find files with TS2305 (Module not found 'svelte/store')
+   npx svelte-check --threshold error | grep -E "TS2305.*svelte/store"
+   ```
+
+2. **Remove Store Imports:**
+   ```typescript
+   // DELETE these lines:
+   import { writable, type Writable } from 'svelte/store';
+   import { derived, readable, get } from 'svelte/store';
+   ```
+
+3. **Convert to $state Class Pattern:**
+   ```typescript
+   // BEFORE:
+   export const myStore: Writable<MyType> = writable(initialValue);
+
+   // AFTER:
+   class MyStoreClass {
+     state = $state<MyType>(initialValue);
+     update(fn: (state: MyType) => MyType) {
+       this.state = fn(this.state);
+     }
+     get value() { return this.state; }
+   }
+   export const myStore = new MyStoreClass();
+   ```
+
+4. **Update Store Method Calls:**
+   ```typescript
+   // BEFORE:
+   myStore.set(newValue);
+   myStore.update(state => ({ ...state, count: state.count + 1 }));
+   $myStore; // Auto-subscribe in .svelte files
+
+   // AFTER:
+   myStore.state = newValue;
+   myStore.update(state => ({ ...state, count: state.count + 1 }));
+   myStore.state; // Direct reactive access
+   ```
+
+5. **Validate TypeScript Errors Reduced:**
+   ```bash
+   # Before fix:
+   npx svelte-check --threshold error | wc -l  # e.g., 348 errors
+
+   # After fix:
+   npx svelte-check --threshold error | wc -l  # Target: <300 errors
+   ```
+
+### Error Code Mappings
+
+| Error Code | Cause (Svelte 4 Store) | Solution (Svelte 5 Rune) |
+|------------|------------------------|--------------------------|
+| TS2305 | `import type { Writable }` not found | Remove import, use `$state` |
+| TS2307 | Module `'svelte/store'` not resolved | Remove store imports entirely |
+| TS2322 | Type mismatch `Writable<T>` vs class | Use class without type annotation |
+| TS2339 | Property doesn't exist on `Writable` | Access `.state` property directly |
+| TS7006 | Implicit `any` in subscription callback | Use typed class methods |
+
+### Integration with RAG/KAG/DAG Knowledge Systems
+
+**Use Case:** Thread-safe cognitive cache with GPU acceleration.
+
+```typescript
+// ✅ CORRECT: Svelte 5 reactive state for AI cache management
+class CognitiveCacheStore {
+  state = $state({
+    totalEntries: 0,
+    gpuAccelerated: false,
+    threadSafe: true,
+    lastOperation: 'initialized',
+    // RAG/KAG/DAG metrics
+    ragQueryCount: 0,
+    kagEmbeddingDimensions: 384,
+    dagNodeCount: 0,
+    redisConnected: false
+  });
+
+  // Thread-safe updates from AsyncMutex-protected operations
+  updateFromCache(entries: number, operation: string) {
+    this.state = {
+      ...this.state,
+      totalEntries: entries,
+      lastOperation: operation
+    };
+  }
+
+  // GPU pipeline integration
+  updateGPUStatus(accelerated: boolean, device?: string) {
+    this.state = {
+      ...this.state,
+      gpuAccelerated: accelerated,
+      lastOperation: `gpu_${device || 'cpu'}_${Date.now()}`
+    };
+  }
+
+  // RAG query tracking
+  incrementRAGQuery() {
+    this.state = {
+      ...this.state,
+      ragQueryCount: this.state.ragQueryCount + 1,
+      lastOperation: `rag_query_${this.state.ragQueryCount + 1}`
+    };
+  }
+}
+
+export const cognitiveCacheStore = new CognitiveCacheStore();
+
+// ✅ Usage in service files (no component needed)
+await mutex.acquire();
+cognitiveCacheStore.updateFromCache(internalCache.data.size, 'store_document');
+mutex.release();
+```
+
+### Benefits for Error Fixing & Knowledge Systems
+
+1. **Eliminates TS2305/TS2307**: No `svelte/store` module dependency.
+2. **Fixes TS2322**: Direct class instantiation, TypeScript infers types correctly.
+3. **SSR-Safe**: No subscription mismatches during hydration.
+4. **Thread-Safe Compatible**: Works with AsyncMutex patterns for concurrent access.
+5. **GPU Pipeline Integration**: Reactive state updates from CUDA operations.
+6. **Fine-Grained Reactivity**: Only re-renders affected UI components.
+
+### Quick Reference: Migration Checklist
+
+- [ ] Remove all `svelte/store` imports (TS2305, TS2307)
+- [ ] Convert `writable()`/`derived()` to `$state` class pattern
+- [ ] Replace `.set()` with direct assignment
+- [ ] Replace `.update()` with class method
+- [ ] Remove `$store` auto-subscribe syntax (use `.state` property)
+- [ ] Validate no SSR errors in browser console
+- [ ] Run `npx svelte-check` to verify error count reduction
+- [ ] Test reactivity in components using the state
+
+### Error Density Targets
+
+**After Svelte 5 reactive state migration:**
+- **High Priority Files** (e.g., `cognitive-cache-integration.ts`): < 50 errors/100 lines
+- **Medium Priority Files**: < 20 errors/100 lines
+- **Low Priority Files**: < 5 errors/100 lines
+
+**Validation Command:**
+```bash
+node scripts/phase90-detect-cascade-errors.mjs --file=src/lib/services/cognitive-cache-integration.ts
+```
+
+## Phase 90: Cascade Error Detection
+
+**Last Run:** January 8, 2026
+**Report:** `reports/cascade-error-detection.json`
+
+**Goal:** Identify high-risk files with "mashed" syntax (semicolons/colons misuse) effectively causing cascade errors.
+
+**High Risk Files (Fixed):**
+- `src/lib/services/cognitive-cache-integration.ts` (Semicolon added to `internalCache`)
+- `src/lib/services/minio-service.ts` (Complete syntax repair of `MinIOFile` and `uploadSingleDocument`)
+
+**Strategy:**
+1.  Run `node scripts/phase90-detect-cascade-errors.mjs`
+2.  Prioritize "Red / High Risk" files.
+3.  Fix underlying syntax (delimiters) rather than individual TS errors.
+4.  Validate with `svelte-check`.
+

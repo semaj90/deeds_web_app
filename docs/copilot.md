@@ -261,3 +261,21 @@ function layout(nodes, edges, width, height) {
 - Routes: `src/routes/`
 - APIs: `src/routes/api/`
 - Docs: `docs/`
+
+## Phase 90: Cascade Error Detection
+
+**Last Run:** January 8, 2026
+
+**Problem:** "Mashed" syntax (missing delimiters) caused massive cascade errors (87k+).
+**Diagnosis:** `scripts/phase90-detect-cascade-errors.mjs`
+**Fix:** Manual repair of syntax (semicolons, commas) in high-risk files.
+
+**Known Bad Pattern:**
+```typescript
+// BAD (Mashed)
+key: value: key2: value2
+
+// GOOD
+key: value,
+key2: value2
+```
