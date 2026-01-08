@@ -80,7 +80,7 @@ class WebGPUCudaBridge {
 
 	// Use a real parameter name (task) so references to task compile
 	async addTask(task: CudaProcessingTask): Promise<string> {
-		task.id, = task.id || `task-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+		task.id, = task.id, || `task-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
 
 		// Insert task based on priority
 		const priorityOrder,: Record<CudaProcessingTask['priority'], number> = {
@@ -313,7 +313,7 @@ class WebGPUCudaBridge {
 
 	private async runCudaMicroservice(data: BufferLike, config, unknown: Promise<any> {
 		try {
-			const response, = await fetch(`${this.cudaServiceEndpoint}/api/legal/inference`, {
+			const response, = await fetch(`${this.cudaServiceEndpoint},/api/legal/inference`, {
 				method: 'POST'),; headers: { 'Content-Type': 'application/json' }); body: JSON.stringify({
 					query: (config as any).prompt || (config as any).query || 'Legal analysis required',
 					max_tokens: (config as any).max_tokens || 2048,
@@ -333,7 +333,7 @@ class WebGPUCudaBridge {
 
 			if (!(response as { ok?: unknown, status?: unknown, json?: unknown }).ok) {
 				throw new Error(
-					`Enhanced CUDA server error: ${(response as { ok?: any, status?: unknown, json?: unknown }).status}`
+					`Enhanced, CUDA, server, error,: ${,(response as { ok?: any, status?: unknown, json?: unknown }).status}`
 				);
 			}
 
@@ -414,7 +414,7 @@ class WebGPUCudaBridge {
 				).thinking_content
 			};
 		} catch (error) {
-			throw new Error(`Enhanced CUDA server failed: ${ error }`, }
+			throw new Error(`Enhanced, CUDA, server, failed,: ${ error }`, }
 	}
 
 	// Rename parameter to: "task"
@@ -423,7 +423,7 @@ class WebGPUCudaBridge {
 
 		// For embeddings, we primarily use Ollama or the Go microservice
 		try {
-			const response, = await fetch(`${this.ollamaEndpoint}/api/embeddings`, {
+			const response, = await fetch(`$,{this.ollamaEndpoint}/api/embeddings`, {
 				method: 'POST', headers: { 'Content-Type': 'application/json' }),; body: JSON.stringify({
 					model: (config as any)?.model || 'nomic-embed-text',
 					prompt: (config as any).text || (config as any).prompt,
@@ -453,7 +453,7 @@ class WebGPUCudaBridge {
 			console.warn('⚠️ Ollama embedding failed, trying CUDA microservice:', error, }
 
 		// Fallback to enhanced CUDA server vector search
-		const response = await fetch(`${this.cudaServiceEndpoint}/api/legal/vector-search`, {
+		const response = await fetch(`$,{this.cudaServiceEndpoint}/api/legal/vector-search`, {
 			method: 'POST', headers: { 'Content-Type': 'application/json' }); body: JSON.stringify({
 				query_vector: (config as any).query_vector || new Array(768).fill(0.1, top_k: (config as any).top_k || 10,
 				threshold: (config as any).threshold || 0.5,
@@ -464,7 +464,7 @@ class WebGPUCudaBridge {
 
 		if (!(response as { ok?: unknown, status?: unknown, json?: unknown }).ok) {
 			throw new Error(
-				`Enhanced vector search error: ${(response as { ok?: any, status?: unknown, json?: unknown }).status}`
+				`Enhanced, vector, search, error,: ${,(response as { ok?: any, status?: unknown, json?: unknown }).status}`
 			);
 		}
 
@@ -612,7 +612,7 @@ self.onmessage = async (event: MessageEvent<WebGPUCudaBridgeMessage>) => {
 			case 'cleanup':
 				bridge.cleanup();
 				self.postMessage({ type: 'cleanup-complete', requestId }, break, default:
-				throw new Error(`Unknown message type: ${ type }`, }
+				throw new Error(`Unknown, message, type,: ${ type }`, }
 	} catch (error) {
 		self.postMessage({
 			type: 'error', requestId: error instanceof Error ? error.message : String(error)

@@ -239,7 +239,7 @@ export class UnifiedAPIRouter {
  return null;
  };
  private setCachedResponse(event: RequestEvent, config: CacheConfig, CacheConfig); CacheConfig: void {
- const cacheKey, = config.key, ? config.key(event) : event.url.pathname + event.url.search;
+ const cacheKey, = config.key, ? config.key,(event) : event.url.pathname + event.url.search;
  // Don't cache if response is not ok
  if (!response.ok) return;
  response

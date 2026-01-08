@@ -14,7 +14,7 @@
 
 import fs from 'fs/promises';
 import path from 'path';
-import { analyzeComplexity } from './complexity-pre-filter.mjs';
+import { processFile } from './phase90-enhanced-ast-fixer.mjs';
 
 const projectRoot = path.resolve(process.cwd());
 
@@ -74,43 +74,10 @@ const BATCH13_CANDIDATES = [
 
 async function runBatch13() {
     console.log('╔════════════════════════════════════════════════════════════════╗');
-    console.log('║           Phase 90 Batch 13: Complexity-Filtered Batch        ║');
+    console.log('║           Phase 90 Batch 13: Next 50 High-Error Files         ║');
     console.log('╚════════════════════════════════════════════════════════════════╝\n');
 
-    // Step 1: Analyze complexity for all candidates
-    console.log('🔍 Step 1: Analyzing complexity for 50 candidate files...\n');
-    const complexityResults = [];
-
-    for (const relPath of BATCH13_CANDIDATES) {
-        const absPath = path.join(projectRoot, relPath);
-        try {
-            const result = await analyzeComplexity(absPath);
-            complexityResults.push(result);
-            console.log(`   ${path.basename(relPath).padEnd(50)} | Score: ${result.score.toString().padStart(5)} | ${result.recommendation}`);
-        } catch (error) {
-            console.log(`   ${path.basename(relPath).padEnd(50)} | ERROR: ${error.message}`);
-        }
-    }
-
-    // Step 2: Categorize by recommendation
-    const autoBatch = complexityResults.filter(r => r.recommendation === 'auto-batch');
-    const slowBatch = complexityResults.filter(r => r.recommendation === 'slow-batch');
-    const manualReview = complexityResults.filter(r => r.recommendation === 'manual-review');
-
-    console.log('\n📊 Complexity Analysis Summary:\n');
-    console.log(`   Auto-batch (<25):    ${autoBatch.length} files`);
-    console.log(`   Slow-batch (25-50):  ${slowBatch.length} files`);
-    console.log(`   Manual-review (>50): ${manualReview.length} files\n`);
-
-    // Save complexity analysis
-    await fs.writeFile(
-        'reports/phase90-batch13-complexity-analysis.json',
-        JSON.stringify({ autoBatch, slowBatch, manualReview }, null, 2)
-    );
-
-    // Step 3: Process auto-batch files first (highest success probability)
-    console.log('═'.repeat(66));
-    console.log('🚀 Step 2: Processing auto-batch files (high confidence)...\n');
+    console.log('🚀 Processing 50 files (ranks 206-255 by error count)...\n');
 
     const results = {
         batch: 13,
@@ -118,6 +85,10 @@ async function runBatch13() {
         filesProcessed: 0,
         successful: 0,
         failed: 0,
+        totalFixes: 0,
+        totalVisibleReduction: 0,
+        files: []
+    };
         totalFixes: 0,
         visibleErrorReduction: 0,
         estimatedCascade: 0,

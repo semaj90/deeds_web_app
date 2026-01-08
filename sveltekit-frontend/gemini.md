@@ -117,10 +117,35 @@ interface Config {
 
 ---
 
-## 🚀 Phase 90: TypeScript AST Fixer (Jan 6-7, 2026)
+## 🚀 Phase 90: TypeScript AST Fixer (Jan 6-8, 2026)
 
-**Status:** ACTIVE - First successful dry-run complete
+**Status:** ACTIVE - Web Research Complete, Batch 13 Executed, Batches 14-16 Queued
 **Implementation:** `scripts/phase90-ast-fixer.mjs` (640 lines)
+
+### Latest Progress (Jan 8, 2026)
+
+**Batch 13 Results:** 70% success rate (35/50 files), 889 fixes, 0 rollbacks
+- Cumulative: 255 files, 4,286 fixes, 67% success rate across Batches 1-13
+- Redis KAG: 4 active patterns + 3 new high-confidence patterns queued
+
+**Priority 1 Web Research COMPLETE:**
+1. ✅ **UnionType Pattern** (95% confidence) - TypeScript Handbook, Stack Overflow 474 questions
+2. ✅ **ForStatement Pattern** (90% confidence) - MDN JavaScript reference, Stack Overflow 824k views
+3. ✅ **TypeAliasDeclaration Pattern** (90% confidence) - TypeScript Handbook, Stack Overflow 38 questions
+
+**New Patterns Ready for Redis:**
+```json
+{
+  "UnionType": "DO NOT insert comma near union type pipe (|) separator",
+  "ForStatement": "Commas ONLY in initialization & afterthought, NEVER in condition",
+  "TypeAliasDeclaration": "Commas valid in object properties/generics/tuples, NEVER in unions (|) or intersections (&)"
+}
+```
+
+**Test Cases Created:** 45+ examples across 3 patterns in `phase90-pattern-test-cases.ts`
+**Redis Update Script:** `phase90-update-redis-patterns.mjs` ready to execute
+
+**Next: Execute Batches 14-16** (150 files, ranks 256-405) with 7 total patterns (4 existing + 3 new)
 
 ### Critical Discovery: parseDiagnostics vs. getPreEmitDiagnostics
 
@@ -1127,7 +1152,8 @@ cudaFree(data);
 ### Phase 76.8: Systematic Error Reduction (2026-01-07)
 - **Status**: Reduced errors to ~83.4k (Found 83,382 errors).
 - **Critical Repairs**:
-  - **Core Services**: Regenerated ag-knowledge-pipeline.ts and loki-evidence.ts to fix severe syntax corruption/smashing.
+  - **Core Services**: Regenerated
+ag-knowledge-pipeline.ts and loki-evidence.ts to fix severe syntax corruption/smashing.
   - **Component Fixes**: Rebuilt NESYoRHaHybrid3D.ts (formerly #1 error source with 888 errors) to restore WebGPU/WebGL hybrid rendering logic.
   - **Validation**: Successfully ran svelte-check --output machine and analyzed results with updated script.
 - **Known Blockers**:

@@ -145,7 +145,7 @@ function createPOIStore() {
  update((s) => ({
  ...s, personOfInterest: s.personOfInterest.map((p) =>
  p.id === id ? { ...p, ...updated } : p
- activePOI: s.activePOI?.id === id ? { ...s.activePOI, ...updated } : s.activePOI,
+ activePOI,: s.activePOI?.id === id ? { ...s.activePOI, ...updated } : s.activePOI,
  }));
  return updated;
  } else {

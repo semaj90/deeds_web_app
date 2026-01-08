@@ -65,46 +65,26 @@ const CONFIG = {
 
 /**
  * Redis KAG knowledge patterns (from Phase 72)
- *
- * Extracted from successful fixes:
- * - BinaryExpression: Often needs comma when used as object property value
- * - PropertyAssignment: Needs comma when inside object literal
- * - AwaitExpression: Needs comma when in function call arguments
  */
 const REDIS_KNOWLEDGE_PATTERNS = {
     BinaryExpression: {
         needsComma: (node) => {
-            // Check if BinaryExpression is inside object literal or array
-            let parent = node.parent;
-            while (parent) {
-                if (parent.kind === ts.SyntaxKind.ObjectLiteralExpression ||
-                    parent.kind === ts.SyntaxKind.ArrayLiteralExpression) {
-                    return true;
-                }
-                if (parent.kind === ts.SyntaxKind.ExpressionStatement) {
-                    return false; // Standalone expression, no comma
-                }
-                parent = parent.parent;
-            }
-            return false;
+             // Logic for BinaryExpression comma check
+             // Often needs comma when used as object property value
+             const parent = node.parent;
+             return parent && (
+                 parent.kind === ts.SyntaxKind.ObjectLiteralExpression ||
+                 parent.kind === ts.SyntaxKind.ArrayLiteralExpression
+             );
         },
-        confidence: 0.85,
-        source: 'Redis KAG - Phase 72 successful fixes',
+        confidence: 0.75, /* Downgraded Phase 91 */
+        source: 'Redis KAG - Downgraded unsafe pattern',
     },
 
     PropertyAssignment: {
-        needsComma: (node) => {
-            // PropertyAssignment inside ObjectLiteralExpression always needs comma
-            // UNLESS it's the last property
-            const objectLiteral = getParentOfKind(node, ts.SyntaxKind.ObjectLiteralExpression);
-            if (!objectLiteral) return false;
-
-            const properties = objectLiteral.properties;
-            const index = properties.indexOf(node);
-            return index < properties.length - 1; // Not last property
-        },
-        confidence: 0.95,
-        source: 'Redis KAG - Phase 72 high-confidence pattern',
+        needsComma: () => false, // Handled by specific handler, this is fallback
+        confidence: 0.82, /* Downgraded Phase 91 */
+        source: 'Redis KAG - Downgraded unsafe pattern',
     },
 
     AwaitExpression: {
@@ -117,8 +97,8 @@ const REDIS_KNOWLEDGE_PATTERNS = {
             const index = args.indexOf(node);
             return index < args.length - 1; // Not last argument
         },
-        confidence: 0.80,
-        source: 'Redis KAG - Phase 72 verified pattern',
+        confidence: 0.60,
+        source: 'Redis KAG - Downgraded',
     },
 
     ExpressionStatement: {
@@ -145,8 +125,8 @@ const REDIS_KNOWLEDGE_PATTERNS = {
             }
             return false;
         },
-        confidence: 0.75,
-        source: 'Redis KAG - Medium confidence pattern',
+        confidence: 0.60,
+        source: 'Redis KAG - Downgraded (lazy logic)',
     },
 
     ReturnStatement: {
@@ -195,8 +175,8 @@ const REDIS_KNOWLEDGE_PATTERNS = {
             }
             return false;
         },
-        confidence: 0.70,
-        source: 'Redis KAG - Medium confidence pattern',
+        confidence: 0.60,
+        source: 'Redis KAG - Downgraded (lazy logic)',
     },
 
     ConditionalExpression: {
@@ -206,8 +186,8 @@ const REDIS_KNOWLEDGE_PATTERNS = {
             const objectLiteral = getParentOfKind(node, ts.SyntaxKind.ObjectLiteralExpression);
             return arrayLiteral || objectLiteral;
         },
-        confidence: 0.75,
-        source: 'Redis KAG - Medium confidence pattern',
+        confidence: 0.60,
+        source: 'Redis KAG - Downgraded (lazy logic)',
     },
 
     ParenthesizedExpression: {
@@ -240,8 +220,8 @@ const REDIS_KNOWLEDGE_PATTERNS = {
             const index = properties.indexOf(node);
             return index < properties.length - 1;
         },
-        confidence: 0.95,
-        source: 'Redis KAG - High confidence pattern',
+        confidence: 0.60,
+        source: 'Redis KAG - Downgraded',
     },
 };
 
@@ -327,6 +307,47 @@ function determineFix(sourceFile, diagnostic) {
         return null;
     }
 
+    // ========================================================================
+    // PHASE 91: PRIORITY TYPE-SAFE PATTERNS
+    // ========================================================================
+
+    // PATTERN: UnionType (High Confidence, Low Risk)
+    // Fix: Ensure types are separated by |
+    // e.g. type Foo = A B; -> type Foo = A | B;
+    if (ts.isUnionTypeNode(node) || (node.parent && ts.isUnionTypeNode(node.parent))) {
+        if (CONFIG.verbose) console.log(`   🎯 Fix from Phase 91 [UnionType] (confidence: 0.92)`);
+        return {
+            text: ' | ',
+            confidence: 0.92,
+            type: 'UnionType',
+            source: 'Phase 91 Type-Safe Pattern'
+        };
+    }
+
+    // PATTERN: ForStatement (High Confidence)
+    // Fix: Ensure loop header has correct semicolons
+    if (ts.isForStatement(node) || (node.parent && ts.isForStatement(node.parent))) {
+         if (CONFIG.verbose) console.log(`   🎯 Fix from Phase 91 [ForStatement] (confidence: 0.94)`);
+         return {
+            text: ';',
+            confidence: 0.94,
+            type: 'ForStatement',
+            source: 'Phase 91 Type-Safe Pattern'
+         };
+    }
+
+    // PATTERN: TypeAliasDeclaration (High Confidence)
+    // Fix: Ensure assignment has =
+    if (ts.isTypeAliasDeclaration(node) || (node.parent && ts.isTypeAliasDeclaration(node.parent))) {
+         if (CONFIG.verbose) console.log(`   🎯 Fix from Phase 91 [TypeAliasDeclaration] (confidence: 0.95)`);
+         return {
+            text: ' = ',
+            confidence: 0.95,
+            type: 'TypeAliasDeclaration',
+            source: 'Phase 91 Type-Safe Pattern'
+         };
+    }
+
     const context = {
         node,
         kind: node.kind,
@@ -399,7 +420,7 @@ function determineFix(sourceFile, diagnostic) {
     // Generate fix with pattern metadata
     if (CONFIG.verbose) {
         console.log(
-            `   🎯 Fix from ${pattern.source} (confidence: ${pattern.confidence})`
+            `   🎯 Fix from ${pattern.source} [${kindName}] (confidence: ${pattern.confidence})`
         );
     }
 
@@ -427,6 +448,7 @@ function handleInterfaceComma(sourceFile, node, context) {
         return null;
     }
 
+    if (CONFIG.verbose) console.log(`   🎯 Fix from Tier 1 [InterfaceDeclaration]`);
     return {
         position: propertySignature.end,
         text: ',',
@@ -447,6 +469,7 @@ function handleObjectLiteralComma(sourceFile, node, context) {
         return null;
     }
 
+    if (CONFIG.verbose) console.log(`   🎯 Fix from Tier 1 [ObjectLiteralExpression]`);
     return {
         position: propertyAssignment.end,
         text: ',',
@@ -465,6 +488,7 @@ function handleArrayLiteralComma(sourceFile, node, context) {
         return null;
     }
 
+    if (CONFIG.verbose) console.log(`   🎯 Fix from Tier 1 [ArrayLiteralExpression]`);
     return {
         position: node.end,
         text: ',',
@@ -479,6 +503,8 @@ function handleArrayLiteralComma(sourceFile, node, context) {
 }
 
 function handleCallExpressionComma(sourceFile, node, context) {
+    // Basic check for call args
+    if (CONFIG.verbose) console.log(`   🎯 Fix from Tier 1 [CallExpression]`);
     return {
         position: node.end,
         text: ',',

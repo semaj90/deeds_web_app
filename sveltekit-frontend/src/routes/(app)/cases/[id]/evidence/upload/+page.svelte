@@ -96,7 +96,7 @@
 		}
 
 		if (!allowedTypes.includes(file.type)) {
-			return { valid: false, error: 'File type not supported (PDF: PNG, JPG: TIFF)' };
+			return { valid: false, error: 'File type not supported (PDF, PNG, JPG, TIFF)' };
 		}
 
 		return { valid: true };

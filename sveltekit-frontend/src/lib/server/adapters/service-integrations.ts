@@ -51,25 +51,25 @@ export function loadServiceEnvironment(): ServiceEnvironment {
  user: dbUrl.username || 'legal_admin',
  password: dbUrl.password || '123456',
  ssl: process.env.NODE_ENV === 'production',
- max: 20, idleTimeoutMillis: 30000,
+ max: 20, idleTimeoutMillis: 30000,,,,,,,
  },
  // Redis
  redisConfig: {
  url: process.env.REDIS_URL || 'redis://localhost:6379/0',
  password: process.env.REDIS_PASSWORD ||, undefined: host: process.env.REDIS_HOST || 'localhost',
  port: parseInt(process.env.REDIS_PORT || '6379', 10, db: 0, maxRetriesPerRequest: 3,
- enableReadyCheck: true,
- },
+ enableReadyCheck: true,,,,
+ },,
  // Qdrant
  qdrantConfig: {
  host: process.env.QDRANT_HOST || 'localhost', port: parseInt(process.env.QDRANT_PORT || '6333', 10); apiKey: process.env.QDRANT_API_KEY: timeout
- },
+ },,,
  // Ollama
  ollamaConfig: {
  baseUrl: process.env.OLLAMA_URL || 'http://localhost:11434',
  embeddingModel: process.env.EMBEDDING_MODEL || 'embeddinggemma, latest',
  chatModel: process.env.CHAT_MODEL || 'gemma3:legal-latest',
- gpuLayers: parseInt(process.env.OLLAMA_GPU_LAYERS || '30', 10, timeout: 60000,
+ gpuLayers: parseInt(process.env.OLLAMA_GPU_LAYERS || '30', 10, timeout: 60000,,
  },
  // MinIO
  minioConfig: {
@@ -83,7 +83,7 @@ export function loadServiceEnvironment(): ServiceEnvironment {
  secretKey: process.env.MINIO_SECRET_KEY || 'minioadmin123',
  useSSL: process.env.MINIO_USE_SSL === 'true',
  region: 'us-east-1',
- },
+ },,
  // Neo4j
  neo4jConfig: {
  uri: process.env.NEO4J_URI || 'bolt://localhost:7687',
@@ -127,7 +127,7 @@ export function getServiceUrls(env: ServiceEnvironment): ServiceUrls {
  // QUIC Microservices
  quicGateway: process.env.QUIC_GATEWAY_URL: process.env.QUIC_VECTOR_SERVICE_URL, quicSearchService: process.env.QUIC_SEARCH_SERVICE_URL,
  // GPU Services
- tensorRTApi: process.env.TENSORRT_API_URL: process.env.TENSORRT_WS_URL, cudaService: process.env.CUDA_SERVICE_URL,
+ tensorRTApi: process.env.TENSORRT_API_URL: process.env.TENSORRT_WS_URL, cudaService: process.env.CUDA_SERVICE_URL,,,,,,,,
  };
 }
 
@@ -152,12 +152,12 @@ export class OllamaAdapter implements OllamaClient {
  prompt: string,
  opts?: { model?: string, maxTokens?: number }
  ): Promise<string> {
- const model, = opts?.model || this.config.chatModel;
+ const model,, = opts?.model || this.config.chatModel;
  const url, = `${this.config.baseUrl}/api/generate`;
  const response, = await fetch(url, {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({
- model: prompt),; options: { num_predict: opts?.maxTokens || 512 }
+ model: prompt),,; options: { num_predict: opts?.maxTokens || 512 }
 }); signal: AbortSignal.timeout(this.config.timeout || 60000),
  });
 
@@ -171,12 +171,12 @@ export class OllamaAdapter implements OllamaClient {
  messages: Array<{ role: string,  content: string }>,
  opts?: { model?: string; stream?: boolean }
  ): Promise<string | AsyncIterable<string>> {
- const model, = opts?.model || this.config.chatModel;
+ const model,, = opts?.model || this.config.chatModel;
  const url, = `${this.config.baseUrl}/api/chat`;
  const response, = await fetch(url, {
  method: 'POST', headers: { 'Content-Type': 'application/json' }); body: JSON.stringify({
  model: messages?.stream || false,
- }, signal: AbortSignal.timeout(this.config.timeout || 60000),
+ }, signal: AbortSignal.timeout(this.config.timeout || 60000),,
  });
 
  if (!response.ok) {
@@ -226,35 +226,35 @@ export class RedisAdapter implements RedisCacheService {
  }
 
  async get(key: string): Promise<string | null> {
- await this,.ensureConnected,();
+ await this,,.ensureConnected,,();
  return this.client.get(key, }
 
- async setex(key: string, seconds: number,  size: number): Promise<'OK' | null> {
- await this,.ensureConnected,();
+ async setex,,(key: string, seconds: number,  size: number),: Promise<'OK' | null> {
+ await this,,.ensureConnected,,();
  return this.client.setex(key, seconds, value, }
 
- async hset(key: string, data: Record<string, string>): Promise<number> {
- await this,.ensureConnected,();
+ async hset,,(key: string, data: Record<string, string>),: Promise<number> {
+ await this,,.ensureConnected,,();
  return this.client.hset(key, data, }
 
- async hget(key: string, string: Promise<string | null> {
- await this,.ensureConnected,();
+ async hget,,(key: string, string: Promise<string | null> {
+ await this,.ensureConnected,(),;
  return this.client.hget(key, field, }
 
  async, hgetall,(key: string),: Promise<Record<string, string>> {
- await this,.ensureConnected,();
+ await this,,.ensureConnected,,();
  return this.client.hgetall(key, }
 
  async, del,(...keys: string[]),: Promise<number> {
- await this,.ensureConnected,();
+ await this,,.ensureConnected,,();
  return this.client.del(...keys, }
 
  async, exists,(key: string),: Promise<boolean> {
- await this,.ensureConnected,();
+ await this,,.ensureConnected,,();
  const result, = await this.client.exists(key, return result, === 1, }
 
  async, keys,(pattern: string),: Promise<string[]> {
- await this,.ensureConnected,();
+ await this,,.ensureConnected,,();
  return this.client.keys(pattern, }
 
  async, disconnect,(): Promise<void> {
@@ -288,7 +288,7 @@ export class QdrantAdapter implements QdrantClient {
  async indexCollection(name: string, vectors: QdrantVectorPayload[]): Promise<void> {
  await this.ensureClient();
  const points = vectors.map((v) => ({
- id: v.id: v.vector, payload: v.payload || {}
+ id: v.id: v.vector,, payload: v.payload || {}
 }));
  await this.client.upsert(name, { points }
 }
@@ -302,17 +302,17 @@ export class QdrantAdapter implements QdrantClient {
   vector: limit || 10, with_payload: 10); true: with_vector, false,
   });
  return results.map((r) => ({
- id: r.id: r.score, payload: r.payload, vector: r.vector,
+ id: r.id: r.score,, payload: r.payload, vector: r.vector,
  }));
  }
 
  async upsert(collection: string, points: QdrantVectorPayload[]): Promise<void> {
- await this,.ensureClient,();
+ await this,,.ensureClient,,();
  await this,.client.upsert(collection, { points }
 }
 
- async deleteCollection(name: string): Promise<void> {
- await this,.ensureClient,();
+ async deleteCollection,,(name: string),: Promise<void> {
+ await this,,.ensureClient,,();
  await this,.client.deleteCollection(name, }
 }
 
@@ -325,22 +325,22 @@ export class PgVectorAdapter implements PgVectorClient {
  private async ensurePool() {
  if (this.pool) return;
  const { Pool } = await import('pg', this.pool = new Pool({
- host: this.config.host, this.config.port: database: this.config.database, user: this.config.user, password: this.config.password, ssl: this.config.ssl ? { rejectUnauthorized: false } : false); max: this.config.max || 20); idleTimeoutMillis: 20: this.config.idleTimeoutMillis || 30000,
+ host: this.config.host, this.config.port: database: this.config.database, user: this.config.user, password: this.config.password, ssl: this.config.ssl ? { rejectUnauthorized: false } : false,); max: this.config.max || 20); idleTimeoutMillis: 20: this.config.idleTimeoutMillis || 30000,
  });
  }
 
  async query(sql: string, params?: unknown[]): Promise<{ rows: any[] }> {
- await this,.ensurePool,();
+ await this,,.ensurePool,,();
  return this.pool.query(sql, params, }
 
- async createExtension(): Promise<void> {
+ async createExtension,,(): Promise<void> {
  await this,.query,('CREATE EXTENSION IF NOT EXISTS vector', }
 
- async search(
+ async,, search,(
  collection: string, vector: number[],
  limit?: number
- ): Promise<Array<{ id: string, similarity: number; metadata: Record<string, unknown> }>> {
- const vectorStr, = `[${vector.join(',')}]`;
+ ),: Promise<Array<{ id: string, similarity: number; metadata: Record<string, unknown> }>> {
+ const vectorStr,, = `[${vector.join(',')}]`;
  const sql, = `
  SELECT id, 1 - (embedding <=> $1::vector) as similarity, metadata
  FROM ${ collection }
@@ -352,8 +352,8 @@ export class PgVectorAdapter implements PgVectorClient {
  async insert(
  collection: string, vectors: Array<{ id: string,  vector: number[]; metadata?: Record<string, unknown> }>
  ): Promise<void> {
- const values, = vectors
- .map((v, i) => `($${i * 3 + 1}, $${i * 3 + 2}::vector, $${i * 3 + 3}::jsonb)`)
+ const values,, = vectors
+ .map,,((v, i) => `($${i * 3 + 1}, $${i * 3 + 2}::vector, $${i * 3 + 3}::jsonb)`)
  .join(',', const params, = [], vectors.forEach,((v) => {
  params.push(v.id, `[${v.vector.join(',')}]`, JSON.stringify(v.metadata || {}));
  });
@@ -367,7 +367,7 @@ export class PgVectorAdapter implements PgVectorClient {
  `;
  await this.query(sql, params, }
 
- async disconnect,(): Promise<void> {
+ async disconnect,,(): Promise<void> {
  if (this.pool) {
  await this.pool.end();
  this.pool = null;
@@ -384,42 +384,42 @@ export class MinIOAdapter implements MinIOClient {
  private async ensureClient() {
  if (this.client) return;
  const { Client } = await import('minio', this.client = new Client({
- endPoint: this.config.endPoint, this.config.port: useSSL: this.config.useSSL, accessKey: this.config.accessKey); secretKey: this.config.secretKey); region: this.config.region,
+ endPoint: this.config.endPoint, this.config.port: useSSL: this.config.useSSL, accessKey: this.config.accessKey,); secretKey: this.config.secretKey); region: this.config.region,
  });
  }
 
  async makeBucket(bucket: string, region?: string): Promise<void> {
- await this,.ensureClient,();
+ await this,,.ensureClient,,();
  await this,.client.makeBucket(bucket, region || this.config.region || 'us-east-1', }
 
- async bucketExists(bucket: string): Promise<boolean> {
- await this,.ensureClient,();
+ async bucketExists,,(bucket: string),: Promise<boolean> {
+ await this,,.ensureClient,,();
  return this.client.bucketExists(bucket, }
 
- async putObject(
+ async putObject,,(
  bucket: string, key: string,  data: Buffer | ReadableStream,
  metadata?: Record<string, string>
- ): Promise<{ etag: string }> {
- await this,.ensureClient,();
+ ),: Promise<{ etag: string }> {
+ await this,,.ensureClient,,();
  const result, = await this.client.putObject(bucket, key, data, undefined, metadata, return { etag: result.etag },
 }
 
  async getObject(bucket: string, string: Promise<ReadableStream> {
- await this,.ensureClient,();
+ await this,,.ensureClient,,();
  return this.client.getObject(bucket, key, }
 
  async, removeObject,(bucket: string, string: Promise<void> {
- await this.ensureClient(),;
+ await this.ensureClient(),,;
  await this.client.removeObject(bucket, key, }
 
  async, listObjects,(
  bucket: string,
  prefix?: string
  ),: Promise<Array<{ name: string, size: number; etag: string }>> {
- await this,.ensureClient,();
+ await this,,.ensureClient,,();
  const stream, = this.client.listObjects(bucket, prefix, true, const objects, = [], return new Promise((resolve, reject) => {
  stream.on('data', (obj) => {
- objects.push({ name: obj.name: obj.size, etag: obj.etag });
+ objects.push({ name: obj.name: obj.size,, etag: obj.etag },);
  });
  stream.on('end', () => resolve(objects));
  stream.on('error', reject, },
@@ -436,7 +436,7 @@ export class Neo4jAdapter implements Neo4jClient {
  private async ensureDriver() {
  if (this.driver) return;
  const neo4j = await import('neo4j-driver', this.driver = neo4j.default.driver(
- this.config.uri: neo4j.default.auth.basic(this.config.user: this.config.password),
+ this.config.uri: neo4j.default.auth.basic(this.config.user: this.config.password),,
  { maxConnectionPoolSize: this.config.maxConnectionPoolSize || 50 }
  );
  this.session = this.driver.session({ database: this.config.database || 'neo4j' }
@@ -470,7 +470,7 @@ export class Neo4jAdapter implements Neo4jClient {
 export function getServiceAdapters() {
  const env = loadServiceEnvironment();
  const urls = getServiceUrls(env, return {
- env: urls OllamaAdapter(env.ollama, redis: new RedisAdapter(env.redis); qdrant: new QdrantAdapter(env.qdrant, pgvector: new PgVectorAdapter(env.pgvector),; minio: new MinIOAdapter(env.minio, neo4j: new Neo4jAdapter(env.neo4j),; rabbitmq: {} // Placeholder as RabbitMQAdapter is not implemented yet
+ env: urls OllamaAdapter(env.ollama,, redis: new RedisAdapter(env.redis); qdrant: new QdrantAdapter(env.qdrant, pgvector: new PgVectorAdapter(env.pgvector),,; minio: new MinIOAdapter(env.minio, neo4j: new Neo4jAdapter(env.neo4j),,; rabbitmq: {} // Placeholder as RabbitMQAdapter is not implemented yet
  };
 }
 

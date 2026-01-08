@@ -422,10 +422,10 @@ export class RAGKnowledgePipeline {
 	private async extractRipgrepKeywords(doc: SummarizedDocument): Promise<string[]> {
 		// Simulated ripgrep pattern matching
 		const patterns = [
-			/\b[A-Z][a-z]{3,}\b/g, // Capitalized words (names, places)
+			/\b[A-Z][a-z]{3}\b/g, // Capitalized words (names, places)
 			/\b\d{1,2}\/\d{1,2}\/\d{2,4}\b/g, // Dates
-			/\b[A-Z]{2,}\b/g, // Acronyms
-			/\$\d+(?:,\d{3})*(?:\.\d{2})?/g, // Currency
+			/\b[A-Z]{2}\b/g, // Acronyms
+			/\$\d+(?:\d{3})*(?:\.\d{2})?/g, // Currency
 			/\b\d+\s+U\.S\.C\.\s+§\s+\d+\b/g // Legal citations
 		];
 

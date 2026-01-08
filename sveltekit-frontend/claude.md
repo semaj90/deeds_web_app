@@ -1,5 +1,46 @@
 # Claude Brief: Phase13 Integration Pattern
 
+## 🔧 Phase 90: AST-Based TypeScript Fixer Progress (Jan 2026)
+
+**Status:** Batch 13 complete (70% success), 3 new high-confidence patterns researched
+
+### Batch 13 Summary (Jan 8, 2026)
+- **Files processed:** 50 (ranks 206-255)
+- **Success rate:** 70% (35/50 files fixed successfully)
+- **Fixes applied:** 889 total
+- **Rollbacks:** 0 (no breaking changes introduced)
+- **Cumulative progress:** 255 files, 4,286 fixes, 67% overall success rate
+
+### Knowledge-Augmented Generation (KAG) Patterns
+
+**Active Patterns in Redis (4):**
+1. BinaryExpression (75% confidence)
+2. PropertySignature (85% confidence)
+3. BindingElement (90% confidence)
+4. AsExpression (70% confidence)
+
+**New Patterns from Web Research (3):**
+1. **UnionType** (95% confidence) - Rule: "DO NOT insert comma near union type pipe (|) separator"
+   - Sources: TypeScript official docs, Stack Overflow 474 questions, Basarat GitBook
+   - Skip indicators: Found '|' within 5 chars, parent is UnionType/TypeReference
+
+2. **ForStatement** (90% confidence) - Rule: "Commas ONLY in initialization & afterthought, NEVER in condition"
+   - Sources: MDN for statement reference, Stack Overflow 824k views, TypeScript Handbook
+   - Skip indicators: Comma in valid sections, parent is ForStatement
+
+3. **TypeAliasDeclaration** (90% confidence) - Rule: "Commas valid for object properties, generics, tuples; NEVER for unions (|) or intersections (&)"
+   - Sources: TypeScript Handbook (2 sections), Stack Overflow 38 questions
+   - Skip indicators: Found '|' or '&' within 5 chars, parent has UnionType/IntersectionType
+
+**Test Coverage:** 45+ test cases created in `phase90-pattern-test-cases.ts`
+
+### Next Phase Goals
+- Execute Batches 14-16 (150 files, ranks 256-405) with 7 total patterns
+- Target: 75%+ success rate with refined skip logic
+- Projected impact: 100% codebase coverage (~300 files total)
+
+---
+
 ## 🔧 TypeScript Language Server: Module Export Cache Issue
 
 **Problem:** `Module '"$lib/server/db"' has no exported member 'db'` (but export exists)
