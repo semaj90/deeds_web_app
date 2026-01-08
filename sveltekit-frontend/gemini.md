@@ -1,5 +1,38 @@
 # Gemini Brief: Phase13 Integration Pattern
 
+## 🔧 Phase 90/91 Transition: From Syntax to Semantics (Jan 8, 2026)
+
+**Phase 90 Status:** ✅ COMPLETE (100% Codebase Coverage)
+- **Total Files Processed:** 455
+- **Total Fixes Applied:** 4,908
+- **Error Reduction:** 51.6% (87,835 → 42,518)
+- **Success Rate:** 53.2% overall
+
+### 🧠 New Knowledge-Augmented Generation (KAG) Patterns
+Three high-confidence patterns were added and validated in Batches 14-16:
+
+1.  **UnionType (95% Confidence)**
+    *   **Rule:** Never insert commas near `|` operators.
+    *   **Context:** `type ID = number | string;` (Correct) vs `type ID = number, string;` (Incorrect).
+    *   **Source:** TypeScript Handbook, Stack Overflow.
+
+2.  **ForStatement (90% Confidence)**
+    *   **Rule:** Commas allowed ONLY in init/afterthought, never in condition.
+    *   **Context:** `for (let i=0; i<10; i++)` (Correct) vs `for (let i=0; i<10,; i++)` (Incorrect).
+    *   **Source:** MDN Specifications.
+
+3.  **TypeAliasDeclaration (90% Confidence)**
+    *   **Rule:** Commas for object props; Pipe/Ampersand for Union/Intersection.
+    *   **Context:** `type P = { x: number, y: number };` (Correct).
+
+### 🔮 Phase 91 Strategy: Semantic Repair
+With "easy" syntax errors resolved, we shift focus to:
+1.  **Svelte 5 Migration:** Fixing `$:` blocks, event handlers, and `export let` props.
+2.  **Type Mismatches:** Resolving `TS2322` and `TS2339`.
+3.  **Enhancement:** Upgrading `phase90-enhanced-ast-fixer.mjs` to use `TypeChecker` for semantic analysis.
+
+---
+
 ## 🔧 TypeScript Language Server: Module Export Cache Issue
 
 **Problem:** `Module '"$lib/server/db"' has no exported member 'db'` (but export exists)
@@ -1161,3 +1194,175 @@ ag-knowledge-pipeline.ts and loki-evidence.ts to fix severe syntax corruption/sm
   - cognitive-cache-integration.ts (541 errors)
   - minio-service.ts (539 errors)
   - src/lib/services/ollama-service.ts (460 errors) - Client-side service needs alignment with backend.
+
+---
+
+## �� Knowledge Base Update: Phase 77 (2026-01-08)
+
+### SvelteKit 2.0 Best Practices (2025)
+
+**+page.server.ts Load Functions:**
+- Server-Side Exclusivity: Use for private env vars, DB queries, auth logic
+- Import PageServerLoad from ./ for type safety
+- Streaming: Return promises for non-critical slow data
+- Use vent.locals from hooks.server.ts for request context
+- Always return orm object from actions unless redirecting
+
+**Data Flow Pattern:**
+`	ypescript
+// +page.server.ts
+import type { PageServerLoad } from './';
+export const load: PageServerLoad = async ({ locals }) => {
+  const user = locals.user;
+  const data = await db.query...;
+  return { data, user };
+};
+`
+
+### Drizzle ORM 0.44 Best Practices
+
+**Schema Definition:**
+- Organize schemas by domain in separate files
+- Use generatedAlwaysAsIdentity() for PostgreSQL primary keys
+- Timestamp config: mode: 'date', precision: 3, withTimezone: true
+- Define enums with pgEnum for type safety
+- Integrate with drizzle-zod for validation
+
+**Migration Workflow:**
+`ash
+drizzle-kit generate  # Create migration files (review before applying)
+drizzle-kit push      # Dev only - direct sync
+drizzle-kit migrate   # Production - applies migration files
+`
+
+### Svelte 5 Runes TypeScript Integration
+
+**Core Runes:**
+`svelte
+<script lang="ts">
+  let count = \<number>(0);
+  let doubled = \(count * 2);
+  let { name } = \<{ name: string }>();
+
+  \(() => {
+    console.log('count changed:', count);
+  });
+</script>
+`
+
+**Key Points:**
+- Runes work in .ts files too (unified reactivity)
+- Explicit types with generics: \<Type>(initial)
+- No imports needed - runes are language syntax
+- Migration script available:
+px sv migrate svelte-5
+
+### Superforms + Zod Best Practices
+
+**Server-Side Validation:**
+`	ypescript
+// +page.server.ts
+import { superValidate } from 'sveltekit-superforms';
+import { zod } from 'sveltekit-superforms/adapters';
+import { z } from 'zod';
+
+const schema = z.object({
+  email: z.string().email(),
+  name: z.string().min(2)
+});
+
+export const load = async () => {
+  const form = await superValidate(zod(schema));
+  return { form };
+};
+
+export const actions = {
+  default: async ({ request }) => {
+    const form = await superValidate(request, zod(schema));
+    if (!form.valid) return fail(400, { form });
+    // Process...
+    return { form };
+  }
+};
+`
+
+**Client-Side:**
+`svelte
+<script>
+  const { form, errors, enhance } = superForm(data.form);
+</script>
+
+<form method="POST" use:enhance>
+  <input name="email" bind:value={\.email} />
+  {#if \.email}<span>{\.email}</span>{/if}
+</form>
+`
+
+### Go 1.25 Features (August 2025)
+
+**JSON v2 (Experimental):**
+- Enable: GOEXPERIMENT=jsonv2 go build
+- 3-10x faster deserialization
+- Cleaner defaults: nil slices → [] not
+ull
+
+**Generics Refinement:**
+- Removed "Core Types" concept
+- Simpler, more intuitive generic constraints
+
+**Modules:**
+- go.mod ignore directive for excluding directories
+- Subdirectory as module root support
+- work package pattern for workspaces
+
+### ts-morph AST Manipulation (2025)
+
+**Codemod Pattern:**
+`	ypescript
+import { Project } from 'ts-morph';
+
+const project = new Project();
+project.addSourceFilesAtPaths('src/**/*.ts');
+
+for (const sourceFile of project.getSourceFiles()) {
+  // Find and replace patterns
+  sourceFile.getVariableDeclarations().forEach(decl => {
+    if (decl.getName().startsWith('old_')) {
+      decl.rename(decl.getName().replace('old_', 'new_'));
+    }
+  });
+}
+
+project.saveSync();
+`
+
+**Key Capabilities:**
+- Add/remove/replace AST nodes
+- All changes in memory until save
+- Works with TypeScript 5.9+
+- Integration with Codemod AI
+
+### svelte-check Automation Pipeline
+
+**Error Analysis Pattern:**
+`ash
+npx svelte-check --threshold error --output machine > errors.txt
+node scripts/phase74-error-analyzer.mjs errors.txt
+`
+
+**AST-Based Fixes:**
+- Use slint-plugin-svelte with @typescript-eslint
+- Oxlint for fast, safe auto-fixes
+- ts-morph for complex structural changes
+
+### Corruption Pattern Database (Updated)
+
+| Pattern | Corrupted | Correct |
+|---------|-----------|---------|
+| Object Property | key: value nextKey: | key: value, nextKey: |
+| Function Param | n(param Type) | n(param: Type) |
+| Return Type | ): Type : | ): Type { |
+| Statement Terminal | , } statement | ; } statement |
+| Interface | interface X: { | interface X { |
+| Import | import: { X } | import { X } |
+

@@ -291,6 +291,43 @@ function findNodeAtPosition(sourceFile, position) {
     return result;
 }
 
+/**
+ * Check if position is preceded by a separator (ignoring whitespace)
+ */
+function isPrecededBySeparator(sourceFile, position) {
+    const text = sourceFile.text;
+    let pos = position - 1;
+    
+    while (pos >= 0) {
+        const char = text[pos];
+        if (/\s/.test(char)) {
+            pos--;
+            continue;
+        }
+        // Check for comma or semicolon
+        if (char === ',' || char === ';') {
+            return true;
+        }
+        // Check for comments (basic check)
+        if (char === '/' && pos > 0 && text[pos-1] === '*') {
+            // End of block comment */
+            // Skip back to start /*
+            // This is complex without full lexer. 
+            // Simplified: just stop if we hit non-separator char.
+            // If we are inside a comment, this logic fails.
+            // But we rely on node.pos which usually skips leading trivia?
+            // node.pos INCLUDES leading trivia.
+            // So we are scanning BACKWARDS through the previous node's trailing trivia 
+            // OR the current node's leading trivia.
+            
+            // If node.pos is used, we are looking at text BEFORE the node specific start.
+        }
+        
+        return false; // Found non-separator token
+    }
+    return false;
+}
+
 // ============================================================================
 // ENHANCED CONTEXT DETECTION
 // ============================================================================
@@ -458,8 +495,8 @@ function handleInterfaceComma(sourceFile, node, context) {
         if (index > 0) {
             if (CONFIG.verbose) console.log(`   🎯 Fix from Tier 1 [InterfaceDeclaration] (Prepend)`);
             return {
-                position: propertySignature.pos,
-                text: ';', // Interfaces prefer semi-colons (or check multiline)
+                position: propertySignature.getStart(sourceFile),
+                text: ';', // Interfaces prefer semi-colons
                 type: 'insert',
                 context,
                 metadata: {
@@ -493,7 +530,7 @@ function handleObjectLiteralComma(sourceFile, node, context) {
         if (index > 0) {
              if (CONFIG.verbose) console.log(`   🎯 Fix from Tier 1 [ObjectLiteralExpression] (Prepend)`);
              return {
-                position: prop.pos,
+                position: prop.getStart(sourceFile),
                 text: ',',
                 type: 'insert',
                 context,
@@ -519,7 +556,7 @@ function handleArrayLiteralComma(sourceFile, node, context) {
         if (index > 0) {
              if (CONFIG.verbose) console.log(`   🎯 Fix from Tier 1 [ArrayLiteralExpression] (Prepend)`);
              return {
-                position: node.pos,
+                position: node.getStart(sourceFile),
                 text: ',',
                 type: 'insert',
                 context,
@@ -543,22 +580,24 @@ function handleCallExpressionComma(sourceFile, node, context) {
         const index = args.indexOf(node);
 
         if (index > 0) {
-             if (CONFIG.verbose) console.log(`   🎯 Fix from Tier 1 [CallExpression] (Prepend)`);
+             // Insert comma AFTER the previous argument
+             const prevArg = args[index - 1];
+             if (CONFIG.verbose) console.log(`   🎯 Fix from Tier 1 [CallExpression] (After prev arg)`);
              return {
-                position: node.pos, // Include leading whitespace
+                position: prevArg.end,
                 text: ',',
                 type: 'insert',
                 context,
                 metadata: {
                     pattern: 'CallExpression',
                     confidence: 1.0,
-                    source: 'Tier 1 Prepend',
+                    source: 'Tier 1 Append-After-Prev',
                 },
              };
         }
     }
 
-    // Strict Tier 1: Do not append.
+    // Strict Tier 1: Do not fix first argument.
     return null;
 }
 

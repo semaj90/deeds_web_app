@@ -24,31 +24,16 @@ import('./phase90-enhanced-ast-fixer.mjs').then(async (module) => {
     console.log('╚════════════════════════════════════════════════════════════════╝\n');
     console.log(`📁 Working Directory: ${process.cwd()}\n`);
 
-    // Generate fresh ranking for files 356-405
-    console.log('📊 Generating fresh error ranking for Batch 16 files...\n');
+    // Load pre-generated file list for Batch 16
+    const batch16FilesPath = path.join(projectRoot, 'reports/phase90-batch16-files.json');
 
-    const { execSync } = await import('child_process');
-    const tscOutput = execSync('npx tsc --noEmit 2>&1', { encoding: 'utf-8', maxBuffer: 50 * 1024 * 1024 });
-
-    const errorCounts = new Map();
-    const lines = tscOutput.split('\n');
-
-    for (const line of lines) {
-        const match = line.match(/^(src\/[^(]+)\((\d+),(\d+)\): error TS(\d+):/);
-        if (match) {
-            const [, file] = match;
-            errorCounts.set(file, (errorCounts.get(file) || 0) + 1);
-        }
+    if (!fs.existsSync(batch16FilesPath)) {
+        console.error('❌ Error: phase90-batch16-files.json not found!');
+        console.log('File list should have been generated. Check if there are enough error files.');
+        process.exit(1);
     }
 
-    const allFiles = Array.from(errorCounts.entries())
-        .map(([file, count]) => ({ File: file, Errors: count }))
-        .sort((a, b) => b.Errors - a.Errors);
-
-    console.log(`📈 Total files with errors: ${allFiles.length}`);
-
-    // Take files ranked 356-405 (indices 355-404)
-    const batch16Files = allFiles.slice(355, 405);
+    const batch16Files = JSON.parse(fs.readFileSync(batch16FilesPath, 'utf-8'));
 
     if (batch16Files.length === 0) {
         console.log('✅ No files in rank 356-405 range (codebase may have < 355 error files)');

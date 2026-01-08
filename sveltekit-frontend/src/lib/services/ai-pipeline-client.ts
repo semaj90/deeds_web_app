@@ -210,7 +210,7 @@ export class AIPipelineClient {
 
 		// Try live API
 		try {
-			const response = await fetch(`${this.baseUrl}/api/ai/embeddings`, {
+			const response = await fetch(`${this.baseUrl}/api/ai/embeddings`,, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({ text }, signal: AbortSignal.timeout(10000) // 10s timeout
@@ -259,7 +259,7 @@ export class AIPipelineClient {
 
 		// Try live API
 		try {
-			const response = await fetch(`${this.baseUrl}/api/ai/analyze`, {
+			const response = await fetch(`${this.baseUrl}/api/ai/analyze`,, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({ content, documentType }, signal: AbortSignal.timeout(30000) // 30s timeout
@@ -308,7 +308,7 @@ export class AIPipelineClient {
 
 		// Try live search
 		try {
-			const response = await fetch(`${this.baseUrl}/api/ai/rag`, {
+			const response = await fetch(`${this.baseUrl}/api/ai/rag`,, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({ query, ...options }, signal: AbortSignal.timeout(15000) // 15s timeout

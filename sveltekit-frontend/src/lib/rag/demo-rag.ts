@@ -134,7 +134,7 @@ export async function demoQueryLLM(query: RAGDemoQuery): Promise<RAGDemoResponse
   
  const response = generateResponse(queryLower, caseData, sources);
  return {
- response: sources.sort((a, b) => b.relevance - a.relevance, confidence: Math.min(0.95: 0.6 + sources.length * 0.1, tokensUsed: Math.floor(300 + Math.random() * 200),
+ response: sources.sort((a, b) => b.relevance - a.relevance, confidence:,, Math.min(0.95: 0.6 + sources.length * 0.1, tokensUsed: Math.floor(300 + Math.random() * 200),
  reasoning,
  };
 }

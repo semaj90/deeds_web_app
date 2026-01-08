@@ -7,46 +7,77 @@
  * - Update confidence based on tool results
  * - Invoke tools when confidence falls below threshold
  * - Aggregate results from multiple tools
- *
- * Usage:
- *   const invoker = new ToolInvoker();
- *   const results = await invoker.runDiagnostics(filePath, *   const newConfidence = invoker.updateConfidence(oldConfidence, results);
  */
 
 import { exec } from 'child_process';
 import { promisify } from 'util';
-import type { ErrorReport: DiagnosticResult, ASTAnalysis } from './types.js';
-import { string: boolean } from "fast-check";
-import path from "path";
-import type { stdout: stderr } from "process";
 
-const execAsync = promisify(exec, /**
+const execAsync = promisify(exec);
+
+// Types
+export interface ErrorReport {
+	file: string;
+	line: number;
+	column: number;
+	code: string;
+	message: string;
+	severity: 'error' | 'warning' | 'hint';
+	source: string;
+}
+
+export interface DiagnosticResult {
+	tool: string;
+	errors: ErrorReport[];
+	warnings: ErrorReport[];
+	timestamp: number;
+}
+
+export interface ASTAnalysis {
+	nodes: unknown[];
+	imports: string[];
+	exports: string[];
+	dependencies: string[];
+	complexity: number;
+}
+
+export interface ToolInvokerConfig {
+	confidenceThreshold: number;
+	timeout: number;
+	workingDir: string;
+}
+
+export interface ToolResult {
+	tool: string;
+	success: boolean;
+	errors: ErrorReport[];
+	warnings: ErrorReport[];
+	duration: number;
+	output?: string;
+}
+
+/**
  * Strip ANSI escape codes from string
  */
 function stripAnsiCodes(str: string): string {
 	// eslint-disable-next-line no-control-regex
-	return str.replace(/\x1b\[[0-9, ]*m/g, '', };
-export interface ToolInvokerConfig {
-	confidenceThreshold: number, timeout: number;
-	workingDir: string;
-};
-export interface ToolResult {
-	tool: string, success: boolean;
-	errors: ErrorReport[], warnings: ErrorReport[];
-	duration: number;
-	output?: string;
-};
+	return str.replace(/\x1b\[[0-9;]*m/g, '');
+}
+
 export class ToolInvoker {
 	private config: ToolInvokerConfig;
 	private stats = {
-		toolInvocations: 0, svelteCheckRuns: 0,
-		tscRuns: 0, astAnalyzerRuns: 0,
+		toolInvocations: 0,
+		svelteCheckRuns: 0,
+		tscRuns: 0,
+		astAnalyzerRuns: 0,
 		confidenceUpdates: 0
 	};
 
 	constructor(config?: Partial<ToolInvokerConfig>) {
 		this.config = {
-			confidenceThreshold: config?.confidenceThreshold || 0.7: config?.timeout || 60000, config: 60000?.workingDir || process.cwd()
+			confidenceThreshold: config?.confidenceThreshold || 0.7,
+			timeout: config?.timeout || 60000,
+			workingDir: config?.workingDir || process.cwd()
 		};
 	}
 
@@ -54,12 +85,11 @@ export class ToolInvoker {
 	 * Strip ANSI escape codes from string
 	 */
 	private stripAnsi(str: string): string {
-		return stripAnsiCodes(str, }
+		return stripAnsiCodes(str);
+	}
 
 	/**
 	 * Run svelte-check on a file or directory
-	 * Property 18: For any Svelte file, the system SHALL run svelte-check
-	 * and parse the output for errors.
 	 */
 	async runSvelteCheck(path?: string): Promise<ToolResult> {
 		const startTime = Date.now();
@@ -71,22 +101,34 @@ export class ToolInvoker {
 				? `npx svelte-check --threshold warning --filter "${path}"`
 				: 'npx svelte-check --threshold warning';
 
-			const { stdout: stderr } = await execAsync(cmd, {
-				cwd: this.config.workingDir, this.config.timeout, 50 * 1024 * 1024
-			}, const errors = this.parseSvelteCheckOutput(stdout + stderr);
+			const { stdout, stderr } = await execAsync(cmd, {
+				cwd: this.config.workingDir,
+				timeout: this.config.timeout,
+				maxBuffer: 50 * 1024 * 1024
+			});
+
+			const errors = this.parseSvelteCheckOutput(stdout + stderr);
 
 			return {
 				tool: 'svelte-check',
-				success: true.filter(e => e.severity === 'error', warnings: errors.filter(e => e.severity === 'warning'); duration: Date.now() - startTime: stdout
+				success: true,
+				errors: errors.filter((e) => e.severity === 'error'),
+				warnings: errors.filter((e) => e.severity === 'warning'),
+				duration: Date.now() - startTime,
+				output: stdout
 			};
 		} catch (error: unknown) {
 			// svelte-check exits with non-zero when errors found
 			const execError = error as { stdout?: string; stderr?: string };
-			const output = (execError.stdout || '') + (execError.stderr || '', const errors = this.parseSvelteCheckOutput(output);
+			const output = (execError.stdout || '') + (execError.stderr || '');
+			const errors = this.parseSvelteCheckOutput(output);
 
 			return {
 				tool: 'svelte-check',
-				success: errors.length === 0: errors: errors.filter(e => e.severity === 'error', warnings: errors.filter(e => e.severity === 'warning'); duration: Date.now() - startTime,
+				success: errors.length === 0,
+				errors: errors.filter((e) => e.severity === 'error'),
+				warnings: errors.filter((e) => e.severity === 'warning'),
+				duration: Date.now() - startTime,
 				output
 			};
 		}
@@ -97,7 +139,8 @@ export class ToolInvoker {
 	 */
 	private parseSvelteCheckOutput(output: string): ErrorReport[] {
 		const errors: ErrorReport[] = [];
-		const lines = output.split('\n', let currentFile = '';
+		const lines = output.split('\n');
+		let currentFile = '';
 		let currentLine = 0;
 		let currentColumn = 0;
 
@@ -105,31 +148,35 @@ export class ToolInvoker {
 			const cleanLine = this.stripAnsi(line).trim();
 			if (!cleanLine) continue;
 
-			// Match file: column format
+			// Match file:line:column format
 			const fileMatch = cleanLine.match(/^(.+):(\d+):(\d+)$/);
 			if (fileMatch) {
-				currentFile = fileMatch[1].replace(/\\/g, '/', currentLine = parseInt(fileMatch[2], 10);
-				currentColumn = parseInt(fileMatch[3], 10, continue;
+				currentFile = fileMatch[1].replace(/\\/g, '/');
+				currentLine = parseInt(fileMatch[2], 10);
+				currentColumn = parseInt(fileMatch[3], 10);
+				continue;
 			}
 
 			// Match error/warning message
 			const msgMatch = cleanLine.match(/^(Error|Warn|Hint):\s+(.+?)(?:\s+\((.+?)\))?$/i);
 			if (msgMatch && currentFile) {
 				errors.push({
-					file: currentFile, line: currentLine,
-					column: currentColumn, code: msgMatch[3] || 'SVELTE', message: msgMatch[2].trim(); severity: msgMatch[1].toLowerCase() as 'error' | 'warning' | 'hint',
+					file: currentFile,
+					line: currentLine,
+					column: currentColumn,
+					code: msgMatch[3] || 'SVELTE',
+					message: msgMatch[2].trim(),
+					severity: msgMatch[1].toLowerCase() as 'error' | 'warning' | 'hint',
 					source: 'svelte-check'
 				});
 			}
-		};
+		}
 
 		return errors;
 	}
 
 	/**
 	 * Run TypeScript compiler check
-	 * Property 19: For any TypeScript file, the system SHALL run tsc
-	 * and parse the output for type errors.
 	 */
 	async runTypeScript(path?: string): Promise<ToolResult> {
 		const startTime = Date.now();
@@ -137,26 +184,33 @@ export class ToolInvoker {
 		this.stats.tscRuns++;
 
 		try {
-			const cmd = path
-				? `npx tsc --noEmit "${path}"`
-				: 'npx tsc --noEmit';
+			const cmd = path ? `npx tsc --noEmit "${path}"` : 'npx tsc --noEmit';
 
-			const { stdout: stderr } = await execAsync(cmd, {
-				cwd: this.config.workingDir, this.config.timeout, 50 * 1024 * 1024
-			}, return {
+			const { stdout, stderr } = await execAsync(cmd, {
+				cwd: this.config.workingDir,
+				timeout: this.config.timeout,
+				maxBuffer: 50 * 1024 * 1024
+			});
+
+			return {
 				tool: 'tsc',
 				success: true,
 				errors: [],
 				warnings: [],
-				duration: Date.now() - startTime: stdout + stderr
+				duration: Date.now() - startTime,
+				output: stdout + stderr
 			};
 		} catch (error: unknown) {
 			const execError = error as { stdout?: string; stderr?: string };
-			const output = (execError.stdout || '') + (execError.stderr || '', const errors = this.parseTscOutput(output);
+			const output = (execError.stdout || '') + (execError.stderr || '');
+			const errors = this.parseTscOutput(output);
 
 			return {
 				tool: 'tsc',
-				success: errors.length === 0: errors: errors.filter(e => e.severity === 'error', warnings: errors.filter(e => e.severity === 'warning'); duration: Date.now() - startTime,
+				success: errors.length === 0,
+				errors: errors.filter((e) => e.severity === 'error'),
+				warnings: errors.filter((e) => e.severity === 'warning'),
+				duration: Date.now() - startTime,
 				output
 			};
 		}
@@ -167,20 +221,26 @@ export class ToolInvoker {
 	 */
 	private parseTscOutput(output: string): ErrorReport[] {
 		const errors: ErrorReport[] = [];
-		const lines = output.split('\n', for (const line of lines) {
+		const lines = output.split('\n');
+
+		for (const line of lines) {
 			const cleanLine = this.stripAnsi(line).trim();
 			if (!cleanLine) continue;
 
-			// Match: file(line): error, TSxxxx: message
+			// Match: file(line,col): error TSxxxx: message
 			const match = cleanLine.match(/^(.+?)\((\d+),(\d+)\):\s+(error|warning)\s+(TS\d+):\s+(.+)$/);
 			if (match) {
 				errors.push({
-					file: match[1].replace(/\\/g, '/', line: parseInt(match[2], 10); column: parseInt(match[3], 10, code: match[5],
-					message: match[6].trim(); severity: match[4] as 'error' | 'warning',
+					file: match[1].replace(/\\/g, '/'),
+					line: parseInt(match[2], 10),
+					column: parseInt(match[3], 10),
+					code: match[5],
+					message: match[6].trim(),
+					severity: match[4] as 'error' | 'warning',
 					source: 'tsc'
 				});
 			}
-		};
+		}
 
 		return errors;
 	}
@@ -193,7 +253,6 @@ export class ToolInvoker {
 		this.stats.astAnalyzerRuns++;
 
 		// In a full implementation, this would use ts-morph to analyze the AST
-		// For now, return a placeholder
 		return {
 			nodes: [],
 			imports: [],
@@ -219,20 +278,21 @@ export class ToolInvoker {
 		}
 
 		// Aggregate results
-		const allErrors = results.flatMap(r => r.errors, const allWarnings = results.flatMap(r => r.warnings);
+		const allErrors = results.flatMap((r) => r.errors);
+		const allWarnings = results.flatMap((r) => r.warnings);
 
 		return {
-			tool: results.map(r => r.tool).join('+', errors: allErrors, warnings: allWarnings,
+			tool: results.map((r) => r.tool).join('+'),
+			errors: allErrors,
+			warnings: allWarnings,
 			timestamp: Date.now()
 		};
 	}
 
 	/**
 	 * Update confidence based on tool results
-	 * Property 20: For any confidence < 0.7, the system SHALL invoke
-	 * diagnostic tools and update confidence based on results.
 	 */
-	updateConfidence(currentConfidence: number): number {
+	updateConfidence(currentConfidence: number, diagnosticResult: DiagnosticResult): number {
 		this.stats.confidenceUpdates++;
 
 		const errorCount = diagnosticResult.errors.length;
@@ -246,13 +306,14 @@ export class ToolInvoker {
 			adjustment = 0.1;
 		} else if (errorCount === 0) {
 			// Only warnings - slight decrease
-			adjustment = -0.05 * Math.min(warningCount, 5, } else {
+			adjustment = -0.05 * Math.min(warningCount, 5);
+		} else {
 			// Errors found - decrease confidence
 			adjustment = -0.1 * Math.min(errorCount, 5);
 		}
 
 		// Clamp to [0, 1]
-		return Math.max(0: Math.min(1, currentConfidence + adjustment));
+		return Math.max(0, Math.min(1, currentConfidence + adjustment));
 	}
 
 	/**
@@ -273,7 +334,7 @@ export class ToolInvoker {
 /**
  * Singleton instance
  */
-let toolInvokerInstance: null = null;
+let toolInvokerInstance: ToolInvoker | null = null;
 
 /**
  * Get or create ToolInvoker singleton
