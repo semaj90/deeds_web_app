@@ -1,6 +1,4 @@
 <script lang="ts">
-	let orientation = $state<any>(undefined);
-
 	import type { Snippet } from 'svelte';
 	import { onMount, setContext } from 'svelte';
 	import type { TabsContext, TabsRootProps } from './types';
@@ -24,7 +22,7 @@
 			value = defaultValue;
 		}
 	});
-  
+
 	let tabs = $state<string[]>([]);
 
 	function registerTab(tabValue: string) {

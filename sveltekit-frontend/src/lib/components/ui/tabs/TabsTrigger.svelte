@@ -1,7 +1,4 @@
 <script lang="ts">
-	let value = $state<any>(undefined);
-	let className = $state<any>(undefined);
-
 	import type { Snippet } from 'svelte';
 	import { getContext, onMount } from 'svelte';
 	import type { TabsContext, TabsTriggerProps } from './types';

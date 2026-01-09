@@ -1,6 +1,4 @@
 <script lang="ts">
-	let className = $state<any>(undefined);
-
 	import type { Snippet } from 'svelte';
 	import { getContext } from 'svelte';
 	import { fade } from 'svelte/transition';
