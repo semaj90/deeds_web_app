@@ -12,17 +12,19 @@
  * - HTML fallback for SSR/progressive enhancement
  * - NES.css inspired design system
  */
-import { Button, ButtonRoot } from 'bits-ui';
+import { ButtonRoot } from 'bits-ui';
 
 // Svelte 5 Props using $props() rune
 interface ButtonProps {
-	variant?: 'primary' | 'secondary' | 'success' | 'warning' | 'error' | 'ghost';
+	variant?: 'primary' | 'secondary' | 'success' | 'warning' | 'error' | 'ghost' | 'outline';
 	size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 	disabled?: boolean;
 	loading?: boolean;
 	class?: string;
 	onclick?: (e: MouseEvent) => void;
 	children?: import('svelte').Snippet;
+	'aria-label'?: string;
+	[key: string]: any;
 }
 
 let {
@@ -32,7 +34,9 @@ let {
 	loading = false,
 	class: className = '',
 	onclick,
-	children
+	children,
+	'aria-label': ariaLabel,
+	...restProps
 }: ButtonProps = $props();
 
 // Reactive state using $state() rune
@@ -46,7 +50,8 @@ let variantClasses = $derived({
 	success: 'bg-green-600 hover:bg-green-700 text-white border-green-800',
 	warning: 'bg-yellow-500 hover:bg-yellow-600 text-black border-yellow-700',
 	error: 'bg-red-600 hover:bg-red-700 text-white border-red-800',
-	ghost: 'bg-transparent hover:bg-gray-100 text-gray-700 border-transparent'
+	ghost: 'bg-transparent hover:bg-gray-100 text-gray-700 border-transparent',
+	outline: 'bg-transparent hover:bg-gray-50 text-gray-700 border-gray-300 hover:border-gray-400'
 }[variant]);
 
 let sizeClasses = $derived({
@@ -65,7 +70,7 @@ let stateClasses = $derived.by(() => {
 	if (isHovered && !disabled) classes.push('shadow-lg');
 	return classes.join(' ');
 });
-  
+
 let buttonClasses = $derived(
 	[
 		// Base styles (HTML fallback friendly)
@@ -117,6 +122,8 @@ function handleMouseLeave() {
 	onmouseleave={handleMouseLeave}
 	onmouseenter={handleMouseEnter}
 	{onclick}
+	aria-label={ariaLabel}
+	{...restProps}
 >
 	{#if loading}
 		<span class="mr-2 animate-spin">

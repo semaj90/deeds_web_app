@@ -1,5 +1,6 @@
 <script lang="ts">
-	import { ButtonRoot, DialogContent, DialogDescription, DialogOverlay, DialogPortal, DialogRoot, DialogTitle, SeparatorRoot } from 'bits-ui';
+	import Button from '$lib/components/ui/button/Button.svelte';
+	import { Content as DialogContent, Description as DialogDescription, Overlay as DialogOverlay, Portal as DialogPortal, Root as DialogRoot, Title as DialogTitle } from '$lib/components/ui/dialog';
 	import { onMount } from 'svelte';
 	import type { PageData } from './$types';
 
@@ -126,14 +127,14 @@
 						RAG+KAG powered analysis • Agentic recommendations • Duplicate detection
 					</p>
 				</div>
-				<ButtonRoot
+				<Button
 					onclick={() => loadAnalysis()}
 					disabled={loading}
 					class="px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold rounded-xl hover:from-purple-700 hover:to-pink-700 transition-all shadow-lg disabled:opacity-50"
 				>
 					<i class="i-carbon-renew mr-2"></i>
 					{loading ? 'Loading...' : 'Refresh Analysis'}
-				</ButtonRoot>
+				</Button>
 			</div>
 
 			{#if analysisData}
@@ -170,6 +171,7 @@
 					<button
 						onclick={() => showRecommendations = false}
 						class="text-gray-400 hover:text-white transition-colors"
+						aria-label="Close recommendations"
 					>
 						<i class="i-carbon-close"></i>
 					</button>
@@ -284,7 +286,7 @@
 						{selectedCluster.error_count} errors • Priority: {selectedCluster.priority}
 					</DialogDescription>
 
-					<SeparatorRoot class="h-px bg-purple-500/30 mb-6" />
+					<div class="h-px bg-purple-500/30 mb-6"></div>
 
 					<!-- Pattern -->
 					<div class="mb-6">
@@ -336,12 +338,12 @@
 											<div class="text-white font-semibold mb-1">{step.action}</div>
 											<code class="text-xs text-gray-400 font-mono">{step.command}</code>
 										</div>
-										<ButtonRoot
+										<Button
 											onclick={() => executeNextStep(step.command)}
 											class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm"
 										>
 											Execute
-										</ButtonRoot>
+										</Button>
 									</div>
 								{/each}
 							</div>
@@ -357,13 +359,13 @@
 						<p class="text-gray-300 mb-4 text-sm">
 							Full automated fix with LLM summarization, ripgrep tagging, and copilot.md/claude.md updates
 						</p>
-						<ButtonRoot
+						<Button
 							onclick={() => executeAgenticFix(selectedCluster.cluster_id)}
 							class="px-6 py-3 bg-gradient-to-r from-pink-600 to-purple-600 text-white font-semibold rounded-lg hover:from-pink-700 hover:to-purple-700 transition-all shadow-lg"
 						>
 							<i class="i-carbon-play-filled mr-2"></i>
 							Run Full Pipeline
-						</ButtonRoot>
+						</Button>
 
 						{#if agenticLogs.length > 0}
 							<div class="mt-4 p-4 bg-gray-800/50 rounded-lg max-h-64 overflow-y-auto">
@@ -374,15 +376,15 @@
 						{/if}
 					</div>
 
-					<SeparatorRoot class="h-px bg-purple-500/30 mb-6" />
+					<div class="h-px bg-purple-500/30 mb-6"></div>
 
 					<div class="flex justify-end gap-3">
-						<ButtonRoot
+						<Button
 							onclick={() => dialogOpen = false}
 							class="px-4 py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-600 transition-colors"
 						>
 							Close
-						</ButtonRoot>
+						</Button>
 					</div>
 				{/if}
 			</DialogContent>

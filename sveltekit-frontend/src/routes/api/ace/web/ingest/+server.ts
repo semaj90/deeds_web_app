@@ -7,7 +7,6 @@
 import { aceSources } from '$lib/db/schema/ace-web';
 import { db } from '$lib/server/db/client';
 import { json } from '@sveltejs/kit';
-import type { Channel, Connection } from 'amqplib';
 import * as amqp from 'amqplib';
 import * as crypto from 'crypto';
 import { inArray } from 'drizzle-orm';
@@ -15,8 +14,8 @@ import { z } from 'zod';
 import type { RequestHandler } from './$types.js';
 
 // --- Singleton RabbitMQ Connection ---
-let amqpConnection: Connection | null = null;
-let amqpChannel: Channel | null = null;
+let amqpConnection: any = null;
+let amqpChannel: any = null;
 
 async function getAmqpChannel() {
   if (amqpChannel) return amqpChannel;
@@ -24,7 +23,7 @@ async function getAmqpChannel() {
   try {
     const rabbitmqUrl = process.env.RABBITMQ_URL || 'amqp://localhost:5672';
     if (!amqpConnection) {
-      amqpConnection = await amqp.connect(rabbitmqUrl);
+      amqpConnection = await (amqp as any).connect(rabbitmqUrl);
 
       // Handle connection close/error
       amqpConnection.on('close', () => {
@@ -91,7 +90,7 @@ export const POST: RequestHandler = async ({ request }) => {
     const body = validation.data;
 
     // Connect to RabbitMQ (reusing connection)
-    let channel: Channel;
+    let channel: any;
     try {
       channel = await getAmqpChannel();
     } catch (error) {

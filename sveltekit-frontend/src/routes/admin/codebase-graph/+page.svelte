@@ -1,5 +1,6 @@
 <script lang="ts">
-	import { ButtonRoot, DialogClose, DialogContent, DialogOverlay, DialogPortal, DialogRoot, DialogTitle } from 'bits-ui';
+	import Button from '$lib/components/ui/button/Button.svelte';
+	import { Close as DialogClose, Content as DialogContent, Overlay as DialogOverlay, Portal as DialogPortal, Root as DialogRoot, Title as DialogTitle } from '$lib/components/ui/dialog';
 	import { onMount } from 'svelte';
 
 	interface VectorCluster {
@@ -226,13 +227,13 @@
 					       placeholder-gray-500 focus:border-purple-500 focus:outline-none"
 					onkeydown={(e) => e.key === 'Enter' && performVectorSearch()}
 				/>
-				<ButtonRoot
+				<Button
 					class="px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-lg
 					       font-medium transition-colors"
 					onclick={ performVectorSearch }
 				>
 					Search
-				</ButtonRoot>
+				</Button>
 			</div>
 
 			{#if searchResults.length > 0}
@@ -412,21 +413,21 @@
 
 							<!-- Actions -->
 							<div class="flex gap-3 pt-4 border-t border-gray-700">
-								<ButtonRoot
+								<Button
 									class="flex-1 px-4 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-lg
 									       font-medium transition-colors flex items-center justify-center gap-2"
 									onclick={() => initiateAgenticFix(selectedCluster)}
 								>
 									<div class="i-carbon-machine-learning"></div>
 									Agentic Fix
-								</ButtonRoot>
-								<ButtonRoot
+								</Button>
+								<Button
 									class="px-4 py-3 bg-gray-700 hover:bg-gray-600 text-white rounded-lg
 									       transition-colors"
 									onclick={() => (detailsOpen = false)}
 								>
 									Close
-								</ButtonRoot>
+								</Button>
 							</div>
 						</div>
 					{/if}
@@ -459,13 +460,13 @@
 						>{agenticFixStatus}</pre>
 					</div>
 
-					<ButtonRoot
+					<Button
 						class="w-full px-4 py-3 bg-gray-700 hover:bg-gray-600 text-white rounded-lg
 						       transition-colors"
 						onclick={() => (fixDialogOpen = false)}
 					>
 						Close
-					</ButtonRoot>
+					</Button>
 				</DialogContent>
 			</DialogPortal>
 		</DialogRoot>

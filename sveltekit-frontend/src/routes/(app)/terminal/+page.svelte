@@ -61,7 +61,8 @@
  id: assistantMsgId,
  role: 'assistant',
  content: data.answer || 'No response received',
- timestamp: new Date( keywords: data.keywords ?? [],
+ timestamp: new Date(),
+ keywords: data.keywords ?? [],
  keyPhrases: data.keyPhrases ?? [],
  suggestions: data.suggestions ?? []
  }];

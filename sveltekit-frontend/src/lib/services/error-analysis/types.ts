@@ -89,7 +89,9 @@ export interface FixStrategy {
 	description: string; // What the fix does
 	code: string; // Actual code change
 	applicablePatterns: string[]; // Error pattern IDs
-	successRate: number; // 0-1, confidence: number; // 0-1, validationRules: ValidationRule[];
+	successRate: number; // 0-1
+	confidence: number; // 0-1
+	validationRules: ValidationRule[];
 	appliedCount: number;
 	lastApplied: Date;
 	createdAt: Date;

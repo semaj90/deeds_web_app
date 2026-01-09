@@ -1,9 +1,8 @@
 <!-- Modern Dark YoRHa Legal, AI, Platform -->
 <script lang="ts">
-	import { DialogClose, DialogContent, DialogDescription, DialogOverlay, DialogRoot, DialogTitle } from 'bits-ui';
+	import { Close as DialogClose, Content as DialogContent, Description as DialogDescription, Header as DialogHeader, Overlay as DialogOverlay, Root as DialogRoot, Title as DialogTitle } from '$lib/components/ui/dialog';
 
 	import { goto } from '$app/navigation';
-	import * as Dialog from '$lib/components/ui/dialog';
 	import AlertTriangle from 'lucide-svelte/icons/alert-triangle';
 	import BarChart3 from 'lucide-svelte/icons/bar-chart-3';
 	import Brain from 'lucide-svelte/icons/brain';
@@ -396,12 +395,12 @@
  data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2
  data-[state=open]:slide-in-from-top-[48%] sm:rounded-lg md:w-full"
  >
- <Dialog.Header>
+ <DialogHeader>
  <DialogTitle class="text-xl font-semibold text-slate-100">Create New Case</DialogTitle>
  <DialogDescription class="text-sm text-slate-300">
  Fill in the details for the new case.
  </DialogDescription>
- </Dialog.Header>
+ </DialogHeader>
  <form
  class="space-y-4"
  onsubmit={(e) => {

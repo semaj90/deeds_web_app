@@ -1,12 +1,14 @@
 <script lang="ts">
-  import { Button as BitsButton } from "bits-ui";
-  import type { Props as BitsButtonProps } from "bits-ui";
-  import { buttonVariants, type ButtonVariantProps } from "../button-variants";
   import { cn } from "$lib/utils/cn";
+  import type { Props as BitsButtonProps } from "bits-ui";
+  import { Button as BitsButton } from "bits-ui";
+  import type { Snippet } from "svelte";
+  import { buttonVariants, type ButtonVariantProps } from "../button-variants";
 
-  interface Props extends BitsButtonProps {
+  interface Props extends Omit<BitsButtonProps, 'children'> {
     variant?: ButtonVariantProps["variant"];
     size?: ButtonVariantProps["size"];
+    children?: Snippet;
   }
 
   let {

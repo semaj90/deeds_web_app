@@ -30,10 +30,11 @@
 import { createHash } from 'crypto';
 import dotenv from 'dotenv';
 import { drizzle } from 'drizzle-orm/postgres-js';
+import { walk } from 'estree-walker';
 import * as fs from 'fs/promises';
 import * as path from 'path';
 import postgres from 'postgres';
-import { parse, walk } from 'svelte/compiler';
+import { parse } from 'svelte/compiler';
 import { fileURLToPath } from 'url';
 
 dotenv.config();
@@ -139,19 +140,23 @@ async function parseSvelteCheckLog(): Promise<SvelteError[]> {
     const content = await fs.readFile(logPath, 'utf-8');
     const errors: SvelteError[] = [];
 
-    // Regex pattern for svelte-check output:
-    // src/routes/+page.svelte:42:10 Error: Type 'string' is not assignable to type 'number'. (ts)
-    const errorPattern = /^(.+?):(\d+):(\d+)\s+(Error|Warning|Info):\s*(.+?)(?:\s+\((\w+)\))?$/gm;
+    // Regex pattern for svelte-check machine output:
+    // TIMESTAMP SEVERITY "FILE" LINE:COL "MESSAGE"
+    // 1767922796153 ERROR "src/routes/+page.svelte" 42:10 "Type 'string' is not assignable to type 'number'."
+    const errorPattern = /^\d+\s+(ERROR|WARNING|INFO)\s+"(.+?)"\s+(\d+):(\d+)\s+"(.+?)"/gm;
 
     let match;
     while ((match = errorPattern.exec(content)) !== null) {
+      // Normalize path separators to forward slashes
+      const filePath = match[2].replace(/\\\\/g, '/').replace(/\\/g, '/');
+
       errors.push({
-        file: match[1],
-        line: parseInt(match[2]),
-        column: parseInt(match[3]),
-        severity: match[4].toLowerCase() as 'error' | 'warning' | 'info',
+        file: filePath,
+        line: parseInt(match[3]),
+        column: parseInt(match[4]),
+        severity: match[1].toLowerCase() as 'error' | 'warning' | 'info',
         message: match[5],
-        code: match[6]
+        code: 'ts' // Default to ts/svelte since machine output simplifies this
       });
     }
 
@@ -632,7 +637,7 @@ async function main() {
   console.log('📈 TOP 10 PRIORITY FIXES\n');
 
   sortedErrors.slice(0, 10).forEach((err, idx) => {
-    console.log(`${idx + 1}. [Score: ${err.priorityScore.toFixed(1)}] ${err.file}:${err.line}`);
+    console.log(`${idx + 1}. [Ranking: ${err.priorityScore.toFixed(1)}] ${err.file}:${err.line}`);
     console.log(`   ${err.message.substring(0, 80)}`);
     console.log(`   Difficulty: ${err.fixComplexity.difficulty} (${err.fixComplexity.estimatedMinutes}min)`);
     console.log(`   Impact: ${err.dependencyImpact.blastRadius} files | Centrality: ${(err.dependencyImpact.centralityScore * 100).toFixed(0)}%`);
