@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { cn } from "$lib/utils";
-  import { Label as BitsLabel } from "bits-ui";
+  import { cn } from "$lib/utils/cn";
+  import { Label } from "bits-ui";
 
   let {
     children,
@@ -9,7 +9,7 @@
   } = $props();
 </script>
 
-<BitsLabel.Root
+<Label.Root
   class={cn(
     "text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70",
     className
@@ -19,4 +19,4 @@
   {#if children}
     {@render children()}
   {/if}
-</BitsLabel.Root>
+</Label.Root>

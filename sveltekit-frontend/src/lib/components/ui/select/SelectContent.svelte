@@ -1,6 +1,5 @@
 <script lang="ts">
-  import { cn } from "$lib/utils";
-  import { Select as BitsSelect } from "bits-ui";
+  import { cn } from "$lib/utils/cn";
   import type { Snippet } from "svelte";
 
   interface Props {
@@ -22,7 +21,7 @@
   }: Props = $props();
 </script>
 
-<BitsSelect.Content
+<Select.Content
   {side}
   {align}
   {sideOffset}
@@ -35,4 +34,5 @@
   {#if children}
     {@render children()}
   {/if}
-</BitsSelect.Content>
+</Select.Content>
+

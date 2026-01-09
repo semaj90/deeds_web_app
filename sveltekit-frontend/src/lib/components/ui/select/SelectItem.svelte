@@ -1,6 +1,5 @@
 <script lang="ts">
-  import { cn } from "$lib/utils";
-  import { Select as BitsSelect } from "bits-ui";
+  import { cn } from "$lib/utils/cn";
   import type { Snippet } from "svelte";
 
   interface Props {
@@ -22,7 +21,7 @@
   }: Props = $props();
 </script>
 
-<BitsSelect.Item
+<Select.Item
   {value}
   {label}
   {disabled}
@@ -32,7 +31,7 @@
   )}
   {...rest}
 >
-  <BitsSelect.ItemIndicator
+  <Select.ItemIndicator
     class="absolute left-2 flex h-3.5 w-3.5 items-center justify-center"
   >
     <svg
@@ -49,7 +48,7 @@
     >
       <polyline points="20 6 9 17 4 12" />
     </svg>
-  </BitsSelect.ItemIndicator>
+  </Select.ItemIndicator>
 
   {#if children}
     {@render children()}
@@ -58,4 +57,5 @@
   {:else}
     {value}
   {/if}
-</BitsSelect.Item>
+</Select.Item>
+

@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { Select as BitsSelect } from "bits-ui";
   import type { Snippet } from "svelte";
 
   interface Props {
@@ -27,7 +26,7 @@
   }: Props = $props();
 </script>
 
-<BitsSelect.Root
+<Select.Root
   {value}
   {open}
   {onValueChange}
@@ -40,4 +39,5 @@
   {#if children}
     {@render children()}
   {/if}
-</BitsSelect.Root>
+</Select.Root>
+

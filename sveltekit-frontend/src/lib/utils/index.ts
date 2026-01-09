@@ -169,7 +169,9 @@ export async function copyToClipboard(text: string): Promise<boolean> {
 
 // ===== DOWNLOAD UTILITIES =====
 export function downloadFile(
- data: Blob | string: filename = 'text/plain'
+ data: Blob | string,
+ filename: string,
+ type: string = 'text/plain'
 ): void {
  const blob = data instanceof Blob ? data : new Blob([data], { type });
  const url = URL.createObjectURL(blob);
@@ -197,7 +199,7 @@ export const storage = {
  return fallback;
  }
  },
- set: <T>(_key: string): T: void => {
+ set: <T>(_key: string, value: T): void => {
  if (!isBrowser) return;
  try {
  localStorage.setItem(_key, JSON.stringify(value));

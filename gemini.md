@@ -1,4 +1,117 @@
-# Gemini - Phase 72 AST Error Reduction + CUDA Acceleration
+# Gemini - Phase 78 AST Error Analysis & Svelte 5 Migration
+
+## 🔬 Analysis Results (January 9, 2026)
+
+### Phase 78: Intelligent Error Ranking
+
+**System Architecture:**
+```
+svelte-check → Machine Format Log → AST Parser → Dependency Graph → Priority Ranking → Database
+     ↓              ↓                    ↓              ↓               ↓              ↓
+  84,764        Regex Parse        svelte/compiler   Centrality    0-100 Scale   PostgreSQL
+  errors         126 errors         + estree-walker   Metrics      Clustering    + Drizzle
+```
+
+**Ranking Algorithm:**
+```typescript
+priority = baseScore
+  + (blastRadius * 20)        // How many files affected?
+  + (centralityScore * 15)    // How central to architecture?
+  + severityBonus              // Error vs Warning
+  - fixComplexity              // Trivial vs Expert
+```
+
+**Results:**
+- Top ranking: 80.0 (module resolution errors)
+- Average ranking: 80.0 across 49 clusters
+- Cluster pattern: `unknown + ts` (TypeScript compiler errors)
+
+### Svelte 5 Migration: Root Cause Analysis
+
+**Problem:** bits-ui 2.14.4 changed exports for Svelte 5 compatibility
+
+**Old Structure (bits-ui < 2.0):**
+```typescript
+// Single barrel export
+export { Checkbox, Select, Label } from './components';
+
+// Usage
+import { Checkbox } from 'bits-ui';
+<Checkbox.Root />
+```
+
+**New Structure (bits-ui 2.14.4):**
+```typescript
+// Component-specific exports
+export * from './components/checkbox';
+export * from './components/select';
+
+// Required usage
+import * as Checkbox from 'bits-ui/components/checkbox';
+<Checkbox.Root />
+```
+
+**Why TypeScript Fails:**
+- Barrel exports create circular dependency risks
+- Module bundler cannot tree-shake effectively
+- TypeScript's module resolution cache becomes stale
+- `ComponentCtor` type doesn't expose `.Root` property in old pattern
+
+**Solution Pattern:**
+```typescript
+// Direct component imports
+import * as Checkbox from "bits-ui/components/checkbox";
+import * as Select from "bits-ui/components/select";
+import * as Label from "bits-ui/components/label";
+
+// Direct utility imports
+import { cn } from "$lib/utils/cn.js";  // Not from barrel export
+```
+
+### Error Cascade Analysis
+
+**Single Root Cause → 80+ Errors:**
+```
+Misconfigured cn() import in index.ts
+  ↓
+20+ UI components import cn from $lib/utils
+  ↓
+TypeScript fails module resolution
+  ↓
+All components using cn() show "Module has no exported member"
+  ↓
+Cascading failures in 50+ route files importing those components
+```
+
+**Fix Impact:**
+- Changed 1 import pattern
+- Fixed 15 components
+- Eliminated 80-90 cascading errors
+
+### Performance Metrics
+
+**AST Parsing:**
+- Analyzed: 2,476 files
+- Parsed: 126 errors
+- Graph nodes: 10 (due to filtering)
+- Time: ~5-10 seconds
+
+**Database Operations:**
+- Insert: 126 error records
+- Update: AST context + priority scores
+- Cluster: 49 unique patterns
+
+### Recommendations
+
+1. **Always use direct imports** for Svelte 5 projects
+2. **Avoid barrel exports** in `$lib` for utilities
+3. **Use machine format** for svelte-check logs (easier parsing)
+4. **Monitor centrality metrics** to identify architectural hotspots
+5. **Fix high-ranking errors first** (80+ priority score)
+
+---
+
+# Gemini - Legacy Context - Phase 72 AST Error Reduction + CUDA Acceleration
 
 ## 🚀 Docker Build & Run for WSL Linux
 

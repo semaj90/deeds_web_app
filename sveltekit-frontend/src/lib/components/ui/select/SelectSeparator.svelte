@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { Select as BitsSelect } from "bits-ui";
   import { cn } from "$lib/utils/cn";
+  import { Select } from "bits-ui";
 
   interface Props {
     class?: string;
@@ -10,7 +10,9 @@
   let { class: className = "", ...rest }: Props = $props();
 </script>
 
-<BitsSelect.Separator
+<Select.Separator
   class={cn("-mx-1 my-1 h-px bg-muted", className)}
   {...rest}
 />
+
+

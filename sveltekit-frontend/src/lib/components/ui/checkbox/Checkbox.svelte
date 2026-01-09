@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { cn } from "$lib/utils";
-  import { Checkbox as BitsCheckbox } from "bits-ui";
+  import { cn } from "$lib/utils/cn";
+  import { Checkbox } from "bits-ui";
 
   let {
     checked = $bindable(false),
@@ -13,7 +13,7 @@
   } = $props();
 </script>
 
-<BitsCheckbox.Root
+<Checkbox.Root
   bind:checked
   {disabled}
   {name}
@@ -25,7 +25,7 @@
   )}
   {...rest}
 >
-  <BitsCheckbox.Indicator class="flex items-center justify-center text-current">
+  <Checkbox.Indicator class="flex items-center justify-center text-current">
     <svg
       xmlns="http://www.w3.org/2000/svg"
       width="12"
@@ -40,5 +40,5 @@
     >
       <polyline points="20 6 9 17 4 12" />
     </svg>
-  </BitsCheckbox.Indicator>
-</BitsCheckbox.Root>
+  </Checkbox.Indicator>
+</Checkbox.Root>

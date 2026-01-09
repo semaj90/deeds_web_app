@@ -7,7 +7,7 @@ export * from './types/index.js';
 export * from './utils/type-guards.js';
 
 // ===== ENHANCED API CLIENT =====
-export { apiClient, EnhancedApiClient } from './services/enhanced-api-client.js';
+export { EnhancedApiClient, apiClient } from './services/enhanced-api-client.js';
 
 // ===== ALL COMPONENTS (COMPREHENSIVE BARREL EXPORT) =====
 // Temporarily commented to avoid LegalDocument export conflict
@@ -18,40 +18,41 @@ export { enhancedFileUpload } from './services/enhanced-file-upload.js';
 export { default } from './services/localStorage-file-fallback.js';
 
 // ===== UTILITIES & TYPES =====
+export { cn, confidenceClass, legalCn, priorityClass } from './utils/cn';
 export {
-  cn, copyToClipboard, debounce, downloadFile, formatDate, formatFileSize, formatProcessingTime, generateId, getCaseStatusStyling, getConfidenceLevel, getEvidenceTypeStyling, getInitials, isBrowser, isValidEmail, storage,
-  theme, throttle
-} from './utils.js';
+    copyToClipboard, debounce, downloadFile, formatDate, formatFileSize, formatProcessingTime, generateId, getCaseStatusStyling, getConfidenceLevel, getEvidenceTypeStyling, getInitials, isBrowser, isValidEmail, storage,
+    theme, throttle
+} from './utils/index';
 
 // Export type helpers for Svelte 5 compatibility
 export type {
-  WithElementRef, WithoutChild,
-  WithoutChildren,
-  WithoutChildrenOrChild
+    WithElementRef, WithoutChild,
+    WithoutChildren,
+    WithoutChildrenOrChild
 } from './utils.js';
 
 // ===== OLLAMA INTEGRATION SERVICES =====
 export {
-  comprehensiveOllamaSummarizer,
-  type ComprehensiveSummaryRequest,
-  type ComprehensiveSummaryResponse,
-  type SummarizerConfig,
-  type SummarizerStats
+    comprehensiveOllamaSummarizer,
+    type ComprehensiveSummaryRequest,
+    type ComprehensiveSummaryResponse,
+    type SummarizerConfig,
+    type SummarizerStats
 } from './services/comprehensive-ollama-summarizer.js';
 
 export {
-  ollamaIntegrationLayer,
-  type IntegratedChatRequest,
-  type IntegratedChatResponse,
-  type OllamaServiceStatus
+    ollamaIntegrationLayer,
+    type IntegratedChatRequest,
+    type IntegratedChatResponse,
+    type OllamaServiceStatus
 } from './services/ollama-integration-layer.js';
 
 export {
-  LangChainOllamaService,
-  langChainOllamaService,
-  type LangChainConfig,
-  type ProcessingResult,
-  type QueryResult
+    LangChainOllamaService,
+    langChainOllamaService,
+    type LangChainConfig,
+    type ProcessingResult,
+    type QueryResult
 } from './ai/langchain-ollama-service.js';
 
 // ===== SERVER SERVICES (Server-side only) =====

@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { Select as BitsSelect } from "bits-ui";
   import { cn } from "$lib/utils/cn";
+  import { Select } from "bits-ui";
 
   interface Props {
     placeholder?: string;
@@ -11,8 +11,10 @@
   let { placeholder = "Select...", class: className = "", ...rest }: Props = $props();
 </script>
 
-<BitsSelect.Value
+<Select.Value
   class={cn("text-sm", className)}
   {placeholder}
   {...rest}
 />
+
+

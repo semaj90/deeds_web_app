@@ -1,6 +1,5 @@
 <script lang="ts">
-  import { cn } from "$lib/utils";
-  import { Select as BitsSelect } from "bits-ui";
+  import { cn } from "$lib/utils/cn";
   import type { Snippet } from "svelte";
 
   interface Props {
@@ -18,7 +17,7 @@
   }: Props = $props();
 </script>
 
-<BitsSelect.Trigger
+<Select.Trigger
   class={cn(
     "flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50",
     className
@@ -46,4 +45,5 @@
   >
     <path d="m6 9 6 6 6-6" />
   </svg>
-</BitsSelect.Trigger>
+</Select.Trigger>
+

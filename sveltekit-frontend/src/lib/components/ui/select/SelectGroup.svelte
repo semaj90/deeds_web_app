@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { Select as BitsSelect } from "bits-ui";
   import { cn } from "$lib/utils/cn";
+  import { Select } from "bits-ui";
   import type { Snippet } from "svelte";
 
   interface Props {
@@ -12,8 +12,10 @@
   let { children, class: className = "", ...rest }: Props = $props();
 </script>
 
-<BitsSelect.Group class={cn("p-1", className)} {...rest}>
+<Select.Group class={cn("p-1", className)} {...rest}>
   {#if children}
     {@render children()}
   {/if}
-</BitsSelect.Group>
+</Select.Group>
+
+
