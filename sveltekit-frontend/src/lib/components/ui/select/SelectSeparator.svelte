@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { cn } from "$lib/utils/cn.js";
+  import { cn } from "$lib/utils/cn";
   import { Select } from "bits-ui";
 
   interface Props {

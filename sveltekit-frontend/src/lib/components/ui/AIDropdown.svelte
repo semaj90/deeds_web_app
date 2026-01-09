@@ -1,7 +1,12 @@
 <script lang="ts">
-  import { cn } from "$lib/utils/cn.js";
+  import { cn } from "$lib/utils/cn";
   import { DropdownMenu } from "bits-ui";
-  import { Brain, ChevronDown, FileText, Keyboard, Sparkles, Wand2 } from "lucide-svelte";
+  import Brain from "lucide-svelte/icons/brain";
+  import ChevronDown from "lucide-svelte/icons/chevron-down";
+  import FileText from "lucide-svelte/icons/file-text";
+  import Keyboard from "lucide-svelte/icons/keyboard";
+  import Sparkles from "lucide-svelte/icons/sparkles";
+  import Wand2 from "lucide-svelte/icons/wand-2";
   import { onMount } from "svelte";
   import { fly } from "svelte/transition";
 

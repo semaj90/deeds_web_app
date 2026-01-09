@@ -1,6 +1,4 @@
 <script lang="ts">
-	let type = $state<any>(undefined);
-
 	/**
 	 * Svelte 5 + bits-ui v2.x Button Template
 	 *

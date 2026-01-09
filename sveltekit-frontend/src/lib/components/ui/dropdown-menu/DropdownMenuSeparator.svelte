@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { cn } from "$lib/utils/cn.js";
+  import { cn } from "$lib/utils/cn";
   import { DropdownMenu } from "bits-ui";
   let { class: className = "", ...rest } = $props();
 </script>

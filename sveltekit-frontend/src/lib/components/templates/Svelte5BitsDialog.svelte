@@ -1,7 +1,4 @@
 <script lang="ts">
-	let title = $state<any>(undefined);
-	let description = $state<any>(undefined);
-
 	/**
 	 * Svelte 5 + bits-ui v2.x Dialog Template
 	 *
@@ -16,7 +13,7 @@
 	 *   {/snippet}
 	 * </Svelte5BitsDialog>
 	 */
-	import { Dialog, DialogClose, DialogContent, DialogDescription, DialogOverlay, DialogPortal, DialogRoot, DialogTitle } from 'bits-ui';
+	import { Dialog } from 'bits-ui';
 	import X from 'lucide-svelte/icons/x';
 	import type { Snippet } from 'svelte';
 
@@ -48,14 +45,14 @@
 	});
 </script>
 
-<DialogRoot bind:open>
-	<DialogPortal>
-		<DialogOverlay
+<Dialog.Root bind:open>
+	<Dialog.Portal>
+		<Dialog.Overlay
 			class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm
 				data-[state=open]:animate-in data-[state=closed]:animate-out
 				data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0"
 		/>
-		<DialogContent
+		<Dialog.Content
 			class="fixed left-1/2 top-1/2 z-50 w-full max-w-lg -translate-x-1/2 -translate-y-1/2
 				border-4 border-nes-border bg-nes-panel p-6 shadow-lg
 				data-[state=open]:animate-in data-[state=closed]:animate-out
@@ -64,15 +61,15 @@
 				{ className }"
 		>
 			{#if title}
-				<DialogTitle class="text-lg font-semibold text-nes-accent uppercase tracking-wider">
+				<Dialog.Title class="text-lg font-semibold text-nes-accent uppercase tracking-wider">
 					{title}
-				</DialogTitle>
+				</Dialog.Title>
 			{/if}
 
 			{#if description}
-				<DialogDescription class="mt-2 text-sm text-nes-muted">
+				<Dialog.Description class="mt-2 text-sm text-nes-muted">
 					{description}
-				</DialogDescription>
+				</Dialog.Description>
 			{/if}
 
 			<div class="mt-4">
@@ -87,14 +84,14 @@
 				</div>
 			{/if}
 
-			<DialogClose
+			<Dialog.Close
 				class="absolute right-4 top-4 rounded-sm opacity-70 hover:opacity-100
 					focus:outline-none focus:ring-2 focus:ring-nes-accent focus:ring-offset-2
 					disabled:pointer-events-none"
 			>
 				<X class="h-4 w-4" />
 				<span class="sr-only">Close</span>
-			</DialogClose>
-		</DialogContent>
-	</DialogPortal>
-</DialogRoot>
+			</Dialog.Close>
+		</Dialog.Content>
+	</Dialog.Portal>
+</Dialog.Root>

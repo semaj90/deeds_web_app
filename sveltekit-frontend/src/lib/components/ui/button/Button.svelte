@@ -1,13 +1,18 @@
 <script lang="ts">
-  import { cn } from "$lib/utils/cn.js";
-  import type { Props as ButtonProps } from "bits-ui";
+  import { cn } from "$lib/utils/cn";
+  import { Button } from "bits-ui";
   import type { Snippet } from "svelte";
   import { buttonVariants, type ButtonVariantProps } from "../button-variants";
 
-  interface Props extends Omit<ButtonProps, 'children'> {
+  interface Props {
     variant?: ButtonVariantProps["variant"];
     size?: ButtonVariantProps["size"];
+    class?: string;
+    type?: "button" | "submit" | "reset";
+    onclick?: (event: MouseEvent) => void;
+    disabled?: boolean;
     children?: Snippet;
+    [key: string]: any; // Allow other HTML button attributes
   }
 
   let {

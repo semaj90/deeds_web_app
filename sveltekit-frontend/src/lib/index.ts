@@ -80,6 +80,10 @@ export {
 export type { AuthService } from './server/auth.js';
 export type { EmbeddingService, type EmbeddingOptions } from './server/embedding-service.js';
 
+// ===== SERVER DATABASE EXPORTS =====
+export { aceChunks, aceDocs, aceSources } from './db/schema/ace-web.js';
+export { adminDb, db } from './server/db/client.js';
+
 // ===== VERSION INFO =====
 export const VERSION = '2.0.0';
 export const BUILD_DATE = new Date().toISOString();
