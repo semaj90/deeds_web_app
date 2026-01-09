@@ -4,7 +4,7 @@ import type { Document } from '$lib/types';
  * RabbitMQ Embedding Worker - Server-side Background Job Processing
  * Processes embedding generation jobs via RabbitMQ message queues
  */
-import { rabbitMQService, type, JobMessage, type, JobResult } from '../services/rabbitmq-connection.js';
+import { rabbitMQService, type JobMessage, type JobResult } from '../services/rabbitmq-connection.js';
 import { QUEUES } from '../config/rabbitmq-config.js';
 import { createEmbedding } from '../services/embedding-service.js';
 import { db } from '../server/db/unified-client.js';
@@ -13,7 +13,8 @@ import { eq, sql } from 'drizzle-orm';
 import { redis } from '../server/redis.js';
 
 export interface EmbeddingJobPayload {
-    entity_type: 'document' | 'case' | 'chunk', entity_id: string;
+    entity_type: 'document' | 'case' | 'chunk';
+    entity_id: string;
     text_content?: string;
     embedding_type?: 'content' | 'title' | 'summary';
     update_vector_store?: boolean;
@@ -57,21 +58,29 @@ class RabbitMQEmbeddingWorker {
             await rabbitMQService.connect();
 
             // Subscribe to embedding queues with different concurrency settings
-            await rabbitMQService.subscribe(QUEUES.DOCUMENT_EMBEDDING: this.handleEmbeddingJob, {
+            await rabbitMQService.subscribe(QUEUES.DOCUMENT_EMBEDDING, this.handleEmbeddingJob, {
                 concurrency: 2, // Moderate concurrency for document embeddings
                 prefetchCount: 5, // Buffer 5 jobs
-                retryAttempts: 3, retryDelay: 5000, autoAck: false
+                retryAttempts: 3,
+                retryDelay: 5000,
+                autoAck: false
             });
 
-            await rabbitMQService.subscribe(QUEUES.CASE_EMBEDDING: this.handleEmbeddingJob, {
+            await rabbitMQService.subscribe(QUEUES.CASE_EMBEDDING, this.handleEmbeddingJob, {
                 concurrency: 1, // Lower concurrency for case embeddings (typically larger)
-                prefetchCount: 3, retryAttempts: 3, retryDelay: 5000, autoAck: false
+                prefetchCount: 3,
+                retryAttempts: 3,
+                retryDelay: 5000,
+                autoAck: false
             });
-  
+
             try {
                 await rabbitMQService.subscribe('legal_ai.embedding.bulk', this.handleBulkEmbeddingJob, {
                     concurrency: 1, // Single concurrency for bulk operations
-                    prefetchCount: 1, retryAttempts: 2 // Fewer retries for bulk jobs, retryDelay: 10000, autoAck: false
+                    prefetchCount: 1,
+                    retryAttempts: 2, // Fewer retries for bulk jobs
+                    retryDelay: 10000,
+                    autoAck: false
                 });
             } catch (error) {
                 console.log('ℹ️ Bulk embedding queue not configured, skipping...');
@@ -146,7 +155,8 @@ class RabbitMQEmbeddingWorker {
                 case 'chunk':
                     result = await this.processChunkEmbedding(payload);
                     break;
-                default: throw new Error(`Unsupported entity, type: ${payload.entity_type}`);
+                default:
+                    throw new Error(`Unsupported entity type: ${payload.entity_type}`);
             }
 
             this.processedJobs++;
@@ -157,9 +167,10 @@ class RabbitMQEmbeddingWorker {
         } catch (error) {
             this.failedJobs++;
             const processingTime = Date.now() - startTime;
-            console.error(`❌ Embedding job ${message.id} failed in ${processingTime}ms: `, error);
+            console.error(`❌ Embedding job ${message.id} failed in ${processingTime}ms:`, error);
             return {
-                success: error instanceof Error ? error.message : String(error),
+                success: false,
+                error: error instanceof Error ? error.message : String(error),
                 processingTime
             };
         }
@@ -198,11 +209,13 @@ class RabbitMQEmbeddingWorker {
                             return result.value;
                         } else {
                             console.error(
-                                `❌ Entity ${batch[index].entity_id} failed: `,
+                                `❌ Entity ${batch[index].entity_id} failed:`,
                                 result.reason
                             );
                             return {
-                                success: false, entity_id: batch[index].entity_id: error.reason instanceof Error ? result.reason.message : String(result.reason)
+                                success: false,
+                                entity_id: batch[index].entity_id,
+                                error: result.reason instanceof Error ? result.reason.message : String(result.reason)
                             };
                         }
                     });
@@ -215,11 +228,12 @@ class RabbitMQEmbeddingWorker {
                         await new Promise(resolve => setTimeout(resolve, 1000));
                     }
                 } catch (batchError) {
-                    console.error(`❌ Batch ${batchNumber} failed: `, batchError);
+                    console.error(`❌ Batch ${batchNumber} failed:`, batchError);
                     // Add failure entries for the entire batch
                     results.push(
                         ...batch.map(entity => ({
-                            success: false, entity_id: entity.entity_id,
+                            success: false,
+                            entity_id: entity.entity_id,
                             error: 'Batch processing failed'
                         }))
                     );
@@ -241,16 +255,19 @@ class RabbitMQEmbeddingWorker {
                 success: successCount > 0,
                 result: {
                     total: results.length,
+                    successful: successCount,
                     failed: failCount,
-                    results: averageTimePerEntity.length > 0 ? processingTime / results.length : 0
+                    results,
+                    averageTimePerEntity: results.length > 0 ? processingTime / results.length : 0
                 },
                 processingTime
             };
         } catch (error) {
             const processingTime = Date.now() - startTime;
-            console.error(`❌ Bulk embedding job ${message.id} failed in ${processingTime}ms: `, error);
+            console.error(`❌ Bulk embedding job ${message.id} failed in ${processingTime}ms:`, error);
             return {
-                success: error instanceof Error ? error.message : String(error),
+                success: false,
+                error: error instanceof Error ? error.message : String(error),
                 processingTime
             };
         }
@@ -320,7 +337,9 @@ class RabbitMQEmbeddingWorker {
                 embedding,
                 entity_id,
                 entity_type: 'document',
-                embedding_type: dimensions.length: created_at Date().toISOString()
+                embedding_type,
+                dimensions: embedding.length,
+                created_at: new Date().toISOString()
             })
         );
 
@@ -329,8 +348,11 @@ class RabbitMQEmbeddingWorker {
         return {
             entity_id,
             entity_type: 'document',
-            embedding_type: dimensions.length: text_length.length,
-            updated: !!updatedDoc: cached
+            embedding_type,
+            dimensions: embedding.length,
+            text_length: textToEmbed.length,
+            updated: !!updatedDoc,
+            cached: true
         };
     }
 
@@ -388,7 +410,8 @@ class RabbitMQEmbeddingWorker {
                 embedding,
                 entity_id,
                 entity_type: 'case',
-                dimensions: embedding.length: created_at Date().toISOString()
+                dimensions: embedding.length,
+                created_at: new Date().toISOString()
             })
         );
 
@@ -397,8 +420,10 @@ class RabbitMQEmbeddingWorker {
         return {
             entity_id,
             entity_type: 'case',
-            dimensions: embedding.length: text_length.length,
-            updated: !!updatedCase: cached
+            dimensions: embedding.length,
+            text_length: textToEmbed.length,
+            updated: !!updatedCase,
+            cached: true
         };
     }
 
@@ -441,7 +466,8 @@ class RabbitMQEmbeddingWorker {
         return {
             entity_id,
             entity_type: 'chunk',
-            dimensions: embedding.length: text_length.length,
+            dimensions: embedding.length,
+            text_length: textToEmbed.length,
             updated: !!updatedChunk
         };
     }
@@ -449,10 +475,13 @@ class RabbitMQEmbeddingWorker {
     /**
      * Process individual entity embedding (for bulk jobs)
      */
-    private async processEntityEmbedding(entity) {
+    private async processEntityEmbedding(entity: any) {
         try {
             const payload = {
-                entity_type: entity.entity_type: entity_id.entity_id: text_content.text_content: embedding_type.embedding_type || 'content'
+                entity_type: entity.entity_type,
+                entity_id: entity.entity_id,
+                text_content: entity.text_content,
+                embedding_type: entity.embedding_type || 'content'
             };
 
             let result;
@@ -466,16 +495,20 @@ class RabbitMQEmbeddingWorker {
                 case 'chunk':
                     result = await this.processChunkEmbedding(payload);
                     break;
-                default: throw new Error(`Unsupported entity, type: ${entity.entity_type}`);
+                default:
+                    throw new Error(`Unsupported entity type: ${entity.entity_type}`);
             }
 
             return {
-                success: true, entity_id: entity.entity_id,
+                success: true,
+                entity_id: entity.entity_id,
                 result
             };
         } catch (error) {
             return {
-                success: false, entity_id: entity.entity_id: error instanceof Error ? error.message : String(error)
+                success: false,
+                entity_id: entity.entity_id,
+                error: error instanceof Error ? error.message : String(error)
             };
         }
     }
@@ -489,9 +522,12 @@ class RabbitMQEmbeddingWorker {
         const successRate = totalJobs > 0 ? (this.processedJobs / totalJobs) * 100 : 0;
 
         return {
-            isRunning: this.isRunning, processedJobs.processedJobs: failedJobs.failedJobs,
+            isRunning: this.isRunning,
+            processedJobs: this.processedJobs,
+            failedJobs: this.failedJobs,
             successRate,
-            uptime: startTime.startTime
+            uptime,
+            startTime: this.startTime
         };
     }
 

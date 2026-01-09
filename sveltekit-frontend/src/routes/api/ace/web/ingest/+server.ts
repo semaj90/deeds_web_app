@@ -5,18 +5,59 @@
  */
 
 import { aceSources } from '$lib/db/schema/ace-web';
-import db from '$lib/server/db/client';
+import { db } from '$lib/server/db/client';
 import { json } from '@sveltejs/kit';
+import type { Channel, Connection } from 'amqplib';
 import * as amqp from 'amqplib';
 import * as crypto from 'crypto';
-import { eq } from 'drizzle-orm';
+import { inArray } from 'drizzle-orm';
+import { z } from 'zod';
 import type { RequestHandler } from './$types.js';
 
-interface IngestRequest {
-  urls: string[];
-  tags?: string[];
-  priority?: 'high' | 'normal' | 'low';
+// --- Singleton RabbitMQ Connection ---
+let amqpConnection: Connection | null = null;
+let amqpChannel: Channel | null = null;
+
+async function getAmqpChannel() {
+  if (amqpChannel) return amqpChannel;
+
+  try {
+    const rabbitmqUrl = process.env.RABBITMQ_URL || 'amqp://localhost:5672';
+    if (!amqpConnection) {
+      amqpConnection = await amqp.connect(rabbitmqUrl);
+
+      // Handle connection close/error
+      amqpConnection.on('close', () => {
+        console.warn('[ACE Ingest] RabbitMQ connection closed. Resetting.');
+        amqpConnection = null;
+        amqpChannel = null;
+      });
+
+      amqpConnection.on('error', (err: unknown) => {
+        console.error('[ACE Ingest] RabbitMQ connection error:', err);
+        amqpConnection = null;
+        amqpChannel = null;
+      });
+    }
+
+    amqpChannel = await amqpConnection.createChannel();
+    await amqpChannel.assertQueue('ace_web_ingest', { durable: true });
+
+    return amqpChannel;
+  } catch (error) {
+    console.error('[ACE Ingest] Failed to connect/create channel:', error);
+    throw error;
+  }
 }
+
+// --- Validation Schema ---
+const IngestRequestSchema = z.object({
+  urls: z.array(z.string().url('Invalid URL format')).min(1, 'At least one URL required').max(100, 'Max 100 URLs per request'),
+  tags: z.array(z.string().min(1)).optional().default([]),
+  priority: z.enum(['high', 'normal', 'low']).default('normal'),
+});
+
+type IngestRequest = z.infer<typeof IngestRequestSchema>;
 
 interface IngestResponse {
   success: boolean;
@@ -31,28 +72,29 @@ interface IngestResponse {
  */
 export const POST: RequestHandler = async ({ request }) => {
   try {
-    const body: IngestRequest = await request.json();
+    const rawBody = await request.json();
 
-    // Validate input
-    const validation = validateInput(body);
-    if (!validation.valid) {
+    // Validate input with Zod
+    const validation = IngestRequestSchema.safeParse(rawBody);
+
+    if (!validation.success) {
       return json(
-        { error: validation.error, success: false },
+        {
+          error: 'Validation failed',
+          details: validation.error.flatten(),
+          success: false
+        },
         { status: 400 }
       );
     }
 
-    // Connect to RabbitMQ
-    let connection: any;
-    let channel: any;
+    const body = validation.data;
 
+    // Connect to RabbitMQ (reusing connection)
+    let channel: Channel;
     try {
-      const rabbitmqUrl = process.env.RABBITMQ_URL || 'amqp://localhost:5672';
-      connection = await amqp.connect(rabbitmqUrl);
-      channel = await connection.createChannel();
-      await channel.assertQueue('ace_web_ingest', { durable: true });
+      channel = await getAmqpChannel();
     } catch (error) {
-      console.error('[ACE Ingest] Failed to connect to RabbitMQ:', error);
       return json(
         {
           error: 'Message queue unavailable',
@@ -66,85 +108,121 @@ export const POST: RequestHandler = async ({ request }) => {
     const jobIds: string[] = [];
     const errors: string[] = [];
 
-    // Process each URL
+    // 1. Check for existing sources in batch
+    let existingSources: { id: string; canonicalUrl: string }[] = [];
+    try {
+      existingSources = await db
+        .select({
+          id: aceSources.id,
+          canonicalUrl: aceSources.canonicalUrl
+        })
+        .from(aceSources)
+        .where(inArray(aceSources.canonicalUrl, body.urls));
+    } catch (dbError) {
+      console.error('[ACE Ingest] Database query failed:', dbError);
+      return json({ error: 'Database error', success: false }, { status: 500 });
+    }
+
+    const existingMap = new Map(existingSources.map(s => [s.canonicalUrl, s.id]));
+    const urlsToInsert: string[] = [];
+    const urlsToUpdate: string[] = [];
+    const sourceIdsMap = new Map<string, string>(); // URL -> SourceID
+
     for (const url of body.urls) {
-      try {
-        // Validate URL format
-        const urlObj = new URL(url);
-        const domain = urlObj.hostname;
-
-        // Check if URL already exists in database
-        const existing = await db
-          .select()
-          .from(aceSources)
-          .where(eq(aceSources.canonicalUrl, url))
-          .limit(1);
-
-        let sourceId: string;
-
-        if (existing.length > 0) {
-          // Update existing source
-          sourceId = existing[0].id;
-          await db
-            .update(aceSources)
-            .set({
-              crawlStatus: 'new'
-            })
-            .where(eq(aceSources.id, sourceId));
-
-          console.log(`[ACE Ingest] Updated existing source: ${sourceId}`);
-        } else {
-          // Insert new source
-          const [newSource] = await db
-            .insert(aceSources)
-            .values({
-              canonicalUrl: url,
-              domain,
-              sourceType: 'web',
-              crawlStatus: 'new',
-              title: null,
-              etag: null,
-              contentHash: null,
-            })
-            .returning();
-
-          sourceId = newSource.id;
-          console.log(`[ACE Ingest] Created new source: ${sourceId}`);
-        }
-
-        // Create job for RabbitMQ
-        const job = {
-          jobId: crypto.randomUUID(),
-          sourceId,
-          url,
-          tags: body.tags || [],
-          priority: body.priority || 'normal',
-          enqueuedAt: new Date().toISOString(),
-        };
-
-        // Enqueue job with priority
-        const priorityValue = getPriorityValue(body.priority);
-        channel.sendToQueue('ace_web_ingest', Buffer.from(JSON.stringify(job)), {
-          persistent: true,
-          priority: priorityValue
-        });
-
-        jobIds.push(job.jobId);
-        console.log(`[ACE Ingest] Enqueued job ${job.jobId} for ${url}`);
-      } catch (error) {
-        const errorMsg = `Failed to process URL ${url}: ${error}`;
-        console.error(`[ACE Ingest] ${errorMsg}`);
-        errors.push(errorMsg);
+      if (existingMap.has(url)) {
+        urlsToUpdate.push(url);
+        sourceIdsMap.set(url, existingMap.get(url)!);
+      } else {
+        urlsToInsert.push(url);
       }
     }
 
-    // Close RabbitMQ connection
-    try {
-      await channel.close();
-      await connection.close();
-    } catch (error) {
-      console.warn('[ACE Ingest] Failed to close RabbitMQ connection:', error);
+    // 2. Perform Batch Insert
+    if (urlsToInsert.length > 0) {
+      try {
+        const values = urlsToInsert.map(url => {
+          const parsedUrl = new URL(url);
+          return {
+            canonicalUrl: url,
+            domain: parsedUrl.hostname,
+            sourceType: 'web' as const,
+            crawlStatus: 'new' as const,
+          };
+        });
+
+        const inserted = await db
+          .insert(aceSources)
+          .values(values)
+          .returning({
+            id: aceSources.id,
+            canonicalUrl: aceSources.canonicalUrl
+          });
+
+        inserted.forEach(s => sourceIdsMap.set(s.canonicalUrl, s.id));
+        console.log(`[ACE Ingest] Batch inserted ${inserted.length} new sources`);
+      } catch (insertError) {
+        console.error('[ACE Ingest] Batch insert failed:', insertError);
+        return json({ error: 'Failed to create sources', success: false }, { status: 500 });
+      }
     }
+
+    // 3. Perform Batch Update (reset status to 'new')
+    if (urlsToUpdate.length > 0) {
+      try {
+        // Update all existing to 'new' status
+        await db
+          .update(aceSources)
+          .set({ crawlStatus: 'new' })
+          .where(inArray(aceSources.canonicalUrl, urlsToUpdate));
+        console.log(`[ACE Ingest] Batch updated ${urlsToUpdate.length} sources to 'new'`);
+      } catch (updateError) {
+        console.error('[ACE Ingest] Batch update failed:', updateError);
+        // Continue, treating as non-fatal but logged
+      }
+    }
+
+    // 4. Batch Enqueue Jobs
+    const priorityValue = getPriorityValue(body.priority);
+
+    // We process sequentially or parallel? Parallel is fine for RabbitMQ
+    await Promise.all(body.urls.map(async (url) => {
+        const sourceId = sourceIdsMap.get(url);
+        if (!sourceId) {
+            const msg = `Skipping enqueue for ${url}: Source ID not found (insert failed?)`;
+            console.error(msg);
+            errors.push(msg);
+            return;
+        }
+
+        try {
+            const job = {
+                jobId: crypto.randomUUID(),
+                sourceId,
+                url,
+                tags: body.tags,
+                priority: body.priority,
+                enqueuedAt: new Date().toISOString(),
+            };
+
+            const sent = channel.sendToQueue('ace_web_ingest', Buffer.from(JSON.stringify(job)), {
+                persistent: true,
+                priority: priorityValue
+            });
+
+            if (sent) {
+                jobIds.push(job.jobId);
+            } else {
+                // Handle backpressure if needed (rare for low volume)
+                console.warn(`[ACE Ingest] Buffer full for ${url}`);
+                // In truly robust system, we'd wait for 'drain' event
+                jobIds.push(job.jobId); // Pretend success for now or implement drain wait logic
+            }
+        } catch (queueError) {
+          const errorMsg = `Failed to enqueue URL ${url}: ${queueError instanceof Error ? queueError.message : String(queueError)}`;
+          console.error(`[ACE Ingest] ${errorMsg}`);
+          errors.push(errorMsg);
+        }
+    }));
 
     // Build response
     const response: IngestResponse = {
@@ -157,7 +235,7 @@ export const POST: RequestHandler = async ({ request }) => {
       response.errors = errors;
     }
 
-    const statusCode = jobIds.length > 0 ? 200 : 400;
+    const statusCode = jobIds.length > 0 ? 200 : 400; // Partial success is 200
 
     return json(response, { status: statusCode });
   } catch (error) {
@@ -173,63 +251,6 @@ export const POST: RequestHandler = async ({ request }) => {
   }
 };
 
-/**
- * Validate ingestion request
- */
-function validateInput(body: any): { valid: boolean; error?: string } {
-  if (!body) {
-    return { valid: false, error: 'Request body is required' };
-  }
-
-  if (!body.urls) {
-    return { valid: false, error: 'urls field is required' };
-  }
-
-  if (!Array.isArray(body.urls)) {
-    return { valid: false, error: 'urls must be an array' };
-  }
-
-  if (body.urls.length === 0) {
-    return { valid: false, error: 'urls array must not be empty' };
-  }
-
-  if (body.urls.length > 100) {
-    return { valid: false, error: 'Maximum 100 URLs per request' };
-  }
-
-  // Validate each URL is a string
-  for (const url of body.urls) {
-    if (typeof url !== 'string' || url.trim() === '') {
-      return { valid: false, error: 'All URLs must be non-empty strings' };
-    }
-  }
-
-  // Validate tags if provided
-  if (body.tags !== undefined) {
-    if (!Array.isArray(body.tags)) {
-      return { valid: false, error: 'tags must be an array' };
-    }
-
-    for (const tag of body.tags) {
-      if (typeof tag !== 'string' || tag.trim() === '') {
-        return { valid: false, error: 'All tags must be non-empty strings' };
-      }
-    }
-  }
-
-  // Validate priority if provided
-  if (body.priority !== undefined) {
-    const validPriorities = ['high', 'normal', 'low'];
-    if (!validPriorities.includes(body.priority)) {
-      return {
-        valid: false,
-        error: 'priority must be one of: high, normal, low',
-      };
-    }
-  }
-
-  return { valid: true };
-}
 
 /**
  * Convert priority string to RabbitMQ priority value

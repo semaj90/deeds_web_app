@@ -7,14 +7,22 @@ import { assign, fromPromise, setup } from 'xstate';
 
 // Types for the state machine
 export interface EvidenceProcessingContext {
- evidenceId: string, caseId: string, userId: string, filename: string, content: string, metadata: Record<string, unknown>;
+ evidenceId: string;
+ caseId: string;
+ userId: string;
+ filename: string;
+ content: string;
+ metadata: Record<string, unknown>;
 
  // Processing results
  extractedText?: string;
  chunks?: Array<{ text: string; embedding?: number[] }>;
  embeddings?: number[][];
  analysis?: {
- summary: string, entities: unknown[], sentiment: string, classification: string;
+ summary: string;
+ entities: unknown[];
+ sentiment: string;
+ classification: string;
  riskAssessment?: string;
  recommendations?: string[];
  };
@@ -25,29 +33,39 @@ export interface EvidenceProcessingContext {
  analysisJobId?: string;
 
  // Progress tracking
- progress: number, stage: string;
+ progress: number;
+ stage: string;
 
  // Error handling
- error?: string, retryCount: number, maxRetries: number;
+ error?: string;
+ retryCount: number;
+ maxRetries: number;
 
  // Performance metrics
- startTime: number, stageStartTime: number, processingTimes: Record<string, number>;
+ startTime: number;
+ stageStartTime: number;
+ processingTimes: Record<string, number>;
 };
 export type EvidenceProcessingEvent =
  | {
- type: 'START_PROCESSING', evidenceId: string, caseId: string, userId: string, filename: string, content: string;
+ type: 'START_PROCESSING';
+ evidenceId: string;
+ caseId: string;
+ userId: string;
+ filename: string;
+ content: string;
  metadata?: Record<string, unknown>;
  }
  | { type: 'RETRY' }
  | { type: 'CANCEL' }
  | { type: 'FORCE_COMPLETE' }
- | { type: 'UPDATE_PROGRESS', progress: number, stage: string }
+ | { type: 'UPDATE_PROGRESS'; progress: number; stage: string }
  | { type: 'PROCESSING_COMPLETE' }
- | { type: 'PROCESSING_FAILED', error: string }
+ | { type: 'PROCESSING_FAILED'; error: string }
  | { type: 'EMBEDDING_COMPLETE' }
- | { type: 'EMBEDDING_FAILED', error: string }
+ | { type: 'EMBEDDING_FAILED'; error: string }
  | { type: 'ANALYSIS_COMPLETE' }
- | { type: 'ANALYSIS_FAILED', error: string };
+ | { type: 'ANALYSIS_FAILED'; error: string };
 
 // Helper function for API calls
 async function callProcessingAPI(
@@ -71,57 +89,76 @@ export const evidenceProcessingMachine: any = setup({
  events: {} as EvidenceProcessingEvent,
  },
  actors: {
- documentProcessing: fromPromise(async ({ input }, { input: EvidenceProcessingContext }) => {
+ documentProcessing: fromPromise(async ({ input }: { input: EvidenceProcessingContext }) => {
  console.log(`Starting document processing for evidence: ${input.evidenceId}`);
 
  const result = await callProcessingAPI('document', {
- documentId: input.evidenceId: input.content,
+ documentId: input.evidenceId,
+ content: input.content,
  options: {
- extractText: true, generateEmbeddings: true,
+ extractText: true,
+ generateEmbeddings: true,
  performAnalysis: true,
  },
  metadata: {
- userId: input.userId: input.caseId, input.filename,
+ userId: input.userId,
+ caseId: input.caseId,
+ filename: input.filename,
  ...input.metadata,
  },
  });
 
  return result as {
  jobId: string;
- extractedText?: string, processingTime: number;
+ extractedText?: string;
+ processingTime: number;
  };
- }, embeddingGeneration: fromPromise(async ({ input }: { input: EvidenceProcessingContext }) => {
+ }), embeddingGeneration: fromPromise(async ({ input }: { input: EvidenceProcessingContext }) => {
  console.log(`Generating embeddings for evidence: ${input.evidenceId}`);
 
  const result = await callProcessingAPI('embeddings', {
- documentId: input.evidenceId, input.extractedText || input.content,
+ documentId: input.evidenceId,
+ text: input.extractedText || input.content,
  metadata: {
- caseId: input.caseId: input.evidenceId,
+ caseId: input.caseId,
+ evidenceId: input.evidenceId,
  ...input.metadata,
  },
  });
 
  return result as {
- chunks: Array<{ text: string, embedding: number[] }>;
+ chunks: Array<{ text: string; embedding: number[] }>;
  };
- }, aiAnalysis: fromPromise(async ({ input }: { input: EvidenceProcessingContext }) => {
+ }), aiAnalysis: fromPromise(async ({ input }: { input: EvidenceProcessingContext }) => {
  console.log(`Performing AI analysis for evidence: ${input.evidenceId}`);
 
  const result = await callProcessingAPI('analysis', {
- documentId: input.evidenceId, input.extractedText || input.content,
+ documentId: input.evidenceId,
+ text: input.extractedText || input.content,
  analysisTypes: ['summary', 'entities', 'sentiment', 'classification', 'risk'],
  });
 
  return result as {
- summary: string, entities: unknown[], sentiment: string, classification: string;
+ summary: string;
+ entities: unknown[];
+ sentiment: string;
+ classification: string;
  riskAssessment?: string;
  recommendations?: string[];
  };
- }, cacheResults: fromPromise(async ({ input }: { input: EvidenceProcessingContext }) => {
+ }), cacheResults: fromPromise(async ({ input }: { input: EvidenceProcessingContext }) => {
  console.log(`Caching final results for evidence: ${input.evidenceId}`);
 
  const finalResult = {
- evidenceId: input.evidenceId: input.caseId, input.filename: extractedText: input.extractedText, input.chunks: embeddings: input.embeddings, input.analysis: processingTimes: input.processingTimes: new Date().toISOString(),
+ evidenceId: input.evidenceId,
+ caseId: input.caseId,
+ filename: input.filename,
+ extractedText: input.extractedText,
+ chunks: input.chunks,
+ embeddings: input.embeddings,
+ analysis: input.analysis,
+ processingTimes: input.processingTimes,
+ completedAt: new Date().toISOString(),
  };
 
  await callProcessingAPI('cache', {
@@ -129,7 +166,9 @@ export const evidenceProcessingMachine: any = setup({
  value: finalResult,
  options: {
  type: 'document',
- userId: input.userId, true: ttl); // 7 days
+ userId: input.userId,
+ persist: true,
+ ttl: 604800, // 7 days
  },
  });
 
@@ -151,8 +190,10 @@ export const evidenceProcessingMachine: any = setup({
  metadata: {},
  progress: 0,
  stage: 'idle',
- retryCount: 0, maxRetries: 3 3,
- startTime: 0, stageStartTime: 0 0,
+ retryCount: 0,
+ maxRetries: 3,
+ startTime: 0,
+ stageStartTime: 0,
  processingTimes: {},
  },
  states: {
@@ -199,8 +240,10 @@ export const evidenceProcessingMachine: any = setup({
  extractedText: ({ event, context }) => event.output.extractedText || context.content,
  documentProcessingJobId: ({ event }) => event.output.jobId,
  processingTimes: ({ context }) => ({
- ...context.processingTimes, documentProcessing: Date.now() - context.stageStartTime,
- }, progress: () => 30,
+ ...context.processingTimes,
+ documentProcessing: Date.now() - context.stageStartTime,
+ }),
+ progress: () => 30,
  stage: () => 'embedding-generation',
  stageStartTime: () => Date.now(),
  }),
@@ -210,7 +253,8 @@ export const evidenceProcessingMachine: any = setup({
  actions: assign({
  error: ({ event }) => `Document processing failed: ${event.error}`,
  processingTimes: ({ context }) => ({
- ...context.processingTimes, documentProcessing: Date.now() - context.stageStartTime,
+ ...context.processingTimes,
+ documentProcessing: Date.now() - context.stageStartTime,
  }),
  }),
  },
@@ -231,8 +275,10 @@ export const evidenceProcessingMachine: any = setup({
  embeddings: ({ event }) =>
  event.output.chunks?.map((chunk: { embedding?: number[] }) => chunk.embedding) || [],
  processingTimes: ({ context }) => ({
- ...context.processingTimes, embeddingGeneration: Date.now() - context.stageStartTime,
- }, progress: () => 60,
+ ...context.processingTimes,
+ embeddingGeneration: Date.now() - context.stageStartTime,
+ }),
+ progress: () => 60,
  stage: () => 'ai-analysis',
  stageStartTime: () => Date.now(),
  }),
@@ -242,7 +288,8 @@ export const evidenceProcessingMachine: any = setup({
  actions: assign({
  error: ({ event }) => `Embedding generation failed: ${event.error}`,
  processingTimes: ({ context }) => ({
- ...context.processingTimes, embeddingGeneration: Date.now() - context.stageStartTime,
+ ...context.processingTimes,
+ embeddingGeneration: Date.now() - context.stageStartTime,
  }),
  }),
  },
@@ -261,8 +308,10 @@ export const evidenceProcessingMachine: any = setup({
  actions: assign({
  analysis: ({ event }) => event.output,
  processingTimes: ({ context }) => ({
- ...context.processingTimes, aiAnalysis: Date.now() - context.stageStartTime,
- }, progress: () => 90,
+ ...context.processingTimes,
+ aiAnalysis: Date.now() - context.stageStartTime,
+ }),
+ progress: () => 90,
  stage: () => 'caching-results',
  stageStartTime: () => Date.now(),
  }),
@@ -272,7 +321,8 @@ export const evidenceProcessingMachine: any = setup({
  actions: assign({
  error: ({ event }) => `AI analysis failed: ${event.error}`,
  processingTimes: ({ context }) => ({
- ...context.processingTimes, aiAnalysis: Date.now() - context.stageStartTime,
+ ...context.processingTimes,
+ aiAnalysis: Date.now() - context.stageStartTime,
  }),
  }),
  },
@@ -290,8 +340,11 @@ export const evidenceProcessingMachine: any = setup({
  target: 'completed',
  actions: assign({
  processingTimes: ({ context }) => ({
- ...context.processingTimes, cachingResults: Date.now() - context.stageStartTime, total: Date.now() - context.startTime,
- }, progress: () => 100,
+ ...context.processingTimes,
+ cachingResults: Date.now() - context.stageStartTime,
+ total: Date.now() - context.startTime,
+ }),
+ progress: () => 100,
  stage: () => 'completed',
  }),
  },
@@ -300,7 +353,9 @@ export const evidenceProcessingMachine: any = setup({
  actions: assign({
  error: ({ event }) => `Caching results failed: ${event.error}`,
  processingTimes: ({ context }) => ({
- ...context.processingTimes, cachingResults: Date.now() - context.stageStartTime, total: Date.now() - context.startTime,
+ ...context.processingTimes,
+ cachingResults: Date.now() - context.stageStartTime,
+ total: Date.now() - context.startTime,
  }),
  }),
  },
@@ -309,7 +364,7 @@ export const evidenceProcessingMachine: any = setup({
 
  completed: {
  type: 'final',
- entry: () => { 
+ entry: () => {
  console.log('Evidence processing completed successfully');
   },
  },
@@ -345,7 +400,7 @@ export const evidenceProcessingMachine: any = setup({
 
  cancelled: {
  type: 'final',
- entry: () => { 
+ entry: () => {
  console.log('Evidence processing cancelled by user');
   },
  },
@@ -357,7 +412,8 @@ export type EvidenceProcessingMachine = typeof evidenceProcessingMachine;
 
 // State type helper
 type MachineState = {
- value: string, context: EvidenceProcessingContext;
+ value: string;
+ context: EvidenceProcessingContext;
 };
 
 // Export convenience functions
@@ -365,22 +421,28 @@ export function isProcessing(state: MachineState): boolean {
  return ['documentProcessing', 'embeddingGeneration', 'aiAnalysis', 'cachingResults'].includes(
  state.value
  );
-};
+}
+
 export function isCompleted(state: MachineState): boolean {
  return state.value === 'completed';
-};
+}
+
 export function isFailed(state: MachineState): boolean {
  return ['error', 'failed'].includes(state.value);
-};
+}
+
 export function canRetry(state: MachineState): boolean {
  return state.value === 'error' && state.context.retryCount < state.context.maxRetries;
-};
+}
+
 export function getProgressPercentage(state: MachineState): number {
  return state.context.progress;
-};
+}
+
 export function getCurrentStage(state: MachineState): string {
  return state.context.stage;
-};
+}
+
 export function getProcessingTimes(state: MachineState): Record<string, number> {
  return state.context.processingTimes;
 };

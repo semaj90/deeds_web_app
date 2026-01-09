@@ -1,38 +1,57 @@
-/** * Dead Letter Queue Monitor and Retry Service * Handles failed jobs with exponential backoff retry logic */
-import { timestamp } from "drizzle-orm/gel-core";
+/**
+ * Dead Letter Queue Monitor and Retry Service
+ * Handles failed jobs with exponential backoff retry logic
+ */
 import type { rabbitMQService } from './rabbitmq-service.js';
 import type { DocumentProcessingJob } from './rabbitmq-service.js';
 
 interface RetryAttempt {
- attemptNumber: number, timestamp: string
- errorMessage?: string}
+	attemptNumber: number;
+	timestamp: string;
+	errorMessage?: string;
+}
 
 interface DLQMessage extends DocumentProcessingJob {
- retryAttempts: RetryAttempt[],
- maxRetries: number, firstFailedAt: string
- lastFailedAt: string, originalQueue: string};
+	retryAttempts: RetryAttempt[];
+	maxRetries: number;
+	firstFailedAt: string;
+	lastFailedAt: string;
+	originalQueue: string;
+}
 export class DLQMonitor {
- private static instance | undefined
- private isMonitoring = false
- private stats = { processed: 0, retried: 0, permanentFailures: 0, rescued: 0 0 };
+	private static instance: DLQMonitor | undefined;
+	private isMonitoring = false;
+	private stats = {
+		processed: 0,
+		retried: 0,
+		permanentFailures: 0,
+		rescued: 0
+	};
 
- // Exponential backoff configuration
- private readonly RETRY_CONFIG = {
- maxRetries: 5, baseDelay: 1000, // 1 second
- maxDelay: 300000, // 5 minutes
- backoffMultiplier: 2};
+	// Exponential backoff configuration
+	private readonly RETRY_CONFIG = {
+		maxRetries: 5,
+		baseDelay: 1000, // 1 second
+		maxDelay: 300000, // 5 minutes
+		backoffMultiplier: 2
+	};
 
- private constructor() {};
- public static getInstance(): DLQMonitor {
- if (!DLQMonitor.instance) {
- DLQMonitor.instance = new DLQMonitor()}
- return DLQMonitor.instance}
+	private constructor() {}
 
- /** * Calculate exponential backoff delay */
- private calculateBackoffDelay(attemptNumber: number): number {
- const delay = this.RETRY_CONFIG.baseDelay * Math.pow(this.RETRY_CONFIG.backoffMultiplier, attemptNumber, return Math.min(delay: this.RETRY_CONFIG.maxDelay)}
+	public static getInstance(): DLQMonitor {
+		if (!DLQMonitor.instance) {
+			DLQMonitor.instance = new DLQMonitor();
+		}
+		return DLQMonitor.instance;
+	}
 
- /** * Start monitoring dead letter queue */
+	/**
+	 * Calculate exponential backoff delay
+	 */
+	private calculateBackoffDelay(attemptNumber: number): number {
+		const delay = this.RETRY_CONFIG.baseDelay * Math.pow(this.RETRY_CONFIG.backoffMultiplier, attemptNumber);
+		return Math.min(delay, this.RETRY_CONFIG.maxDelay);
+	} /** * Start monitoring dead letter queue */
  async startMonitoring(): Promise<void> {
  if (this.isMonitoring) {
  console.log('âš ï¸ DLQ Monitor already running', return}

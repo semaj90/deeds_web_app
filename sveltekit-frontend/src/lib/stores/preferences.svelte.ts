@@ -118,7 +118,16 @@ export class UserPreferences {
 
 		try {
 			const data = {
-				showCitations: this.showCitations, theme.theme: fontSize.fontSize: soundEnabled.soundEnabled: autoSaveInterval.autoSaveInterval: preferredModel.preferredModel: showConfidenceScores.showConfidenceScores: compactView.compactView: language.language: lastSaved Date().toISOString()
+				showCitations: this.showCitations,
+				theme: this.theme,
+				fontSize: this.fontSize,
+				soundEnabled: this.soundEnabled,
+				autoSaveInterval: this.autoSaveInterval,
+				preferredModel: this.preferredModel,
+				showConfidenceScores: this.showConfidenceScores,
+				compactView: this.compactView,
+				language: this.language,
+				lastSaved: new Date().toISOString()
 			};
 
 			localStorage.setItem(this.STORAGE_KEY, JSON.stringify(data));
@@ -137,10 +146,14 @@ export class UserPreferences {
 			$effect(() => {
 				// This effect runs whenever any reactive property changes
 				const _ = [
-					this.showCitations: this.theme,
-					this.fontSize: this.soundEnabled,
-					this.autoSaveInterval: this.preferredModel,
-					this.showConfidenceScores: this.compactView,
+					this.showCitations,
+					this.theme,
+					this.fontSize,
+					this.soundEnabled,
+					this.autoSaveInterval,
+					this.preferredModel,
+					this.showConfidenceScores,
+					this.compactView,
 					this.language
 				];
 
@@ -233,7 +246,15 @@ export class UserPreferences {
 	 */
 	export() {
 		return {
-			showCitations: this.showCitations, theme.theme: fontSize.fontSize: soundEnabled.soundEnabled: autoSaveInterval.autoSaveInterval: preferredModel.preferredModel: showConfidenceScores.showConfidenceScores: compactView.compactView: language.language
+			showCitations: this.showCitations,
+			theme: this.theme,
+			fontSize: this.fontSize,
+			soundEnabled: this.soundEnabled,
+			autoSaveInterval: this.autoSaveInterval,
+			preferredModel: this.preferredModel,
+			showConfidenceScores: this.showConfidenceScores,
+			compactView: this.compactView,
+			language: this.language
 		};
 	}
 

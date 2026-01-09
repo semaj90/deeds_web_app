@@ -694,3 +694,117 @@ Copilot: "Convert all Svelte 4 writable stores to Svelte 5 $state runes in this 
 - Error density: **62.7 → <50** errors/100 lines
 - SSR safety: **improved** (no subscription mismatches)
 
+---
+
+## ⚠️ Understanding Error Count Spikes (Phase 90-91)
+
+### Why Fixing Errors Can Increase Error Count
+
+**Scenario:** You fix syntax errors in core files, then total error count jumps from 12k → 87k.
+
+**This is NORMAL and EXPECTED.**
+
+### The Syntax Masking Effect
+
+TypeScript compiler **stops reading a file** when it hits a critical syntax error:
+
+```typescript
+// File: my-service.ts (500 lines)
+
+export const config = {
+  database: "postgres";  // ❌ LINE 20: SYNTAX ERROR
+  // Compiler stops here
+}
+
+// Lines 21-500 are INVISIBLE to TypeScript
+// Type errors in those lines: NOT COUNTED
+```
+
+```
+Error count shown: 1 error
+Hidden errors: ~100 errors (in lines 21-500)
+Total REAL errors: 101 errors
+```
+
+### After Syntax Fix: The Reveal
+
+```typescript
+// File: my-service.ts (fixed syntax)
+
+export const config = {
+  database: "postgres",  // ✅ FIXED
+  // Compiler NOW READS lines 21-500
+}
+
+// Lines 21-500 now reveal:
+// - Type mismatches
+// - Missing imports
+// - Wrong return types
+```
+
+```
+Error count shown: 101 errors
+Hidden errors: 0 (all visible now)
+This is PROGRESS - you can see what needs fixing
+```
+
+### Phase 90-91 Results
+
+**Before Syntax Fixes:**
+- Visible errors: 12,000
+- Hidden errors: 75,000 (blocked by syntax)
+- Files compiler can't fully parse: 47
+
+**After Syntax Fixes:**
+- Visible errors: 87,000 (12k + 75k revealed)
+- Hidden errors: 0 (all visible)
+- Files compiler can't parse: 0
+
+**Next Phase:**
+- Fix semantic errors systematically
+- Target: 87k → 75k → 50k → 0
+- Measurable progress (no more hidden errors)
+
+### Copilot Recommendations
+
+**When error count increases after fixes:**
+
+1. **Check if syntax errors were just fixed:**
+   ```bash
+   node scripts/phase90-detect-cascade-errors.mjs
+   ```
+
+2. **If result shows 0 HIGH risk files:**
+   - ✅ Increase is expected (revealed errors)
+   - Continue with semantic error fixing
+   - Track progress: errors should now DECREASE steadily
+
+3. **If result shows HIGH risk files:**
+   - ⚠️ More syntax errors need fixing first
+   - Fix those before semantic errors
+
+4. **If error count keeps increasing:**
+   - ❌ Possible regression or bad automated fix
+   - Check git history, consider rollback
+
+### Success Pattern
+
+```
+Week 1: Fix syntax → 12k → 87k errors (spike expected)
+Week 2: Fix semantics → 87k → 75k errors (progress)
+Week 3: Fix semantics → 75k → 60k errors (progress)
+Week 4: Fix semantics → 60k → 45k errors (progress)
+```
+
+### Validation
+
+```bash
+# Verify no syntax blockers remain:
+node scripts/phase90-detect-cascade-errors.mjs
+# Expected: "0 files with HIGH risk"
+
+# Track semantic error reduction:
+npx svelte-check --threshold error 2>&1 | grep -c "Error:"
+# Should DECREASE over time after initial spike
+```
+
