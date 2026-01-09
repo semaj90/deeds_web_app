@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Switch } from "bits-ui";
+  import * as Switch from "bits-ui/components/switch";
 
   interface Props {
     checked?: boolean;

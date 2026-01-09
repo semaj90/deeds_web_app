@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { DropdownMenu } from "bits-ui";
+  import * as DropdownMenu from "bits-ui/components/dropdown-menu";
   import { Brain, ChevronDown, FileText, Keyboard, Sparkles, Wand2 } from "lucide-svelte";
   import { fly } from "svelte/transition";
   import { cn } from "$lib/utils/cn";

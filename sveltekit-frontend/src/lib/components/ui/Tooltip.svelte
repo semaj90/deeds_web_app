@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { Tooltip as BitsTooltip } from "bits-ui";
   import { cn } from "$lib/utils/cn";
   import { fade } from "svelte/transition";
 
@@ -13,13 +12,13 @@
   } = $props();
 </script>
 
-<BitsTooltip.Root {delayDuration} {...rest}>
-  <BitsTooltip.Trigger class={className}>
+<Tooltip.Root {delayDuration} {...rest}>
+  <Tooltip.Trigger class={className}>
     {#if children}
       {@render children()}
     {/if}
-  </BitsTooltip.Trigger>
-  <BitsTooltip.Content
+  </Tooltip.Trigger>
+  <Tooltip.Content
     {side}
     class={cn(
       "z-50 overflow-hidden rounded-md border bg-popover px-3 py-1.5 text-sm text-popover-foreground shadow-md transition-all data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2"
@@ -28,6 +27,6 @@
     <div transition:fade={{ duration: 150 }}>
       {content}
     </div>
-    <BitsTooltip.Arrow class="fill-popover" />
-  </BitsTooltip.Content>
-</BitsTooltip.Root>
+    <Tooltip.Arrow class="fill-popover" />
+  </Tooltip.Content>
+</Tooltip.Root>

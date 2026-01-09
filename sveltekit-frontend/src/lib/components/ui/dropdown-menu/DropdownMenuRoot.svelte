@@ -1,10 +1,10 @@
 <script lang="ts">
-  import { DropdownMenu as BitsDropdownMenu } from "bits-ui";
+  import * as DropdownMenu from "bits-ui/components/dropdown-menu";
   let { children, ...rest } = $props();
 </script>
 
-<BitsDropdownMenu.Root {...rest}>
+<DropdownMenu.Root {...rest}>
   {#if children}
     {@render children()}
   {/if}
-</BitsDropdownMenu.Root>
+</DropdownMenu.Root>

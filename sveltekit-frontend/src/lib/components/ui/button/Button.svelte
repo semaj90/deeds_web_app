@@ -1,11 +1,10 @@
 <script lang="ts">
-  import { cn } from "$lib/utils/cn";
-  import type { Props as BitsButtonProps } from "bits-ui";
-  import { Button as BitsButton } from "bits-ui";
+  import { cn } from "$lib/utils/cn.js";
+  import type { Props as ButtonProps } from "bits-ui/components/button";
   import type { Snippet } from "svelte";
   import { buttonVariants, type ButtonVariantProps } from "../button-variants";
 
-  interface Props extends Omit<BitsButtonProps, 'children'> {
+  interface Props extends Omit<ButtonProps, 'children'> {
     variant?: ButtonVariantProps["variant"];
     size?: ButtonVariantProps["size"];
     children?: Snippet;
@@ -21,7 +20,7 @@
   }: Props = $props();
 </script>
 
-<BitsButton.Root
+<Button.Root
   class={cn(buttonVariants({ variant, size }), className)}
   {type}
   {...rest}
@@ -29,4 +28,4 @@
   {#if children}
     {@render children()}
   {/if}
-</BitsButton.Root>
+</Button.Root>
