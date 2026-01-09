@@ -10,21 +10,21 @@ import { createHash } from 'crypto'; // For SHA256 hashing on the server (value 
 // Define a minimal RedisClientType to satisfy type-checking without a direct dependency on 'redis'.
 // The actual client from '$lib/server/cache/redis' should match this shape.
 type RedisClientType = {
- isReady?: boolean; // Optional - not all Redis implementations have this property
- get(key: string): Promise<string | null>;
- set(key: string, value: string, options?: { EX: number }): Promise<'OK' | null>;
- del(key: string | string[]): Promise<number>;
+	isReady?: boolean; // Optional - not all Redis implementations have this property
+	get(key: string): Promise<string | null>;
+	set(key: string, value: string, options?: { EX?: number }): Promise<string | null>;
+	del(key: string | string[]): Promise<number>;
 };
 
 // Import Redis client only on the server
-let redisClient: RedisClientType | undefined; // Type will be RedisClientType from 'redis'
+let redisClient: any; // Using any to avoid type conflicts with different Redis implementations
 if (!browser) {
- // Dynamically import to avoid bundling for client
- import('$lib/server/cache/redis')
- .then(async (module) => {
- redisClient = await module.getRedisClient();
- })
- .catch((e) => console.error('Failed to load Redis client:', e));
+	// Dynamically import to avoid bundling for client
+	import('$lib/server/cache/redis')
+		.then(async (module) => {
+			redisClient = await module.getRedisClient();
+		})
+		.catch((e) => console.error('Failed to load Redis client:', e));
 }
 
 // Thread synchronization primitives

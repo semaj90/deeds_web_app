@@ -12,7 +12,7 @@
  * - Uses svelte/compiler to parse .svelte files into AST
  * - Matches svelte-check diagnostics to AST node positions
  * - Builds dependency graph from imports/exports
- * - Calculates impact scores using graph centrality
+ * - Calculates impact ranking using graph centrality
  * - Generates fix recommendations with context
  *
  * Integration with existing Phase 78:

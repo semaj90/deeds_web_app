@@ -51,7 +51,7 @@ async function runTest() {
   // Test 2: Run AST ranker on top 10 files
   log('\n2. Running AST ranker (top 10 files)...', colors.yellow);
   try {
-    execSync('tsx scripts/phase78-ast-aware-ranker.mts --top=10', {
+    execSync('npx tsx scripts/phase78-ast-aware-ranker.mts --top=10', {
       cwd: projectRoot,
       stdio: 'inherit'
     });

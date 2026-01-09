@@ -48,9 +48,9 @@
  .sort((a: any, b: any) => new Date(b.createdAt || b.updatedAt || 0).getTime() - new Date(a.createdAt || a.updatedAt || 0).getTime())
  .slice(0, 10)
  .map((caseItem: any) => ({
- id, caseItem.id || caseItem.caseId,
- title, caseItem.title || caseItem.name || 'Untitled Case',
- caseNumber, caseItem.caseNumber || caseItem.id,
+ id: caseItem.id || caseItem.caseId,
+ title: caseItem.title || caseItem.name || 'Untitled Case',
+ caseNumber: caseItem.caseNumber || caseItem.id,
  priority: caseItem.priority || 'medium',
  createdBy: caseItem.createdBy || 'System',
  createdByLastName: caseItem.createdByLastName || '',
