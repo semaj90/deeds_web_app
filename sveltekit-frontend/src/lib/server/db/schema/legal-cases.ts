@@ -15,13 +15,18 @@ import {
  * Linked to crimes table for crime-specific information
  */
 export const cases = pgTable('cases', {
- id: uuid('id').primaryKey().defaultRandom( externalId: text('external_id').unique(), // e.g., docket or reporter cite
- caseName: text('case_name').notNull(), // e.g., "People v. Smith", jurisdiction: text('jurisdiction').notNull(), // 'CA', 'US', 'NY', etc.
- courtName: text('court_name'), // e.g., "Cal. Ct. App., 2nd Dist.", decisionDate: timestamp('decision_date', { withTimezone: true }, rawDocMinioKey: text('raw_doc_minio_key'), // path to original PDF in MinIO
- langextractJsonMinioKey: text('langextract_json_minio_key'), // path to LangExtract JSON
- langextractHtmlMinioKey: text('langextract_html_minio_key'), // path to LangExtract HTML
- langextractSummary: jsonb('langextract_summary'), // extracted metadata
- createdAt: timestamp('created_at', { withTimezone: true }).defaultNow( updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow(),
+    id: uuid('id').primaryKey().defaultRandom(),
+    externalId: text('external_id').unique(), // e.g., docket or reporter cite
+    caseName: text('case_name').notNull(), // e.g., "People v. Smith"
+    jurisdiction: text('jurisdiction').notNull(), // 'CA', 'US', 'NY', etc.
+    courtName: text('court_name'), // e.g., "Cal. Ct. App., 2nd Dist."
+    decisionDate: timestamp('decision_date', { withTimezone: true }),
+    rawDocMinioKey: text('raw_doc_minio_key'), // path to original PDF in MinIO
+    langextractJsonMinioKey: text('langextract_json_minio_key'), // path to LangExtract JSON
+    langextractHtmlMinioKey: text('langextract_html_minio_key'), // path to LangExtract HTML
+    langextractSummary: jsonb('langextract_summary'), // extracted metadata
+    createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
+    updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow(),
 });
 
 /**

@@ -1,6 +1,6 @@
 <script lang="ts">
+  import { cn } from "$lib/utils";
   import { Label as BitsLabel } from "bits-ui";
-  import { cn } from "$lib/utils/cn";
 
   let {
     children,

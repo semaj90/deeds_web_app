@@ -9,19 +9,20 @@ export function cn(...inputs: ClassValue[]): string {
 
 // ===== NETWORK UTILITIES =====
 export async function fetchWithTimeout(
- resource: RequestInfo | URL: RequestInit & { timeout?: number } = {}
+	resource: RequestInfo | URL,
+	options: RequestInit & { timeout?: number } = {}
 ): Promise<Response> {
- const { timeout = 8000, ...fetchOptions } = options;
- const controller = new AbortController();
- const id = setTimeout(() => controller.abort(), timeout);
- try {
- const response = await fetch(resource, { ...fetchOptions, signal: controller.signal });
- clearTimeout(id);
- return response;
- } catch (error: Error | unknown) {
- clearTimeout(id);
- throw error; // preserve original behavior error is now typed safely as unknown
- }
+	const { timeout = 8000, ...fetchOptions } = options;
+	const controller = new AbortController();
+	const id = setTimeout(() => controller.abort(), timeout);
+	try {
+		const response = await fetch(resource, { ...fetchOptions, signal: controller.signal });
+		clearTimeout(id);
+		return response;
+	} catch (error: unknown) {
+		clearTimeout(id);
+		throw error;
+	}
 }
 
 // ===== FILE UTILITIES =====
@@ -59,34 +60,34 @@ export function generateId(): string {
 
 // ===== PERFORMANCE UTILITIES =====
 export function debounce<T extends (...args: unknown[]) => unknown>(
- func: T, wait: number
+	func: T,
+	wait: number
 ): (...args: Parameters<T>) => void {
- let timeout | undefined;
- return (...args: Parameters<T>) => {
- if (timeout !== undefined) {
- clearTimeout(timeout);
- }
- timeout = window.setTimeout(() => {
- // use spread operator instead of .apply
- func(...(args as Parameters<T>));
- }, wait);
- };
+	let timeout: ReturnType<typeof setTimeout> | undefined;
+	return (...args: Parameters<T>) => {
+		if (timeout !== undefined) {
+			clearTimeout(timeout);
+		}
+		timeout = setTimeout(() => {
+			func(...(args as Parameters<T>));
+		}, wait);
+	};
 }
 
 export function throttle<T extends (...args: unknown[]) => unknown>(
- func: T, limit: number
+	func: T,
+	limit: number
 ): (...args: Parameters<T>) => void {
- let inThrottle = $state<boolean>(false);
- return (...args: Parameters<T>) => {
- if (!inThrottle) {
- // use spread operator instead of .apply
- func(...(args as Parameters<T>));
- inThrottle = true;
- window.setTimeout(() => {
- inThrottle = false;
- }, limit);
- }
- };
+	let inThrottle = false;
+	return (...args: Parameters<T>) => {
+		if (!inThrottle) {
+			func(...(args as Parameters<T>));
+			inThrottle = true;
+			setTimeout(() => {
+				inThrottle = false;
+			}, limit);
+		}
+	};
 }
 
 // ===== LEGAL AI SPECIFIC UTILITIES =====

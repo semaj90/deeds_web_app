@@ -1,6 +1,6 @@
 <script lang="ts">
+  import { cn } from "$lib/utils";
   import { Checkbox as BitsCheckbox } from "bits-ui";
-  import { cn } from "$lib/utils/cn";
 
   let {
     checked = $bindable(false),
