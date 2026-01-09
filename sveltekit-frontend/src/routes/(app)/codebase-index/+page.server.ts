@@ -1,5 +1,4 @@
 import type { PageServerLoad } from './$types';
-import { env } from '$env/dynamic/private';
 
 // Define types for the data we return
 interface FileProfile {
@@ -46,20 +45,25 @@ export const load: PageServerLoad = async ({ fetch, url }) => {
 			console.error('Failed to fetch codebase index:', res.status, res.statusText);
 			// Return fallback/demo data on failure to keep page renderable
 			return {
-				files: getDemoFiles( stats: getDemoStats( error: `API Connect Error: ${res.status}`
+				files: getDemoFiles(),
+				stats: getDemoStats(),
+				error: `API Connect Error: ${res.status}`
 			};
 		}
 
 		const data = await res.json();
 		return {
 			files: data.files || [],
-			stats, data.stats || getDemoStats( error: null
+			stats: data.stats || getDemoStats(),
+			error: null
 		};
 
 	} catch (e) {
 		console.error('Error loading codebase index:', e);
 		return {
-			files: getDemoFiles( stats: getDemoStats( error: 'Failed to connect to Index Service'
+			files: getDemoFiles(),
+			stats: getDemoStats(),
+			error: 'Failed to connect to Index Service'
 		};
 	}
 };
