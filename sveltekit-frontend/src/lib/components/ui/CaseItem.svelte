@@ -1,7 +1,7 @@
 <script lang="ts">
   import Badge from "./badge/Badge.svelte";
   import Card from "./Card/Card.svelte";
-  import { cn } from "$lib/utils/cn";
+  import { cn } from "$lib/utils/cn.js";
 
   interface Props {
     caseItem: {

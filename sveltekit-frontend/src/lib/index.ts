@@ -3,6 +3,26 @@ import './polyfills.js';
 // ===== CENTRALIZED TYPES (SINGLE SOURCE OF TRUTH) =====
 export * from './types/index.js';
 
+// ===== EXTERNAL SERVICE TYPES =====
+export type {
+    MinIOClient,
+    MinIOConfig,
+    Neo4jClient,
+    Neo4jConfig,
+    OllamaClient,
+    OllamaConfig,
+    PgVectorClient,
+    PostgresConfig,
+    QdrantClient,
+    QdrantConfig,
+    QdrantSearchResult,
+    QdrantVectorPayload,
+    RedisCacheService,
+    RedisConfig,
+    ServiceEnvironment,
+    ServiceUrls
+} from './types/external-services.js';
+
 // ===== TYPE GUARDS & UTILITIES =====
 export * from './utils/type-guards.js';
 

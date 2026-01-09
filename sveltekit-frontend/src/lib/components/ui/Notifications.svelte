@@ -1,4 +1,4 @@
-﻿<script lang="ts">
+<script lang="ts">
   import  Button  from "$lib/components/ui/enhanced-bits.svelte";
   import { quintOut } from 'svelte/easing';
   import { fly } from 'svelte/transition';

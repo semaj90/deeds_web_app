@@ -1,4 +1,4 @@
-﻿<!-- Comprehensive Bits-UI Demo for Legal, AI, App -->
+<!-- Comprehensive Bits-UI Demo for Legal, AI, App -->
 <script lang="ts">
 import type { Case } from '$lib/types';
   // Svelte, 5 runes are auto-imported

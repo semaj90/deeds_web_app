@@ -52,6 +52,79 @@
 - Redis updater: `phase90-update-redis-patterns.mjs`
 - Research log: `phase90-web-search-results.md`
 
+---
+
+## 🔐 PostgreSQL Auth Fallback (Jan 9, 2026)
+
+**Quick Reference:**
+```typescript
+// Primary credentials
+user: 'legal_admin'
+password: '123456'
+database: 'legal_ai_db'
+
+// Fallback (superuser)
+fallbackUser: 'postgres'
+fallbackPassword: process.env.POSTGRES_SUPERUSER_PASSWORD || 'postgres'
+```
+
+**Environment Variables:**
+- `POSTGRES_USER` - Override primary user
+- `POSTGRES_PASSWORD` - Override primary password
+- `POSTGRES_SUPERUSER_PASSWORD` - Set fallback password
+- `DATABASE_URL` - Full connection string (takes precedence)
+
+**Location:** `src/lib/server/adapters/service-integrations.ts` (lines 52-58)
+
+**Pattern:** Graceful degradation - app user first, superuser as fallback
+
+---
+
+## 🔧 Module Resolution Fixes (Jan 9, 2026)
+
+**Issue:** TypeScript cache not recognizing barrel exports from `$lib/*`
+
+**Fixes Applied:**
+
+1. **External Service Types** - Added explicit re-exports in `src/lib/index.ts`:
+   ```typescript
+   export type {
+       MinIOClient, MinIOConfig, Neo4jClient, Neo4jConfig,
+       OllamaClient, OllamaConfig, PgVectorClient, PostgresConfig,
+       QdrantClient, QdrantConfig, QdrantSearchResult, QdrantVectorPayload,
+       RedisCacheService, RedisConfig, ServiceEnvironment, ServiceUrls
+   } from './types/external-services.js';
+   ```
+
+2. **ACE Web Schema Exports** - Added to `src/lib/server/db/schema.ts`:
+   ```typescript
+   export {
+       aceSources, aceDocs, aceChunks, aceCollections, aceCollectionChunks,
+       type AceSource, type AceDoc, type AceChunk, type AceCollection, type AceCollectionChunk
+   } from '../../db/schema/ace-web';
+   ```
+
+3. **TypeScript Config** - Optimized `tsconfig.json` for SvelteKit + bits-ui:
+   ```json
+   {
+       "compilerOptions": {
+           "noEmit": true,  // Required when using allowImportingTsExtensions
+           "moduleResolution": "bundler",  // Better for Vite/SvelteKit
+           "types": ["svelte", "node"]  // Include node types for process.env
+           // Removed "paths" - use kit.alias in svelte.config.js instead
+       }
+   }
+   ```
+   - **Note:** SvelteKit auto-generates `.svelte-kit/tsconfig.json` with proper path aliases
+   - Manually setting `paths` in tsconfig.json interferes with SvelteKit's resolution
+
+4. **Redis Client** - Fixed method name in `cognitive-cache-integration.ts`:
+   ```typescript
+   // Changed: module.getRedisClient() → module.createRedisClient()
+   ```
+
+**Impact:** Resolved 16+ type import errors in service-integrations.ts and related files
+
 ### Next Steps
 - Add 3 new patterns to Redis KAG (7 total patterns)
 - Execute Batches 14-16: 150 files (ranks 256-405)

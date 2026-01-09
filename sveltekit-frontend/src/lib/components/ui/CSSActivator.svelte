@@ -1,4 +1,4 @@
-﻿<script lang="ts">
+<script lang="ts">
   // Hidden component that activates all NES.css selectors to prevent unused warnings
   // This component is invisible but contains all HTML elements that NES.css styles
   import NESElementsShowcase from './NESElementsShowcase.svelte';

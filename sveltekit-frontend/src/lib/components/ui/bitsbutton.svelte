@@ -1,4 +1,4 @@
-﻿<script lang="ts">
+<script lang="ts">
   import { cva, type VariantProps } from 'class-variance-authority';
   import { cn } from '$lib/utils';
   import { createEventDispatcher } from 'svelte';

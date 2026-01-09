@@ -50,6 +50,37 @@ Ctrl+Shift+P → "TypeScript: Restart TS Server"
 import { db } from '$lib/server/db';
 ```
 
+---
+
+## 🔧 PostgreSQL Authentication: Fallback Strategy (Jan 9, 2026)
+
+**Problem:** Production deployments may have different user credentials than development.
+
+**Solution:** Implement fallback authentication in `service-integrations.ts`:
+
+```typescript
+postgresConfig: {
+  host: dbUrl.hostname || 'localhost',
+  port: parseInt(dbUrl.port || '5432', 10),
+  database: dbUrl.pathname.slice(1) || 'legal_ai_db',
+  user: dbUrl.username || process.env.POSTGRES_USER || 'legal_admin',
+  password: dbUrl.password || process.env.POSTGRES_PASSWORD || '123456',
+  // Fallback to superuser if legal_admin fails
+  fallbackUser: 'postgres',
+  fallbackPassword: process.env.POSTGRES_SUPERUSER_PASSWORD || 'postgres'
+}
+```
+
+**Benefits:**
+- **Development:** Uses `legal_admin` by default
+- **Production:** Falls back to `postgres` superuser if app user fails
+- **Flexibility:** Supports environment variable overrides
+
+**Database Credentials:**
+- Primary: `legal_admin` / `123456`
+- Fallback: `postgres` / (from env or `postgres`)
+- Database: `legal_ai_db`
+
 **Why:** Runtime works perfectly - this is purely an IDE/editor cache issue.
 
 **Prevention:**

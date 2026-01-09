@@ -1,4 +1,4 @@
-﻿<script lang="ts">
+<script lang="ts">
   import { getOllamaGenerateEndpoint } from '$lib/utils/ollama';
 
   import { browser } from '$app/environment';

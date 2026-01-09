@@ -1,4 +1,4 @@
-﻿<script lang="ts">
+<script lang="ts">
   // Replaced melt with bits-ui components
   import { setContext } from 'svelte';
   interface Props {

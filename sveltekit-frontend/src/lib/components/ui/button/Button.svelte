@@ -1,6 +1,6 @@
 <script lang="ts">
   import { cn } from "$lib/utils/cn.js";
-  import type { Props as ButtonProps } from "bits-ui/components/button";
+  import type { Props as ButtonProps } from "bits-ui";
   import type { Snippet } from "svelte";
   import { buttonVariants, type ButtonVariantProps } from "../button-variants";
 

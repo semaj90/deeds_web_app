@@ -22,7 +22,7 @@ if (!browser) {
 	// Dynamically import to avoid bundling for client
 	import('$lib/server/cache/redis')
 		.then(async (module) => {
-			redisClient = await module.getRedisClient();
+			redisClient = await module.createRedisClient();
 		})
 		.catch((e) => console.error('Failed to load Redis client:', e));
 }

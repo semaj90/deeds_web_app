@@ -20,6 +20,13 @@ export {
     chatMetadata, type ChatMessage, type ChatMetadata, type NewChatMessage, type NewChatMetadata
 } from './schema-chat';
 
+// ACE Web Ingestion Schema
+export {
+    aceChunks, aceCollectionChunks, aceCollections, aceDocs, aceSources, type AceChunk,
+    type AceCollection,
+    type AceCollectionChunk, type AceDoc, type AceSource
+} from '../../db/schema/ace-web';
+
 // Also export additional schema modules as needed
 // export * from './schema-route-errors.js';
 // export * from './schema-phase78.js';

@@ -1,4 +1,4 @@
-﻿<script lang="ts">
+<script lang="ts">
   interface Props {
     for_?: string;
     class_?: string;

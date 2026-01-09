@@ -1,9 +1,9 @@
 <script lang="ts">
-  import * as DropdownMenu from "bits-ui/components/dropdown-menu";
+  import { cn } from "$lib/utils/cn.js";
+  import { DropdownMenu } from "bits-ui";
   import { Brain, ChevronDown, FileText, Keyboard, Sparkles, Wand2 } from "lucide-svelte";
-  import { fly } from "svelte/transition";
-  import { cn } from "$lib/utils/cn";
   import { onMount } from "svelte";
+  import { fly } from "svelte/transition";
 
   interface Props {
     disabled?: boolean;

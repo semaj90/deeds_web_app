@@ -55,6 +55,31 @@
 
 ---
 
+## 🔐 Database Authentication: Fallback Strategy (Jan 9, 2026)
+
+**Pattern:** PostgreSQL Connection Resilience
+
+**Implementation:**
+```typescript
+// src/lib/server/adapters/service-integrations.ts
+postgresConfig: {
+  user: dbUrl.username || process.env.POSTGRES_USER || 'legal_admin',
+  password: dbUrl.password || process.env.POSTGRES_PASSWORD || '123456',
+  fallbackUser: 'postgres',
+  fallbackPassword: process.env.POSTGRES_SUPERUSER_PASSWORD || 'postgres'
+}
+```
+
+**Key Findings:**
+- **Primary User:** `legal_admin` (application-level access)
+- **Fallback User:** `postgres` (superuser for emergency access)
+- **Database:** `legal_ai_db`
+- **Environment Support:** Reads from `POSTGRES_USER`, `POSTGRES_PASSWORD`, `POSTGRES_SUPERUSER_PASSWORD`
+
+**Use Case:** Production deployments where app user credentials differ from development
+
+---
+
 ## 🔧 TypeScript Language Server: Module Export Cache Issue
 
 **Problem:** `Module '"$lib/server/db"' has no exported member 'db'` (but export exists)

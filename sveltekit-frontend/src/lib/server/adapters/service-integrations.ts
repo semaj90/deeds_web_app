@@ -14,22 +14,22 @@
  */
 import { dev } from '$app/environment';
 import type {
-  MinIOClient,
-  MinIOConfig,
-  Neo4jClient,
-  Neo4jConfig,
-  OllamaClient,
-  OllamaConfig,
-  PgVectorClient,
-  PostgresConfig,
-  QdrantClient,
-  QdrantConfig,
-  QdrantSearchResult,
-  QdrantVectorPayload,
-  RedisCacheService,
-  RedisConfig,
-  ServiceEnvironment,
-  ServiceUrls
+    MinIOClient,
+    MinIOConfig,
+    Neo4jClient,
+    Neo4jConfig,
+    OllamaClient,
+    OllamaConfig,
+    PgVectorClient,
+    PostgresConfig,
+    QdrantClient,
+    QdrantConfig,
+    QdrantSearchResult,
+    QdrantVectorPayload,
+    RedisCacheService,
+    RedisConfig,
+    ServiceEnvironment,
+    ServiceUrls
 } from '$lib/types/external-services';
 
 // ===== Environment Configuration Loader =====
@@ -50,11 +50,14 @@ export function loadServiceEnvironment(): ServiceEnvironment {
       host: dbUrl.hostname || 'localhost',
       port: parseInt(dbUrl.port || '5432', 10),
       database: dbUrl.pathname.slice(1) || 'legal_ai_db',
-      user: dbUrl.username || 'legal_admin',
-      password: dbUrl.password || '123456',
+      user: dbUrl.username || process.env.POSTGRES_USER || 'legal_admin',
+      password: dbUrl.password || process.env.POSTGRES_PASSWORD || '123456',
       ssl: process.env.NODE_ENV === 'production',
       max: 20,
-      idleTimeoutMillis: 30000
+      idleTimeoutMillis: 30000,
+      // Fallback to superuser if legal_admin fails
+      fallbackUser: 'postgres',
+      fallbackPassword: process.env.POSTGRES_SUPERUSER_PASSWORD || 'postgres'
     },
     // Redis
     redisConfig: {
