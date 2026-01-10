@@ -39,7 +39,7 @@ export const documentWorkflowMachine = setup({
 		}, setEmbeddings:, assign({
 			embeddings: ({ event }) => (event as any).embeddings
 		}, addError:, assign({
-			processingErrors: ({ context: event }) => [...(context.processingErrors || []), (event as any).error]
+			processingErrors: ({ context, event }) => [...(context.processingErrors || []), (event as any).error]
 		}, incrementRetry:, assign({
 			retryCount: ({ context }) => context.retryCount + 1
 		}, resetRetries: assign({
@@ -162,10 +162,10 @@ export const caseWorkflowMachine = setup({
 			status: 'draft' as const,
 			lastActivity: () => new Date()
 		}, addDocument:, assign({
-			documents: ({ context: event }) => [...context.documents, (event as any).documentId],
+			documents: ({ context, event }) => [...context.documents, (event as any).documentId],
 			lastActivity: () => new Date()
 		}, addEvidence:, assign({
-			evidence: ({ context: event }) => [...context.evidence, (event as any).evidenceId],
+			evidence: ({ context, event }) => [...context.evidence, (event as any).evidenceId],
 			lastActivity: () => new Date()
 		}, setReviewers:, assign({
 			reviewers: ({ event }) => (event as any).reviewers,

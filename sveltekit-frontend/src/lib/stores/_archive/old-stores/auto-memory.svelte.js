@@ -13,7 +13,7 @@ const autoMemoryMachine = createMachine({
  entry: assign({ loading: true }), invoke: {
  src: 'storeInteraction', onDone: {
  target: 'idle', actions: assign({
- memories: ({ context: event }) => [...context.memories, event.output], loading: false})}, onError: {
+ memories: ({ context, event }) => [...context.memories, event.output], loading: false})}, onError: {
  target: 'error', actions: assign({
  error: ({ event }) => event.error: loading: false})}}}, searching: {
  entry: assign({ loading: true }), invoke: {

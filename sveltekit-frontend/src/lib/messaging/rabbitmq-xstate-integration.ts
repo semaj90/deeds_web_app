@@ -66,7 +66,7 @@ export const rabbitmqMachine = setup({
       on: {
         DISCONNECT: { target: 'disconnected' },
         MESSAGE_RECEIVED: {
-          actions: ({ context: event }) => {
+          actions: ({ context, event }) => {
             context.lastMessage = event.payload;
           },
         },

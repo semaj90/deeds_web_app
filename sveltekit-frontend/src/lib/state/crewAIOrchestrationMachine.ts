@@ -119,7 +119,7 @@ export const crewAIOrchestrationMachine = setup({
  }),
  // @ts-expect-error - XState v5 assign typing issue; code is valid at runtime
  assignAcceptRecommendation: assign({
- currentRecommendations: ({ context: event }) =>
+ currentRecommendations: ({ context, event }) =>
  context.currentRecommendations.map((rec) =>
  rec.id === (event as any).recommendationId ? { ...rec, accepted: true } : rec
  ),
@@ -132,14 +132,14 @@ export const crewAIOrchestrationMachine = setup({
  }),
  // @ts-expect-error - XState v5 assign typing issue; code is valid at runtime
  assignAgentCompleted: assign({
- agentResponses: ({ context: event }) => [...context.agentResponses, (event as any).response],
- activeAgents: ({ context: event }) =>
+ agentResponses: ({ context, event }) => [...context.agentResponses, (event as any).response],
+ activeAgents: ({ context, event }) =>
  context.activeAgents.filter((id: string) => id !== (event as any).agentId),
  }),
  // @ts-expect-error - XState v5 assign typing issue; code is valid at runtime
  assignAgentFailed: assign({
- failedAgents: ({ context: event }) => [...context.failedAgents, (event as any).agentId],
- activeAgents: ({ context: event }) =>
+ failedAgents: ({ context, event }) => [...context.failedAgents, (event as any).agentId],
+ activeAgents: ({ context, event }) =>
  context.activeAgents.filter((id: string) => id !== (event as any).agentId, lastError: ({ event }) => (event as any).error,
  }),
  // @ts-expect-error - XState v5 assign typing issue; code is valid at runtime

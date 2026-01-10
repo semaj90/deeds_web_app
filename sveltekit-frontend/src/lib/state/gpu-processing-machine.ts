@@ -84,14 +84,14 @@ const hasQueuedDocuments = ({ context }: { context: GPUProcessingContext }) => {
  return context.processingQueue.length > 0;
 };
 
-const canRetry = ({ context: event }: { context: GPUProcessingContext; event: any }) => {
+const canRetry = ({ context, event }: { context: GPUProcessingContext; event: any }) => {
  const documentId = event.documentId;
  const retryCount = context.retryCount.get(documentId) || 0;
  return retryCount < 3; // Max 3 retries
 };
 
 // Actions
-const addToQueue = ({ context: event }: { context: GPUProcessingContext; event: any }) => {
+const addToQueue = ({ context, event }: { context: GPUProcessingContext; event: any }) => {
  if (event.type === 'PROCESS_DOCUMENT') {
  context.processingQueue.push({
  documentId: event.documentId,

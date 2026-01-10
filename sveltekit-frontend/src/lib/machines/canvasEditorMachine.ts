@@ -91,7 +91,7 @@ export const canvasEditorMachine = createMachine({
  on: {
  ADD_TO_HISTORY: {
  actions: assign({
- history: ({ context: event }) => {
+ history: ({ context, event }) => {
  const newHistory = context.history.slice(0, context.historyIndex + 1);
  newHistory.push(event.state);
  return newHistory;
@@ -169,7 +169,7 @@ export const canvasEditorMachine = createMachine({
  },
  REMOTE_CHANGE: {
  actions: assign({
- canvasState: ({ context: event }) => ({
+ canvasState: ({ context, event }) => ({
  ...context.canvasState,
  ...event.change,
  }),

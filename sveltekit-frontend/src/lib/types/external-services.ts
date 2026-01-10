@@ -173,6 +173,9 @@ export interface ServiceUrls {
   neo4j: string;
   neo4jBrowser: string;
   quicGateway?: string;
+  quicVectorService?: string;
+  quicSearchService?: string;
   tensorRTApi?: string;
+  tensorRTWs?: string;
   cudaService?: string;
 }

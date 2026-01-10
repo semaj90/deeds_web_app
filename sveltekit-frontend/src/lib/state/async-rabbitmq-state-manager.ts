@@ -148,7 +148,7 @@ export const rabbitMQStateMachine = setup({
 							startedAt: null,
 							completedAt: null,
 						}),
-						activeJobs: ({ context: event }) => [
+						activeJobs: ({ context, event }) => [
 							...context.activeJobs,
 							{
 								...event.job,
@@ -201,7 +201,7 @@ export const rabbitMQStateMachine = setup({
 			on: {
 				JOB_PROGRESS: {
 					actions: assign({
-						activeJobs: ({ context: event }) =>
+						activeJobs: ({ context, event }) =>
 							context.activeJobs.map((job) =>
 								job.id === event.jobId ? { ...job, progress: event.progress } : job
 							),
@@ -210,8 +210,8 @@ export const rabbitMQStateMachine = setup({
 				JOB_COMPLETED: {
 					target: 'ready',
 					actions: assign({
-						completedJobs: ({ context: event }) => [...context.completedJobs, event.jobId],
-						activeJobs: ({ context: event }) =>
+						completedJobs: ({ context, event }) => [...context.completedJobs, event.jobId],
+						activeJobs: ({ context, event }) =>
 							context.activeJobs.filter((job) => job.id !== event.jobId),
 						currentJob: () => null,
 					}),
@@ -219,7 +219,7 @@ export const rabbitMQStateMachine = setup({
 				JOB_FAILED: {
 					target: 'failed',
 					actions: assign({
-						failedJobs: ({ context: event }) => [...context.failedJobs, event.jobId],
+						failedJobs: ({ context, event }) => [...context.failedJobs, event.jobId],
 						error: ({ event }) => event.error,
 					}),
 				},

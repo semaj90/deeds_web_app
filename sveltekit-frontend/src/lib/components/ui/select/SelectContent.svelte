@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { cn } from "$lib/utils/cn";
-  import * as Select from 'bits-ui';
+  import { cn } from '$lib/utils/cn';
+  import * as Select from 'bits-ui/select';
   import type { Snippet } from "svelte";
 
   interface Props {

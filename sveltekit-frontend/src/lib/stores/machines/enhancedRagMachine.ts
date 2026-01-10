@@ -28,7 +28,7 @@ export const enhancedRagMachine = createMachine({
  on: {
  EXECUTE: {
  target: 'retrieving',
- actions: assign(({ context: event }) => ({
+ actions: assign(({ context, event }) => ({
  query: event.type === 'EXECUTE' ? event.query : context.query,
  })),
  },
@@ -56,7 +56,7 @@ export const enhancedRagMachine = createMachine({
  return response.json();
  }, onDone: {
  target: 'ready',
- actions: assign(({ context: event }) => ({
+ actions: assign(({ context, event }) => ({
  results: event.output?.results || context.results,
  loading: false,
  })),

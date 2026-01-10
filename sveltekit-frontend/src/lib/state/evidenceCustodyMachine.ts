@@ -372,7 +372,7 @@ export const evidenceCustodyMachine = createMachine({
           target: 'verification',
           actions: assign({
             evidenceData: ({ event }) => event.output.evidenceData,
-            custodyEvents: ({ context: event }) => [
+            custodyEvents: ({ context, event }) => [
               ...context.custodyEvents,
               event.output.custodyEvent,
             ],
@@ -395,7 +395,7 @@ export const evidenceCustodyMachine = createMachine({
           actions: assign({
             verificationResults: ({ event }) => event.output.verificationResults,
             integrityStatus: ({ event }) => event.output.integrityStatus,
-            custodyEvents: ({ context: event }) => [
+            custodyEvents: ({ context, event }) => [
               ...context.custodyEvents,
               event.output.custodyEvent,
             ],
@@ -417,7 +417,7 @@ export const evidenceCustodyMachine = createMachine({
           target: 'collaboration',
           actions: assign({
             aiAnalysis: ({ event }) => event.output.aiAnalysis,
-            custodyEvents: ({ context: event }) => [
+            custodyEvents: ({ context, event }) => [
               ...context.custodyEvents,
               event.output.custodyEvent,
             ],
@@ -450,17 +450,17 @@ export const evidenceCustodyMachine = createMachine({
       on: {
         JOIN_COLLABORATION: {
           actions: assign({
-            activeCollaborators: ({ context: event }) => [
+            activeCollaborators: ({ context, event }) => [
               ...context.activeCollaborators,
               event.userId,
             ] }) },
         LEAVE_COLLABORATION: {
           actions: assign({
-            activeCollaborators: ({ context: event }) =>
+            activeCollaborators: ({ context, event }) =>
               context.activeCollaborators.filter((id) => id !== event.userId) }) },
         ADD_ANNOTATION: {
           actions: assign({
-            collaborationSession: ({ context: event }) => ({
+            collaborationSession: ({ context, event }) => ({
               ...context.collaborationSession!,
               annotations: [
                 ...(context.collaborationSession?.annotations || []) => {
@@ -487,7 +487,7 @@ export const evidenceCustodyMachine = createMachine({
     transferring: {
       invoke: {
         src: custodyTransferService,
-        input: ({ context: event }) => ({
+        input: ({ context, event }) => ({
           ...context,
           newCustodian: (event as any).newCustodian,
           reason: (event as any).reason }),
@@ -497,7 +497,7 @@ export const evidenceCustodyMachine = createMachine({
             previousCustodian: ({ event }) => event.output.previousCustodian,
             currentCustodian: ({ event }) => event.output.currentCustodian,
             transferReason: ({ event }) => event.output.transferReason,
-            custodyEvents: ({ context: event }) => [
+            custodyEvents: ({ context, event }) => [
               ...context.custodyEvents,
               event.output.custodyEvent,
             ] }) },
@@ -512,7 +512,7 @@ export const evidenceCustodyMachine = createMachine({
         onDone: {
           target: 'completed',
           actions: assign({
-            custodyEvents: ({ context: event }) => [
+            custodyEvents: ({ context, event }) => [
               ...context.custodyEvents,
               event.output.custodyEvent,
             ],

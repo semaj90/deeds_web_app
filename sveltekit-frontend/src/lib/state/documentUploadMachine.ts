@@ -384,7 +384,7 @@ export const documentUploadMachine: any = setup({
         input: ({ context }) => context,
         onDone: {
           target: 'startingProcessing',
-          actions: assign(({ event: context }) => ({
+          actions: assign(({ event, context }) => ({
             documentId: event.output.documentId,
             evidenceId: event.output.evidenceId,
             extractedText: event.output.extractedText ?? context.extractedText,

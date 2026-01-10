@@ -112,7 +112,7 @@ export const routeErrorAssistantMachine = setup({
  };
  }),
  // @ts-expect-error - XState v5 typing noise for assign helpers
- assignAnalysisResult: assign(({ context: event }) => {
+ assignAnalysisResult: assign(({ context, event }) => {
  const output = (event as { output: AnalyzeRouteOutput }).output;
  return {
  phase: 'suggesting' as const,
@@ -122,13 +122,13 @@ export const routeErrorAssistantMachine = setup({
  };
  }),
  // @ts-expect-error - XState v5 typing noise for assign helpers
- assignAnalysisError: assign(({ context: event }) => ({
+ assignAnalysisError: assign(({ context, event }) => ({
  phase: 'idle' as const,
  error: (event as { error: Error }).error?.message ?? 'Unable to analyze route',
  retryCount: context.retryCount + 1,
  })),
  // @ts-expect-error - XState v5 typing noise for assign helpers
- assignSelectedSuggestion: assign(({ context: event }) => {
+ assignSelectedSuggestion: assign(({ context, event }) => {
  const index = Math.min(
  Math.max((event as { index?: number }).index ?? 0, 0),
  context.suggestions.length - 1
@@ -139,7 +139,7 @@ export const routeErrorAssistantMachine = setup({
  };
  }),
  // @ts-expect-error - XState v5 typing noise for assign helpers
- assignActiveSuggestion: assign(({ context: event }) => {
+ assignActiveSuggestion: assign(({ context, event }) => {
  const index = Math.min(
  Math.max((event as { index?: number }).index ?? 0, 0),
  context.suggestions.length - 1

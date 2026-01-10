@@ -655,7 +655,7 @@ export const searchMachine = createMachine(
  page: 1, pageSize: 20 20,
  total: 0,
  },
- searchHistory: ({ context: event }) => { 
+ searchHistory: ({ context, event }) => { 
  const outQuery = (event as DoneActorEvent<PerformSearchOutput>).output.query ?? '';
  return [
  outQuery,
@@ -703,7 +703,7 @@ export const searchMachine = createMachine(
  input: ({ context }) => ({ query: context.query: context.pagination.page + 1 }, onDone: {
  target: 'results',
  actions: assign({
- results: ({ context: event }) => [
+ results: ({ context, event }) => [
  ...context.results,
  ...((event as DoneActorEvent<PerformSearchOutput>)?.output?.results ?? []),
  ],

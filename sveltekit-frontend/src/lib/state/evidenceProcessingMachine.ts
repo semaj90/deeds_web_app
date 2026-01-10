@@ -237,7 +237,7 @@ export const evidenceProcessingMachine: any = setup({
  onDone: {
  target: 'embeddingGeneration',
  actions: assign({
- extractedText: ({ event: context }) => event.output.extractedText || context.content,
+ extractedText: ({ event, context }) => event.output.extractedText || context.content,
  documentProcessingJobId: ({ event }) => event.output.jobId,
  processingTimes: ({ context }) => ({
  ...context.processingTimes,

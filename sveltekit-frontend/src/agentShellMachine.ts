@@ -1,150 +1,150 @@
 /**
  * XState Machine for AI Agent Shell with Production Go Services Integration
  */
-import { createMachine: assign } from 'xstate';
-import type { RAGResponse: UploadResponse } from '$lib/services/goServiceClient.js';
+import { createMachine, assign } from 'xstate';
+import type { RAGResponse, UploadResponse } from '$lib/services/goServiceClient.js';
 
 // Define context and event types
 export interface AgentShellContext {
-	input: string;
-	response: string;
-	jobId?: string;
-	rating?: number;
-	searchQuery?: string;
-	searchResults?: RAGResponse;
-	uploadResults?: UploadResponse;
-	userId?: string;
-	caseId?: string;
-	serviceHealth?: {
-		enhancedRAG: boolean;
-		uploadService: boolean;
-		kratosServer: boolean;
-	};
+  input: string;
+  response: string;
+  jobId?: string;
+  rating?: number;
+  searchQuery?: string;
+  searchResults?: RAGResponse;
+  uploadResults?: UploadResponse;
+  userId?: string;
+  caseId?: string;
+  serviceHealth?: {
+    enhancedRAG: boolean;
+    uploadService: boolean;
+    kratosServer: boolean;
+  };
 }
 
 type AgentShellEvent =
-	| { type: 'PROMPT'; input: string; userId?: string; caseId?: string }
-	| { type: 'xstate.done.actor.callAgent'; data: string }
-	| { type: 'ACCEPT_PATCH'; jobId: string; userId: string; patchContent: string }
-	| { type: 'RATE_SUGGESTION'; jobId: string; rating: number; userId: string; feedback?: string }
-	| { type: 'SEMANTIC_SEARCH'; query: string; userId: string; caseId?: string }
-	| { type: 'FILE_UPLOAD'; file: File; userId: string; caseId?: string }
-	| { type: 'CHECK_HEALTH' };
+  | { type: 'PROMPT'; input: string; userId?: string; caseId?: string }
+  | { type: 'xstate.done.actor.callAgent'; data: string }
+  | { type: 'ACCEPT_PATCH'; jobId: string; userId: string; patchContent: string }
+  | { type: 'RATE_SUGGESTION'; jobId: string; rating: number; userId: string; feedback?: string }
+  | { type: 'SEMANTIC_SEARCH'; query: string; userId: string; caseId?: string }
+  | { type: 'FILE_UPLOAD'; file: File; userId: string; caseId?: string }
+  | { type: 'CHECK_HEALTH' };
 
 export const agentShellMachine = createMachine({
-	id: 'agentShell',
-	initial: 'idle',
-	context: {
-		input: '',
-		response: ''
-	} as AgentShellContext,
-	types: {} as {
-		context: AgentShellContext;
-		events: AgentShellEvent;
-	},
-	states: {
-		idle: {
-			on: {
-				PROMPT: {
-					target: 'processing',
-					actions: assign({
-						input: ({ event }) => (event as any).input || '',
-						userId: ({ event }) => (event as any).userId,
-						caseId: ({ event }) => (event as any).caseId
-					})
-				},
-				SEMANTIC_SEARCH: {
-					target: 'searching',
-					actions: assign({
-						searchQuery: ({ event }) => (event as any).query,
-						userId: ({ event }) => (event as any).userId,
-						caseId: ({ event }) => (event as any).caseId
-					})
-				},
-				FILE_UPLOAD: {
-					target: 'uploading',
-					actions: assign({
-						userId: ({ event }) => (event as any).userId,
-						caseId: ({ event }) => (event as any).caseId
-					})
-				},
-				CHECK_HEALTH: {
-					target: 'checkingHealth'
-				}
-			}
-		},
-		processing: {
-			invoke: {
-				src: 'callAgent',
-				input: ({ context }) => ({
-					input: context.input,
-					userId: context.userId,
-					caseId: context.caseId
-				}),
-				onDone: {
-					target: 'idle',
-					actions: assign({
-						response: ({ event }) => (event as any).output || ''
-					})
-				},
-				onError: 'idle'
-			},
-			on: {
-				ACCEPT_PATCH: {
-					actions: 'acceptPatchAction'
-				},
-				RATE_SUGGESTION: {
-					actions: 'rateSuggestionAction'
-				}
-			}
-		},
-		searching: {
-			invoke: {
-				src: 'performSemanticSearch',
-				input: ({ context }) => ({
-					query: context.searchQuery,
-					userId: context.userId,
-					caseId: context.caseId
-				}),
-				onDone: {
-					target: 'idle',
-					actions: assign({
-						searchResults: ({ event }) => (event as any).output || null
-					})
-				},
-				onError: 'idle'
-			}
-		},
-		uploading: {
-			invoke: {
-				src: 'performFileUpload',
-				input: ({ context: event }) => ({
-					file: (event as any).file,
-					userId: context.userId,
-					caseId: context.caseId
-				}),
-				onDone: {
-					target: 'idle',
-					actions: assign({
-						uploadResults: ({ event }) => (event as any).output || null
-					})
-				},
-				onError: 'idle'
-			}
-		},
-		checkingHealth: {
-			invoke: {
-				src: 'checkServiceHealth',
-				onDone: {
-					target: 'idle',
-					actions: assign({
-						serviceHealth: ({ event }) => (event as any).output || null
-					})
-				},
-				onError: 'idle'
-			}
-		}
-	}
+  id: 'agentShell',
+  initial: 'idle',
+  context: {
+    input: '',
+    response: '',
+  } as AgentShellContext,
+  types: {} as {
+    context: AgentShellContext;
+    events: AgentShellEvent;
+  },
+  states: {
+    idle: {
+      on: {
+        PROMPT: {
+          target: 'processing',
+          actions: assign({
+            input: ({ event }) => (event as any).input || '',
+            userId: ({ event }) => (event as any).userId,
+            caseId: ({ event }) => (event as any).caseId,
+          }),
+        },
+        SEMANTIC_SEARCH: {
+          target: 'searching',
+          actions: assign({
+            searchQuery: ({ event }) => (event as any).query,
+            userId: ({ event }) => (event as any).userId,
+            caseId: ({ event }) => (event as any).caseId,
+          }),
+        },
+        FILE_UPLOAD: {
+          target: 'uploading',
+          actions: assign({
+            userId: ({ event }) => (event as any).userId,
+            caseId: ({ event }) => (event as any).caseId,
+          }),
+        },
+        CHECK_HEALTH: {
+          target: 'checkingHealth',
+        },
+      },
+    },
+    processing: {
+      invoke: {
+        src: 'callAgent',
+        input: ({ context }) => ({
+          input: context.input,
+          userId: context.userId,
+          caseId: context.caseId,
+        }),
+        onDone: {
+          target: 'idle',
+          actions: assign({
+            response: ({ event }) => (event as any).output || '',
+          }),
+        },
+        onError: 'idle',
+      },
+      on: {
+        ACCEPT_PATCH: {
+          actions: 'acceptPatchAction',
+        },
+        RATE_SUGGESTION: {
+          actions: 'rateSuggestionAction',
+        },
+      },
+    },
+    searching: {
+      invoke: {
+        src: 'performSemanticSearch',
+        input: ({ context }) => ({
+          query: context.searchQuery,
+          userId: context.userId,
+          caseId: context.caseId,
+        }),
+        onDone: {
+          target: 'idle',
+          actions: assign({
+            searchResults: ({ event }) => (event as any).output || null,
+          }),
+        },
+        onError: 'idle',
+      },
+    },
+    uploading: {
+      invoke: {
+        src: 'performFileUpload',
+        input: ({ context, event }) => ({
+          file: (event as any).file,
+          userId: context.userId,
+          caseId: context.caseId,
+        }),
+        onDone: {
+          target: 'idle',
+          actions: assign({
+            uploadResults: ({ event }) => (event as any).output || null,
+          }),
+        },
+        onError: 'idle',
+      },
+    },
+    checkingHealth: {
+      invoke: {
+        src: 'checkServiceHealth',
+        onDone: {
+          target: 'idle',
+          actions: assign({
+            serviceHealth: ({ event }) => (event as any).output || null,
+          }),
+        },
+        onError: 'idle',
+      },
+    },
+  },
 });
 
 // Service implementations for XState with Production Services

@@ -227,7 +227,7 @@ export const evidenceProcessingMachine = createMachine({
  onError: {
  target: 'error',
  actions: assign({
- errors: ({ context: event }) => [...context.errors, `Upload failed: ${event.error}`],
+ errors: ({ context, event }) => [...context.errors, `Upload failed: ${event.error}`],
  streamingUpdates: ({ context }) => [
  ...context.streamingUpdates,
  {
@@ -275,7 +275,7 @@ export const evidenceProcessingMachine = createMachine({
  onError: {
  target: 'error',
  actions: assign({
- errors: ({ context: event }) => [...context.errors, `Analysis failed: ${event.error}`],
+ errors: ({ context, event }) => [...context.errors, `Analysis failed: ${event.error}`],
  streamingUpdates: ({ context }) => [
  ...context.streamingUpdates,
  {
@@ -292,7 +292,7 @@ export const evidenceProcessingMachine = createMachine({
  on: {
  ANALYSIS_PROGRESS: {
  actions: assign({
- streamingUpdates: ({ context: event }) => [
+ streamingUpdates: ({ context, event }) => [
  ...context.streamingUpdates.slice(0, -1),
  {
  step: 'analysis',
@@ -304,7 +304,7 @@ export const evidenceProcessingMachine = createMachine({
  },
  CONFIGURE_NEURAL_SPRITE: {
  actions: assign({
- glyphGeneration: ({ context: event }) => ({
+ glyphGeneration: ({ context, event }) => ({
  ...context.glyphGeneration,
  request: {
  evidence_id: parseInt(context.evidenceId),
@@ -330,7 +330,7 @@ export const evidenceProcessingMachine = createMachine({
  onDone: {
  target: 'embeddingPNG',
  actions: assign({
- glyphGeneration: ({ context: event }) => ({
+ glyphGeneration: ({ context, event }) => ({
  ...context.glyphGeneration!,
  result: event.output,
  }),
@@ -356,7 +356,7 @@ export const evidenceProcessingMachine = createMachine({
  onError: {
  target: 'error',
  actions: assign({
- errors: ({ context: event }) => [
+ errors: ({ context, event }) => [
  ...context.errors,
  `Glyph generation failed: ${event.error}`,
  ],
@@ -376,7 +376,7 @@ export const evidenceProcessingMachine = createMachine({
  on: {
  GLYPH_PROGRESS: {
  actions: assign({
- streamingUpdates: ({ context: event }) => [
+ streamingUpdates: ({ context, event }) => [
  ...context.streamingUpdates.slice(0, -1),
  {
  step: 'glyph_generation',
@@ -425,7 +425,7 @@ export const evidenceProcessingMachine = createMachine({
  onError: {
  target: 'error',
  actions: assign({
- errors: ({ context: event }) => [
+ errors: ({ context, event }) => [
  ...context.errors,
  `PNG embedding failed: ${event.error}`,
  ],
@@ -472,7 +472,7 @@ export const evidenceProcessingMachine = createMachine({
  onError: {
  target: 'error',
  actions: assign({
- errors: ({ context: event }) => [...context.errors, `Storage failed: ${event.error}`],
+ errors: ({ context, event }) => [...context.errors, `Storage failed: ${event.error}`],
  streamingUpdates: ({ context }) => [
  ...context.streamingUpdates,
  {

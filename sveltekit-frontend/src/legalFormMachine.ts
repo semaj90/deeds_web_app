@@ -106,7 +106,7 @@ export const legalFormMachine = setup({
 				UPLOAD_EVIDENCE: {
 					actions: assign({
 						evidenceFiles: ({ event }) => event.files,
-						confidence: ({ context: event }) => {
+						confidence: ({ context, event }) => {
 							const hasDigitalEvidence = event.files.some(
 								(f) =>
 									f.type.includes('pdf') || f.type.includes('image') || f.type.includes('document')
@@ -197,7 +197,7 @@ export const legalFormMachine = setup({
 							event.type === 'UPDATE_CASE_DETAILS' ? event.title : '',
 						caseDescription: ({ event }) =>
 							event.type === 'UPDATE_CASE_DETAILS' ? event.description : '',
-						confidence: ({ context: event }) => {
+						confidence: ({ context, event }) => {
 							if (event.type === 'UPDATE_CASE_DETAILS') {
 								const hasDetail = event.description.length > 50;
 								return hasDetail
@@ -211,7 +211,7 @@ export const legalFormMachine = setup({
 				SET_PRIORITY: {
 					actions: assign({
 						priority: ({ event }) => event.priority,
-						aiSuggestions: ({ context: event }) => {
+						aiSuggestions: ({ context, event }) => {
 							if (
 								event.type === 'SET_PRIORITY' &&
 								event.priority === 'critical' &&
@@ -327,7 +327,7 @@ export const legalFormMachine = setup({
 				},
 				APPLY_AI_RECOMMENDATION: {
 					actions: assign({
-						aiSuggestions: ({ context: event }) => [
+						aiSuggestions: ({ context, event }) => [
 							...context.aiSuggestions,
 							event.type === 'APPLY_AI_RECOMMENDATION' ? `Applied: ${event.recommendation}` : ''
 						]

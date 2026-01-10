@@ -89,9 +89,9 @@ async function runLoop() {
 
     const { rows } = await client.query(`
       SELECT * FROM ts_errors
-      WHERE status = 'open'
+      WHERE resolved = false
       AND file_path NOT LIKE '%.svelte-kit%'
-      ORDER BY impact_score DESC
+      ORDER BY id ASC
       LIMIT 1
     `);
     // client.release(); // Moved down to keep connection open for vector search

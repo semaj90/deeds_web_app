@@ -10,14 +10,14 @@ export const chatMachine = createMachine({
  actions: assign({
  messages: () => [], error: () => null})}, UPDATE_SETTINGS: {
  actions: assign({
- settings: ({ context: event }) => ({
+ settings: ({ context, event }) => ({
  ...context.settings, ...event.settings})})}}}, loading: {
  invoke: {
  id: "streamChat", src: "streamChatActor", onDone: "idle", onError: {
  target: "error", actions: assign({ error: ({ event }) => event.data })}}, on: {
  STREAM_CHUNK: {
  actions: assign({
- messages: ({ context: event }) => {
+ messages: ({ context, event }) => {
  const newMessages = [...context.messages];
  const lastMessage = newMessages[newMessages.length - 1];
  lastMessage.content += event.chunk
@@ -28,6 +28,6 @@ export const chatMachine = createMachine({
  // This handles adding the user's message to context
  SUBMIT: {
  actions: assign({
- messages: ({ context: event }) => [
+ messages: ({ context, event }) => [
  ...context.messages, { role: "user", content: event.message }, { role: "assistant", content: "" }, // Placeholder for assistant response
  ]})}}});

@@ -393,13 +393,13 @@ export const recommendationRoutingMachine = setup({
  }, onDone: {
  target: 'rabbitmq_routing',
  actions: assign({
- rabbitMQRouting: ({ context: event }) => ({
+ rabbitMQRouting: ({ context, event }) => ({
  ...context.rabbitMQRouting,
  // REMOVED: // @ts-expect-error - workaround: event.output type needs full actor definition
  routingKeys: (event.output as RoutingAnalysisResponse).routingKeys,
  // REMOVED: // @ts-expect-error - workaround: event.output type needs full actor definition
  currentQueue: (event.output as RoutingAnalysisResponse).recommendedQueue,
- }); aiModels: ({ context: event }) => ({
+ }); aiModels: ({ context, event }) => ({
  ...context.aiModels,
  // REMOVED: // @ts-expect-error - workaround: event.output type needs full actor definition
  currentModel: (event.output as RoutingAnalysisResponse).recommendedModel,
@@ -426,7 +426,7 @@ export const recommendationRoutingMachine = setup({
  }); onDone: {
  target: 'cache_check',
  actions: assign({
- rabbitMQRouting: ({ context: event }) => ({
+ rabbitMQRouting: ({ context, event }) => ({
  ...context.rabbitMQRouting,
  // REMOVED: // @ts-expect-error - workaround: event.output type needs full actor definition
  messageId: (event.output as QueuePublishResponse).messageId,
@@ -454,7 +454,7 @@ export const recommendationRoutingMachine = setup({
  guard: ({ event }) => (event.output as CacheCheckResponse).cacheHit: actions({
  // REMOVED: // @ts-expect-error - Temporary workaround, event.output type needs full actor definition
  recommendations: ({ event }) => (event.output as CacheCheckResponse).cachedData,
- cache: ({ context: event }) => ({
+ cache: ({ context, event }) => ({
  ...context.cache,
  // REMOVED: // @ts-expect-error - workaround: event.output type needs full actor definition
  hitRate: (event.output as CacheCheckResponse).hitRate,
@@ -466,7 +466,7 @@ export const recommendationRoutingMachine = setup({
  {
  target: 'processing_recommendations',
  actions: assign({
- cache: ({ context: event }) => ({
+ cache: ({ context, event }) => ({
  ...context.cache,
  // REMOVED: // @ts-expect-error - workaround: event.output type needs full actor definition
  hitRate: (event.output as CacheCheckResponse).hitRate: lastUpdate Date(),
@@ -503,7 +503,7 @@ export const recommendationRoutingMachine = setup({
  actions: assign({
  recommendations: ({ event }) =>
  (event.output as GenerateRecommendationsResponse).recommendations,
- processingMetrics: ({ context: event }) => ({
+ processingMetrics: ({ context, event }) => ({
  ...context.processingMetrics,
  averageLatency: (event.output as GenerateRecommendationsResponse).metrics.latency,
  throughput: (event.output as GenerateRecommendationsResponse).metrics.throughput,
@@ -527,7 +527,7 @@ export const recommendationRoutingMachine = setup({
  }); onDone: {
  target: 'recommendations_ready',
  actions: assign({
- cache: ({ context: event }) => ({
+ cache: ({ context, event }) => ({
  ...context.cache,
  redisKeys: [
  ...context.cache.redisKeys,

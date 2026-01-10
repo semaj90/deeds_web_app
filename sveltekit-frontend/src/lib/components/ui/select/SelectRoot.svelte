@@ -1,5 +1,5 @@
 <script lang="ts">
-  import * as Select from 'bits-ui';
+  import * as Select from 'bits-ui/select';
   import type { Snippet } from "svelte";
 
   interface Props {

@@ -22,7 +22,7 @@
   async function handleSearch() {
     if (search.synthesizeEnabled) {
       // Use streaming for synthesis
-      for await (const { event, data } of search.streamSearch()) {
+      for await (const { event } of search.streamSearch()) {
         // Stream updates happen automatically via reactive state
       }
     } else {
