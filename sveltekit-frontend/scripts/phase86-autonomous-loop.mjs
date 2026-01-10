@@ -107,33 +107,32 @@ async function runLoop() {
     console.log(`   Msg: ${safeSlice(errorMsg, 60)}...`);
 
     // 2. CONSULT KNOWLEDGE BASE (Qdrant & Postgres)
-    // We use the error message to find similar past fixes
-    const { embedding } = await ollama.embeddings({ model: MODEL, prompt: errorMsg });
+    // 2. USE KNOWLEDGE PLANE FOR HYBRID RETRIEVAL (pgvector + Qdrant + RRF fusion)
+    console.log(`🔍 Searching Knowledge Plane (hybrid retrieval)...`);
 
-    // Search AST Knowledge Base (Surgical Fixes)
-    const hitsAST = await qdrant.search(COLLECTION_AST, {
-      vector: embedding,
-      limit: 1,
-      with_payload: true
+    const ragResponse = await fetch('http://127.0.0.1:8099/retrieve', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        query: errorMsg,
+        top_k: 5,
+        mode: 'hybrid' // Uses both pgvector and Qdrant with RRF fusion
+      })
     });
 
-    // Search Phase 76 Knowledge Base (Docs & Architecture)
-    const hitsKB = await qdrant.search(COLLECTION_KB, {
-      vector: embedding,
-      limit: 2,
-      with_payload: true
-    });
+    if (!ragResponse.ok) {
+      console.error(`❌ Knowledge Plane error: ${ragResponse.status}`);
+      client.release();
+      return;
+    }
 
-    // Search Error Embeddings (Postgres HNSW)
-    const similarErrors = await client.query(`
-      SELECT ts.error_code, ts.error_message, ts.file_path
-      FROM error_embeddings ee
-      JOIN ts_errors ts ON ee.error_id = ts.id
-      ORDER BY ee.embedding <=> $1::vector
-      LIMIT 3
-    `, [`[${embedding.join(',')}]`]);
+    const ragResult = await ragResponse.json();
+    const hits = ragResult.hits || [];
 
-    client.release(); // Release client after queries are done
+    console.log(`✅ Knowledge Plane returned ${hits.length} hits in ${ragResult.latency_ms}ms`);
+    console.log(`   Sources: pgvector=${ragResult.sources?.pgvector || 0}, qdrant=${ragResult.sources?.qdrant || 0}`);
+
+    client.release(); // Release client
 
     // 3. ALWAYS READ FILE FIRST (we need context)
     console.log(`📄 Reading target file: ${error.file_path}...`);
@@ -147,38 +146,34 @@ async function runLoop() {
 
     console.log(`✅ Read ${fileContent.length} chars from ${error.file_path}`);
 
-    // 4. DECIDE & ACT
+    // 4. DECIDE & ACT - Use hybrid retrieval results
     let fixStrategy = null;
     let contextInfo = "";
 
-    if (hitsAST.length > 0 && hitsAST[0].score > 0.85) {
-      const payload = hitsAST[0].payload;
-      console.log(`💡 KNOWN PATTERN FOUND: ${payload.pattern_name ?? 'Unknown'} (Score: ${hitsAST[0].score.toFixed(4)})`);
-      fixStrategy = payload.fix_strategy;
+    // Check if we have a high-confidence match
+    const bestHit = hits[0];
+    if (bestHit && bestHit.score > 0.75) {
+      console.log(`💡 HIGH CONFIDENCE MATCH: ${bestHit.kind} (Score: ${bestHit.score.toFixed(4)})`);
+      console.log(`   Source: ${bestHit.source}`);
+      fixStrategy = bestHit.meta?.fix_strategy || "Apply the pattern from this similar error";
     } else {
-      console.log(`🤔 No confident local match (score: ${hitsAST[0]?.score?.toFixed(4) ?? 'N/A'})`);
+      console.log(`🤔 No confident match (best score: ${bestHit?.score?.toFixed(4) ?? 'N/A'})`);
       console.log(`🤖 Attempting generic fix via LLM...`);
       fixStrategy = "Analyze the error message and file content to fix the TypeScript error.";
     }
 
-    // Build Context from KB and Similar Errors
-    if (hitsKB.length > 0) {
-        contextInfo += "\nRelevant Documentation:\n";
-        hitsKB.forEach(h => {
-            const content = h.payload?.content || h.payload?.summary || '';
-            if (content) {
-                const safeSummary = safeSlice(content, 200);
-                contextInfo += `- ${h.payload?.source_path || 'Doc'}: ${safeSummary}...\n`;
-            }
-        });
+    // Build Context from hybrid retrieval results
+    if (hits.length > 0) {
+      contextInfo += "\nRelevant Context from Knowledge Base:\n";
+      hits.forEach((h, i) => {
+        const chunk = h.chunk || h.meta?.content || '';
+        if (chunk) {
+          const safeSummary = safeSlice(chunk, 200);
+          contextInfo += `${i + 1}. [${h.kind}] ${h.source} (score: ${h.score.toFixed(3)})\n   ${safeSummary}...\n\n`;
+        }
+      });
     }
 
-    if (similarErrors.rows.length > 0) {
-        contextInfo += "\nSimilar Past Errors:\n";
-        similarErrors.rows.forEach(row => {
-            contextInfo += `- [${row.error_code}] in ${row.file_path}: ${row.error_message}\n`;
-        });
-    }
 
     console.log(`🚀 AGENT COMMAND: Apply Strategy -> ${fixStrategy}`);
 

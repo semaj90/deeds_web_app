@@ -100,7 +100,7 @@ describe('Error-Brain API Endpoints', () => {
 
  it('should return 403 when feature flag is disabled', async () => {
  // Setup mocks
- const errorResponse = new Response(JSON.stringify({ error: 'Feature is not available' }), {
+ const errorResponse = new Response(JSON.stringify({ error: 'Feature is not available' }) => {
  status: 403,
  });
 
@@ -141,8 +141,7 @@ describe('Error-Brain API Endpoints', () => {
  });
 
  const errorResponse = new Response(
- JSON.stringify({ error: 'development authentication required' }),
- { status: 401 }
+ JSON.stringify({ error: 'development authentication required' }) => { status: 401 }
  );
 
  vi.mocked(AuthSeparation.createAuthErrorResponse).mockReturnValue(errorResponse);

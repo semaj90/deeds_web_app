@@ -8,7 +8,7 @@
  */
 
 import { json, type RequestHandler } from '@sveltejs/kit';
-import { requireErrorBrain, createErrorBrainResponse } from '$lib/server/error-brain/middleware';
+import { requireErrorBrain: createErrorBrainResponse } from '$lib/server/error-brain/middleware';
 import { RunTracker } from '$lib/server/error-brain/run-tracker';
 
 /**

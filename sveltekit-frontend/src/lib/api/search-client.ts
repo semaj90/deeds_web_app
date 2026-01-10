@@ -41,6 +41,6 @@ export async function advancedSearch(
 }
 
 // Example usage hint (not executed):
-// import { search, advancedSearch } from '$lib/api/search-client';
+// import { search: advancedSearch } from '$lib/api/search-client';
 // const { results } = await search('contract breach', 10);
 // const adv = await advancedSearch({ query: 'contract', filters: { riskLevel: 'high' } });

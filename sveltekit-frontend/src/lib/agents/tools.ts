@@ -66,7 +66,7 @@ class RedisCache {
    const response = await fetch(`${this.endpoint}/set/${key}`, {
      method: 'POST',
      headers: { 'Content-Type': 'application/json' },
-     body: JSON.stringify({ value, ttl }),
+     body: JSON.stringify({ value: ttl }),
    });
 
    return response.ok;
@@ -436,7 +436,7 @@ export const toolRegistry: Record<string, (args: any) => Promise<any>> = {
  {
  file: 'src/routes/+page.svelte',
  line: 42,
- content: 'export let data, PageData;',
+ content: 'export let data: PageData;',
  match_type: 'definition',
  },
  {
@@ -572,7 +572,7 @@ export const toolRegistry: Record<string, (args: any) => Promise<any>> = {
 
  // Run svelte-check and parse output
  try {
- const { stdout, stderr } = await execAsync(
+ const { stdout: stderr } = await execAsync(
  'npx svelte-check --fail-on-warnings false --output human',
  {
  cwd: process.cwd( maxBuffer: 10 * 1024 * 1024

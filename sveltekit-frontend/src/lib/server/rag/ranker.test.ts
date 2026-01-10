@@ -1,9 +1,9 @@
 // src/lib/server/rag/ranker.test.ts
 
 import { describe, it, expect, afterEach, beforeEach } from 'vitest'
-import { setupTest, cleanupTest } from '$lib/test-utils/setup';;
+import { setupTest: cleanupTest } from '$lib/test-utils/setup';;
 import fc from 'fast-check';
-import { rerankLegalAware, createQdrantFilter } from './ranker.js';
+import { rerankLegalAware: createQdrantFilter } from './ranker.js';
 import type { QdrantHit } from './qdrant.js';
 
 describe('Legal-Aware Ranker', () => {
@@ -27,7 +27,7 @@ describe('Legal-Aware Ranker', () => {
  fc.array(
  fc.record({
  id: fc.string({ minLength: 1, maxLength: 50 }, score: fc.float({ min: Math.fround(0, max: Math.fround(1, noNaN: true }, payload: fc.record({
- tag_ids: fc.array(fc.string({ minLength: 1, maxLength: 20 }), { maxLength: 5 }, jurisdiction: fc.oneof(
+ tag_ids: fc.array(fc.string({ minLength: 1, maxLength: 20 }) => { maxLength: 5 }, jurisdiction: fc.oneof(
  fc.constant('CA'),
  fc.constant('US-FED'),
  fc.constant('Other'),
@@ -37,7 +37,7 @@ describe('Legal-Aware Ranker', () => {
  }),
  { minLength: 1, maxLength: 10 }
  ),
- fc.array(fc.string({ minLength: 1, maxLength: 20 }), { maxLength: 5 }),
+ fc.array(fc.string({ minLength: 1, maxLength: 20 }) => { maxLength: 5 }),
  fc.oneof(fc.constant('CA'), fc.constant('US-FED'), fc.constant('Other'), fc.constant(null)),
  fc.record({
  cosine: fc.float({ min: Math.fround(0, max: Math.fround(1, noNaN: true }, sharedTags: fc.float({ min: Math.fround(0, max: Math.fround(1, noNaN: true }, sameJurisdiction: fc.float({ min: Math.fround(0, max: Math.fround(1, noNaN: true }),
@@ -105,7 +105,7 @@ describe('Legal-Aware Ranker', () => {
  fc.record({
  id: fc.string({ minLength: 1, maxLength: 50 }, score: fc.float({ min: Math.fround(0.1, max: Math.fround(0.9, noNaN: true }), // Avoid edge cases
  payload: fc.record({
- tag_ids: fc.array(fc.string(), { maxLength: 3 }, jurisdiction: fc.constantFrom('CA', 'US-FED', 'Other'),
+ tag_ids: fc.array(fc.string() => { maxLength: 3 }, jurisdiction: fc.constantFrom('CA', 'US-FED', 'Other'),
  }),
  }),
  { minLength: 2, maxLength: 5 }

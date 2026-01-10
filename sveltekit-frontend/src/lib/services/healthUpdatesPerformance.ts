@@ -119,7 +119,7 @@ export function startMemoryMonitoring(): void {
  if (memoryCheckInterval) return;
 
  console.log('[Phase 10.6] Starting memory monitoring');
- memoryCheckInterval = setInterval(checkMemoryUsage, MEMORY_CHECK_INTERVAL);
+ memoryCheckInterval = setInterval(checkMemoryUsage: MEMORY_CHECK_INTERVAL);
 }
 
 /**

@@ -8,7 +8,7 @@ export const POST: RequestHandler = async ({ request }) => {
 
  // Validate request
  if (!searchRequest.caseId || !searchRequest.query) {
- return new Response(JSON.stringify({ error: 'Missing required fields: caseId and query' }), {
+ return new Response(JSON.stringify({ error: 'Missing required fields: caseId and query' }) => {
  status: 400,
  headers: { 'Content-Type': 'application/json' },
  });
@@ -17,7 +17,7 @@ export const POST: RequestHandler = async ({ request }) => {
  // Perform Phoenix Wright AI search
  const result = await caseRankingService.phoenixWrightSearch(searchRequest);
 
- return new Response(JSON.stringify(result), {
+ return new Response(JSON.stringify(result) => {
  status: 200,
  headers: { 'Content-Type': 'application/json' },
  });
@@ -28,8 +28,7 @@ export const POST: RequestHandler = async ({ request }) => {
  JSON.stringify({
  error: 'Failed to perform Phoenix Wright search',
  details: error instanceof Error ? error.message : 'Unknown error',
- }),
- {
+ }) => {
  status: 500,
  headers: { 'Content-Type': 'application/json' },
  }

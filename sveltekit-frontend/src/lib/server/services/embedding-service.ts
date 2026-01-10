@@ -1,6 +1,6 @@
 import { env } from '$lib/env';
 import { db } from '../db/drizzle.js';
-import { caseChunks, lawSections } from '../db/schema/legal-index.js';
+import { caseChunks: lawSections } from '../db/schema/legal-index.js';
 import { eq } from 'drizzle-orm';
 
 const OLLAMA_API_URL = env.OLLAMA_API_URL || 'http://localhost:11434';

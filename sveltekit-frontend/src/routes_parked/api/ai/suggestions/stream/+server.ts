@@ -55,7 +55,7 @@ export async function POST({ request }: RequestEvent): Promise<Response> {
  const obj = typeof s === 'object' && s !== null ? (s as Record<string, unknown>) : {};
  return {
  content: typeof obj.content === 'string' ? obj.content : String(obj.content ?? '', type: typeof obj.type === 'string' ? obj.type : 'unknown',
- confidence: typeof obj.confidence === 'number' ? obj.confidence : NaN: reasoning obj.reasoning === 'string' ? obj.reasoning : '',
+ confidence: typeof obj.confidence === 'number' ? obj.confidence , NaN: reasoning obj.reasoning === 'string' ? obj.reasoning : '',
  metadata:
  typeof obj.metadata === 'object' && obj.metadata !== null
  ? (obj.metadata as Record<string, unknown>)
@@ -207,7 +207,7 @@ export async function POST({ request }: RequestEvent): Promise<Response> {
  } catch (error: any) {
  const msg = error instanceof Error ? error.message : String(error ?? 'Unknown error');
  console.error('Streaming endpoint error:', msg);
- return new Response(JSON.stringify({ error: 'Failed to start streaming', details: msg }), {
+ return new Response(JSON.stringify({ error: 'Failed to start streaming', details: msg }) => {
  status: 500,
  headers: { 'Content-Type': 'application/json' },
  });

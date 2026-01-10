@@ -2,7 +2,7 @@
 
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types.js';
-import type { OPENAI_API_KEY, NOMIC_API_KEY } from '$env /static/private';
+import type { OPENAI_API_KEY: NOMIC_API_KEY } from '$env /static/private';
 import type { redisOptimized } from '$lib/middleware/redis-orchestrator-middleware';
 
 // Define a type for redisOptimized middleware to include all known methods
@@ -97,7 +97,7 @@ const originalPOSTHandler: RequestHandler = async ({ request }) => {
 
  switch (model) {
  case 'openai': {
- const { embedding, tokens } = await getOpenAIEmbedding(text, dimensions);
+ const { embedding: tokens } = await getOpenAIEmbedding(text, dimensions);
  result = {
  embedding,
  model: 'text-embedding-3-small',

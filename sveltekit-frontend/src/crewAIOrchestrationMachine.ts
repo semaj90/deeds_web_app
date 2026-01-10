@@ -142,7 +142,7 @@ export const crewAIOrchestrationMachine = setup({
       userIntent: () => 'idle' as const,
     }),
     assignAcceptRecommendation: assign({
-      currentRecommendations: ({ context, event }) =>
+      currentRecommendations: ({ context: event }) =>
         context.currentRecommendations.map((rec) =>
           rec.id === (event as { type: 'ACCEPT_RECOMMENDATION'; recommendationId: string }).recommendationId
             ? { ...rec, accepted: true }
@@ -155,21 +155,21 @@ export const crewAIOrchestrationMachine = setup({
       activeAgents: () => [] as string[],
     }),
     assignAgentCompleted: assign({
-      agentResponses: ({ context, event }) => [
+      agentResponses: ({ context: event }) => [
         ...context.agentResponses,
         (event as { type: 'AGENT_COMPLETED'; response: AgentResponse }).response,
       ],
-      activeAgents: ({ context, event }) =>
+      activeAgents: ({ context: event }) =>
         context.activeAgents.filter(
           (id: string) => id !== (event as { type: 'AGENT_COMPLETED'; agentId: string }).agentId
         ),
     }),
     assignAgentFailed: assign({
-      failedAgents: ({ context, event }) => [
+      failedAgents: ({ context: event }) => [
         ...context.failedAgents,
         (event as { type: 'AGENT_FAILED'; agentId: string }).agentId,
       ],
-      activeAgents: ({ context, event }) =>
+      activeAgents: ({ context: event }) =>
         context.activeAgents.filter(
           (id: string) => id !== (event as { type: 'AGENT_FAILED'; agentId: string }).agentId
         ),

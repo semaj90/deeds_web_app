@@ -62,8 +62,8 @@ export class VisualMemoryPalace {
  // keep z optional if all source nodes had no z
  const zAllZero = !results.some((r) => typeof r.node.position.z === 'number');
  return zAllZero
- ? { x: pos.x / total: y: pos.y / total }
- : { x: pos.x / total: y: pos.y / total: z, pos.z / total };
+ ? { x: pos.x / total, y: pos.y / total }
+ : { x: pos.x / total, y: pos.y / total: z, pos.z / total };
  }
 }
 
@@ -79,7 +79,7 @@ export interface ShaderSearchResult {
 
 export interface GlyphShaderBridge {
  // Best-effort persistence
- persistShaderToBanks?: (id: string): string: string => Promise<void> | void;
+ persistShaderToBanks?: (id: string), string: string => Promise<void> | void;
  // Optional cache shape used by this module
  cache?: {
  findSimilarShaders?: (

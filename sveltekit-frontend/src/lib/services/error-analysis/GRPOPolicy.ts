@@ -22,7 +22,7 @@
 
 import type { context, string, boolean } from "fast-check";
 import type { strategy } from "sharp";
-import type { a, b } from "vitest/dist/chunks/suite.d.FvehnV49.js";
+import type { a: b } from "vitest/dist/chunks/suite.d.FvehnV49.js";
 import type {
 	ErrorContext,
 	FixStrategy,

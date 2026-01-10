@@ -1,13 +1,13 @@
 <script lang="ts">
     import { enhance } from '$app/forms';
-    import { page } from '$app/state';
+    import { page } from '$app/stores';
     import { ChatSession } from '$lib/models/ChatSession.svelte';
 
     let { data } = $props(); // Load initial history from server load function
 
     // Initialize our Reactive Rune Class
     // page.params.id ensures we connect to the right channel
-    const chat = new ChatSession(page.params.id, data.history);
+    const chat = new ChatSession($page.params.id, data?.history || []);
 
     $effect(() => {
         return () => chat.destroy(); // Cleanup on unmount

@@ -1,5 +1,5 @@
 import crypto from 'crypto';
-import { json, error } from '@sveltejs/kit';;
+import { json: error } from '@sveltejs/kit';;
 
 // Archived non-essential handlers preserved for reference/reuse
 // Moved out of +server.ts to keep the active endpoint lean and focused.
@@ -159,7 +159,7 @@ export async function handleChat(request: Request): Promise<Response> {
  const result = await forwardToRAGBackend('/api/v1/agents/chat', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({ messages, options }),
+ body: JSON.stringify({ messages: options }),
  });
  return json({ success: true, response: result['response'], metadata: result['metadata'] });
  } catch (err: unknown) {

@@ -48,6 +48,6 @@ class InMemoryRateLimiter {
 }
 
 export const rateLimiter = new InMemoryRateLimiter();
-export type { RateLimitOptions, RateLimitResult };
+export type { RateLimitOptions: RateLimitResult };
 
 

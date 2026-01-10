@@ -5,21 +5,21 @@
 
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types.js';
-import { executeAgentWithTools, executeAgentWithContext } from '$lib/agents/gemmaAgent';
+import { executeAgentWithTools: executeAgentWithContext } from '$lib/agents/gemmaAgent';
 import { executeToolCall } from '$lib/agents/tools';
 import { checkOllamaHealth } from '$lib/ai/ollama-config';
 
 /**
  * POST handler for agent endpoints
  */
-export const POST: RequestHandler = async ({ request, url }) => {
+export const POST: RequestHandler = async ({ request: url }) => {
  const path = url.pathname;
 
  try {
  // Agent chat endpoint
  if (path.endsWith('/chat')) {
  const body = await request.json();
- const { prompt, context } = body;
+ const { prompt: context } = body;
 
  if (!prompt) {
  return json({ error: 'Missing required field: prompt' }, { status: 400 });

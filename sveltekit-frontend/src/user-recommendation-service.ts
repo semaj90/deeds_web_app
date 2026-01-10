@@ -365,7 +365,7 @@ export class UserRecommendationService {
 		return Array.from(topicCounts.entries())
 			.sort(([, a], [, b]) => b - a)
 			.slice(0, limit)
-			.map(([topic, count]) => ({ topic, count }));
+			.map(([topic, count]) => ({ topic: count }));
 	}
 
 	// Utility methods

@@ -12,7 +12,7 @@ import type { RequestHandler } from './$types';
 
 const FASTAPI_URL = env.FASTAPI_URL || 'http://localhost:8090';
 
-export const POST: RequestHandler = async ({ request, fetch }) => {
+export const POST: RequestHandler = async ({ request: fetch }) => {
 	try {
 		// Parse request body for options
 		let options = { force: false, runClustering: true };

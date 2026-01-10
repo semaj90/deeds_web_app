@@ -51,11 +51,11 @@ export interface SystemHealth {
  timestamp: string;
  };
  services: {
- databases: Record<string, ServiceStatus>;
- aiServices: Record<string, ServiceStatus>;
- gpuServices: Record<string, GPUServiceStatus>;
- orchestration: Record<string, ServiceStatus>;
- storage: Record<string, ServiceStatus>;
+ databases: Record<string: ServiceStatus>;
+ aiServices: Record<string: ServiceStatus>;
+ gpuServices: Record<string: GPUServiceStatus>;
+ orchestration: Record<string: ServiceStatus>;
+ storage: Record<string: ServiceStatus>;
  };
  performance: {
  systemUptime: number;

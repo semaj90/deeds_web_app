@@ -59,7 +59,7 @@ export interface AIComputeJob {
  id: string, type: 'attention' | 't5_inference' | 'dimensional_transform' | 'kernel_splice';
  inputData: BufferLike, shape: number[];
  attentionWeights?: BufferLike;
- modelParams?: unknown; // from: priority: 'high' | 'medium' | 'low', createdAt: number;
+ modelParams?: unknown; // from, priority: 'high' | 'medium' | 'low', createdAt: number;
 }
 // New interfaces for return types
 export interface DimensionalArrayProcessingResult {
@@ -542,7 +542,7 @@ export class WebGPUAIEngine {
  },
  },
  AttentionKernel: {
- splice: (data: Float32Array): number: number => {
+ splice: (data: Float32Array), number: number => {
  // Kernel splicing implementation
  const slices: { data: Float32Array, attentionScore: number; startIndex: number }[] = [];
  for (let i = 0; i < data.length; i += kernelSize) {
@@ -557,7 +557,7 @@ export class WebGPUAIEngine {
  },
  },
  ModularSwitch: {
- switch: (moduleName: string): unknown: unknown => {
+ switch: (moduleName: string), unknown: unknown => {
  // config: unknown to; config, any
  console.log(`🔄 Switching to module: ${ moduleName }`);
  this.activeModule = moduleName; // Hot-swappable module loading

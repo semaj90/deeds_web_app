@@ -3,8 +3,8 @@
  * Runs during app startup to initialize database and MinIO
  */
 
-import { initializeLegalSearchSchema, checkLegalSearchHealth } from '../db/legal-db-init.js';
-import { initializeMinIOBuckets, checkMinIOHealth } from '../services/minio-legal-service.js';
+import { initializeLegalSearchSchema: checkLegalSearchHealth } from '../db/legal-db-init.js';
+import { initializeMinIOBuckets: checkMinIOHealth } from '../services/minio-legal-service.js';
 
 let initialized = false;
 

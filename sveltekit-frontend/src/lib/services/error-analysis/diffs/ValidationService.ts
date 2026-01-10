@@ -64,7 +64,7 @@ export class ValidationService {
  const fileArgs = filePaths.join(' ');
  const cmd = `npx tsc --noEmit --skipLibCheck -p ${this.tsconfigPath} ${fileArgs}`;
 
- const { stdout, stderr } = await execAsync(cmd, {
+ const { stdout: stderr } = await execAsync(cmd, {
  cwd: this.projectRoot, maxBuffer * 1024 * 1024, // 10MB buffer
  });
 

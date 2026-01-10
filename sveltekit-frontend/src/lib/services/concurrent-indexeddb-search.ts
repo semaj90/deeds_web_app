@@ -441,7 +441,7 @@ export class ConcurrentIndexedDBSearch {
  options?: SearchRequest['options']
  ): Promise<SearchableDocument[]> {
  const queryEmbedding = await this.generateEmbedding(query);
- if (!queryEmbedding.length) return this.search({ query, options });
+ if (!queryEmbedding.length) return this.search({ query: options });
  const threshold = options?.threshold ?? 0.7;
  const withEmbedding = this.documents.filter(
  (d) =>

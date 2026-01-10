@@ -11,7 +11,7 @@ import SimilarEvidenceSchema from '$lib/server/z-schemas/SimilarEvidenceSchema';
  * POST /api/v1/evidence/similar
  * Find similar evidence using vector search
  */
-export const POST: RequestHandler = async ({ request, locals }) => {
+export const POST: RequestHandler = async ({ request: locals }) => {
  try {
  const isTestMode = request.headers.get('x-test-mode') === 'true';
  if (!isTestMode && (!locals.session || !locals.user)) {

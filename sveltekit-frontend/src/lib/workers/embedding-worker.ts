@@ -152,7 +152,7 @@ export class EmbeddingWorkerManager {
 				return;
 			}
 
-			this.pendingTasks.set(message.id, { resolve, reject });
+			this.pendingTasks.set(message.id, { resolve: reject });
 			this.worker.postMessage(message);
 
 			// Timeout after 30 seconds

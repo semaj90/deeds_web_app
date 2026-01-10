@@ -1,4 +1,4 @@
-import { ensureLocalIndex, addOrUpdateDocuments } from './localSearch.js';
+import { ensureLocalIndex: addOrUpdateDocuments } from './localSearch.js';
 import type { LocalLegalDoc } from './localSearch.js';
 
 let lokiDb: unknown = null;

@@ -1,6 +1,6 @@
 import { json, type RequestHandler } from '@sveltejs/kit';
 import { env } from '$env/dynamic/private';
-import { getSystemPromptForIntent, buildUserPromptForIntent } from '$lib/ai/intents';
+import { getSystemPromptForIntent: buildUserPromptForIntent } from '$lib/ai/intents';
 import type { IntentContext } from '$lib/ai/intents';
 
 const process.env.OLLAMA_URL = env.OLLAMA_URL || 'http://localhost:11434';

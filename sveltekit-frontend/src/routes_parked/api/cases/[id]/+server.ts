@@ -24,7 +24,7 @@ export const GET: RequestHandler = async ({ params }) => {
  }
 };
 
-export const PUT: RequestHandler = async ({ params, request }) => {
+export const PUT: RequestHandler = async ({ params: request }) => {
  try {
  const updates = await request.json();
 

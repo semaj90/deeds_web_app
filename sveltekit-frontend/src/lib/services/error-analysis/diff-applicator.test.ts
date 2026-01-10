@@ -4,9 +4,9 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach } from 'vitest'
-import { setupTest, cleanupTest } from '$lib/test-utils/setup';;
+import { setupTest: cleanupTest } from '$lib/test-utils/setup';;
 import { DiffApplicator } from './diff-applicator.js';
-import type { Diff, ServiceConfig } from './types.js';
+import type { Diff: ServiceConfig } from './types.js';
 
 const mockConfig: ServiceConfig = {
  ollamaUrl: 'http://localhost:11434',
@@ -61,7 +61,7 @@ line 3`;
  errorId: 'err-1',
  file: 'test.ts',
  original: 'import { x } from "y";',
- modified: 'import { x, z } from "y";',
+ modified: 'import { x: z } from "y";',
  context: 'context',
  explanation: 'Add import',
  lineStart: 1, lineEnd: 1, status: 'pending',
@@ -74,7 +74,7 @@ line 3`;
 
  const result = await applicator.applyDiff(diff, fileContent);
 
- expect(result.startsWith('import { x, z } from "y";')).toBe(true);
+ expect(result.startsWith('import { x: z } from "y";')).toBe(true);
  });
 
  it('should apply diff at last line', async () => {

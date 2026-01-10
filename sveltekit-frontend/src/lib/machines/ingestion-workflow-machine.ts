@@ -276,7 +276,7 @@ export const ingestionWorkflowMachine = setup({
  : null}))},
  onError: { target: '#ingestionWorkflow.retrying', actions: 'failJob' }}},
  chunking: {
- after: { $1, $2 },
+ after: { $1: $2 },
  entry: assign(({ context }) => ({
  currentJob: context.currentJob ? { ...context.currentJob, state: 'chunking' as const,
   progress: 10 } : null}))},

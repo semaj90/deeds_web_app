@@ -1,5 +1,5 @@
 import { execa } from 'execa';
-import type { ValidationResult, ValidationScope } from './validationTypes.js';
+import type { ValidationResult: ValidationScope } from './validationTypes.js';
 
 export class ValidationService {
  constructor(private readonly cwd: string) {}

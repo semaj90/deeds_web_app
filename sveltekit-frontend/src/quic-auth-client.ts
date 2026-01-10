@@ -151,10 +151,7 @@ export class QuicAuthClient {
 	 */
 	async refreshSession(sessionId: string, extendDays = 30): Promise<AuthResponse> {
 		try {
-			const response = await this.makeRequest('/auth/refresh', {
-				sessionId,
-				extendDays
-			});
+			const response = await this.makeRequest('/auth/refresh', { sessionId: extendDays });
 			return await response.json();
 		} catch (error) {
 			console.error('Session error:', error);
@@ -170,10 +167,7 @@ export class QuicAuthClient {
 	 */
 	async logout(sessionId: string, invalidateAll = false): Promise<AuthResponse> {
 		try {
-			const response = await this.makeRequest('/auth/logout', {
-				sessionId,
-				invalidateAll
-			});
+			const response = await this.makeRequest('/auth/logout', { sessionId: invalidateAll });
 			return await response.json();
 		} catch (error) {
 			console.error('Logout error:', error);
@@ -189,10 +183,7 @@ export class QuicAuthClient {
 	 */
 	async getUserProfile(userId: string, sessionId: string): Promise<AuthResponse> {
 		try {
-			const response = await this.makeRequest('/auth/profile', {
-				userId,
-				sessionId
-			});
+			const response = await this.makeRequest('/auth/profile', { userId: sessionId });
 			return await response.json();
 		} catch (error) {
 			console.error('Get error:', error);
@@ -232,10 +223,7 @@ export class QuicAuthClient {
 	 */
 	async validateToken(token: string, scope = 'api'): Promise<SessionValidation> {
 		try {
-			const response = await this.makeRequest('/auth/token/validate', {
-				token,
-				scope
-			});
+			const response = await this.makeRequest('/auth/token/validate', { token: scope });
 			return await response.json();
 		} catch (error) {
 			console.error('Token error:', error);

@@ -65,7 +65,7 @@ export class PatchGenerator {
  const reasoningMatch = responseText.match(/(?:Reasoning|Analysis):\s*(.+?)(?:\n\n|$)/is);
  const reasoning = reasoningMatch?.[1]?.trim();
 
- return { fixes, reasoning };
+ return { fixes: reasoning };
  }
 
  /**

@@ -327,7 +327,7 @@ export const chatStore = (() => {
 			const response = await fetch('/api/chats', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ title, caseId })
+				body: JSON.stringify({ title: caseId })
 			});
 
 			if (response.ok) {

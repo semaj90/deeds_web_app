@@ -131,7 +131,7 @@ export const userWorkflowMachine = createMachine({
             START_WORKFLOW: {
               target: 'workflowActive',
               actions: assign({
-                workflow: ({ event, context }) => ({
+                workflow: ({ event: context }) => ({
                   ...context.workflow,
                   id: `workflow_${Date.now()}`,
                   type: event.workflowType,
@@ -159,7 +159,7 @@ export const userWorkflowMachine = createMachine({
             },
             ADD_COLLABORATOR: {
               actions: assign({
-                collaborators: ({ context, event }) => {
+                collaborators: ({ context: event }) => {
                   const exists = context.collaborators.some((c: any) => c.id === event.collaborator.id);
                   return exists ? context.collaborators : [...context.collaborators, event.collaborator];
                 }
@@ -167,7 +167,7 @@ export const userWorkflowMachine = createMachine({
             },
             REMOVE_COLLABORATOR: {
               actions: assign({
-                collaborators: ({ context, event }) => context.collaborators.filter((c: any) => c.id !== event.userId)
+                collaborators: ({ context: event }) => context.collaborators.filter((c: any) => c.id !== event.userId)
               })
             }
           }
@@ -183,14 +183,14 @@ export const userWorkflowMachine = createMachine({
                 COMPLETE_STEP: {
                   target: 'stepCompleted',
                   actions: assign({
-                    data: ({ context, event }) => ({ ...context.data, ...event.stepData }),
+                    data: ({ context: event }) => ({ ...context.data, ...event.stepData }),
                     progress: ({ context }) => Math.round((context.workflow.currentStepIndex + 1) / context.workflow.totalSteps * 100)
                   })
                 },
                 ERROR: {
                   target: 'stepError',
                   actions: assign({
-                    errors: ({ context, event }) => [...context.errors, event.error]
+                    errors: ({ context: event }) => [...context.errors, event.error]
                   })
                 }
               }
@@ -283,7 +283,7 @@ export const userWorkflowMachine = createMachine({
             START_WORKFLOW: {
               target: 'workflowActive',
               actions: assign({
-                workflow: ({ event, context }) => ({
+                workflow: ({ event: context }) => ({
                   ...context.workflow,
                   id: `workflow_${Date.now()}`,
                   type: event.workflowType,
@@ -323,7 +323,7 @@ export const userWorkflowMachine = createMachine({
             START_WORKFLOW: {
               target: 'workflowActive',
               actions: assign({
-                workflow: ({ event, context }) => ({
+                workflow: ({ event: context }) => ({
                   ...context.workflow,
                   id: `workflow_${Date.now()}`,
                   type: event.workflowType,
@@ -362,7 +362,7 @@ export const userWorkflowMachine = createMachine({
       on: {
         ADD_NOTIFICATION: {
           actions: assign({
-            notifications: ({ context, event }) => [
+            notifications: ({ context: event }) => [
               ...context.notifications,
               {
                 id: `notification_${Date.now()}`,
@@ -376,7 +376,7 @@ export const userWorkflowMachine = createMachine({
         },
         MARK_NOTIFICATION_READ: {
           actions: assign({
-            notifications: ({ context, event }) => context.notifications.map((n: any) => n.id === event.notificationId ? { ...n, read: true } : n)
+            notifications: ({ context: event }) => context.notifications.map((n: any) => n.id === event.notificationId ? { ...n, read: true } : n)
           })
         },
         CLEAR_NOTIFICATIONS: {
@@ -386,7 +386,7 @@ export const userWorkflowMachine = createMachine({
         },
         UPDATE_PREFERENCES: {
           actions: assign({
-            preferences: ({ context, event }) => ({
+            preferences: ({ context: event }) => ({
               ...context.preferences,
               ...event.preferences
             })

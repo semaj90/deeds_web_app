@@ -221,9 +221,7 @@ class CognitiveSmartRouter {
  // Fallthrough to Ollama if NES memory full
  }
 
- case 'ollama':
- case 'llamacpp-cuda':
- default:
+ case 'ollama': case 'llamacpp-cuda', default:
  // Use existing Ollama integration
  return await this.processWithOllama(request);
  }

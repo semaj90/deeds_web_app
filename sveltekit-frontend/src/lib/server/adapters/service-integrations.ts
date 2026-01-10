@@ -12,24 +12,23 @@
  *
  * All configurations are loaded from environment variables.
  */
-import { dev } from '$app/environment';
 import type {
-    MinIOClient,
-    MinIOConfig,
-    Neo4jClient,
-    Neo4jConfig,
-    OllamaClient,
-    OllamaConfig,
-    PgVectorClient,
-    PostgresConfig,
-    QdrantClient,
-    QdrantConfig,
-    QdrantSearchResult,
-    QdrantVectorPayload,
-    RedisCacheService,
-    RedisConfig,
-    ServiceEnvironment,
-    ServiceUrls
+  MinIOClient,
+  MinIOConfig,
+  Neo4jClient,
+  Neo4jConfig,
+  OllamaClient,
+  OllamaConfig,
+  PgVectorClient,
+  PostgresConfig,
+  QdrantClient,
+  QdrantConfig,
+  QdrantSearchResult,
+  QdrantVectorPayload,
+  RedisCacheService,
+  RedisConfig,
+  ServiceEnvironment,
+  ServiceUrls
 } from '$lib/types/external-services';
 
 // ===== Environment Configuration Loader =====
@@ -106,18 +105,10 @@ export function loadServiceEnvironment(): ServiceEnvironment {
       database: process.env.NEO4J_DATABASE || 'neo4j',
       maxConnectionPoolSize: 50
     },
-    // RabbitMQ
-    rabbitmqConfig: {
-      url: process.env.RABBITMQ_URL || 'amqp://guest:guest@localhost:5672',
-      enabled: process.env.RABBITMQ_ENABLED !== 'false',
-      exchange: 'legal-ai-exchange',
-      queuePrefix: 'legal-ai',
-      heartbeat: 60
-    },
     // Development
-    nodeEnv: process.env.NODE_ENV || 'development',
-    devBypassAuth: process.env.DEV_BYPASS_AUTH === 'true' || dev,
-    logLevel: process.env.LOG_LEVEL || 'info'
+    nodeEnv: (process.env.NODE_ENV || 'development') as 'development' | 'production' | 'test',
+    devBypassAuth: process.env.DEV_BYPASS_AUTH === 'true',
+    logLevel: (process.env.LOG_LEVEL || 'info') as 'error' | 'warn' | 'info' | 'debug'
   };
 }
 
@@ -131,17 +122,13 @@ export function getServiceUrls(env: ServiceEnvironment): ServiceUrls {
     redis: env.redisConfig.url,
     qdrant: `http://${env.qdrantConfig.host}:${env.qdrantConfig.port}`,
     // AI Services
-    ollama: env.ollamaConfig.baseUrl,
-    ollamaEmbeddings: `${env.ollamaConfig.baseUrl}/api/embeddings`,
+    ollama: env.ollamaConfig.baseUrl || env.ollamaConfig.host || 'http://localhost:11434',
+    ollamaEmbeddings: `${env.ollamaConfig.baseUrl || env.ollamaConfig.host || 'http://localhost:11434'}/api/embeddings`,
     // Storage & Processing
     minio: `${env.minioConfig.useSSL ? 'https' : 'http'}://${env.minioConfig.endPoint}:${env.minioConfig.port}`,
     minioConsole: `${env.minioConfig.useSSL ? 'https' : 'http'}://${env.minioConfig.endPoint}:${env.minioConfig.port + 1}`,
     neo4j: env.neo4jConfig.uri,
     neo4jBrowser: env.neo4jConfig.uri.replace('bolt://', 'http://').replace(':7687', ':7474'),
-    rabbitmq: env.rabbitmqConfig.url,
-    rabbitmqManagement: env.rabbitmqConfig.url
-      .replace('amqp://', 'http://')
-      .replace(':5672', ':15672'),
     // QUIC Microservices
     quicGateway: process.env.QUIC_GATEWAY_URL,
     quicVectorService: process.env.QUIC_VECTOR_SERVICE_URL,
@@ -179,8 +166,8 @@ export class OllamaAdapter implements OllamaClient {
     prompt: string,
     opts?: { model?: string; maxTokens?: number }
   ): Promise<string> {
-    const model = opts?.model || this.config.chatModel;
-    const url = `${this.config.baseUrl}/api/generate`;
+    const model = opts?.model || this.config.chatModel || 'gemma3:legal-latest';
+    const url = `${this.config.baseUrl || 'http://localhost:11434'}/api/generate`;
     const response = await fetch(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -204,8 +191,8 @@ export class OllamaAdapter implements OllamaClient {
     messages: Array<{ role: string; content: string }>,
     opts?: { model?: string; stream?: boolean }
   ): Promise<string | AsyncIterable<string>> {
-    const model = opts?.model || this.config.chatModel;
-    const url = `${this.config.baseUrl}/api/chat`;
+    const model = opts?.model || this.config.chatModel || 'gemma3:legal-latest';
+    const url = `${this.config.baseUrl || 'http://localhost:11434'}/api/chat`;
     const response = await fetch(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -214,7 +201,7 @@ export class OllamaAdapter implements OllamaClient {
         messages,
         stream: opts?.stream || false
       }),
-      signal: AbortSignal.timeout(this.config.timeout || 60000)
+      signal: AbortSignal.timeout(this.config.timeout ?? 60000)
     });
 
     if (!response.ok) {
@@ -251,7 +238,7 @@ export class OllamaAdapter implements OllamaClient {
   }
 
   async listModels(): Promise<string[]> {
-    const url = `${this.config.baseUrl}/api/tags`;
+    const url = `${this.config.baseUrl || 'http://localhost:11434'}/api/tags`;
     const response = await fetch(url);
     if (!response.ok) {
       throw new Error(`Ollama listModels failed: ${response.statusText}`);
@@ -271,7 +258,9 @@ export class RedisAdapter implements RedisCacheService {
   private async ensureConnected() {
     if (this.connected) return;
     const Redis = (await import('ioredis')).default;
-    this.client = new Redis(this.config.url, {
+    // ioredis v5: pass config object, not URL + options
+    this.client = new Redis({
+      ...this.parseRedisUrl(this.config.url),
       password: this.config.password,
       maxRetriesPerRequest: this.config.maxRetriesPerRequest || 3,
       enableReadyCheck: this.config.enableReadyCheck !== false,
@@ -279,6 +268,19 @@ export class RedisAdapter implements RedisCacheService {
     });
     await this.client.connect();
     this.connected = true;
+  }
+
+  private parseRedisUrl(url: string): { host: string; port: number; password?: string } {
+    try {
+      const parsed = new URL(url);
+      return {
+        host: parsed.hostname,
+        port: parseInt(parsed.port || '6379'),
+        password: parsed.password || undefined
+      };
+    } catch {
+      return { host: 'localhost', port: 6379 };
+    }
   }
 
   async get(key: string): Promise<string | null> {
@@ -291,9 +293,9 @@ export class RedisAdapter implements RedisCacheService {
     return this.client.setex(key, seconds, value);
   }
 
-  async hset(key: string, data: Record<string, string>): Promise<number> {
+  async hset(key: string, field: string, value: string): Promise<number> {
     await this.ensureConnected();
-    return this.client.hset(key, data);
+    return await this.client.hset(key, field, value);
   }
 
   async hget(key: string, field: string): Promise<string | null> {
@@ -363,11 +365,11 @@ export class QdrantAdapter implements QdrantClient {
     await this.client.upsert(name, { points });
   }
 
-  async search(
+  async search<T = Record<string, unknown>>(
     collection: string,
     vector: number[],
     limit?: number
-  ): Promise<QdrantSearchResult<unknown>[]> {
+  ): Promise<QdrantSearchResult<T>[]> {
     await this.ensureClient();
     const results = await this.client.search(collection, {
       vector,

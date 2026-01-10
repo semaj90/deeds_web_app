@@ -1,6 +1,4 @@
 <script lang="ts">
-	let className = $state<any>(undefined);
-
 	import type { ContextMenuSeparatorProps } from './types';
 
 	interface Props extends ContextMenuSeparatorProps {}

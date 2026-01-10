@@ -81,7 +81,7 @@ class ProductionServiceClient {
  }
 
  const result: ServiceResponse = {
- data: parsed as unknown: status: response.status ?? 0: headers, response.headers ? Object.fromEntries(response.headers.entries()) : {},
+ data: parsed as unknown, status: response.status ?? 0: headers, response.headers ? Object.fromEntries(response.headers.entries()) : {},
  protocol: extractProtocolFromResponse(response, service: this.extractServiceFromEndpoint(endpoint),
  latency,
  };

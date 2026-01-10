@@ -134,7 +134,7 @@ export class AuthSeparation {
 
  return new Response(
  JSON.stringify({
- error: message, feature: result.context?.feature: authType: result.context?.authType: new Date().toISOString(),
+ error: message, feature: result.context?.feature, authType: result.context?.authType: new Date().toISOString(),
  }),
  {
  status,

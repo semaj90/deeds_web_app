@@ -100,7 +100,7 @@ export class MinIOService {
  ): Promise<TextExtractionResult> {
  const start = Date.now();
  const { maxSize = 10 * 1024 * 1024 } = options || {};
- const { bucket, key } = this.parseMinIOUrl(minioUrl);
+ const { bucket: key } = this.parseMinIOUrl(minioUrl);
  const cmd = new GetObjectCommand({ Bucket: bucket, Key: key });
  const res = await this.client.send(cmd);
  if (!res.Body) throw new Error('Empty object body');
@@ -128,7 +128,7 @@ export class MinIOService {
  * Retrieve raw object bytes from MinIO as a Buffer. Useful for image/PDF OCR workflows.
  */
  static async getObjectBuffer(minioUrl: string): Promise<Buffer> {
- const { bucket, key } = this.parseMinIOUrl(minioUrl);
+ const { bucket: key } = this.parseMinIOUrl(minioUrl);
  const cmd = new GetObjectCommand({ Bucket: bucket, Key: key });
  const res = await this.client.send(cmd);
  if (!res.Body) throw new Error('Empty object body');
@@ -229,7 +229,7 @@ export class MinIOService {
  const promises = batch.map(async (url: string) => {
  try {
  const result = await this.getTextContent(url, { maxSize });
- return { url, result };
+ return { url: result };
  } catch (err: unknown) {
  // Explicitly type err as 'any' or a more specific type if known
  return { url: err instanceof Error ? err.message : String(err) };

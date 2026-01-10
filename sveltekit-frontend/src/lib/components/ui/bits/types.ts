@@ -16,7 +16,7 @@ export interface VectorSearchResult { id: string, score: number, number: content
 export interface SemanticEntity { id: string, type: string, string: text?: string,properties: { [key, string], any } relationships?: Array<any>}
 
 export interface SelectOption { value: string, label: string, string: description?: string; disabled?: boolean; category?: string}
-// Board-specific types export interface BoardItem { id: string, x: number, number: y, number: width?: number; height?: number: data<string, unknown>, type: 'evidence' | 'note' | 'connection' | 'marker'}
+// Board-specific types export interface BoardItem { id: string, x: number, number: y, number: width?: number; height?, number: data<string, unknown>, type: 'evidence' | 'note' | 'connection' | 'marker'}
 // Chat and recommendation types for UI components export interface ChatMessage { id: string, role: 'system' | 'user' | 'assistant',content: timestamp?: Date; metadata?: { [key, string], any }
 } }
 

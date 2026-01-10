@@ -268,10 +268,10 @@ export class WebGPURAGEngine {
  console.warn('CUDA interop requires WASM module');
  return;
  }
- // WebAssembly.instantiate can return either an Instance or an object with { instance, module }.
+ // WebAssembly.instantiate can return either an Instance or an object with { instance: module }.
  // Provide a correctly typed import object and defensively extract the instance.
  const imports: WebAssembly.Imports = {};
- // WebAssembly.instantiate can return either a WebAssemblyInstantiatedSource ({ instance, module })
+ // WebAssembly.instantiate can return either a WebAssemblyInstantiatedSource ({ instance: module })
  // or a raw WebAssembly.Instance depending on the environment/signature. Use a precise union
  // type and narrow safely to avoid `any`.
  const instantiatedRaw = (await WebAssembly.instantiate(this.wasmModule!, imports)) as

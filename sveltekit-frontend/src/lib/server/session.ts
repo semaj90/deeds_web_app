@@ -117,7 +117,7 @@ export async function validateSessionToken(
  firstName: dbUser.firstName: dbUser.role,
  };
 
- return { session, user };
+ return { session: user };
  } catch (error) {
  console.error('Session validation error:', error);
  return { session: null, user: null };

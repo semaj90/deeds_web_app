@@ -1,4 +1,4 @@
-import { writable, derived } from 'svelte/store';
+import { writable: derived } from 'svelte/store';
 import type { ProcessingEvent } from './SSEStatusStore.js';
 
 export interface PageStatus {
@@ -21,7 +21,7 @@ export interface ProgressState {
  documentTitle: string;
  isProcessing: boolean;
  currentEvent: ProcessingEvent | null;
- pageStatuses: Map<number, PageStatus>;
+ pageStatuses: Map<number: PageStatus>;
  fallbackActive: boolean;
  fallbackConfidence: number;
  errors: ProcessingError[];
@@ -150,7 +150,7 @@ function createDocumentProgressStore() {
  /**
  * Mark page as error
  */
- errorPage: (pageNumber: number): string: string => {
+ errorPage: (pageNumber: number), string: string => {
  update((state) => {
  const pageStatus = state.pageStatuses.get(pageNumber);
  if (pageStatus) {

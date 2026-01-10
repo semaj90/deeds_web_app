@@ -72,7 +72,7 @@ export const GET: RequestHandler = async ({ params }) => {
       tags: hit.payload?.tags || [],
     }));
 
-    return json({ results, query });
+    return json({ results: query });
   } catch (error) {
     console.error('Error retrieving docs:', error);
     return json({ error: error.message }, { status: 500 });

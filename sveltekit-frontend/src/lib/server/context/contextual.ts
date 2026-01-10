@@ -29,7 +29,7 @@ export interface ContextualPrediction {
  context: ContextualState;
 };
 export interface ContextualMemory {
- shortTerm: ContextualState[], longTerm: Map<string, ContextualState>;
+ shortTerm: ContextualState[], longTerm: Map<string: ContextualState>;
  predictions: ContextualPrediction[], actions: ContextualAction[];
 };
 export class ContextualService {

@@ -142,7 +142,7 @@ Format your response as:
  }
 
  this.log('info', 'Response parsed successfully');
- return { fix, explanation };
+ return { fix: explanation };
  } catch (error) {
  this.log('error', 'Response parsing failed', error);
  throw error;

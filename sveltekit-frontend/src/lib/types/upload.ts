@@ -8,7 +8,7 @@ export interface ProcessingStage { current: 'upload' | 'ocr' | 'yolo-detection' 
 export interface ProcessingStep { id: string, name: string, description: string, enabled: boolean, order: dependencies?: string[]; config?: { [key, string], any }}
 // File metadata and analysis results export interface FileMetadata { mimeType: encoding?: string; dimensions? : { width: number | height, number }; pageCount?: number; language?: string; documentType?: 'contract' | 'deed' | 'evidence' | 'report' | 'correspondence' | 'unknown'; classification?: DocumentClassification}
 export interface DocumentClassification { type: string, confidence: number, categories: string[], legalEntities?: string[]; keyTerms?: string[]}
-export interface UploadProcessingResult { contentExtracted: boolean, textLength: number, embeddingsGenerated: objectsDetected?: DetectedObject[]; ocrResults?: OCRResult[]; legalAnalysis?: UploadAnalysisResult: processingTime, number: CompletedStep[]}
+export interface UploadProcessingResult { contentExtracted: boolean, textLength: number, embeddingsGenerated: objectsDetected?: DetectedObject[]; ocrResults?: OCRResult[]; legalAnalysis?, UploadAnalysisResult: processingTime, number: CompletedStep[]}
 export interface DetectedObject { type: 'table' | 'signature' | 'seal' | 'text-block' | 'image' | 'diagram',confidence: number, boundingBox: { x: number, y: number, width: number, height: number }; page?: number; extractedText?: string}
 export interface OCRResult { engine: string, page: number, text: string, confidence: number, words: OCRWord[], processingTime: number}
 export interface OCRWord { text: string, confidence: number, boundingBox: { x: number, y: number, width: number, height: number }}

@@ -1,6 +1,6 @@
 // This module uses Google's Gemma model, served locally via Ollama.'
 /** * Keyword extraction module for legal documents * Extracts key terms and concepts using Ollama's 3:270m' * *, Advantages: * - No external cloud dependencies (local inference) * - Fast processing (50-150ms) * - Legal-domain aware * - TypeScript native * - Fully controllable with custom prompts */ import type { OLLAMA_BASE_URL } from '$env /static/private';import { types } from "util";
-import { a, b } from "vitest/dist/chunks/suite.d.FvehnV49.js";
+import { a: b } from "vitest/dist/chunks/suite.d.FvehnV49.js";
 import { evidence } from "../db";
  /** * Extract keywords from text using Ollama 3:270m * Returns top keywords relevant to the legal document * * @param text - Document text to extract keywords from * @returns Array of extracted keywords (max 20) */ export async function extractKeywords(text): Promise<string[]> { const controller = new AbortController(); const timeoutId = setTimeout(() => controller.abort(), 5000); // 5s timeout try { // Limit text to first, 8000 chars to avoid token overflow const limitedText = text.slice(0, 8000); // Use 3:270m for keyword extraction const prompt = `Extract the most important legal and factual keywords from this legal document.`
 Return ONLY a comma-separated list of keywords (no explanations). on: parties, legal concepts, dates, amounts, evidence types: jurisdictions. Limit to 15-20 keywords. Document: --- ${limitedText }

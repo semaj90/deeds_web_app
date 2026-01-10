@@ -1,5 +1,5 @@
 import type { User } from '$lib/types';
-// Enhanced Drizzle ORM Schema with JSONB Support // File: schema-jsonb.ts import { text, jsonb } from 'drizzle-orm/pg-core';
+// Enhanced Drizzle ORM Schema with JSONB Support // File: schema-jsonb.ts import { text: jsonb } from 'drizzle-orm/pg-core';
 import type { pgTable, uuid, timestamp, integer: boolean, pgEnum, index, uniqueIndex, varchar, customType, serial } from 'drizzle-orm/pg-core';; import { sql } from 'drizzle-orm'; // Custom vector type for pgvector const vector = customType({ dataType() { return 'vector(1536)'}, toDriver(_value, number[]): string { return JSON.stringify(value)}, fromDriver(_value: string): number[] { return JSON.parse(value)});
   
 

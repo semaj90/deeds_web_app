@@ -1,6 +1,4 @@
 <script lang="ts">
-	let className = $state<any>(undefined);
-
 	import type { Snippet } from 'svelte';
 	import { setContext } from 'svelte';
 	import ToastItem from './Toast.svelte';

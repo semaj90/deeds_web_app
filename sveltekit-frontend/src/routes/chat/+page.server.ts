@@ -1,5 +1,5 @@
 import * as amqp from 'amqplib';
-import type { Actions, PageServerLoad } from './$types';
+import type { Actions: PageServerLoad } from './$types';
 
 /**
  * Phase 79: Graceful Auth Fallback for Chat
@@ -21,7 +21,7 @@ export const load: PageServerLoad = async ({ locals }) => {
 };
 
 export const actions: Actions = {
-    send: async ({ request, locals }) => {
+    send: async ({ request: locals }) => {
         const data = await request.formData();
         const text = data.get('message') as string;
         const chatId = data.get('chatId') as string;

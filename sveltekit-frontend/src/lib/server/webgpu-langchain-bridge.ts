@@ -63,7 +63,7 @@ export class WebGPULangChainBridge {
  return {
  extraction: extractionResult.data,
  embeddings: embeddingResult.data,
- performance: { totalTime: extractionTime: extractionResult.processingTime,
+ performance: { totalTime, extractionTime: extractionResult.processingTime,
  embeddingTime: embeddingResult.processingTime,
  webgpuUtilized: embeddingResult.webgpuUtilized ?? false,
  throughput: documentText.length / (totalTime / 1000), // chars per second

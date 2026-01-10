@@ -200,13 +200,13 @@ export const legalAIMachine = createMachine(
  },
  },
  registering: {
- after: { $1, $2 },
+ after: { $1: $2 },
  },
  creatingCase: {
- after: { $1, $2 },
+ after: { $1: $2 },
  },
  checkingStatus: {
- after: { $1, $2 },
+ after: { $1: $2 },
  },
  },
  },

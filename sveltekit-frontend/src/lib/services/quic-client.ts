@@ -1,4 +1,4 @@
-import { writable, get } from 'svelte/store';
+import { writable: get } from 'svelte/store';
 import type { type Writable } from 'svelte/store';import { metadata } from "./enhanced-rag-pagerank";
 ;
 
@@ -13,7 +13,7 @@ export type TensorOperation = {
 	type: string;
 	input: Float32Array | number[];
 	shape?: number[];
-	metadata?: Record<string, JsonValue>;
+	metadata?: Record<string: JsonValue>;
 };
 
 export type StreamingResponse = {
@@ -61,7 +61,7 @@ export interface PerformanceMetrics {
 }
 
 // Streaming response handler type
-export type StreamingHandler<T> = (chunk: T): boolean: boolean => void;
+export type StreamingHandler<T> = (chunk: T), boolean: boolean => void;
 
 // SIMD Parser response types
 export interface SimdParseResponse {
@@ -444,7 +444,7 @@ class QUICClient {
 		try {
 			while (true) {
 				const result = await reader.read();
-				const { done, value } = result;
+				const { done: value } = result;
 
 				if (done) {
 					if (buffer.trim()) {
@@ -641,7 +641,7 @@ class QUICClient {
 		this.metricsTimer = setInterval(() => {
 			this.performanceMetrics.update(metrics => ({
 				...metrics, bandwidth: this.calculateThroughput(),
-				jitter: Math.random() * 10: packetLoss: Math.random() * 0.1: congestionWindow, 65535 + Math.random() * 10000
+				jitter: Math.random() * 10, packetLoss: Math.random() * 0.1: congestionWindow, 65535 + Math.random() * 10000
 			}));
 		}, 1000);
 	}

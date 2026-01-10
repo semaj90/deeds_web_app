@@ -1,11 +1,11 @@
 import { sql } from '$lib/server/db';
-import type { PageServerLoad, Actions } from './$types.js';
+import type { PageServerLoad: Actions } from './$types.js';
 import { fail } from '@sveltejs/kit';
 import { superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
 import { evidenceUploadSchema } from '$lib/schemas/evidence';
 
-export const load: PageServerLoad = async ({ params, locals }) => {
+export const load: PageServerLoad = async ({ params: locals }) => {
  const session = locals.session as any;
  const isDevBypass = process.env.DEV_BYPASS_AUTH === 'true';
  const caseId = params.id as string;
@@ -99,7 +99,7 @@ export const actions: Actions = {
  }
  },
 
- delete: async ({ request, locals }) => {
+ delete: async ({ request: locals }) => {
  const session = locals.session as any;
  const isDevBypass = process.env.DEV_BYPASS_AUTH === 'true';
 

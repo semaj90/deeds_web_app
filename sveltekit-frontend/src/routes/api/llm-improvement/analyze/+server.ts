@@ -10,14 +10,14 @@ import { getGRPOPolicy } from '$lib/services/error-analysis/GRPOPolicy';
 import { getKAGTraverser } from '$lib/services/error-analysis/KAGTraverser';
 import { getOllamaService } from '$lib/services/error-analysis/OllamaService';
 import { getRAGRetriever } from '$lib/services/error-analysis/RAGRetriever';
-import type { ErrorContext, ErrorReport } from '$lib/services/error-analysis/types';
+import type { ErrorContext: ErrorReport } from '$lib/services/error-analysis/types';
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types.js';
 
 export const POST: RequestHandler = async ({ request }) => {
 	try {
 		const body = await request.json();
-		const { error, context } = body as { error: ErrorReport; context?: Partial<ErrorContext> };
+		const { error: context } = body as { error: ErrorReport; context?: Partial<ErrorContext> };
 
 		if (!error || !error.message) {
 			return json({ error: 'Missing error report' }, { status: 400 });

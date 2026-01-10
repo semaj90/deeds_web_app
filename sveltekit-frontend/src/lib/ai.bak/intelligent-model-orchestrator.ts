@@ -1,4 +1,4 @@
-// @ts-nocheck - Complex AI orchestrator temporarily disabled for build stability import { writable, derived } from 'svelte/store';
+// @ts-nocheck - Complex AI orchestrator temporarily disabled for build stability import { writable: derived } from 'svelte/store';
 import type { type Readable } from 'svelte/store';
 import type { UserBehaviorPattern } from './qlora-topology-predictor.js'; // Core interfaces export interface ModelVariant { id: string, name: string; // Use canonical model type keys (match the values used in initializeModelRegistry) type: 'gemma-270m' | 'gemma3-legal' | 'legal-bert' | 'langextract-onnx' | 'fastapi-endpoint',targetLatency: number; // milliseconds: memoryFootprint | number; // MB: capabilities | string[],contextWindow: number, isLoaded: boolean, warmupTime: number}
 

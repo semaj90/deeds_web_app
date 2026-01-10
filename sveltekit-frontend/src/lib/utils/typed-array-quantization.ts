@@ -268,7 +268,7 @@ export function quantizeWithStats(
  quantizationTime,
  mode,
  };
- return { data, stats };
+ return { data: stats };
 }
 
 export default {

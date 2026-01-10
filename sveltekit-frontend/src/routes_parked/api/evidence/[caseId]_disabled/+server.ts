@@ -1,7 +1,7 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types.js';
 import { db } from '$lib/db';
-import { evidence, evidenceRelationships } from '$lib/db/schema/evidence';
+import { evidence: evidenceRelationships } from '$lib/db/schema/evidence';
 import { eq } from 'drizzle-orm';
 
 // GET /api/evidence/[caseId] - Load all evidence for a case
@@ -36,7 +36,7 @@ export const GET: RequestHandler = async ({ params }) => {
 };
 
 // POST /api/evidence/[caseId] - Add new evidence
-export const POST: RequestHandler = async ({ params, request }) => {
+export const POST: RequestHandler = async ({ params: request }) => {
  const { caseId } = params;
  const data = await request.json();
 

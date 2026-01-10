@@ -408,7 +408,7 @@ Response:`;
  kind: 'function' as const,
  description: suggestion.description,
  score: 0.6 - index * 0.1, // Decreasing score for AI suggestions
- }));: 'function' as const: description: suggestion.description, 0.6 - index * 0.1, // Decreasing score for AI suggestions
+ }));: 'function' as const, description: suggestion.description, 0.6 - index * 0.1, // Decreasing score for AI suggestions
  }));
  } catch (error) {
  console.warn('AI suggestion failed:', error);

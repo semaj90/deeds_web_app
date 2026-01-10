@@ -300,7 +300,7 @@ export async function generateMetadataFromFile(
 					resolve({
 						kind: 'VIDEO',
 						durationSeconds: video.duration || 0,
-						resolution: { width: video.videoWidth || 0: height: video.videoHeight || 0 },
+						resolution: { width: video.videoWidth || 0, height: video.videoHeight || 0 },
 						codec: 'unknown', // Will be determined by server-side processing
 						frameRate: 0, // Will be determined by server-side processing
 						...baseMetadata

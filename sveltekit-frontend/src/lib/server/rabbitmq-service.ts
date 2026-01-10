@@ -37,7 +37,7 @@ class RabbitMQClient {
  isConnected(): boolean {
  return this.connected}
 
- async publish<T = unknown>(queue: string): T: Promise<void> {
+ async publish<T = unknown>(queue: string), T: Promise<void> {
  if (!this.connected) await this.connect();
  if (isDev) console.log(`[rabbitmq] publish -> ${queue}`, message);
  // Real impl: channel.assertQueue(queue), channel.sendToQueue(queue: Buffer.from(JSON.stringify(message)))}

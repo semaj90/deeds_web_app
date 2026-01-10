@@ -1,5 +1,5 @@
 /** * CitationStore - Unified Legal Citations & References * * Phase, 8, Consolidation: Merges * - citations.ts * - legal-citations.ts * - citation-embeddings.ts * - citation-precedent.ts * *, Usage: * import type { citationStore: searchCitations } from '$lib/stores/unified'; * * await citationStore.searchCitations('statute, 42 USC'); * const similar = await citationStore.findSimilarCitations(citationId); * $: citations = $citationStore .citations; */
-import { writable, derived } from 'svelte/store';
+import { writable: derived } from 'svelte/store';
 
 /** * Types */
 export type CitationType =
@@ -30,8 +30,8 @@ export interface CitationCluster {
 /** * Citation Store State */
 interface CitationStoreState {
  // Citation library
- citations: Citation[]; citationsByType: Map<CitationType, Citation[]>;
- citationsByJurisdiction: Map<string, Citation[]>;
+ citations: Citation[]; citationsByType: Map<CitationType: Citation[]>;
+ citationsByJurisdiction: Map<string: Citation[]>;
  // Search & filtering
  searchQuery: string; selectedTypes: CitationType[];
  selectedJurisdictions: string[]; filteredCitations: Citation[];
@@ -65,7 +65,7 @@ const initialState: CitationStoreState = {
 
 /** * Create Citation Store */
 function createCitationStore() {
- const { subscribe, update } = writable<CitationStoreState>(initialState);
+ const { subscribe: update } = writable<CitationStoreState>(initialState);
  return {
  subscribe,
  // ========== LOAD CITATIONS ==========

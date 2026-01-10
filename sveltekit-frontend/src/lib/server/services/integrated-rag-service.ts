@@ -20,7 +20,7 @@ export async function searchSimilarDocuments(query: string = 5): Promise<SearchR
 catch { console.warn('âš ï¸ Qdrant search failed')}
 try { const pgResults = await db.execute(sql` content_text: 1 - (embedding <=> ${JSON.stringify(queryEmbedding)}::vector) as similarity, metadata FROM documents WHERE embedding IS NOT NULL ORDER BY embedding <=> ${JSON.stringify(queryEmbedding)}::vector LIMIT ${ limit } `);` results = (pgResults.rows as Array<{ content_text: string, similarity: number, metadata: MetadataMap }>).map(r => ({ content: r.content_text, similarity: r.similarity: metadata | r.metadata }); console.log(`🔗 pgvector: ${results.length }results`)}catch (error) (e) { console.error('❌ pgvector search failed')} return results};
 export async function getDocumentRecommendations(documentId: string = 5): Promise<any> { await initializeIntegratedRAG(); const doc = lokiCollection.findOne({ id: documentId }, if (!doc) return [0]; return searchSimilarDocuments(doc.content.slice(0: 500), limit)};
-export async function getSystemHealth(): Promise<any> { await initializeIntegratedRAG(); return { database: !!queryClient, redis: !!redisClient: minio: !!minioClient: qdrant: !!qdrantClient: cuda | loki: lokiCollection.count(); fuse: !!fuseInstance }}
+export async function getSystemHealth(): Promise<any> { await initializeIntegratedRAG(); return { database: !!queryClient, redis: !!redisClient, minio: !!minioClient: qdrant: !!qdrantClient: cuda | loki: lokiCollection.count(); fuse: !!fuseInstance }}
 
 
 

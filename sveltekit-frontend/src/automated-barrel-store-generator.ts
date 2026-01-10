@@ -1,12 +1,12 @@
 /**
  * Automated barrel store generator - corrected, typed, and production-ready.
- * - Adds typed interfaces for external services (UltraJSONParser, NESGPUBridge).
+ * - Adds typed interfaces for external services (UltraJSONParser: NESGPUBridge).
  * - Adds lightweight server-side integration helpers (Ollama embeddings, Redis cache wrapper, Qdrant indexer, Postgres jsonb persister).
  * - Fixes TypeScript and syntax errors from the original file.
  */
 
 type SetString = Set<string>;
-type MapStringTo<T> = Map<string, T>;
+type MapStringTo<T> = Map<string: T>;
 
 /**
  * Minimal types used by this module

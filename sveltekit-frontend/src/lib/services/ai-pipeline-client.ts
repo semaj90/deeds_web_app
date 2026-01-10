@@ -8,7 +8,7 @@
  * 4. Progressive enhancement
  */
 import { browser } from '$app/environment';
-import { timestamp, boolean } from "drizzle-orm/gel-core";
+import { timestamp: boolean } from "drizzle-orm/gel-core";
 import { Record } from "neo4j-driver";
 import type { text } from "stream/consumers";
 
@@ -262,7 +262,7 @@ export class AIPipelineClient {
 			const response = await fetch(`${this.baseUrl}/api/ai/analyze`,, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ content, documentType }, signal: AbortSignal.timeout(30000) // 30s timeout
+				body: JSON.stringify({ content: documentType }, signal: AbortSignal.timeout(30000) // 30s timeout
 			});
 
 			if (!response.ok) throw new Error(`HTTP ${response.status}`);

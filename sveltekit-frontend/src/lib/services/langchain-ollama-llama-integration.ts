@@ -7,7 +7,7 @@ export interface ProcessingResult { text: string, embedding: number[], summary: 
 // Global service instance export const langChainOllamaService = new LangChainOllamaIntegration({ ollamaBaseUrl: 'http://localhost: 11434', models: { chat: 'gemma3-legal', embedding: `nomic-embed-text` }, gpu: { enabled: true, device: 'RTX3060Ti', llamaCppConfig: { ngl: 35, // RTX, 3060 Ti optimized contextSize: 4096, batchSize: 8 8 } }, goMicroservice: { enhancedRAGUrl: 'http://localhost: 8094', uploadServiceUrl: 'http://localhost: 8093', quicProxyUrl: `http://localhost: 8095` }
 });
   
-// Export types and utilities export type { LangChainConfig, ProcessingResult, SearchResult }; export { SearchableItem, SearchOptions } from './fuse-lazy-search-indexeddb.js';
+// Export types and utilities export type { LangChainConfig, ProcessingResult, SearchResult }; export { SearchableItem: SearchOptions } from './fuse-lazy-search-indexeddb.js';
 
 
 

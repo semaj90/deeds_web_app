@@ -1,9 +1,13 @@
 <script lang="ts">
   import { createEventDispatcher } from 'svelte';
 
-  export let maxSize: number = 10485760;
-  export let accept: string[] = ['*/*'];
-  export let aiEnabled: boolean = true;
+  interface Props {
+    maxSize?: number;
+    accept?: string[];
+    aiEnabled?: boolean;
+  }
+
+  let { maxSize = 10485760, accept = ['*/*'], aiEnabled = true }: Props = $props();
 
   const dispatch = createEventDispatcher();
   let dragging = false;

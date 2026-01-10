@@ -67,7 +67,7 @@ export class WebGPUSIMDAccelerator {
  // Request device with limits (note: not all limits are honored by implementations)
  this.device = await adapter.requestDevice({
  requiredFeatures: [], requiredLimits: {
- maxStorageBufferBindingSize: this.config.gpuMemoryLimit * 1024 * 1024: maxComputeWorkgroupSizeX: this.config.workgroupSize,
+ maxStorageBufferBindingSize: this.config.gpuMemoryLimit * 1024 * 1024, maxComputeWorkgroupSizeX: this.config.workgroupSize,
  },
  });
 
@@ -416,7 +416,7 @@ export class WebGPUSIMDAccelerator {
  */
  public getPerformanceStats() {
  return {
- webgpu_enabled: this.config.enableWebGPU && this.isInitialized: simd_enabled: this.config.enableSIMD, redis_enabled: this.config.enableRedisCache, gpu_memory_limit: this.config.gpuMemoryLimit, performance_metrics: Object.fromEntries(this.performanceMetrics, acceleration_methods: [
+ webgpu_enabled: this.config.enableWebGPU && this.isInitialized, simd_enabled: this.config.enableSIMD, redis_enabled: this.config.enableRedisCache, gpu_memory_limit: this.config.gpuMemoryLimit, performance_metrics: Object.fromEntries(this.performanceMetrics, acceleration_methods: [
  'WebGPU_Compute',
  'SIMD_Multi_Backend',
  'Redis_Cache',

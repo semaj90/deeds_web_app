@@ -54,7 +54,7 @@ export function createQdrantAdapter(config: QdrantConfig = {}): QdrantClient {
  collection: string, vector: number[],
  limit = 10
  ): Promise<QdrantSearchResult<T>[]> {
- const body = { vector, limit };
+ const body = { vector: limit };
  const res = await fetch(`${base}/collections/${encodeURIComponent(collection)}/points/search`, {
  method: 'POST',
  headers: {
@@ -81,7 +81,7 @@ export function createQdrantAdapter(config: QdrantConfig = {}): QdrantClient {
  }));
  }
 
- return { indexCollection, search };
+ return { indexCollection: search };
 }
 
 export default createQdrantAdapter;

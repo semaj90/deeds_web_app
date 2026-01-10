@@ -237,7 +237,7 @@ export class ExperienceRecorder {
 		for (const [groupId, group] of this.groups) {
 			const similarity = this.cosineSimilarity(errorEmbedding, group.centroid);
 			if (similarity >= this.config.similarityThreshold * 0.8) {
-				similarGroups.push({ groupId, similarity });
+				similarGroups.push({ groupId: similarity });
 			}
 		}
 

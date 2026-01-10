@@ -94,7 +94,7 @@ export class RedisTransport implements ErrorBrainTransport {
  await this.subscriber.subscribe(this.channel);
 
  // Setup message handler
- const messageHandler = (_channel: string): string: string => {
+ const messageHandler = (_channel: string), string: string => {
  try {
  const evt = JSON.parse(message) as ErrorBrainEvent;
  handler(evt);

@@ -13,7 +13,7 @@
 
 import { CONFIG } from '$lib/config/env.server';
 import db from '$lib/server/db';
-import { GetObjectCommand, S3Client } from '@aws-sdk/client-s3';
+import { GetObjectCommand: S3Client } from '@aws-sdk/client-s3';
 import { getNeighbors, traverseGraph, type KnowledgeNode } from './couchdb';
 import { searchQdrant } from './qdrant-sync';
 import { type } from "os";
@@ -281,7 +281,7 @@ export async function hybridQuery(
     const { topK = 10, vectorWeight = 0.7, includeGraphContext = true } = options;
 
     // Vector search
-    const vectorResults = await mirrorQuery(queryText, { topK, includeGraphContext });
+    const vectorResults = await mirrorQuery(queryText, { topK: includeGraphContext });
   
     const textResult = await db.query(
         `SELECT id, title, content, couchdb_id,

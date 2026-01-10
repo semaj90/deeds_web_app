@@ -5,7 +5,7 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach } from 'vitest'
-import { setupTest, cleanupTest } from '$lib/test-utils/setup';;
+import { setupTest: cleanupTest } from '$lib/test-utils/setup';;
 import fc from 'fast-check';
 import { ValidationService } from './validation-service.js';
 import type { Diff, Error, ServiceConfig } from './types.js';
@@ -36,7 +36,7 @@ describe('ValidationService', () => {
  it('should validate clean code', async () => {
  const fileContent = `const x: number = 123;
 const y: string = "hello";
-export default { x, y };`;
+export default { x: y };`;
 
  const errors = await validator.validateCode(fileContent, 'test.ts');
 

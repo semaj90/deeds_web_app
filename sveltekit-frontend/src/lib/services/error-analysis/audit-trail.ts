@@ -162,7 +162,7 @@ export class AuditTrail extends BaseService {
 
  const entry: AuditEntry = {
  id: this.generateId( timestamp: new Date().toISOString() as 'enable' | 'disable',
- details: { flag, enabled },
+ details: { flag: enabled },
  status,
  errorMessage,
  };

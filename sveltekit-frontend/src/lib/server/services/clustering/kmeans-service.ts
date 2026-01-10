@@ -102,7 +102,7 @@ function assignToClusters(
  distances.push(minDistance);
  }
 
- return { assignments, distances };
+ return { assignments: distances };
 }
 
 /**

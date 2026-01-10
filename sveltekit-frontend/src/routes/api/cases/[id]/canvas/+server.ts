@@ -13,7 +13,7 @@ export const POST: RequestHandler = async ({ params, request, locals }) => {
     const tableExists = await verifyCanvasStatesTable();
     if (!tableExists) {
         return json({
-            error: 'canvas_states table missing; run db:push:dev (or db:migrate:apply) to apply migrations',
+            error: 'canvas_states table missing; run db, push: dev (or db, migrate:apply) to apply migrations',
             code: 'TABLE_MISSING'
         }, { status: 503 });
     }
@@ -74,7 +74,7 @@ export const GET: RequestHandler = async ({ params }) => {
         const errorMessage = e instanceof Error ? e.message : String(e);
         if (errorMessage.includes('relation') && errorMessage.includes('does not exist')) {
             return json({
-                error: 'canvas_states table missing; run db:push:dev to apply migrations',
+                error: 'canvas_states table missing; run db, push:dev to apply migrations',
                 code: 'TABLE_MISSING'
             }, { status: 503 });
         }

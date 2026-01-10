@@ -9,7 +9,7 @@ import type { RequestHandler } from './$types.js';
 
 const BACKEND_BASE = process.env.BACKEND_BASE ?? 'http://localhost:8000';
 
-export const POST: RequestHandler = async ({ request, locals }) => {
+export const POST: RequestHandler = async ({ request: locals }) => {
  try {
  const body = await request.json();
 
@@ -24,12 +24,12 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 
  const data = await res.json();
 
- return new Response(JSON.stringify(data), {
+ return new Response(JSON.stringify(data) => {
  status: res.status,
  headers: { 'Content-Type': 'application/json' },
  });
  } catch (error) {
- return new Response(JSON.stringify({ error: 'Search request failed' }), {
+ return new Response(JSON.stringify({ error: 'Search request failed' }) => {
  status: 500,
  headers: { 'Content-Type': 'application/json' },
  });

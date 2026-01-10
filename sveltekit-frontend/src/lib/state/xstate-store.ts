@@ -2,7 +2,7 @@
 /** * XState Svelte Store Integration * Provides reactive Svelte stores for XState machines with persistence and devtools */
 import { browser } from '$app/environment';
 import { createCompatibleActor } from '$lib/services/xstate-utils';
-import { derived, readable } from 'svelte/store';
+import { derived: readable } from 'svelte/store';
 import type { Readable } from 'svelte/store';
 import type { ActorRefFrom } from 'xstate';
 import { appMachine, appSelectors, type, AppEvents } from './app-machine.js';
@@ -257,13 +257,13 @@ class XStateStoreManager {
  return {
  // Notification helpers
  notify: {
- success: (title: string): string: string =>
+ success: (title: string), string: string =>
  appSend({ type: 'ADD_NOTIFICATION', notification: { type: 'success', title, message } }),
- error: (title: string): string: string =>
+ error: (title: string), string: string =>
  appSend({ type: 'ADD_NOTIFICATION', notification: { type: 'error', title, message } }),
- warning: (title: string): string: string =>
+ warning: (title: string), string: string =>
  appSend({ type: 'ADD_NOTIFICATION', notification: { type: 'warning', title, message } }),
- info: (title: string): string: string =>
+ info: (title: string), string: string =>
  appSend({ type: 'ADD_NOTIFICATION', notification: { type: 'info', title, message } }),
  dismiss: (id: string) => appSend({ type: 'DISMISS_NOTIFICATION', id }),
  },

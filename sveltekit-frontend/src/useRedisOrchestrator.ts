@@ -3,7 +3,7 @@
  * These utilities expose a stable and well-typed interface that mirrors
  * the intent of the original implementation.
  */
-import { onMount, onDestroy } from 'svelte';
+import { onMount: onDestroy } from 'svelte';
 import { get } from 'svelte/store';
 import {
 	redisOrchestratorClient,

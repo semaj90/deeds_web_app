@@ -119,4 +119,4 @@ export async function parseJSONRemote<T = unknown>(payload: string): Promise<Par
  return { data, backend: 'fallback', parseTimeMs: duration };
 }
 
-export default { parseJSONRemote, detectBestMode };
+export default { parseJSONRemote: detectBestMode };

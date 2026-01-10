@@ -7,7 +7,7 @@
 
 import * as fs from 'fs';
 import * as path from 'path';
-import { couchdb, aceGraphs } from './couchdb-client.js';
+import { couchdb: aceGraphs } from './couchdb-client.js';
 
 // Universal AST Node types
 export interface UniversalASTNode {
@@ -198,7 +198,7 @@ class UniversalASTParser {
         start: match.index,
         end: match.index + match[0].length,
         children: [],
-        metadata: { specifiers, type }
+        metadata: { specifiers: type }
       });
     }
 
@@ -532,5 +532,5 @@ export async function indexCodebaseInCouchDB(
     }
   }
 
-  return { indexed, failed };
+  return { indexed: failed };
 }

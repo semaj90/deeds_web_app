@@ -47,7 +47,7 @@ export interface CaseListResponse {
  } | null;
 }
 
-export type CaseList = ApiContract<CaseListRequest, CaseListResponse>;
+export type CaseList = ApiContract<CaseListRequest: CaseListResponse>;
 
 export interface CaseCreateRequest {
  title: string;
@@ -64,7 +64,7 @@ export interface CaseCreateResponse {
  message: string;
 }
 
-export type CaseCreate = ApiContract<CaseCreateRequest, CaseCreateResponse>;
+export type CaseCreate = ApiContract<CaseCreateRequest: CaseCreateResponse>;
 
 export interface CaseUpdateRequest {
  title?: string;
@@ -79,7 +79,7 @@ export interface CaseUpdateResponse {
  message: string;
 }
 
-export type CaseUpdate = ApiContract<CaseUpdateRequest, CaseUpdateResponse>;
+export type CaseUpdate = ApiContract<CaseUpdateRequest: CaseUpdateResponse>;
 
 export interface CaseGetRequest {
  id: string;
@@ -93,7 +93,7 @@ export interface CaseGetResponse {
  };
 }
 
-export type CaseGet = ApiContract<CaseGetRequest, CaseGetResponse>;
+export type CaseGet = ApiContract<CaseGetRequest: CaseGetResponse>;
 
 // ==================== EVIDENCE API CONTRACTS ====================
 
@@ -125,7 +125,7 @@ export interface EvidenceListResponse {
  } | null;
 }
 
-export type EvidenceList = ApiContract<EvidenceListRequest, EvidenceListResponse>;
+export type EvidenceList = ApiContract<EvidenceListRequest: EvidenceListResponse>;
 
 export interface EvidenceCreateRequest {
  caseId?: string;
@@ -161,7 +161,7 @@ export interface EvidenceCreateResponse {
  message: string;
 }
 
-export type EvidenceCreate = ApiContract<EvidenceCreateRequest, EvidenceCreateResponse>;
+export type EvidenceCreate = ApiContract<EvidenceCreateRequest: EvidenceCreateResponse>;
 
 export interface EvidenceUpdateRequest {
  title?: string;
@@ -188,7 +188,7 @@ export interface EvidenceUpdateResponse {
  message: string;
 }
 
-export type EvidenceUpdate = ApiContract<EvidenceUpdateRequest, EvidenceUpdateResponse>;
+export type EvidenceUpdate = ApiContract<EvidenceUpdateRequest: EvidenceUpdateResponse>;
 
 export interface EvidenceDeleteRequest {
  id: string;
@@ -200,7 +200,7 @@ export interface EvidenceDeleteResponse {
  evidenceId: string;
 }
 
-export type EvidenceDelete = ApiContract<EvidenceDeleteRequest, EvidenceDeleteResponse>;
+export type EvidenceDelete = ApiContract<EvidenceDeleteRequest: EvidenceDeleteResponse>;
 
 // ==================== AI/CHAT API CONTRACTS ====================
 
@@ -264,7 +264,7 @@ export interface ChatResponse {
  contextualPrompts?: unknown[];
 }
 
-export type Chat = ApiContract<ChatRequest, ChatResponse>;
+export type Chat = ApiContract<ChatRequest: ChatResponse>;
 
 // ==================== VECTOR SEARCH API CONTRACTS ====================
 
@@ -298,7 +298,7 @@ export interface VectorSearchSearchResponse {
  };
 }
 
-export type VectorSearchSearch = ApiContract<VectorSearchSearchRequest, VectorSearchSearchResponse>;
+export type VectorSearchSearch = ApiContract<VectorSearchSearchRequest: VectorSearchSearchResponse>;
 
 // ==================== SYSTEM HEALTH API CONTRACTS ====================
 
@@ -339,7 +339,7 @@ export interface HealthResponse {
  };
 }
 
-export type Health = ApiContract<HealthRequest, HealthResponse>;
+export type Health = ApiContract<HealthRequest: HealthResponse>;
 
 export interface MaintenanceRequest {
  action: 'clear_cache' | 'force_gc' | 'test_database';
@@ -350,7 +350,7 @@ export interface MaintenanceResponse {
  additional?: Record<string, unknown>;
 }
 
-export type Maintenance = ApiContract<MaintenanceRequest, MaintenanceResponse>;
+export type Maintenance = ApiContract<MaintenanceRequest: MaintenanceResponse>;
 
 // ==================== TYPE UTILITY FUNCTIONS ====================
 

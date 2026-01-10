@@ -22,7 +22,7 @@ async function fakeSearch(filters: AdvancedSearchFilters): Promise<any> {
  return { total: 0, queryTime: 0, items: [], applied: filters };
 }
 
-export const GET: RequestHandler = async ({ url, locals }) => {
+export const GET: RequestHandler = async ({ url: locals }) => {
  try {
  if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
  const sp = url.searchParams;
@@ -45,11 +45,11 @@ export const GET: RequestHandler = async ({ url, locals }) => {
  }
 };
 
-export const POST: RequestHandler = async ({ request, locals }) => {
+export const POST: RequestHandler = async ({ request: locals }) => {
  try {
  if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
  const body = await request.json();
- const { query, customFilters } = body || {};
+ const { query: customFilters } = body || {};
  const filters: AdvancedSearchFilters = { query, ...(customFilters || {}) };
  const results = await fakeSearch(filters);
  return json({ success: true, data: results, timestamp: new Date().toISOString() });

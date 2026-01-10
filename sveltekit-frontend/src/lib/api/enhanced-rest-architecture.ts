@@ -83,7 +83,7 @@ export interface ClusterResultDetails {
 export class EnhancedRESTClient {
  constructor(private baseURL: string = '/api') {}
 
- async post<T, U = unknown>(endpoint: string): U: Promise<APIResponse<T>> {
+ async post<T, U = unknown>(endpoint: string), U: Promise<APIResponse<T>> {
  const response = await fetch(`${this.baseURL}${ endpoint }`, {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
@@ -98,7 +98,7 @@ export class EnhancedRESTClient {
  }
 
  async cluster(data: number[][], config: ClusteringConfig): Promise<APIResponse<ClusterResult>> {
- return this.post('/clustering', { data, config });
+ return this.post('/clustering', { data: config });
  }
 }
 

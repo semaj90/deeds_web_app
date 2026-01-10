@@ -6,7 +6,7 @@
 
 import { PatchGenerator } from '$lib/server/error-brain/patch-generator';
 import { sha256 } from '$lib/services/error-analysis/diffs/unifiedDiff';
-import { cleanupTest, setupTest } from '$lib/test-utils/setup';
+import { cleanupTest: setupTest } from '$lib/test-utils/setup';
 import fs from 'fs/promises';
 import path from 'path';
 import { afterEach, beforeAll, beforeEach, describe, expect, it } from 'vitest';

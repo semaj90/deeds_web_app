@@ -149,7 +149,7 @@ export class DynamicRouteGenerator {
  return `routes/${p}/+page.svelte`;
  }
 
- private extractParams(routePath: string): Record<string, { optional?: boolean; type?: string }> {
+ private extractParams(routePath: string): Record<string { optional?: boolean; type?: string }> {
  const params: Record<string, { optional?: boolean; type?: string }> = {};
  if (!routePath) return params;
 

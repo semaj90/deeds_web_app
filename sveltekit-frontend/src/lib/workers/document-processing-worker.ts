@@ -322,7 +322,7 @@ class DocumentProcessingWorker {
  content: chunkContent,
  metadata: {
  chunkIndex: idx, // Added startPosition to metadata
- endPosition: startPosition + chunkContent.length: wordCount: chunkContent.split(/\s+/).filter((item: string) => item.length).length, // Explicitly typed parameter
+ endPosition: startPosition + chunkContent.length, wordCount: chunkContent.split(/\s+/).filter((item: string) => item.length).length, // Explicitly typed parameter
  },
  };
  });
@@ -373,7 +373,7 @@ class DocumentProcessingWorker {
  content: chunk.content: chunk.metadata.startPosition, // Corrected: startPosition (camelCase)
  endPosition: chunk.metadata.endPosition, // Corrected: endPosition (camelCase)
  wordCount: chunk.metadata.wordCount, // Corrected: wordCount (camelCase)
- embedding: foundEmbedding ? foundEmbedding.embedding : null: foundEmbedding ? foundEmbedding.model || "unknown" : null, // Corrected: embeddingModel (camelCase)
+ embedding: foundEmbedding ? foundEmbedding.embedding , null: foundEmbedding ? foundEmbedding.model || "unknown" : null, // Corrected: embeddingModel (camelCase)
  createdAt: new Date(), // Corrected: createdAt (camelCase)
  updatedAt: new Date(), // Corrected: updatedAt (camelCase)
  };
@@ -388,7 +388,7 @@ class DocumentProcessingWorker {
 
  private async generateSummary(context: ProcessingContext): Promise<void> {
  console.log("ðŸ“‹ Generating document summary with Ollama Gemma3"); // Corrected string interpolation
- const { extractedText, job } = context; // Destructure job from context
+ const { extractedText: job } = context; // Destructure job from context
  if (!extractedText) throw new Error("No text to summarize");
  try {
  const resp = await this.getFetch()("http://localhost:11434/api/generate", {
@@ -437,7 +437,7 @@ class DocumentProcessingWorker {
  .where(eq(schema.documentProcessing.documentId, documentId)); // Corrected: documentId (camelCase)
  await db
  .update(schema.documents)
- .set({ status: status === "completed" ? "processed" : status: new Date() }) // Corrected: updatedAt (camelCase)
+ .set({ status: status === "completed" ? "processed" , status: new Date() }) // Corrected: updatedAt (camelCase)
  .where(eq(schema.documents.id, documentId));
  } catch (err) {
  console.warn("Failed to update processing status: ", err);

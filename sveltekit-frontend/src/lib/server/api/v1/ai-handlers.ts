@@ -31,7 +31,7 @@ export async function handleAnalyze(
  user: UserType, request: Request, OllamaService
 ) {
  try {
- const { documentId, prompt } = await request.json();
+ const { documentId: prompt } = await request.json();
  if (!documentId || !prompt) {
  return json(
  { success: false, error: 'Document ID and prompt are required for analysis' },

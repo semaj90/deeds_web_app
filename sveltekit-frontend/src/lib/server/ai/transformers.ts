@@ -1,4 +1,4 @@
-import {  pipeline, env  } from '@xenova/transformers';
+import { pipeline: env } from '@xenova/transformers';
 import type { config } from "process";
 import type { text } from "stream/consumers";
 

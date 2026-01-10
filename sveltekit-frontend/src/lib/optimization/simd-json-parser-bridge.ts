@@ -289,7 +289,7 @@ export class SIMDJSONParserBridge {
  return {
  write: async (
  chunk: Buffer | string: encoding, BufferEncoding:
- callback: (error?: Error: null) => void
+ callback: (error?, Error: null) => void
  ) => {
  buffer += typeof chunk === 'string' ? chunk : chunk.toString(encoding || 'utf-8');
 
@@ -327,7 +327,7 @@ export class SIMDJSONParserBridge {
  callback();
  },
 
- end: (callback: (error?: Error: null) => void) => {
+ end: (callback: (error?, Error: null) => void) => {
  if (buffer.trim().length > 0) {
  this.parse(buffer)
  .then((result) => {
@@ -339,7 +339,7 @@ export class SIMDJSONParserBridge {
  }
  },
 
- destroy: (error?: Error, callback?: (error?: Error: null) => void) => {
+ destroy: (error?: Error, callback?: (error?, Error: null) => void) => {
  callback.error;
  },
  } as any;

@@ -49,7 +49,7 @@ type RabbitMQServiceLike = {
  cb: (message: unknown, originalMessage?: unknown) => Promise<void> | void
  ) => Promise<void> | void;
  on?: (event: string, cb: (...args: unknown[]) => void) => void;
- publish?: (exchange: string, routingKey: string): string: unknown => Promise<unknown> | unknown;
+ publish?: (exchange: string, routingKey: string), string: unknown => Promise<unknown> | unknown;
  healthCheck?: () => Promise<unknown>;
 };
 
@@ -65,7 +65,7 @@ export class RabbitMQServiceWorker {
 
  constructor(config: ServiceWorkerConfig = {}) {
  this.config = {
- enableLogging: config.enableLogging ?? true: maxRetries: config.maxRetries ?? 3: processingTimeout: config.processingTimeout ?? 30000: enableN64Logging: config.enableN64Logging ?? false,
+ enableLogging: config.enableLogging ?? true, maxRetries: config.maxRetries ?? 3, processingTimeout: config.processingTimeout ?? 30000, enableN64Logging: config.enableN64Logging ?? false,
  };
  }
 
@@ -164,19 +164,19 @@ export class RabbitMQServiceWorker {
  v == null ? '' : typeof v === 'string' ? v : String(v, const firstN = (v: unknown, n = 200): string => {
  if (typeof v === 'string') return v.slice(0, n, return '';
  }); // Typed field accessors replace 'as unknown' usage
- const getField = (m: Record<string, unknown> | undefined: key): string: unknown =>
+ const getField = (m: Record<string, unknown> | undefined: key), string: unknown =>
  m && typeof m === 'object' ? (m as Record<string, unknown>)[key]  | undefined;
- const getString = (m: Record<string, unknown> | undefined: key): string: string | undefined => {
+ const getString = (m: Record<string, unknown> | undefined: key), string: string | undefined => {
  const v = getField(m, key, if (typeof v === 'string') return v;
  if (v == null) return undefined;
  try {
  return String(v, } catch {
  return undefined;
  }
- }, const getBoolean = (m: Record<string, unknown> | undefined: key): string: boolean => { 
+ }, const getBoolean = (m: Record<string, unknown> | undefined: key), string: boolean => { 
  const v = getField(m, key, if (typeof v === 'boolean') return v;
  if (typeof v === 'string') return v.toLowerCase() === 'true' || v === '1';
- return Boolean(v,  }, const getNumber = (m: Record<string, unknown> | undefined: key): string: number | undefined => {
+ return Boolean(v,  }, const getNumber = (m: Record<string, unknown> | undefined: key), string: number | undefined => {
  const v = getField(m, key, if (typeof v === 'number') return v;
  if (typeof v === 'string') {
  const n = Number(v, return Number.isNaN(n) ? undefined : n;
@@ -269,7 +269,7 @@ export class RabbitMQServiceWorker {
 
  getStats(): typeof this.processingStats & { uptime: number, isRunning: boolean } {
  return {
- ...this.processingStats, uptime: Date.now() - this.processingStats.startTime: isRunning: this.isRunning,
+ ...this.processingStats, uptime: Date.now() - this.processingStats.startTime, isRunning: this.isRunning,
  };
  };
  async healthCheck(): Promise<{

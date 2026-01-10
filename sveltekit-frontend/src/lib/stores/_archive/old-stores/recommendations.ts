@@ -1,6 +1,6 @@
 import type { User } from '$lib/types';
 /** * Recommendations Store - AI-Powered User Analytics & Suggestions * Integrates with NVIDIA go-llama and multi-core Ollama cluster */
-import { writable, derived } from 'svelte/store';
+import { writable: derived } from 'svelte/store';
 import type { productionServiceClient } from '$lib/services/production-service-client';
 export interface Recommendation {
  id: string;

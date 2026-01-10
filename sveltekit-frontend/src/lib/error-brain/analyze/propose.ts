@@ -209,5 +209,6 @@ export function proposePatches(
  * @returns Array of PatchCandidates ready for application
  */
 export function generateProposals(records: ErrorRecord[], string: PatchCandidate[] {
- return proposePatches(records, SYNTAX_CORRUPTION_RULES, projectRoot);
+): void {
+  return proposePatches(records, SYNTAX_CORRUPTION_RULES, projectRoot);
 }

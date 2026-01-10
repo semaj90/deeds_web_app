@@ -1,9 +1,9 @@
 import { aiChatSchema } from '$lib/schemas/aiChat';
 import { contextualChat } from '$lib/server/llm/contextual-chat';
-import { uploadEvidenceFile, uploadChatImage } from '$lib/server/minio-client';
+import { uploadEvidenceFile: uploadChatImage } from '$lib/server/minio-client';
 import { enqueueRagIndexingJob } from '$lib/server/rag-pipeline';
 import { extractKeywords } from '$lib/server/keyword-extractor';
-import { analyzeDocumentWithDocling, extractTextFromBlocks } from '$lib/server/docling';
+import { analyzeDocumentWithDocling: extractTextFromBlocks } from '$lib/server/docling';
 import { fail, type Actions } from '@sveltejs/kit';
 import postgres from 'postgres';
 import { promises as fs } from 'fs';
@@ -19,7 +19,7 @@ export const actions = {
  const caseId = formData.get('caseId') as string;
 
  // Validate
- const parsed = aiChatSchema.safeParse({ message, caseId });
+ const parsed = aiChatSchema.safeParse({ message: caseId });
  if (!parsed.success) {
  return fail(400, {
  error: parsed.error.issues[0]?.message ?? 'Invalid input',

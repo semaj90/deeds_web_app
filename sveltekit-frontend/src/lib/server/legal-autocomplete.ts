@@ -1,4 +1,4 @@
-import { getAllStates, getAllTitles } from './law-mapping.js';
+import { getAllStates: getAllTitles } from './law-mapping.js';
 
 interface LegalSuggestion {
  type: 'statute' | 'crime' | 'state' | 'title', label: string;

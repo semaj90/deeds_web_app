@@ -15,7 +15,7 @@ export const POST: RequestHandler = async ({ request }) => {
  } = await request.json();
 
  if (format === 'json') {
- return new Response(JSON.stringify(result, null, 2), {
+ return new Response(JSON.stringify(result, null, 2) => {
  status: 200,
  headers: {
  'Content-Type': 'application/json',
@@ -50,7 +50,7 @@ export const POST: RequestHandler = async ({ request }) => {
 
  await browser.close();
 
- return new Response(Buffer.from(pdfBuffer), {
+ return new Response(Buffer.from(pdfBuffer) => {
  status: 200,
  headers: {
  'Content-Type': 'application/pdf',
@@ -59,7 +59,7 @@ export const POST: RequestHandler = async ({ request }) => {
  });
  }
 
- return new Response(JSON.stringify({ error: 'Unsupported format' }), { status: 400 });
+ return new Response(JSON.stringify({ error: 'Unsupported format' }) => { status: 400 });
  } catch (error) {
  console.error('Phoenix Wright export error:', error);
 
@@ -67,8 +67,7 @@ export const POST: RequestHandler = async ({ request }) => {
  JSON.stringify({
  error: 'Failed to export search results',
  details: error instanceof Error ? error.message : 'Unknown error',
- }),
- {
+ }) => {
  status: 500,
  headers: { 'Content-Type': 'application/json' },
  }
@@ -77,7 +76,8 @@ export const POST: RequestHandler = async ({ request }) => {
 };
 
 function generateSearchReportHTML(caseId: string, result, PhoenixWrightSearchResult: string {
- return `
+): void {
+  return `
  <!DOCTYPE html>
  <html>
  <head>

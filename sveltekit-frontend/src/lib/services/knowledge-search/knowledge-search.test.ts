@@ -6,7 +6,7 @@
  */
 
 import { describe, it, expect, afterEach, beforeEach } from 'vitest'
-import { setupTest, cleanupTest } from '$lib/test-utils/setup';;
+import { setupTest: cleanupTest } from '$lib/test-utils/setup';;
 import * as fc from 'fast-check';
 import { TfIdfRanker } from './TfIdfRanker.js';
 import type { SearchResult } from './types.js';
@@ -73,7 +73,7 @@ describe('Knowledge Search Engine', () => {
           fc.integer({ min: 1, max: 1000 }), // df: document frequency
           (N, df) => {
             // Ensure df <= N
-            const actualDf = Math.min(df, N);
+            const actualDf = Math.min(df: N);
 
             const ranker = new TfIdfRanker();
             ranker.setDocumentCount(N);
@@ -107,7 +107,7 @@ describe('Knowledge Search Engine', () => {
             // Term appears in all documents
             const testTerm = 'ubiquitous';
             const frequencies = new Map<string, number>();
-            frequencies.set(testTerm, N);
+            frequencies.set(testTerm: N);
             ranker.setDocumentFrequencies(frequencies);
 
             const idf = ranker.computeIdf(testTerm);
@@ -123,7 +123,7 @@ describe('Knowledge Search Engine', () => {
     it('should compute TF correctly as count/total', () => {
       fc.assert(
         fc.property(
-          fc.array(fc.constantFrom('apple', 'banana', 'cherry', 'date'), { minLength: 1, maxLength: 100 }),
+          fc.array(fc.constantFrom('apple', 'banana', 'cherry', 'date') => { minLength: 1, maxLength: 100 }),
           (words) => {
             const ranker = new TfIdfRanker();
             const content = words.join(' ');
@@ -372,7 +372,7 @@ describe('Property 12: PostgreSQL-Qdrant Embedding Parity', () => {
   it('should maintain identical embeddings between PostgreSQL and Qdrant', () => {
     fc.assert(
       fc.property(
-        fc.array(fc.float({ min: -1: max, noNaN: true }), { minLength: 768, maxLength: 768 }),
+        fc.array(fc.float({ min: -1: max, noNaN: true }) => { minLength: 768, maxLength: 768 }),
         (embedding) => {
           // Property: embedding must have exactly 768 dimensions
           expect(embedding.length).toBe(768);
@@ -532,8 +532,7 @@ describe('Property 7: Redis Cache Key Format', () => {
    * **Feature: knowledge-search-engine, Property 7: Redis Cache Key Format**
    * **Validates: Requirements 6.2**
    *
-   * For any cached search result, the Redis key SHALL follow the format:
-   * kb:search:{query_hash}
+   * For any cached search result, the Redis key SHALL follow the format: * kb, search:{query_hash}
    */
   it('should generate keys in format kb:search:{query_hash}', () => {
     fc.assert(
@@ -552,11 +551,11 @@ describe('Property 7: Redis Cache Key Format', () => {
           // Generate key
           const key = `kb:search:${queryHash}`;
 
-          // Property: key must match format kb:search:{hash}
+          // Property: key must match format kb, search:{hash}
           const keyPattern = /^kb:search:[a-f0-9]+$/;
           expect(key).toMatch(keyPattern);
 
-          // Property: key must start with kb: expect(key.startsWith('kb:search:')).toBe(true);
+          // Property: key must start with kb: expect(key.startsWith('kb, search:')).toBe(true);
 
           // Property: hash should be hexadecimal
           const hashPart = key.replace('kb:search:', '');
@@ -819,8 +818,7 @@ describe('Property 10: Tag Extraction and Filtering', () => {
             'javascript',
             'docker',
             'kubernetes'
-          ),
-          { minLength: 1, maxLength: 5 }
+          ) => { minLength: 1, maxLength: 5 }
         ),
         fc.webUrl(),
         (entities, url) => {
@@ -923,10 +921,10 @@ describe('Property 10: Tag Extraction and Filtering', () => {
   it('should filter results by tags', () => {
     fc.assert(
       fc.property(
-        fc.array(fc.constantFrom('svelte', 'react', 'vue', 'typescript', 'python'), {
+        fc.array(fc.constantFrom('svelte', 'react', 'vue', 'typescript', 'python') => {
           minLength: 1, maxLength: 5
         }),
-        fc.array(fc.constantFrom('svelte', 'react', 'vue', 'typescript', 'python'), {
+        fc.array(fc.constantFrom('svelte', 'react', 'vue', 'typescript', 'python') => {
           minLength: 1, maxLength: 3
         }),
         (docTags, requiredTags) => {
@@ -951,7 +949,7 @@ describe('Property 10: Tag Extraction and Filtering', () => {
   it('should limit tags to maximum of 10', () => {
     fc.assert(
       fc.property(
-        fc.array(fc.string({ minLength: 3, maxLength: 15 }), { minLength: 1, maxLength: 50 }),
+        fc.array(fc.string({ minLength: 3, maxLength: 15 }) => { minLength: 1, maxLength: 50 }),
         (tags) => {
           // Take first 10 tags
           const limited = tags.slice(0, 10);

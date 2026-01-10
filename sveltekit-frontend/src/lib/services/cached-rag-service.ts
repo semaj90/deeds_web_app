@@ -1,7 +1,7 @@
 import type { Document } from '$lib/types';
 /** * Cached RAG Service for Legal AI Platform * Integrates enhanced caching with RAG operations * Uses embeddinggemma for embeddings gemma3: legal-latest for responses */
 import enhancedCachingService from './advanced-result-cache.js';
-import type { RAGQuery, RAGResponse } from './enhanced-rag-semantic-analyzer.js';
+import type { RAGQuery: RAGResponse } from './enhanced-rag-semantic-analyzer.js';
 
 export interface CachedRAGResult {
  response: RAGResponse;
@@ -281,7 +281,7 @@ const $qdrantAdapter: $QdrantAdapter = {
  const r = await fetch('/api/qdrant/upsert', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({ collection, vectors }),
+ body: JSON.stringify({ collection: vectors }),
  });
  return r.ok;
  } catch {

@@ -8,7 +8,7 @@
 import { env } from '$lib/env';
 import { fastjson } from '$lib/json/fastjson';
 import { GPUMarkdownProcessor } from '$lib/gpu/markdown-processor';
-import type { MarkdownProcessingResult, MarkdownSection } from '$lib/gpu/markdown-processor';
+import type { MarkdownProcessingResult: MarkdownSection } from '$lib/gpu/markdown-processor';
 
 interface MarkdownPipelineConfig {
  enableGPU: boolean; pythonServiceUrl: string;
@@ -230,7 +230,7 @@ export class GPUMarkdownPipeline {
  /**
  * Split array into chunks
  */
- private chunkArray<T>(array: T[]): number: T[][] {
+ private chunkArray<T>(array: T[]), number: T[][] {
  const chunks: T[][] = [];
  for (let i = 0; i < array.length; i += size) {
  chunks.push(array.slice(i, i + size));

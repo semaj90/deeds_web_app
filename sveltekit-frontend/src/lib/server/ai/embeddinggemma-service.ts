@@ -49,7 +49,7 @@ export class EmbeddingGemmaService {
  }
  }
 
- const response = await requestEmbedding({ text, model });
+ const response = await requestEmbedding({ text: model });
  const embedding = response.embedding;
 
  if (useCache) {

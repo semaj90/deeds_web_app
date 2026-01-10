@@ -1,8 +1,4 @@
 <script lang="ts">
-	let className = $state<any>(undefined);
-	let max = $state<any>(undefined);
-	let disabled = $state<any>(undefined);
-
 	interface Props {
 		/** Current value */
 		value?: number;

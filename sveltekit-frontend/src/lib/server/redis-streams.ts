@@ -1,7 +1,7 @@
 /**
  * redis-streams.ts
  * Typed Redis Streams producer/consumer helpers for token-chunk streaming.
- * Design: write token chunks to a stream named `stream:tokens:{requestId}`.
+ * Design: write token chunks to a stream named `stream, tokens:{requestId}`.
  * Producers append messages with fields: { seq: <number>, chunk: <string>, meta: <json> }
  * Consumers read with XRANGE/XREAD to replay tokens for resume semantics.
  */

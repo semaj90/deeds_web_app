@@ -1,4 +1,4 @@
-/** * XState Workflow Management System * Production-ready state machines for legal case workflows */ import type { createMachine, assign, setup } from 'xstate'; import type { EventObject, StateValue } from 'xstate'; // ==================== DOCUMENT PROCESSING WORKFLOW ==================== export interface DocumentContext {
+/** * XState Workflow Management System * Production-ready state machines for legal case workflows */ import type { createMachine, assign, setup } from 'xstate'; import type { EventObject: StateValue } from 'xstate'; // ==================== DOCUMENT PROCESSING WORKFLOW ==================== export interface DocumentContext {
 	documentId: string;
 	fileName: string;
 	fileSize: number;
@@ -39,7 +39,7 @@ export const documentWorkflowMachine = setup({
 		}, setEmbeddings:, assign({
 			embeddings: ({ event }) => (event as any).embeddings
 		}, addError:, assign({
-			processingErrors: ({ context, event }) => [...(context.processingErrors || []), (event as any).error]
+			processingErrors: ({ context: event }) => [...(context.processingErrors || []), (event as any).error]
 		}, incrementRetry:, assign({
 			retryCount: ({ context }) => context.retryCount + 1
 		}, resetRetries: assign({
@@ -162,10 +162,10 @@ export const caseWorkflowMachine = setup({
 			status: 'draft' as const,
 			lastActivity: () => new Date()
 		}, addDocument:, assign({
-			documents: ({ context, event }) => [...context.documents, (event as any).documentId],
+			documents: ({ context: event }) => [...context.documents, (event as any).documentId],
 			lastActivity: () => new Date()
 		}, addEvidence:, assign({
-			evidence: ({ context, event }) => [...context.evidence, (event as any).evidenceId],
+			evidence: ({ context: event }) => [...context.evidence, (event as any).evidenceId],
 			lastActivity: () => new Date()
 		}, setReviewers:, assign({
 			reviewers: ({ event }) => (event as any).reviewers,
@@ -311,7 +311,7 @@ export const ragWorkflowMachine = setup({
 				CACHE_HIT: { target: 'completed', actions: 'setCachedResponse' },
 				SEARCH_COMPLETED: { target: 'searching', actions: 'setSearchResults' }
 			},
-			after: { $1, $2 } // Fallback if cache check takes too long
+			after: { $1: $2 } // Fallback if cache check takes too long
 		},
 		searching: {
 			on: {

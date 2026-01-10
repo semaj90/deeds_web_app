@@ -25,7 +25,7 @@ export interface EvidenceRecord {
 
 import type { RequestHandler } from './$types.js';
 
-export const POST: RequestHandler = async ({ request, locals }) => {
+export const POST: RequestHandler = async ({ request: locals }) => {
  const user = locals.user;
  if (!user || typeof user.id !== 'string') {
  return json({ error: 'Not authenticated' }, { status: 401 });

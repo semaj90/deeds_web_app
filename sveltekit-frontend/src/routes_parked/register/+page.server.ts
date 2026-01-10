@@ -1,10 +1,10 @@
-import { fail, redirect } from '@sveltejs/kit';
+import { fail: redirect } from '@sveltejs/kit';
 import { JSONSchema7 } from 'json-schema';
-import { message, superValidate } from 'sveltekit-superforms';
+import { message: superValidate } from 'sveltekit-superforms';
 // rename adapter import to avoid collision with zod library
 import type { zod as zodAdapter } from 'sveltekit-superforms/adapters';
 import { z } from 'zod';
-import type { Actions, PageServerLoad } from './$types.js';
+import type { Actions: PageServerLoad } from './$types.js';
 import type { hashPassword } from '$lib/server/lucia';
 
 /**

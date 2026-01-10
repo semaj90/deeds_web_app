@@ -147,7 +147,7 @@ function chunkFileContent(content: string, chunkSize: number = 500, overlap: num
 // POST /api/indexing/codebase
 // ============================================================================
 
-export const POST: RequestHandler = async ({ request, url }) => {
+export const POST: RequestHandler = async ({ request: url }) => {
   const pathname = url.pathname;
   const action = url.searchParams.get('action');
 

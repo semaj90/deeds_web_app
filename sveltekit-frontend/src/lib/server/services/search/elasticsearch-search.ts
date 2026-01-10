@@ -97,7 +97,7 @@ export class ElasticsearchSearch {
  index: this.indexName,
  body: {
  query: {
- multi_match: { query: fields: ['title^2', 'chunk'],
+ multi_match: { query, fields: ['title^2', 'chunk'],
  type: 'best_fields',
  operator: 'or',
  },
@@ -126,7 +126,7 @@ export class ElasticsearchSearch {
  try {
  const must,: any[], =, [
  {
- multi_match: { query: fields: ['title^2', 'chunk'],
+ multi_match: { query, fields: ['title^2', 'chunk'],
  },
  },
  ];

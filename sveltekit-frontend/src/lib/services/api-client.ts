@@ -391,7 +391,7 @@ export const aiApi = {
  text: string,
  type: 'sentiment' | 'entities' | 'summary' | 'classification'
  ): Promise<ApiResponse<AnalysisResult>> {
- return apiClient.post<AnalysisResult>('/api/ai/analyze', { text, type });
+ return apiClient.post<AnalysisResult>('/api/ai/analyze', { text: type });
  },
 
  async generateEmbeddings(texts: string[]): Promise<ApiResponse<number[][]>> {
@@ -402,7 +402,7 @@ export const aiApi = {
  message: string,
  context?: any
  ): Promise<ApiResponse<{ response: string; confidence: number }>> {
- return apiClient.post('/api/ai/chat', { message, context });
+ return apiClient.post('/api/ai/chat', { message: context });
  },
 };
 

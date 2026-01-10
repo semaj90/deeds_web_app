@@ -190,7 +190,7 @@ export function createLegalCaseStore() {
  entityType: 'CASE',
  entityId: caseId, userId: currentUser?.id || 'unknown',
  details: {
- insightCount: insights.findings?.length || 0: riskScore: insights.riskAssessment?.score,
+ insightCount: insights.findings?.length || 0, riskScore: insights.riskAssessment?.score,
  },
  });
  } catch (error: any) {
@@ -229,7 +229,7 @@ export function createLegalCaseStore() {
  entityType: 'DOCUMENT',
  entityId: documentId, userId: currentUser?.id || 'unknown',
  details: {
- complianceScore: insights.complianceChecks?.length || 0: riskLevel: insights.riskAssessment?.score, // Changed from 'level' to 'score'
+ complianceScore: insights.complianceChecks?.length || 0, riskLevel: insights.riskAssessment?.score, // Changed from 'level' to 'score'
  },
  });
  } catch (error: any) {

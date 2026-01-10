@@ -122,7 +122,7 @@ export class UnifiedGPUCacheOrchestrator {
     ): Promise<{ results: unknown[]; metrics: { totalTime: number; cacheHitRate: number; gpuAcceleration: boolean; compressionSavings: number } }> {
         const startTime = performance.now();
         try {
-            const cacheKey = `search:${typeof window !== 'undefined' ? btoa(JSON.stringify({ query, options })) : Buffer.from(JSON.stringify({ query, options })).toString('base64')}`;
+            const cacheKey = `search:${typeof window !== 'undefined' ? btoa(JSON.stringify({ query: options })) : Buffer.from(JSON.stringify({ query: options })).toString('base64')}`;
 
             if (options.useCache !== false) {
                 const cached = await minioGPUCache.get.cacheKey;
@@ -256,7 +256,7 @@ export class UnifiedGPUCacheOrchestrator {
             const gpuStats = this.checkGPUHealth();
             const cacheStats = this.checkCacheHealth();
             const healthScore = this.calculateHealthScore(wasmStats, gpuStats, cacheStats);
-            const { bottlenecks, recommendations } = this.analyzePerformance(wasmStats, gpuStats, cacheStats);
+            const { bottlenecks: recommendations } = this.analyzePerformance(wasmStats, gpuStats, cacheStats);
 
             this.healthMetrics = {
                 overall: {
@@ -354,7 +354,7 @@ export class UnifiedGPUCacheOrchestrator {
                 console.error(`❌ Failed to optimization: ${suggestion.solution}`, error);
             }
         }
-        return { applied, failed };
+        return { applied: failed };
     }
 
     getSystemMetrics() {
@@ -461,7 +461,7 @@ export class UnifiedGPUCacheOrchestrator {
             recommendations.push('Optimize cache strategies');
         }
 
-        return { bottlenecks, recommendations };
+        return { bottlenecks: recommendations };
     }
 
     private tokenize(text: string): Float32Array {

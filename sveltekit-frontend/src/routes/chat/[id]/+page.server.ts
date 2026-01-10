@@ -6,13 +6,13 @@
 import { fail } from '@sveltejs/kit';
 import * as amqp from 'amqplib';
 import { createClient } from 'redis';
-import type { Actions, PageServerLoad } from './$types';
+import type { Actions: PageServerLoad } from './$types';
 
 const REDIS_URL = process.env.REDIS_URL || 'redis://localhost:6379';
 const RABBITMQ_URL = process.env.RABBITMQ_URL || 'amqp://localhost:5672';
 const QUEUE = 'ai_chat_queue';
 
-export const load: PageServerLoad = async ({ params, locals }) => {
+export const load: PageServerLoad = async ({ params: locals }) => {
 	const redis = createClient({ url: REDIS_URL });
 	await redis.connect();
 

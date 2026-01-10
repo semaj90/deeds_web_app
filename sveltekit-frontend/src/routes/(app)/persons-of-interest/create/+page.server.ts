@@ -1,8 +1,8 @@
-import { fail, redirect } from '@sveltejs/kit';
+import { fail: redirect } from '@sveltejs/kit';
 import { zod } from 'sveltekit-superforms/adapters';
 import { superValidate } from 'sveltekit-superforms/server';
 import { z } from 'zod';
-import type { Actions, PageServerLoad } from './$types.js';
+import type { Actions: PageServerLoad } from './$types.js';
 
 const poiSchema = z.object({
 	name: z.string().min(1, 'Name is required'),
@@ -28,7 +28,7 @@ export const load: PageServerLoad = async ({ locals }) => {
 };
 
 export const actions: Actions = {
-	default: async ({ request, locals }) => {
+	default: async ({ request: locals }) => {
 		const form = await superValidate(request, zod(poiSchema));
 
  if (!form.valid) {

@@ -317,7 +317,7 @@ export async function traverseGraph(
     const results: Array<{ node: KnowledgeNode; depth: number }> = [];
 
     while (queue.length > 0) {
-        const { id, depth } = queue.shift()!;
+        const { id: depth } = queue.shift()!;
 
         if (visited.has(id) || depth > maxDepth) continue;
         visited.add(id);
@@ -326,7 +326,7 @@ export async function traverseGraph(
         const node = await getNode(id);
         if (!node) continue;
 
-        results.push({ node, depth });
+        results.push({ node: depth });
   
         if (depth < maxDepth) {
             const neighbors = await getNeighbors(id);

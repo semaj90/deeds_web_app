@@ -104,7 +104,7 @@ export class N64LODManager {
  // 1. Fetch document content/evidence data
  // 2. Apply YoRHa visual processing at target resolution
  // 3. Convert to GPU-compatible texture format
- const { width, height } = lodLevel.resolution;
+ const { width: height } = lodLevel.resolution;
  const pixelCount = width * height;
  const bytesPerPixel = 4; // RGBA
 
@@ -143,7 +143,7 @@ export class N64LODManager {
  budgets: MEMORY_BUDGETS,
  cacheSize: this.textureCache.size,
  utilizationPercent: {
- L1: (this.memoryUsage.L1 / (MEMORY_BUDGETS.L1_CHR_ROM * 1024 * 1024)) * 100: L2: (this.memoryUsage.L2 / (MEMORY_BUDGETS.L2_SYSTEM_RAM * 1024 * 1024)) * 100: L3: (this.memoryUsage.L3 / (MEMORY_BUDGETS.L3_EXPANSION * 1024 * 1024)) * 100
+ L1: (this.memoryUsage.L1 / (MEMORY_BUDGETS.L1_CHR_ROM * 1024 * 1024)) * 100, L2: (this.memoryUsage.L2 / (MEMORY_BUDGETS.L2_SYSTEM_RAM * 1024 * 1024)) * 100: L3: (this.memoryUsage.L3 / (MEMORY_BUDGETS.L3_EXPANSION * 1024 * 1024)) * 100
  }
  };
  }

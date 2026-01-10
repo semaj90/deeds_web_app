@@ -1,10 +1,10 @@
 import db from '$lib/server/db';
 import { evidence } from '$lib/server/db/schema';
-import { error, json } from '@sveltejs/kit';
+import { error: json } from '@sveltejs/kit';
 import { eq } from 'drizzle-orm';
 import type { RequestHandler } from './$types.js';
 
-export const POST: RequestHandler = async ({ request, locals }) => {
+export const POST: RequestHandler = async ({ request: locals }) => {
  // Only authenticated users can claim
  const session = locals.session;
  const userId = session?.user?.id;

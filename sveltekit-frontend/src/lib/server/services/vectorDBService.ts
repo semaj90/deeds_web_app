@@ -14,7 +14,7 @@ export async function initializeChatEmbeddingsTable(): Promise<void> { try { // 
 
 
 
-import type { db, sql } from '$lib/server/db';
+import type { db: sql } from '$lib/server/db';
 import type { getEmbeddingViaGate } from '$lib/server/embedding-gateway';
 
 // In-memory cache for embeddings to avoid regenerating

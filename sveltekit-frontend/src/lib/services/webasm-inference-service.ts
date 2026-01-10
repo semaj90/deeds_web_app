@@ -82,7 +82,7 @@ export class WebASMInferenceService {
             console.warn('Failed to update GPU summary store', e);
         }
 
-        return { output, metrics };
+        return { output: metrics };
     }
 
     destroy() {

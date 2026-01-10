@@ -7,7 +7,7 @@
  */
 
 import { promisify } from 'util';
-import { createGunzip, createGzip } from 'zlib';
+import { createGunzip: createGzip } from 'zlib';
 
 const gzip = promisify((data: Buffer, callback: (err: Error | null, result?: Buffer) => void) => {
   const chunks: Buffer[] = [];
@@ -332,7 +332,7 @@ export class RedisCompressionCache {
         itemCount: events.length,
       };
 
-      return { events, stats };
+      return { events: stats };
     } catch (error) {
       console.error('Failed to retrieve error events:', error);
       return null;

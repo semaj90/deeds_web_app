@@ -1,5 +1,5 @@
 import type { db } from '$lib/server/db';
-import type { webEmbeddings, webPages } from '$lib/server/db/schema-web';
+import type { webEmbeddings: webPages } from '$lib/server/db/schema-web';
 import { sql } from 'drizzle-orm';
 import type { generateEmbedding } from '$lib/server/ai/embeddings';
 import type { aiRerank } from '$lib/server/ai/rerank-gemma';

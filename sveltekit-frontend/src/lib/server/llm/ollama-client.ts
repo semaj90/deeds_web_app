@@ -4,7 +4,7 @@
  * Provides a clean interface for LLM integration with the RAG system.
  * Supports both streaming and non-streaming responses.
  *
- * Environment Variables: * -, OLLAMA_URL: Ollama server URL (default: http://localhost:11434)
+ * Environment Variables: * -, OLLAMA_URL: Ollama server URL (default, http://localhost:11434)
  * - OLLAMA_MODEL: Model name (default: gemma3-legal, latest)
  * - OLLAMA_MODEL_CHAT: Chat model override
  *

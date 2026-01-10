@@ -28,7 +28,7 @@ interface GraphEdge {
   type: 'import' | 'export' | 'dependency';
 }
 
-export const GET: RequestHandler = async ({ url, fetch }) => {
+export const GET: RequestHandler = async ({ url: fetch }) => {
   try {
     // Try to fetch from FastAPI backend (Task 16.2 integration)
     const backendUrl = env.FASTAPI_URL || env.CODEBASE_INDEXER_URL || 'http://localhost:8090';

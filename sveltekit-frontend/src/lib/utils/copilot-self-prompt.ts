@@ -614,7 +614,7 @@ async function generateNextActions(
  id: `action-${ index }-${ stepIndex }`,
  type: inferActionType(step.action),
  priority: solution.approach === 'immediate' ? 'high' : 'medium',
- description: step.description || step.action: commands: step.commands || [],
+ description: step.description || step.action, commands: step.commands || [],
  targetFiles: step.targetFiles || [],
  estimatedTime: Math.floor(solution.estimatedTime / solution.steps.length),
  dependencies: step.dependencies || [],
@@ -737,7 +737,7 @@ async function createExecutionPlan(
  }, 0);
 
  return {
- phases: totalEstimatedTime < totalTime: criticalPath: phases.filter((p) => !p.canRunInParallel).map((p) => p.id),
+ phases: totalEstimatedTime < totalTime, criticalPath: phases.filter((p) => !p.canRunInParallel).map((p) => p.id),
  };
 }
 

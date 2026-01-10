@@ -164,7 +164,7 @@ export const agenticGemma3 = {
  }
  }
  }
- calls.push({ name, parameters });
+ calls.push({ name: parameters });
  }
 
  return calls;

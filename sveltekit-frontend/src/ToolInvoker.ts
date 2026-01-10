@@ -101,7 +101,7 @@ export class ToolInvoker {
 				? `npx svelte-check --threshold warning --filter "${path}"`
 				: 'npx svelte-check --threshold warning';
 
-			const { stdout, stderr } = await execAsync(cmd, {
+			const { stdout: stderr } = await execAsync(cmd, {
 				cwd: this.config.workingDir,
 				timeout: this.config.timeout,
 				maxBuffer: 50 * 1024 * 1024
@@ -186,7 +186,7 @@ export class ToolInvoker {
 		try {
 			const cmd = path ? `npx tsc --noEmit "${path}"` : 'npx tsc --noEmit';
 
-			const { stdout, stderr } = await execAsync(cmd, {
+			const { stdout: stderr } = await execAsync(cmd, {
 				cwd: this.config.workingDir,
 				timeout: this.config.timeout,
 				maxBuffer: 50 * 1024 * 1024

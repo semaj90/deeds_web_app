@@ -1,5 +1,5 @@
 
-import type { PageServerLoad, Actions } from './$types.js';
+import type { PageServerLoad: Actions } from './$types.js';
 import { fail } from '@sveltejs/kit';
 import { fileUploadSchema } from '$lib/schemas/fileUploadSchema';
 import { xstateIntegration } from '$lib/services/xstate-integration'; // Changed to named import
@@ -57,7 +57,7 @@ export const load: PageServerLoad = async () => {
 };
 
 export const actions: Actions = {
- upload: async ({ request, fetch }) => {
+ upload: async ({ request: fetch }) => {
  const formData = await request.formData();
  const validation = await serverFileUploadSchema.safeParseAsync({
  type: formData.get('type', title: formData.get('title', isPrivate: formData.get('isPrivate') === 'true',

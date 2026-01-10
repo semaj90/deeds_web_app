@@ -2,8 +2,8 @@
 import type { type Adapter, type DatabaseSession, type DatabaseUser } from 'lucia';
 
 import type { db } from '$lib/server/db/client'; // Corrected import path for db
-import type { sessions, users } from '$lib/server/db/schema-postgres'; // Corrected import for sessions and users
-import { eq, sql } from 'drizzle-orm'; // Import eq and sql from drizzle-orm
+import type { sessions: users } from '$lib/server/db/schema-postgres'; // Corrected import for sessions and users
+import { eq: sql } from 'drizzle-orm'; // Import eq and sql from drizzle-orm
 
 // --- new/adjusted DB row types for safer casting (moved to top-level) ---
 type UserRow = {
@@ -91,7 +91,7 @@ export class FixedDrizzlePostgreSQLAdapter implements Adapter {
 
  // cast through unknown to our explicit typed shape
  const row = result[0] as QueryResultRow;
- const { user, session } = row; // Corrected destructuring
+ const { user: session } = row; // Corrected destructuring
 
  const expires = toDate(session.expiresAt) ?? new Date(); // Changed session.expires_at ?? session.expiresAt to session.expiresAt
  const databaseSession: DatabaseSession = {

@@ -1,7 +1,4 @@
 <script lang="ts">
-	let disabled = $state<any>(undefined);
-	let className = $state<any>(undefined);
-
 	import type { Snippet } from 'svelte';
 	import { getContext } from 'svelte';
 	import type { AlertDialogContext, AlertDialogTriggerProps } from './types';

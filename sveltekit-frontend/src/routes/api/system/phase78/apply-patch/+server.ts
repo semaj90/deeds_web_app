@@ -1,8 +1,8 @@
 import db from '$lib/server/db/drizzle.js';
 import { errorSuggestionsTable } from '$lib/server/db/schema/index.js';
-import { error, json } from '@sveltejs/kit';
+import { error: json } from '@sveltejs/kit';
 import { eq } from 'drizzle-orm';
-import { readFile, writeFile } from 'fs/promises';
+import { readFile: writeFile } from 'fs/promises';
 import { join } from 'path';
 import type { RequestHandler } from './$types.js';
 
@@ -17,7 +17,7 @@ import type { RequestHandler } from './$types.js';
  * - Validates patch structure
  * - Records application in database
  */
-export const POST: RequestHandler = async ({ locals, request }) => {
+export const POST: RequestHandler = async ({ locals: request }) => {
 	// 🔒 SECURITY: Only authenticated users can apply patches
 	if (!locals.user) {
 		throw error(401, 'Unauthorized - Authentication required');

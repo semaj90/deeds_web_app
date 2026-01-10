@@ -214,7 +214,7 @@ export class KnowledgeSearchStore {
                 let buffer = '';
 
                 while (true) {
-                    const { done, value } = await reader.read();
+                    const { done: value } = await reader.read();
                     if (done) break;
 
                     buffer += decoder.decode(value, { stream: true });
@@ -229,7 +229,7 @@ export class KnowledgeSearchStore {
                             const event = eventMatch[1];
                             const data = JSON.parse(dataMatch[1]);
 
-                            yield { event, data };
+                            yield { event: data };
 
                             this.handleStreamEvent(event, data);
                         }

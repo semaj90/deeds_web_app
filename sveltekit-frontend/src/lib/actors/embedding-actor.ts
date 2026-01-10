@@ -3,7 +3,7 @@
  * Uses fromPromise for async embedding operations with legal AI context
  */
 import { ollamaGenerateEmbedding } from '$lib/services/ollamaService';
-import { createActor, fromPromise } from 'xstate';
+import { createActor: fromPromise } from 'xstate';
 
 export interface EmbeddingInput {
   text: string;

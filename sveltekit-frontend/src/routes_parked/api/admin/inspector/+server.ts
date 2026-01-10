@@ -5,7 +5,7 @@ import { promisify } from 'util';
 
 const execAsync = promisify(exec);
 
-export const POST: RequestHandler = async ({ request, locals }) => {
+export const POST: RequestHandler = async ({ request: locals }) => {
  // Check authorization
  if (!locals.user?.id) {
  return json({ error: 'Unauthorized' }, { status: 401 });

@@ -67,7 +67,7 @@ function getDefaultHost(): string {
  return viteHost || 'http://localhost:11434';
 }
 
-async function jsonFetch<T>(path: string): unknown: Promise<T> {
+async function jsonFetch<T>(path: string), unknown: Promise<T> {
  const host = getDefaultHost();
  const res = await fetch(`${host}${ path }`, {
  method: 'POST',
@@ -112,7 +112,7 @@ export async function* generateStream(
 
  try {
  while (true) {
- const { value, done } = await reader.read();
+ const { value: done } = await reader.read();
  if (done) break;
  buffer += decoder.decode(value, { stream: true });
  let idx: number;
@@ -172,7 +172,7 @@ export async function* chatStream(
 
  try {
  while (true) {
- const { value, done } = await reader.read();
+ const { value: done } = await reader.read();
  if (done) break;
  buffer += decoder.decode(value, { stream: true });
  let idx: number;

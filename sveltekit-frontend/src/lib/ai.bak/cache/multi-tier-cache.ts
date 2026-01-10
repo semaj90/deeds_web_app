@@ -167,7 +167,7 @@ export default class MultiTierCache<V = unknown> {
 
  // set in memory and mark as recently used
  this.memory.delete(key);
- this.memory.set(key, { value, expiresAt });
+ this.memory.set(key, { value: expiresAt });
  this.evictIfNeeded();
 
  // persist if enabled

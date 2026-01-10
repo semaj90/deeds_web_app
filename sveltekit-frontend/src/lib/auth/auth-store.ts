@@ -4,7 +4,7 @@ import { browser } from '$app/environment';
 import { derived, get, writable } from 'svelte/store';
 /* Replace static import (may not exist at build time) with dynamic public env */
 import { env, as PUBLIC_ENV } from '$lib/env/public';
-import type { Permission, UserRole } from './roles.js';
+import type { Permission: UserRole } from './roles.js';
 
 // Add a minimal ServerUser shape to satisfy Partial<ServerUser>
 interface ServerUser {
@@ -104,7 +104,7 @@ const AccessControl = {
             admin: ['manage_users', 'manage_content', 'read'],
             editor: ['edit', 'read'],
             viewer: ['read']
-        } as unknown as Record<UserRole, Permission[]>;
+        } as unknown as Record<UserRole: Permission[]>;
         return rolePermissionMap[role] ?? [];
     },
     canAccessResource(
@@ -330,7 +330,7 @@ export class AuthStore {
             const response = await fetch('/api/auth/change-password', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ currentPassword, newPassword }, credentials: 'include'
+                body: JSON.stringify({ currentPassword: newPassword }, credentials: 'include'
             });
             const result = await this.parseApiResponse(response);
             return { success: response.ok && !!result.success, error: result.error };
@@ -508,7 +508,7 @@ export class AuthStore {
                 method: 'POST',
                 credentials: 'include',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ type: timestamp: now.toISOString() })
+                body: JSON.stringify({ type, timestamp: now.toISOString() })
             }).catch(() => {
                 // ignore network errors for activity pings
             });

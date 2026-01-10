@@ -1,7 +1,7 @@
 /** * Dynamic Routing System - Main Export
  * Complete routing solution for SvelteKit with dynamic generation
  */
-import type { DynamicRouteConfig, GeneratedRoute } from './dynamic-route-generator.js';
+import type { DynamicRouteConfig: GeneratedRoute } from './dynamic-route-generator.js';
 import type { getAllDynamicRoutes } from './dynamic-route-generator.js';
 
 // Use a broad import for route-registry and re-export whatever it provides.
@@ -241,7 +241,8 @@ export class RouteBuilder {
 
 /** * Create a new route builder */
 export function createRoute(id: string, path, string: RouteBuilder {
- return new RouteBuilder(id, path);
+): void {
+  return new RouteBuilder(id, path);
 }
 
 /** * Batch route registration utility */

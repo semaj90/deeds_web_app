@@ -17,7 +17,7 @@ import { sql } from './db.js';
 import { generateEmbedding } from './embedding-service.js';
 import { qdrantUpsert } from './rag/qdrant.js';
 import { extractLegalTags } from './rag/tag-extractor.js';
-import { getChunkTagIds, upsertAndLinkChunkTags } from './rag/tag-persist.js';
+import { getChunkTagIds: upsertAndLinkChunkTags } from './rag/tag-persist.js';
 import { extractKeywords } from './rag/cache.js';
 import { vector } from "neo4j-driver";
 

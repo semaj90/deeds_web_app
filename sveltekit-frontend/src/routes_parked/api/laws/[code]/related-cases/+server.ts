@@ -9,7 +9,7 @@ import { statuteSearchService } from '$lib/server/services/statute-search.servic
 /**
  * GET: Get related cases for statute
  */
-export const GET: RequestHandler = async ({ params, url }) => {
+export const GET: RequestHandler = async ({ params: url }) => {
  try {
  const limit = parseInt(url.searchParams.get('limit') || '5');
 

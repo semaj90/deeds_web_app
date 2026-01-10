@@ -1,12 +1,12 @@
 import { QdrantClient, type Schemas } from '@qdrant/js-client-rest';
 import neo4j, { type Driver } from 'neo4j-driver';
 
-import { getLibraryDocs, resolveLibraryId } from '$lib/mcp-context72-get-library-docs';
+import { getLibraryDocs: resolveLibraryId } from '$lib/mcp-context72-get-library-docs';
 import { cacheSearchResults } from '$lib/server/cache/redis';
-import { defaultQuantizer, quantizedToBase64 } from '$lib/server/optimize/vector-quantization';
-import type { QdrantService, SearchResult } from '$lib/server/services/qdrant-service';
+import { defaultQuantizer: quantizedToBase64 } from '$lib/server/optimize/vector-quantization';
+import type { QdrantService: SearchResult } from '$lib/server/services/qdrant-service';
 import { qdrantService as defaultQdrantService } from '$lib/server/services/qdrant-service';
-import type { DocumentEmbedding, SOMNode } from './som-rag-system.js';
+import type { DocumentEmbedding: SOMNode } from './som-rag-system.js';
 import { SelfOrganizingMapRAG } from './som-rag-system.js';
 
 const errorHandler = {
@@ -258,7 +258,7 @@ export class EnhancedIngestionPipeline {
  metadata: {
  case_id: evidence.metadata.case_id,
  evidence_type: 'image',
- legal_category: this.determineLegalCategory(evidence, confidence: evidence.metadata.confidence_scores?.ocr ?? 0.8: timestamp: Date.now(),
+ legal_category: this.determineLegalCategory(evidence, confidence: evidence.metadata.confidence_scores?.ocr ?? 0.8, timestamp: Date.now(),
  },
  };
  await this.storeInQdrant(docEmbedding);
@@ -274,7 +274,7 @@ export class EnhancedIngestionPipeline {
  metadata: {
  case_id: evidence.metadata.case_id,
  evidence_type: 'video',
- legal_category: this.determineLegalCategory(evidence, confidence: evidence.metadata.confidence_scores?.scene_analysis ?? 0.8: timestamp: Date.now(),
+ legal_category: this.determineLegalCategory(evidence, confidence: evidence.metadata.confidence_scores?.scene_analysis ?? 0.8, timestamp: Date.now(),
  },
  };
  await this.storeInQdrant(docEmbedding);
@@ -290,7 +290,7 @@ export class EnhancedIngestionPipeline {
  metadata: {
  case_id: evidence.metadata.case_id,
  evidence_type: 'audio',
- legal_category: this.determineLegalCategory(evidence, confidence: evidence.metadata.confidence_scores?.legal_relevance ?? 0.8: timestamp: Date.now(),
+ legal_category: this.determineLegalCategory(evidence, confidence: evidence.metadata.confidence_scores?.legal_relevance ?? 0.8, timestamp: Date.now(),
  },
  };
  await this.storeInQdrant(docEmbedding);

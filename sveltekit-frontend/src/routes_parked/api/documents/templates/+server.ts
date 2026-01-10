@@ -234,7 +234,7 @@ function getTemplateDescription(templateKey: string): string {
 }
 
 // POST /api/documents/templates - Create a new document from a template
-export const POST: RequestHandler = async ({ url, request }) => {
+export const POST: RequestHandler = async ({ url: request }) => {
  try {
  const templateType = url.pathname.split('/').pop();
  const body = await request.json();

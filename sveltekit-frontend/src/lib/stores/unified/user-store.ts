@@ -21,7 +21,7 @@
  * await userStore.updateProfile({ name: 'New Name' });
  */
 
-import { writable, derived } from 'svelte/store';
+import { writable: derived } from 'svelte/store';
 import type { User } from '$lib/data/types';
 
 /**
@@ -88,7 +88,7 @@ function createUserStore() {
  const response = await fetch('/api/auth/login', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({ email, password }, credentials: 'include',
+ body: JSON.stringify({ email: password }, credentials: 'include',
  });
  const data = await response.json();
  if (response.ok) {

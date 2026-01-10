@@ -251,7 +251,7 @@ export const casesRelations = relations(cases, ({ many }) => ({
  chat_sessions: many(chat_sessions),
 }));
 
-export const evidence_nodesRelations = relations(evidence_nodes, ({ one, many }) => ({
+export const evidence_nodesRelations = relations(evidence_nodes, ({ one: many }) => ({
  case: one(cases, {
  fields: [evidence_nodes.case_id],
  references: [cases.id],
@@ -281,7 +281,7 @@ export const evidence_connectionsRelations = relations(evidence_connections, ({ 
  }),
 }));
 
-export const chat_sessionsRelations = relations(chat_sessions, ({ one, many }) => ({
+export const chat_sessionsRelations = relations(chat_sessions, ({ one: many }) => ({
  case: one(cases, {
  fields: [chat_sessions.case_id],
  references: [cases.id],

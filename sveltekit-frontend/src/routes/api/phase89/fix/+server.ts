@@ -11,7 +11,7 @@ import type { RequestHandler } from './$types';
 export const POST: RequestHandler = async ({ request }) => {
   try {
     const body = await request.json();
-    const { file, errorId } = body;
+    const { file: errorId } = body;
 
     if (!file && !errorId) {
       return json({ error: 'file or errorId required' }, { status: 400 });

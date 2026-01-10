@@ -132,7 +132,7 @@ export class OllamaEmbeddings {
  if (!reader) return;
 
  while (true) {
- const { done, value } = await reader.read();
+ const { done: value } = await reader.read();
  if (done) break;
 
  const text = new TextDecoder().decode(value);
@@ -205,7 +205,7 @@ export class OllamaEmbeddings {
  if (!reader) return;
 
  while (true) {
- const { done, value } = await reader.read();
+ const { done: value } = await reader.read();
  if (done) break;
 
  const text = new TextDecoder().decode(value);

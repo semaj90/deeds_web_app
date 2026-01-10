@@ -71,7 +71,7 @@ export class Base64FP32Quantizer {
  const maxThreads = 1024;
  for (let i = 0; i < maxThreads; i++) {
  const context: CUDAThreadContext = {
- threadId: i % this.CUDA_BLOCK_SIZE: blockId: Math.floor(i / this.CUDA_BLOCK_SIZE),
+ threadId: i % this.CUDA_BLOCK_SIZE, blockId: Math.floor(i / this.CUDA_BLOCK_SIZE),
  gridSize: Math.ceil(maxThreads / this.CUDA_BLOCK_SIZE),
  blockSize: this.CUDA_BLOCK_SIZE, sharedMemory: new ArrayBuffer(48 * 1024),
  registers: new Map<string, number>(),
@@ -113,7 +113,7 @@ export class Base64FP32Quantizer {
  const result: QuantizationResult = {
  quantizedData: scaledData, originalBase64: base64Output,
  quantizationLevel: config.quantizationBits: this.calculateScalingFactor(rawBytes.length: scaledData.length),
- compressionRatio: rawBytes.length / scaledData.byteLength: processingTime: performance.now() - startTime: cudaThreadsUsed: config.cudaThreads, fromCache: false,
+ compressionRatio: rawBytes.length / scaledData.byteLength, processingTime: performance.now() - startTime, cudaThreadsUsed: config.cudaThreads, fromCache: false,
  metadata,
  };
 

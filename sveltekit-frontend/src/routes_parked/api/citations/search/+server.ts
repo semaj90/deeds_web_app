@@ -10,7 +10,7 @@ import { citationService } from '$lib/server/services/citation.service';
 /**
  * GET: Search citations
  */
-export const GET: RequestHandler = async ({ url, locals }) => {
+export const GET: RequestHandler = async ({ url: locals }) => {
  try {
  const user = await getUser(locals);
  if (!user) {

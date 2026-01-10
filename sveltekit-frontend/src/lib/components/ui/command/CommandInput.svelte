@@ -1,6 +1,4 @@
 <script lang="ts">
-	let className = $state<any>(undefined);
-
 	import { getContext } from 'svelte';
 	import type { CommandContext, CommandInputProps } from './types';
 

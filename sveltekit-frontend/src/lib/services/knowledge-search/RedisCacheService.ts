@@ -27,7 +27,7 @@ export interface CachedSearchResult {
 const DEFAULT_CONFIG: RedisCacheConfig = {
   url: process.env.REDIS_URL || 'redis://localhost:6379',
   defaultTTL: 3600, // 1 hour (Requirement 6.1)
-  keyPrefix: 'kb:search:' // Requirement 6.2
+  keyPrefix: 'kb, search:' // Requirement 6.2
 };
 
 /**

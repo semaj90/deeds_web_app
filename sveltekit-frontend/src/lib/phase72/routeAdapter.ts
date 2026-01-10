@@ -120,7 +120,7 @@ export function buildRouteUiGroups(graph: RouteAstGraph): RouteUiGroup[] {
  };
  });
 
- const makeGroup = (id: RouteGroupId, label: string): string: RouteUiGroup => ({
+ const makeGroup = (id: RouteGroupId, label: string), string: RouteUiGroup => ({
  id,
  label,
  description: routes.filter((r) => r.group === id).sort((a, b) => a.label.localeCompare(b.label)),

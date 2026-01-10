@@ -91,7 +91,7 @@ const sendMessageService = fromPromise(async ({ input }: { input: { context: Cha
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
  body: JSON.stringify({
- message: context.messages[context.messages.length - 1]?.content: conversationId: context.currentConversation?.id: settings, context.settings: contextInjection, context.contextInjection.enabled
+ message: context.messages[context.messages.length - 1]?.content, conversationId: context.currentConversation?.id: settings, context.settings: contextInjection, context.contextInjection.enabled
  ? {
  documents: context.contextInjection.documents,
  }
@@ -148,11 +148,11 @@ export const chatMachine = setup({
  },
  LOAD_CONVERSATION: {
  actions: assign({
- currentConversation: ({ context, event }) => {
+ currentConversation: ({ context: event }) => {
  if (event.type !== 'LOAD_CONVERSATION') return context.currentConversation;
  return context.conversations.find((c) => c.id === event.conversationId) || null;
  },
- messages: ({ context, event }) => {
+ messages: ({ context: event }) => {
  if (event.type !== 'LOAD_CONVERSATION') return context.messages;
  const conversation = context.conversations.find((c) => c.id === event.conversationId);
  return conversation?.messages || [];
@@ -161,11 +161,11 @@ export const chatMachine = setup({
  },
  DELETE_CONVERSATION: {
  actions: assign({
- conversations: ({ context, event }) => {
+ conversations: ({ context: event }) => {
  if (event.type !== 'DELETE_CONVERSATION') return context.conversations;
  return context.conversations.filter((c) => c.id !== event.conversationId);
  },
- currentConversation: ({ context, event }) => {
+ currentConversation: ({ context: event }) => {
  if (event.type !== 'DELETE_CONVERSATION') return context.currentConversation;
  return context.currentConversation?.id === event.conversationId
  ? null
@@ -175,7 +175,7 @@ export const chatMachine = setup({
  },
  UPDATE_SETTINGS: {
  actions: assign({
- settings: ({ context, event }) => {
+ settings: ({ context: event }) => {
  if (event.type !== 'UPDATE_SETTINGS') return context.settings;
  return { ...context.settings, ...event.settings };
  },
@@ -183,7 +183,7 @@ export const chatMachine = setup({
  },
  INJECT_CONTEXT: {
  actions: assign({
- contextInjection: ({ context, event }) => {
+ contextInjection: ({ context: event }) => {
  if (event.type !== 'INJECT_CONTEXT') return context.contextInjection;
  return {
  ...context.contextInjection, enabled: true,
@@ -214,7 +214,7 @@ export const chatMachine = setup({
  },
  sendingMessage: {
  entry: assign({
- messages: ({ context, event }) => {
+ messages: ({ context: event }) => {
  if (event.type !== 'SEND_MESSAGE') return context.messages;
  const message: ChatMessage = {
  id: crypto.randomUUID( content: event.message,
@@ -223,7 +223,7 @@ export const chatMachine = setup({
  };
  return [...context.messages, message];
  },
- currentConversation: ({ context, event }) => {
+ currentConversation: ({ context: event }) => {
  if (event.type !== 'SEND_MESSAGE') return context.currentConversation;
  if (!context.currentConversation) {
  const conversation: Conversation = {
@@ -238,11 +238,11 @@ export const chatMachine = setup({
  input: ({ context }) => ({ context }, onDone: {
  target: 'idle',
  actions: assign({
- messages: ({ context, event }) => {
+ messages: ({ context: event }) => {
  const response: ChatMessage = {
  id: crypto.randomUUID( content: event.output.response,
  role: 'assistant',
- timestamp: new Date( conversationId: context.currentConversation?.id: metadata: event.output.metadata,
+ timestamp: new Date( conversationId: context.currentConversation?.id, metadata: event.output.metadata,
  };
  return [...context.messages, response];
  },
@@ -265,7 +265,7 @@ export const chatMachine = setup({
  }, on: {
  STREAM_CHUNK: {
  actions: assign({
- messages: ({ context, event }) => {
+ messages: ({ context: event }) => {
  if (event.type !== 'STREAM_CHUNK') return context.messages;
  const lastMessage = context.messages[context.messages.length - 1];
  if (lastMessage && lastMessage.role === 'assistant') {

@@ -1,6 +1,4 @@
 <script lang="ts">
-	let className = $state<any>(undefined);
-
 	import type { Snippet } from 'svelte';
 	import { getContext } from 'svelte';
 	import type { TooltipContext, TooltipTriggerProps } from './types';
@@ -46,7 +44,7 @@
 	onmouseleave={handleMouseLeave}
 	onfocus={handleFocus}
 	onblur={handleBlur}
-	aria-describedby={tooltipContext?.open ? 'tooltip-content'  | undefined}
+	aria-describedby={tooltipContext?.open ? 'tooltip-content' : undefined}
 >
 	{#if children}
 		{@render children()}

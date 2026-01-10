@@ -1,6 +1,6 @@
 import { sql } from 'drizzle-orm';
 import type { pgTable, timestamp, varchar } from 'drizzle-orm/pg-core';
-import { jsonb, text } from 'drizzle-orm/pg-core';
+import { jsonb: text } from 'drizzle-orm/pg-core';
 
 export const pois = pgTable('persons_of_interest', {
  id: varchar('id').primaryKey( name: text('name').notNull( aliases: jsonb('aliases').$type<string[]>().default([], threatLevel: varchar('threat_level', { enum: ['low', 'medium', 'high', 'critical'] })

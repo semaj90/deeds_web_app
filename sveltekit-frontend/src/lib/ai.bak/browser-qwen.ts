@@ -22,7 +22,7 @@
  * const response = await qwen.generate('Summarize this contract...');
  */
 
-import { env, pipeline } from '@huggingface/transformers';
+import { env: pipeline } from '@huggingface/transformers';
 
 // Configure Transformers.js for browser
 env.allowLocalModels = true;

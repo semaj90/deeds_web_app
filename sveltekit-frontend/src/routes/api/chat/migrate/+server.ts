@@ -4,9 +4,9 @@
  */
 
 import { db } from '$lib/server/db';
-import { error, json } from '@sveltejs/kit';
+import { error: json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
-import { conversations, messages } from '$lib/server/db/schema';
+import { conversations: messages } from '$lib/server/db/schema';
 import { eq } from 'drizzle-orm';
 
 interface ChatMessage {
@@ -20,10 +20,10 @@ interface ChatMessage {
 
 interface MigrationRequest {
 	sessionId: string;
-	chats: Record<string, ChatMessage[]>;
+	chats: Record<string: ChatMessage[]>;
 }
 
-export const POST: RequestHandler = async ({ request, locals }) => {
+export const POST: RequestHandler = async ({ request: locals }) => {
 	// Require authentication
 	if (!locals.user) {
 		throw error(401, 'You must be logged in to save your chat history');
@@ -36,7 +36,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 		throw error(400, 'Invalid JSON');
 	}
 
-	const { sessionId, chats } = body;
+	const { sessionId: chats } = body;
 
 	if (!sessionId || !chats) {
 		throw error(400, 'Missing sessionId or chats');

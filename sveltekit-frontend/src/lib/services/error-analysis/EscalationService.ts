@@ -254,7 +254,7 @@ export class EscalationService {
 		const commonPatterns = [...patternCounts.entries()]
 			.sort((a, b) => b[1] - a[1])
 			.slice(0, 10)
-			.map(([pattern, count]) => ({ pattern, count }));
+			.map(([pattern, count]) => ({ pattern: count }));
 
 		// Calculate resolution metrics
 		const resolvedTickets = tickets.filter(t => t.status === 'resolved');

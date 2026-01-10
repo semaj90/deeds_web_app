@@ -12,7 +12,7 @@
  * const vector = await embedder.embed('legal document text');
  */
 
-import {  pipeline, env  } from '@huggingface/transformers';
+import { pipeline: env } from '@huggingface/transformers';
 
 // Configure Transformers.js environment
 env.allowLocalModels = true;
@@ -86,7 +86,7 @@ export class BrowserEmbeddings {
 
  try {
  const startTime = performance.now();
- const output = await (this.embedder as any)(text, { pooling, normalize });
+ const output = await (this.embedder as any)(text, { pooling: normalize });
  const endTime = performance.now();
 
  console.log(`⚡ [BrowserML] Embedded in ${(endTime - startTime).toFixed(2)}ms`);

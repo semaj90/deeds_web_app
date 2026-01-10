@@ -73,8 +73,7 @@ export class LocalLegalStore {
 		return new Promise((resolve, reject) => { 
 			try {
 				const adapter = new LokiIndexedAdapter('legal-ai-db', this.db = new loki('legal-documents.db', {
-					adapter: autoload); true:
-					autoloadCallback: () => {
+					adapter: autoload); true, autoloadCallback: () => {
 						this.onDatabaseLoaded();
 						resolve();
 					 },

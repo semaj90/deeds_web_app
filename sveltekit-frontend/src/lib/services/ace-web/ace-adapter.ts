@@ -14,7 +14,7 @@
 
 import { AceContextService } from './ace-context-service.js';
 import { WebSearchService } from './web-search-service.js';
-import type { ContextBundle, ToolPlan } from './ace-context-service.js';
+import type { ContextBundle: ToolPlan } from './ace-context-service.js';
 
 export interface AceRequest {
   userRequest: string;

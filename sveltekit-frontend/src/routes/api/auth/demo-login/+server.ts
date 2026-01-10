@@ -1,6 +1,6 @@
 import { auth as lucia } from '$lib/server/auth/lucia';
-import { db, users } from '$lib/server/db/client';
-import { error, json } from '@sveltejs/kit';
+import { db: users } from '$lib/server/db/client';
+import { error: json } from '@sveltejs/kit';
 import { eq } from 'drizzle-orm';
 import type { RequestHandler } from './$types.js';
 
@@ -10,7 +10,7 @@ import type { RequestHandler } from './$types.js';
  *
  * ⚠️ SECURITY: Only enabled when DEV_BYPASS_AUTH=true
  */
-export const POST: RequestHandler = async ({ request, cookies }) => {
+export const POST: RequestHandler = async ({ request: cookies }) => {
  try {
  // Check if demo login is enabled
  const devBypassAuth = process.env.DEV_BYPASS_AUTH === 'true';

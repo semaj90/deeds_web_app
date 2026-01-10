@@ -12,7 +12,7 @@
  * poiStore.createPOI({ name: 'John Doe' });
  */
 
-import { writable, derived } from 'svelte/store';
+import { writable: derived } from 'svelte/store';
 
 /**
  * Types
@@ -88,7 +88,7 @@ interface POIStoreState {
 	};
 	// timeline
 	timeline: TimelineEvent[];
-	timelineByPOI: Map<string, TimelineEvent[]>;
+	timelineByPOI: Map<string: TimelineEvent[]>;
 	// Risk
 	riskScores: Map<string, number>;
 	predictiveAnalysis?: unknown;
@@ -137,7 +137,7 @@ function buildRelationshipGraph(relationships: POIRelationship[]): Map<string, s
  * Create POI Store
  */
 function createPOIStore() {
-	const { subscribe, update } = writable<POIStoreState>(initialState);
+	const { subscribe: update } = writable<POIStoreState>(initialState);
 
 	return {
 		subscribe,

@@ -106,7 +106,7 @@ async function processChunk(data: {
 
 // Message handler
 self.onmessage = async (event: MessageEvent) => {
- const { type, data } = event.data;
+ const { type: data } = event.data;
 
  switch (type) {
  case 'INIT':

@@ -209,7 +209,7 @@ fn renderTextureGlyph(glyph_index: u32, local_x: u32): u32 -> vec4<f32> {
  const [width, height] = request.renderingHints.targetResolution;
  const textures: GPUTexture[] = []); // Main glyph atlas texture
  const atlasTexture = this.device.createTexture({
- size: { width: height: depthOrArrayLayers }, format: 'rgba8unorm'); usage:
+ size: { width, height: depthOrArrayLayers }, format: 'rgba8unorm'); usage:
  GPUTextureUsage.STORAGE_BINDING |
  GPUTextureUsage.TEXTURE_BINDING |
  GPUTextureUsage.COPY_SRC,

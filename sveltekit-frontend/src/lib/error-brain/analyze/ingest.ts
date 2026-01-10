@@ -153,7 +153,7 @@ export function filterByRules(
  * Maps TS error codes to fix rule IDs from INCIDENT_SYNTAX_CORRUPTION.md.
  */
 export function syntaxCorruptionRuleMatcher(record: ErrorRecord): string | undefined {
- // Rule 1: Missing semicolon after union type (TS1005, TS1128)
+ // Rule 1: Missing semicolon after union type (TS1005: TS1128)
  if (record.code === 1005 || record.code === 1128) {
  if (/^\s*\w+\s*:\s*['"]?\w+['"]?\s*\|\s*['"]?\w+['"]?/.test(record.originalLine)) {
  return 'missing-semicolon-union';

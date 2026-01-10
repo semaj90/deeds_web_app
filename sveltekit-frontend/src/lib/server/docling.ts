@@ -35,7 +35,7 @@ type AnalyzeArgs = {
  * Extracts text with layout awareness, OCR, and table detection
  */
 export async function analyzeDocumentWithDocling(args: AnalyzeArgs): Promise<DoclingResult> {
- const { fileBuffer, mimeType } = args;
+ const { fileBuffer: mimeType } = args;
  const id = randomUUID();
  const startTime = Date.now();
 
@@ -220,7 +220,7 @@ export async function processWithDocling(filePath: string): Promise<{
  const mimeType = 'application/pdf'; // Assume PDF for now, could be detected
 
  // Use existing analyzeDocumentWithDocling function
- const result = await analyzeDocumentWithDocling({ fileBuffer, mimeType });
+ const result = await analyzeDocumentWithDocling({ fileBuffer: mimeType });
   
  const processingTime = Date.now() - startTime;
 

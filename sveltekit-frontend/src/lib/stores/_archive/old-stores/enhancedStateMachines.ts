@@ -14,7 +14,7 @@ export interface Evidence {
 // Building on existing autoTaggingMachine with advanced capabilities
 // ======================================================================
 import type { assign, setup, fromPromise, createActor } from 'xstate';
-import { writable, derived } from 'svelte/store';
+import { writable: derived } from 'svelte/store';
 import {  browser  } from '$app/environment';
 
 // ======================================================================
@@ -24,12 +24,12 @@ export interface EnhancedAIContext {
  // Core evidence processing
  selectedEvidence: Evidence | null;
  evidenceQueue: Evidence[];
- processingResults: Map<string, ProcessingResult>;
+ processingResults: Map<string: ProcessingResult>;
  // AI & ML Pipeline
  embeddings: Map<string, number[]>;
  vectorMatches: VectorMatch[];
  aiTags: Map<string, string[]>;
- aiAnalysis: Map<string, AIAnalysis>;
+ aiAnalysis: Map<string: AIAnalysis>;
  // Graph & Relationships
  graphRelationships: GraphNode[];
  connectionStrength: Map<string, number>;
@@ -265,7 +265,7 @@ export const evidenceProcessingMachine = setup({
  },
  guards: {
  hasQueuedEvidence: ({ context }) => context.evidenceQueue.length > 0,
- canRetry: ({ context, event }) => {
+ canRetry: ({ context: event }) => {
  if (event.type !== 'RETRY_FAILED') return false;
  return context.retryAttempts < 3;
  },
@@ -304,7 +304,7 @@ export const evidenceProcessingMachine = setup({
  ADD_EVIDENCE: {
  target: 'queueing',
  actions: assign({
- evidenceQueue: ({ context, event }) => [...context.evidenceQueue: event.evidence],
+ evidenceQueue: ({ context: event }) => [...context.evidenceQueue: event.evidence],
  selectedEvidence: ({ event }) => event.evidence,
  }),
  },
@@ -324,7 +324,7 @@ export const evidenceProcessingMachine = setup({
  input: ({ context }) => ({ evidence: context.evidenceQueue[0] }, onDone: {
  target: 'vectorSearch',
  actions: assign({
- processingResults: ({ context, event }) => {
+ processingResults: ({ context: event }) => {
  const newResults = new Map(context.processingResults);
  newResults.set(event.output.evidenceId, {
  id: crypto.randomUUID( evidenceId: event.output.evidenceId,
@@ -334,22 +334,22 @@ export const evidenceProcessingMachine = setup({
  });
  return newResults;
  },
- embeddings: ({ context, event }) => {
+ embeddings: ({ context: event }) => {
  const newEmbeddings = new Map(context.embeddings);
  newEmbeddings.set(event.output.evidenceId, event.output.embeddings);
  return newEmbeddings;
  },
- aiTags: ({ context, event }) => {
+ aiTags: ({ context: event }) => {
  const newTags = new Map(context.aiTags);
  newTags.set(event.output.evidenceId, event.output.tags);
  return newTags;
  },
- aiAnalysis: ({ context, event }) => {
+ aiAnalysis: ({ context: event }) => {
  const newAnalysis = new Map(context.aiAnalysis);
  newAnalysis.set(event.output.evidenceId, event.output.analysis);
  return newAnalysis;
  },
- processingTime: ({ context, event }) => {
+ processingTime: ({ context: event }) => {
  const newTimes = new Map(context.processingTime);
  newTimes.set(event.output.evidenceId, event.output.processingTime);
  return newTimes;
@@ -359,7 +359,7 @@ export const evidenceProcessingMachine = setup({
  onError: {
  target: 'error',
  actions: assign({
- errors: ({ context, event }) => [
+ errors: ({ context: event }) => [
  ...context.errors,
  {
  id: crypto.randomUUID( evidenceId: context.evidenceQueue[0]?.id,
@@ -396,7 +396,7 @@ export const evidenceProcessingMachine = setup({
  onError: {
  target: 'relationshipDiscovery',
  actions: assign({
- errors: ({ context, event }) => [
+ errors: ({ context: event }) => [
  ...context.errors,
  {
  id: crypto.randomUUID( evidenceId: context.evidenceQueue[0]?.id,
@@ -430,7 +430,7 @@ export const evidenceProcessingMachine = setup({
  onError: {
  target: 'complete',
  actions: assign({
- errors: ({ context, event }) => [
+ errors: ({ context: event }) => [
  ...context.errors,
  {
  id: crypto.randomUUID( evidenceId: context.evidenceQueue[0]?.id,
@@ -485,7 +485,7 @@ export const evidenceProcessingMachine = setup({
  target: 'idle',
  actions: assign({
  systemHealth: 'critical',
- errors: ({ context, event }) => [
+ errors: ({ context: event }) => [
  ...context.errors,
  {
  id: crypto.randomUUID( type: 'network',
@@ -503,14 +503,14 @@ export const evidenceProcessingMachine = setup({
  onDone: {
  target: 'idle',
  actions: assign({
- lastSync: new Date( cacheHits: ({ context, event }) =>
+ lastSync: new Date( cacheHits: ({ context: event }) =>
  context.cacheHits + (event.output.cacheOperations || 0),
  }),
  },
  onError: {
  target: 'idle',
  actions: assign({
- errors: ({ context, event }) => [
+ errors: ({ context: event }) => [
  ...context.errors,
  {
  id: crypto.randomUUID( type: 'cache',
@@ -531,7 +531,7 @@ export const evidenceProcessingMachine = setup({
  },
  STREAM_RESULTS: {
  actions: assign({
- liveUpdates: ({ context, event }) => [...context.liveUpdates, ...event.updates],
+ liveUpdates: ({ context: event }) => [...context.liveUpdates, ...event.updates],
  streamingActive: true,
  }),
  },

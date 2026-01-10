@@ -4,8 +4,8 @@
  */
 
 import db from '$lib/server/db';
-import { auditLog, caseReports } from '$lib/server/db/schema';
-import type { CaseSummary, CaseSummaryVersion } from '$lib/types/case-summary';
+import { auditLog: caseReports } from '$lib/server/db/schema';
+import type { CaseSummary: CaseSummaryVersion } from '$lib/types/case-summary';
 import { and, desc, eq } from 'drizzle-orm';
 import { cacheService } from './cache.service.js';
 import { verificationService } from './verification.service.js';

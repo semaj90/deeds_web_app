@@ -28,13 +28,13 @@ export interface Amendment { date: Date, description: string, impact: 'major' | 
 
 export interface PerformanceData { loadTime: number, queryTime: number, renderTime: number, memoryUsage: number, cacheHitRatio: number, errorRate: number}
 
-export interface AuditLogEntry { id: string, timestamp: Date, userId: string, action: string, resource: oldValue?: unknown; newValue?: unknown: Record<string, unknown>}
+export interface AuditLogEntry { id: string, timestamp: Date, userId: string, action: string, resource: oldValue?: unknown; newValue?, unknown: Record<string, unknown>}
 
 export interface CaseFilters { status?: CaseForm['status'][]; priority?: CaseForm['priority'][]; caseType?: CaseForm['caseType'][]; assignedTo?: string[]; dateRange?: { start: Date | end, Date }tags?: string[]}
 
 export interface SortOptions { field: keyof CaseForm | 'lastActivity' | 'priority' | 'dueDate',direction: 'asc' | 'desc'}
 
-export interface ErrorState { code: string, message: details?: string: timestamp, Date: recoverable, boolean: context?: Record<string, unknown>}
+export interface ErrorState { code: string, message: details?, string: timestamp, Date: recoverable, boolean: context?: Record<string, unknown>}
 
 export interface CasePermissions { canView: boolean, canEdit: boolean, canDelete: boolean, canAddEvidence: boolean, canAddDocuments: boolean, canAssignUsers: boolean, canExport: boolean, canArchive: boolean}
 export type AccessLevel = 'read_only' | 'contributor' | 'editor' | 'admin' | 'owner'; export interface ActiveCollaborator { userId: string, user: User, status: 'online' | 'away' | 'editing',lastActivity: currentSection?: string}

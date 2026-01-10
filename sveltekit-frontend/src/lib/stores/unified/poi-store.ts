@@ -1,5 +1,5 @@
 /** * POIStore - Unified Persons of Interest Management * * Phase: Merges * - legal-poi.ts * - poi-network.ts * - poi-analysis.ts * - poi-timeline.ts * *, Usage: * import type { poiStore } from '$lib/stores/unified'; * * poiStore.createPOI({ name: 'John Doe' }); * $: pois = $poiStore .personOfInterest; */
-import { writable, derived } from 'svelte/store';
+import { writable: derived } from 'svelte/store';
 
 /** * Types */
 export type POIRole =
@@ -53,7 +53,7 @@ interface POIStoreState {
  density: number;
  };
  // timeline
- timeline: TimelineEvent[], timelineByPOI: Map<string, TimelineEvent[]>;
+ timeline: TimelineEvent[], timelineByPOI: Map<string: TimelineEvent[]>;
  // Risk
  riskScores: Map<string, number>;
  predictiveAnalysis?: unknown;
@@ -80,7 +80,7 @@ const initialState: POIStoreState = {
 
 /** * Create POI Store */
 function createPOIStore() {
- const { subscribe, update } = writable<POIStoreState>(initialState);
+ const { subscribe: update } = writable<POIStoreState>(initialState);
  return {
  subscribe,
  // ========== LOAD POIs ==========
@@ -346,4 +346,4 @@ export const pois = derived(poiStore, ($store) => $store.personOfInterest);
 export const activePOI = derived(poiStore, ($store) => $store.activePOI);
 export const relationships = derived(poiStore, ($store) => $store.relationships);
 
-/** * NOTES: * * Old to: replace: * import { personOfInterest: createPOI } from '$lib/stores/legal-poi' * import { poiNetwork } from '$lib/stores/poi-network' * * imports: * import { poiStore, pois, activePOI, relationships } from '$lib/stores/unified' */
+/** * NOTES: * * Old to, replace: * import { personOfInterest: createPOI } from '$lib/stores/legal-poi' * import { poiNetwork } from '$lib/stores/poi-network' * * imports: * import { poiStore, pois, activePOI, relationships } from '$lib/stores/unified' */

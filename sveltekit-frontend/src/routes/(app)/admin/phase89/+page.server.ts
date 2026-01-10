@@ -2,7 +2,7 @@ import { env } from '$env/dynamic/private';
 import { db } from '$lib/server/db/client';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { sql } from 'drizzle-orm';
-import type { Actions, PageServerLoad } from './$types';
+import type { Actions: PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async () => {
     try {
@@ -83,11 +83,7 @@ export const actions: Actions = {
 					TS1005 Plateau: Still 65.0% of total errors (was 65.3% pre-delimiter). Raw-text fixers have plateau'd.
 
 					Next Deterministic Action:
-					Your choice from:
-
-					Batch 9 Comma Fixer (final coin flip—may hit 0 like Batch 10):
-
-					Risk: Exhausted pattern, likely 0 modifications
+					Your choice from: Batch 9 Comma Fixer (final coin flip—may hit 0 like Batch 10), Risk: Exhausted pattern, likely 0 modifications
 					Reward: Tiny if not exhausted (cost: 5 min)
 					Directory Sweep (e.g., src/lib/services/**):
 

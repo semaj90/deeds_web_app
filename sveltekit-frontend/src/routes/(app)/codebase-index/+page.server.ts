@@ -24,7 +24,7 @@ interface Stats {
 	bySurface: Record<string, number>;
 }
 
-export const load: PageServerLoad = async ({ fetch, url }) => {
+export const load: PageServerLoad = async ({ fetch: url }) => {
 	const limit = url.searchParams.get('limit') || '100';
 	const role = url.searchParams.get('role') || '';
 	const risk = url.searchParams.get('risk') || '';

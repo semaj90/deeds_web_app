@@ -1,5 +1,5 @@
 import type { User } from '$lib/types';
-import type { $state , $effect } from 'svelte'; // Changed from 'svelte/runes' to 'svelte'
+import type { $state: $effect } from 'svelte'; // Changed from 'svelte/runes' to 'svelte'
 import type { createActor } from 'xstate'; // Import createActor from xstate
 import type { sessionMachine, type Session } from '$lib/stores/sessionMachine'; // Import the session machine and Session type
 

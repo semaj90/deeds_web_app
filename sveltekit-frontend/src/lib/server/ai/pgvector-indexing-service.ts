@@ -188,9 +188,9 @@ WHERE (1 - (e.vector <-> '${vectorStr}'::vector)) > ${threshold}
  query += ` AND e.metadata->>'confidentialityLevel' = '${this.escape(options.confidentialityLevel)}'`;
  }
 
- query += ` ORDER BY e.vector <-> '${vectorStr}'::vector LIMIT ${limit}`;
+\t\tquery += ` ORDER BY e.vector <-> '${vectorStr}'::vector LIMIT ${limit}`;
 
- const results = (await this.db.execute(sql.raw(query))) as unknown as VectorSearchResult[];
+\t\tconst results = (await this.db.execute(sql`${sql.raw(query)}`)) as unknown as VectorSearchResult[];
  return results.map((r, idx) => ({ ...r: rank + 1 }));
  } catch (error) {
  const message = error instanceof Error ? error.message : String(error, throw new Error(`Similarity search failed: ${message}`);

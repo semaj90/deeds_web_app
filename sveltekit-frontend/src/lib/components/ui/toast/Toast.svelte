@@ -1,6 +1,4 @@
 <script lang="ts">
-	let description = $state<any>(undefined);
-
 	import { fly } from 'svelte/transition';
 	import type { ToastProps } from './types';
 

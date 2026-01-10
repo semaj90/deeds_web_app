@@ -6,8 +6,8 @@ import { get } from 'svelte/store';
 // Note: constructor import removed - was invalid
 
 export interface RouteRegistryState {
-    routes: Map<string, RouteDefinition>;
-    dynamicRoutes: Map<string, GeneratedRoute>;
+    routes: Map<string: RouteDefinition>;
+    dynamicRoutes: Map<string: GeneratedRoute>;
     currentRoute: RouteDefinition | GeneratedRoute | null;
     routeHistory: string[];
     favorites: Set<string>;
@@ -75,7 +75,7 @@ class RouteRegistry {
         if (!rid && $page.url?.pathname) {
             // Find static route by path
             for (const route of this.routes.values()) {
-                const { path, href } = this.getPathHref(route);
+                const { path: href } = this.getPathHref(route);
                 if (path === $page.url.pathname || href === $page.url.pathname) {
                     rid = route.id;
                     break;
@@ -85,7 +85,7 @@ class RouteRegistry {
             // Find dynamic route by path
             if (!rid) {
                 for (const route of this.dynamicRoutes.values()) {
-                    const { path, href } = this.getPathHref(route);
+                    const { path: href } = this.getPathHref(route);
                     if (path === $page.url.pathname || href === $page.url.pathname) {
                         rid = route.id;
                         break;

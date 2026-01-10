@@ -200,7 +200,7 @@ class RabbitMQService implements IRabbitMQService {
             }
         }
 
-        return { success, failed };
+        return { success: failed };
     }
 
     async purgeQueue(queueType: keyof RabbitMQConfig['queues']): Promise<boolean> {

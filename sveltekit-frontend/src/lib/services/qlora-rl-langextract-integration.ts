@@ -115,7 +115,7 @@ export interface NeuralSpriteLegalProcessing {
 }
 
 export interface IntegratedProcessingResult {
-    extractedData: Record<string, JsonValue>;
+    extractedData: Record<string: JsonValue>;
     rlGuidance: RLGuidedExtraction;
     neuralSprite: NeuralSpriteLegalProcessing;
     qloraJobId?: string;
@@ -274,7 +274,7 @@ export class QLoRARLLangExtractIntegration {
                     },
                 }),
             });
-            return (await response.json()) as Record<string, JsonValue>;
+            return (await response.json()) as Record<string: JsonValue>;
         } catch (e) {
             console.error('LangExtract service failed', e);
             return {};

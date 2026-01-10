@@ -590,7 +590,7 @@ class MockFetchClient {
 				} catch (error) {
 					return new Response(JSON.stringify({
 						result: []
-					}), {
+					}) => {
 						status: 200,
 						headers: { 'Content-Type': 'application/json' }
 					});
@@ -606,7 +606,7 @@ class MockFetchClient {
 				}
 			}
 
-			return new Response(JSON.stringify(response.data), {
+			return new Response(JSON.stringify(response.data) => {
 				status: response.status,
 				headers: { 'Content-Type': 'application/json' }
 			});

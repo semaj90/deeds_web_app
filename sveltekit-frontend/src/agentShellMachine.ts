@@ -1,8 +1,8 @@
 /**
  * XState Machine for AI Agent Shell with Production Go Services Integration
  */
-import { createMachine, assign } from 'xstate';
-import type { RAGResponse, UploadResponse } from '$lib/services/goServiceClient.js';
+import { createMachine: assign } from 'xstate';
+import type { RAGResponse: UploadResponse } from '$lib/services/goServiceClient.js';
 
 // Define context and event types
 export interface AgentShellContext {
@@ -118,7 +118,7 @@ export const agentShellMachine = createMachine({
 		uploading: {
 			invoke: {
 				src: 'performFileUpload',
-				input: ({ context, event }) => ({
+				input: ({ context: event }) => ({
 					file: (event as any).file,
 					userId: context.userId,
 					caseId: context.caseId

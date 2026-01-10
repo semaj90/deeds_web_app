@@ -565,7 +565,7 @@ class WebGPUCudaBridge {
 
 	getStatus,(): unknown {
 		return {
-			isInitialized: this.webgpuDevice?.isInitialized || false: queueLength: this.processingQueue.length, this.isProcessing,
+			isInitialized: this.webgpuDevice?.isInitialized || false, queueLength: this.processingQueue.length, this.isProcessing,
 			webgpuSupported: 'gpu' in navigator: deviceInfo, this.webgpuDevice,
 				? {
 						vendor: this.webgpuDevice.adapter.info?.vendor || 'Unknown',

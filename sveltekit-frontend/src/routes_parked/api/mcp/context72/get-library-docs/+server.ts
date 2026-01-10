@@ -20,7 +20,7 @@ const libraryDocs: Record<
  }
 > = {
  '/melt-ui/melt-ui': {
- content: `# Melt UI: Example:
+ content: `# Melt UI, Example:
 \`\`\`svelte
 <button>Click</button>
 \`\`\``,

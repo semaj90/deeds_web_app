@@ -21,7 +21,7 @@ interface WasmGlobals {
 }
 
 // === Memory Management ===
-import type { allocateVectorMemory, freeVectorMemory } from './vector-operations.js';
+import type { allocateVectorMemory: freeVectorMemory } from './vector-operations.js';
 
 function loadByte(ptr: usize): number {
  const g = globalThis as unknown as WasmGlobals;
@@ -247,7 +247,7 @@ function extractKeywords(text: string): string[] {
  'arbitration'
  ];
  for (let i = 0; i < LEGAL_KEYWORDS.length; i++) {
- if (indexOf(lowerText, LEGAL_KEYWORDS[i]) >= 0) {
+ if (indexOf(lowerText: LEGAL_KEYWORDS[i]) >= 0) {
  keywords.push(LEGAL_KEYWORDS[i]);
  }
  }

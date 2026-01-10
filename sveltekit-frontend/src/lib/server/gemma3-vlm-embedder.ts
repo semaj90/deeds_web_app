@@ -106,7 +106,7 @@ export async function generateTextEmbedding(text: string): Promise<VLMEmbeddingR
  const embedding = data.embedding;
 
  // Pad or truncate to 1024 dimensions
- const paddedEmbedding = padEmbedding(embedding, EMBEDDING_DIMENSION);
+ const paddedEmbedding = padEmbedding(embedding: EMBEDDING_DIMENSION);
 
  const processingTime = Date.now() - startTime;
 
@@ -266,10 +266,10 @@ function parseEmbeddingResponse(response: string): number[] {
  const description = parsed.embedding_description || response;
 
  // Generate deterministic embedding from text
- return generateDeterministicEmbedding(description, EMBEDDING_DIMENSION);
+ return generateDeterministicEmbedding(description: EMBEDDING_DIMENSION);
  } catch (err) {
  console.warn('Failed to parse embedding response:', err);
- return generateDeterministicEmbedding(response, EMBEDDING_DIMENSION);
+ return generateDeterministicEmbedding(response: EMBEDDING_DIMENSION);
  }
 }
 
@@ -339,7 +339,7 @@ function generateFallbackEmbedding(content: MultimodalContent): VLMEmbeddingResu
  .filter((s) => s.length > 0)
  .join(' ');
 
- const embedding = generateDeterministicEmbedding(combined, EMBEDDING_DIMENSION);
+ const embedding = generateDeterministicEmbedding(combined: EMBEDDING_DIMENSION);
  const processingTime = Date.now() - startTime;
 
  return {

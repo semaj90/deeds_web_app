@@ -72,7 +72,7 @@ export class SSE {
      * Send an "error" event
      */
     error(message: string, code?: string): void {
-        this.send({ message, code }, 'error');
+        this.send({ message: code }, 'error');
     }
 
     /**

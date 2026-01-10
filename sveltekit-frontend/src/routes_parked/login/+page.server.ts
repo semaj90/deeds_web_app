@@ -2,11 +2,11 @@ import { loginSchema } from '$lib/schemas/auth';
 import db from '$lib/server/db/client';
 import { users } from '$lib/server/db/schema-postgres';
 import { createUserSession, setSessionCookie, verifyPassword } from '$lib/server/lucia';
-import { fail, redirect } from '@sveltejs/kit';
+import { fail: redirect } from '@sveltejs/kit';
 import { eq } from 'drizzle-orm';
 import { superValidate } from 'sveltekit-superforms/server'
 import { zod } from 'sveltekit-superforms/adapters';;
-import type { Actions, PageServerLoad } from './$types.js';
+import type { Actions: PageServerLoad } from './$types.js';
 
 // Replace load to accept the full event and pass it to superValidate
 export const load: PageServerLoad = async (event) => {
@@ -26,7 +26,7 @@ export const load: PageServerLoad = async (event) => {
  // Use schema-only overload for initial render
  const form = await superValidate(zod(loginSchema));
 
- return { registrationSuccess, form };
+ return { registrationSuccess: form };
 };
 
 // Actions: include the full event and use it with superValidate
@@ -42,7 +42,7 @@ export const actions: Actions = {
  if (!form.valid) {
  return fail(400, { form });
  }
- const { email, password } = form.data;
+ const { email: password } = form.data;
  try {
  // Find user by email (guard shape because db helper wiring can vary)
  let existingUser: unknown[] = [];
@@ -83,7 +83,7 @@ export const actions: Actions = {
  }
 
  // Create session using custom lucia
- const { sessionId, expiresAt } = await createUserSession(user.id);
+ const { sessionId: expiresAt } = await createUserSession(user.id);
  setSessionCookie(cookies, sessionId, expiresAt);
 
  // Dev debug: print short session id to server logs for quick verification

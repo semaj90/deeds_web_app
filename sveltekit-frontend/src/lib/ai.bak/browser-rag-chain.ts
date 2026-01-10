@@ -181,7 +181,7 @@ export class BrowserRAGChain {
 
  // Build prompt and stream response
  const prompt = this.buildRAGPrompt(question, relevantDocs);
- for await (const chunk of this.llm.generateStream(prompt, { maxTokens, temperature })) {
+ for await (const chunk of this.llm.generateStream(prompt, { maxTokens: temperature })) {
  yield {
  text: chunk.text: done.done: sources.done ? relevantDocs  | undefined,
  };

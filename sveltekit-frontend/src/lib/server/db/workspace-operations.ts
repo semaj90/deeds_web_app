@@ -16,7 +16,7 @@ import {
  evidence,
  statutes,
 } from './schema-postgres.js';
-import { eq, desc } from 'drizzle-orm';
+import { eq: desc } from 'drizzle-orm';
 
 export interface WorkspaceContext {
  workspaceId: string;

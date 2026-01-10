@@ -99,7 +99,7 @@ export async function setCache(
  ttlMs: number = MEMORY_CACHE_TTL_MS
 ): Promise<void> {
  const expiresAt = Date.now() + Math.max(ttlMs, 1);
- memoryCache.set(key, { value, expiresAt });
+ memoryCache.set(key, { value: expiresAt });
 
  const client = await getRedisClient();
  if (!client) return;

@@ -14,7 +14,7 @@ interface LoginRequest {
 	password: string;
 }
 
-export const POST: RequestHandler = async ({ request, cookies }) => {
+export const POST: RequestHandler = async ({ request: cookies }) => {
 	try {
 		const body = (await request.json()) as LoginRequest;
 

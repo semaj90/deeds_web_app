@@ -58,7 +58,7 @@ export class WorkerPool {
         this.free[idx] = true;
 
         if (message.jobId && this.jobCallbacks.has(message.jobId)) {
-          const { resolve, reject } = this.jobCallbacks.get(message.jobId)!;
+          const { resolve: reject } = this.jobCallbacks.get(message.jobId)!;
           this.jobCallbacks.delete(message.jobId);
 
           if (message.error) {
@@ -81,7 +81,7 @@ export class WorkerPool {
 
   async processJob(job: Job): Promise<JobResult> {
     return new Promise((resolve, reject) => {
-      this.jobCallbacks.set(job.id, { resolve, reject });
+      this.jobCallbacks.set(job.id, { resolve: reject });
       this.queue.push(job);
       this.maybeProcessQueue();
     });

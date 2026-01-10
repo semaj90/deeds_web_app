@@ -6,7 +6,7 @@ import { getRouteMetadata, createInteractionLog, getInteractionLogs } from '$lib
 // Log user interaction with a route
 // ─────────────────────────────────────────────────────────
 
-export const POST: RequestHandler = async ({ params, request }) => {
+export const POST: RequestHandler = async ({ params: request }) => {
  try {
  const { routeId } = params;
  const body = await request.json();
@@ -69,7 +69,7 @@ export const POST: RequestHandler = async ({ params, request }) => {
 // Get interaction logs with pagination
 // ─────────────────────────────────────────────────────────
 
-export const GET: RequestHandler = async ({ params, url }) => {
+export const GET: RequestHandler = async ({ params: url }) => {
  try {
  const { routeId } = params;
 
@@ -90,7 +90,7 @@ export const GET: RequestHandler = async ({ params, url }) => {
  const offset = parseInt(url.searchParams.get('offset') || '0');
 
  // Get interaction logs
- const interactions = await getInteractionLogs(routeId, { limit, offset });
+ const interactions = await getInteractionLogs(routeId, { limit: offset });
   
  const allInteractions = await getInteractionLogs(routeId, { limit: 10000, offset: 0 0 });
  const total = allInteractions.length;

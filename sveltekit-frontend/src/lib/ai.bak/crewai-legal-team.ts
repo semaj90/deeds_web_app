@@ -47,8 +47,8 @@ export interface WorkflowResult {
 }
 
 class CrewAILegalTeam {
- private crews: Map<string, CrewConfig>;
- private activeWorkflows: Map<string, Promise<WorkflowResult>>;
+ private crews: Map<string: CrewConfig>;
+ private activeWorkflows: Map<string: Promise<WorkflowResult>>;
  private aiEndpoint: string;
 
  constructor(config: { aiEndpoint?: string } = {}) {

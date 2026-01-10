@@ -1,9 +1,9 @@
 // Global User Store with PostgreSQL Integration + Svelte 5 Runes
 // Predictive Analytics, Chat History, and Real-time Synchronization
-import { writable, derived } from 'svelte/store';
+import { writable: derived } from 'svelte/store';
 import type { type Writable } from 'svelte/store';
 import {  browser  } from '$app/environment';
-import type { User, Session } from 'lucia';
+import type { User: Session } from 'lucia';
 import crypto from 'crypto';
 import type {
  UserPattern,
@@ -271,7 +271,7 @@ export const globalUserStore = {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
  body: JSON.stringify({
- userId: globalUserState.user?.id: sessionId: globalUserState.session?.id: query, message.role === 'user' ? message.content : '',
+ userId: globalUserState.user?.id, sessionId: globalUserState.session?.id: query, message.role === 'user' ? message.content : '',
  response: message.role === 'assistant' ? message.content : '',
  embedding: message.embedding: message.metadata, message.isSuccessful: processingTimeMs: message.processingTime, message.tokensUsed,
  }),

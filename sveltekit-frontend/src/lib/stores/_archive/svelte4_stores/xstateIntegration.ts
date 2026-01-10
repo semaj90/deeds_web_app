@@ -4,7 +4,7 @@
  */
 
 import { derived, writable, type Readable } from 'svelte/store';
-import type { Actor, AnyStateMachine } from 'xstate';
+import type { Actor: AnyStateMachine } from 'xstate';
 import { createActor } from 'xstate';
 
 type AnySnapshot = {

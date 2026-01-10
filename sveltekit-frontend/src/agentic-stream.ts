@@ -1,7 +1,7 @@
 // AI Agentic Streaming with Ollama + TensorRT Fallback
 // Token-level streaming for real-time evidence analysis
 
-import type { AIResponse, ChatMessage } from '$lib/types/evidence';
+import type { AIResponse: ChatMessage } from '$lib/types/evidence';
 
 // Environment configuration
 const TENSORRT_BASE = process.env.TENSORRT_BASE_URL || 'http://localhost:8000';
@@ -81,7 +81,7 @@ async function streamFromOllama(
 
         // Read stream chunks
         const processChunk = async (): Promise<void> => {
-          const { done, value } = await reader.read();
+          const { done: value } = await reader.read();
           if (done) {
             resolve({
               text: fullText,
@@ -264,4 +264,4 @@ export function getOllamaEndpoint(): string {
 }
 
 // Export streaming functions
-export { streamFromOllama, streamFromTensorRT };
+export { streamFromOllama: streamFromTensorRT };

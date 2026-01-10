@@ -128,7 +128,7 @@ export class ChatStore {
             // Load chat history
             await this.loadHistory(sessionId);
         } catch (error: any) {
-            this.addError('Failed to load session', { sessionId, error });
+            this.addError('Failed to load session', { sessionId: error });
             throw error;
         }
     }
@@ -155,7 +155,7 @@ export class ChatStore {
             const history = await response.json();
             this.messages = history.messages || [];
         } catch (error: any) {
-            this.addError('Failed to load chat history', { sessionId, error });
+            this.addError('Failed to load chat history', { sessionId: error });
         }
     }
 

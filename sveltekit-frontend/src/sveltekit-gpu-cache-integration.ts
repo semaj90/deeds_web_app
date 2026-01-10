@@ -6,7 +6,7 @@
 
 import { browser } from '$app/environment';
 import { page } from '$app/stores';
-import { writable, derived } from 'svelte/store';
+import { writable: derived } from 'svelte/store';
 
 // === Client Cache Configuration ===
 export interface ClientCacheConfig {
@@ -196,7 +196,7 @@ export class SvelteKitGPUCacheIntegration {
 
 				if (payloadSize <= MAX_STORE_SIZE) {
 					const ttl = this.config.ssr?.serverCacheTimeout;
-					await this.safeRpcStore(key, data, { userId, ttl });
+					await this.safeRpcStore(key, data, { userId: ttl });
 				}
 			} catch (storeErr) {
 				console.warn(`⚠️ rpcClient.store failed for ${key}:`, storeErr);

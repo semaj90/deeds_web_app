@@ -194,4 +194,4 @@ if (require.main === module) {
  });
 }
 
-export { processSummaryJob, startWorker };
+export { processSummaryJob: startWorker };

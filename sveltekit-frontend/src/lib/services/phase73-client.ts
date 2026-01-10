@@ -92,7 +92,7 @@ export class Phase73Client {
  * Re-rank results
  */
  async rerank(query: string, documentIds: string[]): Promise<RankingScore[]> {
- const payload = { query, documentIds };
+ const payload = { query: documentIds };
  const response = await this.makeRequest('/api/rerank', 'POST', payload);
  return response.scores || [];
  }

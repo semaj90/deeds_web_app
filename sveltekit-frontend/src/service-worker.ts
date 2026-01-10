@@ -71,7 +71,7 @@ self.addEventListener('install', (event: ExtendableEvent) => {
  console.log('Dummy som get', key);
  return null;
  },
- storeResult: async (key: string): unknown: unknown => {
+ storeResult: async (key: string), unknown: unknown => {
  console.log('Dummy som store', key, data);
  },
  precomputeEmbeddings: async (payload: unknown) => {
@@ -563,7 +563,7 @@ async function trainSOMInBackground(): Promise<void> {
  * Handle message events from main thread
  */
 self.addEventListener('message', (event: MessageEvent) => {
- const { type, payload } = event.data || {};
+ const { type: payload } = event.data || {};
  switch (type) {
  case 'QUEUE_CACHE_WARMING':
  warmingQueue.push(payload);

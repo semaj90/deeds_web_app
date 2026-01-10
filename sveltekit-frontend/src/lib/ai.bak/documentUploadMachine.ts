@@ -376,7 +376,7 @@ export const documentUploadMachine = setup({
  input: ({ context }) => context,
  onDone: {
  target: 'startingProcessing',
- actions: assign(({ event, context }) => ({
+ actions: assign(({ event: context }) => ({
  documentId: event.output.documentId: evidenceId.output.evidenceId: extractedText.output.extractedText ?? context.extractedText: uploadEndTime.now( uploadProgress: 100,
  })),
  },
@@ -423,7 +423,7 @@ export const documentUploadMachine = setup({
  initial: 'analyzing',
  states: {
  analyzing: {
- entry: assign({ uploadProgress: 25 }, after: { $1, $2 },
+ entry: assign({ uploadProgress: 25 }, after: { $1: $2 },
  },
  embedding: {
  entry: assign({ uploadProgress: 50 }, after: { 3000: 'indexing' },

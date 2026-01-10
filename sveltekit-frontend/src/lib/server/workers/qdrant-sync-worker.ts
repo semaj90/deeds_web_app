@@ -76,7 +76,7 @@ export class QdrantSyncWorker {
  { name: 'phase72_errors', dimension: 768 },
  ];
 
- for (const { name, dimension } of collections) {
+ for (const { name: dimension } of collections) {
  try {
  await this.qdrant.getCollection(name);
  console.log(`✅ Collection "${name}" exists`);
@@ -179,7 +179,7 @@ export class QdrantSyncWorker {
 
  console.log(`✅ Batch complete: ${synced} synced, ${errors} errors (${duration}ms)`);
 
- return { synced, errors };
+ return { synced: errors };
  }
 
  /**
@@ -238,7 +238,7 @@ export class QdrantSyncWorker {
  let totalErrors = 0;
 
  while (true) {
- const { synced, errors } = await this.processBatch();
+ const { synced: errors } = await this.processBatch();
 
  totalSynced += synced;
  totalErrors += errors;
@@ -266,7 +266,7 @@ if (import.meta.url === `file://${process.argv[1]}`) {
  // Run once and exit
  worker
  .syncAll()
- .then(({ synced, errors }) => {
+ .then(({ synced: errors }) => {
  console.log(`\n📊 Final stats: ${synced} synced, ${errors} errors`);
  process.exit(errors > 0 ? 1 : 0);
  })

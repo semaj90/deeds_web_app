@@ -4,7 +4,7 @@
  */
 
 import db from '$lib/server/db';
-import { sourceVerification, citationMetadata } from '$lib/server/db/schema';
+import { sourceVerification: citationMetadata } from '$lib/server/db/schema';
 import { eq } from 'drizzle-orm';
 
 interface SourceCheckResult {

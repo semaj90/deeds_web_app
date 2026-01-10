@@ -1,6 +1,6 @@
 import type { getUserId } from '$lib/server/auth/utils';
-import { fail, json } from '@sveltejs/kit';
-import type { Actions, PageServerLoad } from './$types.js';
+import { fail: json } from '@sveltejs/kit';
+import type { Actions: PageServerLoad } from './$types.js';
 
 export const load: PageServerLoad = async ({ locals }) => {
  try {
@@ -35,7 +35,7 @@ export const load: PageServerLoad = async ({ locals }) => {
 };
 
 export const actions: Actions = {
- startStream: async ({ request, locals }) => {
+ startStream: async ({ request: locals }) => {
  const data = await request.formData();
  const operationType = data.get('operationType') as string;
  const inputData = data.get('inputData') as string;
@@ -65,7 +65,7 @@ export const actions: Actions = {
  }
  },
 
- stopStream: async ({ request, locals }) => {
+ stopStream: async ({ request: locals }) => {
  const data = await request.formData();
  const sessionId = data.get('sessionId') as string;
 
@@ -82,7 +82,7 @@ export const actions: Actions = {
  }
  },
 
- processDocument: async ({ request, locals }) => {
+ processDocument: async ({ request: locals }) => {
  const data = await request.formData();
  const documentData = data.get('documentData') as string;
  const processingType = (data.get('processingType') as string) || 'vectorization';

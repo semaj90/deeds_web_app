@@ -1,10 +1,13 @@
 <script lang="ts">
     import { enhance } from '$app/forms';
-    import { ChatSession } from '$lib/stores';
+    import { ChatSession } from '$lib/models/ChatSession.svelte';
 
     // 1. Reactive Chat State Logic
     // Using the Barrel Store Pattern
     const room = new ChatSession('case-101');
+
+    // Helper to get chatId
+    const getChatId = () => 'case-101';
 </script>
 
 <div class="chat-window">

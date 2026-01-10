@@ -81,7 +81,7 @@ export const sessionMachine = createMachine({
  on: {
  INIT: {
  target: 'loading',
- actions: assign(({ context, event }) => {
+ actions: assign(({ context: event }) => {
  if (event.pageData?.user && event.pageData?.session) {
  // Primary: Use SvelteKit page data
  persistSession(event.pageData.user, event.pageData.session);

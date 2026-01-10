@@ -106,7 +106,7 @@ function setupRedisSubscriptions() {
  if (!io || pubSub) return;
  pubSub = createPubSubHelper(redisPrimary, {
  patterns: ['progress:*', 'result:*', 'error:*'],
- onMessage: ({ channel, message }: { channel: unknown; message: any }) => {
+ onMessage: ({ channel: message }: { channel: unknown; message: any }) => {
  metrics.pubsubMessages++;
  metrics.lastMessageAt = new Date().toISOString();
  try {
@@ -266,8 +266,7 @@ export const GET: RequestHandler = async ({ url: _url }) => {
  'Document collaboration',
  'Search result streaming',
  ],
- }),
- { headers: { 'Content-Type': 'application/json' } }
+ }) => { headers: { 'Content-Type': 'application/json' } }
  );
 };
 

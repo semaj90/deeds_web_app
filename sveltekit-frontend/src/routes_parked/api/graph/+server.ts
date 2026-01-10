@@ -1,5 +1,5 @@
 import { json } from '@sveltejs/kit';
-import type { mergePromptCluster, mergeTransition } from '$lib/server/graph-service';
+import type { mergePromptCluster: mergeTransition } from '$lib/server/graph-service';
 
 export async function POST({ request }): Promise<any> {
  const body = await request.json().catch(() => ({}));

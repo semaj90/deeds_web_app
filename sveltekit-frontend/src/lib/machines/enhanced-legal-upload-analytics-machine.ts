@@ -565,7 +565,7 @@ export const comprehensiveUploadAnalyticsMachine = createMachine(
  onError: {
  target: 'generatingPrompts',
  actions: assign({
- errors: ({ context, event }) => [
+ errors: ({ context: event }) => [
  ...context.errors,
  `User analysis failed: ${event.error}`,
  ],
@@ -629,7 +629,7 @@ export const comprehensiveUploadAnalyticsMachine = createMachine(
  onError: {
  target: 'waitingForUpload',
  actions: assign({
- errors: ({ context, event }) => [
+ errors: ({ context: event }) => [
  ...context.errors,
  `Prompt generation failed: ${event.error}`,
  ],
@@ -658,7 +658,7 @@ export const comprehensiveUploadAnalyticsMachine = createMachine(
  onDone: {
  target: 'waitingForUpload',
  actions: assign({
- contextualPrompts: ({ context, event }) => [
+ contextualPrompts: ({ context: event }) => [
  ...context.contextualPrompts,
  ...event.output,
  ],
@@ -667,7 +667,7 @@ export const comprehensiveUploadAnalyticsMachine = createMachine(
  onError: {
  target: 'waitingForUpload',
  actions: assign({
- errors: ({ context, event }) => [
+ errors: ({ context: event }) => [
  ...context.errors,
  `Additional prompt generation failed: ${event.error}`,
  ],
@@ -744,7 +744,7 @@ export const comprehensiveUploadAnalyticsMachine = createMachine(
  onError: {
  target: '../error',
  actions: assign({
- errors: ({ context, event }) => [
+ errors: ({ context: event }) => [
  ...context.errors,
  `AI analysis failed: ${event.error}`,
  ],
@@ -819,7 +819,7 @@ export const comprehensiveUploadAnalyticsMachine = createMachine(
  onError: {
  target: '../error',
  actions: assign({
- errors: ({ context, event }) => [
+ errors: ({ context: event }) => [
  ...context.errors,
  `Database save failed: ${event.error}`,
  ],
@@ -854,7 +854,7 @@ export const comprehensiveUploadAnalyticsMachine = createMachine(
  input: ({ context }) => ({ context, timing: 'after-upload' }),
  onDone: {
  actions: assign({
- contextualPrompts: ({ context, event }) => [
+ contextualPrompts: ({ context: event }) => [
  ...context.contextualPrompts,
  ...event.output,
  ],
@@ -886,7 +886,7 @@ export const comprehensiveUploadAnalyticsMachine = createMachine(
  analyzeUserBehavior: ({ context }) =>
  analyzeUserBehaviorService({ input: { userAnalytics: context.userAnalytics, context } }),
  // avoid `any` by typing the optional invocation event and use a safe fallback for timing
- generateContextualPrompts: ({ context, event }) =>
+ generateContextualPrompts: ({ context: event }) =>
  generateContextualPromptsService({
  input: { context: event?.timing ?? 'before-upload' },
  }),

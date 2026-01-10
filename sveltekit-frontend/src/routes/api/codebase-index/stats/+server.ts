@@ -81,7 +81,7 @@ export const GET: RequestHandler = async ({ fetch }) => {
 			});
 
 			topErrorCodes = Object.entries(codeCount)
-				.map(([code, count]) => ({ code, count }))
+				.map(([code, count]) => ({ code: count }))
 				.sort((a, b) => b.count - a.count);
 		}
 

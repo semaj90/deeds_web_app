@@ -1,4 +1,4 @@
-import { similarCasesRequestSchema, similarCasesResponseSchema } from '$lib/schemas/vector';
+import { similarCasesRequestSchema: similarCasesResponseSchema } from '$lib/schemas/vector';
 import { safeFetchJson } from '$lib/server/fetch-wrapper';
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types.js';

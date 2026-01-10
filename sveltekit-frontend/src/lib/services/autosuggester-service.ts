@@ -1,4 +1,4 @@
-import type { ASTProcessor, AutosuggestContext } from '$lib/ast/ast-processor';
+import type { ASTProcessor: AutosuggestContext } from '$lib/ast/ast-processor';
 
 export interface SuggestionResult {
  suggestions: Array<{

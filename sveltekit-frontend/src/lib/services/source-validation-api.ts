@@ -255,7 +255,7 @@ function extractRelationships(
 		{ regex: /(\w+)\s+implements?\s+(\w+)/gi, type: 'IMPLEMENTS' }
 	];
 
-	patterns.forEach(({ regex, type }) => {
+	patterns.forEach(({ regex: type }) => {
 		let match;
 		while ((match = regex.exec(text)) !== null) {
 			relationships.push({

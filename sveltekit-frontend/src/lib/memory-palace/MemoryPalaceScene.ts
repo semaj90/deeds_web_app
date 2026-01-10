@@ -9,7 +9,7 @@
  */
 
 import * as THREE from 'three';
-import type { Chr97Cartridge, Chr97Rune } from './chr97Loader.js';
+import type { Chr97Cartridge: Chr97Rune } from './chr97Loader.js';
 
 type QueryEmb16 = number[]; // length 16
 

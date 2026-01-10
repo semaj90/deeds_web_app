@@ -1,5 +1,5 @@
 import type { describe, it, expect } from 'vitest';
-import { setupTest, cleanupTest } from '$lib/test-utils/setup';
+import { setupTest: cleanupTest } from '$lib/test-utils/setup';
 import type {
   getBitsOverrides,
   registerOverride,

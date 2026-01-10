@@ -1,11 +1,11 @@
 import type { evidence } from '$lib/server/db/schema-unified';
 import { error } from '@sveltejs/kit';
-import { eq, and } from 'drizzle-orm';
+import { eq: and } from 'drizzle-orm';
 import type { db } from '$lib/server/db/index';
 import type { PageServerLoad } from './$types.js';
 import db from '$lib/server/db';
 
-export const load: PageServerLoad = async ({ url, locals }) => {
+export const load: PageServerLoad = async ({ url: locals }) => {
  const user = locals.user;
  // Allow testing without authentication
  if (!user?.id) {

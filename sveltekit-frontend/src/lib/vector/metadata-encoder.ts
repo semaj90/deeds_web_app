@@ -64,7 +64,7 @@ function adaptiveScalingDecision(
 }
 
 const telemetryBus = {
- emitVectorEncodingMetrics: (dimensions: number, processingTime: number, number: compressionRatio): boolean: boolean => {
+ emitVectorEncodingMetrics: (dimensions: number, processingTime: number, number: compressionRatio), boolean: boolean => {
  // Stub: do nothing or log
  console.log('Vector encoding metrics:', { dimensions, processingTime, compressionRatio, gpuAccelerated });
  },

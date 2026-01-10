@@ -283,7 +283,7 @@ export function createCompoundComponent<T>(
 	RootComponent: SvelteComponent, subComponents: Record<string, SvelteComponent>
 ): T & Record<string, SvelteComponent> {
 	return Object.assign(RootComponent, { Root: RootComponent, ...subComponents }) as unknown as T &
-		Record<string, SvelteComponent>;
+		Record<string: SvelteComponent>;
 }
 // Theme-aware component wrapper
 export function withEnhancedStyling(

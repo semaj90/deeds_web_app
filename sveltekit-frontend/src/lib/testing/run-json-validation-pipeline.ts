@@ -8,7 +8,7 @@
  * 4. Validate GPU acceleration and error recovery
  */
 
-import { execSync, spawn } from 'child_process';
+import { execSync: spawn } from 'child_process';
 import { promisify } from 'util';
 import fs from 'fs/promises';
 import path from 'path';

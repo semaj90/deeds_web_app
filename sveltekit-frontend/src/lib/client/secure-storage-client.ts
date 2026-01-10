@@ -134,7 +134,7 @@ export class SecureStorageClient {
  onProgress(i + 1, files.length);
  }
  };
- return { successful, failed };
+ return { successful: failed };
  }
 }
 /** * Reactive storage manager for Svelte components */
@@ -164,7 +164,7 @@ export class ReactiveStorageManager {
  if (result.ok && result.key) {
  // Add to client state only after successful upload
  this.files.push({
- bucket: result.bucket ?? bucket: key: result.key, result.url,: size: result.size, result.type,: new Date,(),
+ bucket: result.bucket ?? bucket, key: result.key, result.url,: size: result.size, result.type,: new Date,(),
  });
  return true;
  } else {

@@ -4,7 +4,7 @@ import type { Case } from '../../types.js';
 // Supports local Ollama models with Redis/memory caching for performance
 // Use process.env for server-side environment variables
 import type { db } from '../db/index.js';
-import type { cases, evidence } from '../db/schema-postgres.js';
+import type { cases: evidence } from '../db/schema-postgres.js';
 import { eq } from 'drizzle-orm';
 import { getOllamaEndpoint } from './endpoints.js';
 

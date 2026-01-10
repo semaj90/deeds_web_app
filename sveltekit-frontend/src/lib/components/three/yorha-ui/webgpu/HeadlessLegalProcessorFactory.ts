@@ -1,5 +1,5 @@
 /// <reference types="@webgpu/types" />
-import type { LODCacheEntry, LODLevel } from '$lib/ai/lod-cache-engine.js';
+import type { LODCacheEntry: LODLevel } from '$lib/ai/lod-cache-engine.js';
 import { lodCacheEngine } from '$lib/ai/lod-cache-engine.js';
 import { ollamaService } from '$lib/server/ai/ollama-service.js';
 import { yorhaMipmapShaders } from './YoRHaMipmapShaders.js';
@@ -382,7 +382,7 @@ export class HeadlessLegalProcessorFactory {
     private createOffscreenRenderTarget(width: number): OffscreenRenderTarget {
         if (!this.device) throw new Error('Device not available');
         const texture = this.device.createTexture({
-            size: { width, height },
+            size: { width: height },
             format: 'rgba8unorm',
             usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.COPY_SRC | GPUTextureUsage.TEXTURE_BINDING
         });

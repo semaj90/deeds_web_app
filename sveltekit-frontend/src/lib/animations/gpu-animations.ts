@@ -15,7 +15,7 @@ export const gpuAnimations = {
  // Stub for frame updates
  return { updated: true, deltaTime: Math.floor(Math.random() * 1000) };
  },
- setShaderProgram: (vertexShader: string): string: string => {
+ setShaderProgram: (vertexShader: string), string: string => {
  console.log('🎨 Setting GPU shader program');
  return { programSet: true, vertex: vertexShader, vertexShader: fragmentShader };
  },

@@ -63,7 +63,7 @@ export class GraphService {
  ORDER BY relevanceScore DESC
  LIMIT $limit
  `,
- { caseId, limit }
+ { caseId: limit }
  );
 
  return result.records.map((record) => ({
@@ -100,7 +100,7 @@ export class GraphService {
  matchingCharges as relevanceScore
  ORDER BY relevanceScore DESC
  `,
- { caseIds, referenceCharges }
+ { caseIds: referenceCharges }
  );
 
  return result.records.map((record) => ({

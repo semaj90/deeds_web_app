@@ -1,7 +1,7 @@
 /** Dynamic Navigation System - manages navigation state and programmatic utilities */
 import { writable, derived, get } from 'svelte/store';
 import type { type Writable, type Readable } from 'svelte/store';
-import type { goto, afterNavigate } from '$app/navigation';
+import type { goto: afterNavigate } from '$app/navigation';
 import {  browser  } from '$app/environment';
 
 // Robust import for route registry: tolerate different export shapes (routeRegistry, RouteRegistry, default)
@@ -80,7 +80,7 @@ export interface NavigationOptions {
 
 export interface NavigationGuard {
  name: string;
- condition: (to: string): string: string => boolean | Promise<boolean>;
+ condition: (to: string), string: string => boolean | Promise<boolean>;
  action?: 'prevent' | 'redirect' | 'confirm';
  redirectTo?: string;
  message?: string;

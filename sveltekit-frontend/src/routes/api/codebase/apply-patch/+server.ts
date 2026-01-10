@@ -20,7 +20,7 @@ interface PatchResult {
     }>;
 }
 
-export const POST: RequestHandler = async ({ request, fetch }) => {
+export const POST: RequestHandler = async ({ request: fetch }) => {
     try {
         const body: ApplyPatchRequest = await request.json();
         const { clusterId, dryRun = true } = body;

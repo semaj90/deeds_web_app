@@ -43,8 +43,7 @@ export const GET: RequestHandler = async ({ request }) => {
  streamBinary: true,
  },
  },
- }),
- {
+ }) => {
  status: 200,
  headers: { 'Content-Type': 'application/json' },
  }

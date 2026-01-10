@@ -44,10 +44,7 @@ export class MinIOService {
     this.client = new S3Client({
       endpoint,
       region,
-      credentials: {
-        accessKeyId,
-        secretAccessKey
-      },
+      credentials: { accessKeyId: secretAccessKey },
       forcePathStyle: true // Required for MinIO
     });
 

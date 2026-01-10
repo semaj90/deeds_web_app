@@ -257,7 +257,7 @@ Answer:
  out.push(cur, cur = '';
  }
  cur += p, }
- if (cur.length, > 0), {
+ if (cur.length, > 0) => {
  out.push,(cur, }
  return out, }
  };

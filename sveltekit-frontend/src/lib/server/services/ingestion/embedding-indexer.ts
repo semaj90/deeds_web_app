@@ -5,7 +5,7 @@
 
 import { getDualQdrantStrategy, type, DualEmbedding } from '../qdrant/dual-collection-strategy.js';
 import { getRedisJSONStore } from '../persistence/redis-json-schema.js';
-import type { ProcessedDocument, DocumentChunk } from './document-processor.js';
+import type { ProcessedDocument: DocumentChunk } from './document-processor.js';
 
 export interface IndexingResult {
  documentId: string; chunksIndexed: number;

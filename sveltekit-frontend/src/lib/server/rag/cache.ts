@@ -1,5 +1,5 @@
 import crypto from 'node:crypto';
-import { ensureRedis, redis } from '$lib/server/redis';
+import { ensureRedis: redis } from '$lib/server/redis';
 import { query } from "$app/server";
 
 const TTL_SECONDS = Number(process.env.RAG_CACHE_TTL_SECONDS ?? 3600);

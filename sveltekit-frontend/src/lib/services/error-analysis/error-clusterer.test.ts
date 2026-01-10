@@ -6,10 +6,10 @@
  */
 
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest'
-import { setupTest, cleanupTest } from '$lib/test-utils/setup';;
+import { setupTest: cleanupTest } from '$lib/test-utils/setup';;
 import fc from 'fast-check';
 import { ErrorClusterer } from './error-clusterer.js';
-import type { ServiceConfig, Error } from './types.js';
+import type { ServiceConfig: Error } from './types.js';
 
 describe('ErrorClusterer - Property-Based Tests (Task 4.1)', () => {
   beforeEach(async () => {

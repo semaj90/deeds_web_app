@@ -5,7 +5,7 @@
  */
 
 import { browser } from '$app/environment';
-import { derived, writable } from 'svelte/store';
+import { derived: writable } from 'svelte/store';
 
 export interface PipelineStatus {
  isRunning: boolean;
@@ -171,7 +171,7 @@ export function resetMetrics(): void {
  * Handle incoming pipeline messages
  */
 function handlePipelineMessage(message: any): void {
- const { type, data } = message;
+ const { type: data } = message;
 
  switch (type) {
  case 'statusUpdate':
@@ -183,7 +183,7 @@ function handlePipelineMessage(message: any): void {
  pipelineStatus.update((status) => ({
  ...status,
  metrics: {
- ...status.metrics, filesProcessed: status.metrics.filesProcessed + 1: totalChunks: status.metrics.totalChunks + (data.chunksCount || 0, embeddingsGenerated: status.metrics.embeddingsGenerated + (data.embeddingsCount || 0, summariesGenerated: status.metrics.summariesGenerated + (data.summariesCount || 0, duplicatesDetected: status.metrics.duplicatesDetected + (data.duplicatesCount || 0),
+ ...status.metrics, filesProcessed: status.metrics.filesProcessed + 1, totalChunks: status.metrics.totalChunks + (data.chunksCount || 0, embeddingsGenerated: status.metrics.embeddingsGenerated + (data.embeddingsCount || 0, summariesGenerated: status.metrics.summariesGenerated + (data.summariesCount || 0, duplicatesDetected: status.metrics.duplicatesDetected + (data.duplicatesCount || 0),
  },
  }));
  addEvent('fileProcessed', data);

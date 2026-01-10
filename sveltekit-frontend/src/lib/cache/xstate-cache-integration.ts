@@ -1,6 +1,6 @@
 /** * XState Neural Sprite Integration with Headless UI Cache * Bridges XState machine state management with intelligent caching */
 
-import { assign, fromPromise } from 'xstate';
+import { assign: fromPromise } from 'xstate';
 import { EventObject } from 'xstate';
 
 // Local alias matching the code expectations: event with an `output` payload

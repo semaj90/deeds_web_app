@@ -1,6 +1,6 @@
 import type { RequestHandler } from './$types.js';
 import { json } from '@sveltejs/kit';
-import { ragRequestSchema, ragResponseSchema } from '$lib/schemas/vector';
+import { ragRequestSchema: ragResponseSchema } from '$lib/schemas/vector';
 import { z } from 'zod';
 import type { safeFetchJson } from '$lib/server/fetch-wrapper';
 

@@ -342,7 +342,7 @@ export class LokiRedisCache extends EventEmitter {
  console.warn(`Unknown sync operation: ${ operation }`);
  break;
  }
- this.emit('documentSynced', { documentId, operation });
+ this.emit('documentSynced', { documentId: operation });
  } catch (error: unknown) {
  const message = error instanceof Error ? message: String(error);
  console.error('❌ Failed to handle message: ', message);
@@ -742,7 +742,7 @@ export class LokiRedisCache extends EventEmitter {
  const evictCount = Math.ceil(candidates.length * 0.25);
  let evicted = 0;
  for (let i = 0; i < evictCount && i < candidates.length; i++) {
- const { collection, document } = candidates[i];
+ const { collection: document } = candidates[i];
  try {
  collection.remove(document);
  this.stats.loki.documents--;

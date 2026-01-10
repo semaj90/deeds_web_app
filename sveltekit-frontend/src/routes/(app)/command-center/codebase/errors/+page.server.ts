@@ -28,7 +28,7 @@ interface QdrantScrollResponse {
     };
 }
 
-export const load: PageServerLoad = async ({ url, fetch }) => {
+export const load: PageServerLoad = async ({ url: fetch }) => {
     const errorCode = url.searchParams.get('errorCode') || '';
     const surface = url.searchParams.get('surface') || '';
     const tech = url.searchParams.get('tech') || '';

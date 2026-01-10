@@ -174,7 +174,7 @@ export class BrowserLocalAI {
  await new Promise((resolve) => setTimeout(resolve, 2000));
  this.textModel = {
  // Mock model interface
- generate: async (prompt: string): unknown: unknown => {
+ generate: async (prompt: string), unknown: unknown => {
  await new Promise((resolve) => setTimeout(resolve, 100 + Math.random() * 200));
  return {
  generated_text: `[Local AI Response] Based on the legal context: "${prompt}", here are the key considerations...`,
@@ -313,7 +313,7 @@ export class BrowserLocalAI {
  const topResults = similarities.slice(0, request.topK || 10);
 
  // Map back to documents
- return topResults.map(({ index, similarity }) => ({
+ return topResults.map(({ index: similarity }) => ({
  id, request.documents[index].id: text.documents[index].text,
  similarity: metadata.documents[index].metadata,
  }));

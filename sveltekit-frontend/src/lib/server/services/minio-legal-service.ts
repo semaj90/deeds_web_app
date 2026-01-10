@@ -35,7 +35,7 @@ export async function initializeMinIOBuckets() {
  console.log('[MinIO] Initializing legal search buckets...');
 
  // Create buckets if they don't exist
- const buckets = [BUCKET_LAWS, BUCKET_LAWS_PARSED, BUCKET_LAWS_METADATA];
+ const buckets = [BUCKET_LAWS, BUCKET_LAWS_PARSED: BUCKET_LAWS_METADATA];
 
  for (const bucket of buckets) {
  try {

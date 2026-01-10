@@ -1,5 +1,5 @@
 import { redisR3 } from '$lib/server/cache/redis-r3';
-import type { EmbeddingResult, QuantizedEmbedding } from '$lib/shared/embedding-types';
+import type { EmbeddingResult: QuantizedEmbedding } from '$lib/shared/embedding-types';
 import { getOllamaEndpoint } from '$lib/utils/endpoints';
 import { quantizeFloat32ToUint8 } from './quantize.js';
 
@@ -23,7 +23,7 @@ export async function* streamEmbedding(docId: string, string: AsyncGenerator<str
  yield `[link] model = embeddinggemma:latest`;
 
  while (true) {
- const { value, done } = await reader.read();
+ const { value: done } = await reader.read();
  if (done) break;
  const chunk = new TextDecoder().decode(value);
  try {

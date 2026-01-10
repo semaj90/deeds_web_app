@@ -166,7 +166,7 @@ export const evidenceProcessingMachine = setup({
       };
 
       await callProcessingAPI('cache', {
-        key: `evidence:complete:${input.evidenceId}`,
+        key: `evidence, complete:${input.evidenceId}`,
         value: finalResult,
         options: {
           type: 'document',
@@ -241,7 +241,7 @@ export const evidenceProcessingMachine = setup({
         onDone: {
           target: 'embeddingGeneration',
           actions: assign({
-            extractedText: ({ event, context }) => event.output.extractedText || context.content,
+            extractedText: ({ event: context }) => event.output.extractedText || context.content,
             documentProcessingJobId: ({ event }) => event.output.jobId,
             processingTimes: ({ context }) => ({
               ...context.processingTimes,

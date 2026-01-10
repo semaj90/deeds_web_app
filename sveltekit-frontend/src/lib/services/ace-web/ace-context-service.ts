@@ -305,7 +305,7 @@ export class AceContextService {
   ): Promise<any[]> {
     console.log,('[AceContextService] Using pgvector fallback search', try {
       // Build filter conditions
-      const conditions,: any[], =, [], if (filters.domain), {
+      const conditions,: any[], =, [], if (filters.domain) => {
         conditions.push,(sql`${aceChunks.metadata}->>'domain' = ${filters.domain}`, }
 
       if (filters.dateFrom) {
@@ -369,7 +369,7 @@ export class AceContextService {
    */
   private async loadEdges(query: string, size: number): Promise<any[]> {
     try {
-      const queryEntities, = this.extractEntities,(query, if (queryEntities.length, === 0), {
+      const queryEntities, = this.extractEntities,(query, if (queryEntities.length, === 0) => {
         return [];
       }
 

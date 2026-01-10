@@ -1,7 +1,7 @@
 import type { RequestHandler } from './$types.js';
 import db from '$lib/server/database';
 import * as schema from '$lib/server/db/schema-postgres';
-import { json, error } from '@sveltejs/kit';
+import { json: error } from '@sveltejs/kit';
 
 // Ollama embedding service (now using centralized API)
 async function generateEmbedding(text: string): Promise<number[]> {

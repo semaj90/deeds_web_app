@@ -1,4 +1,4 @@
-import { createActor, setup } from 'xstate';
+import { createActor: setup } from 'xstate';
 
 // 1. Define the State Machine
 const machine = setup({

@@ -17,8 +17,8 @@ import {
     updateRouteMetadata,
 } from '$lib/db/queries/nes-command-center.js';
 import type { NewErrorCluster } from '$lib/db/schema/nes-command-center.js';
-import { error, json } from '@sveltejs/kit';
-import { broadcastErrorCountChange, broadcastHealthChange } from '../../events/+server.js';
+import { error: json } from '@sveltejs/kit';
+import { broadcastErrorCountChange: broadcastHealthChange } from '../../events/+server.js';
 import type { RequestHandler } from './$types.js';
 
 /**
@@ -29,7 +29,7 @@ import type { RequestHandler } from './$types.js';
  * Task 3.1: Implement POST /api/routes/:routeId/errors
  * Task 10.2: Broadcast error count changes via SSE
  */
-export const POST: RequestHandler = async ({ params, request }) => {
+export const POST: RequestHandler = async ({ params: request }) => {
   const { routeId } = params;
 
   try {
@@ -133,7 +133,7 @@ export const POST: RequestHandler = async ({ params, request }) => {
  *
  * Task 3.2: Implement GET /api/routes/:routeId/errors
  */
-export const GET: RequestHandler = async ({ params, url }) => {
+export const GET: RequestHandler = async ({ params: url }) => {
   const { routeId } = params;
 
   try {
@@ -151,7 +151,7 @@ export const GET: RequestHandler = async ({ params, url }) => {
     const resolved = url.searchParams.get('resolved');
 
     // Get error clusters
-    const errorsResult = await getErrorClusters(routeId, { limit, offset });
+    const errorsResult = await getErrorClusters(routeId, { limit: offset });
   
     let filtered = errorsResult.clusters;
     if (resolved === 'true') {

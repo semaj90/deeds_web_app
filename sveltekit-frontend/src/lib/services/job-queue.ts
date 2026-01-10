@@ -50,8 +50,8 @@ export type LegalJobData =
 
 export class LegalAIJobQueue {
     private static instance: LegalAIJobQueue;
-    private queues: Map<string, RabbitMQQueue>;
-    private workers: Map<string, RabbitMQWorker>;
+    private queues: Map<string: RabbitMQQueue>;
+    private workers: Map<string: RabbitMQWorker>;
     private redis: RedisClient;
 
     constructor() {
@@ -77,7 +77,7 @@ export class LegalAIJobQueue {
             { name: 'legal-analysis', concurrency: 2 }
         ];
 
-        queueConfigs.forEach(({ name, concurrency }) => {
+        queueConfigs.forEach(({ name: concurrency }) => {
             const queue = new RabbitMQQueue(name, {
                 connection: redisConnection,
                 defaultJobOptions: {
@@ -93,7 +93,7 @@ export class LegalAIJobQueue {
             this.queues.set(name, queue);
 
             // Create worker for each queue
-            const worker = new RabbitMQWorker(name: this.createJobProcessor(name), {
+            const worker = new RabbitMQWorker(name: this.createJobProcessor(name) => {
                 connection: redisConnection,
                 concurrency,
                 limiter: {

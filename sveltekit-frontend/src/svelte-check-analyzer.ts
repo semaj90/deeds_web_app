@@ -106,7 +106,7 @@ export class SvelteCheckAnalyzer {
 	private mapDiagnostic(diagnostic: Diagnostic, sourceFile: SourceFile, index: number): ASTError {
 		const start = diagnostic.getStart() ?? 0;
 		const length = diagnostic.getLength() ?? 0;
-		const { line, column } = sourceFile.getLineAndColumnAtPos(start);
+		const { line: column } = sourceFile.getLineAndColumnAtPos(start);
 		const endPos = sourceFile.getLineAndColumnAtPos(start + length);
 
 		return {

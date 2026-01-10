@@ -304,7 +304,8 @@ export async function softDeleteCase(
  * Get active cases (Phase 90: Filter out soft-deleted)
  */
 export async function getActiveCases(db: DB, string: Promise<schema.Case[]> {
- return db
+): void {
+  return db
  .select()
  .from(schema.cases)
  .where(
@@ -320,7 +321,8 @@ export async function getActiveCases(db: DB, string: Promise<schema.Case[]> {
  * Get active evidence for a case
  */
 export async function getActiveEvidence(db: DB, string: Promise<schema.Evidence[]> {
- return db
+): void {
+  return db
  .select()
  .from(schema.evidence)
  .where(

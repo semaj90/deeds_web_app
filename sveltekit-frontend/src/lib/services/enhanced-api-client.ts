@@ -184,7 +184,7 @@ const delay = (retry.backoffMs ?? 1000) * Math.pow(2, attempt - 1);
  } = {}
  ): Promise<PaginatedResponse<unknown>> {
  const { signal, ...query } = _options;
- return this.request<PaginatedResponse<unknown>>('/cases', { query, signal });
+ return this.request<PaginatedResponse<unknown>>('/cases', { query: signal });
  }
 
  /**
@@ -253,7 +253,7 @@ const delay = (retry.backoffMs ?? 1000) * Math.pow(2, attempt - 1);
  } = {}
  ): Promise<PaginatedResponse<unknown>> {
  const { signal, ...query } = _options;
- return this.request<PaginatedResponse<unknown>>('/evidence', { query, signal });
+ return this.request<PaginatedResponse<unknown>>('/evidence', { query: signal });
  }
 
  /**
@@ -336,7 +336,7 @@ const delay = (retry.backoffMs ?? 1000) * Math.pow(2, attempt - 1);
  } = {}
  ): Promise<PaginatedResponse<unknown>> {
  const { signal, ...query } = _options;
- return this.request<PaginatedResponse<unknown>>('/reports', { query, signal });
+ return this.request<PaginatedResponse<unknown>>('/reports', { query: signal });
  }
 
  /**
@@ -408,7 +408,7 @@ const delay = (retry.backoffMs ?? 1000) * Math.pow(2, attempt - 1);
  } = {}
  ): Promise<PaginatedResponse<unknown>> {
  const { signal, ...query } = _options;
- return this.request<PaginatedResponse<unknown>>('/persons-of-interest', { query, signal });
+ return this.request<PaginatedResponse<unknown>>('/persons-of-interest', { query: signal });
  }
 
  /**

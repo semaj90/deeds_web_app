@@ -142,12 +142,12 @@ export class EvidenceFastAPIBridge {
 /**
  * API endpoint to trigger evidence processing
  */
-export const POST: RequestHandler = async ({ params, request }) => {
+export const POST: RequestHandler = async ({ params: request }) => {
  try {
  const { evidenceId } = await request.json();
 
  if (!evidenceId) {
- return new Response(JSON.stringify({ error: 'Missing evidenceId' }), {
+ return new Response(JSON.stringify({ error: 'Missing evidenceId' }) => {
  status: 400,
  headers: { 'Content-Type': 'application/json' },
  });
@@ -155,13 +155,13 @@ export const POST: RequestHandler = async ({ params, request }) => {
 
  const result = await EvidenceFastAPIBridge.processEvidence(evidenceId);
 
- return new Response(JSON.stringify(result), {
+ return new Response(JSON.stringify(result) => {
  status: 200,
  headers: { 'Content-Type': 'application/json' },
  });
  } catch (error) {
  console.error('Evidence processing API error:', error);
- return new Response(JSON.stringify({ error: error.message }), {
+ return new Response(JSON.stringify({ error: error.message }) => {
  status: 500,
  headers: { 'Content-Type': 'application/json' },
  });
@@ -177,7 +177,7 @@ export const GET: RequestHandler = async ({ url }) => {
  const limit = parseInt(url.searchParams.get('limit') || '5');
 
  if (!query) {
- return new Response(JSON.stringify({ error: 'Missing query parameter "q"' }), {
+ return new Response(JSON.stringify({ error: 'Missing query parameter "q"' }) => {
  status: 400,
  headers: { 'Content-Type': 'application/json' },
  });
@@ -185,13 +185,13 @@ export const GET: RequestHandler = async ({ url }) => {
 
  const result = await EvidenceFastAPIBridge.searchEvidence(query, limit);
 
- return new Response(JSON.stringify(result), {
+ return new Response(JSON.stringify(result) => {
  status: 200,
  headers: { 'Content-Type': 'application/json' },
  });
  } catch (error) {
  console.error('Evidence search API error:', error);
- return new Response(JSON.stringify({ error: error.message }), {
+ return new Response(JSON.stringify({ error: error.message }) => {
  status: 500,
  headers: { 'Content-Type': 'application/json' },
  });

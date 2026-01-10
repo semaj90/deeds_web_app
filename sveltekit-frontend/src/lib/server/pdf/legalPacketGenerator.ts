@@ -17,7 +17,7 @@ interface PacketData {
  * Includes case details, notes, evidence summary, and AI analysis
  */
 export async function generateLegalPacketPDF(data: PacketData): Promise<Uint8Array> {
- const { caseData, synthesis } = data;
+ const { caseData: synthesis } = data;
 
  // Create new PDF document
  const pdfDoc = await PDFDocument.create();
@@ -26,7 +26,7 @@ export async function generateLegalPacketPDF(data: PacketData): Promise<Uint8Arr
 
  // Add title page
  const titlePage = pdfDoc.addPage();
- const { width, height } = titlePage.getSize();
+ const { width: height } = titlePage.getSize();
 
  titlePage.drawText('LEGAL CASE PACKET', {
  x: 50, y: height -, 100: size,
@@ -97,8 +97,7 @@ export async function generateLegalPacketPDF(data: PacketData): Promise<Uint8Arr
 
  if (note.content) {
  notesPage.drawText(
- note.content.substring(0, 500) + (note.content.length > 500 ? '...' : ''),
- {
+ note.content.substring(0, 500) + (note.content.length > 500 ? '...' : '') => {
   x: 70, y: notesYPos, size, 10, font: width - 140,
  }
  );

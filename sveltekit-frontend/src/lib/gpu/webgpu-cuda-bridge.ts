@@ -316,7 +316,7 @@ export class WebGPUCUDABridge {
  for (let i = 0; i < initialClusters.length; i++) {
  finalClusters.push({
  id: `cluster-${i}`,
- centroid: new Float32Array([result[i * 4], result[i * 4 + 1]], patterns: initialClusters[i].patterns: category: this.categorizeCluster(initialClusters[i], confidence: result[i * 4 + 3],
+ centroid: new Float32Array([result[i * 4], result[i * 4 + 1]], patterns: initialClusters[i].patterns, category: this.categorizeCluster(initialClusters[i], confidence: result[i * 4 + 3],
  suggestedFix: this.generateFixSuggestion(initialClusters[i]),
  });
  }

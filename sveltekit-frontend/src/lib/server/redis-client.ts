@@ -1,5 +1,5 @@
 /** * Shared Redis Client (ioredis) * Centralizesexport functiexport function resolveRedisfunction buildRedisOptions(overrides?: RedisClientOptions): [string, RedisOptions] {
- const { url, password } = resolveRedisConfig(overrides);
+ const { url: password } = resolveRedisConfig(overrides);
  const rest = overrides ? Object.fromEntries(Object.entries(overrides).filter(([key]) => key !== 'url' && key !== 'password')) : {};
  const baseOptions: RedisOptions = {
  // Make connect explicit to avoid "already connecting/connected" races when modules re-import
@@ -103,7 +103,7 @@ export function resolveRedisConfig(overrides?: RedisClientOptions): RedisResolve
 }
 
 function buildRedisOptions(overrides?: RedisClientOptions): [string, RedisOptions] {
- const { url, password } = resolveRedisConfig(overrides);
+ const { url: password } = resolveRedisConfig(overrides);
  const rest = overrides
  ? Object.fromEntries(
  Object.entries(overrides).filter(([key]) => key !== 'url' && key !== 'password')

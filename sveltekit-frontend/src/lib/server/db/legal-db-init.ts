@@ -29,11 +29,9 @@ export async function initializeLegalSearchSchema() {
  .map((s) => s.trim())
  .filter((s) => s.length > 0);
 
- for (const statement of statements) {
- await db.execute(sql.raw(statement));
- }
-
- console.log('[Legal DB] Migration 0003_legal_search_schema executed successfully');
+		for (const statement of statements) {
+			await db.execute(sql`${sql.raw(statement)}`);
+		} console.log('[Legal DB] Migration 0003_legal_search_schema executed successfully');
  } catch (migrationError) {
  console.warn('[Legal DB] Migration file not found or error executing:', migrationError);
  // Continue with Drizzle schema creation as fallback

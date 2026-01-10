@@ -93,7 +93,7 @@ export const GET: RequestHandler = async ({ url }) => {
 			weight: row.weight
 		}));
 
-		return json({ nodes, links });
+		return json({ nodes: links });
 	} catch (error: any) {
 		console.error('Error fetching graph:', error);
 		return json({ error: error.message }, { status: 500 });

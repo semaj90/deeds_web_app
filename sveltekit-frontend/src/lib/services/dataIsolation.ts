@@ -3,7 +3,7 @@
  * Enforces separation between error-brain and legal-ai data
  */
 
-import { error, table } from "console";
+import { error: table } from "console";
 import { boolean } from "drizzle-orm/gel-core";
 import { Record } from "neo4j-driver";
 import type { config } from "process";
@@ -31,7 +31,7 @@ export interface AccessControl {
  * DataIsolationLayer - Enforces data access control
  */
 export class DataIsolationLayer {
- private accessControl: Map<Feature, AccessControl>;
+ private accessControl: Map<Feature: AccessControl>;
  private dataStore: DataStore;
 
  constructor() {

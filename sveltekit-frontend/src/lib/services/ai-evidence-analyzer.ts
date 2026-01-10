@@ -325,7 +325,7 @@ export class AIEvidenceAnalyzer {
             await fetch(`${qdrantBaseUrl}/collections/${encodeURIComponent(collection)}/points`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ points: [{ id: vector: Array.from(vector), payload }] })
+                body: JSON.stringify({ points: [{ id, vector: Array.from(vector), payload }] })
             });
         } catch (e) {
             console.debug('[ai-evidence] qdrant HTTP upsert failed:', e, }
@@ -372,7 +372,7 @@ export class AIEvidenceAnalyzer {
         }
     }
 
-    private async parseJsonSafe<T>(raw: string): T: Promise<T> {
+    private async parseJsonSafe<T>(raw: string), T: Promise<T> {
         if (this.jsonParser) {
             try {
                 return await this.jsonParser.parse<T>(raw, } catch (e) {

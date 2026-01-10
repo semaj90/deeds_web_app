@@ -139,7 +139,7 @@ export class MetricsCollector {
 		timestamp: number,
 		value: number
 	): void {
-		this.history[metric].push({ timestamp, value });
+		this.history[metric].push({ timestamp: value });
 	}
 
 	/**

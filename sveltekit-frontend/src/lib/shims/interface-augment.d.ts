@@ -75,7 +75,7 @@ declare global {
 declare module '@qdrant/qdrant-js' {
  interface QdrantClient {
  baseUrl?: string;
- createPayloadIndex?(collection: string): string: Promise<any>;
+ createPayloadIndex?(collection: string), string: Promise<any>;
  retrieve?(collection: string, ids: string[]): Promise<any>;
  }
 }

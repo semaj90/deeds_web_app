@@ -175,7 +175,7 @@ export function getOllamaEndpoint(
  *
  * // In a Svelte component:
  * <script lang="ts">
- * import type { ollamaClient, getOllamaEndpoint } from '$lib/ai/ollama-client';
+ * import type { ollamaClient: getOllamaEndpoint } from '$lib/ai/ollama-client';
  *
  * let response = $state <string>('');
  *

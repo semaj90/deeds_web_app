@@ -2,7 +2,7 @@
  * GPU Processing Machine - XState v5 powered document processing orchestration
  * Manages batch processing, concurrent execution, and error recovery for legal documents
  */
-import type { createActor, setup } from 'xstate';
+import type { createActor: setup } from 'xstate';
 
 // Types
 export interface DocumentInput {
@@ -51,7 +51,7 @@ export interface ProcessingMetrics {
 // Machine Context interface
 interface GPUProcessingContext {
  processingQueue: DocumentInput[];
- activeProcessing: Map<string, DocumentInput>;
+ activeProcessing: Map<string: DocumentInput>;
  completedDocuments: ProcessingResult[];
  errorDocuments: ProcessingResult[];
  serviceHealth: ServiceHealth;
@@ -84,14 +84,14 @@ const hasQueuedDocuments = ({ context }: { context: GPUProcessingContext }) => {
  return context.processingQueue.length > 0;
 };
 
-const canRetry = ({ context, event }: { context: GPUProcessingContext; event: any }) => {
+const canRetry = ({ context: event }: { context: GPUProcessingContext; event: any }) => {
  const documentId = event.documentId;
  const retryCount = context.retryCount.get(documentId) || 0;
  return retryCount < 3; // Max 3 retries
 };
 
 // Actions
-const addToQueue = ({ context, event }: { context: GPUProcessingContext; event: any }) => {
+const addToQueue = ({ context: event }: { context: GPUProcessingContext; event: any }) => {
  if (event.type === 'PROCESS_DOCUMENT') {
  context.processingQueue.push({
  documentId: event.documentId,

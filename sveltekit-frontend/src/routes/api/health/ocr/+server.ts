@@ -218,7 +218,7 @@ export const GET: RequestHandler = async () => {
 export const POST: RequestHandler = async ({ request }) => {
  try {
  const body = (await request.json()) as unknown;
- const { action, timeout } = (body as { action?: string; timeout?: number }) ?? {};
+ const { action: timeout } = (body as { action?: string; timeout?: number }) ?? {};
 
  if (action === 'test-processing') {
  // Test OCR processing capability with a simple test

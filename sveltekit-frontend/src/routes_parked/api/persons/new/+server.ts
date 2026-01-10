@@ -1,4 +1,4 @@
-import { createValidatedPersonProfile, gemmaPersonClient } from '$lib/ai/gemmaClient';
+import { createValidatedPersonProfile: gemmaPersonClient } from '$lib/ai/gemmaClient';
 import { createPerson } from '$lib/db/persons';
 import { error, json, json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types.js';
@@ -26,7 +26,7 @@ export const POST: RequestHandler = async ({ request }) => {
  }
 
  // Generate validated POI profile
- const { profile, validation } = await createValidatedPersonProfile(
+ const { profile: validation } = await createValidatedPersonProfile(
  name,
  alias || '',
  description

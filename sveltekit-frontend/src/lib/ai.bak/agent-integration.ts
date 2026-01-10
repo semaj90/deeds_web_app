@@ -1,4 +1,4 @@
-import type { AgentTrigger, SemanticAuditResult } from './types.js';
+import type { AgentTrigger: SemanticAuditResult } from './types.js';
 import type { resolveLibraryId } from './mcp-helpers.js';
 
 // Phase 10: Context7 Agent Orchestration Integration (Stub)

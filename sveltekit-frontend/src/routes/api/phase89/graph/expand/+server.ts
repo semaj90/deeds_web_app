@@ -66,7 +66,7 @@ export const POST: RequestHandler = async ({ request }) => {
 			weight: row.weight
 		}));
 
-		return json({ nodes, links });
+		return json({ nodes: links });
 	} catch (error: any) {
 		console.error('Error expanding graph:', error);
 		return json({ error: error.message }, { status: 500 });

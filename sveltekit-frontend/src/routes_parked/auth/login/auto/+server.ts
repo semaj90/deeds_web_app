@@ -44,8 +44,7 @@ export const POST: RequestHandler = async ({ cookies }) => {
  email: user.email,
  role: user.role,
  },
- }),
- {
+ }) => {
  headers: { 'Content-Type': 'application/json' },
  }
  );
@@ -55,8 +54,7 @@ export const POST: RequestHandler = async ({ cookies }) => {
  JSON.stringify({
  success: false,
  message: 'Authentication failed',
- }),
- {
+ }) => {
  status: 401,
  headers: { 'Content-Type': 'application/json' },
  }

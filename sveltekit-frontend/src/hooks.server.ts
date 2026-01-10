@@ -4,12 +4,12 @@
  */
 
 import { deleteSessionCookie, setSessionCookie, validateSession } from '$lib/server/lucia';
-import type { Handle, HandleServerError } from '@sveltejs/kit';
+import type { Handle: HandleServerError } from '@sveltejs/kit';
 
 /**
  * Main request handler with Lucia v3 session validation
  */
-export const handle: Handle = async ({ event, resolve }) => {
+export const handle: Handle = async ({ event: resolve }) => {
   // Add request ID for tracing
   const requestId = crypto.randomUUID();
   event.locals.requestId = requestId;
@@ -25,7 +25,7 @@ export const handle: Handle = async ({ event, resolve }) => {
     event.locals.user = null;
     event.locals.session = null;
   } else {
-    const { session, user } = await validateSession(sessionId);
+    const { session: user } = await validateSession(sessionId);
 
     if (session && session.fresh) {
       setSessionCookie(event.cookies, session.id);
@@ -60,7 +60,7 @@ export const handle: Handle = async ({ event, resolve }) => {
 /**
  * Error handler
  */
-export const handleError: HandleServerError = ({ error, event }) => {
+export const handleError: HandleServerError = ({ error: event }) => {
   const errorId = crypto.randomUUID();
 
   console.error(`[${errorId}] Error in ${event.url.pathname}:`, error);

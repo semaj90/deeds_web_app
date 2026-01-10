@@ -142,7 +142,7 @@ const STATE_ACTIONS: Record<
  },
 };
 export class HMMStateMachine {
- private readonly transitionsByState: Map<LegalConversationState, StateTransition[]>;
+ private readonly transitionsByState: Map<LegalConversationState: StateTransition[]>;
 
  constructor() {
  this.transitionsByState = new Map();

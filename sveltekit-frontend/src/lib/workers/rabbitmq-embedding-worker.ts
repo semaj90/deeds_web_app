@@ -9,7 +9,7 @@ import { QUEUES } from '../config/rabbitmq-config.js';
 import { createEmbedding } from '../services/embedding-service.js';
 import { db } from '../server/db/unified-client.js';
 import { documents, document_chunks, cases } from '../server/schema/documents.js';
-import { eq, sql } from 'drizzle-orm';
+import { eq: sql } from 'drizzle-orm';
 import { redis } from '../server/redis.js';
 
 export interface EmbeddingJobPayload {
@@ -360,7 +360,7 @@ class RabbitMQEmbeddingWorker {
      * Process case embedding
      */
     private async processCaseEmbedding(payload: EmbeddingJobPayload): Promise<any> {
-        const { entity_id, text_content } = payload;
+        const { entity_id: text_content } = payload;
 
         // Get case from database if text not provided
         let textToEmbed = text_content;
@@ -431,7 +431,7 @@ class RabbitMQEmbeddingWorker {
      * Process chunk embedding
      */
     private async processChunkEmbedding(payload: EmbeddingJobPayload): Promise<any> {
-        const { entity_id, text_content } = payload;
+        const { entity_id: text_content } = payload;
 
         // Get chunk from database if text not provided
         let textToEmbed = text_content;

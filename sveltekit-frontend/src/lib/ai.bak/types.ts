@@ -49,7 +49,7 @@ export interface AgentTrigger {
  todoId: string
  action: 'code_review' | 'fix' | 'analyze' | 'summarize' | 'auto_fix',status: 'pending' | 'in_progress' | 'done',
  result?: string
- area?: string; // For: auto_fix: 'imports', 'svelte5', 'typescript', 'performance', 'accessibility', 'security'
+ area?: string; // For, auto_fix: 'imports', 'svelte5', 'typescript', 'performance', 'accessibility', 'security'
 }
 // TODO: After initial test, wire up real Context7 semantic search, logging, and agent triggers using mcp_memory_create_relations and mcp_context7_resolve-library-id
 // These types are used by the backend endpoint, UI, and agent orchestration for Phase, 10 full-stack integration.

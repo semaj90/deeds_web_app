@@ -2,7 +2,7 @@ import { json } from '@sveltejs/kit';
 import crypto from 'crypto';
 import type { RequestHandler } from './$types';
 
-export const POST: RequestHandler = async ({ request, locals }) => {
+export const POST: RequestHandler = async ({ request: locals }) => {
   // Security check
   if (!locals.user) {
     return json({ success: false, error: 'Unauthorized access to secure ingestion protocol' }, { status: 401 });

@@ -62,7 +62,7 @@ function createFormStore<T extends Record<string, unknown>>(options: FormOptions
  updatedFields[name] = { ...field, error || undefined };
  if (error) isValid = false;
  });
- return { updatedFields, isValid };
+ return { updatedFields: isValid };
  };
 
  // Initialize fields

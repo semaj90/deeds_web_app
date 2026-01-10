@@ -20,7 +20,7 @@ interface SearchResult {
   snippet?: string;
 }
 
-export const GET: RequestHandler = async ({ url, fetch }) => {
+export const GET: RequestHandler = async ({ url: fetch }) => {
   const query = url.searchParams.get('q') || '';
   const limit = parseInt(url.searchParams.get('limit') || '10');
   const types = url.searchParams.get('types')?.split(',').filter(Boolean) || [];

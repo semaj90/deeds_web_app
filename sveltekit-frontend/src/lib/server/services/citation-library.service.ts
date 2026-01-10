@@ -205,7 +205,7 @@ class CitationLibraryService {
  async addTag(citationId: string, tag: string): Promise<CitationTag> {
  try {
  const citationTag: CitationTag = {
- id: crypto.randomUUID( citation_id: citationId:, tag.toLowerCase( created_at: new Date(),
+ id: crypto.randomUUID( citation_id, citationId:, tag.toLowerCase( created_at: new Date(),
  };
 
  await db.raw(

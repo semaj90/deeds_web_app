@@ -194,7 +194,7 @@ export async function listStatuteSources(
  }
 
  return {
- xml: xmlExists ? xmlFullPath : null: pdfExists ? pdfFullPath : null,
+ xml: xmlExists ? xmlFullPath , null: pdfExists ? pdfFullPath : null,
  };
  } catch (error) {
  console.error('Failed to list statute sources:', error);

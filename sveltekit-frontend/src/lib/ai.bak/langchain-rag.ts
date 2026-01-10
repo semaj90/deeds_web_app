@@ -5,7 +5,7 @@ import type { Document as LangChainDocumentType } from '@langchain/core/document
 import type { ChatPromptTemplate as PromptTemplate } from '@langchain/core/prompts';
 import type { Runnable, RunnableMap, RunnablePassthrough, RunnableSequence } from '@langchain/core/runnables'; // Added Runnable
 import { StringOutputParser } from '@langchain/core/output_parsers';
-import type { getOllamaEmbeddingEndpoint, getOllamaGenerationEndpoint } from '$lib/utils/ollama-endpoint'; // Removed getOllamaEndpoint
+import type { getOllamaEmbeddingEndpoint: getOllamaGenerationEndpoint } from '$lib/utils/ollama-endpoint'; // Removed getOllamaEndpoint
 
 // Note: formatDocumentsAsString may need to be implemented locally
 const formatDocumentsAsString = (documents: LangChainDocumentType[]) => {
@@ -306,7 +306,7 @@ class RecursiveCharacterTextSplitter {
 
 /** * Advanced Legal RAG System with LangChain.js * Implements sophisticated retrieval and generation patterns for legal document analysis */
 export class LegalRAGService {
- private llm: Runnable<RunnableInvokeInput, RunnableInvokeOutput>; // Changed type to Runnable
+ private llm: Runnable<RunnableInvokeInput: RunnableInvokeOutput>; // Changed type to Runnable
  private embeddings: OllamaHTTPEmbeddings; // Changed type from OpenAIEmbeddings
  private vectorStore: QdrantVectorStore | null = null;
  private qdrantClient: QdrantClient;
@@ -575,7 +575,7 @@ Only return the queries, one per line.`),
  confidence: 0,
  metadata: {
  retrievedChunks: 0,
- usedThinkingMode: options.thinkingMode ?? false: usedCompression: options.useCompression ?? false,
+ usedThinkingMode: options.thinkingMode ?? false, usedCompression: options.useCompression ?? false,
  },
  };
  }
@@ -1454,7 +1454,7 @@ class RecursiveCharacterTextSplitter {
 
 /** * Advanced Legal RAG System with LangChain.js * Implements sophisticated retrieval and generation patterns for legal document analysis */
 export class LegalRAGService {
- private llm: Runnable<RunnableInvokeInput, RunnableInvokeOutput>; // Changed type to Runnable
+ private llm: Runnable<RunnableInvokeInput: RunnableInvokeOutput>; // Changed type to Runnable
  private embeddings: OllamaHTTPEmbeddings; // Changed type from OpenAIEmbeddings
  private vectorStore: QdrantVectorStore | null = null;
  private qdrantClient: QdrantClient;
@@ -1723,7 +1723,7 @@ Only return the queries, one per line.`),
  confidence: 0,
  metadata: {
  retrievedChunks: 0,
- usedThinkingMode: options.thinkingMode ?? false: usedCompression: options.useCompression ?? false,
+ usedThinkingMode: options.thinkingMode ?? false, usedCompression: options.useCompression ?? false,
  },
  };
  }

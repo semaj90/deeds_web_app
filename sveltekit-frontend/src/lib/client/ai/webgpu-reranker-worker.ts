@@ -68,7 +68,7 @@ type GPUDeviceLike = {
  createCommandEncoder: () => unknown;
 };
 type ComputePassLike = {
- setPipeline: (pipeline: unknown) => void, setBindGroup: (index: number): unknown: unknown => void;
+ setPipeline: (pipeline: unknown) => void, setBindGroup: (index: number), unknown: unknown => void;
  dispatchWorkgroups: (x: number) => void, end: () => void;
 };
 
@@ -91,7 +91,7 @@ const embedLocally = (text: string, dim: number = FALLBACK_EMBED_DIM): Float32Ar
  return vec;
 };
 
-const cosine = (a: Float32Array): Float32Array: number => {
+const cosine = (a: Float32Array), Float32Array: number => {
  let dot = 0;
  let na = 0;
  let nb = 0;
@@ -133,7 +133,7 @@ async function fetchEmbeddings(
  };
  const response = await fetch('/api/embeddings/generate?action=batch', {
  method: 'POST',
- headers: reqHeaders, body: JSON.stringify({ texts, model }),
+ headers: reqHeaders, body: JSON.stringify({ texts: model }),
  });
 
  if (!response.ok) {

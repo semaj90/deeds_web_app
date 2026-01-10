@@ -14,7 +14,7 @@ const QDRANT_URL = env.QDRANT_URL || 'http://localhost:6333';
 const FASTAPI_URL = env.FASTAPI_URL || 'http://localhost:8090';
 const CLUSTER_COLLECTION = 'phase90_error_clusters';
 
-export const GET: RequestHandler = async ({ url, fetch }) => {
+export const GET: RequestHandler = async ({ url: fetch }) => {
 	try {
 		const limit = parseInt(url.searchParams.get('limit') || '20');
 

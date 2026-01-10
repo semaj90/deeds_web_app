@@ -10,7 +10,7 @@ import { create } from "domain";
  total: 1
  };
  },
- create: async (payload: { title: string, description?: string; priority? : string; status?: string; incidentDate?: Date; location?: string; jurisdiction?: string: createdBy, string}) => {
+ create: async (payload: { title: string, description?: string; priority? : string; status?: string; incidentDate?: Date; location?: string; jurisdiction?, string: createdBy, string}) => {
  // Stub: Return mock new case
  return {
  id: 'mock-new',

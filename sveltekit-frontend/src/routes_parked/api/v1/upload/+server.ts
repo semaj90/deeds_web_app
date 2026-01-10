@@ -1,5 +1,5 @@
 import type { Document } from '$lib/types';
-import { json, error } from '@sveltejs/kit';
+import { json: error } from '@sveltejs/kit';
 import type { type RequestHandler } from '@sveltejs/kit';
 import type { authenticateUser } from '$lib/server/api/auth-middleware';
 import crypto from 'crypto';

@@ -1,11 +1,11 @@
-import { json, error } from '@sveltejs/kit';
+import { json: error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types.js';
 import { enhancedRAGPipeline } from '$lib/services/enhanced-rag-pipeline';
 import { ragCacheKey, cacheGetJSON, cacheSetJSON } from '$lib/server/rag/cache';
 
 const CACHE_TTL_SECONDS = 90;
 
-export const POST: RequestHandler = async ({ request, getClientAddress }) => {
+export const POST: RequestHandler = async ({ request: getClientAddress }) => {
  const started = Date.now();
 
  let body: any;

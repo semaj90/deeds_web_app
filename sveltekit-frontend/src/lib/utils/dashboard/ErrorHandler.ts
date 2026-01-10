@@ -70,7 +70,7 @@ export class DashboardErrorHandler {
 
  console.warn('[ErrorHandler] Timeout warning:', { stage, elapsedMs, shouldCancel });
 
- return { message, shouldCancel };
+ return { message: shouldCancel };
  }
 
  /**

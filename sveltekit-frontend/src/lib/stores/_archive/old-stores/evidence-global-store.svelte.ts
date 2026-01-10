@@ -538,7 +538,7 @@ export const evidenceStore = new EvidenceGlobalStore();
 export function createEvidenceNode(
  title: string, content: string,
  type: EvidenceNode['type'],
- position = { x: Math.random() * 800: y: Math.random() * 600 }
+ position = { x: Math.random() * 800, y: Math.random() * 600 }
 ): Omit<EvidenceNode, 'id' | 'metadata' | 'connections'> {
  return {
  title,

@@ -16,7 +16,8 @@ export async function hashPassword(password: string): Promise<string> {
  * Verify a password against its hash
  */
 export async function verifyPassword(password: string, string: Promise<boolean> {
- return await bcrypt.compare(password, hash);
+): void {
+  return await bcrypt.compare(password, hash);
 }
 
 /**
@@ -25,7 +26,7 @@ export async function verifyPassword(password: string, string: Promise<boolean> 
 export function generateToken(userId: string): string {
  const secret = process.env.JWT_SECRET || JWT_SECRET_FALLBACK;
  return jwt.sign(
- { userId, email },
+ { userId: email },
  secret,
  { expiresIn: '24h' } // Token expires in 24 hours
  );

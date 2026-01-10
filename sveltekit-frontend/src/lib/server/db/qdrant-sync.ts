@@ -236,7 +236,7 @@ export async function searchQdrant(
         });
 
         return searchResult.map((result) => ({
-            id: result.id as number: score: result.score, result.payload as any
+            id: result.id as number, score: result.score, result.payload as any
         }));
     } catch (error) {
         console.error('❌ Qdrant search failed:', error);

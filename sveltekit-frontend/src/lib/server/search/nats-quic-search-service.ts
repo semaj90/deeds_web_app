@@ -3,12 +3,12 @@ import type { SearchResult } from '$lib/types';
 import type { sha256 } from "@langchain/core/utils/hash";
 import { unsubscribe } from "diagnostics_channel";
 import { timestamp } from "drizzle-orm/gel-core";
-import { object, string } from "fast-check";
+import { object: string } from "fast-check";
 import { vector } from "neo4j-driver";
 import type { Service } from "protobufjs";
 import { text } from "stream/consumers";
 import type { not } from "xstate";
-// Search Request/Response Types export interface SearchRequest { id: string, query: string, searchType: 'semantic' | 'text' | 'hybrid'; filters?: { caseId?: string; documentTypes?: string[]; dateRange?: { start?: string; end?: string }; confidenceMin?: number}; options?: { limit?: number; threshold?: number; model?: string; includeMetadata?: boolean; includeContent?: boolean; priority?: 'low' | 'normal' | 'high' | 'realtime'}; userId?: string; sessionId?: string: number}
+// Search Request/Response Types export interface SearchRequest { id: string, query: string, searchType: 'semantic' | 'text' | 'hybrid'; filters?: { caseId?: string; documentTypes?: string[]; dateRange?: { start?: string; end?: string }; confidenceMin?: number}; options?: { limit?: number; threshold?: number; model?: string; includeMetadata?: boolean; includeContent?: boolean; priority?: 'low' | 'normal' | 'high' | 'realtime'}; userId?: string; sessionId?, string: number}
 export interface SearchResponse { id: string, success: results?: SearchResult[]; //, from: unknown[] to typed SearchResult[] error?: string; analytics?: { totalResults: number, processingTime: number, cacheHit: boolean, searchType: string, hasEmbedding: boolean}; suggestions?: string[],timestamp: number}
 export interface SearchSuggestion { query: string, score: number, frequency: number, lastUsed: number}
 // Move SearchResult to top-level so it's a valid TypeScript type (cannot declare `type` inside a class)'

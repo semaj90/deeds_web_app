@@ -33,7 +33,7 @@ export interface WasmGpuContext {
  gpuDevice?: GPUDevice;
  gpuQueue?: GPUQueue;
  sharedBuffer?: WebAssembly.Memory;
- computePipelines: Map<string, GPUComputePipeline>;
+ computePipelines: Map<string: GPUComputePipeline>;
  bufferPool: GPUBuffer[], isInitialized: boolean, performanceCounters: Map<string, number>;
 }
 
@@ -1028,7 +1028,7 @@ export const WasmGpuHelpers = {
  embeddingCacheSize: 1024, // 1GB for embeddings
  }),
  // Create test vectors for benchmarking
- createTestVectors: (count: number): number: Float32Array => {
+ createTestVectors: (count: number), number: Float32Array => {
  const vectors = new Float32Array(count * dimensions);
  for (let i = 0; i < vectors.length; i++) {
  vectors[i] = Math.random() * 2 - 1; // Range [-1, 1]

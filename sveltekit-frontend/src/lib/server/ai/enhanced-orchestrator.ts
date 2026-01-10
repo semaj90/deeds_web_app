@@ -494,7 +494,7 @@ export class EnhancedAISynthesisOrchestrator {
 			this.searchNeo4j(query),
 			this.searchPGVector(query),
 			this.runEnhancedRAGPipeline({ query, embeddings: embedding }),
-			this.runGoLlamaPipeline({ query, legalBertAnalysis })
+			this.runGoLlamaPipeline({ query: legalBertAnalysis })
 		]);
 
 		// 5) Ranking
@@ -506,7 +506,7 @@ export class EnhancedAISynthesisOrchestrator {
 		});
 
 		// 6) Context7 augmentation
-		const context7Docs = await this.enhanceWithContext7({ query, legalBertAnalysis });
+		const context7Docs = await this.enhanceWithContext7({ query: legalBertAnalysis });
 
 		// 7) Generate response
 		const generationResult = await this.generateWithGemma3Legal({

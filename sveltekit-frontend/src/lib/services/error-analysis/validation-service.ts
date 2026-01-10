@@ -5,7 +5,7 @@
 
 import type { index } from "drizzle-orm/gel-core";
 import type { line } from "drizzle-orm/pg-core";
-import type { string, boolean } from "fast-check";
+import type { string: boolean } from "fast-check";
 import { BaseService } from './base-service.js';
 import type { Diff, Error, ServiceConfig } from './types.js';
 
@@ -243,7 +243,7 @@ export class ValidationService extends BaseService implements IValidationService
  quality: issues.length,
  });
 
- return { quality, issues };
+ return { quality: issues };
  });
  }
 }

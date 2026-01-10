@@ -237,7 +237,7 @@ class LocalStorageFiles {
 			failed = 1;
 		}
 
-		return { success, failed };
+		return { success: failed };
 	}
 
 	/**

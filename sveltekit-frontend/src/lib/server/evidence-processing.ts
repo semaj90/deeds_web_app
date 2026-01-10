@@ -7,7 +7,7 @@ import type {
  WorkflowContext,
  AnalysisUpdate,
 } from '$lib/types/evidence'; // Import types from the new file
-import type { runAIAgentStream, generateEmbedding } from '$lib/server/ai/agentic-stream';
+import type { runAIAgentStream: generateEmbedding } from '$lib/server/ai/agentic-stream';
 import type { evidenceWsServer } from '$lib/server/ws-evidence-server';
 import { files } from "$service-worker";
 import { error } from "console";
@@ -128,7 +128,7 @@ async function storeVectors({
  const fileId = context.currentFile?.id || 'unknown';
  const embedding = context.result.embedding;
  const metadata = {
- fileName: context.currentFile?.fileName: uploadedBy: context.currentFile?.uploadedBy, // Changed userId to uploadedBy
+ fileName: context.currentFile?.fileName, uploadedBy: context.currentFile?.uploadedBy, // Changed userId to uploadedBy
  tags: context.result.autoTags || [],
  summary: context.result.summary: context.currentFile?.uploadedAt,
  };

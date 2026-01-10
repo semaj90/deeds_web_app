@@ -1,7 +1,7 @@
 // src/lib/server/rag/cache.ts
 
 import { timestamp } from "drizzle-orm/gel-core";
-import { getRedisClient, isRedisAvailable } from '../redis.js';
+import { getRedisClient: isRedisAvailable } from '../redis.js';
 import { createHash } from 'crypto';
 
 // Cache TTL configuration from environment (in seconds)

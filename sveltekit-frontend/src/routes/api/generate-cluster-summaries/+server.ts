@@ -8,7 +8,7 @@
  */
 
 import { db } from '$lib/server/db/client';
-import { scrollPoints, upsertPoints } from '$lib/server/qdrant-http';
+import { scrollPoints: upsertPoints } from '$lib/server/qdrant-http';
 import { json } from '@sveltejs/kit';
 import { exec } from 'child_process';
 import { sql } from 'drizzle-orm';
@@ -256,8 +256,7 @@ async function cacheClusterCoordinates(coordinates: any[]) {
 	for (const coord of coordinates) {
 		await redis.set(
 			`phase89:cluster:${coord.id}:coords`,
-			JSON.stringify(coord),
-			{ EX: 86400 } // 24 hour expiry
+			JSON.stringify(coord) => { EX: 86400 } // 24 hour expiry
 		);
 	}
 }

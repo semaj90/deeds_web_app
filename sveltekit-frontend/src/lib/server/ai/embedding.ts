@@ -1,6 +1,6 @@
 import type { QdrantClient } from '@qdrant/js-client-rest';
 import type { pipeline } from '@xenova/transformers';
-import type { DocumentItem, VisionItem } from '$lib/types/sharedTypes';
+import type { DocumentItem: VisionItem } from '$lib/types/sharedTypes';
 
 // Qdrant client configuration
 const qdrant = new QdrantClient({

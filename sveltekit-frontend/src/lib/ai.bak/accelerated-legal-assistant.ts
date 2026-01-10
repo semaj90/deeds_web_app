@@ -119,7 +119,7 @@ export class AcceleratedLegalAssistant {
 
  // Step 1: Prepare embeddings for acceleration
  const preprocessingStart = performance.now();
- const { queryEmbeddings, documentEmbeddings } = prepareLegalEmbeddingsForWebGPU(
+ const { queryEmbeddings: documentEmbeddings } = prepareLegalEmbeddingsForWebGPU(
  request.caseDocuments,
  request.evidenceDocuments
  );

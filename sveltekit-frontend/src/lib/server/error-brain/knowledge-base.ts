@@ -150,7 +150,7 @@ export class KnowledgeBase {
 				)
 				VALUES (
 					${patternId}, ${ errorMessage }, ${options?.errorCode || null},
-					${filePath}, ${options?.lineNumber || null}, ${sql.raw(`'[${errorEmbedding.join(',')}]'::vector`)},
+					${filePath}, ${options?.lineNumber || null}, ${sql`'[${sql.raw(errorEmbedding.join(','))}]'::vector`},
 					1, ${success ? 1.0 : 0.0}, NOW(), ${JSON.stringify(options?.metadata || {})}
 				)
 				ON CONFLICT (id) DO UPDATE SET
@@ -169,7 +169,7 @@ export class KnowledgeBase {
 				)
 				VALUES (
 					${patchId}, ${patch}, ${filePath}, ${errorMessage},
-					${sql.raw(`'[${patchEmbedding.join(',')}]'::vector`)},
+					${sql`'[${sql.raw(patchEmbedding.join(','))}]'::vector`},
 					true, ${ success }, NOW(), ${ runId }
 				)
 			`);
@@ -201,10 +201,10 @@ export class KnowledgeBase {
 				SELECT
 					id, error_message, error_code, file_path, line_number,
 					fix_count, success_rate, last_seen, metadata,
-					1 - (embedding <=> ${sql.raw(`'[${queryEmbedding.join(',')}]'::vector`)}) as similarity
+					1 - (embedding <=> ${sql`'[${sql.raw(queryEmbedding.join(','))}]'::vector`}) as similarity
 				FROM error_patterns
 				WHERE
-					1 - (embedding <=> ${sql.raw(`'[${queryEmbedding.join(',')}]'::vector`)}) > ${minSimilarity}
+					1 - (embedding <=> ${sql`'[${sql.raw(queryEmbedding.join(','))}]'::vector`}) > ${minSimilarity}
 					${!includeFailures ? sql`AND success_rate > 0.5` : sql``}
 				ORDER BY similarity DESC
 				LIMIT ${limit}
@@ -240,11 +240,11 @@ export class KnowledgeBase {
 				SELECT
 					id, patch_content, target_file, error_fixed,
 					applied, successful, timestamp, run_id,
-					1 - (embedding <=> ${sql.raw(`'[${queryEmbedding.join(',')}]'::vector`)}) as similarity
+					1 - (embedding <=> ${sql`'[${sql.raw(queryEmbedding.join(','))}]'::vector`}) as similarity
 				FROM patch_knowledge
 				WHERE
 					successful = true
-					AND 1 - (embedding <=> ${sql.raw(`'[${queryEmbedding.join(',')}]'::vector`)}) > ${minSimilarity}
+					AND 1 - (embedding <=> ${sql`'[${sql.raw(queryEmbedding.join(','))}]'::vector`}) > ${minSimilarity}
 				ORDER BY similarity DESC, timestamp DESC
 				LIMIT ${limit}
 			`);

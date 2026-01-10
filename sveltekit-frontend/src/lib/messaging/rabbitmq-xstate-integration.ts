@@ -33,7 +33,7 @@ const initialContext: RabbitMQContext = {
 export const rabbitmqMachine = setup({
   types: {} as { context: RabbitMQContext; events: RabbitMQEvent },
   actors: {
-    rabbitMQConnection: fromCallback(({ sendBack, input }) => {
+    rabbitMQConnection: fromCallback(({ sendBack: input }) => {
       // Stub: Replace with real RabbitMQ connection
       console.log('RabbitMQ stub: connecting to', input);
       setTimeout(() => sendBack({ type: 'CONNECTED' }), 1000);
@@ -66,7 +66,7 @@ export const rabbitmqMachine = setup({
       on: {
         DISCONNECT: { target: 'disconnected' },
         MESSAGE_RECEIVED: {
-          actions: ({ context, event }) => {
+          actions: ({ context: event }) => {
             context.lastMessage = event.payload;
           },
         },

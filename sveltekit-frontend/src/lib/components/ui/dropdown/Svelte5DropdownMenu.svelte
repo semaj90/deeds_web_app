@@ -9,7 +9,7 @@ import type { Snippet } from 'svelte';
 
 interface MenuItem {
 	id: string;
-	label: string;
+	label?: string;
 	icon?: string;
 	shortcut?: string;
 	disabled?: boolean;

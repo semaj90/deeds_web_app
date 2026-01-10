@@ -662,7 +662,7 @@ export async function createSpecializedWorkerSystem(
 
 	console.log('🏗️ Specialized Worker System fully initialized');
 
-	return { orchestrator, workers };
+	return { orchestrator: workers };
 }
 
 

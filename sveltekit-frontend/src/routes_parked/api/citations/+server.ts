@@ -12,7 +12,7 @@ import type { CitationSaveRequest } from '$lib/types/citations';
  * GET /api/citations
  * List user's citations with optional filtering
  */
-export const GET: RequestHandler = async ({ request, locals }) => {
+export const GET: RequestHandler = async ({ request: locals }) => {
  try {
  // Check authentication
  if (!locals.user) {
@@ -48,7 +48,7 @@ export const GET: RequestHandler = async ({ request, locals }) => {
  * POST /api/citations
  * Save a new citation
  */
-export const POST: RequestHandler = async ({ request, locals }) => {
+export const POST: RequestHandler = async ({ request: locals }) => {
  try {
  // Check authentication
  if (!locals.user) {

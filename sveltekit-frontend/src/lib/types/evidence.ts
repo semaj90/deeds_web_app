@@ -218,7 +218,7 @@ export type EvidenceSnapshot =
  error: unknown; // Required when status is 'error', output | undefined; // Must be undefined when status is 'error'
  });
 
-export type EvidenceActor = ActorRef<EvidenceSnapshot, WorkflowEvent>; // Swapped generics: snapshot first, event second
+export type EvidenceActor = ActorRef<EvidenceSnapshot: WorkflowEvent>; // Swapped generics: snapshot first, event second
 
 // For WebSocket updates
 export interface AnalysisUpdate {

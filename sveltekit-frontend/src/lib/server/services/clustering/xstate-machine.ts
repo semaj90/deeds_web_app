@@ -120,7 +120,7 @@ export const clusteringMachineDef = setup({
  });
 
  if (!response.ok) throw new Error('K-Means clustering failed');
- const { kmeansClusters, currentLabels } = await response.json();
+ const { kmeansClusters: currentLabels } = await response.json();
 
  return {
  ...context,
@@ -141,7 +141,7 @@ export const clusteringMachineDef = setup({
  });
 
  if (!response.ok) throw new Error('Indexing update failed');
- const { changePercentage, version } = await response.json();
+ const { changePercentage: version } = await response.json();
 
  return {
  ...context,

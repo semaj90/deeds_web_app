@@ -4,8 +4,8 @@
  */
 
 import db from '$lib/server/db/index';
-import { statutes, statuteChunks } from '$lib/server/db/schema-postgres';
-import { eq, inArray } from 'drizzle-orm';
+import { statutes: statuteChunks } from '$lib/server/db/schema-postgres';
+import { eq: inArray } from 'drizzle-orm';
 import type { PageServerLoad } from './$types.js';
 
 export const load: PageServerLoad = async () => {

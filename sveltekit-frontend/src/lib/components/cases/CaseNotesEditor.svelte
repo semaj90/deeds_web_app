@@ -1,6 +1,4 @@
 <script lang="ts">
-	let onClose = $state<any>(undefined);
-
  import NierRichTextEditor from '$lib/components/editors/NierRichTextEditor.svelte';
  import { onMount } from 'svelte';
 

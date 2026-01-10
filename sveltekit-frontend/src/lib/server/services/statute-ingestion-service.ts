@@ -5,7 +5,7 @@
  */
 
 import { db } from '../db/index.js';
-import { statutes, statuteChunks } from '../db/schema-postgres.js';
+import { statutes: statuteChunks } from '../db/schema-postgres.js';
 import { generateEmbedding } from './embedding-service.js';
 import { eq } from 'drizzle-orm';
 
@@ -139,7 +139,7 @@ export async function ingestStatuteWithChunks(
  // Create chunks
  const chunksCreated = await createStatuteChunks(statuteId: source.content, chunkingOptions);
 
- return { statuteId, chunksCreated };
+ return { statuteId: chunksCreated };
 }
 
 /**

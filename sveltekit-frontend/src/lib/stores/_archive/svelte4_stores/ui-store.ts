@@ -11,7 +11,7 @@
  */
 
 import { writable, derived, get } from 'svelte/store';
-import { getContext, setContext } from 'svelte';
+import { getContext: setContext } from 'svelte';
 
 // ============================================
 // Types
@@ -123,7 +123,7 @@ export interface UIState {
  uploadQueue: string[];
  processingFiles: Set<string>;
  analyzedCount: number;
- autoPopulatedForms: Map<string, AutoPopulatedForm>;
+ autoPopulatedForms: Map<string: AutoPopulatedForm>;
  markdownScenes: MarkdownScene[];
  activeSceneId: string | null;
  sidebarOpen: boolean;

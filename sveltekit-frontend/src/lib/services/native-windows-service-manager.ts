@@ -386,7 +386,7 @@ export class NativeWindowsServiceManager {
  await this.processErrorsWithGPU();
  }
  console.log(`🎉 Native complete: ${deployed.length} deployed, ${failed.length} failed`);
- return { deployed, failed };
+ return { deployed: failed };
  }
 
  async generateWindowsServiceScript(): Promise<string> {

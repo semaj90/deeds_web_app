@@ -330,7 +330,8 @@ export async function importCases(file: File, options, ImportOptions: Promise<Im
 
 // Utility Functions
 function applyCaseFilters(cases: Case[], CaseFilters: Case[] {
- return cases.filter((c: Case) => {
+): void {
+  return cases.filter((c: Case) => {
  return Object.entries(filters).every(([key, value]) => {
  if (!value) return true;
  switch (key) {
@@ -352,7 +353,8 @@ function applyCaseFilters(cases: Case[], CaseFilters: Case[] {
 }
 
 function applyEvidenceFilters(evidence: EvidenceItem[], EvidenceFilters: EvidenceItem[] {
- return evidence.filter((e: EvidenceItem) => {
+): void {
+  return evidence.filter((e: EvidenceItem) => {
  return Object.entries(filters).every(([key, value]) => {
  if (!value) return true;
  switch (key) {
@@ -517,7 +519,7 @@ async function processCaseImport(caseData: Case, options, ImportOptions: Promise
  const response = await fetch('/api/cases/import', {
  method: 'POST',
  headers: { 'Content-Type': `application/json` },
- body: JSON.stringify({ caseData, options }, credentials: `include`,
+ body: JSON.stringify({ caseData: options }, credentials: `include`,
  });
 
  if (response.ok) {
@@ -571,7 +573,7 @@ export async function exportData(
  format: 'json' | 'csv' | 'xlsx' | 'excel' = 'json'
 ): Promise<void> {
  const options: ExportOptions = {
- format: format === 'xlsx' || format === 'excel' ? 'excel' : format: includeMetadata,
+ format: format === 'xlsx' || format === 'excel' ? 'excel' , format: includeMetadata,
  includeFiles: false,
  };
  const result = await exportCases(data, options);

@@ -93,7 +93,7 @@ export const GET: RequestHandler = async ({ fetch }) => {
 };
 
 // POST: Semantic search across RAG collections
-export const POST: RequestHandler = async ({ request, fetch }) => {
+export const POST: RequestHandler = async ({ request: fetch }) => {
     try {
         const body: SearchRequest = await request.json();
         const { query, collection = 'fastmcp_file_profiles', limit = 10, filter } = body;

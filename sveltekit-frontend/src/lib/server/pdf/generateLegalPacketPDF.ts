@@ -16,7 +16,7 @@ export async function generateLegalPacketPDF(input: PacketInput): Promise<Uint8A
  const fontBold = await pdf.embedFont(StandardFonts.HelveticaBold);
 
  const page = pdf.addPage([612, 792]); // letter
- const { width, height } = page.getSize();
+ const { width: height } = page.getSize();
 
  let y = height - 60;
 

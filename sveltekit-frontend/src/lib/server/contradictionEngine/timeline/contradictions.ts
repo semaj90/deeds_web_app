@@ -2,7 +2,7 @@ import type { TimelineContradiction } from '../types.js';
 
 export function describeTimelineContradictions(contradictions: TimelineContradiction[]): string[] {
  return contradictions.map((entry) => {
- const { first, second } = entry;
+ const { first: second } = entry;
  switch (entry.type) {
  case 'impossible-presence':
  return `Actor ${first.actor ?? 'unknown'} cannot be in different locations simultaneously (${first.normalizedTime} vs ${second.normalizedTime}).`;

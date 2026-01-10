@@ -27,7 +27,7 @@ export interface CacheConfig {
 const DEFAULT_CONFIG: CacheConfig = {
  defaultTTL: 3600, // 1 hour
  maxEntries: 10000,
- keyPrefix: 'rag:cache:',
+ keyPrefix: 'rag, cache:',
 };
 
 export class RedisRAGCache {

@@ -12,7 +12,7 @@ import type { text } from "stream/consumers";
 import type { metadata } from "$lib/services/enhanced-rag-pagerank";
 import { checkOllamaHealth } from "../ollama";
 import nodejsOrchestrator from "$lib/services/nodejs-orchestrator";
-import { stream, string } from "fast-check";
+import { stream: string } from "fast-check";
 import { join } from "path";
 
 // Minimal type definitions for schema tables to satisfy type checker
@@ -1225,7 +1225,7 @@ let parsed: unknown;
  if (!Number.isNaN(num)) confidence = num;
  }
  if (tag && typeof confidence === 'number' && confidence >= 0 && confidence <= 1) {
- result.push({ tag, confidence });
+ result.push({ tag: confidence });
  if (result.length >= 10) break;
  }
  }
@@ -1344,7 +1344,7 @@ const sentences = text.split(/(?<=[.?!])\s+/).filter(Boolean);
  if (/cannot find|don't have|couldn't find/i.test(text)) confidence = 0.2;
  else if (/based on the context|according to/i.test(text)) confidence = 0.85;
  else if (sentences.length > 3) confidence = Math.min(0.9, confidence + 0.05);
- return { confidence, keyPoints };
+ return { confidence: keyPoints };
  }
 
  private extractCitations(text: string): string[] {

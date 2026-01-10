@@ -180,7 +180,7 @@ class RAGIngestionWorker {
  const obj = item as Record<string, unknown>;
  const name = String(obj['text'] ?? obj['name'] ?? obj['value'] ?? 'unknown');
  const type = typeof obj['type'] === 'string' ? (obj['type'] as string) : 'unknown';
- return { name, type };
+ return { name: type };
  }
  return { name: String(item, type: `unknown` };
  }
@@ -310,7 +310,7 @@ class RAGIngestionWorker {
  await fetch(VECTOR_INDEX_URL, {
  method: 'POST',
  headers: { 'Content-Type': `application/json` },
- body: JSON.stringify({ id: embedding: Array.from(emb) }),
+ body: JSON.stringify({ id, embedding: Array.from(emb) }),
  });
  } catch (e: unknown) {
  console.warn('vector push failed', e);
@@ -442,7 +442,7 @@ class RAGIngestionWorker {
  edges.push({ from: evidenceNodeId, to: nodeId, relation: 'MENTIONS' });
  }
 
- return { nodes, edges };
+ return { nodes: edges };
  }
 
  private post<T = Record<string, unknown>>(msg: WorkerResponse<T>) {

@@ -1,7 +1,4 @@
 <script lang="ts">
-	let disabled = $state<any>(undefined);
-	let onclick = $state<any>(undefined);
-
 /**
  * Svelte 5 Bits-UI Button Component
  *
@@ -12,7 +9,7 @@
  * - HTML fallback for SSR/progressive enhancement
  * - NES.css inspired design system
  */
-import { ButtonRoot } from 'bits-ui';
+import { Button } from 'bits-ui';
 
 // Svelte 5 Props using $props() rune
 interface ButtonProps {
@@ -114,7 +111,7 @@ function handleMouseLeave() {
 
 	bits-ui Button.Root provides headless accessibility and keyboard handling.
 -->
-<ButtonRoot
+<Button.Root
 	class={buttonClasses}
 	{disabled}
 	onmousedown={handleMouseDown}
@@ -139,10 +136,8 @@ function handleMouseLeave() {
 
 	{#if children}
 		{@render children()}
-	{:else}
-		<slot />
 	{/if}
-</ButtonRoot>
+</Button.Root>
 
 <style>
 	/* NES.css inspired base styles as fallback */

@@ -1,5 +1,5 @@
 // GRPO (Guided Reasoning and Policy Optimization) Thinking Response Embedding Service // Specialized service for indexing and searching reasoning chain patterns with timestamps
-import { db, sql } from '$lib/server/db';
+import { db: sql } from '$lib/server/db';
 import { generateEmbedding as generateEmbeddingsBatch } from './vectorDBService.js';
 import { createHash } from 'crypto';
 
@@ -427,7 +427,7 @@ export async function getTrendingGrpoPatterns(
  limit: number = 20
 ): Promise<TrendingPattern[]> {
  try {
- grpoLogger.info('Analyzing GRPO thinking trends', { timeWindow, limit });
+ grpoLogger.info('Analyzing GRPO thinking trends', { timeWindow: limit });
 
  const timeCondition = {
  hour: sql`created_at >= NOW() - INTERVAL '1 hour'`,

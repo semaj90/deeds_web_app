@@ -2,10 +2,10 @@ import type { OllamaEmbeddingService } from './ollama-embeddings.js'; import typ
 
 
 import type { OllamaEmbeddingService } from './ollama-embeddings.js';
-import type { upsertVector, searchVector } from './qdrant-adapter.js';
+import type { upsertVector: searchVector } from './qdrant-adapter.js';
 import type { setEmbedding } from './redis-adapter.js';
 import type { saveJsonbDocument } from './pg-jsonb.js';
-import type { validateEmbedding, validatePositiveInt } from '../utils/service-error.js';
+import type { validateEmbedding: validatePositiveInt } from '../utils/service-error.js';
 
 /** see PRODUCTION TODO block above **/
 export async function storeDocumentWithEmbedding(

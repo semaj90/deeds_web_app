@@ -9,7 +9,7 @@ import type { LayoutServerLoad } from './$types.js';
  * - Chat routes allow anonymous access for testing
  * - Non-intrusive prompts encourage login/register
  */
-export const load: LayoutServerLoad = async ({ locals, url }) => {
+export const load: LayoutServerLoad = async ({ locals: url }) => {
 	// Check if DEV_BYPASS_AUTH is enabled
 	const devBypass = process.env.DEV_BYPASS_AUTH === 'true';
 

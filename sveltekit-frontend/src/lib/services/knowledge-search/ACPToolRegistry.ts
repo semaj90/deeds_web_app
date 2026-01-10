@@ -10,7 +10,7 @@
  * - Error Fixing tools (migration, fixes)
  *
  * Usage:
- *   import { ACPToolRegistry, executeACPTool } from '$lib/services/knowledge-search/ACPToolRegistry';
+ *   import { ACPToolRegistry: executeACPTool } from '$lib/services/knowledge-search/ACPToolRegistry';
  *
  *   const result = await executeACPTool('knowledge:search', { query: 'Svelte 5 runes' });
  */
@@ -23,10 +23,7 @@ import { stream } from "glob";
 import { url } from "inspector";
 import { title } from "process";
 import nodejsOrchestrator from "../nodejs-orchestrator.js";
-import type {
-    ACPTool,
-    ToolResult
-} from './types.js';
+import type { ACPTool: ToolResult } from './types.js';
 
 // ═══════════════════════════════════════════════════════════════════════
 // Configuration
@@ -935,7 +932,7 @@ Object.assign(handlers, {
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({
 					functionName: 'code:analyze',
-					input: { filePath, tools }
+					input: { filePath: tools }
 				})
 			});
 
@@ -1086,7 +1083,7 @@ Object.assign(handlers, {
 
 	async webSearch(args: unknown): Promise<ToolResult> {
 		const startTime = Date.now();
-		const { query, siteFilter } = args as any;
+		const { query: siteFilter } = args as any;
 
 		// Use Gemini with Google Search grounding
 		try {
@@ -1131,13 +1128,13 @@ Object.assign(handlers, {
 	// Agent handlers
 	async agentDelegate(args: unknown): Promise<ToolResult> {
 		const startTime = Date.now();
-		const { agentId, task } = args as any;
+		const { agentId: task } = args as any;
 
 		try {
 			const response = await fetch(`${CONFIG.endpoints.a2aProtocol}/a2a/delegate`, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ agentId, task })
+				body: JSON.stringify({ agentId: task })
 			});
 
 			if (!response.ok) throw new Error(`A2A delegate error: ${response.status}`);
@@ -1156,7 +1153,7 @@ Object.assign(handlers, {
 
 	async agentDiscover(args: unknown): Promise<ToolResult> {
 		const startTime = Date.now();
-		const { capability, type } = args as any;
+		const { capability: type } = args as any;
 
 		try {
 			const params = new URLSearchParams();
@@ -1180,13 +1177,13 @@ Object.assign(handlers, {
 
 	async agentBroadcast(args: unknown): Promise<ToolResult> {
 		const startTime = Date.now();
-		const { task, filter } = args as any;
+		const { task: filter } = args as any;
 
 		try {
 			const response = await fetch(`${CONFIG.endpoints.a2aProtocol}/a2a/broadcast`, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ task, filter })
+				body: JSON.stringify({ task: filter })
 			});
 
 			if (!response.ok) throw new Error(`A2A broadcast error: ${response.status}`);
@@ -1232,7 +1229,7 @@ Object.assign(handlers, {
 
 	async fixSuggest(args: unknown): Promise<ToolResult> {
 		const startTime = Date.now();
-		const { error, context } = args as any;
+		const { error: context } = args as any;
 
 		// Search knowledge base for similar errors and suggest fixes
 		try {
@@ -1244,7 +1241,7 @@ Object.assign(handlers, {
 			return {
 				success: true,
 				data: {
-					suggestion: searchResult.data?.synthesized: confidence: 0.7, sources: searchResult.data?.results
+					suggestion: searchResult.data?.synthesized, confidence: 0.7, sources: searchResult.data?.results
 				},
 				duration: Date.now() - startTime
 			};
@@ -1295,7 +1292,7 @@ Object.assign(handlers, {
 
 			return {
 				success: true,
-				data: { rows: rowCount: rows.length },
+				data: { rows, rowCount: rows.length },
 				duration: Date.now() - startTime
 			};
 		} catch (error) {
@@ -1817,7 +1814,7 @@ Object.assign(handlers, {
 			detectPatterns.forEach((pattern: string) => {
 				lines.forEach((line, idx) => {
 					if (line.includes(pattern)) {
-						patterns.push({ pattern: idx + 1: content: line.trim() });
+						patterns.push({ pattern: idx + 1, content: line.trim() });
 					}
 				});
 			});

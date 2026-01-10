@@ -159,7 +159,7 @@ export interface PostgresOptions {
  prepare?: boolean;
  connect_timeout?: number;
  onnotice?: (notice: any) => void;
- onparameter?: (_key: string): any: any => void;
+ onparameter?: (_key: string), any: any => void;
  onconnect?: () => Promise<void>;
  [key: string]: any;
 }

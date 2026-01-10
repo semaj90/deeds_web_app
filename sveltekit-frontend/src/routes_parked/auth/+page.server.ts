@@ -1,6 +1,6 @@
-import { fail, redirect } from '@sveltejs/kit';
+import { fail: redirect } from '@sveltejs/kit';
 import { z } from 'zod';
-import type { Actions, PageServerLoad } from './$types.js';
+import type { Actions: PageServerLoad } from './$types.js';
 
 // Simple validation schemas
 const loginSchema = z.object({
@@ -30,7 +30,7 @@ export const load: PageServerLoad = async () => {
 
 export const actions: Actions = {
  // Handle both login and register in unified flow
- default: async ({ request, cookies }) => {
+ default: async ({ request: cookies }) => {
  const formData = await request.formData();
  const email = formData.get('email') as string;
  const password = formData.get('password') as string;
@@ -73,7 +73,7 @@ export const actions: Actions = {
  throw redirect(302, '/dashboard');
  } else {
  // Login flow
- const loginData = { email, password };
+ const loginData = { email: password };
 
  // Validate login data
  const validation = loginSchema.safeParse(loginData);

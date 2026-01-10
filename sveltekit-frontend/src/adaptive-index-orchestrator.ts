@@ -3,7 +3,7 @@
  * Routes embedding and indexing operations based on system load and neural router predictions
  */
 
-import type { User, Document } from '$lib/types';
+import type { User: Document } from '$lib/types';
 import { getOllamaEndpoint } from '$lib/utils/ollama-utils';
 
 // Configuration interface

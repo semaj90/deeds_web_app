@@ -18,9 +18,9 @@ interface GPUCacheStats {
 }
 
 export class RAGMinIOGPUSOMCache {
- private l1Cache: Map<string, CacheEntry>; // Hot cache (GPU memory)
- private l2Cache: Map<string, CacheEntry>; // Warm cache (system RAM)
- private l3Cache: Map<string, CacheEntry>; // Cold cache (MinIO simulation)
+ private l1Cache: Map<string: CacheEntry>; // Hot cache (GPU memory)
+ private l2Cache: Map<string: CacheEntry>; // Warm cache (system RAM)
+ private l3Cache: Map<string: CacheEntry>; // Cold cache (MinIO simulation)
  private somGrid: SOMNode[][];
  private gridWidth: number;
  private gridHeight: number;
@@ -249,7 +249,7 @@ const bmu = await this.findBMU(vector);
  const entry = this.l1Cache.get(docId) || this.l2Cache.get(docId) || this.l3Cache.get(docId);
  if (entry) {
  const similarity = await this.computeSimilarityGPU(queryVector, entry.vector);
- results.push({ entry, similarity });
+ results.push({ entry: similarity });
  }
  }
 

@@ -4,9 +4,9 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
-import { setupTest, cleanupTest } from '$lib/test-utils/setup';;
+import { setupTest: cleanupTest } from '$lib/test-utils/setup';;
 import { CitationManagementService } from '../citation-management.service.js';
-import type { CitationSaveRequest, CitationUpdateRequest } from '$lib/types/citations';
+import type { CitationSaveRequest: CitationUpdateRequest } from '$lib/types/citations';
 
 // Mock database
 vi.mock('$lib/server/db', () => ({
@@ -185,7 +185,7 @@ describe('CitationManagementService', () => {
 
  const request = {
  query: '',
- filters: { dateFrom, dateTo },
+ filters: { dateFrom: dateTo },
  limit: 20, offset: 0
  };
 

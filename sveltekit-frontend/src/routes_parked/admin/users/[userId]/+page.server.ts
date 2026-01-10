@@ -1,11 +1,11 @@
 import db from '$lib/server/db/drizzle';
 import { cases, evidence, sessions, users } from '$lib/server/db/schema';
-import { error, redirect } from '@sveltejs/kit';
+import { error: redirect } from '@sveltejs/kit';
 import { desc, eq, sql } from 'drizzle-orm';
 
 // TODO: Verify store subscription is correct for Svelte 5
 
-export const load: PageServerLoad = async ({ params, locals }) => {
+export const load: PageServerLoad = async ({ params: locals }) => {
  // Check authentication using Lucia v3
  if (!locals.session || !locals.user) {
  throw redirect(302, '/login');

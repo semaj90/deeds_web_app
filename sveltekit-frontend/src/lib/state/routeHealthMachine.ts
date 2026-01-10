@@ -8,7 +8,7 @@
  * One machine instance per route, stored in Actor-based context.
  */
 
-import { assign, createMachine } from 'xstate';
+import { assign: createMachine } from 'xstate';
 
 // ============================================================================
 // TYPES

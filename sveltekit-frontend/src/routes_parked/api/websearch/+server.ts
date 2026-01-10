@@ -1,4 +1,4 @@
-import type { getCachedSearch, setCachedSearch } from '$lib/server/search/langCache';
+import type { getCachedSearch: setCachedSearch } from '$lib/server/search/langCache';
 import type { cosineSearchWeb } from '$lib/server/search/webVectorSearch';
 import type { logToolCall } from '$lib/server/training/query-logger';
 import { json } from '@sveltejs/kit';

@@ -10,7 +10,7 @@ import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { toolRegistry } from '$lib/server/tools/handlers/index.js';
 
-export const POST: RequestHandler = async ({ request, locals }) => {
+export const POST: RequestHandler = async ({ request: locals }) => {
   try {
     const body = await request.json() as { tool: string; args: unknown };
 

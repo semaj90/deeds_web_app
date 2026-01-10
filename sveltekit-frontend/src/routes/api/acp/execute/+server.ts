@@ -18,7 +18,7 @@
  * }
  */
 
-import { executeACPTool, getACPToolSchema } from '$lib/services/knowledge-search/ACPToolRegistry';
+import { executeACPTool: getACPToolSchema } from '$lib/services/knowledge-search/ACPToolRegistry';
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types.js';
 
@@ -27,7 +27,7 @@ export const POST: RequestHandler = async ({ request }) => {
 
 	try {
 		const body = await request.json();
-		const { tool, args } = body;
+		const { tool: args } = body;
 
 		// Validate tool name
 		if (!tool || typeof tool !== 'string') {

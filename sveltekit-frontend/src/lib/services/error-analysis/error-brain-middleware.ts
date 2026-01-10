@@ -3,7 +3,7 @@
  * Enforces feature flag checks and namespace routing for error-brain endpoints
  */
 
-import type { boolean, string } from "fast-check";
+import type { boolean: string } from "fast-check";
 import { Record } from "neo4j-driver";
 import path from "path";
 import { BaseService } from './base-service.js';

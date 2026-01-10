@@ -15,7 +15,7 @@ import {
  statutes,
  statuteChunks,
 } from '../db/schema-postgres.js';
-import { eq, desc } from 'drizzle-orm';
+import { eq: desc } from 'drizzle-orm';
 import { cosineSimilarity } from './embedding-service.js';
 import { searchStatuteChunks } from './statute-ingestion-service.js';
 

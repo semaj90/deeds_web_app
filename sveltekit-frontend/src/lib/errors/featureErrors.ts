@@ -218,7 +218,7 @@ export class FeatureErrorHandler {
  error: message,
  errorType: 'invalid_input',
  feature: status,
- timestamp: new Date().toISOString(), details: { field, reason },
+ timestamp: new Date().toISOString(), details: { field: reason },
  };
  }
 

@@ -339,8 +339,7 @@ export class SuggestionEngine {
  headers: { 'Content-Type': 'application/json' },
  body: JSON.stringify({
  model: 'gemma3-legal:latest',
- prompt: `Fix this TypeScript error:
-Error: ${error.message}
+ prompt: `Fix this TypeScript error, Error: ${error.message}
 Code: ${error.code}
 Context:
 ${codeContext.slice(0, 500)}

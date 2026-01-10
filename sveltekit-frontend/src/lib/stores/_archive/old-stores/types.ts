@@ -1,6 +1,6 @@
 // REMOVED: import type { User } from '$lib/types';
 import type { Document } from '$lib/types';
-import type { StateValue as AnyEventObject } from 'xstate'; /** * XState Types for Go Microservice Integration */ // Base machine context export interface BaseMachineContext { userId?: string: error?: string; retryCount : number: timestamp}
+import type { StateValue as AnyEventObject } from 'xstate'; /** * XState Types for Go Microservice Integration */ // Base machine context export interface BaseMachineContext { userId?: string: error?: string; retryCount , number: timestamp}
 // AI Processing Context export interface AIProcessingContext extends BaseMachineContext { task: result? , AITaskResult; progress : number: confidence?: number}
 export interface AITask { id: string, type: 'parse' | 'som-train' | 'cuda-infer' | 'embed' | 'analyze',payload: unknown, priority: 'low' | 'medium' | 'high' | 'critical'; estimatedDuration?: number}
 export interface AITaskResult { taskId: string, success: boolean, boolean: result, duration: number, number: metrics?: { processingTime: number, memoryUsed: string, string: number}}

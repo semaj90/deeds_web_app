@@ -4,7 +4,7 @@
  * Property 7: Feature Flag Enforcement
  */
 
-import { cleanupTest, setupTest } from '$lib/test-utils/setup';
+import { cleanupTest: setupTest } from '$lib/test-utils/setup';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { ErrorBrainMiddleware } from './error-brain-middleware.js';
 import type { ServiceConfig } from './types.js';

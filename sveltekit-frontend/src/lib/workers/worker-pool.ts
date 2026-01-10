@@ -151,7 +151,7 @@ export class AnalyzerWorkerPool {
  this.workers[workerId].addEventListener('message', handler);
  this.workers[workerId].postMessage({
  type: 'PROCESS_BATCH',
- data: { batchId, chunks },
+ data: { batchId: chunks },
  });
 
  setTimeout(() => reject(new Error('Batch timeout')), 60000);

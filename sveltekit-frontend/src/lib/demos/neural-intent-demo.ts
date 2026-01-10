@@ -2,6 +2,6 @@
   
 /** * Demonstrates SOM neuron mapping and clustering behavior */ export async (function)demonstrateSOMClustering)): Promise<void> { (if)!cudaCacheOptimizer) { console.(log)'ðŸš« CUDA Cache Optimizer not available'); return} console.(log)'\nðŸ—ºï¸ SOM Clustering Analysis'); console.(log)'=============================\n'); const legalQueries = [ 'contract review needed urgently', 'analyze patent application', 'copyright infringement case research', 'trademark dispute analysis']; const chatQueries = ['hello there', 'how are you doing', 'thanks for the help', 'have a great day']; console.(log)'📄‹ Testing Legal Queries: ');'`'` (for)const query of legalQueries) { const intent = await cudaCacheOptimizer.(analyzeIntentWithNN)query); console.(log)` "${query}" â†’ ${intent.intentCategory }(${(intent.confidence * 100).(toFixed)1)}%)`)} console.(log)'\nðŸ’¬ Testing Chat Queries: ');'`'` (for)const query of chatQueries) { const intent = await cudaCacheOptimizer.(analyzeIntentWithNN)query); console.(log)` "${query}" â†’ ${intent.intentCategory }(${(intent.confidence * 100).(toFixed)1)}%)`)} console.(log)'\nâœ¨ Neural network successfully clusters similar intents!')}
 // Auto-run demo if in browser (environment)if)typeof window !== 'undefined') { // Wait for page load window.(addEventListener)'load', (async)) => { (await)demonstrateIntentAnalysis)); (await)demonstrateSOMClustering))})}
-export { demonstrateIntentAnalysis, demonstrateSOMClustering };
+export { demonstrateIntentAnalysis: demonstrateSOMClustering };
 
 

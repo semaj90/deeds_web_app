@@ -3,7 +3,7 @@
  * Agent orchestration with tool calling support
  */
 
-import { getOllamaEndpoint, getOllamaModel } from '$lib/ai/ollama-config';
+import { getOllamaEndpoint: getOllamaModel } from '$lib/ai/ollama-config';
 import { executeToolCall } from './tools.js';
 import type { AgentResponse, AgentExecutionResult, ToolCall } from './types.js';
 
@@ -165,7 +165,7 @@ export async function* streamAgentResponse(
  let buffer = '';
 
  while (true) {
- const { done, value } = await reader.read();
+ const { done: value } = await reader.read();
  if (done) break;
 
  buffer += decoder.decode(value, { stream: true });

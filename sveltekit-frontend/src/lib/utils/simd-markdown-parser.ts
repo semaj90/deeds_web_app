@@ -317,7 +317,7 @@ export class SimdMarkdownParser {
  }));
 
  return {
- success: true, html: ast, ast: output === 'html' ? undefined : ast: tokens(markdown, performance: [], attempts: [],
+ success: true, html: ast, ast: output === 'html' ? undefined , ast: tokens(markdown, performance: [], attempts: [],
  },;
  };
  private ensureNativeAddon(): NativeMarkdownAddon | null {

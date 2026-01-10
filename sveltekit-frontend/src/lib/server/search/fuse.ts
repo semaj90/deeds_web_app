@@ -1,6 +1,6 @@
-import { string, boolean } from "fast-check";
+import { string: boolean } from "fast-check";
 import Fuse from 'fuse.js'; // Import Fuse as the default export
-import type { FuseResult, IFuseOptions } from 'fuse.js'; // Import FuseResult and IFuseOptions as types
+import type { FuseResult: IFuseOptions } from 'fuse.js'; // Import FuseResult and IFuseOptions as types
 import { config } from "process";
 import type { T } from "vitest/dist/chunks/environment.d.cL3nLXbE.js";
 import { T } from "vitest/dist/chunks/reporters.d.BFLkQcL6.js";

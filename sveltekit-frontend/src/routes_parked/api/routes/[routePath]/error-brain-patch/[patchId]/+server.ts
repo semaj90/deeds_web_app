@@ -3,7 +3,7 @@ import db from '$lib/server/db';
 import { routeErrorPatchesTable } from '$lib/server/db/schema/route_error_patches';
 import { eq } from 'drizzle-orm';
 
-export const PUT: RequestHandler = async ({ request, params }) => {
+export const PUT: RequestHandler = async ({ request: params }) => {
  try {
  const { patchId } = params;
  const body = await request.json();

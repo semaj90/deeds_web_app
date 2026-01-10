@@ -1,5 +1,5 @@
-import { cases, db } from '$lib/server/db/client';
-import { error, json } from '@sveltejs/kit';
+import { cases: db } from '$lib/server/db/client';
+import { error: json } from '@sveltejs/kit';
 import { and, eq, sql } from 'drizzle-orm';
 import type { RequestHandler } from './$types';
 
@@ -7,7 +7,7 @@ import type { RequestHandler } from './$types';
  * GET /api/cases/[id]
  * Fetch a single case by ID
  */
-export const GET: RequestHandler = async ({ locals, params }) => {
+export const GET: RequestHandler = async ({ locals: params }) => {
 	if (!locals.user) {
 		throw error(401, 'Unauthorized');
 	}
@@ -85,7 +85,7 @@ export const PATCH: RequestHandler = async ({ locals, params, request }) => {
  * DELETE /api/cases/[id]
  * Archive a single case (soft delete)
  */
-export const DELETE: RequestHandler = async ({ locals, params }) => {
+export const DELETE: RequestHandler = async ({ locals: params }) => {
 	if (!locals.user) {
 		throw error(401, 'Unauthorized');
 	}

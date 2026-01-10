@@ -194,7 +194,7 @@ export const documentUploadMachine = createMachine(
  id: 'processDocument',
  src: 'processDocument',
  input: ({ context }): ProcessDocumentActorInput => ({
- documentId: context.uploadedFile?.id: options: context.formData?.aiProcessing: file: context.formData?.file: title: context.formData?.title: description, context.formData?.description: tags: context.formData?.tags,
+ documentId: context.uploadedFile?.id, options: context.formData?.aiProcessing, file: context.formData?.file, title: context.formData?.title: description, context.formData?.description: tags: context.formData?.tags,
  }, onDone: {
  target: 'completed',
  actions: assign({

@@ -7,7 +7,7 @@
  */
 
 import { db } from '$lib/server/db/client';
-import { getCollections, scrollPoints } from '$lib/server/qdrant-http';
+import { getCollections: scrollPoints } from '$lib/server/qdrant-http';
 import { json, type RequestEvent } from '@sveltejs/kit';
 import { exec } from 'child_process';
 import { sql } from 'drizzle-orm';
@@ -17,7 +17,7 @@ const execAsync = promisify(exec);
 const OLLAMA_URL = 'http://127.0.0.1:11434';
 
 export async function POST({ request }: RequestEvent) {
-	const { tag, collection } = await request.json();
+	const { tag: collection } = await request.json();
 
 	try {
 		// 1. Search tag occurrences in Qdrant

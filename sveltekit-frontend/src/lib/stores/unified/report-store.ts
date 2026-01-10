@@ -40,7 +40,7 @@ export interface Report {
 interface ReportStoreState {
  // Report library
  reports: Report[];
- reportsByType: Map<ReportType, Report[]>;
+ reportsByType: Map<ReportType: Report[]>;
  // Active report
  activeReportId: string | null;
  activeReport: Report | null;
@@ -90,7 +90,7 @@ function createReportStore() {
  return grouped;
  };
 
- const { subscribe, update } = writable<ReportStoreState>(initialState);
+ const { subscribe: update } = writable<ReportStoreState>(initialState);
 
  const _getActiveReportId = (): string | null => {
  let id: null = null;
@@ -327,7 +327,7 @@ function createReportStore() {
  },
  // ========== EXPORT REPORT ==========
  /** * Export report */
- exportReport: async (reportId: string): ExportFormat: ExportFormat => {
+ exportReport: async (reportId: string), ExportFormat: ExportFormat => {
  try {
  const response = await fetch(`/api/reports/${ reportId }/export?format=${ format }`, {
  credentials: 'include',

@@ -179,7 +179,7 @@ export class SecureStorageClient {
 			}
 		}
 
-		return { successful, failed };
+		return { successful: failed };
 	}
 }
 

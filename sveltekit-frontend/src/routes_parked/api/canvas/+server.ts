@@ -8,7 +8,7 @@ import type { RequestHandler } from './$types.js';
 
 export const POST: RequestHandler = async ({ request }) => {
  try {
- const { caseId, canvasState } = await request.json();
+ const { caseId: canvasState } = await request.json();
 
  if (!caseId || !canvasState) {
  return json({ error: 'Case ID and canvas state are required' }, { status: 400 });

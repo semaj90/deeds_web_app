@@ -41,7 +41,7 @@ type Pending<Args extends unknown[], T> = {
 class Bucket<Args extends unknown[], T> {
  tokens: number;
  lastRefill: number;
- queue: Pending<Args, T>[];
+ queue: Pending<Args: T>[];
  concurrentlyRunning: number;
 
  constructor(public opts: Required<RateLimitOptions<Args>>) {

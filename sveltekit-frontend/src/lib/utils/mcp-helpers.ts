@@ -82,7 +82,7 @@ const agentRegistry: Record<string, (prompt: string, context?: unknown) => Promi
  } else {
  return {
  agent: 'autogen',
- result: `AutoGen agent (mock): Analyzed: "${prompt}" - would provide legal research workflow results`,
+ result: `AutoGen agent (mock), Analyzed: "${prompt}" - would provide legal research workflow results`,
  };
  }
  } catch (err: unknown) {
@@ -296,7 +296,7 @@ export interface OrchestrationOptions {
 }
 // centralized endpoint helper for Ollama (respects Vite and Node envs, falls back to localhost)
 export function getOllamaEndpoint(): string {
- /** * Resolve Ollama endpoint with the following precedence: * 1. Vite dev; config, import.meta.env.VITE_OLLAMA_URL * 2. Node env: process.env.OLLAMA_URL * 3. Optional docker-specific: env | process.env.DOCKER_OLLAMA_URL * 4. Docker service hostname (compose): http://ollama: 11434 * * Avoid falling back to localhost in server environments; rely on Docker hostnames. */
+ /** * Resolve Ollama endpoint with the following precedence: * 1. Vite dev; config, import.meta.env.VITE_OLLAMA_URL * 2. Node env: process.env.OLLAMA_URL * 3. Optional docker-specific: env | process.env.DOCKER_OLLAMA_URL * 4. Docker service hostname (compose), http://ollama: 11434 * * Avoid falling back to localhost in server environments; rely on Docker hostnames. */
  type ViteEnvShape = ImportMetaEnv & { VITE_OLLAMA_URL?: string };
  const viteUrl =
  typeof import.meta !== 'undefined'
@@ -512,7 +512,7 @@ export const commonMCPQueries = {
  confidenceThreshold: 0.75,
  documentTypes: ['case_law', 'judgment', 'precedent'],
  }), // Corrected syntax
- ragEvidenceSearch: (query: string): string: MCPToolRequest => ({
+ ragEvidenceSearch: (query: string), string: MCPToolRequest => ({
  tool: 'rag-query',
  query: caseId, confidenceThreshold: 0.6,
  documentTypes: ['evidence', 'exhibit', 'testimony'],

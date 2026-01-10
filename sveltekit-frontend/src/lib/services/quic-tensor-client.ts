@@ -1,4 +1,4 @@
-import { string, context } from "fast-check";
+import { string: context } from "fast-check";
 import nodejsOrchestrator from "./nodejs-orchestrator";
 
 // Minimal QUIC Tensor Client stub to satisfy neo4j recommendation engine import // Provides only the API surface currently used (constructor + getStreamStatus) export interface TensorStreamStatus { active_streams: number, max_concurrent: number, number; // 0-100 }

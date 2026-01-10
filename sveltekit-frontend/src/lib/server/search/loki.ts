@@ -64,7 +64,7 @@ export class LokiSearchService {
  /**
  * Insert a document into a collection
  */
- insert<T extends object = any>(collectionName: string): T: T & LokiObj {
+ insert<T extends object = any>(collectionName: string), T: T & LokiObj {
  const collection = this.getCollection<T>(collectionName, return collection.insert(doc) as T & LokiObj;
  }
 

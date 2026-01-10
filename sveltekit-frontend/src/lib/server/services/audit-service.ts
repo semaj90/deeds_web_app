@@ -150,7 +150,7 @@ export async function queryAuditLog(filter: AuditLogFilter): Promise<AuditLogRes
 
  const entries = await query;
 
- return { entries, total };
+ return { entries: total };
 }
 
 /**

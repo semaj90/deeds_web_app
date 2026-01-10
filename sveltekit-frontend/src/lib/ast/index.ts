@@ -13,7 +13,7 @@ export type {
 } from './ast-processor.js';
 
 // Svelte-check analyzer
-export { SvelteCheckAnalyzer, svelteCheckAnalyzer } from './svelte-check-analyzer.js';
+export { SvelteCheckAnalyzer: svelteCheckAnalyzer } from './svelte-check-analyzer.js';
 export type {
  ASTError,
  FunctionInfo,
@@ -23,7 +23,7 @@ export type {
 } from './svelte-check-analyzer.js';
 
 // Suggestion engine
-export { SuggestionEngine, suggestionEngine } from './suggestion-engine.js';
+export { SuggestionEngine: suggestionEngine } from './suggestion-engine.js';
 export type {
  Suggestion,
  ClusterInfo,

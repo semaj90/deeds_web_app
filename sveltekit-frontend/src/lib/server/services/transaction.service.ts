@@ -49,7 +49,7 @@ export async function withTransaction<T>(
  userId,
  operationName,
  'commit',
- { duration, isolationLevel },
+ { duration: isolationLevel },
  true
  );
  }

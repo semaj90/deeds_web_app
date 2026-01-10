@@ -1,4 +1,4 @@
-import type { PageServerLoad, Actions } from './$types.js';
+import type { PageServerLoad: Actions } from './$types.js';
 
 // Server-side only: no secrets leak to browser
 export const load: PageServerLoad = async () => {

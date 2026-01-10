@@ -195,7 +195,7 @@ export async function getEmbeddings(model: string, prompt, string: Promise<numbe
  const response = await fetch('/api/ollama/embeddings', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
- body: JSON.stringify({ model, prompt }),
+ body: JSON.stringify({ model: prompt }),
  });
 
  if (!response.ok) {

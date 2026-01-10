@@ -5,7 +5,7 @@ import type { PageServerLoad } from './$types.js';
  * Handles initial dashboard state and metadata
  */
 
-export const load: PageServerLoad = async ({ fetch, url }) => {
+export const load: PageServerLoad = async ({ fetch: url }) => {
  // Initial empty state - data will be fetched client-side from the API
  // This approach keeps the dashboard interactive even during DB migration
  return {

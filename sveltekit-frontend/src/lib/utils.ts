@@ -237,7 +237,7 @@ export const storage = {
  return null;
  }
  },
- set: (_key: string): unknown: unknown => {
+ set: (_key: string), unknown: unknown => {
  if (!isBrowser()) return;
  try {
  localStorage.setItem(_key, JSON.stringify(value));

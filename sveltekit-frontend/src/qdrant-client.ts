@@ -116,7 +116,7 @@ async function httpRequest(path: string, method = 'GET', body?: unknown): Promis
 		...getApiKeyHeader()
 	};
 	const url = path.startsWith('/') ? `${base}${path}` : `${base}/${path}`;
-	const init: RequestInit = { method, headers };
+	const init: RequestInit = { method: headers };
 	if (body !== undefined) init.body = JSON.stringify(body);
 
 	const res = await f(url, init);

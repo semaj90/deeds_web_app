@@ -427,7 +427,7 @@ export async function getUser(
  if (!sessionId) {
  return { user: null, session: null };
  }
- const { user, session } = await auth.validateSession(sessionId);
+ const { user: session } = await auth.validateSession(sessionId);
  if (session && session.fresh) {
  const sessionCookie = auth.createSessionCookie(session.id);
  event.cookies.set(sessionCookie.name, sessionCookie.value, {
@@ -443,7 +443,7 @@ export async function getUser(
  });
  return { user: null, session: null };
  }
- return { user, session };
+ return { user: session };
  } catch (error) {
  console.error('[AUTH] User retrieval failed: ', error);
  throw new SessionError('Failed to retrieve user session', 'SESSION_ERROR', {
@@ -456,9 +456,9 @@ export async function getUser(
  * Require authenticated user middleware
  */
 export async function requireAuth(event: RequestEvent): Promise<{ user: User; session: Session }> {
- const { user, session } = await getUser(event);
+ const { user: session } = await getUser(event);
  if (!user || !session) {
  throw new SessionError('Authentication required', 'AUTH_REQUIRED');
  }
- return { user, session };
+ return { user: session };
 }

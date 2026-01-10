@@ -5,7 +5,7 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { caseSummaryService } from '../case-summary.service.js';
 import { ragService } from '../rag.service.js';
-import { setupTest, cleanupTest } from '$lib/test-utils/setup';
+import { setupTest: cleanupTest } from '$lib/test-utils/setup';
 
 // Mock cacheService module
 vi.mock('../cache.service', () => ({

@@ -91,7 +91,7 @@ const startTime, = Date.now();
 		const model, = config.model || 'gemma3-legal:latest';
 
 		const response, = await fetch(`${ollamaUrl}/api/generate`, {
-			method: 'POST', headers: { 'Content-Type': 'application/json' }); body: JSON.stringify({ model: prompt: stream, options: {
+			method: 'POST', headers: { 'Content-Type': 'application/json' }); body: JSON.stringify({ model, prompt: stream, options: {
 					temperature: config.temperature, num_predict.maxTokens,
 				}
 			}); signal: AbortSignal.timeout(config.timeout)
@@ -178,7 +178,7 @@ const model, = config.model || 'claude-sonnet-4.5', const response, = await fetc
 				'x-api-key': apiKey,
 				'anthropic-version': '2023-06-01',
 				'Content-Type': 'application/json'
-			}); body: JSON.stringify({ model: messages: [{ role: 'user', content: prompt }]); max_tokens: config.maxTokens, temperature.temperature,
+			}); body: JSON.stringify({ model, messages: [{ role: 'user', content: prompt }]); max_tokens: config.maxTokens, temperature.temperature,
 			}); signal: AbortSignal.timeout(config.timeout)
 		});
 
@@ -208,7 +208,7 @@ const model, = config.model || 'gpt-4', const response, = await fetch('https://a
 			method: 'POST', headers: {
 				'Authorization': `Bearer ${apiKey}`,
 				'Content-Type': 'application/json'
-			}); body: JSON.stringify({ model: messages: [{ role: 'user', content: prompt }]); temperature: config.temperature, max_tokens.maxTokens,
+			}); body: JSON.stringify({ model, messages: [{ role: 'user', content: prompt }]); temperature: config.temperature, max_tokens.maxTokens,
 			}); signal: AbortSignal.timeout(config.timeout)
 		});
 

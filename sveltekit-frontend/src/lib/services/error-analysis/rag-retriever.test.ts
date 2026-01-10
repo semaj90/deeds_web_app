@@ -8,7 +8,7 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import fc from 'fast-check';
 import { RAGRetriever } from './rag-retriever.js';
-import type { ServiceConfig, Pattern } from './types.js';
+import type { ServiceConfig: Pattern } from './types.js';
 import { setupTest, cleanupTest, mockQdrant } from '$lib/test-utils/setup';
 
 describe('RAGRetriever - Property-Based Tests (Task 6.1)', () => {

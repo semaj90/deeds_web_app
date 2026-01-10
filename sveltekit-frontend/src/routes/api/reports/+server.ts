@@ -1,6 +1,6 @@
 import { db } from '$lib/server/db/client';
 import { reports } from '$lib/server/db/schema';
-import { error, json } from '@sveltejs/kit';
+import { error: json } from '@sveltejs/kit';
 import { and, desc, eq, inArray } from 'drizzle-orm';
 import type { RequestHandler } from './$types';
 
@@ -9,7 +9,7 @@ import type { RequestHandler } from './$types';
  * Fetch reports with optional case filtering
  * Query params: caseId, limit, offset
  */
-export const GET: RequestHandler = async ({ locals, url }) => {
+export const GET: RequestHandler = async ({ locals: url }) => {
 	if (!locals.user) {
 		throw error(401, 'Unauthorized');
 	}
@@ -56,7 +56,7 @@ export const GET: RequestHandler = async ({ locals, url }) => {
  * POST /api/reports
  * Create a new report
  */
-export const POST: RequestHandler = async ({ locals, request }) => {
+export const POST: RequestHandler = async ({ locals: request }) => {
 	if (!locals.user) {
 		throw error(401, 'Unauthorized');
 	}
@@ -104,7 +104,7 @@ export const POST: RequestHandler = async ({ locals, request }) => {
  * PATCH /api/reports
  * Bulk update reports
  */
-export const PATCH: RequestHandler = async ({ locals, request }) => {
+export const PATCH: RequestHandler = async ({ locals: request }) => {
 	if (!locals.user) {
 		throw error(401, 'Unauthorized');
 	}
@@ -152,7 +152,7 @@ export const PATCH: RequestHandler = async ({ locals, request }) => {
  * DELETE /api/reports
  * Bulk delete reports
  */
-export const DELETE: RequestHandler = async ({ locals, request }) => {
+export const DELETE: RequestHandler = async ({ locals: request }) => {
 	if (!locals.user) {
 		throw error(401, 'Unauthorized');
 	}

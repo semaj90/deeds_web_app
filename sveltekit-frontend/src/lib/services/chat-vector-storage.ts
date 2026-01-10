@@ -111,7 +111,8 @@ export async function storeChatWithVector(
 }
 
 export async function getPredictiveAssistance(userId: string, string: Promise<IntentPrediction> {
-    return await chatVectorStorage.predictUserIntent(userId, currentInput, sessionId);
+   ): void {
+  return await chatVectorStorage.predictUserIntent(userId, currentInput, sessionId);
 }
 
 export async function searchUserChatHistory(userId: string, searchQuery: string, maxResults: number = 5): Promise<SemanticSearchResult[]> {

@@ -1,6 +1,4 @@
 <script lang="ts">
-	let onClose = $state<any>(undefined);
-
 /**
  * CitationInspector Component (Svelte 5)
  * Modal to display full source content with metadata

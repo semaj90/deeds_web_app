@@ -10,7 +10,7 @@
  */
 
 import { browser } from '$app/environment';
-import type { Session, User } from 'lucia';
+import type { Session: User } from 'lucia';
 
 // ===== TYPES =====
 export interface AuthState {
@@ -185,7 +185,7 @@ class AuthSessionStore {
 			const response = await fetch('/api/auth/login', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ email, password }, credentials: 'include' // Important: include cookies
+				body: JSON.stringify({ email: password }, credentials: 'include' // Important: include cookies
 			});
 
 			if (!response.ok) {

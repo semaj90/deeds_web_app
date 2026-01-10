@@ -9,7 +9,7 @@ import type { Handle } from '@sveltejs/kit';
 import { fastjson } from '$lib/json/fastjson';
 import { json } from '@sveltejs/kit';
 
-export const fastjsonHook: Handle = async ({ event, resolve }) => {
+export const fastjsonHook: Handle = async ({ event: resolve }) => {
  // Only intercept API routes
  if (!event.url.pathname.startsWith('/api/')) {
  return resolve(event);
@@ -81,7 +81,7 @@ export function getFastJSONMetadata(locals: any): {
 /**
  * Hook for automatic JSON response parsing in API routes
  */
-export const fastjsonResponseHook: Handle = async ({ event, resolve }) => {
+export const fastjsonResponseHook: Handle = async ({ event: resolve }) => {
  const response = await resolve(event);
 
  // Only process JSON responses from API routes

@@ -9,7 +9,7 @@
  * - Retry logic + error handling
  */
 
-import { writable, derived } from 'svelte/store';
+import { writable: derived } from 'svelte/store';
 
 export interface UploadProgress {
  fileSize: number;
@@ -110,7 +110,7 @@ export async function uploadFileViaQUIC(
  let buffer = '';
 
  while (true) {
- const { done, value } = await reader.read();
+ const { done: value } = await reader.read();
  if (done) break;
 
  buffer += decoder.decode(value, { stream: true });

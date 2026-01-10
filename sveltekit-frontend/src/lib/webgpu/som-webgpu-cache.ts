@@ -427,7 +427,7 @@ fn compute_error_embedding(@builtin(global_invocation_id) global_id: vec3<u32>) 
  return embedding;
  });
  };
- private async callGoSOMAnalyzer(errors, NPMError[]): Promise<IntelligentTodo[]> {
+ private async callGoSOMAnalyzer(errors: NPMError[]): Promise<IntelligentTodo[]> {
  try {
  const response = await fetch('http://localhost:8080/api/som/analyze', {
  method: 'POST',

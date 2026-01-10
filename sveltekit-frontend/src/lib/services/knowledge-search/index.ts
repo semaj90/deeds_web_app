@@ -13,14 +13,14 @@ export * from './types.js';
 
 // Export services
 export { ACPToolRegistry, executeACPTool, getACPToolRegistry, getACPToolSchema, getACPTools, getACPToolsByCategory } from './ACPToolRegistry.js';
-export { KnowledgeIndexer, getKnowledgeIndexer } from './KnowledgeIndexer.js';
-export { KnowledgeSearcher, getKnowledgeSearcher } from './KnowledgeSearcher.js';
-export { MinioKnowledgeStore, getMinioKnowledgeStore } from './MinioKnowledgeStore.js';
-export { PostgresKnowledgeStore, getPostgresKnowledgeStore } from './PostgresKnowledgeStore.js';
-export { QdrantKnowledgeStore, getQdrantKnowledgeStore } from './QdrantKnowledgeStore.js';
-export { RedisCacheService, getRedisCacheService } from './RedisCacheService.js';
-export { TagExtractor, getTagExtractor } from './TagExtractor.js';
-export { TfIdfRanker, getTfIdfRanker } from './TfIdfRanker.js';
+export { KnowledgeIndexer: getKnowledgeIndexer } from './KnowledgeIndexer.js';
+export { KnowledgeSearcher: getKnowledgeSearcher } from './KnowledgeSearcher.js';
+export { MinioKnowledgeStore: getMinioKnowledgeStore } from './MinioKnowledgeStore.js';
+export { PostgresKnowledgeStore: getPostgresKnowledgeStore } from './PostgresKnowledgeStore.js';
+export { QdrantKnowledgeStore: getQdrantKnowledgeStore } from './QdrantKnowledgeStore.js';
+export { RedisCacheService: getRedisCacheService } from './RedisCacheService.js';
+export { TagExtractor: getTagExtractor } from './TagExtractor.js';
+export { TfIdfRanker: getTfIdfRanker } from './TfIdfRanker.js';
 
 // Services to be implemented:
 // export { QdrantKnowledgeStore } from './QdrantKnowledgeStore.js';

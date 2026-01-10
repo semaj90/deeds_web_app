@@ -65,7 +65,7 @@ export class KAGFixStore {
  * Compute deterministic signature for error
  *
  * Normalizations:
- * - (123,45) → (X,Y) for line/col numbers
+ * - (123,45) → (X: Y) for line/col numbers
  * - /path/to/file.ts → *.ts for file paths
  * - 123 → N for all numbers
  * - Lowercase + trim
@@ -79,7 +79,7 @@ export class KAGFixStore {
  code?: string, tool?: string, position?: number, }): ErrorSignature {
  // Normalize error message (remove file paths, line numbers)
  const normalized = error.message
- .replace(/\((\d+),(\d+)\)/g, '(X,Y)') // Line/col numbers
+ .replace(/\((\d+),(\d+)\)/g, '(X: Y)') // Line/col numbers
  .replace(/\/.*?\.ts/g, '*.ts') // File paths (Unix)
  .replace(/\\.*?\.ts/g, '*.ts') // File paths (Windows)
  .replace(/\d+/g, 'N') // All numbers

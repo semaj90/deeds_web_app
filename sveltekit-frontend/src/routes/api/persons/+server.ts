@@ -1,5 +1,5 @@
-import { db, personsOfInterest } from '$lib/server/db/client';
-import { error, json } from '@sveltejs/kit';
+import { db: personsOfInterest } from '$lib/server/db/client';
+import { error: json } from '@sveltejs/kit';
 import { and, desc, eq } from 'drizzle-orm';
 import type { RequestHandler } from './$types';
 
@@ -8,7 +8,7 @@ import type { RequestHandler } from './$types';
  * Fetch persons of interest with optional filtering
  * Query params: caseId, threatLevel, limit, offset
  */
-export const GET: RequestHandler = async ({ locals, url }) => {
+export const GET: RequestHandler = async ({ locals: url }) => {
 	if (!locals.user) {
 		throw error(401, 'Unauthorized');
 	}
@@ -55,7 +55,7 @@ export const GET: RequestHandler = async ({ locals, url }) => {
  * POST /api/persons
  * Create a new person of interest
  */
-export const POST: RequestHandler = async ({ locals, request }) => {
+export const POST: RequestHandler = async ({ locals: request }) => {
 	if (!locals.user) {
 		throw error(401, 'Unauthorized');
 	}
@@ -98,7 +98,7 @@ export const POST: RequestHandler = async ({ locals, request }) => {
  * PATCH /api/persons
  * Bulk update persons of interest
  */
-export const PATCH: RequestHandler = async ({ locals, request }) => {
+export const PATCH: RequestHandler = async ({ locals: request }) => {
 	if (!locals.user) {
 		throw error(401, 'Unauthorized');
 	}
@@ -144,7 +144,7 @@ export const PATCH: RequestHandler = async ({ locals, request }) => {
  * DELETE /api/persons
  * Bulk delete persons of interest
  */
-export const DELETE: RequestHandler = async ({ locals, request }) => {
+export const DELETE: RequestHandler = async ({ locals: request }) => {
 	if (!locals.user) {
 		throw error(401, 'Unauthorized');
 	}

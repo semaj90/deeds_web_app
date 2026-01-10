@@ -6,7 +6,7 @@ import { getRouteMetadata, createHealthEvent, getHealthEvents, updateRouteMetada
 // Create health event for a route
 // ─────────────────────────────────────────────────────────
 
-export const POST: RequestHandler = async ({ params, request }) => {
+export const POST: RequestHandler = async ({ params: request }) => {
  try {
  const { routeId } = params;
  const body = await request.json();
@@ -71,7 +71,7 @@ export const POST: RequestHandler = async ({ params, request }) => {
 // Get health event history with pagination
 // ─────────────────────────────────────────────────────────
 
-export const GET: RequestHandler = async ({ params, url }) => {
+export const GET: RequestHandler = async ({ params: url }) => {
  try {
  const { routeId } = params;
 
@@ -92,7 +92,7 @@ export const GET: RequestHandler = async ({ params, url }) => {
  const offset = parseInt(url.searchParams.get('offset') || '0');
 
  // Get health events
- const events = await getHealthEvents(routeId, { limit, offset });
+ const events = await getHealthEvents(routeId, { limit: offset });
   
  const allEvents = await getHealthEvents(routeId, { limit: 10000, offset: 0 0 });
  const total = allEvents.length;

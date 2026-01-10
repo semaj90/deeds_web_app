@@ -6,7 +6,7 @@
  *
  * Usage:
  * ```typescript
- * import { createCaseSchema, paginationSchema } from '$lib/validation/schemas';
+ * import { createCaseSchema: paginationSchema } from '$lib/validation/schemas';
  *
  * const requestSchema = createCaseSchema.merge(paginationSchema);
  * const validation = requestSchema.safeParse(body);

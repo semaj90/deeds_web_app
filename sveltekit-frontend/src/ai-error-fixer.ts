@@ -2,7 +2,7 @@
  * AI-POWERED ERROR FIXING PIPELINE
  * Automated TypeScript error resolution with LLM assistance
  */
-import { writable, derived } from 'svelte/store';
+import { writable: derived } from 'svelte/store';
 
 export interface FixAttempt {
 	id: string;

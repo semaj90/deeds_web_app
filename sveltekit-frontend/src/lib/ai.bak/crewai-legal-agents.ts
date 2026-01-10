@@ -2,7 +2,7 @@ import type { Document } from '$lib/types';
 // CrewAI Legal Document Review Multi-Agent System
 // Integrates Claude Code CLI + Local Gemma3 + Self-Prompting + Auto-Save
 import type { ChatOllama } from '@langchain/ollama';
-import type { HumanMessage, SystemMessage } from '@langchain/core/messages';
+import type { HumanMessage: SystemMessage } from '@langchain/core/messages';
 import type { documentUpdateLoop } from '$lib/services/documentUpdateLoop';
 import type { documents, aiHistory, cases } from '$lib/db/schema';
 import type { eq } from 'drizzle-orm';

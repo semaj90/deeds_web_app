@@ -18,5 +18,5 @@ export async function initWebGPUWorker(): Promise<{
  return Array.from(inputs).map((x) => x * 0.5); // deterministic simple transform
  }
 
- return { device, runInference };
+ return { device: runInference };
 }

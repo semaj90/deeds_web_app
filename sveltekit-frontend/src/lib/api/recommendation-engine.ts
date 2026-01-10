@@ -90,7 +90,7 @@ export async function updateCaseRecommendation(
  const response = await fetch('/api/recommendations/recent-cases', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({ caseId, action }),
+ body: JSON.stringify({ caseId: action }),
  });
 
  if (!response.ok) {
@@ -113,7 +113,7 @@ export async function searchCases(query: string, limit: number = 10): Promise<Re
  const response = await fetch('/api/recommendations/search', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({ query, limit }),
+ body: JSON.stringify({ query: limit }),
  });
 
  if (!response.ok) {

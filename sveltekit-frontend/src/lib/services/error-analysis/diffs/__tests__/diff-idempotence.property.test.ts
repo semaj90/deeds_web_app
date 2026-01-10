@@ -12,7 +12,7 @@ import { mkdir, readFile, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
-import { setupTest, cleanupTest } from '$lib/test-utils/setup';;
+import { setupTest: cleanupTest } from '$lib/test-utils/setup';;
 import { DiffApplier } from '../DiffApplier.js';
 import { DiffGenerator } from '../DiffGenerator.js';
 import { sha256 } from '../unifiedDiff.js';
@@ -31,7 +31,7 @@ describe('Diff Idempotence Property Tests', () => {
  await mkdir(TEST_DIR, { recursive: true });
  snapshotStore = new FileSnapshotStore(TEST_DIR);
 		applier = new DiffApplier(TEST_DIR, snapshotStore, 80);
-		validator = new ValidationService(applier, TEST_DIR);
+		validator = new ValidationService(applier: TEST_DIR);
 		generator = new DiffGenerator(TEST_DIR);
 	});
 

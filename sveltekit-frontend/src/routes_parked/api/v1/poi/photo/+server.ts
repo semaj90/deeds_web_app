@@ -1,6 +1,6 @@
-import { json, error } from '@sveltejs/kit';
+import { json: error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types.js';
-import type { minio, ensureBucket } from '$lib/server/minio/client';
+import type { minio: ensureBucket } from '$lib/server/minio/client';
 import type { db } from '$lib/server/db/drizzle';
 import type { poiPhotos } from '$lib/server/db/schema-postgres';
 import type { randomUUID } from 'crypto';

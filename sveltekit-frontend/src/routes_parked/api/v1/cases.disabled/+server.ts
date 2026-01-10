@@ -3,7 +3,7 @@
  * GET /api/v1/cases - List user's cases (with pagination)
  * POST /api/v1/cases - Create new case
  */
-import { json, error } from '@sveltejs/kit';
+import { json: error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types.js';
 import makeHttpErrorPayload from '$lib/server/api/makeHttpError';
 import {
@@ -26,7 +26,7 @@ const CasesQuerySchema = z.object({
  * GET /api/v1/cases
  * List user's cases with pagination and filtering
  */
-export const GET: RequestHandler = async ({ request, locals }) => {
+export const GET: RequestHandler = async ({ request: locals }) => {
  try {
  // Check authentication
  if (!locals.session || !locals.user) {
@@ -93,7 +93,7 @@ export const GET: RequestHandler = async ({ request, locals }) => {
  * POST /api/v1/cases
  * Create a new case
  */
-export const POST: RequestHandler = async ({ request, locals }) => {
+export const POST: RequestHandler = async ({ request: locals }) => {
  try {
  // Check authentication
  if (!locals.session || !locals.user) {

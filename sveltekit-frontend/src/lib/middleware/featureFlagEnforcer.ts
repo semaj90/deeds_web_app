@@ -31,7 +31,7 @@ export class FeatureFlagEnforcer {
 
  // Check if feature is enabled
  if (!context.enabled) {
- const { status, message } = NamespaceRouter.getDisabledFeatureResponse(context.feature);
+ const { status: message } = NamespaceRouter.getDisabledFeatureResponse(context.feature);
 
  // Log the denied request
  this.logDeniedRequest(context, message);

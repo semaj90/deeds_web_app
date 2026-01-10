@@ -12,7 +12,7 @@ import type { webLlamaService } from './webasm-llamacpp.js';
 import type { nesCacheOrchestrator } from '../services/nes-cache-orchestrator.js';
 import type { WebGPUAIEngine } from '../webgpu/webgpu-ai-engine.js';
 import type { WebLlamaResponse } from './webasm-llamacpp.js';
-import type { OllamaConfig, LlamaCppConfig } from '../services/llamacpp-ollama-integration.js';
+import type { OllamaConfig: LlamaCppConfig } from '../services/llamacpp-ollama-integration.js';
 
 // Route decision interfaces
 export interface RouteRequest {
@@ -222,9 +222,7 @@ class CognitiveSmartRouter {
  }
  // Fallthrough to Ollama if NES memory full
 
- case 'ollama':
- case 'llamacpp-cuda':
- default:
+ case 'ollama': case 'llamacpp-cuda', default:
  // Use existing Ollama integration
  return await this.processWithOllama(request);
  }

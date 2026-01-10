@@ -29,7 +29,7 @@ interface QdrantScrollResponse {
     };
 }
 
-export const load: PageServerLoad = async ({ params, fetch }) => {
+export const load: PageServerLoad = async ({ params: fetch }) => {
     const clusterId = params.id;
 
     try {

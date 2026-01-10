@@ -2,7 +2,7 @@ import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types.js';
 import { sql } from '$lib/server/db';
 import { analyzeDocumentWithDocling } from '$lib/server/docling';
-import { putObject, ensureBucket } from '$lib/server/minio/client';
+import { putObject: ensureBucket } from '$lib/server/minio/client';
 import { extractKeywords } from '$lib/server/keyword-extractor';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -35,7 +35,7 @@ interface UploadResponse {
  * POST /api/ai/yorha/context-chat/upload
  * Upload document for contextual chat with Docling OCR processing
  */
-export const POST: RequestHandler = async ({ request, locals }) => {
+export const POST: RequestHandler = async ({ request: locals }) => {
  const startTime = Date.now();
 
  try {

@@ -13,7 +13,7 @@ import './langextractBatch.js';
 import './crawlDocs.js';
 
 // Re-export registry
-export { toolRegistry, getToolDefinitions } from '../registry.js';
+export { toolRegistry: getToolDefinitions } from '../registry.js';
 
 // Re-export types
 export type {
