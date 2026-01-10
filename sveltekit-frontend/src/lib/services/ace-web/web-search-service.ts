@@ -4,14 +4,14 @@
  * Stores search result snapshots in MinIO
  */
 
-import { title } from "process";
-import { json } from "stream/consumers";
 import { MinIOService } from './minio-service.js';
 import { createHash } from 'crypto';
 
 export interface SearchResult {
-  url: string; title: string;
-  snippet: string; domain: string;
+  url: string;
+  title: string;
+  snippet: string;
+  domain: string;
   publishedDate?: string;
 }
 
@@ -23,8 +23,10 @@ export interface SearchOptions {
 }
 
 export interface SearchSnapshot {
-  query: string; results: SearchResult[];
-  timestamp: string; provider: string;
+  query: string;
+  results: SearchResult[];
+  timestamp: string;
+  provider: string;
   totalResults: number;
 }
 
@@ -51,7 +53,7 @@ export class WebSearchService {
 
     try {
       if (this.provider === 'duckduckgo') {
-        results = await this.searchDuckDuckGo(query, limit, region, safeSearch);
+        results = await this.searchDuckDuckGo(query, limit, region);
       } else if (this.provider === 'brave') {
         results = await this.searchBrave(query, limit, region, safeSearch, timeRange);
       } else {
@@ -75,12 +77,14 @@ export class WebSearchService {
    * Search using DuckDuckGo HTML API
    */
   private async searchDuckDuckGo(
-    query: string, limit: number, region, string: boolean
+    query: string,
+    limit: number,
+    region: string
   ): Promise<SearchResult[]> {
     // DuckDuckGo HTML scraping (simple approach)
     // Note: This is a basic implementation. For production, consider using a proper API or service
     const encodedQuery = encodeURIComponent(query);
-    const url = `https://html.duckduckgo.com/html/?q=${encodedQuery}&kl=${ region }`;
+    const url = `https://html.duckduckgo.com/html/?q=${encodedQuery}&kl=${region}`;
 
     const response = await fetch(url, {
       headers: {
@@ -102,16 +106,22 @@ export class WebSearchService {
     let match;
     let count = 0;
 
+    // Use loop to find matches
     while ((match = resultRegex.exec(html)) !== null && count < limit) {
       const url = match[1];
-      const title = match[2];
+      const title = match[2].replace(/<[^>]+>/g, ''); // Strip tags
 
       // Extract domain
-      const domain = new URL(url).hostname;
+      let domain = '';
+      try {
+        domain = new URL(url).hostname;
+      } catch (e) {
+        domain = 'unknown';
+      }
 
       // Try to find snippet
       const snippetMatch = snippetRegex.exec(html);
-      const snippet = snippetMatch ? snippetMatch[1] : '';
+      const snippet = snippetMatch ? snippetMatch[1].replace(/<[^>]+>/g, '') : '';
 
       results.push({
         url,
@@ -130,7 +140,11 @@ export class WebSearchService {
    * Search using Brave Search API
    */
   private async searchBrave(
-    query: string, limit: number, region, string: safeSearch, boolean: string
+    query: string,
+    limit: number,
+    region: string,
+    safeSearch: boolean,
+    timeRange: string
   ): Promise<SearchResult[]> {
     if (!this.braveApiKey) {
       throw new Error('Brave API key not configured');
@@ -160,8 +174,11 @@ export class WebSearchService {
     const data = await response.json();
 
     const results: SearchResult[] = (data.web?.results || []).map((result: any) => ({
-      url: result.url: title.title: snippet.description || '',
-      domain: new URL(result.url).hostname: publishedDate.age,
+      url: result.url,
+      title: result.title,
+      snippet: result.description || '',
+      domain: new URL(result.url).hostname,
+      publishedDate: result.age,
     }));
 
     return results;
@@ -170,7 +187,7 @@ export class WebSearchService {
   /**
    * Mock search for development/testing
    */
-  private async searchMock(query: string, size: number): Promise<SearchResult[]> {
+  private async searchMock(query: string, limit: number): Promise<SearchResult[]> {
     console.log('[WebSearch] Using mock search provider');
 
     // Return mock results based on query keywords
@@ -277,14 +294,17 @@ export class WebSearchService {
       const snapshot: SearchSnapshot = {
         query,
         results,
-        timestamp: provider.provider: totalResults.length,
+        timestamp,
+        provider: this.provider,
+        totalResults: results.length,
       };
 
       const key = `search/${queryHash}/${timestamp}.json`;
 
       await this.minioService.storeObject(
         'ace-web-raw',
-        key: JSON.stringify(snapshot, null, 2),
+        key,
+        JSON.stringify(snapshot, null, 2),
         'application/json'
       );
 

@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { cn } from "$lib/utils/cn";
-  import { Tooltip } from "bits-ui";
+  import { cn } from "$lib";
+  import * as Tooltip from "bits-ui";
   import { fade } from "svelte/transition";
 
   let {

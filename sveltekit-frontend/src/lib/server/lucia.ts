@@ -1,5 +1,5 @@
 import { db } from '$lib/server/db/client';
-import { sessions: users } from '$lib/server/db/schema';
+import { sessions, users } from '$lib/server/db/schema';
 import { DrizzlePostgreSQLAdapter } from '@lucia-auth/adapter-drizzle';
 import type { Cookies } from '@sveltejs/kit';
 import bcrypt from 'bcryptjs';
@@ -13,6 +13,8 @@ export interface CreateUserSessionResult {
 }
 
 const adapter = new DrizzlePostgreSQLAdapter(db as any, sessions, users);
+
+// ... (lines 17-33 unchanged)
 
 export const lucia = new Lucia(adapter, {
   sessionCookie: {
@@ -95,7 +97,7 @@ export interface ValidationResult {
 
 export async function validateSession(sessionId: string): Promise<ValidationResult> {
   console.log(`[lucia] Validating session: ${sessionId}`);
-  const { session: user } = await lucia.validateSession(sessionId);
+  const { session, user } = await lucia.validateSession(sessionId);
 
   if (session && user) {
     return {

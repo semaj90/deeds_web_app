@@ -1,7 +1,8 @@
 
 import { index, integer, jsonb, pgTable, timestamp, uuid } from 'drizzle-orm/pg-core';
 import { sql } from 'drizzle-orm';
-import { canvasStates: users } from './schema-postgres.js';
+import { users } from './schema-postgres.js';
+import { canvasStates } from './schema-canvas.js';
 
 export const canvasAutosaves = pgTable(
 	'canvas_autosaves',
@@ -13,21 +14,13 @@ export const canvasAutosaves = pgTable(
 		userId: uuid('user_id').references(() => users.id, { onDelete: 'set null' }),
 		snapshot: jsonb('snapshot').default({}).notNull(),
         // Note: vector type might need explicit import or sql type depending on setup.
-        // Using sql`vector(384)` as seen in other files or raw definition if pgvector/drizzle-orm is setup.
-        // Original code tried: import { vector } from 'pgvector/drizzle-orm';
-        // Check if that package exists. If not, use sql.
-        // Assuming it exists for now based on import.
-		// embedding: vector('embedding', { dimensions: 384 }),
-        // Note: Earlier debugging showed `pgvector` might not be installed or configured in `package.json`?
-        // Let's use custom type or sql if needed.
-        // Reverting to `vector` import if valid.
-        // But to be safe, I will comment it out or use compatible definition.
-        // schema-postgres.ts used `vector: text('vector'), // Using sql'vector(384)'` in one place?
-        // Let's check imports in schema-postgres.ts.
-	    embedding:  uuid('embedding').defaultRandom(), // WAIT. Embedding should be vector.
-        // If I don't have the explicit type, I can skip it or use custom.
-        // Original code had: embedding: vector('embedding', { dimensions: 384 })
-        // I will trust the import.
+        // Keeping logical placeholder or uuid if temporarily mapped, but should be vector(384)
+        // If pgvector is not available, commenting out is safer than wrong type
+        // embedding: vector('embedding', { dimensions: 384 }),
+        // For now, keeping what was there to avoid schema drift if it was successfully migrated as uuid (unlikely)
+        // But preventing syntax errors is priority.
+	    // embedding:  uuid('embedding').defaultRandom(),
+        // commenting out embedding to prevent runtime type mismatch if not properly typed.
 		version: integer('version').default(1).notNull(),
 		createdAt: timestamp('created_at', { mode: 'date' }).defaultNow().notNull(),
 	},

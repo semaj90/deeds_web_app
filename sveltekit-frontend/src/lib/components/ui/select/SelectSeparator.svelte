@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { cn } from "$lib/utils/cn";
-  import { Select } from "bits-ui";
+  import { cn } from "$lib";
+  import * as Select from "bits-ui";
 
   interface Props {
     class?: string;

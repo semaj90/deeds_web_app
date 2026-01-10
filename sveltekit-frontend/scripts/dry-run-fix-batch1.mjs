@@ -1,275 +1,203 @@
 #!/usr/bin/env node
 /**
- * DRY-RUN: Fix Batch 1 - Test fixing 4 corrupted files
- * Files: adaptive-index-orchestrator.ts, agentShellMachine.ts, ai-error-fixer.ts, hooks.server.ts
+ * Dry-Run Fix Script - Batch 1
+ * Tests fixes on a small set of files before full deployment
+ *
+ * Target Files (5 files with high error counts):
+ * 1. src/lib/agents/tools.ts - Multiple TS1005 errors
+ * 2. src/lib/ai/ollama-config.ts - Try/catch corruption
+ * 3. src/lib/api/client.ts - Multiple comma/colon issues
+ * 4. src/lib/animations/gpu-animations.ts - Type annotation issues
+ * 5. src/adaptive-index-orchestrator.ts - Import corruption
  */
 
-import fs from 'fs';
+import fs from 'fs/promises';
 import path from 'path';
-import { fileURLToPath } from 'url';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const srcDir = path.join(__dirname, '../src');
+const DRY_RUN = true; // Set to false to apply fixes
+const BACKUP_DIR = '.fix-backups-batch1';
 
-// Track fixes
-const fixes = {
-  total: 0,
-  byFile: {},
-  patterns: {}
-};
+// Corruption patterns to fix
+const PATTERNS = [
+  {
+    name: 'Import type comma',
+    regex: /import\s*{\s*([^}]+?)\s+type\s+([A-Z][a-zA-Z0-9]*)\s*}/g,
+    replacement: 'import { $1, type $2 }',
+    description: 'Fix: import { X type Y } → import { X, type Y }'
+  },
+  {
+    name: 'Object literal colon-comma swap',
+    regex: /(\w+)\s*:\s*([^,}\n]+?)\s*:\s*/g,
+    replacement: '$1: $2,',
+    description: 'Fix: key: value: → key: value,'
+  },
+  {
+    name: 'Function param colon-comma swap',
+    regex: /\(([^)]+?)\s*:\s*([^:,)]+?)\s*:\s*([^)]+?)\)/g,
+    replacement: '($1: $2, $3)',
+    description: 'Fix: (a: string: b) → (a: string, b)'
+  },
+  {
+    name: 'Try-catch corruption',
+    regex: /}\s*catch\s*\(\s*(\w+)\s*:\s*(\w+)\s*:\s*(\w+)\s*:\s*(\w+)\s*\)\s*{/g,
+    replacement: '} catch ($1) {',
+    description: 'Fix: } catch (e: unknown: Error: any) { → } catch (e) {'
+  },
+  {
+    name: 'Array/Object trailing comma before closing',
+    regex: /,(\s*[}\]])/g,
+    replacement: '$1',
+    description: 'Fix: Remove trailing commas before } or ]'
+  }
+];
 
-/**
- * Fix Pattern 1: Import corruption - "import type { User: Document }"
- * Should be: "import type { User, Document }"
- */
-function fixImportTypeColon(content, filePath) {
-  const pattern = /import\s+type\s+\{\s*([^}]+):\s*([^}]+)\s*\}/g;
-  let count = 0;
+const TARGET_FILES = [
+  'src/lib/agents/tools.ts',
+  'src/lib/ai/ollama-config.ts',
+  'src/lib/api/client.ts',
+  'src/lib/animations/gpu-animations.ts',
+  'src/adaptive-index-orchestrator.ts'
+];
 
-  const fixed = content.replace(pattern, (match, before, after) => {
-    count++;
-    console.log(`  [FIX] Import type colon: "${before}: ${after}" → "${before}, ${after}"`);
-    return `import type { ${before.trim()}, ${after.trim()} }`;
-  });
-
-  if (count > 0) {
-    fixes.total += count;
-    fixes.byFile[filePath] = (fixes.byFile[filePath] || 0) + count;
-    fixes.patterns['import_type_colon'] = (fixes.patterns['import_type_colon'] || 0) + count;
+class DryRunFixer {
+  constructor() {
+    this.stats = {
+      filesProcessed: 0,
+      filesModified: 0,
+      patternsApplied: 0,
+      errors: []
+    };
   }
 
-  return fixed;
-}
+  async run() {
+    console.log('🧪 DRY-RUN FIX - BATCH 1');
+    console.log('='.repeat(60));
+    console.log(`Mode: ${DRY_RUN ? '🔍 DRY-RUN (no changes)' : '✍️  APPLY FIXES'}`);
+    console.log(`Target: ${TARGET_FILES.length} files`);
+    console.log('='.repeat(60));
+    console.log('');
 
-/**
- * Fix Pattern 2: XState import corruption - "import { createMachine: assign }"
- * Should be: "import { createMachine, assign }"
- */
-function fixXStateImportColon(content, filePath) {
-  const pattern = /import\s+\{\s*createMachine:\s*assign\s*\}/g;
-  let count = 0;
+    // Create backup directory if applying fixes
+    if (!DRY_RUN) {
+      await fs.mkdir(BACKUP_DIR, { recursive: true });
+    }
 
-  const fixed = content.replace(pattern, (match) => {
-    count++;
-    console.log(`  [FIX] XState import: "createMachine: assign" → "createMachine, assign"`);
-    return 'import { createMachine, assign }';
-  });
+    for (const filePath of TARGET_FILES) {
+      await this.processFile(filePath);
+    }
 
-  if (count > 0) {
-    fixes.total += count;
-    fixes.byFile[filePath] = (fixes.byFile[filePath] || 0) + count;
-    fixes.patterns['xstate_import_colon'] = (fixes.patterns['xstate_import_colon'] || 0) + count;
+    this.printSummary();
   }
 
-  return fixed;
-}
+  async processFile(filePath) {
+    const fullPath = path.join(process.cwd(), filePath);
 
-/**
- * Fix Pattern 3: Type import corruption - "import type { RAGResponse: UploadResponse }"
- * Should be: "import type { RAGResponse, UploadResponse }"
- */
-function fixMultiTypeImportColon(content, filePath) {
-  const pattern = /import\s+type\s+\{\s*(\w+):\s*(\w+)\s*\}/g;
-  let count = 0;
+    try {
+      console.log(`\n📄 Processing: ${filePath}`);
 
-  const fixed = content.replace(pattern, (match, type1, type2) => {
-    count++;
-    console.log(`  [FIX] Multi-type import: "${type1}: ${type2}" → "${type1}, ${type2}"`);
-    return `import type { ${type1}, ${type2} }`;
-  });
+      // Read file
+      const originalContent = await fs.readFile(fullPath, 'utf-8');
+      let modifiedContent = originalContent;
+      let fileModified = false;
+      const appliedPatterns = [];
 
-  if (count > 0) {
-    fixes.total += count;
-    fixes.byFile[filePath] = (fixes.byFile[filePath] || 0) + count;
-    fixes.patterns['multi_type_import_colon'] = (fixes.patterns['multi_type_import_colon'] || 0) + count;
-  }
+      // Apply each pattern
+      for (const pattern of PATTERNS) {
+        const beforeLength = modifiedContent.length;
+        const matches = modifiedContent.match(pattern.regex);
 
-  return fixed;
-}
+        if (matches && matches.length > 0) {
+          modifiedContent = modifiedContent.replace(pattern.regex, pattern.replacement);
 
-/**
- * Fix Pattern 4: Svelte store import corruption - "import { writable: derived }"
- * Should be: "import { writable, derived }"
- */
-function fixSvelteStoreImportColon(content, filePath) {
-  const pattern = /import\s+\{\s*writable:\s*derived\s*\}/g;
-  let count = 0;
+          if (modifiedContent.length !== beforeLength || modifiedContent !== originalContent) {
+            fileModified = true;
+            appliedPatterns.push({
+              name: pattern.name,
+              matches: matches.length
+            });
+            console.log(`   ✓ ${pattern.name}: ${matches.length} matches`);
+          }
+        }
+      }
 
-  const fixed = content.replace(pattern, (match) => {
-    count++;
-    console.log(`  [FIX] Svelte store import: "writable: derived" → "writable, derived"`);
-    return 'import { writable, derived }';
-  });
+      if (fileModified) {
+        this.stats.filesModified++;
+        this.stats.patternsApplied += appliedPatterns.length;
 
-  if (count > 0) {
-    fixes.total += count;
-    fixes.byFile[filePath] = (fixes.byFile[filePath] || 0) + count;
-    fixes.patterns['svelte_store_import_colon'] = (fixes.patterns['svelte_store_import_colon'] || 0) + count;
-  }
+        if (DRY_RUN) {
+          console.log(`   🔍 Would modify file (${appliedPatterns.length} patterns)`);
 
-  return fixed;
-}
+          // Show diff preview (first 200 chars of changes)
+          const diff = this.generateDiffPreview(originalContent, modifiedContent);
+          if (diff) {
+            console.log(`   📝 Preview:\n${diff}`);
+          }
+        } else {
+          // Backup original
+          const backupPath = path.join(BACKUP_DIR, path.basename(filePath) + '.backup');
+          await fs.writeFile(backupPath, originalContent, 'utf-8');
 
-/**
- * Fix Pattern 5: Handle type corruption - "import type { Handle: HandleServerError }"
- * Should be: "import type { Handle, HandleServerError }"
- */
-function fixHandleTypeImportColon(content, filePath) {
-  const pattern = /import\s+type\s+\{\s*Handle:\s*HandleServerError\s*\}/g;
-  let count = 0;
+          // Write modified
+          await fs.writeFile(fullPath, modifiedContent, 'utf-8');
+          console.log(`   ✅ File modified and backed up`);
+        }
+      } else {
+        console.log(`   ⏭️  No changes needed`);
+      }
 
-  const fixed = content.replace(pattern, (match) => {
-    count++;
-    console.log(`  [FIX] Handle type import: "Handle: HandleServerError" → "Handle, HandleServerError"`);
-    return 'import type { Handle, HandleServerError }';
-  });
+      this.stats.filesProcessed++;
 
-  if (count > 0) {
-    fixes.total += count;
-    fixes.byFile[filePath] = (fixes.byFile[filePath] || 0) + count;
-    fixes.patterns['handle_type_import_colon'] = (fixes.patterns['handle_type_import_colon'] || 0) + count;
-  }
-
-  return fixed;
-}
-
-/**
- * Fix Pattern 6: Handle function parameter corruption - "export const handle: Handle = async ({ event: resolve })"
- * Should be: "export const handle: Handle = async ({ event, resolve })"
- */
-function fixHandleFunctionParams(content, filePath) {
-  const pattern = /\{\s*event:\s*resolve\s*\}/g;
-  let count = 0;
-
-  const fixed = content.replace(pattern, (match) => {
-    count++;
-    console.log(`  [FIX] Handle params: "{ event: resolve }" → "{ event, resolve }"`);
-    return '{ event, resolve }';
-  });
-
-  if (count > 0) {
-    fixes.total += count;
-    fixes.byFile[filePath] = (fixes.byFile[filePath] || 0) + count;
-    fixes.patterns['handle_function_params'] = (fixes.patterns['handle_function_params'] || 0) + count;
-  }
-
-  return fixed;
-}
-
-/**
- * Fix Pattern 7: HandleError function parameter corruption - "handleError: HandleServerError = ({ error: event })"
- * Should be: "handleError: HandleServerError = ({ error, event })"
- */
-function fixHandleErrorParams(content, filePath) {
-  const pattern = /\{\s*error:\s*event\s*\}/g;
-  let count = 0;
-
-  const fixed = content.replace(pattern, (match) => {
-    count++;
-    console.log(`  [FIX] HandleError params: "{ error: event }" → "{ error, event }"`);
-    return '{ error, event }';
-  });
-
-  if (count > 0) {
-    fixes.total += count;
-    fixes.byFile[filePath] = (fixes.byFile[filePath] || 0) + count;
-    fixes.patterns['handle_error_params'] = (fixes.patterns['handle_error_params'] || 0) + count;
-  }
-
-  return fixed;
-}
-
-/**
- * Process a single file
- */
-function processFile(filePath) {
-  const relativePath = path.relative(srcDir, filePath);
-  console.log(`\n📄 Processing: ${relativePath}`);
-
-  let content = fs.readFileSync(filePath, 'utf8');
-  const originalContent = content;
-
-  // Apply all fix patterns
-  content = fixImportTypeColon(content, relativePath);
-  content = fixXStateImportColon(content, relativePath);
-  content = fixMultiTypeImportColon(content, relativePath);
-  content = fixSvelteStoreImportColon(content, relativePath);
-  content = fixHandleTypeImportColon(content, relativePath);
-  content = fixHandleFunctionParams(content, relativePath);
-  content = fixHandleErrorParams(content, relativePath);
-
-  if (content !== originalContent) {
-    console.log(`  ✅ Fixed ${fixes.byFile[relativePath] || 0} issues`);
-    return { path: filePath, content, changed: true };
-  } else {
-    console.log(`  ℹ️  No changes needed`);
-    return { path: filePath, content, changed: false };
-  }
-}
-
-/**
- * Main execution
- */
-async function main() {
-  console.log('🔧 DRY-RUN: Batch 1 Error Fixer');
-  console.log('================================\n');
-
-  const filesToFix = [
-    path.join(srcDir, 'adaptive-index-orchestrator.ts'),
-    path.join(srcDir, 'agentShellMachine.ts'),
-    path.join(srcDir, 'ai-error-fixer.ts'),
-    path.join(srcDir, 'hooks.server.ts')
-  ];
-
-  const results = [];
-
-  for (const filePath of filesToFix) {
-    if (fs.existsSync(filePath)) {
-      const result = processFile(filePath);
-      results.push(result);
-    } else {
-      console.log(`\n⚠️  File not found: ${path.relative(srcDir, filePath)}`);
+    } catch (error) {
+      console.error(`   ❌ Error: ${error.message}`);
+      this.stats.errors.push({ file: filePath, error: error.message });
     }
   }
 
-  // Summary
-  console.log('\n\n📊 DRY-RUN SUMMARY');
-  console.log('==================');
-  console.log(`Total fixes: ${fixes.total}`);
-  console.log(`Files changed: ${results.filter(r => r.changed).length}/${results.length}`);
-  console.log('\nFixes by pattern:');
-  Object.entries(fixes.patterns).forEach(([pattern, count]) => {
-    console.log(`  - ${pattern}: ${count}`);
-  });
-  console.log('\nFixes by file:');
-  Object.entries(fixes.byFile).forEach(([file, count]) => {
-    console.log(`  - ${file}: ${count}`);
-  });
-
-  // Write preview files (DRY-RUN - don't overwrite originals)
-  console.log('\n\n💾 Writing preview files...');
-  const previewDir = path.join(__dirname, '../.dry-run-previews');
-  if (!fs.existsSync(previewDir)) {
-    fs.mkdirSync(previewDir, { recursive: true });
-  }
-
-  for (const result of results) {
-    if (result.changed) {
-      const previewPath = path.join(previewDir, path.basename(result.path));
-      fs.writeFileSync(previewPath, result.content, 'utf8');
-      console.log(`  ✅ ${path.basename(result.path)}`);
+  generateDiffPreview(original, modified) {
+    // Find first difference
+    let diffStart = 0;
+    while (diffStart < original.length && diffStart < modified.length &&
+           original[diffStart] === modified[diffStart]) {
+      diffStart++;
     }
+
+    if (diffStart === original.length) return null;
+
+    // Get context around difference
+    const contextStart = Math.max(0, diffStart - 50);
+    cst fixed =xtEnd = Math.min(original.length, diffStart + 150);
+
+    const originalSnippet = original.substring(contextStart, contextEnd);
+    const modifiedSnippet = modified.substring(contextStart, Math.min(modified.length, contextStart + 200));
+
+    return `      BEFORE: ${originalSnippet.replace(/\n/g, '\\n')}\n      AFTER:  ${modifiedSnippet.replace(/\n/g, '\\n')}`;
   }
 
-  console.log(`\n✨ Preview files written to: ${previewDir}`);
-  console.log('\n🔍 Review the preview files, then run with --apply to make changes');
+  printSummary() {
+    console.log('\n' + '='.repeat(60));
+    console.log('📊 DRY-RUN SUMMARY');
+    console.log('='.repeat(60));
+    console.log(`Files Processed: ${this.stats.filesProcessed}`);
+    console.log(`Files Modified: ${this.stats.filesModified}`);
+    console.log(`Patterns Applied: ${this.stats.patternsApplied}`);
+    console.log(`Errors: ${this.stats.errors.length}`);
 
-  // Check if --apply flag is present
-  if (process.argv.includes('--apply')) {
-    console.log('\n\n⚠️  --apply flag detected, but this is a DRY-RUN script');
-    console.log('Please review the preview files first, then use the main batch fixer');
+    if (this.stats.errors.length > 0) {
+      console.log('\n❌ Errors:');
+      this.stats.errors.forEach(({ file, error }) => {
+        console.log(`   ${file}: ${error}`);
+      });
+    }
+
+    if (DRY_RUN && this.stats.filesModified > 0) {
+      console.log('\n💡 To apply these fixes, run:');
+      console.log('   node scripts/dry-run-fix-batch1.mjs --apply');
+    }
+
+    console.log('='.repeat(60));
   }
 }
 
-main().catch(console.error);
+// Run the fixer
+const fixer = new DryRunFixer();
+fixer.run().catch(console.error);

@@ -40,13 +40,13 @@ export class WebGPURedisOptimizer {
     private gpuDevice: any = null;
     private computePipeline: any = null;
     private metricsHistory: GPUMetrics[] = [];
-    
+
     // RTX 3060 Ti optimized constants
     private readonly MAX_TENSOR_CORES = 112;
     private readonly OPTIMAL_BATCH_SIZE = 128;
 
     constructor() {
-        this.initializeWebGPU().catch(err => 
+        this.initializeWebGPU().catch(err =>
             console.warn('WebGPU init deferred/failed:', err)
         );
     }
@@ -58,7 +58,7 @@ export class WebGPURedisOptimizer {
     private async initializeWebGPU(): Promise<void> {
         try {
             if (typeof navigator === 'undefined' || !navigator.gpu) {
-                console.warn('WebGPU not available, utilizing CPU fallback');
+                // Common in server-side Node.js environment
                 return;
             }
 
@@ -79,7 +79,8 @@ export class WebGPURedisOptimizer {
                 },
             });
 
-            const shaderCode = \
+            // Shader code fixed: removed backslash escapes
+            const shaderCode = `
                 @group(0) @binding(0) var<storage, read> input: array<f32>;
                 @group(0) @binding(1) var<storage, read_write> output: array<f32>;
                 @group(0) @binding(2) var<uniform> params: vec4<u32>; // [length, compression_ratio, padding, mode]
@@ -99,7 +100,7 @@ export class WebGPURedisOptimizer {
                     let quantized = round(value * f32(compression_ratio)) / f32(compression_ratio);
                     output[index] = quantized;
                 }
-            \;
+            `;
 
             const shaderModule = this.gpuDevice.createShaderModule({
                 code: shaderCode,
@@ -128,6 +129,8 @@ export class WebGPURedisOptimizer {
         }
 
         try {
+            // TODO: Implement actual GPU buffer encoding
+            // For now, fallback to CPU to avoid crash
             return this.compressTensorCPU(data, compressionRatio);
         } catch (error) {
             console.warn('GPU tensor compression failed, falling back CPU:', error);
@@ -145,7 +148,7 @@ export class WebGPURedisOptimizer {
             const val = Math.abs(data[i]);
             if (val > maxVal) maxVal = val;
         }
-        
+
         const scale = maxVal > 0 ? 127 / maxVal : 1;
 
         for (let i = 0; i < data.length; i++) {
@@ -186,10 +189,11 @@ export class WebGPURedisOptimizer {
                 originalLength: value.length,
                 timestamp: Date.now()
             };
-            
+
              if (redis) {
-                await redis.set(\\:data\, Buffer.from(compressed), 'EX', ttl);
-                await redis.set(\\:meta\, JSON.stringify(metadata), 'EX', ttl);
+                // Fixed backslash escapes on keys
+                await redis.set(`${key}:data`, Buffer.from(compressed), 'EX', ttl);
+                await redis.set(`${key}:meta`, JSON.stringify(metadata), 'EX', ttl);
              }
         } else {
              if (redis) {
@@ -203,13 +207,14 @@ export class WebGPURedisOptimizer {
      */
     async getOptimized(key: string, options: { decompress?: boolean } = {}): Promise<any> {
         if (!redis) return null;
-        
+
         try {
-            const metaStr = await redis.get(\\:meta\);
+            // Fixed backslash escapes on keys
+            const metaStr = await redis.get(`${key}:meta`);
             const metadata = metaStr ? JSON.parse(metaStr) : null;
 
             if (metadata?.type === 'compressed_tensor') {
-                const compressedBuffer = await redis.getBuffer(\\:data\);
+                const compressedBuffer = await redis.getBuffer(`${key}:data`);
                 if (compressedBuffer) {
                     return this.decompressTensor(
                         new Uint8Array(compressedBuffer),
@@ -235,13 +240,13 @@ export const webgpuRedisOptimizer = new WebGPURedisOptimizer();
 
 export const optimizedCache = {
     async set(key: string, value: any, options: { ttl?: number; compress?: boolean } = {}): Promise<void> {
-        return webgpuRedisOptimizer.setOptimized(key, value, { 
-            ttl: options.ttl, 
-            compress: options.compress, 
-            priority: 'medium' 
+        return webgpuRedisOptimizer.setOptimized(key, value, {
+            ttl: options.ttl,
+            compress: options.compress,
+            priority: 'medium'
         });
     },
-    
+
     async get(key: string): Promise<any> {
         return webgpuRedisOptimizer.getOptimized(key, { decompress: true });
     }

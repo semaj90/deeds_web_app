@@ -1190,7 +1190,7 @@ export const passwordResetTokensRelations = relations(passwordResetTokens, ({ on
  user: one(users, { fields: [passwordResetTokens.userId], references: [users.id] }),
 }));
 
-export const casesRelations = relations(cases, ({ many: one }) => ({
+export const casesRelations = relations(cases, ({ one, many }) => ({
  assignedAttorney: one(users, { fields: [cases.assignedAttorney], references: [users.id] }),
  evidence: many(evidence),
  activities: many(caseActivities),

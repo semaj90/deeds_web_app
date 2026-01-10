@@ -1,6 +1,6 @@
 import type { LayoutServerLoad } from './$types.js';
 
-export const load: LayoutServerLoad = async ({ locals: setHeaders }) => {
+export const load: LayoutServerLoad = async ({ locals, setHeaders }) => {
 	// SSR Caching Strategy (per user guidance):
 	// - Authenticated users: no-store (private data)
 	// - Public/unauthenticated: public + max-age (static content)

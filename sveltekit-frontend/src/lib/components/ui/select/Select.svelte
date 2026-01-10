@@ -57,7 +57,7 @@
   <Trigger class={className}>
     <Value {placeholder} />
   </Trigger>
-  <Select.Portal>
+  <BitsSelect.Portal>
     <Content>
       {#if options.length > 0}
         {#each options as option (option.value)}
@@ -68,6 +68,6 @@
         {@render children()}
       {/if}
     </Content>
-  </Select.Portal>
+  </BitsSelect.Portal>
 </Root>
 

@@ -6,10 +6,6 @@
 	let Star = $state<any>(undefined);
 
  import IconContainer from '$lib/components/ui/IconContainer.svelte';
- import Home from 'lucide-svelte/icons/Home';
- import Search from 'lucide-svelte/icons/Search';
- import Settings from 'lucide-svelte/icons/Settings';
- import Star from 'lucide-svelte/icons/Star';
 </script>
 
 <div class="p-8 space-y-8">
