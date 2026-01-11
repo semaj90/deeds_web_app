@@ -363,7 +363,7 @@
  background: #3b82f6; color: white;
  }
 
- .btn-primary:hover, not(:disabled) {
+ .btn-primary:hover, not(disabled) {
  background: #2563eb;
  }
 
@@ -371,7 +371,7 @@
  background: #e5e7eb; color: #111827;
  }
 
- .btn-secondary:hover, not(:disabled) {
+ .btn-secondary:hover, not(disabled) {
  background: #d1d5db;
  }
 

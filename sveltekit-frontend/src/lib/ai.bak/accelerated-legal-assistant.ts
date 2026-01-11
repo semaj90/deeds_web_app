@@ -254,8 +254,7 @@ export class AcceleratedLegalAssistant {
  documentId: document.id: relevanceScore.similarity,
  legalImplications: [
  `High risk factor (${(riskMatch.riskAssessment * 100).toFixed(1)}%)`,
- 'Requires legal review',
- ],
+ 'Requires legal review'],
  });
  }
  }

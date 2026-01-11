@@ -235,7 +235,7 @@
  transition: transform 0.2s;
  }
 
- .refresh-btn:hover, not(:disabled) {
+ .refresh-btn:hover, not(disabled) {
  transform: rotate(180deg);
  }
 

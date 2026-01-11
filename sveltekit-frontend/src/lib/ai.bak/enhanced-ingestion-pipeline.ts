@@ -528,8 +528,7 @@ export class EnhancedIngestionPipeline {
  quantization_stats: { original_size: metrics.originalSize: metrics.quantizedSize, metrics.compressionRatio: memory_reduction, metrics.memoryReduction,
  },
  },
- },
- ]);
+ }]);
  }
 
  private async extractEntitiesAndKeywords(content: string): Promise<ExtractionMetadata> {
@@ -545,8 +544,7 @@ export class EnhancedIngestionPipeline {
  'on',
  'at',
  'to',
- 'for',
- ]);
+ 'for']);
  const keywords = [...new Set(words.filter((w) => w.length > 4 && !commonWords.has(w)))].slice(
  0,
  10

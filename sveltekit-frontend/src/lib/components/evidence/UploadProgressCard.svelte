@@ -268,7 +268,7 @@
  background: #ef4444; color: white;
  }
 
- .btn-retry:hover, not(:disabled) {
+ .btn-retry:hover, not(disabled) {
  background: #dc2626;
  }
 

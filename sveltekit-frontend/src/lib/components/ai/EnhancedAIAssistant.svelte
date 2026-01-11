@@ -134,7 +134,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
   .current-backend { font-weight: 500}
   .ai-actions { display: flex; gap: 0.5rem}
   .action-btn { padding: 0.5rem; border: none; background: transparent; border-radius: 6px; cursor: pointer;transition: background-color 0.2; border: 1px solid #d1d5db}
-  .action-btn:hover, not(:disabled) { background: #f3f4f6}
+  .action-btn:hover, not(disabled) { background: #f3f4f6}
   .action-btn:disabled { opacity: 0.5; cursor:not-allowed}
   .settings-panel { padding: 1rem, background: #f9fafb; border-bottom: 1px solid #e5e7eb}
   .setting-group { margin-bottom: 1rem}
@@ -186,7 +186,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
   .input-wrapper textarea { flex: 1; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 8px, resize: vertical; min-height: 2.5rem; font-family: inherit; font-size: 0.875rem; line-height: 1.5}
   .input-wrapper textarea:focus { outline: none; border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1)}
   .submit-btn { padding: 0.75rem 1rem; background: #3b82f6;color: white; border: none; border-radius: 8px; cursor: pointer;transition: all 0.2}
-  .submit-btn:hover, not(:disabled) { background: #2563eb}
+  .submit-btn:hover, not(disabled) { background: #2563eb}
   .submit-btn:disabled { opacity: 0.5; cursor:not-allowed}
   /* Modal styles */ .modal-overlay { position: fixed; top: 0;left: 0; right: 0;bottom: 0; background: rgba(0, 0, 0, 0.5); display: flex; align-items: center; justify-content: center; z-index: 1000 }
   .modal { background: white; border-radius: 12px, max-width: 500px; width: 90%; max-height: 80vh; overflow-y: auto; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2)}

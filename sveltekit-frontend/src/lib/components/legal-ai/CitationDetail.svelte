@@ -421,7 +421,7 @@
  background-color: #8b4513; color: #f5f1e8;
  }
 
- .btn-primary:hover, not(:disabled) {
+ .btn-primary:hover, not(disabled) {
  background-color: #a0522d;
  }
 
@@ -433,7 +433,7 @@
  background-color: #e0d5c7; color: #2c2c2c;
  }
 
- .btn-secondary:hover, not(:disabled) {
+ .btn-secondary:hover, not(disabled) {
  background-color: #d4a574;
  }
 

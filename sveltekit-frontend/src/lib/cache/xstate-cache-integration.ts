@@ -304,8 +304,7 @@ export const createCachedMachineStates = () => ({
  },
  };
  }),
- },
- ],
+ }],
  onError: 'computing',
  },
  },

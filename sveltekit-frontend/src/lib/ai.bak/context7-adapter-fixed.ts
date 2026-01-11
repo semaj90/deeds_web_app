@@ -150,8 +150,7 @@ export const context7SemanticAuditor = {
  status: 'ok',
  message: 'Mocked audit step - Context7 not available',
  suggestedFix: null,
- },
- ];
+ }];
  }
 
  return (impl as any).performSemanticAudit(component);

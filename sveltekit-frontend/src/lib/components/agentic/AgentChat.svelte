@@ -246,7 +246,7 @@
  font-weight: 600; cursor: pointer; transition: all 0.2s;
  }
 
- button:hover, not(:disabled) {
+ button:hover, not(disabled) {
  background: #00acc1; transform: translateY(-2px);
  box-shadow: 0 4px 12px rgba(0, 188, 212, 0.3);
  }

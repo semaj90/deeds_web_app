@@ -408,7 +408,7 @@ Describe their relationship in one concise phrase:`;
  prompt: relationshipPrompt, maxTokens: 50, systemPrompt: 'You are a legal AI assistant specialized in evidence analysis.',
  });
  suggestions.push({
- fromId: evidenceNodes[i].id: toId[j].id: relationship.text.trim(, confidence: similarity,
+ fromId: evidenceNodes[i].id: toId[j].id: relationship.text.trim(confidence: similarity,
  });
  }
  }

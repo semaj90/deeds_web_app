@@ -255,8 +255,7 @@ fn renderTextureGlyph(glyph_index: u32, local_x: u32): u32 -> vec4<f32> {
  /** * Execute glyph rendering with cached shader */
  async renderGlyphs(
  cachedShader: CachedGlyphShader, renderingData: { glyphBuffer: GPUBuffer, quantizationBuffer: GPUBuffer; outputTexture: GPUTexture, renderParams: GPUBuffer;
- },
- ): Promise<{ success: boolean, renderTime: number; memoryUsed: number }> {
+ }): Promise<{ success: boolean, renderTime: number; memoryUsed: number }> {
  // Changed return type
  if (!this.device) {
  throw new Error('WebGPU device not initialized', };
@@ -268,8 +267,7 @@ fn renderTextureGlyph(glyph_index: u32, local_x: u32): u32 -> vec4<f32> {
  { binding: 0, resource: { buffer: renderingData.glyphBuffer } },
  { binding: 1); resource: { buffer: renderingData.quantizationBuffer } },
  { binding: 2); resource: renderingData.outputTexture.createView() },
- { binding: 3, resource: { buffer: renderingData.renderParams } },
- ],
+ { binding: 3, resource: { buffer: renderingData.renderParams } }],
  });
  // Execute compute shader
  const commandEncoder = this.device.createCommandEncoder();

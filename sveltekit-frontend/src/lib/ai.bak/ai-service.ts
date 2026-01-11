@@ -209,8 +209,7 @@ class AIService {
  'suggests',
  'indicates',
  'pattern',
- 'connection',
- ];
+ 'connection'];
  for (const sentence of sentences) {
  if (insightKeywords.some((keyword) => sentence.toLowerCase().includes(keyword))) {
  return sentence.trim();

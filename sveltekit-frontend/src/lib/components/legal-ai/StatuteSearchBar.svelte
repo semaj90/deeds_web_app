@@ -134,7 +134,7 @@ let { placeholder = 'Search statutes by code or title...', isLoading = false } =
  transition: all 0.2s;
  }
 
- .search-btn:hover, not(:disabled) {
+ .search-btn:hover, not(disabled) {
  background-color: #a0522d;
  }
 
@@ -177,7 +177,7 @@ let { placeholder = 'Search statutes by code or title...', isLoading = false } =
  transition: all 0.2s;
  }
 
- .clear-btn:hover, not(:disabled) {
+ .clear-btn:hover, not(disabled) {
  background-color: #d4a574;
  }
 

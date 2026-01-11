@@ -66,8 +66,7 @@ https://svelte.dev/e/js_parse_error -->
  { id: 'incident-details', title: 'Incident Details', description: 'What happened, when, and where' },
  { id: 'impact-assessment', title: 'Impact Assessment', description: 'Effects on the victim' },
  { id: 'evidence-links', title: 'Evidence Links', description: 'Connect to existing evidence' },
- { id: 'review', title: 'Review & Submit', description: 'Review and finalize the statement' },
- ];
+ { id: 'review', title: 'Review & Submit', description: 'Review and finalize the statement' }];
 
  function getCurrentStepIndex(): number {
  return steps.findIndex(step => step.id === currentStep);

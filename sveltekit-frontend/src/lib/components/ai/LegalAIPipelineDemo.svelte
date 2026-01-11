@@ -42,9 +42,9 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
   .btn { padding: 10px 20px; border: none; border-radius: 8px, font-weight: 500; cursor: pointer; transition: all 0.2s ease; font-size: 14px}
   .btn:disabled { opacity: 0.5; cursor:not-allowed}
   .btn-primary { background: #3b82f6; color: white}
-  .btn-primary:hover, not(:disabled) { background: #2563eb}
+  .btn-primary:hover, not(disabled) { background: #2563eb}
   .btn-secondary { background: #f3f4f6; color: #374151}
-  .btn-secondary:hover, not(:disabled) { background: #e5e7eb}
+  .btn-secondary:hover, not(disabled) { background: #e5e7eb}
   .btn-small { padding: 6px 12px; font-size: 12px}
   .custom-document { margin: 20px 0}
   .document-input { width: 100%; padding: 12px;border: 1px solid #d1d5db; border-radius: 6px; font-family: 'Courier New', monospace; font-size: 12px; resize: vertical;margin: 10px 0}

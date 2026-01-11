@@ -166,10 +166,10 @@
   .form-actions { display: flex; gap: 16px; justify-content: center; margin-top: 32px}
   .submit-button, .reset-button { display: flex; align-items: center; gap: 8px;padding: 12px 24px; border-radius: 6px; font-size: 16px, font-weight: 500; cursor: pointer; transition: all 0.2s ease; border: none}
   .submit-button.primary { background: #3b82f6; color: white}
-  .submit-button.primary:hover, not(:disabled) { background: #2563eb}
+  .submit-button.primary:hover, not(disabled) { background: #2563eb}
   .submit-button.primary:disabled { background: #9ca3af; cursor:not-allowed}
   .reset-button.secondary { background: #f3f4f6; color: #374151;border: 1px solid #d1d5db}
-  .reset-button.secondary:hover, not(:disabled) { background: #e5e7eb}
+  .reset-button.secondary:hover, not(disabled) { background: #e5e7eb}
   .reset-button.secondary:disabled { opacity: 0.5; cursor:not-allowed}
   .loading-spinner { width: 16px; height: 16px; border: 2px solid transparent; border-top: 2px solid currentColor; border-radius: 50%; animation: spin 1s linear infinite}
   .submit-message { margin-top: 16px, padding: 12px; border-radius: 6px; text-align: center; font-weight: 500}

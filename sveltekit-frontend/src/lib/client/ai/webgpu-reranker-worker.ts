@@ -50,7 +50,7 @@ const GPU_MAP_MODE = { READ: 1 } as const;
 type GPUAdapterLike = { requestDevice?: () => Promise<GPUDeviceLike | undefined> };
 type GPUDeviceLike = {
  createBuffer: (desc: { size: number, usage: number }) => unknown;
- queue: { writeBuffer: (, buffer: unknown, bufferOffset: number,
+ queue: { writeBuffer: (buffer: unknown, bufferOffset: number,
  data: ArrayBuffer | SharedArrayBuffer | Uint8Array,
  dataOffset?: number,
  size?: number
@@ -262,8 +262,7 @@ self.addEventListener('message', async (event: MessageEvent) => {
  { binding: 0, resource: { buffer: queryBuffer } },
  { binding: 1, resource: { buffer: candidatesBuffer } },
  { binding: 2, resource: { buffer: scoresBuffer } },
- { binding: 3, resource: { buffer: metaBuffer } },
- ],
+ { binding: 3, resource: { buffer: metaBuffer } }],
  });
 
  const encoder = device.createCommandEncoder();
@@ -277,7 +276,7 @@ self.addEventListener('message', async (event: MessageEvent) => {
 
  (
  encoder as unknown as {
- copyBufferToBuffer: (, src: unknown, srcOffset: number,
+ copyBufferToBuffer: (src: unknown, srcOffset: number,
  dst: unknown, dstOffset: number,
  size: number
  ) => void;

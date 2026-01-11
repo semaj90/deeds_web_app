@@ -13,8 +13,7 @@ export interface CacheEntry<T> {
 export const CONSOLE_CACHE_LAYERS: Record<string, CacheLayer[]> = {
  nes: [
  { name: 'CHR_ROM', maxSize: 1024, maxAge: 300000, priority: 'high', evictionPolicy: 'lru' },
- { name: 'PRG_ROM', maxSize: 1024, maxAge: 600000, priority: 'medium', evictionPolicy: 'fifo' },
- ],
+ { name: 'PRG_ROM', maxSize: 1024, maxAge: 600000, priority: 'medium', evictionPolicy: 'fifo' }],
  snes: [
  { name: 'VRAM', maxSize: 64 * 1024, maxAge: 300000, priority: 'high', evictionPolicy: 'lru' },
  {
@@ -23,8 +22,7 @@ export const CONSOLE_CACHE_LAYERS: Record<string, CacheLayer[]> = {
  maxAge: 600000,
  priority: 'medium',
  evictionPolicy: 'lfu',
- },
- ],
+ }],
  n64: [
  {
  name: 'RDRAM',
@@ -39,8 +37,7 @@ export const CONSOLE_CACHE_LAYERS: Record<string, CacheLayer[]> = {
  maxAge: 1800000,
  priority: 'high',
  evictionPolicy: 'lru',
- },
- ],
+ }],
  legal: [
  {
  name: 'EMBEDDINGS',
@@ -62,8 +59,7 @@ export const CONSOLE_CACHE_LAYERS: Record<string, CacheLayer[]> = {
  maxAge: 900000,
  priority: 'low',
  evictionPolicy: 'fifo',
- },
- ],
+ }],
 };
 
 export class MultiLayerCacheSystem {

@@ -132,8 +132,7 @@ export function focusManagement(
  'select:not([disabled])',
  'textarea:not([disabled])',
  '[tabindex]:not([tabindex="-1"])',
- '[role="button"]:not([aria-disabled="true"])',
- ].join(', ');
+ '[role="button"]:not([aria-disabled="true"])'].join(', ');
  return Array.from(element.querySelectorAll(selectors)) as HTMLElement[];
  }
 

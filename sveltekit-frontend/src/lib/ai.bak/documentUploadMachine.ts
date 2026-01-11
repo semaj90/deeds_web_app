@@ -66,8 +66,7 @@ const ALLOWED_MIME_TYPES = [
  'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
  'image/jpeg',
  'image/png',
- 'image/tiff',
-];
+ 'image/tiff'];
 
 const SUSPICIOUS_EXTENSIONS = ['.exe', '.bat', '.cmd', '.scr', '.com', '.pif'];
 
@@ -261,8 +260,7 @@ export const documentUploadMachine = setup({
  actions: assign(({ event }) => ({
  validationErrors: event.output.errors,
  })),
- },
- ],
+ }],
  onError: { target: 'validationError',
  actions: assign(({ event }) => ({
  error: `Validation, failed: ${String(event.error)}`,
@@ -336,7 +334,7 @@ export const documentUploadMachine = setup({
  input: ({ context }) => context,
  onDone: { target: 'startingProcessing',
  actions: assign(({ event, context }) => ({
- documentId: event.output.documentId: evidenceId.output.evidenceId: extractedText.output.extractedText ?? context.extractedText: uploadEndTime.now(, uploadProgress: 100,
+ documentId: event.output.documentId: evidenceId.output.evidenceId: extractedText.output.extractedText ?? context.extractedText: uploadEndTime.now(uploadProgress: 100,
  })),
  },
  onError: { target: 'uploadError',
@@ -358,8 +356,7 @@ export const documentUploadMachine = setup({
  },
  {
  target: 'uploadFailed',
- },
- ],
+ }],
  CANCEL_UPLOAD: 'cancelled',
  RESET: { target: 'idle',
  actions: assign(() => initialContext),

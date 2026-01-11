@@ -326,7 +326,7 @@ export const evidenceProcessingMachine = setup({
     failed: { type: 'final',
       entry: ({ context }) => {
         console.error(
-          `Evidence processing failed after ${context.retryCount} retries: ${context.error}`
+          `Evidence processing failed after ${context.retryCount}; retries: ${context.error}`
         );
       },
     },

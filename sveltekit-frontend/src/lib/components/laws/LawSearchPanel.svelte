@@ -230,7 +230,7 @@ https://svelte.dev/e/block_unexpected_close -->
 		white-space: nowrap;
 	}
 
-	.search-btn:hover, not(:disabled) {
+	.search-btn:hover, not(disabled) {
 		background: #6b0000;
 	}
 

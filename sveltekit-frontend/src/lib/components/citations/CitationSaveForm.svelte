@@ -376,7 +376,7 @@ import { createEventDispatcher } from 'svelte';
  flex: 1;
  }
 
- .btn-primary:hover, not(:disabled) {
+ .btn-primary:hover, not(disabled) {
  background: var(--color-dark-burgundy); transform: translateY(-1px);
  box-shadow: 0 2px 8px rgba(139, 35, 50, 0.2);
  }
@@ -390,7 +390,7 @@ import { createEventDispatcher } from 'svelte';
  background: var(--color-tan); color: var(--color-dark);
  }
 
- .btn-secondary:hover, not(:disabled) {
+ .btn-secondary:hover, not(disabled) {
  background: var(--color-dark-tan);
  }
 

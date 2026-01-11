@@ -54,8 +54,7 @@
 			icon: '🤖',
 			status: 'idle',
 			lastRun: null, result: null, null,
-		},
-	]);
+		}]);
 
 	let selectedTool: null = $state(null);
 	let toolOutput = $state('');
@@ -365,7 +364,7 @@
 		background: #3b82f6; color: white;
 	}
 
-	.run-btn:hover, not(:disabled) {
+	.run-btn:hover, not(disabled) {
 		background: #2563eb;
 	}
 
@@ -476,7 +475,7 @@
 		color: white;
 	}
 
-	.rerun-btn:hover, not(:disabled) {
+	.rerun-btn:hover, not(disabled) {
 		background: #2563eb;
 	}
 

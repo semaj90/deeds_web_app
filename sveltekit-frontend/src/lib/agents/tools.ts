@@ -378,8 +378,7 @@ export const toolRegistry: Record<string, (args: any) => Promise<any>> = {
  title: `GitHub - ${query} Repository`,
  url: `https://github.com/topics/${encodeURIComponent(query)}`,
  snippet: `Open source projects and repositories related to ${query} on GitHub. Explore code examples and libraries.`,
- },
- ];
+ }];
 
  const result = {
  query: results, simulatedResults:
@@ -456,8 +455,7 @@ export const toolRegistry: Record<string, (args: any) => Promise<any>> = {
  line: 450,
  content: `code_search, async (args: { pattern: string; path?: string }) => {`,
  match_type: 'definition',
- },
- ],
+ }],
  status: 'simulated',
  message: 'Simulated results (Go service not configured)',
  };
@@ -573,7 +571,7 @@ export const toolRegistry: Record<string, (args: any) => Promise<any>> = {
  const { stdout: stderr } = await execAsync(
  'npx svelte-check --fail-on-warnings false --output human',
  {
- cwd: process.cwd(, maxBuffer: 10 * 1024 * 1024
+ cwd: process.cwd(maxBuffer: 10 * 1024 * 1024
  }
  );
 

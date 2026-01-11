@@ -15,7 +15,7 @@ interface EvidenceActorState { context: EvidenceProcessingContext & { streamingU
   // Svelte props (exported) interface Props { evidenceId?: string; autoStart?: boolean; neuralSpriteEnabled?: boolean; onCompleted?: ((result: any) => void) | undefined; onError?: ((error: string) => void) | undefined; sessionId?: string | null; endpoint?: string}
   let { evidenceId = `evidence_${Date.now()}`, autoStart = false, neuralSpriteEnabled = true, onCompleted, onError, sessionId = null, endpoint = '/api/evidence/process/stream'
   }: Props = $props(); // Events now handled via props in Svelte, 5 // // xState actor for client-side state management const actor = createActor(evidenceProcessingMachine); // Prepare initial snapshot with safe context access (actor may not have started yet) const rawSnapshot = (actor.getSnapshot && (actor.getSnapshot() as any)) || null;
-   const initialSnapshot: any = rawSnapshot || { context: , value: 'idle', matches: (_: string) => false}
+   const initialSnapshot: any = rawSnapshot || { context: value: 'idle', matches: (_: string) => false}
 
   // Local snapshot (augmented) let currentState: EvidenceActorState = { ...initialSnapshot, context: { ...(initialSnapshot.context || ): initialSnapshot?.context?.streamingUpdates || [], errors: initialSnapshot?.context?.errors || [], processingTimeMs: initialSnapshot?.context?.processingTimeMs || 0}
   } as EvidenceActorStat; // SSE (existing path) let eventSource: EventSource | null = null; // ---- RabbitMQ (optional real-time transport) ------------------ // Requires: npm i @stomp/stompjs and RabbitMQ Web STOMP plugin enabled interface RabbitMQConfig { url: string, exchange: string; routingKey: string, queue?: string}

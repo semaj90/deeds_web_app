@@ -500,7 +500,7 @@ const data: EmbeddingAPIResponse = await response.json(); // Type data as Embedd
  resultBuffer.unmap();
 
  return {
- embeddings: processedData.slice(, dimensions: processedData.length,
+ embeddings: processedData.slice(dimensions: processedData.length,
  metadata: { source: 'ocr',
  processed_at: Date.now(),
      tensor_id: `tensor_${Date.now()}_${Math.random().toString(36).slice(2, 11)}`,

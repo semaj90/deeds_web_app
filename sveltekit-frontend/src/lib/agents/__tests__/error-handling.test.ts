@@ -40,8 +40,7 @@ describe('Error Handling - Property 3: Error Handling', () => {
  new Error('Network error'),
  new Error('fetch failed'),
  new Error('Connection refused'),
- new Error('ECONNREFUSED'),
- ];
+ new Error('ECONNREFUSED')];
 
  for (const error of networkErrors) {
  const category = classifyError(error);
@@ -53,8 +52,7 @@ describe('Error Handling - Property 3: Error Handling', () => {
  const timeoutErrors = [
  new Error('Timeout'),
  new Error('Request timed out'),
- new Error('Operation timeout'),
- ];
+ new Error('Operation timeout')];
 
  for (const timeoutError of timeoutErrors) {
  const category = classifyError(timeoutError);
@@ -66,8 +64,7 @@ describe('Error Handling - Property 3: Error Handling', () => {
  const validationErrors = [
  new Error('Validation failed'),
  new Error('Invalid input'),
- new Error('Required field missing'),
- ];
+ new Error('Required field missing')];
 
  for (const error of validationErrors) {
  const category = classifyError(error);
@@ -79,8 +76,7 @@ describe('Error Handling - Property 3: Error Handling', () => {
  const serviceErrors = [
  new Error('Service unavailable'),
  new Error('500 Internal Server Error'),
- new Error('503 Service Unavailable'),
- ];
+ new Error('503 Service Unavailable')];
 
  for (const error of serviceErrors) {
  const category = classifyError(error);
@@ -158,8 +154,7 @@ describe('Error Handling - Property 3: Error Handling', () => {
  calculateBackoffDelay(1, 100),
  calculateBackoffDelay(2, 100),
  calculateBackoffDelay(3, 100),
- calculateBackoffDelay(4, 100),
- ];
+ calculateBackoffDelay(4, 100)];
 
  // Each delay should be roughly double the previous (with jitter)
  expect(delays[0]).toBeLessThan(200);

@@ -134,7 +134,7 @@ interface Props { open: boolean}
   .action-btn.secondary { background: rgba(33, 150, 243, 0.2); border-color: rgba(33, 150, 243, 0.4); color: #fff}
   .action-btn.tertiary { background: rgba(255, 152, 0, 0.2); border-color: rgba(255, 152, 0, 0.4); color: #fff}
   .action-btn.success { background: rgba(76, 175, 80, 0.2); border-color: rgba(76, 175, 80, 0.4); color: #fff}
-  .action-btn:hover, not(:disabled) { transform: translateY(-1px); opacity: 0.9}
+  .action-btn:hover, not(disabled) { transform: translateY(-1px); opacity: 0.9}
   .loading-state, .empty-state { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 3rem; text-align: center; color: rgba(255, 255, 255, 0.7)}
   .spinner { width: 40px; height: 40px;border: 3px solid rgba(255, 255, 255, 0.2); border-top: 3px solid rgba(138, 43, 226, 0.8); border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 1rem}
   .empty-icon { font-size: 3rem; margin-bottom: 1rem; opacity: 0.5}

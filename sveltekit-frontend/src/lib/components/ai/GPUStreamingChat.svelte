@@ -87,7 +87,7 @@
   .button-group { display: flex; flex-direction: column; gap: 0.5rem}
   .btn { padding: 0.5rem 1rem; border: none; border-radius: 6px, font-size: 0.875rem; cursor: pointer; transition: all 0.2; display: flex; align-items: center, justify-content: center; gap: 0.25rem}
   .btn-send { background: #3b82f6; color: white}
-  .btn-send:hover, not(:disabled) { background: #2563eb}
+  .btn-send:hover, not(disabled) { background: #2563eb}
   .btn-send:disabled { opacity: 0.5; cursor:not-allowed}
   .btn-stop { background: #ef4444; color: white}
   .btn-stop:hover { background: #dc2626}

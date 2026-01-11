@@ -463,7 +463,7 @@
 		font-size: 0.9rem; transition: all 0.15s ease;
 	}
 
-	.pagination-btn:hover, not(:disabled) {
+	.pagination-btn:hover, not(disabled) {
 		background: #1a1a1f;
 		border-color: #9df; color: #9df;
 	}

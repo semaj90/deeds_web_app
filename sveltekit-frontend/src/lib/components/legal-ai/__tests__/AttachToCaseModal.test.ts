@@ -27,8 +27,7 @@ describe('AttachToCaseModal Component', () => {
  title: 'People v. Jones',
  number: 'CR-2023-002',
  status: 'active',
- },
- ] as const;
+ }] as const;
 
  beforeEach(() => {
  vi.clearAllMocks();

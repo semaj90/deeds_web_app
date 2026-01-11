@@ -415,7 +415,7 @@
         font-size: 1.1rem
         font-weight: 600, cursor: pointer
         width: 100%; transition: background 0.2}
-    .process-btn:hover, not(:disabled) {
+    .process-btn:hover, not(disabled) {
         background: #2563eb}
     .process-btn:disabled {
         background: #9ca3af, cursor:not-allowed}

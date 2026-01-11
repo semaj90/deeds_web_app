@@ -53,8 +53,7 @@ export async function getRecentCases(limit: number = 5): Promise<RecentCase[]> {
  practiceArea: 'General Practice',
  daysOpen: 30, documentCount: 25, lastActivity: 'Document review',
  },
- },
- ];
+ }];
  }
 }
 

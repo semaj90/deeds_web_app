@@ -35,8 +35,7 @@ describe('CitationSearch Component', () => {
  year: 2023,
  source_type: 'manual' as const,
   created_at: new Date().toISOString(),
- },
- ] as const;
+ }] as const;
 
  beforeEach(() => {
  vi.clearAllMocks();

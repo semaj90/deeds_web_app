@@ -264,7 +264,7 @@
 		border-radius: 6px; transition: all 0.2s ease;
 	}
 
-	.close-btn:hover, not(:disabled) {
+	.close-btn:hover, not(disabled) {
 		color: white; background: rgba(255, 255, 255, 0.1);
 	}
 
@@ -401,7 +401,7 @@
 		color: rgba(255, 255, 255, 0.7);
 	}
 
-	.btn.secondary:hover, not(:disabled) {
+	.btn.secondary:hover, not(disabled) {
 		background: rgba(255, 255, 255, 0.05);
 		border-color: rgba(255, 255, 255, 0.3);
 	}
@@ -412,7 +412,7 @@
 		color: #00d4ff;
 	}
 
-	.btn.primary:hover, not(:disabled) {
+	.btn.primary:hover, not(disabled) {
 		background: rgba(0, 212, 255, 0.3);
 	}
 

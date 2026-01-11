@@ -262,7 +262,7 @@
 		transition: all 0.2s ease;
 	}
 
-	.export-btn:hover, not(:disabled) {
+	.export-btn:hover, not(disabled) {
 		background: rgba(255, 255, 255, 0.1);
 		border-color: rgba(255, 255, 255, 0.2);
 	}

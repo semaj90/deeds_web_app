@@ -269,8 +269,7 @@ export async function withTimeout<T>(
             )
           );
         });
-      }),
-    ]);
+      })]);
 
     clearTimeout(timeoutId);
     return result;

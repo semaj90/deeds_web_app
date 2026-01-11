@@ -128,10 +128,10 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
   .controls button { padding: 0.75rem 1rem; border: none; border-radius: 0.5rem, font-weight: 500; cursor: pointer; transition: all 0.2}
   .controls buttondisabled { opacity: 0.6; cursor:not-allowed}
   .controls button.primary { background: #3b82f6; color: white}
-  .controls button.primary:hover, not(:disabled) { background: #2563eb}
+  .controls button.primary:hover, not(disabled) { background: #2563eb}
   .controls button.export { background: #10b981; color: white}
   .controls buttonnot(.primary):not(.export) { background: #f3f4f6; color: #374151}
-  .controls buttonnot(.primary):not(.export):hover, not(:disabled) { background: #e5e7eb}
+  .controls buttonnot(.primary):not(.export):hover, not(disabled) { background: #e5e7eb}
   .settings { border-top: 1px solid #e5e7eb; padding-top: 1rem}
   .settings h4 { margin-bottom: 0.75rem; color: #374151; font-size: 0.875rem; font-weight: 600}
   .settings label { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem; font-size: 0.875rem; color: #6b7280; cursor: pointer}

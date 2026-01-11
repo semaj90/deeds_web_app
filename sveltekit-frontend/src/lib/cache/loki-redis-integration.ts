@@ -580,8 +580,7 @@ export class LokiRedisCache extends EventEmitter {
  { id: { $contains: query } },
  { 'metadata.title': { $contains: query } },
  { 'metadata.description': { $contains: query } },
- { 'metadata.jurisdiction': { $contains: query } },
- ];
+ { 'metadata.jurisdiction': { $contains: query } }];
  }
  const documents = collection.find(lokiQuery);
  for (const doc of documents) {

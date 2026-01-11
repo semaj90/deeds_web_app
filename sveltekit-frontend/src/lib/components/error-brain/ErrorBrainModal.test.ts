@@ -173,8 +173,7 @@ describe('ErrorBrainModal Component', () => {
  suggestions: [{ title: 'Fix 2', description: 'Desc 2' }],
  phase: 'verifying',
  created_at: new Date().toISOString(), patches: [],
- },
- ];
+ }];
 
  (global.fetch as any).mockResolvedValueOnce({
  ok: true, json: async () => ({
@@ -210,10 +209,8 @@ describe('ErrorBrainModal Component', () => {
  id: 'p2',
  file_path: 'src/test2.ts',
  verification_status: 'pending',
- },
- ],
- },
- ];
+ }],
+ }];
 
  (global.fetch as any).mockResolvedValueOnce({
  ok: true, json: async () => ({
@@ -244,13 +241,11 @@ describe('ErrorBrainModal Component', () => {
  title: 'Fix type error',
  description: 'Add type annotation',
  code: 'const, x: string = value;',
- },
- ],
+ }],
  phase: 'suggesting',
  error_message: 'Type error on line 42',
  created_at: new Date().toISOString(), patches: [],
- },
- ];
+ }];
 
  (global.fetch as any).mockResolvedValueOnce({
  ok: true, json: async () => ({

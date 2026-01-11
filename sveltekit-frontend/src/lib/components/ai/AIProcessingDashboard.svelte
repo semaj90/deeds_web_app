@@ -202,7 +202,7 @@ import type { Document } from '$lib/types';
         {selectedProvider?.status?.toUpperCase() || 'NO PROVIDER'}
       </Badge>
       <div class="text-sm">
-        Queue: {taskQueue?.length || 0} |, Workers: {systemMetrics?.availableWorkers || 0}
+        Queue: {taskQueue?.length || 0} | Workers: {systemMetrics?.availableWorkers || 0}
       </div>
     </div>
   </div>

@@ -694,7 +694,7 @@
  font-weight: 500; transition: all 0.2s;
  }
 
- .btn-export:hover, not(:disabled) {
+ .btn-export:hover, not(disabled) {
  background: var(--yorha-accent, #3cbcfc);
  color: #000;
  border-color: var(--yorha-accent, #3cbcfc);

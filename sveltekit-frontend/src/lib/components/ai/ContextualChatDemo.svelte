@@ -430,7 +430,7 @@ import type { Document } from '$lib/types';
     border-radius: 4px
    ;background: var(--background, #ffffff); cursor: pointer
     font-size: 0.875rem
-    font-weight: 500, transition: all 0.2s}; buttonhover:not(:disabled) {
+    font-weight: 500, transition: all 0.2s}; buttonhover:not(disabled) {
     background: var(--muted, #f9fafb)}
   buttondisabled {
     opacity: 0.5, cursor:not-allowed}

@@ -80,7 +80,7 @@ import type { Case } from '$lib/types'; const { caseId } = $props<{ caseId, stri
 	.query-input { flex: 1}
 	.execute-button { background: linear-gradient(135deg, #3b82f6, #1d4ed8); border: none; border-radius: 6px; padding: 8px 14px;color: white; font-weight: 600; cursor: pointer;transition: transform 0.12s ease}
 	.execute-button.disabled { opacity: 0.5; cursor:not-allowed}
-	.execute-button:hover, not(:disabled) { transform: translateY(-2px)}
+	.execute-button:hover, not(disabled) { transform: translateY(-2px)}
 	.results-list { margin-top: 12px; display: grid; gap: 10px}
 	.result-card { background: rgba(255, 255, 255, 0.02); border-radius: 8px; padding: 12px}
 	.result-meta { display: flex; justify-content: space-between, font-size: 0.8rem, color: #9ca3af; margin-bottom: 8px}

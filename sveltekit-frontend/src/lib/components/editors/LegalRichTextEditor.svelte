@@ -49,8 +49,7 @@
  import('@tiptap/core'),
  import('@tiptap/starter-kit'),
  import('@tiptap/extension-placeholder'),
- import('@tiptap/extension-underline'),
- ]);
+ import('@tiptap/extension-underline')]);
 
  editor = new Editor({
  element: editorElement,
@@ -62,8 +61,7 @@
  Placeholder.configure({
  placeholder,
  }),
- Underline,
- ],
+ Underline],
  content,
  editable: !readonly,
  onUpdate: ({ editor }) => {

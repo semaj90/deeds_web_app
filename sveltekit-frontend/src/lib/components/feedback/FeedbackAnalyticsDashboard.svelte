@@ -96,7 +96,7 @@ import type { User } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
   .filter-select { padding: 0.5rem 1rem; border: 1px solid #d1d5db; border-radius: 6px; background: white; font-size: 0.875rem}
   .action-button { display: flex; align-items: center; gap: 0.5rem;padding: 0.5rem 1rem; border-radius: 6px; font-weight: 500, font-size: 0.875rem; transition: all 0.2}
   .refresh-button { background: #3b82f6; color: white;border: none}
-  .refresh-buttonhover:not(:disabled) { background: #2563eb}
+  .refresh-buttonhover:not(disabled) { background: #2563eb}
   .export-button { background: #10b981; color: white; border: none}
   .export-buttonhover { background: #059669}
   .error-banner { background: #fef2f2; border: 1px solid #fecaca; border-radius: 8px, padding: 1rem, margin-bottom: 2rem, display: flex; align-items: center; gap: 1rem; color: #dc2626}

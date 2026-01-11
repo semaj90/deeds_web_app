@@ -70,8 +70,7 @@
  <button
  onclick={() => handleCaseClick(caseItem.id)}
  class="bg-white border-2 border-gray-300 hover:border-[#9E0000] transition p-6 cursor-pointer rounded text-left {getStatusColor(
- caseItem.status,
- )}"
+ caseItem.status)}"
  >
  <div class="flex items-start justify-between mb-3">
  <h3 class="text-lg font-bold text-gray-900 flex-1">{caseItem.title}</h3>

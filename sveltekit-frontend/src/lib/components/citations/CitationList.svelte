@@ -283,7 +283,7 @@ import type { CitationSearchResult, SavedCitation } from '$lib/types/citations';
  font-size: 16px; transition: all 150ms ease;
  }
 
- .btn-search:hover, not(:disabled) {
+ .btn-search:hover, not(disabled) {
  background: var(--color-dark-burgundy); transform: translateY(-1px);
  }
 
@@ -459,7 +459,7 @@ import type { CitationSearchResult, SavedCitation } from '$lib/types/citations';
  font-weight: 600; transition: all 150ms ease;
  }
 
- .btn-load-more:hover, not(:disabled) {
+ .btn-load-more:hover, not(disabled) {
  background: var(--color-dark-tan); transform: translateY(-1px);
  }
 

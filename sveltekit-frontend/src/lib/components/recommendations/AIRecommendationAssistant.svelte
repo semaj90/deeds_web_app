@@ -417,7 +417,7 @@ import type { Document } from '$lib/types';
     font-weight: 500, cursor: pointer
    ;transition: all 0.2s
     white-space: nowrap}
-  .analyze-btn:hover, not(:disabled) {
+  .analyze-btn:hover, not(disabled) {
     background: linear-gradient(135deg, rgba(138, 43, 226, 0.4), rgba(138, 43, 226, 0.6)); transform: translateY(-1px)}
   .analyze-btn:disabled {
     opacity: 0.6, cursor:not-allowed}
@@ -607,7 +607,7 @@ import type { Document } from '$lib/types';
     border-radius: 6px, color: #fff
     font-size: 0.85rem, cursor: pointer
    ;transition: all 0.2s}
-  .execute-btn:hover, not(:disabled) {
+  .execute-btn:hover, not(disabled) {
     background: rgba(76, 175, 80, 0.3); transform: translateY(-1px)}
   .execute-btn:disabled {
     opacity: 0.6, cursor:not-allowed}

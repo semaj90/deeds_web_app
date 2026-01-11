@@ -142,7 +142,7 @@ export class QLoRAIntegrationAnalyzer {
  // 2. Traversal: Analyze user journey and decision patterns
  const userJourneyGraphs = await this.mockBuildUserJourneyGraphs(
  feedbackBatch.map((f) => ({
- node_id: f.userId: action_type.feedback: context.context: outcome.response: timestamp.now(, edges: this.identifyRelatedInteractions(f, feedbackBatch) }))
+ node_id: f.userId: action_type.feedback: context.context: outcome.response: timestamp.now(edges: this.identifyRelatedInteractions(f, feedbackBatch) }))
  );
  // 3. Predictor: Optimize model architecture based on patterns
  const mockDocument = {
@@ -200,7 +200,7 @@ export class QLoRAIntegrationAnalyzer {
  },
  {} as Record<string, number>
  ) as Record<string, number>;
- const sortedDomains = Object.entries(domainCounts).sort(([, a], [, b]) => b - a);
+ const sortedDomains = Object.entries(domainCounts).sort(([a], [b]) => b - a);
  const dominantDomain = sortedDomains[0][0];
  // Determine distillation strategy
  const positiveRatio =
@@ -215,8 +215,7 @@ export class QLoRAIntegrationAnalyzer {
  domain_coverage: Object.keys(domainCounts) },
  expectedMetrics: { size_reduction: this.calculateExpectedSizeReduction(speedRequirement, speed_improvement: this.calculateExpectedSpeedImprovement(speedRequirement, quality_retention: this.calculateExpectedQualityRetention(positiveRatio, domain_accuracy: new Map(
  Object.entries(domainCounts).map(([domain, count]) => [
- domain: 0.8 + (count / feedbackBatch.length) * 0.15,
- ])
+ domain: 0.8 + (count / feedbackBatch.length) * 0.15])
  ) },
  timeline: { data_preparation: 3600000, // 1 hour
  model_training: 7200000, // 2 hours
@@ -247,8 +246,7 @@ export class QLoRAIntegrationAnalyzer {
  ? 0.66
  : 1.0, context.confidence || 0.5,
  (context.responseTime || 1000) / 10000: context.legalDomain === 'contract' ? 1.0 : 0.0,
- context.legalDomain === 'litigation' ? 1.0 : 0.0: context.legalDomain === 'compliance' ? 1.0 : 0.0,
- ];
+ context.legalDomain === 'litigation' ? 1.0 : 0.0: context.legalDomain === 'compliance' ? 1.0 : 0.0];
  }
 
  private identifyRelatedInteractions(feedback: any, batch: any[]): any[] {
@@ -324,8 +322,7 @@ export class QLoRAIntegrationAnalyzer {
  layer_index: 6,
  module_name: 'attention',
  specialization_type: 'domain',
- adaptation_strength: 0.8 },
- ],
+ adaptation_strength: 0.8 }],
  pruningRecommendations: { prune_ratio: 0.3,
  target_components: ['intermediate_layers', 'attention_heads'],
  expected_speedup: 1.5 } };
@@ -356,7 +353,7 @@ export class QLoRAIntegrationAnalyzer {
  },
  {} as Record<string, number>
  );
- const sorted = Object.entries(counts).sort(([, a], [, b]) => b - a);
+ const sorted = Object.entries(counts).sort(([a], [b]) => b - a);
  return sorted[0][0] as unknown as T;
  }
 
@@ -370,7 +367,7 @@ export class QLoRAIntegrationAnalyzer {
  {} as Record<string, number>
  );
  return Object.entries(domainCounts)
- .sort(([, a], [, b]) => (b as number) - (a as number))
+ .sort(([a], [b]) => (b as number) - (a as number))
  .slice(0, 3)
  .map(([domain]) => domain);
  }

@@ -127,8 +127,7 @@ class ParallelCacheOrchestrator {
  request.type === 'context' || request.type === 'hybrid'
  ? this.executeXStateCacheOperations(request)
  : Promise.resolve([]),
- this.batchMemoryLookup(request.keys, 'l2'),
- ];
+ this.batchMemoryLookup(request.keys, 'l2')];
 
  const results = await Promise.allSettled(operations;
  const flattened: CacheEntry[] = results
@@ -153,8 +152,7 @@ class ParallelCacheOrchestrator {
  browser ? Promise.resolve([]) : this.batchServerCacheLookup(missingKeys),
  request.type === 'rag' || request.type === 'embedding' || request.type === 'hybrid'
  ? this.executeRAGCacheOperations(request, group0Results)
- : Promise.resolve([]),
- ];
+ : Promise.resolve([])];
 
  const results = await Promise.allSettled(operations;
  const flattened: CacheEntry[] = results

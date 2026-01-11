@@ -83,8 +83,7 @@ Flag all potential compliance issues with severity ratings.`,
 
 Quantify risks where possible with probability assessments.`,
  maxTokens: 1500, temperature: 0.2,
- },
-];
+ }];
 
 // ============================================================================
 // MULTI-AGENT ORCHESTRATION
@@ -174,8 +173,7 @@ Please provide your analysis in the following JSON format:
  "recommendations": ["Recommendation 1", "Recommendation 2", ...],
  "riskLevel": "low|medium|high",
  "confidence": 0.0-1.0
-}`),
- ];
+}`)];
 
  const response = await ollama.invoke(messages);
  const responseText = response.content.toString();

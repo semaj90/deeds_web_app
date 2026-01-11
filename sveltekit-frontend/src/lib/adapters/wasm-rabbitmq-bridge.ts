@@ -77,8 +77,7 @@ function shouldUseWASM(message: unknown): boolean {
     'tensor',
     'vector-embedding',
     'cuda-acceleration',
-    'batch-processing',
-  ];
+    'batch-processing'];
   const messageStr = JSON.stringify(message).toLowerCase();
   const msgRecord = message as Record<string, unknown>;
   return wasmIndicators.some(

@@ -60,7 +60,7 @@ export class SecureStorageClient {
  };
  const response = await fetch(`${this.baseUrl}/upload`, {
  method: 'POST',
- headers: this.getAuthHeaders(, body: formData,
+ headers: this.getAuthHeaders(body: formData,
  });
  const result: UploadResponse = await response.json();
  if (!response.ok) {
@@ -120,7 +120,7 @@ export class SecureStorageClient {
  bucket: string = 'legal-documents',
  onProgress?: (completed: number, total) => void
  ): Promise<{ successful: UploadResponse[], failed: { file: File, error: string }[] }> {
- const successful,: UploadResponse[], =, [];
+ const successful,: UploadResponse[], = [];
  const failed,: Array<{ file: File, error: string }> = [];
  for (let i = 0; i < files.length; i++) {
  const file = files[i];
@@ -183,7 +183,7 @@ export class ReactiveStorageManager {
  this.loading, = true;
  this.error, = null;
  try {
- const result, =, (await this.client.deleteFile(bucket, key)) as DeleteResponse;
+ const result, = (await this.client.deleteFile(bucket, key)) as DeleteResponse;
  if (result.ok) {
  // Remove from client state only after successful server deletion
  this.files = this.files.filter((f) => !(f.bucket === bucket && f.key === key));

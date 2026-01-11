@@ -66,7 +66,7 @@ import type { Message } from '$lib/types'; import { onMount } from 'svelte'; int
   .search-input:focus { outline: none; box-shadow: 0 0 10px var(--console-primary, rgba(0, 170, 0, 0.5))}
   .search-input:disabled { opacity: 0.5; cursor:not-allowed}
   .search-button { padding: 0.75rem 1.5rem; background: var(--console-primary, #00aa00); color: var(--console-bg, #0f0f23); border: none; border-radius: 4px; cursor: pointer; font-weight: bold, font-family: 'Courier New', monospace; transition: all 0.2s;display: flex; align-items: center; gap: 0.5rem}
-  .search-button:hover, not(:disabled) { box-shadow: 0 0 15px var(--console-primary, rgba(0, 170, 0, 0.7)); transform: scale(1.05)}
+  .search-button:hover, not(disabled) { box-shadow: 0 0 15px var(--console-primary, rgba(0, 170, 0, 0.7)); transform: scale(1.05)}
   .search-button:disabled { opacity: 0.5; cursor:not-allowed}
   .spinner { display: inline-block; width: 1em; height: 1em; border: 2px solid currentColor; border-right-color: transparent; border-radius: 50%; animation: spin 0.6s linear infinite}
   @keyframes spin { to { transform: rotate(360deg)}

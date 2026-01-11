@@ -377,8 +377,7 @@ describe('AgentChat Component', () => {
  {
  toolName: 'rag_lookup',
  arguments: { query: 'contract law' },
- },
- ],
+ }],
  };
 
  expect(messageWithTools.toolCalls).toBeDefined();
@@ -664,8 +663,7 @@ describe('AgentChat Component', () => {
  content: 'Searching and summarizing...',
  timestamp: new Date( toolCalls: [
  { toolName: 'rag_lookup', arguments: { query: 'contract' } },
- { toolName: 'web_doc_summary', arguments: { url: 'https://example.com' } },
- ],
+ { toolName: 'web_doc_summary', arguments: { url: 'https://example.com' } }],
  };
 
  expect(messageWithMultipleTools.toolCalls?.length).toBe(2);

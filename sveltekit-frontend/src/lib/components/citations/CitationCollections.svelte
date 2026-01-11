@@ -218,7 +218,7 @@
  font-weight: 600; transition: all 150ms ease;
  }
 
- .btn-create:hover, not(:disabled) {
+ .btn-create:hover, not(disabled) {
  background: var(--color-dark-burgundy);
  }
 

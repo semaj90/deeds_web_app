@@ -74,8 +74,7 @@ class CrewAILegalTeam {
  tools: ['legal_database', 'citation_checker', 'precedent_analyzer'],
  maxExecutionTime: 180000, // 3 minutes
  memoryEnabled: true, verboseMode: false,
- },
- ],
+ }],
  tasks: [
  {
  id: 'initial_case_review',
@@ -106,8 +105,7 @@ class CrewAILegalTeam {
  priority: 'high',
  estimatedDuration: 150000,
  context: {},
- },
- ],
+ }],
  });
   
  this.crews.set('trial_preparation', {
@@ -148,8 +146,7 @@ class CrewAILegalTeam {
  tools: ['exhibit_organizer', 'tech_setup', 'presentation_tools'],
  maxExecutionTime: 120000, // 2 minutes
  memoryEnabled: false, verboseMode: false,
- },
- ],
+ }],
  tasks: [
  {
  id: 'trial_strategy',
@@ -180,8 +177,7 @@ class CrewAILegalTeam {
  priority: 'medium',
  estimatedDuration: 90000,
  context: {},
- },
- ],
+ }],
  });
   
  this.crews.set('appeal_analysis', {
@@ -211,8 +207,7 @@ class CrewAILegalTeam {
  tools: ['procedure_checker', 'deadline_tracker', 'compliance_auditor'],
  maxExecutionTime: 180000, // 3 minutes
  memoryEnabled: true, verboseMode: false,
- },
- ],
+ }],
  tasks: [
  {
  id: 'appeal_vulnerability_analysis',
@@ -235,8 +230,7 @@ class CrewAILegalTeam {
  priority: 'high',
  estimatedDuration: 120000,
  context: {},
- },
- ],
+ }],
  });
  }
 
@@ -640,8 +634,7 @@ Consensus output:`;
  const insightPatterns = [
  /(?:insight|finding|discovery):\s*(.+?)(?:\n|$)/gi,
  /(?:importantly|notably|significantly),?\s*(.+?)(?:\n|$)/gi,
- /(?:revealed|shows|indicates)\s+(?:that\s+)?(.+?)(?:\n|$)/gi,
- ];
+ /(?:revealed|shows|indicates)\s+(?:that\s+)?(.+?)(?:\n|$)/gi];
 
  const insights: string[] = [];
 
@@ -661,8 +654,7 @@ Consensus output:`;
  const recommendationPatterns = [
  /(?:recommend|suggest|should|propose):\s*(.+?)(?:\n|$)/gi,
  /(?:recommendation|suggestion):\s*(.+?)(?:\n|$)/gi,
- /(?:next step|action item):\s*(.+?)(?:\n|$)/gi,
- ];
+ /(?:next step|action item):\s*(.+?)(?:\n|$)/gi];
 
  const recommendations: string[] = [];
 

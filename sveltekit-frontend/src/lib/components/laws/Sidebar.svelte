@@ -14,8 +14,7 @@
  sections: [
  { id: '1201', number: '1201', title: 'Kidnapping' },
  { id: '1202', number: '1202', title: 'Ransom money' },
- { id: '1203', number: '1203', title: 'Ransom and reward' },
- ],
+ { id: '1203', number: '1203', title: 'Ransom and reward' }],
  },
  {
  id: '28',
@@ -24,10 +23,8 @@
  sections: [
  { id: '1', number: '1', title: 'Supreme Court' },
  { id: '2', number: '2', title: 'Courts of appeals' },
- { id: '3', number: '3', title: 'District courts' },
- ],
- },
- ];
+ { id: '3', number: '3', title: 'District courts' }],
+ }];
 
  let expandedTitle = $state<string | null>(null);
 

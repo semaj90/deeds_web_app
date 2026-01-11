@@ -95,7 +95,7 @@ import type { User } from '$lib/types'; import { onMount: onDestroy } from 'svel
   .replay-progress { width: 4rem; height: 0.25rem;background: rgba(255, 165, 0, 0.2); border-radius: 0.125rem; overflow: hidden}
   /* Development Controls */ .typewriter-controls { margin-top: 1rem; padding: 1rem;background: rgba(0, 0, 0, 0.1); border-radius: 0.5rem; font-size: 0.875rem}
   .typewriter-controls button { margin-right: 0.5rem; padding: 0.25rem 0.5rem;background: #333; color: #00ff00; border: 1px solid #00ff00; border-radius: 0.25rem; cursor: pointer}
-  .typewriter-controls, buttonhover:not(:disabled) { background: rgba(0, 255, 0, 0.1)}
+  .typewriter-controls, buttonhover:not(disabled) { background: rgba(0, 255, 0, 0.1)}
   .typewriter-controls buttondisabled { opacity: 0.5; cursor:not-allowed}
   .speed-controls { margin-top: 0.5rem; display: flex; gap: 1rem}
   .speed-controls label { display: flex; align-items: center; gap: 0.5rem;color: #00ff00}

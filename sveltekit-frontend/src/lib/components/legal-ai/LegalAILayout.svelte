@@ -33,8 +33,7 @@
  { label: 'Evidence', href: '/evidence-board', icon: '🔍' },
  { label: 'Laws & Statutes', href: '/laws', icon: '📚' },
  { label: 'Analysis', href: '/analysis-center', icon: '📊' },
- { label: 'AI Chat', href: '/aichat', icon: '💬' },
- ];
+ { label: 'AI Chat', href: '/aichat', icon: '💬' }];
 </script>
 
 <div class="legal-ai-layout">

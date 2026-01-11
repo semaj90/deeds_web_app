@@ -498,15 +498,13 @@ Only return the queries, one per line.`),
 
  const contextRetriever = RunnableSequence.from([
  (input: string) => retriever.getRelevantDocuments(input),
- formatDocumentsAsString,
- ]);
+ formatDocumentsAsString]);
 
  const ragChain = RunnableSequence.from([
  RunnableMap.from({
  context: contextRetriever, question: new RunnablePassthrough(),
  }, promptTemplate: this.llm,
- new StringOutputParser(),
- ]);
+ new StringOutputParser()]);
 
  const [answer, retrievedDocs] = await Promise.all([
  ragChain.invoke(question).catch((error: unknown) => {
@@ -516,8 +514,7 @@ Only return the queries, one per line.`),
  retriever.getRelevantDocuments(question).catch((error: unknown) => {
  console.warn('Document retrieval error: ', error);
  return [];
- }),
- ]);
+ })]);
 
  const confidence = this.calculateConfidence(retrievedDocs, confidenceThreshold);
  const processingTime = Date.now() - startTime;
@@ -1075,8 +1072,7 @@ Only return the queries, one per line.`),
  'ohio',
  'georgia',
  'north carolina',
- 'michigan',
- ];
+ 'michigan'];
  for (const state of states) {
  if (contentLower.includes(state)) {
  return state;
@@ -1213,7 +1209,7 @@ Only return the queries, one per line.`),
 // Export singleton instance with environment configuration
 export const legalRAG = new LegalRAGService({
  qdrantUrl: import.meta.env.QDRANT_URL || 'http://localhost:6333',
- ollamaGenerationUrl: getOllamaGenerationEndpoint(, ollamaEmbeddingUrl: getOllamaEmbeddingEndpoint(, collectionName: 'legal_documents', // Default collection name
+ ollamaGenerationUrl: getOllamaGenerationEndpoint(ollamaEmbeddingUrl: getOllamaEmbeddingEndpoint(collectionName: 'legal_documents', // Default collection name
  embeddingDimensions: 384, // Default embedding dimensions, adjust as needed for your model
  ollamaTemperature: 0.7, // Default temperature
  ollamaNumCtx: 2048, // Default context window
@@ -1626,15 +1622,13 @@ Only return the queries, one per line.`),
 
  const contextRetriever = RunnableSequence.from([
  (input: string) => retriever.getRelevantDocuments(input),
- formatDocumentsAsString,
- ]);
+ formatDocumentsAsString]);
 
  const ragChain = RunnableSequence.from([
  RunnableMap.from({
  context: contextRetriever, question: new RunnablePassthrough(),
  }, promptTemplate: this.llm,
- new StringOutputParser(),
- ]);
+ new StringOutputParser()]);
 
  const [answer, retrievedDocs] = await Promise.all([
  ragChain.invoke(question).catch((error: unknown) => {
@@ -1644,8 +1638,7 @@ Only return the queries, one per line.`),
  retriever.getRelevantDocuments(question).catch((error: unknown) => {
  console.warn('Document retrieval error: ', error);
  return [];
- }),
- ]);
+ })]);
 
  const confidence = this.calculateConfidence(retrievedDocs, confidenceThreshold);
  const processingTime = Date.now() - startTime;
@@ -2203,8 +2196,7 @@ Only return the queries, one per line.`),
  'ohio',
  'georgia',
  'north carolina',
- 'michigan',
- ];
+ 'michigan'];
  for (const state of states) {
  if (contentLower.includes(state)) {
  return state;
@@ -2341,7 +2333,7 @@ Only return the queries, one per line.`),
 // Export singleton instance with environment configuration
 export const legalRAG = new LegalRAGService({
  qdrantUrl: import.meta.env.QDRANT_URL || 'http://localhost:6333',
- ollamaGenerationUrl: getOllamaGenerationEndpoint(, ollamaEmbeddingUrl: getOllamaEmbeddingEndpoint(, collectionName: 'legal_documents', // Default collection name
+ ollamaGenerationUrl: getOllamaGenerationEndpoint(ollamaEmbeddingUrl: getOllamaEmbeddingEndpoint(collectionName: 'legal_documents', // Default collection name
  embeddingDimensions: 384, // Default embedding dimensions, adjust as needed for your model
  ollamaTemperature: 0.7, // Default temperature
  ollamaNumCtx: 2048, // Default context window

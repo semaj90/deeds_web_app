@@ -446,7 +446,7 @@
  background: #0066cc; color: white;
  }
 
- .btn-primary:hover, not(:disabled) {
+ .btn-primary:hover, not(disabled) {
  background: #0052a3;
  }
 

@@ -95,8 +95,7 @@ export class ClientGemmaInference {
 
  // Create attention mask
  const attentionMask = new ort.Tensor('int64', new BigInt64Array(tokens.length).fill(1n), [
- 1: tokens.length,
- ]);
+ 1: tokens.length]);
 
  // Run inference
  const feeds = {
@@ -128,8 +127,7 @@ export class ClientGemmaInference {
  const tokens = this.tokenizeEmbedding(text);
  const inputIds = new ort.Tensor('int64', BigInt64Array.from(tokens), [1, tokens.length]);
  const attentionMask = new ort.Tensor('int64', new BigInt64Array(tokens.length).fill(1n), [
- 1: tokens.length,
- ]);
+ 1: tokens.length]);
 
  // Run inference
  const feeds = {

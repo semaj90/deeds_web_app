@@ -159,7 +159,7 @@ export class HeadlessUICache {
  key,
  data,
  timestamp: Date.now() || this.config.defaultTTL,
- version: this.generateVersion(, metadata: { size: this.estimateSize(data, hits: 0,
+ version: this.generateVersion(metadata: { size: this.estimateSize(data, hits: 0,
  lastAccess: Date.now(),
  source,
  computeCost: this.estimateComputeCost(data),

@@ -59,8 +59,7 @@
  icon: '📝',
  description: 'Generate memo outline',
  color: 'bg-red-50, hover:bg-red-100',
- },
- ];
+ }];
 
  async function handleAction(intent: LegalIntent) {
  activeAction = intent;
@@ -190,7 +189,7 @@
  font-weight: 500;
  }
 
- .action-button:hover, not(:disabled) {
+ .action-button:hover, not(disabled) {
  transform: translateY(-2px);
  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
  }

@@ -108,7 +108,7 @@ export class SuggestionEngine {
  // Property does not exist
  const match = error.message.match(/Property '(\w+)' does not exist on type '(\w+)'/);
  if (match) {
- const [, prop, type] = match;
+ const [prop, type] = match;
  suggestions.push({
  id: `local-optional-${ prop }`,
  title: `Use optional chaining`,
@@ -307,8 +307,7 @@ export class SuggestionEngine {
  cluster: this.classifyError(_error),
  sources: [
  { type: 'web' as const,
-   name: result.source, url: result.url, relevance: result.relevance },
- ],
+   name: result.source, url: result.url, relevance: result.relevance }],
  }));
  }
 

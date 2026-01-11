@@ -74,8 +74,7 @@
  role: 'assistant',
  content, data.answer || data.response || 'No response',
  citations: data.citations || [],
- },
- ];
+ }];
  } catch (err) {
  error = err instanceof Error ? err.message : 'Failed to send message';
  } finally {
@@ -342,7 +341,7 @@
  white-space: nowrap;
  }
 
- .send-button:hover, not(:disabled) {
+ .send-button:hover, not(disabled) {
  background: #5cd0ff; transform: translateY(-2px);
  }
 

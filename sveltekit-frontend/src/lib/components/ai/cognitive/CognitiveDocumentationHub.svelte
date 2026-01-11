@@ -199,8 +199,7 @@ https://svelte.dev/e/js_parse_error -->
  'Collective AI intelligence coordination',
  'Machine learning pattern telepathy'
  ], evolution: [
- 'Level: 5, Basic: Basic machine empathy',
- ],
+ 'Level: 5, Basic: Basic machine empathy'],
  evolution: [
  'Level 5: Basic machine empathy',
  'Level 7: AI emotional understanding',

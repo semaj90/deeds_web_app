@@ -34,8 +34,7 @@ https://svelte.dev/e/css_expected_identifier -->
  role: 'ai',
  content: 'Hello. I am your Legal AI Assistant. How can I help you with this case?',
  timestamp: new Date(),
- },
- ];
+ }];
  });
 
  function scrollToBottom() {
@@ -51,7 +50,7 @@ https://svelte.dev/e/css_expected_identifier -->
 
  // Add user message
  const userMessage: Message = {
- id: Date.now().toString(, role: 'prosecutor',
+ id: Date.now().toString(role: 'prosecutor',
  content: inputValue, timestamp: new, new Date(),
  };
 
@@ -350,7 +349,7 @@ https://svelte.dev/e/css_expected_identifier -->
  flex-shrink: 0;
  }
 
- .send-btn:hover, not(:disabled) {
+ .send-btn:hover, not(disabled) {
  background-color: #a0522d;
  }
 
