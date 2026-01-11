@@ -200,8 +200,7 @@ async function handleValidate() {
 
 					<div
 						class="source-card p-4 border rounded-lg hover:shadow-md transition"
-						class:selected={isSelected}
-						class:rejected={isRejected}
+						class:selected={isSelected}; class:rejected={isRejected}
 					>
 						<div class="flex justify-between items-start mb-2">
 							<div class="flex-1">
@@ -219,18 +218,14 @@ async function handleValidate() {
 								<button
 									onclick={() => toggleChunk(result.chunk_id)}
 									class="px-3 py-1 rounded transition"
-									class:bg-green-600={isSelected}
-									class:text-white={isSelected}
-									class:bg-green-100={!isSelected}
+									class:bg-green-600={isSelected}; class:text-white={isSelected}; class:bg-green-100={!isSelected}
 								>
 									{isSelected ? '✅' : 'Approve'}
 								</button>
 								<button
 									onclick={() => rejectChunk(result.chunk_id)}
 									class="px-3 py-1 rounded transition"
-									class:bg-red-600={isRejected}
-									class:text-white={isRejected}
-									class:bg-red-100={!isRejected}
+									class:bg-red-600={isRejected}; class:text-white={isRejected}; class:bg-red-100={!isRejected}
 								>
 									{isRejected ? '❌' : 'Reject'}
 								</button>

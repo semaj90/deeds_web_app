@@ -74,9 +74,7 @@ function handleBackdropClick(event: MouseEvent) {
 						<span class="label">Confidence:</span>
 						<span
 							class="value font-semibold"
-							class:text-green-600={citation.confidence >= 0.9}
-							class:text-yellow-600={citation.confidence >= 0.7 && citation.confidence < 0.9}
-							class:text-red-600={citation.confidence < 0.7}
+							class:text-green-600={citation.confidence >= 0.9}; class:text-yellow-600={citation.confidence >= 0.7 && citation.confidence < 0.9}; class:text-red-600={citation.confidence < 0.7}
 						>
 							{(citation.confidence * 100).toFixed(1)}%
 						</span>

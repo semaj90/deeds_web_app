@@ -47,8 +47,7 @@
  <input
  bind:this={inputElement}
  type="text"
- { placeholder }
- bind:value
+ { placeholder }; bind:value
  oninput={ handleInput }
  onkeydown={ handleKeydown }
  class="search-input"
@@ -98,7 +97,7 @@
  background: rgba(255, 255, 255, 0.08);
  }
 
- .search-input::placeholder {
+ .search-input: placeholder {
  color: #888;
  }
 
