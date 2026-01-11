@@ -110,8 +110,7 @@
  <!-- Code Area -->
  <div class="code-area flex-1 relative">
  <textarea
- bind:this={editorRef}
- bind:value={ code }
+ bind:this={editorRef}; bind:value={ code }
  oninput={ handleInput }
  onkeydown={ handleKeyDown }
  { readonly }

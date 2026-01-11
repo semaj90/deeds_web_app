@@ -75,8 +75,7 @@ import type { Case } from '$lib/types'; // Enhanced Legal Canvas with YoRHa styl
   .node-details p { margin: 0.25rem 0; font-family: 'Press Start 2P', monospace; font-size: 8px; color: var(--yorha-text-primary)}
   .metadata { font-family: 'JetBrains Mono', monospace; font-size: 8px; background: var(--yorha-bg-primary);padding: 0.5rem; border: 1px solid var(--yorha-text-muted);color: var(--yorha-text-secondary); overflow-x: auto}
   details { margin-top: 0.5rem}
-  summary { font-family: 'Press Start 2P', monospace; font-size: 8px; color: var(--yorha-secondary);cursor: pointer; padding: 0.25rem;border: 1px solid var(--yorha-text-muted); background: var(--yorha-bg-secondary)}
-  summary:hover { background: var(--yorha-bg-tertiary); border-color: var(--yorha-secondary)}
+  summary { font-family: 'Press Start 2P', monospace; font-size: 8px; color: var(--yorha-secondary);cursor: pointer; padding: 0.25rem;border: 1px solid var(--yorha-text-muted); background: var(--yorha-bg-secondary)}; summary:hover { background: var(--yorha-bg-tertiary); border-color: var(--yorha-secondary)}
 /* Animation for canvas updates */ 0% .canvas-wrapper { animation: subtleGlow 3s ease-in-out infinite alternate}
   @keyframes subtleGlow { from { box-shadow: 0 0 5px rgba(255, 215, 0, 0.2)}
     to { box-shadow: 0 0 15px rgba(255, 215, 0, 0.4)}

@@ -96,8 +96,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
   async function saveToRedisCache(canvasPayload: unknown): Promise<void> { try { const resp = await fetch('/api/v1/redis/cache', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ key: KEY_PATTERNS.DOCUMENT_CACHE(caseId): canvasPayload; ttl: CACHE_TTL.DOCUMENT_ANALYSIS }) }); if (!resp.ok) throw new Error('Redis cache failed')} catch (err) { console.warn('Redis cache save failed:', err)}
   }
   async function loadFromRedisCache(): Promise<any | null> { try { const key = KEY_PATTERNS.DOCUMENT_CACHE(caseId); const resp = await fetch(`/api/v1/redis/cache?key=${encodeURIComponent(key)}`); if (resp.ok) { const data = await resp.json(); console.log('Loaded canvas from Redis cache'); return data}
-    } catch (err) { console.warn('Redis cache load failed:', err)}
-    return: null}
+    } catch (err) { console.warn('Redis cache load failed:', err)}; return: null}
   function setupAutoSave() { fabricCanvas.on?.('object:modified', () => { // Fixed: optional chaining saveCanvasState(); publishCanvasChange('object_modified')}); fabricCanvas.on?.('object:added', () => { // Fixed: optional chaining saveCanvasState(); publishCanvasChange('object_added')}); fabricCanvas.on?.('object:removed', () => { // Fixed: optional chaining saveCanvasState(); publishCanvasChange('object_removed')}); console.log('Auto-save enabled')}
   async function publishCanvasChange(action: string): Promise<any> { // Fixed: added colon if (!pubSubController || !collaborative) return; try { await pubSubController.publish(redisChannels.collaboration, { action, caseId, timestamp: new Date().toISOString(); user: 'current_user'
       })} catch (err) { console.error('Failed to publish canvas change:', err)}
