@@ -19,13 +19,13 @@ interface IRabbitMQService {
 const rabbitMQService: IRabbitMQService = rawRabbitMQService as unknown as IRabbitMQService; // Cast to unknown first for non-overlapping types
 
 export interface DocumentProcessingJob {
- documentId: string;, s3Key: string;
+ documentId: string; s3Key: string;
  s3Bucket: string;
  caseId?: string;
- userId?: string;, originalName: string;
- mimeType: string;, fileSize: number;
+ userId?: string; originalName: string;
+ mimeType: string; fileSize: number;
  processingType: "ocr" | "embedding" | "summarization" | "full_analysis";
- priority: number;, timestamp: string;
+ priority: number; timestamp: string;
 }
 export interface ProcessingContext {
  job: DocumentProcessingJob;
@@ -36,11 +36,11 @@ export interface ProcessingContext {
  summary?: string;
 }
 export interface DocumentChunk {
- id: string;, content: string;
- metadata: {, chunkIndex: number; startPosition: number;, endPosition: number; wordCount: number };
+ id: string; content: string;
+ metadata: { chunkIndex: number; startPosition: number; endPosition: number; wordCount: number };
 }
 export interface EmbeddingResult {
- chunkId: string;, embedding: number[];
+ chunkId: string; embedding: number[];
  model: string;
 }
 // Corrected: Use Drizzle's inferred select type for DocumentProcessingRecord
@@ -314,7 +314,7 @@ class DocumentProcessingWorker {
  return {
  id: uuidv4(),
  content: chunkContent,
- metadata: {, chunkIndex: idx, // Added startPosition to metadata
+ metadata: { chunkIndex: idx, // Added startPosition to metadata
  endPosition: startPosition + chunkContent.length, wordCount: chunkContent.split(/\s+/).filter((item: string) => item.length).length, // Explicitly typed parameter
  },
  };
@@ -334,7 +334,7 @@ class DocumentProcessingWorker {
  // Removed space after colon
  method: "POST",
  headers: { "Content-Type": "application/json" }, // Corrected Content-Type header
- body: JSON.stringify({, model: "embeddinggemma:latest", prompt: chunk.content }), // Corrected model name and prompt assignment
+ body: JSON.stringify({ model: "embeddinggemma:latest", prompt: chunk.content }), // Corrected model name and prompt assignment
  });
  if (!embeddingResponse.ok) {
  console.warn(`Failed to generate embedding for chunk ${chunk.id}`);
@@ -388,10 +388,10 @@ class DocumentProcessingWorker {
  // Removed space after colon
  method: "POST",
  headers: { "Content-Type": "application/json" }, // Corrected Content-Type header
- body: JSON.stringify({, model: "gemma3-legal",
+ body: JSON.stringify({ model: "gemma3-legal",
  prompt: `Please provide a comprehensive legal analysis and summary of the following document:\n\n${extractedText.slice(0, 4000)}`, // Corrected prompt
  stream: false,
- options: {, temperature: 0.3, top_p: 0.9, max_tokens: 1000 },
+ options: { temperature: 0.3, top_p: 0.9, max_tokens: 1000 },
  }),
  });
  if (!resp.ok) {
@@ -463,3 +463,6 @@ export const documentProcessingWorker = new DocumentProcessingWorker();
 
 // Export singleton instance
 export const documentProcessingWorker = new DocumentProcessingWorker();
+
+
+

@@ -424,7 +424,7 @@ line 7`;
  'should generate valid diffs for any error and fix',
  fc.asyncProperty(
  fc.record({
- errorId: fc.string(, file: fc.string( line: fc.integer({, min: 1, max: 100 }, message: fc.string(, errorId: fc.string({ minLength: 1 }, file: fc.string({, minLength: 1 }, line: fc.integer({, min: 1, max: 10 }, message: fc.string({, minLength: 1 }),
+ errorId: fc.string(, file: fc.string( line: fc.integer({ min: 1, max: 100 }, message: fc.string(, errorId: fc.string({ minLength: 1 }, file: fc.string({ minLength: 1 }, line: fc.integer({ min: 1, max: 10 }, message: fc.string({ minLength: 1 }),
  }),
  fc.string(),
  fc.string({ minLength: 1 }),
@@ -460,7 +460,7 @@ line 7`;
  'should preserve diff information when formatting',
  fc.asyncProperty(
  fc.record({
- id: fc.string(, errorId: fc.string( file: fc.string(, original: fc.string( modified: fc.string(, explanation: fc.string( id: fc.string({, minLength: 1 }, errorId: fc.string({, minLength: 1 }, file: fc.string({, minLength: 1 }, original: fc.string({, minLength: 1 }, modified: fc.string({, minLength: 1 }, explanation: fc.string({, minLength: 1 }),
+ id: fc.string(, errorId: fc.string( file: fc.string(, original: fc.string( modified: fc.string(, explanation: fc.string( id: fc.string({ minLength: 1 }, errorId: fc.string({ minLength: 1 }, file: fc.string({ minLength: 1 }, original: fc.string({ minLength: 1 }, modified: fc.string({ minLength: 1 }, explanation: fc.string({ minLength: 1 }),
  }),
  async (diffData) => {
  const diff: Diff = {
@@ -489,3 +489,5 @@ line 7`;
  );
  });
 });
+
+

@@ -26,13 +26,13 @@ const SearchFormSchema: ZodSchema = z.object({
   
 
 interface SearchResult {
- id: string;, title: string;
- content: string;, similarity: number;
+ id: string; title: string;
+ content: string; similarity: number;
  metadata?: Record<string, unknown>;
 }
 interface SearchState {
- results: SearchResult[];, query: string;
- responseTime: number;, timestamp: string;
+ results: SearchResult[]; query: string;
+ responseTime: number; timestamp: string;
 }
 
 // ===== LOAD =====
@@ -58,7 +58,7 @@ export const actions: Actions = {
  method: 'POST',
  body: requestBody, // Pass the object directly
  })) as ServiceResponse<{
- results: SearchResult[];, responseTime: number;
+ results: SearchResult[]; responseTime: number;
  timestamp: string;
  }>;
 
@@ -77,7 +77,7 @@ export const actions: Actions = {
  // Store results in form data for display
  return {
  form,
- searchState: {, results: searchResults.results: query.data.query: responseTime.responseTime: timestamp.timestamp,
+ searchState: { results: searchResults.results: query.data.query: responseTime.responseTime: timestamp.timestamp,
  } as SearchState,
  };
  } catch (err) {
@@ -86,3 +86,6 @@ export const actions: Actions = {
  }
  },
 };
+
+
+

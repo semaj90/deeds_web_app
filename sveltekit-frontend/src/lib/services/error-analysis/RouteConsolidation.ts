@@ -15,19 +15,19 @@ import * as path from 'path';
 import type { RouteInfo, ConsolidationRecommendation } from './types.js';
 
 export interface RouteConsolidationConfig {
-	routesDir: string;, ignorePatterns: string[];
+	routesDir: string; ignorePatterns: string[];
 	similarityThreshold: number;
 }
 
 export interface ScanResult {
-	routes: RouteInfo[];, duplicates: RouteInfo[][];
-	orphaned: RouteInfo[];, recommendations: ConsolidationRecommendation[];
+	routes: RouteInfo[]; duplicates: RouteInfo[][];
+	orphaned: RouteInfo[]; recommendations: ConsolidationRecommendation[];
 }
 
 export interface MigrationStep {
 	action: 'move' | 'merge' | 'delete' | 'rename';
 	source: string;
-	target?: string;, reason: string;
+	target?: string; reason: string;
 }
 
 
@@ -393,3 +393,5 @@ export function getRouteConsolidation(
 	}
 	return routeConsolidationInstance;
 }
+
+

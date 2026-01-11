@@ -17,3 +17,4 @@ export async function parseJSON_QUIC(payload: string): Promise<unknown> {
  if (!res.ok) throw new Error(`QUIC parser error: ${res.status} ${res.statusText}`);
  return res.json();
 }
+

@@ -23,3 +23,4 @@ import Button from './Button.svelte';
  <Button class="bits-btn" variant="primary">Register</Button>
  </div>
 </header>
+

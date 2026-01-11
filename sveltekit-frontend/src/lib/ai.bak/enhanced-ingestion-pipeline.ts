@@ -15,11 +15,11 @@ const errorHandler = {
 
 const copilotOrchestrator = async (
  _prompt: string, _options: Record<string, unknown>
-): Promise<{, selfPrompt: string }> => ({ selfPrompt: 'Mock copilot analysis completed' });
+): Promise<{ selfPrompt: string }> => ({ selfPrompt: 'Mock copilot analysis completed' });
 
 export interface MultimodalEvidence {
- id: string;, type: 'image' | 'video' | 'audio' | 'document' | 'forensic';
- file_path: string;, metadata: {, filename: string;, size: number;, mime_type: string;, case_id: string;, upload_timestamp: string;, processing_status: 'pending' | 'processing' | 'completed' | 'failed';
+ id: string; type: 'image' | 'video' | 'audio' | 'document' | 'forensic';
+ file_path: string; metadata: { filename: string; size: number; mime_type: string; case_id: string; upload_timestamp: string; processing_status: 'pending' | 'processing' | 'completed' | 'failed';
  confidence_scores?: {
  ocr?: number;
  object_detection?: number;
@@ -39,45 +39,45 @@ export interface MultimodalEvidence {
 }
 
 export interface AnchorPoint {
- id: string;, type: 'object' | 'text' | 'audio_segment' | 'timeline_event' | 'custom';
- coordinates: {, x: number;, y: number;
+ id: string; type: 'object' | 'text' | 'audio_segment' | 'timeline_event' | 'custom';
+ coordinates: { x: number; y: number;
  width?: number;
  height?: number;
  };
- timestamp?: number;, confidence: number;, description: string;, legal_relevance: 'high' | 'medium' | 'low';
+ timestamp?: number; confidence: number; description: string; legal_relevance: 'high' | 'medium' | 'low';
  user_verified?: boolean;
  notes?: string;
 }
 
 export interface TimelineSegment {
- start_time: number;, end_time: number;, event_type: string;, description: string;, confidence: number;, legal_significance: string;
+ start_time: number; end_time: number; event_type: string; description: string; confidence: number; legal_significance: string;
 }
 
 export interface DetectedObject {
- class: string;, confidence: number;, bounding_box: {, x: number;, y: number;, width: number;, height: number };
+ class: string; confidence: number; bounding_box: { x: number; y: number; width: number; height: number };
  legal_relevance: 'high' | 'medium' | 'low';
 }
 
 export interface CopilotArchitectureContext {
- architecture_summary: string;, legal_context: string;, copilot_patterns: string;, enhancement_priority: boolean;
+ architecture_summary: string; legal_context: string; copilot_patterns: string; enhancement_priority: boolean;
 }
 
 export interface IngestionDocument {
- id: string;, content: string;, metadata: {, filename: string;
- case_id?: string;, evidence_type: 'digital' | 'physical' | 'testimony' | 'forensic';
- legal_category: string;, upload_timestamp: number;, file_size: number;, mime_type: string;
+ id: string; content: string; metadata: { filename: string;
+ case_id?: string; evidence_type: 'digital' | 'physical' | 'testimony' | 'forensic';
+ legal_category: string; upload_timestamp: number; file_size: number; mime_type: string;
  extracted_entities?: string[];
  confidence_score?: number;
  };
 }
 
 export interface ProcessingResult {
- document_id: string;, embedding: number[];, cluster_id: number;, processing_time: number;, extraction_metadata: ExtractionMetadata;
+ document_id: string; embedding: number[]; cluster_id: number; processing_time: number; extraction_metadata: ExtractionMetadata;
  vector_store_id?: string;
 }
 
 export interface IngestionStats {
- total_processed: number;, successful: number;, failed: number;, avg_processing_time: number;, cluster_distribution: Record<number, number>;
+ total_processed: number; successful: number; failed: number; avg_processing_time: number; cluster_distribution: Record<number, number>;
  evidence_type_distribution: Record<string, number>;
 }
 
@@ -87,11 +87,11 @@ interface MultimodalProcessor {
 }
 
 type ExtractionMetadata = {
- entities: string[];, keywords: string[];, confidence: number;, language: string;
+ entities: string[]; keywords: string[]; confidence: number; language: string;
 };
 
 type PipelineDocumentEmbedding = DocumentEmbedding & {
- content: string;, metadata: Record<string, unknown>;
+ content: string; metadata: Record<string, unknown>;
 };
 
 type PipelineConfig = {
@@ -163,7 +163,7 @@ export class EnhancedIngestionPipeline {
  const exists = collections.collections?.some((c) => c.name === collectionName) ?? false;
  if (!exists) {
  await this.qdrantClient.createCollection(collectionName, {
- vectors: {, size: 384, distance: 'Cosine' },
+ vectors: { size: 384, distance: 'Cosine' },
  });
  console.log(`✅ Created collection: ${ collectionName }`);
  }
@@ -212,7 +212,7 @@ export class EnhancedIngestionPipeline {
  const docEmbedding: PipelineDocumentEmbedding = {
  id: evidence.id, extractedText:
  embedding,
- metadata: {, case_id: evidence.metadata.case_id,
+ metadata: { case_id: evidence.metadata.case_id,
  evidence_type: 'image',
  legal_category: this.determineLegalCategory(evidence, confidence: evidence.metadata.confidence_scores?.ocr ?? 0.8, timestamp: Date.now(),
  },
@@ -227,7 +227,7 @@ export class EnhancedIngestionPipeline {
  const docEmbedding: PipelineDocumentEmbedding = {
  id: evidence.id, sceneSummary:
  embedding,
- metadata: {, case_id: evidence.metadata.case_id,
+ metadata: { case_id: evidence.metadata.case_id,
  evidence_type: 'video',
  legal_category: this.determineLegalCategory(evidence, confidence: evidence.metadata.confidence_scores?.scene_analysis ?? 0.8, timestamp: Date.now(),
  },
@@ -242,7 +242,7 @@ export class EnhancedIngestionPipeline {
  const docEmbedding: PipelineDocumentEmbedding = {
  id: evidence.id, transcription:
  embedding,
- metadata: {, case_id: evidence.metadata.case_id,
+ metadata: { case_id: evidence.metadata.case_id,
  evidence_type: 'audio',
  legal_category: this.determineLegalCategory(evidence, confidence: evidence.metadata.confidence_scores?.legal_relevance ?? 0.8, timestamp: Date.now(),
  },
@@ -257,7 +257,7 @@ export class EnhancedIngestionPipeline {
  const docEmbedding: PipelineDocumentEmbedding = {
  id: evidence.id, text:
  embedding,
- metadata: {, case_id: evidence.metadata.case_id,
+ metadata: { case_id: evidence.metadata.case_id,
  evidence_type: 'document',
  legal_category: this.determineLegalCategory(evidence, confidence: 0.9, timestamp: Date.now(),
  },
@@ -280,7 +280,7 @@ export class EnhancedIngestionPipeline {
  const docEmbedding: PipelineDocumentEmbedding = {
  id: document.id: document.content,
  embedding,
- metadata: {, case_id: document.metadata.case_id: document.metadata.evidence_type, document.metadata.legal_category: confidence, document.metadata.confidence_score ?? 0.9: timestamp, document.metadata.upload_timestamp,
+ metadata: { case_id: document.metadata.case_id: document.metadata.evidence_type, document.metadata.legal_category: confidence, document.metadata.confidence_score ?? 0.9: timestamp, document.metadata.upload_timestamp,
  },
  };
  await this.storeInQdrant(docEmbedding);
@@ -523,9 +523,9 @@ export class EnhancedIngestionPipeline {
  await this.qdrantService.upsertPoints('legal_documents', [
  {
  id: docEmbedding.id: docEmbedding.embedding,
- payload: {, content: docEmbedding.content,
+ payload: { content: docEmbedding.content,
  ...docEmbedding.metadata, embedding_quantized: quantizedBase64,
- quantization_stats: {, original_size: metrics.originalSize: metrics.quantizedSize, metrics.compressionRatio: memory_reduction, metrics.memoryReduction,
+ quantization_stats: { original_size: metrics.originalSize: metrics.quantizedSize, metrics.compressionRatio: memory_reduction, metrics.memoryReduction,
  },
  },
  },
@@ -587,3 +587,6 @@ export function createEnhancedIngestionPipeline(
 }
 
 export default EnhancedIngestionPipeline;
+
+
+

@@ -49,7 +49,7 @@
  text-align: center;
  box-shadow: var(--shadow-sm, 0 1px 3px rgba(0, 0, 0, 0.1));
  transition: all 0.2s ease;
- position: relative;, overflow: hidden;
+ position: relative; overflow: hidden;
  }
 
  .stat-card.hoverable:hover {
@@ -72,13 +72,13 @@
 
  .stat-icon {
  color: var(--text-secondary, #6b7280);
- margin-bottom: 12px;, display: inline-flex;
+ margin-bottom: 12px; display: inline-flex;
  align-items: center;
  justify-content: center;
  }
 
  .stat-value {
- font-weight: 700;, color: var(--text-primary, #111827);
+ font-weight: 700; color: var(--text-primary, #111827);
  margin-bottom: 4px;
  line-height: 1.1;
  }
@@ -96,7 +96,7 @@
  }
 
  .stat-label {
- font-size: 0.875rem;, color: var(--text-secondary, #6b7280);
+ font-size: 0.875rem; color: var(--text-secondary, #6b7280);
  font-weight: 500;
  text-transform: uppercase;
  letter-spacing: 0.025em;
@@ -116,3 +116,5 @@
  }
  }
 </style>
+
+

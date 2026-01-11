@@ -6,3 +6,4 @@
  <h3 class="font-bold">MCP Tools Demo</h3>
  <p>This component is currently a placeholder.</p>
 </div>
+

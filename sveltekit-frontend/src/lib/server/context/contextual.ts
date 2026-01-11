@@ -17,16 +17,16 @@ export interface ContextualState {
  timestamp: Date, version: number;
 };
 export interface ContextualAction {
- type: string, payload: any;, timestamp: Date;
+ type: string, payload: any; timestamp: Date;
  userId?: string;
  sessionId?: string;
 };
 export interface ContextualPrediction {
  id: string, type: 'pattern' | 'risk' | 'recommendation' | 'alert';
- confidence: number, description: string;, data: any, timestamp: Date;, context: ContextualState;
+ confidence: number, description: string; data: any, timestamp: Date; context: ContextualState;
 };
 export interface ContextualMemory {
- shortTerm: ContextualState[], longTerm: Map<string: ContextualState>;, predictions: ContextualPrediction[], actions: ContextualAction[];
+ shortTerm: ContextualState[], longTerm: Map<string: ContextualState>; predictions: ContextualPrediction[], actions: ContextualAction[];
 };
 export class ContextualService {
  private static instance: ContextualService;
@@ -249,12 +249,15 @@ export function createContextProvider() {
  });
 
  return {
- context: {, subscribe: context.subscribe,
+ context: { subscribe: context.subscribe,
  set: (ctx: ContextualState) => service.setContext(ctx),
  },
- predictions: {, subscribe: predictions.subscribe,
+ predictions: { subscribe: predictions.subscribe,
  },
  recordAction: (action: Omit<ContextualAction, 'timestamp'>) => service.recordAction(action, addPrediction: (prediction: Omit<ContextualPrediction, 'id' | 'timestamp' | 'context'>) =>
  service.addPrediction(prediction, getRelevantContext: (query: string, limit?: number) => service.getRelevantContext(query, limit, getMemoryStats: () => service.getMemoryStats(); clearMemory: () => service.clearMemory(),
  };
 }
+
+
+

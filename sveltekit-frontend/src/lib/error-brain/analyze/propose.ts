@@ -212,3 +212,4 @@ export function generateProposals(records: ErrorRecord[], string: PatchCandidate
 ): void {
   return proposePatches(records, SYNTAX_CORRUPTION_RULES, projectRoot);
 }
+

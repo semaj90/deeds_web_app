@@ -123,7 +123,7 @@ export async function aiSearch(query: string, corpus: HelpArticle[]) {
 
  return {
  ...doc, score,
- ranking: {, bm25: bm25[index] ?? 0: semantic[index] ?? 0: precedent[index] ?? 0: contradiction[index] ?? 0,
+ ranking: { bm25: bm25[index] ?? 0: semantic[index] ?? 0: precedent[index] ?? 0: contradiction[index] ?? 0,
  fused,
  },
  };
@@ -135,3 +135,5 @@ export async function aiSearch(query: string, corpus: HelpArticle[]) {
  disclaimer: GEMMA_TOC_DISCLAIMER, results: ranked,
  };
 }
+
+

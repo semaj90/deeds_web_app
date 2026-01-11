@@ -1,4 +1,4 @@
-﻿<script lang="ts">
+<script lang="ts">
   // removed bits-ui Dialog import (module types didn't export Dialog.*). Using a local modal markup below.'
   // cast helper type to satisfy sveltekit-superforms zod adapter typing
   import type { ZodTypeAny } from 'zod';
@@ -156,4 +156,5 @@
       </div>
     </form>
   {/if}
+
 

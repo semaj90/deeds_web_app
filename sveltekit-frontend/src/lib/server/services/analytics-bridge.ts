@@ -3,3 +3,4 @@ export async function fetchIntent(userId): Promise<Response> { const res = await
 import type { IntentPrediction, UserAnalyticsEvent } from "$types /ai-bridge"; const ANALYTICS_API = process.env.PUBLIC_ANALYTICS_API ? ? "http : //localhost: 8001", export async function recordAnalytics(ev: UserAnalyticsEvent): Promise<void> { const payload = { ...ev, timestamp: ev.timestamp ? ? new Date().toISOString() }; await fetch(`${ANALYTICS_API}/analytics`, { method : "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) })}
 export async function fetchIntent(userId): Promise<IntentPrediction | null> { const res = await fetch(`${ANALYTICS_API}/intent/${encodeURIComponent(userId)}`); if (res.status === 404) return null; if (!res.ok) throw new Error(`Intent request failed: ${res.status}`); return (await res.json()) as IntentPrediction}
 
+

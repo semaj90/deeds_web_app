@@ -9,7 +9,7 @@
 
 // Tree-shaking utilities
 export interface ComponentModule {
- default: any;, name: string;
+ default: any; name: string;
  dependencies?: string[];
  size?: number;
 }
@@ -19,8 +19,8 @@ const componentRegistry = new Map<string, () => Promise<ComponentModule>>();
 
 // Performance metrics tracking
 export interface PerformanceMetrics {
- componentLoadTime: number;, renderTime: number;
- memoryUsage: number;, bundleSize: number;
+ componentLoadTime: number; renderTime: number;
+ memoryUsage: number; bundleSize: number;
  dependencies: string[];
 }
 
@@ -149,7 +149,7 @@ export class VirtualScrollManager {
  this.totalItems = count;
  }
 
- getVisibleRange(): {, start: number; end: number;, offset: number } {
+ getVisibleRange(): { start: number; end: number; offset: number } {
  const { itemHeight, bufferSize, overscan } = this.options;
  const startIndex = Math.floor(this.scrollTop / itemHeight);
  const endIndex = Math.min(
@@ -319,8 +319,8 @@ export class ResourcePool<T> {
  * Bundle analyzer for component dependencies
  */
 export interface BundleAnalysis {
- totalSize: number;, gzippedSize: number;
- components: Array<any>;, duplicates: Array<any>;
+ totalSize: number; gzippedSize: number;
+ components: Array<any>; duplicates: Array<any>;
  recommendations: string[];
 }
 
@@ -466,3 +466,6 @@ registerComponent('VectorIntelligenceDemo', async () => ({
  name: 'VectorIntelligenceDemo',
  default: (await import('./VectorIntelligenceDemo.svelte')).default,
 }));
+
+
+

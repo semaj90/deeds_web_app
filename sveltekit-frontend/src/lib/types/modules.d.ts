@@ -62,7 +62,7 @@ declare module 'lokijs' {
  update(doc: T): T;
  remove(doc: T): void;
  removeWhere(query: unknown): void;
- count(query?: unknown): number;, data: T[];
+ count(query?: unknown): number; data: T[];
  chain(): {
  find(query?: unknown): unknown;
  where(filter: (obj: T) => boolean): unknown;
@@ -105,3 +105,5 @@ declare module '@tauri-apps/api/fs' {
 declare module '@tauri-apps/api/core' {
  export function invoke<T>(cmd: string, args?: Record<string, unknown>): Promise<T>;
 }
+
+

@@ -4,42 +4,42 @@
  */
 
 export interface SearchEvidenceResult {
- query: string;, found: number;
- results: Array<{, id: string;
- title: string;, classification: string;
- status: string;, relevance: number;
+ query: string; found: number;
+ results: Array<{ id: string;
+ title: string; classification: string;
+ status: string; relevance: number;
  snippet: string;
  }>;
 }
 
 export interface ExtractHoldingsResult {
- evidenceId: string;, holdings: Array<{
- text: string;, confidence: number;
+ evidenceId: string; holdings: Array<{
+ text: string; confidence: number;
  citations: string[];
  }>;
 }
 
 export interface FindCitationsResult {
- evidenceId: string;, citations: Array<{
+ evidenceId: string; citations: Array<{
  type: 'statute' | 'case' | 'regulation';
- reference: string;, title: string;
+ reference: string; title: string;
  year?: number;
  }>;
 }
 
 export interface AnalyzeRelationshipsResult {
- evidenceIds: string[];, relationships: Array<{
- source: string;, target: string;
+ evidenceIds: string[]; relationships: Array<{
+ source: string; target: string;
  type: 'mentions' | 'contradicts' | 'supports' | 'references' | 'timeline';
- confidence: number;, reasoning: string;
+ confidence: number; reasoning: string;
  }>;
 }
 
 export interface GenerateSummaryResult {
- caseId: string;, summary: {
- title: string;, status: string;
- totalEvidence: number;, keyFindings: string[];
- timeline: string;, nextSteps: string[];
+ caseId: string; summary: {
+ title: string; status: string;
+ totalEvidence: number; keyFindings: string[];
+ timeline: string; nextSteps: string[];
  };
 }
 
@@ -285,7 +285,7 @@ export async function generateSummary(caseId: string): Promise<GenerateSummaryRe
  // Mock implementation - in production, would compile from database
  return {
  caseId,
- summary: {, title: 'Investigation Summary - Case ' + caseId,
+ summary: { title: 'Investigation Summary - Case ' + caseId,
  status: 'Active Investigation',
  totalEvidence: 12,
  keyFindings: [
@@ -338,8 +338,8 @@ export async function executeTerminalFunction(
  */
 export function parseFunctionCalls(
  response: string
-): Array<{, name: string; args: Record<string, any> }> {
- const functionCalls: Array<{, name: string; args: Record<string, any> }> = [];
+): Array<{ name: string; args: Record<string, any> }> {
+ const functionCalls: Array<{ name: string; args: Record<string, any> }> = [];
 
  // Match patterns like: search_evidence(query="test", caseId="123")
  const functionCallRegex = /FUNCTION_CALL:\s*(\w+)\s*\((.*?)\)(?=\s|$|FUNCTION_CALL)/gs;
@@ -441,3 +441,6 @@ export function formatFunctionResult(result: any): string {
 
  return JSON.stringify(result, null, 2);
 }
+
+
+

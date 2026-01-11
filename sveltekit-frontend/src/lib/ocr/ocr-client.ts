@@ -8,13 +8,13 @@
  */
 
 export interface OCRResult {
-  text: string;, confidence: number;
-  blocks: OCRBlock[];, processingTime: number;
+  text: string; confidence: number;
+  blocks: OCRBlock[]; processingTime: number;
 }
 
 export interface OCRBlock {
-  text: string;, confidence: number;
-  boundingBox: {, x: number; y: number;, width: number; height: number };
+  text: string; confidence: number;
+  boundingBox: { x: number; y: number; width: number; height: number };
 }
 
 export interface OCROptions {
@@ -74,3 +74,6 @@ export class OCRClient {
 // Default instance
 export const ocrClient = new OCRClient();
 export default ocrClient;
+
+
+

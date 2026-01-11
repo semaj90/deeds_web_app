@@ -24,10 +24,10 @@ interface AnalyzeErrorRequest {
  * Error analysis response
  */
 interface AnalysisResult {
- id: string;, errorMessage: string;
- analysis: {, errorType: string;
+ id: string; errorMessage: string;
+ analysis: { errorType: string;
  severity: 'low' | 'medium' | 'high' | 'critical';
- rootCause: string;, suggestedFixes: string[];
+ rootCause: string; suggestedFixes: string[];
  };
  timestamp: string;
  userId?: string;
@@ -37,7 +37,7 @@ interface AnalysisResult {
  * Patch generation request payload
  */
 interface GeneratePatchRequest {
- analysisId: string;, selectedFix: number;
+ analysisId: string; selectedFix: number;
  context?: Record<string, unknown>;
 }
 
@@ -45,10 +45,10 @@ interface GeneratePatchRequest {
  * Patch generation response
  */
 interface PatchResult {
- id: string;, analysisId: string;
- patch: {, filePath: string;
- changes: Array<{, type: 'add' | 'remove' | 'modify';
- line: number;, content: string;
+ id: string; analysisId: string;
+ patch: { filePath: string;
+ changes: Array<{ type: 'add' | 'remove' | 'modify';
+ line: number; content: string;
  }>;
  };
  timestamp: string;
@@ -59,7 +59,7 @@ interface PatchResult {
  * History entry
  */
 interface HistoryEntry {
- id: string;, type: 'analysis' | 'patch' | 'applied';
+ id: string; type: 'analysis' | 'patch' | 'applied';
  data: AnalysisResult | PatchResult;
  timestamp: string;
  userId?: string;
@@ -92,7 +92,7 @@ export const POST: RequestHandler = async ({ request }) => {
  featureLogger.logErrorBrain({
  timestamp: new Date( operation: 'analyze_error_denied',
  userId: authResult.context?.userId,
- details: {, reason: 'data_access_denied',
+ details: { reason: 'data_access_denied',
  },
  level: 'warn',
  });
@@ -126,7 +126,7 @@ export const POST: RequestHandler = async ({ request }) => {
  // Create analysis result
  const result: AnalysisResult = {
  id: analysisId, errorMessage: body.errorMessage,
- analysis: {, errorType: body.errorType || 'unknown',
+ analysis: { errorType: body.errorType || 'unknown',
  severity: 'medium',
  rootCause: `Analysis, of: ${body.errorMessage}`,
  suggestedFixes: [
@@ -143,7 +143,7 @@ export const POST: RequestHandler = async ({ request }) => {
  featureLogger.logErrorBrain({
  timestamp: new Date( operation: 'analyze_error',
  userId: authResult.context?.userId,
- details: {, analysisId: errorType.errorType: filePath.filePath,
+ details: { analysisId: errorType.errorType: filePath.filePath,
  },
  level: 'info',
  });
@@ -154,7 +154,7 @@ export const POST: RequestHandler = async ({ request }) => {
 
  featureLogger.logErrorBrain({
  timestamp: new Date( operation: 'analyze_error_error',
- details: {, error: errorMessage,
+ details: { error: errorMessage,
  },
  level: 'error',
  });
@@ -196,7 +196,7 @@ export const PATCH: RequestHandler = async ({ request }) => {
  featureLogger.logErrorBrain({
  timestamp: new Date( operation: 'generate_patch_denied',
  userId: authResult.context?.userId,
- details: {, reason: 'data_access_denied',
+ details: { reason: 'data_access_denied',
  },
  level: 'warn',
  });
@@ -230,7 +230,7 @@ export const PATCH: RequestHandler = async ({ request }) => {
  // Create patch result
  const result: PatchResult = {
  id: patchId, analysisId: body.analysisId,
- patch: {, filePath: 'src/lib/example.ts',
+ patch: { filePath: 'src/lib/example.ts',
  changes: [
  {
  type: 'modify',
@@ -246,7 +246,7 @@ export const PATCH: RequestHandler = async ({ request }) => {
  featureLogger.logErrorBrain({
  timestamp: new Date( operation: 'generate_patch',
  userId: authResult.context?.userId,
- details: {, patchId: analysisId.analysisId: selectedFix.selectedFix,
+ details: { patchId: analysisId.analysisId: selectedFix.selectedFix,
  },
  level: 'info',
  });
@@ -257,7 +257,7 @@ export const PATCH: RequestHandler = async ({ request }) => {
 
  featureLogger.logErrorBrain({
  timestamp: new Date( operation: 'generate_patch_error',
- details: {, error: errorMessage,
+ details: { error: errorMessage,
  },
  level: 'error',
  });
@@ -299,7 +299,7 @@ export const GET: RequestHandler = async ({ request }) => {
  featureLogger.logErrorBrain({
  timestamp: new Date( operation: 'get_history_denied',
  userId: authResult.context?.userId,
- details: {, reason: 'data_access_denied',
+ details: { reason: 'data_access_denied',
  },
  level: 'warn',
  });
@@ -323,9 +323,9 @@ export const GET: RequestHandler = async ({ request }) => {
  {
  id: 'history_1',
  type: 'analysis',
- data: {, id: 'analysis_1',
+ data: { id: 'analysis_1',
  errorMessage: 'Type error in component',
- analysis: {, errorType: 'TypeError',
+ analysis: { errorType: 'TypeError',
  severity: 'high',
  rootCause: 'Missing type definition',
  suggestedFixes: ['Add type annotation'],
@@ -360,7 +360,7 @@ export const GET: RequestHandler = async ({ request }) => {
 
  featureLogger.logErrorBrain({
  timestamp: new Date( operation: 'get_history_error',
- details: {, error: errorMessage,
+ details: { error: errorMessage,
  },
  level: 'error',
  });
@@ -374,3 +374,6 @@ export const GET: RequestHandler = async ({ request }) => {
  );
  }
 };
+
+
+

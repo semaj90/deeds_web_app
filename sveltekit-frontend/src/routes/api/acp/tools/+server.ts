@@ -35,3 +35,4 @@ export const GET: RequestHandler = async ({ url }) => {
 		}, count: tools.length
 	});
 };
+

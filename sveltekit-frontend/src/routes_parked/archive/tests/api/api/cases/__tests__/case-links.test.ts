@@ -6,12 +6,12 @@ vi.mock('$lib/server/auth/lucia', () => ({
 }));
 
 vi.mock('$lib/server/services/case-link.service', () => ({
- caseLinkService: {, linkStatuteToCase: vi.fn( getCaseStatutes: vi.fn(, unlinkStatute: vi.fn( updateLinkMetadata: vi.fn(, getLinkStats: vi.fn(),
+ caseLinkService: { linkStatuteToCase: vi.fn( getCaseStatutes: vi.fn(, unlinkStatute: vi.fn( updateLinkMetadata: vi.fn(, getLinkStats: vi.fn(),
  },
 }));
 
 vi.mock('$lib/server/services/audit.service', () => ({
- auditService: {, logSummaryOperation: vi.fn(),
+ auditService: { logSummaryOperation: vi.fn(),
  },
 }));
 
@@ -54,7 +54,7 @@ describe('Case Links API', () => {
  vi.mocked(caseLinkService.getCaseStatutes).mockResolvedValue([mockLink]);
  vi.mocked(caseLinkService.getLinkStats).mockResolvedValue({
  total: 1,
- byLinkType: {, CHARGED_UNDER: 1 },
+ byLinkType: { CHARGED_UNDER: 1 },
  });
 
  expect(true).toBe(true);
@@ -140,3 +140,4 @@ describe('Case Links API', () => {
  });
  });
 });
+

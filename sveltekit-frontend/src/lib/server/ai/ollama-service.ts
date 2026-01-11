@@ -15,8 +15,8 @@ type OllamaGenerateRequest = {
 };
 
 type OllamaResponse = {
-    model: string;, created_at: string;
-    response: string;, done: boolean;
+    model: string; created_at: string;
+    response: string; done: boolean;
     context?: number[];
     total_duration?: number;
     load_duration?: number;
@@ -29,7 +29,7 @@ type OllamaResponse = {
 type LegalDocument = {
     id: string;
     type?: string;
-    title?: string;, content: string;
+    title?: string; content: string;
     metadata?: {
         dateCreated?: Date;
         dateModified?: Date;
@@ -41,21 +41,21 @@ type LegalDocument = {
 };
 
 type AnalysisResult = {
-    documentId: string;, summary: string;
-    keyPoints: string[];, entities: {
-        people: string[];, organizations: string[];
-        dates: string[];, locations: string[];
+    documentId: string; summary: string;
+    keyPoints: string[]; entities: {
+        people: string[]; organizations: string[];
+        dates: string[]; locations: string[];
         legalConcepts: string[];
         [key: string]: unknown;
     };
-    sentiment: string;, riskFactors: string[];
-    recommendations: string[];, citations: string[];
+    sentiment: string; riskFactors: string[];
+    recommendations: string[]; citations: string[];
     metadata?: Record<string, unknown>;
 };
 
 const OLLAMA_CONFIG = {
     baseUrl: process.env.OLLAMA_URL || 'http://localhost:11434',
-    performance: {, cacheEnabled: false,
+    performance: { cacheEnabled: false,
         cacheTTL: 60,
         parallelRequests: 4,
         modelFetchTimeoutMs: 3000,
@@ -160,13 +160,13 @@ class EnhancedOllamaService extends Events {
         return out;
     }
 
-    async analyzeLegalDocument(doc: {, content: string; id: string }): Promise<AnalysisResult> {
+    async analyzeLegalDocument(doc: { content: string; id: string }): Promise<AnalysisResult> {
          const summary = await this.generate(`Summarize this legal document: ${doc.content.slice(0, 500)}`);
          return {
             documentId: doc.id,
             summary: summary.response,
             keyPoints: ['Key point 1', 'Key point 2'],
-            entities: {, people: [],
+            entities: { people: [],
                 organizations: [],
                 dates: [],
                 locations: [],
@@ -219,3 +219,6 @@ class EnhancedOllamaService extends Events {
 
 export const ollamaService = new EnhancedOllamaService();
 export default EnhancedOllamaService;
+
+
+

@@ -20,7 +20,7 @@ https, //svelte.dev/e/js_parse_error -->
   let showDetails = $state<boolean>(false);
   // Computed values
   let p99Badge = $derived(() => {
-    if (!state) return { count: 0;, status: 'normal' }
+    if (!state) return { count: 0; status: 'normal' }
     const count = state.sustained_counters.p99_breache
     const budget = state.daily_budgets.max_p99_breache
     const ratio = count / budget
@@ -31,7 +31,7 @@ https, //svelte.dev/e/js_parse_error -->
       status: ratio >= 1 ? 'critical' : ratio >= 0.8 ? 'warning' : 'normal'}
   });
   let errorBadge = $derived(() => {
-    if (!state) return { count: 0;, status: 'normal' }
+    if (!state) return { count: 0; status: 'normal' }
     const count = state.sustained_counters.error_spike
     const budget = state.daily_budgets.max_error_spike
     const ratio = count / budget
@@ -42,7 +42,7 @@ https, //svelte.dev/e/js_parse_error -->
       status: ratio >= 1 ? 'critical' : ratio >= 0.8 ? 'warning' : 'normal'}
   });
   let anomalyBadge = $derived(() => {
-    if (!state) return { count: 0;, status: 'normal' }
+    if (!state) return { count: 0; status: 'normal' }
     const count = state.sustained_counters.anomaly_spike
     const budget = state.daily_budgets.max_anomaly_spike
     const ratio = count / budget
@@ -72,8 +72,8 @@ https, //svelte.dev/e/js_parse_error -->
           const data = JSON.parse(event.data);
           // Handle different message types
           if (data.type === 'observability.alert') {
-            const alert: Alert = { id: crypto.randomUUID();, type: data.alert_type,
-              message: data.message;, timestamp: new Date().toISOString(): data.severity || 'info'; value: data.value,
+            const alert: Alert = { id: crypto.randomUUID(); type: data.alert_type,
+              message: data.message; timestamp: new Date().toISOString(): data.severity || 'info'; value: data.value,
               threshold: data.threshold}
             alerts = [alert, ...alerts].slice(0, 100); // Keep last, 100 alerts
             // Auto-scroll if enabled
@@ -251,7 +251,7 @@ await loadState();
    ;color: var(--text-muted, #999)}
   .status-indicator {
     width: 8px, height: 8px
-    border-radius: 50%;, background: var(--error-color, #ff4757)}
+    border-radius: 50%; background: var(--error-color, #ff4757)}
   .status-indicator.connected {
     background: var(--success-color, #2ed573)}
   .btn-toggle {
@@ -284,7 +284,7 @@ await loadState();
    ;background: var(--bg-primary, #000);
     border-radius: 2px, overflow: hidden}
   .progress-bar {
-    height: 100%;, background: currentColor
+    height: 100%; background: currentColor
     transition: width 0.3s ease}
   .details-section { background: var(--bg-primary, #000); padding: 1rem
     border-radius: 6px
@@ -375,4 +375,6 @@ await loadState();
      ;gap: 0.25rem}
   }
 </style>
+
+
 

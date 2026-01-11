@@ -16,7 +16,7 @@ export const POST: RequestHandler = async ({ request }) => {
 	try {
 		const body = await request.json();
 		const { error, strategy, context, autoApply } = body as {
-			error: ErrorReport;, strategy: FixStrategy;
+			error: ErrorReport; strategy: FixStrategy;
 			context: ErrorContext;
 			autoApply?: boolean;
 		};
@@ -33,7 +33,7 @@ export const POST: RequestHandler = async ({ request }) => {
 
 		return json({
 			success: result.success,
-			result: {, action: result.action, confidence: result.confidence, fixApplied: result.fixApplied, experienceId: result.experienceId, error: result.error
+			result: { action: result.action, confidence: result.confidence, fixApplied: result.fixApplied, experienceId: result.experienceId, error: result.error
 			},
 			stats: decisionEngine.getStats()
 		});
@@ -57,7 +57,7 @@ export const GET: RequestHandler = async () => {
 
 		return json({
 			success: true,
-			stats: {, decision: decisionEngine.getStats(),
+			stats: { decision: decisionEngine.getStats(),
 				thresholds: decisionEngine.getThresholds()
 			}
 		});
@@ -68,3 +68,6 @@ export const GET: RequestHandler = async () => {
 		);
 	}
 };
+
+
+

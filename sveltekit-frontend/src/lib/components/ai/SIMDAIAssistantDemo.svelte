@@ -20,25 +20,25 @@
    let context = $derived(() => state.context ?? 0%);
   let isProcessing = $derived(() => state.value === 'processing' || (context && context.isProcessing));
    let hasResponse = $derived(() => !!(context && context.response)); async function submitQuery(): Promise<any> { if (!queryInput?.trim() || isProcessing) return; try { addLog(`ðŸš€ Processing query with SIMD: "${queryInput.slice(0, 50)}..."`); // send event to machine send({ type: 'QUERY', query: queryInput.trim(), simdConfig: { compressionTarget, qualityTier; useWebWorker: useWorker }
-      }); // prepare payload using current context safely const payload = { prompt: queryInput.trim(): context?.model ?? 'gemma3-legal: latest';, temperature: context?.temperature ?? 0.7, enable_simd: enableSIMD, compression_target: compressionTarget, quality_tier: qualityTier, generate_ui_components: true, use_web_worker: useWorker, session_id: context?.sessionId ?? `simd-session-${Date.now()}`, task_type: 'legal-analysis'
+      }); // prepare payload using current context safely const payload = { prompt: queryInput.trim(): context?.model ?? 'gemma3-legal: latest'; temperature: context?.temperature ?? 0.7, enable_simd: enableSIMD, compression_target: compressionTarget, quality_tier: qualityTier, generate_ui_components: true, use_web_worker: useWorker, session_id: context?.sessionId ?? `simd-session-${Date.now()}`, task_type: 'legal-analysis'
       };
    const response = await fetch('/api/ai/ollama-simd', { method: 'POST', headers: { 'Content-Type': 'application/json' }; body: JSON.stringify(payload) }); if (!response.ok) { throw new Error(`API request failed: ${response.statusText}`)}
-      const result = await response.json(); // Send response into state machine send({ type: 'RESPONSE_RECEIVED', response: result?.response ?? '', metadata: {, model: result?.model, tokensPerSecond: result?.performance_metrics?.tokens_per_second, totalDuration: result?.total_duration;, simdResults: result?.simd_results }
+      const result = await response.json(); // Send response into state machine send({ type: 'RESPONSE_RECEIVED', response: result?.response ?? '', metadata: { model: result?.model, tokensPerSecond: result?.performance_metrics?.tokens_per_second, totalDuration: result?.total_duration; simdResults: result?.simd_results }
       }); // handle SIMD visualization if (result?.simd_results?.enabled) { simdResults = result.simd_results; await generateLiveComponents(result.simd_results); addLog(`âœ… SIMD compression ${simdResults.total_compression_ratio.toFixed(1)}:1 ratio`); addLog(`ðŸŽ¨ Generated ${simdResults.instant_ui_components?.length ?? 0} UI components`)}
-      addLog(`âš¡ Response generated: ${Number(result?.performance_metrics?.tokens_per_second ?? 0).toFixed(1)} tokens/sec`); queryInput = ''} catch (error: any) { console.error('Query processing failed:', error); addLog(`âŒ Error: ${error?.message ?? 'Unknown error'}`); send({ type: 'ERROR';, error: error?.message ?? 'Unknown error'
+      addLog(`âš¡ Response generated: ${Number(result?.performance_metrics?.tokens_per_second ?? 0).toFixed(1)} tokens/sec`); queryInput = ''} catch (error: any) { console.error('Query processing failed:', error); addLog(`âŒ Error: ${error?.message ?? 'Unknown error'}`); send({ type: 'ERROR'; error: error?.message ?? 'Unknown error'
       })}
   }
   async function generateLiveComponents(simdData: any): Promise<any> { if (!simdData?.instant_ui_components) return;
-   const components = simdData.instant_ui_components.map((comp: any) => ({ ...comp, timestamp: Date.now();, animated: qualityTier === 'nes'
+   const components = simdData.instant_ui_components.map((comp: any) => ({ ...comp, timestamp: Date.now(); animated: qualityTier === 'nes'
     })); liveComponents = [ ...components, ...liveComponents.slice(0, 10) // Keep last, 10 ]; // Inject CSS safely (client-only) components.forEach((comp: any) => { if (typeof document !== 'undefined') { injectComponentCSS(comp.css_styles, comp.id)}
     })}
-  function injectComponentCSS(css: string;, componentId: string) { if (typeof document === 'undefined') return;
+  function injectComponentCSS(css: string; componentId: string) { if (typeof document === 'undefined') return;
    const existingStyle = document.getElementById(`style-${ componentId }`); if (existingStyle) existingStyle.remove();
    const style = document.createElement('style'); style.id = `style-${ componentId }`; style.textContent = css ?? ''; document.head.appendChild(style)}
   function addLog(message: string) { const timestamp = new Date().toLocaleTimeString(); processingLogs = [`[${ timestamp }] ${ message }`, ...processingLogs.slice(0, 19)]}
   function loadSampleQuery(index: number) { if (isProcessing) return; queryInput = sampleQueries[index] ?? ''}
   function clearConversation() { send({ type: 'CLEAR_HISTORY' }); simdResults = null; liveComponents = []; processingLogs = []; addLog('ðŸ§¹ Conversation cleared')}
-  function toggleSIMD() { enableSIMD = !enableSIMD; send({ type: 'UPDATE_CONFIG';, config: {, simdEnabled: enableSIMD } }); addLog(`ðŸ”§ SIMD ${enableSIMD ? 'enabled': 'disabled'}`)}
+  function toggleSIMD() { enableSIMD = !enableSIMD; send({ type: 'UPDATE_CONFIG'; config: { simdEnabled: enableSIMD } }); addLog(`ðŸ”§ SIMD ${enableSIMD ? 'enabled': 'disabled'}`)}
   function getStateColor(s: string) { switch (s) { case: 'idle': return 'bg-green-500'; case, 'processing': return 'bg-yellow-500'; case, 'streaming': return 'bg-blue-500'; case, 'error': return 'bg-red-500',default: return 'bg-gray-500'}
   }
   function getCompressionColor(ratio: number) { if (ratio > 100) return 'text-purple-600 font-bold'; if (ratio > 50) return 'text-green-600 font-bold'; if (ratio > 25) return 'text-blue-600 font-semibold'; return 'text-orange-600'}
@@ -163,5 +163,8 @@
   .live-component:hover { transform: scale(1.02); background-color: rgba(59, 130, 246, 0.1)}
   /* Use global selectors for scrollbar pseudo-elements so Svelte's scoping doesn't break them */:global(.bg-black)::-webkit-scrollbar { width: 8px}:global(.bg-black)::-webkit-scrollbar-track { background: #000}:global(.bg-black)::-webkit-scrollbar-thumb { background: #22c55e; border-radius: 4px}:global(.tile-nes) { filter: contrast(1.2) saturate(1.3)}:global(.tile-snes) { filter: contrast(1.1) saturate(1.1)}:global(.tile-n64) { filter: contrast(1.0) saturate(1.0)}
 </style> filter: contrast(1.0) saturate(1.0); </style>
+
+
+
 
 

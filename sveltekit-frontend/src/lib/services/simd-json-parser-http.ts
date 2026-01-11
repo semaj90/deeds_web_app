@@ -30,3 +30,4 @@ async function safeReadText(response: Response): Promise<string> {
  return '';
  }
 }
+

@@ -180,13 +180,13 @@
  display: grid;
  grid-template-columns: 1fr 2.4fr 1.2fr;
  min-height: 100vh;
- background-color: #f5f1e8;, color: #2c2c2c;
+ background-color: #f5f1e8; color: #2c2c2c;
  font-family: 'Source Sans 3', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
  }
 
  /* Sidebar */
  .sidebar {
- background-color: #2c2c2c;, color: #f5f1e8;
+ background-color: #2c2c2c; color: #f5f1e8;
  padding: 1.5rem 1rem;
  border-right: 2px solid #8b4513;
  display: flex;
@@ -205,7 +205,7 @@
 
  .logo {
  display: flex;
- align-items: center;, gap: 0.75rem;
+ align-items: center; gap: 0.75rem;
  font-weight: 600;
  font-size: 1.1rem;
  }
@@ -219,32 +219,32 @@
  }
 
  .sidebar-toggle {
- display: none;, background: none;
- border: none;, color: #f5f1e8;
- font-size: 1.5rem;, cursor: pointer;
+ display: none; background: none;
+ border: none; color: #f5f1e8;
+ font-size: 1.5rem; cursor: pointer;
  }
 
  .sidebar-nav {
- flex: 1;, display: flex;
- flex-direction: column;, gap: 0.5rem;
+ flex: 1; display: flex;
+ flex-direction: column; gap: 0.5rem;
  }
 
  .nav-item {
  display: flex;
- align-items: center;, gap: 0.75rem;
+ align-items: center; gap: 0.75rem;
  padding: 0.75rem 1rem;
  border-radius: 6px;
- text-decoration: none;, color: #b8b8b8;
+ text-decoration: none; color: #b8b8b8;
  transition: all 0.2s;
  font-size: 0.95rem;
  }
 
  .nav-item:hover {
- background-color: #3a3a3a;, color: #d4a574;
+ background-color: #3a3a3a; color: #d4a574;
  }
 
  .nav-item.active {
- background-color: #8b4513;, color: #f5f1e8;
+ background-color: #8b4513; color: #f5f1e8;
  font-weight: 500;
  }
 
@@ -264,17 +264,17 @@
 
  .system-strip {
  display: flex;
- align-items: center;, gap: 0.5rem;
- margin-bottom: 1rem;, padding: 0.5rem;
+ align-items: center; gap: 0.5rem;
+ margin-bottom: 1rem; padding: 0.5rem;
  background-color: #3a3a3a;
  border-radius: 4px;
  font-size: 0.85rem;
  }
 
  .status-indicator {
- width: 8px;, height: 8px;
+ width: 8px; height: 8px;
  border-radius: 50%;
- background-color: #ff4444;, animation: pulse 2s infinite;
+ background-color: #ff4444; animation: pulse 2s infinite;
  }
 
  .status-indicator.online {
@@ -296,12 +296,12 @@
  }
 
  .system-info {
- font-size: 0.8rem;, color: #999;
+ font-size: 0.8rem; color: #999;
  }
 
  .info-row {
  display: flex;
- justify-content: space-between;, padding: 0.25rem 0;
+ justify-content: space-between; padding: 0.25rem 0;
  }
 
  .label {
@@ -328,57 +328,57 @@
 
  .header-text {
  display: flex;
- flex-direction: column;, gap: 0.5rem;
+ flex-direction: column; gap: 0.5rem;
  }
 
  .page-title {
  font-family: 'Crimson Text', Georgia, serif;
  font-size: 2.5rem;
- font-weight: 700;, margin: 0;
+ font-weight: 700; margin: 0;
  color: #2c2c2c;
  }
 
  .page-subtitle {
- font-size: 1rem;, color: #666;
+ font-size: 1rem; color: #666;
  margin: 0;
  }
 
  .content-area {
  display: flex;
- flex-direction: column;, gap: 1.5rem;
+ flex-direction: column; gap: 1.5rem;
  }
 
  /* Right Rail */
  .right-rail {
- background-color: #f0ebe0;, padding: 1.5rem 1rem;
+ background-color: #f0ebe0; padding: 1.5rem 1rem;
  border-left: 2px solid #d4a574;
- overflow-y: auto;, display: flex;
- flex-direction: column;, gap: 1.5rem;
+ overflow-y: auto; display: flex;
+ flex-direction: column; gap: 1.5rem;
  }
 
  .rail-section {
  display: flex;
- flex-direction: column;, gap: 0.75rem;
+ flex-direction: column; gap: 0.75rem;
  }
 
  .rail-title {
  font-family: 'Crimson Text', Georgia, serif;
  font-size: 1.1rem;
- font-weight: 600;, margin: 0;
+ font-weight: 600; margin: 0;
  color: #2c2c2c;
  padding-bottom: 0.5rem;
  border-bottom: 1px solid #d4a574;
  }
 
  .ai-terminal {
- background-color: #1a1a1a;, border: 1px solid #8b4513;
- border-radius: 6px;, overflow: hidden;
+ background-color: #1a1a1a; border: 1px solid #8b4513;
+ border-radius: 6px; overflow: hidden;
  display: flex;
  flex-direction: column;
  }
 
  .terminal-header {
- background-color: #2c2c2c;, color: #d4a574;
+ background-color: #2c2c2c; color: #d4a574;
  padding: 0.5rem 0.75rem;
  font-size: 0.8rem;
  font-weight: 600;
@@ -386,8 +386,8 @@
  }
 
  .terminal-content {
- padding: 0.75rem;, flex: 1;
- min-height: 60px;, color: #44ff44;
+ padding: 0.75rem; flex: 1;
+ min-height: 60px; color: #44ff44;
  font-family: 'Monaco', 'Courier New', monospace;
  font-size: 0.8rem;
  line-height: 1.4;
@@ -399,7 +399,7 @@
 
  .terminal-input {
  padding: 0.5rem 0.75rem;
- background-color: #2c2c2c;, color: #44ff44;
+ background-color: #2c2c2c; color: #44ff44;
  border: none;
  border-top: 1px solid #8b4513;
  font-family: 'Monaco', 'Courier New', monospace;
@@ -417,60 +417,60 @@
 
  .status-panel {
  display: flex;
- flex-direction: column;, gap: 1rem;
+ flex-direction: column; gap: 1rem;
  }
 
  .status-item {
  display: flex;
- flex-direction: column;, gap: 0.25rem;
+ flex-direction: column; gap: 0.25rem;
  }
 
  .status-label {
  font-size: 0.8rem;
- font-weight: 600;, color: #2c2c2c;
+ font-weight: 600; color: #2c2c2c;
  }
 
  .status-bar {
  height: 6px;
  background-color: #e0d5c7;
- border-radius: 3px;, overflow: hidden;
+ border-radius: 3px; overflow: hidden;
  }
 
  .bar-fill {
- height: 100%;, background: linear-gradient(90deg, #8b4513, #d4a574);
+ height: 100%; background: linear-gradient(90deg, #8b4513, #d4a574);
  border-radius: 3px;
  }
 
  .status-value {
- font-size: 0.75rem;, color: #666;
+ font-size: 0.75rem; color: #666;
  }
 
  .quick-actions {
  display: flex;
- flex-direction: column;, gap: 0.5rem;
+ flex-direction: column; gap: 0.5rem;
  }
 
  .action-btn {
  padding: 0.5rem 0.75rem;
- background-color: #e0d5c7;, border: 1px solid #d4a574;
- border-radius: 4px;, color: #2c2c2c;
+ background-color: #e0d5c7; border: 1px solid #d4a574;
+ border-radius: 4px; color: #2c2c2c;
  font-size: 0.85rem;
- font-weight: 500;, cursor: pointer;
+ font-weight: 500; cursor: pointer;
  transition: all 0.2s;
  }
 
  .action-btn:hover {
- background-color: #d4a574;, color: #f5f1e8;
+ background-color: #d4a574; color: #f5f1e8;
  }
 
  .mobile-toggle {
- display: none;, position: fixed;
- bottom: 1rem;, right: 1rem;
- width: 50px;, height: 50px;
- background-color: #8b4513;, color: #f5f1e8;
+ display: none; position: fixed;
+ bottom: 1rem; right: 1rem;
+ width: 50px; height: 50px;
+ background-color: #8b4513; color: #f5f1e8;
  border: none;
  border-radius: 50%;
- font-size: 1.5rem;, cursor: pointer;
+ font-size: 1.5rem; cursor: pointer;
  z-index: 1000;
  }
 
@@ -491,10 +491,10 @@
  }
 
  .sidebar {
- position: fixed;, left: 0;
- top: 0;, height: 100vh;
+ position: fixed; left: 0;
+ top: 0; height: 100vh;
  width: 250px;
- z-index: 999;, transform: translateX(-100%);
+ z-index: 999; transform: translateX(-100%);
  transition: transform 0.3s;
  }
 
@@ -519,3 +519,5 @@
  }
  }
 </style>
+
+

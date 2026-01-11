@@ -62,3 +62,4 @@ export const GET: RequestHandler = async () => {
 		return json({ status: 'error', message: 'Could not check status' });
 	}
 };
+

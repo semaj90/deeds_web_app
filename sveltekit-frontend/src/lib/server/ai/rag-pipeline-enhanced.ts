@@ -21,50 +21,50 @@ import { join } from "path";
 declare module '$lib/server/db/schema-postgres' {
  // Example Drizzle table type (simplified)
  interface DrizzleTable<TName extends string, TColumns extends Record<string, any>> {
- _?: {, name: TName; columns: TColumns;, dialect: 'pg'; schema | undefined;
+ _?: { name: TName; columns: TColumns; dialect: 'pg'; schema | undefined;
  };
  }
 
 export const legal_documents: DrizzleTable<'legal_documents', {
- id: string;, title: string;
- content: string;, previewContent: string;
- fullText: string;, documentType: string;
- keywords: string[];, topics: string[];
+ id: string; title: string;
+ content: string; previewContent: string;
+ fullText: string; documentType: string;
+ keywords: string[]; topics: string[];
  jurisdiction?: string;
- caseId?: string;, createdBy: string; confidentialityLevel: string;
- clientId?: string;, metadata: Record<string, unknown>;
- embedding: string;, createdAt: Date;
+ caseId?: string; createdBy: string; confidentialityLevel: string;
+ clientId?: string; metadata: Record<string, unknown>;
+ embedding: string; createdAt: Date;
  updatedAt: Date;
  }>;
 
  export const documentChunks: DrizzleTable<'documentChunks', {
- id: string;, documentId: string;
- documentType: string;, chunkIndex: number;
- content: string;, embedding: string;
+ id: string; documentId: string;
+ documentType: string; chunkIndex: number;
+ content: string; embedding: string;
  metadata: Record<string, unknown>;
  createdAt: Date;
  }>;
 
  export const autoTags: DrizzleTable<'autoTags', {
- id: string;, entityId: string;
- entityType: string;, tag: string;
- confidence: number;, source: string;
- model: string;, createdAt: Date;
+ id: string; entityId: string;
+ entityType: string; tag: string;
+ confidence: number; source: string;
+ model: string; createdAt: Date;
  }>;
 
  export const userAiQueries: DrizzleTable<'userAiQueries', {
- id: string;, userId: string;
- caseId?: string;, query: string; response: string;, model: string; queryType: string;, confidence: string; processingTime: number;, contextUsed: string[]; embedding: string;, metadata: Record<string, unknown>;
+ id: string; userId: string;
+ caseId?: string; query: string; response: string; model: string; queryType: string; confidence: string; processingTime: number; contextUsed: string[]; embedding: string; metadata: Record<string, unknown>;
  isSuccessful?: boolean;
- errorMessage?: string;, createdAt: Date;
+ errorMessage?: string; createdAt: Date;
  }>;
 }
 
 // ===== CONFIGURATION & CONSTANTS =====
 /** * RAG Pipeline Configuration */
 export interface RAGConfig {
- database: DatabaseConfig;, redis: RedisConfig;
- ollama: OllamaConfig;, rag: RAGSettings;
+ database: DatabaseConfig; redis: RedisConfig;
+ ollama: OllamaConfig; rag: RAGSettings;
  security: SecuritySettings;
 }
 
@@ -74,7 +74,7 @@ export interface DatabaseConfig {
  port?: number;
  database?: string;
  username?: string;
- password?: string;, databaseUrl: string; max: number;, idle_timeout: number; ssl: boolean | 'require' | 'allow' | 'prefer' | 'verify-full';
+ password?: string; databaseUrl: string; max: number; idle_timeout: number; ssl: boolean | 'require' | 'allow' | 'prefer' | 'verify-full';
  connect_timeout: number;
 }
 
@@ -82,33 +82,33 @@ export interface DatabaseConfig {
 export interface RedisConfig {
  host?: string;
  port?: number;
- db?: number;, redisUrl: string; maxRetriesPerRequest: number;, cacheTtl: number; enableReadyCheck: boolean;, lazyConnect: boolean;
+ db?: number; redisUrl: string; maxRetriesPerRequest: number; cacheTtl: number; enableReadyCheck: boolean; lazyConnect: boolean;
 }
 
 /** * Ollama Configuration */
 export interface OllamaConfig {
- baseUrl: string;, embeddingModel: string;
- llmModel: string;, embeddingDimensions: number;
- timeout: number;, temperature: number;
- numCtx: number;, numPredict: number;
+ baseUrl: string; embeddingModel: string;
+ llmModel: string; embeddingDimensions: number;
+ timeout: number; temperature: number;
+ numCtx: number; numPredict: number;
 }
 
 /** * RAG Settings */
 export interface RAGSettings {
- chunkSize: number;, chunkOverlap: number;
- maxSources: number;, similarityThreshold: number;
- timeoutMs: number;, enableMetrics: boolean;
- enableAutoTagging: boolean;, enableCaching: boolean;
+ chunkSize: number; chunkOverlap: number;
+ maxSources: number; similarityThreshold: number;
+ timeoutMs: number; enableMetrics: boolean;
+ enableAutoTagging: boolean; enableCaching: boolean;
  batchSize: number;
 }
 
 /** * Security Settings */
 export interface SecuritySettings {
- rateLimit: {, perMinute: number; windowMs: number;
+ rateLimit: { perMinute: number; windowMs: number;
  };
- validation: {, maxInputLength: number; maxDocumentSize: number;, allowedDocumentTypes: string[];
+ validation: { maxInputLength: number; maxDocumentSize: number; allowedDocumentTypes: string[];
  };
- sanitization: {, removeHtmlTags: boolean; removeSqlChars: boolean;, maxLineLength: number;
+ sanitization: { removeHtmlTags: boolean; removeSqlChars: boolean; maxLineLength: number;
  };
 }
 
@@ -139,7 +139,7 @@ const createDefaultConfig = (): RAGConfig => ({
  // Prioritize process.env.OLLAMA_URL for Docker compatibility
  baseUrl: process.env.OLLAMA_URL || OLLAMA_CONFIG.baseUrl, embeddingModel: OLLAMA_CONFIG.embeddingModel, llmModel: OLLAMA_CONFIG.llmModel, embeddingDimensions: OLLAMA_CONFIG.embeddingDimensions, timeout: OLLAMA_CONFIG.timeout, temperature: OLLAMA_CONFIG.temperature, numCtx: OLLAMA_CONFIG.numCtx, numPredict: OLLAMA_CONFIG.numPredict,
  },
- rag: {, chunkSize: parseInt(process.env.RAG_CHUNK_SIZE || '1500'),
+ rag: { chunkSize: parseInt(process.env.RAG_CHUNK_SIZE || '1500'),
  chunkOverlap: parseInt(process.env.RAG_CHUNK_OVERLAP || '300'),
  maxSources: parseInt(process.env.RAG_MAX_SOURCES || '10'),
  similarityThreshold: parseFloat(process.env.RAG_SIMILARITY_THRESHOLD || '0.5'),
@@ -149,15 +149,15 @@ const createDefaultConfig = (): RAGConfig => ({
  enableCaching: process.env.RAG_ENABLE_CACHING !== 'false',
  batchSize: parseInt(process.env.RAG_BATCH_SIZE || '10'),
  },
- security: {, rateLimit: {
+ security: { rateLimit: {
  perMinute: parseInt(process.env.RAG_RATE_LIMIT_PER_MINUTE || '60'),
  windowMs: parseInt(process.env.RAG_RATE_LIMIT_WINDOW_MS || '60000'),
  },
- validation: {, maxInputLength: parseInt(process.env.RAG_MAX_INPUT_LENGTH || '10000'),
+ validation: { maxInputLength: parseInt(process.env.RAG_MAX_INPUT_LENGTH || '10000'),
  maxDocumentSize: parseInt(process.env.RAG_MAX_DOCUMENT_SIZE || '10485760'),
  allowedDocumentTypes: (process.env.RAG_ALLOWED_DOC_TYPES || 'contract,statute,case_law,brief,memo').split(','),
  },
- sanitization: {, removeHtmlTags: process.env.RAG_REMOVE_HTML_TAGS !== 'false',
+ sanitization: { removeHtmlTags: process.env.RAG_REMOVE_HTML_TAGS !== 'false',
  removeSqlChars: process.env.RAG_REMOVE_SQL_CHARS !== 'false',
  maxLineLength: parseInt(process.env.RAG_MAX_LINE_LENGTH || '2000'),
  },
@@ -166,10 +166,10 @@ const createDefaultConfig = (): RAGConfig => ({
 // ===== INTERFACES & TYPES =====
 /** * Document Ingestion Parameters */
 export interface DocumentIngestionParams {
- title: string;, content: string;
+ title: string; content: string;
  documentType: string;
  metadata?: JsonObject;
- caseId?: string;, userId: string;
+ caseId?: string; userId: string;
  confidentialityLevel?: 'public' | 'confidential' | 'privileged' | 'attorney_client';
  jurisdiction?: string;
  clientId?: string;
@@ -190,7 +190,7 @@ export interface SearchParams {
 /** * Question Answering Parameters */
 export interface QuestionParams {
  question: string;
- caseId?: string;, userId: string;
+ caseId?: string; userId: string;
  conversationContext?: string;
  confidentialityLevel?: string;
  requireSources?: boolean;
@@ -199,38 +199,38 @@ export interface QuestionParams {
 
 /** * Search Result Document */
 export interface SearchResult {
- id: string;, content: string;
- title: string;, documentId: string;
- score: number;, similarity: number;
- textRank: number;, metadata: JsonObject;
+ id: string; content: string;
+ title: string; documentId: string;
+ score: number; similarity: number;
+ textRank: number; metadata: JsonObject;
  confidentialityLevel?: string;
  highlights?: string[];
 }
 
 /** * Answer Result */
 export interface AnswerResult {
- answer: string;, sources: SourceRef[];
- confidence: number;, keyPoints: string[];
+ answer: string; sources: SourceRef[];
+ confidence: number; keyPoints: string[];
  processingTime: number;
  citations?: string[];
  legalPrecedents?: string[];
- riskAssessment?: {, level: 'low' | 'medium' | 'high', factors: string[] };
+ riskAssessment?: { level: 'low' | 'medium' | 'high', factors: string[] };
 }
 
 /** * Contract Analysis Result */
 export interface ContractAnalysisResult {
- contractType: string;, parties: string[];
- keyTerms: string[];, risks: Risk[];
- legalIssues: string[];, recommendations: string[];
- confidence: number;, processingTime: number;
+ contractType: string; parties: string[];
+ keyTerms: string[]; risks: Risk[];
+ legalIssues: string[]; recommendations: string[];
+ confidence: number; processingTime: number;
  complianceFlags?: string[];
  jurisdiction?: string;
 }
 
 /** * Ingestion Result */
 export interface IngestionResult {
- documentId: string;, chunksCreated: number;
- tags: string[];, processingTime: number;
+ documentId: string; chunksCreated: number;
+ tags: string[]; processingTime: number;
  success: boolean;
  errors?: string[];
  metadata?: JsonObject;
@@ -239,21 +239,21 @@ export interface IngestionResult {
 type JsonObject = { [key, string]: unknown }
 
 interface DBChunkRow {
- id: string;, content: string;
+ id: string; content: string;
  metadata: JsonObject | null;
- document_id: string;, title: string | null;
+ document_id: string; title: string | null;
  confidentiality_level: string | null;
  similarity?: number | null;
  text_rank?: number | null;
  [key, string]: unknown;
 }
-type CombinedResult = DBChunkRow & { score: number;, highlights: string[] }
+type CombinedResult = DBChunkRow & { score: number; highlights: string[] }
 
 export interface AutoTag {
- tag: string;, confidence: number;
+ tag: string; confidence: number;
 }
 interface Risk {
- description: string;, severity: 'low' | 'medium' | 'high';
+ description: string; severity: 'low' | 'medium' | 'high';
  category: string;
 }
 
@@ -351,7 +351,7 @@ class RateLimiter {
 /** * Minimal MetricsCollector class. */
 class MetricsCollector {
  private counters: Map<string, number> = new Map();
- private timings: Map<string, { total: number;, count: number; last: number }> = new Map();
+ private timings: Map<string, { total: number; count: number; last: number }> = new Map();
  incrementCounter(name: string, value: number = 1): void {
  this.counters.set(name, (this.counters.get(name) || 0) + value);
  }
@@ -443,7 +443,7 @@ class OllamaHTTPEmbeddings implements EmbeddingsProvider {
  const response = await fetch(`${this.baseUrl}/api/embeddings`, {
  method: 'POST',
  headers: { 'Content-Type': `application/json` },
- body: JSON.stringify({, model: this.model, prompt: input }),
+ body: JSON.stringify({ model: this.model, prompt: input }),
  });
  if (!response.ok) {
  const errorText = await response.text();
@@ -478,9 +478,9 @@ class OllamaHTTPLLM {
  const response = await fetch(`${this.baseUrl}/api/generate`, {
  method: 'POST',
  headers: { 'Content-Type': `application/json` },
- body: JSON.stringify({, model: this.model,
+ body: JSON.stringify({ model: this.model,
  prompt,
- options: {, temperature: this.temperature, num_ctx: this.numCtx, num_predict: this.numPredict },
+ options: { temperature: this.temperature, num_ctx: this.numCtx, num_predict: this.numPredict },
  stream: false, // Request non-streaming response for invoke
  }),
  });
@@ -512,7 +512,7 @@ export class EnhancedLegalRAGPipeline {
  private db?: ReturnType<typeof drizzle>;
  private redis?: InstanceType<typeof Redis>;
  private embeddings?: EmbeddingsProvider;
- private llm?: {, invoke: (input: RunnableInvokeInput) => Promise<RunnableInvokeOutput> }; // treat as Runnable-like adapter
+ private llm?: { invoke: (input: RunnableInvokeInput) => Promise<RunnableInvokeOutput> }; // treat as Runnable-like adapter
  private validator: InputValidator;
  private rateLimiter: RateLimiter;
  private metrics: MetricsCollector;
@@ -741,8 +741,8 @@ const embedding = await this.embeddings.embedQuery(text);
  }
  }));
  type DocumentChunkInsert = {
- documentId: string;, documentType: string;
- chunkIndex: number;, content: string;
+ documentId: string; documentType: string;
+ chunkIndex: number; content: string;
  embedding: string, metadata: Record<string, unknown>;
  }
 
@@ -1028,7 +1028,7 @@ Answer: `);
   confidence: analysis.confidence.toString(),
   processingTime: Date.now() - startTime, contextUsed: relevantDocs.map((d) => d.documentId),
   embedding: JSON.stringify(queryEmbedding),
-  metadata: {, sourcesCount: relevantDocs.length, analysis.keyPoints, confidentialityLevel: citations.length, legalPrecedents.length, riskLevel: riskAssessment.level,
+  metadata: { sourcesCount: relevantDocs.length, analysis.keyPoints, confidentialityLevel: citations.length, legalPrecedents.length, riskLevel: riskAssessment.level,
   },
   });
  } catch (error) {
@@ -1250,9 +1250,9 @@ let parsed: unknown;
  getMetrics(): Record<string, unknown> {
  return {
  ...this.metrics.getMetrics(),
- config: {, chunkSize: this.config.rag.chunkSize, this.config.rag.maxSources, enableCaching: this.config.rag.enableCaching, enableAutoTagging: this.config.rag.enableAutoTagging,
+ config: { chunkSize: this.config.rag.chunkSize, this.config.rag.maxSources, enableCaching: this.config.rag.enableCaching, enableAutoTagging: this.config.rag.enableAutoTagging,
  },
- rateLimiting: {, perMinute: this.config.security.rateLimit.perMinute, this.config.security.rateLimit.windowMs,
+ rateLimiting: { perMinute: this.config.security.rateLimit.perMinute, this.config.security.rateLimit.windowMs,
  },
  };
  }
@@ -1333,7 +1333,7 @@ const sentences = text.split(/(?<=[.?!])\s+/).filter(Boolean);
  return Array.from(precedents);
  }
 
- private assessLegalRisks(text: string): {, level: 'low' | 'medium' | 'high', factors: string[] } {
+ private assessLegalRisks(text: string): { level: 'low' | 'medium' | 'high', factors: string[] } {
  const lowerText = (text || '').toLowerCase();
  const highRiskTerms = ['breach', 'penalty', 'fines', 'criminal', 'termination for cause', 'liability unlimited'];
  const mediumRiskTerms = ['indemnify', 'warranty', 'material breach', 'liquidated damages', 'exclusive'];
@@ -1489,6 +1489,9 @@ export const enhancedRAGPipeline = new EnhancedLegalRAGPipeline();
 export const ragPipeline = enhancedRAGPipeline;
 /** * Export configuration creator for custom instances */
 export { createDefaultConfig };
+
+
+
 
 
 

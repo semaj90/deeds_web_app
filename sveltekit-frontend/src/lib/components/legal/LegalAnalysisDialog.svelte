@@ -5,7 +5,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
   let prompt = ''; let analysisType: 'case_analysis' | 'legal_research' | 'document_review' | 'precedent_search' = 'case_analysis'; let loading = $state<boolean>(false); let analysis: LegalAnalysis | null = null; let error = ''; const analysisTypes = [ { value: 'case_analysis', label: 'Case Analysis' }, { value: 'legal_research', label: 'Legal Research' }, { value: 'document_review', label: 'Document Review' }, { value: 'precedent_search', label: 'Precedent Search' } ]; async function performAnalysis(): Promise<any> { if (!prompt.trim()) { error = 'Please enter an analysis prompt'; return}
     loading = true; error = ''; try { const response = await fetch('/api/legal/chat', { method: 'POST', headers: {
           'Content-Type': 'application/json'
-        }, body: JSON.stringify({ prompt, caseId, userId: 'current-user', // This should come from auth context sessionType: analysisType, context: {, caseDetails: caseId ? { id: caseId }: undefined, evidenceIds: evidenceId ? [evidenceId]: undefined, requestedAnalysis: [analysisType] }
+        }, body: JSON.stringify({ prompt, caseId, userId: 'current-user', // This should come from auth context sessionType: analysisType, context: { caseDetails: caseId ? { id: caseId }: undefined, evidenceIds: evidenceId ? [evidenceId]: undefined, requestedAnalysis: [analysisType] }
         }) }); if (!response.ok) { throw new Error(`Analysis failed: ${response.statusText}`)}
       analysis = await response.json(); onAnalysisComplete(analysis)} catch (err) { error = err instanceof Error ? err.message: 'Analysis failed'; console.error('Legal analysis, error:', err)} finally { loading = false}'
   }
@@ -27,5 +27,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
           > New Analysis </button> <button type="button"
             onclick={ closeDialog } class="px-4 py-2 border border-gray-300 rounded-md hover, bg-gray-50"
           > Close </button> </div> {/if} </div> </Dialog> ;
+
+
 
 

@@ -123,3 +123,4 @@ export function queryLokiTitle(term: string, limit = 25) {
  .limit(limit)
  .data();
 }
+

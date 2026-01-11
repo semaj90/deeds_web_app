@@ -316,3 +316,4 @@ export type NewChatMessage = typeof chat_messages.$inferInsert;
 
 export type SystemMetrics = typeof system_metrics.$inferSelect;
 export type NewSystemMetrics = typeof system_metrics.$inferInsert;
+

@@ -199,7 +199,7 @@
 <style>
 	.codebase-viewer {
 		padding: 2rem;
-		max-width: 1400px;, margin: 0 auto;
+		max-width: 1400px; margin: 0 auto;
 	}
 
 	.viewer-header {
@@ -207,12 +207,12 @@
 	}
 
 	.viewer-header h1 {
-		font-size: 2rem;, margin: 0;
+		font-size: 2rem; margin: 0;
 		color: #1a1a1a;
 	}
 
 	.subtitle {
-		color: #666;, margin: 0.5rem 0 0;
+		color: #666; margin: 0.5rem 0 0;
 	}
 
 	/* Stats Grid */
@@ -225,9 +225,9 @@
 
 	.stat-card {
 		display: flex;
-		align-items: center;, gap: 1rem;
+		align-items: center; gap: 1rem;
 		padding: 1.5rem;
-		border-radius: 12px;, background: white;
+		border-radius: 12px; background: white;
 		border: 2px solid #e5e7eb;
 		transition: all 0.2s;
 	}
@@ -259,32 +259,32 @@
 
 	.stat-value {
 		font-size: 1.75rem;
-		font-weight: 700;, color: #1a1a1a;
+		font-weight: 700; color: #1a1a1a;
 	}
 
 	.stat-label {
-		font-size: 0.875rem;, color: #666;
+		font-size: 0.875rem; color: #666;
 		margin-top: 0.25rem;
 	}
 
 	/* View Tabs */
 	.view-tabs {
-		display: flex;, gap: 0.5rem;
+		display: flex; gap: 0.5rem;
 		margin-bottom: 1.5rem;
 		border-bottom: 2px solid #e5e7eb;
 	}
 
 	.view-tabs button {
 		padding: 0.75rem 1.5rem;
-		border: none;, background: none;
+		border: none; background: none;
 		cursor: pointer;
-		font-size: 1rem;, color: #666;
+		font-size: 1rem; color: #666;
 		border-bottom: 3px solid transparent;
 		transition: all 0.2s;
 	}
 
 	.view-tabs button:hover {
-		color: #1a1a1a;, background: #f9fafb;
+		color: #1a1a1a; background: #f9fafb;
 	}
 
 	.view-tabs button.active {
@@ -298,10 +298,10 @@
 	}
 
 	.search-input {
-		width: 100%;, padding: 0.75rem 1rem;
+		width: 100%; padding: 0.75rem 1rem;
 		border: 2px solid #e5e7eb;
 		border-radius: 8px;
-		font-size: 1rem;, transition: border-color 0.2s;
+		font-size: 1rem; transition: border-color 0.2s;
 	}
 
 	.search-input:focus {
@@ -317,9 +317,9 @@
 	}
 
 	.collection-card {
-		padding: 1.5rem;, border: 2px solid #e5e7eb;
-		border-radius: 12px;, background: white;
-		cursor: pointer;, transition: all 0.2s;
+		padding: 1.5rem; border: 2px solid #e5e7eb;
+		border-radius: 12px; background: white;
+		cursor: pointer; transition: all 0.2s;
 	}
 
 	.collection-card:hover {
@@ -328,7 +328,7 @@
 	}
 
 	.collection-card.selected {
-		border-color: #3b82f6;, background: #eff6ff;
+		border-color: #3b82f6; background: #eff6ff;
 	}
 
 	.collection-header {
@@ -340,7 +340,7 @@
 
 	.collection-header h3 {
 		margin: 0;
-		font-size: 1.125rem;, color: #1a1a1a;
+		font-size: 1.125rem; color: #1a1a1a;
 	}
 
 	.status-badge {
@@ -352,7 +352,7 @@
 	}
 
 	.status-badge.green {
-		background: #d1fae5;, color: #065f46;
+		background: #d1fae5; color: #065f46;
 	}
 
 	.collection-stats .stat-row {
@@ -367,13 +367,13 @@
 	}
 
 	.collection-stats .value {
-		font-weight: 600;, color: #1a1a1a;
+		font-weight: 600; color: #1a1a1a;
 	}
 
 	/* Embeddings Table */
 	.embeddings-table {
 		background: white;
-		border-radius: 12px;, border: 2px solid #e5e7eb;
+		border-radius: 12px; border: 2px solid #e5e7eb;
 		overflow: hidden;
 	}
 
@@ -389,7 +389,7 @@
 	th {
 		padding: 1rem;
 		text-align: left;
-		font-weight: 600;, color: #1a1a1a;
+		font-weight: 600; color: #1a1a1a;
 		border-bottom: 2px solid #e5e7eb;
 	}
 
@@ -403,13 +403,13 @@
 	}
 
 	.file-path code {
-		background: #f3f4f6;, padding: 0.25rem 0.5rem;
+		background: #f3f4f6; padding: 0.25rem 0.5rem;
 		border-radius: 4px;
 		font-size: 0.875rem;
 	}
 
 	.error-count .badge {
-		background: #fef3c7;, color: #92400e;
+		background: #fef3c7; color: #92400e;
 		padding: 0.25rem 0.75rem;
 		border-radius: 9999px;
 		font-weight: 600;
@@ -417,8 +417,8 @@
 	}
 
 	.error-badge {
-		display: inline-block;, background: #fee2e2;
-		color: #991b1b;, padding: 0.25rem 0.5rem;
+		display: inline-block; background: #fee2e2;
+		color: #991b1b; padding: 0.25rem 0.5rem;
 		border-radius: 4px;
 		font-size: 0.75rem;
 		font-weight: 600;
@@ -444,18 +444,18 @@
 	}
 
 	.timeline-marker {
-		position: absolute;, left: 0;
-		top: 0.5rem;, width: 12px;
+		position: absolute; left: 0;
+		top: 0.5rem; width: 12px;
 		height: 12px;
-		border-radius: 50%;, background: #3b82f6;
+		border-radius: 50%; background: #3b82f6;
 		border: 3px solid white;
 		box-shadow: 0 0 0 2px #3b82f6;
 	}
 
 	.timeline-item::before {
-		content: '';, position: absolute;
-		left: 5px;, top: 1.5rem;
-		bottom: -1.5rem;, width: 2px;
+		content: ''; position: absolute;
+		left: 5px; top: 1.5rem;
+		bottom: -1.5rem; width: 2px;
 		background: #e5e7eb;
 	}
 
@@ -464,8 +464,8 @@
 	}
 
 	.timeline-content {
-		background: white;, padding: 1.5rem;
-		border-radius: 12px;, border: 2px solid #e5e7eb;
+		background: white; padding: 1.5rem;
+		border-radius: 12px; border: 2px solid #e5e7eb;
 	}
 
 	.timeline-content h4 {
@@ -475,7 +475,7 @@
 
 	.timeline-events {
 		display: flex;
-		flex-wrap: wrap;, gap: 0.5rem;
+		flex-wrap: wrap; gap: 0.5rem;
 	}
 
 	.event {
@@ -486,18 +486,20 @@
 	}
 
 	.event.indexed {
-		background: #dbeafe;, color: #1e40af;
+		background: #dbeafe; color: #1e40af;
 	}
 
 	.event.tagged {
-		background: #fef3c7;, color: #92400e;
+		background: #fef3c7; color: #92400e;
 	}
 
 	.event.edited {
-		background: #d1fae5;, color: #065f46;
+		background: #d1fae5; color: #065f46;
 	}
 
 	.event.analyzed {
-		background: #f3e8ff;, color: #6b21a8;
+		background: #f3e8ff; color: #6b21a8;
 	}
 </style>
+
+

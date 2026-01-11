@@ -12,16 +12,16 @@ export type Feature = 'errorBrain' | 'legalAi';
 
 export interface DataStore {
  // Error-Brain tables
- errorBrainAnalyses: string;, errorBrainPatches: string;
+ errorBrainAnalyses: string; errorBrainPatches: string;
  errorBrainHistory: string;
 
  // Legal-AI tables
- legalAiCitations: string;, legalAiAuthorities: string;
+ legalAiCitations: string; legalAiAuthorities: string;
  legalAiReports: string;
 }
 
 export interface AccessControl {
- feature: Feature;, allowedTables: string[];
+ feature: Feature; allowedTables: string[];
 }
 
 /**
@@ -127,7 +127,7 @@ export class DataIsolationLayer {
  /**
  * Validate data access request
  */
- validateAccess(feature: Feature): {, valid: boolean; error?: string } {
+ validateAccess(feature: Feature): { valid: boolean; error?: string } {
  if (!this.canAccess(feature, table)) {
  return {
  valid: false,
@@ -185,6 +185,9 @@ export function getAllowedTablesForFeature(feature: Feature): string[] {
  */
 export function validateDataAccess(
  feature: Feature, table: string
-): {, valid: boolean; error?: string } {
+): { valid: boolean; error?: string } {
  return dataIsolationLayer.validateAccess(feature, table);
 }
+
+
+

@@ -853,14 +853,14 @@ export const personsOfInterest = pgTable('persons', {
  photos: jsonb('photos')
  .$type<
  {
- id: string;, url: string;
- filename: string;, uploadedAt: string;
+ id: string; url: string;
+ filename: string; uploadedAt: string;
  metadata: {
  exif?: Record<string, any>;
- gps?: {, lat: number; lng: number };
+ gps?: { lat: number; lng: number };
  timestamp?: string;
  deviceModel?: string;
- resolution?: {, width: number; height: number };
+ resolution?: { width: number; height: number };
  };
  ai: {
  faceEmbedding?: number[]; // Face recognition vector
@@ -874,8 +874,8 @@ export const personsOfInterest = pgTable('persons', {
  photoUrl: text('photo_url'),
  ai: jsonb('ai')
  .$type<{
- riskScore: number;, patterns: string[];
- recommendations: string[];, lastUpdated: string;
+ riskScore: number; patterns: string[];
+ recommendations: string[]; lastUpdated: string;
  }>()
  .default(null),
  createdAt: timestamp('created_at').defaultNow(),
@@ -2325,3 +2325,6 @@ export const auditLog = pgTable('audit_log', {
 	details: jsonb('details').default({}).notNull(),
 	createdAt: timestamp('created_at', { withTimezone: true, mode: 'string' }).defaultNow().notNull(),
 });
+
+
+

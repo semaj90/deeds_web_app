@@ -20,3 +20,4 @@ export const load: LayoutServerLoad = async ({ url: locals }) => {
  const session = (locals as any).session ?? null;
  return { user, session: isAuthRoute, path };
 };
+

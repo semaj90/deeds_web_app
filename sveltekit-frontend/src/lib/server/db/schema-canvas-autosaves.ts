@@ -30,3 +30,4 @@ export const canvasAutosaves = pgTable(
 		index('canvas_autosaves_user_id_idx').on(table.userId),
 	])
 );
+

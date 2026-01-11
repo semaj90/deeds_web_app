@@ -39,3 +39,4 @@ export async function validateDatabaseOnStartup(): Promise<boolean> {
 export default { validateDatabaseOnStartup };
 export default { validateDatabaseOnStartup };
 
+

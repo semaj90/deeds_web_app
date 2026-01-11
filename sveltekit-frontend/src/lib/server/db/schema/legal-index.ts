@@ -12,3 +12,4 @@ export { lawSections, lawSectionsRelations, laws, lawsRelations } from './legal-
 // Type exports
 export type { caseChunks as CaseChunksTable, cases as CasesTable, crimes as CrimesTable } from './legal-cases.js';
 export type { lawSections as LawSectionsTable, laws as LawsTable } from './legal-laws.js';
+

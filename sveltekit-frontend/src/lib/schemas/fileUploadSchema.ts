@@ -8,3 +8,4 @@ export const fileUploadSchema = z.object({
 
 export type FileUploadSchema = typeof fileUploadSchema;
 export type FileUploadFormData = z.infer<typeof fileUploadSchema>;
+

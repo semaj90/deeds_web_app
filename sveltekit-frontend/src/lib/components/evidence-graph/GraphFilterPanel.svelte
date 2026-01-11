@@ -43,3 +43,4 @@
 
  <button class="nes-btn is-primary w-full mt-4" onclick={()=>onFilterChange('reset')}>Reset Filters</button>
 </div>
+

@@ -15,3 +15,4 @@ describe('DiffApplier', () => {
  expect(true).toBe(true);
  });
 });
+

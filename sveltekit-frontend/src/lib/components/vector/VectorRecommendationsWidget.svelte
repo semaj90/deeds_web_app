@@ -69,7 +69,7 @@ Compact AI recommendations component for sidebar/dashboard use
     try {
       const result = await vectorIntelligenceService.generateRecommendations({
         context,
-        userProfile: {, role: userRole,
+        userProfile: { role: userRole,
           experience: 'senior',
           specialization: ['legal-analysis', 'case-management']
         },
@@ -80,7 +80,7 @@ Compact AI recommendations component for sidebar/dashboard use
               status: 'active'
             }
           : undefined,
-        preferences: {, preferredActions: ['research', 'analysis', 'documentation'],
+        preferences: { preferredActions: ['research', 'analysis', 'documentation'],
           workflowStyle: 'systematic'
         }
       });
@@ -116,7 +116,7 @@ Compact AI recommendations component for sidebar/dashboard use
       case, 'warning':
         return 'border-l-red-500 bg-red-50/50 dark:bg-red-900/10',
       case, 'opportunity':
-        return 'border-l-purple-500 bg-purple-50/50 dark: bg-purple-900/10';, default: return 'border-l-gray-500 bg-gray-50/50 dark:bg-gray-900/10'}
+        return 'border-l-purple-500 bg-purple-50/50 dark: bg-purple-900/10'; default: return 'border-l-gray-500 bg-gray-50/50 dark:bg-gray-900/10'}
   }
   function getPriorityIcon(priority: string) {
     switch (priority) {
@@ -269,5 +269,8 @@ Compact AI recommendations component for sidebar/dashboard use
     -webkit-box-orient: vertical
    ;overflow: hidden}
 </style>
+
+
+
 
 

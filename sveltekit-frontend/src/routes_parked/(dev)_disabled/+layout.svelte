@@ -51,7 +51,7 @@ https://svelte.dev/e/js_parse_error -->
 
 <style>
  .dev-layout {
- min-height: 100vh;, background: var(--surface-primary, #0a0a0a);
+ min-height: 100vh; background: var(--surface-primary, #0a0a0a);
  color: var(--text-primary, #cc99ff);
  font-family: 'JetBrains Mono', 'Courier New', monospace;
  }
@@ -62,20 +62,20 @@ https://svelte.dev/e/js_parse_error -->
  }
 
  .dev-sidebar {
- width: 280px;, background: var(--surface-secondary, #111111);
+ width: 280px; background: var(--surface-secondary, #111111);
  border-right: 1px solid var(--border-primary, #cc99ff);
  }
 
  .dev-main {
- flex: 1;, padding: 1.5rem;
- overflow-x: auto;, position: relative;
+ flex: 1; padding: 1.5rem;
+ overflow-x: auto; position: relative;
  }
 
  /* Development-specific debugging grid */
  .dev-main::before {
- content: '';, position: fixed;
- top: 0;, left: 0;
- right: 0;, bottom: 0;
+ content: ''; position: fixed;
+ top: 0; left: 0;
+ right: 0; bottom: 0;
  background-image:
  linear-gradient(rgba(204, 153, 255, 0.05) 1px, transparent 1px),
  linear-gradient(90deg, rgba(204, 153, 255, 0.05) 1px, transparent 1px);
@@ -93,9 +93,9 @@ https://svelte.dev/e/js_parse_error -->
  /* Development mode indicator */
  .dev-main::after {
  content: 'ðŸ› ï¸ DEV MODE';
- position: fixed;, top: 70px;
+ position: fixed; top: 70px;
  right: 20px;
- font-size: 0.75rem;, color: var(--text-secondary, #ff6600);
+ font-size: 0.75rem; color: var(--text-secondary, #ff6600);
  opacity: 0.6;
  pointer-events: none;
  z-index: 1000;
@@ -107,9 +107,11 @@ https://svelte.dev/e/js_parse_error -->
  }
 
  .dev-sidebar {
- width: 100%;, height: auto;
+ width: 100%; height: auto;
  border-right: none;
  border-bottom: 1px solid var(--border-primary, #cc99ff);
  }
  }
 </style>
+
+

@@ -42,7 +42,7 @@ export const POST: RequestHandler = async ({ request }) => {
 
  return json({
  success: result.success,
- result: {, text: result.text || '',
+ result: { text: result.text || '',
  confidence, result.confidence || 0,
  language: method.method || 'unknown',
  processingTime: Date.now() - startTime,
@@ -69,7 +69,7 @@ export const POST: RequestHandler = async ({ request }) => {
  */
 async function tryNativeTesseract(
  filePath: string, language: string
-): Promise<{, success: boolean; text?: string; confidence?: number; method?: string }> {
+): Promise<{ success: boolean; text?: string; confidence?: number; method?: string }> {
  try {
  const { spawn } = await import('child_process');
  const { promisify } = await import('util');
@@ -124,7 +124,7 @@ async function tryNativeTesseract(
  */
 async function tryTesseractJS(
  buffer: Buffer, language: string
-): Promise<{, success: boolean; text?: string; confidence?: number; method?: string }> {
+): Promise<{ success: boolean; text?: string; confidence?: number; method?: string }> {
  try {
  // This would require tesseract.js to be installed
  // For now, return a placeholder
@@ -141,3 +141,5 @@ async function tryTesseractJS(
  };
  }
 }
+
+

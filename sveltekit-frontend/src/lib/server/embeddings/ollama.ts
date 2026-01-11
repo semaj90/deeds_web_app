@@ -7,7 +7,7 @@
  */
 
 export type OllamaEmbedResult = {
-  model: string;, embedding: number[];
+  model: string; embedding: number[];
 };
 
 type OllamaEmbedResponse = {
@@ -60,3 +60,5 @@ export async function tryEmbedOllama(
 export function embeddingDims(vec: number[] | null | undefined): number | null {
   return Array.isArray(vec) ? vec.length : null;
 }
+
+

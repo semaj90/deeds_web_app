@@ -2,7 +2,7 @@
  import PhoenixProsecutorDashboard from '$lib/components/yorha/PhoenixProsecutorDashboard.svelte';
  import type { PageData } from './$types';
 
- let { data }: {, data: PageData } = $props();
+ let { data }: { data: PageData } = $props();
 
  // Extract caseId from URL params if available
  let caseId = $derived(data?.caseId || null);
@@ -14,3 +14,4 @@
 </svelte:head>
 
 <PhoenixProsecutorDashboard {caseId} />
+

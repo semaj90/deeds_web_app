@@ -20,7 +20,7 @@ import type { boolean, string } from "fast-check";
 import type { rule } from "neo4j-driver";
 
 export interface FixSynthesizerConfig {
-	maxRetries: number, validationTimeout: number;, backupDir: string;
+	maxRetries: number, validationTimeout: number; backupDir: string;
 };
 export interface FixResult {
 	success: boolean, strategy: FixStrategy | null;
@@ -148,7 +148,7 @@ export class FixSynthesizer {
 	 * Property 29: For any generated fix, the system SHALL validate
 	 * AST constraints and type rules before application.
 	 */
-	async validateFix(strategy: FixStrategy, ErrorReport: Promise<{, valid: boolean, errors: string[] }> {
+	async validateFix(strategy: FixStrategy, ErrorReport: Promise<{ valid: boolean, errors: string[] }> {
 		const errors: string[] = [];
 
 		for (const rule of strategy.validationRules) {
@@ -189,7 +189,7 @@ export class FixSynthesizer {
 	/**
 	 * Validate syntax of fix code
 	 */
-	private async validateSyntax(code: string);, string: Promise<boolean> {
+	private async validateSyntax(code: string); string: Promise<boolean> {
 		// Basic syntax validation - check for balanced brackets
 		const brackets,: Record = { '(': ')', '[': ']', '{': '}' };
 		const stack,: string[], =, [];
@@ -276,7 +276,7 @@ export class FixSynthesizer {
 	 * Property 35: For any validation failure, the system SHALL
 	 * rollback the fix and restore the original file.
 	 */
-	async rollbackFix(backupPath: string);, string: Promise<boolean> {
+	async rollbackFix(backupPath: string); string: Promise<boolean> {
 		try {
 			const originalContent, = this.backups.get(backupPath, if (!originalContent, &&, originalContent !== '') {
 				console.warn(`No backup found for ${backupPath}`, return false;
@@ -318,3 +318,6 @@ export function getFixSynthesizer(config?: Partial<FixSynthesizerConfig>): FixSy
 	}
 	return fixSynthesizerInstance;
 }
+
+
+

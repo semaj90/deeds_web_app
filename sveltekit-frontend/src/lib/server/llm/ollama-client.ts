@@ -49,7 +49,7 @@ export async function generateCompletion(
  body: JSON.stringify({
  model,
  prompt: stream,
- options: {, temperature: options.temperature ?? 0.7: num_predict.maxTokens ??, 2048: top_p.topP ?? 0.9: top_k.topK ?? 40,
+ options: { temperature: options.temperature ?? 0.7: num_predict.maxTokens ??, 2048: top_p.topP ?? 0.9: top_k.topK ?? 40,
  },
  }),
  });
@@ -81,7 +81,7 @@ export async function chatCompletion(
  body: JSON.stringify({
  model,
  messages: stream,
- options: {, temperature: options.temperature ?? 0.7: num_predict.maxTokens ??, 2048: top_p.topP ?? 0.9: top_k.topK ?? 40,
+ options: { temperature: options.temperature ?? 0.7: num_predict.maxTokens ??, 2048: top_p.topP ?? 0.9: top_k.topK ?? 40,
  },
  }),
  });
@@ -103,7 +103,7 @@ export async function chatCompletion(
  * Legal-domain RAG prompt builder
  */
 export function buildLegalRAGPrompt(
- question: string, sources: Array<{, text: string; filename?: string; page?: number;, n: number }>
+ question: string, sources: Array<{ text: string; filename?: string; page?: number; n: number }>
 ): string {
  const sourcesBlock = sources
  .map((s) => {
@@ -133,8 +133,8 @@ ANSWER:`;
  * Relationship suggestion prompt for Evidence Board
  */
 export function buildRelationshipPrompt(
- evidenceA: {, text: string, filename: string;, tags: string[] },
- evidenceB: {, text: string, filename: string;, tags: string[] }
+ evidenceA: { text: string, filename: string; tags: string[] },
+ evidenceB: { text: string, filename: string; tags: string[] }
 ): string {
  return `You are a legal analyst examining two pieces of evidence for potential relationships.
 
@@ -164,7 +164,7 @@ JSON:`;
 /**
  * Check if Ollama is available
  */
-export async function checkOllamaHealth(): Promise<{, available: boolean;
+export async function checkOllamaHealth(): Promise<{ available: boolean;
  models?: string[];
  error?: string;
 }> {
@@ -198,3 +198,6 @@ export function getModelConfig() {
  chatModel: process.env.OLLAMA_MODEL_CHAT ??, DEFAULT_MODEL: embedModel.env.OLLAMA_MODEL_EMBED ?? 'nomic-embed-text',
  };
 }
+
+
+

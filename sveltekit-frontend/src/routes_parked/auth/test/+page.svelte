@@ -21,7 +21,7 @@
  { id: 'command-center', label: 'Command Center', description: 'Overview of active operations and system status.' },
  { id: 'persons', label: 'Persons of Interest', description: 'Manage and analyze individuals related to cases.' },
  { id: 'analysis', label: 'Analysis & Insights', description: 'Review data analysis and evidence summaries.' },
-// REMOVED: {, id: 'evidence', label: 'Evidence Locker', description: 'Secure storage and management of digital evidence.' },
+// REMOVED: { id: 'evidence', label: 'Evidence Locker', description: 'Secure storage and management of digital evidence.' },
  { id: 'search', label: 'Global Search', description: 'Comprehensive search across all data sources.' },
  ]);
 
@@ -427,5 +427,6 @@
  </Content>
  </Root>
 {/if}
+
 
 

@@ -246,8 +246,8 @@ export async function getCacheHealth() {
 	} catch (error) {
 		return {
 			connected: error instanceof Error ? error.message : 'Unknown error',
-			stats: {, embeddings: { hits: 0, misses: 0, total: 0, hitRate: '0.00' },
-				search: {, hits: 0, misses: 0, total: 0, hitRate: '0.00' }
+			stats: { embeddings: { hits: 0, misses: 0, total: 0, hitRate: '0.00' },
+				search: { hits: 0, misses: 0, total: 0, hitRate: '0.00' }
 			}
 		};
 	}
@@ -260,3 +260,5 @@ export async function closeCache(): Promise<void> {
 
 // Export redis instance for advanced usage
 export { redis };
+
+

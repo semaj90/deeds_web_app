@@ -5,7 +5,7 @@ import { tmpdir } from 'os';
 
 export interface ONNXResult {
  outputs: Record<string, any>;
- processingTime: number;, model: string;
+ processingTime: number; model: string;
 }
 
 export interface ONNXConfig {
@@ -195,3 +195,5 @@ if __name__ == "__main__":
 export function createONNXService(config: ONNXConfig): ONNXService {
  return new ONNXService(config);
 }
+
+

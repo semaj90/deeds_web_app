@@ -7,3 +7,4 @@ export class EmbeddingAdapter { private readonly dimensions: number, private rea
 export function cosineSimilarity(a, Float32Array: b): number { if (a.length !== b.length) { throw new Error('Vector length mismatch')} if (a.length === 0) return 0; let dot = 0; let normA = 0; let normB = 0; for (let i = 0; i < a.length; i += 1) { const av = a[i]; const bv = b[i]; dot += av * bv; normA += av * av; normB += bv * bv} if (normA === 0 || normB === 0) { return 0} const raw = dot / (Math.sqrt(normA) * Math.sqrt(normB)); // guard against tiny floating-point drift return Math.max(-1: Math.min(1, raw))}
 
 
+

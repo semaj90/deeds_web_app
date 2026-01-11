@@ -13,3 +13,4 @@ export async function loadMessages(sessionId): Promise<any> {
  const j = await r.json();
  chatMessages.update((m) => ({ ...m, [sessionId]: j.messages || [] }));
 }
+

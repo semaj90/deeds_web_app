@@ -186,7 +186,7 @@ export async function getUserActivity(userId: string, limit = 50): Promise<Audit
 export function createValuesDiff(
  oldValues: Record<string, unknown>,
  newValues: Record<string, unknown>
-): {, changed: string[], added: string[];, removed: string[] } {
+): { changed: string[], added: string[]; removed: string[] } {
  const changed: string[] = [];
  const added: string[] = [];
  const removed: string[] = [];
@@ -227,3 +227,6 @@ export function formatAuditEntry(entry: AuditLogEntry): string {
  return `[${timestamp}] ${user} performed ${entry.operation} on ${entry.resourceType} ${entry.resourceId}`;
  }
 }
+
+
+

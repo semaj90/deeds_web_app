@@ -16,3 +16,4 @@ export const sessionsRelations = relations(sessions, ({ one }) => ({
 export const usersRelations = relations(users, ({ many }) => ({
  sessions: many(sessions),
 }));
+

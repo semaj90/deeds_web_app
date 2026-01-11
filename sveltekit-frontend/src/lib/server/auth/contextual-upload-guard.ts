@@ -14,3 +14,4 @@ export function requireLuciaForContextualUploads(): boolean {
 export function isLuciaAvailableForContextualUploads(): boolean {
  return luciaAvailableForUploads;
 }
+

@@ -34,12 +34,12 @@ let aiStats = $state({);
  };
 
  // type-safe maps
- const statusColors: Record<string, { bg: string;, text: string; label: string }> = {
- open: {, bg: '#4caf50', text: '#fff', label: 'Open' },
- investigating: {, bg: '#ff9800', text: '#fff', label: 'Investigating' },
- pending: {, bg: '#ffd700', text: '#000', label: 'Pending' },
- closed: {, bg: '#666', text: '#fff', label: 'Closed' },
- archived: {, bg: '#999', text: '#fff', label: 'Archived' },
+ const statusColors: Record<string, { bg: string; text: string; label: string }> = {
+ open: { bg: '#4caf50', text: '#fff', label: 'Open' },
+ investigating: { bg: '#ff9800', text: '#fff', label: 'Investigating' },
+ pending: { bg: '#ffd700', text: '#000', label: 'Pending' },
+ closed: { bg: '#666', text: '#fff', label: 'Closed' },
+ archived: { bg: '#999', text: '#fff', label: 'Archived' },
  };
 
  const priorityColors: Record<string, string> = {
@@ -204,7 +204,7 @@ let aiStats = $state({);
 <style>
  .ai-dashboard {
  display: flex;
- flex-direction: column;, gap: 2rem;
+ flex-direction: column; gap: 2rem;
  padding: 2rem;
  min-height: 100%;
  }
@@ -212,7 +212,7 @@ let aiStats = $state({);
  .header-top {
  display: flex;
  justify-content: space-between;
- align-items: center;, gap: 2rem;
+ align-items: center; gap: 2rem;
  }
 
  .user-profile-section {
@@ -220,13 +220,13 @@ let aiStats = $state({);
  }
 
  :global(.user-card) {
- width: 100%;, background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+ width: 100%; background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
  border: 1px solid rgba(102, 126, 234, 0.2);
  }
 
  :global(.user-card-content) {
  display: flex;
- align-items: center;, gap: 1.5rem;
+ align-items: center; gap: 1.5rem;
  }
 
  .user-avatar {
@@ -234,9 +234,9 @@ let aiStats = $state({);
  }
 
  .avatar-circle {
- width: 60px;, height: 60px;
- border-radius: 50%;, background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
- color: white;, display: flex;
+ width: 60px; height: 60px;
+ border-radius: 50%; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+ color: white; display: flex;
  align-items: center;
  justify-content: center;
  font-size: 1.5rem;
@@ -250,7 +250,7 @@ let aiStats = $state({);
 
  .user-status {
  margin: 0;
- font-size: 0.85rem;, color: var(--text-muted);
+ font-size: 0.85rem; color: var(--text-muted);
  text-transform: uppercase;
  font-weight: 500;
  }
@@ -259,32 +259,32 @@ let aiStats = $state({);
  margin:
  0.25rem,
  0 0.5rem;
- font-size: 1.3rem;, color: var(--text-primary);
+ font-size: 1.3rem; color: var(--text-primary);
  }
 
  .user-role-info {
  margin: 0;
- font-size: 0.85rem;, color: var(--text-muted);
+ font-size: 0.85rem; color: var(--text-muted);
  }
 
  .dashboard-header h1 {
- font-size: 2rem;, margin: 0;
+ font-size: 2rem; margin: 0;
  }
 
  .user-greeting {
  display: flex;
  flex-direction: column;
- align-items: flex-end;, gap: 0.25rem;
+ align-items: flex-end; gap: 0.25rem;
  text-align: right;
  }
 
  .user-name {
  font-size: 1.1rem;
- font-weight: 600;, color: var(--text-primary);
+ font-weight: 600; color: var(--text-primary);
  }
 
  .user-role {
- font-size: 0.85rem;, color: var(--text-muted);
+ font-size: 0.85rem; color: var(--text-muted);
  text-transform: capitalize;
  }
 
@@ -311,7 +311,7 @@ let aiStats = $state({);
 
  .status-item {
  display: flex;
- flex-direction: column;, gap: 0.5rem;
+ flex-direction: column; gap: 0.5rem;
  font-size: 0.9rem;
  }
 
@@ -361,7 +361,7 @@ let aiStats = $state({);
  }
 
  .stat-label {
- margin-top: 0.5rem;, color: var(--text-muted);
+ margin-top: 0.5rem; color: var(--text-muted);
  }
 
  .section-header h2 {
@@ -384,12 +384,12 @@ let aiStats = $state({);
 
  :global(.service-card) {
  display: flex;
- flex-direction: column;, height: 100%;
+ flex-direction: column; height: 100%;
  }
 
  :global(.service-card) :global(.card-content) {
  display: flex;
- flex-direction: column;, gap: 1rem;
+ flex-direction: column; gap: 1rem;
  flex: 1;
  }
 
@@ -398,7 +398,7 @@ let aiStats = $state({);
  }
 
  .service-description {
- margin: 0;, color: var(--text-muted);
+ margin: 0; color: var(--text-muted);
  }
 
  .service-meta {
@@ -410,13 +410,13 @@ let aiStats = $state({);
 
  .activity-list {
  display: flex;
- flex-direction: column;, gap: 1rem;
+ flex-direction: column; gap: 1rem;
  }
 
  .activity-item {
  display: flex;
- align-items: center;, gap: 1rem;
- padding: 1rem;, border: 1px solid var(--border-muted);
+ align-items: center; gap: 1rem;
+ padding: 1rem; border: 1px solid var(--border-muted);
  border-radius: 0.75rem;
  }
 
@@ -444,14 +444,14 @@ let aiStats = $state({);
 
  .cases-section {
  display: flex;
- flex-direction: column;, gap: 1.5rem;
+ flex-direction: column; gap: 1.5rem;
  }
 
  .cases-header-container {
  display: flex;
  flex-direction: row;
  justify-content: space-between;
- align-items: center;, gap: 2rem;
+ align-items: center; gap: 2rem;
  }
 
  .cases-section-title {
@@ -459,13 +459,13 @@ let aiStats = $state({);
  0,
  0 0.5rem 0;
  font-size: 1.5rem;
- font-weight: bold;, color: #d4af37;
+ font-weight: bold; color: #d4af37;
  font-family: 'Press Start 2P', 'Courier New', monospace;
  }
 
  .cases-section-subtitle {
  margin: 0;
- font-size: 0.85rem;, color: #999;
+ font-size: 0.85rem; color: #999;
  text-transform: uppercase;
  letter-spacing: 1px;
  }
@@ -480,17 +480,17 @@ let aiStats = $state({);
  .cases-grid-container {
  display: grid;
  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
- gap: 1.25rem;, width: 100%;
+ gap: 1.25rem; width: 100%;
  }
 
  .case-card-wrapper {
  display: flex;
- text-decoration: none;, color: inherit;
- cursor: pointer;, border: 4px solid #1e293b !important;
+ text-decoration: none; color: inherit;
+ cursor: pointer; border: 4px solid #1e293b !important;
  background: #1e293b !important;
  padding: 1.25rem !important;
  transition: all 0.2s ease;
- position: relative;, overflow: hidden;
+ position: relative; overflow: hidden;
  }
 
  .case-card-wrapper:hover {
@@ -503,13 +503,13 @@ let aiStats = $state({);
 
  .case-card-inner {
  display: flex;
- flex-direction: column;, gap: 0.75rem;
- width: 100%;, position: relative;
+ flex-direction: column; gap: 0.75rem;
+ width: 100%; position: relative;
  z-index: 1;
  }
 
  .case-status-badge {
- display: inline-block;, width: fit-content;
+ display: inline-block; width: fit-content;
  padding: 0.25rem 0.75rem;
  border: 2px solid currentColor;
  font-size: 0.7rem;
@@ -523,7 +523,7 @@ let aiStats = $state({);
  }
 
  .case-priority-badge {
- display: inline-block;, width: fit-content;
+ display: inline-block; width: fit-content;
  padding: 0.25rem 0.75rem;
  border: 2px solid currentColor;
  color: white;
@@ -542,7 +542,7 @@ let aiStats = $state({);
  0.5rem,
  0 0 0;
  font-size: 1rem;
- font-weight: bold;, color: #fff;
+ font-weight: bold; color: #fff;
  line-height: 1.3;
  word-break: break-word;
  font-family: 'Press Start 2P', 'Courier New', monospace;
@@ -550,16 +550,16 @@ let aiStats = $state({);
 
  .case-card-type {
  margin: 0;
- font-size: 0.8rem;, color: #888;
+ font-size: 0.8rem; color: #888;
  display: flex;
- align-items: center;, gap: 0.5rem;
+ align-items: center; gap: 0.5rem;
  }
 
  .case-card-updated {
  margin: 0;
- font-size: 0.75rem;, color: #666;
+ font-size: 0.75rem; color: #666;
  display: flex;
- align-items: center;, gap: 0.5rem;
+ align-items: center; gap: 0.5rem;
  }
 
  .case-card-hover-indicator {
@@ -573,8 +573,8 @@ let aiStats = $state({);
  }
 
  .arrow-icon {
- font-size: 1.5rem;, color: #d4af37;
- font-weight: bold;, transition: transform 0.2s ease;
+ font-size: 1.5rem; color: #d4af37;
+ font-weight: bold; transition: transform 0.2s ease;
  }
 
  .case-card-wrapper:hover .arrow-icon {
@@ -596,7 +596,7 @@ let aiStats = $state({);
 
  .cases-header-container {
  flex-direction: column;
- align-items: flex-start;, gap: 1rem;
+ align-items: flex-start; gap: 1rem;
  }
 
  .cases-section-title {
@@ -613,3 +613,6 @@ let aiStats = $state({);
  }
  }
 </style>
+
+
+

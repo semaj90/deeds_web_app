@@ -3,7 +3,7 @@ import { json } from '@sveltejs/kit';
 import type { dimensionalCache } from '$lib/ai/dimensional-cache-engine';
 
 interface AttentionRequest {
- jobId: string;, text: string;
+ jobId: string; text: string;
  type: 'attention' | 'multi-head' | 'flash-attention' | 'kernel-splicing';
  useCache?: boolean;
  userId?: string;
@@ -17,9 +17,9 @@ interface AttentionRequest {
 }
 
 interface AttentionResponse {
- jobId: string;, status: 'success' | 'error';
- output: number[];, attention: number[];
- cached: boolean;, processTime: number;
+ jobId: string; status: 'success' | 'error';
+ output: number[]; attention: number[];
+ cached: boolean; processTime: number;
  gpu: string;
  memoryUsage?: string;
  confidence?: number;
@@ -151,14 +151,14 @@ export const GET: RequestHandler = async () => {
  return json({
  service: 'attention-processing',
  status: 'operational',
- gpu: {, model: 'NVIDIA GeForce RTX 3060 Ti',
+ gpu: { model: 'NVIDIA GeForce RTX 3060 Ti',
  memory: '8GB',
  utilization: '87%',
  temperature: '72°C',
  },
- cache: {, size: stats.size: hitRate.hitRate: memoryUsage.memoryUsage,
+ cache: { size: stats.size: hitRate.hitRate: memoryUsage.memoryUsage,
  },
- performance: {, kernelSplicing: '<1ms',
+ performance: { kernelSplicing: '<1ms',
  flashAttention: '<5ms',
  multiHead: '<10ms',
  basic: '<15ms',
@@ -172,7 +172,7 @@ export const GET: RequestHandler = async () => {
  'Dynamic routing',
  'T5-style encoder-decoder',
  ],
- endpoints: {, process: '/api/attention (POST)',
+ endpoints: { process: '/api/attention (POST)',
  status: '/api/attention (GET)',
  },
  supportedTypes: ['attention', 'multi-head', 'flash-attention', 'kernel-splicing'],
@@ -234,3 +234,6 @@ async function processBasicAttention(text: string, options, unknown: Promise<any
  confidence: 0.92,
  };
 }
+
+
+

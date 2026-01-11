@@ -66,3 +66,4 @@ export function getEmbeddingModel(): string {
  const { EMBEDDING_MODEL } = require('$lib/server/env.server'); // Dynamic import to avoid client-side exposure
  return EMBEDDING_MODEL;
 }
+

@@ -48,3 +48,4 @@ export const GET: RequestHandler = async ({ url }) => {
     return json({ nodes: [], edges: [], error: error.message }, { status: 500 });
   }
 };
+

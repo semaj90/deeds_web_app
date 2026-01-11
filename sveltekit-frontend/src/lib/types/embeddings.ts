@@ -29,9 +29,9 @@ export interface BatchEmbeddingRequest {
  options?: { batchSize?: number; maxConcurrent?: number };
 }
 export interface TextPreprocessingResult {
- cleanText: string;, tokens: string[];
- metadata: {, originalLength: number;
- cleanedLength: number;, tokenCount: number;
+ cleanText: string; tokens: string[];
+ metadata: { originalLength: number;
+ cleanedLength: number; tokenCount: number;
  hasSpecialChars: boolean;
  };
 }
@@ -43,12 +43,12 @@ export interface WASMEmbeddingConfig {
  enableGPU?: boolean;
 }
 export interface BatchEmbeddingResponse {
- success: boolean;, results: EmbeddingResponse[];
- summary: {, total: number; successful: number;, failed: number; processingTime: string };
+ success: boolean; results: EmbeddingResponse[];
+ summary: { total: number; successful: number; failed: number; processingTime: string };
 }
 export interface VectorDocument {
- id: string;, content: string;
- embedding: number[];, metadata: {
+ id: string; content: string;
+ embedding: number[]; metadata: {
  title?: string;
  type?: string;
  source?: string;
@@ -64,11 +64,14 @@ export interface SimilaritySearchOptions {
  includeContent?: boolean;
 }
 export interface SimilaritySearchResult {
- id: string;, documentId: string;
+ id: string; documentId: string;
  title?: string;
  documentType?: string;
- content?: string;, distance: number;
+ content?: string; distance: number;
  similarity?: number;
  metadata?: Record<string, unknown>;
  createdAt?: string;
 }
+
+
+

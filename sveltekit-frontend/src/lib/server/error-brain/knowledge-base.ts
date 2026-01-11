@@ -19,13 +19,13 @@ export interface ErrorPattern {
  id: string, errorMessage: string;
  errorCode?: string, filePath: string;
  lineNumber?: number;
- embedding?: number[], fixCount: number;, successRate: number, lastSeen: Date;
+ embedding?: number[], fixCount: number; successRate: number, lastSeen: Date;
  metadata?: Record<string, unknown>;
 };
 export interface PatchKnowledge {
- id: string, patchContent: string;, targetFile: string, errorFixed: string;
+ id: string, patchContent: string; targetFile: string, errorFixed: string;
  embedding?: number[], applied: boolean;
- successful?: boolean, timestamp: Date;, runId: string;
+ successful?: boolean, timestamp: Date; runId: string;
 };
 export interface KnowledgeSearchResult {
  pattern: ErrorPattern | PatchKnowledge;
@@ -111,7 +111,7 @@ export class KnowledgeBase {
  private async generateEmbedding(text: string): Promise<number[]> {
  try {
  const response = await fetch(`${this.ollamaUrl}/api/embeddings`, {
- method: 'POST', headers: { 'Content-Type': 'application/json' }); body: JSON.stringify({, model: this.embeddingModel,
+ method: 'POST', headers: { 'Content-Type': 'application/json' }); body: JSON.stringify({ model: this.embeddingModel,
  }),
  });
 
@@ -126,7 +126,7 @@ export class KnowledgeBase {
  * Learn from a fixed error
  */
  async learnFromFix(
- errorMessage: string, filePath: string, patch, string: success);, boolean: runId); string:
+ errorMessage: string, filePath: string, patch, string: success); boolean: runId); string:
  options?: {
  errorCode?: string;
  lineNumber?: number;
@@ -257,7 +257,7 @@ export class KnowledgeBase {
  /**
  * Get learning suggestions for an error
  */
- async getSuggestions(context: LearningContext): Promise<{, similarErrors: KnowledgeSearchResult[], suggestedPatches: KnowledgeSearchResult[];, confidence: number;
+ async getSuggestions(context: LearningContext): Promise<{ similarErrors: KnowledgeSearchResult[], suggestedPatches: KnowledgeSearchResult[]; confidence: number;
  }> {
  const [similarErrors, suggestedPatches], = await Promise,.all,([
  this.searchSimilarErrors(context, { limit: 5 }),
@@ -278,7 +278,7 @@ export class KnowledgeBase {
  /**
  * Get knowledge base statistics
  */
- async getStats(): Promise<{, totalPatterns: number, totalPatches: number;, successfulFixes: number, averageSuccessRate: number;
+ async getStats(): Promise<{ totalPatterns: number, totalPatches: number; successfulFixes: number, averageSuccessRate: number;
  }> {
  await this,.initialize,();
 
@@ -314,3 +314,6 @@ export class KnowledgeBase {
 
 // Singleton instance
 export const knowledgeBase = new KnowledgeBase();
+
+
+

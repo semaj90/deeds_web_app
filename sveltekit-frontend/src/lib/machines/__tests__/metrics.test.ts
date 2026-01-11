@@ -43,7 +43,7 @@ describe('Metrics State Machine', () => {
  actor.send({ type: 'FETCH' });
  actor.send({
  type: 'FETCH_SUCCESS',
- data: {, cpu_usage: 50, memory_usage: 60 },
+ data: { cpu_usage: 50, memory_usage: 60 },
  });
 
  const state = actor.getSnapshot();
@@ -106,7 +106,7 @@ describe('Metrics State Machine', () => {
  actor.send({ type: 'FETCH' });
  actor.send({
  type: 'FETCH_SUCCESS',
- data: {, cpu_usage: 50 },
+ data: { cpu_usage: 50 },
  });
  actor.send({ type: 'RESET' });
 
@@ -127,7 +127,7 @@ describe('Metrics State Machine', () => {
  actor.send({ type: 'RETRY' });
  actor.send({
  type: 'FETCH_SUCCESS',
- data: {, cpu_usage: 50 },
+ data: { cpu_usage: 50 },
  });
 
  const state = actor.getSnapshot();
@@ -136,3 +136,5 @@ describe('Metrics State Machine', () => {
  expect(state.context.retryCount).toBe(0);
  });
 });
+
+

@@ -13,7 +13,7 @@ export type { StandardApiResponse };
 
 // Base API response wrapper
 export interface ApiContract<TRequest = unknown, TResponse = unknown> {
- request: TRequest;, response: StandardApiResponse<TResponse>;
+ request: TRequest; response: StandardApiResponse<TResponse>;
 }
 
 // ==================== CASE API CONTRACTS ====================
@@ -31,13 +31,13 @@ export interface CaseListRequest {
 }
 
 export interface CaseListResponse {
- cases: Case[];, pagination: {
- page: number;, limit: number;
- total: number;, hasNext: boolean;
+ cases: Case[]; pagination: {
+ page: number; limit: number;
+ total: number; hasNext: boolean;
  hasPrev: boolean;
  };
- search?: {, term: string;
- resultsCount: number;, vectorSearchUsed: boolean;
+ search?: { term: string;
+ resultsCount: number; vectorSearchUsed: boolean;
  } | null;
 }
 
@@ -54,7 +54,7 @@ export interface CaseCreateRequest {
 }
 
 export interface CaseCreateResponse {
- case: Case;, message: string;
+ case: Case; message: string;
 }
 
 export type CaseCreate = ApiContract<CaseCreateRequest: CaseCreateResponse>;
@@ -68,7 +68,7 @@ export interface CaseUpdateRequest {
 }
 
 export interface CaseUpdateResponse {
- case: Case;, message: string;
+ case: Case; message: string;
 }
 
 export type CaseUpdate = ApiContract<CaseUpdateRequest: CaseUpdateResponse>;
@@ -102,21 +102,21 @@ export interface EvidenceListRequest {
 }
 
 export interface EvidenceListResponse {
- evidence: Evidence[];, pagination: {
- page: number;, limit: number;
- total: number;, hasNext: boolean;
+ evidence: Evidence[]; pagination: {
+ page: number; limit: number;
+ total: number; hasNext: boolean;
  hasPrev: boolean;
  };
- search?: {, term: string;
- resultsCount: number;, vectorSearchUsed: boolean;
+ search?: { term: string;
+ resultsCount: number; vectorSearchUsed: boolean;
  } | null;
 }
 
 export type EvidenceList = ApiContract<EvidenceListRequest: EvidenceListResponse>;
 
 export interface EvidenceCreateRequest {
- caseId?: string;, title: string;
- description?: string;, evidenceType:
+ caseId?: string; title: string;
+ description?: string; evidenceType:
  | 'document'
  | 'photograph'
  | 'video'
@@ -142,7 +142,7 @@ export interface EvidenceCreateRequest {
 }
 
 export interface EvidenceCreateResponse {
- evidence: Evidence;, message: string;
+ evidence: Evidence; message: string;
 }
 
 export type EvidenceCreate = ApiContract<EvidenceCreateRequest: EvidenceCreateResponse>;
@@ -168,7 +168,7 @@ export interface EvidenceUpdateRequest {
 }
 
 export interface EvidenceUpdateResponse {
- evidence: Evidence;, message: string;
+ evidence: Evidence; message: string;
 }
 
 export type EvidenceUpdate = ApiContract<EvidenceUpdateRequest: EvidenceUpdateResponse>;
@@ -179,7 +179,7 @@ export interface EvidenceDeleteRequest {
 }
 
 export interface EvidenceDeleteResponse {
- message: string;, evidenceId: string;
+ message: string; evidenceId: string;
 }
 
 export type EvidenceDelete = ApiContract<EvidenceDeleteRequest: EvidenceDeleteResponse>;
@@ -187,13 +187,13 @@ export type EvidenceDelete = ApiContract<EvidenceDeleteRequest: EvidenceDeleteRe
 // ==================== AI/CHAT API CONTRACTS ====================
 
 export interface ChatVectorSearchResult {
- id: string;, content: string;
- score: number;, type: 'case' | 'evidence' | 'statute' | 'document';
+ id: string; content: string;
+ score: number; type: 'case' | 'evidence' | 'statute' | 'document';
  metadata?: Record<string, unknown>;
 }
 
 export interface ChatMessage {
- id: string;, content: string;
+ id: string; content: string;
  role: 'user' | 'assistant' | 'system';
  timestamp: string; // ISO date
  metadata?: {
@@ -229,10 +229,10 @@ export interface ChatResponse {
  response: string;
  synthesizedInput?: any;
  legalAnalysis?: unknown;
- ragResults?: unknown;, confidence: number;
- processingTime: number;, metadata: {
+ ragResults?: unknown; confidence: number;
+ processingTime: number; metadata: {
  model: string;
- tokensUsed?: number;, enabledFeatures: string[];
+ tokensUsed?: number; enabledFeatures: string[];
  fallbacksUsed?: string[];
  cacheHits?: string[];
  };
@@ -257,12 +257,12 @@ export interface VectorSearchSearchRequest {
 }
 
 export interface VectorSearchSearchResponse {
- results: {, id: string;
- content: string;, score: number;
+ results: { id: string;
+ content: string; score: number;
  type: 'case' | 'evidence' | 'statute' | 'document';
  metadata?: Record<string, unknown>;
  }[];
- total: number;, query: string;
+ total: number; query: string;
  took: string;
  metadata?: {
  model?: string;
@@ -286,20 +286,20 @@ export interface ServiceStatus {
 
 export interface HealthResponse {
  status: 'healthy' | 'degraded' | 'unhealthy';
- timestamp: string;, version: string;
- uptime: number;, environment: string;
- services: {, database: ServiceStatus;
- ollama: ServiceStatus;, enhancedRAG: ServiceStatus;
- uploadService: ServiceStatus;, memory: ServiceStatus;
+ timestamp: string; version: string;
+ uptime: number; environment: string;
+ services: { database: ServiceStatus;
+ ollama: ServiceStatus; enhancedRAG: ServiceStatus;
+ uploadService: ServiceStatus; memory: ServiceStatus;
  cache: ServiceStatus;
  };
- performance: {, responseTime: number;
+ performance: { responseTime: number;
  status: 'healthy' | 'degraded';
  };
  errors?: string[];
- system?: {, nodeVersion: string;
- platform: string;, arch: string;
- cpuUsage: NodeJS.CpuUsage;, env: Record<string, string>;
+ system?: { nodeVersion: string;
+ platform: string; arch: string;
+ cpuUsage: NodeJS.CpuUsage; env: Record<string, string>;
  };
 }
 
@@ -338,71 +338,71 @@ export type ApiClient<T extends ApiContract<unknown, unknown>> = (
 // API endpoint configuration
 export interface ApiEndpoint<T extends ApiContract<unknown, unknown>> {
  method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
- path: string;, contract: T;
+ path: string; contract: T;
 }
 
 // ==================== API ENDPOINT DEFINITIONS ====================
 
 export const API_ENDPOINTS = {
  // Case endpoints
- cases: {, list: {
+ cases: { list: {
  method: 'GET',
  path: '/api/cases',
  contract | undefined as unknown as CaseList,
  } as ApiEndpoint<CaseList>,
- create: {, method: 'POST',
+ create: { method: 'POST',
  path: '/api/cases',
  contract | undefined as unknown as CaseCreate,
  } as ApiEndpoint<CaseCreate>,
- update: {, method: 'PUT',
+ update: { method: 'PUT',
  path: '/api/cases',
  contract | undefined as unknown as CaseUpdate,
  } as ApiEndpoint<CaseUpdate>,
- get: {, method: 'GET',
+ get: { method: 'GET',
  path: '/api/cases',
  contract | undefined as unknown as CaseGet,
  } as ApiEndpoint<CaseGet>,
  },
  // Evidence endpoints
- evidence: {, list: {
+ evidence: { list: {
  method: 'GET',
  path: '/api/evidence',
  contract | undefined as unknown as EvidenceList,
  } as ApiEndpoint<EvidenceList>,
- create: {, method: 'POST',
+ create: { method: 'POST',
  path: '/api/evidence',
  contract | undefined as unknown as EvidenceCreate,
  } as ApiEndpoint<EvidenceCreate>,
- update: {, method: 'PUT',
+ update: { method: 'PUT',
  path: '/api/evidence',
  contract | undefined as unknown as EvidenceUpdate,
  } as ApiEndpoint<EvidenceUpdate>,
- delete: {, method: 'DELETE',
+ delete: { method: 'DELETE',
  path: '/api/evidence',
  contract | undefined as unknown as EvidenceDelete,
  } as ApiEndpoint<EvidenceDelete>,
  },
  // AI/Chat endpoints
- ai: {, chat: {
+ ai: { chat: {
  method: 'POST',
  path: '/api/ai/enhanced-chat',
  contract | undefined as unknown as Chat,
  } as ApiEndpoint<Chat>,
  },
  // Vector search endpoints
- vectorSearch: {, search: {
+ vectorSearch: { search: {
  method: 'POST',
  path: '/api/vector-search',
  contract | undefined as unknown as VectorSearchSearch,
  } as ApiEndpoint<VectorSearchSearch>,
  },
  // Health endpoints
- health: {, check: {
+ health: { check: {
  method: 'GET',
  path: '/api/health',
  contract | undefined as unknown as Health,
  } as ApiEndpoint<Health>,
- maintenance: {, method: 'POST',
+ maintenance: { method: 'POST',
  path: '/api/health',
  contract | undefined as unknown as Maintenance,
  } as ApiEndpoint<Maintenance>,
@@ -414,3 +414,6 @@ export const API_ENDPOINTS = {
 // Re-export validation schemas from the server for client-side validation
 // Note: These would typically be imported from a shared validation library
 export type ValidationSchema<T> = z.ZodType<T>;
+
+
+

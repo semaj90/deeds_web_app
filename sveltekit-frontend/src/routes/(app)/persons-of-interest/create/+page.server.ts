@@ -40,7 +40,7 @@ export const actions: Actions = {
  const response = await fetch('http://localhost:8000/api/persons-of-interest', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({, case_id: locals.caseId,
+ body: JSON.stringify({ case_id: locals.caseId,
  ...form.data,
  }),
  });
@@ -56,3 +56,5 @@ export const actions: Actions = {
  }
  },
 };
+
+

@@ -54,3 +54,4 @@ export const POST: RequestHandler = async ({ request: locals }) => {
     return json({ success: false, error: 'Ingestion protocol failed' }, { status: 500 });
   }
 };
+

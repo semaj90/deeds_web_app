@@ -44,3 +44,4 @@ export const errorBrainAnalysisTable = pgTable(
 
 export type ErrorBrainAnalysis = typeof errorBrainAnalysisTable.$inferSelect;
 export type ErrorBrainAnalysisInsert = typeof errorBrainAnalysisTable.$inferInsert;
+

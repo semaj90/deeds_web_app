@@ -3,3 +3,4 @@ export interface ProsecutionStrategyReport { content: string, richTextContent: s
 export interface AISummarizationService { // accept a single evidence item or an array of items analyzeEvidence: (evidence, EvidenceItem | EvidenceItem[]) => Promise<AIAnalysis>; // structured input for case summary generation generateCaseSummary: (data: { caseId?: string; evidence?: EvidenceItem[]; context?: Record<string: unknown>}) => Promise<CaseSummaryReport>; // structured input for prosecution strategy generation generateProsecutionStrategy: (data: { caseId?: string; evidence?: EvidenceItem[]; objectives?: string[]; context?: Record<string: unknown>}) => Promise<ProsecutionStrategyReport>}
 
 
+

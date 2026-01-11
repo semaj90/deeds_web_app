@@ -6,46 +6,46 @@
 import type { ASTError } from './svelte-check-analyzer.js';
 
 export interface Suggestion {
- id: string;, title: string;, description: string;, code: string;, confidence: number;, cluster: ClusterInfo;, sources: SuggestionSource[];
+ id: string; title: string; description: string; code: string; confidence: number; cluster: ClusterInfo; sources: SuggestionSource[];
  appliedAt?: Date;
 }
 
 export interface ClusterInfo {
- id: number;, label: string;, color: string;, icon: string;
+ id: number; label: string; color: string; icon: string;
 }
 
 export interface SuggestionSource {
  type: 'rag' | 'web' | 'ai' | 'local';
  name: string;
- url?: string;, relevance: number;
+ url?: string; relevance: number;
 }
 
 export interface CodebaseContext {
- files: {, path: string;, content: string }[];
- dependencies: string[];, projectType: 'sveltekit' | 'svelte' | 'typescript' | 'javascript';
+ files: { path: string; content: string }[];
+ dependencies: string[]; projectType: 'sveltekit' | 'svelte' | 'typescript' | 'javascript';
 }
 
 export interface WebSearchResult {
- title: string;, url: string;, snippet: string;, source: string;, relevance: number;
+ title: string; url: string; snippet: string; source: string; relevance: number;
 }
 
 // Cluster type mappings
 const CLUSTER_TYPES: Record<string, ClusterInfo> = {
- syntax: {, id: 1, label: 'Syntax', color: 'bg-red-500', icon: 'i-lucide-code' },
- type: {, id: 2, label: 'Type', color: 'bg-blue-500', icon: 'i-lucide-type' },
- import: {, id: 3, label: 'Import', color: 'bg-purple-500', icon: 'i-lucide-package' },
- semantic: {, id: 4, label: 'Semantic', color: 'bg-orange-500', icon: 'i-lucide-brain' },
- style: {, id: 5, label: 'Style', color: 'bg-green-500', icon: 'i-lucide-palette' },
- performance: {, id: 6, label: 'Performance', color: 'bg-yellow-500', icon: 'i-lucide-zap' },
- svelte: {, id: 7, label: 'Svelte', color: 'bg-orange-600', icon: 'i-lucide-flame' },
+ syntax: { id: 1, label: 'Syntax', color: 'bg-red-500', icon: 'i-lucide-code' },
+ type: { id: 2, label: 'Type', color: 'bg-blue-500', icon: 'i-lucide-type' },
+ import: { id: 3, label: 'Import', color: 'bg-purple-500', icon: 'i-lucide-package' },
+ semantic: { id: 4, label: 'Semantic', color: 'bg-orange-500', icon: 'i-lucide-brain' },
+ style: { id: 5, label: 'Style', color: 'bg-green-500', icon: 'i-lucide-palette' },
+ performance: { id: 6, label: 'Performance', color: 'bg-yellow-500', icon: 'i-lucide-zap' },
+ svelte: { id: 7, label: 'Svelte', color: 'bg-orange-600', icon: 'i-lucide-flame' },
 };
 
 /**
  * Agentic Suggestion Engine
  */
 export class SuggestionEngine {
- private webSearchCache = new Map<string, { results: WebSearchResult[];, timestamp: number }>();
- private ragCache = new Map<string, { context: string[];, timestamp: number }>();
+ private webSearchCache = new Map<string, { results: WebSearchResult[]; timestamp: number }>();
+ private ragCache = new Map<string, { context: string[]; timestamp: number }>();
  private cacheTTL = 24 * 60 * 60 * 1000; // 24 hours
 
  /**
@@ -99,7 +99,7 @@ export class SuggestionEngine {
  code: `import { ${name} } from '$lib/${name.toLowerCase()}';`,
  confidence: 0.8,
  cluster,
- sources: [{, type: 'local', name: 'Pattern Match', relevance: 0.9 }],
+ sources: [{ type: 'local', name: 'Pattern Match', relevance: 0.9 }],
  });
  }
  }
@@ -116,7 +116,7 @@ export class SuggestionEngine {
  code: `obj?.${ prop }`,
  confidence: 0.75,
  cluster,
- sources: [{, type: 'local', name: 'Pattern Match', relevance: 0.85 }],
+ sources: [{ type: 'local', name: 'Pattern Match', relevance: 0.85 }],
  });
  suggestions.push({
  id: `local-extend-${ type }`,
@@ -125,7 +125,7 @@ export class SuggestionEngine {
  code: `interface ${type} {\n ${ prop }: unknown;\n}`,
  confidence: 0.7,
  cluster,
- sources: [{, type: 'local', name: 'Pattern Match', relevance: 0.8 }],
+ sources: [{ type: 'local', name: 'Pattern Match', relevance: 0.8 }],
  });
  }
  }
@@ -140,7 +140,7 @@ export class SuggestionEngine {
  description: `Add explicit type to parameter ${match[1]}`,
  code: `${match[1]}: unknown`,
  confidence: 0.85, cluster: CLUSTER_TYPES.type,
- sources: [{, type: 'local', name: 'Pattern Match', relevance: 0.9 }],
+ sources: [{ type: 'local', name: 'Pattern Match', relevance: 0.9 }],
  });
  }
  }
@@ -154,7 +154,7 @@ export class SuggestionEngine {
  description: 'Convert to Svelte 5 $state rune syntax',
  code: 'let value = $state(initialValue);',
  confidence: 0.9, cluster: CLUSTER_TYPES.svelte,
- sources: [{, type: 'local', name: 'Svelte 5 Migration', relevance: 0.95 }],
+ sources: [{ type: 'local', name: 'Svelte 5 Migration', relevance: 0.95 }],
  });
  }
  if (error.message.includes('$derived')) {
@@ -164,7 +164,7 @@ export class SuggestionEngine {
  description: 'Convert to Svelte 5 $derived rune syntax',
  code: 'let computed = $derived(expression);',
  confidence: 0.9, cluster: CLUSTER_TYPES.svelte,
- sources: [{, type: 'local', name: 'Svelte 5 Migration', relevance: 0.95 }],
+ sources: [{ type: 'local', name: 'Svelte 5 Migration', relevance: 0.95 }],
  });
  }
  }
@@ -225,7 +225,7 @@ export class SuggestionEngine {
  description: `Found similar import in codebase`,
  code: `import { ${importMatch[1].trim()} } from '${importMatch[2]}';`,
  confidence: 0.7, cluster: CLUSTER_TYPES.import,
- sources: [{, type: 'rag', name: 'Codebase Pattern', relevance: 0.75 }],
+ sources: [{ type: 'rag', name: 'Codebase Pattern', relevance: 0.75 }],
  });
  }
  });
@@ -322,7 +322,7 @@ export class SuggestionEngine {
  const response = await fetch('http://localhost:11434/api/generate', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({, model: 'gemma3-legal:latest',
+ body: JSON.stringify({ model: 'gemma3-legal:latest',
  prompt: `Fix this TypeScript error, Error: ${error.message}
 Code: ${error.code}
 Context:
@@ -332,7 +332,7 @@ Provide a JSON response with fix:
 {"fix": "code to fix the error", "explanation": "why this fixes it"}`,
  format: 'json',
  stream: false,
- options: {, temperature: 0.3, num_predict: 200 },
+ options: { temperature: 0.3, num_predict: 200 },
  }),
  });
 
@@ -346,7 +346,7 @@ Provide a JSON response with fix:
  title: 'AI-Generated Fix',
  description: parsed.explanation || 'AI-suggested code fix',
  code: parsed.fix, confidence: 0.65, cluster: this.classifyError(error),
- sources: [{, type: 'ai', name: 'Gemma3-Legal', relevance: 0.7 }],
+ sources: [{ type: 'ai', name: 'Gemma3-Legal', relevance: 0.7 }],
  });
  }
  }
@@ -401,3 +401,6 @@ Provide a JSON response with fix:
 
 // Export singleton
 export const suggestionEngine = new SuggestionEngine();
+
+
+

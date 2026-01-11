@@ -6,21 +6,21 @@ import { sql } from 'drizzle-orm'; // Removed unused type Table
 
 // GRPMO imports
 interface GRPMOConfig {
- hotCacheThreshold: number;, warmCacheThreshold: number;
- coldCacheThreshold: number;, reinforcementLearningRate: number;
- predictiveWindowMs: number;, glyphCompressionRatio: number;
+ hotCacheThreshold: number; warmCacheThreshold: number;
+ coldCacheThreshold: number; reinforcementLearningRate: number;
+ predictiveWindowMs: number; glyphCompressionRatio: number;
 }
 
 interface ExtendedThinkingStage {
- name: string;, duration: number;
+ name: string; duration: number;
  cacheLayer: 'hot' | 'warm' | 'cold';
  confidence: number;
  glyphData?: string;
 }
 
 interface PPOState {
- stateVector: number[];, actionHistory: string[];
- rewardSignal: number;, policyGradient: number[];
+ stateVector: number[]; actionHistory: string[];
+ rewardSignal: number; policyGradient: number[];
  valueFunction: number;
 }
 
@@ -40,7 +40,7 @@ type PPOContext = {
 
 interface SimilarityResult {
  id: string;
- title?: string;, content: string;
+ title?: string; content: string;
  similarity: number;
  metadata?: Metadata;
  cacheLayer?: 'hot' | 'warm' | 'cold';
@@ -211,7 +211,7 @@ export async function hybridSearch(
  return {
  id,
  title: content * 0.5,
- metadata: {, searchType: 'text' },
+ metadata: { searchType: 'text' },
  } as SimilarityResult;
  });
   
@@ -239,8 +239,8 @@ export async function checkPgVectorAvailable(): Promise<boolean> {
 }
 
 // Vector operations test function
-export async function testVectorOperations(): Promise<{, pgvectorAvailable: boolean;
- similaritySearchWorking: boolean;, embeddingCacheWorking: boolean;
+export async function testVectorOperations(): Promise<{ pgvectorAvailable: boolean;
+ similaritySearchWorking: boolean; embeddingCacheWorking: boolean;
 }> {
  const pgvectorAvailable = await checkPgVectorAvailable();
  let similaritySearchWorking = false;
@@ -267,15 +267,15 @@ export async function testVectorOperations(): Promise<{, pgvectorAvailable: bool
 
 // New interface for the return type of processExtendedThinking
 interface ProcessExtendedThinkingResult {
- result: SimilarityResult[];, thinkingStages: ExtendedThinkingStage[];
- cachePerformance: {, hot: number; warm: number;, cold: number };
+ result: SimilarityResult[]; thinkingStages: ExtendedThinkingStage[];
+ cachePerformance: { hot: number; warm: number; cold: number };
 }
 
 // GRPMO Extended Thinking Engine
 export class GRPMOOrchestrator {
  private config: GRPMOConfig;
  // Narrowed memoryCache type from any to SimilarityResult[]
- private memoryCache: Map<string, { data: SimilarityResult[];, timestamp: number; layer: string }> =
+ private memoryCache: Map<string, { data: SimilarityResult[]; timestamp: number; layer: string }> =
  new Map();
  private reinforcementAgent: PPOAgent;
  constructor(config: GRPMOConfig = defaultGRPMOConfig) {
@@ -358,7 +358,7 @@ export class GRPMOOrchestrator {
 
  private async retrieveFromCache(
  key: string, layer: string
- ): Promise<{, data: SimilarityResult[]; timestamp: number } | null> {
+ ): Promise<{ data: SimilarityResult[]; timestamp: number } | null> {
  const cached = this.memoryCache.get(key);
  if (!cached) return null;
  const age = Date.now() - cached.timestamp;
@@ -428,3 +428,6 @@ class PPOAgent {
  return results;
  }
 }
+
+
+

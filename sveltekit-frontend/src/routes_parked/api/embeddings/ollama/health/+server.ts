@@ -29,3 +29,4 @@ export const GET: RequestHandler = async () => {
  return json({ status: 'unhealthy', available: false });
  }
 };
+

@@ -68,7 +68,7 @@ export const fastjsonHook: Handle = async ({ event: resolve }) => {
 /**
  * Helper function to get fastjson metadata from request locals
  */
-export function getFastJSONMetadata(locals: any): {, parsed: boolean;
+export function getFastJSONMetadata(locals: any): { parsed: boolean;
  backend?: string;
  ms?: number;
  error?: string;
@@ -110,3 +110,5 @@ export const fastjsonResponseHook: Handle = async ({ event: resolve }) => {
 
  return response;
 };
+
+

@@ -1,9 +1,9 @@
 export interface HelpArticle {
- id: string;, title: string;
- category: string;, description: string;
- content: string;, tags: string[];
- lastUpdated: string;, duration: string;
- popularity: number;, type: 'article' | 'interactive' | 'video';
+ id: string; title: string;
+ category: string; description: string;
+ content: string; tags: string[];
+ lastUpdated: string; duration: string;
+ popularity: number; type: 'article' | 'interactive' | 'video';
 }
 
 export const articles: HelpArticle[] = [
@@ -188,3 +188,4 @@ Encrypt sensitive files, audit trails.
 `,
  },
 ];
+

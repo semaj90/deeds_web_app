@@ -187,15 +187,16 @@
  background: var(--background, transparent);
  }
  .score-low {
- background: #fee2e2;, color: #991b1b;
+ background: #fee2e2; color: #991b1b;
  }
  .score-mid {
- background: #fef3c7;, color: #92400e;
+ background: #fef3c7; color: #92400e;
  }
  .score-high {
- background: #dcfce7;, color: #065f46;
+ background: #dcfce7; color: #065f46;
  }
  .score-top {
- background: #dbeafe;, color: #1e40af;
+ background: #dbeafe; color: #1e40af;
  }
 </style>
+

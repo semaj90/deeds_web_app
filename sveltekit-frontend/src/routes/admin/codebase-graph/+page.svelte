@@ -4,24 +4,24 @@
 	import { onMount } from 'svelte';
 
 	interface VectorCluster {
-		id: number;, cluster_id: number;
-		pattern: string;, error_count: number;
-		avg_similarity: number;, file_paths: string[];
-		summary: string;, tags: string[];
+		id: number; cluster_id: number;
+		pattern: string; error_count: number;
+		avg_similarity: number; file_paths: string[];
+		summary: string; tags: string[];
 		embedding: number[];
 	}
 
 	interface GraphNode {
-		id: string;, label: string;
+		id: string; label: string;
 		type: 'file' | 'error' | 'cluster' | 'fix';
 		cluster_id?: number;
-		similarity?: number;, tags: string[];
+		similarity?: number; tags: string[];
 		fix_status?: 'pending' | 'in-progress' | 'applied' | 'failed';
 	}
 
 	interface GraphEdge {
-		source: string;, target: string;
-		weight: number;, type: 'similarity' | 'dependency' | 'fix-attempt';
+		source: string; target: string;
+		weight: number; type: 'similarity' | 'dependency' | 'fix-attempt';
 	}
 
 	let clusters = $state<VectorCluster[]>([]);
@@ -99,7 +99,7 @@
 			const response = await fetch('/api/phase89/vector-search', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({, query: searchQuery,
+				body: JSON.stringify({ query: searchQuery,
 					limit: 10,
 					threshold: 0.7
 				})
@@ -118,7 +118,7 @@
 			const response = await fetch('/api/phase89/similar-clusters', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({, cluster_id: cluster.cluster_id,
+				body: JSON.stringify({ cluster_id: cluster.cluster_id,
 					embedding: cluster.embedding,
 					limit: 5
 				})
@@ -140,10 +140,10 @@
 			const response = await fetch('/api/phase89/agentic-fix', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({, cluster_id: cluster.cluster_id,
+				body: JSON.stringify({ cluster_id: cluster.cluster_id,
 					pattern: cluster.pattern,
 					file_paths: cluster.file_paths,
-					context: {, summary: cluster.summary,
+					context: { summary: cluster.summary,
 						tags: cluster.tags,
 						similar_clusters: similarClusters.map((c) => c.pattern)
 					}
@@ -460,3 +460,6 @@
 		</DialogRoot>
 	</div>
 </div>
+
+
+

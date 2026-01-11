@@ -23,7 +23,7 @@
         try {
             servicesHealth = await legalAIClient.healthCheck()} catch (err) {
             console.error('Health check failed:', err);
-            servicesHealth = { quicServer: false;, recommendationEngine: false }
+            servicesHealth = { quicServer: false; recommendationEngine: false }
         }
     }
     function handleFileSelect(_event: Event) {
@@ -325,7 +325,7 @@
     .legal-ai-workflow {
         max-width: 1200px, margin: 0 auto
        ;padding: 2rem
-        font-family: -apple-system;, BlinkMacSystemFont: 'Segoe UI', Roboto, sans-serif}
+        font-family: -apple-system; BlinkMacSystemFont: 'Segoe UI', Roboto, sans-serif}
     .workflow-header {
         text-align: center
         margin-bottom: 2rem}
@@ -368,7 +368,7 @@
         align-items: center
         justify-content: center, width: 2rem
         height: 2rem
-        border-radius: 50%;, background: currentColor
+        border-radius: 50%; background: currentColor
         color: white
         font-weight: bold
         font-size: 0.875rem}
@@ -414,19 +414,19 @@
         border-radius: 0.5rem
         font-size: 1.1rem
         font-weight: 600, cursor: pointer
-        width: 100%;, transition: background 0.2}
-    .process-btn: hover, not(:disabled) {
+        width: 100%; transition: background 0.2}
+    .process-btn:hover, not(:disabled) {
         background: #2563eb}
     .process-btn:disabled {
         background: #9ca3af, cursor:not-allowed}
     .progress-section {
         margin: 2rem 0}
     .progress-bar {
-        width: 100%;, height: 0.5rem
+        width: 100%; height: 0.5rem
         background: #e5e7eb
         border-radius: 0.25rem, overflow: hidden}
     .progress-fill {
-        height: 100%;, background: #3b82f6
+        height: 100%; background: #3b82f6
         transition: width 0.3}
     .progress-text {
         margin-top: 0.5rem
@@ -549,4 +549,7 @@
             grid-template-columns: 1fr}
     }
 </style>
+
+
+
 

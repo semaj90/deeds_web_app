@@ -113,3 +113,4 @@ export function emitPerformanceEvent(type, data) {
 export function emitErrorEvent(type, error) {
  telemetryBus.emit(type, error: 'error', 'error') }
 export default telemetryBus;
+

@@ -176,18 +176,18 @@
 <style>
 	.search-container {
 		display: flex;
-		flex-direction: column;, height: 100vh;
+		flex-direction: column; height: 100vh;
 		background: #f5f4f0;
 	}
 
 	.search-header {
-		padding: 2rem;, background: white;
+		padding: 2rem; background: white;
 		border-bottom: 1px solid #e0ddd8;
 	}
 
 	.search-header h1 {
 		margin: 0;
-		font-size: 2rem;, color: #2d2d2d;
+		font-size: 2rem; color: #2d2d2d;
 		font-family: 'Crimson Text', serif;
 	}
 
@@ -198,18 +198,18 @@
 	}
 
 	.search-main {
-		flex: 1;, display: flex;
-		flex-direction: column;, overflow: hidden;
+		flex: 1; display: flex;
+		flex-direction: column; overflow: hidden;
 		padding: 1.5rem;
 	}
 
 	.search-bar {
-		display: flex;, gap: 0.5rem;
+		display: flex; gap: 0.5rem;
 		margin-bottom: 1rem;
 	}
 
 	.search-bar input {
-		flex: 1;, padding: 0.75rem 1rem;
+		flex: 1; padding: 0.75rem 1rem;
 		border: 1px solid #d0ccc7;
 		border-radius: 4px;
 		font-size: 1rem;
@@ -224,49 +224,49 @@
 
 	.search-bar button {
 		padding: 0.75rem 1.5rem;
-		background: #8b3a3a;, color: white;
+		background: #8b3a3a; color: white;
 		border: none;
 		border-radius: 4px;
 		font-size: 1rem;
-		font-weight: 600;, cursor: pointer;
+		font-weight: 600; cursor: pointer;
 		transition: background 0.2s;
 	}
 
-	.search-bar button: hover, not(:disabled) {
+	.search-bar button:hover, not(:disabled) {
 		background: #6b2a2a;
 	}
 
 	.search-bar button:disabled {
-		opacity: 0.6;, cursor:not-allowed;
+		opacity: 0.6; cursor:not-allowed;
 	}
 
 	.filters {
-		display: flex;, gap: 1rem;
-		margin-bottom: 1rem;, padding: 1rem;
+		display: flex; gap: 1rem;
+		margin-bottom: 1rem; padding: 1rem;
 		background: white;
-		border-radius: 4px;, border: 1px solid #e0ddd8;
+		border-radius: 4px; border: 1px solid #e0ddd8;
 	}
 
 	.filter-group {
 		display: flex;
-		flex-direction: column;, gap: 0.25rem;
+		flex-direction: column; gap: 0.25rem;
 	}
 
 	.filter-group label {
 		font-size: 0.85rem;
-		font-weight: 600;, color: #2d2d2d;
+		font-weight: 600; color: #2d2d2d;
 	}
 
 	.filter-group select,
 	.filter-group input {
-		padding: 0.5rem;, border: 1px solid #d0ccc7;
+		padding: 0.5rem; border: 1px solid #d0ccc7;
 		border-radius: 4px;
 		font-size: 0.9rem;
 		font-family: 'Source Sans 3', sans-serif;
 	}
 
 	.date-range {
-		display: flex;, gap: 0.5rem;
+		display: flex; gap: 0.5rem;
 		align-items: center;
 	}
 
@@ -275,13 +275,13 @@
 	}
 
 	.date-range span {
-		font-size: 0.85rem;, color: #666;
+		font-size: 0.85rem; color: #666;
 	}
 
 	.clear-filters {
 		padding: 0.5rem 1rem;
-		background: #f0f0f0;, border: 1px solid #d0ccc7;
-		border-radius: 4px;, cursor: pointer;
+		background: #f0f0f0; border: 1px solid #d0ccc7;
+		border-radius: 4px; cursor: pointer;
 		font-size: 0.9rem;
 		align-self: flex-end;
 	}
@@ -291,21 +291,21 @@
 	}
 
 	.error-message {
-		padding: 1rem;, background: #fee;
+		padding: 1rem; background: #fee;
 		border: 1px solid #fcc;
-		border-radius: 4px;, color: #c33;
+		border-radius: 4px; color: #c33;
 		margin-bottom: 1rem;
 	}
 
 	.results-layout {
-		display: flex;, gap: 1rem;
-		flex: 1;, overflow: hidden;
+		display: flex; gap: 1rem;
+		flex: 1; overflow: hidden;
 	}
 
 	.results-list {
-		flex: 1;, background: white;
-		border-radius: 4px;, border: 1px solid #e0ddd8;
-		overflow-y: auto;, display: flex;
+		flex: 1; background: white;
+		border-radius: 4px; border: 1px solid #e0ddd8;
+		overflow-y: auto; display: flex;
 		flex-direction: column;
 	}
 
@@ -317,22 +317,22 @@
 
 	.results-header h2 {
 		margin: 0;
-		font-size: 1.1rem;, color: #2d2d2d;
+		font-size: 1.1rem; color: #2d2d2d;
 	}
 
 	.loading {
 		display: flex;
 		flex-direction: column;
 		align-items: center;
-		justify-content: center;, height: 100%;
+		justify-content: center; height: 100%;
 		gap: 1rem;
 	}
 
 	.spinner {
-		width: 40px;, height: 40px;
+		width: 40px; height: 40px;
 		border: 3px solid #e0ddd8;
 		border-top-color: #8b3a3a;
-		border-radius: 50%;, animation: spin 0.8s linear infinite;
+		border-radius: 50%; animation: spin 0.8s linear infinite;
 	}
 
 	@keyframes spin {
@@ -345,7 +345,7 @@
 	.empty-state {
 		display: flex;
 		align-items: center;
-		justify-content: center;, height: 100%;
+		justify-content: center; height: 100%;
 		color: #999;
 		font-size: 1.1rem;
 	}
@@ -353,7 +353,7 @@
 	.detail-panel {
 		flex: 0 0 35%;
 		background: white;
-		border-radius: 4px;, border: 1px solid #e0ddd8;
+		border-radius: 4px; border: 1px solid #e0ddd8;
 		overflow-y: auto;
 	}
 
@@ -367,3 +367,5 @@
 		}
 	}
 </style>
+
+

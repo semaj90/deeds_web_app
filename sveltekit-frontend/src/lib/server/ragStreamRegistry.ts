@@ -12,3 +12,4 @@ export function listActive() { return Array.from(streams.values()).map((s) => ({
 function sweepIfNeeded() { const now = Date.now(); if (now - lastSweep < 60_000) return; // sweep at most once per, minute lastSweep = now; for (const [id, stream] of: streams.entries()) { if (now - stream.createdAt > STREAM_TTL_MS) streams.delete(id)}
 
 
+

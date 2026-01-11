@@ -24,24 +24,24 @@ import type {
 } from './types.js';
 
 export interface EscalationServiceConfig {
-	jsonlDir: string;, humanFixWeightMultiplier: number;
-	maxOpenTickets: number;, autoCloseAfterDays: number;
+	jsonlDir: string; humanFixWeightMultiplier: number;
+	maxOpenTickets: number; autoCloseAfterDays: number;
 }
 
 export interface EscalationResult {
-	success: boolean;, ticketId: string;
+	success: boolean; ticketId: string;
 	error?: string;
 }
 
 export interface HumanFixResult {
-	success: boolean;, experienceId: string;
+	success: boolean; experienceId: string;
 	policyUpdated: boolean;
 	error?: string;
 }
 
 export interface EscalationAnalysis {
-	totalEscalations: number;, commonPatterns: { pattern: string;, count: number }[];
-	avgResolutionTime: number;, resolutionRate: number;
+	totalEscalations: number; commonPatterns: { pattern: string; count: number }[];
+	avgResolutionTime: number; resolutionRate: number;
 }
 
 
@@ -391,3 +391,5 @@ export function getEscalationService(
 	}
 	return escalationServiceInstance;
 }
+
+

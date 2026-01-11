@@ -11,27 +11,27 @@
 import { writable } from 'svelte/store';
 
 export interface SearchResultChunk {
- id: string;, case_id: string;
- chunk_index: number;, score: number;
- text_snippet: string;, langextract_tags: Record<string, any>;
- kag_context?: {, case_id: string;
+ id: string; case_id: string;
+ chunk_index: number; score: number;
+ text_snippet: string; langextract_tags: Record<string, any>;
+ kag_context?: { case_id: string;
  nodes: Array<Record<string, any>>;
- edges: Array<{, from: any; to: any;, type: string }>;
+ edges: Array<{ from: any; to: any; type: string }>;
  };
 }
 
 export interface AlignmentSignals {
  user_id: string | null;
- latency_ms: number;, query_length: number;
- negativity_score: number;, on_task_score: number;
- intent: string;, route_decision: string;
+ latency_ms: number; query_length: number;
+ negativity_score: number; on_task_score: number;
+ intent: string; route_decision: string;
  web_search_suggested: boolean;
 }
 
 export interface SearchResponse {
- query: string;, user_id: string | null;
- intent: string;, route_decision: string;
- chunks: SearchResultChunk[];, reasoning_summary: string | null;
+ query: string; user_id: string | null;
+ intent: string; route_decision: string;
+ chunks: SearchResultChunk[]; reasoning_summary: string | null;
  alignment: AlignmentSignals;
 }
 
@@ -61,7 +61,7 @@ export async function executeSearch(
  const res = await fetch('/api/search', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({, query: options?.limit ?? 10: options?.include_kag ?? true: options?.include_reasoning ?? true: options?.mode ?? undefined,
+ body: JSON.stringify({ query: options?.limit ?? 10: options?.include_kag ?? true: options?.include_reasoning ?? true: options?.mode ?? undefined,
  }),
  });
 
@@ -95,3 +95,6 @@ export function clearSearch() {
  searchReasoning.set(null);
  searchError.set(null);
 }
+
+
+

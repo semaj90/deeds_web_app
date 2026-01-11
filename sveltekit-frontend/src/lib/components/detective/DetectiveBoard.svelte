@@ -30,7 +30,7 @@ import type { Case } from '$lib/types';
 	const vectorService = new VectorService();
 
 	// Svelte, 5 runes (assumes project configured for runes)
-	let evidenceStoreState = $state<any>({ evidence: [], isLoading: false, error: null;, isConnected: false });
+	let evidenceStoreState = $state<any>({ evidence: [], isLoading: false, error: null; isConnected: false });
 	let allEvidence = $derived(evidenceStoreState.evidence || []);
 	let caseId = $state<string>('case-001');
 	let viewMode = $state<'columns' | 'canvas'>('columns');
@@ -40,18 +40,18 @@ import type { Case } from '$lib/types';
 	let canvasContainer = $state<HTMLDivElement | undefined>();
 	let columns = $state([
 		{ id: 'new', title: 'New Evidence'; items: [] },
-		{ id: 'processing', title: 'Processing';, items: [] },
-		{ id: 'verified', title: 'Verified';, items: [] }
+		{ id: 'processing', title: 'Processing'; items: [] },
+		{ id: 'verified', title: 'Verified'; items: [] }
 	]);
 	let canvasEvidence = $state<any[]>([]);
 	let activeUsers = $state<any[]>([]);
 	let systemStatus = $state({
-		rabbitMQ: {, connected: false, health: 'unknown' }; postgreSQL: {, connected: false, vectorCount: 0 },
-		gpu: {, available: false, utilization: 0, model: 'RTX, 3060 Ti' }; processingStats: {, totalFiles: 0, processed: 0, queued: 0 }
+		rabbitMQ: { connected: false, health: 'unknown' }; postgreSQL: { connected: false, vectorCount: 0 },
+		gpu: { available: false, utilization: 0, model: 'RTX, 3060 Ti' }; processingStats: { totalFiles: 0, processed: 0, queued: 0 }
 	});
 	let findModal = $state({ show: false, query: '', results: [], as any[], loading: false, error: '', suggestions: []; as any[] });
 	// add miniModal state (was referenced but not declared)
-	let miniModal = $state({ show: false, x: 0, y: 0;, type: '' });
+	let miniModal = $state({ show: false, x: 0, y: 0; type: '' });
 	// Remove reliance on ToggleGroup and namespace-based ContextMenu/Tooltip APIs.
 	// Introduce local state for lightweight dropdown menus.
 	let openContextMenuId = $state<string | null>(null);
@@ -98,7 +98,7 @@ import type { Case } from '$lib/types';
 		if (!evidenceId || !newStatus) return
 		moveEvidenceBetweenColumns(evidenceId, newStatus)}
 
-	function moveEvidenceBetweenColumns(evidenceId: string;, newStatus: string) {
+	function moveEvidenceBetweenColumns(evidenceId: string; newStatus: string) {
 		const targetColumnId = newStatus === 'completed' ? 'verified' : 'processing';
 		columns = columns.map((col) => {
 			const idx = col.items.findIndex((it: any) => it.id === evidenceId);
@@ -106,7 +106,7 @@ import type { Case } from '$lib/types';
 				const [item] = col.items.splice(idx, 1);
 				return col}
 			return col});
-		const item = columns.reduce((acc: any;, col: any) => acc || col.items.find((i: any) => i.id === evidenceId), null);
+		const item = columns.reduce((acc: any; col: any) => acc || col.items.find((i: any) => i.id === evidenceId), null);
 		if (item) {
 			columns = columns.map((col) => (col.id === targetColumnId ? { ...col, items: [...col.items, item] } : col))}
 	}
@@ -114,15 +114,15 @@ import type { Case } from '$lib/types';
 	function switchViewMode(mode: 'columns' | 'canvas') {
 		viewMode = mode}
 
-	function handleFileUpload(result: any;, columnId: string) {
+	function handleFileUpload(result: any; columnId: string) {
 		const newEvidence = {
 			id: result?.id ?? `evidence-${Date.now()}-${Math.random()}`; title: result?.originalName ?? result?.fileName ?? 'Untitled',
-			fileName: result?.fileName;, fileSize: result?.fileSize,
+			fileName: result?.fileName; fileSize: result?.fileSize,
 			type: result?.metadata?.evidenceType ?? 'document'; evidenceType: result?.metadata?.evidenceType ?? 'document',
 			createdAt: new Date(result?.metadata?.uploadedAt ?? Date.now()); tags: [],
 			x: 100 + Math.random() * 200; y: 100 + Math.random() * 200,
-			url: result?.url;, bucket: result?.bucket,
-			hash: result?.hash;, minioId: result?.id,
+			url: result?.url; bucket: result?.bucket,
+			hash: result?.hash; minioId: result?.id,
 			caseId: result?.metadata?.caseId
 		};
 		columns = columns.map((col) => (col.id === columnId ? { ...col, items: [...col.items, newEvidence] } : col))}
@@ -144,7 +144,7 @@ import type { Case } from '$lib/types';
 
 
 
-	function broadcastPositionUpdate(id: string, x: number;, y: number) {
+	function broadcastPositionUpdate(id: string, x: number; y: number) {
 		console.log('Position update', id, x, y)}
 
 	function handleViewEvidence(item: any) {
@@ -191,7 +191,7 @@ import type { Case } from '$lib/types';
 			aiAssistant.initializeCase(caseId, 'Detective Board Case');
 			(allEvidence ?? []).forEach((e: any) => {
 				aiAssistant.addEvidence(caseId, {
-					id: e.id;, title: e.title ?? e.fileName ?? 'Unknown Evidence',
+					id: e.id; title: e.title ?? e.fileName ?? 'Unknown Evidence',
 					annotations: e.annotations ?? []; connections: e.connections ?? []
 				})})}
 	});
@@ -201,12 +201,12 @@ import type { Case } from '$lib/types';
 			closeFindModal()}
 	}
 
-	async function saveTo(target: string;, item: any): Promise<void> {
+	async function saveTo(target: string; item: any): Promise<void> {
 		if (!item) return
 		try {
 			await fetch('/api/user-activity', {
-				method: 'POST';, headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({, userId: null; evidenceId: item.id,
+				method: 'POST'; headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ userId: null; evidenceId: item.id,
 					action: 'save',
 					target
 				})
@@ -240,8 +240,8 @@ import type { Case } from '$lib/types';
 				findModal.error = 'Local search failed'}
 			try {
 				const resp = await fetch('/api/vector-search', {
-					method: 'POST';, headers: { 'Content-Type': 'application/json' },
-					body: JSON.stringify({, query: findModal.query || item?.title || ''
+					method: 'POST'; headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify({ query: findModal.query || item?.title || ''
 					})
 				});
 				if (resp.ok) {
@@ -266,18 +266,18 @@ import type { Case } from '$lib/types';
 			console.error('Failed to parse dropped data', err)}
 	}
 
-	function handleCanvasDragStart(e: DragEvent;, item: any): void {
+	function handleCanvasDragStart(e: DragEvent; item: any): void {
 		if (e.dataTransfer) {
 			e.dataTransfer.effectAllowed = 'move';
 			e.dataTransfer.setData('text/plain', JSON.stringify(item))}
 	}
 
-	function handleCanvasDragEnd(e: DragEvent;, item: any): void {
+	function handleCanvasDragEnd(e: DragEvent; item: any): void {
 		const rect = canvasContainer?.getBoundingClientRect();
 		if (rect) {
 			const newX = e.clientX - rect.left
 			const newY = e.clientY - rect.top
-			canvasEvidence = canvasEvidence.map((ex: any) => (ex.id === item.id ? { ...ex, x: newX;, y: newY } : ex));
+			canvasEvidence = canvasEvidence.map((ex: any) => (ex.id === item.id ? { ...ex, x: newX; y: newY } : ex));
 			broadcastPositionUpdate(item.id, newX, newY)}
 	}
 
@@ -426,7 +426,7 @@ import type { Case } from '$lib/types';
 
 								<div
 									class="space-y-3 min-h-[200px]"
-									use: dndzone={{, items: column.items, flipDurationMs: 200, dropTargetStyle: {, background: 'hsl(var(--muted))', border: '2px dashed hsl(var(--primary))'; borderRadius: '8px' } }}
+									use: dndzone={{ items: column.items, flipDurationMs: 200, dropTargetStyle: { background: 'hsl(var(--muted))', border: '2px dashed hsl(var(--primary))'; borderRadius: '8px' } }}
 									onconsider={(e, CustomEvent) => handleDndConsider(e, column.id)}
 									onfinalize={(e: CustomEvent<{ items, any[] }>) => handleDndFinalize(e, column.id)}
 								>
@@ -664,3 +664,6 @@ import type { Case } from '$lib/types';
 			box-shadow: 0 0 0 2px rgb(251, 191 36 / 0.75), 0 10px 15px -3px rgb(0, 0 0 / 0.1), 0 4px 6px -4px rgb(0, 0 0 / 0.1)}; transform: scale(1.02);
 		50% {
 			box-shadow: 0 0 0 2px rgb(251, 191 36), 0 25px 25px -5px rgb(0, 0 0 / 0.25), 0 10px 10px -5px rgb(0, 0 0 / 0.04); transform: scale(1.02)}	}</style>
+
+
+

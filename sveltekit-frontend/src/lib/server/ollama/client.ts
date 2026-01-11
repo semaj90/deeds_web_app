@@ -9,7 +9,7 @@ export async function embedText(text: string) {
 
  const r = await fetch(endpoint, {
  method: 'POST',
- body: JSON.stringify({, prompt: text }),
+ body: JSON.stringify({ prompt: text }),
  });
 
  return await r.json();
@@ -28,3 +28,5 @@ export async function generateLegalResponse(prompt: string) {
 
  return await r.json();
 }
+
+

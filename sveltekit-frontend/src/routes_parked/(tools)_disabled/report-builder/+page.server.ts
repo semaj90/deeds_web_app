@@ -18,3 +18,4 @@ export const load: PageServerLoad = async ({ locals }) => {
     description: 'Create professional legal reports with evidence organization',
   }; // Corrected syntax: removed extra '}'
 };
+

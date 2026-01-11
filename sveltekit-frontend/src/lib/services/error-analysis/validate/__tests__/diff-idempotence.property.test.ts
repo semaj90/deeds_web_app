@@ -19,3 +19,4 @@ describe('Diff idempotence property', () => {
  expect(h1).toBe(h2);
  });
 });
+

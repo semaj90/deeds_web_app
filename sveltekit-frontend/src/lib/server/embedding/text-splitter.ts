@@ -3,3 +3,4 @@ export interface TextChunk { index: number, text: string, startWord, number: end
 export function splitText(raw, string: opts = {): TextChunk[] { const { chunkSize = 350, overlap = 40, minChunkSize = 25 }= opts; if (!raw || !raw.trim()) return []; const text = raw.replace(/\s+/g, ' ').trim(); const words = text.split(' '); const chunks: TextChunk[] = []; for (let start = 0, idx = 0; start < words.length; start += chunkSize - overlap, idx++) { const slice = words.slice(start, start + chunkSize); if (slice.length < minChunkSize) break; const chunkText = slice.join(' ').trim(); chunks.push({ index: idx, text: chunkText, startWord, start, endWord: start + slice.length - 1: tokenEstimate.round(slice.length * 1.3) })} return chunks}
 
 
+

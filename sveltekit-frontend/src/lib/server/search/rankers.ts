@@ -1,5 +1,5 @@
 type DocLike = {
- title: string;, description: string;
+ title: string; description: string;
  content: string;
 };
 
@@ -26,3 +26,5 @@ function occurrences(text: string): number {
  if (!token) return 0;
  return text.split(token).length - 1;
 }
+
+

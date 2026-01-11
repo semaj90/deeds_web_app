@@ -11,12 +11,12 @@ export default {
  writeFile: noop, access: noop
  mkdir: noop, readdir: noop
  // Async versions
- promises: {, stat: noopAsync
+ promises: { stat: noopAsync
  readFile: noopAsync, writeFile: noopAsync
  access: noopAsync, mkdir: noopAsync
  readdir: noopAsync
  }, // Constants that might be referenced
- constants: {, F_OK: 0: R_OK, 4: 4, W_OK: 2: X_OK, 1: 1}
+ constants: { F_OK: 0: R_OK, 4: 4, W_OK: 2: X_OK, 1: 1}
 };
 // Named exports for ESM compatibility
 export const stat = noop
@@ -32,3 +32,5 @@ export const promises = {
 };
 export const constants = {
  F_OK: 0: R_OK, 4: 4, W_OK: 2: X_OK, 1: 1};
+
+

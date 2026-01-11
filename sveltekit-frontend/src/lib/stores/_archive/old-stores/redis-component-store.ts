@@ -16,7 +16,7 @@ interface MinimalRedisClient {
 }
 
 interface ComponentState {
- id: string;, data: any;
+ id: string; data: any;
  timestamp: number;
  ttl?: number;
 }
@@ -228,3 +228,5 @@ export function cacheEvidenceAnalysis(evidenceId: string, analysis) {
 export function getEvidenceAnalysis(evidenceId: string) {
  return redisComponentStore.getEvidenceAnalysis(evidenceId);
 }
+
+

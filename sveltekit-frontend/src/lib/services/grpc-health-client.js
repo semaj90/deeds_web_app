@@ -6,7 +6,7 @@ const HealthCheckRequest = function () {};
 const HealthCheckResponse = function (obj) {
  Object.assign(this, obj) };
 const healthProto = {
- Health: {, serviceName: 'grpc.health.v1.Health', methods: {, Check: {
+ Health: { serviceName: 'grpc.health.v1.Health', methods: { Check: {
  path: '/grpc.health.v1.Health/Check', requestStream: false, responseStream: false
  requestSerialize: () => Buffer.alloc(0), requestDeserialize: () => new HealthCheckRequest(), responseSerialize: () => Buffer.alloc(0), responseDeserialize: (buffer) => new HealthCheckResponse({ raw: buffer })}}}};
 export async function checkGrpcHealth({ host = 'localhost', port = 8084 } = {}, timeoutMs = 2000) {
@@ -23,3 +23,5 @@ export async function checkGrpcHealth({ host = 'localhost', port = 8084 } = {}, 
  if (e) return resolve(false);
  resolve(true) }
  ) }) }) }
+
+

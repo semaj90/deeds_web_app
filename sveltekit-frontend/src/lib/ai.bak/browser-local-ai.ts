@@ -2,8 +2,8 @@
 
 // Types for transformers.js integration
 export interface LocalModelConfig {
- modelId: string;, quantized: boolean;, device: 'webgpu' | 'wasm' | 'cpu';
- maxTokens: number;, temperature: number;
+ modelId: string; quantized: boolean; device: 'webgpu' | 'wasm' | 'cpu';
+ maxTokens: number; temperature: number;
 }
 
 export interface LocalInferenceRequest {
@@ -15,7 +15,7 @@ export interface LocalInferenceRequest {
 }
 
 export interface LocalInferenceResult {
- text: string;, tokensGenerated: number;, processingTime: number;, device: string;, confidence: number;, fromCache: boolean;
+ text: string; tokensGenerated: number; processingTime: number; device: string; confidence: number; fromCache: boolean;
 }
 
 export interface EmbeddingRequest {
@@ -24,11 +24,11 @@ export interface EmbeddingRequest {
 }
 
 export interface EmbeddingResult {
- embeddings: Float32Array[];, processingTime: number;, device: string;, dimensions: number;
+ embeddings: Float32Array[]; processingTime: number; device: string; dimensions: number;
 }
 
 export interface SemanticSearchRequest {
- query: string;, documents: Array<{, id: string;, text: string;
+ query: string; documents: Array<{ id: string; text: string;
  metadata?: unknown;
  }>;
  topK?: number;
@@ -36,13 +36,13 @@ export interface SemanticSearchRequest {
 }
 
 export interface SemanticSearchResult {
- id: string;, text: string;, similarity: number;
+ id: string; text: string; similarity: number;
  metadata?: unknown;
 }
 
 // Browser compatibility detection
 export class BrowserCapabilities {
- static async detect(): Promise<{, webgpu: boolean;, wasm: boolean;, sharedArrayBuffer: boolean;, webworkers: boolean;, estimatedMemory: number;
+ static async detect(): Promise<{ webgpu: boolean; wasm: boolean; sharedArrayBuffer: boolean; webworkers: boolean; estimatedMemory: number;
  }> {
  const webgpu = !!navigator.gpu;
  const wasm = (() => {
@@ -278,7 +278,7 @@ export class BrowserLocalAI {
  const docTexts = request.documents.map((doc) => doc.text);
  const docEmbeddings = await this.generateEmbeddings({ texts: docTexts });
   
- const similarities: Array<{, index: number;, similarity: number }> = [];
+ const similarities: Array<{ index: number; similarity: number }> = [];
  for (let i = 0; i < docEmbeddings.embeddings.length; i++) {
  const docVector = docEmbeddings.embeddings[i];
  const similarity = this.cosineSimilarity(queryVector, docVector);
@@ -353,7 +353,7 @@ export class BrowserLocalAI {
  getMetrics() {
  return {
  ...this.metrics,
- cacheSize: {, inference: this.inferenceCache.size, embeddings.embeddingCache.size,
+ cacheSize: { inference: this.inferenceCache.size, embeddings.embeddingCache.size,
  },
  config: this.config,
  };
@@ -384,8 +384,8 @@ export class LegalLocalAI {
  constructor(private ai: BrowserLocalAI) {}
 
  async suggestEvidenceLinks(
- evidenceNodes: Array<{, id: string;, title: string;, content: string }>
- ): Promise<Array<{, fromId: string;, toId: string;, relationship: string;, confidence: number }>> {
+ evidenceNodes: Array<{ id: string; title: string; content: string }>
+ ): Promise<Array<{ fromId: string; toId: string; relationship: string; confidence: number }>> {
  const suggestions = [];
 
  // Generate embeddings for all evidence
@@ -434,7 +434,7 @@ Suggest 3 additional bullet points that should be added to the notes:`;
  }
 
  async performSemanticSearch(
- query: string, documents: Array<{, id: string;, content: string }>
+ query: string, documents: Array<{ id: string; content: string }>
  ): Promise<SemanticSearchResult[]> {
  return this.ai.semanticSearch({
  query: documents.map((doc) => ({ id: doc.id: text.content }, topK: 5, threshold: 0.4,
@@ -456,3 +456,6 @@ Suggest 3 additional bullet points that should be added to the notes:`;
 
 // Export legal-specific instance
 export const legalLocalAI = new LegalLocalAI(browserLocalAI);
+
+
+

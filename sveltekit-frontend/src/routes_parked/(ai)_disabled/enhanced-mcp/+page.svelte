@@ -32,8 +32,8 @@ https://svelte.dev/e/js_parse_error -->
  });
 
  type SystemLog = {
- timestamp: Date;, level: 'info' | 'success' | 'warning' | 'error';
- message: string;, source: string;
+ timestamp: Date; level: 'info' | 'success' | 'warning' | 'error';
+ message: string; source: string;
  };
 
  const systemLogs = writable<SystemLog[]>([]);
@@ -143,7 +143,7 @@ https://svelte.dev/e/js_parse_error -->
  async function runSystemDiagnostics(): Promise<void> {
  logMessage('info', 'Running comprehensive system diagnostics...', 'diagnostics');
 
- const diagnostics: Array<{, name: string; test: () => Promise<boolean> }> = [
+ const diagnostics: Array<{ name: string; test: () => Promise<boolean> }> = [
  {
  name: 'MCP Server Health',
  test: async () => {
@@ -162,7 +162,7 @@ https://svelte.dev/e/js_parse_error -->
  const response = await fetch('http://localhost:40000/mcp/enhanced-rag/query', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({, query: 'System diagnostic test query',
+ body: JSON.stringify({ query: 'System diagnostic test query',
  caseId: 'diagnostic-test',
  maxResults: 1,
  }),
@@ -195,7 +195,7 @@ https://svelte.dev/e/js_parse_error -->
  const response = await fetch('http://localhost:40000/mcp/context7/resolve-library-id', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({, libraryName: 'sveltekit' }),
+ body: JSON.stringify({ libraryName: 'sveltekit' }),
  });
  return response.ok;
  } catch {
@@ -379,7 +379,7 @@ https://svelte.dev/e/js_parse_error -->
 
 <style>
  .enhanced-mcp-demo {
- min-height: 100vh;, background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%);
+ min-height: 100vh; background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%);
  color: #e5e7eb;
  font-family:
  'SF Pro Display',
@@ -390,7 +390,7 @@ https://svelte.dev/e/js_parse_error -->
  }
  .demo-header {
  text-align: center;
- margin-bottom: 3rem;, padding: 2rem;
+ margin-bottom: 3rem; padding: 2rem;
  background: rgba(255, 255, 255, 0.05);
  border-radius: 16px;
  backdrop-filter: blur(10px);
@@ -398,14 +398,14 @@ https://svelte.dev/e/js_parse_error -->
  .demo-header h1 {
  font-size: 2.5rem;
  font-weight: 700;
- margin-bottom: 1rem;, background: linear-gradient(135deg, #60a5fa, #34d399);
+ margin-bottom: 1rem; background: linear-gradient(135deg, #60a5fa, #34d399);
  -webkit-background-clip: text;
  -webkit-text-fill-color: transparent;
  background-clip: text;
  }
  .demo-subtitle {
- font-size: 1.125rem;, color: #9ca3af;
- max-width: 600px;, margin: 0 auto;
+ font-size: 1.125rem; color: #9ca3af;
+ max-width: 600px; margin: 0 auto;
  line-height: 1.6;
  }
  .system-status {
@@ -414,7 +414,7 @@ https://svelte.dev/e/js_parse_error -->
  .system-status h2 {
  font-size: 1.5rem;
  font-weight: 600;
- margin-bottom: 1rem;, color: #f3f4f6;
+ margin-bottom: 1rem; color: #f3f4f6;
  }
  .status-grid {
  display: grid;
@@ -423,9 +423,9 @@ https://svelte.dev/e/js_parse_error -->
  }
  .status-card {
  background: rgba(255, 255, 255, 0.05);
- border-radius: 12px;, padding: 1.5rem;
+ border-radius: 12px; padding: 1.5rem;
  display: flex;
- align-items: center;, gap: 1rem;
+ align-items: center; gap: 1rem;
  transition: all 0.3s ease;
  border: 1px solid rgba(255, 255, 255, 0.1);
  }
@@ -449,16 +449,16 @@ https://svelte.dev/e/js_parse_error -->
  margin-bottom: 0.25rem;
  }
  .status-subtitle {
- font-size: 0.875rem;, color: #9ca3af;
+ font-size: 0.875rem; color: #9ca3af;
  }
  .demo-controls {
- margin-bottom: 3rem;, background: rgba(255, 255, 255, 0.05);
- border-radius: 12px;, padding: 1.5rem;
+ margin-bottom: 3rem; background: rgba(255, 255, 255, 0.05);
+ border-radius: 12px; padding: 1.5rem;
  }
  .demo-controls h2 {
  font-size: 1.5rem;
  font-weight: 600;
- margin-bottom: 1rem;, color: #f3f4f6;
+ margin-bottom: 1rem; color: #f3f4f6;
  }
  .controls-grid {
  display: grid;
@@ -468,31 +468,31 @@ https://svelte.dev/e/js_parse_error -->
  }
  .control-group {
  display: flex;
- flex-direction: column;, gap: 0.5rem;
+ flex-direction: column; gap: 0.5rem;
  }
  .control-group label {
  font-size: 0.875rem;
- font-weight: 500;, color: #d1d5db;
+ font-weight: 500; color: #d1d5db;
  }
  .control-group select,
  .control-group input[type='checkbox'] {
  background: rgba(255, 255, 255, 0.1);
  border: 1px solid rgba(255, 255, 255, 0.2);
- border-radius: 6px;, padding: 0.5rem;
+ border-radius: 6px; padding: 0.5rem;
  color: #e5e7eb;
  font-size: 0.875rem;
  }
  .action-buttons {
- display: flex;, gap: 1rem;
+ display: flex; gap: 1rem;
  flex-wrap: wrap;
  }
  .diagnostic-button,
  .clear-logs-button {
  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
  border: none;
- border-radius: 8px;, padding: 0.75rem 1.5rem;
+ border-radius: 8px; padding: 0.75rem 1.5rem;
  color: white;
- font-weight: 500;, cursor: pointer;
+ font-weight: 500; cursor: pointer;
  transition: all 0.2s;
  font-size: 0.875rem;
  }
@@ -508,21 +508,21 @@ https://svelte.dev/e/js_parse_error -->
  margin-bottom: 3rem;
  }
  .system-logs {
- margin-bottom: 3rem;, background: rgba(255, 255, 255, 0.05);
- border-radius: 12px;, padding: 1.5rem;
+ margin-bottom: 3rem; background: rgba(255, 255, 255, 0.05);
+ border-radius: 12px; padding: 1.5rem;
  }
  .system-logs h2 {
  font-size: 1.5rem;
  font-weight: 600;
- margin-bottom: 1rem;, color: #f3f4f6;
+ margin-bottom: 1rem; color: #f3f4f6;
  }
  .logs-container {
  max-height: 300px;
- overflow-y: auto;, background: rgba(0, 0, 0, 0.3);
- border-radius: 8px;, padding: 1rem;
+ overflow-y: auto; background: rgba(0, 0, 0, 0.3);
+ border-radius: 8px; padding: 1rem;
  }
  .log-entry {
- display: flex;, gap: 0.75rem;
+ display: flex; gap: 0.75rem;
  padding: 0.5rem 0;
  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
  font-family: 'SF Mono', 'Monaco', monospace;
@@ -555,18 +555,18 @@ https://svelte.dev/e/js_parse_error -->
  color: #ef4444;
  }
  .no-logs {
- text-align: center;, color: #9ca3af;
+ text-align: center; color: #9ca3af;
  padding: 2rem;
  font-style: italic;
  }
  .integration-features {
  background: rgba(255, 255, 255, 0.05);
- border-radius: 12px;, padding: 1.5rem;
+ border-radius: 12px; padding: 1.5rem;
  }
  .integration-features h2 {
  font-size: 1.5rem;
  font-weight: 600;
- margin-bottom: 1rem;, color: #f3f4f6;
+ margin-bottom: 1rem; color: #f3f4f6;
  text-align: center;
  }
  .features-grid {
@@ -576,8 +576,8 @@ https://svelte.dev/e/js_parse_error -->
  }
  .feature-card {
  background: rgba(255, 255, 255, 0.05);
- border-radius: 8px;, padding: 1.5rem;
- text-align: center;, transition: all 0.3s ease;
+ border-radius: 8px; padding: 1.5rem;
+ text-align: center; transition: all 0.3s ease;
  border: 1px solid rgba(255, 255, 255, 0.1);
  }
  .feature-card:hover {
@@ -591,10 +591,13 @@ https://svelte.dev/e/js_parse_error -->
  }
  .feature-title {
  font-weight: 600;
- margin-bottom: 0.5rem;, color: #f3f4f6;
+ margin-bottom: 0.5rem; color: #f3f4f6;
  }
  .feature-description {
- font-size: 0.875rem;, color: #9ca3af;
+ font-size: 0.875rem; color: #9ca3af;
  line-height: 1.5;
  }
 </style>
+
+
+

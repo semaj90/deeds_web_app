@@ -35,7 +35,7 @@ describe('LinkMetadataForm Component', () => {
 
  it('should render link metadata form', () => {
  const { container } = render(LinkMetadataForm, {
- props: {, link: mockLink, isEditing: false },
+ props: { link: mockLink, isEditing: false },
  });
 
  expect(container.querySelector('.link-metadata-form')).toBeTruthy();
@@ -43,7 +43,7 @@ describe('LinkMetadataForm Component', () => {
 
  it('should display link type in display mode', () => {
  render(LinkMetadataForm, {
- props: {, link: mockLink, isEditing: false },
+ props: { link: mockLink, isEditing: false },
  });
 
  expect(screen.getByText('CHARGED_UNDER')).toBeTruthy();
@@ -51,7 +51,7 @@ describe('LinkMetadataForm Component', () => {
 
  it('should display notes in display mode', () => {
  render(LinkMetadataForm, {
- props: {, link: mockLink, isEditing: false },
+ props: { link: mockLink, isEditing: false },
  });
 
  expect(screen.getByText('Primary charge')).toBeTruthy();
@@ -59,7 +59,7 @@ describe('LinkMetadataForm Component', () => {
 
  it('should display timestamps', () => {
  render(LinkMetadataForm, {
- props: {, link: mockLink, isEditing: false },
+ props: { link: mockLink, isEditing: false },
  });
 
  expect(screen.getByText(/Created:/)).toBeTruthy();
@@ -68,7 +68,7 @@ describe('LinkMetadataForm Component', () => {
 
  it('should show edit button in display mode', () => {
  render(LinkMetadataForm, {
- props: {, link: mockLink, isEditing: false },
+ props: { link: mockLink, isEditing: false },
  });
 
  expect(screen.getByText('Edit Link')).toBeTruthy();
@@ -76,7 +76,7 @@ describe('LinkMetadataForm Component', () => {
 
  it('should switch to edit mode on edit button click', async () => {
  const { container } = render(LinkMetadataForm, {
- props: {, link: mockLink, isEditing: false },
+ props: { link: mockLink, isEditing: false },
  });
 
  const editBtn = screen.getByText('Edit Link');
@@ -90,7 +90,7 @@ describe('LinkMetadataForm Component', () => {
 
  it('should display form fields in edit mode', async () => {
  const { container } = render(LinkMetadataForm, {
- props: {, link: mockLink, isEditing: true },
+ props: { link: mockLink, isEditing: true },
  });
 
  await waitFor(() => {
@@ -103,7 +103,7 @@ describe('LinkMetadataForm Component', () => {
 
  it('should display link type options in edit mode', async () => {
  render(LinkMetadataForm, {
- props: {, link: mockLink, isEditing: true },
+ props: { link: mockLink, isEditing: true },
  });
 
  await waitFor(() => {
@@ -114,7 +114,7 @@ describe('LinkMetadataForm Component', () => {
 
  it('should display save and cancel buttons in edit mode', async () => {
  render(LinkMetadataForm, {
- props: {, link: mockLink, isEditing: true },
+ props: { link: mockLink, isEditing: true },
  });
 
  await waitFor(() => {
@@ -125,7 +125,7 @@ describe('LinkMetadataForm Component', () => {
 
  it('should save changes on save button click', async () => {
  render(LinkMetadataForm, {
- props: {, link: mockLink, isEditing: true },
+ props: { link: mockLink, isEditing: true },
  });
 
  await waitFor(() => {
@@ -136,7 +136,7 @@ describe('LinkMetadataForm Component', () => {
 
  it('should cancel edit on cancel button click', async () => {
  const { component } = render(LinkMetadataForm, {
- props: {, link: mockLink, isEditing: true },
+ props: { link: mockLink, isEditing: true },
  });
 
  await waitFor(() => {
@@ -145,3 +145,5 @@ describe('LinkMetadataForm Component', () => {
  });
  });
 });
+
+

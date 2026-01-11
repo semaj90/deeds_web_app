@@ -43,3 +43,4 @@ export { default as Svelte5Button } from './Svelte5Button.svelte';
  * - Compound component pattern (Dialog.Root, Dialog.Content, etc.)
  * - bind:open works directly with $state
  */
+

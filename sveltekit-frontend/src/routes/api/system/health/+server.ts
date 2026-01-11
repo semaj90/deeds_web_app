@@ -6,13 +6,13 @@ export const GET: RequestHandler = async () => {
 	const health = {
 		status: 'ok',
 		timestamp: new Date().toISOString(),
-		system: {, uptime: os.uptime(),
+		system: { uptime: os.uptime(),
 			loadavg: os.loadavg(),
-			memory: {, total: os.totalmem(),
+			memory: { total: os.totalmem(),
 				free: os.freemem(),
 			},
 		},
-		services: {, database: 'unknown', // TODO: Check DB connection
+		services: { database: 'unknown', // TODO: Check DB connection
 			redis: 'unknown', // TODO: Check Redis connection
 			ollama: 'unknown', // TODO: Check Ollama connection
 		},
@@ -20,3 +20,5 @@ export const GET: RequestHandler = async () => {
 
 	return json(health);
 };
+
+

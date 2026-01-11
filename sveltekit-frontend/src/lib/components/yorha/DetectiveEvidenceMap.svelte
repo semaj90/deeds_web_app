@@ -11,8 +11,8 @@ https://svelte.dev/e/js_parse_error -->
  import { onDestroy, onMount } from 'svelte';;
 
  interface EvidenceNode {
- id: string;, title: string;
- type: string;, color: string;
+ id: string; title: string;
+ type: string; color: string;
  size: number;
  status?: string;
  timestamp?: string;
@@ -20,14 +20,14 @@ https://svelte.dev/e/js_parse_error -->
  }
 
  interface GraphLink {
- source: string;, target: string;
- score: number;, type: string;
+ source: string; target: string;
+ score: number; type: string;
  }
 
  interface DetectiveMapData {
- evidence: EvidenceNode[];, links: GraphLink[];
- contradictions: Array<{, sourceId: string; targetId: string;, type: string }>;
- timeline: Array<{, evidenceId: string; timestamp: string;, description: string }>;
+ evidence: EvidenceNode[]; links: GraphLink[];
+ contradictions: Array<{ sourceId: string; targetId: string; type: string }>;
+ timeline: Array<{ evidenceId: string; timestamp: string; description: string }>;
  }
 
  let { data = null, caseId = null, show = true } = $props<{
@@ -48,16 +48,16 @@ https://svelte.dev/e/js_parse_error -->
 
  // Phoenix Wright color scheme
  const colors = {
- evidence: {, approved: '#10b981',
+ evidence: { approved: '#10b981',
  reviewing: '#f59e0b',
  rejected: '#ef4444',
  new: '#3b82f6'
  },
- poi: {, high: '#ef4444',
+ poi: { high: '#ef4444',
  normal: '#f59e0b',
  low: '#10b981'
  },
- links: {, similar: '#6b7280',
+ links: { similar: '#6b7280',
  contradicts: '#ef4444',
  timeline: '#3b82f6'
  }
@@ -517,10 +517,13 @@ https://svelte.dev/e/js_parse_error -->
 
  @keyframes contradiction-glow {
  0%, 100% {
- r: 0;, opacity: 0;
+ r: 0; opacity: 0;
  }
  50% {
- r: 30;, opacity: 0.3;
+ r: 30; opacity: 0.3;
  }
  }
 </style>
+
+
+

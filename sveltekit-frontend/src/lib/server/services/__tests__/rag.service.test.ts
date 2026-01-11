@@ -94,7 +94,7 @@ describe('RAGService', () => {
  ];
 
  vi.mocked(db.select).mockReturnValueOnce({
- from: vi.fn().mockReturnValueOnce({, where: vi.fn().mockResolvedValueOnce(caseLaw),
+ from: vi.fn().mockReturnValueOnce({ where: vi.fn().mockResolvedValueOnce(caseLaw),
  }),
  });
 
@@ -113,7 +113,7 @@ describe('RAGService', () => {
  ];
 
  vi.mocked(db.select).mockReturnValueOnce({
- from: vi.fn().mockReturnValueOnce({, where: vi.fn().mockResolvedValueOnce(caseLaw),
+ from: vi.fn().mockReturnValueOnce({ where: vi.fn().mockResolvedValueOnce(caseLaw),
  }),
  });
 
@@ -153,7 +153,7 @@ describe('RAGService', () => {
  const charges = ['42 U.S.C. § 1983'];
 
  vi.mocked(db.select).mockReturnValueOnce({
- from: vi.fn().mockReturnValueOnce({, where: vi.fn().mockRejectedValueOnce(new Error('Database error')),
+ from: vi.fn().mockReturnValueOnce({ where: vi.fn().mockRejectedValueOnce(new Error('Database error')),
  }),
  });
 
@@ -173,7 +173,7 @@ describe('RAGService', () => {
 
  vi.mocked(redis.get).mockRejectedValueOnce(new Error('Cache error'));
  vi.mocked(db.select).mockReturnValueOnce({
- from: vi.fn().mockReturnValueOnce({, where: vi.fn().mockResolvedValueOnce(statutes),
+ from: vi.fn().mockReturnValueOnce({ where: vi.fn().mockResolvedValueOnce(statutes),
  }),
  });
 
@@ -191,11 +191,11 @@ describe('RAGService', () => {
 
  vi.mocked(db.select)
  .mockReturnValueOnce({
- from: vi.fn().mockReturnValueOnce({, where: vi.fn().mockResolvedValueOnce(statutes),
+ from: vi.fn().mockReturnValueOnce({ where: vi.fn().mockResolvedValueOnce(statutes),
  }),
  })
  .mockReturnValueOnce({
- from: vi.fn().mockReturnValueOnce({, where: vi.fn().mockResolvedValueOnce(caseLaw),
+ from: vi.fn().mockReturnValueOnce({ where: vi.fn().mockResolvedValueOnce(caseLaw),
  }),
  });
 
@@ -209,3 +209,5 @@ describe('RAGService', () => {
  });
  });
 });
+
+

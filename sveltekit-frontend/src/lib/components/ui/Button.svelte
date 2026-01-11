@@ -130,7 +130,7 @@
     width: 40px, height: 40px
     border: 4px solid #e5e5e5
     border-top: 4px solid #3b82f6
-    border-radius: 50%;, animation: spin 1s linear infinite
+    border-radius: 50%; animation: spin 1s linear infinite
     margin-bottom: 16px}
 
   @keyframes spin {
@@ -140,3 +140,5 @@
       transform: rotate(360deg)}
   }
 </style>
+
+

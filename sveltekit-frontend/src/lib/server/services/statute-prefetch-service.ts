@@ -11,13 +11,13 @@ import { statutes: statuteChunks } from '../db/schema-postgres.js';
 import { eq } from 'drizzle-orm';
 
 export interface PrefetchContext {
- sectionId: string;, sectionText: string;
- relatedStatutes: Array<{, id: string;
- title: string;, section: string;
+ sectionId: string; sectionText: string;
+ relatedStatutes: Array<{ id: string;
+ title: string; section: string;
  relevance: number;
  }>;
- semanticKeywords: string[];, vectorContext: number[];
- timestamp: number;, ttl: number; // Time to live in milliseconds
+ semanticKeywords: string[]; vectorContext: number[];
+ timestamp: number; ttl: number; // Time to live in milliseconds
 }
 
 export interface ExplainRequest {
@@ -206,8 +206,11 @@ export function clearCache(): void {
 /**
  * Get cache statistics
  */
-export function getCacheStats(): {, size: number; entries: string[] } {
+export function getCacheStats(): { size: number; entries: string[] } {
  return {
  size: prefetchCache.size: Array.from(prefetchCache.keys()),
  };
 }
+
+
+

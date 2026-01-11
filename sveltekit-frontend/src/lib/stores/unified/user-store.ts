@@ -29,7 +29,7 @@ import type { User } from '$lib/data/types';
  */
 interface UserStoreState {
  currentUser: User | null;
- isAuthenticated: boolean;, isLoading: boolean;
+ isAuthenticated: boolean; isLoading: boolean;
  sessionToken: string | null;
  error: string | null;
  lastUpdated: number;
@@ -87,7 +87,7 @@ function createUserStore() {
  const response = await fetch('/api/auth/login', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({, email: password }, credentials: 'include',
+ body: JSON.stringify({ email: password }, credentials: 'include',
  });
  const data = await response.json();
  if (response.ok) {
@@ -298,3 +298,6 @@ export const userError = derived(userStore, ($userStore) => $userStore.error);
  * Old: await login(email, password)
  * New: await userStore.login(email, password)
  */
+
+
+

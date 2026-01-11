@@ -50,3 +50,4 @@ declare module '$lib/components/ui/*' {
  export const Tooltip: typeof SvelteComponentTyped;
  export const Icon: typeof SvelteComponentTyped;
 }
+

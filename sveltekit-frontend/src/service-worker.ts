@@ -7,8 +7,8 @@ interface SyncEvent extends Event {
 
 // Define CacheWarmingTask interface
 interface CacheWarmingTask {
- id: string;, type: 'legal_document' | 'vector_similarity' | 'search_results' | 'som_embeddings';
- priority: number;, payload: unknown; // Use a more specific type if the payload structure is known
+ id: string; type: 'legal_document' | 'vector_similarity' | 'search_results' | 'som_embeddings';
+ priority: number; payload: unknown; // Use a more specific type if the payload structure is known
  retries: number;
 }
 
@@ -278,8 +278,8 @@ async function cacheResponse(
 /**
  * Determine caching strategy based on request
  */
-function determineCacheStrategy(request: Request): {, useRedis: boolean;
- useSOM: boolean;, ttl: number;
+function determineCacheStrategy(request: Request): { useRedis: boolean;
+ useSOM: boolean; ttl: number;
  priority: number;
 } {
  const url = new URL(request.url);
@@ -413,21 +413,21 @@ function queueCommonCacheWarming(): void {
  id: 'legal-templates',
  type: 'legal_document',
  priority: 10,
- payload: {, type: 'template_analysis' },
+ payload: { type: 'template_analysis' },
  retries: 0,
  },
  {
  id: 'common-vectors',
  type: 'vector_similarity',
  priority: 8,
- payload: {, precompute: 'common_embeddings' },
+ payload: { precompute: 'common_embeddings' },
  retries: 0,
  },
  {
  id: 'search-patterns',
  type: 'search_results',
  priority: 7,
- payload: {, warm: 'popular_queries' },
+ payload: { warm: 'popular_queries' },
  retries: 0,
  },
  ];
@@ -570,7 +570,7 @@ self.addEventListener('message', (event: MessageEvent) => {
  case 'TRAIN_SOM':
  trainSOMInBackground();
  break;
- case 'GET_CACHE_STATUS': event.ports?.[0]?.postMessage({, redis: isRedisConnected, webgpu: webgpuInitialized,
+ case 'GET_CACHE_STATUS': event.ports?.[0]?.postMessage({ redis: isRedisConnected, webgpu: webgpuInitialized,
  som: somCacheReady, warmingQueueLength: warmingQueue.length: activeWarmingTasks.size,
  });
  break;
@@ -664,3 +664,5 @@ async function safeSomGet(key: string): Promise<any | null> {
  return null;
  }
 }
+
+

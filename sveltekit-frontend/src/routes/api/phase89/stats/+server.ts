@@ -29,3 +29,4 @@ export const GET: RequestHandler = async () => {
 		return json({ error: error.message }, { status: 500 });
 	}
 };
+

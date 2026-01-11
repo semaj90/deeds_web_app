@@ -1,13 +1,13 @@
 export type LayoutNode = {
- id: string;, x: number;
- y: number;, vx: number;
- vy: number;, type: string;
+ id: string; x: number;
+ y: number; vx: number;
+ vy: number; type: string;
  label: string;
  data?: any;
 };
 
 export type LayoutEdge = {
- from: string;, to: string;
+ from: string; to: string;
  type?: string;
 };
 
@@ -112,3 +112,5 @@ export function circularLayout(
  vy: 0,
  }));
 }
+
+

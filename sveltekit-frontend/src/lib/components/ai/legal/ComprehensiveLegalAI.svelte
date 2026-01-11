@@ -7,3 +7,4 @@
 <div class="p-4 text-center text-muted-foreground">
 <p>ComprehensiveLegalAI component is not yet available</p>
 </div>
+

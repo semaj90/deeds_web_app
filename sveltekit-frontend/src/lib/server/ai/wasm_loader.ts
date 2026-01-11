@@ -3,3 +3,4 @@ export async function loadWasmStub(wasmPath): Promise<any> { if (!fs.existsSync(
 import type { spawn } from 'child_process'; export async function runNativeEncoder(binaryPath, string: modelPath, input: number[]): Promise<number[]> { return new Promise((resolve, reject) => { const args = [modelPath, ...input.map(String)]; const proc = spawn(binaryPath, args, { stdio: ['ignore', 'pipe', 'pipe'] }); let out = ''; proc.stdout.on('data', (chunk) => (out += chunk.toString())); proc.stderr.on('data', (chunk) => console.error('encoder stderr: ', chunk.toString())); proc.on('close', (code) => { if (code !== 0) return reject(new Error(`encoder exited ${ code }`)); const parts = out.trim().split(/\s+/).filter(Boolean); const nums = parts.map(Number); resolve(nums)})})}
 export async function loadWasmStub(_wasmPath): Promise<null> { // Placeholder for future WASM loader implementation return null}
 
+

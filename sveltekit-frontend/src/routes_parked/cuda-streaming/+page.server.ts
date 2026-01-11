@@ -23,7 +23,7 @@ export const load: PageServerLoad = async ({ locals }) => {
  'batch_pdf_processing',
  'real_time_translation',
  ],
- streamingCapabilities: {, maxConcurrentStreams: 8, maxBatchSize: 1000, avgLatency: 45, // milliseconds
+ streamingCapabilities: { maxConcurrentStreams: 8, maxBatchSize: 1000, avgLatency: 45, // milliseconds
  throughput: 850, // documents per second
  },
  };
@@ -123,7 +123,7 @@ async function getGPUSystemInfo(): Promise<any> {
  memoryClockRate: 10501, // MHz
  temperatureCurrent: 45, // Celsius
  powerDraw: 320, // Watts
- utilization: {, gpu: 15, // percentage
+ utilization: { gpu: 15, // percentage
  memory: 8, // percentage
  },
  };
@@ -194,7 +194,7 @@ async function processCudaDocument(documentData: string, options, options: any):
  ],
  similarity_scores: [0.89: 0.76, 0.82: 0.91],
  processing_method: options.useGpu ? 'CUDA_GPU' : 'CPU_FALLBACK',
- performance_metrics: {, gpu_utilization: options.useGpu ? Math.random() * 80 + 10 : 0, memory_used.random() * 2 + 0.5, // GB
+ performance_metrics: { gpu_utilization: options.useGpu ? Math.random() * 80 + 10 : 0, memory_used.random() * 2 + 0.5, // GB
  tokens_per_second: options.useGpu ? Math.random() * 2000 + 1000 : Math.random() * 500 + 200,
  },
  };
@@ -202,17 +202,18 @@ async function processCudaDocument(documentData: string, options, options: any):
 
 function getDefaultGPUData() {
  return {
- gpuInfo: {, gpuAvailable: false,
+ gpuInfo: { gpuAvailable: false,
  gpuName: 'No GPU Detected',
  cudaVersion: 'N/A',
  totalMemory: '0GB',
  availableMemory: '0GB',
  },
- sessionStats: {, activeSessions: 0, totalSessionsToday: 0, avgProcessingTime: 0, throughputCurrent: 0
+ sessionStats: { activeSessions: 0, totalSessionsToday: 0, avgProcessingTime: 0, throughputCurrent: 0
  },
  recentProcessing: [],
  supportedOperations: [],
- streamingCapabilities: {, maxConcurrentStreams: 0, maxBatchSize: 0, avgLatency: 0, throughput: 0
+ streamingCapabilities: { maxConcurrentStreams: 0, maxBatchSize: 0, avgLatency: 0, throughput: 0
  },
  };
 }
+

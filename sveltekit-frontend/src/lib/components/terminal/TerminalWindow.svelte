@@ -1,8 +1,8 @@
 <script lang="ts">
  interface Query {
- id: string;, query: string;
- response: string;, timestamp: Date;
- functionCalls: Array<{, name: string; result: any }>;
+ id: string; query: string;
+ response: string; timestamp: Date;
+ functionCalls: Array<{ name: string; result: any }>;
  }
 
  interface Props {
@@ -132,3 +132,6 @@
  animation: pulse 1s cubic-bezier(0.4, 0, 0.6, 1) infinite;
  }
 </style>
+
+
+

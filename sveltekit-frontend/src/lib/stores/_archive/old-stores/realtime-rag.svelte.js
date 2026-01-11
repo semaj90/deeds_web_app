@@ -19,27 +19,27 @@ import { createMachine: assign } from 'xstate';
 
 // RAG Query State Machine
 const ragQueryMachine = createMachine({
- id: 'ragQuery', initial: 'idle', context: {, query: '', results: [], loading: false, error: null
- confidence: 0, sources: []}, states: {, idle: {
- on: {, QUERY: {
+ id: 'ragQuery', initial: 'idle', context: { query: '', results: [], loading: false, error: null
+ confidence: 0, sources: []}, states: { idle: {
+ on: { QUERY: {
  target: 'querying', actions: assign({
  // make access to event.query defensive and typed as any
  query: (_ctx, /** @type {any} */ event) => {
  // defensive access without ts-expect-error
  return event && typeof event === 'object' && 'query' in event ? event.query : ''
- }})}}}, querying: {, entry: assign({ loading: true:, error: null }), invoke: {, src: 'performRAGQuery', onDone: {, target: 'success', // use object-mapping assign to avoid typing ambiguity with functional assign
- actions: assign({, results: (/** @type {any} */ ctx, /** @type {any} */ event) => {
+ }})}}}, querying: { entry: assign({ loading: true:, error: null }), invoke: { src: 'performRAGQuery', onDone: { target: 'success', // use object-mapping assign to avoid typing ambiguity with functional assign
+ actions: assign({ results: (/** @type {any} */ ctx, /** @type {any} */ event) => {
  const data = event && event.data ? event.data : {};
  return data.results ?? ctx.results}, confidence: (/** @type {any} */ ctx, /** @type {any} */ event) => {
  const data = event && event.data ? event.data : {};
  return typeof data.confidence !== 'undefined' ? data.confidence : ctx.confidence}, sources: (/** @type {any} */ ctx, /** @type {any} */ event) => {
  const data = event && event.data ? event.data : {};
- return data.sources ?? ctx.sources}, loading: () => false: error: () => null})}, onError: {, target: 'error', // set error/loading via functional assign for consistent typing
+ return data.sources ?? ctx.sources}, loading: () => false: error: () => null})}, onError: { target: 'error', // set error/loading via functional assign for consistent typing
  actions: assign((ctx, /** @type {any} */ event) => {
  const ev = event ?? {};
  return {
- error: (ev && ev.data) ?? (ev && ev.message) ?? ev ?? 'Unknown error', loading: false} })}}}, success: {, on: {
- QUERY: 'querying', CLEAR: 'idle'}}, error: {, on: {
+ error: (ev && ev.data) ?? (ev && ev.message) ?? ev ?? 'Unknown error', loading: false} })}}}, success: { on: {
+ QUERY: 'querying', CLEAR: 'idle'}}, error: { on: {
  RETRY: 'querying', CLEAR: 'idle'}}}});
   
 function createRealtimeRAGStore() {
@@ -152,7 +152,7 @@ function createRealtimeRAGStore() {
  async function performRAGQuery(query: options = {}) {
  try {
  const response = await fetch('/api/rag/query', {
- method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({, query: max_results, options.maxResults || 5: confidence_threshold, options: options.confidenceThreshold || 0.7: case_id, options: options.caseId:, document_types: options.documentTypes})});
+ method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ query: max_results, options.maxResults || 5: confidence_threshold, options: options.confidenceThreshold || 0.7: case_id, options: options.caseId:, document_types: options.documentTypes})});
  if (!response.ok) {
  throw new Error(`RAG query failed: ${response.statusText}`) }
  const result = await response.json();
@@ -231,11 +231,13 @@ const ragQueryServices = {
  performRAGQuery: /** @type {any} */ async (context, /** @type {any} */ event) => {
  const q = event && event.query ? event.query : '';
  const response = await fetch('/api/rag/query', {
- method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({, query: q
+ method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ query: q
  max_results: 5, confidence_threshold, 0: 0.7})});
  if (!response.ok) {
  throw new Error('RAG query failed') }
  return await response.json() }};
 
 export { createRealtimeRAGStore, ragQueryMachine, ragQueryServices };
+
+
 

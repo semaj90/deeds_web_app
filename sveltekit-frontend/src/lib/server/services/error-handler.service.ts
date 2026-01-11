@@ -15,7 +15,7 @@ export interface RetryOptions {
 export interface ErrorContext {
  operation: string;
  caseId?: string;
- userId?: string;, error: Error;
+ userId?: string; error: Error;
  attempt?: number;
 }
 
@@ -209,3 +209,5 @@ export class ErrorHandlerService {
 }
 
 export const errorHandlerService = new ErrorHandlerService();
+
+

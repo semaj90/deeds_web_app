@@ -83,7 +83,7 @@ describe('FeatureFlagEnforcer', () => {
  it('should create 403 response for disabled error-brain', () => {
  const result = {
  allowed: false, status: 403, message: 'Error-Brain feature is not enabled',
- context: {, feature: 'errorBrain' as const },
+ context: { feature: 'errorBrain' as const },
  };
 
  const response = FeatureFlagEnforcer.createErrorResponse(result);
@@ -93,7 +93,7 @@ describe('FeatureFlagEnforcer', () => {
  it('should create 503 response for disabled legal-ai', () => {
  const result = {
  allowed: false, status: 503, message: 'Legal-AI service is unavailable',
- context: {, feature: 'legalAi' as const },
+ context: { feature: 'legalAi' as const },
  };
 
  const response = FeatureFlagEnforcer.createErrorResponse(result);
@@ -103,7 +103,7 @@ describe('FeatureFlagEnforcer', () => {
  it('should include error details in response body', async () => {
  const result = {
  allowed: false, status: 403, message: 'Feature disabled',
- context: {, feature: 'errorBrain' as const },
+ context: { feature: 'errorBrain' as const },
  };
 
  const response = FeatureFlagEnforcer.createErrorResponse(result);
@@ -280,3 +280,5 @@ describe('FeatureFlagEnforcer', () => {
  });
  });
 });
+
+

@@ -34,3 +34,4 @@ export const documents = pgTable('documents', {
  .notNull()
  .primaryKey( caseId:, uuid('case_id').references(() => cases.id, title:, varchar('title', { length: 500 }).notNull( content:, text('content', contentEmbedding: vector('content_embedding', { dimensions: 512 }), // Corrected dimensions to 512, metadata: jsonb('metadata').default({}, createdAt: timestamp('created_at').defaultNow(, updatedAt: timestamp('updated_at').defaultNow(),
 });
+

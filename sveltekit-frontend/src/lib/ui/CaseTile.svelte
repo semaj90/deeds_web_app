@@ -18,3 +18,4 @@
  <p class="opacity-80 mb-2 text-ink/80 text-sm">{summary}</p>
  <span class="font-mono text-xs text-accent">OPEN →</span>
 </a>
+

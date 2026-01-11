@@ -10,3 +10,4 @@ export async function putCHRManifest(m, CHRManifest, ttlSec = 600): Promise<any>
 export async function getCHRManifest(id): Promise<any> { const c = await ensure(); if (!c) return null; return c.getJSON<CHRManifest>(`index, chr: ${ id }`)}
 
 
+

@@ -24,3 +24,4 @@ export async function closeRedisClient() {
  redisClient = null;
  }
 }
+

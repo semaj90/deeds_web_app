@@ -3,8 +3,8 @@ import type { EmbeddingService } from '$lib/server/embeddings';
 import type { OllamaService } from '$lib/server/ollama';
 
 interface UserType {
- id: string;, email: string;
- firstName: string;, lastName: string;
+ id: string; email: string;
+ firstName: string; lastName: string;
  role: string;
 }
 
@@ -47,3 +47,5 @@ export async function handleAnalyze(
  return json({ success: false, error: 'Failed to perform AI analysis' }, { status: 500 });
  }
 }
+
+

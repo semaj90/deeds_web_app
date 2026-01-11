@@ -18,15 +18,15 @@ import { line } from "drizzle-orm/pg-core";
 const execAsync = promisify(exec);
 
 export interface MultiLanguageConfig {
-	enableCpp: boolean;, enablePython: boolean;
-	enableGo: boolean;, cppPaths: string[];
-	pythonPaths: string[];, goPaths: string[];
+	enableCpp: boolean; enablePython: boolean;
+	enableGo: boolean; cppPaths: string[];
+	pythonPaths: string[]; goPaths: string[];
 	timeout: number;
 }
 
 export interface DetectionResult {
-	language: string;, errors: ErrorReport[];
-	warnings: ErrorReport[];, duration: number;
+	language: string; errors: ErrorReport[];
+	warnings: ErrorReport[]; duration: number;
 	tool: string;
 }
 
@@ -39,7 +39,7 @@ export class MultiLanguageDetector {
 	private config: MultiLanguageConfig;
 	private stats = {
 		totalDetections: 0,
-		byLanguage: {, typescript: 0, svelte: 0, cpp: 0, python: 0, go: 0
+		byLanguage: { typescript: 0, svelte: 0, cpp: 0, python: 0, go: 0
 		}
 	};
 
@@ -359,7 +359,7 @@ export class MultiLanguageDetector {
 	resetStats(): void {
 		this.stats = {
 			totalDetections: 0,
-			byLanguage: {, typescript: 0, svelte: 0, cpp: 0, python: 0, go: 0
+			byLanguage: { typescript: 0, svelte: 0, cpp: 0, python: 0, go: 0
 			}
 		};
 	}
@@ -381,3 +381,6 @@ export function getMultiLanguageDetector(
 	}
 	return multiLanguageDetectorInstance;
 }
+
+
+

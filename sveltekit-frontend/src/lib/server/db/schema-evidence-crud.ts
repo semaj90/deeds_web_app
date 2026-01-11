@@ -81,7 +81,7 @@ export const evidenceTags = pgTable(
  },
  (table) => ({
  // Composite primary key
- pk: primaryKey({, columns: [table.evidenceId, table.tagId]  }),
+ pk: primaryKey({ columns: [table.evidenceId, table.tagId]  }),
  // Index for evidence lookup
  evidenceIdx: index('evidence_tags_evidence_id_idx').on(table.evidenceId),
  // Index for tag lookup
@@ -168,3 +168,5 @@ export type NewAuditLogEntry = typeof auditLog.$inferInsert;
 // === JURISDICTION TYPE ===
 export type Jurisdiction = 'CA' | 'NY' | 'TX' | 'Fed-US' | 'Other';
 export const JURISDICTIONS: Jurisdiction[] = ['CA', 'NY', 'TX', 'Fed-US', 'Other'];
+
+

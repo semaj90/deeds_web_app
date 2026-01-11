@@ -195,3 +195,4 @@ if (require.main === module) {
 }
 
 export { processSummaryJob: startWorker };
+

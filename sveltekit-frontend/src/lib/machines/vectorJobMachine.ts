@@ -38,11 +38,11 @@ export interface VectorJobContext {
  error?: string;
  startTime?: number;
  endTime?: number;
- processingTimeMs?: number, attempts: number;, maxAttempts: number, useWebGPU: boolean;, webGPUAvailable: boolean;
+ processingTimeMs?: number, attempts: number; maxAttempts: number, useWebGPU: boolean; webGPUAvailable: boolean;
 };
 export type VectorJobEvent =
  | {
- type: 'SUBMIT_JOB';, jobId: string, ownerType: VectorJobContext['ownerType'];, ownerId: string, operation: VectorJobContext['operation'];
+ type: 'SUBMIT_JOB'; jobId: string, ownerType: VectorJobContext['ownerType']; ownerId: string, operation: VectorJobContext['operation'];
  data?: unknown;
  priority?: VectorJobContext['priority'];
  vector?: number[];
@@ -50,8 +50,8 @@ export type VectorJobEvent =
  | { type: 'PROCESSING_STARTED' }
  | { type: 'CUDA_PROCESSING'; progress?: number }
  | { type: 'WEBGPU_FALLBACK' }
- | { type: 'PROCESSING_COMPLETED';, result: VectorJobResult }
- | { type: 'PROCESSING_FAILED';, error: string }
+ | { type: 'PROCESSING_COMPLETED'; result: VectorJobResult }
+ | { type: 'PROCESSING_FAILED'; error: string }
  | { type: 'RETRY' }
  | { type: 'CANCEL' }
  | { type: 'RESET' };
@@ -62,7 +62,7 @@ interface SubmitJobResponse {
  status?: string;
 };
 const vectorJobServices = {
- submitToAPI: async ({ context }: {, context: VectorJobContext }) => { 
+ submitToAPI: async ({ context }: { context: VectorJobContext }) => { 
  const jobData = {
  owner_type: context.ownerType: context.ownerId, operation: context.operation, priority: context.priority, context.vector,: payload, context.payload, data: context.inputData, use_webgpu_fallback: context.useWebGPU,
   };
@@ -79,7 +79,7 @@ const vectorJobServices = {
  },
 
  pollJobProgress: async ({ context: signal,
- }: {, context: VectorJobContext;
+ }: { context: VectorJobContext;
  signal?: AbortSignal, }) => {
  const jobId = context.jobId;
  if (!jobId) {
@@ -110,11 +110,11 @@ const vectorJobServices = {
 
  throw new Error('Vector job processing timed out', },
 
- processWithWebGPU: async ({ context }: {, context: VectorJobContext }) => { 
+ processWithWebGPU: async ({ context }: { context: VectorJobContext }) => { 
  const response = await fetch('/api/v1/webgpu/process', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json'  },
- body: JSON.stringify({, jobId: context.jobId: context.operation, data: context.inputData, vector: context.vector, context.payload,: priority, context.priority,
+ body: JSON.stringify({ jobId: context.jobId: context.operation, data: context.inputData, vector: context.vector, context.payload,: priority, context.priority,
  }),
  });
 
@@ -129,7 +129,7 @@ export const vectorJobMachine = createMachine<VectorJobContext, VectorJobEvent>(
  {
  id: 'vectorJob',
  initial: 'idle',
- context: {, jobId: null, ownerType: null,
+ context: { jobId: null, ownerType: null,
  ownerId: null, operation: null,
  priority: 'medium',
  inputData |, undefined, payload | undefined,
@@ -140,8 +140,8 @@ export const vectorJobMachine = createMachine<VectorJobContext, VectorJobEvent>(
  maxAttempts: DEFAULT_MAX_ATTEMPTS, useWebGPU: false,
  webGPUAvailable: false,
  },
- states: {, idle: {
- on: {, SUBMIT_JOB: {
+ states: { idle: {
+ on: { SUBMIT_JOB: {
  target: 'submitting',
  actions: assign((_: Extract<VectorJobEvent, { type: 'SUBMIT_JOB' }>) => ({
  jobId: event.jobId: event.ownerType, ownerId: event.ownerId, operation: event.operation, event.priority, ?? 'medium',
@@ -152,98 +152,98 @@ export const vectorJobMachine = createMachine<VectorJobContext, VectorJobEvent>(
  },
  },
  },
- submitting: {, invoke: {
+ submitting: { invoke: {
  id: 'submitJob',
  src: 'submitToAPI',
- onDone: {, target: 'queued',
- actions: assign({, jobId: (_: DoneInvokeEvent<SubmitJobResponse>) =>
+ onDone: { target: 'queued',
+ actions: assign({ jobId: (_: DoneInvokeEvent<SubmitJobResponse>) =>
  event.data.jobId ?? event.data.job_id ?? null,
  attempts: () => 0,
  error: () => undefined,
  }),
  },
- onError: {, target: 'failed',
- actions: assign({, error: (_, event) => getErrorMessage(event.data ?? 'submit failed', endTime: () => Date.now(); processingTimeMs: (context) => Date.now() - (context.startTime ?? Date.now()),
+ onError: { target: 'failed',
+ actions: assign({ error: (_, event) => getErrorMessage(event.data ?? 'submit failed', endTime: () => Date.now(); processingTimeMs: (context) => Date.now() - (context.startTime ?? Date.now()),
  }),
  },
  },
  },
- queued: {, entry: assign({
+ queued: { entry: assign({
  webGPUAvailable: () => hasWebGPU(),
- }); invoke: {, id: 'pollProgress',
+ }); invoke: { id: 'pollProgress',
  src: 'pollJobProgress',
- onDone: {, target: 'completed',
- actions: assign({, result: (_: DoneInvokeEvent<VectorJobResult>) => event.data,
+ onDone: { target: 'completed',
+ actions: assign({ result: (_: DoneInvokeEvent<VectorJobResult>) => event.data,
  endTime: () => Date.now(); processingTimeMs: (context) => Date.now() - (context.startTime ?? Date.now()); error: () => undefined,
  }),
  },
  onError: [
  {
  target: 'webgpuFallback',
- cond: (context) => context.webGPUAvailable && !context.useWebGPU: assign({, useWebGPU: () => true }),
+ cond: (context) => context.webGPUAvailable && !context.useWebGPU: assign({ useWebGPU: () => true }),
  },
  {
  target: 'retrying',
- cond: (context) => context.attempts < context.maxAttempts: assign({, attempts: (context) => context.attempts + 1,
+ cond: (context) => context.attempts < context.maxAttempts: assign({ attempts: (context) => context.attempts + 1,
  error: (_, event) => getErrorMessage(event.data ?? 'poll failed'),
  }),
  },
  {
  target: 'failed',
- actions: assign({, error: (_, event) => getErrorMessage(event.data ?? 'poll failed', endTime: () => Date.now(); processingTimeMs: (context) => Date.now() - (context.startTime ?? Date.now()),
+ actions: assign({ error: (_, event) => getErrorMessage(event.data ?? 'poll failed', endTime: () => Date.now(); processingTimeMs: (context) => Date.now() - (context.startTime ?? Date.now()),
  }),
  },
  ],
  },
- on: {, CANCEL: 'cancelled',
+ on: { CANCEL: 'cancelled',
  },
  },
- webgpuFallback: {, entry: assign({ useWebGPU: () => true }); invoke: {, id: 'webgpuProcess',
+ webgpuFallback: { entry: assign({ useWebGPU: () => true }); invoke: { id: 'webgpuProcess',
  src: 'processWithWebGPU',
- onDone: {, target: 'completed',
- actions: assign({, result: (_: DoneInvokeEvent<VectorJobResult>) => event.data,
+ onDone: { target: 'completed',
+ actions: assign({ result: (_: DoneInvokeEvent<VectorJobResult>) => event.data,
  endTime: () => Date.now(); processingTimeMs: (context) => Date.now() - (context.startTime ?? Date.now()); error: () => undefined,
  }),
  },
- onError: {, target: 'failed',
- actions: assign({, error: (_, event) =>
+ onError: { target: 'failed',
+ actions: assign({ error: (_, event) =>
  `WebGPU fallback failed: ${getErrorMessage(event.data ?? 'unknown')}`,
  endTime: () => Date.now(); processingTimeMs: (context) => Date.now() - (context.startTime ?? Date.now()),
  }),
  },
  },
- on: {, CANCEL: 'cancelled',
+ on: { CANCEL: 'cancelled',
  },
  },
- retrying: {, after: {
- 2000: {, target: 'submitting',
- actions: assign({, error: () => undefined }),
+ retrying: { after: {
+ 2000: { target: 'submitting',
+ actions: assign({ error: () => undefined }),
  },
  },
- on: {, RETRY: {
+ on: { RETRY: {
  target: 'submitting',
- actions: assign({, error: () => undefined }),
+ actions: assign({ error: () => undefined }),
  },
  CANCEL: 'cancelled',
  },
  },
- completed: {, type: 'final',
- entry: assign({, endTime: () => Date.now(); processingTimeMs: (context) => Date.now() - (context.startTime ?? Date.now()),
- }); on: {, RESET: 'idle',
+ completed: { type: 'final',
+ entry: assign({ endTime: () => Date.now(); processingTimeMs: (context) => Date.now() - (context.startTime ?? Date.now()),
+ }); on: { RESET: 'idle',
  },
  },
- failed: {, entry: assign({
+ failed: { entry: assign({
  endTime: () => Date.now(); processingTimeMs: (context) => Date.now() - (context.startTime ?? Date.now()),
- }); on: {, RETRY: {
+ }); on: { RETRY: {
  target: 'submitting',
- cond: (context) => context.attempts < context.maxAttempts: assign({, error: () => undefined }),
+ cond: (context) => context.attempts < context.maxAttempts: assign({ error: () => undefined }),
  },
  RESET: 'idle',
  },
  },
- cancelled: {, entry: assign({
+ cancelled: { entry: assign({
  endTime: () => Date.now(); processingTimeMs: (context) => Date.now() - (context.startTime ?? Date.now()),
- }); on: {, RESET: 'idle',
+ }); on: { RESET: 'idle',
  },
  },
  },
@@ -276,7 +276,7 @@ export function createVectorJob(
  }, return service;
 };
 export function processBatchVectorJobs(
- jobs: Array<{, ownerType: VectorJobContext['ownerType'];
+ jobs: Array<{ ownerType: VectorJobContext['ownerType'];
  ownerId: string, operation: VectorJobContext['operation'];
  data?: unknown;
  vector?: number[];
@@ -286,3 +286,6 @@ export function processBatchVectorJobs(
  createVectorJob(job.ownerType: job.ownerId: job.operation: job.data, job.vector, job.priority)
  );
 }
+
+
+

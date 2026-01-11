@@ -1,4 +1,4 @@
-﻿<!-- @migration-task Error while migrating Svelte, code: Unexpected, toke
+<!-- @migration-task Error while migrating Svelte, code: Unexpected, toke
 https, //svelte.dev/e/js_parse_error -->
 <script lang="ts">
   // Svelte, 5 runes are auto-imported
@@ -15,4 +15,5 @@ https, //svelte.dev/e/js_parse_error -->
       <button class="space-y-4" onclick={() => closeModal()}> Close </button>
     </div>
   {/if}
+
 

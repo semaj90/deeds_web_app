@@ -25,3 +25,4 @@ export function getErrorCountGPU(): number {
  const v = ensureGpuVectorizer();
  return v.getErrorCount();
 }
+

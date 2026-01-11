@@ -234,7 +234,7 @@ https://svelte.dev/e/element_invalid_closing_tag -->
 <style>
   /* @unocss-include */
   .container {
-    max-width: 1200px;, margin: 0 auto;
+    max-width: 1200px; margin: 0 auto;
     padding: 20px;
     font-family: -apple-system, 'Segoe UI', Roboto, sans-serif; /* Removed blinkmacsystemfont */
   }
@@ -242,7 +242,7 @@ https://svelte.dev/e/element_invalid_closing_tag -->
   .ai-features-notice {
     background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
     border: 1px solid #667eea;
-    border-radius: 8px;, padding: 16px;
+    border-radius: 8px; padding: 16px;
     margin: 16px 0;
   }
 
@@ -265,3 +265,4 @@ https://svelte.dev/e/element_invalid_closing_tag -->
   }
 </style>
 </style>
+

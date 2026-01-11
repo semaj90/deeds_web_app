@@ -11,3 +11,4 @@
  <button class="nes-btn is-error mb-2 w-full" onclick={()=>onAction('contradictions', node)}>View Contradictions</button>
  <button class="nes-btn is-success w-full" onclick={()=>onAction('timeline', node)}>Add to Timeline</button>
 </div>
+

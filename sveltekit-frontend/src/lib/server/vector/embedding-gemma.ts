@@ -9,7 +9,7 @@ export async function* streamEmbedding(docId: string, string: AsyncGenerator<str
  const res = await fetch(`${getOllamaEndpoint()}/api/embeddings`, {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({, model: 'embeddinggemma:latest', input: text }),
+ body: JSON.stringify({ model: 'embeddinggemma:latest', input: text }),
  });
 
  if (!res.body) {
@@ -52,3 +52,5 @@ export async function* streamEmbedding(docId: string, string: AsyncGenerator<str
 export async function getCachedEmbedding(docId: string): Promise<EmbeddingResult | null> {
  return redisR3.getEmbedding(docId);
 }
+
+

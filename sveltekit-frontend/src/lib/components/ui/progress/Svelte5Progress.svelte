@@ -117,3 +117,4 @@ let barClasses = $derived({
 		animation: progress-indeterminate 1.5s ease-in-out infinite;
 	}
 </style>
+

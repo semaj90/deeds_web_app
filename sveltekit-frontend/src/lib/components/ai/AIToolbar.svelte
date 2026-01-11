@@ -1,4 +1,4 @@
-﻿<!-- Consider wrapping this component in an ErrorBoundary for better, error, handling -->
+<!-- Consider wrapping this component in an ErrorBoundary for better, error, handling -->
 <!-- import  ErrorBoundary, from "$lib/components/ErrorBoundary.svelte"; -->
 <script lang="ts">
   // Svelte, 5 runes are auto-imported
@@ -42,7 +42,7 @@
         category: 'all',
         maxResults: 10,
         useAI: true,
-        advancedOptions: {, useVector: true,
+        advancedOptions: { useVector: true,
           similarityThreshold: 0.7
         }
       };
@@ -121,7 +121,7 @@
     summaryResult = '';
     errorMessage = '';
     try {
-      const payload = { text: summarizeText, type: 'legal', options: {, max_tokens: 500 } };
+      const payload = { text: summarizeText, type: 'legal', options: { max_tokens: 500 } };
       const response = await fetch('/api/ai/summarize', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -326,3 +326,5 @@
   {#if errorMessage}
     <div class="text-center text-sm text-red-600">{errorMessage}{/if}
 </div>
+
+

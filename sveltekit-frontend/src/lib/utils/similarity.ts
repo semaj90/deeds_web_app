@@ -4,7 +4,7 @@
 
 export interface SimilarityBand {
  label: 'High' | 'Medium' | 'Low';
- color: string;, threshold: number;
+ color: string; threshold: number;
 }
 
 export function similarityBand(score: number): SimilarityBand {
@@ -26,8 +26,8 @@ export function shouldAllowEdit(score: number, threshold: number = 0.92): boolea
 }
 
 export interface ScoredResult {
- text: string;, score: number;
- rank: number;, source: 'rag' | 'kag' | 'web' | 'code' | 'chat';
+ text: string; score: number;
+ rank: number; source: 'rag' | 'kag' | 'web' | 'code' | 'chat';
  metadata?: any;
 }
 
@@ -41,3 +41,5 @@ export function filterByThreshold(
 ): ScoredResult[] {
  return results.filter((r) => r.score >= threshold);
 }
+
+

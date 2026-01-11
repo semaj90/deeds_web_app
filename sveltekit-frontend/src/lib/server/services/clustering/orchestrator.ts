@@ -12,8 +12,8 @@ import {
 import { redisClient } from '../persistence/redis-state.js';
 
 export interface OrchestrationResult {
- jobId: string;, status: 'success' | 'failed' | 'timeout';
- context: ClusteringContext;, executionTimeMs: number;
+ jobId: string; status: 'success' | 'failed' | 'timeout';
+ context: ClusteringContext; executionTimeMs: number;
  error?: Error;
 }
 
@@ -102,3 +102,5 @@ export async function getJobStatus(jobId: string): Promise<ClusteringSnapshot | 
 export async function cancelJob(jobId: string): Promise<void> {
  await redisClient.del(`clustering:job:${jobId}:state`);
 }
+
+

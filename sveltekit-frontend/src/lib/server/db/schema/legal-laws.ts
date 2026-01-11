@@ -39,3 +39,4 @@ export const lawSectionsRelations = relations(lawSections, ({ one }) => ({
  references: [laws.id],
  }),
 }));
+

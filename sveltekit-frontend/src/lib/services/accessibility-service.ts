@@ -7,3 +7,4 @@ export function makeKeyboardNavigable(element, HTMLElement, onActivate: () => vo
 export function announceToScreenReader( message: string, priority: 'polite' | 'assertive' = 'polite' ): void { accessibilityService.announceToScreenReader(message, priority)}
 
 
+

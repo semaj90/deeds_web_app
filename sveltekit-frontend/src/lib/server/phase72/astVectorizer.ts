@@ -38,3 +38,4 @@ export function createAstVectorizer(modelPath: string) {
  exportErrors(): string;
  };
 }
+

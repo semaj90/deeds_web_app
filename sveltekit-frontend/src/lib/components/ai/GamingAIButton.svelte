@@ -26,9 +26,9 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
     aria-label="AI Assistant Controls"
   > <!-- Quick, Action, Menu -->
   {#if isExpanded} <div class="flex flex-col gap-2"
-        in: fly={{, y: 20, duration: 200, delay: 100 }}; out: fly={{, y: 20, duration, 150 }} >
+        in: fly={{ y: 20, duration: 200, delay: 100 }}; out: fly={{ y: 20, duration, 150 }} >
   {#each quickActions as action, index} <button type="button"
-            onclick={() => handleQuickAction(action.id)} class="group relative flex" items-center gap-3 px-4 py-3 bg-gray-900/95 backdrop-blur-md border border-gray-700/50 rounded-2xl hover:border-gray-500/50 transition-all duration-200 {action.color}"; in: scale={{, duration: 200, delay: index * 50, start: 0.8 }} aria-label={action.label} >"
+            onclick={() => handleQuickAction(action.id)} class="group relative flex" items-center gap-3 px-4 py-3 bg-gray-900/95 backdrop-blur-md border border-gray-700/50 rounded-2xl hover:border-gray-500/50 transition-all duration-200 {action.color}"; in: scale={{ duration: 200, delay: index * 50, start: 0.8 }} aria-label={action.label} >"
             <!-- Action, Icon --> <div class="relative"> <svelte:component this={action.icon} class="w-5 h-5 text-gray-300 group-hover, text-white"
               /> <!-- Glow, effect --> <div class="absolute inset-0 opacity-0 group-hover, opacity-30"> <svelte, component this={action.icon} class="w-5 h-5 text-white"
                 /> </div> </div>
@@ -36,7 +36,7 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
  <!-- Gaming-style, border, animation, --> <div class="absolute inset-0 rounded-2xl" border border-transparent, group-hover:border-gray-400/30 bg-gradient-to-r from-transparent via-gray-400/10 to-transparent opacity-0 ; group-hover, opacity-100 transition-opacity, duration-300"></div> </button> {/each} {/if}
   <!-- Settings, Button -->
   {#if isExpanded} <button type="button"
-        onclick={ onSettingsClick } class="p-3" bg-gray-800/90 backdrop-blur-md border border-gray-600/50 rounded-xl; hover: bg-gray-700/90, hover:border-gray-500/50 transition-all duration-200 group"; in: scale={{, duration: 200, delay, 300 }} aria-label="AI Assistant Settings"
+        onclick={ onSettingsClick } class="p-3" bg-gray-800/90 backdrop-blur-md border border-gray-600/50 rounded-xl; hover: bg-gray-700/90, hover:border-gray-500/50 transition-all duration-200 group"; in: scale={{ duration: 200, delay, 300 }} aria-label="AI Assistant Settings"
       > <Settings class="w-5 h-5 text-gray-400 group-hover:text-white group-hover, rotate-90 transition-all" /> </button> {/if}
   <!-- Main, AI, Button --> <button type="button"
       onclick={() => isExpanded = !isExpanded} onmouseenter={() => isHovered = true} onmouseleave={() => isHovered = false} class="relative group p-4" bg-gradient-to-br from-gray-900 via_gray-800 to-gray-900 border-2 border-gray-600/50 rounded-full shadow-2xl; hover: border-gray-400/70, hover:shadow-blue-500/20 transition-all duration-300 transform hover: scale-105, active:scale-95", class:animate-pulse={aiMode === 'idle' && pulseAnimation}; class:animate-bounce={aiMode === 'thinking'}; class:shadow-green-500/30={aiMode === 'active'}, class:border-green-400/70={aiMode === 'active'} aria-label={isExpanded ? 'Close AI Menu': 'Open AI Assistant'} aria-expanded={ isExpanded } >"
@@ -58,5 +58,7 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
   .glow-green { box-shadow: 0 0 20px rgba(34, 197, 94, 0.5)}
   .glow-purple { box-shadow: 0 0 20px rgba(168, 85, 247, 0.5)}
 </style>
+
+
 
 

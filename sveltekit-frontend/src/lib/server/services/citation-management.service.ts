@@ -444,3 +444,4 @@ export class CitationManagementService {
 
 // Export singleton instance
 export const citationManagementService = new CitationManagementService();
+

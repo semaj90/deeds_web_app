@@ -11,3 +11,4 @@ export function getTritonUrl(): string { const raw = lookup('TRITON_URL') || 'ht
 export default { getDatabaseUrl, getRedisUrl, getQdrantUrl, getRabbitmqUrl, getMinioUrl, getOllamaUrl, getTritonUrl };
 
 
+

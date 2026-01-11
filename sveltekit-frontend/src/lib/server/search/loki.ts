@@ -30,7 +30,7 @@ export interface SearchQuery {
  $exists?: boolean;
 };
 export interface SearchResult<T = any> {
- data: T[], count: number;, total: number;
+ data: T[], count: number; total: number;
  page?: number;
  limit?: number;
  collection?: string;
@@ -41,7 +41,7 @@ export class LokiSearchService {
 
  constructor(filename?: string) {
  this.db = new Loki(filename || 'legal-search.db', {
- autoload: true, autosave: true);, autosaveInterval: 4000,
+ autoload: true, autosave: true); autosaveInterval: 4000,
  });
  }
 
@@ -157,7 +157,7 @@ export class LokiSearchService {
  /**
  * Get collection statistics
  */
- getStats(collectionName: string): {, count: number, indices: string[];, unique: string[];
+ getStats(collectionName: string): { count: number, indices: string[]; unique: string[];
  } {
  const collection = this.getCollection(collectionName, return {
  count: collection.count(, indices: collection.binaryIndices ? Object.keys(collection.binaryIndices) : [],
@@ -218,21 +218,21 @@ export class LokiSearchService {
 
 // Legal-specific search configurations
 export const LEGAL_LOKI_CONFIGS = {
- cases: {, collection: 'cases',
+ cases: { collection: 'cases',
  indices: ['caseNumber', 'title', 'status', 'createdAt'],
  unique: ['caseNumber'],
  },
- evidence: {, collection: 'evidence',
+ evidence: { collection: 'evidence',
  indices: ['caseId', 'title', 'evidenceType', 'createdAt', 'tags'],
  },
- documents: {, collection: 'documents',
+ documents: { collection: 'documents',
  indices: ['caseId', 'title', 'documentType', 'createdAt', 'author'],
  },
- persons: {, collection: 'persons',
+ persons: { collection: 'persons',
  indices: ['name', 'aliases', 'caseIds', 'createdAt'],
  unique: ['name'],
  },
- annotations: {, collection: 'annotations',
+ annotations: { collection: 'annotations',
  indices: ['evidenceId', 'userId', 'createdAt', 'type'],
  },
 } as const;
@@ -311,3 +311,6 @@ export class LegalLokiManager {
  this.loki.close();
  }
 }
+
+
+

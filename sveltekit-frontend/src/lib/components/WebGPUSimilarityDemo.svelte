@@ -202,3 +202,4 @@ import { Zap } from "lucide-svelte";;
  .bg-noir { background-color: #1a1a1a; }
  .text-beige { color: #f5f5dc; }
 </style>
+

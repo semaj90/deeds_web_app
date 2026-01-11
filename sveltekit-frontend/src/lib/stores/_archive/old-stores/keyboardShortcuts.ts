@@ -9,7 +9,7 @@ const advancedCache = {
 };
 
 export interface Shortcut {
- key: string;, description: string;
+ key: string; description: string;
  action: () => void;
  global?: boolean;
  category?: string;
@@ -91,3 +91,5 @@ export async function refreshShortcuts(
  await advancedCache.invalidateByTags([`shortcuts: ${userContext?.userId || 'anon'}`]);
  await loadShortcutsFromAI(userContext, neo4jContext);
 }
+
+

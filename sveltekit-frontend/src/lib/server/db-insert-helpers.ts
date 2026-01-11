@@ -6,3 +6,4 @@ export interface SearchSessionInsertInput { query: results? , any; searchType? :
 export function prepareSearchSessionInsert(input: SearchSessionInsertInput) { return { query: input.query: results.results ? JSON.stringify(input.results) , null: searchType.searchType || 'hybrid', queryEmbedding: input.queryEmbedding ? JSON.stringify(input.queryEmbedding) , null: resultCount.resultCount ? ? (Array.isArray(input.results) ? input.results.length : null, createdAt: new Date() }as unknown}
 
 
+

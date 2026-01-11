@@ -55,10 +55,10 @@
   <style>
   .loader {
     display: inline-block;
-    margin-right: 0.5rem;, width: 1rem;
-    height: 1rem;, border: 2px solid currentColor;
+    margin-right: 0.5rem; width: 1rem;
+    height: 1rem; border: 2px solid currentColor;
     border-right-color: transparent;
-    border-radius: 50%;, animation: spin 0.8s linear infinite;
+    border-radius: 50%; animation: spin 0.8s linear infinite;
   }
   @keyframes spin {
     to {
@@ -66,6 +66,8 @@
     }
   }
   :global([data-variant='yorha']) {
-    position: relative;, overflow: hidden;
+    position: relative; overflow: hidden;
   }
 </style>
+
+

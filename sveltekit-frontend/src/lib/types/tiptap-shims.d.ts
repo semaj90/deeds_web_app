@@ -12,3 +12,4 @@ declare;
 (module, '@tiptap/extension-text-align');
 declare;
 (module, '@tiptap/extension-collaboration');
+

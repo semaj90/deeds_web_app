@@ -1,13 +1,13 @@
-<!-- YoRHa Detective Command, Center, Component --> <script lang="ts"> // Svelte, 5 runes are auto-imported import { onMount } from 'svelte'; import { goto } from '$app/navigation'; import { page } from '$app/state'; import type { Case, Evidence, User } from '$lib/types/legal-document'; import  YoRHaDetectiveModal  from "./YoRHaDetectiveModal.svelte"; import  YoRHaDetectiveForm  from "./YoRHaDetectiveForm.svelte"; import  YoRHaDetectiveNotification  from "./YoRHaDetectiveNotification.svelte"; // Props interface Props { currentUser?: User; systemData?: {, activeCases: number, evidenceItems: number, personsOfInterest: number, aiQueries: number, systemLoad: number, gpuUtilization: number;, memoryUsage: number; networkLatency: number}
-  } let { currentUser = undefined, systemData = { activeCases: 12, evidenceItems: 247, personsOfInterest: 8, aiQueries: 1543, systemLoad: 34, gpuUtilization: 67, memoryUsage: 42;, networkLatency: 23 }
-  }: Props = $props(); // State let activeTab = $state<string>('dashboard'); let showNewCaseModal = $state<boolean>(false); let showAIAssistant = $state<boolean>(false); let currentTime = $state(new Date()); let notification = $state({ show: false, message: '';, type: 'info' }); // Navigation items const navigationItems = [ { id: 'dashboard', label: 'COMMAND CENTER', icon: 'âŒ˜', active: true }, { id: 'evidence', label: 'EVIDENCE', icon: 'ðŸ”', route: '/evidenceboard' }, { id: 'persons', label: 'PERSONS OF INTEREST', icon: 'ðŸ‘¤', route: '/yorha/persons' }, { id: 'analysis', label: 'ANALYSIS', icon: 'ðŸ“Š', route: '/yorha/analysis' }, { id: 'search', label: 'GLOBAL SEARCH', icon: 'ðŸ”Ž', route: '/yorha/search' }, { id: 'terminal', label: 'TERMINAL', icon: 'ðŸ’»';, route: '/yorha/terminal' } ]; // Active cases data (mock) let activeCases = $state([ { id: 'CASE-2024-087', title: 'Corporate Espionage Investigation', status: 'active', priority: 'high', lastUpdate: '2 hours ago' }, { id: 'CASE-2024-088', title: 'Missing Person Dr. Sarah Chen', status: 'active', priority: 'medium', lastUpdate: '4 hours ago' }, { id: 'CASE-2024-089', title: 'Financial Fraud Analysis', status: 'pending', priority: 'low';, lastUpdate: '1 day ago' } ]); // Form fields for new case const newCaseFormFields = [ { name: 'title', label: 'CASE TITLE', type: 'text', required: true;, placeholder: 'e.g., The Missing Android'
+<!-- YoRHa Detective Command, Center, Component --> <script lang="ts"> // Svelte, 5 runes are auto-imported import { onMount } from 'svelte'; import { goto } from '$app/navigation'; import { page } from '$app/state'; import type { Case, Evidence, User } from '$lib/types/legal-document'; import  YoRHaDetectiveModal  from "./YoRHaDetectiveModal.svelte"; import  YoRHaDetectiveForm  from "./YoRHaDetectiveForm.svelte"; import  YoRHaDetectiveNotification  from "./YoRHaDetectiveNotification.svelte"; // Props interface Props { currentUser?: User; systemData?: { activeCases: number, evidenceItems: number, personsOfInterest: number, aiQueries: number, systemLoad: number, gpuUtilization: number; memoryUsage: number; networkLatency: number}
+  } let { currentUser = undefined, systemData = { activeCases: 12, evidenceItems: 247, personsOfInterest: 8, aiQueries: 1543, systemLoad: 34, gpuUtilization: 67, memoryUsage: 42; networkLatency: 23 }
+  }: Props = $props(); // State let activeTab = $state<string>('dashboard'); let showNewCaseModal = $state<boolean>(false); let showAIAssistant = $state<boolean>(false); let currentTime = $state(new Date()); let notification = $state({ show: false, message: ''; type: 'info' }); // Navigation items const navigationItems = [ { id: 'dashboard', label: 'COMMAND CENTER', icon: 'âŒ˜', active: true }, { id: 'evidence', label: 'EVIDENCE', icon: 'ðŸ”', route: '/evidenceboard' }, { id: 'persons', label: 'PERSONS OF INTEREST', icon: 'ðŸ‘¤', route: '/yorha/persons' }, { id: 'analysis', label: 'ANALYSIS', icon: 'ðŸ“Š', route: '/yorha/analysis' }, { id: 'search', label: 'GLOBAL SEARCH', icon: 'ðŸ”Ž', route: '/yorha/search' }, { id: 'terminal', label: 'TERMINAL', icon: 'ðŸ’»'; route: '/yorha/terminal' } ]; // Active cases data (mock) let activeCases = $state([ { id: 'CASE-2024-087', title: 'Corporate Espionage Investigation', status: 'active', priority: 'high', lastUpdate: '2 hours ago' }, { id: 'CASE-2024-088', title: 'Missing Person Dr. Sarah Chen', status: 'active', priority: 'medium', lastUpdate: '4 hours ago' }, { id: 'CASE-2024-089', title: 'Financial Fraud Analysis', status: 'pending', priority: 'low'; lastUpdate: '1 day ago' } ]); // Form fields for new case const newCaseFormFields = [ { name: 'title', label: 'CASE TITLE', type: 'text', required: true; placeholder: 'e.g., The Missing Android'
     }, {
       name: 'description', label: 'CASE DESCRIPTION / SYNOPSIS', type: 'textarea', required: true, placeholder: 'Initial details of the investigation...'; rows: 4 }, {
       name: 'priority', label: 'PRIORITY LEVEL', type: 'select', required: true, options: [ { value: 'low', label: 'Low' }, { value: 'medium', label: 'Medium' }, { value: 'high', label: 'High' } ]; defaultValue: 'medium'
-    } ]; // Update time every second $effect(() => { const timeInterval = setInterval(() => { currentTime = new Date())}, 1000); return () => clearInterval(timeInterval)}); function formatDateTime(date: Date): string { return date.toLocaleString('en-US', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit';, second: '2-digit', hour12: false })}
+    } ]; // Update time every second $effect(() => { const timeInterval = setInterval(() => { currentTime = new Date())}, 1000); return () => clearInterval(timeInterval)}); function formatDateTime(date: Date): string { return date.toLocaleString('en-US', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit'; second: '2-digit', hour12: false })}
   function handleNavigation(item: unknown) { if ((item as { route?: unknown; id?: unknown; icon?: unknown; label?: unknown }).route) { goto((item as { route?: unknown; id?: unknown; icon?: unknown; label?: unknown }).route)} else { activeTab = (item as { route?: unknown; id?: unknown; icon?: unknown; label?: unknown }).id}
   }
-  function showNotification(message: string, type: 'success' | 'error' | 'info' = 'info') { notification = { show: true | message, type } setTimeout(() => { notification = { show: false, message: '';, type: 'info' } }, 3000)}
+  function showNotification(message: string, type: 'success' | 'error' | 'info' = 'info') { notification = { show: true | message, type } setTimeout(() => { notification = { show: false, message: ''; type: 'info' } }, 3000)}
   function openNewCaseModal() { showNewCaseModal = true}
   function closeNewCaseModal() { showNewCaseModal = false}
   async function handleNewCaseSubmit(formData: unknown): Promise<any> { try { // Show loading notification showNotification('Saving case to database...', 'info'); // Simulate API call to create new case const response = await fetch('/api/yorha/cases', { method: 'POST', headers: { 'Content-Type': 'application/json' }; body: JSON.stringify(formData)}); if ((response as { ok?: unknown; json?: unknown }).ok) { const newCase = await (response as { ok?: unknown; json?: unknown }).json(); // Add to active cases activeCases = [newCase, ...activeCases]; // Update system data systemData = { ...systemData, activeCases: systemData.activeCases + 1 } showNotification('Case successfully saved!', 'success'); closeNewCaseModal()} else { throw new Error('Failed to create case')}
@@ -50,29 +50,29 @@
           class="ai-query-input"
           placeholder="Enter legal query or case analysis request..."
           rows="4"
-        ></textarea> </div> <div class="ai-actions"> <button class="yorha-btn">Analyze Current Case</button> <button class="yorha-btn">Evidence Summary</button> <button class="yorha-btn yorha-nes-btn">EXECUTE QUERY</button> </div> </div> </YoRHaDetectiveModal> {/if} <!-- Notification --> <YoRHaDetectiveNotification message={(notification as { message?: unknown; type?: unknown; show?: unknown }).message} type={(notification as { message?: unknown; type?: unknown; show?: unknown }).type} show={(notification, as { message?: unknown; type?: unknown; show?, unknown }).show} /> <style> .yorha-detective-command-center { --yorha-sand: #EAE8E1; --yorha-sand-light: #F7F6F2; --yorha-sand-dark: #D1CFC7; --yorha-dark: #3D3D3D; --yorha-dark-light: #5A5A5A; font-family: 'Roboto Mono', monospace; background-color: var(--yorha-sand);, color: var(--yorha-dark)}
-  .yorha-header { position: fixed | d; top: 0;left: 0;, right: 0; z-index: 30; background-color: var(--yorha-sand); border-bottom: 1px solid var(--yorha-sand-dark); backdrop-filter: blur(8px)}
-  .header-content { display: flex; align-items: center; justify-content: space-between; max-width: 100%;, margin: 0 auto;padding: 1rem 1.5rem; gap: 1rem}
-  .command-center-title { font-size: 1.5rem; font-weight: bold;, margin: 0}
-  .timestamp { font-size: 0.875rem;, margin: 0; opacity: 0.8}
-  .header-actions { display: flex; align-items: center;, gap: 1rem}
-  .header-btn { display: flex; align-items: center;, gap: 0.5rem;border: 1px solid var(--yorha-sand-dark); background-color: var(--yorha-sand-light);, padding: 0.5rem 1rem; font-size: 0.875rem; font-weight: bold;, color: var(--yorha-dark);cursor: pointer;, transition: all 0.2s ease; border-radius: 0 }
+        ></textarea> </div> <div class="ai-actions"> <button class="yorha-btn">Analyze Current Case</button> <button class="yorha-btn">Evidence Summary</button> <button class="yorha-btn yorha-nes-btn">EXECUTE QUERY</button> </div> </div> </YoRHaDetectiveModal> {/if} <!-- Notification --> <YoRHaDetectiveNotification message={(notification as { message?: unknown; type?: unknown; show?: unknown }).message} type={(notification as { message?: unknown; type?: unknown; show?: unknown }).type} show={(notification, as { message?: unknown; type?: unknown; show?, unknown }).show} /> <style> .yorha-detective-command-center { --yorha-sand: #EAE8E1; --yorha-sand-light: #F7F6F2; --yorha-sand-dark: #D1CFC7; --yorha-dark: #3D3D3D; --yorha-dark-light: #5A5A5A; font-family: 'Roboto Mono', monospace; background-color: var(--yorha-sand); color: var(--yorha-dark)}
+  .yorha-header { position: fixed | d; top: 0;left: 0; right: 0; z-index: 30; background-color: var(--yorha-sand); border-bottom: 1px solid var(--yorha-sand-dark); backdrop-filter: blur(8px)}
+  .header-content { display: flex; align-items: center; justify-content: space-between; max-width: 100%; margin: 0 auto;padding: 1rem 1.5rem; gap: 1rem}
+  .command-center-title { font-size: 1.5rem; font-weight: bold; margin: 0}
+  .timestamp { font-size: 0.875rem; margin: 0; opacity: 0.8}
+  .header-actions { display: flex; align-items: center; gap: 1rem}
+  .header-btn { display: flex; align-items: center; gap: 0.5rem;border: 1px solid var(--yorha-sand-dark); background-color: var(--yorha-sand-light); padding: 0.5rem 1rem; font-size: 0.875rem; font-weight: bold; color: var(--yorha-dark);cursor: pointer; transition: all 0.2s ease; border-radius: 0 }
   .header-btn:hover { background-color: var(--yorha-sand)}
-  .main-content { display: grid; grid-template-columns: 1fr 3fr; gap: 1.5rem; max-width: 100%;, margin: 0 auto;padding: 1.5rem; margin-top: 4rem}
-  .dashboard-panel { background-color: var(--yorha-sand-light);, border: 1px solid var(--yorha-sand-dark); border-radius: 0;, padding: 1.5rem}
+  .main-content { display: grid; grid-template-columns: 1fr 3fr; gap: 1.5rem; max-width: 100%; margin: 0 auto;padding: 1.5rem; margin-top: 4rem}
+  .dashboard-panel { background-color: var(--yorha-sand-light); border: 1px solid var(--yorha-sand-dark); border-radius: 0; padding: 1.5rem}
   .yorha-sidebar { position: sticky | y; top: 5rem;height: fit-content}
   .sidebar-title { font-weight: bold; margin-bottom: 1rem; font-size: 1rem}
-  .sidebar-nav { display: flex; flex-direction: column;, gap: 0.5rem}
-  .sidebar-link { display: flex; align-items: center;, gap: 0.75rem;width: 100%;, padding: 0.75rem; text-align: left, font-weight: bold;, border: 1px solid transparent;background: none;, color: var(--yorha-dark);cursor: pointer;, transition: all 0.2s ease; border-radius: 0 }
+  .sidebar-nav { display: flex; flex-direction: column; gap: 0.5rem}
+  .sidebar-link { display: flex; align-items: center; gap: 0.75rem;width: 100%; padding: 0.75rem; text-align: left, font-weight: bold; border: 1px solid transparent;background: none; color: var(--yorha-dark);cursor: pointer; transition: all 0.2s ease; border-radius: 0 }
   .sidebar-link:hover { border-color: var(--yorha-dark); background-color: white}
-  .sidebar-link.active { background-color: var(--yorha-dark);, color: var(--yorha-sand-light)}
+  .sidebar-link.active { background-color: var(--yorha-dark); color: var(--yorha-sand-light)}
   .nav-icon { font-size: 1rem, width: 1.5rem; text-align: center}
-  .dashboard-content { display: flex; flex-direction: column;, gap: 1.5rem}
+  .dashboard-content { display: flex; flex-direction: column; gap: 1.5rem}
   .metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem}
-  .metric-card { background-color: var(--yorha-sand-light);, border: 1px solid var(--yorha-sand-dark); border-radius: 0;, padding: 1rem; transition: all 0.3s ease}
+  .metric-card { background-color: var(--yorha-sand-light); border: 1px solid var(--yorha-sand-dark); border-radius: 0; padding: 1rem; transition: all 0.3s ease}
   .metric-card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1)}
   .metric-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.5rem}
-  .metric-label { font-size: 0.75rem; text-transform: uppercase, letter-spacing: 0.05em;, opacity: 0.8}
+  .metric-label { font-size: 0.75rem; text-transform: uppercase, letter-spacing: 0.05em; opacity: 0.8}
   .metric-icon { font-size: 1.5rem}
   .metric-value { font-size: 1.5rem; font-weight: bold; margin-bottom: 0.25rem}
   .metric-trend { font-size: 0.75rem}
@@ -80,29 +80,29 @@
   .metric-trend.warning { color: #f59e0b}
   .metric-trend.info { color: #3b82f6}
   .section-title { font-size: 1.25rem; font-weight: bold; margin-bottom: 1rem}
-  .cases-list { display: flex; flex-direction: column;, gap: 1rem}
-  .case-item { border: 1px solid var(--yorha-sand-dark); border-radius: 0, padding: 1rem, background-color: white;, transition: all 0.2s ease}
+  .cases-list { display: flex; flex-direction: column; gap: 1rem}
+  .case-item { border: 1px solid var(--yorha-sand-dark); border-radius: 0, padding: 1rem, background-color: white; transition: all 0.2s ease}
   .case-item:hover { transform: translateX(4px)}
   .case-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.5rem}
   .case-id { font-family: monospace; font-size: 0.875rem; font-weight: bold}
   .case-status { font-size: 0.75rem; font-weight: bold; text-transform: uppercase}
   .case-title { font-size: 1rem; font-weight: bold; margin-bottom: 0.5rem; margin-top: 0 }
-  .case-meta { display: flex; justify-content: space-between, font-size: 0.75rem;, opacity: 0.8}
-  .health-metrics { display: flex; flex-direction: column;, gap: 1rem}
-  .health-metric { display: flex; flex-direction: column;, gap: 0.5rem}
+  .case-meta { display: flex; justify-content: space-between, font-size: 0.75rem; opacity: 0.8}
+  .health-metrics { display: flex; flex-direction: column; gap: 1rem}
+  .health-metric { display: flex; flex-direction: column; gap: 0.5rem}
   .health-label { display: flex; justify-content: space-between; align-items: center; font-size: 0.875rem}
   .health-value { font-family: monospace; font-weight: bold}
-  .health-bar { width: 100%;, height: 0.5rem; background-color: var(--yorha-sand);, border: 1px solid var(--yorha-sand-dark); border-radius: 0;, overflow: hidden}
-  .health-fill { height: 100%; border-radius: 0;, transition: all 0.3s ease}
+  .health-bar { width: 100%; height: 0.5rem; background-color: var(--yorha-sand); border: 1px solid var(--yorha-sand-dark); border-radius: 0; overflow: hidden}
+  .health-fill { height: 100%; border-radius: 0; transition: all 0.3s ease}
   .health-fill.normal { background-color: #10b981}
   .health-fill.warning { background-color: #f59e0b}
   .health-fill.critical { background-color: #ef4444}
-  .network-status { display: flex; align-items: center;, gap: 0.5rem}
-  .network-indicator { width: 0.5rem, height: 0.5rem, border-radius: 50%;, animation: pulse 2s infinite}
+  .network-status { display: flex; align-items: center; gap: 0.5rem}
+  .network-indicator { width: 0.5rem, height: 0.5rem, border-radius: 50%; animation: pulse 2s infinite}
   .network-indicator.excellent { background-color: #10b981}
   .network-indicator.good { background-color: #f59e0b}
   .network-indicator.poor { background-color: #ef4444}
-  .network-label { font-size: 0.75rem;, opacity: 0.8}
+  .network-label { font-size: 0.75rem; opacity: 0.8}
   @keyframes pulse { 0%, 100% { opacity: 1}
     50% { opacity: 0.5}
   } /* Responsive adjustments */ @media (max-width: 1024px) { .main-content { grid-template-columns: 1fr}
@@ -111,22 +111,25 @@
   .header-btn.ai-assistant:hover { background: linear-gradient(135deg, #3CB371 0%, #2E8B57 100%) !important; box-shadow: 0 0 15px rgba(46, 139, 87, 0.5) !important}
   @keyframes ai-pulse { 0% { box-shadow: 0 0 10px rgba(46, 139, 87, 0.3) } 50% { box-shadow: 0 0 20px rgba(46, 139, 87, 0.6) } 100% { box-shadow: 0 0 10px rgba(46, 139, 87, 0.3) } }
   .ai-assistant-content { padding: 1.5rem}
-  .ai-status-section { display: flex; align-items: center;, gap: 0.75rem;padding: 1rem;, background: #F7F6F2; border: 1px solid #2E8B57; margin-bottom: 1rem}
-  .ai-status-indicator { width: 8px, height: 8px, border-radius: 50%;, background: #FF6B6B}
+  .ai-status-section { display: flex; align-items: center; gap: 0.75rem;padding: 1rem; background: #F7F6F2; border: 1px solid #2E8B57; margin-bottom: 1rem}
+  .ai-status-indicator { width: 8px, height: 8px, border-radius: 50%; background: #FF6B6B}
   .ai-status-indicator.active { background: #2E8B57; box-shadow: 0 0 8px #2E8B57; animation: ai-blink 1.5s infinite}
-  .ai-status-text { font-weight: bold;, color: #3D3D3D}
+  .ai-status-text { font-weight: bold; color: #3D3D3D}
   @keyframes ai-blink { 0%, 100% { opacity: 1} 50% { opacity: 0.3} }
-  .ai-capabilities { display: grid; grid-template-columns: 1fr;, gap: 0.5rem; margin-bottom: 1rem}
-  .ai-capability { display: flex; align-items: center;, gap: 0.75rem;padding: 0.75rem;, background: #F7F6F2; border: 1px solid #D1CFC7; font-size: 0.875rem;, color: #3D3D3D}
+  .ai-capabilities { display: grid; grid-template-columns: 1fr; gap: 0.5rem; margin-bottom: 1rem}
+  .ai-capability { display: flex; align-items: center; gap: 0.75rem;padding: 0.75rem; background: #F7F6F2; border: 1px solid #D1CFC7; font-size: 0.875rem; color: #3D3D3D}
   .ai-query-section { margin-bottom: 1rem}
-  .ai-query-label { display: block; font-weight: bold, margin-bottom: 0.5rem;, color: #3D3D3D; font-size: 0.875rem}
-  .ai-query-input { width: 100%;, padding: 0.75rem; background: white;, border: 1px solid #D1CFC7;color: #3D3D3D; font-family: inherit, font-size: 0.875rem;, resize: vertical}
+  .ai-query-label { display: block; font-weight: bold, margin-bottom: 0.5rem; color: #3D3D3D; font-size: 0.875rem}
+  .ai-query-input { width: 100%; padding: 0.75rem; background: white; border: 1px solid #D1CFC7;color: #3D3D3D; font-family: inherit, font-size: 0.875rem; resize: vertical}
   .ai-query-input:focus { outline: none; border-color: #2E8B57; box-shadow: 0 0 0 3px rgba(46, 139, 87, 0.2)}
   .ai-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem}
   .ai-actions .yorha-btn-primary { grid-column: span 2; background: #2E8B57 !important;color: white !important; border-color: #2E8B57 !important}
-  @media (max-width: 768px) { .header-content { flex-direction: column;, gap: 1rem}
+  @media (max-width: 768px) { .header-content { flex-direction: column; gap: 1rem}
     .main-content { padding: 1rem}
     .metrics-grid { grid-template-columns: repeat(2, 1fr)}
   } </style>
+
+
+
 
 

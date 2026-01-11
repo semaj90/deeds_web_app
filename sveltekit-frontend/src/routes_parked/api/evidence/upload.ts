@@ -5,14 +5,14 @@ import fs from 'fs/promises';
 import path from 'path';
 
 export interface EvidenceRecord {
- id: string;, title: string;
- description: string;, caseId: string;
+ id: string; title: string;
+ description: string; caseId: string;
  criminalId: string | null;
- evidenceType: string;, fileUrl: string;
- fileType: string;, fileSize: number;
- tags: string[];, uploadedBy: string;
- uploadedAt: Date;, updatedAt: Date;
- fileName: string;, summary: string | null;
+ evidenceType: string; fileUrl: string;
+ fileType: string; fileSize: number;
+ tags: string[]; uploadedBy: string;
+ uploadedAt: Date; updatedAt: Date;
+ fileName: string; summary: string | null;
  aiSummary: string | null;
 }
 
@@ -63,3 +63,5 @@ export const POST: RequestHandler = async ({ request: locals }) => {
  }
  return json(newEvidence, { status: 201 });
 };
+
+

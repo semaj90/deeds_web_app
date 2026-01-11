@@ -11,3 +11,4 @@ export async function webgpuRerankFallback(request: RerankRequest): Promise<any>
  // Stub: return input as-is; implement actual WebGPU-based reranking here
  return { rerankedItems, request.items || [], message: 'WebGPU rerank fallback placeholder' };
 }
+

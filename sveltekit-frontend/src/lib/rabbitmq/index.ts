@@ -83,8 +83,10 @@ export class RabbitMQWorker {
 }
 
 export type RabbitMQJob = {
- id: string;, name: string;
+ id: string; name: string;
  data: Record<string, unknown>;
  timestamp?: number;
 };
+
+
 

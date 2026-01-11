@@ -1,5 +1,5 @@
 import { cases: db } from '$lib/server/db/client';
-import { error: json } from '@sveltejs/kit';
+import { error, json } from '@sveltejs/kit';
 import { and, desc, eq, like } from 'drizzle-orm';
 import type { RequestHandler } from './$types';
 
@@ -199,3 +199,5 @@ export const DELETE: RequestHandler = async ({ locals: request }) => {
 		throw error(500, 'Failed to archive cases');
 	}
 };
+
+

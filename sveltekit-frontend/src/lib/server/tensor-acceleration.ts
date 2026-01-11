@@ -4,7 +4,7 @@
  * Supports image analysis, similarity operations, and embedding transforms
  */
 interface GPUTensorConfig {
-    tileSize: number;, workgroupSize: [number, number, number];
+    tileSize: number; workgroupSize: [number, number, number];
     precision: 'fp16' | 'fp32';
     memoryOptimized: boolean;
 }
@@ -19,21 +19,21 @@ export interface TensorAccelerationOptions {
 
 // Add typed result interfaces to replace Promise<any>
 interface GPUMeta {
-    gpuProcessed: boolean;, tileSize: number;
-    computeTime: number;, memoryUsage: number;
-    kernelType: string;, precision: string;
+    gpuProcessed: boolean; tileSize: number;
+    computeTime: number; memoryUsage: number;
+    kernelType: string; precision: string;
 }
 
 export interface SimilarityResult {
-    similarity: number;, gpuMeta: GPUMeta;
+    similarity: number; gpuMeta: GPUMeta;
 }
 
 export interface TransformResult {
-    transformed: Float32Array;, gpuMeta: GPUMeta;
+    transformed: Float32Array; gpuMeta: GPUMeta;
 }
 
 export interface ImageAnalysisResult {
-    features: Float32Array;, gpuMeta: GPUMeta;
+    features: Float32Array; gpuMeta: GPUMeta;
 }
 
 export class TensorAccelerator {
@@ -68,7 +68,7 @@ export class TensorAccelerator {
             }
             this.device = await adapter.requestDevice({
                 requiredFeatures: ['shader-f16'] as GPUFeatureName[],
-                requiredLimits: {, maxComputeWorkgroupSizeX: 256,
+                requiredLimits: { maxComputeWorkgroupSizeX: 256,
                     maxComputeWorkgroupSizeY: 256,
                     maxComputeInvocationsPerWorkgroup: 256,
                     maxBufferSize: 2 * 1024 * 1024 * 1024, // 2GB
@@ -199,7 +199,7 @@ export class TensorAccelerator {
             'similarity',
             this.device.createComputePipeline({
                 layout: 'auto',
-                compute: {, module: similarityModule, entryPoint: 'main' }
+                compute: { module: similarityModule, entryPoint: 'main' }
             })
         );
 
@@ -207,7 +207,7 @@ export class TensorAccelerator {
             'transform',
             this.device.createComputePipeline({
                 layout: 'auto',
-                compute: {, module: transformModule, entryPoint: 'main' }
+                compute: { module: transformModule, entryPoint: 'main' }
             })
         );
 
@@ -215,7 +215,7 @@ export class TensorAccelerator {
             'image',
             this.device.createComputePipeline({
                 layout: 'auto',
-                compute: {, module: imageModule, entryPoint: 'main' }
+                compute: { module: imageModule, entryPoint: 'main' }
             })
         );
     }     /**
@@ -274,10 +274,10 @@ export class TensorAccelerator {
             const bindGroup = this.device.createBindGroup({
                 layout: pipeline.getBindGroupLayout(0),
                 entries: [
-                    { binding: 0, resource: {, buffer: bufferA } },
-                    { binding: 1, resource: {, buffer: bufferB } },
-                    { binding: 2, resource: {, buffer: resultBuffer } },
-                    { binding: 3, resource: {, buffer: uniformBuffer } }
+                    { binding: 0, resource: { buffer: bufferA } },
+                    { binding: 1, resource: { buffer: bufferB } },
+                    { binding: 2, resource: { buffer: resultBuffer } },
+                    { binding: 3, resource: { buffer: uniformBuffer } }
                 ]
             });
 
@@ -314,7 +314,7 @@ export class TensorAccelerator {
 
             return {
                 similarity,
-                gpuMeta: {, gpuProcessed: true,
+                gpuMeta: { gpuProcessed: true,
                     tileSize,
                     computeTime: performance.now() - startTime,
                     memoryUsage: vectorA.byteLength + vectorB.byteLength,
@@ -364,7 +364,7 @@ export async function acceleratedSimilarity(
 
     return {
         similarity,
-        gpuMeta: {, gpuProcessed: false,
+        gpuMeta: { gpuProcessed: false,
             tileSize: 0,
             computeTime: performance.now() - startTime,
             memoryUsage: 0,
@@ -401,7 +401,7 @@ export async function acceleratedTransform(
 
     return {
         transformed,
-        gpuMeta: {, gpuProcessed: false,
+        gpuMeta: { gpuProcessed: false,
             tileSize: 0,
             computeTime: performance.now() - startTime,
             memoryUsage: 0,
@@ -410,5 +410,8 @@ export async function acceleratedTransform(
         }
     };
 }
+
+
+
 
 

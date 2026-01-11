@@ -70,7 +70,7 @@
 	{#if variant === 'banner'}
 		<div
 			class="auth-prompt-banner"
-			transition: slide={{, duration: 300 }}
+			transition: slide={{ duration: 300 }}
 		>
 			<div class="prompt-content">
 				<div class="prompt-icon">💡</div>
@@ -91,7 +91,7 @@
 	{:else if variant === 'toast'}
 		<div
 			class="auth-prompt-toast"
-			transition: fade={{, duration: 200 }}
+			transition: fade={{ duration: 200 }}
 		>
 			<div class="toast-content">
 				<span class="toast-icon">💾</span>
@@ -103,7 +103,7 @@
 	{:else if variant === 'inline'}
 		<div
 			class="auth-prompt-inline"
-			transition: slide={{, duration: 200 }}
+			transition: slide={{ duration: 200 }}
 		>
 			<p>
 				💡 <a href="/login?redirect=/chat" class="inline-link">Sign in</a> or
@@ -117,7 +117,7 @@
 	/* Banner variant (top of chat) */
 	.auth-prompt-banner {
 		background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-		color: white;, padding: 1rem;
+		color: white; padding: 1rem;
 		border-radius: 0.5rem;
 		margin-bottom: 1rem;
 		box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
@@ -125,7 +125,7 @@
 
 	.prompt-content {
 		display: flex;
-		align-items: center;, gap: 1rem;
+		align-items: center; gap: 1rem;
 	}
 
 	.prompt-icon {
@@ -144,12 +144,12 @@
 	}
 
 	.prompt-text p {
-		margin: 0;, opacity: 0.95;
+		margin: 0; opacity: 0.95;
 		font-size: 0.9rem;
 	}
 
 	.prompt-actions {
-		display: flex;, gap: 0.5rem;
+		display: flex; gap: 0.5rem;
 		align-items: center;
 	}
 
@@ -157,21 +157,21 @@
 		padding: 0.5rem 1rem;
 		border: none;
 		border-radius: 0.375rem;
-		font-weight: 600;, cursor: pointer;
+		font-weight: 600; cursor: pointer;
 		transition: all 0.2s;
 	}
 
 	.btn-login {
-		background: white;, color: #667eea;
+		background: white; color: #667eea;
 	}
 
 	.btn-login:hover {
-		background: #f7fafc;, transform: translateY(-1px);
+		background: #f7fafc; transform: translateY(-1px);
 	}
 
 	.btn-register {
 		background: rgba(255, 255, 255, 0.2);
-		color: white;, border: 1px solid rgba(255, 255, 255, 0.3);
+		color: white; border: 1px solid rgba(255, 255, 255, 0.3);
 	}
 
 	.btn-register:hover {
@@ -179,10 +179,10 @@
 	}
 
 	.btn-dismiss {
-		background: transparent;, border: none;
+		background: transparent; border: none;
 		color: white;
-		font-size: 1.2rem;, cursor: pointer;
-		opacity: 0.7;, padding: 0.25rem 0.5rem;
+		font-size: 1.2rem; cursor: pointer;
+		opacity: 0.7; padding: 0.25rem 0.5rem;
 		margin-left: 0.5rem;
 	}
 
@@ -192,8 +192,8 @@
 
 	/* Toast variant (bottom-right) */
 	.auth-prompt-toast {
-		position: fixed;, bottom: 2rem;
-		right: 2rem;, background: white;
+		position: fixed; bottom: 2rem;
+		right: 2rem; background: white;
 		border-radius: 0.5rem;
 		box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
 		z-index: 1000;
@@ -202,7 +202,7 @@
 
 	.toast-content {
 		display: flex;
-		align-items: center;, gap: 0.75rem;
+		align-items: center; gap: 0.75rem;
 		padding: 1rem;
 	}
 
@@ -211,15 +211,15 @@
 	}
 
 	.toast-text {
-		flex: 1;, color: #2d3748;
+		flex: 1; color: #2d3748;
 		font-weight: 500;
 	}
 
 	.toast-link {
-		background: #667eea;, color: white;
-		border: none;, padding: 0.5rem 1rem;
+		background: #667eea; color: white;
+		border: none; padding: 0.5rem 1rem;
 		border-radius: 0.375rem;
-		font-weight: 600;, cursor: pointer;
+		font-weight: 600; cursor: pointer;
 		font-size: 0.9rem;
 	}
 
@@ -228,9 +228,9 @@
 	}
 
 	.toast-close {
-		background: transparent;, border: none;
+		background: transparent; border: none;
 		color: #718096;
-		font-size: 1.2rem;, cursor: pointer;
+		font-size: 1.2rem; cursor: pointer;
 		padding: 0.25rem;
 	}
 
@@ -248,7 +248,7 @@
 	}
 
 	.auth-prompt-inline p {
-		margin: 0;, color: #4a5568;
+		margin: 0; color: #4a5568;
 		font-size: 0.9rem;
 	}
 
@@ -275,9 +275,12 @@
 		}
 
 		.auth-prompt-toast {
-			bottom: 1rem;, right: 1rem;
+			bottom: 1rem; right: 1rem;
 			left: 1rem;
 			max-width: none;
 		}
 	}
 </style>
+
+
+

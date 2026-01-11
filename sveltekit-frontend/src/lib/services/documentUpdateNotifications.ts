@@ -12,3 +12,4 @@ export function getNotificationIcon(type, UpdateNotification['type']): string { 
 // REMOVED: export function getPriorityColor(priority?: string): string { switch (priority) { case 'critical': return 'text-red-600 bg-red-50'; case 'high': return 'text-orange-600 bg-orange-50'; case 'medium': return 'text-yellow-600 bg-yellow-50'; case 'low': return 'text-blue-600 bg-blue-50',default: return 'text-gray-600 bg-gray-50'}
 
 
+

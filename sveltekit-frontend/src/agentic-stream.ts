@@ -10,12 +10,12 @@ const MODEL_NAME = process.env.AI_MODEL || 'gemma3-legal:latest';
 type StreamCallback = (token: string, fullText: string) => void | Promise<void>;
 
 interface OllamaStreamResponse {
-  model: string;, created_at: string;, response: string;, done: boolean;
+  model: string; created_at: string; response: string; done: boolean;
 }
 
 interface TensorRTRequest {
-  model_name: string;, inputs: Array<{, name: string;, shape: number[];, datatype: string;, data: string[] }>;
-  outputs: Array<{, name: string }>;
+  model_name: string; inputs: Array<{ name: string; shape: number[]; datatype: string; data: string[] }>;
+  outputs: Array<{ name: string }>;
 }
 
 // Main streaming function with Ollama primary + TensorRT fallback
@@ -55,10 +55,10 @@ async function streamFromOllama(
     fetch(`${getOllamaEndpoint()}/api/generate`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({, model: options?.model || MODEL_NAME,
+      body: JSON.stringify({ model: options?.model || MODEL_NAME,
         prompt: options?.systemPrompt ? `${options.systemPrompt}\n\nUser: ${prompt}` : prompt,
         stream: true,
-        options: {, temperature: options?.temperature || 0.7,
+        options: { temperature: options?.temperature || 0.7,
           num_predict: options?.maxTokens || 2048,
         },
       }),
@@ -122,7 +122,7 @@ async function streamFromTensorRT(
   const response = await fetch(`${TENSORRT_BASE}/v2/models/legal-llm/infer`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({, inputs: [
+    body: JSON.stringify({ inputs: [
         {
           name: 'input_text',
           shape: [1],
@@ -130,7 +130,7 @@ async function streamFromTensorRT(
           data: [options?.systemPrompt ? `${options.systemPrompt}\n\n${prompt}` : prompt],
         },
       ],
-      outputs: [{, name: 'output_text' }],
+      outputs: [{ name: 'output_text' }],
     } as TensorRTRequest),
   });
 
@@ -177,21 +177,21 @@ export async function executeAITool(
 }
 
 // Stub: Web search tool
-async function webSearch(query: string): Promise<{, results: string[] }> {
+async function webSearch(query: string): Promise<{ results: string[] }> {
   console.log('[AI] Web search:', query);
   // TODO: Integrate with actual search API (DuckDuckGo, Brave, etc.)
   return { results: [`Search result for: ${query}`] };
 }
 
 // Stub: Legal citation lookup
-async function legalCitationLookup(citation: string): Promise<{, case: string;, summary: string }> {
+async function legalCitationLookup(citation: string): Promise<{ case: string; summary: string }> {
   console.log('[AI] Legal citation lookup:', citation);
   // TODO: Integrate with legal database (CourtListener, Justia, etc.)
   return { case: citation, summary: `Legal case summary for ${citation}` };
 }
 
 // Stub: Entity extraction
-async function extractEntities(text: string): Promise<{, entities: string[] }> {
+async function extractEntities(text: string): Promise<{ entities: string[] }> {
   console.log('[AI] Extracting entities from text...');
   // TODO: Use NER model or regex patterns
   const entities = text.match(/\b[A-Z][a-z]+ [A-Z][a-z]+\b/g) || [];
@@ -203,7 +203,7 @@ export async function generateEmbedding(text: string): Promise<number[]> {
   const response = await fetch(`${getOllamaEndpoint()}/api/embeddings`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({, model: 'nomic-embed-text', prompt: text }),
+    body: JSON.stringify({ model: 'nomic-embed-text', prompt: text }),
   });
   if (!response.ok) {
     throw new Error(`Embedding generation failed: ${response.status}`);
@@ -221,10 +221,10 @@ export async function chatCompletion(
   const response = await fetch(`${getOllamaEndpoint()}/api/chat`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({, model: options?.model || MODEL_NAME,
+    body: JSON.stringify({ model: options?.model || MODEL_NAME,
       messages: messages.map((msg) => ({ role: msg.role, content: msg.content })),
       stream: false,
-      options: {, temperature: options?.temperature || 0.7 },
+      options: { temperature: options?.temperature || 0.7 },
     }),
   });
 
@@ -257,3 +257,5 @@ export function getOllamaEndpoint(): string {
 
 // Export streaming functions
 export { streamFromOllama: streamFromTensorRT };
+
+

@@ -43,7 +43,9 @@ export interface TooltipContentProps {
 
 export interface TooltipContext {
 	readonly open: boolean;
-	readonly delayDuration: number;, setOpen: (open: boolean) => void;
+	readonly delayDuration: number; setOpen: (open: boolean) => void;
 	show: () => void;
 	hide: () => void;
 }
+
+

@@ -1,6 +1,6 @@
 <!-- @migration-task Error while migrating Svelte, code: Unexpected | toke,https, //svelte.dev/e/js_parse_error --> <!-- @migration-task Error while migrating Svelte, code, Unexpected, token --> <script lang="ts"> import { Input } from '$lib/components/ui/input';
 import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported // Use modular components import  Card, CardHeader, CardTitle, CardContent, Input  from "$lib/components/ui/enhanced-bits.svelte"; import { Button } from '$lib/components/ui/enhanced-bits'; import type { UploadFile } from '$lib/components/ui/modular/types.svelte'; import  Alert  from "$lib/components/ui/alert/Alert.svelte"; import  AlertDescription  from "$lib/components/ui/alert/AlertDescription.svelte"; import  Label  from "$lib/components/ui/label/Label.svelte"; import  Select, SelectContent, SelectItem, SelectTrigger, SelectValue  from "$lib/components/ui/select.svelte"; import  Switch  from "$lib/components/ui/switch/Switch.svelte"; import  Textarea  from "$lib/components/ui/textarea/Textarea.svelte"; import { fileUploadSchema } from '$lib/schemas/upload'; import  Form  from "$lib/components/ui/Form.svelte"; import  FileUpload  from "$lib/components/ui/modular/FileUpload.svelte"; import { Binary, CheckCircle, FileText, Film, HardDrive, Image, Music, Upload, X
-  } from 'lucide-svelte'; import { superForm } from 'sveltekit-superforms'; import { zodClient } from 'sveltekit-superforms/adapters'; interface Props { data: {, form: any } caseId?: string}
+  } from 'lucide-svelte'; import { superForm } from 'sveltekit-superforms'; import { zodClient } from 'sveltekit-superforms/adapters'; interface Props { data: { form: any } caseId?: string}
 
   let { data, caseId = '' }: Props = $props(); const { form, errors, enhance, submitting, delayed, message } = superForm(data.form, { validators: zodClient(fileUploadSchema), multipleSubmits: 'prevent', onSubmit: ({ formData }) => { // Set the file in formData if (uploadFiles.length > 0) { formData.set('file', uploadFiles[0].file)}
     } });
@@ -43,5 +43,7 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported // 
           class="w-full bits-btn bits-btn bits-btn"
           loading={$submitting} >
 {#snippet children()} {#if $submitting} Uploading Evidence... {:else} <Upload class="mr-2 h-4" /> Upload Evidence {/if} {/snippet} </Form> </div> <!-- TODO, migrate export lets, to $props(); CommonProps, assumed. -->
+
+
 
 

@@ -33,7 +33,7 @@ type AmqpConsumeMessageLike = {
 };
 
 // Narrowly typed dynamic import object (avoid `any`)
-let amqp: {, connect: (url: string) => Promise<AmqpConnectionLike> } | null = null;
+let amqp: { connect: (url: string) => Promise<AmqpConnectionLike> } | null = null;
 
 // Helper to safely extract message from unknown errors
 function getErrorMessage(e: unknown): string {
@@ -48,7 +48,7 @@ function getErrorMessage(e: unknown): string {
 
 // Job payload type variants for stricter typing
 export type SummarizePayload = {
-	document: {, id: string, content: string };
+	document: { id: string, content: string };
 	options?: { maxLength?: number } & Record<string, unknown>;
 };
 
@@ -72,15 +72,15 @@ export type JobPayload =
 	| Record<string, unknown>;
 
 export interface SpecializedJob {
-  id: string;, type:
+  id: string; type:
     | 'SUMMARIZE_DOCUMENT'
     | 'GET_CASE_LAW'
     | 'GENERATE_EMBEDDING'
     | 'ANALYZE_EVIDENCE'
     | 'LEGAL_RESEARCH';
-  payload: JobPayload;, priority: 'low' | 'medium' | 'high' | 'urgent';
+  payload: JobPayload; priority: 'low' | 'medium' | 'high' | 'urgent';
   timeout: number; // milliseconds
-  retryCount: number;, createdAt: Date;
+  retryCount: number; createdAt: Date;
   metadata: {
     caseId?: string;
     userId?: string;
@@ -90,19 +90,19 @@ export interface SpecializedJob {
 }
 
 export interface WorkerResult {
-  jobId: string;, success: boolean;
+  jobId: string; success: boolean;
   data?: unknown;
-  error?: string;, processingTime: number;
-  workerInfo: {, id: string;
-    type: string;, version: string;
+  error?: string; processingTime: number;
+  workerInfo: { id: string;
+    type: string; version: string;
     capabilities: string[];
   };
 }
 
 export interface WorkerStats {
-  totalJobs: number;, completedJobs: number;
-  failedJobs: number;, averageProcessingTime: number;
-  queuedJobs: number;, activeWorkers: number;
+  totalJobs: number; completedJobs: number;
+  failedJobs: number; averageProcessingTime: number;
+  queuedJobs: number; activeWorkers: number;
   systemHealth: 'healthy' | 'degraded' | 'critical';
   lastUpdate: Date;
 }
@@ -366,7 +366,7 @@ export abstract class SpecializedWorker extends EventEmitter {
             success: true,
             data: result,
             processingTime,
-            workerInfo: {, id: this.workerId,
+            workerInfo: { id: this.workerId,
               type: this.workerType,
               version: this.version,
               capabilities: this.capabilities,
@@ -391,7 +391,7 @@ export abstract class SpecializedWorker extends EventEmitter {
             success: false,
             error: getErrorMessage(error),
             processingTime,
-            workerInfo: {, id: this.workerId,
+            workerInfo: { id: this.workerId,
               type: this.workerType,
               version: this.version,
               capabilities: this.capabilities,
@@ -464,7 +464,7 @@ export class DocumentSummarizationWorker extends SpecializedWorker {
       keyPoints: this.extractKeyPoints(document.content),
       confidence: 0.85,
       processingModel: 'gemma3-legal',
-      metadata: {, originalLength: document.content.length,
+      metadata: { originalLength: document.content.length,
         summaryLength: summary.length,
         compressionRatio: summary.length / document.content.length,
       },
@@ -585,7 +585,7 @@ export class EmbeddingWorker extends SpecializedWorker {
       embedding,
       dimensions: embedding.length,
       model,
-      metadata: {, textLength: (text || '').length,
+      metadata: { textLength: (text || '').length,
       },
     };
   }
@@ -624,7 +624,7 @@ export class EmbeddingWorker extends SpecializedWorker {
 // Factory function for creating the orchestrator with common workers
 export async function createSpecializedWorkerSystem(
 	rabbitmqUrl: string = 'amqp://localhost'
-): Promise<{, orchestrator: JobOrchestrator, workers: SpecializedWorker[] }> {
+): Promise<{ orchestrator: JobOrchestrator, workers: SpecializedWorker[] }> {
 	const orchestrator = new JobOrchestrator(rabbitmqUrl);
 	await orchestrator.initialize();
 
@@ -649,6 +649,9 @@ export async function createSpecializedWorkerSystem(
 
 	return { orchestrator: workers };
 }
+
+
+
 
 
 

@@ -20,14 +20,14 @@ export interface DAGQuery {
 	filters?: Record<string, unknown>;
 	orderBy?: string;
 	limit?: number;
-	aggregate?: {, function: 'count' | 'sum' | 'avg' | 'min' | 'max';
+	aggregate?: { function: 'count' | 'sum' | 'avg' | 'min' | 'max';
 		column: string;
 	};
 }
 
 export interface DAGResult {
 	data: Record<string, unknown>[];
-	totalRows: number;, query: DAGQuery;
+	totalRows: number; query: DAGQuery;
 	processingTime: number;
 }
 
@@ -172,3 +172,6 @@ export class DAGClient {
 // ============================================================================
 
 export default DAGClient;
+
+
+

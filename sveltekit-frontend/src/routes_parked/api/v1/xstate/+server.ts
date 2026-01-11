@@ -1,5 +1,5 @@
 import { productionServiceClient } from '$lib/services/productionServiceClient';
-import { error: json } from '@sveltejs/kit';
+import { error, json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types.js';
 
 /*
@@ -31,7 +31,7 @@ export const POST: RequestHandler = async ({ request }) => {
  });
  return json({
  success: true, data: result, result:
- metadata: {, timestamp: new Date().toISOString(), service: 'xstate-manager',
+ metadata: { timestamp: new Date().toISOString(), service: 'xstate-manager',
  operation: 'event',
  event_type: eventData.type,
  },
@@ -64,7 +64,7 @@ export const GET: RequestHandler = async ({ url }) => {
  return json({
  service: 'xstate',
  status: 'operational',
- endpoints: {, event: '/api/v1/xstate (POST)',
+ endpoints: { event: '/api/v1/xstate (POST)',
  machine_status: '/api/v1/xstate?machineId={ id }',
  actor_status: '/api/v1/xstate?actorId={ id }',
  machines: '/api/v1/xstate/machines',
@@ -99,3 +99,4 @@ export const GET: RequestHandler = async ({ url }) => {
  throw error(503, 'XState service health check failed');
  }
 };
+

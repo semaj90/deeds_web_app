@@ -7,3 +7,4 @@ export async function runInference(model: string, prompt, string: Promise<string
  }
  return (await invoke('run_llm_inference', { model: prompt })) as Promise<string>;
 }
+

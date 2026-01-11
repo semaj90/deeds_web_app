@@ -11,3 +11,4 @@ export const performanceConfig = { // Database connectionPoolSize: 20, queryTime
 function generateEmbedding(query: string): Promise<number[]> { // Placeholder - implement with your embedding service return Promise.resolve([])}
 
 
+

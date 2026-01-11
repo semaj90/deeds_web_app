@@ -8,35 +8,35 @@ import { eq, and, sql, count, desc } from 'drizzle-orm';
 
 // User behavior pattern interfaces
 export interface UserPattern {
-	userId: string;, commonQueries: string[];
-	frequentCases: string[];, preferredTopics: string[];
+	userId: string; commonQueries: string[];
+	frequentCases: string[]; preferredTopics: string[];
 	queryComplexity: 'simple' | 'moderate' | 'complex';
 	usageFrequency: 'low' | 'medium' | 'high';
-	timePatterns: {, mostActiveHours: number[];
-		averageSessionLength: number;, queriesPerSession: number;
+	timePatterns: { mostActiveHours: number[];
+		averageSessionLength: number; queriesPerSession: number;
 	};
 }
 
 export interface RecommendationResult {
 	type: 'query' | 'case' | 'document' | 'legal_precedent';
-	content: string;, confidence: number;
-	reasoning: string;, relatedItems: string[];
+	content: string; confidence: number;
+	reasoning: string; relatedItems: string[];
 }
 
 export interface ChatAnalytics {
-	totalQueries: number;, successRate: number;
-	averageProcessingTime: number;, topTopics: Array<{ topic: string;, count: number }>;
-	userSatisfaction: number;, improvementSuggestions: string[];
+	totalQueries: number; successRate: number;
+	averageProcessingTime: number; topTopics: Array<{ topic: string; count: number }>;
+	userSatisfaction: number; improvementSuggestions: string[];
 }
 
 interface TimeRange {
-	from: Date;, to: Date;
+	from: Date; to: Date;
 }
 
 interface StoreAiChatParams {
 	userId: string;
 	sessionId?: string;
-	caseId?: string;, query: string;
+	caseId?: string; query: string;
 	response: string;
 	embedding?: number[];
 	metadata?: Record<string, unknown>;
@@ -151,7 +151,7 @@ export class UserRecommendationService {
 				preferredTopics: topicAnalysis.topics,
 				queryComplexity: queryStats.complexity,
 				usageFrequency: sessionStats.frequency as 'high' | 'low' | 'medium',
-				timePatterns: {, mostActiveHours: sessionStats.activeHours,
+				timePatterns: { mostActiveHours: sessionStats.activeHours,
 					averageSessionLength: sessionStats.avgSessionLength,
 					queriesPerSession: sessionStats.avgQueriesPerSession
 				}
@@ -334,7 +334,7 @@ export class UserRecommendationService {
 	private async extractTopTopics(
 		userId: string,
 		limit: number
-	): Promise<Array<{, topic: string; count: number }>> {
+	): Promise<Array<{ topic: string; count: number }>> {
 		const queries = await db
 			.select({ query: userAiQueries.query })
 			.from(userAiQueries)
@@ -394,7 +394,7 @@ export class UserRecommendationService {
 		return 'complex';
 	}
 
-	private extractActiveHours(sessions: {, startedAt: Date | string | null }[]): number[] {
+	private extractActiveHours(sessions: { startedAt: Date | string | null }[]): number[] {
 		const hourCounts = new Map<number, number>();
 
 		sessions.forEach((session) => {
@@ -480,7 +480,7 @@ export class UserRecommendationService {
 
 	private generateImprovementSuggestions(
 		stats: { avgProcessingTime?: number | null; successfulQueries?: number; totalQueries?: number },
-		topTopics: Array<{, topic: string; count: number }>
+		topTopics: Array<{ topic: string; count: number }>
 	): string[] {
 		const suggestions: string[] = [];
 		const successRate =
@@ -512,3 +512,5 @@ export class UserRecommendationService {
 
 // Export singleton instance
 export const userRecommendationService = new UserRecommendationService();
+
+

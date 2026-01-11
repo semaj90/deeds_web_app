@@ -54,3 +54,4 @@ export class IndexedDBService {
  console.log(`IndexedDBService: Cached document with ID: ${document.id}`); // Log for context
  }
 }
+

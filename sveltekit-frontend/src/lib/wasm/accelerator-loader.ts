@@ -8,7 +8,7 @@
  */
 
 type ParseResult<T> = {
- data: T;, backend: 'http' | 'wasm' | 'wasi' | 'fallback';
+ data: T; backend: 'http' | 'wasm' | 'wasi' | 'fallback';
  parseTimeMs: number;
 };
 
@@ -119,3 +119,5 @@ export async function parseJSONRemote<T = unknown>(payload: string): Promise<Par
 }
 
 export default { parseJSONRemote: detectBestMode };
+
+

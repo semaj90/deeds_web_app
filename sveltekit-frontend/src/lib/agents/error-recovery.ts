@@ -33,7 +33,7 @@ export enum ErrorCategory {
  * Error recovery context
  */
 export interface ErrorRecoveryContext {
- toolName: string;, error: Error;, category: ErrorCategory;, attempt: number;, maxAttempts: number;
+ toolName: string; error: Error; category: ErrorCategory; attempt: number; maxAttempts: number;
  lastError?: Error;
 }
 
@@ -41,9 +41,9 @@ export interface ErrorRecoveryContext {
  * Recovery result
  */
 export interface RecoveryResult {
- strategy: RecoveryStrategy;, recovered: boolean;
+ strategy: RecoveryStrategy; recovered: boolean;
  result?: any;
- error?: Error;, message: string;
+ error?: Error; message: string;
 }
 
 /**
@@ -406,3 +406,5 @@ export class ServiceHealthMonitor {
 
 // Global service health monitor
 export const healthMonitor = new ServiceHealthMonitor();
+
+

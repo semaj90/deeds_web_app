@@ -97,9 +97,9 @@ import type { User } from '$lib/types';
       if (worker) {
         worker.postMessage({
           type: 'SMART_MODEL_SELECT',
-          payload: {, query: queryInput,
-            userContext: {, sessionId: 'demo' },
-            intent: {, category: 'general', confidence: 0.8 }
+          payload: { query: queryInput,
+            userContext: { sessionId: 'demo' },
+            intent: { category: 'general', confidence: 0.8 }
           }
         })}
     } catch (error) {
@@ -472,4 +472,6 @@ import type { User } from '$lib/types';
     border-radius: 3px}
   .overflow-x-auto::-webkit-scrollbar-thumb:hover { background: #a8a8a8}
 </style>
+
+
 

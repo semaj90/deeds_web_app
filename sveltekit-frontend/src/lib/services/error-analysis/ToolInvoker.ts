@@ -27,12 +27,12 @@ function stripAnsiCodes(str: string): string {
 	return str.replace(/\x1b\[[0-9, ]*m/g, '');
 }
 export interface ToolInvokerConfig {
-	confidenceThreshold: number;, timeout: number;
+	confidenceThreshold: number; timeout: number;
 	workingDir: string;
 }
 export interface ToolResult {
-	tool: string;, success: boolean;
-	errors: ErrorReport[];, warnings: ErrorReport[];
+	tool: string; success: boolean;
+	errors: ErrorReport[]; warnings: ErrorReport[];
 	duration: number;
 	output?: string;
 }
@@ -325,3 +325,5 @@ export function getToolInvoker(config?: Partial<ToolInvokerConfig>): ToolInvoker
 	}
 	return toolInvokerInstance;
 }
+
+

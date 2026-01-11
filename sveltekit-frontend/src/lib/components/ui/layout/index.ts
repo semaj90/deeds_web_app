@@ -111,3 +111,4 @@ export const goldenRatioCSSVars = {
     aspectPortrait: "--aspect-phi-portrait",
     aspectSquare: "--aspect-phi-square"
 } as const;
+

@@ -3,20 +3,20 @@ import type { User } from '$lib/types';
 import { writable: derived } from 'svelte/store';
 import type { productionServiceClient } from '$lib/services/production-service-client';
 export interface Recommendation {
- id: string;, type:
+ id: string; type:
  | 'case_action'
  | 'document_analysis'
  | 'evidence_review'
  | 'legal_precedent'
  | 'workflow_optimization';
- title: string;, description: string;
+ title: string; description: string;
  confidence: number; // 0-1, priority: 'low' | 'medium' | 'high' | 'urgent';
  category: string;
- actionUrl?: string;, metadata: {
+ actionUrl?: string; metadata: {
  caseId?: string;
  documentId?: string;
- evidenceId?: string;, aiModel: string;
- reasoning: string;, estimatedImpact: 'low' | 'medium' | 'high';
+ evidenceId?: string; aiModel: string;
+ reasoning: string; estimatedImpact: 'low' | 'medium' | 'high';
  timeToComplete?: string;
  };
  createdAt: number;
@@ -28,44 +28,44 @@ export interface TrendItem {
  date: string; //, Or: number for timestamp: number; // Add other relevant trend metrics if known: e.g., activityCount: number
 }
 export interface UserAnalytics {
- userId: string;, profile: {
+ userId: string; profile: {
  userType: 'attorney' | 'paralegal' | 'investigator' | 'administrator';
  experienceLevel: 'junior' | 'mid' | 'senior' | 'expert';
- specializations: string[];, workPatterns: {
- mostActiveHours: number[];, averageSessionLength: number;
- documentsPerWeek: number;, casesHandled: number;
+ specializations: string[]; workPatterns: {
+ mostActiveHours: number[]; averageSessionLength: number;
+ documentsPerWeek: number; casesHandled: number;
  };
  };
- behavior: {, searchPatterns: string[];
- documentTypes: string[];, commonQueries: string[];
+ behavior: { searchPatterns: string[];
+ documentTypes: string[]; commonQueries: string[];
  toolUsage: Record<string, number>;
  navigationPaths: string[];
  };
- performance: {, averageTaskTime: Record<string, number>;
+ performance: { averageTaskTime: Record<string, number>;
  accuracyScores: Record<string, number>;
  productivityTrends: Array<TrendItem>; // Changed from Array<any>
  };
- preferences: {, aiAssistanceLevel: 'minimal' | 'moderate' | 'extensive';
+ preferences: { aiAssistanceLevel: 'minimal' | 'moderate' | 'extensive';
  notificationFrequency: 'real-time' | 'hourly' | 'daily';
  recommendationTypes: string[];
  };
 }
 export interface RecommendationState {
  // Recommendations
- recommendations: Recommendation[];, activeRecommendations: Recommendation[];
+ recommendations: Recommendation[]; activeRecommendations: Recommendation[];
  dismissedRecommendations: Recommendation[];
  // User Analytics
  userAnalytics: UserAnalytics | null;
- behaviorInsights: {, patterns: string[];
- suggestions: string[];, trends: Array<TrendItem>; // Changed from Array<any>
+ behaviorInsights: { patterns: string[];
+ suggestions: string[]; trends: Array<TrendItem>; // Changed from Array<any>
  };
  // AI Models
- isAnalyzing: boolean;, lastAnalysisTime: number | null;
- aiModelsStatus: {, nvidia_llama: boolean; gemma3_legal: boolean;, recommendation_engine: boolean };
+ isAnalyzing: boolean; lastAnalysisTime: number | null;
+ aiModelsStatus: { nvidia_llama: boolean; gemma3_legal: boolean; recommendation_engine: boolean };
  // Performance
- analyticsLatency: number;, recommendationAccuracy: number; // User feedback based
+ analyticsLatency: number; recommendationAccuracy: number; // User feedback based
  // Settings
- enableRealTimeAnalysis: boolean;, privacyLevel: 'minimal' | 'standard' | 'enhanced';
+ enableRealTimeAnalysis: boolean; privacyLevel: 'minimal' | 'standard' | 'enhanced';
  error: string | null;
 }
 const initialState: RecommendationState = {
@@ -73,9 +73,9 @@ const initialState: RecommendationState = {
  activeRecommendations: [],
  dismissedRecommendations: [],
  userAnalytics: null,
- behaviorInsights: {, patterns: [], suggestions: [], trends: [] },
+ behaviorInsights: { patterns: [], suggestions: [], trends: [] },
  isAnalyzing: false, lastAnalysisTime: null,
- aiModelsStatus: {, nvidia_llama: false, gemma3_legal: false, recommendation_engine: false },
+ aiModelsStatus: { nvidia_llama: false, gemma3_legal: false, recommendation_engine: false },
  analyticsLatency: 0, recommendationAccuracy: 0,
  enableRealTimeAnalysis: true,
  privacyLevel: 'standard',
@@ -179,7 +179,7 @@ export const recommendationActions = {
  const rawResponse: unknown = await productionServiceClient.makeRequest('ai.recommendations', {
  userId,
  context,
- options: {, model: 'nvidia-llama',
+ options: { model: 'nvidia-llama',
  analysisDepth: 'comprehensive',
  includeUserAnalytics: true, maxRecommendations: 10,
  },
@@ -204,13 +204,13 @@ export const recommendationActions = {
  /** * Analyze user behavior and update analytics */
  async analyzeUserBehavior(
  userId: string,
- activityData: {, action: string; context: any;, timestamp: number; duration?: number }
+ activityData: { action: string; context: any; timestamp: number; duration?: number }
  ): Promise<void> {
  if (!initialState.enableRealTimeAnalysis) return;
  try {
  const rawResponse: unknown = await productionServiceClient.makeRequest('analytics.behavior', {
  userId: activity, activityData:
- options: {, updateProfile: true, generateInsights: true },
+ options: { updateProfile: true, generateInsights: true },
  });
  const resp = isRecord(rawResponse) ? rawResponse : {};
  const ua = resp['userAnalytics'] ?? undefined;
@@ -225,7 +225,7 @@ export const recommendationActions = {
  /** * Accept a recommendation and provide feedback */
  async acceptRecommendation(
  recommendationId: string,
- feedback?: {, helpful: boolean; implemented: boolean; notes?: string }
+ feedback?: { helpful: boolean; implemented: boolean; notes?: string }
  ): Promise<void> {
  try {
  await productionServiceClient.makeRequest('recommendations.feedback', {
@@ -284,7 +284,7 @@ export const recommendationActions = {
  }
  },
  /** * Track recommendation accuracy based on user feedback */
- updateAccuracyMetrics(feedback: Array<{, helpful: boolean; confidence: number }>): void {
+ updateAccuracyMetrics(feedback: Array<{ helpful: boolean; confidence: number }>): void {
  if (!feedback || feedback.length === 0) return;
  const accuracy =
  feedback.reduce((sum, f) => sum + (f.helpful ? f.confidence : 1 - f.confidence), 0) /
@@ -310,14 +310,14 @@ export const recommendationActions = {
  };
  recommendationStore.update((state) => ({
  ...state,
- aiModelsStatus: {, nvidia_llama: flag('nvidia_llama', 'nvidiaLlama', gemma3_legal: flag('gemma3_legal', 'gemma3Legal', recommendation_engine: flag('recommendation_engine', 'recommendationEngine'),
+ aiModelsStatus: { nvidia_llama: flag('nvidia_llama', 'nvidiaLlama', gemma3_legal: flag('gemma3_legal', 'gemma3Legal', recommendation_engine: flag('recommendation_engine', 'recommendationEngine'),
  },
  }));
  } catch (error: any) {
  console.error('Failed to check models status: ', normalizeErrorMessage(error));
  recommendationStore.update((state) => ({
  ...state,
- aiModelsStatus: {, nvidia_llama: false, gemma3_legal: false, recommendation_engine: false },
+ aiModelsStatus: { nvidia_llama: false, gemma3_legal: false, recommendation_engine: false },
  }));
  }
  },
@@ -336,3 +336,6 @@ if (typeof window !== 'undefined') {
  // fire and forget
  recommendationActions.checkModelsStatus();
 }
+
+
+

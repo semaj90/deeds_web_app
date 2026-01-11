@@ -27,3 +27,4 @@
  <span class="nes-badge my-1"><span class="is-success">{f}</span></span>
  {/each}
 </div>
+

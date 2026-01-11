@@ -14,7 +14,7 @@
 		forceMount = false,
 	}: Props = $props();
 
-	const dialogContext = getContext<{ open: boolean;, close: () => void }>('dialog');
+	const dialogContext = getContext<{ open: boolean; close: () => void }>('dialog');
 
 	function handleClick() {
 		dialogContext?.close();
@@ -33,7 +33,7 @@
 	<!-- svelte-ignore a11y_click_events_have_key_events -->
 	<div
 		class="{defaultClass} {className}"
-		transition: fade={{, duration: 150 }}
+		transition: fade={{ duration: 150 }}
 		onclick={ handleClick }
 		onkeydown={ handleKeydown }
 		role="button"
@@ -47,3 +47,6 @@
 		{/if}
 	</div>
 {/if}
+
+
+

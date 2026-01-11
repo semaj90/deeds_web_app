@@ -122,7 +122,7 @@
  }
 
  @keyframes particle {
- 0% { transform: scale(1);, opacity: 1; }
+ 0% { transform: scale(1); opacity: 1; }
  100% { transform: scale(0) translateY(-20px); opacity: 0; }
  }
 
@@ -130,3 +130,5 @@
  animation: particle 0.4s ease-out forwards;
  }
 </style>
+
+

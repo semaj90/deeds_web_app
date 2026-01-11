@@ -23,3 +23,4 @@ export async function closeNeo4jDriver() {
  cachedDriver = null;
  }
 }
+

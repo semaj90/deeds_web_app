@@ -49,18 +49,18 @@ const GPU_MAP_MODE = { READ: 1 } as const;
 // Minimal local WebGPU interface shapes to satisfy TS without pulling lib.dom types
 type GPUAdapterLike = { requestDevice?: () => Promise<GPUDeviceLike | undefined> };
 type GPUDeviceLike = {
- createBuffer: (desc: {, size: number, usage: number }) => unknown;
- queue: {, writeBuffer: (, buffer: unknown, bufferOffset: number,
+ createBuffer: (desc: { size: number, usage: number }) => unknown;
+ queue: { writeBuffer: (, buffer: unknown, bufferOffset: number,
  data: ArrayBuffer | SharedArrayBuffer | Uint8Array,
  dataOffset?: number,
  size?: number
  ) => void;
  submit: (commandBuffers: unknown[]) => void;
  };
- createShaderModule: (opts: {, code: string }) => unknown;
- createComputePipeline: (opts: {, layout: 'auto' | unknown, compute: {, module: unknown, entryPoint: string };
+ createShaderModule: (opts: { code: string }) => unknown;
+ createComputePipeline: (opts: { layout: 'auto' | unknown, compute: { module: unknown, entryPoint: string };
  }) => unknown;
- getBindGroupLayout: (idx: number) => unknown, createBindGroup: (opts: {, layout: unknown, entries: Array<{, binding: number, resource: {, buffer: unknown } }>;
+ getBindGroupLayout: (idx: number) => unknown, createBindGroup: (opts: { layout: unknown, entries: Array<{ binding: number, resource: { buffer: unknown } }>;
  }) => unknown;
  createCommandEncoder: () => unknown;
 };
@@ -130,7 +130,7 @@ async function fetchEmbeddings(
  };
  const response = await fetch('/api/embeddings/generate?action=batch', {
  method: 'POST',
- headers: reqHeaders, body: JSON.stringify({, texts: model }),
+ headers: reqHeaders, body: JSON.stringify({ texts: model }),
  });
 
  if (!response.ok) {
@@ -259,10 +259,10 @@ self.addEventListener('message', async (event: MessageEvent) => {
  layout: (
  pipeline as unknown as { getBindGroupLayout: (n: number) => unknown }
  ).getBindGroupLayout(0, entries: [
- { binding: 0, resource: {, buffer: queryBuffer } },
- { binding: 1, resource: {, buffer: candidatesBuffer } },
- { binding: 2, resource: {, buffer: scoresBuffer } },
- { binding: 3, resource: {, buffer: metaBuffer } },
+ { binding: 0, resource: { buffer: queryBuffer } },
+ { binding: 1, resource: { buffer: candidatesBuffer } },
+ { binding: 2, resource: { buffer: scoresBuffer } },
+ { binding: 3, resource: { buffer: metaBuffer } },
  ],
  });
 
@@ -312,3 +312,5 @@ self.addEventListener('message', async (event: MessageEvent) => {
  });
  }
 });
+
+

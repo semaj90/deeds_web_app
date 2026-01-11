@@ -28,7 +28,7 @@ export async function generateEmbedding(text: string): Promise<number[]> {
         const res = await fetch(`${baseUrl}/api/embeddings`, {
             method: 'POST',
             headers: { 'content-type': 'application/json' },
-            body: JSON.stringify({, model: DEFAULT_EMBED_MODEL,
+            body: JSON.stringify({ model: DEFAULT_EMBED_MODEL,
                 prompt: text,
             }),
             signal: controller.signal,
@@ -44,7 +44,7 @@ export async function generateEmbedding(text: string): Promise<number[]> {
 
         const data = (await res.json()) as OllamaEmbedResponse;
 
-        // Handle both response formats: {, embedding: [...] } or { embeddings: [[...]] }
+        // Handle both response formats: { embedding: [...] } or { embeddings: [[...]] }
         const embedding =
             data.embedding ??
             (Array.isArray(data.embeddings) && data.embeddings.length > 0
@@ -74,3 +74,5 @@ export async function generateEmbedding(text: string): Promise<number[]> {
         throw error;
     }
 }
+
+

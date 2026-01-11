@@ -7,3 +7,4 @@
  <div class="mb-2 text-neon/70">{prompt}</div>
  {@render children?.()}
 </div>
+

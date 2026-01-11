@@ -120,3 +120,4 @@ export const poiService = {
  return data.results || [];
  },
 };
+

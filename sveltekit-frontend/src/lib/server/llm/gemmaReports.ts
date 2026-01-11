@@ -5,8 +5,8 @@ export type ReportTemplate = 'charging_memo' | 'intake_summary';
 const OLLAMA_URL = process.env.OLLAMA_URL ?? 'http://localhost:11434';
 const OLLAMA_MODEL = process.env.OLLAMA_MODEL ?? 'gemma3-legal:latest';
 
-export async function generateReportWithGemma(opts: {, caseTitle: string;
- caseId: string;, template: ReportTemplate;
+export async function generateReportWithGemma(opts: { caseTitle: string;
+ caseId: string; template: ReportTemplate;
  narrative?: string | null;
  who?: string | null;
  what?: string | null;
@@ -14,8 +14,8 @@ export async function generateReportWithGemma(opts: {, caseTitle: string;
  where?: string | null;
  why?: string | null;
  how?: string | null;
- persons: Array<{, fullName: string; role?: string | null; riskLevel?: string | null }>;
- evidence: Array<{, title: string; kind: string }>;
+ persons: Array<{ fullName: string; role?: string | null; riskLevel?: string | null }>;
+ evidence: Array<{ title: string; kind: string }>;
 }): Promise<string> {
  const {
  caseTitle,
@@ -75,7 +75,7 @@ Requirements:
  const res = await fetch(`${OLLAMA_URL}/api/generate`, {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({, model: OLLAMA_MODEL,
+ body: JSON.stringify({ model: OLLAMA_MODEL,
  prompt,
  stream: false
  }),
@@ -88,3 +88,6 @@ Requirements:
  const data = (await res.json()) as { response: string };
  return data.response; // plain HTML-ish text
 }
+
+
+

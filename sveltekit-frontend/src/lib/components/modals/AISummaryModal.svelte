@@ -1,4 +1,4 @@
-﻿<!-- @migration-task Error while migrating Svelte, code: Unexpected, toke
+<!-- @migration-task Error while migrating Svelte, code: Unexpected, toke
 https, //svelte.dev/e/js_parse_error -->
 <script lang="ts">
   import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '$lib/components/ui/dialog';
@@ -110,4 +110,5 @@ https, //svelte.dev/e/js_parse_error -->
   .dialog-header { margin-bottom: 0.75rem}
   .dialog-footer { margin-top: 1rem}
 </style>
+
 

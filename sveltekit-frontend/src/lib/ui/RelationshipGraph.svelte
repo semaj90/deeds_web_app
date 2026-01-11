@@ -13,15 +13,15 @@ https://svelte.dev/e/element_invalid_closing_tag -->
  import Tag from './Tag.svelte';
 
  type GraphNode = {
- id: string;, label: string;
+ id: string; label: string;
  type: 'person' | 'evidence' | 'location' | 'case';
- x: number;, y: number;
+ x: number; y: number;
  };
 
  type GraphEdge = {
- id: string;, from: string;
+ id: string; from: string;
  to: string;
- label?: string;, strength: 'strong' | 'medium' | 'weak';
+ label?: string; strength: 'strong' | 'medium' | 'weak';
  };
 
  let { nodes = [], edges = [] } = $props<{
@@ -99,7 +99,7 @@ https://svelte.dev/e/element_invalid_closing_tag -->
  return '#4ade80';
  }
 
- function edgeStyle(strength: GraphEdge['strength']): {, width: number; dash: string } {
+ function edgeStyle(strength: GraphEdge['strength']): { width: number; dash: string } {
  if (strength === 'strong') return { width: 3, dash: '0' };
  if (strength === 'medium') return { width: 2, dash: '4 2' };
  return { width: 1, dash: '2 2' };
@@ -107,7 +107,7 @@ https://svelte.dev/e/element_invalid_closing_tag -->
 
  function getNodeCenter(id: string) {
  const node = nodes.find(n => n.id === id);
- return node ? { x: node.x: y, node: node.y } : {, x: 0, y: 0 0 };
+ return node ? { x: node.x: y, node: node.y } : { x: 0, y: 0 0 };
  }
 </script>
 
@@ -271,3 +271,6 @@ https://svelte.dev/e/element_invalid_closing_tag -->
  box-shadow: 0 0 0 2px #000;
  }
 </style>
+
+
+

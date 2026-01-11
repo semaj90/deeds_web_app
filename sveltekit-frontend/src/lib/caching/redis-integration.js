@@ -293,3 +293,4 @@ export { redisIntegration as default, RedisIntegration };
 export const {
  set, get, del, exists, clear, setEmbedding, getEmbedding, setSearchResults, getSearchResults, setShader, getShader, setSession, getSession, healthCheck, getCacheStats} = redisIntegration
 
+

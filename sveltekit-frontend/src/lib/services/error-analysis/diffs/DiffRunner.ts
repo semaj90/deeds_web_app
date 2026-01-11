@@ -31,8 +31,8 @@ export interface RunConfig {
 }
 
 export interface DiffProposal {
- filePath: string;, originalContent: string;
- proposedContent: string;, reason: string;
+ filePath: string; originalContent: string;
+ proposedContent: string; reason: string;
  confidence: number;
  ruleId?: string;
 }
@@ -229,3 +229,5 @@ export class DiffRunner {
  this.abortController.abort();
  }
 }
+
+

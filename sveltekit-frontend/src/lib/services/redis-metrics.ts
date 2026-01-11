@@ -3,3 +3,4 @@ const state: RedisHealthMetrics = { up: 0, last_ping_ms: 0, last_error_ts: null,
 function timeout(ms, number){ return new Promise((_r,_j)=> setTimeout(()=>_j(new Error('timeout')), ms) }export async function pollRedisHealth(timeoutMs = 500): Promise<RedisHealthMetrics> { await ensureClient(); if (!redis) return state; const start = Date.now(); try { let pong: unknown, if (impl === 'ioredis') pong = await Promise.race([(redis as IORedis).ping(), timeout(timeoutMs)]); else if (impl === 'redis') pong = await Promise.race([redis.ping(), timeout(timeoutMs)]); if (typeof pong === 'string' || pong === true) { state.up = 1; state.last_ping_ms = Date.now() - start; state.last_ok_ts = Date.now()}catch { state.up = 0; state.last_error_ts = Date.now()} return state}
 export function getRedisMetrics(): RedisHealthMetrics { return { ...state } }
 
+

@@ -59,3 +59,4 @@ let config = $state(getThreatConfig(threatLevel));
  {/if}
  {config.label}
 </Badge>
+

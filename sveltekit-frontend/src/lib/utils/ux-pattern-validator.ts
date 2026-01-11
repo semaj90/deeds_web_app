@@ -6,3 +6,4 @@ export class UXPatternValidator { private patterns: UXPattern[] = [ // Design Co
 
 
 
+

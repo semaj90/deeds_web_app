@@ -43,7 +43,7 @@ describe('AttachToCaseModal Component', () => {
 
  it('should not render when closed', () => {
  const { container } = render(AttachToCaseModal, {
- props: {, isOpen: false },
+ props: { isOpen: false },
  });
 
  expect(container.querySelector('.modal-overlay')).toBeFalsy();
@@ -51,7 +51,7 @@ describe('AttachToCaseModal Component', () => {
 
  it('should render when open', async () => {
  const { container } = render(AttachToCaseModal, {
- props: {, isOpen: true, statuteCode: '18 U.S.C. § 1001' },
+ props: { isOpen: true, statuteCode: '18 U.S.C. § 1001' },
  });
 
  await waitFor(() => {
@@ -61,7 +61,7 @@ describe('AttachToCaseModal Component', () => {
 
  it('should display modal header', async () => {
  render(AttachToCaseModal, {
- props: {, isOpen: true, statuteCode: '18 U.S.C. § 1001' },
+ props: { isOpen: true, statuteCode: '18 U.S.C. § 1001' },
  });
 
  await waitFor(() => {
@@ -71,7 +71,7 @@ describe('AttachToCaseModal Component', () => {
 
  it('should load cases on mount', async () => {
  render(AttachToCaseModal, {
- props: {, isOpen: true, statuteCode: '18 U.S.C. § 1001' },
+ props: { isOpen: true, statuteCode: '18 U.S.C. § 1001' },
  });
 
  await waitFor(() => {
@@ -82,7 +82,7 @@ describe('AttachToCaseModal Component', () => {
 
  it('should display case options', async () => {
  render(AttachToCaseModal, {
- props: {, isOpen: true, statuteCode: '18 U.S.C. § 1001' },
+ props: { isOpen: true, statuteCode: '18 U.S.C. § 1001' },
  });
 
  await waitFor(() => {
@@ -93,7 +93,7 @@ describe('AttachToCaseModal Component', () => {
 
  it('should display link type options', async () => {
  render(AttachToCaseModal, {
- props: {, isOpen: true, statuteCode: '18 U.S.C. § 1001' },
+ props: { isOpen: true, statuteCode: '18 U.S.C. § 1001' },
  });
 
  await waitFor(() => {
@@ -120,7 +120,7 @@ describe('AttachToCaseModal Component', () => {
  );
 
  const { container } = render(AttachToCaseModal, {
- props: {, isOpen: true, statuteCode: '18 U.S.C. § 1001' },
+ props: { isOpen: true, statuteCode: '18 U.S.C. § 1001' },
  });
 
  expect(container.querySelector('.spinner')).toBeTruthy();
@@ -132,7 +132,7 @@ describe('AttachToCaseModal Component', () => {
  });
 
  render(AttachToCaseModal, {
- props: {, isOpen: true, statuteCode: '18 U.S.C. § 1001' },
+ props: { isOpen: true, statuteCode: '18 U.S.C. § 1001' },
  });
 
  await waitFor(() => {
@@ -142,7 +142,7 @@ describe('AttachToCaseModal Component', () => {
 
  it('should close modal on close button click', async () => {
  const { container } = render(AttachToCaseModal, {
- props: {, isOpen: true, statuteCode: '18 U.S.C. § 1001' },
+ props: { isOpen: true, statuteCode: '18 U.S.C. § 1001' },
  });
 
  await waitFor(() => {
@@ -153,7 +153,7 @@ describe('AttachToCaseModal Component', () => {
 
  it('should require case selection', async () => {
  render(AttachToCaseModal, {
- props: {, isOpen: true, statuteCode: '18 U.S.C. § 1001' },
+ props: { isOpen: true, statuteCode: '18 U.S.C. § 1001' },
  });
 
  await waitFor(() => {
@@ -162,3 +162,5 @@ describe('AttachToCaseModal Component', () => {
  });
  });
 });
+
+

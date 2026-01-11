@@ -4,7 +4,7 @@ import type { evidence } from "../db";
 
 interface CaseData {
  id: string, title: string;
- description?: string;, createdAt: Date, updatedAt: Date;
+ description?: string; createdAt: Date, updatedAt: Date;
 }
 
 interface PacketData {
@@ -153,3 +153,5 @@ export async function generateLegalPacketPDF(data: PacketData): Promise<Uint8Arr
  const pdfBytes = await pdfDoc.save();
  return pdfBytes;
 }
+
+

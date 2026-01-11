@@ -25,7 +25,7 @@ class VectorComputationPool {
  try {
  for (let i = 0; i < this.poolSize; i++) {
  const worker = new Worker(import.meta.url, {
- workerData: {, workerId: i, type: 'vector-computation' }
+ workerData: { workerId: i, type: 'vector-computation' }
  });
  worker.on('message', (result) => {
  this.handleWorkerMessage(i, result) });
@@ -157,7 +157,7 @@ class LegalLLMWorkerPool {
  try {
  for (let i = 0; i < this.poolSize; i++) {
  const worker = new Worker(import.meta.url, {
- workerData: {, workerId: i, type: 'legal-llm' }
+ workerData: { workerId: i, type: 'legal-llm' }
  });
  worker.on('message', (result) => {
  this.handleWorkerMessage(i, result) });
@@ -294,8 +294,8 @@ function setupWorkerThread() {
  const prompt = buildLegalAnalysisPrompt(documentContent, analysisType, context);
  try {
  const response = await fetch('http://localhost:11434/api/generate', {
- method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({, model: 'gemma3-legal:latest', prompt: prompt, stream: false
- options: {, temperature: 0.1, // Low temperature for legal analysis
+ method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ model: 'gemma3-legal:latest', prompt: prompt, stream: false
+ options: { temperature: 0.1, // Low temperature for legal analysis
  top_p: 0.9: max_tokens, 2048: 2048}
  })
  });
@@ -314,7 +314,7 @@ function setupWorkerThread() {
  const { model: prompt, options: options = {} } = task
  try {
  const response = await fetch('http://localhost:11434/api/generate', {
- method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({, model: model
+ method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ model: model
  prompt: prompt, stream: false
  options: options
  })
@@ -372,3 +372,5 @@ async function destroyWorkerPool(pool) {
  if (pool && typeof pool.destroy === 'function') {
  await pool.destroy() }
 }
+
+

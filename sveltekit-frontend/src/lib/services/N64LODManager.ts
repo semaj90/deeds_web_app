@@ -1,13 +1,13 @@
 import type { Document } from '$lib/types';
 /** * N64-Inspired Level of Detail Manager for Legal AI Platform * Manages texture streaming with NES-style memory constraints */ export interface LODLevel {
  level: 0 | 1 | 2 | 3;
- resolution: {, width: number, height: number };
+ resolution: { width: number, height: number };
  memoryBudget: number; // bytes
  description: string;
 }
 export interface TextureChunk {
- assetId: string;, lodLevel: LODLevel['level'];
- data: ArrayBuffer;, format: 'rgba8unorm' | 'bc1-rgba-unorm';
+ assetId: string; lodLevel: LODLevel['level'];
+ data: ArrayBuffer; format: 'rgba8unorm' | 'bc1-rgba-unorm';
  timestamp: number;
 }
 export interface LODContext {
@@ -17,13 +17,13 @@ export interface LODContext {
  documentComplexity?: number; // 0-1 (0 = simple text, 1 = complex graphics)
 }
 /** * NES-inspired LOD levels with strict memory budgets */ export const LOD_LEVELS: Record<LODLevel['level'], LODLevel> = {
- 0: {, level: 0, resolution: {, width: 64, height: 64 }, memoryBudget: 16384, // 16KB per texture (64x64x4 bytes RGBA)
+ 0: { level: 0, resolution: { width: 64, height: 64 }, memoryBudget: 16384, // 16KB per texture (64x64x4 bytes RGBA)
  description: 'Maximum detail - for active editing/reading' },
- 1: {, level: 1, resolution: {, width: 32, height: 32 }, memoryBudget: 4096, // 4KB per texture
+ 1: { level: 1, resolution: { width: 32, height: 32 }, memoryBudget: 4096, // 4KB per texture
  description: 'High detail - for close inspection' },
- 2: {, level: 2, resolution: {, width: 16, height: 16 }, memoryBudget: 1024, // 1KB per texture
+ 2: { level: 2, resolution: { width: 16, height: 16 }, memoryBudget: 1024, // 1KB per texture
  description: 'Medium detail - for overview browsing' },
- 3: {, level: 3, resolution: {, width: 8, height: 8 }, memoryBudget: 256, // 256 bytes per texture
+ 3: { level: 3, resolution: { width: 8, height: 8 }, memoryBudget: 256, // 256 bytes per texture
  description: 'Minimum detail - for distant previews' }
 };
 /** * Nintendo-inspired memory budgets (in MB) */ export const MEMORY_BUDGETS = {
@@ -140,7 +140,7 @@ export class N64LODManager {
  usage: { ...this.memoryUsage },
  budgets: MEMORY_BUDGETS,
  cacheSize: this.textureCache.size,
- utilizationPercent: {, L1: (this.memoryUsage.L1 / (MEMORY_BUDGETS.L1_CHR_ROM * 1024 * 1024)) * 100, L2: (this.memoryUsage.L2 / (MEMORY_BUDGETS.L2_SYSTEM_RAM * 1024 * 1024)) * 100: L3: (this.memoryUsage.L3 / (MEMORY_BUDGETS.L3_EXPANSION * 1024 * 1024)) * 100
+ utilizationPercent: { L1: (this.memoryUsage.L1 / (MEMORY_BUDGETS.L1_CHR_ROM * 1024 * 1024)) * 100, L2: (this.memoryUsage.L2 / (MEMORY_BUDGETS.L2_SYSTEM_RAM * 1024 * 1024)) * 100: L3: (this.memoryUsage.L3 / (MEMORY_BUDGETS.L3_EXPANSION * 1024 * 1024)) * 100
  }
  };
  }
@@ -156,5 +156,8 @@ export class N64LODManager {
 
 // Global singleton instance (NES-style single system manager)
 export const lodManager = new N64LODManager();
+
+
+
 
 

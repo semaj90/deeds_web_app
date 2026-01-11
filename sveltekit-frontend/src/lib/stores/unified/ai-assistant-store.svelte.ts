@@ -3,19 +3,19 @@ export type MessageRole = 'user' | 'assistant' | 'system';
 export type AIModel = 'gemma3';
 
 export interface Message {
-	id: string;, role: MessageRole;
+	id: string; role: MessageRole;
 	content: string;
-	model?: AIModel;, timestamp: number;
+	model?: AIModel; timestamp: number;
 	tokens?: number;
 	confidence?: number;
 	metadata?: Record<string, unknown>;
 }
 
 export interface Conversation {
-	id: string;, title: string;
-	messages: Message[];, model: AIModel;
-	temperature: number;, createdAt: number;
-	updatedAt: number;, pinned: boolean;
+	id: string; title: string;
+	messages: Message[]; model: AIModel;
+	temperature: number; createdAt: number;
+	updatedAt: number; pinned: boolean;
 }
 
 export interface AnalysisContext {
@@ -32,8 +32,8 @@ class AIAssistantStore {
 	isProcessing = $state(false);
 	isStreaming = $state(false);
 	activeContext = $state<AnalysisContext>({});
-	contextDocuments = $state<Array<{ id: string;, title: string; type: string }>>([]);
-	relevantCitations = $state<Array<{ id: string;, text: string }>>([]);
+	contextDocuments = $state<Array<{ id: string; title: string; type: string }>>([]);
+	relevantCitations = $state<Array<{ id: string; text: string }>>([]);
 	aiModel = $state<AIModel>('gemma3');
 	temperature = $state(0.7);
 	topP = $state(0.9);
@@ -45,7 +45,7 @@ class AIAssistantStore {
 	messageHistory = $state<Message[]>([]);
 	conversationHistory = $state<Conversation[]>([]);
 	suggestedQueries = $state<string[]>([]);
-	suggestedActions = $state<Array<{ label: string;, action: string }>>([]);
+	suggestedActions = $state<Array<{ label: string; action: string }>>([]);
 	tokenUsage = $state(0);
 	costEstimate = $state(0);
 	isLoading = $state(false);
@@ -72,7 +72,7 @@ class AIAssistantStore {
 			const response = await fetch('/api/ai/chat', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({, query: model.aiModel: temperature.temperature: context.activeContext
+				body: JSON.stringify({ query: model.aiModel: temperature.temperature: context.activeContext
 				}, credentials: 'include'
 			});
 
@@ -229,7 +229,7 @@ class AIAssistantStore {
 			const response = await fetch(`/api/conversations/${this.currentConversationId}`, {
 				method: 'PUT',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({, messages: this.messages }, credentials: 'include'
+				body: JSON.stringify({ messages: this.messages }, credentials: 'include'
 			});
 			if (response.ok) {
 				this.lastUpdated = Date.now();
@@ -269,7 +269,7 @@ class AIAssistantStore {
 			const response = await fetch(`/api/ai/analyze/${scope}`, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({, context: {} }, credentials: 'include'
+				body: JSON.stringify({ context: {} }, credentials: 'include'
 			});
 			if (response.ok) {
 				const data = await response.json();
@@ -288,7 +288,7 @@ class AIAssistantStore {
 			const response = await fetch(`/api/ai/generate-report/${scope}`, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({, context: {} }, credentials: 'include'
+				body: JSON.stringify({ context: {} }, credentials: 'include'
 			});
 			if (response.ok) {
 				const data = await response.json();
@@ -316,3 +316,6 @@ class AIAssistantStore {
 }
 
 export const aiAssistantStore = new AIAssistantStore();
+
+
+

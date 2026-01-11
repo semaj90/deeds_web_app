@@ -11,11 +11,11 @@ interface MockVisualRecognition {
 }
 
 interface MockIamAuthenticator {
- new (config: {, apikey: string }): any;
+ new (config: { apikey: string }): any;
 }
 
 export interface IBMVisionResult {
- text: string;, confidence: number;
+ text: string; confidence: number;
  language?: string;
  entities?: {
  persons?: string[];
@@ -23,19 +23,19 @@ export interface IBMVisionResult {
  locations?: string[];
  dates?: string[];
  };
- classifications?: Array<{, class: string;
+ classifications?: Array<{ class: string;
  confidence: number;
  }>;
- faces?: Array<{, bbox: number[];
- age?: {, min: number; max: number };
+ faces?: Array<{ bbox: number[];
+ age?: { min: number; max: number };
  gender?: string;
  emotions?: Record<string, number>;
  }>;
- processingTime: number;, method: 'ibm-vision';
+ processingTime: number; method: 'ibm-vision';
 }
 
 export interface IBMVisionConfig {
- apiKey: string;, serviceUrl: string;
+ apiKey: string; serviceUrl: string;
  version?: string;
 }
 
@@ -90,18 +90,18 @@ export class IBMVisionService {
  /**
  * Extract text using IBM's OCR
  */
- private async extractText(imageBase64: string): Promise<{, text: string;
+ private async extractText(imageBase64: string): Promise<{ text: string;
  confidence: number;
  language?: string;
  entities?: any;
  }> {
  const params = {
- images_file: {, value: Buffer.from(imageBase64, 'base64'),
- options: {, filename: 'image.jpg',
+ images_file: { value: Buffer.from(imageBase64, 'base64'),
+ options: { filename: 'image.jpg',
  contentType: 'image/jpeg',
  },
  },
- features: {, text: {},
+ features: { text: {},
  },
  };
 
@@ -124,10 +124,10 @@ export class IBMVisionService {
  */
  private async classifyImage(
  imageBase64: string
- ): Promise<Array<{, class: string; confidence: number }>> {
+ ): Promise<Array<{ class: string; confidence: number }>> {
  const params = {
- images_file: {, value: Buffer.from(imageBase64, 'base64'),
- options: {, filename: 'image.jpg',
+ images_file: { value: Buffer.from(imageBase64, 'base64'),
+ options: { filename: 'image.jpg',
  contentType: 'image/jpeg',
  },
  },
@@ -153,18 +153,18 @@ export class IBMVisionService {
  private async detectFaces(imageBase64: string): Promise<
  Array<{
  bbox: number[];
- age?: {, min: number; max: number };
+ age?: { min: number; max: number };
  gender?: string;
  emotions?: Record<string, number>;
  }>
  > {
  const params = {
- images_file: {, value: Buffer.from(imageBase64, 'base64'),
- options: {, filename: 'image.jpg',
+ images_file: { value: Buffer.from(imageBase64, 'base64'),
+ options: { filename: 'image.jpg',
  contentType: 'image/jpeg',
  },
  },
- features: {, faces: {},
+ features: { faces: {},
  },
  };
 
@@ -193,3 +193,6 @@ export function createIBMVisionService(config: IBMVisionConfig): IBMVisionServic
 export function isIBMVisionConfigured(): boolean {
  return !!(process.env.IBM_VISION_API_KEY && process.env.IBM_VISION_SERVICE_URL);
 }
+
+
+

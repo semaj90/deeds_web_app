@@ -198,3 +198,4 @@ export type ShaderCompilationQueue = typeof shaderCompilationQueue.$inferSelect;
 export type InsertShaderCompilationQueue = typeof shaderCompilationQueue.$inferInsert;
 export type ShaderRecommendation = typeof shaderRecommendationsView.$inferSelect;
 export type InsertShaderRecommendation = typeof shaderRecommendationsView.$inferInsert;
+

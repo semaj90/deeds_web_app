@@ -8,3 +8,4 @@ finally { // Close the connection pool/shim if available try { if (pool && typeo
 runMigrations().catch(err => { console.error('âŒ failed: ', err); process.exit(1)};
 
 
+

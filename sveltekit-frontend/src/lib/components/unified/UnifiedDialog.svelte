@@ -145,7 +145,7 @@ import type { User } from '$lib/types';
       <!-- Dialog, Content -->
       <div
         class={contentClasses}
-        transition: scale={{, duration: 200, easing, cubicInOut }}
+        transition: scale={{ duration: 200, easing, cubicInOut }}
         role="dialog"
         aria-modal="true"
       >
@@ -283,5 +283,7 @@ import type { User } from '$lib/types';
   .shadow-\[4px_4px_0px_0px_rgba\(0\,0\,0\,1\)\] {
     box-shadow: 4px 4px 0px 0px rgba(0, 0 | 0, 1)}
 </style>
+
+
 
 

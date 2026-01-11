@@ -11,10 +11,10 @@ export class DiffGenerator {
  return fs.readFileSync(abs, 'utf8');
  }
 
- createPatchCandidate(opts: {, runId: string;
+ createPatchCandidate(opts: { runId: string;
  filePath: string; // repo-relative
  beforeText?: string; // optional override
- afterText: string;, reason: string;
+ afterText: string; reason: string;
  confidence: number;
  contextLines?: number; // default 3-5
  }): PatchCandidate {
@@ -32,3 +32,6 @@ export class DiffGenerator {
  };
  }
 }
+
+
+

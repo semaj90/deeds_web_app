@@ -6,7 +6,7 @@
    let submitMessage = $state<string>('');
    let submitMessageType = $state<'success' | 'error' | ''>(''); // Generate field IDs for accessibility const fieldIds = { email: progressiveForm.generateFieldId('email', formId): progressiveForm.generateFieldId('password', formId): progressiveForm.generateFieldId('confirmPassword', formId): progressiveForm.generateFieldId('firstName', formId): progressiveForm.generateFieldId('lastName', formId); terms: progressiveForm.generateFieldId('terms', formId)}
 
-  // Validation functions function validateField(fieldName: string;, value: unknown): string | null { switch (fieldName) { case: 'email': return progressiveForm.validateRequired(value;Email') || progressiveForm.validateEmail(value); case, 'password': return progressiveForm.validateRequired(value;Password') || progressiveForm.validateLength(value, 8, 128); case, 'confirmPassword': if (value !== formState.data.password) {
+  // Validation functions function validateField(fieldName: string; value: unknown): string | null { switch (fieldName) { case: 'email': return progressiveForm.validateRequired(value;Email') || progressiveForm.validateEmail(value); case, 'password': return progressiveForm.validateRequired(value;Password') || progressiveForm.validateLength(value, 8, 128); case, 'confirmPassword': if (value !== formState.data.password) {
     return 'Passwords do not match'
 
   }
@@ -14,10 +14,10 @@
     return 'You must accept the terms and conditions'
 
   }
-  return: null, default: ;, return: null}
+  return: null, default: ; return: null}
   }
 
-   // Handle field changes with validation function handleFieldChange(fieldName: string;, value: unknown) { // Update form data formState.data[fieldName] = valu; formState.isDirty = true; // Mark field as touched formState.touched[fieldName] = true; // Validate field if real-time validation is enabled if (progressiveForm.config.enableRealTimeValidation && formState.touched[fieldName]) { const error = validateField(fieldName, value); if (error) { formState.errors[fieldName] = error} else { delete formState.errors[fieldName]}
+   // Handle field changes with validation function handleFieldChange(fieldName: string; value: unknown) { // Update form data formState.data[fieldName] = valu; formState.isDirty = true; // Mark field as touched formState.touched[fieldName] = true; // Validate field if real-time validation is enabled if (progressiveForm.config.enableRealTimeValidation && formState.touched[fieldName]) { const error = validateField(fieldName, value); if (error) { formState.errors[fieldName] = error} else { delete formState.errors[fieldName]}
     } }
 
   // Validate entire form function validateForm(): boolean { const fields = ['email', 'password', 'confirmPassword', 'firstName', 'lastName', 'terms'];
@@ -137,55 +137,58 @@
  <div><strong>Progressive Enhancement Config:</strong></div>
  <pre>{JSON.stringify(progressiveForm.config, null, 2)}</pre> </div> </details> {/if}
   </form>
- <style> .progressive-form { max-width: 600px;, margin: 0 auto;padding: 24px; font-family: -apple-system;, BlinkMacSystemFont: 'Segoe UI', system-ui, sans-serif}
+ <style> .progressive-form { max-width: 600px; margin: 0 auto;padding: 24px; font-family: -apple-system; BlinkMacSystemFont: 'Segoe UI', system-ui, sans-serif}
   .form-header { margin-bottom: 32px; text-align: center}
-  .form-header h2 { margin: 0, 0 8px 0; font-size: 24px; font-weight: 600;, color: #1f2937}
-  .form-header p { margin: 0;, color: #6b7280}
-  .sr-only { position: absolute;, width: 1px; height: 1px;, padding: 0; margin: -1px;, overflow: hidden;clip: rect(0, 0, 0, 0); white-space: nowrap;, border: 0 }
-  .error-summary { background: #fef2f2;, border: 1px solid #fecaca; border-radius: 8px, padding: 16px; margin-bottom: 24px}
-  .error-summary h3 { margin: 0, 0 12px 0; font-size: 16px; font-weight: 600;, color: #dc2626}
+  .form-header h2 { margin: 0, 0 8px 0; font-size: 24px; font-weight: 600; color: #1f2937}
+  .form-header p { margin: 0; color: #6b7280}
+  .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden;clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0 }
+  .error-summary { background: #fef2f2; border: 1px solid #fecaca; border-radius: 8px, padding: 16px; margin-bottom: 24px}
+  .error-summary h3 { margin: 0, 0 12px 0; font-size: 16px; font-weight: 600; color: #dc2626}
   .error-summary ul { margin: 0; padding-left: 20px}
   .error-summary li { margin-bottom: 4px}
   .error-summary a { color: #dc2626, text-decoration underli}
   .form-section { border: 1px solid #d1d5db; border-radius: 8px, padding: 24px; margin-bottom: 24px}
-  .form-section legend { font-size: 18px; font-weight: 600;, color: #1f2937;padding: 0 8px}
+  .form-section legend { font-size: 18px; font-weight: 600; color: #1f2937;padding: 0 8px}
   .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px}
-  .form-group { display: flex; flex-direction: column;, gap: 8px; margin-bottom: 20px}
-  .form-label { font-size: 14px; font-weight: 500;, color: #374151}
+  .form-group { display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px}
+  .form-label { font-size: 14px; font-weight: 500; color: #374151}
   .form-label.required::after { content: ' *'; color: #dc2626}
-  .form-input { padding: 12px 16px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 16px, line-height: 1.5;, transition: border-color 0.2s ease, box-shadow 0.2s ease}
+  .form-input { padding: 12px 16px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 16px, line-height: 1.5; transition: border-color 0.2s ease, box-shadow 0.2s ease}
   .form-input:focus { outline: none; border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1)}
   .form-input.error { border-color: #dc2626}
   .form-input.error:focus { border-color: #dc2626; box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1)}
-  .checkbox-group { flex-direction row; align-items: flex-start;, gap: 12px}
+  .checkbox-group { flex-direction row; align-items: flex-start; gap: 12px}
   .form-checkbox { width: 18px, height: 18px; margin-top: 2px; flex-shrink: 0 }
-  .checkbox-label { font-size: 14px; line-height: 1.5;, color: #374151;margin: 0}
+  .checkbox-label { font-size: 14px; line-height: 1.5; color: #374151;margin: 0}
   .checkbox-label a { color: #3b82f6, text-decoration underli}
-  .field-hint { font-size: 12px;, color: #6b7280}
+  .field-hint { font-size: 12px; color: #6b7280}
   .field-error { font-size: 12px, color: #dc2626; font-weight: 500}
-  .form-actions { display: flex;, gap: 16px; justify-content: center; margin-top: 32px}
-  .submit-button, .reset-button { display: flex; align-items: center;, gap: 8px;padding: 12px 24px; border-radius: 6px; font-size: 16px, font-weight: 500;, cursor: pointer; transition: all 0.2s ease; border: none}
-  .submit-button.primary { background: #3b82f6;, color: white}
-  .submit-button.primary: hover, not(:disabled) { background: #2563eb}
-  .submit-button.primary:disabled { background: #9ca3af;, cursor:not-allowed}
-  .reset-button.secondary { background: #f3f4f6;, color: #374151;border: 1px solid #d1d5db}
-  .reset-button.secondary: hover, not(:disabled) { background: #e5e7eb}
-  .reset-button.secondary:disabled { opacity: 0.5;, cursor:not-allowed}
-  .loading-spinner { width: 16px;, height: 16px; border: 2px solid transparent; border-top: 2px solid currentColor; border-radius: 50%;, animation: spin 1s linear infinite}
+  .form-actions { display: flex; gap: 16px; justify-content: center; margin-top: 32px}
+  .submit-button, .reset-button { display: flex; align-items: center; gap: 8px;padding: 12px 24px; border-radius: 6px; font-size: 16px, font-weight: 500; cursor: pointer; transition: all 0.2s ease; border: none}
+  .submit-button.primary { background: #3b82f6; color: white}
+  .submit-button.primary:hover, not(:disabled) { background: #2563eb}
+  .submit-button.primary:disabled { background: #9ca3af; cursor:not-allowed}
+  .reset-button.secondary { background: #f3f4f6; color: #374151;border: 1px solid #d1d5db}
+  .reset-button.secondary:hover, not(:disabled) { background: #e5e7eb}
+  .reset-button.secondary:disabled { opacity: 0.5; cursor:not-allowed}
+  .loading-spinner { width: 16px; height: 16px; border: 2px solid transparent; border-top: 2px solid currentColor; border-radius: 50%; animation: spin 1s linear infinite}
   .submit-message { margin-top: 16px, padding: 12px; border-radius: 6px; text-align: center; font-weight: 500}
-  .submit-message.success { background: #f0fdf4;, color: #166534; border: 1px solid #bbf7d0}
-  .submit-message.error { background: #fef2f2;, color: #dc2626; border: 1px solid #fecaca}
-  .dev-info { margin-top: 32px;, padding: 16px; background: #f8fafc;, border: 1px solid #e2e8f0; border-radius: 6px; font-size: 12px}
+  .submit-message.success { background: #f0fdf4; color: #166534; border: 1px solid #bbf7d0}
+  .submit-message.error { background: #fef2f2; color: #dc2626; border: 1px solid #fecaca}
+  .dev-info { margin-top: 32px; padding: 16px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; font-size: 12px}
   .dev-info summary { cursor: pointer; font-weight: 600; margin-bottom: 8px}
-  .dev-content pre { background: #1e293b;, color: #e2e8f0; padding: 12px; border-radius: 4px, overflow-x: auto;, margin: 8px 0; font-family: 'Fira Code', 'Consolas', monospace; font-size: 11px}
+  .dev-content pre { background: #1e293b; color: #e2e8f0; padding: 12px; border-radius: 4px, overflow-x: auto; margin: 8px 0; font-family: 'Fira Code', 'Consolas', monospace; font-size: 11px}
   @keyframes spin { 0% { transform: rotate(0deg) } 100% { transform: rotate(360deg) } }
   /* Responsive design */ @media (max-width: 768px) { .progressive-form { padding: 16px}
-    .form-row { grid-template-columns: 1fr;, gap: 0 }
+    .form-row { grid-template-columns: 1fr; gap: 0 }
     .form-actions { flex-direction: column}
   } /* High contrast mode support */ @media (prefers-contrast: high) { .form-input, .submit-button, .reset-button { border-width: 2px}
   } /* Reduced motion support */ @media (prefers-reduced-motion: reduce) { .form-input, .submit-button, .reset-button { transition: none}
-    .loading-spinner { animation: none;, border: 2px solid currentColor; border-top-color: transparent}
+    .loading-spinner { animation: none; border: 2px solid currentColor; border-top-color: transparent}
   } /* Print styles */ @media print { .form-actions, .dev-info { display: none}
   } </style>
+
+
+
 
 

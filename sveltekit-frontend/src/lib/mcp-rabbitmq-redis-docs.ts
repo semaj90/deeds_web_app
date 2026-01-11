@@ -26,3 +26,4 @@ export async function getNodeRedisTransactions(
  return getNodeRedisDocs('transactions', fetchFn);
 }
 // Quick access to get all Redis documentation export async function getAllRedisDocs(fetchFn?: typeof fetch): Promise<any> { const [ioredis, nodeRedis, patterns] = await Promise.all([ getRedisDocs(undefined, fetchFn), getNodeRedisDocs(undefined, fetchFn), getMessageQueueRedisBestPractices(fetchFn)]); return { ioredis, nodeRedis, patterns }}
+

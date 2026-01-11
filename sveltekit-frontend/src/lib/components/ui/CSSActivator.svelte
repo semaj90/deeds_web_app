@@ -6,7 +6,7 @@
 
 <!-- Hidden showcase that activates all, CSS, selectors -->
 <div
-  style="position: absolute, left: -9999px, top: -9999px;, visibility: hidden, pointer-events, none;"
+  style="position: absolute, left: -9999px, top: -9999px; visibility: hidden, pointer-events, none;"
   aria-hidden="true"
 >
   <NESElementsShowcase visible={true} />
@@ -236,3 +236,5 @@
     height: 1px !important
    ;overflow: hidden !important}
 </style>
+
+

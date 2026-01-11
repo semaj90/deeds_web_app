@@ -12,11 +12,11 @@ import type { LegalEntity } from '$lib/types/sharedTypes';
 import * as crypto from 'crypto';
 
 // Reusing types from previous context where appropriate
-type QdrantCollectionsResponse = { collections?: Array<{, name: string }> };
+type QdrantCollectionsResponse = { collections?: Array<{ name: string }> };
 
 type QdrantFilterClause = {
 	key: string;
-	match?: {, value: string | number };
+	match?: { value: string | number };
 	range?: { gte?: number; lte?: number };
 };
 
@@ -107,7 +107,7 @@ export class QdrantVectorStore {
 						size,
 						distance: 'Cosine'
 					},
-					optimizers_config: {, default_segment_number: 2 },
+					optimizers_config: { default_segment_number: 2 },
 					replication_factor: 1
 				});
 				console.log(`✓ Created Qdrant collection: ${collectionName}`);
@@ -144,7 +144,7 @@ export class QdrantVectorStore {
 
 		await this.client.upsert(COLLECTIONS.CONVERSATIONS, {
 			wait: true,
-			points: [{, id: pointId, vector: embedding, payload }]
+			points: [{ id: pointId, vector: embedding, payload }]
 		});
 
 		return pointId;
@@ -177,7 +177,7 @@ export class QdrantVectorStore {
 
 		await this.client.upsert(COLLECTIONS.ENTITIES, {
 			wait: true,
-			points: [{, id: pointId, vector: embedding, payload }]
+			points: [{ id: pointId, vector: embedding, payload }]
 		});
 
 		return pointId;
@@ -209,7 +209,7 @@ export class QdrantVectorStore {
 
 		await this.client.upsert(COLLECTIONS.SUMMARIES, {
 			wait: true,
-			points: [{, id: pointId, vector: embedding, payload }]
+			points: [{ id: pointId, vector: embedding, payload }]
 		});
 
 		return pointId;
@@ -234,10 +234,10 @@ export class QdrantVectorStore {
 		await this.ensureInitialized();
 
 		const must: QdrantFilterClause[] = [];
-		if (filter?.sessionId) must.push({ key: 'sessionId', match: {, value: filter.sessionId } });
-		if (filter?.intent) must.push({ key: 'intent', match: {, value: filter.intent } });
+		if (filter?.sessionId) must.push({ key: 'sessionId', match: { value: filter.sessionId } });
+		if (filter?.intent) must.push({ key: 'intent', match: { value: filter.intent } });
 		if (filter?.minConfidence !== undefined)
-			must.push({ key: 'confidence', range: {, gte: filter.minConfidence } });
+			must.push({ key: 'confidence', range: { gte: filter.minConfidence } });
 
 		const qdrantFilter: QdrantFilter = must.length > 0 ? { must } : undefined;
 
@@ -278,7 +278,7 @@ export class QdrantVectorStore {
 	> {
 		await this.ensureInitialized();
 		const filter = entityType
-			? { must: [{, key: 'entityType', match: {, value: entityType } }] }
+			? { must: [{ key: 'entityType', match: { value: entityType } }] }
 			: undefined;
 
 		const searchResult = (await this.client.search(COLLECTIONS.ENTITIES, {
@@ -338,7 +338,7 @@ export class QdrantVectorStore {
 		await this.ensureInitialized();
 
 		const scrollResult = (await this.client.scroll(COLLECTIONS.ENTITIES, {
-			filter: {, must: [{ key: 'entityType', match: {, value: entityType } }] },
+			filter: { must: [{ key: 'entityType', match: { value: entityType } }] },
 			limit: 1000,
 			with_payload: true
 		})) as { points: { payload?: EntityPayload }[] };
@@ -355,8 +355,8 @@ export class QdrantVectorStore {
 			counts.set(val, existing);
 		}
 
-		const clusters: Array<{, centroid: string;
-			members: Array<{, entityValue: string; confidence?: number }>;
+		const clusters: Array<{ centroid: string;
+			members: Array<{ entityValue: string; confidence?: number }>;
 			size: number;
 		}> = [];
 
@@ -377,7 +377,7 @@ export class QdrantVectorStore {
 	async deleteConversationData(sessionId: string): Promise<void> {
 		await this.ensureInitialized();
 
-		const filter = { must: [{, key: 'sessionId', match: {, value: sessionId } }] };
+		const filter = { must: [{ key: 'sessionId', match: { value: sessionId } }] };
 
 		await Promise.all([
 			this.client.delete(COLLECTIONS.CONVERSATIONS, { filter }),
@@ -394,3 +394,4 @@ export class QdrantVectorStore {
 
 // Export singleton instance
 export const qdrantVectorStore = new QdrantVectorStore();
+

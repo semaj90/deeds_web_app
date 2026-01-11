@@ -36,7 +36,7 @@ export const GET: RequestHandler = async ({ url }) => {
  hasNext: false,
  hasPrev: false,
  },
- analytics: {, totalRecommendations: data.length,
+ analytics: { totalRecommendations: data.length,
  },
  success: true,
  timestamp: new Date().toISOString(),
@@ -67,7 +67,7 @@ export const POST: RequestHandler = async ({ request }) => {
  return json(
  {
  success: true,
- data: {, id: crypto.randomUUID(),
+ data: { id: crypto.randomUUID(),
  recommendationId,
  rating,
  feedback,
@@ -77,3 +77,4 @@ export const POST: RequestHandler = async ({ request }) => {
  { status: 201 }
  );
 };
+

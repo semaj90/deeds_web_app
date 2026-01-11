@@ -44,7 +44,7 @@ async function testSelfPromptingDemo() {
  console.log(` Iteration ${i + 1}/${iterations}`);
  const result = await copilotOrchestrator(initialPrompt, {
  useMultiAgent: true, synthesizeOutputs, true: true,
- context: {, iteration: i + 1 }
+ context: { iteration: i + 1 }
  });
   
  if (result.selfPrompt) {
@@ -74,3 +74,5 @@ async function testSelfPromptingDemo() {
 if (typeof window === 'undefined') {
  testSelfPromptingDemo().catch(console.error) }
 export { testSelfPromptingDemo };
+
+

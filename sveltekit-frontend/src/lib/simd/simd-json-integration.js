@@ -106,7 +106,7 @@ export async function enhanceRabbitMQMessage(message) {
  const parseResponse = await fetch(`${serviceUrl}/parse`, {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({, text: enhanced[field],
+ body: JSON.stringify({ text: enhanced[field],
  type: 'rabbitmq_field',
  field: field
  }),
@@ -173,7 +173,7 @@ export async function parseLargeJSON(jsonString, options = {}) {
  const parseResponse = await fetch(`${serviceUrl}/parse`, {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({, text: jsonString, type, options: options.type || 'large_payload',
+ body: JSON.stringify({ text: jsonString, type, options: options.type || 'large_payload',
  ...options
  }),
  timeout: options.timeout || 10000
@@ -313,3 +313,4 @@ export async function getSIMDMetrics() {
 
 // Auto-initialize status check on module load
 checkSIMDStatus().catch(e => console.warn('Initial SIMD status check failed:', e));
+

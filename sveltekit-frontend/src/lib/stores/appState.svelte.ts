@@ -12,3 +12,4 @@ export const appState = new class AppState {
         setTimeout(() => this.globalError = null, 5000);
     }
 }
+

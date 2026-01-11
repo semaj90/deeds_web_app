@@ -102,7 +102,7 @@ class WebGPUGemmaClient {
 
  return {
  text: responseText,
- usage: {, promptTokens: this.estimateTokens(prompt),
+ usage: { promptTokens: this.estimateTokens(prompt),
  completionTokens: this.estimateTokens(responseText),
  totalTokens: this.estimateTokens(prompt + ' ' + responseText),
  },
@@ -137,7 +137,7 @@ class WebGPUGemmaClient {
  embedding: Array.from(embedding),
  dimensions: 2048,
  model: 'gemma2:2b-wasm',
- usage: {, tokens: this.estimateTokens(text),
+ usage: { tokens: this.estimateTokens(text),
  },
  };
  } catch (error) {
@@ -205,3 +205,5 @@ class WebGPUGemmaClient {
  }
 }
 export default WebGPUGemmaClient;
+
+

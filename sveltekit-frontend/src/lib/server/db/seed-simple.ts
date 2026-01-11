@@ -120,3 +120,4 @@ async function seed() {
 }
 
 seed();
+

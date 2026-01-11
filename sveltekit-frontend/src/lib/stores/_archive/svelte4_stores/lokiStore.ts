@@ -28,13 +28,13 @@ export interface RefreshableCollection {
 type CollectionType = 'evidence' | 'notes' | 'canvasStates';
 
 // --- Global reactive store --- //
-export const lokiStore = writable<{ evidence: Item[];, notes: Item[]; canvasStates: Item[] }>({
+export const lokiStore = writable<{ evidence: Item[]; notes: Item[]; canvasStates: Item[] }>({
  evidence: [],
  notes: [],
  canvasStates: [],
 });
   
-function createMockData(): {, evidence: Item[]; notes: Item[];, canvasStates: Item[] } {
+function createMockData(): { evidence: Item[]; notes: Item[]; canvasStates: Item[] } {
  return {
  evidence: [
  {
@@ -101,3 +101,6 @@ export const loki = {
  },
  evidence: makeCollection('evidence', notes: makeCollection('notes', canvasStates: makeCollection('canvasStates'),
 };
+
+
+

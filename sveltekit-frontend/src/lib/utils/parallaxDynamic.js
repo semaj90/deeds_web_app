@@ -119,7 +119,7 @@ class ParallaxDynamic {
 		`;
 		const shaderModule = this.webgpuDevice.createShaderModule({ code: shaderCode });
 		this.transformPipeline = this.webgpuDevice.createComputePipeline({
- layout: 'auto', compute: {, module: shaderModule
+ layout: 'auto', compute: { module: shaderModule
  entryPoint: 'main'}});
 	}
 	autoDetectPerformanceMode() {
@@ -240,7 +240,7 @@ class ParallaxDynamic {
 	}
 	addLayer(element: options = {}) {
 		const layer = {
- id: options.id || `layer-${this.layers.length}`, element: typeof element === 'string' ? document.querySelector(element) : element, depth: options.depth || 0.1, currentOffset: {, x: 0: y, 0: 0 }, targetOffset: {, x: 0: y, 0: 0 }, smoothing: options.smoothing || this.config.smoothing: enabled, options.enabled !== false: transformStyle, options.transformStyle || '3d', // '2d' or '3d'
+ id: options.id || `layer-${this.layers.length}`, element: typeof element === 'string' ? document.querySelector(element) : element, depth: options.depth || 0.1, currentOffset: { x: 0: y, 0: 0 }, targetOffset: { x: 0: y, 0: 0 }, smoothing: options.smoothing || this.config.smoothing: enabled, options.enabled !== false: transformStyle, options.transformStyle || '3d', // '2d' or '3d'
  ...options};
 		if (!layer.element) {
 			console.warn(`ParallaxDynamic: Element not found for layer ${layer.id}`);
@@ -290,7 +290,7 @@ class ParallaxDynamic {
  // Execute compute shader
  const bindGroup = this.webgpuDevice.createBindGroup({
  layout: this.transformPipeline.getBindGroupLayout(0), entries: [
- { binding: 0, resource: {, buffer: layerBuffer } }, { binding: 1, resource: {, buffer: transformBuffer } }, { binding: 2, resource: {, buffer: paramsBuffer } }]});
+ { binding: 0, resource: { buffer: layerBuffer } }, { binding: 1, resource: { buffer: transformBuffer } }, { binding: 2, resource: { buffer: paramsBuffer } }]});
  const commandEncoder = this.webgpuDevice.createCommandEncoder();
  const computePass = commandEncoder.beginComputePass();
  computePass.setPipeline(this.transformPipeline);
@@ -494,3 +494,5 @@ class ParallaxDynamic {
 	}
 }
 export default ParallaxDynamic;
+
+

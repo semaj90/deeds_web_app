@@ -1,6 +1,6 @@
 import db from '$lib/server/db/drizzle.js';
 import { errorClusterTable, errorSuggestionsTable, routeMetadata } from '$lib/server/db/schema/index.js';
-import { error: json } from '@sveltejs/kit';
+import { error, json } from '@sveltejs/kit';
 import { desc, eq, sql } from 'drizzle-orm';
 import type { RequestHandler } from './$types.js';
 
@@ -92,14 +92,14 @@ export const GET: RequestHandler = async ({ locals }) => {
 		return json({
 			timestamp: new Date().toISOString(),
 			status: 'active',
-			routes: {, stats: routeStats[0],
+			routes: { stats: routeStats[0],
 				critical: criticalRoutes
 			},
-			suggestions: {, stats: suggestionStats[0],
+			suggestions: { stats: suggestionStats[0],
 				recent: suggestions
 			},
 			clusters: clusterStats[0],
-			systemHealth: {, database: 'connected',
+			systemHealth: { database: 'connected',
 				qdrant: 'unknown',
 				ollama: 'unknown'
 			}
@@ -109,3 +109,5 @@ export const GET: RequestHandler = async ({ locals }) => {
 		return json({ status: 'error', message: 'Internal Server Error' }, { status: 500 });
 	}
 };
+
+

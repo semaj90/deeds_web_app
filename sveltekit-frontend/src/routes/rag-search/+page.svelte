@@ -358,3 +358,4 @@ function startNewSearch() {
 <style>
   /* Custom styles */
 </style>
+

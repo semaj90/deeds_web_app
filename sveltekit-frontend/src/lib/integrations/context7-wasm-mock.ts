@@ -9,7 +9,7 @@ export type Context7InitOptions = {
 };
 
 export type Pattern = {
- id: string;, name: string;
+ id: string; name: string;
  description?: string;
  template?: string;
 };
@@ -125,3 +125,5 @@ export default {
  processFile,
  fetchAndProcessUrl,
 };
+
+

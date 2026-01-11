@@ -27,7 +27,7 @@ declare module '$env /static/public' {
  export const PUBLIC_MINIO_URL: string;
  export const PUBLIC_NEO4J_URL: string;
 }
-// Enhanced environment interface export interface EnhancedEnv { // Database configuration DATABASE_URL: string;, POSTGRES_URL: string; POSTGRES_HOST: string;, POSTGRES_PORT: string; POSTGRES_DB: string;, POSTGRES_USER: string; POSTGRES_PASSWORD: string; // Redis configuration REDIS_URL: string;, REDIS_HOST: string; REDIS_PORT: string;, REDIS_PASSWORD: string; // AI services OLLAMA_URL: string;, OLLAMA_HOST: string; OLLAMA_PORT: string;, OPENAI_API_KEY: string; ANTHROPIC_API_KEY: string;, GOOGLE_API_KEY: string; // Vector database QDRANT_URL: string;, QDRANT_HOST: string; QDRANT_PORT: string;, QDRANT_API_KEY: string; // Graph database NEO4J_URL: string;, NEO4J_HOST: string; NEO4J_PORT: string;, NEO4J_USERNAME: string; NEO4J_PASSWORD: string; // Object storage MINIO_URL: string;, MINIO_HOST: string; MINIO_PORT: string;, MINIO_ACCESS_KEY: string; MINIO_SECRET_KEY: string;, MINIO_BUCKET: string; MINIO_BUCKET_LEGAL_DOCUMENTS?: string; // Security JWT_SECRET: string;, ENCRYPTION_KEY: string; API_SECRET: string; // Application NODE_ENV: string;, PORT: string; HOST: string;, PUBLIC_API_BASE_URL: string; // Development DEBUG: string;, LOG_LEVEL: string; ENABLE_LOGGING: string}
+// Enhanced environment interface export interface EnhancedEnv { // Database configuration DATABASE_URL: string; POSTGRES_URL: string; POSTGRES_HOST: string; POSTGRES_PORT: string; POSTGRES_DB: string; POSTGRES_USER: string; POSTGRES_PASSWORD: string; // Redis configuration REDIS_URL: string; REDIS_HOST: string; REDIS_PORT: string; REDIS_PASSWORD: string; // AI services OLLAMA_URL: string; OLLAMA_HOST: string; OLLAMA_PORT: string; OPENAI_API_KEY: string; ANTHROPIC_API_KEY: string; GOOGLE_API_KEY: string; // Vector database QDRANT_URL: string; QDRANT_HOST: string; QDRANT_PORT: string; QDRANT_API_KEY: string; // Graph database NEO4J_URL: string; NEO4J_HOST: string; NEO4J_PORT: string; NEO4J_USERNAME: string; NEO4J_PASSWORD: string; // Object storage MINIO_URL: string; MINIO_HOST: string; MINIO_PORT: string; MINIO_ACCESS_KEY: string; MINIO_SECRET_KEY: string; MINIO_BUCKET: string; MINIO_BUCKET_LEGAL_DOCUMENTS?: string; // Security JWT_SECRET: string; ENCRYPTION_KEY: string; API_SECRET: string; // Application NODE_ENV: string; PORT: string; HOST: string; PUBLIC_API_BASE_URL: string; // Development DEBUG: string; LOG_LEVEL: string; ENABLE_LOGGING: string}
 // Declare the runtime helper signatures (implementation should be in env-helper.ts)
 export declare const envHelper: {
  get(key: string, defaultValue?: string): string | undefined;
@@ -40,3 +40,5 @@ export declare const envHelper: {
 };
 // Export types
 export type { EnhancedEnv };
+
+

@@ -45,8 +45,8 @@ export type ConnectionState = 'connected' | 'disconnected' | 'reconnecting' | 'f
 
 // Health updates service state
 export interface HealthUpdatesState {
- connectionState: ConnectionState;, lastUpdateTime: Date | null;
- reconnectionAttempts: number;, isUsingSSE: boolean;
+ connectionState: ConnectionState; lastUpdateTime: Date | null;
+ reconnectionAttempts: number; isUsingSSE: boolean;
 }
 
 /**
@@ -471,3 +471,5 @@ if (typeof window !== 'undefined') {
  cleanup();
  });
 }
+
+

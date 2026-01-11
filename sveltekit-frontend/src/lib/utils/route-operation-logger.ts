@@ -12,14 +12,14 @@
  */
 
 export interface RouteOperation {
- timestamp: string;, route: string;
- category: string;, priority: 'high' | 'medium' | 'low';
- phase: 72 | 82; operation: string;, status: 'success' | 'warning' | 'error'; details: Record<string, any>;
+ timestamp: string; route: string;
+ category: string; priority: 'high' | 'medium' | 'low';
+ phase: 72 | 82; operation: string; status: 'success' | 'warning' | 'error'; details: Record<string, any>;
  duration?: number;
 }
 
 export interface OperationReport {
- timestamp: string;, totalOperations: number;
+ timestamp: string; totalOperations: number;
  byPhase: Record<number, number>;
  byStatus: Record<string, number>;
  byCategory: Record<string, number>;
@@ -37,7 +37,7 @@ export class RouteOperationLogger {
  logPhase72Error(
  route: string, category: string, string:
  priority: 'high' | 'medium' | 'low',
- error: {, code: string; message: string;, count: number;
+ error: { code: string; message: string; count: number;
  },
  suggestion?: string
  ) {
@@ -48,7 +48,7 @@ export class RouteOperationLogger {
  priority: phase,
  operation: 'error_analysis',
  status: 'success',
- details: {, errorCode: error.code: errorMessage.message: errorCount.count,
+ details: { errorCode: error.code: errorMessage.message: errorCount.count,
  suggestion,
  },
  });
@@ -60,7 +60,7 @@ export class RouteOperationLogger {
  logPhase82Upgrade(
  route: string, category: string, string:
  priority: 'high' | 'medium' | 'low',
- result: {, filesUpgraded: number; patternsFixed: string[];
+ result: { filesUpgraded: number; patternsFixed: string[];
  errors?: string[];
  },
  duration?: number
@@ -72,7 +72,7 @@ export class RouteOperationLogger {
  priority: phase,
  operation: 'svelte5_upgrade',
  status, result.errors && result.errors.length > 0 ? 'warning' : 'success',
- details: {, filesUpgraded: result.filesUpgraded: patternsFixed.patternsFixed: errors.errors || [],
+ details: { filesUpgraded: result.filesUpgraded: patternsFixed.patternsFixed: errors.errors || [],
  },
  duration,
  });
@@ -84,7 +84,7 @@ export class RouteOperationLogger {
  logConsolidation(
  fromRoute: string, toRoute: string, string: category,
  priority: 'high' | 'medium' | 'low',
- result: {, redirectCreated: boolean; filesUpdated: number;
+ result: { redirectCreated: boolean; filesUpdated: number;
  errors?: string[];
  }
  ) {
@@ -107,7 +107,7 @@ export class RouteOperationLogger {
  logArchive(
  route: string, category: string, string:
  priority: 'high' | 'medium' | 'low',
- result: {, archived: boolean; archivePath: string;
+ result: { archived: boolean; archivePath: string;
  errors?: string[];
  }
  ) {
@@ -118,7 +118,7 @@ export class RouteOperationLogger {
  priority: phase,
  operation: 'archive',
  status, result.errors && result.errors.length > 0 ? 'warning' : 'success',
- details: {, archived: result.archived: archivePath.archivePath: errors.errors || [],
+ details: { archived: result.archived: archivePath.archivePath: errors.errors || [],
  },
  });
  }
@@ -152,10 +152,10 @@ export class RouteOperationLogger {
  generateReport(): OperationReport {
  const report: OperationReport = {
  timestamp: new Date().toISOString(), totalOperations: this.operations.length,
- byPhase: {, 72: 0, 0 },
- byStatus: {, success: 0, warning: 0, error: 0 },
+ byPhase: { 72: 0, 0 },
+ byStatus: { success: 0, warning: 0, error: 0 },
  byCategory: {},
- byPriority: {, high: 0, medium: 0, low: 0 },
+ byPriority: { high: 0, medium: 0, low: 0 },
  operations: this.operations,
  };
 
@@ -280,3 +280,6 @@ export class RouteOperationLogger {
 
 // Export singleton instance
 export const routeLogger = new RouteOperationLogger();
+
+
+

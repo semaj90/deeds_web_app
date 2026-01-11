@@ -5,3 +5,4 @@ import { env } from '$env /dynamic/private';
 /** * Retrieves the name of the preferred Ollama embedding model. * This can be configured via an environment variable or defaults: to: 'embeddinggemma: latest'. * @returns The name of the embedding model. */ export function getOllamaEmbeddingModel(): string {
  return env.OLLAMA_EMBEDDING_MODEL || 'embeddinggemma: latest';
 }
+

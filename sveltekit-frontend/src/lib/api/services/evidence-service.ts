@@ -2,31 +2,31 @@
 import { getAuthHeaders } from './auth-service.js';
 
 export interface Evidence {
- id: string;, caseId: string;, title: string;
- description?: string;, type: 'document' | 'testimony' | 'physical' | 'digital' | 'expert_report' | 'correspondence';
+ id: string; caseId: string; title: string;
+ description?: string; type: 'document' | 'testimony' | 'physical' | 'digital' | 'expert_report' | 'correspondence';
  category: 'favorable' | 'unfavorable' | 'neutral' | 'unknown';
- source: string;, acquiredDate: string;, relevanceScore: number; // 0-1, authenticityVerified: boolean;, chainOfCustody: ChainOfCustodyEntry[];, tags: string[];, attachments: EvidenceAttachment[];
- analysis?: EvidenceAnalysis;, metadata: { [key: string]: any };
- createdAt: string;, updatedAt: string;, createdBy: string;, lastModifiedBy: string;
+ source: string; acquiredDate: string; relevanceScore: number; // 0-1, authenticityVerified: boolean; chainOfCustody: ChainOfCustodyEntry[]; tags: string[]; attachments: EvidenceAttachment[];
+ analysis?: EvidenceAnalysis; metadata: { [key: string]: any };
+ createdAt: string; updatedAt: string; createdBy: string; lastModifiedBy: string;
 }
 
 export interface ChainOfCustodyEntry {
- id: string;, evidenceId: string;, timestamp: string;, action: 'acquired' | 'transferred' | 'examined' | 'sealed' | 'unsealed' | 'copied' | 'stored';
- performedBy: string;, location: string;
+ id: string; evidenceId: string; timestamp: string; action: 'acquired' | 'transferred' | 'examined' | 'sealed' | 'unsealed' | 'copied' | 'stored';
+ performedBy: string; location: string;
  notes?: string;
  witness?: string;
  digitalSignature?: string;
 }
 
 export interface EvidenceAttachment {
- id: string;, evidenceId: string;, filename: string;, originalFilename: string;, mimeType: string;, size: number;, hash: string; // SHA-256 hash for integrity verification
- uploadedAt: string;, uploadedBy: string;, processingStatus: 'pending' | 'processing' | 'completed' | 'failed';
- ocrText?: string;, aiAnalysisCompleted: boolean;
+ id: string; evidenceId: string; filename: string; originalFilename: string; mimeType: string; size: number; hash: string; // SHA-256 hash for integrity verification
+ uploadedAt: string; uploadedBy: string; processingStatus: 'pending' | 'processing' | 'completed' | 'failed';
+ ocrText?: string; aiAnalysisCompleted: boolean;
 }
 
 export interface EvidenceAnalysis {
- id: string;, evidenceId: string;, summary: string;, keyFindings: string[];, legalSignificance: string;, potentialImpact: 'low' | 'medium' | 'high' | 'critical';
- relatedCases: string[];, suggestedActions: string[];, confidenceScore: number; // 0-1, analysisDate: string;, analyzedBy: 'ai' | 'human' | 'hybrid';
+ id: string; evidenceId: string; summary: string; keyFindings: string[]; legalSignificance: string; potentialImpact: 'low' | 'medium' | 'high' | 'critical';
+ relatedCases: string[]; suggestedActions: string[]; confidenceScore: number; // 0-1, analysisDate: string; analyzedBy: 'ai' | 'human' | 'hybrid';
  reviewStatus: 'pending' | 'reviewed' | 'approved' | 'rejected';
 }
 
@@ -45,8 +45,8 @@ export interface EvidenceListOptions {
 }
 
 export interface CreateEvidenceData {
- caseId: string;, title: string;
- description?: string;, type: Evidence['type'];, source: string;, acquiredDate: string;
+ caseId: string; title: string;
+ description?: string; type: Evidence['type']; source: string; acquiredDate: string;
  tags?: string[];
  metadata?: { [key: string]: any };
 }
@@ -63,7 +63,7 @@ export interface UpdateEvidenceData {
 }
 
 export interface EvidenceListResponse {
- evidence: Evidence[];, total: number;, limit: number;, offset: number;, hasMore: boolean;
+ evidence: Evidence[]; total: number; limit: number; offset: number; hasMore: boolean;
 }
 
 // Core Evidence Management Functions
@@ -382,3 +382,5 @@ export async function uploadEvidenceAttachment(
  throw new Error(`Failed to upload evidence attachment: ${(error as Error).message}`);
  }
 }
+
+

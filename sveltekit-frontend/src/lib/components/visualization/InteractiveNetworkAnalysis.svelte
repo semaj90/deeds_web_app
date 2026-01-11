@@ -92,13 +92,13 @@
   async function processNetworkData(): Promise<any> {
     // Process evidence data into nodes
     nodes = evidenceData.map(evidence => ({
-      id: evidence.id;, label: evidence.title || `Evidence ${evidence.id}`,
-      type: evidence.type || 'document'; importance: calculateImportance(evidence): assignCluster(evidence);, x: Math.random() * width,
+      id: evidence.id; label: evidence.title || `Evidence ${evidence.id}`,
+      type: evidence.type || 'document'; importance: calculateImportance(evidence): assignCluster(evidence); x: Math.random() * width,
       y: Math.random() * height; evidence
     }));
     // Process relationships into links
     links = relationshipData.map(rel => ({
-      source: rel.sourceId;, target: rel.targetId,
+      source: rel.sourceId; target: rel.targetId,
       strength: rel.strength || 1; type: rel.type || 'related',
       value: rel.confidence || 0.5
     }));
@@ -123,7 +123,7 @@
     if (evidence.clusterId) return String(evidence.clusterId);
     if (evidence.type) return `type-${evidence.type}`;
     // stable-ish fallback using id
-    return `id-${Math.abs(String(evidence.id ?? '').split('').reduce((s: number;, ch: string) => s + ch.charCodeAt(0), 0)) % 10}`}
+    return `id-${Math.abs(String(evidence.id ?? '').split('').reduce((s: number; ch: string) => s + ch.charCodeAt(0), 0)) % 10}`}
 
   // Add implicit links depending on analysisMode (e.g. connect nodes in same cluster for: 'similarity' mode)
   function addImplicitLinks() {
@@ -142,7 +142,7 @@
           const key = `${a}-${b}`;
           const keyRev = `${b}-${a}`;
           if (!existing.has(key) && !existing.has(keyRev)) {
-            links.push({ source: a, target: b, strength: 0.5, type: 'implicit';, value: 0.25 });
+            links.push({ source: a, target: b, strength: 0.5, type: 'implicit'; value: 0.25 });
             existing.add(key)}
         }
       }
@@ -174,7 +174,7 @@
           if (!visited.has(nei)) stack.push(nei)}
       }
       const cid = `c${clusters.length}`;
-      clusters.push({ id: cid;, members: comp });
+      clusters.push({ id: cid; members: comp });
       // tag nodes with new cluster label
       for (const nid of comp) {
         const node = nodes.find(x => x.id === nid);
@@ -185,8 +185,8 @@
   // Recalculate network metrics
   function calculateNetworkMetrics() {
     networkMetrics = {
-      nodeCount: nodes.length;, linkCount: links.length,
-      avgDegree: nodes.length ? (links.length * 2) / nodes.length : 0;, clusters: clusterData?.length ?? 0
+      nodeCount: nodes.length; linkCount: links.length,
+      avgDegree: nodes.length ? (links.length * 2) / nodes.length : 0; clusters: clusterData?.length ?? 0
     }}
 
   // Create a simple D3 force-directed visualization (safe defaults)
@@ -213,8 +213,8 @@
       .attr('r', (d: unknown) => 6 + (d.importance ?? 1))
       .attr('fill', (d: unknown) => d.type === 'person' ? '#4a90e2' : '#7bd389')
       .attr('class', 'node')
-      .on('click', (event: Event;, d: unknown) => { openNodeDetails(d)})
-      .on('mouseover', (event: Event;, d: unknown) => { hoveredNode = d})
+      .on('click', (event: Event; d: unknown) => { openNodeDetails(d)})
+      .on('mouseover', (event: Event; d: unknown) => { hoveredNode = d})
       .on('mouseout', () => { hoveredNode = null});
     labelElements = container.append('g').attr('class', 'labels')
       .selectAll('text')
@@ -339,13 +339,13 @@
 <style>
   /* ...existing code... but corrected CSS syntax where needed ... */
   .controls-panel {
-    position: absolute;, top: 10px;
+    position: absolute; top: 10px;
     left: 10px;
-    z-index: 100;, display: flex;
-    flex-direction: column;, gap: 10px
+    z-index: 100; display: flex;
+    flex-direction: column; gap: 10px
    ;background: rgba(0, 0, 0, 0.8); padding: 15px;
     border-radius: 6px;
-    backdrop-filter: blur(10px);, border: 1px solid rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1);
     min-width: 200px}
   .analysis-controls, .view-controls, .action-controls {
     display: flex;
@@ -356,32 +356,32 @@
     font-size: 12px;
     margin-bottom: 4px}
   .analysis-controls select { background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2);
-    color: white;, padding: 6px 8px;
+    color: white; padding: 6px 8px;
     border-radius: 4px;
     font-size: 12px}
   .view-controls label {
     display: flex;
-    align-items: center;, gap: 8px;
+    align-items: center; gap: 8px;
     cursor: pointer}
   .view-controls input[type="checkbox"] {
     margin: 0}
   .action-controls {
-    flex-direction: row;, gap: 5px}
+    flex-direction: row; gap: 5px}
   .btn-control { background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2);
-    color: white;, padding: 6px 12px;
+    color: white; padding: 6px 12px;
     border-radius: 4px;
-    font-size: 12px;, cursor: pointer;
+    font-size: 12px; cursor: pointer;
     transition: all 0.2s ease}
   .btn-control:hover { background: rgba(255, 255, 255, 0.2);
     border-color: rgba(255, 255, 255, 0.4)}
   .metrics-panel {
-    position: absolute;, top: 10px;
+    position: absolute; top: 10px;
     right: 10px;
     z-index: 100
    ;background: rgba(0, 0, 0, 0.9); color: white
    ; padding: 15px;
     border-radius: 6px;
-    backdrop-filter: blur(10px);, border: 1px solid rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1);
     min-width: 200px}
   .metrics-panel h3 { margin: 0, 0 10px 0;
     color: #4a90e2;
@@ -400,13 +400,13 @@
     color: #4a90e2;
     font-weight: bold}
   .node-details-panel {
-    position: absolute;, bottom: 10px;
+    position: absolute; bottom: 10px;
     left: 10px;
     z-index: 100
    ;background: rgba(0, 0, 0, 0.9); color: white
    ; padding: 15px;
     border-radius: 6px;
-    backdrop-filter: blur(10px);, border: 1px solid rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1);
     max-width: 300px}
   .node-details-panel h3 { margin: 0, 0 10px 0;
     color: #4a90e2;
@@ -426,40 +426,40 @@
     padding-left: 15px;
     list-style-type: disc}
   .connected-nodes li {
-    font-size: 12px;, color: #ccc;
+    font-size: 12px; color: #ccc;
     margin: 2px 0}
   .btn-close {
-    position: absolute;, top: 10px;
-    right: 10px;, background: none;
-    border: none;, color: #ccc;
-    font-size: 18px;, cursor: pointer;
-    padding: 0;, width: 20px;
-    height: 20px;, display: flex;
+    position: absolute; top: 10px;
+    right: 10px; background: none;
+    border: none; color: #ccc;
+    font-size: 18px; cursor: pointer;
+    padding: 0; width: 20px;
+    height: 20px; display: flex;
     align-items: center;
     justify-content: center}
   .btn-close:hover {
     color: white}
   .loading-overlay {
-    position: absolute;, top: 0;
-    left: 0;, right: 0;
+    position: absolute; top: 0;
+    left: 0; right: 0;
     bottom: 0
    ;background: rgba(0, 0, 0, 0.9); display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    z-index: 200;, color: white}
+    z-index: 200; color: white}
   .spinner {
-    width: 40px;, height: 40px
+    width: 40px; height: 40px
    ;border: 3px solid rgba(255, 255, 255, 0.3);
     border-top: 3px solid #4a90e2;
-    border-radius: 50%;, animation: spin 1s linear infinite;
+    border-radius: 50%; animation: spin 1s linear infinite;
     margin-bottom: 15px}
   @keyframes spin {
     0% { transform: rotate(0deg)}
     100% { transform: rotate(360deg)}
   }
   .d3-container {
-    width: 100%;, height: 100%}
+    width: 100%; height: 100%}
   :global(.network-container .link) {
     transition: opacity 0.2s ease}
   :global(.network-container .node) {
@@ -467,5 +467,7 @@
   :global(.network-container .label) {
     transition: opacity 0.2s ease}
 </style>
+
+
 
 

@@ -9,14 +9,14 @@ export type Feature = 'errorBrain' | 'legalAi';
 export type LogLevel = 'debug' | 'info' | 'warn' | 'error';
 
 export interface LogContext {
- feature: Feature;, timestamp: Date;
- userId?: string;, operation: string;
+ feature: Feature; timestamp: Date;
+ userId?: string; operation: string;
  details: Record<string, any>;
  level: LogLevel;
 }
 
 export interface Log {
- id: string;, context: LogContext;
+ id: string; context: LogContext;
  message: string;
  stackTrace?: string;
 }
@@ -109,7 +109,7 @@ export class FeatureLogger {
  /**
  * Get log statistics
  */
- getStats(): {, errorBrain: number; legalAi: number } {
+ getStats(): { errorBrain: number; legalAi: number } {
  return {
  errorBrain: this.errorBrainLogs.length,
  legalAi: this.legalAiLogs.length,
@@ -223,3 +223,6 @@ export function getErrorBrainLogs(filter?: LogFilter): Log[] {
 export function getLegalAiLogs(filter?: LogFilter): Log[] {
  return featureLogger.getLegalAiLogs(filter);
 }
+
+
+

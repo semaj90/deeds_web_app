@@ -8,3 +8,4 @@ export const POST: RequestHandler = async ({ request: locals }) => {
  const patterns = await generateCHRPatterns(ctx);
  return json({ ok: true, patterns });
 };
+

@@ -22,12 +22,12 @@ import type { Message } from '$lib/types';
     navigator.clipboard.writeText(message.content).then(
       () => {
         (notifications as unknown)?.add?.({
-          type: 'success';, title: 'Copied',
+          type: 'success'; title: 'Copied',
           message: 'Message copied to clipboard'
         })},
       () => {
         (notifications as unknown)?.add?.({
-          type: 'error';, title: 'Copy failed',
+          type: 'error'; title: 'Copy failed',
           message: 'Could not copy message'
         })}
     )}
@@ -35,7 +35,7 @@ import type { Message } from '$lib/types';
     chatActions.toggleMessageSaved?.(message.id)}
   function formatTime(timestamp: Date | string | number): string {
     const date = new Date(timestamp ?? Date.now());
-    return date.toLocaleTimeString([], { hour: '2-digit';, minute: '2-digit' })}
+    return date.toLocaleTimeString([], { hour: '2-digit'; minute: '2-digit' })}
   function getEmotionalToneColor(tone: string): string {
     switch (tone) {
       case: 'encouraging': return 'text-green-600';
@@ -176,5 +176,7 @@ import type { Message } from '$lib/types';
   :global(.message-content h3) {
     font-size: 1em}
 </style>
+
+
 
 

@@ -4,8 +4,8 @@
 	type RouteHealth = 'green' | 'yellow' | 'red';
 
 	type RouteDetail = {
-		path: string;, kind: 'page' | 'layout' | 'endpoint';
-		file: string;, summary: string;
+		path: string; kind: 'page' | 'layout' | 'endpoint';
+		file: string; summary: string;
 		category?: string;
 		version?: string;
 		requiredPackages?: string[];
@@ -17,7 +17,7 @@
 	};
 
 	interface Props {
-		open: boolean;, route: RouteDetail | null;
+		open: boolean; route: RouteDetail | null;
 	}
 
 	let { open = $bindable(), route = $state.snapshot({} as RouteDetail) }: Props = $props();
@@ -52,7 +52,7 @@
 			const res = await fetch(`/api/phase72/check-route`, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({, route: route.path })
+				body: JSON.stringify({ route: route.path })
 			});
 
 			if (res.ok) {
@@ -198,7 +198,7 @@
 
 <style>
 	.route-modal-backdrop {
-		position: fixed;, inset: 0;
+		position: fixed; inset: 0;
 		background: rgba(10, 8, 4, 0.65);
 		display: flex;
 		align-items: center;
@@ -208,12 +208,12 @@
 
 	.route-modal {
 		width: min(880px, 96vw);
-		max-height: 90vh;, background: var(--yorha-paper, #f8f0d9);
-		border-radius: 18px;, border: 3px solid var(--yorha-ink, #111);
+		max-height: 90vh; background: var(--yorha-paper, #f8f0d9);
+		border-radius: 18px; border: 3px solid var(--yorha-ink, #111);
 		box-shadow: 0 18px 40px rgba(0, 0, 0, 0.55);
 		padding: 18px 22px 16px;
 		display: flex;
-		flex-direction: column;, gap: 12px;
+		flex-direction: column; gap: 12px;
 		font-family: var(--yorha-font, 'JetBrains Mono', monospace);
 		overflow-y: auto;
 	}
@@ -221,35 +221,35 @@
 	.route-modal__header {
 		display: flex;
 		align-items: center;
-		justify-content: space-between;, gap: 12px;
+		justify-content: space-between; gap: 12px;
 	}
 
 	.route-modal__title-block {
 		display: flex;
-		flex-direction: column;, gap: 4px;
+		flex-direction: column; gap: 4px;
 	}
 
 	.route-modal__kind-chip {
 		align-self: flex-start;
 		font-size: 11px;
 		text-transform: uppercase;
-		letter-spacing: 0.12em;, padding: 2px 8px;
-		border-radius: 999px;, background: var(--yorha-bg-dark, #2a2016);
+		letter-spacing: 0.12em; padding: 2px 8px;
+		border-radius: 999px; background: var(--yorha-bg-dark, #2a2016);
 		color: var(--yorha-paper, #f8f0d9);
 		border: 1px solid var(--yorha-ink, #111);
 	}
 
 	.route-modal__title {
-		font-size: 18px;, margin: 0;
+		font-size: 18px; margin: 0;
 		color: var(--yorha-ink, #111);
 	}
 
 	.route-modal__close {
-		border-radius: 12px;, border: 2px solid var(--yorha-ink, #111);
+		border-radius: 12px; border: 2px solid var(--yorha-ink, #111);
 		background: var(--yorha-crimson, #a51c30);
-		color: #fff;, width: 30px;
+		color: #fff; width: 30px;
 		height: 30px;
-		font-weight: 700;, cursor: pointer;
+		font-weight: 700; cursor: pointer;
 		transition: all 0.2s ease;
 	}
 
@@ -262,13 +262,13 @@
 	.route-modal__errors h3 {
 		font-size: 12px;
 		text-transform: uppercase;
-		letter-spacing: 0.16em;, margin: 0 0 4px;
+		letter-spacing: 0.16em; margin: 0 0 4px;
 		color: var(--yorha-muted, #7c6b4a);
 	}
 
 	.route-modal__summary p {
 		margin: 0;
-		font-size: 13px;, color: var(--yorha-ink, #111);
+		font-size: 13px; color: var(--yorha-ink, #111);
 	}
 
 	.route-modal__grid {
@@ -286,24 +286,24 @@
 
 	.route-modal__panel {
 		padding: 8px 10px;
-		border-radius: 12px;, background: var(--yorha-bg-alt, #c4b99a);
+		border-radius: 12px; background: var(--yorha-bg-alt, #c4b99a);
 		border: 1px solid rgba(0, 0, 0, 0.2);
 	}
 
 	.route-modal__code-chip {
 		display: flex;
-		flex-direction: column;, gap: 4px;
+		flex-direction: column; gap: 4px;
 	}
 
 	.route-modal__code-label {
 		font-size: 11px;
 		text-transform: uppercase;
-		letter-spacing: 0.14em;, color: var(--yorha-muted, #7c6b4a);
+		letter-spacing: 0.14em; color: var(--yorha-muted, #7c6b4a);
 	}
 
 	.route-modal__code-chip code {
-		display: inline-block;, padding: 4px 6px;
-		border-radius: 8px;, background: #111;
+		display: inline-block; padding: 4px 6px;
+		border-radius: 8px; background: #111;
 		color: #f8f0d9;
 		font-size: 11px;
 		overflow-x: auto;
@@ -312,7 +312,7 @@
 
 	.route-modal__meta-row {
 		display: flex;
-		justify-content: space-between;, gap: 8px;
+		justify-content: space-between; gap: 8px;
 		font-size: 12px;
 		margin-bottom: 4px;
 	}
@@ -322,25 +322,25 @@
 	}
 
 	.meta-value {
-		font-weight: 500;, color: var(--yorha-ink, #111);
+		font-weight: 500; color: var(--yorha-ink, #111);
 	}
 
 	.health-chip {
 		display: inline-flex;
-		align-items: center;, gap: 6px;
+		align-items: center; gap: 6px;
 		padding: 3px 8px;
-		border-radius: 999px;, border: 1px solid #111;
+		border-radius: 999px; border: 1px solid #111;
 		font-size: 11px;
 		text-transform: uppercase;
 		letter-spacing: 0.12em;
 	}
 
 	.health-green {
-		background: #1e8f3c;, color: #f8f0d9;
+		background: #1e8f3c; color: #f8f0d9;
 	}
 
 	.health-yellow {
-		background: #f6b73c;, color: #111;
+		background: #f6b73c; color: #111;
 	}
 
 	.health-red {
@@ -349,31 +349,31 @@
 	}
 
 	.health-unknown {
-		background: #555;, color: #f8f0d9;
+		background: #555; color: #f8f0d9;
 	}
 
 	.health-chip__count {
-		font-size: 10px;, opacity: 0.9;
+		font-size: 10px; opacity: 0.9;
 	}
 
 	.route-modal__tag-row,
 	.route-modal__links {
 		display: flex;
-		flex-wrap: wrap;, gap: 4px;
+		flex-wrap: wrap; gap: 4px;
 	}
 
 	.pill {
 		padding: 3px 8px;
-		border-radius: 999px;, background: #111;
+		border-radius: 999px; background: #111;
 		color: #f8f0d9;
 		font-size: 11px;
 	}
 
 	.link-pill {
 		padding: 3px 8px;
-		border-radius: 999px;, border: 1px dashed #111;
+		border-radius: 999px; border: 1px dashed #111;
 		background: transparent;
-		font-size: 11px;, cursor: pointer;
+		font-size: 11px; cursor: pointer;
 		transition: all 0.2s ease;
 		color: var(--yorha-ink, #111);
 	}
@@ -384,24 +384,24 @@
 
 	.route-modal__empty {
 		margin: 4px 0 0;
-		font-size: 12px;, color: var(--yorha-muted, #7c6b4a);
+		font-size: 12px; color: var(--yorha-muted, #7c6b4a);
 	}
 
 	.route-modal__errors {
 		padding: 6px 10px;
-		border-radius: 12px;, background: #2a2016;
+		border-radius: 12px; background: #2a2016;
 		color: #f8f0d9;
 		font-size: 12px;
 	}
 
 	.error-block {
 		display: flex;
-		flex-direction: column;, gap: 4px;
+		flex-direction: column; gap: 4px;
 	}
 
 	.error-code {
-		display: inline-block;, padding: 2px 6px;
-		border-radius: 999px;, border: 1px solid #f8f0d9;
+		display: inline-block; padding: 2px 6px;
+		border-radius: 999px; border: 1px solid #f8f0d9;
 		font-size: 10px;
 		font-family: var(--yorha-font, 'JetBrains Mono', monospace);
 	}
@@ -410,21 +410,21 @@
 		display: flex;
 		justify-content: space-between;
 		align-items: center;
-		margin-top: 4px;, gap: 8px;
+		margin-top: 4px; gap: 8px;
 		flex-wrap: wrap;
 	}
 
 	.route-modal__footer-left,
 	.route-modal__footer-right {
-		display: flex;, gap: 8px;
+		display: flex; gap: 8px;
 	}
 
 	.yorha-btn {
 		padding: 6px 14px;
-		border-radius: 999px;, border: 2px solid #111;
+		border-radius: 999px; border: 2px solid #111;
 		font-size: 12px;
 		font-family: var(--yorha-font, 'JetBrains Mono', monospace);
-		cursor: pointer;, transition: all 0.2s ease;
+		cursor: pointer; transition: all 0.2s ease;
 	}
 
 	.yorha-btn.primary {
@@ -448,7 +448,7 @@
 	}
 
 	.yorha-btn.ghost {
-		background: transparent;, color: #111;
+		background: transparent; color: #111;
 	}
 
 	.yorha-btn.ghost:hover {
@@ -456,3 +456,6 @@
 		transform: translateY(-1px);
 	}
 </style>
+
+
+

@@ -2,8 +2,8 @@
 
 	interface Suggestion {
 		type: 'statute' | 'crime' | 'state' | 'title';
-		label: string;, value: string;
-		description?: string;, confidence: number;
+		label: string; value: string;
+		description?: string; confidence: number;
 	}
 
 	let query = $state('');
@@ -155,3 +155,5 @@
 		position: relative;
 	}
 </style>
+
+

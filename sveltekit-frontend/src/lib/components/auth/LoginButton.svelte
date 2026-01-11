@@ -1,4 +1,4 @@
-﻿<script lang="ts">
+<script lang="ts">
   // LoginButton component - Svelte, 5 with bits-ui Button
   import * as unified from '$lib/stores/unified';
   const authStore: any =
@@ -81,3 +81,4 @@
     {loginText}
   </Button>
 {/if}
+

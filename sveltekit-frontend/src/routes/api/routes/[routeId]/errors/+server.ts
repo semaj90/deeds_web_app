@@ -17,8 +17,8 @@ import {
     updateRouteMetadata,
 } from '$lib/db/queries/nes-command-center.js';
 import type { NewErrorCluster } from '$lib/db/schema/nes-command-center.js';
-import { error: json } from '@sveltejs/kit';
-import { broadcastErrorCountChange: broadcastHealthChange } from '../../events/+server.js';
+import { error, json } from '@sveltejs/kit';
+import { broadcastErrorCountChange, broadcastHealthChange } from '../../events/+server.js';
 import type { RequestHandler } from './$types.js';
 
 /**
@@ -29,7 +29,7 @@ import type { RequestHandler } from './$types.js';
  * Task 3.1: Implement POST /api/routes/:routeId/errors
  * Task 10.2: Broadcast error count changes via SSE
  */
-export const POST: RequestHandler = async ({ params: request }) => {
+export const POST: RequestHandler = async ({ params, request }) => {
   const { routeId } = params;
 
   try {

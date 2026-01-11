@@ -114,3 +114,4 @@ export async function healthCheck() {
  console.error('âŒ RabbitMQ health check failed:', error);
  return false}
 }
+

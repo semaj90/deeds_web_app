@@ -4,10 +4,10 @@
   import { cn } from "$lib";
 
   interface Props {
-    caseItem: {, id: string;
+    caseItem: { id: string;
       title: string;
-      description?: string;, priority: string;
-      status: string;, updatedAt: string | Date;
+      description?: string; priority: string;
+      status: string; updatedAt: string | Date;
     };
     class?: string;
   }
@@ -75,3 +75,6 @@
   <!-- Subtle decoration -->
   <div class="absolute top-0 left-0 w-1 h-full bg-primary opacity-0 group-hover:opacity-100 transition-opacity" />
 </Card>
+
+
+

@@ -12,9 +12,9 @@
 	import { onDestroy } from 'svelte';
 
 	interface SearchResult {
-		id: string;, filePath: string;
-		label: string;, type: string;
-		score: number;, errorCount: number;
+		id: string; filePath: string;
+		label: string; type: string;
+		score: number; errorCount: number;
 		snippet?: string;
 	}
 
@@ -205,27 +205,27 @@
 
 <style>
 	.semantic-search {
-		position: relative;, width: 100%;
+		position: relative; width: 100%;
 		max-width: 400px;
 	}
 
 	.search-input-container {
-		position: relative;, display: flex;
+		position: relative; display: flex;
 		align-items: center;
 	}
 
 	.search-icon {
-		position: absolute;, left: 0.75rem;
+		position: absolute; left: 0.75rem;
 		color: rgba(255, 255, 255, 0.5);
 		pointer-events: none;
 	}
 
 	.search-input {
-		width: 100%;, background: rgba(255, 255, 255, 0.05);
+		width: 100%; background: rgba(255, 255, 255, 0.05);
 		border: 1px solid rgba(255, 255, 255, 0.1);
-		border-radius: 8px;, padding: 0.625rem 2.5rem 0.625rem 2.5rem;
+		border-radius: 8px; padding: 0.625rem 2.5rem 0.625rem 2.5rem;
 		color: white;
-		font-size: 0.875rem;, transition: all 0.2s ease;
+		font-size: 0.875rem; transition: all 0.2s ease;
 	}
 
 	.search-input::placeholder {
@@ -240,23 +240,23 @@
 
 	.loading-icon,
 	.clear-btn {
-		position: absolute;, right: 0.75rem;
+		position: absolute; right: 0.75rem;
 		color: rgba(255, 255, 255, 0.5);
 	}
 
 	.clear-btn {
-		background: transparent;, border: none;
-		cursor: pointer;, padding: 0.25rem;
-		border-radius: 4px;, transition: all 0.2s ease;
+		background: transparent; border: none;
+		cursor: pointer; padding: 0.25rem;
+		border-radius: 4px; transition: all 0.2s ease;
 	}
 
 	.clear-btn:hover {
-		color: white;, background: rgba(255, 255, 255, 0.1);
+		color: white; background: rgba(255, 255, 255, 0.1);
 	}
 
 	.search-results {
-		position: absolute;, top: calc(100% + 0.5rem);
-		left: 0;, right: 0;
+		position: absolute; top: calc(100% + 0.5rem);
+		left: 0; right: 0;
 		background: rgba(0, 0, 0, 0.95);
 		border: 1px solid rgba(255, 255, 255, 0.15);
 		border-radius: 8px;
@@ -268,13 +268,13 @@
 
 	.result-item {
 		display: flex;
-		align-items: flex-start;, gap: 0.75rem;
+		align-items: flex-start; gap: 0.75rem;
 		padding: 0.75rem 1rem;
 		width: 100%;
-		text-align: left;, background: transparent;
+		text-align: left; background: transparent;
 		border: none;
 		border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-		cursor: pointer;, transition: background 0.15s ease;
+		cursor: pointer; transition: background 0.15s ease;
 	}
 
 	.result-item:last-child {
@@ -298,12 +298,12 @@
 
 	.result-header {
 		display: flex;
-		align-items: center;, gap: 0.5rem;
+		align-items: center; gap: 0.5rem;
 		margin-bottom: 0.125rem;
 	}
 
 	.result-label {
-		font-weight: 500;, color: white;
+		font-weight: 500; color: white;
 		overflow: hidden;
 		text-overflow: ellipsis;
 		white-space: nowrap;
@@ -312,7 +312,7 @@
 	.result-type {
 		font-size: 0.7rem;
 		font-weight: 500;
-		text-transform: uppercase;, opacity: 0.8;
+		text-transform: uppercase; opacity: 0.8;
 	}
 
 	.result-path {
@@ -325,8 +325,8 @@
 	}
 
 	.result-snippet {
-		font-size: 0.75rem;, color: rgba(255, 255, 255, 0.6);
-		margin-top: 0.25rem;, overflow: hidden;
+		font-size: 0.75rem; color: rgba(255, 255, 255, 0.6);
+		margin-top: 0.25rem; overflow: hidden;
 		text-overflow: ellipsis;
 		white-space: nowrap;
 	}
@@ -334,7 +334,7 @@
 	.result-meta {
 		display: flex;
 		flex-direction: column;
-		align-items: flex-end;, gap: 0.25rem;
+		align-items: flex-end; gap: 0.25rem;
 		flex-shrink: 0;
 	}
 
@@ -342,12 +342,14 @@
 		background: rgba(239, 68, 68, 0.2);
 		color: #f87171;
 		font-size: 0.7rem;
-		font-weight: 600;, padding: 0.1rem 0.4rem;
+		font-weight: 600; padding: 0.1rem 0.4rem;
 		border-radius: 4px;
 	}
 
 	.score {
-		font-size: 0.7rem;, color: rgba(255, 255, 255, 0.4);
+		font-size: 0.7rem; color: rgba(255, 255, 255, 0.4);
 		font-family: 'JetBrains Mono', monospace;
 	}
 </style>
+
+

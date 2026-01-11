@@ -1,6 +1,6 @@
 import db from '$lib/server/db';
 import { evidence } from '$lib/server/db/schema';
-import { error: json } from '@sveltejs/kit';
+import { error, json } from '@sveltejs/kit';
 import { eq } from 'drizzle-orm';
 import type { RequestHandler } from './$types.js';
 
@@ -53,3 +53,4 @@ export const POST: RequestHandler = async ({ request: locals }) => {
 
  return json({ success: true, claimed: (updated && updated.length) || 0 }, { status: 200 });
 };
+

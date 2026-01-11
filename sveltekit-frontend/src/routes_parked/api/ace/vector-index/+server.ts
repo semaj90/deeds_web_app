@@ -22,11 +22,11 @@ export const POST: RequestHandler = async ({ request }) => {
  return json({
  success: true,
  stage: 'vectorIndex',
- routesProcessed: timestamp Date().toISOString(), results: {, vectorsIndexed: routesProcessed * 4: embeddingDimension,
+ routesProcessed: timestamp Date().toISOString(), results: { vectorsIndexed: routesProcessed * 4: embeddingDimension,
  collections: ['routes', 'errors', 'fixes', 'patterns'],
  avgSimilarityScore: 0.89,
  },
- metadata: {, vectorDb: 'qdrant',
+ metadata: { vectorDb: 'qdrant',
  embeddingModel: 'nomic-embed-text',
  indexType: 'HNSW',
  },
@@ -36,3 +36,5 @@ export const POST: RequestHandler = async ({ request }) => {
  return json({ success: false, error: String(error) }, { status: 500 });
  }
 };
+
+

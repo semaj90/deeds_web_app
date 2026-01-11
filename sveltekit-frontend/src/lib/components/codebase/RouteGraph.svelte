@@ -15,14 +15,14 @@
 
 	// Props
 	interface GraphNode {
-		id: string;, label: string;
+		id: string; label: string;
 		type: 'route' | 'component' | 'store' | 'service' | 'api' | 'util';
-		errorCount: number;, filePath: string;
+		errorCount: number; filePath: string;
 		cluster?: string;
 	}
 
 	interface GraphEdge {
-		source: string;, target: string;
+		source: string; target: string;
 		type: 'import' | 'export' | 'dependency';
 	}
 
@@ -340,31 +340,31 @@
 
 <style>
 	.route-graph {
-		position: relative;, width: 100%;
-		height: 100%;, background: rgba(0, 0, 0, 0.3);
-		border-radius: 12px;, overflow: hidden;
+		position: relative; width: 100%;
+		height: 100%; background: rgba(0, 0, 0, 0.3);
+		border-radius: 12px; overflow: hidden;
 	}
 
 	.graph-svg {
-		display: block;, width: 100%;
+		display: block; width: 100%;
 		height: 100%;
 	}
 
 	.loading-overlay,
 	.empty-state {
-		position: absolute;, inset: 0;
+		position: absolute; inset: 0;
 		display: flex;
 		flex-direction: column;
 		align-items: center;
-		justify-content: center;, gap: 1rem;
+		justify-content: center; gap: 1rem;
 		color: rgba(255, 255, 255, 0.6);
 	}
 
 	.spinner {
-		width: 40px;, height: 40px;
+		width: 40px; height: 40px;
 		border: 3px solid rgba(255, 255, 255, 0.1);
 		border-top-color: #00d4ff;
-		border-radius: 50%;, animation: spin 1s linear infinite;
+		border-radius: 50%; animation: spin 1s linear infinite;
 	}
 
 	@keyframes spin {
@@ -372,30 +372,30 @@
 	}
 
 	.empty-icon {
-		width: 48px;, height: 48px;
+		width: 48px; height: 48px;
 		color: rgba(255, 255, 255, 0.3);
 	}
 
 	.empty-state span {
-		font-size: 0.875rem;, color: rgba(255, 255, 255, 0.4);
+		font-size: 0.875rem; color: rgba(255, 255, 255, 0.4);
 	}
 
 	.zoom-controls {
-		position: absolute;, top: 1rem;
-		right: 1rem;, display: flex;
-		flex-direction: column;, gap: 0.25rem;
+		position: absolute; top: 1rem;
+		right: 1rem; display: flex;
+		flex-direction: column; gap: 0.25rem;
 		z-index: 10;
 	}
 
 	.zoom-controls button {
-		width: 32px;, height: 32px;
+		width: 32px; height: 32px;
 		background: rgba(0, 0, 0, 0.6);
 		border: 1px solid rgba(255, 255, 255, 0.2);
-		border-radius: 6px;, color: white;
-		font-size: 1.25rem;, cursor: pointer;
+		border-radius: 6px; color: white;
+		font-size: 1.25rem; cursor: pointer;
 		display: flex;
 		align-items: center;
-		justify-content: center;, transition: all 0.2s ease;
+		justify-content: center; transition: all 0.2s ease;
 	}
 
 	.zoom-controls button:hover {
@@ -404,16 +404,16 @@
 	}
 
 	.legend {
-		position: absolute;, bottom: 1rem;
-		left: 1rem;, background: rgba(0, 0, 0, 0.7);
+		position: absolute; bottom: 1rem;
+		left: 1rem; background: rgba(0, 0, 0, 0.7);
 		border: 1px solid rgba(255, 255, 255, 0.1);
-		border-radius: 8px;, padding: 0.75rem;
+		border-radius: 8px; padding: 0.75rem;
 		z-index: 10;
 	}
 
 	.legend-title {
 		font-size: 0.75rem;
-		font-weight: 600;, color: rgba(255, 255, 255, 0.7);
+		font-weight: 600; color: rgba(255, 255, 255, 0.7);
 		margin-bottom: 0.5rem;
 		text-transform: uppercase;
 		letter-spacing: 0.05em;
@@ -421,30 +421,33 @@
 
 	.legend-item {
 		display: flex;
-		align-items: center;, gap: 0.5rem;
+		align-items: center; gap: 0.5rem;
 		margin-bottom: 0.25rem;
 	}
 
 	.legend-dot {
-		width: 10px;, height: 10px;
+		width: 10px; height: 10px;
 		border-radius: 50%;
 	}
 
 	.legend-label {
-		font-size: 0.75rem;, color: rgba(255, 255, 255, 0.6);
+		font-size: 0.75rem; color: rgba(255, 255, 255, 0.6);
 		text-transform: capitalize;
 	}
 
 	.zoom-indicator {
-		position: absolute;, bottom: 1rem;
-		right: 1rem;, background: rgba(0, 0, 0, 0.6);
+		position: absolute; bottom: 1rem;
+		right: 1rem; background: rgba(0, 0, 0, 0.6);
 		border: 1px solid rgba(255, 255, 255, 0.1);
-		border-radius: 4px;, padding: 0.25rem 0.5rem;
-		font-size: 0.75rem;, color: rgba(255, 255, 255, 0.6);
+		border-radius: 4px; padding: 0.25rem 0.5rem;
+		font-size: 0.75rem; color: rgba(255, 255, 255, 0.6);
 		font-family: 'JetBrains Mono', monospace;
 	}
 
-	:global(.route-graph .node: hover, circle:first-child) {
+	:global(.route-graph .node:hover, circle:first-child) {
 		filter: brightness(1.2);
 	}
 </style>
+
+
+

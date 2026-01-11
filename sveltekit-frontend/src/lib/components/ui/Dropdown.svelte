@@ -63,7 +63,7 @@
       onkeydown={(e) => {
         if (e.key === 'Escape') close()}}
       style={`position: absolute, top: 100%; z-index: 60, ${menuPosition}`}
-      transition: fly={{, y: -6; duration: 140 }}
+      transition: fly={{ y: -6; duration: 140 }}
     >
       <!-- default slot used for, menu, items -->
       <slot></slot>
@@ -82,5 +82,7 @@
    ; border: 1px solid #e6edf3
     min-width: 12rem}
 </style>
+
+
 
 

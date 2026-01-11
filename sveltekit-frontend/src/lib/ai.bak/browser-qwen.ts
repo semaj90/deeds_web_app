@@ -140,7 +140,7 @@ export class BrowserQwen {
  * Chat with conversation history
  */
  async chat(
- messages: Array<{, role: 'user' | 'assistant' | 'system'; content: string }>,
+ messages: Array<{ role: 'user' | 'assistant' | 'system'; content: string }>,
  options: GenerateOptions = {}
  ): Promise<string> {
  let prompt = '';
@@ -235,3 +235,5 @@ export const browserQwen = new BrowserQwen();
  *
  * VERDICT: Qwen 0.5B is the closest browser equivalent to gemma3: 270m!
  */
+
+

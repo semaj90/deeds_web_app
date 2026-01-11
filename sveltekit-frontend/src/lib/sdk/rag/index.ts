@@ -15,7 +15,7 @@ import type { QdrantClient } from '@qdrant/js-client-rest';
 // ============================================================================
 
 export interface RAGDocument {
-	id: string;, content: string;
+	id: string; content: string;
 	metadata: Record<string, unknown>;
 	embedding?: number[];
 	score?: number;
@@ -29,12 +29,12 @@ export interface RAGQuery {
 }
 
 export interface RAGResult {
-	documents: RAGDocument[];, query: string;
-	totalFound: number;, processingTime: number;
+	documents: RAGDocument[]; query: string;
+	totalFound: number; processingTime: number;
 }
 
 export interface RAGConfig {
-	collectionName: string;, embeddingModel: string;
+	collectionName: string; embeddingModel: string;
 	vectorSize: number;
 	qdrantUrl?: string;
 }
@@ -62,7 +62,7 @@ export class RAGClient {
 			await this.qdrant.getCollection(this.config.collectionName);
 		} catch {
 			await this.qdrant.createCollection(this.config.collectionName, {
-				vectors: {, size: this.config.vectorSize,
+				vectors: { size: this.config.vectorSize,
 					distance: 'Cosine'
 				}
 			});
@@ -84,7 +84,7 @@ export class RAGClient {
 				{
 					id: doc.id,
 					vector: doc.embedding,
-					payload: {, content: doc.content,
+					payload: { content: doc.content,
 						...doc.metadata
 					}
 				}
@@ -166,3 +166,6 @@ export class RAGClient {
 // ============================================================================
 
 export default RAGClient;
+
+
+

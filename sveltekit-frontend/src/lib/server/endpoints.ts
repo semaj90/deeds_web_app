@@ -21,3 +21,4 @@ export function getEnhancedRagEndpoint(): string {
  // keep docker-first pattern for other services
  return getEnvUrl('ENHANCED_RAG_URL', 'http://enhanced-rag:8094', 'http://localhost:8094');
 }
+

@@ -63,3 +63,4 @@ export async function closeConnection(): Promise<void> {
 
 // Default export for convenience
 export default db;
+

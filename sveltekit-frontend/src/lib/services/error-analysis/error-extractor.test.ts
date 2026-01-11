@@ -196,3 +196,4 @@ describe('ErrorExtractor - Property 1: Error Extraction Completeness', () => {
  expect(warningSeverity).toHaveLength(1);
  });
 });
+

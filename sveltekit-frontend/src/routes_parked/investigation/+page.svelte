@@ -22,24 +22,24 @@
  // import { Upload } from "lucide-svelte"; // Not used
 
  interface Case {
- id: string;, title: string;
+ id: string; title: string;
  status: 'active' | 'investigating' | 'closed';
  priority: 'low' | 'medium' | 'high' | 'critical';
- createdAt: string;, updatedAt: string;
+ createdAt: string; updatedAt: string;
  description?: string;
  assignedTo?: string;
  }
  interface EvidenceItem {
- id: string;, caseId: string;
- title: string;, type: 'document' | 'image' | 'video' | 'audio' | 'digital';
+ id: string; caseId: string;
+ title: string; type: 'document' | 'image' | 'video' | 'audio' | 'digital';
  status: 'pending' | 'analyzing' | 'analyzed' | 'tagged';
  confidence?: number;
- aiAnalysis?: string;, tags: string[];
- uploadedAt: string;, size: number;
+ aiAnalysis?: string; tags: string[];
+ uploadedAt: string; size: number;
  }
  interface ChatMessage {
- id: string;, role: 'user' | 'assistant' | 'system';
- content: string;, timestamp: string;
+ id: string; role: 'user' | 'assistant' | 'system';
+ content: string; timestamp: string;
  context?: 'evidence' | 'case' | 'citation' | 'analysis';
  relatedId?: string;
  }
@@ -92,9 +92,9 @@
  // const { patterns, conflicts } = (event as CustomEvent).detail
  // console.log('ðŸ•µï¸ Detective insights:', patterns);
  // if (conflicts && conflicts.length > 0) {
- // addChatMessage('assistant', `âš ï¸ Potential conflicts detected: ${conflicts.map((c: {, description: string }) => c.description).join(', ')}`, 'analysis')}
+ // addChatMessage('assistant', `âš ï¸ Potential conflicts detected: ${conflicts.map((c: { description: string }) => c.description).join(', ')}`, 'analysis')}
  // if (patterns && patterns.length > 0) {
- // addChatMessage('assistant', `ðŸ” Patterns identified: ${patterns.map((p: {, type: string }) => p.type).join(', ')}`, 'analysis')}
+ // addChatMessage('assistant', `ðŸ” Patterns identified: ${patterns.map((p: { type: string }) => p.type).join(', ')}`, 'analysis')}
  // }
 
  // AI Chat functionality
@@ -220,13 +220,13 @@
  border-bottom: 1px solid #00ff88;
  }
  :global(.tab-trigger) {
- color: #cccccc;, transition: color 0.3s ease;
+ color: #cccccc; transition: color 0.3s ease;
  }
  :global(.tab-trigger):hover {
  color: #bfeecf;
  }
  :global(.tab-trigger[data-state='active']) {
- color: #00ff88;, background: rgba(0, 255, 136, 0.1);
+ color: #00ff88; background: rgba(0, 255, 136, 0.1);
  }
 
  /* Text shadow for header */
@@ -245,16 +245,16 @@
  justify-content: space-between;
  align-items: center;
  margin-bottom: 0.5rem;
- font-size: 0.8rem;, opacity: 0.7;
+ font-size: 0.8rem; opacity: 0.7;
  }
  :global(.thinking-indicator) {
- display: flex;, gap: 0.25rem;
+ display: flex; gap: 0.25rem;
  }
  /* span rules declared earlier as global */
  :global(.thinking-indicator span) {
- width: 6px;, height: 6px;
+ width: 6px; height: 6px;
  background: #ffd700;
- border-radius: 50%;, animation: thinking 1.5s ease-in-out infinite;
+ border-radius: 50%; animation: thinking 1.5s ease-in-out infinite;
  }
  : global(.thinking-indicator, span:nth-child(2)) {
  /* Corrected syntax */;
@@ -271,10 +271,10 @@
  :global(.citation-item) {
  display: flex;
  justify-content: space-between;
- align-items: center;, padding: 0.75rem;
+ align-items: center; padding: 0.75rem;
  border: 1px solid rgba(0, 255, 136, 0.3);
  border-radius: 4px;
- margin-bottom: 0.5rem;, background: rgba(0, 0, 0, 0.3);
+ margin-bottom: 0.5rem; background: rgba(0, 0, 0, 0.3);
  }
 
  /* chat layout â€” make global so nested chat component DOM picks up these styles */
@@ -284,7 +284,7 @@
  }
  :global(.chat-content) {
  display: flex;
- flex-direction: column;, height: 100%;
+ flex-direction: column; height: 100%;
  }
  :global(.messages-container) {
  flex: 1;
@@ -293,16 +293,16 @@
  padding-right: 0.5rem;
  }
  :global(.message) {
- margin-bottom: 1rem;, padding: 1rem;
+ margin-bottom: 1rem; padding: 1rem;
  border-radius: 8px;
  max-width: 90%;
  }
  :global(.message.user) {
- margin-left: auto;, background: rgba(0, 255, 136, 0.1);
+ margin-left: auto; background: rgba(0, 255, 136, 0.1);
  border-left: 3px solid #00ff88;
  }
  :global(.message.assistant) {
- margin-right: auto;, background: rgba(255, 215, 0, 0.1);
+ margin-right: auto; background: rgba(255, 215, 0, 0.1);
  border-left: 3px solid #ffd700;
  }
  :global(.message.system) {
@@ -316,7 +316,7 @@
 
  :global(.message-role) {
  display: flex;
- align-items: center;, gap: 0.25rem;
+ align-items: center; gap: 0.25rem;
  font-weight: 600;
  text-transform: uppercase;
  }
@@ -330,21 +330,21 @@
  0%,
  80%,
  100% {
- opacity: 0.3;, transform: scale(0.8);
+ opacity: 0.3; transform: scale(0.8);
  }
  40% {
- opacity: 1;, transform: scale(1);
+ opacity: 1; transform: scale(1);
  }
  }
  :global(.chat-input) {
- display: flex;, gap: 0.5rem;
+ display: flex; gap: 0.5rem;
  align-items: center;
  padding-top: 1rem;
  border-top: 1px solid rgba(0, 255, 136, 0.3);
  }
  :global(.citations-container) {
  display: flex;
- flex-direction: column;, height: 100%;
+ flex-direction: column; height: 100%;
  }
  :global(.add-citation) {
  margin-bottom: 2rem;
@@ -375,3 +375,5 @@
  } /* Corrected CSS syntax */
  }
 </style>
+
+

@@ -294,39 +294,39 @@
  .phase-74-layout {
  display: flex;
  flex-direction: column;
- min-height: 100vh;, background: var(--yorha-bg, #1a1a1a);
+ min-height: 100vh; background: var(--yorha-bg, #1a1a1a);
  color: var(--yorha-text, #d4d4d4);
  }
 
  .main-header {
  display: flex;
  justify-content: space-between;
- align-items: center;, padding: 1.5rem 2rem;
+ align-items: center; padding: 1.5rem 2rem;
  background: var(--yorha-bg-secondary, #2a2a2a);
  border-bottom: 1px solid var(--yorha-border, #4a4a4a);
  }
 
  .header-content h1 {
  margin: 0 0 0.25rem;
- font-size: 1.5rem;, color: var(--yorha-accent, #c8a84b);
+ font-size: 1.5rem; color: var(--yorha-accent, #c8a84b);
  }
 
  .header-content p {
- margin: 0;, color: var(--yorha-text-muted, #888);
+ margin: 0; color: var(--yorha-text-muted, #888);
  font-size: 0.9rem;
  }
 
  .header-actions {
  display: flex;
- align-items: center;, gap: 1rem;
+ align-items: center; gap: 1rem;
  }
 
  .settings-link {
  padding: 0.5rem 1rem;
  background: var(--yorha-bg, #1a1a1a);
  border: 1px solid var(--yorha-border, #4a4a4a);
- border-radius: 4px;, color: var(--yorha-text, #d4d4d4);
- text-decoration: none;, transition: all 0.2s;
+ border-radius: 4px; color: var(--yorha-text, #d4d4d4);
+ text-decoration: none; transition: all 0.2s;
  }
 
  .settings-link:hover {
@@ -337,7 +337,7 @@
  .main-content {
  display: grid;
  grid-template-columns: 200px 1fr;
- gap: 0;, flex: 1;
+ gap: 0; flex: 1;
  overflow: hidden;
  }
 
@@ -355,18 +355,18 @@
  .nav-section h3 {
  margin: 0 0 0.75rem;
  font-size: 0.85rem;
- font-weight: 600;, color: var(--yorha-text-muted, #888);
+ font-weight: 600; color: var(--yorha-text-muted, #888);
  text-transform: uppercase;
  }
 
  .nav-btn,
  .nav-link {
- display: block;, width: 100%;
+ display: block; width: 100%;
  padding: 0.625rem 0.75rem;
- background: transparent;, border: none;
+ background: transparent; border: none;
  border-left: 3px solid transparent;
- border-radius: 0;, color: var(--yorha-text-muted, #888);
- text-align: left;, cursor: pointer;
+ border-radius: 0; color: var(--yorha-text-muted, #888);
+ text-align: left; cursor: pointer;
  transition: all 0.2s;
  text-decoration: none;
  font-size: 0.9rem;
@@ -395,7 +395,7 @@
 
  .tab-content h2 {
  margin: 0 0 0.5rem;
- font-size: 1.5rem;, color: var(--yorha-text, #d4d4d4);
+ font-size: 1.5rem; color: var(--yorha-text, #d4d4d4);
  }
 
  .section-desc {
@@ -405,15 +405,15 @@
  }
 
  .search-box {
- display: flex;, gap: 0.5rem;
+ display: flex; gap: 0.5rem;
  margin-bottom: 1.5rem;
  }
 
  .search-input {
- flex: 1;, padding: 0.75rem 1rem;
+ flex: 1; padding: 0.75rem 1rem;
  background: var(--yorha-bg-secondary, #2a2a2a);
  border: 1px solid var(--yorha-border, #4a4a4a);
- border-radius: 4px;, color: var(--yorha-text, #d4d4d4);
+ border-radius: 4px; color: var(--yorha-text, #d4d4d4);
  font-size: 0.9rem;
  }
 
@@ -428,7 +428,7 @@
  color: var(--yorha-bg, #1a1a1a);
  border: none;
  border-radius: 4px;
- font-weight: 500;, cursor: pointer;
+ font-weight: 500; cursor: pointer;
  transition: background 0.2s;
  }
 
@@ -437,7 +437,7 @@
  }
 
  .uploaded-files {
- margin-top: 2rem;, padding: 1rem;
+ margin-top: 2rem; padding: 1rem;
  background: var(--yorha-bg-secondary, #2a2a2a);
  border: 1px solid var(--yorha-border, #4a4a4a);
  border-radius: 4px;
@@ -450,12 +450,12 @@
 
  .file-list {
  display: flex;
- flex-direction: column;, gap: 0.5rem;
+ flex-direction: column; gap: 0.5rem;
  }
 
  .file-item {
  display: flex;
- justify-content: space-between;, padding: 0.5rem;
+ justify-content: space-between; padding: 0.5rem;
  background: var(--yorha-bg, #1a1a1a);
  border-radius: 2px;
  font-size: 0.85rem;
@@ -471,7 +471,7 @@
  background: var(--yorha-bg-secondary, #2a2a2a);
  border-top: 1px solid var(--yorha-border, #4a4a4a);
  text-align: center;
- font-size: 0.8rem;, color: var(--yorha-text-muted, #888);
+ font-size: 0.8rem; color: var(--yorha-text-muted, #888);
  }
 
  .main-footer p {
@@ -488,3 +488,4 @@
  }
  }
 </style>
+

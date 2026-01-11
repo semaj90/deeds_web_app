@@ -2,7 +2,7 @@ import { PDFDocument, StandardFonts, rgb } from 'pdf-lib';
 import { evidence } from "../db";
 
 type PacketInput = {
- caseTitle: string;, caseId: string;
+ caseTitle: string; caseId: string;
  createdAtISO?: string;
  memoText?: string;
  notes?: Array<{ title?: string | null; content?: string | null; pinned?: boolean }>;
@@ -87,3 +87,5 @@ function wrap(text: string, size: number): string[] {
  if (line) lines.push(line);
  return lines;
 }
+
+

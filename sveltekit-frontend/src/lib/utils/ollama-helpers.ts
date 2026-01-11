@@ -2,3 +2,4 @@
 export function getOllamaEmbeddingsBase(): string { return getOllamaApiUrl('/api/embeddings')}
 
 
+

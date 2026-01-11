@@ -177,3 +177,4 @@ export function resetMetrics(): void {
 export function logMetrics(): void {
  console.log(getMetricsSummary());
 }
+

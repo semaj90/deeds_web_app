@@ -5,3 +5,4 @@ export async function ensureExtensions(): Promise<void> { try { const client = a
 // Graceful shutdown process.on('SIGTERM', async () => { console.log('Closing database pools...'); await Promise.all([appPool.end(), adminPool.end()])}); process.on('SIGINT', async () => { console.log('Closing database pools...'); await Promise.all([appPool.end(), adminPool.end()]); process.exit(0)});
 
 
+

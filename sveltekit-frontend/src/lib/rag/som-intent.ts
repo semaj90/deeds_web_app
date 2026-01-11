@@ -10,3 +10,4 @@ export function buildIntentMap(points, IntentPoint[], cfg: SOMGridConfig) { if (
 
 
 
+

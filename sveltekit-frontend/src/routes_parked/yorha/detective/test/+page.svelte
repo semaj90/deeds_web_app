@@ -38,7 +38,7 @@
  headers: {
  'Content-Type': 'application/json',
  },
- body: JSON.stringify({, title: 'Test Case from YoRHa Detective',
+ body: JSON.stringify({ title: 'Test Case from YoRHa Detective',
  description: 'This is a test case created from the YoRHa Detective interface',
  priority: 'medium',
  }),
@@ -74,3 +74,4 @@
  <h2>Result:</h2>
  <pre>{testResult}</pre>
 {/if}
+

@@ -30,3 +30,4 @@ export type {
   KBSearchResult,
   ToolPermission
 } from '../registry.js';
+

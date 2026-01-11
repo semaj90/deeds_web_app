@@ -12,7 +12,7 @@ export type LegalIntent =
 
 export interface IntentContext {
  query: string;
- statute?: {, titleNumber: number;, section: string;, id: string;
+ statute?: { titleNumber: number; section: string; id: string;
  };
  workspaceId?: string;
  selectedClause?: string;
@@ -20,7 +20,7 @@ export interface IntentContext {
 }
 
 export interface IntentResult {
- intent: LegalIntent;, confidence: number;
+ intent: LegalIntent; confidence: number;
  reasoning?: string;
 }
 
@@ -138,3 +138,6 @@ Generate only an outline with headings and bullet points for a legal memo.`;
  return base;
  }
 }
+
+
+

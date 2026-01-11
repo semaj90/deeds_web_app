@@ -37,3 +37,4 @@ export function extractTimestamp(runId: string): Date | null {
  const [, year, month, day, hour, minute, second] = match;
  return new Date(`${ year }-${ month }-${ day }T${ hour }:${minute}:${ second }Z`);
 }
+

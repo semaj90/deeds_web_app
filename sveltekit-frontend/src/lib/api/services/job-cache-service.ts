@@ -2,11 +2,11 @@
 import { getAuthHeaders } from './auth-service.js';
 
 export interface JobStatus {
- jobId: string;, status: 'pending' | 'processing' | 'completed' | 'failed' | 'cancelled';
+ jobId: string; status: 'pending' | 'processing' | 'completed' | 'failed' | 'cancelled';
  progress: number; // 0-100
  result?: any;
- error?: string;, createdAt: string;, updatedAt: string;
- estimatedCompletionTime?: string;, priority: 'low' | 'normal' | 'high' | 'critical';
+ error?: string; createdAt: string; updatedAt: string;
+ estimatedCompletionTime?: string; priority: 'low' | 'normal' | 'high' | 'critical';
  type: string;
 }
 
@@ -133,3 +133,5 @@ export async function clearJobCache(jobId: string): Promise<void> {
  throw new Error(`Failed to clear job cache: ${(error as Error).message}`);
  }
 }
+
+

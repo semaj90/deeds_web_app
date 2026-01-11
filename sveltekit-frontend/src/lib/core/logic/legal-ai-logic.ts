@@ -8,3 +8,4 @@ export interface AIAnalysis { confidence: number, entities: Array<any>, themes: 
 
 
 
+

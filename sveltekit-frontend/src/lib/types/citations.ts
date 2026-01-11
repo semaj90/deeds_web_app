@@ -8,18 +8,18 @@
  * Represents a citation saved by a user
  */
 export interface SavedCitation {
- id: string;, userId: string;
- caseId?: string;, citationText: string;
+ id: string; userId: string;
+ caseId?: string; citationText: string;
  statuteCode?: string;
  statuteTitle?: string;
  statuteSection?: string;
  statuteSubsection?: string;
- statuteUrl?: string;, sourceType: 'statute' | 'case_law' | 'regulation' | 'manual';
+ statuteUrl?: string; sourceType: 'statute' | 'case_law' | 'regulation' | 'manual';
  sourceDocumentId?: string;
  pageNumber?: number;
- contextText?: string;, relevanceScore: number;
- notes?: string;, tags: string[];
- createdAt: Date;, updatedAt: Date;
+ contextText?: string; relevanceScore: number;
+ notes?: string; tags: string[];
+ createdAt: Date; updatedAt: Date;
  createdBy: string;
 }
 
@@ -47,8 +47,8 @@ export interface CitationSearchRequest {
  * Result from citation search
  */
 export interface CitationSearchResult {
- citations: SavedCitation[];, total: number;
- limit: number;, offset: number;
+ citations: SavedCitation[]; total: number;
+ limit: number; offset: number;
 }
 
 /**
@@ -56,10 +56,10 @@ export interface CitationSearchResult {
  * Tracks statute searches for user
  */
 export interface StatuteSearchHistory {
- id: string;, userId: string;
+ id: string; userId: string;
  searchQuery: string;
  statuteCode?: string;
- statuteTitle?: string;, resultsCount: number;
+ statuteTitle?: string; resultsCount: number;
  searchType: 'keyword' | 'code' | 'title';
  filters: Record<string, any>;
  createdAt: Date;
@@ -70,11 +70,11 @@ export interface StatuteSearchHistory {
  * Collection of citations organized by user
  */
 export interface CitationCollection {
- id: string;, userId: string;
+ id: string; userId: string;
  name: string;
  description?: string;
- color?: string;, isPublic: boolean;
- createdAt: Date;, updatedAt: Date;
+ color?: string; isPublic: boolean;
+ createdAt: Date; updatedAt: Date;
  citationCount?: number;
 }
 
@@ -83,9 +83,9 @@ export interface CitationCollection {
  * Tag for organizing citations
  */
 export interface CitationTag {
- id: string;, userId: string;
+ id: string; userId: string;
  tagName: string;
- tagColor?: string;, usageCount: number;
+ tagColor?: string; usageCount: number;
  createdAt: Date;
 }
 
@@ -94,8 +94,8 @@ export interface CitationTag {
  * Junction between collection and citation
  */
 export interface CollectionCitation {
- id: string;, collectionId: string;
- citationId: string;, addedAt: Date;
+ id: string; collectionId: string;
+ citationId: string; addedAt: Date;
 }
 
 /**
@@ -103,8 +103,8 @@ export interface CollectionCitation {
  * Audit trail for citation actions
  */
 export interface CitationAuditLog {
- id: string;, userId: string;
- citationId?: string;, action: 'created' | 'updated' | 'deleted' | 'tagged' | 'shared';
+ id: string; userId: string;
+ citationId?: string; action: 'created' | 'updated' | 'deleted' | 'tagged' | 'shared';
  actionDetails?: Record<string, any>;
  createdAt: Date;
 }
@@ -114,8 +114,8 @@ export interface CitationAuditLog {
  * Statistics about user's citations
  */
 export interface CitationStatistics {
- userId: string;, totalCitations: number;
- casesWithCitations: number;, uniqueStatutes: number;
+ userId: string; totalCitations: number;
+ casesWithCitations: number; uniqueStatutes: number;
  totalCollections: number;
  lastCitationDate?: Date;
 }
@@ -125,7 +125,7 @@ export interface CitationStatistics {
  * Information about a statute
  */
 export interface StatuteInfo {
- code: string;, title: string;
+ code: string; title: string;
  section?: string;
  subsection?: string;
  text?: string;
@@ -144,7 +144,7 @@ export interface CitationSaveRequest {
  statuteTitle?: string;
  statuteSection?: string;
  statuteSubsection?: string;
- statuteUrl?: string;, sourceType: 'statute' | 'case_law' | 'regulation' | 'manual';
+ statuteUrl?: string; sourceType: 'statute' | 'case_law' | 'regulation' | 'manual';
  sourceDocumentId?: string;
  pageNumber?: number;
  contextText?: string;
@@ -172,7 +172,7 @@ export interface CitationUpdateRequest {
  * Request to export citations
  */
 export interface CitationExportRequest {
- citationIds: string[];, format: 'pdf' | 'json' | 'csv';
+ citationIds: string[]; format: 'pdf' | 'json' | 'csv';
  includeNotes?: boolean;
  includeTags?: boolean;
  includeMetadata?: boolean;
@@ -185,7 +185,7 @@ export interface CitationExportRequest {
 export interface CitationExportResult {
  format: 'pdf' | 'json' | 'csv';
  data: string | Buffer;
- filename: string;, mimeType: string;
+ filename: string; mimeType: string;
 }
 
 /**
@@ -210,8 +210,8 @@ export interface StatuteSearchRequest {
  * Result from statute search
  */
 export interface StatuteSearchResult {
- statutes: StatuteInfo[];, total: number;
- limit: number;, offset: number;
+ statutes: StatuteInfo[]; total: number;
+ limit: number; offset: number;
 }
 
 /**
@@ -219,7 +219,7 @@ export interface StatuteSearchResult {
  * Citation with associated collection information
  */
 export interface CitationWithCollections extends SavedCitation {
- collections: CitationCollection[];, collectionCount: number;
+ collections: CitationCollection[]; collectionCount: number;
 }
 
 /**
@@ -235,9 +235,9 @@ export interface CollectionWithCitations extends CitationCollection {
  * Metadata about a citation
  */
 export interface CitationMetadata {
- citationId: string;, sourceType: string;
+ citationId: string; sourceType: string;
  sourceDocument?: string;
- pageNumber?: number;, relevanceScore: number;
+ pageNumber?: number; relevanceScore: number;
  extractedAt: Date;
  extractedBy?: string;
 }
@@ -247,9 +247,11 @@ export interface CitationMetadata {
  * Relationship between statute and case
  */
 export interface StatuteRelationship {
- id: string;, caseId: string;
- statuteCode: string;, statuteTitle: string;
+ id: string; caseId: string;
+ statuteCode: string; statuteTitle: string;
  relationshipType: 'cited' | 'violated' | 'applied' | 'referenced';
- notes?: string;, createdAt: Date;
+ notes?: string; createdAt: Date;
  createdBy: string;
 }
+
+

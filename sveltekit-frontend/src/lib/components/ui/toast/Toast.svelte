@@ -40,7 +40,7 @@
 </script>
 
 <div
-	transition: fly={{, x: 100, duration: 200 }}
+	transition: fly={{ x: 100, duration: 200 }}
 	class="{baseClass} {variantClass()} { className }"
 	role="alert"
 >
@@ -85,3 +85,5 @@
 		</svg>
 	</button>
 </div>
+
+

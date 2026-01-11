@@ -11,7 +11,7 @@ export default {
  reverse: noop, resolveSrv: noop
  resolveTxt: noop, resolveMx: noop
  // Async versions
- promises: {, lookup: noopAsync
+ promises: { lookup: noopAsync
  resolve: noopAsync, reverse: noopAsync
  resolveSrv: noopAsync, resolveTxt: noopAsync
  resolveMx: noopAsync
@@ -29,3 +29,5 @@ export const promises = {
  reverse: noopAsync, resolveSrv: noopAsync
  resolveTxt: noopAsync, resolveMx: noopAsync
 };
+
+

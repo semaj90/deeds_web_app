@@ -2,20 +2,20 @@ import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types.js';
 
 interface OCRHealthDetails {
- service: string;, status: 'operational' | 'degraded' | 'offline';
- port?: number;, endpoint: string;
+ service: string; status: 'operational' | 'degraded' | 'offline';
+ port?: number; endpoint: string;
  features?: string[];
- performance?: {, avgProcessingTime: number;
- documentsProcessed: number;, errorRate: number;
+ performance?: { avgProcessingTime: number;
+ documentsProcessed: number; errorRate: number;
  };
- version?: string;, lastChecked: string;
+ version?: string; lastChecked: string;
  responseTime: number;
 }
 
 interface OCRHealthResponse {
  status: 'healthy' | 'degraded' | 'unhealthy';
- timestamp: string;, ocr: OCRHealthDetails;
- metadata: {, checkDuration: number;
+ timestamp: string; ocr: OCRHealthDetails;
+ metadata: { checkDuration: number;
  environment: string;
  };
 }
@@ -70,7 +70,7 @@ async function performOCRHealthCheck(): Promise<OCRHealthDetails> {
 
  const response = await fetch(`${ocrBaseUrl}/status`, {
  method: 'GET',
- headers: {, Accept: 'application/json',
+ headers: { Accept: 'application/json',
  'User-Agent': 'LegalAI-HealthCheck/1.0',
  },
  signal: controller.signal,
@@ -90,7 +90,7 @@ async function performOCRHealthCheck(): Promise<OCRHealthDetails> {
  port: data.port,
  endpoint: `${ocrBaseUrl}/status`,
  features: Array.isArray(data.features) ? data.features : [],
- performance: {, avgProcessingTime: safeNumber(data.performance?.avgProcessingTime, 0),
+ performance: { avgProcessingTime: safeNumber(data.performance?.avgProcessingTime, 0),
  documentsProcessed: safeNumber(data.performance?.documentsProcessed, 0),
  errorRate: safeNumber(data.performance?.errorRate, 0),
  },
@@ -269,7 +269,7 @@ export const POST: RequestHandler = async ({ request }) => {
  return json({
  action: 'detailed-status',
  ...ocrHealth,
- additionalChecks: {, batchProcessingAvailable: true,
+ additionalChecks: { batchProcessingAvailable: true,
  extractionFormats: ['pdf', 'png', 'jpg', 'jpeg', 'txt'],
  maxFileSize: '50MB',
  },
@@ -285,7 +285,7 @@ export const POST: RequestHandler = async ({ request }) => {
  status: overallStatus,
  timestamp: new Date().toISOString(),
  ocr: ocrHealth,
- metadata: {, checkDuration: 0,
+ metadata: { checkDuration: 0,
  environment: process.env.NODE_ENV || 'development',
  },
  };
@@ -329,3 +329,6 @@ export const HEAD: RequestHandler = async () => {
  });
  }
 };
+
+
+

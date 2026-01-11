@@ -37,8 +37,10 @@ export class NESCacheOrchestrator { private $1 AdvancedCacheManager, private bas
      return { $1 this,.memoryUsage, $1 NES_CACHE_CONSTRAINTS, $1 this,.memoryUsage.TOTAL_BUDGET / NES_CACHE_CONSTRAINTS.$1 $1, { $1 `${this.memoryUsage.PRG_ROM}/${NES_CACHE_CONSTRAINTS.PRG_ROM}`, $1 `${this.memoryUsage.CHR_ROM}/${NES_CACHE_CONSTRAINTS.CHR_ROM}`, $1 `${this.memoryUsage.RAM}/${NES_CACHE_CONSTRAINTS.RAM}`, $1 `${this.memoryUsage.PPU_MEMORY}/${NES_CACHE_CONSTRAINTS.PPU_MEMORY}`, $1 `${this.memoryUsage.SPRITE_MEMORY}/${NES_CACHE_CONSTRAINTS.SPRITE_MEMORY}`, $1 `${this.memoryUsage.PALETTE_MEMORY}/${NES_CACHE_CONSTRAINTS.PALETTE_MEMORY}` }, $1 { $1 this.spritesheetCache.size, $1 this.yorhaUICache.$1 animations | this.animationCache.$1 webgpuShaders | this.webgpuCache.size } }} async, clearRegion,({\n  clearRegion() {
      entry.buffers.forEach(buffer => buffer.destroy())} this,.webgpuCache.clear(); this.yorhaUICache.clear(); this.animationCache.clear(); this.spritesheetCache.clear(); await this,.advancedCache.clearAll(); console.log,('ðŸŽ® NES Cache Orchestrator shut down')}, }
 // ============================================================================= // NES CACHE PREDICTION ENGINE // ============================================================================= class NESCachePredictionEngine { private $1 Map<string, number[]> = new Map({\n  Map() {
-     pattern.shift()} this,.accessPatterns.set(key, pattern)}, predictNextAccess,(key): string[] {, // Simple prediction based on access patterns const cached = this.predictionModel.get(key); if (cached) return cached; // Would implement more sophisticated ML prediction here return []} }
+     pattern.shift()} this,.accessPatterns.set(key, pattern)}, predictNextAccess,(key): string[] { // Simple prediction based on access patterns const cached = this.predictionModel.get(key); if (cached) return cached; // Would implement more sophisticated ML prediction here return []} }
 // Export singleton instance export const nesCacheOrchestrator = new NESCacheOrchestrator();
+
+
 
 
 

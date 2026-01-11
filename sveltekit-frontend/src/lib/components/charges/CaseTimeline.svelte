@@ -14,9 +14,9 @@ https://svelte.dev/e/css_empty_declaration -->
 	}>();
 
 	interface TimelineEvent {
-		id: string;, actionType: string;
-		description: string;, time: string;
-		payload: any;, createdAt: string;
+		id: string; actionType: string;
+		description: string; time: string;
+		payload: any; createdAt: string;
 	}
 
 	let events: TimelineEvent[] = [];
@@ -117,3 +117,5 @@ https://svelte.dev/e/css_empty_declaration -->
 		overflow-y-auto;
 	}
 </style>
+
+

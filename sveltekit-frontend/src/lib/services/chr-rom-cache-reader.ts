@@ -15,3 +15,4 @@ export async function getDocumentStatusIndicator(docId): Promise<string> {
  const result = await chrROMCacheReader.getPattern(docId, 'status_indicator');
  return result.pattern.data || '';
 }
+

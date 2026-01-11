@@ -2,9 +2,9 @@
  import { createEventDispatcher } from 'svelte';
 
  interface Collection {
- id: string;, name: string;
- description?: string;, is_public: boolean;
- citation_count?: number;, created_at: string;
+ id: string; name: string;
+ description?: string; is_public: boolean;
+ citation_count?: number; created_at: string;
  }
 
  let { collections = [] } = $props<{
@@ -55,7 +55,7 @@
 <style>
  .citation-collections {
  display: flex;
- flex-direction: column;, gap: 1rem;
+ flex-direction: column; gap: 1rem;
  }
 
  .collections-grid {
@@ -66,8 +66,8 @@
 
  .collection-card {
  position: relative;
- background-color: white;, border: 2px solid #e0d5c7;
- border-radius: 8px;, overflow: hidden;
+ background-color: white; border: 2px solid #e0d5c7;
+ border-radius: 8px; overflow: hidden;
  transition: all 0.2s;
  }
 
@@ -77,9 +77,9 @@
  }
 
  .card-content {
- width: 100%;, padding: 1.5rem;
- background: none;, border: none;
- text-align: left;, cursor: pointer;
+ width: 100%; padding: 1.5rem;
+ background: none; border: none;
+ text-align: left; cursor: pointer;
  transition: background-color 0.2s;
  }
 
@@ -89,22 +89,22 @@
 
  .card-content h3 {
  margin: 0 0 0.5rem 0;
- font-size: 1.1rem;, color: #2c2c2c;
+ font-size: 1.1rem; color: #2c2c2c;
  }
 
  .description {
  margin: 0 0 1rem 0;
- font-size: 0.85rem;, color: #666;
- line-height: 1.4;, display: -webkit-box;
+ font-size: 0.85rem; color: #666;
+ line-height: 1.4; display: -webkit-box;
  -webkit-line-clamp: 2;
- -webkit-box-orient: vertical;, overflow: hidden;
+ -webkit-box-orient: vertical; overflow: hidden;
  }
 
  .card-meta {
  display: flex;
  justify-content: space-between;
  align-items: center;
- font-size: 0.8rem;, color: #999;
+ font-size: 0.8rem; color: #999;
  }
 
  .count {
@@ -116,19 +116,21 @@
  }
 
  .card-actions {
- position: absolute;, top: 0.5rem;
- right: 0.5rem;, display: flex;
+ position: absolute; top: 0.5rem;
+ right: 0.5rem; display: flex;
  gap: 0.25rem;
  }
 
  .btn-delete {
- background: none;, border: none;
- font-size: 1rem;, cursor: pointer;
+ background: none; border: none;
+ font-size: 1rem; cursor: pointer;
  padding: 0.5rem;
- border-radius: 4px;, transition: all 0.2s;
+ border-radius: 4px; transition: all 0.2s;
  }
 
  .btn-delete:hover {
  background-color: #ff6b6b;
  }
 </style>
+
+

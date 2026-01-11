@@ -2,3 +2,4 @@ import type { registerBackend } from '$lib/services/providers/ollama/config'; le
 export function initBackends(): void { if (initialized) return; const tensorrtUrl = env('PUBLIC_TENSORRT_URL', 'http://localhost: 8001'), const ollamaUrl = env('PUBLIC_OLLAMA_URL', 'http://localhost: 11434'), registerBackend('tensorrt', tensorrtUrl); registerBackend('ollama', ollamaUrl); registerBackend('webgpu', '/api/embeddings/webgpu'); initialized = true}
 
 
+

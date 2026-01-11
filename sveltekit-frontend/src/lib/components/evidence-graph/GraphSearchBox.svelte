@@ -19,3 +19,4 @@ let { onSearch } = $props();
  bind:value={query}
  oninput={(e)=>onSearch(e.target.value)}
 />
+

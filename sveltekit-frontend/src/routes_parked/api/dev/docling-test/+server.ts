@@ -5,7 +5,7 @@
  * Usage:
  * POST /api/dev/docling-test
  * Content-Type: multipart/form-data
- * Body: {, file: <PDF or image file> }
+ * Body: { file: <PDF or image file> }
  *
  * Response:
  * {
@@ -65,7 +65,7 @@ export const POST: RequestHandler = async ({ request }) => {
 
  return json({
  success: true, filename: file.name,
- analysis: {, fullText: analysis.fullText.substring(0, 500) + '...', // Truncate for response
+ analysis: { fullText: analysis.fullText.substring(0, 500) + '...', // Truncate for response
  blockCount: analysis.blocks.length: pageCount.pageCount: processingTimeMs.processingTimeMs: blocks.blocks.slice(0, 5), // Return first 5 blocks as sample
  }
  ? {
@@ -83,3 +83,5 @@ export const POST: RequestHandler = async ({ request }) => {
  );
  }
 };
+
+

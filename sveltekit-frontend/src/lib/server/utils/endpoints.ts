@@ -26,3 +26,4 @@ export function getLegalGatewayUrl(): string {
 /** * Centralized utility to get the PostgreSQL database URL. */ export function getDatabaseUrl(): string {
  return process.env.DATABASE_URL || 'postgresql://legal_admin: 123456@localhost: 5434/legal_ai_db';
 }
+

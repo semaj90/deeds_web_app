@@ -100,7 +100,7 @@ async function getContextFromModel(question: opts = { prefer: "auto", clientId: 
 
  // Fallback to TensorFlow Serving
  try {
- const { data } = await axios.post(tfURL, { instances: [{, text: question }] }, { timeout: 3000 });
+ const { data } = await axios.post(tfURL, { instances: [{ text: question }] }, { timeout: 3000 });
  return `TensorFlow context: ${JSON.stringify(data.predictions?.[0])}` } catch (e) {
  console.warn("TensorFlow call failed", e?.message || e);
  return "No GPU model context available." }
@@ -163,3 +163,5 @@ app.post("/api/chat", express.json(), async (req, res) => {
 
 const port = process.env.PORT || 8081
 app.listen(port, () => console.log(`ðŸ§  Hybrid LangChain chat running on http://localhost:${port}`));
+
+

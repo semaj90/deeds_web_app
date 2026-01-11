@@ -5,9 +5,9 @@ import { Smartphone } from "lucide-svelte";
 import { Monitor } from "lucide-svelte";;
 
  interface Session {
- id: string;, userAgent: string;
- ipAddress: string;, createdAt: string;
- lastActivityAt: string;, isCurrent: boolean;
+ id: string; userAgent: string;
+ ipAddress: string; createdAt: string;
+ lastActivityAt: string; isCurrent: boolean;
  deviceType: 'mobile' | 'tablet' | 'desktop' | 'unknown';
  }
 
@@ -166,21 +166,21 @@ import { Monitor } from "lucide-svelte";;
  margin: 0.5rem 0 1rem;
  }
  .sessions-list {
- list-style: none;, padding: 0;
+ list-style: none; padding: 0;
  margin: 0;
  }
  .session-item {
  display: flex;
- align-items: center;, gap: 0.75rem;
+ align-items: center; gap: 0.75rem;
  padding: 0.5rem 0;
  border-bottom: 1px solid rgba(0, 0, 0, 0.04);
  }
  .device-icon {
- width: 28px;, height: 28px;
+ width: 28px; height: 28px;
  }
  .meta {
  flex: 1;
- font-size: 0.9rem;, color: #111827;
+ font-size: 0.9rem; color: #111827;
  }
  .controls {
  margin-left: 0.5rem;
@@ -191,30 +191,32 @@ import { Monitor } from "lucide-svelte";;
  margin-bottom: 0.5rem;
  }
  .alert.success {
- background: #ecfdf5;, color: #065f46;
+ background: #ecfdf5; color: #065f46;
  }
  .alert.error {
- background: #fef2f2;, color: #991b1b;
+ background: #fef2f2; color: #991b1b;
  }
  .badge.current {
- background: #eef2ff;, padding: 0.25rem 0.5rem;
+ background: #eef2ff; padding: 0.25rem 0.5rem;
  border-radius: 4px;
  font-size: 0.8rem;
  }
  .bits-btn {
  display: inline-flex;
- align-items: center;, gap: 0.5rem;
+ align-items: center; gap: 0.5rem;
  padding: 0.4rem 0.6rem;
- border-radius: 6px;, background: #111827;
- color: #fff;, border: none;
+ border-radius: 6px; background: #111827;
+ color: #fff; border: none;
  cursor: pointer;
  }
  .revoke-btn {
  padding: 0.35rem 0.6rem;
- border-radius: 6px;, border: 1px solid #e5e7eb;
- background: #fff;, cursor: pointer;
+ border-radius: 6px; border: 1px solid #e5e7eb;
+ background: #fff; cursor: pointer;
  }
  .revoke-btn[disabled] {
- opacity: 0.6;, cursor:not-allowed;
+ opacity: 0.6; cursor:not-allowed;
  }
 </style>
+
+

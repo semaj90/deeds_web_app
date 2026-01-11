@@ -15,7 +15,7 @@ export class EvidenceFastAPIBridge {
  */
  static async processEvidence(
  evidenceId: string,
- fileData?: {, buffer: Buffer; filename: string;, mimeType: string }
+ fileData?: { buffer: Buffer; filename: string; mimeType: string }
  ) {
  try {
  console.log(`🔄 Processing evidence ${ evidenceId } with FastAPI RAG pipeline`);
@@ -70,7 +70,7 @@ export class EvidenceFastAPIBridge {
  */
  private static async uploadToFastAPI(
  evidenceId: string,
- fileData: {, buffer: Buffer; filename: string;, mimeType: string }
+ fileData: { buffer: Buffer; filename: string; mimeType: string }
  ) {
  const formData = new FormData();
  const file = new File([fileData.buffer], fileData.filename, { type: fileData.mimeType });
@@ -142,7 +142,7 @@ export class EvidenceFastAPIBridge {
 /**
  * API endpoint to trigger evidence processing
  */
-export const POST: RequestHandler = async ({ params: request }) => {
+export const POST: RequestHandler = async ({ params, request }) => {
  try {
  const { evidenceId } = await request.json();
 
@@ -197,3 +197,7 @@ export const GET: RequestHandler = async ({ url }) => {
  });
  }
 };
+
+
+
+

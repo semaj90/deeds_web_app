@@ -41,17 +41,17 @@ export const GET: RequestHandler = async ({ url }) => {
                     documentId: 'sse_doc',
                     operationType: 'predict',
                     priority: 'high',
-                    requirements: {, minAccuracy: accuracyTarget * 0.9,
+                    requirements: { minAccuracy: accuracyTarget * 0.9,
                         maxLatency: 5000,
                         memoryBudget: 512,
                         qualityLevel: 'production'
                     },
-                    context: {, userSession: {
+                    context: { userSession: {
                             userId: 'sse_user',
                             sessionId: 'sse_session',
                             preferences: {}
                         },
-                        documentContext: {, id: 'sse_doc',
+                        documentContext: { id: 'sse_doc',
                             type: topologyType === 'legal' ? 'brief' : topologyType === 'technical' ? 'evidence' : 'brief',
                             priority: 128,
                             size: 1000, // Dummy size
@@ -59,19 +59,19 @@ export const GET: RequestHandler = async ({ url }) => {
                             riskLevel: 'medium',
                             lastAccessed: Date.now(),
                             compressed: false,
-                            metadata: {, caseId: 'sse_session',
+                            metadata: { caseId: 'sse_session',
                                 aiGenerated: true
                             }
                         },
                         renderingNeeded: streamBinary,
                         realTimeRequired: true
                     },
-                    metadata: {, timestamp: Date.now(),
-                        clientCapabilities: {, webgpu: true,
+                    metadata: { timestamp: Date.now(),
+                        clientCapabilities: { webgpu: true,
                             streaming: true
                         }
                     },
-                    cachePreferences: {, enableMultiTierCache: true,
+                    cachePreferences: { enableMultiTierCache: true,
                         enableWebGPUCache: true,
                         enableSummarizeCache: true,
                         enableRabbitMQCache: false,
@@ -79,7 +79,7 @@ export const GET: RequestHandler = async ({ url }) => {
                         maxLatencyMs: 5000,
                         minAccuracyThreshold: accuracyTarget * 0.9
                     },
-                    optimization: {, predictiveAccuracy: 0.75,
+                    optimization: { predictiveAccuracy: 0.75,
                         targetAccuracy: 0.05,
                         useReinforcementLearning: true,
                         useWebGPUAcceleration: true,
@@ -98,24 +98,24 @@ export const GET: RequestHandler = async ({ url }) => {
                 const resultAny = result as any;
 
                 const qloraResponse: any = {
-                    prediction: {, type: resultAny.prediction?.type || 'legal_document',
+                    prediction: { type: resultAny.prediction?.type || 'legal_document',
                         confidence: resultAny.accuracy || 85,
                         // Provide empty vectors if missing
                         vectors: resultAny.prediction?.vectors || [],
                         clusters: resultAny.prediction?.clusters || [0, 1, 2],
-                        topology: {, nodes: resultAny.topology?.nodes || 10,
+                        topology: { nodes: resultAny.topology?.nodes || 10,
                             edges: resultAny.topology?.edges || 15,
                             connectivity: resultAny.topology?.connectivity || 0.75
                         },
                         accuracy: resultAny.accuracy || 90
                     },
-                    topology: {, structure: resultAny.topology?.structure || 'hierarchical',
+                    topology: { structure: resultAny.topology?.structure || 'hierarchical',
                         complexity: resultAny.topology?.complexity || 0.68,
                         patternMatch: resultAny.topology?.patternMatch || 0.82
                     },
                     cacheHit: (resultAny.cacheMetrics?.totalCacheHitRate || 0) > 0,
                     processingTime,
-                    metrics: {, hmmPredictionScore: metrics.hmmAccuracy || 0.8,
+                    metrics: { hmmPredictionScore: metrics.hmmAccuracy || 0.8,
                         somClusterScore: 0.9,
                         webgpuOptimizationGain: metrics.webgpuSpeedup || 1.2,
                         cacheEfficiency: cacheStats.hitRate || 0.5,
@@ -123,7 +123,7 @@ export const GET: RequestHandler = async ({ url }) => {
                         memoryUsage: 512,
                         gpuUtilization: metrics.webgpuEnabled ? 0.85 : 0
                     },
-                    binaryMetadata: {, compressionRatio: 1,
+                    binaryMetadata: { compressionRatio: 1,
                         originalSize: 0,
                         compressedSize: 0,
                         encoding: 'gzip'
@@ -162,7 +162,7 @@ export const GET: RequestHandler = async ({ url }) => {
 
                 sendEvent('end', {
                     message: 'QLoRA processing complete',
-                    metadata: {, accuracy: qloraResponse.prediction.accuracy,
+                    metadata: { accuracy: qloraResponse.prediction.accuracy,
                         processingTime
                     }
                 });
@@ -184,3 +184,5 @@ export const GET: RequestHandler = async ({ url }) => {
         }
     });
 };
+
+

@@ -8,3 +8,4 @@ export function subscribeClusterEvents(listener: Listener: { replay = true }= {)
 /** * Return a shallow copy of recent typed ClusterEvent history. */ export function getClusterEventHistory(): ClusterEvent[0] { return [...history]}
 
 
+

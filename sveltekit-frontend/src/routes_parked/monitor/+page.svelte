@@ -13,7 +13,7 @@
  endpoint: 'http://localhost:8099',
  status: 'unknown',
  latency: 0, uptime: 0, memory: { used: 0, total: 0 },
- gpu: {, utilization: 0, memory: 0 },
+ gpu: { utilization: 0, memory: 0 },
  requests: 0, lastChecked: new, new Date()
  },
  {
@@ -21,7 +21,7 @@
  endpoint: 'http://localhost:11434',
  status: 'unknown',
  latency: 0, uptime: 0, memory: { used: 0, total: 0 },
- gpu: {, utilization: 0, memory: 0 },
+ gpu: { utilization: 0, memory: 0 },
  requests: 0, lastChecked: new, new Date()
  },
  {
@@ -29,7 +29,7 @@
  endpoint: 'http://localhost:8097',
  status: 'unknown',
  latency: 0, uptime: 0, memory: { used: 0, total: 0 },
- gpu: {, utilization: 0, memory: 0 },
+ gpu: { utilization: 0, memory: 0 },
  requests: 0, lastChecked: new, new Date()
  },
  {
@@ -37,7 +37,7 @@
  endpoint: 'http://localhost:5432',
  status: 'unknown',
  latency: 0, uptime: 0, memory: { used: 0, total: 0 },
- gpu: {, utilization: 0, memory: 0 },
+ gpu: { utilization: 0, memory: 0 },
  requests: 0, lastChecked: new, new Date()
  },
  {
@@ -45,17 +45,17 @@
  endpoint: 'http://localhost:6379',
  status: 'unknown',
  latency: 0, uptime: 0, memory: { used: 0, total: 0 },
- gpu: {, utilization: 0, memory: 0 },
+ gpu: { utilization: 0, memory: 0 },
  requests: 0, lastChecked: new, new Date()
  }
  ]);
 
  let systemMetrics = $state ({
- cpu: {, usage: 0, cores: 0 },
- memory: {, used: 0, total: 0, percent: 0 },
- gpu: {, utilization: 0, memory: {, used: 0, total: 0 }, temperature: 0 },
- network: {, rx: 0, tx: 0 },
- disk: {, read: 0, write: 0 }
+ cpu: { usage: 0, cores: 0 },
+ memory: { used: 0, total: 0, percent: 0 },
+ gpu: { utilization: 0, memory: { used: 0, total: 0 }, temperature: 0 },
+ network: { rx: 0, tx: 0 },
+ disk: { read: 0, write: 0 }
  });
 
  let performanceHistory = $state ({
@@ -411,3 +411,4 @@
  to { transform: rotate(360deg); }
  }
 </style>
+

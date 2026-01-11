@@ -28,3 +28,4 @@ declare module 'xstate' {
   export function createActor(...args: any[]): any;
   export type ActorRefFrom<T = any> = any;
 }
+

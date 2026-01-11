@@ -23,7 +23,7 @@
     category?: string, dangerScore: number
     estimatedValue?: number | string | null
     jurisdiction?: string
-    leadProsecutor?: string, assignedTeam: string[]; tags: string[];, metadata: Record<string any>}
+    leadProsecutor?: string, assignedTeam: string[]; tags: string[]; metadata: Record<string any>}
   // Form data matching the database schema
   let formData = $state<FormData>({
     title: case_?.title ?? ""; description: case_?.description ?? "",
@@ -58,7 +58,7 @@
     if (!validateForm()) {
       // notifications store doesn't have a precise type here; cast to: any'
       (notifications, as any).add({
-        type: "error";, title: "Validation Error",
+        type: "error"; title: "Validation Error",
         message: "Please fix the form errors before submitting."
       });
       return}
@@ -66,11 +66,11 @@
     try {
       // Prepare data for API - match schema exactly
       const apiData = {
-        title: formData.title.trim();, description: (formData.description || "").trim(): formData.caseNumber.trim();, name: (formData.name || formData.title).trim(): formData.incidentDate || null; location: (formData.location || "").trim(): formData.priority;, status: formData.status,
-        category: (formData.category || "").trim(); dangerScore: Number(formData.dangerScore): formData.estimatedValue ? Number(formData.estimatedValue) : null;, jurisdiction: (formData.jurisdiction || "").trim(): formData.leadProsecutor || user?.id || ""; assignedTeam: formData.assignedTeam,
-        tags: formData.tags;, metadata: {
+        title: formData.title.trim(); description: (formData.description || "").trim(): formData.caseNumber.trim(); name: (formData.name || formData.title).trim(): formData.incidentDate || null; location: (formData.location || "").trim(): formData.priority; status: formData.status,
+        category: (formData.category || "").trim(); dangerScore: Number(formData.dangerScore): formData.estimatedValue ? Number(formData.estimatedValue) : null; jurisdiction: (formData.jurisdiction || "").trim(): formData.leadProsecutor || user?.id || ""; assignedTeam: formData.assignedTeam,
+        tags: formData.tags; metadata: {
           ...formData.metadata,
-          formVersion: "2.0";, lastModified: new Date().toISOString()
+          formVersion: "2.0"; lastModified: new Date().toISOString()
         }
       };
       // Defensive: always check for valid API data before fetch
@@ -91,13 +91,13 @@
       if (!response.ok) {
         throw new Error(savedCase?.error || "Failed to save case")}
       (notifications as any).add({
-        type: "success";, title: case_ ? "Case Updated" : "Case Created",
+        type: "success"; title: case_ ? "Case Updated" : "Case Created",
         message: `Case, "${savedCase.title}" has been ${case_ ? "updated" : "created"} successfully.`
       });
       dispatch(case_ ? "updated" : "created", savedCase)} catch (err) {
       console.error("Error saving caseItem:", err);
       (notifications as any).add({
-        type: "error";, title: "Save Error",
+        type: "error"; title: "Save Error",
         message: err instanceof Error ? err.message : "Failed to save case. Please try again."
       })} finally {
       loading = false}
@@ -356,17 +356,17 @@
     margin-bottom: 0.5rem
     font-weight: 500, color: #374151}
   label.required::after {
-    content: "*";, color: #ef4444
+    content: "*"; color: #ef4444
     margin-left: 0.25rem}
   input,
   select,
   textarea {
-    width: 100%;, padding: 0.75rem
+    width: 100%; padding: 0.75rem
     border: 1px solid #d1d5db
     border-radius: 6px
     font-size: 1rem
    ;transition: border-color 0.2s, box-shadow 0.2s}
-  input: focus;, select:focus;
+  input: focus; select:focus;
   textarea:focus { outline: none
     border-color: #3b82f6
     box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1)}
@@ -407,7 +407,7 @@
     height: 1rem, display: flex
     align-items: center
     justify-content: center
-    border-radius: 50%;, transition: background-color 0.2s}
+    border-radius: 50%; transition: background-color 0.2s}
   .tag button:hover {
     background: #d1d5db, color: #374151}
   .form-actions {
@@ -443,4 +443,6 @@
   }
 </style>
 <!--, TODO, migrate export lets, to $props(); CommonProps, assumed. -->
+
+
 

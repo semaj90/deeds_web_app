@@ -31,3 +31,4 @@ export { default as Trigger } from './DialogTrigger.svelte';
 
 // Type exports
 export type * from './types';
+

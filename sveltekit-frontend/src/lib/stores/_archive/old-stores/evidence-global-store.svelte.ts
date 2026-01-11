@@ -6,16 +6,16 @@ import type { Case } from '$lib/types';
  */
 
 export interface EvidenceNode {
- id: string;, title: string;
- content: string;, type: 'document' | 'photo' | 'testimony' | 'physical' | 'digital';
- tags: string[];, position: { x: number;, y: number };
+ id: string; title: string;
+ content: string; type: 'document' | 'photo' | 'testimony' | 'physical' | 'digital';
+ tags: string[]; position: { x: number; y: number };
  connections: string[]; // IDs of nodes
- metadata: {, dateCreated: number;
+ metadata: { dateCreated: number;
  lastModified: number;
  source?: string;
  relevanceScore?: number;
- aiAnalysis?: {, summary: string;
- keyTerms: string[];, confidence: number;
+ aiAnalysis?: { summary: string;
+ keyTerms: string[]; confidence: number;
  suggestedConnections: string[];
  };
  };
@@ -24,25 +24,25 @@ export interface EvidenceNode {
 }
 
 export interface LegalCase {
- id: string;, title: string;
- description: string;, jurisdiction: string;
- practiceArea: string;, nodes: EvidenceNode[];
- connections: Array<{, id: string;
- fromNodeId: string;, toNodeId: string;
- relationship: string;, strength: number;
+ id: string; title: string;
+ description: string; jurisdiction: string;
+ practiceArea: string; nodes: EvidenceNode[];
+ connections: Array<{ id: string;
+ fromNodeId: string; toNodeId: string;
+ relationship: string; strength: number;
  aiGenerated: boolean;
  }>;
- metadata: {, dateCreated: number;
- lastModified: number;, status: 'active' | 'archived' | 'completed';
+ metadata: { dateCreated: number;
+ lastModified: number; status: 'active' | 'archived' | 'completed';
  priority: 'low' | 'medium' | 'high' | 'urgent';
  };
 }
 
 export interface UIState {
- selectedNodeIds: string[];, draggedNodeId: string | null;
- modalOpen: boolean;, modalType: 'add' | 'edit' | 'delete' | 'connect' | null;
+ selectedNodeIds: string[]; draggedNodeId: string | null;
+ modalOpen: boolean; modalType: 'add' | 'edit' | 'delete' | 'connect' | null;
  editingNode: EvidenceNode | null;
- showAISuggestions: boolean;, filterBy: {
+ showAISuggestions: boolean; filterBy: {
  type?: string;
  status?: string;
  tags?: string[];
@@ -99,7 +99,7 @@ class EvidenceGlobalStore {
  ...caseData, id: caseId,
  nodes: [],
  connections: [],
- metadata: {, dateCreated: Date.now(),
+ metadata: { dateCreated: Date.now(),
      lastModified: Date.now(),
      status: 'active',
  priority: 'medium',
@@ -143,7 +143,7 @@ class EvidenceGlobalStore {
  const newNode: EvidenceNode = {
  ...nodeData, id: nodeId,
  connections: [],
- metadata: {, dateCreated: Date.now(),
+ metadata: { dateCreated: Date.now(),
      lastModified: Date.now(),
  },
  };
@@ -195,7 +195,7 @@ class EvidenceGlobalStore {
  }
 
  // === Node Positioning (for drag & drop) ===
- updateNodePosition(nodeId: string, position: {, x: number; y: number }) {
+ updateNodePosition(nodeId: string, position: { x: number; y: number }) {
  if (!this.currentCase) return;
  const node = this.currentCase.nodes.find((n) => n.id === nodeId);
  if (node) {
@@ -311,8 +311,8 @@ class EvidenceGlobalStore {
  if (node) {
  this.aiWorker.postMessage({
  type: 'analyzeEvidence',
- data: {, node: allNodes, this.currentCase.nodes,
- caseContext: {, title: this.currentCase.title, this.currentCase.jurisdiction, this.currentCase.practiceArea,
+ data: { node: allNodes, this.currentCase.nodes,
+ caseContext: { title: this.currentCase.title, this.currentCase.jurisdiction, this.currentCase.practiceArea,
  },
  },
  });
@@ -538,3 +538,6 @@ export function getConnectedNodes(nodeId: string): EvidenceNode[] {
  if (!node) return [];
  return evidenceStore.currentNodes.filter((n) => node.connections.includes(n.id));
 }
+
+
+

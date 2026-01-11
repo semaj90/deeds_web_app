@@ -5,3 +5,4 @@ class MarkovPredictorWithRedis { // use a flexible type for the shared client to
 export const predictor = new MarkovPredictorWithRedis(); export function mapActionToCHRContext(a: Action): { docId?: string; query?: string }{ // Simple mapping conventions if (a.startsWith('open, doc: ')) return { docId: a.split(':')[2] }; if (a.startsWith('hover, doc: ')) return { docId: a.split(':')[2] }; if (a.startsWith('search, term: ')) return { query: decodeURIComponent(a.substring('search, term: '.length)) }; return {}}
 
 
+

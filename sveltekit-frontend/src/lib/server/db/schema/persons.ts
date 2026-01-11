@@ -25,3 +25,4 @@ export const casePersons = pgTable('case_persons', {
     isPrimary: varchar('is_primary', { length: 5 }).default('false'),
     createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
 });
+

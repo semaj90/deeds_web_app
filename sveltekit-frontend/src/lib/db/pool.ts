@@ -188,7 +188,7 @@ export async function withRetry<T>(queryFn: () => Promise<T>, maxRetries: number
  * console.log('Database health:', health);
  * ```
  */
-export async function healthCheck(): Promise<{, healthy: boolean;
+export async function healthCheck(): Promise<{ healthy: boolean;
   responseTime: number;
   error?: string;
 }> {
@@ -215,3 +215,5 @@ export async function healthCheck(): Promise<{, healthy: boolean;
 
 // Export the client for advanced use cases
 export { client };
+
+

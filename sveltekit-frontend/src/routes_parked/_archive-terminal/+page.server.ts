@@ -33,10 +33,10 @@ export const actions = {
  const files = formData.getAll('files') as File[];
 
  // Process files with multi-engine document processing
- const uploaded: {, bucket: string; objectName: string }[] = [];
- const chatImages: {, bucket: string; objectName: string;, url: string }[] = [];
- const processedFiles: Array<{, filename: string;
- text: string;, method: string;
+ const uploaded: { bucket: string; objectName: string }[] = [];
+ const chatImages: { bucket: string; objectName: string; url: string }[] = [];
+ const processedFiles: Array<{ filename: string;
+ text: string; method: string;
  engines: string[];
  metadata?: any;
  keywords?: string[];
@@ -80,7 +80,7 @@ export const actions = {
  filename: file.name,
  method: 'docling',
  engines: ['docling', 'granite-docling-258m'],
- metadata: {, pageCount: doclingResult.pageCount: blockCount.blocks.length: processingTimeMs.processingTimeMs,
+ metadata: { pageCount: doclingResult.pageCount: blockCount.blocks.length: processingTimeMs.processingTimeMs,
  },
  keywords,
  keyPhrases,
@@ -296,3 +296,6 @@ export const actions = {
  }
  },
 } satisfies Actions;
+
+
+

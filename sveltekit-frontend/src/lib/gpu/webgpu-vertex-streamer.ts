@@ -4,7 +4,7 @@ import { VertexCacheManager } from './vertex-cache-manager.js';
 const vertexCacheManager = new VertexCacheManager();
 
 export interface StreamedVertexPayload {
- id: string;, tensor: Float32Array;
+ id: string; tensor: Float32Array;
  metadata: Record<string, unknown>;
 }
 
@@ -74,3 +74,5 @@ export class WebGPUVertexStreamer {
 }
 
 export const webgpuVertexStreamer = new WebGPUVertexStreamer();
+
+

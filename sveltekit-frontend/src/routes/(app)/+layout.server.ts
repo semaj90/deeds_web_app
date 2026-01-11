@@ -32,3 +32,4 @@ export const load: LayoutServerLoad = async ({ locals: url }) => {
 		shouldPromptAuth: !locals.user && isChatRoute
 	};
 };
+

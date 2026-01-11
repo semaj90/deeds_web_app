@@ -2,13 +2,13 @@
  import { createEventDispatcher } from 'svelte';
 
  let { summary } = $props<{
- summary: {, id: string;
- caseId: string;, text: string;
- holding: string;, citations: Array<{
- code: string;, title: string;
+ summary: { id: string;
+ caseId: string; text: string;
+ holding: string; citations: Array<{
+ code: string; title: string;
  jurisdiction: string;
  }>;
- version: number;, createdAt: string;
+ version: number; createdAt: string;
  updatedAt: string;
  };
  }>();
@@ -29,7 +29,7 @@
  const response = await fetch(`/api/cases/${summary.caseId}/summary`, {
  method: 'PUT',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({, text: editedText, holding: editedHolding,
+ body: JSON.stringify({ text: editedText, holding: editedHolding,
  }),
  });
 
@@ -236,25 +236,25 @@
 <style>
  .summary-editor {
  background-color: white;
- border-radius: 8px;, border: 1px solid #e0e0e0;
+ border-radius: 8px; border: 1px solid #e0e0e0;
  overflow: hidden;
  }
 
  .editor-header {
  display: flex;
  justify-content: space-between;
- align-items: center;, padding: 1.5rem;
+ align-items: center; padding: 1.5rem;
  border-bottom: 1px solid #e0e0e0;
  background-color: #f9fafb;
  }
 
  .editor-header h2 {
  margin: 0;
- font-size: 1.5rem;, color: #1f2937;
+ font-size: 1.5rem; color: #1f2937;
  }
 
  .editor-actions {
- display: flex;, gap: 0.75rem;
+ display: flex; gap: 0.75rem;
  }
 
  .btn-primary,
@@ -263,24 +263,24 @@
  border: none;
  border-radius: 6px;
  font-size: 0.875rem;
- font-weight: 500;, cursor: pointer;
+ font-weight: 500; cursor: pointer;
  transition: all 0.2s;
  }
 
  .btn-primary {
- background-color: #2563eb;, color: white;
+ background-color: #2563eb; color: white;
  }
 
- .btn-primary: hover, not(:disabled) {
+ .btn-primary:hover, not(:disabled) {
  background-color: #1d4ed8;
  }
 
  .btn-primary:disabled {
- background-color: #9ca3af;, cursor:not-allowed;
+ background-color: #9ca3af; cursor:not-allowed;
  }
 
  .btn-secondary {
- background-color: #e5e7eb;, color: #1f2937;
+ background-color: #e5e7eb; color: #1f2937;
  }
 
  .btn-secondary:hover {
@@ -296,12 +296,12 @@
  .version-history h3 {
  margin: 0 0 0.75rem 0;
  font-size: 0.875rem;
- text-transform: uppercase;, color: #6b7280;
+ text-transform: uppercase; color: #6b7280;
  }
 
  .versions-list {
  display: flex;
- flex-direction: column;, gap: 0.5rem;
+ flex-direction: column; gap: 0.5rem;
  max-height: 200px;
  overflow-y: auto;
  }
@@ -309,9 +309,9 @@
  .version-item {
  display: flex;
  justify-content: space-between;
- align-items: center;, padding: 0.5rem 0.75rem;
- background-color: white;, border: 1px solid #d1d5db;
- border-radius: 4px;, cursor: pointer;
+ align-items: center; padding: 0.5rem 0.75rem;
+ background-color: white; border: 1px solid #d1d5db;
+ border-radius: 4px; cursor: pointer;
  transition: all 0.2s;
  }
 
@@ -326,11 +326,11 @@
  }
 
  .version-number {
- font-weight: 600;, color: #1f2937;
+ font-weight: 600; color: #1f2937;
  }
 
  .version-date {
- font-size: 0.75rem;, color: #6b7280;
+ font-size: 0.75rem; color: #6b7280;
  }
 
  .editor-content {
@@ -343,17 +343,17 @@
 
  .section h3 {
  margin: 0 0 0.75rem 0;
- font-size: 1rem;, color: #1f2937;
+ font-size: 1rem; color: #1f2937;
  font-weight: 600;
  }
 
  .editor-textarea {
  width: 100%;
- min-height: 200px;, padding: 0.75rem;
+ min-height: 200px; padding: 0.75rem;
  border: 1px solid #d1d5db;
  border-radius: 6px;
  font-family: 'Monaco', 'Courier New', monospace;
- font-size: 0.875rem;, resize: vertical;
+ font-size: 0.875rem; resize: vertical;
  }
 
  .editor-textarea:focus {
@@ -367,14 +367,14 @@
  padding: 0.75rem;
  background-color: #f9fafb;
  border-radius: 6px;
- line-height: 1.6;, color: #374151;
+ line-height: 1.6; color: #374151;
  white-space: pre-wrap;
  word-wrap: break-word;
  }
 
  :global(.citation) {
  color: #2563eb;
- text-decoration: underline;, cursor: pointer;
+ text-decoration: underline; cursor: pointer;
  font-weight: 500;
  }
 
@@ -392,28 +392,28 @@
  padding: 0.75rem;
  background-color: #f3f4f6;
  border-left: 3px solid #2563eb;
- border-radius: 4px;, display: flex;
- flex-direction: column;, gap: 0.25rem;
+ border-radius: 4px; display: flex;
+ flex-direction: column; gap: 0.25rem;
  }
 
  .citation-code {
- font-weight: 600;, color: #1f2937;
+ font-weight: 600; color: #1f2937;
  font-family: 'Monaco', 'Courier New', monospace;
  }
 
  .citation-title {
- font-size: 0.875rem;, color: #374151;
+ font-size: 0.875rem; color: #374151;
  }
 
  .citation-jurisdiction {
- font-size: 0.75rem;, color: #6b7280;
+ font-size: 0.75rem; color: #6b7280;
  text-transform: uppercase;
  }
 
  .metadata {
  display: grid;
  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
- gap: 1rem;, padding: 1rem;
+ gap: 1rem; padding: 1rem;
  background-color: #f9fafb;
  border-top: 1px solid #e0e0e0;
  border-radius: 0 0 8px 8px;
@@ -421,16 +421,19 @@
 
  .meta-item {
  display: flex;
- flex-direction: column;, gap: 0.25rem;
+ flex-direction: column; gap: 0.25rem;
  }
 
  .meta-item label {
  font-size: 0.75rem;
  font-weight: 600;
- text-transform: uppercase;, color: #6b7280;
+ text-transform: uppercase; color: #6b7280;
  }
 
  .meta-item span {
- font-size: 0.875rem;, color: #1f2937;
+ font-size: 0.875rem; color: #1f2937;
  }
 </style>
+
+
+

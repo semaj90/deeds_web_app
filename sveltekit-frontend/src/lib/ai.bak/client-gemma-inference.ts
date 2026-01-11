@@ -15,7 +15,7 @@ export interface GemmaInferenceOptions {
 }
 
 export interface EmbeddingResult {
- embedding: number[];, dimensions: number;
+ embedding: number[]; dimensions: number;
 }
 
 export class ClientGemmaInference {
@@ -225,3 +225,5 @@ export class ClientGemmaInference {
  * Singleton instance for global use
  */
 export const clientGemmaInference = new ClientGemmaInference();
+
+

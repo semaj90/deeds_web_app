@@ -6,9 +6,9 @@
 import { cacheService } from './cache.service.js';
 
 export interface SimilarCase {
- caseId: string;, caseNumber: string;
- charges: string[];, outcome: string;
- relevanceScore: number;, jurisdiction: string;
+ caseId: string; caseNumber: string;
+ charges: string[]; outcome: string;
+ relevanceScore: number; jurisdiction: string;
  year: number;
 }
 
@@ -81,3 +81,5 @@ export class SimilarCasesService {
 }
 
 export const similarCasesService = new SimilarCasesService();
+
+

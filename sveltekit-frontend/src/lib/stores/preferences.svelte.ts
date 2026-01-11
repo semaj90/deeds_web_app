@@ -273,3 +273,4 @@ export class UserPreferences {
 		if (data.language !== undefined) this.language = data.language;
 	}
 }
+

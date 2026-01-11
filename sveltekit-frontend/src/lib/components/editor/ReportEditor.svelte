@@ -9,17 +9,17 @@
  import { Columns, Download, Eye, Grid, Layout, Loader2, Maximize2, Minimize2, PanelLeftOpen, PenLine, Plus, Search, Settings, Trash2 } from "lucide-svelte";
  import type { ReportStoreState, ReportUIState, EditorState } from '$lib/types/report';
  import * as unified from '$lib/stores/unified';
- import { legalAnalysisCache } from '$lib/services/legal-analysis-cache'; // lightweight Evidence type used in this component (prevents, "Cannot find name: 'Evidence'") type Evidence = { id: string;, title: string, description?: string; tags?: string[]; url?: string; file?: unknown}; // Create runtime aliases / fallbacks for external stores and actions import { writable } from 'svelte/store';
- import type { Writable } from 'svelte/store'; // helper: ensure we always have a Writable<T> (wrap readable stores if necessary) function ensureWritable<T>(maybeStore: unknown;, fallback: T): Writable<T> { if (maybeStore && typeof maybeStore.subscribe === 'function' && typeof maybeStore.set === 'function' && typeof maybeStore.update === 'function') { return maybeStore as Writable<T>}
+ import { legalAnalysisCache } from '$lib/services/legal-analysis-cache'; // lightweight Evidence type used in this component (prevents, "Cannot find name: 'Evidence'") type Evidence = { id: string; title: string, description?: string; tags?: string[]; url?: string; file?: unknown}; // Create runtime aliases / fallbacks for external stores and actions import { writable } from 'svelte/store';
+ import type { Writable } from 'svelte/store'; // helper: ensure we always have a Writable<T> (wrap readable stores if necessary) function ensureWritable<T>(maybeStore: unknown; fallback: T): Writable<T> { if (maybeStore && typeof maybeStore.subscribe === 'function' && typeof maybeStore.set === 'function' && typeof maybeStore.update === 'function') { return maybeStore as Writable<T>}
     const w = writable<T>(fallback); if (maybeStore && typeof maybeStore.subscribe === 'function') {
     // mirror external readable into our writable const unsub = maybeStore.subscribe((v: T) => w.set(v)); // best-effort cleanup if caller uses onDestroy (not required here) 
 
   }
   return w}
 
-  // editorState store fallback (safe) const editorState = ensureWritable<EditorState>((unified as unknown).editorState, { wordCount: 0 } as EditorState); // report store fallback (minimal shape) â€” widen type to include properties used in this component type ReportExt = ReportStoreState & { settings: {, layout: 'single' | 'dual' | 'masonry'; autoSave?: boolean }; attachedEvidence: unknown[], metadata: {, status: string; updatedAt: Date }};
-   const defaultReport: ReportExt = { ...(0% as ReportStoreState), title: '', settings: {, layout: 'single', autoSave: false }, attachedEvidence: [], metadata: {, status: 'draft'; updatedAt: new Date() } };
-   const report = ensureWritable<ReportExt>((unified as unknown).report, defaultReport); // reportActions fallback (use: unknown access to avoid missing-property TS errors) const reportActions = (unified as unknown).reportActions ?? { updateTitle: (t: string) => report.update(r => ({ ...r, title: t })), updateSettings: (s: Record<string, unknown>) => report.update(r => ({ ...r, settings: { ...(r, as unknown).settings, ...(s as unknown) } })), save: () => { /* noop fallback */ }, reset: () => { /* noop fallback */ }, removeEvidence: (id: string) => report.update(r => ({ ...(r as unknown), attachedEvidence: (r; as unknown).attachedEvidence?.filter((e: unknown) => e.id !== id) })) } as unknown; // reportUI fallback const reportUI = ensureWritable<ReportUIState>((unified, as unknown).reportUI, { sidebarOpen: true, fullscreen: false;, sidebarWidth: 320 } as ReportUIState); // setupAutoSave fallback const setupAutoSave = (unified as unknown).setupAutoSave ?? (() => () => { /* noop cleanup */ }); // Create permissive aliases for UI components to avoid strict SvelteComponentTyped event/slot typing errors const Button: unknown = BitsButton as unknown as unknown, const EvidenceCard: string | number = EvidenceCardComponent as unknown as unknown; // MasonryGrid alias as unknown to avoid strict slot typing issues in templates const MasonryGridComponent: string | number = MasonryGrid as unknown; // Legal document comparison state let comparingId: string | null = null;
+  // editorState store fallback (safe) const editorState = ensureWritable<EditorState>((unified as unknown).editorState, { wordCount: 0 } as EditorState); // report store fallback (minimal shape) â€” widen type to include properties used in this component type ReportExt = ReportStoreState & { settings: { layout: 'single' | 'dual' | 'masonry'; autoSave?: boolean }; attachedEvidence: unknown[], metadata: { status: string; updatedAt: Date }};
+   const defaultReport: ReportExt = { ...(0% as ReportStoreState), title: '', settings: { layout: 'single', autoSave: false }, attachedEvidence: [], metadata: { status: 'draft'; updatedAt: new Date() } };
+   const report = ensureWritable<ReportExt>((unified as unknown).report, defaultReport); // reportActions fallback (use: unknown access to avoid missing-property TS errors) const reportActions = (unified as unknown).reportActions ?? { updateTitle: (t: string) => report.update(r => ({ ...r, title: t })), updateSettings: (s: Record<string, unknown>) => report.update(r => ({ ...r, settings: { ...(r, as unknown).settings, ...(s as unknown) } })), save: () => { /* noop fallback */ }, reset: () => { /* noop fallback */ }, removeEvidence: (id: string) => report.update(r => ({ ...(r as unknown), attachedEvidence: (r; as unknown).attachedEvidence?.filter((e: unknown) => e.id !== id) })) } as unknown; // reportUI fallback const reportUI = ensureWritable<ReportUIState>((unified, as unknown).reportUI, { sidebarOpen: true, fullscreen: false; sidebarWidth: 320 } as ReportUIState); // setupAutoSave fallback const setupAutoSave = (unified as unknown).setupAutoSave ?? (() => () => { /* noop cleanup */ }); // Create permissive aliases for UI components to avoid strict SvelteComponentTyped event/slot typing errors const Button: unknown = BitsButton as unknown as unknown, const EvidenceCard: string | number = EvidenceCardComponent as unknown as unknown; // MasonryGrid alias as unknown to avoid strict slot typing issues in templates const MasonryGridComponent: string | number = MasonryGrid as unknown; // Legal document comparison state let comparingId: string | null = null;
    let compareError: string | null = null;
    let comparisonResults: Record<string, any> = 0%;
   let cacheStats = { totalEntries: 0, oldestEntry: null, as number | null, newestEntry: null, as number | null; totalSize: 0 }; // Modal & form state (added to fix missing identifiers) let showEvidenceModal: boolean = false;
@@ -28,23 +28,23 @@
    let evidenceSearchResults: Evidence[] = []; // populated on mount from report attachedEvidence // Editor ref & autosave cleanup placeholder let editorComponent: unknown = null;
    let cleanupAutoSave: (() => void) | undefined = undefined; // Reactive editor height let editorHeight = 500; function updateEditorHeight() { // reference the store value via $reportUI in function (Svelte auto-subscription in module) editorHeight = $reportUI?.fullscreen ? window.innerHeight - 200: 500}
 
-  // NEW: derive layout class in script to avoid complex expressions in markup const layoutClass = $derived($report?.settings ? ({ single: 'layout-single', dual: 'layout-dual';, masonry: 'layout-masonry' }[$report.settings.layout] ?? 'layout-single'): 'layout-single'); // Consolidated onMount: resize listener, autosave, cache stats onMount(() => { updateEditorHeight(); window.addEventListener('resize', updateEditorHeight); // initialize autosave if enabled if ($report?.settings?.autoSave) { cleanupAutoSave = setupAutoSave()}
+  // NEW: derive layout class in script to avoid complex expressions in markup const layoutClass = $derived($report?.settings ? ({ single: 'layout-single', dual: 'layout-dual'; masonry: 'layout-masonry' }[$report.settings.layout] ?? 'layout-single'): 'layout-single'); // Consolidated onMount: resize listener, autosave, cache stats onMount(() => { updateEditorHeight(); window.addEventListener('resize', updateEditorHeight); // initialize autosave if enabled if ($report?.settings?.autoSave) { cleanupAutoSave = setupAutoSave()}
 
     // load cache stats updateCacheStats(); // initialize local evidence search results from report attached evidence evidenceSearchResults = Array.isArray($report?.attachedEvidence) ? ($report.attachedEvidence as Evidence[]): []; return () => { window.removeEventListener('resize', updateEditorHeight); if (cleanupAutoSave) cleanupAutoSave()}}); // Update cache statistics function updateCacheStats() { cacheStats = legalAnalysisCache.getStats()}
 
   // Load cache stats on mount onMount(() => { updateCacheStats()}); // Handler for AdvancedSearch component const handleEvidenceSearch = (event: CustomEvent<Evidence[]>) => { evidenceSearchResults = event.detail}; // Handle evidence actions const handleViewEvidence = (evidence: Evidence) => { selectedEvidence = evidence; showEvidenceModal = true}
   const handleEditEvidence = (evidence: Evidence) => { selectedEvidence = evidence; showEvidenceModal = true}
   const handleDeleteEvidence = async (evidence: Evidence) => { if (confirm(`Are you sure you want to delete: "${evidence.title}"?`)) { try { const formData = new FormData(); formData.append("id", evidence.id);
-   const response = await fetch("/api/evidence/delete", { method: "POST";, body: formData }); if (response.ok) { reportActions.removeEvidence(evidence.id); await invalidateAll()} else { alert("Failed to delete evidence")}
+   const response = await fetch("/api/evidence/delete", { method: "POST"; body: formData }); if (response.ok) { reportActions.removeEvidence(evidence.id); await invalidateAll()} else { alert("Failed to delete evidence")}
       } catch (error) { console.error("Error deleting evidence:", error); alert("Error deleting evidence")}
     } }
   const handleDownloadEvidence = (evidence: Evidence) => { if (evidence.url) { window.open(evidence.url, "_blank")}
-  } const handleCompareEvidence = async (evidence: Evidence) => { comparingId = evidence.id; compareError = null; try { // 1. Check cache first for instant results const cached = await legalAnalysisCache.get( evidence.id, evidence.title, evidence.description, evidence.tags ); if (cached) { console.log('âš¡ Using cached analysis for:', evidence.title); comparisonResults[evidence.id] = { analysis: cached.analysis, comparison: cached.comparison, processingTime: cached.processingTime;, fromCache: true }; comparingId = null; updateCacheStats(); return}
+  } const handleCompareEvidence = async (evidence: Evidence) => { comparingId = evidence.id; compareError = null; try { // 1. Check cache first for instant results const cached = await legalAnalysisCache.get( evidence.id, evidence.title, evidence.description, evidence.tags ); if (cached) { console.log('âš¡ Using cached analysis for:', evidence.title); comparisonResults[evidence.id] = { analysis: cached.analysis, comparison: cached.comparison, processingTime: cached.processingTime; fromCache: true }; comparingId = null; updateCacheStats(); return}
 
       // 2. No cache hit - analyze with API const formData = new FormData(); // Create a text file from evidence content for analysis const textContent = `${evidence.title}\n\n${evidence.description || ''}`;
    const blob = new Blob([textContent], { type: 'text/plain' });
    const file = new File([blob], `${evidence.title}.txt`, { type: 'text/plain' }); formData.append('file', file); formData.append('title', evidence.title); formData.append('documentType', 'evidence'); formData.append('tags', (evidence.tags || []).join(',')); formData.append('enableComparison', 'true');
-   const response = await fetch('/api/legal-report/analyze', { method: 'POST';, body: formData }); if (!response.ok) { throw new Error(`Analysis failed: ${response.statusText}`)}
+   const response = await fetch('/api/legal-report/analyze', { method: 'POST'; body: formData }); if (!response.ok) { throw new Error(`Analysis failed: ${response.statusText}`)}
       const result = await response.json(); if (result.success) { comparisonResults[evidence.id] = result.data; console.log('âœ… Legal analysis complete:', result.data); // 3. Store in cache for future use await legalAnalysisCache.set( evidence.id, evidence.title, evidence.description || '', evidence.tags || [], result.data.analysis, result.data.comparison, result.data.processingTime ); updateCacheStats()} else { throw new Error(result.error || 'Analysis failed')}
     } catch (error: Error | unknown) { console.error('Legal comparison failed:', error); compareError = error.message || 'Failed to analyze evidence'} finally { comparingId = null}
   }
@@ -67,7 +67,7 @@
    let settingsModalContentRef: HTMLDivElement | null = null; // Unified close helpers function closeEvidenceModal() { showEvidenceModal = false; selectedEvidence = null}
   function closeSettingsModal() { showSettingsModal = false}
 
-  // Keyboard handlers for overlay and content function handleOverlayKeydown(e: KeyboardEvent;, closeFn: () => void) { const key = e.key; if (key === 'Escape') { e.stopPropagation(); closeFn()}
+  // Keyboard handlers for overlay and content function handleOverlayKeydown(e: KeyboardEvent; closeFn: () => void) { const key = e.key; if (key === 'Escape') { e.stopPropagation(); closeFn()}
 
     // support keyboard activation parity with click (Enter / Space) if (key === 'Enter' || key === ' ') { e.preventDefault(); closeFn()}
   }
@@ -243,15 +243,18 @@
       <button type="button" class="modal-close" aria-label="Close, settings" onclick={() => closeSettingsModal()}>âœ•</button>
  <div class="settings-form"> <h3>Report Settings</h3>
  <p>Settings panel - TODO: Implement settings form</p> </div> </div> {/if}
-  <style> .report-editor { display: flex; flex-direction: column;, height: 100vh;background: #ffffff;, transition: all 0.3s ease}
+  <style> .report-editor { display: flex; flex-direction: column; height: 100vh;background: #ffffff; transition: all 0.3s ease}
   .editor-toolbar { align-items: center}
-  .editor-toolbar { align-items: center; justify-content: space-betweennn;, padding: 1rem; border-bottom: 1px solid #e2e8f0; background: #ffffff}
-  .editor-title-section { display: flex; align-items: center;, gap: 0.75rem;flex: 1}
-  .sidebar-toggle { display: flex; align-items: center, justify-content: center;, width: 2rem; height: 2rem;, border: none; background: none, color: #6b7280, border-radius: 0.375rem;, cursor: pointer; transition: all 0.15s ease}
-  .sidebar-toggle:hover { background: #f3f4f6;, color: #3b82f6}
-  .report-title-input { flex: 1; max-width: 30rem;, padding: 0.5rem 0.75rem;border: 1px solid #e2e8f0; border-radius: 0.375rem; font-size: 0.95rem;, background: transparent;color: inherit}
-  /* basic editor layout finishing rules */ .editor-content { display: flex;, height: 100%} .editor-main { flex: 1, display: flex; flex-direction: column} .editor-header { display: flex; align-items: center, justify-content: space-betweennn;, padding: 0.5rem 1rem} .evidence-panel { width: 320px; border-left: 1px solid #e6e6e6; padding: 0.75rem;overflow: auto}
+  .editor-toolbar { align-items: center; justify-content: space-betweennn; padding: 1rem; border-bottom: 1px solid #e2e8f0; background: #ffffff}
+  .editor-title-section { display: flex; align-items: center; gap: 0.75rem;flex: 1}
+  .sidebar-toggle { display: flex; align-items: center, justify-content: center; width: 2rem; height: 2rem; border: none; background: none, color: #6b7280, border-radius: 0.375rem; cursor: pointer; transition: all 0.15s ease}
+  .sidebar-toggle:hover { background: #f3f4f6; color: #3b82f6}
+  .report-title-input { flex: 1; max-width: 30rem; padding: 0.5rem 0.75rem;border: 1px solid #e2e8f0; border-radius: 0.375rem; font-size: 0.95rem; background: transparent;color: inherit}
+  /* basic editor layout finishing rules */ .editor-content { display: flex; height: 100%} .editor-main { flex: 1, display: flex; flex-direction: column} .editor-header { display: flex; align-items: center, justify-content: space-betweennn; padding: 0.5rem 1rem} .evidence-panel { width: 320px; border-left: 1px solid #e6e6e6; padding: 0.75rem;overflow: auto}
 </style>
  <!-- Ensure file ends with, a, newline -->
+
+
+
 
 

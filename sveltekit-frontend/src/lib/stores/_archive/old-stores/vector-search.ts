@@ -7,3 +7,4 @@ const initialState: VectorSearchState = { query: '', results: [], isSearching: f
 }; // Initialize connection check if (typeof window !== 'undefined') { vectorSearchActions.checkConnection()}
 
 
+

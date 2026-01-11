@@ -2,26 +2,26 @@
  import { onMount } from 'svelte';
 
  interface MonitoringStats {
- timestamp: string;, summary: {
- totalErrors: number;, totalRoutes: number;
- totalClusters: number;, totalSuggestions: number;
+ timestamp: string; summary: {
+ totalErrors: number; totalRoutes: number;
+ totalClusters: number; totalSuggestions: number;
  appliedSuggestions: number;
  };
- errors: {, bySeverity: Array<{ severity: string;, count: number }>;
+ errors: { bySeverity: Array<{ severity: string; count: number }>;
  };
- routes: {, byHealth: Array<{ state: string;, count: number }>;
- top: Array<{, routePath: string;
- errorState: string;, recentErrorCount: number;
+ routes: { byHealth: Array<{ state: string; count: number }>;
+ top: Array<{ routePath: string;
+ errorState: string; recentErrorCount: number;
  lastErrorAt: string;
  }>;
  };
- suggestions: {, byRisk: Array<{ level: string;, count: number }>;
- applied: number;, effectiveness: number;
+ suggestions: { byRisk: Array<{ level: string; count: number }>;
+ applied: number; effectiveness: number;
  };
- topErrors: Array<{, tsCode: string;
- count: number;, messages: string[];
+ topErrors: Array<{ tsCode: string;
+ count: number; messages: string[];
  }>;
- errorVelocity: Array<{, date: string;
+ errorVelocity: Array<{ date: string;
  count: number;
  }>;
  }
@@ -328,5 +328,8 @@
  {/if}
  </div>
 </div>
+
+
+
 
 

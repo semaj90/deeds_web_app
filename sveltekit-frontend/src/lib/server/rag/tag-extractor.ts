@@ -48,3 +48,4 @@ export function extractLegalEntities(text: string) {
  cases: tags.cases,
  };
 }
+

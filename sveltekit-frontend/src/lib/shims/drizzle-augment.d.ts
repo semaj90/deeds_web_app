@@ -1,2 +1,3 @@
 // Conservative Drizzle augment shim (permissive) to reduce TS noise during migration. // Exports common names as any to avoid missing-export errors. declare module, 'drizzle-orm' { const _any: unknown | export = _any}
 // Fallback for local db modules declare module, '$lib/server/db/*' { const anyExport: export default anyExport; export const db: unknown, export const enhanced_db: unknown, export const legalDocuments: unknown, export const legal_documents: unknown, export const documents: unknown, export const embeddings: unknown, export const cases: unknown, export const criminals: unknown, export const aiAnalyses: unknown}
+

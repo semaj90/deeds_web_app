@@ -217,3 +217,4 @@ describe('RAG System Integration Tests', () => {
  console.log(`Tag extraction performance: ${avgTimePerExtraction.toFixed(2)}ms per extraction`);
  });
 });
+

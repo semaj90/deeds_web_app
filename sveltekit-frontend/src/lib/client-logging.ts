@@ -21,7 +21,9 @@ export function logError(event: string, error: Error | unknown, fields: LogField
  const errObj =
  error instanceof Error
  ? { message: error.message, stack: error.stack }
- : {, message: String(error) };
+ : { message: String(error) };
  // eslint-disable-next-line no-console
  console.error(JSON.stringify({ level: 'error', event, ...base(), ...fields, error: errObj }));
 }
+
+

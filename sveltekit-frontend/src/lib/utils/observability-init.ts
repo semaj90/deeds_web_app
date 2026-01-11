@@ -11,3 +11,4 @@ function extractRouteId(): string { // Try to extract route ID from current loca
 // Auto-initialize if in browser if (browser) { // Wait for DOM to be ready if (document.readyState === 'loading') { document.addEventListener('DOMContentLoaded', initializeObservability)}else { initializeObservability()}
 
 
+

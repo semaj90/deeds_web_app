@@ -19,3 +19,4 @@ export const uploadSchema = z.object({
  message: 'Invalid file type. Only JPEG, PNG, WEBP, GIF, and PDF are allowed.',
  }),
 });
+

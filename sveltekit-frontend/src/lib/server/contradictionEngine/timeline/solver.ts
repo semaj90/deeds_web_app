@@ -32,7 +32,7 @@ export function solveTimelineContradictions(facts: TimelineFact[]): TimelineCont
  type: 'alibi-failure',
  first,
  second,
- details: {, travelTimeRequiredMs: travelTime },
+ details: { travelTimeRequiredMs: travelTime },
  });
  }
  }
@@ -66,3 +66,5 @@ export function solveTimelineContradictions(facts: TimelineFact[]): TimelineCont
 
  return contradictions;
 }
+
+

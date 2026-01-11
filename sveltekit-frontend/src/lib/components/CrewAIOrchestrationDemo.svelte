@@ -47,7 +47,7 @@
  agentId,
  response: {
  agentId,
- analysis: {, confidence: Math.random() * 0.4 + 0.6, // 60-100%
+ analysis: { confidence: Math.random() * 0.4 + 0.6, // 60-100%
  findings: [
  `Finding 1 from ${ agentId }`,
  `Finding 2 from ${ agentId }`,
@@ -300,7 +300,7 @@
 
 <style>
  .crew-orchestration-demo {
- max-width: 1000px;, margin: 0 auto;
+ max-width: 1000px; margin: 0 auto;
  padding: 2rem;
  }
 
@@ -316,40 +316,40 @@
  }
 
  .control-panel {
- background: #f9f9f9;, border: 1px solid #ddd;
- border-radius: 8px;, padding: 1.5rem;
+ background: #f9f9f9; border: 1px solid #ddd;
+ border-radius: 8px; padding: 1.5rem;
  margin-bottom: 2rem;
  }
 
  .form-group {
- margin-bottom: 1rem;, display: flex;
- flex-direction: column;, gap: 0.5rem;
+ margin-bottom: 1rem; display: flex;
+ flex-direction: column; gap: 0.5rem;
  }
 
  .form-group label {
  display: flex;
- flex-direction: column;, gap: 0.25rem;
+ flex-direction: column; gap: 0.25rem;
  }
 
  .form-group span {
- font-weight: 500;, color: #333;
+ font-weight: 500; color: #333;
  }
 
  input,
  select {
- padding: 0.5rem;, border: 1px solid #ddd;
+ padding: 0.5rem; border: 1px solid #ddd;
  border-radius: 4px;
  font-size: 1rem;
  }
 
  .agent-checkboxes {
  display: flex;
- flex-wrap: wrap;, gap: 1rem;
+ flex-wrap: wrap; gap: 1rem;
  }
 
  .agent-checkboxes label {
  display: flex;
- align-items: center;, gap: 0.5rem;
+ align-items: center; gap: 0.5rem;
  flex-direction: row;
  }
 
@@ -359,24 +359,24 @@
  .btn-small {
  padding: 0.5rem 1rem;
  border: none;
- border-radius: 4px;, cursor: pointer;
- font-size: 0.95rem;, transition: all 0.2s;
+ border-radius: 4px; cursor: pointer;
+ font-size: 0.95rem; transition: all 0.2s;
  }
 
  .btn-primary {
- background: #0066cc;, color: white;
+ background: #0066cc; color: white;
  }
 
- .btn-primary: hover, not(:disabled) {
+ .btn-primary:hover, not(:disabled) {
  background: #0052a3;
  }
 
  .btn-primary:disabled {
- background: #ccc;, cursor:not-allowed;
+ background: #ccc; cursor:not-allowed;
  }
 
  .btn-secondary {
- background: #e0e0e0;, color: #333;
+ background: #e0e0e0; color: #333;
  }
 
  .btn-secondary:hover {
@@ -384,7 +384,7 @@
  }
 
  .btn-danger {
- background: #cc0000;, color: white;
+ background: #cc0000; color: white;
  }
 
  .btn-danger:hover {
@@ -397,10 +397,10 @@
  }
 
  .btn-small.accept {
- background: #00cc66;, color: white;
+ background: #00cc66; color: white;
  }
 
- .btn-small.accept: hover, not(:disabled) {
+ .btn-small.accept:hover, not(:disabled) {
  background: #00aa55;
  }
 
@@ -412,8 +412,8 @@
  .agents-panel,
  .responses-panel,
  .recommendations-panel {
- background: white;, border: 1px solid #ddd;
- border-radius: 8px;, padding: 1.5rem;
+ background: white; border: 1px solid #ddd;
+ border-radius: 8px; padding: 1.5rem;
  margin-bottom: 2rem;
  }
 
@@ -422,7 +422,7 @@
  }
 
  progress {
- width: 100%;, height: 24px;
+ width: 100%; height: 24px;
  border-radius: 4px;
  margin-top: 0.5rem;
  }
@@ -432,28 +432,28 @@
  }
 
  .quality-badge {
- display: inline-block;, padding: 0.25rem 0.75rem;
+ display: inline-block; padding: 0.25rem 0.75rem;
  border-radius: 4px;
  font-weight: bold;
  }
 
  .quality-badge.excellent {
- background: #00cc66;, color: white;
+ background: #00cc66; color: white;
  }
 
  .quality-badge.good {
- background: #ffaa00;, color: white;
+ background: #ffaa00; color: white;
  }
 
  .quality-badge.fair {
- background: #ff6600;, color: white;
+ background: #ff6600; color: white;
  }
 
  .metrics {
  display: grid;
  grid-template-columns: repeat(3, 1fr);
  gap: 1rem;
- margin-bottom: 1.5rem;, padding: 1rem;
+ margin-bottom: 1.5rem; padding: 1rem;
  background: #f0f8ff;
  border-radius: 4px;
  }
@@ -471,53 +471,53 @@
  .state-info p {
  margin: 0.5rem 0;
  display: flex;
- align-items: center;, gap: 0.5rem;
+ align-items: center; gap: 0.5rem;
  }
 
  .badge {
- display: inline-block;, padding: 0.25rem 0.5rem;
+ display: inline-block; padding: 0.25rem 0.5rem;
  background: #e0e0e0;
  border-radius: 3px;
  font-size: 0.85rem;
  }
 
  .badge.orchestrating {
- background: #0066cc;, color: white;
+ background: #0066cc; color: white;
  }
 
  .badge.completed {
- background: #00cc66;, color: white;
+ background: #00cc66; color: white;
  }
 
  .badge.failed {
- background: #cc0000;, color: white;
+ background: #cc0000; color: white;
  }
 
  .badge.idle {
- background: #999;, color: white;
+ background: #999; color: white;
  }
 
  .error-box {
- background: #ffe0e0;, border: 1px solid #cc0000;
- border-radius: 4px;, padding: 1rem;
- margin-top: 1rem;, color: #cc0000;
+ background: #ffe0e0; border: 1px solid #cc0000;
+ border-radius: 4px; padding: 1rem;
+ margin-top: 1rem; color: #cc0000;
  }
 
  .error-actions {
- display: flex;, gap: 0.5rem;
+ display: flex; gap: 0.5rem;
  margin-top: 0.75rem;
  }
 
  .agents-list,
  .responses-list,
  .recommendations-list {
- display: grid;, gap: 0.75rem;
+ display: grid; gap: 0.75rem;
  }
 
  .agent-item {
  display: flex;
  justify-content: space-between;
- align-items: center;, padding: 0.75rem;
+ align-items: center; padding: 0.75rem;
  background: #e8f4ff;
  border-left: 4px solid #0066cc;
  border-radius: 4px;
@@ -529,7 +529,7 @@
  }
 
  .response-item {
- padding: 1rem;, background: #f5f5f5;
+ padding: 1rem; background: #f5f5f5;
  border-left: 4px solid #0066cc;
  border-radius: 4px;
  }
@@ -542,8 +542,8 @@
  }
 
  .confidence {
- display: inline-block;, padding: 0.25rem 0.5rem;
- background: #0066cc;, color: white;
+ display: inline-block; padding: 0.25rem 0.5rem;
+ background: #0066cc; color: white;
  border-radius: 3px;
  font-size: 0.85rem;
  font-weight: bold;
@@ -560,33 +560,36 @@
  }
 
  .recommendation-item {
- padding: 1rem;, background: #f0f8ff;
+ padding: 1rem; background: #f0f8ff;
  border-left: 4px solid #0066cc;
  border-radius: 4px;
  }
 
  .recommendation-item.accepted {
  background: #e8ffe8;
- border-left-color: #00cc66;, opacity: 0.8;
+ border-left-color: #00cc66; opacity: 0.8;
  }
 
  .rec-header {
  display: flex;
  justify-content: space-between;
- align-items: flex-start;, gap: 1rem;
+ align-items: flex-start; gap: 1rem;
  margin-bottom: 0.75rem;
  }
 
  .rec-header p {
- margin: 0;, flex: 1;
+ margin: 0; flex: 1;
  }
 
  .rec-actions {
- display: flex;, gap: 0.5rem;
+ display: flex; gap: 0.5rem;
  }
 
  .action-buttons {
- display: flex;, gap: 1rem;
- justify-content: center;, padding: 2rem 0;
+ display: flex; gap: 1rem;
+ justify-content: center; padding: 2rem 0;
  }
 </style>
+
+
+

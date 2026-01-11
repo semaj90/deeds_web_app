@@ -74,7 +74,7 @@ export class OllamaService {
  model,
  prompt,
  stream: options.stream ?? false,
- options: {, temperature: options.temperature ?? 0.7,
+ options: { temperature: options.temperature ?? 0.7,
  num_predict: options.max_tokens ?? 1000,
  },
  }
@@ -109,7 +109,7 @@ const res = await fetch(`${this.baseUrl}/api/generate`, {
  const res = await fetch(`${this.baseUrl}/api/embeddings`, {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({, model: prompt }, signal: AbortSignal.timeout(this.timeout),
+ body: JSON.stringify({ model: prompt }, signal: AbortSignal.timeout(this.timeout),
  });
  if (!res.ok) {
  const text = await res.text().catch(() => '');
@@ -139,3 +139,5 @@ const res = await fetch(`${this.baseUrl}/api/generate`, {
 
 export const ollamaService = new OllamaService();
 export default ollamaService;
+
+

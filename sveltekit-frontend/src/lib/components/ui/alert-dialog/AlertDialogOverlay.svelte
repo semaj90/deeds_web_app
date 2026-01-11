@@ -19,8 +19,10 @@
 {#if dialogContext?.open}
 	<div
 		class="{defaultClass} {className}"
-		transition: fade={{, duration: 150 }}
+		transition: fade={{ duration: 150 }}
 		data-state="open"
 		aria-hidden="true"
 	></div>
 {/if}
+
+

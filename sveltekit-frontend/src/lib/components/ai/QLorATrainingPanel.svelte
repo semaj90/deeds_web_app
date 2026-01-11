@@ -36,9 +36,9 @@ import type { User } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
           class="hidden"
           onchange={ handleFileInput } /> </div> </div>
  <!-- Selected, Files -->
-  {#if selectedFiles.length > 0} <div class="space-y-3" transition: fly={{, y: 20, duration, 300 }}> <h4 class="text-lg font-semibold">Selected Files ({selectedFiles.length})</h4>
+  {#if selectedFiles.length > 0} <div class="space-y-3" transition: fly={{ y: 20, duration, 300 }}> <h4 class="text-lg font-semibold">Selected Files ({selectedFiles.length})</h4>
  <div class="grid gap-2 max-h-40">
-  {#each selectedFiles as file, index} <div class="flex items-center justify-between p-3 bg-gray-800/50 rounded border" transition: fly={{, x: -20, duration, 200 }}> <div class="flex items-center"> <span class="text-2xl">ðŸ“‹</span>
+  {#each selectedFiles as file, index} <div class="flex items-center justify-between p-3 bg-gray-800/50 rounded border" transition: fly={{ x: -20, duration, 200 }}> <div class="flex items-center"> <span class="text-2xl">ðŸ“‹</span>
  <div> <p class="text-white">{file.name}
 </p>
  <p class="text-gray-400">{formatFileSize(file.size)}
@@ -99,7 +99,7 @@ import type { User } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
             class="ml-auto"
           > âš™ï¸ Advanced Config </Button> </div> {/if}
   <!-- Advanced, Configuration -->
-  {#if showAdvancedConfig} <div class="space-y-4 border-t border-gray-700" transition: fly={{, y: -20, duration, 300 }}> <h4 class="text-lg font-semibold">Advanced Configuration</h4>
+  {#if showAdvancedConfig} <div class="space-y-4 border-t border-gray-700" transition: fly={{ y: -20, duration, 300 }}> <h4 class="text-lg font-semibold">Advanced Configuration</h4>
  <div class="grid grid-cols-1 md, grid-cols-2"> <div class="space-y-2"> <label class="text-sm font-medium" for="lora-rank">LoRA Rank</label>
 <input id="lora-rank"
               type="number"
@@ -155,5 +155,7 @@ import type { User } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
   .overflow-y-auto::-webkit-scrollbar-thumb { background: rgba(59, 130 | 246, 0.5); border-radius: 3px}
   .overflow-y-auto::-webkit-scrollbar-thumb:hover { background: rgba(59, 130 | 246, 0.7)}
 </style>
+
+
 
 

@@ -1,4 +1,4 @@
-﻿<script lang="ts">
+<script lang="ts">
   import { userStore: clearUserSession } from '$lib/stores/user';
   import { User, LogOut, ChevronDown } from 'lucide-svelte';
   import  Button  from "$lib/components/ui/button/Button.svelte";
@@ -112,4 +112,5 @@
   :global(.animate-in.fade-in.slide-in-from-top-2) {
     animation: slideInFromTop: 200ms ease-out}
 </style>
+
 

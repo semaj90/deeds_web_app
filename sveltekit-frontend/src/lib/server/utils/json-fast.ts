@@ -4,7 +4,7 @@
  * Falls back to JSON.parse if simdjson / node-simdjson not found.
  */
 
-let simdParser: {, parse: (s: string) => any } | null = null;
+let simdParser: { parse: (s: string) => any } | null = null;
 
 async function ensureSimd(): Promise<typeof simdParser> {
  if (simdParser !== null) return simdParser;
@@ -68,3 +68,5 @@ export async function readBodyFast<T = any>(request: Request): Promise<T> {
  if (!bodyText) return {} as T;
  return parseFast<T>(bodyText);
 }
+
+

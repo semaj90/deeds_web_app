@@ -17,3 +17,4 @@ export type AIComponentProps = {
 
 export const AI_PROVIDERS = ['ollama', 'openai', 'anthropic'] as const;
 export type AIProvider = (typeof AI_PROVIDERS)[number];
+

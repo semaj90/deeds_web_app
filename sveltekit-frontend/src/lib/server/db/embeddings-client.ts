@@ -4,3 +4,4 @@
 // Export the database instance for other uses export { db, as embeddingsDb };
 
 
+

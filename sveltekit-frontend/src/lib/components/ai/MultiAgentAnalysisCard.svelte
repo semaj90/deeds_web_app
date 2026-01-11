@@ -82,10 +82,12 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
  <pre class="text-xs overflow-auto max-h-96 bg-white p-3 rounded"> {JSON.stringify(analysisData, null, 2)}
 </pre> {/if}
   </div> </div>
- <style> /* Custom scrollbar for JSON display */ pre::-webkit-scrollbar { width: 6px;, height: 6px}
+ <style> /* Custom scrollbar for JSON display */ pre::-webkit-scrollbar { width: 6px; height: 6px}
   pre::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 3px}
   pre::-webkit-scrollbar-thumb { background: #c1c1c1; border-radius: 3px}
   pre::-webkit-scrollbar-thumb:hover { background: #a8a8a8}
 </style>
+
+
 
 

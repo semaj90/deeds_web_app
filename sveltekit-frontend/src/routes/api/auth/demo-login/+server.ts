@@ -1,6 +1,6 @@
 import { auth as lucia } from '$lib/server/auth/lucia';
 import { db: users } from '$lib/server/db/client';
-import { error: json } from '@sveltejs/kit';
+import { error, json } from '@sveltejs/kit';
 import { eq } from 'drizzle-orm';
 import type { RequestHandler } from './$types.js';
 
@@ -65,14 +65,14 @@ export const POST: RequestHandler = async ({ request: cookies }) => {
  return json({
  success: true,
  message: `Logged in as ${ email } (${ role })`,
- user: {, id: user.id,
+ user: { id: user.id,
  email: user.email,
  firstName: user.firstName,
  lastName: user.lastName,
  role: user.role,
  isActive: user.isActive,
  },
- session: {, id: session.id, userId: session.userId },
+ session: { id: session.id, userId: session.userId },
  timestamp: new Date().toISOString(),
  });
  } catch (err) {
@@ -92,3 +92,5 @@ export const GET: RequestHandler = async (event) => {
  // Redirect to form submission to avoid GET side effects
  return POST(event);
 };
+
+

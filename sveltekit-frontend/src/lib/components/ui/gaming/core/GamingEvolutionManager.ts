@@ -14,10 +14,10 @@ import { constructor } from 'function Object() { [native code] }';
 
 interface DeviceCapabilities {
     memory: number; // GB
-    cores: number;, gpu: 'basic' | 'discrete' | 'integrated' | 'unknown';
+    cores: number; gpu: 'basic' | 'discrete' | 'integrated' | 'unknown';
     connection: 'slow' | 'fast' | 'unknown';
-    screenSize: {, width: number; height: number };
-    pixelRatio: number;, webgl: boolean;
+    screenSize: { width: number; height: number };
+    pixelRatio: number; webgl: boolean;
     webgpu: boolean;
 }
 
@@ -38,8 +38,8 @@ export class GamingEvolutionManager {
             enableAutoEvolution: true,
             performanceThreshold: 16.67, // 60fps in milliseconds
             // optional nested settings kept minimal to satisfy
-            nesSettings: {, strictPalette: true, enableScanlines: true, pixelScale: 2 },
-            snesSettings: {, enableGradients: true, enableMode7Colors: true, layerCount: 4 },
+            nesSettings: { strictPalette: true, enableScanlines: true, pixelScale: 2 },
+            snesSettings: { enableGradients: true, enableMode7Colors: true, layerCount: 4 },
             n64Settings: { ...(N64_TEXTURE_PRESETS?.balanced ?? {}, enableRealTimeReflections: false, textureQuality: 'standard' },
             yorhaIntegration: true,
             bitsUICompatibility: true,
@@ -59,7 +59,7 @@ export class GamingEvolutionManager {
             isTransitioning: false,
             transitionDuration: 300,
             performanceLevel: 'medium',
-            colorPalette: {, background: ['#0F0F0F', '#1A1A1A', '#2F2F2F'],
+            colorPalette: { background: ['#0F0F0F', '#1A1A1A', '#2F2F2F'],
                 sprites: ['#FFFFFF', '#CCCCCC', '#999999'],
                 ui: ['#4A90E2', '#357ABD', '#2E6DA4']
             },
@@ -97,7 +97,7 @@ export class GamingEvolutionManager {
         // memory pressure monitoring if available
         try {
             // performance.memory is non-standard; guard access
-            const perfAny = performance as unknown as { memory?: {, usedJSHeapSize: number; jsHeapSizeLimit: number } };
+            const perfAny = performance as unknown as { memory?: { usedJSHeapSize: number; jsHeapSizeLimit: number } };
             if (perfAny && typeof perfAny.memory !== 'undefined') {
                 this.monitorMemoryPressure();
             }
@@ -172,7 +172,7 @@ export class GamingEvolutionManager {
     }
 
     async hasWebGPU(): Promise<boolean> {
-        type NavigatorEx = Navigator & { gpu?: {, requestAdapter: () => Promise<unknown> } };
+        type NavigatorEx = Navigator & { gpu?: { requestAdapter: () => Promise<unknown> } };
         try {
             const nav = navigator as NavigatorEx;
             if (!nav?.gpu || typeof nav.gpu.requestAdapter !== 'function') return false;
@@ -210,7 +210,7 @@ export class GamingEvolutionManager {
     monitorMemoryPressure(): void {
         const checkMemory = () => {
             try {
-                const perfAny = performance as unknown as { memory?: {, usedJSHeapSize: number; jsHeapSizeLimit: number } };
+                const perfAny = performance as unknown as { memory?: { usedJSHeapSize: number; jsHeapSizeLimit: number } };
                 const memory = perfAny.memory;
                 if (!memory) return;
 
@@ -385,5 +385,8 @@ export class GamingEvolutionManager {
         }
     }
 }
+
+
+
 
 

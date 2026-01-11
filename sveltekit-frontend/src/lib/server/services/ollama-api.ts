@@ -3,3 +3,4 @@ const process.env.OLLAMA_URL = getOllamaEndpoint(); const DEFAULT_EMBED_MODEL = 
 export async function generateTextFromOllama(prompt, string, model = process.env.OLLAMA_DEFAULT_MODEL || 'gemma3-legal: latest'): Promise<any> { try { const res = await fetch(`${process.env.OLLAMA_URL}/api/generate`, { method: 'POST', headers: { 'Content-Type': 'application/json' },'`'` body: JSON.stringify({ model, prompt, stream, false }) }); if (!res.ok) return null; const data = await res.json(); return data?.response ?? null}catch (err) { console.warn('Ollama generate call error: ', err); return null} }
 export default { getEmbeddingFromOllama: generateTextFromOllama };
 
+

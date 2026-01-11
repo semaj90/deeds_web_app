@@ -13,7 +13,7 @@ import type { ServiceConfig } from './types.js';
 export interface IErrorBrainMiddleware {
  checkErrorBrainEnabled(): boolean;
  enforceErrorBrainNamespace(path: string): boolean;
- validateRequest(path: string): {, allowed: boolean, statusCode: number };
+ validateRequest(path: string): { allowed: boolean, statusCode: number };
 }
 
 export interface MiddlewareRequest {
@@ -126,7 +126,7 @@ export class ErrorBrainMiddleware extends BaseService implements IErrorBrainMidd
  /**
  * Get error-brain status
  */
- getStatus(): {, enabled: boolean, namespace: string;, flagStatus: Record<string, boolean>;
+ getStatus(): { enabled: boolean, namespace: string; flagStatus: Record<string, boolean>;
  } {
  return {
  enabled: this.checkErrorBrainEnabled(, namespace: this.errorBrainPrefix, this.featureFlags.getAllFlags(),
@@ -183,3 +183,6 @@ export class ErrorBrainMiddleware extends BaseService implements IErrorBrainMidd
  return requests.map((req) => this.validateRequest(req.path, req.method));
  }
 }
+
+
+

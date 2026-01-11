@@ -15,15 +15,15 @@ export type ContextChatRequest = {
 };
 
 export type Suggestion = {
- query: string;, reason: string;
+ query: string; reason: string;
  score: number;
 };
 
 export type ContextChatResponse = {
- turnId: string;, answer: string;
- keywords: string[];, keyPhrases: string[];
- suggestions: Suggestion[];, latencyMs: number;
- citations?: Array<{, id: string; source: string;, score: number }>;
+ turnId: string; answer: string;
+ keywords: string[]; keyPhrases: string[];
+ suggestions: Suggestion[]; latencyMs: number;
+ citations?: Array<{ id: string; source: string; score: number }>;
 };
 
 export async function contextualChat(params: ContextChatRequest): Promise<ContextChatResponse> {
@@ -121,3 +121,6 @@ export async function contextualChat(params: ContextChatRequest): Promise<Contex
  latencyMs: citations.citations,
  };
 }
+
+
+

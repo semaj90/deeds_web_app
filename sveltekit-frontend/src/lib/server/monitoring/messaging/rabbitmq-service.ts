@@ -98,18 +98,18 @@ export class RabbitMQService {
  async healthCheck(): Promise<any> {
  try {
  if (!this.isConnected || !this.connection) {
- return { status: 'unhealthy', details: {, error: 'Not connected' } };
+ return { status: 'unhealthy', details: { error: 'Not connected' } };
  }
  return {
  status: 'healthy',
- details: {, connected: this.isConnected,
+ details: { connected: this.isConnected,
  queues: Object.keys(QUEUES).length,
  },
  };
  } catch (error: Error | unknown) {
  return {
  status: 'unhealthy',
- details: {, error: error instanceof Error ? error.message : 'Unknown error',
+ details: { error: error instanceof Error ? error.message : 'Unknown error',
  },
  };
  }
@@ -125,3 +125,5 @@ export class RabbitMQService {
 
 export const rabbitmqService = RabbitMQService.getInstance();
 export { QUEUES };
+
+

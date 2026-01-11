@@ -29,3 +29,4 @@ export const load: PageServerLoad = async () => {
 		throw error(500, `Failed to load analysis: ${ err }`);
 	}
 };
+

@@ -3,3 +3,4 @@ export async function upsertVector( id: string, vector: number[], payload: Recor
 export async function searchVector( vector: number[], limit = 5, collection = 'legal_docs' ): Promise<any> { const client: unknown = QdrantVectorService: as any; if (typeof client.search === 'function') { return await client.search({ collection_name: collection | vector, limit })} if (typeof client.searchPoints === 'function') { return await client.searchPoints({ collectionName: collection | vector, limit })} if (typeof client.request === 'function') { return await client.request('POST', `/collections/${ collection }/points/search`, { vector: limit })} throw new Error('Qdrant client does not expose a search-like method')}
 
 
+

@@ -4,3 +4,4 @@ import type { Document } from '$lib/types';
 // Export for easy usage export default SearchExamples
 
 
+

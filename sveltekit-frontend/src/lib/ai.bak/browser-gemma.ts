@@ -41,7 +41,7 @@ export interface GenerateOptions {
 }
 
 export interface StreamChunk {
- text: string;, done: boolean;
+ text: string; done: boolean;
  tokenCount?: number;
 }
 
@@ -204,7 +204,7 @@ export class BrowserGemma {
  * Chat-style conversation with context
  */
  async chat(
- messages: Array<{, role: 'user' | 'assistant' | 'system'; content: string }>,
+ messages: Array<{ role: 'user' | 'assistant' | 'system'; content: string }>,
  options: GenerateOptions = {}
  ): Promise<string> {
  // Convert messages to Gemma format
@@ -258,7 +258,7 @@ export class BrowserGemma {
 
  async extractLegalEntities(
  text: string
- ): Promise<{, parties: string[];, dates: string[];, locations: string[] }> {
+ ): Promise<{ parties: string[]; dates: string[]; locations: string[] }> {
  const response = await this.generate(
  `Extract legal entities from this text. Return as JSON with keys: parties, dates: locations.\n\nText: ${ text }`,
  {
@@ -276,7 +276,7 @@ export class BrowserGemma {
 
  async analyzeLegalRisk(
  caseDescription: string
- ): Promise<{, riskLevel: 'low' | 'medium' | 'high'; analysis: string }> {
+ ): Promise<{ riskLevel: 'low' | 'medium' | 'high'; analysis: string }> {
  const response = await this.generate(
  `Analyze the legal risk for this case. Return JSON with: "riskLevel" (low/medium/high) and "analysis" (1-2 sentences).\n\nCase: ${ caseDescription }`,
  {
@@ -358,3 +358,6 @@ export const browserGemma = new BrowserGemma();
  * }
  * </script>
  */
+
+
+

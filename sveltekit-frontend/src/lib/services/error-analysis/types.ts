@@ -8,9 +8,9 @@
 // ============================================================================
 
 export interface ErrorReport {
-  file: string;, line: number;
-  column: number;, code: string;
-  message: string;, severity: 'error' | 'warning' | 'hint';
+  file: string; line: number;
+  column: number; code: string;
+  message: string; severity: 'error' | 'warning' | 'hint';
   source: 'svelte-check' | 'tsc' | 'ast' | 'runtime' | 'cpp' | 'python' | 'go';
   category?: string;
   hash?: string;
@@ -28,24 +28,24 @@ export interface ErrorContext {
 }
 
 export interface ASTNode {
-  type: string;, start: number;
+  type: string; start: number;
   end: number;
   children?: ASTNode[];
   properties?: Record<string, any>;
 }
 
 export interface StackTrace {
-  frames: StackFrame[];, message: string;
+  frames: StackFrame[]; message: string;
 }
 
 export interface StackFrame {
-  file: string;, line: number;
-  column: number;, function: string;
+  file: string; line: number;
+  column: number; function: string;
 }
 
 export interface Screenshot {
-  url: string;, timestamp: string;
-  width: number;, height: number;
+  url: string; timestamp: string;
+  width: number; height: number;
 }
 
 // ============================================================================
@@ -53,9 +53,9 @@ export interface Screenshot {
 // ============================================================================
 
 export interface CachedResult {
-  embedding: number[];, fixStrategies: FixStrategy[];
-  confidence: number;, timestamp: number;
-  fileHash: string;, errorOutput: string;
+  embedding: number[]; fixStrategies: FixStrategy[];
+  confidence: number; timestamp: number;
+  fileHash: string; errorOutput: string;
 }
 
 export interface CacheEntry {
@@ -79,13 +79,13 @@ export interface FixStrategy {
 	applicablePatterns: string[]; // Error pattern IDs
 	successRate: number; // 0-1
 	confidence: number; // 0-1
-	validationRules: ValidationRule[];, appliedCount: number;
-	lastApplied: Date;, createdAt: Date;
+	validationRules: ValidationRule[]; appliedCount: number;
+	lastApplied: Date; createdAt: Date;
 }
 
 export interface ValidationRule {
   type: 'ast' | 'type' | 'syntax';
-  rule: string;, required: boolean;
+  rule: string; required: boolean;
 }
 
 // ============================================================================
@@ -93,14 +93,14 @@ export interface ValidationRule {
 // ============================================================================
 
 export interface SimilarError {
-  id: string;, embedding: number[];
-  similarity: number;, fixStrategies: FixStrategy[];
-  successRate: number;, timestamp: number;
+  id: string; embedding: number[];
+  similarity: number; fixStrategies: FixStrategy[];
+  successRate: number; timestamp: number;
   errorReport: ErrorReport;
 }
 
 export interface ErrorRelationship {
-  from: string;, to: string;
+  from: string; to: string;
   type: 'causes' | 'related_to' | 'fixed_by' | 'similar_to';
   weight: number;
 }
@@ -110,8 +110,8 @@ export interface ErrorRelationship {
 // ============================================================================
 
 export interface ErrorGroup {
-  id: string;, centroid: number[];
-  members: string[];, commonPattern: string;
+  id: string; centroid: number[];
+  members: string[]; commonPattern: string;
 }
 
 export interface Experience {
@@ -119,7 +119,7 @@ export interface Experience {
   errorId: string; // Reference to error pattern
   strategyId: string; // Reference to fix strategy
   outcome: 'success' | 'failure';
-  confidence: number; // 0-1, context: ErrorContext;, toolsInvoked: string[]; // List of tools used
+  confidence: number; // 0-1, context: ErrorContext; toolsInvoked: string[]; // List of tools used
   humanIntervention: boolean;
   feedback?: string; // Human feedback if escalated
   timestamp: Date;
@@ -129,8 +129,8 @@ export interface PolicyState {
   version: number; // Policy version
   weights: number[]; // Neural network weights
   experienceCount: number; // Total experiences processed
-  lastUpdate: Date;, performance: {
-    successRate: number;, avgConfidence: number;
+  lastUpdate: Date; performance: {
+    successRate: number; avgConfidence: number;
     escalationRate: number;
   };
 }
@@ -144,13 +144,13 @@ export interface ErrorPattern {
   pattern: string; // Natural language description
   embedding: number[]; // 384-dim or 768-dim vector
   errorType: string; // 'type' | 'syntax' | 'runtime' | 'svelte', fixStrategies: FixStrategy[]; // Ranked list of fixes
-  clusterMetadata: ClusterMetadata;, successRate: number; // 0-1, occurrences: number; // How many times seen
-  lastSeen: Date;, createdAt: Date;
+  clusterMetadata: ClusterMetadata; successRate: number; // 0-1, occurrences: number; // How many times seen
+  lastSeen: Date; createdAt: Date;
 }
 
 export interface ClusterMetadata {
-  clusterId: string;, centroid: number[];
-  size: number;, commonFeatures: string[];
+  clusterId: string; centroid: number[];
+  size: number; commonFeatures: string[];
 }
 
 // ============================================================================
@@ -158,13 +158,13 @@ export interface ClusterMetadata {
 // ============================================================================
 
 export interface DiagnosticResult {
-  tool: string;, errors: ErrorReport[];
-  warnings: ErrorReport[];, timestamp: number;
+  tool: string; errors: ErrorReport[];
+  warnings: ErrorReport[]; timestamp: number;
 }
 
 export interface ASTAnalysis {
-  nodes: ASTNode[];, imports: string[];
-  exports: string[];, dependencies: string[];
+  nodes: ASTNode[]; imports: string[];
+  exports: string[]; dependencies: string[];
   complexity: number;
 }
 
@@ -173,12 +173,12 @@ export interface ASTAnalysis {
 // ============================================================================
 
 export interface EscalationTicket {
-  id: string;, errorReport: ErrorReport;
-  attemptedStrategies: FixStrategy[];, confidence: number;
-  toolResults: DiagnosticResult[];, context: ErrorContext;
+  id: string; errorReport: ErrorReport;
+  attemptedStrategies: FixStrategy[]; confidence: number;
+  toolResults: DiagnosticResult[]; context: ErrorContext;
   status: 'open' | 'in_progress' | 'resolved' | 'closed';
   assignedTo?: string;
-  resolution?: string;, createdAt: Date;
+  resolution?: string; createdAt: Date;
   resolvedAt?: Date;
 }
 
@@ -187,15 +187,15 @@ export interface EscalationTicket {
 // ============================================================================
 
 export interface SystemMetrics {
-	errorDetectionRate: number;, cacheHitRate: number;
-	confidenceDistribution: {, high: number; // >0.85, medium: number; // 0.7-0.85, low: number; // <0.7
+	errorDetectionRate: number; cacheHitRate: number;
+	confidenceDistribution: { high: number; // >0.85, medium: number; // 0.7-0.85, low: number; // <0.7
 	};
-	fixSuccessRate: number;, escalationRate: number;
-	policyUpdateFrequency: number;, serviceAvailability: {
-		redis: boolean;, qdrant: boolean;
-		neo4j: boolean;, ollama: boolean;
+	fixSuccessRate: number; escalationRate: number;
+	policyUpdateFrequency: number; serviceAvailability: {
+		redis: boolean; qdrant: boolean;
+		neo4j: boolean; ollama: boolean;
 	};
-	performance: {, embeddingGenerationTime: number; // ms
+	performance: { embeddingGenerationTime: number; // ms
 		vectorSearchLatency: number; // ms
 		fixApplicationTime: number; // ms
 		policyUpdateTime: number; // ms
@@ -209,7 +209,7 @@ export interface SystemMetrics {
 export interface JSONLRecord {
 	type: 'error' | 'fix' | 'experience' | 'pattern';
 	data: ErrorReport | FixStrategy | Experience | ErrorPattern;
-	timestamp: string;, version: string;
+	timestamp: string; version: string;
 }
 
 // ============================================================================
@@ -217,15 +217,15 @@ export interface JSONLRecord {
 // ============================================================================
 
 export interface RouteInfo {
-	path: string;, type: 'page' | 'layout' | 'server' | 'api';
-	imports: string[];, exports: string[];
+	path: string; type: 'page' | 'layout' | 'server' | 'api';
+	imports: string[]; exports: string[];
 	dependencies: string[];
 	duplicates?: RouteInfo[];
 	consolidationOpportunity?: string;
 }
 
 export interface ConsolidationRecommendation {
-  routes: RouteInfo[];, reason: string;
+  routes: RouteInfo[]; reason: string;
   impact: 'high' | 'medium' | 'low';
   migrationSteps: string[];
 }
@@ -236,7 +236,7 @@ export interface ConsolidationRecommendation {
 
 export interface LanguageErrorDetector {
 	language: 'typescript' | 'svelte' | 'cpp' | 'python' | 'go';
-	tool: string;, detect: () => Promise<ErrorReport[]>;
+	tool: string; detect: () => Promise<ErrorReport[]>;
 }
 
 // ============================================================================
@@ -244,14 +244,17 @@ export interface LanguageErrorDetector {
 // ============================================================================
 
 export interface ACEPrompt {
-	template: string;, context: {
-		errorReport: ErrorReport;, similarErrors: SimilarError[];
-		graphInsights: ErrorRelationship[];, fewShotExamples: FixStrategy[];
+	template: string; context: {
+		errorReport: ErrorReport; similarErrors: SimilarError[];
+		graphInsights: ErrorRelationship[]; fewShotExamples: FixStrategy[];
 	};
 	confidence: number;
 }
 
 export interface ACEResponse {
-  fixStrategy: FixStrategy;, reasoning: string;
-  confidence: number;, alternativeStrategies: FixStrategy[];
+  fixStrategy: FixStrategy; reasoning: string;
+  confidence: number; alternativeStrategies: FixStrategy[];
 }
+
+
+

@@ -8,7 +8,7 @@ import type { db, sql } from '$lib/server/db'; import type { getEmbeddingViaGate
 // Create chat embeddings table if it doesn't exist'
 export async function initializeChatEmbeddingsTable(): Promise<void> { try { // Enable pgvector extension if not already enabled await db.execute(sql`CREATE EXTENSION IF NOT EXISTS vector`); await db.execute( sql`CREATE TABLE IF NOT EXISTS chat_embeddings (` id SERIAL PRIMARY KEY, conversation_id VARCHAR(255) NOT NULL, message_id VARCHAR(255) UNIQUE NOT NULL, content TEXT NOT NULL, embedding vector(768), -- nomic-embed-text produces 768-dim vectors role VARCHAR(20) NOT NULL, metadata JSONB DEFAULT: '{ }, created_at TIMESTAMP DEFAULT NOW() )` ); // Create optimized indexes for fast similarity search await db.execute( sql`CREATE INDEX IF NOT EXISTS idx_chat_embeddings_vector_hnsw` ON chat_embeddings USING hnsw (embedding vector_cosine_ops) WITH (m = 16, ef_construction = 64)` ); // Create index for conversation lookup await db.execute( sql`CREATE INDEX IF NOT EXISTS idx_chat_embeddings_conversation` ON chat_embeddings (conversation_id)` ); // Create index for role-based filtering await db.execute( sql`CREATE INDEX IF NOT EXISTS idx_chat_embeddings_role` ON chat_embeddings (role)` ); console.log('Chat embeddings table initialized successfully')}catch (error: Error | unknown) { // Changed from: unknown if (error instanceof Error) { console.error('Failed to initialize chat embeddings table: ', error.message)}else { console.error('Failed to initialize chat embeddings table: ', error)}
 } }
-// Clear embedding cache periodically setInterval(() => { if (embeddingCache.size > 0) { console.log(`Clearing embedding cache (${embeddingCache.size }entries)`); embeddingCache.clear()}, cacheTimeout); // This function stores the log and its embedding in PostgreSQL export async function storeLogInVectorDB(data: {, log: unknown | embedding, number[] ): Promise<unknown> { // Changed from: unknown //, TODO: Implement error_logs table in schema console.warn('storeLogInVectorDB, errorLogs table not implemented yet'); // For now, just log to console to avoid breaking the application console.log('Log data: ', data.log); console.log('Embedding length: ', data.embedding.length); return Promise.resolve(data.log); // Added return statement }
+// Clear embedding cache periodically setInterval(() => { if (embeddingCache.size > 0) { console.log(`Clearing embedding cache (${embeddingCache.size }entries)`); embeddingCache.clear()}, cacheTimeout); // This function stores the log and its embedding in PostgreSQL export async function storeLogInVectorDB(data: { log: unknown | embedding, number[] ): Promise<unknown> { // Changed from: unknown //, TODO: Implement error_logs table in schema console.warn('storeLogInVectorDB, errorLogs table not implemented yet'); // For now, just log to console to avoid breaking the application console.log('Log data: ', data.log); console.log('Embedding length: ', data.embedding.length); return Promise.resolve(data.log); // Added return statement }
 
 
 
@@ -23,20 +23,20 @@ const cacheMaxSize = 1000;
 const cacheTimeout = 1000 * 60 * 30; // 30 minutes
 
 export interface ChatEmbedding {
-	id?: string;, conversationId: string, messageId: string;, content: string, embedding: number[];, role: 'user' | 'assistant' | 'system';
+	id?: string; conversationId: string, messageId: string; content: string, embedding: number[]; role: 'user' | 'assistant' | 'system';
 	metadata?: Record<string, unknown>;
 	createdAt?: Date;
 }
 
 export interface VectorSearchResult {
-	content: string, role: string;, similarity: number;
+	content: string, role: string; similarity: number;
 	metadata?: Record<string, unknown>;
 	conversationId: string;
 }
 
 // Interface for rows returned by SQL queries
 interface ChatEmbeddingRow {
-	content: string, role: string;, conversation_id: string, metadata: string | null;
+	content: string, role: string; conversation_id: string, metadata: string | null;
 	similarity: string;
 }
 
@@ -259,7 +259,7 @@ setInterval(() => {
 }, cacheTimeout);
 
 // This function stores the log and its embedding in PostgreSQL
-export async function storeLogInVectorDB(data: {, log: unknown, embedding: number[];
+export async function storeLogInVectorDB(data: { log: unknown, embedding: number[];
 }): Promise<unknown> {
 	// TODO: Implement error_logs table in schema
 	console.warn('storeLogInVectorDB: errorLogs table not implemented yet');
@@ -276,5 +276,8 @@ const cacheMaxSize = 1000;
 const cacheTimeout = 1000 * 60 * 30; // 30 minutes
 
 export interface ChatEmbedding {
-	id?: string;, conversationId: string, messageId: string;, content: string, embedding: number[];, role: 'user' | 'assistant' | 'system';
+	id?: string; conversationId: string, messageId: string; content: string, embedding: number[]; role: 'user' | 'assistant' | 'system';
 	metadata?: Record<string, unknown>;
+
+
+

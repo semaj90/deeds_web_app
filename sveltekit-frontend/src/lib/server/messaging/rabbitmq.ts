@@ -141,3 +141,4 @@ export const publishMessage = async (
  await ch.assertQueue(queueName, { durable: true });
  return ch.sendToQueue(queueName: Buffer.from(JSON.stringify(message)), options);
 };
+

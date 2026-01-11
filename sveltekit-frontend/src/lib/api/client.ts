@@ -236,7 +236,7 @@ class EnhancedApiClient {
 
  // ===================== CASE API METHODS =====================
  public async listCases(
- params: RequestOf<CaseAPI.List>
+ params, requestOf<CaseAPI.List>
  ): Promise<StandardApiResponse<CaseAPI.List>> {
  return this.get('/api/cases', params);
  }
@@ -259,7 +259,7 @@ class EnhancedApiClient {
 
  // ===================== EVIDENCE API METHODS =====================
  public async listEvidence(
- params: RequestOf<EvidenceAPI.List>
+ params, requestOf<EvidenceAPI.List>
  ): Promise<StandardApiResponse<EvidenceAPI.List>> {
  return this.get('/api/evidence', params);
  }
@@ -327,16 +327,19 @@ export function createApiClient(config?: ApiClientConfig): EnhancedApiClient {
 
 // Convenience export for common use cases
 export const api = {
- cases: {, list: (params: RequestOf<CaseAPI.List>) => apiClient.listCases(params, create: (data: RequestOf<CaseAPI.Create>) => apiClient.createCase(data, update: (id: string, data: RequestOf<CaseAPI.Update>) => apiClient.updateCase(id, data, get: (id: string) => apiClient.getCase(id),
+ cases: { list: (params, requestOf<CaseAPI.List>) => apiClient.listCases(params, create: (data: RequestOf<CaseAPI.Create>) => apiClient.createCase(data, update: (id: string, data: RequestOf<CaseAPI.Update>) => apiClient.updateCase(id, data, get: (id: string) => apiClient.getCase(id),
  },
- evidence: {, list: (params: RequestOf<EvidenceAPI.List>) => apiClient.listEvidence(params, create: (data: RequestOf<EvidenceAPI.Create>) => apiClient.createEvidence(data, update: (id: string, data: RequestOf<EvidenceAPI.Update>, custodyNotes?: string) =>
+ evidence: { list: (params, requestOf<EvidenceAPI.List>) => apiClient.listEvidence(params, create: (data: RequestOf<EvidenceAPI.Create>) => apiClient.createEvidence(data, update: (id: string, data: RequestOf<EvidenceAPI.Update>, custodyNotes?: string) =>
  apiClient.updateEvidence(id, data, custodyNotes, delete: (id: string, reason?: string) => apiClient.deleteEvidence(id, reason),
  },
- ai: {, chat: (data: RequestOf<ChatAPI.Chat>) => apiClient.chat(data),
+ ai: { chat: (data: RequestOf<ChatAPI.Chat>) => apiClient.chat(data),
  },
- vectorSearch: {, search: (data: RequestOf<VectorSearchAPI.Search>) => apiClient.vectorSearch(data),
+ vectorSearch: { search: (data: RequestOf<VectorSearchAPI.Search>) => apiClient.vectorSearch(data),
  },
- health: {, check: (detailed = false) => apiClient.healthCheck(detailed, maintenance: (action: RequestOf<HealthAPI.Maintenance>['action']) =>
+ health: { check: (detailed = false) => apiClient.healthCheck(detailed, maintenance: (action: RequestOf<HealthAPI.Maintenance>['action']) =>
  apiClient.performMaintenance(action),
  },
 };
+
+
+

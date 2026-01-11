@@ -5,11 +5,11 @@ import crypto from 'node:crypto';
 import type { RequestHandler } from './$types.js';
 
 type CapturePayload = {
- route?: string;, file_path: string;
+ route?: string; file_path: string;
  line?: number;
  col?: number;
  code?: string;
- severity?: string;, message: string;
+ severity?: string; message: string;
  phase?: number;
  cycle?: number;
 };
@@ -74,3 +74,4 @@ export const POST: RequestHandler = async ({ request }) => {
  return json({ error: 'Failed to capture error' }, { status: 500 });
  }
 };
+

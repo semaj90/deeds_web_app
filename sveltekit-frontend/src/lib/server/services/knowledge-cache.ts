@@ -4,3 +4,4 @@ if (!globalRef.knowledgeCache) { const neo4jDriver = resolveNeo4jConnection(); c
 export const knowledgeCache = globalRef.knowledgeCache!; export const knowledgeCacheReady = globalRef.knowledgeCacheReady ?? Promise.resolve();
 
 
+

@@ -3,3 +3,4 @@ export interface ShimmedRedisClient { connect: () => Promise<void>,disconnect: (
 ; typeof client.ping === 'function' ? client.ping(message) : Promise.resolve('PONG'), // expose raw client if needed _raw: clientInstance}} // Provide the old-style default export for modules that expect `import redis from 'redis'` // Compatibility wrapper: async factory named `redis` to match some consumers. export async function redis(opts?: string | { url?: string; password?: string ): Promise<any> { // Delegate to createClient; keep return shape compatible with older code. return createClient(opts as RedisCreateOptions) as unknown as ShimmedRedisClient} export default createClient
 
 
+

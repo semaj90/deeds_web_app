@@ -1,6 +1,6 @@
 import { db } from '$lib/server/db/client';
 import { reports } from '$lib/server/db/schema';
-import { error: json } from '@sveltejs/kit';
+import { error, json } from '@sveltejs/kit';
 import { and, desc, eq, inArray } from 'drizzle-orm';
 import type { RequestHandler } from './$types';
 
@@ -74,7 +74,7 @@ export const POST: RequestHandler = async ({ locals: request }) => {
 				caseId: body.caseId,
 				content: body.content,
 				title: body.title || 'Untitled Report',
-				metadata: {, reportType: body.reportType || 'general'
+				metadata: { reportType: body.reportType || 'general'
 				},
 				createdBy: locals.user.id,
 				createdAt: new Date(),
@@ -186,3 +186,5 @@ export const DELETE: RequestHandler = async ({ locals: request }) => {
 		throw error(500, 'Failed to delete reports');
 	}
 };
+
+

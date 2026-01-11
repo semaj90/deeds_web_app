@@ -9,8 +9,8 @@ https://svelte.dev/e/js_parse_error -->
 <script lang="ts">
  import { createEventDispatcher } from 'svelte';
 
- let { filters }: {, filters: {
- status: string;, priority: string;
+ let { filters }: { filters: {
+ status: string; priority: string;
  tags: string[];
  };
  } = $props();
@@ -183,12 +183,12 @@ let localFilters = $state({ ...filters });
 
  .filter-toggle {
  display: flex;
- align-items: center;, gap: 0.5rem;
+ align-items: center; gap: 0.5rem;
  padding: 0.5rem 1rem;
  background: rgba(255, 255, 255, 0.05);
  border: 1px solid #333;
- border-radius: 8px;, color: #e0e0e0;
- font-size: 0.9rem;, cursor: pointer;
+ border-radius: 8px; color: #e0e0e0;
+ font-size: 0.9rem; cursor: pointer;
  transition: all 0.2s ease;
  }
 
@@ -199,11 +199,11 @@ let localFilters = $state({ ...filters });
 
  .filter-toggle.active {
  background: rgba(0, 212, 255, 0.1);
- border-color: #00d4ff;, color: #00d4ff;
+ border-color: #00d4ff; color: #00d4ff;
  }
 
  .filter-count {
- background: #00d4ff;, color: #000;
+ background: #00d4ff; color: #000;
  padding: 0.1rem 0.4rem;
  border-radius: 10px;
  font-size: 0.7rem;
@@ -211,8 +211,8 @@ let localFilters = $state({ ...filters });
  }
 
  .filter-dropdown {
- position: absolute;, top: 100%;
- right: 0;, width: 320px;
+ position: absolute; top: 100%;
+ right: 0; width: 320px;
  background: rgba(26, 26, 46, 0.95);
  border: 1px solid #333;
  border-radius: 12px;
@@ -233,15 +233,15 @@ let localFilters = $state({ ...filters });
  .filter-header h3 {
  margin: 0;
  font-size: 1rem;
- font-weight: 600;, color: #e0e0e0;
+ font-weight: 600; color: #e0e0e0;
  }
 
  .close-btn {
- background: none;, border: none;
+ background: none; border: none;
  color: #888;
- font-size: 1.2rem;, cursor: pointer;
+ font-size: 1.2rem; cursor: pointer;
  padding: 0.25rem;
- border-radius: 4px;, transition: all 0.2s ease;
+ border-radius: 4px; transition: all 0.2s ease;
  }
 
  .close-btn:hover {
@@ -265,16 +265,16 @@ let localFilters = $state({ ...filters });
 
  .filter-label {
  display: block;
- font-weight: 600;, color: #e0e0e0;
+ font-weight: 600; color: #e0e0e0;
  margin-bottom: 0.5rem;
  font-size: 0.9rem;
  }
 
  .filter-select {
- width: 100%;, padding: 0.5rem;
+ width: 100%; padding: 0.5rem;
  background: rgba(255, 255, 255, 0.05);
  border: 1px solid #333;
- border-radius: 6px;, color: #e0e0e0;
+ border-radius: 6px; color: #e0e0e0;
  font-size: 0.85rem;
  }
 
@@ -285,20 +285,20 @@ let localFilters = $state({ ...filters });
 
  .tags-section {
  display: flex;
- flex-direction: column;, gap: 1rem;
+ flex-direction: column; gap: 1rem;
  }
 
  .common-tags {
  display: flex;
- flex-wrap: wrap;, gap: 0.5rem;
+ flex-wrap: wrap; gap: 0.5rem;
  }
 
  .tag-btn {
  padding: 0.3rem 0.6rem;
  background: rgba(255, 255, 255, 0.05);
  border: 1px solid #333;
- border-radius: 12px;, color: #b0b0b0;
- font-size: 0.8rem;, cursor: pointer;
+ border-radius: 12px; color: #b0b0b0;
+ font-size: 0.8rem; cursor: pointer;
  transition: all 0.2s ease;
  }
 
@@ -309,44 +309,44 @@ let localFilters = $state({ ...filters });
 
  .tag-btn.selected {
  background: rgba(0, 212, 255, 0.2);
- border-color: #00d4ff;, color: #00d4ff;
+ border-color: #00d4ff; color: #00d4ff;
  }
 
  .selected-tags {
- padding: 0.75rem;, background: rgba(0, 212, 255, 0.05);
+ padding: 0.75rem; background: rgba(0, 212, 255, 0.05);
  border: 1px solid rgba(0, 212, 255, 0.2);
  border-radius: 8px;
  }
 
  .selected-label {
- font-size: 0.8rem;, color: #00d4ff;
+ font-size: 0.8rem; color: #00d4ff;
  margin-bottom: 0.5rem;
  font-weight: 600;
  }
 
  .tag-list {
  display: flex;
- flex-wrap: wrap;, gap: 0.5rem;
+ flex-wrap: wrap; gap: 0.5rem;
  }
 
  .selected-tag {
  display: flex;
- align-items: center;, gap: 0.25rem;
+ align-items: center; gap: 0.25rem;
  padding: 0.25rem 0.5rem;
  background: rgba(0, 212, 255, 0.1);
  border: 1px solid rgba(0, 212, 255, 0.3);
- border-radius: 8px;, color: #00d4ff;
+ border-radius: 8px; color: #00d4ff;
  font-size: 0.75rem;
  }
 
  .remove-tag {
- background: none;, border: none;
+ background: none; border: none;
  color: #00d4ff;
- font-size: 0.8rem;, cursor: pointer;
+ font-size: 0.8rem; cursor: pointer;
  padding: 0;
  margin-left: 0.25rem;
- border-radius: 50%;, width: 14px;
- height: 14px;, display: flex;
+ border-radius: 50%; width: 14px;
+ height: 14px; display: flex;
  align-items: center;
  justify-content: center;
  }
@@ -358,7 +358,7 @@ let localFilters = $state({ ...filters });
  .filter-actions {
  padding: 1rem 1.5rem;
  border-top: 1px solid rgba(255, 255, 255, 0.1);
- display: flex;, gap: 0.75rem;
+ display: flex; gap: 0.75rem;
  justify-content: flex-end;
  }
 
@@ -366,7 +366,7 @@ let localFilters = $state({ ...filters });
  padding: 0.5rem 1rem;
  border: none;
  border-radius: 6px;
- font-weight: 600;, cursor: pointer;
+ font-weight: 600; cursor: pointer;
  transition: all 0.2s ease;
  }
 
@@ -392,7 +392,7 @@ let localFilters = $state({ ...filters });
 
  @media (max-width: 768px) {
  .filter-dropdown {
- width: 280px;, right: -20px;
+ width: 280px; right: -20px;
  }
 
  .filter-content {
@@ -404,7 +404,10 @@ let localFilters = $state({ ...filters });
  }
 
  .tag-btn {
- font-size: 0.75rem;, padding: 0.25rem 0.5rem;
+ font-size: 0.75rem; padding: 0.25rem 0.5rem;
  }
  }
 </style>
+
+
+

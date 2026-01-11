@@ -131,3 +131,4 @@ export const GET: RequestHandler = async () => {
  healthData.overall === 'healthy' ? 200 : healthData.overall === 'degraded' ? 207 : 503;
  return json(healthData, { status: httpStatus });
 };
+

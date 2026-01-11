@@ -15,3 +15,4 @@
  <pre class="text-sm">{b.extractedText}</pre>
  </div>
 </div>
+

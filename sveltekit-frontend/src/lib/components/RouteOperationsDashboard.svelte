@@ -230,8 +230,8 @@
 
 <style>
 	.operations-dashboard {
-		background: var(--yorha-bg);, color: var(--yorha-ink);
-		font-family: var(--yorha-font);, padding: 2rem;
+		background: var(--yorha-bg); color: var(--yorha-ink);
+		font-family: var(--yorha-font); padding: 2rem;
 		min-height: 100vh;
 	}
 
@@ -243,7 +243,7 @@
 
 	.dashboard-header h1 {
 		margin: 0;
-		font-size: 2rem;, color: var(--yorha-crimson);
+		font-size: 2rem; color: var(--yorha-crimson);
 		font-weight: bold;
 	}
 
@@ -256,7 +256,7 @@
 	.loading,
 	.error {
 		padding: 2rem;
-		text-align: center;, background: var(--yorha-paper);
+		text-align: center; background: var(--yorha-paper);
 		border: 2px solid var(--yorha-ink);
 		border-radius: 4px;
 	}
@@ -273,25 +273,25 @@
 	}
 
 	.stat-card {
-		background: var(--yorha-paper);, border: 2px solid #ddd;
-		border-radius: 4px;, padding: 1rem;
+		background: var(--yorha-paper); border: 2px solid #ddd;
+		border-radius: 4px; padding: 1rem;
 		text-align: center;
 	}
 
 	.stat-card.success {
-		border-color: #00c853;, background: #e8f5e9;
+		border-color: #00c853; background: #e8f5e9;
 	}
 
 	.stat-card.warning {
-		border-color: #ff9800;, background: #fff3e0;
+		border-color: #ff9800; background: #fff3e0;
 	}
 
 	.stat-card.error {
-		border-color: #f44336;, background: #ffebee;
+		border-color: #f44336; background: #ffebee;
 	}
 
 	.stat-label {
-		font-size: 0.75rem;, color: #666;
+		font-size: 0.75rem; color: #666;
 		text-transform: uppercase;
 		letter-spacing: 0.5px;
 		margin-bottom: 0.5rem;
@@ -299,20 +299,20 @@
 
 	.stat-value {
 		font-size: 1.75rem;
-		font-weight: bold;, color: var(--yorha-ink);
+		font-weight: bold; color: var(--yorha-ink);
 	}
 
 	.filters {
-		display: flex;, gap: 1rem;
-		margin-bottom: 2rem;, padding: 1rem;
-		background: var(--yorha-paper);, border: 1px solid #ddd;
+		display: flex; gap: 1rem;
+		margin-bottom: 2rem; padding: 1rem;
+		background: var(--yorha-paper); border: 1px solid #ddd;
 		border-radius: 4px;
 		flex-wrap: wrap;
 	}
 
 	.filter-group {
 		display: flex;
-		align-items: center;, gap: 0.5rem;
+		align-items: center; gap: 0.5rem;
 	}
 
 	.filter-group label {
@@ -321,26 +321,26 @@
 	}
 
 	.filter-group select {
-		padding: 0.5rem;, border: 1px solid #ccc;
+		padding: 0.5rem; border: 1px solid #ccc;
 		border-radius: 3px;
-		font-family: var(--yorha-font);, background: white;
+		font-family: var(--yorha-font); background: white;
 		color: var(--yorha-ink);
 	}
 
 	.operations-table-container {
 		overflow-x: auto;
-		margin-bottom: 2rem;, border: 2px solid var(--yorha-ink);
+		margin-bottom: 2rem; border: 2px solid var(--yorha-ink);
 		border-radius: 4px;
 	}
 
 	.operations-table {
 		width: 100%;
-		border-collapse: collapse;, background: var(--yorha-paper);
+		border-collapse: collapse; background: var(--yorha-paper);
 		font-size: 0.875rem;
 	}
 
 	.operations-table thead {
-		background: var(--yorha-bg-dark);, color: var(--yorha-paper);
+		background: var(--yorha-bg-dark); color: var(--yorha-paper);
 	}
 
 	.operations-table th {
@@ -379,7 +379,7 @@
 	}
 
 	.timestamp {
-		font-size: 0.75rem;, color: #999;
+		font-size: 0.75rem; color: #999;
 	}
 
 	.route {
@@ -389,17 +389,17 @@
 
 	.priority-badge,
 	.status-badge {
-		display: inline-block;, padding: 0.25rem 0.5rem;
+		display: inline-block; padding: 0.25rem 0.5rem;
 		border-radius: 3px;
 		font-size: 0.65rem;
 		font-weight: bold;
 		text-transform: uppercase;
-		letter-spacing: 0.5px;, color: white;
+		letter-spacing: 0.5px; color: white;
 	}
 
 	.no-operations {
 		padding: 2rem;
-		text-align: center;, color: #999;
+		text-align: center; color: #999;
 	}
 
 	.breakdown {
@@ -409,7 +409,7 @@
 	.breakdown h3 {
 		margin: 0 0 1rem 0;
 		font-size: 1rem;
-		font-weight: bold;, color: var(--yorha-ink);
+		font-weight: bold; color: var(--yorha-ink);
 		text-transform: uppercase;
 		letter-spacing: 0.5px;
 	}
@@ -423,8 +423,8 @@
 	.breakdown-item {
 		display: flex;
 		justify-content: space-between;
-		align-items: center;, padding: 1rem;
-		background: var(--yorha-paper);, border: 1px solid #ddd;
+		align-items: center; padding: 1rem;
+		background: var(--yorha-paper); border: 1px solid #ddd;
 		border-radius: 4px;
 	}
 
@@ -437,6 +437,8 @@
 	.category-count,
 	.priority-count {
 		font-size: 1.25rem;
-		font-weight: bold;, color: var(--yorha-crimson);
+		font-weight: bold; color: var(--yorha-crimson);
 	}
 </style>
+
+

@@ -6,15 +6,15 @@
 import type { EvidenceNode, SimilarityResult } from './case-similarity-service.js';
 
 export interface AISuggestion {
- id: string;, type: 'evidence' | 'strategy' | 'risk' | 'precedent' | 'investigation';
- title: string;, description: string;
- confidence: number;, relatedNodes: string[];
- actionItems?: string[];, priority: 'low' | 'medium' | 'high' | 'critical';
+ id: string; type: 'evidence' | 'strategy' | 'risk' | 'precedent' | 'investigation';
+ title: string; description: string;
+ confidence: number; relatedNodes: string[];
+ actionItems?: string[]; priority: 'low' | 'medium' | 'high' | 'critical';
 }
 
 export interface SuggestionContext {
- selectedNodes: EvidenceNode[];, caseType: string;
- jurisdiction: string;, currentPhase: string;
+ selectedNodes: EvidenceNode[]; caseType: string;
+ jurisdiction: string; currentPhase: string;
 }
 
 export class AISuggestionsService {
@@ -137,9 +137,9 @@ Provide 2-3 strategic recommendations with confidence levels.`;
  headers: {
  'Content-Type': 'application/json',
  },
- body: JSON.stringify({, model: 'gemma3-legal:latest',
+ body: JSON.stringify({ model: 'gemma3-legal:latest',
  prompt: stream,
- options: {, temperature: 0.3, num_predict: 200
+ options: { temperature: 0.3, num_predict: 200
  },
  }),
  });
@@ -229,9 +229,9 @@ Provide 2-3 strategic recommendations with confidence levels.`;
  return examples[type] || 'supporting documentation';
  }
 
- private analyzeEvidenceGaps(nodes: EvidenceNode[]): Array<{, type: string;
- description: string;, riskLevel: 'low' | 'medium' | 'high';
- confidence: number;, mitigationSteps: string[];
+ private analyzeEvidenceGaps(nodes: EvidenceNode[]): Array<{ type: string;
+ description: string; riskLevel: 'low' | 'medium' | 'high';
+ confidence: number; mitigationSteps: string[];
  }> {
  const gaps = [];
 
@@ -280,8 +280,8 @@ Provide 2-3 strategic recommendations with confidence levels.`;
  return gaps;
  }
 
- private parseStrategyResponse(response: string): Array<{, title: string;
- description: string;, confidence: number;
+ private parseStrategyResponse(response: string): Array<{ title: string;
+ description: string; confidence: number;
  priority: 'low' | 'medium' | 'high' | 'critical';
  actions: string[];
  }> {
@@ -338,3 +338,6 @@ Provide 2-3 strategic recommendations with confidence levels.`;
 }
 
 export const aiSuggestionsService = new AISuggestionsService();
+
+
+

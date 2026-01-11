@@ -71,7 +71,7 @@ export class EmbeddingService extends BaseService implements IEmbeddingService {
  const response = await fetch(`${this.config.ollamaUrl}/api/embed`, {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({, model: this.EMBEDDING_MODEL,
+ body: JSON.stringify({ model: this.EMBEDDING_MODEL,
  input: text,
  }),
  });
@@ -182,3 +182,5 @@ export class EmbeddingService extends BaseService implements IEmbeddingService {
  return dotProduct / denominator;
  }
 }
+
+

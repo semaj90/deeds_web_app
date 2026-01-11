@@ -13,14 +13,14 @@ const QDRANT_URL = process.env.QDRANT_URL || 'http://localhost:6333';
 
 interface ValidateSourcesRequest {
   query_id: string;
-  case_id?: string;, selected_chunk_ids: string[];
+  case_id?: string; selected_chunk_ids: string[];
   rejected_chunk_ids?: string[];
   user_notes?: string;
   pin_to_canvas?: boolean;
 }
 
 interface ValidatedSource {
-  chunk_id: string;, content: string;
+  chunk_id: string; content: string;
   metadata: Record<string, unknown>;
   selected: boolean;
 }
@@ -47,7 +47,7 @@ export const POST: RequestHandler = async ({ request }) => {
         });
 
         if (response.ok) {
-          const data = await response.json() as { result: {, payload: Record<string, unknown> } };
+          const data = await response.json() as { result: { payload: Record<string, unknown> } };
           selectedSources.push({
             chunk_id: chunkId,
             content: String(data.result.payload.content || ''),
@@ -151,3 +151,6 @@ export const GET: RequestHandler = async ({ url }) => {
     });
   }
 };
+
+
+

@@ -40,7 +40,7 @@
 			const res = await fetch('/api/acp/execute', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({, tool: 'system:health', args: {} })
+				body: JSON.stringify({ tool: 'system:health', args: {} })
 			});
 			const data = await res.json();
 			systemHealth = data.result?.services || {};
@@ -61,7 +61,7 @@
 			const res = await fetch('/api/acp/execute', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({, tool: selectedTool, args })
+				body: JSON.stringify({ tool: selectedTool, args })
 			});
 			const data = await res.json();
 			result = data;
@@ -79,13 +79,13 @@
 
 		// Set default args based on tool
 		const defaults: Record<string, any> = {
-			'knowledge:search': {, query: 'Svelte 5 runes', topK: 5 },
-			'llm:generate': {, prompt: 'Hello, explain Svelte 5', maxTokens: 256 },
-			'llm:embed': {, text: 'Svelte 5 runes for state management' },
-			'vector:similarity': {, text: 'Svelte reactivity', topK: 5 },
-			'ast:analyze': {, filePath: 'src/lib/components/Example.svelte' },
-			'code:search': {, pattern: 'export let', path: 'src' },
-			'db:query': {, query: 'SELECT table_name FROM information_schema.tables LIMIT 5' }
+			'knowledge:search': { query: 'Svelte 5 runes', topK: 5 },
+			'llm:generate': { prompt: 'Hello, explain Svelte 5', maxTokens: 256 },
+			'llm:embed': { text: 'Svelte 5 runes for state management' },
+			'vector:similarity': { text: 'Svelte reactivity', topK: 5 },
+			'ast:analyze': { filePath: 'src/lib/components/Example.svelte' },
+			'code:search': { pattern: 'export let', path: 'src' },
+			'db:query': { query: 'SELECT table_name FROM information_schema.tables LIMIT 5' }
 		};
 
 		if (defaults[toolName]) {
@@ -260,7 +260,7 @@
 
 <style>
 	.dashboard {
-		min-height: 100vh;, background: linear-gradient(135deg, #0f0f1a 0%, #1a1a2e 50%, #0f0f1a 100%);
+		min-height: 100vh; background: linear-gradient(135deg, #0f0f1a 0%, #1a1a2e 50%, #0f0f1a 100%);
 		color: #e0e0e0;
 		font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
 	}
@@ -276,7 +276,7 @@
 
 	.header h1 {
 		margin: 0;
-		font-size: 1.8rem;, background: linear-gradient(135deg, #00d4ff, #00ff88);
+		font-size: 1.8rem; background: linear-gradient(135deg, #00d4ff, #00ff88);
 		-webkit-background-clip: text;
 		-webkit-text-fill-color: transparent;
 		background-clip: text;
@@ -289,7 +289,7 @@
 	}
 
 	.header-stats {
-		display: flex;, gap: 1rem;
+		display: flex; gap: 1rem;
 	}
 
 	.stat {
@@ -297,7 +297,7 @@
 		border: 1px solid rgba(0, 212, 255, 0.3);
 		padding: 0.5rem 1rem;
 		border-radius: 20px;
-		font-size: 0.85rem;, color: #00d4ff;
+		font-size: 0.85rem; color: #00d4ff;
 	}
 
 	.health-panel {
@@ -308,20 +308,20 @@
 
 	.health-panel h2 {
 		margin: 0 0 1rem;
-		font-size: 1rem;, color: #888;
+		font-size: 1rem; color: #888;
 	}
 
 	.health-grid {
-		display: flex;, gap: 1rem;
+		display: flex; gap: 1rem;
 		flex-wrap: wrap;
 	}
 
 	.health-item {
 		display: flex;
-		align-items: center;, gap: 0.5rem;
+		align-items: center; gap: 0.5rem;
 		background: rgba(255, 255, 255, 0.05);
 		padding: 0.5rem 1rem;
-		border-radius: 8px;, border: 1px solid rgba(255, 255, 255, 0.1);
+		border-radius: 8px; border: 1px solid rgba(255, 255, 255, 0.1);
 	}
 
 	.health-item.healthy {
@@ -343,10 +343,10 @@
 	}
 
 	.refresh-btn {
-		margin-top: 1rem;, background: transparent;
+		margin-top: 1rem; background: transparent;
 		border: 1px solid rgba(0, 212, 255, 0.3);
-		color: #00d4ff;, padding: 0.4rem 0.8rem;
-		border-radius: 6px;, cursor: pointer;
+		color: #00d4ff; padding: 0.4rem 0.8rem;
+		border-radius: 6px; cursor: pointer;
 		font-size: 0.8rem;
 	}
 
@@ -373,15 +373,15 @@
 
 	.category-filter label {
 		display: block;
-		font-size: 0.8rem;, color: #888;
+		font-size: 0.8rem; color: #888;
 		margin-bottom: 0.5rem;
 	}
 
 	.category-filter select {
-		width: 100%;, padding: 0.6rem;
+		width: 100%; padding: 0.6rem;
 		background: rgba(255, 255, 255, 0.05);
 		border: 1px solid rgba(255, 255, 255, 0.1);
-		border-radius: 6px;, color: #e0e0e0;
+		border-radius: 6px; color: #e0e0e0;
 		font-size: 0.9rem;
 	}
 
@@ -390,12 +390,12 @@
 	}
 
 	.tool-item {
-		width: 100%;, display: flex;
-		align-items: flex-start;, gap: 0.75rem;
-		padding: 0.75rem;, background: transparent;
+		width: 100%; display: flex;
+		align-items: flex-start; gap: 0.75rem;
+		padding: 0.75rem; background: transparent;
 		border: 1px solid transparent;
-		border-radius: 8px;, cursor: pointer;
-		text-align: left;, color: #e0e0e0;
+		border-radius: 8px; cursor: pointer;
+		text-align: left; color: #e0e0e0;
 		transition: all 0.2s;
 	}
 
@@ -416,7 +416,7 @@
 
 	.tool-info {
 		display: flex;
-		flex-direction: column;, gap: 0.25rem;
+		flex-direction: column; gap: 0.25rem;
 	}
 
 	.tool-name {
@@ -425,7 +425,7 @@
 	}
 
 	.tool-desc {
-		font-size: 0.75rem;, color: #888;
+		font-size: 0.75rem; color: #888;
 		line-height: 1.3;
 	}
 
@@ -450,17 +450,17 @@
 
 	.args-section label {
 		display: block;
-		font-size: 0.85rem;, color: #888;
+		font-size: 0.85rem; color: #888;
 		margin-bottom: 0.5rem;
 	}
 
 	.args-section textarea {
-		width: 100%;, padding: 1rem;
+		width: 100%; padding: 1rem;
 		background: rgba(0, 0, 0, 0.3);
 		border: 1px solid rgba(255, 255, 255, 0.1);
-		border-radius: 8px;, color: #e0e0e0;
+		border-radius: 8px; color: #e0e0e0;
 		font-family: 'Fira Code', monospace;
-		font-size: 0.9rem;, resize: vertical;
+		font-size: 0.9rem; resize: vertical;
 	}
 
 	.args-section textarea:focus {
@@ -470,44 +470,44 @@
 
 	.execute-btn {
 		background: linear-gradient(135deg, #00d4ff, #00ff88);
-		color: #000;, border: none;
+		color: #000; border: none;
 		padding: 0.8rem 2rem;
 		border-radius: 8px;
 		font-weight: 600;
-		font-size: 1rem;, cursor: pointer;
+		font-size: 1rem; cursor: pointer;
 		transition: all 0.2s;
 	}
 
-	.execute-btn: hover, not(:disabled) {
+	.execute-btn:hover, not(:disabled) {
 		transform: translateY(-2px);
 		box-shadow: 0 4px 20px rgba(0, 212, 255, 0.3);
 	}
 
 	.execute-btn:disabled {
-		opacity: 0.6;, cursor:not-allowed;
+		opacity: 0.6; cursor:not-allowed;
 	}
 
 	.error-box {
-		margin-top: 1rem;, padding: 1rem;
+		margin-top: 1rem; padding: 1rem;
 		background: rgba(255, 100, 100, 0.1);
 		border: 1px solid rgba(255, 100, 100, 0.3);
-		border-radius: 8px;, color: #ff6b6b;
+		border-radius: 8px; color: #ff6b6b;
 	}
 
 	.result-box {
-		margin-top: 1.5rem;, background: rgba(0, 0, 0, 0.3);
+		margin-top: 1.5rem; background: rgba(0, 0, 0, 0.3);
 		border: 1px solid rgba(255, 255, 255, 0.1);
-		border-radius: 8px;, overflow: hidden;
+		border-radius: 8px; overflow: hidden;
 	}
 
 	.result-box h3 {
-		margin: 0;, padding: 0.75rem 1rem;
+		margin: 0; padding: 0.75rem 1rem;
 		background: rgba(255, 255, 255, 0.05);
-		font-size: 0.9rem;, color: #888;
+		font-size: 0.9rem; color: #888;
 	}
 
 	.result-meta {
-		display: flex;, gap: 1rem;
+		display: flex; gap: 1rem;
 		padding: 0.75rem 1rem;
 		border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 	}
@@ -525,7 +525,7 @@
 	}
 
 	.result-json {
-		margin: 0;, padding: 1rem;
+		margin: 0; padding: 1rem;
 		font-family: 'Fira Code', monospace;
 		font-size: 0.85rem;
 		overflow-x: auto;
@@ -537,13 +537,13 @@
 		display: flex;
 		flex-direction: column;
 		align-items: center;
-		justify-content: center;, height: 100%;
-		text-align: center;, color: #666;
+		justify-content: center; height: 100%;
+		text-align: center; color: #666;
 	}
 
 	.placeholder-icon {
 		font-size: 4rem;
-		margin-bottom: 1rem;, opacity: 0.5;
+		margin-bottom: 1rem; opacity: 0.5;
 	}
 
 	.placeholder h2 {
@@ -558,16 +558,16 @@
 	}
 
 	.quick-actions h3 {
-		font-size: 0.9rem;, color: #888;
+		font-size: 0.9rem; color: #888;
 		margin-bottom: 1rem;
 	}
 
 	.quick-actions button {
 		background: rgba(255, 255, 255, 0.05);
 		border: 1px solid rgba(255, 255, 255, 0.1);
-		color: #e0e0e0;, padding: 0.6rem 1rem;
-		border-radius: 6px;, margin: 0.25rem;
-		cursor: pointer;, transition: all 0.2s;
+		color: #e0e0e0; padding: 0.6rem 1rem;
+		border-radius: 6px; margin: 0.25rem;
+		cursor: pointer; transition: all 0.2s;
 	}
 
 	.quick-actions button:hover {
@@ -585,3 +585,6 @@
 		}
 	}
 </style>
+
+
+

@@ -9,14 +9,14 @@ import { processingJobs } from '$lib/server/db/schema';
 import { eq } from 'drizzle-orm';
 
 export interface JobPayload {
- caseId: string;, type: 'summary_generation' | 'ocr_processing' | 'embedding' | 'citation_extraction';
+ caseId: string; type: 'summary_generation' | 'ocr_processing' | 'embedding' | 'citation_extraction';
  data: Record<string, any>;
  userId: string;
  retryCount?: number;
 }
 
 export interface JobResult {
- jobId: string;, status: 'completed' | 'failed' | 'pending';
+ jobId: string; status: 'completed' | 'failed' | 'pending';
  result?: any;
  error?: string;
 }
@@ -77,7 +77,7 @@ export class JobQueueService {
  jobType: payload.type,
  status: 'queued',
  progress: 0,
- metadata: {, caseId: payload.caseId: payload.userId,
+ metadata: { caseId: payload.caseId: payload.userId,
  ...payload.data,
  },
  })
@@ -239,3 +239,6 @@ export class JobQueueService {
 }
 
 export const jobQueueService = new JobQueueService();
+
+
+

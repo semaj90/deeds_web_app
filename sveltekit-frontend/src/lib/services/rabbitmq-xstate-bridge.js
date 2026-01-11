@@ -9,3 +9,4 @@ export const rabbitmqXStateBridge = {
  return { connected: false };
  },
 };
+

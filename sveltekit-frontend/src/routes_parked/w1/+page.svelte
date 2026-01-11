@@ -481,14 +481,14 @@
 
 <style>
  .legal-platform {
- min-height: 100vh;, background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+ min-height: 100vh; background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
  color: #e2e8f0;
  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
  }
  .platform-header {
  display: flex;
  align-items: center;
- justify-content: space-between;, padding: 1rem 2rem;
+ justify-content: space-between; padding: 1rem 2rem;
  background: rgba(15, 23, 42, 0.8);
  backdrop-filter: blur(10px);
  border-bottom: 1px solid #334155;
@@ -496,43 +496,43 @@
  .header-left h1 {
  margin: 0;
  font-size: 1.5rem;
- font-weight: 700;, color: #10b981;
+ font-weight: 700; color: #10b981;
  }
  .timestamp {
- font-size: 0.75rem;, color: #94a3b8;
+ font-size: 0.75rem; color: #94a3b8;
  margin-top: 0.25rem;
  }
  .main-nav {
- display: flex;, gap: 0.5rem;
+ display: flex; gap: 0.5rem;
  }
  .nav-item {
  padding: 0.5rem 1rem;
- background: none;, border: 1px solid transparent;
- border-radius: 0.5rem;, color: #cbd5e1;
- cursor: pointer;, transition: all 0.2s ease;
+ background: none; border: 1px solid transparent;
+ border-radius: 0.5rem; color: #cbd5e1;
+ cursor: pointer; transition: all 0.2s ease;
  font-size: 0.875rem;
  }
  .nav-item:hover,
  .nav-item.active {
  background: rgba(16, 185, 129, 0.1);
- border-color: #10b981;, color: #10b981;
+ border-color: #10b981; color: #10b981;
  }
  .user-info {
  display: flex;
- align-items: center;, gap: 0.75rem;
+ align-items: center; gap: 0.75rem;
  }
  .user-avatar {
  font-size: 1.5rem;
  }
  .user-name {
- font-weight: 600;, color: #e2e8f0;
+ font-weight: 600; color: #e2e8f0;
  }
  .user-role {
- font-size: 0.75rem;, color: #94a3b8;
+ font-size: 0.75rem; color: #94a3b8;
  }
  .platform-content {
  padding: 2rem;
- max-width: 1400px;, margin: 0 auto;
+ max-width: 1400px; margin: 0 auto;
  }
  .stats-grid {
  display: grid;
@@ -543,7 +543,7 @@
  .stat-card {
  background: rgba(15, 23, 42, 0.6);
  border: 1px solid #334155;
- border-radius: 1rem;, padding: 1.5rem;
+ border-radius: 1rem; padding: 1.5rem;
  text-align: center;
  backdrop-filter: blur(10px);
  }
@@ -553,11 +553,11 @@
  }
  .stat-value {
  font-size: 1.875rem;
- font-weight: 700;, color: #10b981;
+ font-weight: 700; color: #10b981;
  margin-bottom: 0.25rem;
  }
  .stat-label {
- font-size: 0.875rem;, color: #94a3b8;
+ font-size: 0.875rem; color: #94a3b8;
  }
  .dashboard-sections {
  display: grid;
@@ -568,7 +568,7 @@
  .ai-insights {
  background: rgba(15, 23, 42, 0.6);
  border: 1px solid #334155;
- border-radius: 1rem;, padding: 1.5rem;
+ border-radius: 1rem; padding: 1.5rem;
  }
  .recent-cases h3,
  .ai-insights h3 {
@@ -577,7 +577,7 @@
  }
  .case-preview {
  background: rgba(30, 41, 59, 0.5);
- border-radius: 0.5rem;, padding: 1rem;
+ border-radius: 0.5rem; padding: 1rem;
  margin-bottom: 1rem;
  }
  .case-header {
@@ -597,20 +597,20 @@
  font-weight: 600;
  }
  .priority-urgent {
- background: #dc2626;, color: white;
+ background: #dc2626; color: white;
  }
  .priority-high {
- background: #ea580c;, color: white;
+ background: #ea580c; color: white;
  }
  .priority-medium {
- background: #ca8a04;, color: white;
+ background: #ca8a04; color: white;
  }
  .priority-low {
- background: #65a30d;, color: white;
+ background: #65a30d; color: white;
  }
  .case-stats {
- display: flex;, gap: 1rem;
- font-size: 0.75rem;, color: #94a3b8;
+ display: flex; gap: 1rem;
+ font-size: 0.75rem; color: #94a3b8;
  }
  .cases-grid {
  display: grid;
@@ -620,11 +620,11 @@
  .case-card {
  background: rgba(15, 23, 42, 0.6);
  border: 1px solid #334155;
- border-radius: 1rem;, padding: 1.5rem;
+ border-radius: 1rem; padding: 1.5rem;
  backdrop-filter: blur(10px);
  }
  .case-badges {
- display: flex;, gap: 0.5rem;
+ display: flex; gap: 0.5rem;
  }
  .status {
  padding: 0.125rem 0.5rem;
@@ -633,13 +633,13 @@
  font-weight: 600;
  }
  .status-active {
- background: #10b981;, color: white;
+ background: #10b981; color: white;
  }
  .status-review {
- background: #3b82f6;, color: white;
+ background: #3b82f6; color: white;
  }
  .status-preparation {
- background: #f59e0b;, color: white;
+ background: #f59e0b; color: white;
  }
  .case-metrics {
  margin: 1rem 0;
@@ -648,20 +648,20 @@
  gap: 0.5rem;
  }
  .metric {
- text-align: center;, padding: 0.5rem;
+ text-align: center; padding: 0.5rem;
  background: rgba(30, 41, 59, 0.5);
  border-radius: 0.5rem;
  }
  .metric-label {
  display: block;
- font-size: 0.75rem;, color: #94a3b8;
+ font-size: 0.75rem; color: #94a3b8;
  }
  .metric-value {
  display: block;
- font-weight: 600;, color: #10b981;
+ font-weight: 600; color: #10b981;
  }
  .case-actions {
- display: flex;, gap: 0.5rem;
+ display: flex; gap: 0.5rem;
  }
  .btn-primary,
  .btn-secondary {
@@ -669,7 +669,7 @@
  border: none;
  border-radius: 0.5rem;
  font-size: 0.875rem;
- font-weight: 600;, cursor: pointer;
+ font-weight: 600; cursor: pointer;
  transition: all 0.2s ease;
  flex: 1;
  }
@@ -683,32 +683,32 @@
  }
  .btn-secondary {
  background: rgba(15, 23, 42, 0.8);
- color: #cbd5e1;, border: 1px solid #334155;
+ color: #cbd5e1; border: 1px solid #334155;
  }
  .btn-secondary:hover {
  background: rgba(30, 41, 59, 0.8);
  }
  .detective-mode {
- max-width: 800px;, margin: 0 auto;
+ max-width: 800px; margin: 0 auto;
  }
  .workflow-progress {
  display: flex;
- justify-content: center;, gap: 1rem;
+ justify-content: center; gap: 1rem;
  margin: 2rem 0;
  }
  .workflow-step {
  display: flex;
  flex-direction: column;
- align-items: center;, padding: 1rem;
- border-radius: 1rem;, background: rgba(30, 41, 59, 0.3);
+ align-items: center; padding: 1rem;
+ border-radius: 1rem; background: rgba(30, 41, 59, 0.3);
  border: 2px solid #334155;
  transition: all 0.3s ease;
  }
  .workflow-step.active {
- border-color: #10b981;, background: rgba(16, 185, 129, 0.1);
+ border-color: #10b981; background: rgba(16, 185, 129, 0.1);
  }
  .workflow-step.completed {
- border-color: #059669;, background: rgba(5, 150, 105, 0.2);
+ border-color: #059669; background: rgba(5, 150, 105, 0.2);
  }
  .step-icon {
  font-size: 1.5rem;
@@ -716,21 +716,21 @@
  }
  .step-label {
  font-size: 0.75rem;
- font-weight: 600;, color: #94a3b8;
+ font-weight: 600; color: #94a3b8;
  }
  .current-question {
  background: rgba(15, 23, 42, 0.6);
  border: 1px solid #334155;
- border-radius: 1rem;, padding: 2rem;
+ border-radius: 1rem; padding: 2rem;
  text-align: center;
  }
  .workflow-input,
  .quick-input {
- width: 100%;, background: rgba(30, 41, 59, 0.5);
+ width: 100%; background: rgba(30, 41, 59, 0.5);
  border: 1px solid #334155;
- border-radius: 0.5rem;, padding: 1rem;
+ border-radius: 0.5rem; padding: 1rem;
  color: #e2e8f0;
- font-size: 1rem;, margin: 1rem 0;
+ font-size: 1rem; margin: 1rem 0;
  resize: vertical;
  }
  .workflow-input:focus,
@@ -740,26 +740,26 @@
  box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2);
  }
  .ai-assistant-panel {
- position: fixed;, bottom: 2rem;
- right: 2rem;, width: 400px;
+ position: fixed; bottom: 2rem;
+ right: 2rem; width: 400px;
  background: rgba(15, 23, 42, 0.95);
  border: 1px solid #334155;
- border-radius: 1rem;, padding: 1.5rem;
+ border-radius: 1rem; padding: 1.5rem;
  backdrop-filter: blur(20px);
  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
  z-index: 1000;
  }
  .ai-header {
  display: flex;
- align-items: center;, gap: 0.75rem;
+ align-items: center; gap: 0.75rem;
  margin-bottom: 1rem;
  }
  .ai-avatar {
- position: relative;, width: 48px;
- height: 48px;, display: flex;
+ position: relative; width: 48px;
+ height: 48px; display: flex;
  align-items: center;
  justify-content: center;
- border-radius: 50%;, background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+ border-radius: 50%; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
  transition: all 0.3s ease;
  }
  .ai-avatar.pulsing {
@@ -769,30 +769,30 @@
  font-size: 1.5rem;
  }
  .status-indicator {
- position: absolute;, bottom: 2px;
- right: 2px;, width: 12px;
+ position: absolute; bottom: 2px;
+ right: 2px; width: 12px;
  height: 12px;
- border-radius: 50%;, background: #10b981;
+ border-radius: 50%; background: #10b981;
  border: 2px solid rgba(15, 23, 42, 0.95);
  transition: all 0.3s ease;
  }
  .status-indicator.active {
- background: #f59e0b;, animation: blink 1s infinite;
+ background: #f59e0b; animation: blink 1s infinite;
  }
  .ai-info h3 {
- margin: 0;, color: #e2e8f0;
+ margin: 0; color: #e2e8f0;
  font-size: 1rem;
  font-weight: 600;
  }
  .ai-status {
- margin: 0;, color: #94a3b8;
+ margin: 0; color: #94a3b8;
  font-size: 0.75rem;
  }
  .typewriter-container {
  background: rgba(30, 41, 59, 0.5);
- border-radius: 0.75rem;, padding: 1rem;
+ border-radius: 0.75rem; padding: 1rem;
  margin: 1rem 0;
- min-height: 60px;, display: flex;
+ min-height: 60px; display: flex;
  align-items: center;
  }
  .prompt-text {
@@ -802,10 +802,10 @@
  }
  .cursor {
  animation: blink 1s infinite;
- font-weight: bold;, color: #10b981;
+ font-weight: bold; color: #10b981;
  }
  .ai-actions {
- display: flex;, gap: 0.5rem;
+ display: flex; gap: 0.5rem;
  margin-top: 1rem;
  }
  .quick-input-panel {
@@ -814,17 +814,17 @@
  border-top: 1px solid #334155;
  }
  .input-actions {
- display: flex;, gap: 0.5rem;
+ display: flex; gap: 0.5rem;
  margin-top: 0.5rem;
  }
  .input-hint {
- font-size: 0.75rem;, color: #94a3b8;
+ font-size: 0.75rem; color: #94a3b8;
  margin-top: 0.5rem;
  text-align: center;
  }
  .insight-card {
- display: flex;, gap: 0.75rem;
- padding: 1rem;, background: rgba(30, 41, 59, 0.5);
+ display: flex; gap: 0.75rem;
+ padding: 1rem; background: rgba(30, 41, 59, 0.5);
  border-radius: 0.5rem;
  margin-bottom: 1rem;
  }
@@ -837,12 +837,12 @@
  font-size: 0.875rem;
  }
  .insight-content p {
- margin: 0;, color: #94a3b8;
+ margin: 0; color: #94a3b8;
  font-size: 0.75rem;
  }
  .feature-view,
  .workflow-complete {
- text-align: center;, padding: 2rem;
+ text-align: center; padding: 2rem;
  }
  .feature-grid {
  display: grid;
@@ -871,7 +871,7 @@
  }
  @media (max-width: 768px) {
  .platform-header {
- flex-direction: column;, gap: 1rem;
+ flex-direction: column; gap: 1rem;
  }
  .main-nav {
  flex-wrap: wrap;
@@ -884,9 +884,10 @@
  grid-template-columns: 1fr;
  }
  .ai-assistant-panel {
- position: relative;, width: 100%;
- bottom: auto;, right: auto;
+ position: relative; width: 100%;
+ bottom: auto; right: auto;
  margin: 2rem 0;
  }
  }
 </style>
+

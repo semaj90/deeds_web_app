@@ -2,7 +2,7 @@
  import { createEventDispatcher } from 'svelte';
 
  interface Statute {
- id: string;, code: string;
+ id: string; code: string;
  title?: string;
  jurisdiction?: string;
  severity?: string;
@@ -88,7 +88,7 @@
 <style>
  .statute-results {
  display: flex;
- flex-direction: column;, gap: 1rem;
+ flex-direction: column; gap: 1rem;
  }
 
  .loading,
@@ -98,15 +98,15 @@
  flex-direction: column;
  align-items: center;
  justify-content: center;
- min-height: 200px;, gap: 1rem;
+ min-height: 200px; gap: 1rem;
  color: #666;
  }
 
  .spinner {
- width: 40px;, height: 40px;
+ width: 40px; height: 40px;
  border: 4px solid #e0e0e0;
  border-top-color: #8b4513;
- border-radius: 50%;, animation: spin 1s linear infinite;
+ border-radius: 50%; animation: spin 1s linear infinite;
  }
 
  @keyframes spin {
@@ -122,19 +122,19 @@
 
  .results-header h3 {
  margin: 0;
- font-size: 0.95rem;, color: #666;
+ font-size: 0.95rem; color: #666;
  }
 
  .results-list {
  display: flex;
- flex-direction: column;, gap: 0.75rem;
+ flex-direction: column; gap: 0.75rem;
  }
 
  .result-item {
  padding: 1rem;
- background-color: white;, border: 1px solid #e0d5c7;
+ background-color: white; border: 1px solid #e0d5c7;
  border-radius: 6px;
- text-align: left;, cursor: pointer;
+ text-align: left; cursor: pointer;
  transition: all 0.2s;
  }
 
@@ -153,24 +153,24 @@
  .code {
  font-family: 'Monaco', 'Courier New', monospace;
  font-size: 0.9rem;
- font-weight: 600;, color: #8b4513;
+ font-weight: 600; color: #8b4513;
  }
 
  .relevance {
  padding: 0.25rem 0.5rem;
  border-radius: 3px;
  font-size: 0.75rem;
- font-weight: 600;, color: white;
+ font-weight: 600; color: white;
  }
 
  .title {
- font-size: 0.95rem;, color: #333;
+ font-size: 0.95rem; color: #333;
  margin-bottom: 0.5rem;
  line-height: 1.3;
  }
 
  .meta {
- display: flex;, gap: 0.5rem;
+ display: flex; gap: 0.5rem;
  flex-wrap: wrap;
  }
 
@@ -178,7 +178,7 @@
  padding: 0.2rem 0.5rem;
  border-radius: 3px;
  font-size: 0.7rem;
- font-weight: 600;, color: white;
+ font-weight: 600; color: white;
  }
 
  .badge.jurisdiction {
@@ -193,3 +193,5 @@
  background-color: #666;
  }
 </style>
+
+

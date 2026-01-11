@@ -13,7 +13,7 @@
 		disabled = false,
 	}: Props = $props();
 
-	const dialogContext = getContext<{ open: boolean;, setOpen: (value: boolean) => void }>('dialog');
+	const dialogContext = getContext<{ open: boolean; setOpen: (value: boolean) => void }>('dialog');
 
 	function handleClick() {
 		if (!disabled) {
@@ -42,3 +42,5 @@
 		{@render children()}
 	{/if}
 </button>
+
+

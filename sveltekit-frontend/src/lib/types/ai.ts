@@ -7,28 +7,28 @@ export interface AIResponse {
  [key: string]: any;
 }
 export interface VectorSearchResult {
- id: string;, content: string;
+ id: string; content: string;
  score: number;
  metadata?: Record<string, unknown>;
- source?: {, type: string; name: string;, url: string };
+ source?: { type: string; name: string; url: string };
  highlights?: string[];
  confidence?: number;
 }
 export interface SemanticEntity {
- id?: string;, text: string;
- type: string;, confidence: number;
+ id?: string; text: string;
+ type: string; confidence: number;
  start?: number;
  end?: number;
  metadata?: Record<string, unknown>;
 }
 // Context7 integration types
 export interface OrchestrationOptions {
- enabled: boolean;, priority: 'low' | 'medium' | 'high';
+ enabled: boolean; priority: 'low' | 'medium' | 'high';
  timeout?: number;
  retries?: number;
 }
 export interface MCPToolRequest {
- tool: string;, args: Record<string, unknown>;
+ tool: string; args: Record<string, unknown>;
  context?: Record<string, unknown>;
 }
 export interface EnhancedRAGEngine {
@@ -57,11 +57,11 @@ export interface ChatRequest {
  };
 }
 export interface ChatResponse {
- response: string;, model: string;
+ response: string; model: string;
  timestamp: string;
- conversationId?: string;, performance: {
- duration: number;, tokens: number;
- promptTokens: number;, responseTokens: number;
+ conversationId?: string; performance: {
+ duration: number; tokens: number;
+ promptTokens: number; responseTokens: number;
  tokensPerSecond: number;
  };
  suggestions?: string[];
@@ -69,7 +69,10 @@ export interface ChatResponse {
  vectorSearchResults?: VectorSearchResult[];
 }
 export interface SystemStatus {
- gpu: boolean;, ollama: boolean;
- enhancedRAG: boolean;, postgres: boolean;
+ gpu: boolean; ollama: boolean;
+ enhancedRAG: boolean; postgres: boolean;
  neo4j: boolean;
 }
+
+
+

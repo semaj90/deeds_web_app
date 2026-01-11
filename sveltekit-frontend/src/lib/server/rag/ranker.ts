@@ -10,16 +10,16 @@ export type RankExplain = {
 };
 
 export type RankedHit = QdrantHit & {
- finalScore: number;, explain: RankExplain;
+ finalScore: number; explain: RankExplain;
 };
 
 /**
  * Rerank search results using legal-aware scoring
  */
-export function rerankLegalAware(opts: {, hits: QdrantHit[];
+export function rerankLegalAware(opts: { hits: QdrantHit[];
  queryTagIds?: string[];
  jurisdiction?: string | null;
- weights?: {, cosine: number; sharedTags: number;, sameJurisdiction: number };
+ weights?: { cosine: number; sharedTags: number; sameJurisdiction: number };
 }): RankedHit[] {
  const w = opts.weights ?? { cosine: 0.75, sharedTags: 0.15, sameJurisdiction: 0.1 };
  const qTags = new Set(opts.queryTagIds ?? []);
@@ -63,17 +63,20 @@ export function createQdrantFilter(opts: {
  const conditions: any[] = [];
 
  if (opts.jurisdiction) {
- conditions.push({ key: 'jurisdiction', match: {, value: opts.jurisdiction } });
+ conditions.push({ key: 'jurisdiction', match: { value: opts.jurisdiction } });
  }
 
  if (opts.caseId) {
- conditions.push({ key: 'case_id', match: {, value: opts.caseId } });
+ conditions.push({ key: 'case_id', match: { value: opts.caseId } });
  }
 
  // Optional: strict tag filtering (can be used instead of rerank-only approach)
  if (opts.tagIds && opts.tagIds.length > 0) {
- conditions.push({ key: 'tag_ids', match: {, any: opts.tagIds } });
+ conditions.push({ key: 'tag_ids', match: { any: opts.tagIds } });
  }
 
  return conditions.length > 0 ? { must: conditions }  | undefined;
 }
+
+
+

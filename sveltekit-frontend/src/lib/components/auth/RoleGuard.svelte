@@ -1,10 +1,10 @@
-﻿<script lang="ts">
+<script lang="ts">
   import type { User } from '$lib/types';
   // Svelte, 5 runes are auto-imported
   // RoleGuard component - Role-based access control - Svelte, 5 compatible
   import { auth } from '$lib/stores/unified';
   interface Props {
-    children?: import('svelte').Snippet;, roles: string | string[];
+    children?: import('svelte').Snippet; roles: string | string[];
     fallback?: import('svelte').Snippet;
     requireAll?: boolean; // For multiple roles, require all or just one
   }
@@ -38,3 +38,5 @@
 {:else if fallback}
   {@render fallback()}
 {/if}
+
+

@@ -7,7 +7,7 @@ import type { Snippet } from 'svelte';
 import { setContext, getContext } from 'svelte';
 
 interface AccordionItem {
-	id: string;, title: string;
+	id: string; title: string;
 	disabled?: boolean;
 	icon?: string;
 }
@@ -80,7 +80,7 @@ let variantClasses = $derived({
 	{/if}
 </div>
 
-{#snippet AccordionItemComponent({ item, variant }: {, item: AccordionItem; variant: string })}
+{#snippet AccordionItemComponent({ item, variant }: { item: AccordionItem; variant: string })}
 	{@const ctx = getContext<{ isOpen: (id: string) => boolean; toggle: (id: string) => void }>('accordion')}
 	{@const isOpen = ctx?.isOpen(item.id) ?? false}
 
@@ -130,10 +130,10 @@ let variantClasses = $derived({
 <style>
 	@keyframes accordion-down {
 		from {
-			height: 0;, opacity: 0;
+			height: 0; opacity: 0;
 		}
 		to {
-			height: var(--accordion-content-height);, opacity: 1;
+			height: var(--accordion-content-height); opacity: 1;
 		}
 	}
 
@@ -141,3 +141,6 @@ let variantClasses = $derived({
 		animation: accordion-down 0.2s ease-out;
 	}
 </style>
+
+
+

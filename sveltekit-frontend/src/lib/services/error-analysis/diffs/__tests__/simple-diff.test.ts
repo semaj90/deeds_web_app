@@ -46,3 +46,4 @@ describe('Error Brain Diff Logic', () => {
  expect(result.afterText).toBe('content modified');
  });
 });
+

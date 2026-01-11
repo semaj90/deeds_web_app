@@ -34,8 +34,9 @@
 		color: red;
 	}
 	.message {
-		padding: 1em;, margin: 1em 0;
+		padding: 1em; margin: 1em 0;
 		border: 1px solid #ccc;
 		border-radius: 4px;
 	}
 </style>
+

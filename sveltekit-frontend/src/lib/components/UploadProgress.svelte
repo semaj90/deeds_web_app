@@ -68,10 +68,10 @@ let { uploadProgress = 0, uploadStatus = '', currentDocId = '' } = $props();
 
 <style>
 	.progress-container {
-		padding: 1.5rem;, background: white;
+		padding: 1.5rem; background: white;
 		border: 1px solid #e0ddd8;
-		border-radius: 4px;, display: flex;
-		flex-direction: column;, gap: 1rem;
+		border-radius: 4px; display: flex;
+		flex-direction: column; gap: 1rem;
 	}
 
 	.progress-header {
@@ -82,11 +82,11 @@ let { uploadProgress = 0, uploadStatus = '', currentDocId = '' } = $props();
 
 	.progress-header h3 {
 		margin: 0;
-		font-size: 1.1rem;, color: #2d2d2d;
+		font-size: 1.1rem; color: #2d2d2d;
 	}
 
 	.doc-id {
-		font-size: 0.8rem;, color: #999;
+		font-size: 0.8rem; color: #999;
 		font-family: 'Courier New', monospace;
 	}
 
@@ -103,58 +103,58 @@ let { uploadProgress = 0, uploadStatus = '', currentDocId = '' } = $props();
 
 	.progress-percentage {
 		font-size: 1.3rem;
-		font-weight: 700;, color: #2d2d2d;
+		font-weight: 700; color: #2d2d2d;
 	}
 
 	.progress-bar-container {
-		width: 100%;, height: 8px;
+		width: 100%; height: 8px;
 		background: #e0ddd8;
-		border-radius: 4px;, overflow: hidden;
+		border-radius: 4px; overflow: hidden;
 	}
 
 	.progress-bar {
-		height: 100%;, transition: width 0.3s ease;
+		height: 100%; transition: width 0.3s ease;
 		border-radius: 4px;
 	}
 
 	.progress-details {
 		display: grid;
 		grid-template-columns: 1fr 1fr;
-		gap: 1rem;, padding: 1rem;
+		gap: 1rem; padding: 1rem;
 		background: #fafaf8;
 		border-radius: 4px;
 	}
 
 	.detail-item {
 		display: flex;
-		flex-direction: column;, gap: 0.25rem;
+		flex-direction: column; gap: 0.25rem;
 	}
 
 	.detail-label {
-		font-size: 0.75rem;, color: #999;
+		font-size: 0.75rem; color: #999;
 		font-weight: 600;
 		text-transform: uppercase;
 	}
 
 	.detail-value {
-		font-size: 0.95rem;, color: #2d2d2d;
+		font-size: 0.95rem; color: #2d2d2d;
 		font-weight: 600;
 	}
 
 	.progress-info {
-		padding: 1rem;, background: #f0f5f0;
+		padding: 1rem; background: #f0f5f0;
 		border-left: 3px solid #6b8e6b;
 		border-radius: 4px;
 	}
 
 	.progress-info p {
 		margin: 0;
-		font-size: 0.9rem;, color: #2d5f2d;
+		font-size: 0.9rem; color: #2d5f2d;
 	}
 
 	@media (max-width: 768px) {
 		.progress-container {
-			padding: 1rem;, gap: 0.75rem;
+			padding: 1rem; gap: 0.75rem;
 		}
 
 		.progress-details {
@@ -162,3 +162,5 @@ let { uploadProgress = 0, uploadStatus = '', currentDocId = '' } = $props();
 		}
 	}
 </style>
+
+

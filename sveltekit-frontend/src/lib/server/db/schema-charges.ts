@@ -29,3 +29,4 @@ export type Charge = typeof charges.$inferSelect;
 export type ChargeInsert = typeof charges.$inferInsert;
 export type CaseTimelineEvent = typeof caseTimeline.$inferSelect;
 export type CaseTimelineInsert = typeof caseTimeline.$inferInsert;
+

@@ -350,3 +350,4 @@ export class WebGPUPolyfillService {
  this.safeLog('WebGPU/WebGL resources cleaned up');
  }
 }
+

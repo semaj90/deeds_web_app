@@ -1,5 +1,5 @@
 <script lang="ts"> import { Upload, Camera, X } from 'lucide-svelte';
- import { Button } from '$lib/components/ui/enhanced-bits'; interface Props { poiId: string, poiName?: string; currentImage?: string; onUploadComplete?: (data: {, imageUrl: string; [key: string]: any }) => void}
+ import { Button } from '$lib/components/ui/enhanced-bits'; interface Props { poiId: string, poiName?: string; currentImage?: string; onUploadComplete?: (data: { imageUrl: string; [key: string]: any }) => void}
   let { poiId, poiName = 'Person of Interest', currentImage, onUploadComplete }: Props = $props();
    let uploading = $state<boolean>(false);
    let message = $state<string>('');
@@ -39,5 +39,7 @@
     accept="image/jpeg,image/png"
     onchange={ handleFileSelect } style="display, none"
   /> <p class="text-xs"> Images are stored securely in MinIO S3 and cached for, 30 days </p> </div>
+
+
 
 

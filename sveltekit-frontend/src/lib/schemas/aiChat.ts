@@ -5,3 +5,4 @@ export const aiChatSchema = z.object({
 });
 
 export type AiChatInput = z.infer<typeof aiChatSchema>;
+

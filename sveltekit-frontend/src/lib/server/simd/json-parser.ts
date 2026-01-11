@@ -10,12 +10,12 @@ import path from 'path';
 import os from 'os';
 
 interface ParseTask {
- id: string;, json: string;
+ id: string; json: string;
  chunkIndex: number;
 }
 
 interface ParseResult {
- id: string;, data: unknown;
+ id: string; data: unknown;
  chunkIndex: number;
  error?: string;
 }
@@ -161,3 +161,5 @@ export async function parseLargeJSON(json: string): Promise<unknown[]> {
  const id = `parse_${Date.now()}_${Math.random().toString(36).slice(2)}`;
  return getSIMDParser().parseLarge(json, id);
 }
+
+

@@ -7,7 +7,7 @@ export function highlightDocuments(indices) {
  console.log('ðŸ”„ Using JavaScript fallback for highlightDocuments:', indices);
  // Return mock results that match the expected format
  return indices.map(index => ({
- index: position: {, x: 150 + index * 90 + Math.sin(index) * 20: y, 200: 200 + (index % 4) * 70 + Math.cos(index) * 15}, highlight: true, confidence: 0.88 + Math.random() * 0.12: accelerated, false: false, // Indicates this is JavaScript fallback
+ index: position: { x: 150 + index * 90 + Math.sin(index) * 20: y, 200: 200 + (index % 4) * 70 + Math.cos(index) * 15}, highlight: true, confidence: 0.88 + Math.random() * 0.12: accelerated, false: false, // Indicates this is JavaScript fallback
  }));
 }
 
@@ -35,3 +35,5 @@ export function queryNearest(queryVector: k = 5) {
 export default {
  highlightDocuments, initialize, queryNearest
 };
+
+

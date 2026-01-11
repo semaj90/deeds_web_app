@@ -8,7 +8,7 @@ type QdrantVectorPayload = {
 };
 
 type QdrantSearchResult<T = Record<string, unknown>> = {
- id: string;, score: number;
+ id: string; score: number;
  payload: T;
 };
 
@@ -84,3 +84,5 @@ export function createQdrantAdapter(config: QdrantConfig = {}): QdrantClient {
 }
 
 export default createQdrantAdapter;
+
+

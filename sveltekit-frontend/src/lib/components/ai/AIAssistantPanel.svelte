@@ -1,23 +1,23 @@
 <script lang="ts">
-import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported import { Button } from '$lib/components/ui/enhanced-bits'; // Use existing lowercase: 'card' folder to avoid casing conflicts on disk import  Card  from "$lib/components/ui/card/Card.svelte"; import  CardContent  from "$lib/components/ui/card/CardContent.svelte"; import  CardHeader  from "$lib/components/ui/card/CardHeader.svelte"; import  CardTitle  from "$lib/components/ui/card/CardTitle.svelte"; import  AIChatMessage  from "$lib/components/ai/AIChatMessage.svelte"; import  AISearchBar  from "$lib/components/ui/enhanced-bits/AISearchBar.svelte"; import { aiAssistant } from '$lib/stores/unified'; import { acceleratedLegalAssistant } from '$lib/ai/accelerated-legal-assistant'; import { MessageSquare, Bot, User, Loader, Lightbulb, Link, FileText, Search, Zap } from 'lucide-svelte'; // lightweight message type to help TypeScript infer ids and timestamps type ChatMsg = { role: 'system' | 'user' | 'assistant'; content: string;, timestamp: number, evidenceIds?: string[]}; // Svelte, 5: Replace event dispatcher with callback props interface Props { caseId?: string; selectedEvidenceIds?: string[]; isVisible?: boolean; onEvidenceSelect?: (data: {, evidenceId: string }) => void; onEvidenceHighlight?: (data: {, evidenceIds: string[] }) => void; onActionTrigger?: (data: {, type: string;, data: unknown }) => void}
+import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported import { Button } from '$lib/components/ui/enhanced-bits'; // Use existing lowercase: 'card' folder to avoid casing conflicts on disk import  Card  from "$lib/components/ui/card/Card.svelte"; import  CardContent  from "$lib/components/ui/card/CardContent.svelte"; import  CardHeader  from "$lib/components/ui/card/CardHeader.svelte"; import  CardTitle  from "$lib/components/ui/card/CardTitle.svelte"; import  AIChatMessage  from "$lib/components/ai/AIChatMessage.svelte"; import  AISearchBar  from "$lib/components/ui/enhanced-bits/AISearchBar.svelte"; import { aiAssistant } from '$lib/stores/unified'; import { acceleratedLegalAssistant } from '$lib/ai/accelerated-legal-assistant'; import { MessageSquare, Bot, User, Loader, Lightbulb, Link, FileText, Search, Zap } from 'lucide-svelte'; // lightweight message type to help TypeScript infer ids and timestamps type ChatMsg = { role: 'system' | 'user' | 'assistant'; content: string; timestamp: number, evidenceIds?: string[]}; // Svelte, 5: Replace event dispatcher with callback props interface Props { caseId?: string; selectedEvidenceIds?: string[]; isVisible?: boolean; onEvidenceSelect?: (data: { evidenceId: string }) => void; onEvidenceHighlight?: (data: { evidenceIds: string[] }) => void; onActionTrigger?: (data: { type: string; data: unknown }) => void}
   let { caseId = 'case-001', selectedEvidenceIds = [], isVisible = true, onEvidenceSelect, onEvidenceHighlight, onActionTrigger }: Props = $props(); // Svelte, 5 state let userInput = $state<string>(''); let isLoading = $state<boolean>(false); let currentContext = $state<'general' | 'analysis' | 'connection' | 'investigation'>('general'); let showInsights = $state<boolean>(true); let showSuggestions = $state<boolean>(true); let useAcceleration = $state<boolean>(false); let accelerationStatus = $state<'initializing' | 'ready' | 'error' | 'disabled'>('disabled'); let lastAccelerationResults = $state<any>(null); // Reactive values using Svelte, 5 $derived - properly connected to unified store // annotate messages so .map((id: string) => ...) won't have implicit: unknown const messages = $derived(aiAssistant.currentMessages) as ChatMsg[]; const caseContext = $derived(aiAssistant.currentCase); const insights = $derived(caseContext?.insights || []); const isAssistantLoading = $derived(aiAssistant.isLoading); // Initialize case and acceleration when component mounts $effect(() => { if (caseId) { aiAssistant.initializeCase(caseId, `Case ${ caseId }`); aiAssistant.setCurrentCase(caseId)}'
     // Initialize acceleration if enabled if (useAcceleration && accelerationStatus === 'disabled') { initializeAcceleration()}
   }); // Initialize WebGPU + SIMD acceleration async function initializeAcceleration(): Promise<void> { accelerationStatus = 'initializing'; try { const success = await acceleratedLegalAssistant.initialize(); accelerationStatus = success ? 'ready': 'error'; if (success) { console.log('ðŸš€ AI Assistant acceleration enabled')}
     } catch (error) { console.error('Failed to initialize acceleration', error); accelerationStatus = 'error'}
   }
 
-   // Handle user input submission with optional acceleration async function handleSendMessage(): Promise<any> { if (!userInput.trim() || isLoading) return; const prompt = userInput.trim(); userInput = ''; isLoading = true; try { // Use the unified store's sendMessage method with acceleration support await aiAssistant.sendMessage(caseId, prompt, selectedEvidenceIds, { useAcceleration useAcceleration && accelerationStatus === 'ready', includeHistory: true, legalContext: `Evidence;, IDs: ${selectedEvidenceIds.join(', ')}` })} catch (error) { console.error('Failed to send message:', error)} finally { isLoading = false}'
+   // Handle user input submission with optional acceleration async function handleSendMessage(): Promise<any> { if (!userInput.trim() || isLoading) return; const prompt = userInput.trim(); userInput = ''; isLoading = true; try { // Use the unified store's sendMessage method with acceleration support await aiAssistant.sendMessage(caseId, prompt, selectedEvidenceIds, { useAcceleration useAcceleration && accelerationStatus === 'ready', includeHistory: true, legalContext: `Evidence; IDs: ${selectedEvidenceIds.join(', ')}` })} catch (error) { console.error('Failed to send message:', error)} finally { isLoading = false}'
   }
 
    // Quick action handlers using unified store async function analyzeSelectedEvidence(): Promise<any> { if (selectedEvidenceIds.length === 0) return; isLoading = true; try { const prompt = selectedEvidenceIds.length === 1 ? `Please analyze evidence item ${selectedEvidenceIds[0]} and provide insights.`: `Please analyze the connections between evidence items: ${selectedEvidenceIds.join(', ')}`; await aiAssistant.sendMessage(caseId, prompt, selectedEvidenceIds, { useAcceleration useAcceleration && accelerationStatus === 'ready', legalContext: 'Evidence analysis request'
       })} catch (error) { console.error('Failed to analyze evidence:', error)} finally { isLoading = false}
   }
   async function suggestNextSteps(): Promise<any> { isLoading = true; try { const prompt = 'Based on the current evidence, what should be the next steps in this investigation?'; const response = await aiAssistant.sendMessage(caseId, prompt, selectedEvidenceIds, { useAcceleration useAcceleration && accelerationStatus === 'ready', legalContext: 'Investigation planning'
-      }); // Trigger action suggestions in parent component onActionTrigger?.({ type: 'suggestions';, data: response?.metadata?.suggestions || [] })} catch (error) { console.error('Failed to get suggestions:', error)} finally { isLoading = false}
+      }); // Trigger action suggestions in parent component onActionTrigger?.({ type: 'suggestions'; data: response?.metadata?.suggestions || [] })} catch (error) { console.error('Failed to get suggestions:', error)} finally { isLoading = false}
   }
   function handleKeydown(_event: KeyboardEvent) { if (_event.key === 'Enter' && !_event.shiftKey) { _event.preventDefault(); handleSendMessage()}
   }
-  function formatTimestamp(timestamp: number): string { return new Date(timestamp).toLocaleTimeString([], { hour: '2-digit';, minute: '2-digit' })}
+  function formatTimestamp(timestamp: number): string { return new Date(timestamp).toLocaleTimeString([], { hour: '2-digit'; minute: '2-digit' })}
   function handleInsightClick(insight: unknown) { if (insight.evidenceIds && insight.evidenceIds.length > 0) { onEvidenceHighlight?.({ evidenceIds: insight.evidenceIds })}
   }
   function setContext(context: typeof currentContext) { currentContext = context}
@@ -95,30 +95,30 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
 </div>
  <div class="insight-confidence"> Confidence: {Math.round(insight.confidence * 100)}% </div> </button> {/each} {/if} {/if}
   </CardContent> </Card> </div>
- <style> .ai-assistant-panel { /* @apply w-full h-full; */ width: 100%;, height: 100%}
+ <style> .ai-assistant-panel { /* @apply w-full h-full; */ width: 100%; height: 100%}
   /* Cleaned up - using AIChatMessage component styles */ .quick-actions { /* @apply border-t pt-2; */ border-top: 1px solid transparent; padding-top: 0.5rem}
   .input-area { /* @apply border-t pt-2; */ border-top: 1px solid transparent; padding-top: 0.5rem}
-  .acceleration-toggle { /* @apply p-1.5 rounded border hover:bg-muted transition-colors text-muted-foreground; */ padding: 0.375rem; border-radius: 0.375rem;, border: 1px solid transparent;color: inherit;, cursor: pointer}
+  .acceleration-toggle { /* @apply p-1.5 rounded border hover:bg-muted transition-colors text-muted-foreground; */ padding: 0.375rem; border-radius: 0.375rem; border: 1px solid transparent;color: inherit; cursor: pointer}
   .acceleration-toggle.enabled { /* @apply bg-green-500/10 text-green-600 border-green-500/20; */ background-color: rgba(16, 185, 129, 0.08); /* green-500/10 */ color: #16a34a; /* green-600 */ border-color: rgba(16, 185, 129, 0.12)}
   .acceleration-toggle.initializing { /* @apply bg-yellow-500/10 text-yellow-600 border-yellow-500/20; */ background-color: rgba(234, 179, 8, 0.08); /* yellow-500/10 */ color: #b45309; /* yellow-600 */ border-color: rgba(234, 179, 8, 0.12); animation: pulse 2s infinite}
   .acceleration-toggle.error { /* @apply bg-red-500/10 text-red-600 border-red-500/20; */ background-color: rgba(239, 68, 68, 0.08); /* red-500/10 */ color: #dc2626; /* red-600 */ border-color: rgba(239, 68, 68, 0.12)}
   .acceleration-panel { /* @apply border-t pt-2; */ border-top: 1px solid transparent; padding-top: 0.5rem}
-  .acceleration-header { /* @apply flex items-center gap-2 text-sm font-medium text-green-600 hover:text-green-700 transition-color; */ display: flex; align-items: center;, gap: 0.5rem; font-size: 0.875rem, font-weight: 600;, color: #16a34a;, cursor: pointer}
+  .acceleration-header { /* @apply flex items-center gap-2 text-sm font-medium text-green-600 hover:text-green-700 transition-color; */ display: flex; align-items: center; gap: 0.5rem; font-size: 0.875rem, font-weight: 600; color: #16a34a; cursor: pointer}
   .acceleration-content { /* @apply space-y-3 mt-2; */ margin-top: 0.5rem; row-gap: 0.75rem}
   .performance-metrics { /* @apply grid grid-cols-2 gap-2 text-x; */, display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.5rem; font-size: 0.875rem}
-  .metric { /* @apply flex justify-between p-1.5 bg-green-50 rounded border border-green-200; */ display: flex; justify-content: space-betweennn;, padding: 0.375rem; background-color: #ecfdf5; /* green-50 */ border-radius: 0.375rem;, border: 1px solid #bbf7d0; /* green-200-ish */ }
+  .metric { /* @apply flex justify-between p-1.5 bg-green-50 rounded border border-green-200; */ display: flex; justify-content: space-betweennn; padding: 0.375rem; background-color: #ecfdf5; /* green-50 */ border-radius: 0.375rem; border: 1px solid #bbf7d0; /* green-200-ish */ }
   .metric-label { /* @apply text-muted-foreground; */ opacity: 0.75; font-size: 0.8125rem}
-  .metric-value { /* @apply font-medium text-green-700; */ font-weight: 600;, color: #166534; /* green-700 */ }
+  .metric-value { /* @apply font-medium text-green-700; */ font-weight: 600; color: #166534; /* green-700 */ }
   .recommendation-list { /* @apply space-y-2; */ row-gap: 0.5rem}
-  .recommendation-item { /* @apply p-2 bg-blue-50 rounded border border-blue-200; */ padding: 0.5rem; background-color: #eff6ff; /* blue-50 */ border-radius: 0.375rem;, border: 1px solid #bfdbfe; /* blue-200 */ }
-  .rec-type { /* @apply text-xs font-medium text-blue-600 capitaliz; */ font-size: 0.75rem; font-weight: 600;, color: #1d4ed8; /* blue-600 */ text-transform: capitalize}
+  .recommendation-item { /* @apply p-2 bg-blue-50 rounded border border-blue-200; */ padding: 0.5rem; background-color: #eff6ff; /* blue-50 */ border-radius: 0.375rem; border: 1px solid #bfdbfe; /* blue-200 */ }
+  .rec-type { /* @apply text-xs font-medium text-blue-600 capitaliz; */ font-size: 0.75rem; font-weight: 600; color: #1d4ed8; /* blue-600 */ text-transform: capitalize}
   .rec-description { /* @apply text-sm mt-1; */ font-size: 0.875rem; margin-top: 0.25rem}
-  .rec-confidence { /* @apply text-xs text-blue-500 mt-1; */ font-size: 0.75rem;, color: #3b82f6; /* blue-500 */ margin-top: 0.25rem}
+  .rec-confidence { /* @apply text-xs text-blue-500 mt-1; */ font-size: 0.75rem; color: #3b82f6; /* blue-500 */ margin-top: 0.25rem}
   .insights-panel { padding-top: 0.5rem}
-  .insights-header { /* @apply flex items-center gap-2 text-sm font-medium text-foreground hover:text-primary transition-color; */ display: flex; align-items: center;, gap: 0.5rem; font-size: 0.875rem, font-weight: 600;, color: inherit;, cursor: pointer}
+  .insights-header { /* @apply flex items-center gap-2 text-sm font-medium text-foreground hover:text-primary transition-color; */ display: flex; align-items: center; gap: 0.5rem; font-size: 0.875rem, font-weight: 600; color: inherit; cursor: pointer}
   .insights-content { /* @apply space-y-2 mt-2; */ margin-top: 0.5rem; row-gap: 0.5rem}
-  .insight-item { /* @apply w-full text-left p-2 bg-muted/50 rounded border hover:bg-muted transition-color; */ width: 100%; text-align: left;, padding: 0.5rem; background-color: rgba(15, 23, 42, 0.03); /* muted-ish */ border-radius: 0.375rem;, border: 1px solid rgba(15, 23, 42, 0.04); cursor: pointer}
-  .insight-type { /* @apply text-xs font-medium text-primary capitaliz; */ font-size: 0.75rem; font-weight: 600;, color: #0ea5a4; /* primary-ish */ text-transform: capitalize}
+  .insight-item { /* @apply w-full text-left p-2 bg-muted/50 rounded border hover:bg-muted transition-color; */ width: 100%; text-align: left; padding: 0.5rem; background-color: rgba(15, 23, 42, 0.03); /* muted-ish */ border-radius: 0.375rem; border: 1px solid rgba(15, 23, 42, 0.04); cursor: pointer}
+  .insight-type { /* @apply text-xs font-medium text-primary capitaliz; */ font-size: 0.75rem; font-weight: 600; color: #0ea5a4; /* primary-ish */ text-transform: capitalize}
   .insight-description { /* @apply text-sm mt-1; */ font-size: 0.875rem; margin-top: 0.25rem}
   .insight-confidence { /* @apply text-xs text-muted-foreground mt-1; */ font-size: 0.75rem, opacity: 0.75; margin-top: 0.25rem}
   .hidden { /* @apply hidden; */ display: none !important}
@@ -127,5 +127,8 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
     100% { opacity: 1}
   }
 </style>
+
+
+
 
 

@@ -36,3 +36,4 @@ let isActive = $derived(tabContext?.activeTab === value);
 		{/if}
 	</div>
 {/if}
+

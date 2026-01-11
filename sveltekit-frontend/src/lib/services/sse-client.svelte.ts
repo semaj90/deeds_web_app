@@ -13,7 +13,7 @@ import type { url } from "inspector";
 import { config, off, disconnect } from "process";
 
 export interface SSEMessage {
-  type: string;, data: unknown;
+  type: string; data: unknown;
   timestamp: string;
 }
 
@@ -203,3 +203,5 @@ export function createSSEClient(config: SSEConfig): SSEClient {
  *   sseClient.disconnect();
  * });
  */
+
+

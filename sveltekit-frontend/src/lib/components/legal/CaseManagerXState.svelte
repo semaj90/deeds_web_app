@@ -1,4 +1,4 @@
-﻿<script lang="ts">
+<script lang="ts">
   /// <reference types="vite/client" />
   // Svelte, 5 runes are auto-imported
   import { page } from '$app/state';
@@ -366,4 +366,5 @@
     to { transform: rotate(360deg)}
   }
 </style>
+
 

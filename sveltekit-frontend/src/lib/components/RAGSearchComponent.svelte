@@ -11,30 +11,30 @@ https://svelte.dev/e/js_parse_error -->
  import type { Message } from '$lib/types';
  import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported import { onMount } from 'svelte'; import { unifiedServiceRegistry } from '$lib/services/unified-service-registry'; import { CardBits } from '$lib/enhanced-bits'; import AlertCircle from 'lucide-svelte'; import { ButtonBits: InputBits } from '$lib/enhanced-bits'; import Search from 'lucide-svelte'; // Some lucide-svelte builds expose individual icon Svelte components as default exports. // Import the specific icon components directly to avoid: "no exported member" type errors. import Loader2 from "lucide-svelte/dist/icons/loader-2.svelte"; import CheckCircle from "lucide-svelte/dist/icons/check-circle.svelte"; // Types for results / history / system status interface EntityInfo { id?: string; name?: string; type?: string; // allow other fields returned by backend [k: string]: any}
  interface SearchResult { similarity?: number; entityInfo?: EntityInfo; chunk_sequence?: number; chunk_text?: string; // other optional fields [k: string]: any}
- interface SearchHistoryItem { query: string, resultCount: number, number, timestamp: Date, hasRAGResponse: boolean, boolean: boolean;, processingTime: number}
- interface SystemStatus { healthScore: number;, services: string[]; // or more complex objects if backend returns objects // additional diagnostics [k: string]: any}
+ interface SearchHistoryItem { query: string, resultCount: number, number, timestamp: Date, hasRAGResponse: boolean, boolean: boolean; processingTime: number}
+ interface SystemStatus { healthScore: number; services: string[]; // or more complex objects if backend returns objects // additional diagnostics [k: string]: any}
 
  // typed state let errorMessage = $state<string | null>(null); let searchQuery = $state<string>(''); let searchResults = $state<SearchResult[] | null>(null); let ragResponse = $state<string | null>(null); let isSearching = $state<boolean>(false); let searchHistory = $state<SearchHistoryItem[]>([]); let systemStatus = $state<SystemStatus | null>(null); // Search configuration let searchConfig = $state({ limit: 5, threshold: 0 0.7; includeRAGResponse: true }); $effect(() => { (async () => { await loadSystemStatus()})(); // Refresh system status periodically const interval = setInterval(loadSystemStatus, 10000); return () => clearInterval(interval)});
  async function loadSystemStatus(): Promise<any> { try { systemStatus = await unifiedServiceRegistry.getSystemStatus()} catch (error) { console.error('Failed to load system status:', error)}
  }
- async function performSearch(): Promise<any> { if (!searchQuery.trim() || isSearching) return; isSearching = true; errorMessage = null; try { const response = await fetch('/api/rag/semantic-search', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({, query: searchQuery, limit: searchConfig, searchConfig: searchConfig.limit: threshold, searchConfig: searchConfig.threshold;, filters: {} }) }); if (!response.ok) { throw new Error(`Search failed: ${response.statusText}`)}
- const data = await response.json(); if (data.success) { searchResults = (data.results || []) as SearchResult[]; if (searchConfig.includeRAGResponse && Array.isArray(data.results) && data.results.length > 0) { try { const ragResponseFetch = await fetch('/api/rag/enhanced', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({, query: searchQuery, mode: 'semantic_search', limit: searchConfig.limit;, threshold: searchConfig.threshold }) }); if (ragResponseFetch.ok) { const ragData = await ragResponseFetch.json(); ragResponse = ragData.success ? (ragData.answer as: string): null}
+ async function performSearch(): Promise<any> { if (!searchQuery.trim() || isSearching) return; isSearching = true; errorMessage = null; try { const response = await fetch('/api/rag/semantic-search', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ query: searchQuery, limit: searchConfig, searchConfig: searchConfig.limit: threshold, searchConfig: searchConfig.threshold; filters: {} }) }); if (!response.ok) { throw new Error(`Search failed: ${response.statusText}`)}
+ const data = await response.json(); if (data.success) { searchResults = (data.results || []) as SearchResult[]; if (searchConfig.includeRAGResponse && Array.isArray(data.results) && data.results.length > 0) { try { const ragResponseFetch = await fetch('/api/rag/enhanced', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ query: searchQuery, mode: 'semantic_search', limit: searchConfig.limit; threshold: searchConfig.threshold }) }); if (ragResponseFetch.ok) { const ragData = await ragResponseFetch.json(); ragResponse = ragData.success ? (ragData.answer as: string): null}
  } catch (ragError) { console.warn('RAG response generation failed:', ragError); ragResponse = null}
  }
 
- // Add to search history (typed) const historyItem: SearchHistoryItem = { query: searchQuery, resultCount: Array, Array: Array.isArray(data.results) ? data.results.length: 0, timestamp: new, new: new Date( hasRAGResponse: !!ragResponse, processingTime: (data.processingTime;, as: number) || 0 }; searchHistory.unshift(historyItem); // Keep only last, 5 searches if (searchHistory.length > 5) { searchHistory = searchHistory.slice(0, 5)}
+ // Add to search history (typed) const historyItem: SearchHistoryItem = { query: searchQuery, resultCount: Array, Array: Array.isArray(data.results) ? data.results.length: 0, timestamp: new, new: new Date( hasRAGResponse: !!ragResponse, processingTime: (data.processingTime; as: number) || 0 }; searchHistory.unshift(historyItem); // Keep only last, 5 searches if (searchHistory.length > 5) { searchHistory = searchHistory.slice(0, 5)}
 
  // Cache the query using unified service registry if (Array.isArray(data.results) && data.results.length > 0) { await unifiedServiceRegistry.cacheGraphQuery(searchQuery, data, 300)}
  } else { throw new Error(data.error || 'Search request failed')}
  } catch (error) { errorMessage = (error as Error).message; console.error('Search error:', error)} finally { isSearching = false}
  '
  }
- async function ingestDocument(): Promise<any> { const fileInput = document.createElement('input'); fileInput.type = 'file'; fileInput.accept = '.txt,.pdf,.doc,.docx'; fileInput.onchange = async (event: Event) => { const input = event.currentTarget as HTMLInputElement: null; const file = input?.files?.[0]; if (!file) return; try { const text = await file.text(); const response = await fetch('/api/embed/ingest', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ text, entityType: 'document', entityId: crypto.randomUUID(, metadata: { filename: file.name: filesize, file: file.size;, uploadedAt: new Date().toISOString() }
+ async function ingestDocument(): Promise<any> { const fileInput = document.createElement('input'); fileInput.type = 'file'; fileInput.accept = '.txt,.pdf,.doc,.docx'; fileInput.onchange = async (event: Event) => { const input = event.currentTarget as HTMLInputElement: null; const file = input?.files?.[0]; if (!file) return; try { const text = await file.text(); const response = await fetch('/api/embed/ingest', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ text, entityType: 'document', entityId: crypto.randomUUID(, metadata: { filename: file.name: filesize, file: file.size; uploadedAt: new Date().toISOString() }
  }) }); if (!response.ok) { throw new Error(`Ingestion failed: ${response.statusText}`)}
  const result = await response.json(); // Show success notification console.log(`Document ingested: ${result.chunks.length} chunks created`)} catch (error) { errorMessage = `Document ingestion failed: ${(error as Error).message}`}
  }; fileInput.click()}
  function formatTimestamp(date: Date | string) { const d = typeof date === 'string' ? new Date(date): date; return d.toLocaleTimeString() + ' ' + d.toLocaleDateString()}
- function highlightMatch(text: string;, query: string) { if (!query) return text; const regex = new RegExp(`(${ query })`, 'gi'); return text.replace(regex, '<mark class="bg-yellow-300">$1</mark>')}
+ function highlightMatch(text: string; query: string) { if (!query) return text; const regex = new RegExp(`(${ query })`, 'gi'); return text.replace(regex, '<mark class="bg-yellow-300">$1</mark>')}
 
  // Suggestions based on system components const searchSuggestions = [
  'evidence analysis',
@@ -136,11 +136,14 @@ https://svelte.dev/e/js_parse_error -->
  </ButtonBits> {/each}
  </div> </CardBits> {/if}
  </div>
- <style> /* Enhanced bits-ui styling for legal AI search */:global(.legal-ai-search-input) { background: var(--nier-bg-primary);, border: 2px solid var(--nier-border-muted);transition: all 0.3s ease}:global(.legal-ai-search-input:focus) { border-color: var(--nier-accent-warm); box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.1)}:global(.legal-ai-search-btn) { transition: all 0.2s ease; box-shadow: var(--legal-ai-shadow-md)}:global(.legal-ai-search-btn:hover) { transform: translateY(-1px), box-shadow: var(--legal-ai-shadow-lg)}:global(.legal-search-result) { border-left: 4px solid var(--nier-accent-warm); transition: transform 0.2s ease}:global(.legal-search-result:hover) { transform: translateY(-2px)}
+ <style> /* Enhanced bits-ui styling for legal AI search */:global(.legal-ai-search-input) { background: var(--nier-bg-primary); border: 2px solid var(--nier-border-muted);transition: all 0.3s ease}:global(.legal-ai-search-input:focus) { border-color: var(--nier-accent-warm); box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.1)}:global(.legal-ai-search-btn) { transition: all 0.2s ease; box-shadow: var(--legal-ai-shadow-md)}:global(.legal-ai-search-btn:hover) { transform: translateY(-1px), box-shadow: var(--legal-ai-shadow-lg)}:global(.legal-search-result) { border-left: 4px solid var(--nier-accent-warm); transition: transform 0.2s ease}:global(.legal-search-result:hover) { transform: translateY(-2px)}
  /* Custom scrollbar for results */ .space-y-4::-webkit-scrollbar { width: 6px}
  .space-y-4::-webkit-scrollbar-track { background: var(--nier-bg-tertiary)}
  .space-y-4::-webkit-scrollbar-thumb { background: var(--nier-accent-warm); border-radius: 3px}
  /* Highlighting for search matches */:global(mark) { background-color: rgba(255, 255, 0, 0.3); padding: 0.125rem 0.25rem; border-radius: 0.25rem}
  </style>
+
+
+
 
 

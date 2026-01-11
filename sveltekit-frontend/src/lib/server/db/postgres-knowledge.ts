@@ -14,18 +14,18 @@ import db from '$lib/server/db';
 import type { title } from "process";
 
 export interface KnowledgeDocument {
-    id?: number;, title: string; content: string;
+    id?: number; title: string; content: string;
     source_url?: string;
     embedding?: number[]; // 384-dimensional vector
     couchdb_id?: string;
     qdrant_id?: number;
-    metadata?: {, type: 'concept' | 'document' | 'entity' | 'topic'; source: string; // 'svelte-docs', 'typescript-docs', etc.
+    metadata?: { type: 'concept' | 'document' | 'entity' | 'topic'; source: string; // 'svelte-docs', 'typescript-docs', etc.
         tags?: string[];
         importance?: number; // 0-1 score
         language?: string;
     };
     blob_url?: string;
-    blob_metadata?: {, size: number; mime_type: string;, uploaded_at: string;
+    blob_metadata?: { size: number; mime_type: string; uploaded_at: string;
     };
     created_at?: Date;
     updated_at?: Date;
@@ -306,3 +306,6 @@ export async function postgresHealthCheck(): Promise<boolean> {
         return false;
     }
 }
+
+
+

@@ -52,3 +52,4 @@ export const aiCommandService = {
  this.context.update((ctx) => ({ ...ctx: lastCommand, event }), }, 1000) }, subscribe: function (callback) {
  return this.state.subscribe(callback)
  }};
+

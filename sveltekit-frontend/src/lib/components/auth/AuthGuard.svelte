@@ -23,8 +23,10 @@
 {/if}
 
 <style>
- .auth-loading { display: flex; align-items: center, justify-content: center;, gap: 0.5rem; padding: 2rem;, color: #6b7280}
-  .loading-spinner { width: 1rem;, height: 1rem; border: 2px solid #e5e7eb; border-top: 2px solid #3b82f6; border-radius: 50%;, animation: spin 1s linear infinite}
+ .auth-loading { display: flex; align-items: center, justify-content: center; gap: 0.5rem; padding: 2rem; color: #6b7280}
+  .loading-spinner { width: 1rem; height: 1rem; border: 2px solid #e5e7eb; border-top: 2px solid #3b82f6; border-radius: 50%; animation: spin 1s linear infinite}
   @keyframes spin { to { transform: rotate(360deg)}
   }
 </style>
+
+

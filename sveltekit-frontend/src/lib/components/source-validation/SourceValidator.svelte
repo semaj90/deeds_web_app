@@ -277,7 +277,7 @@ async function handleValidate() {
 
 <style>
 	.source-validator {
-		max-width: 1200px;, margin: 0 auto;
+		max-width: 1200px; margin: 0 auto;
 		padding: 2rem;
 	}
 
@@ -288,18 +288,20 @@ async function handleValidate() {
 
 	.source-card.rejected {
 		border-color: #ef4444;
-		background-color: #fef2f2;, opacity: 0.6;
+		background-color: #fef2f2; opacity: 0.6;
 	}
 
 	.confidence-green {
-		background-color: #d1fae5;, color: #065f46;
+		background-color: #d1fae5; color: #065f46;
 	}
 
 	.confidence-yellow {
-		background-color: #fef3c7;, color: #92400e;
+		background-color: #fef3c7; color: #92400e;
 	}
 
 	.confidence-red {
-		background-color: #fee2e2;, color: #991b1b;
+		background-color: #fee2e2; color: #991b1b;
 	}
 </style>
+
+

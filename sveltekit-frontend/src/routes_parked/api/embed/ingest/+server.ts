@@ -44,8 +44,8 @@ export const POST: RequestHandler = async ({ request }) => {
  }
  // Chunk the text for better embedding quality
  const chunks = chunkText(text);
- const ingestedChunks: {, id: any;
- text: string;, sequence: number;
+ const ingestedChunks: { id: any;
+ text: string; sequence: number;
  embeddingDimensions: number;
  }[] = [];
  for (let i = 0; i < chunks.length; i++) {
@@ -79,7 +79,7 @@ export const POST: RequestHandler = async ({ request }) => {
  success: true,
  message: `Successfully ingested ${chunks.length} chunks`,
  chunks: ingestedChunks,
- metadata: {, totalChunks: chunks.length,
+ metadata: { totalChunks: chunks.length,
  entityType,
  entityId,
  embeddingModel: 'embeddinggemma:latest',
@@ -91,3 +91,6 @@ export const POST: RequestHandler = async ({ request }) => {
  return error(500, `Ingestion failed: ${err instanceof Error ? err.message : 'Unknown error'}`);
  }
 };
+
+
+

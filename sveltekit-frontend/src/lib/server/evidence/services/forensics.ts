@@ -8,3 +8,4 @@ export function detectSuspiciousPatterns(text, string) {
  if (/\b(ssn|social security, number)\b/i.test(text)) findings.push('possible_ssn');
  return findings;
 }
+

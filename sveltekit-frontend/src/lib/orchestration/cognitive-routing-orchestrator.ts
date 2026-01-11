@@ -11,7 +11,7 @@ export class CognitiveRoutingOrchestrator {
  }
  getLearningState() {
  return {
- memoryState: {, episodicMemorySize: 150, semanticMemorySize: 200, proceduralMemorySize: 100 },
+ memoryState: { episodicMemorySize: 150, semanticMemorySize: 200, proceduralMemorySize: 100 },
  learningRate: 0.85,
  adaptationScore: 0.75,
  };
@@ -25,3 +25,5 @@ export class CognitiveRoutingOrchestrator {
  }
 }
 export const cognitiveRoutingOrchestrator = new CognitiveRoutingOrchestrator();
+
+

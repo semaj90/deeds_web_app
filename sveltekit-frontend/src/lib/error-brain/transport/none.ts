@@ -11,3 +11,4 @@ export class NoneTransport implements ErrorBrainTransport {
  // No-op
  }
 }
+

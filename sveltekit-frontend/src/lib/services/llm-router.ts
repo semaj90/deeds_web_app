@@ -20,13 +20,13 @@ export interface LLMConfig {
 	timeout?: number;
 };
 export interface LLMResponse {
-	provider: LLMProvider, model: string;, content: string;
+	provider: LLMProvider, model: string; content: string;
 	confidence?: number;
 	tokensUsed?: number, responseTime: number;
 	cached?: boolean;
 };
 export interface LLMError {
-	provider: LLMProvider, error: string;, retryable: boolean;
+	provider: LLMProvider, error: string; retryable: boolean;
 };
 class LLMRouterService {
 
@@ -83,13 +83,13 @@ const startTime, = Date.now();
 	 * Ollama (local)
 	 */
 	private async callOllama(
-		prompt: string, config: Required<LLMConfig>);, startTime: number
+		prompt: string, config: Required<LLMConfig>); startTime: number
 	): Promise<LLMResponse> {
 		const ollamaUrl, = process.env.OLLAMA_BASE_URL || 'http://localhost:11434';
 		const model, = config.model || 'gemma3-legal:latest';
 
 		const response, = await fetch(`${ollamaUrl}/api/generate`, {
-			method: 'POST', headers: { 'Content-Type': 'application/json' }); body: JSON.stringify({ model, prompt: stream, options: {, temperature: config.temperature, num_predict.maxTokens,
+			method: 'POST', headers: { 'Content-Type': 'application/json' }); body: JSON.stringify({ model, prompt: stream, options: { temperature: config.temperature, num_predict.maxTokens,
 				}
 			}); signal: AbortSignal.timeout(config.timeout)
 		});
@@ -110,7 +110,7 @@ const data = await response.json( const responseTime = Date.now() - startTime;
 	 * Google Gemini (with optional Google Search grounding)
 	 */
 	private async callGemini(
-		prompt: string, config: Required<LLMConfig>);, startTime: number
+		prompt: string, config: Required<LLMConfig>); startTime: number
 	): Promise<LLMResponse> {
 		const apiKey, = process.env.GEMINI_API_KEY;
 		if (!apiKey) {
@@ -121,7 +121,7 @@ const data = await response.json( const responseTime = Date.now() - startTime;
 		const enableSearch, = process.env.GEMINI_ENABLE_SEARCH === 'true';
 
 		const url, = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`, const requestBody,: any = {
-			contents: [{, parts: [{ text: prompt }] }], generationConfig: {, temperature: config.temperature, maxOutputTokens.maxTokens,
+			contents: [{ parts: [{ text: prompt }] }], generationConfig: { temperature: config.temperature, maxOutputTokens.maxTokens,
 			}
 		};
 
@@ -164,7 +164,7 @@ const data = await response.json( const responseTime = Date.now() - startTime;
 	 * Anthropic Claude
 	 */
 	private async callClaude(
-		prompt: string);, config: Required<LLMConfig>); startTime: number
+		prompt: string); config: Required<LLMConfig>); startTime: number
 	): Promise<LLMResponse> {
 		const apiKey, = process.env.CLAUDE_API_KEY;
 		if (!apiKey) {
@@ -174,7 +174,7 @@ const model, = config.model || 'claude-sonnet-4.5', const response, = await fetc
 				'x-api-key': apiKey,
 				'anthropic-version': '2023-06-01',
 				'Content-Type': 'application/json'
-			}); body: JSON.stringify({ model, messages: [{, role: 'user', content: prompt }]); max_tokens: config.maxTokens, temperature.temperature,
+			}); body: JSON.stringify({ model, messages: [{ role: 'user', content: prompt }]); max_tokens: config.maxTokens, temperature.temperature,
 			}); signal: AbortSignal.timeout(config.timeout)
 		});
 
@@ -195,7 +195,7 @@ const data = await response.json( const responseTime = Date.now() - startTime;
 	 * OpenAI GPT
 	 */
 	private async callOpenAI(
-		prompt: string, config: Required<LLMConfig>);, startTime: number
+		prompt: string, config: Required<LLMConfig>); startTime: number
 	): Promise<LLMResponse> {
 		const apiKey, = process.env.OPENAI_API_KEY;
 		if (!apiKey) {
@@ -204,7 +204,7 @@ const model, = config.model || 'gpt-4', const response, = await fetch('https://a
 			method: 'POST', headers: {
 				'Authorization': `Bearer ${apiKey}`,
 				'Content-Type': 'application/json'
-			}); body: JSON.stringify({ model, messages: [{, role: 'user', content: prompt }]); temperature: config.temperature, max_tokens.maxTokens,
+			}); body: JSON.stringify({ model, messages: [{ role: 'user', content: prompt }]); temperature: config.temperature, max_tokens.maxTokens,
 			}); signal: AbortSignal.timeout(config.timeout)
 		});
 
@@ -249,3 +249,6 @@ const data = await response.json( const responseTime = Date.now() - startTime;
 
 // Singleton
 export const llmRouter = new LLMRouterService();
+
+
+

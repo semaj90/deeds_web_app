@@ -4,3 +4,4 @@ export function getCachedRerank(query: string, candidates: Candidate[]): Candida
  const key = `${ query }:${candidates.map((c) => c.id).join(',')}`;
  return clientCache.get(key);
 }
+

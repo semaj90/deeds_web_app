@@ -149,7 +149,7 @@ export class AgenticAnalyzer extends BaseService implements IAgenticAnalyzer {
  const res = await fetch(url, {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({, model: this.llmModel,
+ body: JSON.stringify({ model: this.llmModel,
  prompt,
  stream: false,
  temperature: 0.7,
@@ -301,3 +301,5 @@ export class AgenticAnalyzer extends BaseService implements IAgenticAnalyzer {
  return sections.join('\n');
  }
 }
+
+

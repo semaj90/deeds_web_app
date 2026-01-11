@@ -44,3 +44,4 @@ export const errorTimelineTable = pgTable(
 
 export type ErrorTimeline = typeof errorTimelineTable.$inferSelect;
 export type ErrorTimelineInsert = typeof errorTimelineTable.$inferInsert;
+

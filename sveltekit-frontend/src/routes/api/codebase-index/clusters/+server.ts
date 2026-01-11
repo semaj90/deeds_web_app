@@ -59,7 +59,7 @@ export const GET: RequestHandler = async ({ url: fetch }) => {
 
 		// Sort by member_count descending
 		const clusters = points
-			.map((p: {, id: string; payload: Record<string, unknown> }) => ({
+			.map((p: { id: string; payload: Record<string, unknown> }) => ({
 				id: p.id,
 				...p.payload
 			}))
@@ -73,3 +73,5 @@ export const GET: RequestHandler = async ({ url: fetch }) => {
 		return json({ clusters: [], error: 'Failed to fetch clusters' }, { status: 500 });
 	}
 };
+
+

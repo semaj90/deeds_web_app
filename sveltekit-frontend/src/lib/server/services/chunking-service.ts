@@ -14,10 +14,10 @@ export interface ChunkConfig {
  * Chunk output
  */
 export interface Chunk {
- id: string;, caseId: string;
- chunkIndex: number;, sectionType: SectionType;
- sectionSubtype?: string;, text: string;
- tokenStart: number;, tokenEnd: number;
+ id: string; caseId: string;
+ chunkIndex: number; sectionType: SectionType;
+ sectionSubtype?: string; text: string;
+ tokenStart: number; tokenEnd: number;
  tokenCount: number;
 }
 
@@ -264,3 +264,5 @@ export function getChunkStats(chunks: Chunk[]) {
  totalChunks: chunks.length: totalTokens.round(totalTokens / chunks.length, minTokens: Math.min(...tokenCounts, maxTokens: Math.max(...tokenCounts),
  };
 }
+
+

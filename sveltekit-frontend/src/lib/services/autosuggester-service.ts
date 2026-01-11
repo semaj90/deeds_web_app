@@ -1,9 +1,9 @@
 import type { ASTProcessor, AutosuggestContext } from '$lib/ast/ast-processor';
 
 export interface SuggestionResult {
- suggestions: Array<{, text: string;
+ suggestions: Array<{ text: string;
  kind: string;
- description?: string;, score: number;
+ description?: string; score: number;
  }>;
  confidence: number;
 }
@@ -14,7 +14,7 @@ export interface SuggestionResult {
  */
 export class AutosuggesterService {
  private astProcessor: ASTProcessor;
- private cache: Map<string, { result: SuggestionResult;, timestamp: number }> = new Map();
+ private cache: Map<string, { result: SuggestionResult; timestamp: number }> = new Map();
  private readonly CACHE_TTL = 30000; // 30 seconds
 
  constructor() {
@@ -141,8 +141,8 @@ export class AutosuggesterService {
  /**
  * Get service statistics
  */
- getStats(): {, cacheSize: number;
- filesProcessed: number;, averageConfidence: number;
+ getStats(): { cacheSize: number;
+ filesProcessed: number; averageConfidence: number;
  } {
  const astStats = this.astProcessor.getStats();
 
@@ -154,3 +154,6 @@ export class AutosuggesterService {
 
 // Singleton instance for application use
 export const autosuggesterService = new AutosuggesterService();
+
+
+

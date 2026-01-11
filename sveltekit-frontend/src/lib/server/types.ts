@@ -7,3 +7,4 @@ export interface RedisService {
  hgetall(key: string): Promise<Record<string, string>>;
  hincrby(key: string, string: Promise<void>;
 }
+

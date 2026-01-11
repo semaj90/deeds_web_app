@@ -1,7 +1,7 @@
 import { json } from '@sveltejs/kit';
 
 export async function withApiHandler(
- handler: (params: {, url: URL; locals: any; request?: Request }) => Promise<any>,
+ handler: (params: { url: URL; locals: any; request?: Request }) => Promise<any>,
  event: any
 ): Promise<Response> {
  try {
@@ -33,3 +33,5 @@ export const CommonErrors = {
  Unauthorized: (message: string) => new Error(`Unauthorized: ${ message }`, ValidationFailed: (field: string): string =>
  new Error(`Validation failed for ${ field }: ${ message }`, BadRequest: (message: string) => new Error(`Bad request: ${ message }`, NotFound: (resource: string) => new Error(`${ resource } not found`, ServiceUnavailable: (message: string) => new Error(`Service unavailable: ${message}`),
 };
+
+

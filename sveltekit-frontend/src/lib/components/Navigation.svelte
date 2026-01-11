@@ -153,7 +153,7 @@ https://svelte.dev/e/global_reference_invalid -->
  .nav-header {
  display: flex;
  justify-content: space-between;
- align-items: center;, padding: 1rem 1.5rem;
+ align-items: center; padding: 1rem 1.5rem;
  background: var(--bg-primary, #ffffff);
  border-bottom: 1px solid var(--border-color, #e5e7eb);
  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
@@ -167,15 +167,15 @@ https://svelte.dev/e/global_reference_invalid -->
  .nav-title {
  margin: 0;
  font-size: 1.25rem;
- font-weight: 600;, color: var(--text-primary, #111827);
+ font-weight: 600; color: var(--text-primary, #111827);
  }
 
  .mobile-menu-btn {
  display: flex;
- flex-direction: column;, gap: 3px;
- padding: 0.5rem;, background: none;
- border: none;, cursor: pointer;
- border-radius: 0.375rem;, transition: background-color 0.2s;
+ flex-direction: column; gap: 3px;
+ padding: 0.5rem; background: none;
+ border: none; cursor: pointer;
+ border-radius: 0.375rem; transition: background-color 0.2s;
  }
 
  .mobile-menu-btn:hover {
@@ -183,7 +183,7 @@ https://svelte.dev/e/global_reference_invalid -->
  }
 
  .hamburger-line {
- width: 20px;, height: 2px;
+ width: 20px; height: 2px;
  background: var(--text-primary, #111827);
  transition: all 0.3s;
  }
@@ -193,7 +193,7 @@ https://svelte.dev/e/global_reference_invalid -->
  }
 
  .nav-list {
- list-style: none;, margin: 0;
+ list-style: none; margin: 0;
  padding: 0;
  }
 
@@ -203,10 +203,10 @@ https://svelte.dev/e/global_reference_invalid -->
 
  .nav-link {
  display: flex;
- align-items: center;, gap: 0.75rem;
+ align-items: center; gap: 0.75rem;
  padding: 0.75rem 1.5rem;
- text-decoration: none;, color: var(--text-secondary, #6b7280);
- border-radius: 0.375rem;, transition: all 0.2s;
+ text-decoration: none; color: var(--text-secondary, #6b7280);
+ border-radius: 0.375rem; transition: all 0.2s;
  font-weight: 500;
  }
 
@@ -225,17 +225,17 @@ https://svelte.dev/e/global_reference_invalid -->
  }
 
  .mobile-nav-overlay {
- position: fixed;, top: 0;
- left: 0;, right: 0;
- bottom: 0;, background: rgba(0, 0, 0, 0.5);
- z-index: 1000;, display: flex;
+ position: fixed; top: 0;
+ left: 0; right: 0;
+ bottom: 0; background: rgba(0, 0, 0, 0.5);
+ z-index: 1000; display: flex;
  align-items: flex-start;
  justify-content: flex-end;
  }
 
  .mobile-nav {
  width: 280px;
- max-width: 80vw;, height: 100vh;
+ max-width: 80vw; height: 100vh;
  background: var(--bg-primary, #ffffff);
  box-shadow: -2px 0 10px rgba(0, 0, 0, 0.1);
  display: flex;
@@ -245,22 +245,22 @@ https://svelte.dev/e/global_reference_invalid -->
  .mobile-nav-header {
  display: flex;
  justify-content: space-between;
- align-items: center;, padding: 1rem 1.5rem;
+ align-items: center; padding: 1rem 1.5rem;
  border-bottom: 1px solid var(--border-color, #e5e7eb);
  }
 
  .mobile-nav-header h2 {
  margin: 0;
  font-size: 1.125rem;
- font-weight: 600;, color: var(--text-primary, #111827);
+ font-weight: 600; color: var(--text-primary, #111827);
  }
 
  .close-btn {
- background: none;, border: none;
- font-size: 1.5rem;, cursor: pointer;
+ background: none; border: none;
+ font-size: 1.5rem; cursor: pointer;
  color: var(--text-secondary, #6b7280);
  padding: 0.25rem;
- border-radius: 0.25rem;, transition: all 0.2s;
+ border-radius: 0.25rem; transition: all 0.2s;
  }
 
  .close-btn:hover {
@@ -269,7 +269,7 @@ https://svelte.dev/e/global_reference_invalid -->
  }
 
  .mobile-nav-list {
- list-style: none;, margin: 0;
+ list-style: none; margin: 0;
  padding: 1rem 0;
  }
 
@@ -279,9 +279,9 @@ https://svelte.dev/e/global_reference_invalid -->
 
  .mobile-nav-link {
  display: flex;
- align-items: center;, gap: 1rem;
+ align-items: center; gap: 1rem;
  padding: 1rem 1.5rem;
- text-decoration: none;, color: var(--text-secondary, #6b7280);
+ text-decoration: none; color: var(--text-secondary, #6b7280);
  transition: all 0.2s;
  font-weight: 500;
  }
@@ -308,3 +308,5 @@ https://svelte.dev/e/global_reference_invalid -->
  }
  }
 </style>
+
+

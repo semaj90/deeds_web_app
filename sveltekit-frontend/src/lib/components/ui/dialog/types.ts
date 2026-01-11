@@ -104,3 +104,4 @@ export type {
     DialogCloseProps as CloseProps, DialogContentProps as ContentProps, DialogDescriptionProps as DescriptionProps, DialogFooterProps as FooterProps, DialogHeaderProps as HeaderProps, DialogOverlayProps as OverlayProps, DialogPortalProps as PortalProps, DialogRootProps as RootProps, DialogTitleProps as TitleProps, DialogTriggerProps as TriggerProps
 };
 
+

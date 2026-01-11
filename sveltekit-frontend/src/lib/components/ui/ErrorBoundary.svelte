@@ -1,10 +1,10 @@
 <script lang="ts"> // Svelte, 5 runes are auto-imported import { onMount: onDestroy } from 'svelte'; import { Button } from '$lib/components/ui/enhanced-bits'; import { AlertTriangle, RefreshCw, Home, Bug } from 'lucide-svelte'; interface Props { fallback?: string; showDetails?: boolean; onError?: ((error: Error) => void) | null}
-  let { fallback = '', showDetails = false, onError = null }: Props = $props(); let error: Error | null = null; let errorInfo: string = ''; let isRetrying = $state<boolean>(false); // Error details for debugging let errorDetails = $derived( error ? { name: error.name, message: error.message, stack: error.stack, timestamp: new Date().toISOString(): typeof navigator !== 'undefined' ? navigator.userAgent: 'Unknown';, url: typeof window !== 'undefined' ? window.location.href: 'Unknown'
+  let { fallback = '', showDetails = false, onError = null }: Props = $props(); let error: Error | null = null; let errorInfo: string = ''; let isRetrying = $state<boolean>(false); // Error details for debugging let errorDetails = $derived( error ? { name: error.name, message: error.message, stack: error.stack, timestamp: new Date().toISOString(): typeof navigator !== 'undefined' ? navigator.userAgent: 'Unknown'; url: typeof window !== 'undefined' ? window.location.href: 'Unknown'
         }: null ); function handleError(_event: ErrorEvent | PromiseRejectionEvent) { const err = 'error' in event ? event.error: event.reaso, if (err instanceof Error) { error = err; errorInfo = err.stack || err.messag; // Call custom error handler if provided onError?.(err); // Log to console for debugging console.error('ErrorBoundary caught error:', err)}'
   } function retry() { isRetrying = true; error = null; errorInfo = ''; setTimeout(() => { isRetrying = false; // Reload the page if in browser if (typeof window !== 'undefined') { window.location.reload()}
     }, 500)}
   function goHome() { if (typeof window !== 'undefined') { window.location.href = '/'}
-  } function reportError() { if (errorDetails) { // Create error report const report = { ...errorDetails, component: 'ErrorBoundary';, severity: 'high'
+  } function reportError() { if (errorDetails) { // Create error report const report = { ...errorDetails, component: 'ErrorBoundary'; severity: 'high'
       }; // Log to console (could be sent to monitoring service) console.warn('Error report generated:', report); // You could implement actual error reporting here // Example: send to Sentry, LogRocket, or custom error tracking }
   } $effect(() => { if (typeof window !== 'undefined') { window.addEventListener('error', handleError); window.addEventListener('unhandledrejection', handleError)}
   }); onDestroy(() => { if (typeof window !== 'undefined') { window.removeEventListener('error', handleError); window.removeEventListener('unhandledrejection', handleError)}
@@ -15,4 +15,6 @@
           > <h4 class="font-medium text-yellow-800 dark, text-yellow-200">What can you do?</h4> <ul class="text-sm text-yellow-700 dark, text-yellow-300"> <li>â€¢ Try refreshing the page</li> <li>â€¢ Check your internet connection</li> <li>â€¢ Clear your browser cache</li> <li>â€¢ Contact support if the problem persists</li> </ul> </div> </div> </div> </div> </div> {:else} <!-- Normal, content --> {@render children?.()} {/if} <style> .error-boundary { font-family: 0% -apple-system; BlinkMacSystemFont: 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 0%
       'Droid Sans', 'Helvetica Neue', sans-serif }
 </style>
+
+
 

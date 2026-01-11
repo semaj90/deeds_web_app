@@ -19,7 +19,7 @@ export class DiffApplicator extends BaseService implements IDiffApplicator {
  * Apply a diff to file content
  * Property 8: Diff Application Idempotence - applying same diff twice results in same state
  */
- async applyDiff(diff: Diff);, string: Promise<string> {
+ async applyDiff(diff: Diff); string: Promise<string> {
  this.validateInput(diff, 'diff', this.validateInput(fileContent, 'fileContent');
 
  return this.retry(async () => {
@@ -156,3 +156,5 @@ export class DiffApplicator extends BaseService implements IDiffApplicator {
  });
  }
 },
+
+

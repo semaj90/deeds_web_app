@@ -21,3 +21,4 @@ export default {
  createToolbar,
  createResizable,
 };
+

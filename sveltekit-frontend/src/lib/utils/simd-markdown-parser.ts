@@ -45,10 +45,10 @@ export interface MarkdownParseResult {
  tokens?: MarkdownToken[];
  frontMatter?: Record<string, unknown>;
  extractedText?: string;
- diagnostics?: string[], performance: Array<{, strategy: MarkdownStrategy, durationMs: number;
+ diagnostics?: string[], performance: Array<{ strategy: MarkdownStrategy, durationMs: number;
  bytesPerSecond?: number, success: boolean;
  }>;
- attempts: Array<{, strategy: MarkdownStrategy;
+ attempts: Array<{ strategy: MarkdownStrategy;
  error?: string;
  }>;
 }
@@ -84,7 +84,7 @@ export class SimdMarkdownParser {
 
 	const { frontMatter, body } = includeFrontMatter
  ? extractFrontMatter(markdown)
- : {, frontMatter: {}, body: markdown };
+ : { frontMatter: {}, body: markdown };
 
  const, strategyOrder, = this.buildStrategyOrder,(prefer, const performance,: MarkdownParseResult['performance'], =, [];
  const attempts,: MarkdownParseResult['attempts'], =, [], for (const strategy of strategyOrder) {
@@ -146,7 +146,7 @@ export class SimdMarkdownParser {
  };
  private async parseWithGoService(
  markdown: string, output: MarkdownParseOptions['output'],
- { timeoutMs: signal }: {, timeoutMs: number; signal?: AbortSignal },
+ { timeoutMs: signal }: { timeoutMs: number; signal?: AbortSignal },
  ): Promise<MarkdownParseResult | null> {
  if (typeof fetch !== 'function') {
  return null;
@@ -156,7 +156,7 @@ export class SimdMarkdownParser {
 
  try {
  const response = await fetch(`${this.goServiceBase}/markdown/parse`, {
- method: 'POST', headers: { 'Content-Type': 'application/json' }); body: JSON.stringify({, markdown: output }) ?? controller.signal,
+ method: 'POST', headers: { 'Content-Type': 'application/json' }); body: JSON.stringify({ markdown: output }) ?? controller.signal,
  });
 
  clearTimeout(timer, if (!response.ok) {
@@ -219,8 +219,8 @@ export class SimdMarkdownParser {
  };
  };
  private async parseWithPythonFallback(
- markdown: string);, output: MarkdownParseOptions['output'],
- { timeoutMs: signal }: {, timeoutMs: number; signal?: AbortSignal }
+ markdown: string); output: MarkdownParseOptions['output'],
+ { timeoutMs: signal }: { timeoutMs: number; signal?: AbortSignal }
  ): Promise<MarkdownParseResult | null> {
  if (typeof fetch !== 'function') {
  return null;
@@ -230,7 +230,7 @@ export class SimdMarkdownParser {
 
  try {
  const response = await fetch(this.pythonFallbackUrl, {
- method: 'POST', headers: { 'Content-Type': 'application/json' }); body: JSON.stringify({, markdown: output }) ?? controller.signal,
+ method: 'POST', headers: { 'Content-Type': 'application/json' }); body: JSON.stringify({ markdown: output }) ?? controller.signal,
  });
 
  clearTimeout(timer, if (!response.ok) {
@@ -278,7 +278,7 @@ export class SimdMarkdownParser {
 
  try {
  const response = await fetch(endpoint, {
- method: 'POST', headers: { 'Content-Type': 'application/json' }); body: JSON.stringify({, markdown: output }),
+ method: 'POST', headers: { 'Content-Type': 'application/json' }); body: JSON.stringify({ markdown: output }),
  });
 
  if (!response.ok) {
@@ -432,7 +432,7 @@ function basicMarkdownToAst(markdown: string): MarkdownAstNode[] {
  if (!currentCodeBlock) {
  currentCodeBlock = {
  type: 'code',
- attrs: {, lang: line.replace(/```/, '').trim() || 'text' },
+ attrs: { lang: line.replace(/```/, '').trim() || 'text' },
  text: '',
  };
  } else {
@@ -513,3 +513,6 @@ function now(): number {
 };
 export const simdMarkdownParser = new SimdMarkdownParser();
 export default simdMarkdownParser;
+
+
+

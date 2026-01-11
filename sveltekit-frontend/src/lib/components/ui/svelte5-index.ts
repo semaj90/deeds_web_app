@@ -71,3 +71,4 @@ export type * from './dialog/types';
 // Utility functions
 export const cn = (...classes: (string | false | null | undefined)[]) =>
 	classes.filter(Boolean).join(' ');
+

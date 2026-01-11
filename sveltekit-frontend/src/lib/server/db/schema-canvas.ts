@@ -63,3 +63,4 @@ export const reportsRelations = relations(reports, ({ one }) => ({
         references: [users.id],
     }),
 }));
+

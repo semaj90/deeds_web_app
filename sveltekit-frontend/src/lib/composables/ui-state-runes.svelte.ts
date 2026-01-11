@@ -54,10 +54,10 @@ export function useModal(initialOpen = false) {
 
 // Toast/Notification state management
 interface Toast {
-	id: string;, type: 'success' | 'error' | 'warning' | 'info';
+	id: string; type: 'success' | 'error' | 'warning' | 'info';
 	title: string;
 	message?: string;
-	duration?: number;, createdAt: number;
+	duration?: number; createdAt: number;
 }
 
 export function useToast() {
@@ -337,6 +337,8 @@ export function usePagination(totalItems: number, itemsPerPage = 10) {
 		setItemsPerPage,
 	};
 }
+
+
 
 
 

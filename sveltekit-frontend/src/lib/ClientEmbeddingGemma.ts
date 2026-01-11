@@ -67,7 +67,7 @@ export class ClientEmbeddingGemma {
  normalize?: boolean;
  maxLength?: number;
  } = {}
- ): Promise<{, embeddings: number[][];, model: string;, dimension: number;, count: number;
+ ): Promise<{ embeddings: number[][]; model: string; dimension: number; count: number;
  }> {
  if (!this.isInitialized || !this.session || !this.tokenizer) {
  await this.initialize();
@@ -215,7 +215,7 @@ class SimpleTokenizer {
  encode(
  text: string,
  maxLength: number = 512
- ): {, input_ids: BigInt64Array;, attention_mask: number[] } {
+ ): { input_ids: BigInt64Array; attention_mask: number[] } {
  // Very basic tokenization - replace with proper implementation
  const words = text
  .toLowerCase()
@@ -290,7 +290,7 @@ export function findSimilar(
  queryEmbedding: number[],
  embeddings: number[][],
  topK: number = 5
-): {, index: number;, similarity: number }[] {
+): { index: number; similarity: number }[] {
  const similarities = embeddings.map((emb, index) => ({
  index,
  similarity: cosineSimilarity(queryEmbedding, emb),
@@ -298,3 +298,6 @@ export function findSimilar(
 
  return similarities.sort((a, b) => b.similarity - a.similarity).slice(0, topK);
 }
+
+
+

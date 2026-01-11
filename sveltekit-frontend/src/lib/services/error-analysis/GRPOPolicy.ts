@@ -33,9 +33,9 @@ import type {
 } from './types.js';
 
 export interface GRPOConfig {
-	learningRate: number;, groupSize: number;
-	experienceBufferSize: number;, minExperiencesForUpdate: number;
-	validationSplit: number;, rollbackThreshold: number;
+	learningRate: number; groupSize: number;
+	experienceBufferSize: number; minExperiencesForUpdate: number;
+	validationSplit: number; rollbackThreshold: number;
 }
 
 export class GRPOPolicy {
@@ -60,7 +60,7 @@ export class GRPOPolicy {
 			weights: this.initializeWeights(),
 			experienceCount: 0,
 			lastUpdate: new Date(),
-			performance: {, successRate: 0,
+			performance: { successRate: 0,
 				avgConfidence: 0,
 				escalationRate: 0
 			}
@@ -299,7 +299,7 @@ export class GRPOPolicy {
 	 * Update policy from experiences
 	 * Property 5: Experience Replay Prevents Forgetting
 	 */
-	async updatePolicy(): Promise<{, success: boolean; message: string }> {
+	async updatePolicy(): Promise<{ success: boolean; message: string }> {
 		if (this.experienceBuffer.length < this.config.minExperiencesForUpdate) {
 			return {
 				success: false,
@@ -496,3 +496,6 @@ export function getGRPOPolicy(config?: Partial<GRPOConfig>): GRPOPolicy {
 	}
 	return grpoPolicyInstance;
 }
+
+
+

@@ -41,7 +41,7 @@ export const GET: RequestHandler = async () => {
  migratedAPIs,
  targetProduction: 350,
  currentPhase: week1Progress >= 100 ? (week2Progress >= 100 ? 3 : 2) : 1,
- phaseProgress: {, week1: Math.round(week1Progress, week2: Math.round(week2Progress, week3: 0,
+ phaseProgress: { week1: Math.round(week1Progress, week2: Math.round(week2Progress, week3: 0,
  week4: 0,
  },
  phases: [
@@ -100,3 +100,5 @@ export const GET: RequestHandler = async () => {
 
  return json(status);
 };
+
+

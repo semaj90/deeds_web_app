@@ -3,13 +3,13 @@ import { quantizedCosineSimilarity } from '$lib/shared/quantize';
 import { WebGPUSimilarityEngine, type SimilarityResult } from './webgpu-similarity-engine.js';
 
 export interface SimilaritySearchOptions {
- topK: number;, threshold: number;
- useWebGPU: boolean;, batchSize: number;
+ topK: number; threshold: number;
+ useWebGPU: boolean; batchSize: number;
 }
 
 export interface SimilaritySearchResult {
- results: SimilarityResult[];, totalDocuments: number;
- searchTime: number;, method: 'webgpu' | 'cpu';
+ results: SimilarityResult[]; totalDocuments: number;
+ searchTime: number; method: 'webgpu' | 'cpu';
 }
 
 /**
@@ -154,3 +154,5 @@ export class WebGPUSimilarityService {
 
 // Global singleton instance
 export const webgpuSimilarityService = new WebGPUSimilarityService();
+
+

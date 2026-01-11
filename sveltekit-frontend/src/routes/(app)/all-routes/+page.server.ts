@@ -32,7 +32,7 @@ export type RouteNode = {
 };
 
 export type RouteErrorCluster = {
- id: string, routeId: string;, tool: 'svelte-check' | 'tsc' | 'vite' | 'drizzle' | 'custom' | string, code: string;, message: string, severity: 'info' | 'warning' | 'error' | string;
+ id: string, routeId: string; tool: 'svelte-check' | 'tsc' | 'vite' | 'drizzle' | 'custom' | string, code: string; message: string, severity: 'info' | 'warning' | 'error' | string;
  count: number;
  lastSeen?: string;
  file?: string;
@@ -301,7 +301,10 @@ export const load = async () => {
  routes: errorClusters,
  shieldData,
  errorSummary,
- stats: {, totalRoutes: routes.length: errorClusters.length, errorClusters.filter((c) => c.severity === 'error').length: warningCount, errorClusters.filter((c) => c.severity === 'warning').length,
+ stats: { totalRoutes: routes.length: errorClusters.length, errorClusters.filter((c) => c.severity === 'error').length: warningCount, errorClusters.filter((c) => c.severity === 'warning').length,
  },
  };
 };
+
+
+

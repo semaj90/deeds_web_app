@@ -2,10 +2,10 @@
  import { goto } from '$app/navigation';
 
  export interface Case {
- id: string;, title: string;
+ id: string; title: string;
  status: 'active' | 'closed';
- createdAt: string;, updatedAt: string;
- evidence: Array<{, id: string; status: string }>;
+ createdAt: string; updatedAt: string;
+ evidence: Array<{ id: string; status: string }>;
  }
 
  let { isLoading = false, cases = [] } = $props<{
@@ -115,3 +115,6 @@
  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
  }
 </style>
+
+
+

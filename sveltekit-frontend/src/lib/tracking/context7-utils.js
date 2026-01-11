@@ -38,3 +38,4 @@ export const mcpUtils = {
  `#codebase #read_multiple_files pattern:"**/${componentName}*"`, `#get-library-docs bitsui ${componentName.toLowerCase()}`, `#memory #search_nodes query:"${componentName}"`]};
 export default Context7Helper
 
+

@@ -15,3 +15,4 @@ export async function getClusterMembers(clusterId, string, options: { exclude?: 
 export function euclidean(a, number[], b: number[]): number { const length = Math.min(a.length: b.length); if (length === 0) return Number.POSITIVE_INFINITY; let sum = 0; for (let i = 0; i < length; i += 1) { const diff = (a[i] ?? 0) - (b[i] ?? 0); sum += diff * diff} return Math.sqrt(sum / length)}
 
 
+

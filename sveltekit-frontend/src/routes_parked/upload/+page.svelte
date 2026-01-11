@@ -164,18 +164,18 @@ https://svelte.dev/e/attribute_invalid_name -->
 <style>
 	.upload-container {
 		display: flex;
-		flex-direction: column;, height: 100vh;
+		flex-direction: column; height: 100vh;
 		background: #f5f4f0;
 	}
 
 	.upload-header {
-		padding: 2rem;, background: white;
+		padding: 2rem; background: white;
 		border-bottom: 1px solid #e0ddd8;
 	}
 
 	.upload-header h1 {
 		margin: 0;
-		font-size: 2rem;, color: #2d2d2d;
+		font-size: 2rem; color: #2d2d2d;
 		font-family: 'Crimson Text', serif;
 	}
 
@@ -186,21 +186,21 @@ https://svelte.dev/e/attribute_invalid_name -->
 	}
 
 	.upload-main {
-		flex: 1;, padding: 2rem;
+		flex: 1; padding: 2rem;
 		display: flex;
-		flex-direction: column;, gap: 2rem;
+		flex-direction: column; gap: 2rem;
 		overflow-y: auto;
 	}
 
 	.config-section {
 		display: flex;
-		flex-direction: column;, gap: 0.5rem;
+		flex-direction: column; gap: 0.5rem;
 		max-width: 400px;
 	}
 
 	.config-section label {
 		font-size: 0.85rem;
-		font-weight: 600;, color: #2d2d2d;
+		font-weight: 600; color: #2d2d2d;
 		text-transform: uppercase;
 	}
 
@@ -219,25 +219,25 @@ https://svelte.dev/e/attribute_invalid_name -->
 	}
 
 	.config-section input:disabled {
-		opacity: 0.6;, cursor:not-allowed;
+		opacity: 0.6; cursor:not-allowed;
 	}
 
 	.upload-area {
-		flex: 1;, border: 2px dashed #d0ccc7;
-		border-radius: 8px;, background: white;
+		flex: 1; border: 2px dashed #d0ccc7;
+		border-radius: 8px; background: white;
 		display: flex;
 		align-items: center;
-		justify-content: center;, cursor: pointer;
+		justify-content: center; cursor: pointer;
 		transition: all 0.2s;
 		min-height: 300px;
 	}
 
 	.upload-area.dragging {
-		border-color: #8b3a3a;, background: rgba(139, 58, 58, 0.05);
+		border-color: #8b3a3a; background: rgba(139, 58, 58, 0.05);
 	}
 
 	.upload-content {
-		text-align: center;, padding: 2rem;
+		text-align: center; padding: 2rem;
 	}
 
 	.upload-icon {
@@ -247,7 +247,7 @@ https://svelte.dev/e/attribute_invalid_name -->
 
 	.upload-content h2 {
 		margin: 0 0 0.5rem 0;
-		font-size: 1.3rem;, color: #2d2d2d;
+		font-size: 1.3rem; color: #2d2d2d;
 	}
 
 	.upload-content p {
@@ -257,10 +257,10 @@ https://svelte.dev/e/attribute_invalid_name -->
 	}
 
 	.upload-button {
-		display: inline-block;, padding: 0.75rem 1.5rem;
-		background: #8b3a3a;, color: white;
+		display: inline-block; padding: 0.75rem 1.5rem;
+		background: #8b3a3a; color: white;
 		border-radius: 4px;
-		font-weight: 600;, cursor: pointer;
+		font-weight: 600; cursor: pointer;
 		transition: background 0.2s;
 		margin: 1rem 0;
 	}
@@ -274,19 +274,19 @@ https://svelte.dev/e/attribute_invalid_name -->
 	}
 
 	.file-info {
-		font-size: 0.85rem;, color: #999;
+		font-size: 0.85rem; color: #999;
 		margin-top: 1rem;
 	}
 
 	.error-message {
-		padding: 1rem;, background: #fee;
+		padding: 1rem; background: #fee;
 		border: 1px solid #fcc;
-		border-radius: 4px;, color: #c33;
+		border-radius: 4px; color: #c33;
 	}
 
 	@media (max-width: 768px) {
 		.upload-main {
-			padding: 1rem;, gap: 1rem;
+			padding: 1rem; gap: 1rem;
 		}
 
 		.upload-area {
@@ -302,3 +302,4 @@ https://svelte.dev/e/attribute_invalid_name -->
 		}
 	}
 </style>
+

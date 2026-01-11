@@ -87,3 +87,4 @@ export class WasmLoader {
 }
 
 export const wasmLoader = WasmLoader.getInstance();
+

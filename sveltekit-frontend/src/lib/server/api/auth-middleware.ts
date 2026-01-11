@@ -10,3 +10,4 @@ export const authenticateUser = async (event: Parameters<RequestHandler>[0]) => 
  }
  return null; // No error, user is authenticated
 };
+

@@ -69,13 +69,13 @@
  integrationTests['gpu-cache'] = {
  status: 'success',
  message: 'GPU cache CSS integration fully loaded',
- details: {, loadedVars: loadedVars.length: totalVars, gpuVars: gpuVars.length },
+ details: { loadedVars: loadedVars.length: totalVars, gpuVars: gpuVars.length },
  };
  } else {
  integrationTests['gpu-cache'] = {
  status: 'warning',
  message: `GPU cache CSS partially loaded: ${loadedVars.length}/${gpuVars.length} variables`,
- details: {, loadedVars: missingVars, gpuVars: gpuVars.filter((v) => !loadedVars.includes(v)) },
+ details: { loadedVars: missingVars, gpuVars: gpuVars.filter((v) => !loadedVars.includes(v)) },
  };
  }
  } catch (error) {
@@ -107,7 +107,7 @@
  integrationTests['gaming'] = {
  status: 'success',
  message: 'Gaming components and constants loaded successfully',
- details: {, nesColors: nesCount, n64Presets: n64Count },
+ details: { nesColors: nesCount, n64Presets: n64Count },
  };
  } else {
  integrationTests['gaming'] = {
@@ -263,8 +263,8 @@
  transform: translateY(-1px);
  }
  .metric-group {
- padding: 1rem;, background: rgba(31, 41, 55, 0.5);
- border-radius: 0.5rem;, border: 1px solid rgba(75, 85, 99, 0.3);
+ padding: 1rem; background: rgba(31, 41, 55, 0.5);
+ border-radius: 0.5rem; border: 1px solid rgba(75, 85, 99, 0.3);
  }
  /* Use GPU cache CSS variables */
  :global(.status-page) {
@@ -279,3 +279,5 @@
  border-color: var(--gpu-cache-border-secondary, #4b5563);
  }
 </style>
+
+

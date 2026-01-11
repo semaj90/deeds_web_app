@@ -229,24 +229,24 @@ https://svelte.dev/e/js_parse_error -->
 
 <style>
  .evidence-canvas-container {
- display: flex;, height: 100vh;
- background: #1a1a1a;, color: #ffffff;
+ display: flex; height: 100vh;
+ background: #1a1a1a; color: #ffffff;
  }
 
  .canvas-main {
- flex: 1;, position: relative;
+ flex: 1; position: relative;
  }
 
  .control-panel {
- width: 300px;, background: #2a2a2a;
+ width: 300px; background: #2a2a2a;
  border-left: 1px solid #444;
  padding: 1rem;
  overflow-y: auto;
  }
 
  .suggestions-panel {
- position: absolute;, bottom: 0;
- left: 0;, right: 300px;
+ position: absolute; bottom: 0;
+ left: 0; right: 300px;
  background: rgba(42, 42, 42, 0.95);
  border-top: 1px solid #444;
  padding: 1rem;
@@ -262,13 +262,13 @@ https://svelte.dev/e/js_parse_error -->
 
  .suggestions-list {
  display: flex;
- flex-direction: column;, gap: 0.5rem;
+ flex-direction: column; gap: 0.5rem;
  }
 
  .suggestion-item {
- background: #333;, border: 1px solid #555;
- border-radius: 8px;, padding: 1rem;
- cursor: pointer;, transition: all 0.2s ease;
+ background: #333; border: 1px solid #555;
+ border-radius: 8px; padding: 1rem;
+ cursor: pointer; transition: all 0.2s ease;
  }
 
  .suggestion-item:hover {
@@ -283,7 +283,7 @@ https://svelte.dev/e/js_parse_error -->
 
  .suggestion-header {
  display: flex;
- align-items: center;, gap: 0.5rem;
+ align-items: center; gap: 0.5rem;
  margin-bottom: 0.5rem;
  }
 
@@ -295,11 +295,11 @@ https://svelte.dev/e/js_parse_error -->
  text-transform: uppercase;
  }
 
- .type-evidence { background: #4caf50;, color: white; }
- .type-strategy { background: #2196f3;, color: white; }
- .type-risk { background: #f44336;, color: white; }
- .type-precedent { background: #ff9800;, color: white; }
- .type-investigation { background: #9c27b0;, color: white; }
+ .type-evidence { background: #4caf50; color: white; }
+ .type-strategy { background: #2196f3; color: white; }
+ .type-risk { background: #f44336; color: white; }
+ .type-precedent { background: #ff9800; color: white; }
+ .type-investigation { background: #9c27b0; color: white; }
 
  .suggestion-priority {
  padding: 0.25rem 0.5rem;
@@ -309,13 +309,13 @@ https://svelte.dev/e/js_parse_error -->
  text-transform: uppercase;
  }
 
- .priority-low { background: #666;, color: white; }
- .priority-medium { background: #ff9800;, color: black; }
- .priority-high { background: #f44336;, color: white; }
- .priority-critical { background: #d32f2f;, color: white; }
+ .priority-low { background: #666; color: white; }
+ .priority-medium { background: #ff9800; color: black; }
+ .priority-high { background: #f44336; color: white; }
+ .priority-critical { background: #d32f2f; color: white; }
 
  .suggestion-confidence {
- font-size: 0.75rem;, color: #4fc3f7;
+ font-size: 0.75rem; color: #4fc3f7;
  font-weight: bold;
  }
 
@@ -341,3 +341,5 @@ https://svelte.dev/e/js_parse_error -->
  margin-bottom: 0.25rem;
  }
 </style>
+
+

@@ -6,7 +6,7 @@ import { invalidateAll } from '$app/navigation';
 import type { RequestEvent } from '@sveltejs/kit';
 
 interface AuthRequest {
-	email: string;, password: string;
+	email: string; password: string;
 	ipAddress?: string;
 	userAgent?: string;
 }
@@ -23,25 +23,25 @@ interface AuthResponse {
 }
 
 interface UserProfile {
-	userId: string;, email: string;
-	firstName: string;, lastName: string;
-	organization?: string;, role: string;
-	createdAt: number;, updatedAt: number;
+	userId: string; email: string;
+	firstName: string; lastName: string;
+	organization?: string; role: string;
+	createdAt: number; updatedAt: number;
 	preferences?: UserPreferences;
 	permissions?: UserPermissions;
 }
 
 interface UserPreferences {
 	theme: 'light' | 'dark' | 'auto';
-	language: string;, emailNotifications: boolean;
-	pushNotifications: boolean;, timezone: string;
+	language: string; emailNotifications: boolean;
+	pushNotifications: boolean; timezone: string;
 }
 
 interface UserPermissions {
-	allowedActions: string[];, allowedResources: string[];
+	allowedActions: string[]; allowedResources: string[];
 	featureFlags: Record<string, boolean>;
-	apiRateLimit: number;, storageQuotaMb: number;
-	canAccessQuic: boolean;, canAccessGpu: boolean;
+	apiRateLimit: number; storageQuotaMb: number;
+	canAccessQuic: boolean; canAccessGpu: boolean;
 }
 
 interface SessionValidation {
@@ -298,3 +298,4 @@ export function clearSessionCookies(event: RequestEvent): void {
 
 // Export singleton instance
 export const quicAuthClient = new QuicAuthClient();
+

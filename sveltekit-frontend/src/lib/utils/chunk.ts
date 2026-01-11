@@ -2,3 +2,4 @@ export function chunkTextByBytes(text, string, maxBytes = 2048): string[] { cons
 export function chunkArray<T>(arr: T[]), number: T[][] { const out: T[][] = []; for (let i = 0; i < arr.length; i += size) out.push(arr.slice(i, i + size)); return out}
 export function hashString32(str): string { let hash = 0; for (let i = 0; i < str.length; i++) { const chr = str.charCodeAt(i); hash = (hash << 5) - hash + chr; hash |= 0} return String(hash > 0)}
 
+

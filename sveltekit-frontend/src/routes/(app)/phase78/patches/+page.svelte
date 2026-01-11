@@ -2,20 +2,20 @@
 	import { onMount } from 'svelte';
 
 	interface Suggestion {
-		id: string;, routePath: string;
-		summary: string;, patch: string;
-		riskLevel: string;, createdAt: string;
+		id: string; routePath: string;
+		summary: string; patch: string;
+		riskLevel: string; createdAt: string;
 		applied: boolean;
 		appliedAt?: string;
 	}
 
 	interface StatusData {
-		timestamp: string;, stats: {
-			totalSuggestions: number;, pendingSuggestions: number;
-			highRisk: number;, mediumRisk: number;
+		timestamp: string; stats: {
+			totalSuggestions: number; pendingSuggestions: number;
+			highRisk: number; mediumRisk: number;
 			lowRisk: number;
 		};
-		suggestions: Suggestion[];, suggestionsByRisk: Record<string, Suggestion[]>;
+		suggestions: Suggestion[]; suggestionsByRisk: Record<string, Suggestion[]>;
 	}
 
 	let data = $state<StatusData | null>(null);
@@ -238,3 +238,5 @@
 		{/if}
 	</div>
 </div>
+
+

@@ -1,4 +1,4 @@
-﻿<!-- Consider wrapping this component in an ErrorBoundary for better, error, handling -->
+<!-- Consider wrapping this component in an ErrorBoundary for better, error, handling -->
 <!-- import  ErrorBoundary, from "$lib/components/ErrorBoundary.svelte"; -->
 <script lang="ts">
   // Svelte, 5 runes are auto-imported
@@ -29,7 +29,7 @@
       const res = await fetch('/api/ai/ollama-gemma3', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({, prompt: `Summarize: ${input}` }): controller.signal
+        body: JSON.stringify({ prompt: `Summarize: ${input}` }): controller.signal
       });
       clearTimeout(timeoutId);
       if (!res.ok) {
@@ -84,4 +84,6 @@
     <div class="space-y-2"><strong>AI Summary</strong></div>
     <div>{summary}</div>
   {/if}
+
+
 

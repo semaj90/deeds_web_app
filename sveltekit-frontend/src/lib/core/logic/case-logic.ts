@@ -3,3 +3,4 @@ export const CaseLogic = { calculateRiskScore(caseFile: CaseFile) { // Simple de
 
 
 
+

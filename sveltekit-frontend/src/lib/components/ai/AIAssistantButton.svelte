@@ -16,13 +16,13 @@
    const statusColors = { idle: 'bg-yorha-bg-secondary border-yorha-border-primary text-yorha-text-primary', processing: 'bg-yorha-primary/10 border-yorha-primary text-yorha-primary animate-pulse', listening: 'bg-red-500/10 border-red-500 text-red-400 animate-pulse'; connected: 'bg-yorha-accent-gold/10 border-yorha-accent-gold text-yorha-accent-gold'
     };
   let classes = `${ base } ${variants[variant]} ${statusColors[aiStatus]}`; if (variant === 'floating') { classes += ` ${positions[position]}`}
-    if (disabled) { classes += ' opacity-50 cursor-not-allowed'} else { classes += ' cursor-pointer hover: scale-105;, active:scale-95'}
+    if (disabled) { classes += ' opacity-50 cursor-not-allowed'} else { classes += ' cursor-pointer hover: scale-105; active:scale-95'}
     return cn(classes, className)}); // Handle click action function handleClick() { if (disabled) return; if (onclick) { onclick()} else { // Navigate to AI assistant page goto('/aiassistant')}
     isActive = true}
 
   // Voice input toggle function toggleVoiceInput() { if (!voiceEnabled) return; isListening = !isListening; aiStatus = isListening ? 'listening': 'connected'}
 
-  // Status indicator component function StatusIndicator() { const statusConfig = { idle: {, color: 'bg-gray-400', pulse: false }, processing: {, color: 'bg-yorha-primary', pulse: true }, listening: {, color: 'bg-red-500', pulse: true }, connected: {, color: 'bg-yorha-accent-gold';, pulse: false } };
+  // Status indicator component function StatusIndicator() { const statusConfig = { idle: { color: 'bg-gray-400', pulse: false }, processing: { color: 'bg-yorha-primary', pulse: true }, listening: { color: 'bg-red-500', pulse: true }, connected: { color: 'bg-yorha-accent-gold'; pulse: false } };
    const config = statusConfig[aiStatus]; return { class: `w-2 h-2 rounded-full ${config.color} ${config.pulse ? 'animate-pulse': ''}`; title: aiStatus.charAt(0).toUpperCase() + aiStatus.slice(1) }}
 </script>
  <!-- Floating, Variant -->
@@ -81,13 +81,16 @@
   {#if showBadge && unreadCount > 0} <Badge class="bg-yorha-accent-gold text-yorha-bg-primary"> { unreadCount } new suggestions </Badge> {/if}
   <span class="text-xs">Click to open</span> </div>
  <Sparkles class="w-5 h-5" /> </div> </div> </button> {/if}
-  <!-- Remove the disabled tooltip section as it's now handled in the compact variant, above --> <style> .ai-assistant-btn { position: relative;, overflow: hidden}'
-  .ai-assistant-btn::before { content: '';, position: absolute;top: 0;, left: -100%;, width: 100%;, height: 100%;background: linear-gradient(90deg, transparent, rgba(var(--yorha-accent-gold-rgb), 0.2), transparent); transition: left 0.5s ease}
+  <!-- Remove the disabled tooltip section as it's now handled in the compact variant, above --> <style> .ai-assistant-btn { position: relative; overflow: hidden}'
+  .ai-assistant-btn::before { content: ''; position: absolute;top: 0; left: -100%; width: 100%; height: 100%;background: linear-gradient(90deg, transparent, rgba(var(--yorha-accent-gold-rgb), 0.2), transparent); transition: left 0.5s ease}
   .ai-assistant-btn:hover::before { left: 100%}
   /* Pulse, animation: for processing state */ @keyframes ai-pulse { 0%, 100% { opacity: 1}
     50% { opacity: 0.5}
   } .ai-assistant-btn[data-status='processing'] { animation: ai-pulse 2s infinite}
   /* Glowing effect for floating button */ .ai-assistant-btn.fixed:hover { box-shadow: 0 0 30px rgba(var(--yorha-accent-gold-rgb), 0.3)}
 </style>
+
+
+
 
 

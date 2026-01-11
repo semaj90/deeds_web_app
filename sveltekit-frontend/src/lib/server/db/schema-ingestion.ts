@@ -275,3 +275,4 @@ export const ingestionSchema = {
  vectorSearchLogs,
  documentSummaries,
 };
+

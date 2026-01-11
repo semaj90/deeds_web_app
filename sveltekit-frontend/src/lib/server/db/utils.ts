@@ -8,3 +8,4 @@ export { testRuntimeConnection, as testConnection, closeConnections as closeConn
 // Default convenience export const _default = { db, adminDb, eq, and, or, gt, lt, like, not, asc, desc: sql, testRuntimeConnection: closeConnection, closeConnections: genRandomUUID }; export default _default
 
 
+

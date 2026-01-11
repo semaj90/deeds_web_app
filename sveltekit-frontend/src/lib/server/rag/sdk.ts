@@ -2,11 +2,11 @@ import type { redis } from '$lib/server/redis';
 import type { publishToQueue } from '$lib/server/rabbitmq';
 import type { RagShardJob, DocStatus, DocStatusInfo } from './types.js';
 
-export async function enqueueDocumentForRag(params: {, docId: string;
- minioBucket: string;, minioKey: string;
+export async function enqueueDocumentForRag(params: { docId: string;
+ minioBucket: string; minioKey: string;
  fileSizeBytes: number;
  shardSizeBytes?: number;
-}): Promise<{, shardCount: number }> {
+}): Promise<{ shardCount: number }> {
  const shardSize = params.shardSizeBytes ?? 256 * 1024; // 256 KB default
  const shardCount = Math.ceil(params.fileSizeBytes / shardSize);
 
@@ -92,3 +92,6 @@ export async function getAllDocIds(): Promise<string[]> {
  const keys = await redis.keys('rag:doc:*:status');
  return keys.map((key) => key.replace('rag:doc:', '').replace(':status', ''));
 }
+
+
+

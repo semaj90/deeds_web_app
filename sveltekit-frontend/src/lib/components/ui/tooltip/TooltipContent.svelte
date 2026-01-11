@@ -38,7 +38,7 @@
 		id="tooltip-content"
 		role="tooltip"
 		class="{defaultClass} {sideClass} {className}"
-		transition: fade={{, duration: 150 }}
+		transition: fade={{ duration: 150 }}
 		data-state="open"
 		data-side={side}
 		data-align={ align }
@@ -48,3 +48,5 @@
 		{/if}
 	</div>
 {/if}
+
+

@@ -10,3 +10,4 @@ async function querySimilar(query: string = {): Promise<SimilarityResult[]> { co
 export const pgvectorEmbeddingRepository: EmbeddingRepository = { enqueueIngestion: processNextJob, getJobStatus: async (jobId: string) => getJobStatus(jobId) || null, querySimilar }; // Named exports (optional direct usage) export { enqueueIngestion, processNextJob, getJobStatus, querySimilar };
 
 
+

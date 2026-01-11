@@ -3,7 +3,7 @@
  import { createEventDispatcher } from 'svelte';
 
  const dispatch = createEventDispatcher<{
- updated: Array<{, embeddingId: string;
+ updated: Array<{ embeddingId: string;
  thumbUrl: string;
  embedding?: number[] | null;
  frameIndex?: number;
@@ -129,3 +129,5 @@
  <div class="mt-3 text-sm animate-pulse">Uploading…</div>
  {/if}
 </div>
+
+

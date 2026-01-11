@@ -300,3 +300,4 @@ export function getTfIdfRanker(config?: Partial<TfIdfConfig>): TfIdfRanker {
   }
   return tfIdfRankerInstance;
 }
+

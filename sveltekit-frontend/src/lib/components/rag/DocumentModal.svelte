@@ -1,5 +1,5 @@
-﻿<script lang="ts">
-import type { Document } from '$lib/types'; import { X, Download, Trash2, Clock, FileText, Zap } from 'lucide-svelte'; import  Button  from "$lib/components/ui/button/Button.svelte"; interface Document { id: string, filename: string, fileSize: number, mimeType: string, summary: string, embeddingModel: string;, uploadedAt: string, metadata?: { pageCount?: number; language?: string; confidence?: number}}
+<script lang="ts">
+import type { Document } from '$lib/types'; import { X, Download, Trash2, Clock, FileText, Zap } from 'lucide-svelte'; import  Button  from "$lib/components/ui/button/Button.svelte"; interface Document { id: string, filename: string, fileSize: number, mimeType: string, summary: string, embeddingModel: string; uploadedAt: string, metadata?: { pageCount?: number; language?: string; confidence?: number}}
   interface Props { document?: Document; open?: boolean}
   let { document, open = false }: Props = $props(); let deleting = $state<boolean>(false); let downloading = $state<boolean>(false); let message = $state<string>(''); let messageType = $state<'success' | 'error'>('success'); function closeModal() { open = false}
   function formatFileSize(bytes: number): string { if (bytes === 0) return '0 Bytes'; const k = 1024; const sizes = ['Bytes', 'KB', 'MB', 'GB']; const i = Math.floor(Math.log(bytes) / Math.log(k)); return Math.round((bytes / Math.pow(k, i)) * 100) / 100 + ' ' + sizes[i]}
@@ -23,4 +23,6 @@ import type { Document } from '$lib/types'; import { X, Download, Trash2, Clock,
       > <Trash2 class="w-4" /> {deleting ? 'Deleting...': 'Delete'} </Button> <Button onclick={ closeModal } disabled={deleting || downloading} class="flex-1 px-4 py-2 bg-gray-300 text-gray-900 rounded-lg hover, bg-gray-400 bits-btn"
       > Close </Button> </div> {/if} <style>:global(body) { overflow: hidden}
 </style>
+
+
 

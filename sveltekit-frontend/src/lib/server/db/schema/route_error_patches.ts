@@ -50,3 +50,4 @@ export const routeErrorPatchesTable = pgTable(
 
 export type RouteErrorPatch = typeof routeErrorPatchesTable.$inferSelect;
 export type RouteErrorPatchInsert = typeof routeErrorPatchesTable.$inferInsert;
+

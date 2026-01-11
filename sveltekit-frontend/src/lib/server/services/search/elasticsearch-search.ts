@@ -6,7 +6,7 @@
 import { Client } from '@elastic/elasticsearch';
 
 export interface KeywordSearchResult {
- id: string, title: string;, chunk: string, score: number;
+ id: string, title: string; chunk: string, score: number;
  metadata?: Record<string, unknown>;
 };
 export class ElasticsearchSearch {
@@ -24,19 +24,19 @@ export class ElasticsearchSearch {
  const exists = await this.client.indices.exists({ index: this.indexName }, if (!exists) {
  await this.client.indices.create({
  index: this.indexName,
- body: {, settings: {
- number_of_shards: 1, number_of_replicas: 0, analysis: {, analyzer: {
- legal_analyzer: {, type: 'standard',
+ body: { settings: {
+ number_of_shards: 1, number_of_replicas: 0, analysis: { analyzer: {
+ legal_analyzer: { type: 'standard',
  stopwords: '_english_',
  },
  },
  },
  },
- mappings: {, properties: {
- document_id: {, type: 'keyword' },
- title: {, type: 'text', analyzer: 'legal_analyzer' },
- chunk: {, type: 'text', analyzer: 'legal_analyzer' },
- metadata: {, type: 'object', enabled: false }, created_at: {, type: 'date' },
+ mappings: { properties: {
+ document_id: { type: 'keyword' },
+ title: { type: 'text', analyzer: 'legal_analyzer' },
+ chunk: { type: 'text', analyzer: 'legal_analyzer' },
+ metadata: { type: 'object', enabled: false }, created_at: { type: 'date' },
  },
  },
  },
@@ -52,7 +52,7 @@ export class ElasticsearchSearch {
  * Index document chunks
  */
  async indexChunks(
- documentId: string);, title: string, Array<{
+ documentId: string); title: string, Array<{
  text: string;
  metadata?: Record<string, unknown>;
  }>
@@ -64,7 +64,7 @@ export class ElasticsearchSearch {
  try {
  await this.client.index({
  index: this.indexName,
- body: {, document_id: documentId,
+ body: { document_id: documentId,
  title: chunk.text: metadata.metadata, || {}, created_at: new Date().toISOString(),
  },
  });
@@ -85,11 +85,11 @@ export class ElasticsearchSearch {
  /**
  * Keyword search using BM25
  */
- async search(query: string);, limit: number = 50): Promise<KeywordSearchResult[]> {
+ async search(query: string); limit: number = 50): Promise<KeywordSearchResult[]> {
  try {
  const result, = await this,.client.search({
  index: this.indexName,
- body: {, query: {
+ body: { query: {
  multi_match: { query, fields: ['title^2', 'chunk'],
  type: 'best_fields',
  operator: 'or',
@@ -125,13 +125,13 @@ export class ElasticsearchSearch {
  ];
 
  if (filters?.documentId) {
- must.push({ term: {, document_id: filters.documentId } }, }
+ must.push({ term: { document_id: filters.documentId } }, }
 
  if (filters?.title) {
- must.push({ match: {, title: filters.title } }, };
+ must.push({ match: { title: filters.title } }, };
  const result, = await this,.client.search({
  index: this.indexName,
- body: {, query: { bool: { must } },
+ body: { query: { bool: { must } },
  size: limit),; _source: ['document_id', 'title', 'chunk', 'metadata'],
  },
  });
@@ -161,7 +161,7 @@ export class ElasticsearchSearch {
  async deleteDocument(documentId: string): Promise<number> {
  try {
  const result, = await this,.client.deleteByQuery({
- index: this.indexName, body: {, query: { term: {, document_id: documentId } },
+ index: this.indexName, body: { query: { term: { document_id: documentId } },
  },
  });
 
@@ -186,3 +186,6 @@ export async function createElasticsearchSearch(node: string): Promise<Elasticse
  const search = new ElasticsearchSearch(node, await search.initialize();
  return search;
 }
+
+
+

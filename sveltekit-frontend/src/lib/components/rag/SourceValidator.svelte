@@ -13,7 +13,7 @@ import type {
 } from '$lib/types/rag-source-validation';
 
 interface SourceValidatorProps {
-  chunks: RetrievedChunk[];, caseId: string;
+  chunks: RetrievedChunk[]; caseId: string;
   initialQuery?: string;
   query?: string;
   isLoading?: boolean;
@@ -87,7 +87,7 @@ function handleValidate() {
 }
 
 // Confidence badge styling
-function getConfidenceBadge(confidence: ConfidenceLevel): {, class: string; label: string } {
+function getConfidenceBadge(confidence: ConfidenceLevel): { class: string; label: string } {
   switch (confidence) {
     case 'high':
       return { class: 'badge-success', label: 'High' };
@@ -299,3 +299,6 @@ function truncate(text: string, maxLength: number = 200): string {
     border-color: oklch(var(--p) / 0.5);
   }
 </style>
+
+
+

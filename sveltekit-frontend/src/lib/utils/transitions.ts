@@ -5,3 +5,4 @@ export function slideInFromBottom(node, Element, params: { duration?: number; de
 // REMOVED: export function scaleIn(node, Element, params: { duration?: number; start?: number }= {): TransitionConfig { void node; return { duration: params.duration ? ? 150: t => { const eased = cubicOut(t); const scale = (params.start ?? 0.8) + (1 - (params.start ?? 0.8)) * eased; return ` transform, scale(${scale}); opacity: ${eased } `;' }` }}
 
 
+

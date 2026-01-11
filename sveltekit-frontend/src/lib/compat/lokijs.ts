@@ -69,7 +69,7 @@ interface LokiOptions {
 }
 
 class Loki {
- filename: string;, options: LokiOptions;
+ filename: string; options: LokiOptions;
  private collections = new Map<string, MemoryCollection<Doc>>();
 
  static LokiMemoryAdapter = LokiMemoryAdapter;
@@ -116,3 +116,5 @@ class Loki {
 export default Loki;
 // change: ensure generic parameter enforces Doc constraint
 export type Collection<T extends Doc = Doc> = MemoryCollection<T>;
+
+

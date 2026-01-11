@@ -50,8 +50,10 @@
 {/if}
   <style>
   .lazy-load-error {
-    min-height: 100px;, display: flex;
+    min-height: 100px; display: flex;
     flex-direction: column;
     justify-content: center;
   }
 </style>
+
+

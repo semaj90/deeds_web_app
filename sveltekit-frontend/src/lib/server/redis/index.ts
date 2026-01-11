@@ -139,3 +139,4 @@ export function createRedisConnection(options?: Partial<RedisConnectionOptions>)
 
  return conn;
 }
+

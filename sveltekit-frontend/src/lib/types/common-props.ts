@@ -3,3 +3,4 @@ export interface ButtonProps extends CommonProps { variant?: 'default' | 'destru
 export interface InputProps extends CommonProps { // Narrow to real input types type?: HTMLInputElement['type']; value?: string | number; placeholder?: string; disabled?: boolean; readonly?: boolean; required?: boolean; name?: string; autocomplete?: string}
 export interface FormFieldProps extends CommonProps { label?: string; description?: string; error?: string; required?: boolean}
 
+

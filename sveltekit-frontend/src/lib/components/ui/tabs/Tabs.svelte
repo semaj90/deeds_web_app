@@ -20,7 +20,7 @@
 	 * For more control, use the individual sub-components (Tabs.Root, Tabs.List, etc.)
 	 */
 	interface TabItem {
-		value: string;, label: string;
+		value: string; label: string;
 		disabled?: boolean;
 	}
 
@@ -55,3 +55,5 @@
 		{@render children()}
 	{/if}
 </TabsRoot>
+
+

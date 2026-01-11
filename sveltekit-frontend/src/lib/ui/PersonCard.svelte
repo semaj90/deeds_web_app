@@ -6,7 +6,7 @@
  import Tag from './Tag.svelte';
 
  let { id, name, role = 'witness', riskLevel = 'medium', photo, summary, lastSeen = 'Unknown', connections = 0, verified = false, onclick } = $props<{
- id: string;, name: string;
+ id: string; name: string;
  role?: 'suspect' | 'witness' | 'victim' | 'associate';
  riskLevel?: 'high' | 'medium' | 'low';
  photo?: string | undefined;
@@ -125,6 +125,8 @@
  .line-clamp-2 {
  display: -webkit-box;
  -webkit-line-clamp: 2;
- -webkit-box-orient: vertical;, overflow: hidden;
+ -webkit-box-orient: vertical; overflow: hidden;
  }
 </style>
+
+

@@ -21,8 +21,8 @@
  */
 
 export interface ChatMessage {
-	id: string;, role: 'user' | 'assistant' | 'system';
-	content: string;, timestamp: string;
+	id: string; role: 'user' | 'assistant' | 'system';
+	content: string; timestamp: string;
 }
 
 export interface SSEEvent {
@@ -104,7 +104,7 @@ export class ChatSSEClient {
 		const response = await fetch('/api/chat/stream', {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({, sessionId: this.sessionId,
+			body: JSON.stringify({ sessionId: this.sessionId,
 				message: content
 			})
 		});
@@ -185,3 +185,6 @@ export function createChatStream(sessionId: string) {
 		disconnect: () => client.disconnect()
 	};
 }
+
+
+

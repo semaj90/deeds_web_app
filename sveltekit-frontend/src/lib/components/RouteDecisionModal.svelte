@@ -1,6 +1,6 @@
 <script lang="ts">
 	interface RouteDecision {
-		path: string;, reason: string;
+		path: string; reason: string;
 		decision: 'keep' | 'archive' | 'remove' | null;
 		notes?: string;
 	}
@@ -103,9 +103,9 @@
 
 <style>
 	.modal-overlay {
-		position: fixed;, top: 0;
-		left: 0;, right: 0;
-		bottom: 0;, background: rgba(0, 0, 0, 0.5);
+		position: fixed; top: 0;
+		left: 0; right: 0;
+		bottom: 0; background: rgba(0, 0, 0, 0.5);
 		display: flex;
 		align-items: center;
 		justify-content: center;
@@ -113,9 +113,9 @@
 	}
 
 	.modal-content {
-		background: var(--yorha-paper);, border: 2px solid var(--yorha-ink);
+		background: var(--yorha-paper); border: 2px solid var(--yorha-ink);
 		border-radius: 4px;
-		max-width: 600px;, width: 90%;
+		max-width: 600px; width: 90%;
 		max-height: 80vh;
 		overflow-y: auto;
 		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
@@ -124,9 +124,9 @@
 	.modal-header {
 		display: flex;
 		justify-content: space-between;
-		align-items: center;, padding: 1.5rem;
+		align-items: center; padding: 1.5rem;
 		border-bottom: 2px solid var(--yorha-ink);
-		background: var(--yorha-bg-dark);, color: var(--yorha-paper);
+		background: var(--yorha-bg-dark); color: var(--yorha-paper);
 	}
 
 	.modal-header h2 {
@@ -136,10 +136,10 @@
 	}
 
 	.close-btn {
-		background: none;, border: none;
-		font-size: 1.5rem;, cursor: pointer;
-		color: var(--yorha-paper);, padding: 0;
-		width: 2rem;, height: 2rem;
+		background: none; border: none;
+		font-size: 1.5rem; cursor: pointer;
+		color: var(--yorha-paper); padding: 0;
+		width: 2rem; height: 2rem;
 		display: flex;
 		align-items: center;
 		justify-content: center;
@@ -165,13 +165,13 @@
 	.notes-section h3 {
 		margin: 0 0 0.75rem 0;
 		font-size: 0.95rem;
-		font-weight: bold;, color: var(--yorha-ink);
+		font-weight: bold; color: var(--yorha-ink);
 		text-transform: uppercase;
 		letter-spacing: 0.5px;
 	}
 
 	.reason-section p {
-		margin: 0;, color: #666;
+		margin: 0; color: #666;
 		font-size: 0.9rem;
 		line-height: 1.5;
 	}
@@ -186,19 +186,19 @@
 		display: flex;
 		flex-direction: column;
 		align-items: center;
-		justify-content: center;, gap: 0.5rem;
-		padding: 1rem;, border: 2px solid #ddd;
-		border-radius: 4px;, background: white;
-		cursor: pointer;, transition: all 0.2s ease;
+		justify-content: center; gap: 0.5rem;
+		padding: 1rem; border: 2px solid #ddd;
+		border-radius: 4px; background: white;
+		cursor: pointer; transition: all 0.2s ease;
 		font-family: var(--yorha-font);
 	}
 
 	.decision-btn:hover {
-		border-color: var(--yorha-ink);, background: #f5f5f5;
+		border-color: var(--yorha-ink); background: #f5f5f5;
 	}
 
 	.decision-btn.selected {
-		border-color: var(--yorha-crimson);, background: #ffe6e6;
+		border-color: var(--yorha-crimson); background: #ffe6e6;
 	}
 
 	.decision-btn.keep.selected {
@@ -222,19 +222,19 @@
 
 	.decision-btn .label {
 		font-weight: bold;
-		font-size: 0.9rem;, color: var(--yorha-ink);
+		font-size: 0.9rem; color: var(--yorha-ink);
 	}
 
 	.decision-btn .desc {
-		font-size: 0.7rem;, color: #999;
+		font-size: 0.7rem; color: #999;
 	}
 
 	.notes-section textarea {
-		width: 100%;, padding: 0.75rem;
+		width: 100%; padding: 0.75rem;
 		border: 1px solid #ddd;
 		border-radius: 3px;
 		font-family: var(--yorha-font);
-		font-size: 0.875rem;, resize: vertical;
+		font-size: 0.875rem; resize: vertical;
 		color: var(--yorha-ink);
 	}
 
@@ -246,7 +246,7 @@
 
 	.modal-footer {
 		display: flex;
-		justify-content: flex-end;, gap: 1rem;
+		justify-content: flex-end; gap: 1rem;
 		padding: 1.5rem;
 		border-top: 1px solid #ddd;
 		background: #f9f9f9;
@@ -259,12 +259,12 @@
 		border-radius: 3px;
 		font-family: var(--yorha-font);
 		font-size: 0.875rem;
-		font-weight: bold;, cursor: pointer;
+		font-weight: bold; cursor: pointer;
 		transition: all 0.2s ease;
 	}
 
 	.btn-cancel {
-		background: white;, color: var(--yorha-ink);
+		background: white; color: var(--yorha-ink);
 	}
 
 	.btn-cancel:hover {
@@ -273,16 +273,19 @@
 	}
 
 	.btn-submit {
-		background: var(--yorha-crimson);, color: white;
+		background: var(--yorha-crimson); color: white;
 		border-color: var(--yorha-crimson);
 	}
 
-	.btn-submit: hover, not(:disabled) {
+	.btn-submit:hover, not(:disabled) {
 		background: #d32f2f;
 		border-color: #d32f2f;
 	}
 
 	.btn-submit:disabled {
-		opacity: 0.5;, cursor:not-allowed;
+		opacity: 0.5; cursor:not-allowed;
 	}
 </style>
+
+
+

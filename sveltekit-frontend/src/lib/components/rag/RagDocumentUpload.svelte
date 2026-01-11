@@ -1,10 +1,10 @@
-﻿<script lang="ts">
+<script lang="ts">
 import type { Document } from '$lib/types';
   import { Upload, X, CheckCircle, AlertCircle } from 'lucide-svelte';
   import  Button  from "$lib/components/ui/button/Button.svelte";
   interface UploadResult {
     success: boolean, message: string
-    document?: {, id: string
+    document?: { id: string
       filename: string, title: string
       chunks: number, hasOCR: boolean
  embeddingModel: string};
@@ -184,4 +184,6 @@ import type { Document } from '$lib/types';
   input[type='file'] {
     cursor: pointer}
 </style>
+
+
 

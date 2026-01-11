@@ -79,3 +79,4 @@ export const caseChunksRelations = relations(caseChunks, ({ one }) => ({
  references: [cases.id],
  }),
 }));
+

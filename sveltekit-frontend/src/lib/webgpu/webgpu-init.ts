@@ -1,7 +1,7 @@
 import type { GPU } from 'gpu.js';
 
 export interface WebGPUCapabilities {
- hasWebGPU: boolean, hasWebGL: boolean;, maxTextureSize: number, maxComputeWorkgroupsPerDimension: number;, maxComputeWorkgroupSizeX: number, maxComputeWorkgroupSizeY: number;, maxComputeWorkgroupSizeZ: number, maxComputeInvocationsPerWorkgroup: number;, maxStorageBufferBindingSize: number, maxUniformBufferBindingSize: number;, maxVertexAttributes: number, maxVertexBuffers: number;, maxInterStageShaderComponents: number, maxColorAttachments: number;, maxComputeWorkgroupStorageSize: number;
+ hasWebGPU: boolean, hasWebGL: boolean; maxTextureSize: number, maxComputeWorkgroupsPerDimension: number; maxComputeWorkgroupSizeX: number, maxComputeWorkgroupSizeY: number; maxComputeWorkgroupSizeZ: number, maxComputeInvocationsPerWorkgroup: number; maxStorageBufferBindingSize: number, maxUniformBufferBindingSize: number; maxVertexAttributes: number, maxVertexBuffers: number; maxInterStageShaderComponents: number, maxColorAttachments: number; maxComputeWorkgroupStorageSize: number;
 }
 
 export class WebGPUInit {
@@ -41,7 +41,7 @@ export class WebGPUInit {
      // Request device
      this.device = await this.adapter.requestDevice({
        requiredFeatures: ['shader-f16', 'bgra8unorm-storage'] as GPUFeatureName[],
-       requiredLimits: {, maxTextureDimension2D: 8192,
+       requiredLimits: { maxTextureDimension2D: 8192,
          maxStorageBufferBindingSize: 1 << 30, // 1GB
          maxComputeWorkgroupsPerDimension: 65535,
          maxComputeWorkgroupSizeX: 1024,
@@ -143,3 +143,6 @@ export class WebGPUInit {
 
 // Global WebGPU instance
 export const webgpu = WebGPUInit.getInstance();
+
+
+

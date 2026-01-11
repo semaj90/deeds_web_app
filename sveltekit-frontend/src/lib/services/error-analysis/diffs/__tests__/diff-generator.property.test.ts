@@ -54,3 +54,4 @@ describe('DiffGenerator / unified diff properties', () => {
  expect(r.diffText).toContain('+++ b/a.ts');
  });
 });
+

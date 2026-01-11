@@ -5,3 +5,4 @@ export type VideoMetadata = {
  size?: number;
  uploadedAt?: string;
 };
+

@@ -69,7 +69,7 @@
 				headers: {
 					'Content-Type': 'application/json'
 				},
-				body: JSON.stringify({, query: `Analyze this evidence: ${evidence.file_name}`,
+				body: JSON.stringify({ query: `Analyze this evidence: ${evidence.file_name}`,
 					caseId: evidence.case_id
 				})
 			});
@@ -217,7 +217,7 @@
 <style>
 	.evidence-board-container {
 		display: flex;
-		flex-direction: column;, height: 100vh;
+		flex-direction: column; height: 100vh;
 		background: #f5f4f0;
 	}
 
@@ -232,21 +232,21 @@
 
 	.board-header h1 {
 		margin: 0;
-		font-size: 1.8rem;, color: #2d2d2d;
+		font-size: 1.8rem; color: #2d2d2d;
 		font-family: 'Crimson Text', serif;
 	}
 
 	.zoom-controls {
-		display: flex;, gap: 0.5rem;
+		display: flex; gap: 0.5rem;
 		align-items: center;
 	}
 
 	.zoom-controls button {
-		width: 32px;, height: 32px;
+		width: 32px; height: 32px;
 		border: 1px solid #d0ccc7;
 		background: white;
-		border-radius: 4px;, cursor: pointer;
-		font-weight: 600;, transition: all 0.2s;
+		border-radius: 4px; cursor: pointer;
+		font-weight: 600; transition: all 0.2s;
 	}
 
 	.zoom-controls button:hover {
@@ -256,19 +256,19 @@
 	.zoom-level {
 		min-width: 50px;
 		text-align: center;
-		font-size: 0.9rem;, color: #666;
+		font-size: 0.9rem; color: #666;
 	}
 
 	.board-layout {
-		display: flex;, flex: 1;
-		gap: 1rem;, padding: 1rem;
+		display: flex; flex: 1;
+		gap: 1rem; padding: 1rem;
 		overflow: hidden;
 	}
 
 	.sidebar {
-		background: white;, border: 1px solid #e0ddd8;
-		border-radius: 4px;, display: flex;
-		flex-direction: column;, overflow: hidden;
+		background: white; border: 1px solid #e0ddd8;
+		border-radius: 4px; display: flex;
+		flex-direction: column; overflow: hidden;
 	}
 
 	.left-sidebar {
@@ -280,7 +280,7 @@
 	}
 
 	.sidebar h2 {
-		margin: 0;, padding: 1rem;
+		margin: 0; padding: 1rem;
 		font-size: 1rem;
 		border-bottom: 1px solid #e0ddd8;
 		background: #fafaf8;
@@ -288,16 +288,16 @@
 
 	.evidence-list {
 		flex: 1;
-		overflow-y: auto;, display: flex;
+		overflow-y: auto; display: flex;
 		flex-direction: column;
 	}
 
 	.list-item {
 		padding: 0.75rem 1rem;
 		border-bottom: 1px solid #e0ddd8;
-		cursor: pointer;, display: flex;
+		cursor: pointer; display: flex;
 		gap: 0.75rem;
-		align-items: center;, transition: background 0.2s;
+		align-items: center; transition: background 0.2s;
 	}
 
 	.list-item:hover {
@@ -310,7 +310,7 @@
 	}
 
 	.status-indicator {
-		width: 12px;, height: 12px;
+		width: 12px; height: 12px;
 		border-radius: 50%;
 		flex-shrink: 0;
 	}
@@ -322,22 +322,22 @@
 
 	.list-item-title {
 		font-size: 0.9rem;
-		font-weight: 600;, color: #2d2d2d;
-		white-space: nowrap;, overflow: hidden;
+		font-weight: 600; color: #2d2d2d;
+		white-space: nowrap; overflow: hidden;
 		text-overflow: ellipsis;
 	}
 
 	.list-item-meta {
-		font-size: 0.75rem;, color: #999;
-		white-space: nowrap;, overflow: hidden;
+		font-size: 0.75rem; color: #999;
+		white-space: nowrap; overflow: hidden;
 		text-overflow: ellipsis;
 	}
 
 	.canvas {
-		flex: 1;, background: white;
+		flex: 1; background: white;
 		border: 1px solid #e0ddd8;
-		border-radius: 4px;, overflow: hidden;
-		cursor: grab;, position: relative;
+		border-radius: 4px; overflow: hidden;
+		cursor: grab; position: relative;
 	}
 
 	.canvas:active {
@@ -345,74 +345,74 @@
 	}
 
 	.canvas-content {
-		width: 100%;, height: 100%;
-		transform-origin: center;, transition: transform 0.1s;
+		width: 100%; height: 100%;
+		transform-origin: center; transition: transform 0.1s;
 		position: relative;
 	}
 
 	.cards-container {
-		position: relative;, width: 100%;
+		position: relative; width: 100%;
 		height: 100%;
 	}
 
 	.metadata-panel {
 		flex: 1;
-		overflow-y: auto;, padding: 1rem;
+		overflow-y: auto; padding: 1rem;
 		display: flex;
-		flex-direction: column;, gap: 1rem;
+		flex-direction: column; gap: 1rem;
 	}
 
 	.metadata-panel h2 {
 		margin: 0;
-		font-size: 1rem;, color: #2d2d2d;
+		font-size: 1rem; color: #2d2d2d;
 	}
 
 	.metadata-section {
 		display: flex;
-		flex-direction: column;, gap: 0.25rem;
+		flex-direction: column; gap: 0.25rem;
 	}
 
 	.metadata-section label {
-		font-size: 0.75rem;, color: #999;
+		font-size: 0.75rem; color: #999;
 		font-weight: 600;
 		text-transform: uppercase;
 	}
 
 	.metadata-section span {
-		font-size: 0.9rem;, color: #2d2d2d;
+		font-size: 0.9rem; color: #2d2d2d;
 	}
 
 	.status-badge {
-		display: inline-block;, padding: 0.25rem 0.75rem;
-		border-radius: 12px;, color: white;
+		display: inline-block; padding: 0.25rem 0.75rem;
+		border-radius: 12px; color: white;
 		font-size: 0.8rem;
-		font-weight: 600;, width: fit-content;
+		font-weight: 600; width: fit-content;
 	}
 
 	.related-list {
 		display: flex;
-		flex-direction: column;, gap: 0.5rem;
+		flex-direction: column; gap: 0.5rem;
 	}
 
 	.related-item {
-		padding: 0.5rem;, background: #fafaf8;
+		padding: 0.5rem; background: #fafaf8;
 		border: 1px solid #e0ddd8;
 		border-radius: 4px;
-		font-size: 0.85rem;, color: #2d2d2d;
+		font-size: 0.85rem; color: #2d2d2d;
 	}
 
 	.actions {
 		display: flex;
-		flex-direction: column;, gap: 0.5rem;
+		flex-direction: column; gap: 0.5rem;
 		padding-top: 1rem;
 		border-top: 1px solid #e0ddd8;
 	}
 
 	.actions button {
 		padding: 0.5rem 1rem;
-		background: #f0f0f0;, border: 1px solid #d0ccc7;
-		border-radius: 4px;, cursor: pointer;
-		font-size: 0.9rem;, transition: background 0.2s;
+		background: #f0f0f0; border: 1px solid #d0ccc7;
+		border-radius: 4px; cursor: pointer;
+		font-size: 0.9rem; transition: background 0.2s;
 	}
 
 	.actions button:hover {
@@ -422,7 +422,9 @@
 	.empty-state {
 		display: flex;
 		align-items: center;
-		justify-content: center;, height: 100%;
+		justify-content: center; height: 100%;
 		color: #999;
 	}
 </style>
+
+

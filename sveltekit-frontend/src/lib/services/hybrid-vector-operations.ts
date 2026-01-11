@@ -5,3 +5,4 @@ export async function syncVectorData(): Promise<void> {
 export async function getVectorSystemHealth(): Promise<Record<string, unknown>> {
  return hybridVectorService.getSystemHealth();
 }
+

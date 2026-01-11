@@ -20,6 +20,8 @@
  <style> /* @unocss-include */ .form-field { margin-bottom: 1rem, display: flex; flex-direction: column}
   .error { color: red; font-size: 0.8rem}
   .form-message { text-align: center; margin-bottom: 1rem}
-  .submit-button { width: 100%, padding: 0.75rem, margin-top: 1rem;, cursor: pointer}
+  .submit-button { width: 100%, padding: 0.75rem, margin-top: 1rem; cursor: pointer}
 </style>
+
+
 

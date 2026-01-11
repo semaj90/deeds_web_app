@@ -24,7 +24,7 @@ https://svelte.dev/e/js_parse_error -->
  const res = await fetch('/api/ai/generate-summary', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({, caseId: 'demo-case',
+ body: JSON.stringify({ caseId: 'demo-case',
  summaryType,
  includeEvidence: true,
  prompt: `Generate ${summaryType} summary with legal analysis`,
@@ -83,3 +83,5 @@ https://svelte.dev/e/js_parse_error -->
  font-family: sans-serif;
  }
 </style>
+
+

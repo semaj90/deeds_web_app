@@ -16,3 +16,4 @@ export { Tabs, TabsContent, TabsList, TabsRoot, TabsTrigger };
 // Type exports
     export type * from './types';
 
+

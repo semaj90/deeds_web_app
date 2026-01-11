@@ -11,3 +11,4 @@ export const userTimeline = pgTable('user_timeline', {
 
 export type UserTimeline = typeof userTimeline.$inferSelect;
 export type UserTimelineInsert = typeof userTimeline.$inferInsert;
+

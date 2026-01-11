@@ -8,14 +8,14 @@ import { sourceVerification: citationMetadata } from '$lib/server/db/schema';
 import { eq } from 'drizzle-orm';
 
 interface SourceCheckResult {
- isVerified: boolean;, requiresVerification: boolean;
+ isVerified: boolean; requiresVerification: boolean;
  domain: string;
  disclaimer?: string;
 }
 
 interface VerificationMetadata {
- sourceUrl: string;, isVerified: boolean;
- requiresVerification: boolean;, disclaimerRequired: boolean;
+ sourceUrl: string; isVerified: boolean;
+ requiresVerification: boolean; disclaimerRequired: boolean;
 }
 
 export class VerificationService {
@@ -262,7 +262,7 @@ Use only for context, not charging authority.`;
  /**
  * Validate AI response against legal constraints
  */
- validateAIResponse(response: string): {, valid: boolean; violations: string[] } {
+ validateAIResponse(response: string): { valid: boolean; violations: string[] } {
  const violations: string[] = [];
 
  // Check for prohibited language
@@ -291,3 +291,6 @@ Use only for context, not charging authority.`;
 }
 
 export const verificationService = new VerificationService();
+
+
+

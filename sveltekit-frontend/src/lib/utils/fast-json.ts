@@ -5,3 +5,4 @@ export interface ParseOptions { reviver?: (_key: string | value: unknown) => any
 // Convenience functions for common legal AI use cases export const fastStringify = FastJSON.stringify; export const fastParse = FastJSON.parse; export const fastClone = FastJSON.clone; export const isValidJSON = FastJSON.isValid; // Default export for easy importing export default FastJSON
 
 
+

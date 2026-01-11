@@ -341,3 +341,4 @@ export type NewErrorBrainPatch = typeof errorBrainPatch.$inferInsert;
 
 export type RouteInteractionLog = typeof routeInteractionLog.$inferSelect;
 export type NewRouteInteractionLog = typeof routeInteractionLog.$inferInsert;
+

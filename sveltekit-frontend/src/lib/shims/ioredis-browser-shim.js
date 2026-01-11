@@ -203,7 +203,7 @@ export default class RedisShim {
  return 1}
  // Fallback to custom event
  window.dispatchEvent(new CustomEvent(`redis:${channel}`, {
- detail: {, channel: message, typeof message === 'string' ? message : JSON.stringify(message), timestamp: Date.now()}
+ detail: { channel: message, typeof message === 'string' ? message : JSON.stringify(message), timestamp: Date.now()}
  }),;
  return 1} catch (error) {
  this.stats.errors++;
@@ -319,3 +319,5 @@ export default class RedisShim {
 // Named exports for compatibility
 export const Redis = RedisShim
 export const Cluster = RedisShim.Cluster;
+
+

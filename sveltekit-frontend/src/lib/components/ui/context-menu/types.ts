@@ -24,8 +24,10 @@ export interface ContextMenuSeparatorProps {
 
 export interface ContextMenuContext {
 	get open(): boolean;
-	get position(): {, x: number; y: number };
+	get position(): { x: number; y: number };
 	setOpen: (value: boolean) => void;
 	setPosition: (x: number, y: number) => void;
 	close: () => void;
 }
+
+

@@ -84,11 +84,11 @@ function getServicePortWithFallback(serviceName: string, fallbackPort: number): 
 }
 
 const services = {
-	neo4j: {, uri: process.env.NEO4J_URI || 'bolt://localhost:7687',
+	neo4j: { uri: process.env.NEO4J_URI || 'bolt://localhost:7687',
 		user: process.env.NEO4J_USER || 'neo4j',
 		password: process.env.NEO4J_PASSWORD || 'password'
 	},
-	goMicroservice: {, enhancedRAG:
+	goMicroservice: { enhancedRAG:
 			process.env.ENHANCED_RAG_URL ||
 			`http://enhanced-rag:${getServicePortWithFallback('enhanced-rag', 8094)}`,
 		gpuOrchestrator:
@@ -98,8 +98,8 @@ const services = {
 			process.env.VECTOR_CONSUMER_URL ||
 			`http://vector-consumer:${getServicePortWithFallback('vector-consumer', 8096)}`
 	},
-	ollama: {, baseUrl: getOllamaEndpoint(),
-		models: {, legal: 'gemma3-legal:latest',
+	ollama: { baseUrl: getOllamaEndpoint(),
+		models: { legal: 'gemma3-legal:latest',
 			embedding: 'embeddinggemma:latest'
 		}
 	},
@@ -221,15 +221,15 @@ export class EnhancedAISynthesisOrchestrator {
 		}
 	}
 
-	private async runEnhancedRAGPipeline(input: {, query: string;
+	private async runEnhancedRAGPipeline(input: { query: string;
 		embeddings?: number[] | null;
-	}): Promise<{, documents: unknown[] }> {
+	}): Promise<{ documents: unknown[] }> {
 		try {
 			const fetchImpl = await getFetch();
 			const response = await fetchImpl(`${services.goMicroservice.enhancedRAG}/api/search`, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({, query: input.query,
+				body: JSON.stringify({ query: input.query,
 					useGPU: true,
 					embedding: input.embeddings || null
 				})
@@ -243,7 +243,7 @@ export class EnhancedAISynthesisOrchestrator {
 		}
 	}
 
-	private async runGoLlamaPipeline(input: {, query: string;
+	private async runGoLlamaPipeline(input: { query: string;
 		legalBertAnalysis?: LegalBertAnalysis | null;
 	}): Promise<unknown> {
 		try {
@@ -251,7 +251,7 @@ export class EnhancedAISynthesisOrchestrator {
 			const response = await fetchImpl(`${services.goMicroservice.enhancedRAG}/api/generate`, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({, model: services.ollama.models.legal,
+				body: JSON.stringify({ model: services.ollama.models.legal,
 					prompt: input.query,
 					context: input.legalBertAnalysis,
 					temperature: 0.3,
@@ -270,7 +270,7 @@ export class EnhancedAISynthesisOrchestrator {
 		return null;
 	}
 
-	private async enhanceWithContext7(context: {, query: string;
+	private async enhanceWithContext7(context: { query: string;
 		legalBertAnalysis?: LegalBertAnalysis | null;
 	}): Promise<unknown> {
 		try {
@@ -278,7 +278,7 @@ export class EnhancedAISynthesisOrchestrator {
 			const response = await fetchImpl(`${services.context7}/api/query`, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({, query: context.query,
+				body: JSON.stringify({ query: context.query,
 					context: context.legalBertAnalysis,
 					includeLibraries: ['langchain', 'drizzle-orm', 'xstate', 'neo4j'],
 					maxTokens: 5000
@@ -299,7 +299,7 @@ export class EnhancedAISynthesisOrchestrator {
 			const gpuResp = await fetchImpl(`${services.goMicroservice.gpuOrchestrator}/api/generate`, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({, model: services.ollama.models.legal,
+				body: JSON.stringify({ model: services.ollama.models.legal,
 					prompt: buildEnhancedPrompt(input),
 					useGPU: true,
 					workers: 8,
@@ -323,7 +323,7 @@ export class EnhancedAISynthesisOrchestrator {
 			const resp = await fetchImpl2(`${services.ollama.baseUrl}/api/generate`, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({, model: services.ollama.models.legal,
+				body: JSON.stringify({ model: services.ollama.models.legal,
 					prompt: buildEnhancedPrompt(input),
 					format: 'json',
 					stream: false
@@ -343,7 +343,7 @@ export class EnhancedAISynthesisOrchestrator {
 
 	private async checkCache(
 		query: string
-	): Promise<{, hit: boolean; data?: unknown; source?: string }> {
+	): Promise<{ hit: boolean; data?: unknown; source?: string }> {
 		const key = generateCacheKey(query);
 
 		// Check Redis first
@@ -407,7 +407,7 @@ export class EnhancedAISynthesisOrchestrator {
 				})
 				.onConflictDoUpdate({
 					target: synthesisCache.queryHash,
-					set: {, result: finalSynthesis as Parameters<
+					set: { result: finalSynthesis as Parameters<
 							typeof db.insert<typeof synthesisCache>
 						>[0]['values']['result'],
 						hitCount: sql`${synthesisCache.hitCount} + 1`,
@@ -421,7 +421,7 @@ export class EnhancedAISynthesisOrchestrator {
 
 	// Placeholder methods for full implementation
 	private async analyzeWithLegalBERT(_query: string): Promise<LegalBertAnalysis> {
-		return { entities: [], concepts: [], complexity: {, legalComplexity: 0.5 } };
+		return { entities: [], concepts: [], complexity: { legalComplexity: 0.5 } };
 	}
 
 	private async generateNomicEmbeddings(_query: string): Promise<number[]> {
@@ -443,9 +443,9 @@ export class EnhancedAISynthesisOrchestrator {
 		return [];
 	}
 
-	private async rankWithCrossEncoder(_input: {, query: string;
-		neo4jResults: unknown[];, pgVectorResults: unknown[];
-		ragResults: {, documents: unknown[] };
+	private async rankWithCrossEncoder(_input: { query: string;
+		neo4jResults: unknown[]; pgVectorResults: unknown[];
+		ragResults: { documents: unknown[] };
 	}): Promise<RankedSource[]> {
 		return [];
 	}
@@ -538,7 +538,7 @@ export class EnhancedAISynthesisOrchestrator {
 		await this.initialize().catch(() => {});
 		return {
 			status: this.initialized ? 'healthy' : 'initializing',
-			services: {, postgres: await this.checkPostgres(),
+			services: { postgres: await this.checkPostgres(),
 				redis: await this.checkRedis(),
 				neo4j: this.neo4jStore !== null,
 				pgVector: this.pgVectorStore !== null,
@@ -652,3 +652,6 @@ RESPONSE:`;
 // Export singleton instance
 export const orchestrator = new EnhancedAISynthesisOrchestrator();
 export default orchestrator;
+
+
+

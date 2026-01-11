@@ -39,7 +39,7 @@ async function testSIMDIntegration() {
  id: `doc-${i}`,
  title: `Legal Document ${i}`,
  content: 'Sample legal content '.repeat(50),
- metadata: {, type: 'contract', jurisdiction: 'federal' }
+ metadata: { type: 'contract', jurisdiction: 'federal' }
  }))
  });
 
@@ -58,3 +58,4 @@ async function testSIMDIntegration() {
 
 // Run the test
 testSIMDIntegration().catch(console.error);
+

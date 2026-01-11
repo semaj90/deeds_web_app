@@ -6,18 +6,18 @@
 import type { ProcessingEvent } from './types.js';
 
 export interface UploadInitiation {
- evidence_id: string;, job_id: string;
- presigned_url: string;, expires_in: number;
- bucket: string;, object_name: string;
+ evidence_id: string; job_id: string;
+ presigned_url: string; expires_in: number;
+ bucket: string; object_name: string;
 }
 
 export interface UploadCompletion {
- evidence_id: string;, job_id: string;
- status: string;, message: string;
+ evidence_id: string; job_id: string;
+ status: string; message: string;
 }
 
 export interface UploadStatus {
- stage: string;, percentage: number;
+ stage: string; percentage: number;
  eta_seconds: number | null;
  last_update: string;
 }
@@ -205,7 +205,7 @@ export async function uploadEvidence(
  onProgress?: (progress: number) => void,
  onProcessingEvent?: (event: ProcessingEvent) => void,
  onError?: (error: Error) => void
-): Promise<{, evidenceId: string; jobId: string }> {
+): Promise<{ evidenceId: string; jobId: string }> {
  try {
  // Validate file
  const validation = await validateFile(file);
@@ -246,7 +246,7 @@ export async function uploadEvidence(
 /**
  * Retry failed processing
  */
-export async function retryProcessing(evidenceId: string): Promise<{, jobId: string }> {
+export async function retryProcessing(evidenceId: string): Promise<{ jobId: string }> {
  const response = await fetch(`${API_BASE}/${ evidenceId }/retry`, {
  method: 'POST',
  });
@@ -308,3 +308,6 @@ export async function deleteEvidence(evidenceId: string): Promise<void> {
  throw new Error('Failed to delete evidence');
  }
 }
+
+
+

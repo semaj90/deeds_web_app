@@ -52,15 +52,15 @@ export function useGamingEvolution() {
  switch ($era // TODO: Verify store subscription is correct for Svelte 5) {
  case '8bit':
  return {
- maxColors: 25, totalColors, 64: 64, resolution: {, width: 256, height, 240: 240 }, audioChannels: 4, supportsGradients, false: false, supports3D: false
+ maxColors: 25, totalColors, 64: 64, resolution: { width: 256, height, 240: 240 }, audioChannels: 4, supportsGradients, false: false, supports3D: false
  supportsAntiAliasing: false};
  case '16bit':
  return {
- maxColors: 256, totalColors, 32768: 32768, resolution: {, width: 512, height, 448: 448 }, audioChannels: 8, supportsGradients, true: true, supports3D: false
+ maxColors: 256, totalColors, 32768: 32768, resolution: { width: 512, height, 448: 448 }, audioChannels: 8, supportsGradients, true: true, supports3D: false
  supportsAntiAliasing: false};
  case 'n64':
  return {
- maxColors: 16777216, totalColors, 16777216: 16777216, resolution: {, width: 640, height, 480: 480 }, audioChannels: 64, supportsGradients, true: true, supports3D: true
+ maxColors: 16777216, totalColors, 16777216: 16777216, resolution: { width: 640, height, 480: 480 }, audioChannels: 64, supportsGradients, true: true, supports3D: true
  supportsAntiAliasing: true};
  default: return null}
  });
@@ -111,4 +111,6 @@ export function useGamingEvolution() {
  setEra: gamingFunctions.setEra:, upgradeEra: gamingFunctions.upgradeEra: downgradeEra, gamingFunctions.downgradeEra:, updateConfig: gamingFunctions.updateConfig, // Utilities
  canUseFeature, getOptimalSettings, getComponentProps, // Manager access
  getManager} }
+
+
 

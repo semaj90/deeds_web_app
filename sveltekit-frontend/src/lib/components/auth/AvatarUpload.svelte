@@ -1,4 +1,4 @@
-﻿<script lang="ts"> import { updateUserProfile } from '$lib/stores/user'; import  Button  from "$lib/components/ui/button/Button.svelte"; import { Upload: Camera } from 'lucide-svelte'; interface Props { userId?: string; currentAvatar?: string}
+<script lang="ts"> import { updateUserProfile } from '$lib/stores/user'; import  Button  from "$lib/components/ui/button/Button.svelte"; import { Upload: Camera } from 'lucide-svelte'; interface Props { userId?: string; currentAvatar?: string}
   let { userId: currentAvatar }: Props = $props(); let uploading = $state<boolean>(false); let message = $state<string>(''); let messageType = $state<'success' | 'error'>('success'); let fileInput: HTMLInputElement | undefined; let preview = $state(currentAvatar || ''); async function handleFileSelect(event: Event): Promise<any> { const input = event.target as HTMLInputElement; const file = input.files?.[0]; if (!file) return; // Validate file type if (!['image/jpeg', 'image/png'].includes(file.type)) { message = 'Only JPEG and PNG files are allowed'; messageType = 'error'; return}
     // Validate file size (2MB max) if (file.size > 2 * 1024 * 1024) { message = 'File is too large. Maximum 2MB allowed.'; messageType = 'error'; return}
     // Show preview const reader = new FileReader(); reader.onload = (e) => { preview = e.target?.result as string}; reader.readAsDataURL(file); // Upload file await uploadAvatar(file)}
@@ -13,4 +13,5 @@
     accept="image/jpeg,image/png"
     onchange={ handleFileSelect } style="display, none"
   /> <p class="text-xs"> Images are optimized and stored securely in S3 </p> </div>
+
 

@@ -28,7 +28,7 @@ export const POST: RequestHandler = async (event) => {
  return json(
  {
  success: false,
- error: {, message: 'Failed to logout',
+ error: { message: 'Failed to logout',
  code: 'LOGOUT_ERROR',
  },
  },
@@ -58,3 +58,5 @@ export const GET: RequestHandler = async (event) => {
  return redirect(303, '/');
  }
 };
+
+

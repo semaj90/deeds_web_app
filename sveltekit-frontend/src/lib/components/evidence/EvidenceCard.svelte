@@ -21,7 +21,7 @@
   // Svelte, 5 event handling
   let { $$events } = $props<{
     compare: (evidence, Evidence) => void
-    compared: (data: {, evidence: Evidence; result: any }) => void}>();
+    compared: (data: { evidence: Evidence; result: any }) => void}>();
   // small helper - use project-wide helper in the future
   const getOllamaEndpoint = () => (import.meta.env.VITE_OLLAMA_URL ?? 'http://ollama:11434'),
   const getIcon = (type: Evidence["type"]) => {
@@ -82,7 +82,7 @@
   class:shadow-2xl={isHovered}
   onmouseenter={handleMouseEnter}
   onmouseleave={handleMouseLeave}
-  transition: scale={{, duration: 200, easing, quintOut }}
+  transition: scale={{ duration: 200, easing, quintOut }}
 >
   <!-- Header -->
   <div class="flex items-center justify-between px-3 py-3 bg-gray-50 border-b">
@@ -207,4 +207,6 @@
 <!-- Tooltip section removed - replaced with native, title, attributes -->
 <!-- Tooltip section removed - replaced with native, title, attributes -->
       >
+
+
 

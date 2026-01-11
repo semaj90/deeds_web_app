@@ -360,7 +360,7 @@
  .case-form {
  background: var(--yorha-bg-secondary, #2a2a2a);
  border: 1px solid var(--yorha-border, #4a4a4a);
- border-radius: 8px;, padding: 1.5rem;
+ border-radius: 8px; padding: 1.5rem;
  }
 
  .form-header {
@@ -375,19 +375,19 @@
  .form-title {
  margin: 0;
  font-size: 1.25rem;
- font-weight: 600;, color: var(--yorha-text, #d4d4d4);
+ font-weight: 600; color: var(--yorha-text, #d4d4d4);
  }
 
  .form-meta {
  display: flex;
- align-items: center;, gap: 0.75rem;
+ align-items: center; gap: 0.75rem;
  }
 
  .source-badge {
  padding: 0.25rem 0.5rem;
  font-size: 0.75rem;
  font-weight: 600;
- border-radius: 2px;, background: var(--yorha-bg, #1a1a1a);
+ border-radius: 2px; background: var(--yorha-bg, #1a1a1a);
  color: var(--yorha-text-muted, #888);
  }
 
@@ -397,11 +397,11 @@
  }
 
  .source-badge[data-source="ocr"] {
- background: #60a5fa;, color: var(--yorha-bg, #1a1a1a);
+ background: #60a5fa; color: var(--yorha-bg, #1a1a1a);
  }
 
  .confidence-indicator {
- font-size: 0.8rem;, color: var(--yorha-success, #4ade80);
+ font-size: 0.8rem; color: var(--yorha-success, #4ade80);
  }
 
  .form-grid {
@@ -413,7 +413,7 @@
 
  .form-group {
  display: flex;
- flex-direction: column;, gap: 0.5rem;
+ flex-direction: column; gap: 0.5rem;
  }
 
  .form-group.full-width {
@@ -422,9 +422,9 @@
 
  .form-label {
  display: flex;
- align-items: center;, gap: 0.5rem;
+ align-items: center; gap: 0.5rem;
  font-size: 0.85rem;
- font-weight: 500;, color: var(--yorha-text-muted, #888);
+ font-weight: 500; color: var(--yorha-text-muted, #888);
  }
 
  .ai-indicator {
@@ -436,8 +436,8 @@
  padding: 0.625rem 0.875rem;
  background: var(--yorha-bg, #1a1a1a);
  border: 1px solid var(--yorha-border, #4a4a4a);
- border-radius: 4px;, color: var(--yorha-text, #d4d4d4);
- font-size: 0.9rem;, transition: border-color 0.2s;
+ border-radius: 4px; color: var(--yorha-text, #d4d4d4);
+ font-size: 0.9rem; transition: border-color 0.2s;
  }
 
  .form-input:focus,
@@ -448,7 +448,7 @@
 
  .form-input:disabled,
  .form-textarea:disabled {
- opacity: 0.6;, cursor:not-allowed;
+ opacity: 0.6; cursor:not-allowed;
  }
 
  .form-textarea {
@@ -469,9 +469,9 @@
 
  .add-btn {
  padding: 0.25rem 0.5rem;
- background: transparent;, border: 1px solid var(--yorha-accent, #c8a84b);
- border-radius: 2px;, color: var(--yorha-accent, #c8a84b);
- font-size: 0.75rem;, cursor: pointer;
+ background: transparent; border: 1px solid var(--yorha-accent, #c8a84b);
+ border-radius: 2px; color: var(--yorha-accent, #c8a84b);
+ font-size: 0.75rem; cursor: pointer;
  transition: all 0.2s;
  }
 
@@ -482,11 +482,11 @@
 
  .list-items {
  display: flex;
- flex-direction: column;, gap: 0.5rem;
+ flex-direction: column; gap: 0.5rem;
  }
 
  .list-item {
- display: flex;, gap: 0.5rem;
+ display: flex; gap: 0.5rem;
  }
 
  .list-item .form-input {
@@ -495,9 +495,9 @@
 
  .remove-btn {
  padding: 0.5rem 0.75rem;
- background: transparent;, border: 1px solid var(--yorha-error, #ef4444);
- border-radius: 4px;, color: var(--yorha-error, #ef4444);
- cursor: pointer;, transition: all 0.2s;
+ background: transparent; border: 1px solid var(--yorha-error, #ef4444);
+ border-radius: 4px; color: var(--yorha-error, #ef4444);
+ cursor: pointer; transition: all 0.2s;
  }
 
  .remove-btn:hover {
@@ -508,11 +508,11 @@
  .empty-list {
  color: var(--yorha-text-muted, #888);
  font-size: 0.85rem;
- font-style: italic;, margin: 0;
+ font-style: italic; margin: 0;
  }
 
  .form-actions {
- display: flex;, gap: 0.75rem;
+ display: flex; gap: 0.75rem;
  padding-top: 1rem;
  border-top: 1px solid var(--yorha-border, #4a4a4a);
  }
@@ -522,7 +522,7 @@
  border: none;
  border-radius: 4px;
  font-size: 0.9rem;
- font-weight: 500;, cursor: pointer;
+ font-weight: 500; cursor: pointer;
  transition: all 0.2s;
  }
 
@@ -552,7 +552,9 @@
 
  .form-header {
  flex-direction: column;
- align-items: flex-start;, gap: 0.75rem;
+ align-items: flex-start; gap: 0.75rem;
  }
  }
 </style>
+
+

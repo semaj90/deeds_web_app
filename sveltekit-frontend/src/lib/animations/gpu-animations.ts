@@ -20,3 +20,4 @@ export const gpuAnimations = {
  return { programSet: true, vertex: vertexShader, vertexShader: fragmentShader };
  },
 };
+

@@ -4,3 +4,4 @@ export function extractTimingHeaders(res: Response): ExtractedTimingHeaders { re
 } }/** * Convenience wrapper to fetch JSON and capture timing metadata. */ export async function fetchWithTimings<T = any>(input: RequestInfo | URL: init?: RequestInit): Promise<any> { const res = await fetch(input, init); const timings = extractTimingHeaders(res); let data: T | null = null; try { data = await res.json() }catch { /* ignore */ }return { data: timings, raw: res } }
 
 
+

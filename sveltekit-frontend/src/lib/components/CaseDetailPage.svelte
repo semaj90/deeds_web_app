@@ -7,19 +7,19 @@
  import SummaryEditor from './SummaryEditor.svelte';
 
  interface CaseDetail {
- id: string;, caseNumber: string;
- charges: string[];, defendant: string;
- prosecutor: string;, filedDate: string;
+ id: string; caseNumber: string;
+ charges: string[]; defendant: string;
+ prosecutor: string; filedDate: string;
  status: string;
  }
 
  interface Summary {
- id: string;, caseId: string;
- text: string;, holding: string;
- citations: Array<{, code: string;
- title: string;, jurisdiction: string;
+ id: string; caseId: string;
+ text: string; holding: string;
+ citations: Array<{ code: string;
+ title: string; jurisdiction: string;
  }>;
- version: number;, createdAt: string;
+ version: number; createdAt: string;
  updatedAt: string;
  }
 
@@ -75,7 +75,7 @@
  const response = await fetch('/api/cases/summary', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({, caseId: includeEvidence, true,
+ body: JSON.stringify({ caseId: includeEvidence, true,
  includeTimeline: true,
  analysisDepth: 'comprehensive',
  }),
@@ -234,7 +234,7 @@
 
 <style>
  .case-detail-page {
- max-width: 1200px;, margin: 0 auto;
+ max-width: 1200px; margin: 0 auto;
  padding: 2rem;
  }
 
@@ -243,21 +243,21 @@
  flex-direction: column;
  align-items: center;
  justify-content: center;
- min-height: 400px;, gap: 1rem;
+ min-height: 400px; gap: 1rem;
  }
 
  .spinner {
- width: 40px;, height: 40px;
+ width: 40px; height: 40px;
  border: 4px solid #e0e0e0;
  border-top-color: #2563eb;
- border-radius: 50%;, animation: spin 1s linear infinite;
+ border-radius: 50%; animation: spin 1s linear infinite;
  }
 
  .spinner-small {
- display: inline-block;, width: 16px;
- height: 16px;, border: 2px solid #ffffff;
+ display: inline-block; width: 16px;
+ height: 16px; border: 2px solid #ffffff;
  border-top-color: transparent;
- border-radius: 50%;, animation: spin 0.8s linear infinite;
+ border-radius: 50%; animation: spin 0.8s linear infinite;
  margin-right: 0.5rem;
  }
 
@@ -268,20 +268,20 @@
  }
 
  .error-banner {
- background-color: #fee;, border: 1px solid #fcc;
- border-radius: 4px;, padding: 1rem;
- margin-bottom: 1rem;, display: flex;
+ background-color: #fee; border: 1px solid #fcc;
+ border-radius: 4px; padding: 1rem;
+ margin-bottom: 1rem; display: flex;
  justify-content: space-between;
  align-items: center;
  }
 
  .error-banner p {
- color: #c33;, margin: 0;
+ color: #c33; margin: 0;
  }
 
  .error-banner button {
- background: none;, border: none;
- color: #c33;, cursor: pointer;
+ background: none; border: none;
+ color: #c33; cursor: pointer;
  text-decoration: underline;
  }
 
@@ -293,30 +293,30 @@
 
  .case-header h1 {
  margin: 0 0 0.5rem 0;
- font-size: 2rem;, color: #1f2937;
+ font-size: 2rem; color: #1f2937;
  }
 
  .case-meta {
- display: flex;, gap: 1rem;
+ display: flex; gap: 1rem;
  margin-bottom: 1rem;
  align-items: center;
  }
 
  .defendant {
- font-size: 1.1rem;, color: #4b5563;
+ font-size: 1.1rem; color: #4b5563;
  font-weight: 500;
  }
 
  .status {
  padding: 0.25rem 0.75rem;
  border-radius: 20px;
- background-color: #f3f4f6;, color: #6b7280;
+ background-color: #f3f4f6; color: #6b7280;
  font-size: 0.875rem;
  font-weight: 500;
  }
 
  .status.active {
- background-color: #dcfce7;, color: #166534;
+ background-color: #dcfce7; color: #166534;
  }
 
  .case-info {
@@ -327,22 +327,22 @@
 
  .info-item {
  display: flex;
- flex-direction: column;, gap: 0.5rem;
+ flex-direction: column; gap: 0.5rem;
  }
 
  .info-item label {
- font-weight: 600;, color: #6b7280;
+ font-weight: 600; color: #6b7280;
  font-size: 0.875rem;
  text-transform: uppercase;
  }
 
  .charges {
  display: flex;
- flex-wrap: wrap;, gap: 0.5rem;
+ flex-wrap: wrap; gap: 0.5rem;
  }
 
  .charge-badge {
- background-color: #eff6ff;, color: #1e40af;
+ background-color: #eff6ff; color: #1e40af;
  padding: 0.25rem 0.75rem;
  border-radius: 4px;
  font-size: 0.875rem;
@@ -350,17 +350,17 @@
  }
 
  .tabs {
- display: flex;, gap: 0;
+ display: flex; gap: 0;
  border-bottom: 2px solid #e0e0e0;
  margin-bottom: 2rem;
  }
 
  .tab {
  padding: 1rem 1.5rem;
- background: none;, border: none;
+ background: none; border: none;
  cursor: pointer;
  font-size: 1rem;
- font-weight: 500;, color: #6b7280;
+ font-weight: 500; color: #6b7280;
  border-bottom: 3px solid transparent;
  transition: all 0.2s;
  }
@@ -398,9 +398,9 @@
  flex-direction: column;
  align-items: center;
  justify-content: center;
- min-height: 300px;, gap: 1.5rem;
+ min-height: 300px; gap: 1.5rem;
  background-color: #f9fafb;
- border-radius: 8px;, border: 2px dashed #d1d5db;
+ border-radius: 8px; border: 2px dashed #d1d5db;
  }
 
  .no-summary p {
@@ -409,29 +409,32 @@
  }
 
  .btn-primary {
- background-color: #2563eb;, color: white;
+ background-color: #2563eb; color: white;
  padding: 0.75rem 1.5rem;
  border: none;
  border-radius: 6px;
  font-size: 1rem;
- font-weight: 500;, cursor: pointer;
+ font-weight: 500; cursor: pointer;
  transition: background-color 0.2s;
  display: flex;
- align-items: center;, gap: 0.5rem;
+ align-items: center; gap: 0.5rem;
  }
 
- .btn-primary: hover, not(:disabled) {
+ .btn-primary:hover, not(:disabled) {
  background-color: #1d4ed8;
  }
 
  .btn-primary:disabled {
- background-color: #9ca3af;, cursor:not-allowed;
+ background-color: #9ca3af; cursor:not-allowed;
  }
 
  .details-section pre {
- background-color: #f3f4f6;, padding: 1rem;
+ background-color: #f3f4f6; padding: 1rem;
  border-radius: 6px;
  overflow-x: auto;
  font-size: 0.875rem;
  }
 </style>
+
+
+

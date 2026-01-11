@@ -3,16 +3,16 @@
 	import { writable } from 'svelte/store';
 
 	interface TopologyNode {
-		id: string;, name: string;
+		id: string; name: string;
 		type: 'file' | 'component' | 'route' | 'lib';
-		errors: number;, complexity: number;
-		tags: string[];, recommended_action: string;
-		dependencies: string[];, x: number;
+		errors: number; complexity: number;
+		tags: string[]; recommended_action: string;
+		dependencies: string[]; x: number;
 		y: number;
 	}
 
 	interface Edge {
-		from: string;, to: string;
+		from: string; to: string;
 		type: 'import' | 'error' | 'dependency';
 	}
 
@@ -433,13 +433,13 @@
 	:global(body) {
 		margin: 0;
 		font-family: 'Inter', system-ui, sans-serif;
-		background: #0f172a;, color: #e2e8f0;
+		background: #0f172a; color: #e2e8f0;
 	}
 
 	.topology-viewer {
-		width: 100vw;, height: 100vh;
+		width: 100vw; height: 100vh;
 		display: flex;
-		flex-direction: column;, background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+		flex-direction: column; background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
 	}
 
 	.header {
@@ -459,23 +459,23 @@
 	}
 
 	.stats {
-		display: flex;, gap: 2rem;
-		font-size: 0.875rem;, color: #94a3b8;
+		display: flex; gap: 2rem;
+		font-size: 0.875rem; color: #94a3b8;
 	}
 
 	.controls {
 		padding: 1rem 2rem;
 		background: rgba(15, 23, 42, 0.6);
-		display: flex;, gap: 1rem;
+		display: flex; gap: 1rem;
 		align-items: center;
 		border-bottom: 1px solid rgba(148, 163, 184, 0.1);
 	}
 
 	.search-input {
-		flex: 1;, padding: 0.5rem 1rem;
+		flex: 1; padding: 0.5rem 1rem;
 		background: rgba(30, 41, 59, 0.8);
 		border: 1px solid rgba(148, 163, 184, 0.2);
-		border-radius: 0.5rem;, color: #e2e8f0;
+		border-radius: 0.5rem; color: #e2e8f0;
 		font-size: 0.875rem;
 	}
 
@@ -488,35 +488,35 @@
 		padding: 0.5rem 1rem;
 		background: rgba(30, 41, 59, 0.8);
 		border: 1px solid rgba(148, 163, 184, 0.2);
-		border-radius: 0.5rem;, color: #e2e8f0;
+		border-radius: 0.5rem; color: #e2e8f0;
 		font-size: 0.875rem;
 	}
 
 	.legend {
-		display: flex;, gap: 1rem;
+		display: flex; gap: 1rem;
 		margin-left: auto;
 	}
 
 	.legend-item {
 		display: flex;
 		align-items: center;
-		font-size: 0.75rem;, color: #94a3b8;
+		font-size: 0.75rem; color: #94a3b8;
 	}
 
 	.legend-item::before {
-		content: '';, width: 12px;
+		content: ''; width: 12px;
 		height: 12px;
-		border-radius: 50%;, background: var(--color);
+		border-radius: 50%; background: var(--color);
 		margin-right: 0.5rem;
 	}
 
 	.canvas-container {
-		flex: 1;, position: relative;
+		flex: 1; position: relative;
 		overflow: hidden;
 	}
 
 	canvas {
-		width: 100%;, height: 100%;
+		width: 100%; height: 100%;
 		cursor: grab;
 	}
 
@@ -525,17 +525,17 @@
 	}
 
 	.loading {
-		position: absolute;, top: 50%;
-		left: 50%;, transform: translate(-50%, -50%);
-		font-size: 1.25rem;, color: #64748b;
+		position: absolute; top: 50%;
+		left: 50%; transform: translate(-50%, -50%);
+		font-size: 1.25rem; color: #64748b;
 	}
 
 	.details-panel {
-		position: absolute;, top: 5rem;
-		right: 2rem;, width: 300px;
+		position: absolute; top: 5rem;
+		right: 2rem; width: 300px;
 		background: rgba(30, 41, 59, 0.95);
-		backdrop-filter: blur(10px);, border: 1px solid rgba(148, 163, 184, 0.2);
-		border-radius: 0.75rem;, padding: 1.5rem;
+		backdrop-filter: blur(10px); border: 1px solid rgba(148, 163, 184, 0.2);
+		border-radius: 0.75rem; padding: 1.5rem;
 		box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3);
 	}
 
@@ -549,12 +549,12 @@
 	.detail-row {
 		display: flex;
 		justify-content: space-between;
-		align-items: center;, padding: 0.5rem 0;
+		align-items: center; padding: 0.5rem 0;
 		border-bottom: 1px solid rgba(148, 163, 184, 0.1);
 	}
 
 	.label {
-		font-size: 0.875rem;, color: #94a3b8;
+		font-size: 0.875rem; color: #94a3b8;
 	}
 
 	.value {
@@ -580,7 +580,7 @@
 
 	.tags {
 		display: flex;
-		flex-wrap: wrap;, gap: 0.5rem;
+		flex-wrap: wrap; gap: 0.5rem;
 		margin-top: 1rem;
 	}
 
@@ -589,7 +589,7 @@
 		background: rgba(59, 130, 246, 0.2);
 		border: 1px solid rgba(59, 130, 246, 0.3);
 		border-radius: 0.25rem;
-		font-size: 0.75rem;, color: #93c5fd;
+		font-size: 0.75rem; color: #93c5fd;
 	}
 
 	.dependencies {
@@ -598,11 +598,11 @@
 
 	.dependencies h3 {
 		margin: 0 0 0.5rem 0;
-		font-size: 0.875rem;, color: #94a3b8;
+		font-size: 0.875rem; color: #94a3b8;
 	}
 
 	.dependency {
-		padding: 0.5rem;, background: rgba(15, 23, 42, 0.5);
+		padding: 0.5rem; background: rgba(15, 23, 42, 0.5);
 		border-radius: 0.25rem;
 		font-size: 0.75rem;
 		margin-bottom: 0.25rem;
@@ -611,11 +611,11 @@
 
 	.fix-button {
 		width: 100%;
-		margin-top: 1rem;, padding: 0.75rem;
+		margin-top: 1rem; padding: 0.75rem;
 		background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
 		border: none;
-		border-radius: 0.5rem;, color: white;
-		font-weight: 600;, cursor: pointer;
+		border-radius: 0.5rem; color: white;
+		font-weight: 600; cursor: pointer;
 		transition: transform 0.2s;
 	}
 
@@ -627,3 +627,5 @@
 		transform: scale(0.98);
 	}
 </style>
+
+

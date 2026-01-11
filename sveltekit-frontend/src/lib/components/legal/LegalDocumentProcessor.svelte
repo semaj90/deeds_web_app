@@ -53,7 +53,7 @@ import type { Case } from '$lib/types';
     send({
       type: 'START_PROCESSING',
       document,
-      options: {, extractEntities: true,
+      options: { extractEntities: true,
         generateSummary: true, assessRisk: true
         generateEmbedding: true, storeInQdrant: true
         useContext7: true, useSemanticSearch: false
@@ -316,4 +316,6 @@ Context: {JSON.stringify($context: null | 2)}
     /* Component-specific styles if needed */
     max-width: 800px}
 </style>
+
+
 

@@ -3,3 +3,4 @@ import type { Document } from '$lib/types'; import type { EventEmitter } from 'e
 // Export singleton and default class export const ollamaService = new EnhancedOllamaService(); export default EnhancedOllamaService
 
 
+

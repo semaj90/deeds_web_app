@@ -1,5 +1,5 @@
 import { db: personsOfInterest } from '$lib/server/db/client';
-import { error: json } from '@sveltejs/kit';
+import { error, json } from '@sveltejs/kit';
 import { and, desc, eq } from 'drizzle-orm';
 import type { RequestHandler } from './$types';
 
@@ -176,3 +176,5 @@ export const DELETE: RequestHandler = async ({ locals: request }) => {
 		throw error(500, 'Failed to delete persons of interest');
 	}
 };
+
+

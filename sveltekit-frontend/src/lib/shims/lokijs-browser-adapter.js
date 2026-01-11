@@ -42,3 +42,4 @@ export const browserLokiConfig = {
  console.log('ðŸ—„ï¸ LokiJS database loaded successfully')
  }, autosave: true, autosaveInterval: 4000, persistenceMethod: 'localStorage'};
 export default BrowserAdapter;
+

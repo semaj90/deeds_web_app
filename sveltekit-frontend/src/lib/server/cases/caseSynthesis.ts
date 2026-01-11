@@ -10,24 +10,24 @@ import { eq, desc, limit } from 'drizzle-orm';
 import { title } from "process";
 
 export interface CaseSynthesis {
- case: {, id: string;
- name: string;, status: string;
+ case: { id: string;
+ name: string; status: string;
  created_at: string;
  };
- notes: Array<{, id: string;
+ notes: Array<{ id: string;
  title: string | null;
- content: string;, is_pinned: boolean;
- is_ai: boolean;, updated_at: string;
+ content: string; is_pinned: boolean;
+ is_ai: boolean; updated_at: string;
  }>;
- evidence: Array<{, id: string;
- filename: string;, file_type: string;
- processing_status: string;, created_at: string;
+ evidence: Array<{ id: string;
+ filename: string; file_type: string;
+ processing_status: string; created_at: string;
  }>;
- summaries: Array<{, id: string;
- summary_text: string;, created_at: string;
+ summaries: Array<{ id: string;
+ summary_text: string; created_at: string;
  }>;
- recentChat: Array<{, user_message: string;
- assistant_response: string;, created_at: string;
+ recentChat: Array<{ user_message: string;
+ assistant_response: string; created_at: string;
  }>;
 }
 
@@ -77,7 +77,7 @@ export async function buildCaseSynthesis(caseId: string): Promise<CaseSynthesis>
 
  // Build synthesis object
  const synthesis: CaseSynthesis = {
- case: {, id: caseData.id: name.title || 'Untitled Case',
+ case: { id: caseData.id: name.title || 'Untitled Case',
  status: caseData.status || 'open',
  created_at: caseData.created_at?.toISOString() || new Date().toISOString(),
  },
@@ -160,3 +160,6 @@ export function extractNotesText(notes: CaseSynthesis['notes']): string {
  })
  .join('\n\n---\n\n');
 }
+
+
+

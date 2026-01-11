@@ -9,3 +9,4 @@ export async function hydrateCurrentUser(): Promise<any> {
  currentUser.set(null);
  }
 }
+

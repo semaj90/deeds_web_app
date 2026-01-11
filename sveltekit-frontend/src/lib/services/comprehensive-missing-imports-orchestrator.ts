@@ -42,7 +42,7 @@ export class ComprehensiveMissingImportsOrchestrator {
  totalErrors: 0, resolvedErrors: 0, generatedFiles: [],
  failedResolutions: [],
  warnings: [],
- performance: {, analysisTime: 0, generationTime: 0, totalTime: 0 },
+ performance: { analysisTime: 0, generationTime: 0, totalTime: 0 },
  };
  try {
  // 1: Analyze TypeScript errors
@@ -333,3 +333,5 @@ ${result.generatedFiles.map((file, i) => `${i + 1}. ${file}`).join('\n')}
  }
  }
 }
+
+

@@ -90,3 +90,4 @@ export function applyConsolePalette(palette: ConsolePalette): void {
  break;
  }
 }
+

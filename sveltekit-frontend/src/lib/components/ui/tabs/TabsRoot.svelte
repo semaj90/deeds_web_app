@@ -58,9 +58,11 @@
 <style>
 	.tabs-root {
 		display: flex;
-		flex-direction: column;, gap: 0.5rem;
+		flex-direction: column; gap: 0.5rem;
 	}
 	.tabs-root[data-orientation="vertical"] {
 		flex-direction: row;
 	}
 </style>
+
+

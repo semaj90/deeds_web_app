@@ -1,7 +1,7 @@
 <script lang="ts">
  export interface Stats {
- activeCases: number;, pendingEvidence: number;
- approvedEvidence: number;, personsOfInterest: number;
+ activeCases: number; pendingEvidence: number;
+ approvedEvidence: number; personsOfInterest: number;
  }
 
  let { isLoading = false, stats = {
@@ -71,3 +71,5 @@
  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
  }
 </style>
+
+

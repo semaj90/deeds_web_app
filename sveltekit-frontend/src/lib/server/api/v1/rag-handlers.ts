@@ -5,8 +5,8 @@ import type { RAGService } from '$lib/server/rag';
 import { db } from "$lib/server/db";
 
 interface UserType {
- id: string;, email: string;
- firstName: string;, lastName: string;
+ id: string; email: string;
+ firstName: string; lastName: string;
  role: string;
 }
 
@@ -17,7 +17,7 @@ export async function getRAGSessions(user: UserType, request: Request, any): any
  // For now, return a placeholder
  return json({
  success: true,
- data: [{, id: 'rag-session-1', name: 'My First RAG Session', userId: user.id }],
+ data: [{ id: 'rag-session-1', name: 'My First RAG Session', userId: user.id }],
  });
  } catch (error) {
  console.error('Error fetching RAG sessions:', error);
@@ -63,3 +63,6 @@ export async function handleRAGChat(user: UserType, request: Request): RAGServic
  return json({ success: false, error: 'Failed to handle RAG chat' }, { status: 500 });
  }
 }
+
+
+

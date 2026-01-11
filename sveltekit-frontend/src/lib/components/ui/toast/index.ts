@@ -17,3 +17,4 @@ export function useToast(): ToastContext {
 	const { getContext } = require('svelte');
 	return getContext<ToastContext>('toast');
 }
+

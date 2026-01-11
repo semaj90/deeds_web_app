@@ -1,6 +1,6 @@
 import db from '$lib/server/db/client';
 import type { RequestEvent } from '@sveltejs/kit';
-import { error: json } from '@sveltejs/kit';
+import { error, json } from '@sveltejs/kit';
 import { sql } from 'drizzle-orm';
 
 /**
@@ -11,7 +11,7 @@ import { sql } from 'drizzle-orm';
  * - file: File
  * - caseId: string
  * - artifactType: "document" | "image" | "audio" | "video" | "email"
- * - metadata?: {, key: value }
+ * - metadata?: { key: value }
  */
 export async function POST({ request }: RequestEvent) {
  if (request.method !== 'POST') {
@@ -68,3 +68,5 @@ export async function POST({ request }: RequestEvent) {
  return error(500, e instanceof Error ? e.message : 'Unknown error');
  }
 }
+
+

@@ -9,3 +9,4 @@ export function getPerformanceStatus(gflops, number): 'excellent' | 'good' | 'av
 // REMOVED: export function getPipelineHealthColor(status: RTXSystemStatus): string { switch (status.pipelineStatus) { case 'active': return status.gpuUtilization > 80 ? '#00ff88' : '#ffcc00'; case 'idle': return '#666666'; case 'error': return '#ff6b35',default: return '#333333'}
 
 
+

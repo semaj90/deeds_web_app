@@ -9,7 +9,7 @@ function stableStringify(obj: any) {
  return JSON.stringify(obj, Object.keys(obj).sort());
 }
 
-export function ragCacheKey(input: {, kind: 'rag_search' | 'context_chat';
+export function ragCacheKey(input: { kind: 'rag_search' | 'context_chat';
  query: string;
  // filters
  caseId?: string | null;
@@ -59,7 +59,7 @@ export const setCached = cacheSetJSON;
 /**
  * Get cache statistics
  */
-export async function getCacheStats(): Promise<{, available: boolean;
+export async function getCacheStats(): Promise<{ available: boolean;
  keyCount: number;
  memoryUsage?: string;
 }> {
@@ -112,3 +112,5 @@ export function extractKeywords(text: string): string[] {
  // Deduplicate and limit
  return [...new Set(words)].slice(0, 50);
 }
+
+

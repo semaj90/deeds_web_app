@@ -11,7 +11,7 @@ export interface DualEmbedding {
 }
 
 export interface QdrantPayload {
- statute_id: string, title_number: number;, section: string, full_citation: string;, heading: string, som_cluster_id: number;, kmeans_label: string, cluster_confidence: number;, flagged_for_review: boolean, echo_hits: number;, cluster_version: number;
+ statute_id: string, title_number: number; section: string, full_citation: string; heading: string, som_cluster_id: number; kmeans_label: string, cluster_confidence: number; flagged_for_review: boolean, echo_hits: number; cluster_version: number;
 }
 
 export class DualQdrantStrategy {
@@ -30,10 +30,10 @@ export class DualQdrantStrategy {
  // Create 768d collection
  try {
  await this.client.recreateCollection(this.collection768, {
- vectors: {, size: 768,
+ vectors: { size: 768,
  distance: 'Cosine',
  },
- optimizers_config: {, default_segment_number: 2, snapshot_on_replica: false,
+ optimizers_config: { default_segment_number: 2, snapshot_on_replica: false,
  },
  });
  console.log(`✓ Created collection: ${this.collection768}`);
@@ -44,10 +44,10 @@ export class DualQdrantStrategy {
  // Create 256d collection
  try {
  await this.client.recreateCollection(this.collection256, {
- vectors: {, size: 256,
+ vectors: { size: 256,
  distance: 'Cosine',
  },
- optimizers_config: {, default_segment_number: 2, snapshot_on_replica: false,
+ optimizers_config: { default_segment_number: 2, snapshot_on_replica: false,
  },
  });
  console.log(`✓ Created collection: ${this.collection256}`);
@@ -86,7 +86,7 @@ export class DualQdrantStrategy {
  * Batch upsert to both collections
  */
  async batchUpsert(
- points: Array<{, id: string | number, embedding: DualEmbedding;, payload: QdrantPayload;
+ points: Array<{ id: string | number, embedding: DualEmbedding; payload: QdrantPayload;
  }>
  ): Promise<void> {
  const points768 = points.map((p) => ({
@@ -178,7 +178,7 @@ export class DualQdrantStrategy {
  must: [
  {
  key: 'kmeans_label',
- match: {, value: clusterLabel,
+ match: { value: clusterLabel,
  },
  },
  ],
@@ -197,12 +197,12 @@ export class DualQdrantStrategy {
  async updatePayload(pointId: string |, number: Partial<QdrantPayload>): Promise<void> {
  await Promise.all([
  this.client.setPayload(this.collection768, {
- points_selector: {, ids: [pointId],
+ points_selector: { ids: [pointId],
  },
  payload,
  }),
  this.client.setPayload(this.collection256, {
- points_selector: {, ids: [pointId],
+ points_selector: { ids: [pointId],
  },
  payload,
  }),
@@ -215,11 +215,11 @@ export class DualQdrantStrategy {
  async deletePoint(pointId: string | number): Promise<void> {
  await Promise.all([
  this.client.delete(this.collection768, {
- points_selector: {, ids: [pointId],
+ points_selector: { ids: [pointId],
  },
  }),
  this.client.delete(this.collection256, {
- points_selector: {, ids: [pointId],
+ points_selector: { ids: [pointId],
  },
  }),
  ]);
@@ -228,7 +228,7 @@ export class DualQdrantStrategy {
  /**
  * Get collection stats
  */
- async getStats(): Promise<{, collection768: any, collection256: any;
+ async getStats(): Promise<{ collection768: any, collection256: any;
  }> {
  const [stats768, stats256] = await Promise.all([
  this.client.getCollection(this.collection768),
@@ -267,3 +267,6 @@ export async function getDualQdrantStrategy(url?: string): Promise<DualQdrantStr
  }
  return strategy;
 }
+
+
+

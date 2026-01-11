@@ -93,7 +93,7 @@ class ProductionServiceClient {
  const name = err instanceof Error ? err.name : 'Error';
 
  const fallback: Partial<ServiceResponse> = {
- data: {, error: message, type: name },
+ data: { error: message, type: name },
  status: 0,
  headers: {},
  protocol: 'unknown',
@@ -192,7 +192,7 @@ class ProductionServiceClient {
  async benchmark(
  endpoint: string, options: IntegrationServiceRequest,
  iterations = 5
- ): Promise<{, averageLatency: number;, minLatency: number;, maxLatency: number;, successRate: number;, results: ServiceResponse[];
+ ): Promise<{ averageLatency: number; minLatency: number; maxLatency: number; successRate: number; results: ServiceResponse[];
  }> {
  const results: ServiceResponse[] = [];
  let successCount = 0;
@@ -243,3 +243,6 @@ function extractProtocolFromResponse(response: Response): string {
 // Export singleton and class (avoid duplicate re-export)
 export const productionServiceClient = new ProductionServiceClient();
 export { ProductionServiceClient };
+
+
+

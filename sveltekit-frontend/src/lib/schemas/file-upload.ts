@@ -9,3 +9,4 @@ export const formatFileSize = (bytes: number): string => { const sizes = ['B', '
 export const defaultCaseWithFilesValues: Partial<CaseWithFiles> = { title: '', caseNumber: '', description: '', category: '', priority: 'medium', assignedTeam: [], tags: [], files: [], fileDescriptions: [], fileTitles: [], fileTypes: [], fileEvidenceTypes: [] }
 
 
+

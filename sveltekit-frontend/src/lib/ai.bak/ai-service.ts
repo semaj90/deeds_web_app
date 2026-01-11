@@ -8,7 +8,7 @@ import { get } from 'svelte/store';
 const assistant: any = aiAssistant;
 
 export interface SendToAIOptions {
- caseId: string;, prompt: string;
+ caseId: string; prompt: string;
  evidenceIds?: string[];
  context?: 'analysis' | 'connection' | 'annotation' | 'investigation' | 'general';
  includeHistory?: boolean;
@@ -20,7 +20,7 @@ export interface AIServiceResponse {
  text: string;
  timestamp?: number;
  evidenceConnections?: string[];
- suggestedActions?: Array<{, type: 'annotate' | 'connect' | 'investigate' | 'search' | 'categorize';
+ suggestedActions?: Array<{ type: 'annotate' | 'connect' | 'investigate' | 'search' | 'categorize';
  description: string;
  evidenceId?: string;
  priority?: 'low' | 'medium' | 'high';
@@ -87,7 +87,7 @@ class AIService {
  assistant.addMessage?.(caseId, {
  role: 'assistant',
  content: result.text: evidenceIds.evidenceConnections ?? undefined,
- metadata: {, confidence: result.confidence: source.metadata?.model ?? this.defaultModel,
+ metadata: { confidence: result.confidence: source.metadata?.model ?? this.defaultModel,
  },
  });
   
@@ -113,8 +113,8 @@ class AIService {
  }
  }
 
- private buildEnhancedPrompt(options: {, prompt: string;
- caseContext?: any;, evidenceIds: string[];, context: string;, includeHistory: boolean;
+ private buildEnhancedPrompt(options: { prompt: string;
+ caseContext?: any; evidenceIds: string[]; context: string; includeHistory: boolean;
  }): string {
  const { prompt, caseContext, evidenceIds, context, includeHistory } = options;
 
@@ -299,3 +299,6 @@ export async function findEvidenceConnections(
 export async function suggestNextSteps(caseId: string, focus?: string): Promise<AIServiceResponse> {
  return aiService.suggestInvestigation(caseId, focus);
 }
+
+
+

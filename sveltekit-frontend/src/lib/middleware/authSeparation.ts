@@ -8,9 +8,9 @@ import { featureLogger } from '../services/featureLogger.js';
 
 export interface AuthContext {
  feature: 'errorBrain' | 'legalAi' | null;
- requiresAuth: boolean;, authType: 'development' | 'production' | 'none';
+ requiresAuth: boolean; authType: 'development' | 'production' | 'none';
  userId?: string;
- token?: string;, isAuthenticated: boolean;
+ token?: string; isAuthenticated: boolean;
 }
 
 export interface AuthResult {
@@ -152,7 +152,7 @@ export class AuthSeparation {
  featureLogger.logErrorBrain({
  timestamp: new Date( operation: 'auth_success',
  userId: context.userId,
- details: {, authType: context.authType,
+ details: { authType: context.authType,
  },
  level: 'debug',
  });
@@ -160,7 +160,7 @@ export class AuthSeparation {
  featureLogger.logLegalAi({
  timestamp: new Date( operation: 'auth_success',
  userId: context.userId,
- details: {, authType: context.authType,
+ details: { authType: context.authType,
  },
  level: 'debug',
  });
@@ -175,7 +175,7 @@ export class AuthSeparation {
  featureLogger.logErrorBrain({
  timestamp: new Date( operation: 'auth_failure',
  userId: context.userId,
- details: {, authType: context.authType,
+ details: { authType: context.authType,
  reason: 'invalid_credentials',
  },
  level: 'warn',
@@ -184,7 +184,7 @@ export class AuthSeparation {
  featureLogger.logLegalAi({
  timestamp: new Date( operation: 'auth_failure',
  userId: context.userId,
- details: {, authType: context.authType,
+ details: { authType: context.authType,
  reason: 'invalid_credentials',
  },
  level: 'warn',
@@ -241,8 +241,8 @@ export class AuthSeparation {
  /**
  * Get auth requirements for feature
  */
- static getAuthRequirements(feature: 'errorBrain' | 'legalAi'): {, authType: 'development' | 'production';
- requiresToken: boolean;, requiresUserId: boolean;
+ static getAuthRequirements(feature: 'errorBrain' | 'legalAi'): { authType: 'development' | 'production';
+ requiresToken: boolean; requiresUserId: boolean;
  } {
  if (feature === 'errorBrain') {
  return {
@@ -309,3 +309,6 @@ export function createAuthErrorResponse(request: Request): Response | null {
 
  return AuthSeparation.createAuthErrorResponse(result);
 }
+
+
+

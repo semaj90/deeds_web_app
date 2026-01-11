@@ -5,3 +5,4 @@ export type GuardProps = AuthComponentProps & { requiredRole?: string; requiredP
 export type AuthMode = 'login' | 'register' | 'forgot-password' | 'reset-password'; export type AuthProviderType = 'email' | 'google' | 'github' | 'microsoft'; export interface AuthFormData { email: password?: string; confirmPassword? : string; firstName?: string; lastName?: string}
 
 
+

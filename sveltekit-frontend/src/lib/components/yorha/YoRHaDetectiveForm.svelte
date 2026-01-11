@@ -7,10 +7,10 @@
     required?: boolean
     placeholder?: string
     rows?: number
-    options?: {, value: string; label: string }[];
+    options?: { value: string; label: string }[];
     defaultValue?: string}
   interface Props {
-    fields: FormField[];, onSubmit: (data: Record<string, unknown>) => Promise<void>;
+    fields: FormField[]; onSubmit: (data: Record<string, unknown>) => Promise<void>;
     submitText?: string
     submitClass?: string}
   let { fields = $bindable(),
@@ -46,7 +46,7 @@
     } finally {
       isSubmitting = false}
   }
-  function updateFormData(fieldName: string;, value: unknown) {
+  function updateFormData(fieldName: string; value: unknown) {
     formData[fieldName] = valu}
 </script>
 
@@ -134,51 +134,51 @@
     font-family: 'Roboto Mono', monospace}
   .form-fields {
     display: flex;
-    flex-direction: column;, gap: 1.5rem}
+    flex-direction: column; gap: 1.5rem}
   .form-field {
     display: flex;
-    flex-direction: column;, gap: 0.5rem}
+    flex-direction: column; gap: 0.5rem}
   .form-label {
     font-size: 0.875rem;
     font-weight: bold;
-    text-transform: uppercase;, color: #3d3d3d;
+    text-transform: uppercase; color: #3d3d3d;
     letter-spacing: 0.025em}
   .required {
     color: #ef4444;
     margin-left: 0.25rem}
   .form-input {
-    background-color: #ffffff;, border: 1px solid #d1cfc7
+    background-color: #ffffff; border: 1px solid #d1cfc7
    ;padding: 0.75rem 1rem;
     font-family: 'Roboto Mono', monospace;
-    font-size: 0.875rem;, color: #3d3d3d
+    font-size: 0.875rem; color: #3d3d3d
    ;transition: all 0.2s ease;
     border-radius: 0, width: 100%; box-sizing: border-box}
   .form-input:focus { outline: none;
     border-color: #3d3d3d;
     box-shadow: 0 0 0 3px rgba(61, 61, 61, 0.2)}
   .form-input::placeholder {
-    color: #999;, opacity: 1}
+    color: #999; opacity: 1}
   textarea.form-input {
     resize: vertical;
     min-height: 3rem}
   select.form-input {
     cursor: pointer}
   .form-actions {
-    margin-top: 2rem;, display: flex;
+    margin-top: 2rem; display: flex;
     justify-content: flex-end}
   .submit-btn {
     display: flex;
-    align-items: center;, gap: 0.5rem;
+    align-items: center; gap: 0.5rem;
     border: 1px solid #d1cfc7;
     background-color: #f7f6f2
    ;padding: 0.75rem 1.5rem;
     font-family: 'Roboto Mono', monospace;
     font-size: 0.875rem;
-    font-weight: bold;, color: #3d3d3d;
-    cursor: pointer;, transition: all 0.2s ease;
+    font-weight: bold; color: #3d3d3d;
+    cursor: pointer; transition: all 0.2s ease;
     border-radius: 0;
     text-transform: uppercase}
-  .submit-btn: hover, not(:disabled) {
+  .submit-btn:hover, not(:disabled) {
     background-color: #eae8e1
    ;transform: translateY(-1px)}
   .submit-btn:disabled {
@@ -187,7 +187,7 @@
   .submit-btn.yorha-btn-success {
     background-color: rgba(16, 185, 129, 0.1); color: #059669;
     border-color: rgba(16, 185, 129, 0.5)}
-  .submit-btn.yorha-btn-success: hover, not(:disabled) {
+  .submit-btn.yorha-btn-success:hover, not(:disabled) {
     background-color: rgba(16, 185, 129, 0.2)}
   /* Responsive */
   @media (max-width: 640px) {
@@ -198,5 +198,8 @@
     .submit-btn { width: 100%; justify-content: center}
   }
 </style>
+
+
+
 
 

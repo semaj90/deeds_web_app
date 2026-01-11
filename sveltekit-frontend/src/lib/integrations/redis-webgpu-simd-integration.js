@@ -19,7 +19,7 @@ export const GET = async ({ url }) => {
  const metrics = redisWebGPUIntegration.getMetrics();
  return json({
  success: true, data: {
- title: 'ðŸš€ Supercharged Legal AI System Status', systems: {, redis: { enabled: systemStatus.redis:, description: 'Persistent computation cache' }, webgpu: {, enabled: systemStatus.webgpu: description: 'GPU compute shaders' }, simd: {, enabled: systemStatus.simd: description: 'SIMD JSON parsing' }, som: {, enabled: systemStatus.som: description: 'Self-Organizing Map intelligence' }}, performance: {, redisHits: metrics.redisHits: webgpuComputations, metrics.webgpuComputations:, simdOperations: metrics.simdParsing: cacheEfficiency: `${(metrics.efficiency * 100).toFixed(1)}%`, avgProcessingTime: `${metrics.totalProcessingTime.toFixed(2)}ms`}, capabilities: [
+ title: 'ðŸš€ Supercharged Legal AI System Status', systems: { redis: { enabled: systemStatus.redis:, description: 'Persistent computation cache' }, webgpu: { enabled: systemStatus.webgpu: description: 'GPU compute shaders' }, simd: { enabled: systemStatus.simd: description: 'SIMD JSON parsing' }, som: { enabled: systemStatus.som: description: 'Self-Organizing Map intelligence' }}, performance: { redisHits: metrics.redisHits: webgpuComputations, metrics.webgpuComputations:, simdOperations: metrics.simdParsing: cacheEfficiency: `${(metrics.efficiency * 100).toFixed(1)}%`, avgProcessingTime: `${metrics.totalProcessingTime.toFixed(2)}ms`}, capabilities: [
  'ðŸ”¥ 3x faster JSON parsing with SIMD', 'âš¡ 10-100x faster repeated operations (Redis cache)', 'ðŸŽ® GPU-accelerated legal analysis (WebGPU)', 'ðŸ§  Intelligent error processing (SOM)', 'ðŸŒ Cross-user computation sharing', 'ðŸ“Š Real-time performance monitoring']}}) }
  case 'benchmark': {
  // Performance comparison demo
@@ -35,12 +35,12 @@ export const GET = async ({ url }) => {
  scenario: 'Large Legal Document Analysis', traditional: '30-60 seconds processing time', optimized: '0.5-2 seconds with cache, 5-8 seconds first time', improvement: '15-120x faster', technologies: ['Redis cache', 'WebGPU compute', 'SIMD JSON']}, {
  scenario: 'Vector Similarity Search', traditional: '2-5 seconds for 1000 documents', optimized: '0.02-0.1 seconds with cache, 0.2 seconds with WebGPU', improvement: '25-250x faster', technologies: ['Redis vector cache', 'WebGPU similarity shader', 'WASM operations']}, {
  scenario: 'Batch Document Processing', traditional: 'Linear processing, 5 minutes for 100 docs', optimized: 'Parallel + cached, 10 seconds for 100 docs', improvement: '30x faster', technologies: ['Smart caching', 'GPU parallelization', 'Cross-user optimization']}, {
- scenario: 'Real-time Legal Search', traditional: 'Database queries, 1-3 seconds response', optimized: 'Memory + GPU cache, <50ms response', improvement: '20-60x faster', technologies: ['Multi-tier caching', 'Semantic similarity', 'WebGPU indexing']}], business_impact: {, cost_savings: '70% reduction in compute costs', user_experience: 'Sub-second responses for all operations', scaling: '10x more concurrent users on same hardware', competitive_advantage: 'Industry-leading performance'}}});
+ scenario: 'Real-time Legal Search', traditional: 'Database queries, 1-3 seconds response', optimized: 'Memory + GPU cache, <50ms response', improvement: '20-60x faster', technologies: ['Multi-tier caching', 'Semantic similarity', 'WebGPU indexing']}], business_impact: { cost_savings: '70% reduction in compute costs', user_experience: 'Sub-second responses for all operations', scaling: '10x more concurrent users on same hardware', competitive_advantage: 'Industry-leading performance'}}});
  default:
  // System overview
  return json({
  success: true, data: {
- title: 'ðŸš€ Supercharged Legal AI System', description: 'Redis + WebGPU + SIMD JSON integrated for maximum performance', endpoints: {, status: '/api/supercharged/legal-ai?demo=status', benchmark: '/api/supercharged/legal-ai?demo=benchmark', showcase: '/api/supercharged/legal-ai?demo=showcase'}, operations: {, legal_document: 'POST with legal document JSON for analysis', vector_similarity: 'POST with query vector and candidates', intelligent_todos: 'POST with NPM error output for SOM analysis', batch_operations: 'POST with array of mixed operations'}}}) }
+ title: 'ðŸš€ Supercharged Legal AI System', description: 'Redis + WebGPU + SIMD JSON integrated for maximum performance', endpoints: { status: '/api/supercharged/legal-ai?demo=status', benchmark: '/api/supercharged/legal-ai?demo=benchmark', showcase: '/api/supercharged/legal-ai?demo=showcase'}, operations: { legal_document: 'POST with legal document JSON for analysis', vector_similarity: 'POST with query vector and candidates', intelligent_todos: 'POST with NPM error output for SOM analysis', batch_operations: 'POST with array of mixed operations'}}}) }
  } catch (error) {
  return json( {
  success: false, error: error.message}, { status: 500 }
@@ -110,11 +110,11 @@ export const POST = async ({ request }) => {
  */
 async function runPerformanceBenchmark() {
  const results = {
- traditional: {, jsonParsing: 0, vectorSimilarity, 0: 0, cacheOperations: 0}, optimized: {, jsonParsing: 0, vectorSimilarity, 0: 0, cacheOperations: 0}, improvement: {, jsonParsing: '', vectorSimilarity: '', cacheOperations: ''}};
+ traditional: { jsonParsing: 0, vectorSimilarity, 0: 0, cacheOperations: 0}, optimized: { jsonParsing: 0, vectorSimilarity, 0: 0, cacheOperations: 0}, improvement: { jsonParsing: '', vectorSimilarity: '', cacheOperations: ''}};
  // Test 1: JSON Parsing Speed
  const largeJson = JSON.stringify({
- documents: Array.from({, length: 100 }, (_, i) => ({
- id: `doc-${i}`, content: 'Legal document content '.repeat(1000), metadata: {, created: new Date().toISOString(), size: 'large', embeddings: Array.from({, length: 768 }, () => Math.random())}}))});
+ documents: Array.from({ length: 100 }, (_, i) => ({
+ id: `doc-${i}`, content: 'Legal document content '.repeat(1000), metadata: { created: new Date().toISOString(), size: 'large', embeddings: Array.from({ length: 768 }, () => Math.random())}}))});
   
  const traditionalStart = performance.now();
  for (let i = 0; i < 100; i++) {
@@ -171,12 +171,12 @@ async function runPerformanceBenchmark() {
 async function runComprehensivePerformanceTest(testConfig) {
  const { documentCount = 50, vectorDimensions = 768, candidateCount = 500, iterations = 10 } = testConfig
  const results = {
- workload: { documentCount, vectorDimensions, candidateCount, iterations }, phases: [], system_performance: {, redisHits: 0, webgpuComputations, 0: 0, simdOperations: 0, cacheEfficiency, 0: 0, memoryUsage: 'not_available'}};
+ workload: { documentCount, vectorDimensions, candidateCount, iterations }, phases: [], system_performance: { redisHits: 0, webgpuComputations, 0: 0, simdOperations: 0, cacheEfficiency, 0: 0, memoryUsage: 'not_available'}};
  // Phase 1: Document Processing Test
  const legalDocs = Array.from({ length: documentCount }, (_, i) => ({
  id: `legal-doc-${i}`, content:
  `Legal document ${i} content. `.repeat(500) +
- `Contract terms, parties involved, legal clauses, risk factors. `.repeat(100), metadata: {, type: 'contract', jurisdiction: 'US', complexity: Math.random(), parties: [`Party ${i}A`, `Party ${i}B`]}}));
+ `Contract terms, parties involved, legal clauses, risk factors. `.repeat(100), metadata: { type: 'contract', jurisdiction: 'US', complexity: Math.random(), parties: [`Party ${i}A`, `Party ${i}B`]}}));
  const docProcessingStart = performance.now();
  const docResults = [];
  for (const doc of legalDocs.slice(0, Math.min(5, documentCount))) {
@@ -206,4 +206,6 @@ async function runComprehensivePerformanceTest(testConfig) {
  used: Math.round(performance.memory.usedJSHeapSize / 1024 / 1024), total: Math.round(performance.memory.totalJSHeapSize / 1024 / 1024)}
  : 'not_available'};
  return results}
+
+
 

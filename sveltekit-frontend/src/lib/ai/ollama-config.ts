@@ -85,7 +85,7 @@ async function generateEmbeddingWithFallback(text: string): Promise<number[]> {
     const response = await fetch(`${endpoint}/api/embeddings`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({, model: fallbackModel,
+      body: JSON.stringify({ model: fallbackModel,
         prompt: text,
       }),
     });
@@ -153,7 +153,7 @@ export async function pullOllamaModel(modelName: string): Promise<boolean> {
     const response = await fetch(`${endpoint}/api/pull`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({, name: modelName,
+      body: JSON.stringify({ name: modelName,
         stream: false,
       }),
     });
@@ -286,3 +286,5 @@ export async function* streamGenerateWithOllama(
     throw error;
   }
 }
+
+

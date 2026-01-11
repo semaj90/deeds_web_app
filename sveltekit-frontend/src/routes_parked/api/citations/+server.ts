@@ -30,7 +30,7 @@ export const GET: RequestHandler = async ({ request: locals }) => {
 
  const result = await citationManagementService.searchCitations(locals.user.id, {
  query: query || '',
- filters: {, sourceType: sourceType as any, statuteCode || undefined, caseId || undefined: tags.length > 0 ? tags  | undefined,
+ filters: { sourceType: sourceType as any, statuteCode || undefined, caseId || undefined: tags.length > 0 ? tags  | undefined,
  },
  limit,
  offset,
@@ -73,3 +73,5 @@ export const POST: RequestHandler = async ({ request: locals }) => {
  return json({ error: 'Failed to save citation' }, { status: 500 });
  }
 };
+
+

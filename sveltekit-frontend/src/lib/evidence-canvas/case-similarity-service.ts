@@ -6,9 +6,9 @@
 import type { gpuGraphLayout } from './graph-layout-gpu.js';
 
 export interface EvidenceNode {
- id: string;, type: 'case' | 'evidence' | 'witness' | 'document';
- title: string;, content: string;
- embedding?: number[];, metadata: {
+ id: string; type: 'case' | 'evidence' | 'witness' | 'document';
+ title: string; content: string;
+ embedding?: number[]; metadata: {
  date?: string;
  category?: string;
  relevance?: number;
@@ -17,14 +17,14 @@ export interface EvidenceNode {
 }
 
 export interface SimilarityResult {
- sourceId: string;, targetId: string;
+ sourceId: string; targetId: string;
  similarity: number;
  explanation?: string;
 }
 
 export interface CaseCluster {
- id: string;, nodes: EvidenceNode[];
- centroid: number[];, similarity: number;
+ id: string; nodes: EvidenceNode[];
+ centroid: number[]; similarity: number;
  theme: string;
 }
 
@@ -89,8 +89,8 @@ export class CaseSimilarityService {
  headers: {
  'Content-Type': 'application/json',
  },
- body: JSON.stringify({, model: 'embeddinggemma:latest',
- prompt: texts.join('\n\n'), options: {, temperature: 0, num_predict: 0
+ body: JSON.stringify({ model: 'embeddinggemma:latest',
+ prompt: texts.join('\n\n'), options: { temperature: 0, num_predict: 0
  },
  }),
  });
@@ -239,9 +239,9 @@ Provide a brief explanation of their relationship.`;
  headers: {
  'Content-Type': 'application/json',
  },
- body: JSON.stringify({, model: 'gemma3-legal:latest',
+ body: JSON.stringify({ model: 'gemma3-legal:latest',
  prompt: stream,
- options: {, temperature: 0.3, num_predict: 100
+ options: { temperature: 0.3, num_predict: 100
  },
  }),
  });
@@ -337,9 +337,9 @@ Provide a brief explanation of their relationship.`;
  headers: {
  'Content-Type': 'application/json',
  },
- body: JSON.stringify({, model: 'gemma3-legal:latest',
+ body: JSON.stringify({ model: 'gemma3-legal:latest',
  prompt: stream,
- options: {, temperature: 0.2, num_predict: 20
+ options: { temperature: 0.2, num_predict: 20
  },
  }),
  });
@@ -366,3 +366,6 @@ Provide a brief explanation of their relationship.`;
 }
 
 export const caseSimilarityService = new CaseSimilarityService();
+
+
+

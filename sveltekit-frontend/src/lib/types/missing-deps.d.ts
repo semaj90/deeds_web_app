@@ -1,7 +1,7 @@
 // Missing type definitions for external libraries
 declare module 'fuse.js' {
  interface FuseOptions<T> {
- keys?: Array<string | { name: string;, weight: number }>;
+ keys?: Array<string | { name: string; weight: number }>;
  threshold?: number;
  includeScore?: boolean;
  includeMatches?: boolean;
@@ -81,3 +81,5 @@ declare global {
  inert?: boolean;
  }
 }
+
+

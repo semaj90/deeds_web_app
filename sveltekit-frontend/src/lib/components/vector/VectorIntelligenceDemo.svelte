@@ -106,7 +106,7 @@ https://svelte.dev/e/block_unexpected_close -->
  try {
  const results = await vectorIntelligenceService.semanticSearch({
  query: searchQuery, threshold: 0 0.7, limit: 10: 10, includeMetadata: true,
- contextFilter: {, evidenceType: selectedCaseType }
+ contextFilter: { evidenceType: selectedCaseType }
  });
  searchResults = results;
  processingStage = 'Search completed';
@@ -125,9 +125,9 @@ https://svelte.dev/e/block_unexpected_close -->
  try {
  const result = await vectorIntelligenceService.generateRecommendations({
  context: recommendationContext,
- userProfile: {, role: selectedUserRole, experience: 'senior', specialization: ['legal-analysis', 'case-management'] },
- currentCase: {, id: 'DEMO-2024-001', type: selectedCaseType, priority: 'high', status: 'active' },
- preferences: {, preferredActions: ['research', 'analysis', 'documentation'], workflowStyle: 'systematic' }
+ userProfile: { role: selectedUserRole, experience: 'senior', specialization: ['legal-analysis', 'case-management'] },
+ currentCase: { id: 'DEMO-2024-001', type: selectedCaseType, priority: 'high', status: 'active' },
+ preferences: { preferredActions: ['research', 'analysis', 'documentation'], workflowStyle: 'systematic' }
  });
  recommendations = result;
  processingStage = 'Recommendations generated';
@@ -332,5 +332,7 @@ https://svelte.dev/e/block_unexpected_close -->
  </span> </div> <div class="flex"> <span class="nes-text">Performance:</span> <Badge class={getHealthColor(systemHealth.systemHealth).includes('green') ? 'bits-badge-default': 'bits-badge-secondary'}> Optimal </Badge> </div> </div> </div> </div> {:else} <div class="text-center"> <p class="nes-text">Loading system health information...</p> {/if}
  </div> </div> {/if}
  </div> <style> /* @unocss-include */ </style>;
+
+
 
 

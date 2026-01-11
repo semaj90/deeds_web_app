@@ -254,29 +254,29 @@ https://svelte.dev/e/element_invalid_closing_tag -->
 <style>
  @import 'nes.css/css/nes.min.css';
  :global(body) {
- background: #212529;, color: #d4af37;
+ background: #212529; color: #d4af37;
  font-family: 'Press Start 2P', 'Courier New', monospace;
  }
 
  .rag-page {
- max-width: 980px;, margin: 2rem auto;
+ max-width: 980px; margin: 2rem auto;
  padding: 1rem;
  }
 
  .tabs {
- display: flex;, gap: 0.5rem;
+ display: flex; gap: 0.5rem;
  margin-bottom: 1rem;
  }
 
  .panel {
- background: #fff;, color: #000;
+ background: #fff; color: #000;
  padding: 1rem;
  border-radius: 8px;
  }
 
  .doc-list,
  .results {
- list-style: none;, padding: 0;
+ list-style: none; padding: 0;
  margin: 0;
  }
 
@@ -284,7 +284,7 @@ https://svelte.dev/e/element_invalid_closing_tag -->
  .results li {
  display: flex;
  justify-content: space-between;
- align-items: center;, padding: 0.6rem 0;
+ align-items: center; padding: 0.6rem 0;
  border-bottom: 1px solid #eee;
  }
 
@@ -294,3 +294,4 @@ https://svelte.dev/e/element_invalid_closing_tag -->
 </style>
  }
 </style>
+

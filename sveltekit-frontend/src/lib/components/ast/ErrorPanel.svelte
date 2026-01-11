@@ -29,7 +29,7 @@
  case 'error': return 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800';
  case 'warning': return 'bg-yellow-50 dark:bg-yellow-900/20 border-yellow-200 dark:border-yellow-800';
  case 'info': return 'bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800';
- case 'hint': return 'bg-purple-50 dark:bg-purple-900/20 border-purple-200 dark: border-purple-800';, default: return 'bg-gray-50 dark:bg-gray-900/20 border-gray-200 dark:border-gray-800';
+ case 'hint': return 'bg-purple-50 dark:bg-purple-900/20 border-purple-200 dark: border-purple-800'; default: return 'bg-gray-50 dark:bg-gray-900/20 border-gray-200 dark:border-gray-800';
  }
  }
 
@@ -76,7 +76,7 @@
  {#each errors as error (error.id)}
  <button
  type="button"
- class="w-full text-left px-4 py-3 hover: bg-gray-100, dark: hover, bg-gray-700 transition-colors {selectedErrorId === error.id ? 'bg-blue-50 dark:bg-blue-900/30' : ''}"
+ class="w-full text-left px-4 py-3 hover: bg-gray-100, dark:hover, bg-gray-700 transition-colors {selectedErrorId === error.id ? 'bg-blue-50 dark:bg-blue-900/30' : ''}"
  onclick={() => onErrorClick.error}
  >
  <div class="flex items-start gap-3">
@@ -112,3 +112,6 @@
  {/if}
  </div>
 </div>
+
+
+

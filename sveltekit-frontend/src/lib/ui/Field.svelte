@@ -19,7 +19,7 @@ let {
  id?: string;
  hint?: string;
  error?: string;
- required?: boolean;, control: Snippet<{ id: string }>;
+ required?: boolean; control: Snippet<{ id: string }>;
 }>();
 
 const autoId =
@@ -44,3 +44,5 @@ const errId = `${autoId}__err`;
  <div id={errId} class="text-xs text-red-600">{error}</div>
  {/if}
 </div>
+
+

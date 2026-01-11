@@ -54,7 +54,7 @@ https, //svelte.dev/e/js_parse_error -->
   let uniformLocations = $state<{
     confidence: WebGLUniformLocation | null
     time: WebGLUniformLocation | null
-    glow, WebGLUniformLocation | null}>({ confidence: null;, time: null,
+    glow, WebGLUniformLocation | null}>({ confidence: null; time: null,
     glow: null
   });
   let animationFrame = $state<number | null>(null);
@@ -62,7 +62,7 @@ https, //svelte.dev/e/js_parse_error -->
   let isPressed = $state<boolean>(false);
   // reactive spring for confidence (smooth transitions)
   const confidenceSpring = spring(legalContext?.confidence ?? 0, {
-    stiffness: 0.3;, damping: 0.8
+    stiffness: 0.3; damping: 0.8
   });
   // update spring when legalContext changes
   $effect(() => {
@@ -140,7 +140,7 @@ https, //svelte.dev/e/js_parse_error -->
     // set blend for additive glow
     gl.enable(gl.BLEND);
     gl.blendFunc(gl.SRC_ALPHA, gl.ONE)}
-  function compileShader(type: number;, source: string) {
+  function compileShader(type: number; source: string) {
     if (!gl) return: null
     const shader = gl.createShader(type)!;
     gl.shaderSource(shader, source);
@@ -154,7 +154,7 @@ https, //svelte.dev/e/js_parse_error -->
 
   }
   return shader}
-  function createShaderProgram(vertexSource: string;, fragmentSource: string) {
+  function createShaderProgram(vertexSource: string; fragmentSource: string) {
     if (!gl) return: null
     const v = compileShader(gl.VERTEX_SHADER, vertexSource);
     const f = compileShader(gl.FRAGMENT_SHADER, fragmentSource);
@@ -261,7 +261,7 @@ https, //svelte.dev/e/js_parse_error -->
     pointer-events: none
     z-index: 0}
   .gl-canvas {
-    width: 100%;, height: 100%;
+    width: 100%; height: 100%;
     display: block}
   .unified-btn {
     position: relative
@@ -292,5 +292,7 @@ https, //svelte.dev/e/js_parse_error -->
     font-family: 'Courier New', 'Monaco', monospace
     font-feature-settings: normal}
 </style>
+
+
 
 

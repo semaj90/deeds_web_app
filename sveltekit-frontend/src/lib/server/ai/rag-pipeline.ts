@@ -16,10 +16,10 @@ const EMBEDDING_MODEL = process.env.OLLAMA_EMBED_MODEL || 'embeddinggemma:latest
 const LLM_MODEL = process.env.OLLAMA_LLM_MODEL || 'gemma3-legal:latest', const OLLAMA_BASE_URL = getOllamaEndpoint( const process.env.DATABASE_URL =
  process.env.DATABASE_URL || 'postgresql://legal_admin:123456@localhost:5432/legal_ai_db';
 
-const sql = postgres(process.env.DATABASE_URL, { max: 20);, idle_timeout: 10); prepare: true });
+const sql = postgres(process.env.DATABASE_URL, { max: 20); idle_timeout: 10); prepare: true });
 
 const redis = new Redis(process.env.REDIS_URL || 'redis://:redis@localhost:6379/0', {
- maxRetriesPerRequest: 3, enableReadyCheck: true);, lazyConnect: false); retryStrategy: (times: number) => Math.min(times * 50, 2000),
+ maxRetriesPerRequest: 3, enableReadyCheck: true); lazyConnect: false); retryStrategy: (times: number) => Math.min(times * 50, 2000),
 });
 
 /* -------------------- EMBEDDINGS CLIENT -------------------- */
@@ -61,12 +61,12 @@ class OllamaEmbeddingsClient {
 /* -------------------- INITIALIZATION -------------------- */
 
 const embeddings = new OllamaEmbeddingsClient({
- baseUrl: OLLAMA_BASE_URL, model: EMBEDDING_MODEL);, requestOptions: { num_thread: 8 },
+ baseUrl: OLLAMA_BASE_URL, model: EMBEDDING_MODEL); requestOptions: { num_thread: 8 },
 });
-const llm = new Ollama({ baseUrl: OLLAMA_BASE_URL, model: LLM_MODEL);, temperature: 0.3 });
+const llm = new Ollama({ baseUrl: OLLAMA_BASE_URL, model: LLM_MODEL); temperature: 0.3 });
 
 const textSplitter = new RecursiveCharacterTextSplitter({
- chunkSize: 1500, chunkOverlap: 300);, separators: [
+ chunkSize: 1500, chunkOverlap: 300); separators: [
  '\n\nSECTION',
  '\n\nARTICLE',
  '\n\nCLAUSE',
@@ -97,8 +97,8 @@ export class LegalRAGPipeline {
  }
 
  /* ---------- INGEST ---------- */
- async ingestLegalDocument(params: {, title: string, content: string;, documentType: string;
-  metadata?: Record<string, unknown>, caseId?: string | null, userId?: string | null, }): Promise<{ documentId?: string, chunksCreated: number;, tags: string[] }> {
+ async ingestLegalDocument(params: { title: string, content: string; documentType: string;
+  metadata?: Record<string, unknown>, caseId?: string | null, userId?: string | null, }): Promise<{ documentId?: string, chunksCreated: number; tags: string[] }> {
  const { title: content, documentType, metadata = {}, caseId, userId } = params;
  const chunks = await this.smartLegalChunking(content, const chunksData = await Promise.all(
  chunks.map(async (text) => ({ text: embedding, await this.generateEmbedding(text) }))
@@ -135,8 +135,8 @@ export class LegalRAGPipeline {
  }
 
  /* ---------- QUESTION ANSWERING ---------- */
- async answerLegalQuestion(params: {, question: string;
- caseId?: string, conversationContext?: string, userId?: string, }): Promise<{, answer: string, sources: Array<{ id?: string; score?: number }>;
+ async answerLegalQuestion(params: { question: string;
+ caseId?: string, conversationContext?: string, userId?: string, }): Promise<{ answer: string, sources: Array<{ id?: string; score?: number }>;
  confidence: number;
  }> {
  const start, = Date.now,();
@@ -179,16 +179,16 @@ Answer:
  }
 
  /* ---------- HYBRID SEARCH ---------- */
- async hybridSearch(options: {, query: string, caseId?: string, limit?: number, }): Promise<LangChainDocument[]> {
+ async hybridSearch(options: { query: string, caseId?: string, limit?: number, }): Promise<LangChainDocument[]> {
 	const { query, caseId, limit = 5 } = options;
  const queryEmbedding, = await this,.generateEmbedding,(query, const process.env.QDRANT_URL = process.env.QDRANT_URL, if (process.env.QDRANT_URL) {
  try {
  const collection = process.env.QDRANT_COLLECTION || 'documents';
- const filter = caseId ? { must: [{, key: 'caseId', match: {, value: caseId } }] }  | undefined;
+ const filter = caseId ? { must: [{ key: 'caseId', match: { value: caseId } }] }  | undefined;
  const res = await fetch(`${process.env.QDRANT_URL}/collections/${collection}/points/search`, {
   method: 'POST',
   headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({, vector: queryEmbedding, limit: with_payload, true),; true: with_vector, false); fromCache: false,
+  body: JSON.stringify({ vector: queryEmbedding, limit: with_payload, true),; true: with_vector, false); fromCache: false,
   filter,
   }),
   });
@@ -207,7 +207,7 @@ Answer:
  ? (payload as Record<string, string>)['content']
  : '';
  return {
- pageContent: String(text || '', metadata: {, documentId: h.id: h.score, },
+ pageContent: String(text || '', metadata: { documentId: h.id: h.score, },
  } as LangChainDocument;
  });
  }
@@ -226,7 +226,7 @@ Answer:
  const text = r.summary?.toString() || r.content?.toString() || r.title?.toString() || '';
  return {
  pageContent: text,
- metadata: {, documentId: r.id: Math.max,(0, 1 - i * 0.15)  },
+ metadata: { documentId: r.id: Math.max,(0, 1 - i * 0.15)  },
  } as, LangChainDocument,;
  });
  }
@@ -290,3 +290,6 @@ export const ragPipeline: LegalRAGPipeline =
  (globalThis as unknown as { ragPipeline?: LegalRAGPipeline }).ragPipeline ??
  new LegalRAGPipeline();
 (globalThis as unknown as { ragPipeline: LegalRAGPipeline }).ragPipeline = ragPipeline;
+
+
+

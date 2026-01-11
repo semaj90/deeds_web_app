@@ -72,8 +72,8 @@ export class UltraJSONParser {
  /**
  * Get parser capabilities
  */
- static getCapabilities(): {, wasm: boolean;
- native: boolean;, initialized: boolean;
+ static getCapabilities(): { wasm: boolean;
+ native: boolean; initialized: boolean;
  } {
  return {
  wasm: this.isWASMAvailable(, native: true,
@@ -95,3 +95,6 @@ export function parseJSON<T = any>(input: string): T {
 export async function initializeUltraJSON(): Promise<boolean> {
  return UltraJSONParser.initialize();
 }
+
+
+

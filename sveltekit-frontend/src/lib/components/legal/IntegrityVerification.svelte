@@ -22,7 +22,7 @@ Displays detailed integrity verification results with AI analysis
     riskAssessment?: string};
   type AIAnalysis = {
     authenticity: number, completeness: number
-    relevance: number, riskLevel: RiskLevel, recommendations: string[];, flaggedAnomalies: string[]};
+    relevance: number, riskLevel: RiskLevel, recommendations: string[]; flaggedAnomalies: string[]};
   // Exported props (clean, typed)
   const { integrityStatus } = $props<{ integrityStatus, 'pending' | 'verified' | 'compromised' | 'requires-attention' }>()
   const { verificationResults } = $props<{ verificationResults, VerificationResults | undefined }>()
@@ -317,4 +317,6 @@ Displays detailed integrity verification results with AI analysis
      ;transform: translateY(0)}
   }
 </style>
+
+
 

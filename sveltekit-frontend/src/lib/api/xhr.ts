@@ -30,3 +30,4 @@ export function uploadWithXhr(
 		xhr.send(formData);
 	});
 }
+

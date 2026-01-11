@@ -32,7 +32,7 @@
 		gpuStatus: 'active',
 		ragIndexSize: 0,
 		ocrAccuracy: 0,
-		trends: {, totalCases: 5.2,
+		trends: { totalCases: 5.2,
 			activeCases: -2.1,
 			evidenceProcessed: 12.8,
 			aiQueries: 8.5
@@ -40,21 +40,21 @@
 	});
 
 	let activeCases = $state<Array<{
-		id: string;, title: string;
+		id: string; title: string;
 		status: 'active' | 'pending' | 'critical';
-		lastActivity: string;, evidenceCount: number;
+		lastActivity: string; evidenceCount: number;
 		priority: 'low' | 'medium' | 'high' | 'urgent';
 	}>>([]);
 
 	let systemAlerts = $state<Array<{
-		id: string;, type: 'info' | 'warning' | 'error';
-		message: string;, timestamp: string;
+		id: string; type: 'info' | 'warning' | 'error';
+		message: string; timestamp: string;
 		dismissed?: boolean;
 	}>>([]);
 
 	let notifications = $state<Array<{
-		id: string;, type: 'info' | 'success' | 'warning' | 'error';
-		title: string;, message: string;
+		id: string; type: 'info' | 'success' | 'warning' | 'error';
+		title: string; message: string;
 		timestamp: string;
 		read?: boolean;
 	}>>([]);
@@ -141,7 +141,7 @@
 			activeCases: Math.round(baseMetrics.activeCases * (1 + variation)),
 			evidenceProcessed: Math.round(baseMetrics.evidenceProcessed * (1 + variation)),
 			aiQueries: Math.round(baseMetrics.aiQueries * (1 + variation)),
-			trends: {, totalCases: (Math.random() - 0.5) * 20, // Random trend between -10% and +10%
+			trends: { totalCases: (Math.random() - 0.5) * 20, // Random trend between -10% and +10%
 					activeCases: (Math.random() - 0.5) * 20,
 					evidenceProcessed: (Math.random() - 0.5) * 20,
 					aiQueries: (Math.random() - 0.5) * 20
@@ -806,7 +806,7 @@
 
 <style>
 	.command-center {
-		min-height: 100vh;, background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 100%);
+		min-height: 100vh; background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 100%);
 		color: white;
 	}
 
@@ -817,7 +817,7 @@
 	}
 
 	.header-content {
-		max-width: 1400px;, margin: 0 auto;
+		max-width: 1400px; margin: 0 auto;
 		padding: 1rem 2rem;
 		display: flex;
 		justify-content: space-between;
@@ -826,12 +826,12 @@
 
 	.logo-section {
 		display: flex;
-		align-items: center;, gap: 1rem;
+		align-items: center; gap: 1rem;
 	}
 
 	.logo {
 		font-size: 1.5rem;
-		font-weight: bold;, background: linear-gradient(45deg, #00d4ff, #ff6b35);
+		font-weight: bold; background: linear-gradient(45deg, #00d4ff, #ff6b35);
 		-webkit-background-clip: text;
 		-webkit-text-fill-color: transparent;
 		background-clip: text;
@@ -843,29 +843,29 @@
 	}
 
 	.header-actions {
-		display: flex;, gap: 0.5rem;
+		display: flex; gap: 0.5rem;
 		align-items: center;
 	}
 
 	.keyboard-shortcut {
 		margin-left: 0.5rem;
-		font-size: 0.7rem;, color: rgba(255, 255, 255, 0.5);
+		font-size: 0.7rem; color: rgba(255, 255, 255, 0.5);
 		background: rgba(255, 255, 255, 0.1);
 		padding: 0.1rem 0.3rem;
 		border-radius: 3px;
 	}
 
 	.refresh-btn:disabled {
-		opacity: 0.6;, cursor:not-allowed;
+		opacity: 0.6; cursor:not-allowed;
 	}
 
 	/* Quick Actions Dropdown */
 	.quick-actions-dropdown {
-		position: absolute;, top: 100%;
+		position: absolute; top: 100%;
 		right: 0;
-		margin-top: 0.5rem;, background: rgba(0, 0, 0, 0.9);
+		margin-top: 0.5rem; background: rgba(0, 0, 0, 0.9);
 		border: 1px solid rgba(255, 255, 255, 0.1);
-		border-radius: 8px;, padding: 0.5rem;
+		border-radius: 8px; padding: 0.5rem;
 		min-width: 200px;
 		z-index: 1000;
 		backdrop-filter: blur(10px);
@@ -873,11 +873,11 @@
 
 	.quick-action-item {
 		display: flex;
-		align-items: center;, gap: 0.75rem;
-		width: 100%;, padding: 0.75rem 1rem;
-		border-radius: 6px;, background: transparent;
-		border: none;, color: rgba(255, 255, 255, 0.8);
-		text-align: left;, transition: all 0.2s ease;
+		align-items: center; gap: 0.75rem;
+		width: 100%; padding: 0.75rem 1rem;
+		border-radius: 6px; background: transparent;
+		border: none; color: rgba(255, 255, 255, 0.8);
+		text-align: left; transition: all 0.2s ease;
 		font-size: 0.875rem;
 	}
 
@@ -892,23 +892,23 @@
 	}
 
 	.notification-badge {
-		position: absolute;, top: -8px;
-		right: -8px;, background: #ef4444;
+		position: absolute; top: -8px;
+		right: -8px; background: #ef4444;
 		color: white;
-		border-radius: 50%;, width: 20px;
-		height: 20px;, display: flex;
+		border-radius: 50%; width: 20px;
+		height: 20px; display: flex;
 		align-items: center;
 		justify-content: center;
 		font-size: 0.7rem;
-		font-weight: bold;, border: 2px solid rgba(15, 15, 35, 1);
+		font-weight: bold; border: 2px solid rgba(15, 15, 35, 1);
 	}
 
 	.notifications-dropdown {
-		position: absolute;, top: 100%;
+		position: absolute; top: 100%;
 		right: 0;
-		margin-top: 0.5rem;, background: rgba(0, 0, 0, 0.95);
+		margin-top: 0.5rem; background: rgba(0, 0, 0, 0.95);
 		border: 1px solid rgba(255, 255, 255, 0.1);
-		border-radius: 12px;, width: 400px;
+		border-radius: 12px; width: 400px;
 		max-height: 500px;
 		z-index: 1000;
 		backdrop-filter: blur(10px);
@@ -918,13 +918,13 @@
 	.notifications-header {
 		display: flex;
 		justify-content: space-between;
-		align-items: center;, padding: 1rem 1.5rem;
+		align-items: center; padding: 1rem 1.5rem;
 		border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 	}
 
 	.notifications-title {
 		font-size: 1rem;
-		font-weight: 600;, color: white;
+		font-weight: 600; color: white;
 	}
 
 	.notifications-list {
@@ -952,7 +952,7 @@
 	}
 
 	.notification-title {
-		font-weight: 600;, color: white;
+		font-weight: 600; color: white;
 		margin-bottom: 0.25rem;
 	}
 
@@ -968,13 +968,13 @@
 	}
 
 	.notification-actions {
-		display: flex;, gap: 0.5rem;
+		display: flex; gap: 0.5rem;
 		margin-top: 0.5rem;
 	}
 
 	.no-notifications {
 		padding: 2rem;
-		text-align: center;, color: rgba(255, 255, 255, 0.5);
+		text-align: center; color: rgba(255, 255, 255, 0.5);
 	}
 
 	/* Status Bar */
@@ -982,13 +982,13 @@
 		background: rgba(255, 255, 255, 0.05);
 		border-top: 1px solid rgba(255, 255, 255, 0.1);
 		padding: 0.5rem 2rem;
-		display: flex;, gap: 2rem;
+		display: flex; gap: 2rem;
 		font-size: 0.875rem;
 	}
 
 	.status-item {
 		display: flex;
-		align-items: center;, gap: 0.5rem;
+		align-items: center; gap: 0.5rem;
 	}
 
 	.status-label {
@@ -1002,14 +1002,14 @@
 
 	.main-content {
 		display: flex;
-		max-width: 1400px;, margin: 0 auto;
-		padding: 2rem;, gap: 2rem;
+		max-width: 1400px; margin: 0 auto;
+		padding: 2rem; gap: 2rem;
 	}
 
 	.sidebar {
 		width: 280px;
-		flex-shrink: 0;, background: rgba(255, 255, 255, 0.05);
-		border-radius: 12px;, padding: 1.5rem;
+		flex-shrink: 0; background: rgba(255, 255, 255, 0.05);
+		border-radius: 12px; padding: 1.5rem;
 		height: fit-content;
 		backdrop-filter: blur(10px);
 	}
@@ -1022,12 +1022,12 @@
 		font-size: 0.75rem;
 		font-weight: 600;
 		text-transform: uppercase;
-		letter-spacing: 0.05em;, color: rgba(255, 255, 255, 0.6);
+		letter-spacing: 0.05em; color: rgba(255, 255, 255, 0.6);
 		margin-bottom: 0.75rem;
 	}
 
 	.nav-list {
-		list-style: none;, padding: 0;
+		list-style: none; padding: 0;
 		margin: 0;
 	}
 
@@ -1037,11 +1037,11 @@
 
 	.nav-link {
 		display: flex;
-		align-items: center;, gap: 0.75rem;
-		width: 100%;, padding: 0.75rem 1rem;
-		border-radius: 8px;, background: transparent;
-		border: none;, color: rgba(255, 255, 255, 0.8);
-		text-align: left;, transition: all 0.2s ease;
+		align-items: center; gap: 0.75rem;
+		width: 100%; padding: 0.75rem 1rem;
+		border-radius: 8px; background: transparent;
+		border: none; color: rgba(255, 255, 255, 0.8);
+		text-align: left; transition: all 0.2s ease;
 		font-size: 0.875rem;
 	}
 
@@ -1076,7 +1076,7 @@
 
 	.metric-value {
 		font-size: 2rem;
-		font-weight: bold;, color: white;
+		font-weight: bold; color: white;
 		margin-bottom: 0.5rem;
 	}
 
@@ -1098,8 +1098,8 @@
 	}
 
 	.case-item {
-		padding: 1rem;, background: rgba(255, 255, 255, 0.05);
-		border-radius: 8px;, border: 1px solid rgba(255, 255, 255, 0.1);
+		padding: 1rem; background: rgba(255, 255, 255, 0.05);
+		border-radius: 8px; border: 1px solid rgba(255, 255, 255, 0.1);
 	}
 
 	.case-header {
@@ -1118,23 +1118,23 @@
 		padding: 0.25rem 0.5rem;
 		border-radius: 4px;
 		font-size: 0.75rem;
-		font-weight: 500;, border: 1px solid;
+		font-weight: 500; border: 1px solid;
 	}
 
 	.case-meta {
-		display: flex;, gap: 1rem;
-		font-size: 0.75rem;, color: rgba(255, 255, 255, 0.6);
+		display: flex; gap: 1rem;
+		font-size: 0.75rem; color: rgba(255, 255, 255, 0.6);
 	}
 
 	.system-metrics {
 		display: flex;
-		flex-direction: column;, gap: 0.75rem;
+		flex-direction: column; gap: 0.75rem;
 	}
 
 	.metric-item {
 		display: flex;
 		justify-content: space-between;
-		align-items: center;, padding: 0.5rem 0;
+		align-items: center; padding: 0.5rem 0;
 		border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 	}
 
@@ -1161,21 +1161,21 @@
 
 	.alerts-title {
 		font-size: 0.875rem;
-		font-weight: 600;, color: rgba(255, 255, 255, 0.8);
+		font-weight: 600; color: rgba(255, 255, 255, 0.8);
 		margin-bottom: 0.75rem;
 	}
 
 	.alerts-list {
 		display: flex;
-		flex-direction: column;, gap: 0.5rem;
+		flex-direction: column; gap: 0.5rem;
 	}
 
 	.alert-item {
 		display: flex;
-		align-items: center;, gap: 0.5rem;
+		align-items: center; gap: 0.5rem;
 		padding: 0.75rem;
 		border-radius: 6px;
-		font-size: 0.75rem;, position: relative;
+		font-size: 0.75rem; position: relative;
 		transition: all 0.2s ease;
 	}
 
@@ -1185,17 +1185,17 @@
 
 	.alert-info {
 		background: rgba(0, 212, 255, 0.1);
-		color: #00d4ff;, border: 1px solid rgba(0, 212, 255, 0.2);
+		color: #00d4ff; border: 1px solid rgba(0, 212, 255, 0.2);
 	}
 
 	.alert-warning {
 		background: rgba(255, 107, 53, 0.1);
-		color: #ff6b35;, border: 1px solid rgba(255, 107, 53, 0.2);
+		color: #ff6b35; border: 1px solid rgba(255, 107, 53, 0.2);
 	}
 
 	.alert-error {
 		background: rgba(239, 68, 68, 0.1);
-		color: #ef4444;, border: 1px solid rgba(239, 68, 68, 0.2);
+		color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.2);
 	}
 
 	.alert-message {
@@ -1208,10 +1208,10 @@
 	}
 
 	.alert-dismiss {
-		background: none;, border: none;
+		background: none; border: none;
 		color: rgba(255, 255, 255, 0.5);
-		cursor: pointer;, padding: 0.25rem;
-		border-radius: 3px;, transition: all 0.2s ease;
+		cursor: pointer; padding: 0.25rem;
+		border-radius: 3px; transition: all 0.2s ease;
 		opacity: 0;
 	}
 
@@ -1222,8 +1222,8 @@
 	.no-alerts {
 		display: flex;
 		align-items: center;
-		justify-content: center;, gap: 0.5rem;
-		padding: 1rem;, color: rgba(34, 197, 94, 0.8);
+		justify-content: center; gap: 0.5rem;
+		padding: 1rem; color: rgba(34, 197, 94, 0.8);
 		font-size: 0.875rem;
 	}
 
@@ -1241,17 +1241,17 @@
 		}
 
 		.header-content {
-			flex-direction: column;, gap: 1rem;
+			flex-direction: column; gap: 1rem;
 			align-items: flex-start;
 		}
 
 		.header-actions {
-			flex-wrap: wrap;, width: 100%;
+			flex-wrap: wrap; width: 100%;
 			justify-content: center;
 		}
 
 		.status-bar {
-			flex-direction: column;, gap: 0.5rem;
+			flex-direction: column; gap: 0.5rem;
 			align-items: flex-start;
 		}
 
@@ -1287,6 +1287,9 @@
 		}
 	}
 </style>
+
+
+
 
 
 

@@ -76,3 +76,4 @@
   input[type="range"] { /* @apply accent-blue-500; */ }
   input[type="range"]:disabled { /* @apply opacity-50 cursor-not-allowed; */ }
 </style>
+

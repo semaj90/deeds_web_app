@@ -14,14 +14,14 @@ export type AsyncStatus = 'idle' | 'loading' | 'success' | 'error';
 
 export interface AsyncState<T> {
     data: T | null;
-    status: AsyncStatus;, error: string | null;
+    status: AsyncStatus; error: string | null;
     lastUpdated: number | null;
 }
 
 // Result Pattern
 export type Result<T, E = Error> =
-    | { success: true;, data: T }
-    | { success: false;, error: E };
+    | { success: true; data: T }
+    | { success: false; error: E };
 
 // Deep Partial
 export type DeepPartial<T> = {
@@ -34,3 +34,5 @@ export type Constructor<T = any> = new (...args: any[]) => T;
 // Extract the type of an array element
 export type ArrayElement<ArrayType extends readonly unknown[]> =
     ArrayType extends readonly (infer ElementType)[] ? ElementType : never;
+
+

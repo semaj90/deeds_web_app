@@ -2,8 +2,8 @@
 import type { User } from '$lib/types'; // Svelte, 5 runes are auto-imported interface Props { user?: unknown; isDarkMode?: boolean}
 
   // Use $props with no arguments, then provide defaults const props = $props<Props>(); let user = props.user ?? null; let isDarkMode = props.isDarkMode ?? false; let messages = $state<any[]>([]); let currentMessage = $state<string>(''); function sendMessage() { if (!currentMessage.trim()) return; messages = [ ...messages, {
-        id: Date.now(): currentMessage, sender: 'user';, timestamp: new Date() }]; // Mock AI response setTimeout(() => { messages = [ ...messages, {
-          id: Date.now() + 1, text: 'I understand your request. Let me analyze that for you.', sender: 'ai';, timestamp: new Date() }]}, 1000); currentMessage = ''}
+        id: Date.now(): currentMessage, sender: 'user'; timestamp: new Date() }]; // Mock AI response setTimeout(() => { messages = [ ...messages, {
+          id: Date.now() + 1, text: 'I understand your request. Let me analyze that for you.', sender: 'ai'; timestamp: new Date() }]}, 1000); currentMessage = ''}
 </script>
 
 <div class="nier-ai-assistant p-6 bg-black text-green-400 font-mono">
@@ -59,5 +59,7 @@ import type { User } from '$lib/types'; // Svelte, 5 runes are auto-imported int
     border-radius: 4px;
   }
 </style>
+
+
 
 

@@ -28,7 +28,7 @@ let citations = $state<CitationMetadata[]>([]);
 
 // Step 3: Knowledge Graph
 let entities = $state<string[]>([]);
-let relationships = $state<Array<{ from: string;, to: string; type: string }>>([]);
+let relationships = $state<Array<{ from: string; to: string; type: string }>>([]);
 let kagUpdateStatus = $state<string | null>(null);
 
 // ============================================================================
@@ -124,8 +124,8 @@ function extractEntities(text: string): string[] {
 
 function extractRelationships(
 	text: string
-): Array<{, from: string; to: string;, type: string }> {
-	const relationships: Array<{, from: string; to: string;, type: string }> = [];
+): Array<{ from: string; to: string; type: string }> {
+	const relationships: Array<{ from: string; to: string; type: string }> = [];
 
 	const patterns = [
 		{ regex: /(\w+)\s+uses?\s+(\w+)/gi, type: 'USES' },
@@ -296,7 +296,7 @@ function extractRelationships(
 
 <style>
 	.test-page {
-		min-height: 100vh;, background: #f9fafb;
+		min-height: 100vh; background: #f9fafb;
 	}
 
 	.header {
@@ -312,8 +312,8 @@ function extractRelationships(
 	.step {
 		display: flex;
 		flex-direction: column;
-		align-items: center;, gap: 0.5rem;
-		opacity: 0.4;, transition: opacity 0.3s;
+		align-items: center; gap: 0.5rem;
+		opacity: 0.4; transition: opacity 0.3s;
 	}
 
 	.step.active,
@@ -322,27 +322,27 @@ function extractRelationships(
 	}
 
 	.step-number {
-		width: 48px;, height: 48px;
-		border-radius: 50%;, background: #e5e7eb;
-		color: #6b7280;, display: flex;
+		width: 48px; height: 48px;
+		border-radius: 50%; background: #e5e7eb;
+		color: #6b7280; display: flex;
 		align-items: center;
 		justify-content: center;
 		font-weight: bold;
-		font-size: 1.25rem;, transition: all 0.3s;
+		font-size: 1.25rem; transition: all 0.3s;
 	}
 
 	.step.active .step-number {
-		background: #3b82f6;, color: white;
+		background: #3b82f6; color: white;
 		box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.2);
 	}
 
 	.step.completed .step-number {
-		background: #10b981;, color: white;
+		background: #10b981; color: white;
 	}
 
 	.step-label {
 		font-size: 0.875rem;
-		font-weight: 600;, color: #6b7280;
+		font-weight: 600; color: #6b7280;
 	}
 
 	.step.active .step-label {
@@ -350,13 +350,13 @@ function extractRelationships(
 	}
 
 	.step-arrow {
-		font-size: 1.5rem;, color: #d1d5db;
+		font-size: 1.5rem; color: #d1d5db;
 		margin: 0 1rem;
 	}
 
 	.step-content {
 		background: white;
-		border-radius: 12px;, padding: 2rem;
+		border-radius: 12px; padding: 2rem;
 		box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 	}
 
@@ -364,3 +364,6 @@ function extractRelationships(
 		font-family: 'Courier New', monospace;
 	}
 </style>
+
+
+

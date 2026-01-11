@@ -7,3 +7,4 @@ import type { User } from '$lib/types'; /** * Server-Side Authentication Utiliti
 /** * Check if user is authenticated (including dev bypass) */ export function isAuthenticated(locals: LocalsWithUser): boolean { return resolveUser(locals) !== null}
 
 
+

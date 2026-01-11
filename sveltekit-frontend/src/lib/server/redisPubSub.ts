@@ -3,7 +3,7 @@ import { createRedisClientSet, type RedisBasicCommands } from '$lib/server/redis
 export interface PubSubHandlerOptions {
     patterns?: string[]; // pattern-based subscriptions (psubscribe)
     channels?: string[]; // direct channel subscriptions (subscribe)
-    onMessage: (info: { pattern?: string;, channel: string; message: string }) => void;
+    onMessage: (info: { pattern?: string; channel: string; message: string }) => void;
     autoStart?: boolean;
 }
 
@@ -11,7 +11,7 @@ export interface PubSubController {
     publish(channel: string, message: unknown): Promise<number>;
     subscribe(channels: string[]): Promise<void>;
     psubscribe(patterns: string[]): Promise<void>;
-    stop(): Promise<void>;, clients: { primary: RedisBasicCommands;, subscriber: unknown; publisher: unknown };
+    stop(): Promise<void>; clients: { primary: RedisBasicCommands; subscriber: unknown; publisher: unknown };
 }
 
 export function createPubSubHelper(opts: PubSubHandlerOptions): PubSubController {
@@ -51,5 +51,7 @@ export function createPubSubHelper(opts: PubSubHandlerOptions): PubSubController
         clients: { primary, subscriber, publisher }
     };
 }
+
+
 
 
