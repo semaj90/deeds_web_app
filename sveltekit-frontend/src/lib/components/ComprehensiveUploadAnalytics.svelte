@@ -323,7 +323,7 @@
 	<!-- File Selection Area -->
 	<div
 		class="file-drop-zone"
-		class:drag-over={dragOver} class:has-files={selectedFiles.length > 0}
+		class:drag-over={dragOver}; class:has-files={selectedFiles.length > 0}
 		ondrop={handleDrop}
 		ondragover={handleDragOver}
 		ondragleave={handleDragLeave}
@@ -410,7 +410,7 @@
 				{#each Object.entries(pipelineStatus) as [stage, status]}
 					{#if status && typeof status === 'object' && 'status' in status}
 						<div class="pipeline-stage"
-							class:active={status.status === 'processing'} class:completed={status.status === 'completed'} class:failed={status.status === 'failed'}
+							class:active={status.status === 'processing'}; class:completed={status.status === 'completed'}; class:failed={status.status === 'failed'}
 						>
 							<div class="stage-icon">{getStageIcon(status.status as string)}</div>
 							<span class="stage-name">{stage.replace(/([A-Z])/g, ' $1').toLowerCase()}</span>
@@ -442,7 +442,7 @@
 
 			<div class="results-list">
 				{#each uploadResults as result}
-					<div class="result-item" class:success={result.success} class:error={!result.success}>
+					<div class="result-item" class:success={result.success}; class:error={!result.success}>
 						<div class="result-info">
 							<span class="result-filename">{result.fileName}</span>
 							{#if result.success && result.documentId}

@@ -494,7 +494,7 @@ import type { Case } from '$lib/types';
 								<div class="relative">
 									<div
 										class="absolute p-4 bg-background border-2 border-border rounded-lg shadow-lg cursor-move transition-shadow nes-container is-rounded bits-draggable"
-										class:highlighted={aiHighlightedEvidence.includes(item.id)} class:selected={selectedEvidenceIds.includes(item.id)}
+										class:highlighted={aiHighlightedEvidence.includes(item.id)}; class:selected={selectedEvidenceIds.includes(item.id)}
 										style="left: {item.x || 100}px; top: {item.y || 100}px; min-width: 200px;"
 										draggable="true"
 										data-evidence-id={item.id}

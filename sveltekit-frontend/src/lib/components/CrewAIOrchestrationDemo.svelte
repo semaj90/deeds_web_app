@@ -101,8 +101,7 @@
  <label>
  <input
  type="checkbox"
- value={agent}
- bind:group={selectedAgents}
+ value={agent}; bind:group={selectedAgents}
  />
  {agent}
  </label>
@@ -144,9 +143,7 @@
  <div class="quality-section">
  <p>
  <strong>Quality Score:</strong>
- <span class="quality-badge" class:excellent={$qualityScore$ >= 90}
- class:good={$qualityScore$ >= 70 && $qualityScore$ < 90}
- class:fair={$qualityScore$ < 70}>
+ <span class="quality-badge" class:excellent={$qualityScore$ >= 90}; class:good={$qualityScore$ >= 70 && $qualityScore$ < 90}; class:fair={$qualityScore$ < 70}>
  {$qualityScore$}%
  </span>
  </p>

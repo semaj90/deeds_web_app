@@ -80,7 +80,7 @@
   $: if (showSettingsModal) { (async () => { await tick(); if (settingsModalContentRef) { settingsModalContentRef.focus()} else if (settingsModalRef) { settingsModalRef.focus()}
     })()}
 </script>
- <svelte, window | onkeydown={ handleKeydown } /> <div class={"report-editor, " + layoutClass} class:fullscreen={$reportUI.fullscreen}; class, sidebar-closed={!$reportUI.sidebarOpen} >
+ <svelte, window | onkeydown={ handleKeydown } /> <div class={"report-editor, " + layoutClass}; class:fullscreen={$reportUI.fullscreen}; class, sidebar-closed={!$reportUI.sidebarOpen} >
   <!-- Toolbar --> <header class="editor-toolbar"> <ReportToolbar /> </header>
  <!-- Main, Content, Area --> <div class="editor-content"> <!-- Sidebar -->
   {#if $reportUI.sidebarOpen} <aside class="editor-sidebar"

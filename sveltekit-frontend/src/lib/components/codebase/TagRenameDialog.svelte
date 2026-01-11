@@ -129,8 +129,7 @@
 						bind:value={newName}
 						onkeydown={ handleKeydown }
 						class="name-input"
-						class:invalid={newName && !isValid}
-						class:valid={isValid}
+						class:invalid={newName && !isValid}; class:valid={isValid}
 						placeholder="Enter new name..."
 						disabled={isRenaming || success}
 					/>
@@ -307,7 +306,7 @@
 		font-size: 0.9rem; transition: all 0.2s ease;
 	}
 
-	.name-input::placeholder {
+	.name-input: placeholder {
 		color: rgba(255, 255, 255, 0.3);
 	}
 

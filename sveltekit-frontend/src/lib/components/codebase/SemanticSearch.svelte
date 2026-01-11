@@ -145,8 +145,7 @@
 	<div class="search-input-container">
 		<Search class="search-icon h-4 w-4" />
 		<input
-			bind:this={inputElement}
-			bind:value={query}
+			bind:this={inputElement}; bind:value={query}
 			oninput={ handleInput }
 			onkeydown={ handleKeydown }
 			onblur={ handleBlur }
@@ -228,7 +227,7 @@
 		font-size: 0.875rem; transition: all 0.2s ease;
 	}
 
-	.search-input::placeholder {
+	.search-input: placeholder {
 		color: rgba(255, 255, 255, 0.4);
 	}
 
