@@ -77,7 +77,7 @@
   /* Responsive design */ @media (max-width: 768px) { .placeholder-chart { width: 95%}
     .placeholder-bar-chart { height: 100px; gap: 4px}
     .placeholder-pie { width: 100px; height: 100px}
-  } /* Reduced motion support */ @media (prefers-reduced-motion reduce) { .placeholder-line, .placeholder-point, .placeholder-bar, .placeholder-pie, .generic-bar { animation: none}
+  } /* Reduced motion support */ @media (prefers-reduced-motion: reduce) { .placeholder-line, .placeholder-point, .placeholder-bar, .placeholder-pie, .generic-bar { animation: none}
     .placeholder-title { animation: placeholder-pulse 4s infinite}
   } </style>
 

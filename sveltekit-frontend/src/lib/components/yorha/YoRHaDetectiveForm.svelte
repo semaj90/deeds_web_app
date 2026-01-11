@@ -190,7 +190,7 @@
     transition: all 0.2s ease;
     border-radius: 0;
     text-transform: uppercase}
-  .submit-btn: hover:not(:disabled) {
+  .submit-btn:hover:not(:disabled) {
     background-color: #eae8e1
    ;transform: translateY(-1px)}
   .submit-btn:disabled {

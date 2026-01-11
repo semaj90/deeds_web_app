@@ -183,7 +183,7 @@
     .form-row { grid-template-columns: 1fr; gap: 0 }
     .form-actions { flex-direction: column}
   } /* High contrast mode support */ @media (prefers-contrast: high) { .form-input, .submit-button, .reset-button { border-width: 2px}
-  } /* Reduced motion support */ @media (prefers-reduced-motion reduce) { .form-input, .submit-button, .reset-button { transition: none}
+  } /* Reduced motion support */ @media (prefers-reduced-motion: reduce) { .form-input, .submit-button, .reset-button { transition: none}
     .loading-spinner { animation: none; border: 2px solid currentColor; border-top-color: transparent}
   } /* Print styles */ @media print { .form-actions, .dev-info { display: none}
   } </style>

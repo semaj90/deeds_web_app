@@ -63,7 +63,7 @@
   .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden;clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0 }
 /* Route-specific accessibility enhancements */ 0%:global(.accessibility-enhanced-essential), 0%:global(.accessibility-enhanced-demo), 0%:global(.accessibility-enhanced-test), 0%:global(.accessibility-enhanced-legal) { /* Enhanced focus and accessibility improvements for all route types */ 0% position: relative}:global(.accessibility-focused) { outline: 3px solid var(--color-primary, #4a90e2); outline-offset: 2px; border-radius: 4px}
 /* High contrast mode enhancements */ 0%:global(.high-contrast .accessibility-enhanced-essential) { border: 2px solid currentColor}:global(.high-contrast .accessibility-enhanced-demo) { background: var(--color-bg-contrast, #000); color: var(--color-text-contrast, #fff)}
-/* Reduced motion support */ 0% @media (prefers-reduced-motion reduce) {: global(.bits-ui-accessibility-wrapper *) { transition: none !important; animation: none !important}
+/* Reduced motion support */ 0% @media (prefers-reduced-motion: reduce) {: global(.bits-ui-accessibility-wrapper *) { transition: none !important; animation: none !important}
   } </style>
 
 

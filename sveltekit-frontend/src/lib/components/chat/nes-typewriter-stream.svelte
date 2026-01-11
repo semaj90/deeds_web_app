@@ -83,7 +83,7 @@
   } @media (max-width: 480px) { .nes-typewriter-container { font-size: 12px; padding: 4px}
   } /* High contrast mode */ @media (prefers-contrast: high) { .nes-typewriter-container { border-width: 3px}
     .nes-legal { color: #ffff00; text-shadow: 0, 0 2px #000000}
-  } /* Reduced motion support */ @media (prefers-reduced-motion reduce) { .nes-typewriter-cursor { animation: none; opacity: 1}
+  } /* Reduced motion support */ @media (prefers-reduced-motion: reduce) { .nes-typewriter-cursor { animation: none; opacity: 1}
     .nes-typewriter-text:global(.nes-text-emphasis) { animation: none}
   } </style>
 

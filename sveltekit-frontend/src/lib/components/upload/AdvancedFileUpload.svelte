@@ -131,7 +131,7 @@
 </div> {/if}
 </div> <style> /* @unocss-include */ .advanced-file-upload { width: 100%}
   .drop-zone { border: 2px dashed #d1d5db; border-radius: 12px; padding: 3rem 2rem; text-align: center; cursor: pointer; transition: all 0.2s ease; background: #fafafa}
-  .drop-zone: hover:not(.disabled) { border-color: #3b82f6; background: #eff6ff}
+  .drop-zone:hover:not(.disabled) { border-color: #3b82f6; background: #eff6ff}
   .drop-zone.drag-over { border-color: #3b82f6; background: #eff6ff;transform: scale(1.02)}
   .drop-zone.disabled { opacity: 0.6; cursor:not-allowed}
   .drop-zone:focus { outline: 2px solid #3b82f6; outline-offset: 2px}
@@ -165,7 +165,7 @@
     .file-list-header { flex-direction: column; align-items: stretch; gap: 1rem}
     .file-item { flex-direction: column; align-items: flex-start; gap: 0.75rem}
     .file-actions { align-self: flex-end}} /* High contrast mode */ @media (prefers-contrast: high) { .drop-zone { border-width: 3px}
-    .file-item { border-bottom-width: 2px}} /* Reduced motion */ @media (prefers-reduced-motion reduce) { .drop-zone, .file-item, .progress-fill { transition: none !important}
+    .file-item { border-bottom-width: 2px}} /* Reduced motion */ @media (prefers-reduced-motion: reduce) { .drop-zone, .file-item, .progress-fill { transition: none !important}
     .drop-zone.drag-over { transform: none}}
 </style> <!--; TODO, migrate export lets, to $props(); CommonProps, assumed. -->
 

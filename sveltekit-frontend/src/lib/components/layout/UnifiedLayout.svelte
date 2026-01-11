@@ -258,7 +258,7 @@
       border-width: 3px !important}
   }
   /* Reduced motion support */
-  @media (prefers-reduced-motion reduce) {
+  @media (prefers-reduced-motion: reduce) {
     * {
       transition: none !important
  animation, none !important}

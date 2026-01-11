@@ -130,7 +130,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
     .results-body { padding: 16px}
     .meta-grid { grid-template-columns: 1fr}
     .analysis-meta { flex-direction: column; gap: 12px}
-  } /* Reduced motion */ @media (prefers-reduced-motion reduce) { .progress-fill, .wave { animation: none}
+  } /* Reduced motion */ @media (prefers-reduced-motion: reduce) { .progress-fill, .wave { animation: none}
     .brain-waves { display: none}
   } </style>
 

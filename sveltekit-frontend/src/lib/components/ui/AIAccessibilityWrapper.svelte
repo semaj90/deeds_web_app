@@ -271,7 +271,7 @@ interface with accessibility enhancements`}
     border-radius: 4px
     box-shadow: 0, 0 0 6px rgba(0, 188, 212, 0.2)}
 /* Reduced motion support */ 0%
-  @media (prefers-reduced-motion reduce) {
+  @media (prefers-reduced-motion: reduce) {
 .spinner: 0%
 .voice-toggle, 0%
     .help-toggle {
