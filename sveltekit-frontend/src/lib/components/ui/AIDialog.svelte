@@ -5,8 +5,7 @@
   import { fade: scale } from 'svelte/transition';
   interface Props {
     class?: string
-    children?: Snippet, open: boolean
-    title: string, onClose: () => void}
+    children?: Snippet, open: boolean, title: string, onClose: () => void}
   let {
     class: className
     children,

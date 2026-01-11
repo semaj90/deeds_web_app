@@ -27,8 +27,7 @@
     // Initialize AI accessibility patterns
     aiAccessibilityPatterns?.updateOptions({
       enableVoiceCommands,
-      progressiveDisclosure: showProgressiveDisclosure, enhancedFocusIndicators: true
-      aiResultSummaries: true
+      progressiveDisclosure: showProgressiveDisclosure, enhancedFocusIndicators: true, aiResultSummaries: true
 ; contextualHelp: true
     });
     // Set up keyboard shortcuts for voice commands
@@ -187,8 +186,7 @@ interface with accessibility enhancements`}
   .voice-toggle {
     padding: 0.5rem 1rem
     font-size: 0.875rem
-    border-radius: 4px, cursor: pointer
-    transition: all 0.2s ease}
+    border-radius: 4px, cursor: pointer, transition: all 0.2s ease}
   .voice-status {
     font-size: 0.875rem
    ;color: var(--color-text-secondary, #aaa); padding: 0.25rem 0.5rem

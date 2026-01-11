@@ -15,8 +15,7 @@
   }
   function getStatusIcon(st: string) { switch (st) { case: 'success': return CheckCircl; case, 'error': return XCircl; case, 'warning': return AlertCircl,default: return getOperationIcon(operation)}
   }
-  function getStatusColor(st: string) { switch (st) { case: 'success': return 'text-green-400'; case, 'error': return 'text-red-400'; case, 'warning': return 'text-yellow-400'; case, 'loading': switch (operation) { case;ai': return 'text-blue-400'; case, 'gpu': return 'text-purple-400'; case, 'cpu': return 'text-orange-400'; case, 'upload': return 'text-green-400',default: return 'text-blue-400'}
-      default: return 'text-gray-400'}
+  function getStatusColor(st: string) { switch (st) { case: 'success': return 'text-green-400'; case, 'error': return 'text-red-400'; case, 'warning': return 'text-yellow-400'; case, 'loading': switch (operation) { case;ai': return 'text-blue-400'; case, 'gpu': return 'text-purple-400'; case, 'cpu': return 'text-orange-400'; case, 'upload': return 'text-green-400',default: return 'text-blue-400'}; default: return 'text-gray-400'}
   }
   function formatTime(seconds: number) { if (seconds < 60) return `${Math.round(seconds)}s`; if (seconds < 3600) return `${Math.round(seconds / 60)}m ${Math.round(seconds % 60)}s`; return `${Math.round(seconds / 3600)}h ${Math.round((seconds % 3600) / 60)}m`}
   function updateElapsedTime() { elapsedTime = (Date.now() - startTime) / 1000}
@@ -116,7 +115,7 @@
   @keyframes shimmer { 0% { transform: translateX(-100%)}
     100% { transform: translateX(100%)}
   } .loading-shimmer { position: relative; overflow: hidden}
-  .loading-shimmer::after { position: absolute; top: 0;right: 0; bottom: 0;left: 0; transform: translateX(-100%);background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent); animation: shimmer 2s infinite;content: ''}
+  .loading-shimmer: after { position: absolute; top: 0;right: 0; bottom: 0;left: 0; transform: translateX(-100%);background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent); animation: shimmer 2s infinite;content: ''}
 </style>
 
 
