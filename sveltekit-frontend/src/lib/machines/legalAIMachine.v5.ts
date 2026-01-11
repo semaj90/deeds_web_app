@@ -353,7 +353,7 @@ export const legalAIMachine = createMachine(
  const response = (await productionServiceClient.makeRequest('/api/cases', {
  method: 'GET',
  body: input?.filters ?? {},
- })) as ServiceResponse<LooseObject[] | { cases?: LooseObject[] }>;
+ })) as ServiceResponse<LooseObject[] :  { cases?: LooseObject[] }>;
 
  if (response.success && response.data) {
  const data = response.data as LooseObject[] | { cases?: LooseObject[] };
@@ -364,10 +364,10 @@ export const legalAIMachine = createMachine(
  status: (caseData.status as string) ?? 'pending',
  priority: (caseData.priority as string) ?? 'medium',
  category: (caseData.category as string) ?? 'general',
- createdAt: (caseData.createdAt as string) ?? (caseData.created_at as, string | undefined),
- updatedAt: (caseData.updatedAt as string) ?? (caseData.updated_at as, string | undefined),
+ createdAt: (caseData.createdAt as string) ?? (caseData.created_at as, string : undefined),
+ updatedAt: (caseData.updatedAt as string) ?? (caseData.updated_at as, string : undefined),
  description: caseData.description as, string | undefined,
- assignedTo: (caseData.assignedTo as string) ?? (caseData.assigned_to as, string | undefined),
+ assignedTo: (caseData.assignedTo as string) ?? (caseData.assigned_to as, string : undefined),
  }));
  } else {
  console.warn('Failed to load cases: ', response.error);

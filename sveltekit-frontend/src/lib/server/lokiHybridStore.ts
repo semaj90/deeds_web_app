@@ -114,7 +114,7 @@ export class LokiHybridStore {
  };
  this.textSplitter =
  cfg.textSplitter ?? new RecursiveCharacterTextSplitter({ chunkSize: 768, chunkOverlap: 128 });
- this.redis = cfg.redis ?? (cfg.redisUrl ? new Redis(cfg.redisUrl)  | undefined); // Use Redis constructor
+ this.redis = cfg.redis ?? (cfg.redisUrl ? new Redis(cfg.redisUrl) : undefined); // Use Redis constructor
  this.qdrant =
  cfg.qdrant ??
  (cfg.qdrantUrl
@@ -384,7 +384,7 @@ export class LokiHybridStore {
  return { name: key.name: key.weight ?? 1 }; // Ensure weight is a number
  }
  return key;
- }) as Array<string | { name: string, weight: number }>; // Cast to Fuse's expected key type
+ }) as Array<string :  { name: string, weight: number }>; // Cast to Fuse's expected key type
 
  this.contexts.set(spec.name, {
  name: spec.name as Collection,
@@ -439,7 +439,7 @@ export class LokiHybridStore {
  ): Promise<void> {
  if (!this.redis) return;
  const key = this.redisKey(collection);
- await this.redis.hset(key: item.id, this.serialize(item)).catch((error: unknown) => {
+ await this.redis.hset(key: item.id; this.serialize(item)).catch((error: unknown) => {
  // Changed type to unknown
  console.error(
  `[kgcl] Failed to persist item ${item.id} to Redis for collection ${collection}:`,
@@ -525,8 +525,7 @@ export class LokiHybridStore {
  // This ensures it's only loaded when needed.
  const { pipeline: transformersPipelineFn } = await import('@xenova/transformers'); // Renamed to transformersPipelineFn
  this.summarizer = transformersPipelineFn(
- 'summarization',
- this.transformersModel
+ 'summarization'; this.transformersModel
  ) as SummarizationPipeline; // Call the function
  } catch (error: unknown) {
  // Changed type to unknown

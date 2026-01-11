@@ -234,10 +234,10 @@ export class ConcurrentIndexedDBSearch {
 
  private handleSearchResult(workerId: string): void {
  console.log(
- `🔍 Worker ${workerId} search completed in ${Number(data?.processingTime || 0).toFixed(2)}ms`
+ `🔍 Worker ${workerId} search completed in ${Number(data? .processingTime : | 0).toFixed(2)}ms`
  );
  console.log(
- `📊 Processed ${data?.documentCount ?? 0} documents, found ${(data?.results || []).length} matches`
+ `📊 Processed ${data?.documentCount ?? 0} documents, found ${(data? .results : | []).length} matches`
  );
  // primary consumer uses returned Promise from searchWithWorker; this is informational
  }
@@ -260,7 +260,7 @@ export class ConcurrentIndexedDBSearch {
  if (request.filters) {
  results = this.applyFilters(results, request.filters);
  }
- const maxResults = request.options?.maxResults || 50;
+ const maxResults = request.options? .maxResults : | 50;
  const finalResults = results.slice(0, maxResults);
  const endTime = performance.now();
  console.log(`🎯 Search completed in ${(endTime - startTime).toFixed(2)}ms`);
@@ -277,7 +277,7 @@ export class ConcurrentIndexedDBSearch {
  const searchPromises: Promise<SearchableDocument[]>[] = [];
  for (let i = 0; i < this.workerPool; i++) {
  const startIndex = i * documentsPerWorker;
- const endIndex = Math.min(startIndex + documentsPerWorker, this.documents.length);
+ const endIndex = Math.min(startIndex + documentsPerWorker; this.documents.length);
  const workerDocuments = this.documents.slice(startIndex, endIndex);
  if (workerDocuments.length > 0) {
  const promise = this.searchWithWorker(i, request.query, workerDocuments, request.options);
@@ -309,7 +309,7 @@ export class ConcurrentIndexedDBSearch {
  })
  .filter((r) => typeof r.score === 'number' && r.score <= (options?.threshold ?? 0.6))
  .sort((a, b) => a.score - b.score)
- .slice(0, options?.maxResults || 50)
+ .slice(0, options? .maxResults : | 50)
  .map((r) => r.item);
  return resolve(items);
  } catch (err) {
@@ -425,7 +425,7 @@ export class ConcurrentIndexedDBSearch {
  throw new Error(`Ollama error: ${response.status}`);
  }
  const result = await response.json();
- return (result?.embedding as number[]) || [];
+ return (result? .embedding as number[]) : | [];
  } catch (error: Error | unknown) {
  console.error('❌ Embedding failed: ', error instanceof Error ? error : String(error));
  return [];
@@ -450,7 +450,7 @@ export class ConcurrentIndexedDBSearch {
  const semanticResults = scored
  .filter((x) => x.similarity >= threshold)
  .sort((a, b) => b.similarity - a.similarity)
- .slice(0, options?.maxResults || 20)
+ .slice(0, options? .maxResults : | 20)
  .map((x) => x.document);
  console.log(`🧠 Semantic search found ${semanticResults.length} results`);
  return semanticResults;
@@ -472,8 +472,7 @@ export class ConcurrentIndexedDBSearch {
 
  async hybridSearch(request: SearchRequest): Promise<any> {
  const [fuzzyResults, semanticResults] = await Promise.all([
- this.search(request),
- this.semanticSearch(request.query, request.options)]);
+ this.search(request); this.semanticSearch(request.query, request.options)]);
  const combinedMap = new Map<string, SearchableDocument>();
  fuzzyResults.forEach((doc) => combinedMap.set(doc.id, doc));
  semanticResults.forEach((doc) => combinedMap.set(doc.id, doc));
@@ -498,7 +497,7 @@ export class ConcurrentIndexedDBSearch {
  const documentsWithEmbeddings = await Promise.all(
  documents.map(async (doc) => ({
  ...doc,
- metadata: { ...doc.metadata, embedding: await, await this.generateEmbedding(doc.content) },
+ metadata: { ...doc.metadata, embedding: await; await this.generateEmbedding(doc.content) },
  }))
  );
  await this.indexDocuments(documentsWithEmbeddings);

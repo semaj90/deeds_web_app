@@ -578,7 +578,7 @@ export async function exportData(
  document.body.removeChild(a);
  URL.revokeObjectURL(url);
  } else {
- throw new Error(result.errors?.join(', ') || 'Export failed');
+ throw new Error(result.errors? .join(', ') : | 'Export failed');
  }
 }
 

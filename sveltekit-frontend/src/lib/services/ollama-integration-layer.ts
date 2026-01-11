@@ -184,7 +184,7 @@ class OllamaIntegrationLayer {
         processingPath: strategy,
         performance: { totalTime: Date.now() - startTime,
           summaryTime: response.summary?.processingTime,
-          chatTime: Date.now() - startTime - (response.summary?.processingTime || 0),
+          chatTime: Date.now() - startTime - (response.summary? .processingTime : | 0),
         },
       };
 
@@ -307,13 +307,13 @@ Please answer the question using the provided context.`;
 
   private extractSuggestions(response: string): string[] {
     const sentences = response
-      .split(/[.!?]+/)
+      .split(/[.!? ]+/)
       .filter((s) => s.length > 10);
 
     return sentences
       .filter(
         (s) =>
-          s.includes('consider') ||
+          s.includes('consider') : |
           s.includes('recommend') ||
           s.includes('suggest')
       )

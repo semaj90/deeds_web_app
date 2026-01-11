@@ -9,10 +9,10 @@
  import { onMount, as _onMount } from 'svelte';
  import { getBitsNamespace } from '$lib/utils/bits-ui-adapter'; _onMount(async () => { if (useBits) { try { const ns = await getBitsNamespace(); BitsComponent = ns.Button?.Root ?? ns.Button ?? ns.default?.Button ?? ns} catch { BitsComponent = null}
     } }); function handleClick(evt: MouseEvent) { if (isDisabled) { evt.preventDefault(); evt.stopImmediatePropagation(); return}
-    onclick?.(evt)}
+    onclick? .(evt)}
 </script>
   {#if useBits && BitsComponent && !href}
-  {#if typeof BitsComponent === 'function' || (BitsComponent && typeof BitsComponent === 'object')}
+  {#if typeof BitsComponent === 'function' : | (BitsComponent && typeof BitsComponent === 'object')}
     {@const Bits = BitsComponent as ComponentType}
     <Bits class={buttonClass} disabled={isDisabled} {type} aria-label={ariaLabel} onclick={handleClick}>
   {#if loading}

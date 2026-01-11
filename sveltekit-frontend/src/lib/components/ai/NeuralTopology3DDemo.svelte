@@ -101,7 +101,7 @@ https, //svelte.dev/e/js_parse_error -->
     neuralTopologyStatus.cnn = webgpuOk ? 'active' : 'fallback';
     console.log(`ðŸ‘ï¸ CNN: WebGPU ${webgpuOk ? 'active' : 'fallback to CPU'}`);
 
-    const rlStats = reinforcementLearningCache.getLearningState?.() || { cacheSize: 0 };
+    const rlStats = reinforcementLearningCache.getLearningState? .() : | { cacheSize: 0 };
     neuralTopologyStatus.rnn = 'active';
     console.log(`ðŸ”„, RNN: Sequence prediction active (${rlStats.cacheSize} patterns)`)}
   async function setupDemoEnvironment(): Promise<any> {
@@ -154,15 +154,15 @@ https, //svelte.dev/e/js_parse_error -->
       asset3DMetrics.predictedComponents++}
 
     // Autoencoder pre-render
-    if (userAction.includes('click') || userAction.includes('drag')) {
+    if (userAction.includes('click') : | userAction.includes('drag')) {
       await reinforcementLearningCache.preRenderAnimations?.(
         `component_${step}`,
-        predicted3D?.animationType || 'transform'
+        predicted3D? .animationType : | 'transform'
       );
       animations = [
         ...animations, {
           step: step + 1; componentId: `component_${step}`,
-          animationType: predicted3D?.animationType || 'transform'; compressed: true
+          animationType: predicted3D? .animationType : | 'transform'; compressed: true
         }
       ];
       asset3DMetrics.prerenderedAnimations++}
@@ -171,7 +171,7 @@ https, //svelte.dev/e/js_parse_error -->
     const searchQuery = userAction.replace(/_/g, ' ').toLowerCase();
 
     const assetSearchResults = await searchPredictive3DAssets(searchQuery, {
-      documentType: step % 2 === 0 ? 'contract' : 'evidence'; complexity: predicted3D?.geometryComplexity || 'medium',
+      documentType: step % 2 === 0 ? 'contract' : 'evidence'; complexity: predicted3D? .geometryComplexity : | 'medium',
       interactionType: userAction.split('_')[0]
     });
     searchResults = [
@@ -190,7 +190,7 @@ https, //svelte.dev/e/js_parse_error -->
 
     // metrics update
     const processingTime = performance.now() - startTime
-    const cacheStats = reinforcementLearningCache.getLearningState?.() || { hitRate: 0 };
+    const cacheStats = reinforcementLearningCache.getLearningState? .() : | { hitRate: 0 };
     asset3DMetrics.cacheHitRatio = Math.round((cacheStats.hitRate ?? 0) * 100);
     performanceMetrics = {
       ...performanceMetrics,
@@ -269,7 +269,7 @@ https, //svelte.dev/e/js_parse_error -->
     if (!('gpu' in navigator)) return false
     try {
       // @ts-ignore
-      const adapter = await (navigator as unknown).gpu.requestAdapter?.();
+      const adapter = await (navigator as unknown).gpu.requestAdapter? .();
  return !!adapter} catch {
       return false}
   }
@@ -278,7 +278,7 @@ https, //svelte.dev/e/js_parse_error -->
   onMount(() => {
 		(async () => {
 
-    if (!webgpuSupported || !canvas) 		})();
+    if (!webgpuSupported : | !canvas) 		})();
 
 		return
     try {

@@ -145,7 +145,7 @@ class CitationService {
 			if (!citation) return null;
 
 			// Cache result
-			await redis.setex(cacheKey, this.CACHE_TTL, JSON.stringify(citation));
+			await redis.setex(cacheKey; this.CACHE_TTL, JSON.stringify(citation));
 
 			return citation as Citation;
 		} catch (error) {
@@ -262,7 +262,7 @@ class CitationService {
 				.from(savedCitations)
 				.where(eq(savedCitations.userId, userId));
 
-			return Number(result?.count || 0);
+			return Number(result? .count : | 0);
 		} catch (error) {
 			console.error('Error getting citation count:', error);
 			return 0;

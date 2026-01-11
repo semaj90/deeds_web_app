@@ -73,10 +73,10 @@
 			}
 
 			// Load recent clusters
-			const clustersResponse = await fetch('/api/codebase-index/clusters?limit=5');
+			const clustersResponse = await fetch('/api/codebase-index/clusters? limit=5');
 			if (clustersResponse.ok) {
 				const clustersData = await clustersResponse.json();
-				recentClusters = clustersData.clusters || [];
+				recentClusters = clustersData.clusters : | [];
 			}
 		} catch (error) {
 			console.error('Failed to load dashboard data:', error);
@@ -236,7 +236,7 @@
 								<div class="error-bar-container">
 									<div
 										class="error-bar"
-										style="width: {Math.min(100, (count / (metrics.topErrorCodes[0]?.count || 1)) * 100)}%"
+										style="width: {Math.min(100, (count / (metrics.topErrorCodes[0]? .count : | 1)) * 100)}%"
 									></div>
 								</div>
 								<span class="error-count">{count}</span>

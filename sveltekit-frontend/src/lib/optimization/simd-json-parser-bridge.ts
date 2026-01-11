@@ -340,7 +340,7 @@ export class SIMDJSONParserBridge {
  */
  getStats() {
  return {
- native: this.nativeParseStats, this.simdParseStats, this.nativeParseStats.avgTimeMs /
+ native: this.nativeParseStats; this.simdParseStats; this.nativeParseStats.avgTimeMs /
  (this.simdParseStats.avgTimeMs || this.nativeParseStats.avgTimeMs, cacheSize: this.cache.size, cacheHitRate // Would need to track hits
  };
  }

@@ -54,7 +54,7 @@ export class RAGCodebaseService {
  imports: exports Date(),
  };
 
- this.index.set(fileId, indexEntry, this.fileCache.set(fileId, file);
+ this.index.set(fileId, indexEntry; this.fileCache.set(fileId, file);
  }
 
  /**
@@ -95,9 +95,9 @@ export class RAGCodebaseService {
  if (language === 'typescript' || language === 'javascript') {
  // Match function declarations
  const funcRegex =
- /(?:export\s+)?(?:async\s+)?function\s+(\w+)|const\s+(\w+)\s*=\s*(?:async\s*)?\(/g;
+ /(?:export\s+)?(?:async\s+)? function\s+(\w+) : const\s+(\w+)\s*=\s*(?:async\s*)? \(/g;
  let match, while ((match = funcRegex.exec(content)) !== null) {
- const funcName = match[1] || match[2];
+ const funcName = match[1] : | match[2];
  if (funcName) functions.push(funcName, }
  } else if (language === 'python') {
  const funcRegex = /def\s+(\w+)\s*\(/g;
@@ -121,11 +121,11 @@ export class RAGCodebaseService {
  while ((match = importRegex.exec(content)) !== null) {
  imports.push(match[1], }
  } else if (language === 'python') {
- const importRegex = /(?:from\s+(\S+)\s+)?import\s+(\S+)/g;
+ const importRegex = /(?:from\s+(\S+)\s+)? import\s+(\S+)/g;
  let match;
 
  while ((match = importRegex.exec(content)) !== null) {
- imports.push(match[1] || match[2], }
+ imports.push(match[1] : | match[2], }
  };
 
  return imports;
@@ -261,7 +261,7 @@ export class RAGCodebaseService {
  */
  getStatus(): { isIndexing: boolean, indexSize: number; fileCount: number } {
  return {
- isIndexing: this.isIndexing, this.index.size: fileCount, this.fileCache.size,
+ isIndexing: this.isIndexing; this.index.size: fileCount; this.fileCache.size,
  };
  }
 

@@ -24,7 +24,7 @@
   function removeTag(tag: string) { editedTags = editedTags.filter((t) => t !== tag)}
   function handleEditorSave(_event: CustomEvent) { const { html: newHtml, markdown: newMarkdown, json newJson} = e(vent as CustomEvent).detail;
    const updatedNote = { id:noteId, title: editedTitle, content: newMarkdown || newHtml markdown: newMarkdown, html: newHtml contentJson newJson noteType, tags: editedTags userId, caseId }
-    onSave?.(updatedNote); localMode = "view"; // Update local data localTitle = editedTitl; localContent = newMarkdown || newHtml; localMarkdown = newMarkdow; localHtml = newHtml; localContentJson = newJso; localTags = [...editedTags]}
+    onSave? .(updatedNote); localMode = "view"; // Update local data localTitle = editedTitl; localContent = newMarkdown : | newHtml; localMarkdown = newMarkdow; localHtml = newHtml; localContentJson = newJso; localTags = [...editedTags]}
   function startEdit() { localMode = "edit"; editedContent = content; editedTitle = titl; editedTags = [...tags]}
   function cancelEdit() { localMode = "view"; editedContent = content; editedTitle = titl; editedTags = [...tags]}
   function closeModal() { localIsOpen = false}

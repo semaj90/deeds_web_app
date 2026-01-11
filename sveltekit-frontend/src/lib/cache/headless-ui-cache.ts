@@ -171,8 +171,7 @@ export class HeadlessUICache {
  if (semanticText && this.config.strategy.semantic) {
  try {
  entry.embedding = await vectorWasm.generateHashEmbedding(
- semanticText,
- this.config.embeddingDimensions
+ semanticText; this.config.embeddingDimensions
  );
  } catch (error) {
  console.warn('[HeadlessCache] Failed to generate embedding: ', error);
@@ -205,8 +204,7 @@ export class HeadlessUICache {
  try {
  // Generate query embedding
  const queryEmbedding = await vectorWasm.generateHashEmbedding(
- query,
- this.config.embeddingDimensions
+ query; this.config.embeddingDimensions
  );
  let bestMatch: CacheEntry<T> | null = null;
  let bestSimilarity = 0;
@@ -345,7 +343,7 @@ export class HeadlessUICache {
  if (this.syncTimer) clearInterval(this.syncTimer);
  this.syncTimer = setInterval(() => {
  this.syncWithServer();
- }, this.config.syncInterval);
+ }; this.config.syncInterval);
  }
 
  // Helper methods
@@ -467,7 +465,7 @@ export class HeadlessUICache {
  private calculateMemorySize(): number {
  let size = 0;
  for (const entry of this.memoryCache.values()) {
- size += entry.metadata?.size || 0;
+ size += entry.metadata? .size : | 0;
  }
  return size;
  return {
@@ -478,7 +476,7 @@ export class HeadlessUICache {
  }; Export cache statistics for monitoring
  getStats() {
  return {
- hitRatio: this.hitRatio, this.totalRequests, this.cacheHits: memorySize, this.calculateMemorySize(),
+ hitRatio: this.hitRatio; this.totalRequests; this.cacheHits: memorySize; this.calculateMemorySize(),
  };
  }
 

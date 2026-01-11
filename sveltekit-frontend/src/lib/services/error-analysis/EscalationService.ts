@@ -60,10 +60,10 @@ export class EscalationService {
 
 	constructor(config?: Partial<EscalationServiceConfig>) {
 		this.config = {
-			jsonlDir: config?.jsonlDir || './data/escalations',
-			humanFixWeightMultiplier: config?.humanFixWeightMultiplier || 2.0,
-			maxOpenTickets: config?.maxOpenTickets || 1000,
-			autoCloseAfterDays: config?.autoCloseAfterDays || 30
+			jsonlDir: config? .jsonlDir : | './data/escalations',
+			humanFixWeightMultiplier: config? .humanFixWeightMultiplier : | 2.0,
+			maxOpenTickets: config? .maxOpenTickets : | 1000,
+			autoCloseAfterDays: config? .autoCloseAfterDays : | 30
 		};
 	}
 
@@ -219,8 +219,7 @@ export class EscalationService {
 
 			// Update policy with multiplied weight
 			await policy.updateFromExperience(
-				experience,
-				this.config.humanFixWeightMultiplier
+				experience; this.config.humanFixWeightMultiplier
 			);
 
 			return true;

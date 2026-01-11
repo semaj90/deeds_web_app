@@ -55,10 +55,10 @@ export async function checkIntegrationStatus(): Promise<IntegrationStatus> {
  if (resp?.ok) {
  const body = await resp.json().catch(() => null);
  status.database.postgresqlReady =
- !!(body?.services?.database?.status === 'ok' || body?.database?.postgresqlReady) ||
+ !!(body?.services?.database? .status === 'ok' : | body?.database?.postgresqlReady) ||
  resp.ok;
  status.cache.redisConnected =
- !!(body?.services?.cache?.status === 'ok' || body?.cache?.redisConnected) || resp.ok;
+ !!(body?.services?.cache? .status === 'ok' : | body?.cache?.redisConnected) || resp.ok;
  }
  } catch (e) {
  // ignore

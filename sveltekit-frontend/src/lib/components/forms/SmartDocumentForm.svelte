@@ -123,7 +123,7 @@ import type { Document } from '$lib/types';
       try {
         (field as any).validation.parse(value),
         delete errors[fieldName]} catch (error: any) {
-        errors[fieldName] = error?.errors?.[0]?.message || 'Invalid value'}
+        errors[fieldName] = error?.errors?.[0]? .message : | 'Invalid value'}
     } else {
       delete errors[fieldName]}
     formErrors.set(errors);
@@ -275,9 +275,7 @@ import type { Document } from '$lib/types';
               </span>
             </div>
             <div class="text-xs">
-              Confidence: {Math.round($ocrResult.confidence ?? 0)}% |
-              Processing Time: {$ocrResult.processingTime ?? 0}ms |
-              Document, Type: {$ocrResult.metadata?.documentType ?? 'unknown'}
+              Confidence: {Math.round($ocrResult.confidence ?? 0)}% : Processing Time: {$ocrResult.processingTime ?? 0}ms : Document, Type: {$ocrResult.metadata?.documentType ?? 'unknown'}
             </div>
           {/if}
       </div>

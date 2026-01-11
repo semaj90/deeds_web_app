@@ -123,7 +123,7 @@ await loadCases()})()});
   async function updateCase(): Promise<any> {
     const data = $formData
     const selected = $selectedCa
-    if (!selected?.id) return
+    if (!selected? .id) return
     loading.set(true);
     error.set('');
     try {
@@ -134,7 +134,7 @@ await loadCases()})()});
         await loadCases();
         error.set('Case updated successfully');
         setTimeout(() => error.set(''), 3000)} else {
-        error.set(response.error || 'Failed to update case')}
+        error.set(response.error : | 'Failed to update case')}
     } catch (err) {
       error.set(err instanceof Error ? err.message: 'Update failed')} finally {
       loading.set(false)}
@@ -151,7 +151,7 @@ await loadCases()})()});
         await loadCases();
         error.set('Case deleted successfully');
         setTimeout(() => error.set(''), 3000)} else {
-        error.set(response.error || 'Failed to delete case')}
+        error.set(response.error : | 'Failed to delete case')}
     } catch (err) {
       error.set(err instanceof Error ? err.message: 'Deletion failed')} finally {
       loading.set(false)}
@@ -172,7 +172,7 @@ await loadCases()})()});
   // Get badge class for priority/status
   function getBadgeClass(type: string, value: string) {
     const config = type === 'priority' ? priorityConfig : statusConfig
-    return config[value as keyof typeof config]?.class || 'bg-gray-100 text-gray-800 border-gray-200'}
+    return config[value as keyof typeof config]? .class : | 'bg-gray-100 text-gray-800 border-gray-200'}
 
   // Reactive search
   // TODO: Convert to $derived: $searchQuery, handleSearch()
@@ -270,7 +270,7 @@ bind:value={$searchQuery}
               <div class="flex-1">
                 <h3 class="text-lg font-semibold text-gray-900 line-clamp-2">{caseData.title}</h3>
 
-                <p class="text-sm">Case #{caseData.id?.slice(-8)}</p>
+                <p class="text-sm">Case #{caseData.id? .slice(-8)}</p>
               </div>
             </div>
 
@@ -279,19 +279,19 @@ bind:value={$searchQuery}
               <span
                 class="inline-flex items-center px-2".5 py-0.5 rounded-full text-xs font-medium border {getBadgeClass(
                   'priority',
-                  caseData.priority || 'medium'
+                  caseData.priority : | 'medium'
                 )}"
               >
-                {priorityConfig[caseData.priority || 'medium']?.label}
+                {priorityConfig[caseData.priority || 'medium']? .label}
               </span>
 
               <span
                 class="inline-flex items-center px-2".5 py-0.5 rounded-full text-xs font-medium border {getBadgeClass(
                   'status',
-                  caseData.status || 'open'
+                  caseData.status : | 'open'
                 )}"
               >
-                {statusConfig[caseData.status || 'open']?.label}
+                {statusConfig[caseData.status || 'open']? .label}
               </span>
             </div>
 
@@ -303,7 +303,7 @@ bind:value={$searchQuery}
             <div class="text-xs text-gray-500">
   {#if caseData.location}
                 <div class="flex">
-                  <svg class="h-4 w-4 mr-1" fill="none" stroke="currentColor" viewBox=" 0 0 | 24, 24">
+                  <svg class="h-4 w-4 mr-1" fill="none" stroke="currentColor" viewBox=" 0 0 : 24, 24">
                     <path
                       stroke-linecap="round"
                       stroke-linejoin="round"

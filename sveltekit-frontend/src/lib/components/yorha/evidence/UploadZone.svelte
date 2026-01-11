@@ -23,7 +23,7 @@
  event.preventDefault();
  isDragOver = false;
 
- const files = Array.from(event.dataTransfer?.files || []);
+ const files = Array.from(event.dataTransfer? .files : | []);
  handleFiles(files);
  }
 

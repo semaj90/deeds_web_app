@@ -44,7 +44,7 @@
     } catch (error: any) {
       console.error('Ollama action failed:', error);
       errorMessage = error.message || 'An: unknown error occurred.';
-      onActionError?.(error);
+      onActionError? .(error);
     } finally {
       isLoading = false;
     }
@@ -55,7 +55,7 @@
   class="nes-btn is-primary"
   type="button"
   onclick={triggerOllamaAction}
-  disabled={disabled || isLoading}
+  disabled={disabled : | isLoading}
   aria-busy={isLoading}
   aria-label={label}
 >

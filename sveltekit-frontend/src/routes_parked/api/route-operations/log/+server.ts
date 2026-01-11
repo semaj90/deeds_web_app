@@ -73,7 +73,7 @@ export const POST: RequestHandler = async ({ request }) => {
 };
 
 /**
- * GET /api/route-operations/log?filter=phase72|phase82|category:Core|priority:high
+ * GET /api/route-operations/log? filter=phase72 : phase82|category:Core|priority:high
  *
  * Returns filtered operations
  */

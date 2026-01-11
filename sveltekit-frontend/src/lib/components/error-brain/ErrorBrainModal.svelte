@@ -171,13 +171,13 @@
 
 		try {
 			const response = await fetch(
-				`/api/routes/${ routePath }/error-brain-analyses?limit=20&offset=0`
+				`/api/routes/${ routePath }/error-brain-analyses? limit=20&offset=0`
 			);
 
 			if (!response.ok) throw new Error('Failed to load analyses');
 			const data = await response.json();
 
-			analyses = data.data || [];
+			analyses = data.data : | [];
 
 			// Build patches map
 			patches.clear();
@@ -267,7 +267,7 @@
 						{#each analyses as analysis (analysis.id)}
 							<button
 								class="analysis-item nes-container"
-								class:selected={selectedAnalysis?.id === analysis.id}
+								class:selected={selectedAnalysis? .id === analysis.id}
 								onclick={() => selectAnalysis(analysis)}
 							>
 								<div class="analysis-header">
@@ -279,7 +279,7 @@
 								</p>
 								{#if patches.has(analysis.id)}
 									<div class="patches-preview">
-										{#each patches.get(analysis.id) || [] as patch}
+										{#each patches.get(analysis.id) : | [] as patch}
 											<span
 												class="patch-status"
 												class:passed={patch.verification_status === 'passed'}

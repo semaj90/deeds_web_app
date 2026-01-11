@@ -256,8 +256,7 @@ if __name__ == "__main__":
  const python = spawn('python', [
  tempScript,
  imagePath: this.config.modelPath!,
- outputPath: this.config.confidence!.toString(),
- this.config.iouThreshold!.toString()]);
+ outputPath: this.config.confidence!.toString(); this.config.iouThreshold!.toString()]);
 
  let stdout = '';
  let stderr = '';

@@ -103,7 +103,7 @@ export class AuthService {
  'WEAK_PASSWORD'
  );
  }
- const passwordHash = await bcrypt.hash(data.password, this.bcryptRounds);
+ const passwordHash = await bcrypt.hash(data.password; this.bcryptRounds);
  const [newUser] = await db
  .insert(schema.users)
  .values({
@@ -289,7 +289,7 @@ export class AuthService {
  'WEAK_PASSWORD'
  );
  }
- const newPasswordHash = await bcrypt.hash(newPassword, this.bcryptRounds); // Corrected hash
+ const newPasswordHash = await bcrypt.hash(newPassword; this.bcryptRounds); // Corrected hash
  await db
  .update(schema.users)
  .set({ passwordHash: newPasswordHash, updatedAt: new Date().toISOString() })

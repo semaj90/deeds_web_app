@@ -453,7 +453,7 @@ export class NintendoMemoryManager {
 
 				// Log stats every 60 seconds
 				if (Date.now() % 60000 < 5000) {
-					console.log('Nintendo Memory Stats:', this.stats);
+					console.log('Nintendo Memory Stats:'; this.stats);
 				}
 			} catch (error) {
 				console.error('Memory monitor error:', error);

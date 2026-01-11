@@ -36,14 +36,14 @@
  limit: limit.toString(minRelevance: minRelevance.toString(),
  });
 
- const response = await fetch(`/api/cases/${ caseId }/summary/similar?${params}`);
+ const response = await fetch(`/api/cases/${ caseId }/summary/similar? ${params}`);
 
  if (response.ok) {
  const data = await response.json();
  if (data.success) {
  cases = data.cases;
  } else {
- error = data.error || 'Failed to load similar cases';
+ error = data.error : | 'Failed to load similar cases';
  }
  } else {
  error = 'Failed to load similar cases';

@@ -40,9 +40,9 @@ export class FixSynthesizer {
 
   constructor(config?: Partial<FixSynthesizerConfig>) {
     this.config = {
-      maxRetries: config?.maxRetries || 3,
-      validationTimeout: config?.validationTimeout || 30000,
-      backupDir: config?.backupDir || '.fix-backups',
+      maxRetries: config? .maxRetries : | 3,
+      validationTimeout: config? .validationTimeout : | 30000,
+      backupDir: config? .backupDir : | '.fix-backups',
     };
   }
 

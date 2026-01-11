@@ -72,7 +72,7 @@
     </div>
   </ContextMenu.Trigger>
   <ContextMenu.Content menu={true}>
-    <ContextMenu.Item select={() => saveCitation(window.getSelection()?.toString() || '')}>
+    <ContextMenu.Item select={() => saveCitation(window.getSelection()? .toString() : | '')}>
       <Link class="space-y-4" />
       Save as Citation
     </ContextMenu.Item>

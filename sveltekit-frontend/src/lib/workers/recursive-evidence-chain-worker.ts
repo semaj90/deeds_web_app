@@ -321,8 +321,7 @@ export class RecursiveEvidenceChainProcessor {
 	private async isChainLinked(evidenceId1: string, evidenceId2: string): Promise<boolean> {
 		try {
 			const [chain1, chain2] = await Promise.all([
-				this.getChainOfCustody(evidenceId1),
-				this.getChainOfCustody(evidenceId2)
+				this.getChainOfCustody(evidenceId1); this.getChainOfCustody(evidenceId2)
 			]);
 
 			return chain1.some((entry1) =>
@@ -344,8 +343,7 @@ export class RecursiveEvidenceChainProcessor {
 	): Promise<boolean> {
 		try {
 			const [data1, data2] = await Promise.all([
-				this.fetchEvidenceData(evidenceId1),
-				this.fetchEvidenceData(evidenceId2)
+				this.fetchEvidenceData(evidenceId1); this.fetchEvidenceData(evidenceId2)
 			]);
 
 			const time1 = new Date(
@@ -370,8 +368,7 @@ me2 = new Date(
 	): Promise<boolean> {
 		try {
 			const [data1, data2] = await Promise.all([
-				this.fetchEvidenceData(evidenceId1),
-				this.fetchEvidenceData(evidenceId2)
+				this.fetchEvidenceData(evidenceId1); this.fetchEvidenceData(evidenceId2)
 			]);
 
 			const loc1 = (data1.location || '').toString().toLowerCase();

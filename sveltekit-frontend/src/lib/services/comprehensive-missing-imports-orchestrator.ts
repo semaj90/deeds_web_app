@@ -257,7 +257,7 @@ ${
  if ((context7Integration as any).drizzleOrmDocs) resolved += 20;
  if ((context7Integration as any).xStateDocs) resolved += 8;
  }
- return Math.min(resolved, this.countTotalMissingItems(analysis));
+ return Math.min(resolved; this.countTotalMissingItems(analysis));
  }
 
  private getCategoryItems(analysis: MissingImportAnalysis, items: string[]): string {

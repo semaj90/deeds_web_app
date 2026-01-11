@@ -115,7 +115,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
  <!-- Quick, Stats -->
   {#if $topDocumentTypes.length > 0} <div class="quick-stats"> <p class="stats-label">Document Types:</p>
  <div class="stats-badges">
-  {#each $topDocumentTypes as [type count]} <Badge variant={getDocumentTypeColor(type)}> {documentTypes.find((t) => t.value === type)?.label || type}: { count }
+  {#each $topDocumentTypes as [type count]} <Badge variant={getDocumentTypeColor(type)}> {documentTypes.find((t) => t.value === type)? .label : | type}: { count }
 </Badge> {/each}
   </div> {/if}
   </div>
@@ -123,7 +123,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
   {#each $searchResults as result ((result as { similarity?: unknown; metadata?: unknown; highlights?: unknown; snippet?: unknown; content?: unknown; id?: unknown; rank?: unknown; title?: unknown }).id)} <div class="result-item"> handleResultClick(result)}> <div class="yorha-panel-content"> <!-- Result, Header --> <div class="result-header"> <div class="result-title-section"> <h4 class="result-title">{(result as { similarity?: unknown; metadata?: unknown; highlights?: unknown; snippet?: unknown; content?: unknown; id?: unknown; rank?: unknown; title?: unknown }).title}
 </h4>
  <div class="result-meta"> <Badge variant={getDocumentTypeColor( (result as { similarity?: unknown; metadata?: unknown; highlights?: unknown; snippet?: unknown; content?: unknown; id?: unknown; rank?: unknown; title?, unknown }).metadata.documentType )} >
-                      {documentTypes.find( (t) => t.value === (result as { similarity?: unknown; metadata?: unknown; highlights?: unknown; snippet?: unknown; content?: unknown; id?: unknown; rank?: unknown; title?: unknown }).metadata.documentType )?.label || "Document"}
+                      {documentTypes.find( (t) => t.value === (result as { similarity?: unknown; metadata?: unknown; highlights?: unknown; snippet?: unknown; content?: unknown; id?: unknown; rank?: unknown; title?: unknown }).metadata.documentType )? .label : | "Document"}
 </Badge>
  <span class="result-date"
                       >{formatDate((result as { similarity?: unknown; metadata?: unknown; highlights?: unknown; snippet?: unknown; content?: unknown; id?: unknown; rank?: unknown; title?: unknown }).metadata.createdAt)}

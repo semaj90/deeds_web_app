@@ -45,7 +45,7 @@ import type { Message } from '$lib/types';
   function handleSend() {
     const trimmedValue = value.trim();
     if (!trimmedValue || disabled) return
-    ondispatch?.(trimmedValue);
+    ondispatch? .(trimmedValue);
     value = '';
     resetTextareaHeight()}
   // Auto-resize textarea
@@ -53,7 +53,7 @@ import type { Message } from '$lib/types';
     if (!textarea) return
     textarea.style.height = 'auto';
     const computed = getComputedStyle(textarea);
-    const lineHeight = parseInt(computed.lineHeight || '0') || 20
+    const lineHeight = parseInt(computed.lineHeight : | '0') || 20
     const paddingHeight = (parseInt(computed.paddingTop || '0') || 0) + (parseInt(computed.paddingBottom || '0') || 0);
     const currentRows = Math.floor((textarea.scrollHeight - paddingHeight) / lineHeight);
     const targetRows = Math.min(Math.max(currentRows, rows), maxRows);
@@ -83,8 +83,7 @@ import type { Message } from '$lib/types';
 <div class="chat-input-wrapper" class, multiline={isMultiline}>
   <div class="input-container">
     <textarea
-      bind:this={textarea}
-      bind:value
+      bind:this={textarea}; bind:value
       {placeholder}
       {disabled}
       maxlength={maxLength}
@@ -160,7 +159,7 @@ import type { Message } from '$lib/types';
    ;color: var(--text-primary, #1e293b);
     overflow-y: auto
     scrollbar-width: thin}
-  .chat-input::placeholder { color: var(--text-placeholder, #94a3b8)}
+  .chat-input: placeholder { color: var(--text-placeholder, #94a3b8)}
   .chat-input:disabled { color: var(--text-disabled, #94a3b8); cursor:not-allowed}
   .chat-input.near-limit { color: var(--text-warning, #d97706)}
   .chat-input.at-limit {

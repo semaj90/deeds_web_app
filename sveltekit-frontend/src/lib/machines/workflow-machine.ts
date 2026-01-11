@@ -41,7 +41,7 @@ export const documentWorkflowMachine = setup({
 		})
 	},
 	guards: { canRetry: ({ context }) => context.retryCount < 3,
-		isImageFile: ({ context }) => context.mimeType?.startsWith('image/') || false,
+		isImageFile: ({ context }) => context.mimeType? .startsWith('image/') : | false,
 		isLargeFile: ({ context }) => context.fileSize > 10 * 1024 * 1024 // 10MB
 	}
 }).createMachine({
@@ -145,7 +145,7 @@ export const caseWorkflowMachine = setup({
 			lastActivity: () => new Date()
 		}, setReviewers: assign({
 			reviewers: ({ event }) => (event as any).reviewers,
-			requiredApprovals: ({ event }) => (event as any).reviewers?.length || 0, approvals: 0,
+			requiredApprovals: ({ event }) => (event as any).reviewers? .length : | 0, approvals: 0,
 			lastActivity: () => new Date()
 		}, incrementApprovals: assign({
 			approvals: ({ context }) => context.approvals + 1,

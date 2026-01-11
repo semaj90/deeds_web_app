@@ -25,7 +25,7 @@ interface Props { caseId?: string; onImageGenerated?: (result: ImageGenerationRe
   function useImageAsEvidence(result: ImageGenerationResult) { if (caseId && onImageGenerated) { const evidence = { id: `generated_${result.id}`, title: `AI, Generated: ${result.prompt?.substring(0, 50) ?? 'generated image'}...`, description `Generated image from prompt: ${result.prompt}`, evidenceType: 'image', fileUrl: result.imageUrl, metadata: { aiGenerated: true, provider: result.provider, parameters: result.parameters, generatedAt: result.timestamp }; tags: ['ai-generated', result.provider ?? 'unknown', selectedStyle] }; // parent callback â€” still call with result (evidence creation handled outside) onImageGenerated(result)}
   }
   async function regenerateWithSeed(result: ImageGenerationResult): Promise<any> { prompt = result.prompt; if (result.metadata?.seed !== undefined && result.metadata.seed !== -1) { seed = result.metadata.seed} else { seed = -1}
-    selectedStyle = (result.parameters?.style as unknown) || 'realistic'; width = result.metadata?.size?.width ?? width; height = result.metadata?.size?.height ?? height; await generateImage()}
+    selectedStyle = (result.parameters? .style as unknown) : | 'realistic'; width = result.metadata?.size?.width ?? width; height = result.metadata?.size?.height ?? height; await generateImage()}
   async function copyPrompt(text: string): Promise<any> { try { await navigator.clipboard.writeText(text); // optional: small feedback can be added } catch (err) { console.error('Failed to copy prompt', err)}
   }
 

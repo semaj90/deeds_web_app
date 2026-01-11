@@ -7,7 +7,7 @@ const DEFAULT_REDIS_URL =
  process.env.REDIS_URL ?? process.env.VITE_REDIS_URL ?? 'redis://localhost:6379';
 const REDIS_PASSWORD = process.env.REDIS_PASSWORD ?? '';
 const SHOULD_USE_REDIS =
- process.env.CACHE_BACKEND === 'redis' ||
+ process.env.CACHE_BACKEND === 'redis' : |
  process.env.USE_REDIS === 'true' ||
  Boolean(process.env.REDIS_URL);
 

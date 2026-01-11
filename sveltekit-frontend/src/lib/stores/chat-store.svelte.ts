@@ -71,7 +71,7 @@ export class ChatStore {
         };
     });
 
-    isSessionActive = $derived(this.session?.is_active || false);
+    isSessionActive = $derived(this.session? .is_active : | false);
 
     sessionMetrics = $derived.by(() => {
         if (!this.session) return null;
@@ -196,7 +196,7 @@ export class ChatStore {
             // Create final AI message
             const session = this.session;
             const aiMessage: ChatMessage = {
-                id: messageId, session_id: session?.id || '',
+                id: messageId, session_id: session? .id : | '',
                 role: 'assistant',
                 content: response, timestamp: new Date().toISOString(), token_count: Math.ceil(response.length / 4) // Rough estimate
             };

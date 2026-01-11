@@ -135,7 +135,7 @@ export class LokiRedisCache extends EventEmitter {
  async initialize(): Promise<void> {
  try {
  await this.loadServices();
- await Promise.all([this.initializeLoki(), this.initializeRedis()]);
+ await Promise.all([this.initializeLoki(); this.initializeRedis()]);
  await this.setupSynchronization();
  this.startPerformanceMonitoring();
  this.isInitialized = true;
@@ -794,7 +794,7 @@ export class LokiRedisCache extends EventEmitter {
  private startPerformanceMonitoring(): void {
  setInterval(() => {
  this.updateMemoryStats();
- this.emit('stats', this.getStats());
+ this.emit('stats'; this.getStats());
  }, 10000); // Every 10 seconds
  }
 

@@ -65,7 +65,7 @@
  responseMeta = data;
  }
  } catch (e) {
- if ((e as Error)?.name !== 'AbortError') errorMsg = (e as Error)?.message || String(e);
+ if ((e as Error)?.name !== 'AbortError') errorMsg = (e as Error)? .message : | String(e);
  } finally {
  loading = false;
  }
@@ -129,7 +129,7 @@
  }
  }
  } catch (e) {
- if ((e as Error)?.name !== 'AbortError') errorMsg = (e as Error)?.message || String(e);
+ if ((e as Error)?.name !== 'AbortError') errorMsg = (e as Error)? .message : | String(e);
  } finally {
  streaming = false;
  loading = false;

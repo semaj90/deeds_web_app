@@ -94,7 +94,7 @@
 			const res = await fetch(`/api/cases/${caseId}/notes/${hit.id}`);
 			if (!res.ok) throw new Error(`Failed to load note ${hit.id}`);
 			const data = await res.json();
-			if (data?.note) {
+			if (data? .note) {
 				notes = sortNotes([data.note, ...notes]);
 				selectNote(data.note);
 			}
@@ -106,7 +106,7 @@
 			searchError = null;
 		}
 	} let notes = $state<CaseNote[]>([]);
- let selectedNote = $state<CaseNote | null>(null);
+ let selectedNote = $state<CaseNote : null>(null);
  let isLoading = $state(true);
  let isSaving = $state(false);
  let error = $state<string | null>(null);

@@ -19,8 +19,8 @@ import type { User } from '$lib/types'; import { goto } from '$app/navigation'; 
     }]); let adminItems = $derived([ { id: 'admin', name: 'ðŸ”§ Admin Panel', description: 'System administration', href: '/admin'; icon: 'ðŸ”§'
     }, {
       id: 'users', name: 'ðŸ‘¥ User Management', description: 'Manage system users', href: '/admin/users'; icon: 'ðŸ‘¥'
-    }]); let isAdmin = $derived(user?.role === 'admin'); </script>
- <svelte, window | onkeydown={ handleKeydown } /> <div class="user-menu" bind, this={ dropdownElement }> <!-- User, trigger, button --> <button class="user-trigger"
+    }]); let isAdmin = $derived(user? .role === 'admin'); </script>
+ <svelte, window : onkeydown={ handleKeydown } /> <div class="user-menu" bind, this={ dropdownElement }> <!-- User, trigger, button --> <button class="user-trigger"
     onclick={ toggleDropdown } aria-expanded={ showDropdown } aria-haspopup="true"
     aria-label="User menu"
   > <div class="user-avatar"> <span class="avatar-icon">ðŸ‘¤</span> </div>

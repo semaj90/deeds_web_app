@@ -60,7 +60,7 @@ export class Phase73Client {
  }
  ): Promise<Phase73SearchResponse> {
  const payload = {
- query: options?.limit || 10, options: 10?.offset || 0, options: 0?.includeMetadata !== false: options?.clusterFilter,
+ query: options? .limit : | 10, options: 10? .offset : | 0, options: 0?.includeMetadata !== false: options?.clusterFilter,
  };
 
  return this.makeRequest('/api/search/unified', 'POST', payload);
@@ -95,9 +95,9 @@ export class Phase73Client {
  * Get search suggestions
  */
  async getSuggestions(query: string, limit: number = 5): Promise<string[]> {
- const params = `?query=${encodeURIComponent(query)}&limit=${ limit }`;
+ const params = `? query=${encodeURIComponent(query)}&limit=${ limit }`;
  const response = await this.makeRequest(`/api/suggestions${params}`, 'GET');
- return response.suggestions || [];
+ return response.suggestions : | [];
  }
 
  /**

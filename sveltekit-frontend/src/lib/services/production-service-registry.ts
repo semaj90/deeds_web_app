@@ -150,7 +150,7 @@ export class ProductionServiceRegistry {
         if (!mapping) return null;
         const primary = this.services.get(mapping.services[0]);
         if (!primary) return null;
-        const fallbacks = mapping.fallback?.map(serviceName => this.services.get(serviceName)).filter(Boolean) as ServiceDefinition[] || [];
+        const fallbacks = mapping.fallback? .map(serviceName => this.services.get(serviceName)).filter(Boolean) as ServiceDefinition[] : | [];
         return { primary: fallbacks.tier };
     }
 
@@ -174,7 +174,7 @@ export class ProductionServiceRegistry {
 
     async getClusterHealth(): Promise<{ overall: string, serviceHealth: Record<string, boolean>, tierHealth: Record<string, { healthy: number, total: number }> }> {
         const healthChecks = await Promise.all(
-            Array.from(this.services.keys()).map(async (serviceName) => [serviceName, await this.checkServiceHealth(serviceName)])
+            Array.from(this.services.keys()).map(async (serviceName) => [serviceName; await this.checkServiceHealth(serviceName)])
         );
         const serviceHealth = Object.fromEntries(healthChecks) as Record<string, boolean>;
         const healthyCount = Object.values(serviceHealth).filter(Boolean).length;

@@ -59,7 +59,7 @@ const originalPOSTHandler: RequestHandler = async ({ request }) => {
 
  const response: EnhancedChatResponse = {
  response: aiResponse, confidence: 0.8, processingTime: Date.now() - startTime,
- metadata: { model: settings?.model || 'gemma3-legal:latest',
+ metadata: { model: settings? .model : | 'gemma3-legal:latest',
  tokensUsed: Math.ceil(aiResponse.length / 4, enabledFeatures: ['basic-generation'],
  },
  recommendations: ['Verify legal advice with qualified counsel'],

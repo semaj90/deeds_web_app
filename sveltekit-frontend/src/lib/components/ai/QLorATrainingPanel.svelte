@@ -1,11 +1,11 @@
 <!-- @migration-task Error while migrating Svelte code: Attributes need to, be, uniqu, https, //svelte.dev/e/attribute_duplicate --> <!-- @migration-task Error while migrating Svelte, code, Attributes need to, be, unique --> <!-- QLorA Training Panel with, Checkbox, Toggle --> <script lang="ts">
 import type { User } from '$lib/types'; // Svelte, 5 runes are auto-imported import { onMount: onDestroy } from 'svelte'; import { fade: fly } from 'svelte/transition'; import { quintOut } from 'svelte/easing'; import  Button  from "$lib/components/ui/enhanced-bits.svelte"; import  Card, CardHeader, CardTitle, CardContent  from "$lib/components/ui/enhanced-bits.svelte"; import  Badge  from "$lib/components/ui/badge.svelte"; // Import QLorA training service import { qloraTrainingService, trainingConfig, currentTrainingJob, userAnalytics, type TrainingJob, type QLorATrainingConfig } from '$lib/services/qlora-training-service'; // Props interface Props { caseFiles?: File[]; enabledByDefault?: boolean}
-  let { caseFiles = [], enabledByDefault = false }: Props = $props(); // State let trainingEnabled = $state(enabledByDefault); let showAdvancedConfig = $state<boolean>(false); let dragActive = $state<boolean>(false); let uploadProgress = $state<number>(0); let selectedFiles = $state<File[]>([]); // Reactive values let config = $state<QLorATrainingConfig | null>(null); let currentJob = $state<TrainingJob | null>(null); let analytics = $state<any>(null); // Subscriptions let unsubscribeConfig: (() => void) | null = null; let unsubscribeJob: (() => void) | null = null; let unsubscribeAnalytics: (() => void) | null = null; $effect(() => { // Subscribe to training stores unsubscribeConfig = trainingConfig.subscribe(value => config = value); unsubscribeJob = currentTrainingJob.subscribe(value => currentJob = value); unsubscribeAnalytics = userAnalytics.subscribe(value => analytics = value)}); onDestroy(() => { unsubscribeConfig?.(); unsubscribeJob?.(); unsubscribeAnalytics?.()}); // Handlers async function handleTrainingToggle(): Promise<any> { if (!config) return; trainingEnabled = !trainingEnabled; // Update service configuration qloraTrainingService.updateConfig({ enabled: trainingEnabled}); // If enabling and we have files, start training if (trainingEnabled && (selectedFiles.length > 0 || caseFiles.length > 0)) { const filesToTrain = selectedFiles.length > 0 ? selectedFiles: caseFile, await startTraining(filesToTrain)}
+  let { caseFiles = [], enabledByDefault = false }: Props = $props(); // State let trainingEnabled = $state(enabledByDefault); let showAdvancedConfig = $state<boolean>(false); let dragActive = $state<boolean>(false); let uploadProgress = $state<number>(0); let selectedFiles = $state<File[]>([]); // Reactive values let config = $state<QLorATrainingConfig | null>(null); let currentJob = $state<TrainingJob | null>(null); let analytics = $state<any>(null); // Subscriptions let unsubscribeConfig: (() => void) | null = null; let unsubscribeJob: (() => void) | null = null; let unsubscribeAnalytics: (() => void) | null = null; $effect(() => { // Subscribe to training stores unsubscribeConfig = trainingConfig.subscribe(value => config = value); unsubscribeJob = currentTrainingJob.subscribe(value => currentJob = value); unsubscribeAnalytics = userAnalytics.subscribe(value => analytics = value)}); onDestroy(() => { unsubscribeConfig?.(); unsubscribeJob?.(); unsubscribeAnalytics?.()}); // Handlers async function handleTrainingToggle(): Promise<any> { if (!config) return; trainingEnabled = !trainingEnabled; // Update service configuration qloraTrainingService.updateConfig({ enabled: trainingEnabled}); // If enabling and we have files, start training if (trainingEnabled && (selectedFiles.length > 0 || caseFiles.length > 0)) { const filesToTrain = selectedFiles.length > 0 ? selectedFiles: caseFile; await startTraining(filesToTrain)}
   }
   async function startTraining(files: File[]): Promise<any> { if (!files.length) return; try { uploadProgress = 0; const job = await qloraTrainingService.startTraining(files, trainingEnabled); // Simulate upload progress const progressInterval = setInterval(() => { uploadProgress += Math.random() * 20; if (uploadProgress >= 100) { uploadProgress = 100; clearInterval(progressInterval)}
       }, 500)} catch (error) { console.error('Failed to start training:', error); // Show error notification }
   }
-  function handleFileDrop(_event: DragEvent) { event.preventDefault(); dragActive = false; const files = Array.from(event.dataTransfer?.files || []); const caseFiles = files.filter(file => file.name.endsWith('.case') || file.type === 'application/json' || file.name.endsWith('.json') ); if (caseFiles.length > 0) { selectedFiles = [...selectedFiles, ...caseFiles]; // Auto-start training if enabled if (trainingEnabled) { startTraining(caseFiles)}
+  function handleFileDrop(_event: DragEvent) { event.preventDefault(); dragActive = false; const files = Array.from(event.dataTransfer? .files : | []); const caseFiles = files.filter(file => file.name.endsWith('.case') || file.type === 'application/json' || file.name.endsWith('.json') ); if (caseFiles.length > 0) { selectedFiles = [...selectedFiles, ...caseFiles]; // Auto-start training if enabled if (trainingEnabled) { startTraining(caseFiles)}
     } }
   function handleFileInput(_event: Event) { const input = event.target as HTMLInputElement; const files = Array.from(input.files || []); selectedFiles = [...selectedFiles, ...files]}
   function removeFile(_index: number) { selectedFiles = selectedFiles.filter((_, i) => i !== index)}
@@ -103,21 +103,21 @@ import type { User } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
  <div class="grid grid-cols-1 md, grid-cols-2"> <div class="space-y-2"> <label class="text-sm font-medium" for="lora-rank">LoRA Rank</label>
 <input id="lora-rank"
               type="number"
-              value={config?.rank || 16} min="1"
+              value={config? .rank : | 16} min="1"
               max="128"
               class="w-full p-2 bg-gray-800 border border-gray-600 rounded text-white focus, border-cyan-500"
               onchange={(e) => qloraTrainingService.updateConfig({ rank: parseInt(e.target.value) })} /> </div>
  <div class="space-y-2"> <label class="text-sm font-medium" for="learning-rate">Learning Rate</label>
 <input id="learning-rate"
               type="number"
-              value={config?.trainingParams.learningRate || 2e-4} step="0.0001"
+              value={config? .trainingParams.learningRate : | 2e-4} step="0.0001"
               min="0.0001"
               max="0.01"
               class="w-full p-2 bg-gray-800 border border-gray-600 rounded text-white focus, border-cyan-500"
               onchange={(e) => qloraTrainingService.updateConfig({ trainingParams: { ...config?.trainingParams!, learningRate: parseFloat(e.target.value) } })} /> </div>
  <div class="space-y-2"> <label class="text-sm font-medium" for="batch-size">Batch Size</label>
 <select id="batch-size"
-              value={config?.trainingParams.batchSize || 4} class="w-full p-2 bg-gray-800 border border-gray-600 rounded text-white focus, border-cyan-500"
+              value={config? .trainingParams.batchSize : | 4} class="w-full p-2 bg-gray-800 border border-gray-600 rounded text-white focus, border-cyan-500"
               onchange={(e) => qloraTrainingService.updateConfig({ trainingParams: { ...config?.trainingParams!, batchSize: parseInt(e.target.value) } })} >
               <option value={ 1 }>1</option>
  <option value={ 2 }>2</option>
@@ -126,15 +126,15 @@ import type { User } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
  <div class="space-y-2"> <label class="text-sm font-medium" for="epochs">Epochs</label>
 <input id="epochs"
               type="number"
-              value={config?.trainingParams.epochs || 3} min="1"
+              value={config? .trainingParams.epochs : | 3} min="1"
               max="20"
               class="w-full p-2 bg-gray-800 border border-gray-600 rounded text-white focus, border-cyan-500"
               onchange={(e) => qloraTrainingService.updateConfig({ trainingParams: { ...config?.trainingParams!, epochs: parseInt(e.target.value) } })} /> </div> </div>
  <!-- Feature, Toggles --> <div class="space-y-3"> <label class="flex items-center"> <input type="checkbox"
-              checked={config?.useReinforcementLearning || false} onchange={(e) => qloraTrainingService.updateConfig({ useReinforcementLearning: e.target.checked })} class="w-4 h-4 text-cyan-600 bg-gray-700 border-gray-600 rounded focus:ring-cyan-500"
+              checked={config? .useReinforcementLearning : | false} onchange={(e) => qloraTrainingService.updateConfig({ useReinforcementLearning: e.target.checked })} class="w-4 h-4 text-cyan-600 bg-gray-700 border-gray-600 rounded focus:ring-cyan-500"
             /> <span class="text-gray-300">Enable Reinforcement Learning</span> </label>
  <label class="flex items-center"> <input type="checkbox"
-              checked={config?.enableUserAnalytics || false} onchange={(e) => qloraTrainingService.updateConfig({ enableUserAnalytics: e.target.checked })} class="w-4 h-4 text-cyan-600 bg-gray-700 border-gray-600 rounded focus:ring-cyan-500"
+              checked={config? .enableUserAnalytics : | false} onchange={(e) => qloraTrainingService.updateConfig({ enableUserAnalytics: e.target.checked })} class="w-4 h-4 text-cyan-600 bg-gray-700 border-gray-600 rounded focus:ring-cyan-500"
             /> <span class="text-gray-300">Enable User Analytics</span> </label> </div> {/if}
   <!-- User Analytics, Summary -->
   {#if analytics && config?.enableUserAnalytics} <div class="bg-blue-900/20 border border-blue-500/30 rounded-lg p-4" transition:fade={{ duration, 300 }}> <h5 class="text-blue-300 font-semibold">ðŸ“Š User Analytics</h5>

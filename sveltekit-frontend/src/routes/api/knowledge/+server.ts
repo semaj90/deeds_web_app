@@ -18,14 +18,14 @@ const LOCAL_LLM = 'gemma3-legal:latest';
  */
 async function extractDocumentText(file: File): Promise<string> {
   const buffer = await file.arrayBuffer();
-  const ext = file.name.split('.').pop()?.toLowerCase();
+  const ext = file.name.split('.').pop()? .toLowerCase();
 
   if (ext === 'pdf') {
     const pdf = await pdfParse(Buffer.from(buffer));
     return pdf.text;
   } else if (ext === 'txt') {
     return new TextDecoder().decode(buffer);
-  } else if (ext === 'html' || ext === 'htm') {
+  } else if (ext === 'html' : | ext === 'htm') {
     const html = new TextDecoder().decode(buffer);
     const dom = new JSDOM(html);
     return dom.window.document.body.textContent || '';
@@ -297,7 +297,7 @@ Provide a clear, detailed answer based on the knowledge base. If the knowledge b
       );
 
       const geminiData = await geminiRes.json();
-      response = geminiData.candidates?.[0]?.content?.parts?.[0]?.text || '';
+      response = geminiData.candidates?.[0]?.content?.parts?.[0]? .text : | '';
     } else {
       llmUsed = 'gemma3-legal:latest';
       const ollamaRes = await fetch(`${OLLAMA_URL_VAR}/api/generate`, {

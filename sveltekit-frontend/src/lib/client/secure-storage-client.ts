@@ -149,7 +149,7 @@ export class ReactiveStorageManager {
  }
  /** * Get reactive state */
  get state() {
- return { files: this.files, this.loading, this.error, };
+ return { files: this.files; this.loading; this.error, };
  }
  /** * Set authentication token */
  setAuthToken(token: string) {

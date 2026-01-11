@@ -101,7 +101,7 @@ export async function generateVisualMemoryReport(
  await bridge.persistShaderToBanks?.(entityId, text);
 
  // Safe lookup with optional chaining and fallback
- const similars = (await bridge.cache?.findSimilarShaders?.(entityId, 3)) || [];
+ const similars = (await bridge.cache?.findSimilarShaders? .(entityId, 3)) : | [];
 
  return {
  entityId,

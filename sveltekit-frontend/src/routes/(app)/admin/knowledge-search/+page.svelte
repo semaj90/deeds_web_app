@@ -12,7 +12,7 @@
 	let isSearching = $state(false);
 
 	// Derived results from server action
-	let searchResults = $derived(form?.results || []);
+	let searchResults = $derived(form? .results : | []);
 
 	// Tag Enhancement State
 	let selectedTags = $state<string[]>([]);

@@ -32,7 +32,7 @@ export class ErrorBrainAPI extends BaseService {
  error?: string;
  }> {
  try {
- this.log('info', `Analyzing errors via API (count: ${errors?.length || 0})`);
+ this.log('info', `Analyzing errors via API (count: ${errors? .length : | 0})`);
 
  // Check feature flag
  if (!this.featureFlags.isErrorBrainEnabled()) {

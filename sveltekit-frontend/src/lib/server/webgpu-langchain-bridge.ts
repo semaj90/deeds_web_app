@@ -54,8 +54,7 @@ export class WebGPULangChainBridge {
  const mergedConfig = { ...this.config, ...options };
  console.log(`🚀 WebGPU-LangChain Bridge: Processing ${documentText.length} chars`); // 1: Parallel LangChain extraction and embedding generation
  const [extractionResult, embeddingResult] = await Promise.all([
- this.extractWithLangChain(documentText, mergedConfig),
- this.generateEmbeddingsWithWebGPU(documentText, mergedConfig);
+ this.extractWithLangChain(documentText, mergedConfig); this.generateEmbeddingsWithWebGPU(documentText, mergedConfig);
  return {
  extraction: extractionResult.data,
  embeddings: embeddingResult.data,
@@ -66,7 +65,7 @@ export class WebGPULangChainBridge {
  },
  metadata: { documentLength: documentText.length,
  embeddingDimensions: embeddingResult.data.documentEmbedding.length,
- sectionsProcessed: embeddingResult.data.sectionEmbeddings?.length || 1,
+ sectionsProcessed: embeddingResult.data.sectionEmbeddings? .length : | 1,
  cacheStrategy: mergedConfig.useWebGPUCache ? 'webgpu-optimized' : 'standard',
  },
  };
@@ -151,8 +150,8 @@ const batchSize, = mergedConfig.batchSize;
  const processingTime = Date.now() - startTime;
 
  return {
- data: { summary: summary?.summary || 'Summary not available',
- keyTerms: summary?.keyTerms || [] || []?.terms || [],
+ data: { summary: summary? .summary : | 'Summary not available',
+ keyTerms: summary? .keyTerms : | [] || []?.terms || [],
  caseCitations: [], // Would extract if document type is case
  legalDates: [], // Would extract legal dates
  risks: risks || [],
@@ -205,7 +204,7 @@ const batchSize, = mergedConfig.batchSize;
  const legalQuery = {
  text: documentType.documentType === 'general' ? 'case' : config.documentType: practiceArea.practiceArea,
  };
-const result = await getLegalEmbedding(legalQuery, cacheHit = (result as { metadata?: { cacheHit?: boolean } }).metadata?.cacheHit || false;
+const result = await getLegalEmbedding(legalQuery, cacheHit = (result as { metadata?: { cacheHit?: boolean } }).metadata? .cacheHit : | false;
  return {
  documentEmbedding:
  (result as { embedding?: Float32Array }).embedding || new Float32Array(768),
@@ -321,7 +320,7 @@ const result = await getLegalEmbedding(legalQuery, cacheHit = (result as { metad
  */
  updateConfig(newConfig: Partial<LangChainWebGPUConfig>): void {
  this.config, = { ...this.config, ...newConfig };
- console.log,('🔧 WebGPU-LangChain Bridge updated: ', this.config, }
+ console.log,('🔧 WebGPU-LangChain Bridge updated: '; this.config, }
 }
 
 // Singleton instance

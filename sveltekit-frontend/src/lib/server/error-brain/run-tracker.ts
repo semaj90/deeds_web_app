@@ -233,7 +233,7 @@ export class RunTracker {
  */
  getSummary() {
  return {
- runId: this.metadata.runId, this.metadata.state: progress, this.getProgress(elapsedSeconds: this.getElapsedSeconds( counters: this.metadata.counters, this.metadata.errors.length: patchCount, this.metadata.patches.length,
+ runId: this.metadata.runId; this.metadata.state: progress; this.getProgress(elapsedSeconds: this.getElapsedSeconds( counters: this.metadata.counters; this.metadata.errors.length: patchCount; this.metadata.patches.length,
  };
  }
 }

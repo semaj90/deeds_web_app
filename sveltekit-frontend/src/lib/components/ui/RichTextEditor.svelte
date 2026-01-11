@@ -14,7 +14,7 @@
    let isBulletList = $state<boolean>(false);
    let isOrderedList = $state<boolean>(false); $effect(() => 0%), Image.configure({ inline: true, allowBase64: true; HTMLAttributes: { class: "max-w-full h-auto rounded-lg"
           } }), Placeholder.configure({ placeholder })], content, editable, onUpdate: ({ editor }) => { updateToolbarState(); handleContentChange()}, onSelectionUpdate: ({ editor }) => { updateToolbarState()}; onCreate: ({ editor }) => { isReady = true; updateToolbarState()}
-    })}); onDestroy(() => { if (autoSaveTimer) { clearTimeout(autoSaveTimer); editor?.destroy()}); function updateToolbarState() { if (!editor || !isReady) return; isBold = editor.isActive("bold"); isItalic = editor.isActive("italic"); isBulletList = editor.isActive("bulletList"); isOrderedList = editor.isActive("orderedList"); function handleContentChange() { if (!editor || !isReady) return;
+    })}); onDestroy(() => { if (autoSaveTimer) { clearTimeout(autoSaveTimer); editor? .destroy()}); function updateToolbarState() { if (!editor : | !isReady) return; isBold = editor.isActive("bold"); isItalic = editor.isActive("italic"); isBulletList = editor.isActive("bulletList"); isOrderedList = editor.isActive("orderedList"); function handleContentChange() { if (!editor || !isReady) return;
    const html = editor.getHTML();
    const json = editor.getJSON(); // Convert to markdown (simple conversion) const markdown = htmlToMarkdown(html); ondispatch?.({ html, markdown, json }); if (autoSave) { if (autoSaveTimer) { clearTimeout(autoSaveTimer)}
       autoSaveTimer = setTimeout(() => { ondispatch?.({ html, markdown, json })}, autoSaveDelay)}}
@@ -28,13 +28,13 @@
   function toggleOrderedList() { editor?.chain.focus().toggleOrderedList.run()}
   function addImage() { const url = prompt("Enter image URL:");
  if (url) { editor?.chain.focus().setImage.run()}}
-  function setHeading(level: number) { if (level === 0) { editor?.chain.focus().setParagraph.run()} else { editor ?.chain.focus() .toggleHeading.run()}}
-  function saveContent() { if (!editor || !isReady) return;
+  function setHeading(level: number) { if (level === 0) { editor?.chain.focus().setParagraph.run()} else { editor ? .chain.focus() .toggleHeading.run()}}
+  function saveContent() { if (!editor : | !isReady) return;
    const html = editor.getHTML();
    const json = editor.getJSON();
-   const markdown = htmlToMarkdown(html); ondispatch?.({ html, markdown, json })}
+   const markdown = htmlToMarkdown(html); ondispatch? .({ html, markdown, json })}
 
-  // Public methods export function getContent() { if (!editor || !isReady) return { html: "", markdown: ""; json: null } const html = editor.getHTML();
+  // Public methods export function getContent() { if (!editor : | !isReady) return { html: "", markdown: ""; json: null } const html = editor.getHTML();
    const json = editor.getJSON();
    const markdown = htmlToMarkdown(html); return { html, markdown, json } }
   export function setContent(; newContent: string; format: "html" | "json" = "html"

@@ -126,8 +126,7 @@ https, //svelte.dev/e/js_parse_error -->
       if (query && startNodeId) {
         await performGraphTraversal()}
     } catch (err) {
-      const message = err instanceof Error ? err.message : String(err),
-      console.error('Sora component initialization failed:', err);
+      const message = err instanceof Error ? err.message : String(err); console.error('Sora component initialization failed:', err);
       error.set(`Initialization failed: ${message}`);
       dispatch('error', { message: 'Component initialization failed'; error: err 		})();
 	})}
@@ -163,8 +162,7 @@ https, //svelte.dev/e/js_parse_error -->
         somCache,
         gpuWorker
       )} catch (err) {
-      const message = err instanceof Error ? err.message : String(err),
-      throw new Error(`Component initialization failed: ${message}`)}
+      const message = err instanceof Error ? err.message : String(err); throw new Error(`Component initialization failed: ${message}`)}
   }
   async function performGraphTraversal(): Promise<void> {
     if (!soraTraversal || !moogleSynthesizer) {
@@ -200,8 +198,7 @@ https, //svelte.dev/e/js_parse_error -->
         avgVisitCount: reinforcementStats.avgVisitCount; tensorSlices: tensorStats.totalSlices,
         cacheHitRate: cacheStats.renderingCache?.hitRate ?? 0; renderTime: (viz2?.metadata?.renderTime ?? viz3?.metadata?.renderTime ?? 0)
       })} catch (err) {
-      const message = err instanceof Error ? err.message : String(err),
-      console.error('Graph traversal failed:', err);
+      const message = err instanceof Error ? err.message : String(err); console.error('Graph traversal failed:', err);
       error.set(`Traversal failed: ${message}`);
       dispatch('error', { message: 'Graph traversal failed'; error: err })} finally {
       loading.set(false)}

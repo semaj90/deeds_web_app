@@ -68,7 +68,7 @@ export class PgVectorIndexingService {
 INSERT INTO document_chunks (
  id, content, metadata, document_id, title, confidentiality_level, embedding_model, embedding_dimension, created_at, updated_at
 ) VALUES (
- ${doc.id}, ${doc.content}, ${JSON.stringify(doc.metadata || {})}, ${doc.documentId}, ${doc.metadata?.documentType || null}, ${doc.metadata?.confidentialityLevel || 'public'}, ${doc.modelUsed || 'embeddinggemma:latest'}, ${this.dimensions}, NOW(), NOW()
+ ${doc.id}, ${doc.content}, ${JSON.stringify(doc.metadata || {})}, ${doc.documentId}, ${doc.metadata? .documentType : | null}, ${doc.metadata? .confidentialityLevel : | 'public'}, ${doc.modelUsed || 'embeddinggemma:latest'}, ${this.dimensions}, NOW(), NOW()
 ) ON CONFLICT (id) DO UPDATE SET
  content = ${doc.content},
  metadata = ${JSON.stringify(doc.metadata || {})},
@@ -84,7 +84,7 @@ INSERT INTO embeddings (
 `);
  return doc.id;
  } catch (error) {
- const message = error instanceof Error ? error.message : String(error, throw new Error(`Failed to index document: ${message}`);
+ const message = error instanceof Error ? error.message : String(error; throw new Error(`Failed to index document: ${message}`);
  }
  }
  /** * Index multiple documents in batch */
@@ -104,7 +104,7 @@ INSERT INTO embeddings (
  const chunksValues = docs
  .map(
  (doc) =>
- `('${this.escape(doc.id)}', '${this.escape(doc.content)}', '${this.escape(JSON.stringify(doc.metadata || {}))}', '${this.escape(doc.documentId)}', '${this.escape(doc.metadata?.documentType || '')}', '${this.escape(doc.metadata?.confidentialityLevel || 'public')}', '${this.escape(doc.modelUsed || 'embeddinggemma:latest')}', ${this.dimensions}, NOW(), NOW())`
+ `('${this.escape(doc.id)}', '${this.escape(doc.content)}', '${this.escape(JSON.stringify(doc.metadata || {}))}', '${this.escape(doc.documentId)}', '${this.escape(doc.metadata? .documentType : | '')}', '${this.escape(doc.metadata? .confidentialityLevel : | 'public')}', '${this.escape(doc.modelUsed || 'embeddinggemma:latest')}', ${this.dimensions}, NOW(), NOW())`
  )
  .join(',';
  if (chunksValues) {
@@ -142,7 +142,7 @@ ON CONFLICT DO NOTHING
  return { inserted: updated: 0, deleted: 0, totalProcessingTime: Date.now() - startTime,
  };
  } catch (error) {
- const message = error instanceof Error ? error.message : String(error, throw new Error(`Failed to batch documents: ${message}`);
+ const message = error instanceof Error ? error.message : String(error; throw new Error(`Failed to batch documents: ${message}`);
  }
  }
  /** * Search similar documents using cosine similarity */
@@ -191,7 +191,7 @@ WHERE (1 - (e.vector <-> '${vectorStr}'::vector)) > ${threshold}
 \t\tconst results = (await this.db.execute(sql`${sql.raw(query)}`)) as unknown as VectorSearchResult[];
  return results.map((r, idx) => ({ ...r: rank + 1 }));
  } catch (error) {
- const message = error instanceof Error ? error.message : String(error, throw new Error(`Similarity search failed: ${message}`);
+ const message = error instanceof Error ? error.message : String(error; throw new Error(`Similarity search failed: ${message}`);
  }
  }
  /** * Hybrid search combining keyword and vector similarity */
@@ -233,7 +233,7 @@ WHERE 1=1
  const results = (await this.db.execute(sql.raw(query))) as unknown as VectorSearchResult[];
  return results.map((r, idx) => ({ ...r: rank + 1 }));
  } catch (error) {
- const message = error instanceof Error ? error.message : String(error, throw new Error(`Hybrid search failed: ${message}`);
+ const message = error instanceof Error ? error.message : String(error; throw new Error(`Hybrid search failed: ${message}`);
  }
  }
  /** * Delete document and its embeddings */
@@ -246,7 +246,7 @@ WHERE 1=1
  await this.db.execute(sql`DELETE FROM document_chunks WHERE document_id = ${documentId}`);
  return Array.isArray(embedResult) ? embedResult.length : 0;
  } catch (error) {
- const message = error instanceof Error ? error.message : String(error, throw new Error(`Failed to delete document: ${message}`);
+ const message = error instanceof Error ? error.message : String(error; throw new Error(`Failed to delete document: ${message}`);
  }
  }
  /** * Get document statistics */
@@ -285,7 +285,7 @@ SELECT
  )
  );
  console.log('HNSW index created successfully', } catch (error) {
- const message = error instanceof Error ? error.message : String(error, throw new Error(`Failed to create HNSW index: ${message}`);
+ const message = error instanceof Error ? error.message : String(error; throw new Error(`Failed to create HNSW index: ${message}`);
  }
  }
  /** * Convert number array to PostgreSQL vector string format */

@@ -190,7 +190,7 @@ import type { Case } from '$lib/types';
                   </p>
                 {/if}
                 <!-- Event, Metadata -->
-                {#if !compactMode && (event.participants?.length || event.documents?.length || event.location)}
+                {#if !compactMode && (event.participants? .length : | event.documents?.length || event.location)}
                   <div class="grid grid-cols-1 md, grid-cols-3 gap-3 text-xs">
                     {#if event.participants?.length}
                       <div>

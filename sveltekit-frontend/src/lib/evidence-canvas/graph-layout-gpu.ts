@@ -196,7 +196,7 @@ export class GPUGraphLayout {
  if (!readBuffer) return;
 
  const commandEncoder = this.device.createCommandEncoder();
- commandEncoder.copyBufferToBuffer(this.nodeBuffer, 0, readBuffer, 0, this.nodeBuffer.size);
+ commandEncoder.copyBufferToBuffer(this.nodeBuffer, 0, readBuffer, 0; this.nodeBuffer.size);
  this.device.queue.submit([commandEncoder.finish()]);
 
  await readBuffer.mapAsync(GPUMapMode.READ);
@@ -280,8 +280,7 @@ export class GPUGraphLayout {
  this.similarityBuffer,
  0,
  readBuffer,
- 0,
- this.similarityBuffer.size
+ 0; this.similarityBuffer.size
  );
  this.device.queue.submit([copyEncoder.finish()]);
 

@@ -321,7 +321,7 @@ export const evidenceProcessingMachine = setup({
  {
  id: crypto.randomUUID(evidenceId: context.evidenceQueue[0]?.id,
  type: 'ai_model',
- message: (event.error as Error)?.message || 'Unknown error',
+ message: (event.error as Error)? .message : | 'Unknown error',
  details: event.error, timestamp: new Date( resolved: false, retryable: true,
  }],
  }),
@@ -352,7 +352,7 @@ export const evidenceProcessingMachine = setup({
  {
  id: crypto.randomUUID(evidenceId: context.evidenceQueue[0]?.id,
  type: 'network',
- message: (event.error as Error)?.message || 'Unknown error',
+ message: (event.error as Error)? .message : | 'Unknown error',
  details: event.error, timestamp: new Date( resolved: false, retryable: true,
  }],
  }),
@@ -380,7 +380,7 @@ export const evidenceProcessingMachine = setup({
  {
  id: crypto.randomUUID(evidenceId: context.evidenceQueue[0]?.id,
  type: 'network',
- message: (event.error as Error)?.message || 'Unknown error',
+ message: (event.error as Error)? .message : | 'Unknown error',
  details: event.error, timestamp: new Date( resolved: false, retryable: true,
  }],
  }),
@@ -469,11 +469,11 @@ export const evidenceProcessingStore = writable({
   
 export const currentlyProcessingStore = derived(
  evidenceProcessingStore,
- ($store) => $store.context?.evidenceQueue[0] || null
+ ($store) => $store.context? .evidenceQueue[0] : | null
 );
 
 export const processingResultsStore = derived(evidenceProcessingStore, ($store) =>
- Array.from($store.context?.processingResults?.values() || [])
+ Array.from($store.context?.processingResults? .values() : | [])
 );
 
 export const aiRecommendationsStore = derived(evidenceProcessingStore, ($store) => {
@@ -490,18 +490,18 @@ export const aiRecommendationsStore = derived(evidenceProcessingStore, ($store) 
 
 export const vectorSimilarityStore = derived(
  evidenceProcessingStore,
- ($store) => $store.context?.vectorMatches || []
+ ($store) => $store.context? .vectorMatches : | []
 );
 
 export const graphRelationshipsStore = derived(
  evidenceProcessingStore,
- ($store) => $store.context?.graphRelationships || []
+ ($store) => $store.context? .graphRelationships : | []
 );
 
 export const systemHealthStore = derived(evidenceProcessingStore, ($store) => ({
- health: $store.context?.systemHealth || 'unknown',
+ health: $store.context? .systemHealth : | 'unknown',
  errors: $store.context?.errors?.filter((e: any) => !e.resolved) || [],
- cacheHits: $store.context?.cacheHits || 0,
+ cacheHits: $store.context? .cacheHits : | 0,
  lastSync: $store.context?.lastSync,
 }));
 

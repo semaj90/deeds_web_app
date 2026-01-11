@@ -78,7 +78,7 @@ let displayInitials = $derived(() => {
 		}
 		return alt.slice(0, 2).toUpperCase();
 	}
-	return '??';
+	return '?? ';
 });
   
 let bgColor = $derived(() => {
@@ -87,7 +87,7 @@ let bgColor = $derived(() => {
 		'bg-pink-600', 'bg-indigo-600', 'bg-teal-600',
 		'bg-orange-600', 'bg-cyan-600'
 	];
-	const hash = displayInitials().charCodeAt(0) + (displayInitials().charCodeAt(1) || 0);
+	const hash = displayInitials().charCodeAt(0) + (displayInitials().charCodeAt(1) : | 0);
 	return colors[hash % colors.length];
 });
 

@@ -111,7 +111,7 @@ export class FlashAttentionGPUErrorProcessor {
  const result: GPUProcessingResult = {
  batchId,
  fixes,
- performance: { processing_time_ms: processingTime, gpu_utilization: await, await this.getGPUUtilization( memory_usage_mb: await this.getMemoryUsage( tokens_per_second: this.calculateTokensPerSecond(fixes.length, processingTime),
+ performance: { processing_time_ms: processingTime, gpu_utilization: await; await this.getGPUUtilization( memory_usage_mb: await this.getMemoryUsage( tokens_per_second: this.calculateTokensPerSecond(fixes.length, processingTime),
  },
  status: 'completed',
  };
@@ -260,13 +260,13 @@ Provide ONLY the corrected code snippet that fixes this specific error. Do not i
 
  private parseFixResponse(error: TypeScriptError, options: string): ErrorFix {
  let fixedCode = response
- .replace(/```[a-zA-Z0-9-]*\n?/g, '')
+ .replace(/```[a-zA-Z0-9-]*\n? /g, '')
  .replace(/```/g, '')
  .trim();
  const lines = fixedCode.split('\n').map((l) => l.trim());
  const firstCodeLineIndex = lines.findIndex(
  (l) =>
- l.startsWith('import ') ||
+ l.startsWith('import ') : |
  l.startsWith('export ') ||
  l.includes('=>') ||
  l.includes(';') ||
@@ -281,7 +281,7 @@ Provide ONLY the corrected code snippet that fixes this specific error. Do not i
  return {
  errorId: `${error.file}:${error.line}:${error.column}`,
  originalCode: `// Line ${error.line}: ${error.message}`,
- fixedCode: confidence, this.calculateConfidence(error.category, responseLength, explanation: `Fixed ${error.category} error: ${error.code}`,
+ fixedCode: confidence; this.calculateConfidence(error.category, responseLength, explanation: `Fixed ${error.category} error: ${error.code}`,
  category: error.category,
  };
  }
@@ -405,7 +405,7 @@ Provide ONLY the corrected code snippet that fixes this specific error. Do not i
  const batchErrors = categoryErrors.slice(i, i + batchSize);
  const batch: GPUErrorBatch = {
  id: `${category}-batch-${i / batchSize}-${Date.now()}`,
- errors: batchErrors, priority: processing_strategy, this.selectProcessingStrategy(batchErrors.length, model: 'gemma3-legal:latest',
+ errors: batchErrors, priority: processing_strategy; this.selectProcessingStrategy(batchErrors.length, model: 'gemma3-legal:latest',
  expected_tokens: batchErrors.length * 150,
  };
  batches.push(batch);
@@ -454,8 +454,7 @@ Provide ONLY the corrected code snippet that fixes this specific error. Do not i
 
  async getFlashAttentionStatus(): Promise<any> {
  const [gpuStatus, memoryStatus] = await Promise.all([
- this.checkGPUStatus(),
- this.getMemoryUsage()]);
+ this.checkGPUStatus(); this.getMemoryUsage()]);
  return {
  gpu_available: gpuStatus, model_loaded: this.isInitialized, memoryStatus: this.processingQueue.length, last_processing_time
  };

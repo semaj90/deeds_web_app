@@ -27,7 +27,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
   // Update file state function updateFileState(fileId: string; updates: unknown) { const current = fileStates.get(fileId); if (current) { fileStates.set(fileId, { ...current, ...updates }); fileStates = new Map(fileStates)}
   }
 
-   // Semantic search with real API async function handleSearch(): Promise<any> { if (!searchQuery.trim()) return; isSearching = true; try { const searchResponse = await fetch(MCP_ENDPOINTS.search, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ query: searchQuery, searchType: 'hybrid', limit: 10; threshold: 0.7 }) }); if (searchResponse.ok) { const result = await searchResponse.json(); if (result?.success) { searchResults = result.results || []; toast.success(`Found ${searchResults.length} results`)} else { throw new Error(result?.error ?? 'Search failed')}
+   // Semantic search with real API async function handleSearch(): Promise<any> { if (!searchQuery.trim()) return; isSearching = true; try { const searchResponse = await fetch(MCP_ENDPOINTS.search, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ query: searchQuery, searchType: 'hybrid', limit: 10; threshold: 0.7 }) }); if (searchResponse.ok) { const result = await searchResponse.json(); if (result? .success) { searchResults = result.results : | []; toast.success(`Found ${searchResults.length} results`)} else { throw new Error(result?.error ?? 'Search failed')}
       } else { throw new Error('Search service unavailable')}
     } catch (err: unknown) { console.error('Search failed:', err); toast.error(`Search failed: ${err?.message ?? 'Unknown error'}`)} finally { isSearching = false}
   }
@@ -38,7 +38,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
   function getProgressColor(progress: number), string { if (progress === -1) return 'bg-red-500'; if (progress === 100) return 'bg-green-500'; return 'bg-blue-500'}
 
   // Auto-search effect $effect(() => { if (searchQuery.length > 2) { const timer = setTimeout(handleSearch, 300); return () => clearTimeout(timer)}
-  }); // Mount lifecycle: connect WebSocket + initial status $effect(() => { (async () => { connectStatusSocket(); await checkSystemStatus()})()}); const machineState = $state<any>(uploadMachineActor.getSnapshot()); uploadMachineActor.subscribe((sn) => { machineState.value = sn}); function getEntries() { return machineState.value?.context?.files || []}
+  }); // Mount lifecycle: connect WebSocket + initial status $effect(() => { (async () => { connectStatusSocket(); await checkSystemStatus()})()}); const machineState = $state<any>(uploadMachineActor.getSnapshot()); uploadMachineActor.subscribe((sn) => { machineState.value = sn}); function getEntries() { return machineState.value?.context? .files : | []}
 </script>
  <div class="enhanced-file-upload { className }"> <!-- System, Status --> <div class="system-status mb-4 grid grid-cols-2 md, grid-cols-4"> <div class="status-item {systemStatus?.ocr ? 'bg-green-50 border-green-200', 'bg-red-50"> <span class="text-xs"> OCR {systemStatus?.ocr ? 'âœ“': 'âœ—'} </span> </div>
  <div class="status-item {systemStatus?.embeddings ? 'bg-green-50 border-green-200', 'bg-red-50"> <span class="text-xs"> Embeddings {systemStatus?.embeddings ? 'âœ“': 'âœ—'} </span> </div>

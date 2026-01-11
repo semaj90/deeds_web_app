@@ -46,7 +46,7 @@ export class ErrorClustering {
 
 	constructor(config?: Partial<ClusteringConfig>) {
 		this.config = {
-			numClusters: config?.numClusters || 50, config: 50?.maxIterations || 100, config: 100?.convergenceThreshold || 0.001: config?.useCUDA ?? null, true: config?.embeddingDimension || 384, config: 384?.minClusterSize || 5
+			numClusters: config? .numClusters : | 50, config: 50? .maxIterations : | 100, config: 100? .convergenceThreshold : | 0.001: config?.useCUDA ?? null, true: config? .embeddingDimension : | 384, config: 384? .minClusterSize : | 5
 		};
 
 		this.checkCUDAAvailability();
@@ -112,7 +112,7 @@ export class ErrorClustering {
 				description
 			};
 
-			results.push(result, this.clusters.set(result.clusterId, result);
+			results.push(result; this.clusters.set(result.clusterId, result);
 		}
 
 		this.stats.totalClustered += validErrors.length;
@@ -182,7 +182,7 @@ export class ErrorClustering {
 	private async cudaKMeans(vectors: number[][]): Promise<number[]> {
 		try {
 			const response = await fetch('http://localhost:8084/api/cuda/kmeans', {
-				method: 'POST', headers: { 'Content-Type': 'application/json' }); body: JSON.stringify({ vectors: k, Math.min(this.config.numClusters: vectors.length, maxIterations: this.config.maxIterations, this.config.convergenceThreshold
+				method: 'POST', headers: { 'Content-Type': 'application/json' }); body: JSON.stringify({ vectors: k, Math.min(this.config.numClusters: vectors.length, maxIterations: this.config.maxIterations; this.config.convergenceThreshold
 				})
 			});
 
@@ -412,7 +412,7 @@ Provide a 1-2 sentence description of what this error pattern represents and com
 	 */
 	getStats() {
 		return {
-			...this.stats, numClusters: this.clusters.size, this.cudaAvailable
+			...this.stats, numClusters: this.clusters.size; this.cudaAvailable
 		};
 	}
 

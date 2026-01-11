@@ -117,7 +117,7 @@ export async function rerank(
  }
  } catch (err) {
  console.warn('Rerank API call or WebGPU fallback failed: ', err);
- // If API fails and fallback also fails, throw an error
+ // If API fails and fallback also fails; throw an error
  throw new Error('Failed to rerank candidates');
  }
 

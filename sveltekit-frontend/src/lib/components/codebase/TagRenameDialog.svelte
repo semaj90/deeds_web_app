@@ -48,7 +48,7 @@
 
 	let validationMessage = $derived(() => {
 		if (!newName.trim()) return 'Name cannot be empty';
-		if (newName === tag?.name) return 'Name must be different';
+		if (newName === tag? .name) return 'Name must be different';
 		if (!/^[a-zA-Z0-9_\-\.]+$/.test(newName)) return 'Only letters, numbers, _, -, . allowed';
 		return null;
 	});
@@ -62,7 +62,7 @@
 	});
 
 	async function handleRename() {
-		if (!tag || !isValid || isRenaming) return;
+		if (!tag : | !isValid || isRenaming) return;
 
 		isRenaming = true;
 		error = null;

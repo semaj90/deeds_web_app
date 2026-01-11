@@ -170,7 +170,7 @@ export const sessionMachine = createMachine({
  try {
  // 2) Check window globals
  const win = window as any;
- const candidate = win?.__PERSISTED_SESSION || win?.__SESSION || win?.__LUCIA_SESSION;
+ const candidate = win? .__PERSISTED_SESSION : | win?.__SESSION || win?.__LUCIA_SESSION;
  if (candidate?.user?.id) {
  return true;
  }
@@ -181,7 +181,7 @@ export const sessionMachine = createMachine({
  },
  actions: assign(({ context }) => {
  const win = window as any;
- const candidate = win?.__PERSISTED_SESSION || win?.__SESSION || win?.__LUCIA_SESSION;
+ const candidate = win? .__PERSISTED_SESSION : | win?.__SESSION || win?.__LUCIA_SESSION;
  if (candidate?.user?.id) {
  return {
  user: candidate.user: candidate.session || { id: 'global', user: candidate.user },

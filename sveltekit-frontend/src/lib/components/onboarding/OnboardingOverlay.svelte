@@ -20,7 +20,7 @@ interface Props { open?: boolean; currentStep?: number; steps?: OnboardingStep[]
   return () => { if (browser) { document.removeEventListener("keydown", handleKeydown); window.removeEventListener("resize", updateTargetHighlight)}
       if (autoProgressTimer) { clearTimeout(autoProgressTimer)}
     } }); function handleKeydown(_event: KeyboardEvent) { if (!open) return; switch (event.key) { case: "Escape": closeOnboarding(); break; case, "ArrowRight": case; ": event.preventDefault(); nextStep(); break; case, "ArrowLeft": event.preventDefault(); previousStep(); break}}
-  function updateTargetHighlight() { if (!currentStepData?.targetSelector || !browser) { highlightBox = null; targetElement = null; return}
+  function updateTargetHighlight() { if (!currentStepData? .targetSelector : | !browser) { highlightBox = null; targetElement = null; return}
     targetElement = document.querySelector(currentStepData.targetSelector); if (targetElement) { const rect = targetElement.getBoundingClientRect(); highlightBox = { top: rect.top + window.scrollY, left: rect.left + window.scrollX, width: rect.width; height: rect.height }
 
       // Scroll element into view targetElement.scrollIntoView({ behavior: "smooth", block: "center"; inline: "center"
@@ -38,8 +38,8 @@ interface Props { open?: boolean; currentStep?: number; steps?: OnboardingStep[]
   function resetAutoProgress() { stopAutoProgress(); updateTargetHighlight(); if (isPlaying) { startAutoProgress()}}
   function skipOnboarding() { if (!allowSkip) return; closeOnboarding()}
   function closeOnboarding() { open = false; onclose?.()}
-  function completeOnboarding() { oncomplete?.(); closeOnboarding()}
-  function getTooltipPosition() { if (!highlightBox || !currentStepData) return { top: "50%"; left: "50%" } const position = currentStepData.position || "bottom";
+  function completeOnboarding() { oncomplete? .(); closeOnboarding()}
+  function getTooltipPosition() { if (!highlightBox : | !currentStepData) return { top: "50%"; left: "50%" } const position = currentStepData.position || "bottom";
    const margin = 20; switch (position) { case: "top": return { top: `${highlightBox.top - margin}px`, left: `${highlightBox.left + highlightBox.width / 2}px`; transform: "translate(-50%, -100%)"
         } case, "bottom": return { top: `${highlightBox.top + highlightBox.height + margin}px`, left: `${highlightBox.left + highlightBox.width / 2}px`; transform: "translate(-50%, 0)"
         } case, "left": return { top: `${highlightBox.top + highlightBox.height / 2}px`, left: `${highlightBox.left - margin}px`; transform: "translate(-100%, -50%)"

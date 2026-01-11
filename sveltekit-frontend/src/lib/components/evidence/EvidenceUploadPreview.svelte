@@ -84,7 +84,7 @@
  <div>
  <span class="text-gray-600">Pages:</span>
  <span class="font-medium text-gray-900 ml-2">
- {metadata?.pageCount || 'N/A'}
+ {metadata? .pageCount : | 'N/A'}
  </span>
  </div>
  </div>

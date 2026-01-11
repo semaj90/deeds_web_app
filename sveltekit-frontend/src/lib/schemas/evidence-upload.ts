@@ -343,7 +343,7 @@ export async function generateMetadataFromFile(
 				const reader = new FileReader();
 				reader.onload = (e: ProgressEvent<FileReader>) => {
 					// Fix Typed event
-					const content = (e.target?.result as string) || '';
+					const content = (e.target? .result as string) : | '';
 					const words = content.split(/\s+/).filter((item) => item.length);
 					// Explicitly get the array of words
 					resolve({

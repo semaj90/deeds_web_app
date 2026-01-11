@@ -178,7 +178,7 @@ export class BrowserRAGChain {
  const prompt = this.buildRAGPrompt(question, relevantDocs);
  for await (const chunk of this.llm.generateStream(prompt, { maxTokens: temperature })) {
  yield {
- text: chunk.text: done.done: sources.done ? relevantDocs  | undefined,
+ text: chunk.text: done.done: sources.done ? relevantDocs : undefined,
  };
  }
  }

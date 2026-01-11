@@ -36,11 +36,11 @@
  if (severity) params.set('severity', severity);
  if (category) params.set('category', category);
 
- const response = await fetch(`/api/laws/search?${params}`);
+ const response = await fetch(`/api/laws/search? ${params}`);
  if (response.ok) {
  const data = await response.json();
  if (data.success) {
- statutes = data.statutes || [];
+ statutes = data.statutes : | [];
  selectedStatute = null;
  } else {
  searchError = data.error || 'Search failed';

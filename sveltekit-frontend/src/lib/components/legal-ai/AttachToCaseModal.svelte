@@ -43,13 +43,13 @@ https://svelte.dev/e/attribute_invalid_event_handler -->
  error = null;
 
  try {
- const response = await fetch('/api/cases?status=active&limit=50');
+ const response = await fetch('/api/cases? status=active&limit=50');
  if (response.ok) {
  const data = await response.json();
  if (data.success) {
  cases = data.cases;
  } else {
- error = data.error || 'Failed to load cases';
+ error = data.error : | 'Failed to load cases';
  }
  } else {
  error = 'Failed to load cases';

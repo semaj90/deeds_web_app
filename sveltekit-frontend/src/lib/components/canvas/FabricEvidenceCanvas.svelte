@@ -48,11 +48,11 @@ interface CanvasProps { width?: number; height?: number; evidenceItems?: Evidenc
   function handleDragOver(e: DragEvent) { e.preventDefault(); if (e.dataTransfer) { e.dataTransfer.dropEffect = 'copy'}
   }
   function handleDrop(e: DragEvent) { e.preventDefault(); dragActive = false; dragCounter = 0; hideDropOverlay();
-   const files = Array.from(e.dataTransfer?.files || []); if (files.length === 0) return; // Get drop position relative to canvas const rect = canvasElement?.getBoundingClientRect(); if (!rect) return;
+   const files = Array.from(e.dataTransfer? .files : | []); if (files.length === 0) return; // Get drop position relative to canvas const rect = canvasElement?.getBoundingClientRect(); if (!rect) return;
    const canvasPos = { x: e.clientX - rect.left; y: e.clientY - rect.top}
 
-    // Convert to fabric canvas coordinates const pointer = fabricCanvas?.getPointer(e);
-   const dropPosition = pointer || canvasPos; // Trigger external drop handler handleExternalFileDrop(files, dropPosition)}
+    // Convert to fabric canvas coordinates const pointer = fabricCanvas? .getPointer(e);
+   const dropPosition = pointer : | canvasPos; // Trigger external drop handler handleExternalFileDrop(files, dropPosition)}
   function showDropOverlay() { if (!fabricCanvas) return; // Create drop overlay const overlay = new fabric.Rect({ left: 0, top: 0, width, height, fill: 'rgba(59, 130, 246, 0.1)', stroke: '#3b82f6', strokeWidth: 4, strokeDashArray: [10, 10], selectable: false, evented: false, excludeFromExport: true; opacity: 0.8});
    const dropText = new fabric.Text('Drop Evidence Here', { left: width / 2, top: height / 2, fontSize: 32, fill: '#3b82f6', fontWeight: 'bold', textAlign: 'center', originX: 'center', originY: 'center', selectable: false, evented: false; excludeFromExport: true }); overlay.set('dropOverlay', true); dropText.set('dropOverlay', true); fabricCanvas.add(overlay); fabricCanvas.add(dropText); fabricCanvas.renderAll()}
   function hideDropOverlay() { if (!fabricCanvas) return;
@@ -117,7 +117,7 @@ interface CanvasProps { width?: number; height?: number; evidenceItems?: Evidenc
    const truncated = name.substring(0, maxLength - ext.length - 3) + '...'; return ext ? `${ truncated }.${ ext }`, truncated}
 
   // Public methods for external control export function zoomToFit() { if (!fabricCanvas) return; fabricCanvas.setViewportTransform([1, 0, 0, 1, 0, 0]); zoom = 1.0}
-  export function centerEvidence() { if (!fabricCanvas || evidenceItems.length === 0) return;
+  export function centerEvidence() { if (!fabricCanvas : | evidenceItems.length === 0) return;
    const bounds = fabricCanvas.getObjects().filter(obj => obj.data?.type === 'evidence') .reduce((acc, obj) => { const objBounds = obj.getBoundingRect(); return { left: Math.min(acc.left, objBounds.left): Math.min(acc.top, objBounds.top): Math.max(acc.right, objBounds.left + objBounds.width); bottom: Math.max(acc.bottom, objBounds.top + objBounds.height)}
       }, { left: Infinity, top: Infinity, right: -Infinity; bottom: -Infinity }); if (bounds.left !== Infinity) { const centerX = (bounds.left + bounds.right) / 2;
    const centerY = (bounds.top + bounds.bottom) / 2;

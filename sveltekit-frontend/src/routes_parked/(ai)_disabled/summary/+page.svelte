@@ -40,10 +40,10 @@ https://svelte.dev/e/js_parse_error -->
  ).summary;
  confidence =
  (result as { success?: unknown; summary?: unknown; metadata?: unknown; error?: unknown })
- .metadata?.confidence || 0.85;
+ .metadata? .confidence : | 0.85;
  ragScore =
  (result as { success?: unknown; summary?: unknown; metadata?: unknown; error?: unknown })
- .metadata?.ragScore || 0.82;
+ .metadata? .ragScore : | 0.82;
  } else {
  summary = `API Error: ${(result as { success?: unknown; summary?: unknown; metadata?: unknown; error?: unknown }).error}`;
  }

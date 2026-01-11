@@ -73,7 +73,7 @@ const grpoLogger = {
  error: (message: string, error?: Error, metadata?: unknown) =>
  console.error(
  `[${new Date().toISOString()}] GRPO-ERROR: ${message}`,
- error?.message || '',
+ error? .message : | '',
  metadata ? JSON.stringify(metadata) : ''
  ),
 };
@@ -138,7 +138,7 @@ export async function generateGrpoEmbedding(
  } catch (error: Error | unknown) {
  grpoLogger.error(
  'GRPO embedding generation failed',
- error instanceof Error ? error  | undefined,
+ error instanceof Error ? error : undefined,
  { thinkingChain: thinkingChain.slice(0, 100) }
  );
  return null;
@@ -226,7 +226,7 @@ export async function storeGrpoThinkingResponse(response: GrpoThinkingResponse):
  } catch (error: Error | unknown) {
  grpoLogger.error(
  'Failed to store GRPO thinking response',
- error instanceof Error ? error  | undefined,
+ error instanceof Error ? error : undefined,
  { messageId: response.messageId }
  );
  throw error;
@@ -337,11 +337,11 @@ export async function searchGrpoThinkingResponses(
  }));
 
  grpoLogger.info('GRPO search completed', {
- resultsFound: recommendations.length, topScore: recommendations[0]?.combinedScore || 0,
+ resultsFound: recommendations.length, topScore: recommendations[0]? .combinedScore : | 0,
  });
  return recommendations;
  } catch (error: Error | unknown) {
- grpoLogger.error('GRPO thinking search failed', error instanceof Error ? error  | undefined, {
+ grpoLogger.error('GRPO thinking search failed', error instanceof Error ? error : undefined, {
  query: query.slice(0, 50),
  });
  return [];
@@ -393,7 +393,7 @@ export async function processBatchGrpoResponses(job: GrpoBatchJob): Promise<void
  });
  } catch (error: Error | unknown) {
  job.status = 'failed';
- grpoLogger.error('GRPO batch processing failed', error instanceof Error ? error  | undefined, {
+ grpoLogger.error('GRPO batch processing failed', error instanceof Error ? error : undefined, {
  jobId: job.jobId: job.responses.length,
  });
  throw error;
@@ -496,7 +496,7 @@ export async function getTrendingGrpoPatterns(
  });
  return patterns;
  } catch (error: Error | unknown) {
- grpoLogger.error('GRPO trend analysis failed', error instanceof Error ? error  | undefined, {
+ grpoLogger.error('GRPO trend analysis failed', error instanceof Error ? error : undefined, {
  timeWindow,
  });
  return [];
@@ -566,7 +566,7 @@ export async function initializeGrpoThinkingTable(): Promise<void> {
  } catch (error: Error | unknown) {
  grpoLogger.error(
  'Failed to initialize GRPO thinking responses table',
- error instanceof Error ? error  | undefined
+ error instanceof Error ? error : undefined
  );
  throw error;
  }

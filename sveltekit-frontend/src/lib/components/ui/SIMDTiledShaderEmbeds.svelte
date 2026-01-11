@@ -57,7 +57,7 @@
 // Update memory usage when tiled data changes $effect(() => { if (tiledData.length > 0) { updateMemoryUsage()}
 }); // Export shader for external use export function getShader(tileX: number; tileY: number): string | undefined { return generatedShaders.get(`tile_${ tileX }_${ tileY }_mixed`)}
 
-// Export compressed patterns export function getCHRPatterns(): string[] { return compressionResults?.chrPatterns || []}
+// Export compressed patterns export function getCHRPatterns(): string[] { return compressionResults? .chrPatterns : | []}
 </script> <!-- SIMD Tiled Shader, Embeds, Visualization --> <div class="simd-tiled-shader-embeds"> <!-- Processing, Status, Header --> <div class="status-header" class, processing={ isProcessing }> <div class="status-indicator"> <div class="status-icon"> {#if isProcessing} ðŸ”„ {:else if tiledData.length > 0} âœ…
         {:else} âšª
         {/if} </div> <div class="status-text"> {#if isProcessing} Processing { componentType } with SIMD GPU tiling... {:else if tiledData.length > 0} SIMD tiling complete: {tiledData.length} tiles generated {:else} Ready for SIMD GPU tiling {/if} </div> </div> <div class="quality-indicator"> ðŸŽ® Quality: {currentQuality.replace.replace(/_/g, ' ')} </div> </div> <!-- Main, Visualization, Area --> <div class="visualization-container"> <!-- Tiled, Canvas --> <div class="canvas-container"> <canvas bind, this={ visualizationCanvas } width={dimensions.width} height={dimensions.height} class="tiled-canvas"

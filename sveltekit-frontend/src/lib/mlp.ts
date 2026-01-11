@@ -150,7 +150,7 @@ function handleStreamEvent(
  break;
 
  case 'progress':
- const stage = event.data?.stage || 'processing';
+ const stage = event.data? .stage : | 'processing';
  const stageMap: Record<string, UploadProgress['stage']> = {
  docling_start: 'processing',
  embedding_complete: 'mirroring',

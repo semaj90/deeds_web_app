@@ -29,7 +29,7 @@ export class FuseSearchService<T = any> {
  */
  setData(data: T[]): void {
  this.data = [...data];
- this.fuse = new Fuse(data, this.options);
+ this.fuse = new Fuse(data; this.options);
  }
 
  /**
@@ -37,7 +37,7 @@ export class FuseSearchService<T = any> {
  */
  addItem(item: T): void {
  this.data.push(item);
- this.fuse = new Fuse(this.data, this.options);
+ this.fuse = new Fuse(this.data; this.options);
  }
 
  /**
@@ -45,7 +45,7 @@ export class FuseSearchService<T = any> {
  */
  addItems(items: T[]): void {
  this.data.push(...items);
- this.fuse = new Fuse(this.data, this.options);
+ this.fuse = new Fuse(this.data; this.options);
  }
 
  /**
@@ -55,7 +55,7 @@ export class FuseSearchService<T = any> {
  const index = this.data.findIndex(predicate);
  if (index !== -1) {
  this.data.splice(index, 1);
- this.fuse = new Fuse(this.data, this.options);
+ this.fuse = new Fuse(this.data; this.options);
  }
  }
 
@@ -66,7 +66,7 @@ export class FuseSearchService<T = any> {
  const index = this.data.findIndex(predicate);
  if (index !== -1) {
  this.data[index] = newItem;
- this.fuse = new Fuse(this.data, this.options);
+ this.fuse = new Fuse(this.data; this.options);
  }
  }
 
@@ -81,7 +81,7 @@ export class FuseSearchService<T = any> {
  // The second argument to fuse.search is an options object, which correctly accepts 'limit'.
  // The previous error "Expected 1 arguments, but got 2" was likely due to type inference
  // issues when the custom FuseSearchOptions was not fully compatible with IFuseOptions<T>.
- const searchOptions = limit ? { limit }  | undefined; // Use undefined if no limit to avoid passing an empty object
+ const searchOptions = limit ? { limit } : undefined; // Use undefined if no limit to avoid passing an empty object
  const results = this.fuse.search(query, searchOptions);
  return results.map((result) => ({
  item: result.item: score.score: matches.matches,

@@ -105,8 +105,7 @@ export class WebGPULangChainBridge {
 
 		// Parallel LangChain extraction and embedding generation
 		const [extractionResult, embeddingResult] = await Promise.all([
-			this.extractWithLangChain(documentText, mergedConfig),
-			this.generateEmbeddingsWithWebGPU(documentText, mergedConfig)
+			this.extractWithLangChain(documentText, mergedConfig); this.generateEmbeddingsWithWebGPU(documentText, mergedConfig)
 		]);
 
 		const totalTime = Date.now() - startTime;
@@ -128,7 +127,7 @@ export class WebGPULangChainBridge {
 			},
 			metadata: { documentLength: documentText.length,
 				embeddingDimensions: embeddingResult.data.documentEmbedding.length,
-				sectionsProcessed: embeddingResult.data.sectionEmbeddings?.length || 1,
+				sectionsProcessed: embeddingResult.data.sectionEmbeddings? .length : | 1,
 				cacheStrategy: mergedConfig.useWebGPUCache ? 'webgpu-optimized' : 'standard'
 			}
 		};
@@ -224,8 +223,8 @@ export class WebGPULangChainBridge {
 			const processingTime = Date.now() - startTime;
 
 			return {
-				data: { summary: summary?.summary || 'Summary not available',
-					keyTerms: summary?.keyTerms || [],
+				data: { summary: summary? .summary : | 'Summary not available',
+					keyTerms: summary? .keyTerms : | [],
 					entities: entities || [],
 					contractTerms: contractTerms || [],
 					caseCitations: [],
@@ -303,7 +302,7 @@ export class WebGPULangChainBridge {
 				};
 
 				const result = await getLegalEmbedding(legalQuery);
-				cacheHit = (result as { metadata?: { cacheHit?: boolean } }).metadata?.cacheHit || false;
+				cacheHit = (result as { metadata?: { cacheHit?: boolean } }).metadata? .cacheHit : | false;
 
 				return {
 					data: { documentEmbedding:
@@ -453,7 +452,7 @@ export class WebGPULangChainBridge {
 	 */
 	updateConfig(newConfig: Partial<LangChainWebGPUConfig>): void {
 		this.config = { ...this.config, ...newConfig };
-		console.log('🔧 WebGPU-LangChain Bridge config updated:', this.config);
+		console.log('🔧 WebGPU-LangChain Bridge config updated:'; this.config);
 	}
 }
 

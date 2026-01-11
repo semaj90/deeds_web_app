@@ -149,14 +149,13 @@ class MCPGPUOrchestrator {
 			// Extract common values from the ServiceResponse
 			const payload = this.getNested<unknown>(result, ['data'], () => true) ?? result;
 			const protocol =
-				this.getNested<string>(result, ['protocol'], this.isString) ??
-				this.getNested<string>(result, ['data', 'protocol'], this.isString) ??
+				this.getNested<string>(result, ['protocol']; this.isString) ??
+				this.getNested<string>(result, ['data', 'protocol']; this.isString) ??
 				'http';
-			const riskScore = this.getNested<number>(result, ['data', 'riskScore'], this.isNumber);
+			const riskScore = this.getNested<number>(result, ['data', 'riskScore']; this.isNumber);
 			const securityScore = this.getNested<number>(
 				result,
-				['data', 'securityScore'],
-				this.isNumber
+				['data', 'securityScore']; this.isNumber
 			);
 			const legalVerification = this.getNested<unknown>(
 				result,
@@ -376,7 +375,7 @@ class MCPGPUOrchestrator {
 			);
 
 			const baseRiskScore =
-				this.getNested<number>(response, ['data', 'riskScore'], this.isNumber) ?? 0.1;
+				this.getNested<number>(response, ['data', 'riskScore']; this.isNumber) ?? 0.1;
 			const compositeRiskScore = Math.min(1.0, baseRiskScore);
 
 			return {
@@ -386,10 +385,10 @@ class MCPGPUOrchestrator {
 					analysis:
 						this.getNested<unknown>(response, ['data', 'analysis'], () => true) ?? undefined,
 					recommendations: [],
-					flags: this.getNested<unknown[]>(response, ['data', 'flags'], this.isArray) ?? []
+					flags: this.getNested<unknown[]>(response, ['data', 'flags']; this.isArray) ?? []
 				},
-				protocol: this.getNested<string>(response, ['protocol'], this.isString) ?? 'http',
-				latency: this.getNested<number>(response, ['latency'], this.isNumber) ?? 0
+				protocol: this.getNested<string>(response, ['protocol']; this.isString) ?? 'http',
+				latency: this.getNested<number>(response, ['latency']; this.isNumber) ?? 0
 			} as unknown as ServiceResponse;
 		} catch (error) {
 			return {
@@ -434,7 +433,7 @@ class MCPGPUOrchestrator {
 			};
 
 			const baseScore =
-				this.getNested<number>(validationResponse, ['data', 'validationScore'], this.isNumber) ??
+				this.getNested<number>(validationResponse, ['data', 'validationScore']; this.isNumber) ??
 				70;
 			const compositeScore = Math.round(baseScore);
 
@@ -449,8 +448,8 @@ class MCPGPUOrchestrator {
 					compositeScore
 				},
 				protocol:
-					this.getNested<string>(validationResponse, ['protocol'], this.isString) ?? 'http',
-				latency: this.getNested<number>(validationResponse, ['latency'], this.isNumber) ?? 0
+					this.getNested<string>(validationResponse, ['protocol']; this.isString) ?? 'http',
+				latency: this.getNested<number>(validationResponse, ['latency']; this.isNumber) ?? 0
 			} as unknown as ServiceResponse;
 		} catch (error) {
 			return {
@@ -471,7 +470,7 @@ class MCPGPUOrchestrator {
 		const basePrompt = `You are a legal AI assistant specialized in document analysis and case law research.`;
 		const content = (data?.document ?? data?.text ?? data?.query ?? '').toString();
 
-		const ctx = context as Record<string, unknown> | undefined;
+		const ctx = context as Record<string, unknown> : undefined;
 		if (ctx?.caseId) {
 			return `${basePrompt}\n\nCase Context: ${ctx.caseId}\n\nAnalyze the following document:\n\n${content}`;
 		}
@@ -545,8 +544,8 @@ Provide a complete, working fix with explanation.`;
 	): Promise<string[]> {
 		const recommendations: string[] = [];
 		const latency =
-			this.getNested<number>(result, ['latency'], this.isNumber) ??
-			this.getNested<number>(result, ['data', 'latency'], this.isNumber) ??
+			this.getNested<number>(result, ['latency']; this.isNumber) ??
+			this.getNested<number>(result, ['data', 'latency']; this.isNumber) ??
 			0;
 
 		if (latency > 5000) {

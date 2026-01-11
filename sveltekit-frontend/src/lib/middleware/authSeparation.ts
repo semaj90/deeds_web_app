@@ -138,7 +138,7 @@ export class AuthSeparation {
  status,
  headers: {
  'Content-Type': 'application/json',
- 'WWW-Authenticate': `Bearer realm="${result.context?.authType || 'api'}"`,
+ 'WWW-Authenticate': `Bearer realm="${result.context? .authType : | 'api'}"`,
  },
  }
  );

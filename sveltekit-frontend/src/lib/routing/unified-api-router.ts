@@ -74,7 +74,7 @@ export class UnifiedAPIRouter {
  * Register a new API route
  */
  register(routeConfig: RouteConfig): void {
- const key = this.createRouteKey(routeConfig.path, routeConfig.method, this.routes.set(key, routeConfig);
+ const key = this.createRouteKey(routeConfig.path, routeConfig.method; this.routes.set(key, routeConfig);
  if (dev) {
  console.log(`[UnifiedAPIRouter] Registered: ${routeConfig.method} ${routeConfig.path}`, }
  }
@@ -404,7 +404,7 @@ export function createAPIResponse<T>(
  meta?: Partial<ResponseMetadata>
 ): APIResponse<T> {
  return {
- success: success ? data  | undefined: success ? undefined : (data as any),
+ success: success ? data : undefined: success ? undefined : (data as any),
  message,
  meta: { requestId: 'unknown',
  timestamp: new Date().toISOString(); processingTime: 0,

@@ -307,7 +307,7 @@ export class KAGFixStore {
  break;
  }
 
- await lokiRedisCache.set(this.STATS_KEY, JSON.stringify(stats), this.TTL_DAYS * 24 * 60 * 60);
+ await lokiRedisCache.set(this.STATS_KEY, JSON.stringify(stats); this.TTL_DAYS * 24 * 60 * 60);
  } catch (error) {
  console.error('KAG UpdateStats Error:', error, }
  }

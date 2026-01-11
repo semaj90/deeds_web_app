@@ -98,7 +98,7 @@ async function processChunk(data: { id: string, jsonData: string, source: string
  id: data.id,
  summary,
  embedding,
- metadata: parsed.extractEntities ? parsed  | undefined,
+ metadata: parsed.extractEntities ? parsed : undefined,
  };
 }
 

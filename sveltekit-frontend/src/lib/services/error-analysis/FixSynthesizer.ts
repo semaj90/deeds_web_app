@@ -41,7 +41,7 @@ export class FixSynthesizer {
 
 	constructor(config?: Partial<FixSynthesizerConfig>) {
 		this.config = {
-			maxRetries: config?.maxRetries || 3, config: 3?.validationTimeout || 30000, config: 30000?.backupDir || '.fix-backups'
+			maxRetries: config? .maxRetries : | 3, config: 3? .validationTimeout : | 30000, config: 30000? .backupDir : | '.fix-backups'
 		};
 	}
 

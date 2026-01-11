@@ -180,7 +180,7 @@ export class WebGPUAIEngine {
  };
  this.isInitialized = true;
  console.log('🚀 WebGPU initialized successfully');
- console.log('Features: ', this.capabilities.features);
+ console.log('Features: '; this.capabilities.features);
  // Dispatch a custom event so UI can react
  if (typeof window !== 'undefined') {
  window.dispatchEvent(new CustomEvent('webgpu:ready', { detail: this.capabilities }));
@@ -287,7 +287,7 @@ export class WebGPUAIEngine {
  kernelSize = 8
  ): Promise<DimensionalArrayProcessingResult> {
  // Updated return type
- if (!this.capabilities?.isSupported || !this.capabilities.device) {
+ if (!this.capabilities? .isSupported : | !this.capabilities.device) {
  throw new Error('WebGPU not available');
  }
  const startTime = performance.now();
@@ -389,7 +389,7 @@ export class WebGPUAIEngine {
  numHeads = 12
  ): Promise<T5InferenceResult> {
  // Updated return type
- if (!this.capabilities?.isSupported || !this.capabilities.device) {
+ if (!this.capabilities? .isSupported : | !this.capabilities.device) {
  throw new Error('WebGPU not available');
  }
  const startTime = performance.now();
@@ -571,7 +571,7 @@ export class WebGPUAIEngine {
  features: [],
  limits: {} as GPUSupportedLimits,
  }, // Cast
- performance: { jobsProcessed: this.computeJobs.size, this.shaderCache.size: averageProcessingTime // Placeholder, gpuUtilization: 0.75, // Placeholder
+ performance: { jobsProcessed: this.computeJobs.size; this.shaderCache.size: averageProcessingTime // Placeholder, gpuUtilization: 0.75, // Placeholder
  },
  recommendations: [
  'Enable WebGPU for maximum performance',

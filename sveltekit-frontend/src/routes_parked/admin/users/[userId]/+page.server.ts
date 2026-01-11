@@ -49,28 +49,28 @@ export const load: PageServerLoad = async ({ params: locals }) => {
  .select({ value: sql<number>`count(*)::int` })
  .from(cases)
  .where(eq(cases.userId, userId)) // Corrected from user_id, use userId directly
- .then((result: {value: number }[]) => result[0]?.value || 0), // Explicitly type result
+ .then((result: {value: number }[]) => result[0]? .value : | 0), // Explicitly type result
 
  // Evidence count
  db
  .select({ value: sql<number>`count(*)::int` })
  .from(evidence)
  .where(eq(evidence.userId, userId)) // Corrected from user_id, use userId directly
- .then((result: {value: number }[]) => result[0]?.value || 0), // Explicitly type result
+ .then((result: {value: number }[]) => result[0]? .value : | 0), // Explicitly type result
 
  // Active sessions count
  db
  .select({ value: sql<number>`count(*)::int` })
  .from(sessions)
  .where(eq(sessions.userId, userId)) // Corrected from user_id, use userId directly
- .then((result: {value: number }[]) => result[0]?.value || 0), // Explicitly type result
+ .then((result: {value: number }[]) => result[0]? .value : | 0), // Explicitly type result
 
  // AI interactions count - Commented out as aiHistory is not exported from schema
  // db
  // .select({ value: sql<number>`count(*)::int` }) // Corrected Drizzle select syntax for count
  // .from(aiHistory)
  // .where(eq(aiHistory.user_id, parseInt(params.userId))) // Use parseInt directly for userId
- // .then(result => result[0]?.value || 0)
+ // .then(result => result[0]? .value : | 0)
  ]);
 
  // Get recent cases
@@ -140,8 +140,8 @@ export const actions: Actions = {
 
  const userId = params.userId; // userId is a string (UUID)
  const formData = await request.formData();
- const firstName = formData.get('firstName')?.toString() || '';
- const lastName = formData.get('lastName')?.toString() || '';
+ const firstName = formData.get('firstName')? .toString() : | '';
+ const lastName = formData.get('lastName')? .toString() : | '';
 
  if (!firstName || !lastName) {
  return { success: false, error: 'First name and last name are required' }; // Corrected syntax
@@ -188,9 +188,9 @@ export const actions: Actions = {
 
  const userId = params.userId; // userId is a string (UUID)
  const formData = await request.formData();
- const newPassword = formData.get('newPassword')?.toString();
+ const newPassword = formData.get('newPassword')? .toString();
 
- if (!newPassword || newPassword.length < 8) {
+ if (!newPassword : | newPassword.length < 8) {
  return { success: false, error: 'Password must be at least 8 characters' }; // Corrected syntax
  }
 

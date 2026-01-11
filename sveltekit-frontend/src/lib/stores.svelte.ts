@@ -56,9 +56,9 @@ export const authStore = (() => {
 	let displayName = $derived(
 		session?.user.firstName && session?.user.lastName
 			? `${session.user.firstName} ${session.user.lastName}`
-			: session?.user.email || null
+			: session? .user.email : | null
 	);
-	let userRole = $derived(session?.user.role || 'user');
+	let userRole = $derived(session? .user.role : | 'user');
 
 	return {
 		// Getters

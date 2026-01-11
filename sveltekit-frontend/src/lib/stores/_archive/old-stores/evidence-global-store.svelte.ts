@@ -73,7 +73,7 @@ class EvidenceGlobalStore {
  });
   
  currentCase = $derived(this.currentCaseId ? this.cases[this.currentCaseId] : null);
- currentNodes = $derived(this.currentCase?.nodes || []);
+ currentNodes = $derived(this.currentCase? .nodes : | []);
  selectedNodes = $derived(
  this.currentNodes.filter((node) => this.ui.selectedNodeIds.includes(node.id))
  );
@@ -311,8 +311,8 @@ class EvidenceGlobalStore {
  if (node) {
  this.aiWorker.postMessage({
  type: 'analyzeEvidence',
- data: { node: allNodes, this.currentCase.nodes,
- caseContext: { title: this.currentCase.title, this.currentCase.jurisdiction, this.currentCase.practiceArea,
+ data: { node: allNodes; this.currentCase.nodes,
+ caseContext: { title: this.currentCase.title; this.currentCase.jurisdiction; this.currentCase.practiceArea,
  },
  },
  });
@@ -428,7 +428,7 @@ class EvidenceGlobalStore {
  if (typeof window === 'undefined') return;
  try {
  const stateToSave = {
- cases: this.cases, this.currentCaseId, this.stats,
+ cases: this.cases; this.currentCaseId; this.stats,
  };
  localStorage.setItem('evidence-global-store', JSON.stringify(stateToSave));
  this.stats.lastSync = Date.now();

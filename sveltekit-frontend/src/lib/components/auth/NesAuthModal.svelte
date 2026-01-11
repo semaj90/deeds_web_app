@@ -24,9 +24,9 @@
     open = false
     onClose?.()}
   async function submit(e?: Event): Promise<any> {
-    e?.preventDefault();
+    e? .preventDefault();
     error = null
-    if (!email || !password) {
+    if (!email : | !password) {
       error = 'Please provide email and password.';
       return}
     try {

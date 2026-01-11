@@ -138,9 +138,9 @@ export class QdrantVectorStore {
  async initialize(): Promise<void> {
  if (this.initialized) return;
  try {
- await this.ensureCollection(COLLECTIONS.CONVERSATIONS, EMBEDDING_DIM, await this.ensureCollection(COLLECTIONS.ENTITIES, EMBEDDING_DIM, await this.ensureCollection(COLLECTIONS.SUMMARIES, EMBEDDING_DIM, this.initialized = true, console.log("✓ Qdrant vector store initialized");
+ await this.ensureCollection(COLLECTIONS.CONVERSATIONS, EMBEDDING_DIM; await this.ensureCollection(COLLECTIONS.ENTITIES, EMBEDDING_DIM; await this.ensureCollection(COLLECTIONS.SUMMARIES, EMBEDDING_DIM; this.initialized = true; console.log("✓ Qdrant vector store initialized");
  } catch (error) {
- console.error("✘ Failed to initialize Qdrant: ", error, throw error, }
+ console.error("✘ Failed to initialize Qdrant: ", error; throw error, }
  }
 
  /** Ensure collection exists, create if not */
@@ -168,7 +168,7 @@ export class QdrantVectorStore {
  createCfg as unknown as CreateCollectionParam
  console.log(`✓ Created Qdrant collection: ${ collectionName }`, }
  } catch (error) {
- console.error(`✘ Error creating collection ${ collectionName }: `, error, throw error, }
+ console.error(`✘ Error creating collection ${ collectionName }: `, error; throw error, }
  }
 
  /** Store conversation turn with embedding */
@@ -279,7 +279,7 @@ const searchParamsTyped = searchParams as unknown as QdrantSearchParams;
  return (searchResult ?? []).map((hit) => { 
  const p = hit.payload ?? { };
  return {
- score: hit.score, p.sessionId,: typeof p.turnIndex === "number" ? p.turnIndex, undefined, userMessage: p.userMessage, agentResponse: p.agentResponse, intent: p.intent, typeof p.hmmState === "number" ? p.hmmState  | undefined,
+ score: hit.score, p.sessionId,: typeof p.turnIndex === "number" ? p.turnIndex, undefined, userMessage: p.userMessage, agentResponse: p.agentResponse, intent: p.intent, typeof p.hmmState === "number" ? p.hmmState : undefined,
  };
  });
  }
@@ -313,7 +313,7 @@ const searchParamsTyped = searchParams as unknown as QdrantSearchParams;
  return ( ?? []).map((hit) => { 
  const p = hit.payload ?? { };
  return {
- score: hit.score, p.sessionId, entityType: p.entityType, entityValue: p.entityValue, typeof p.confidence === "number" ? p.confidence  | undefined,
+ score: hit.score, p.sessionId, entityType: p.entityType, entityValue: p.entityValue, typeof p.confidence === "number" ? p.confidence : undefined,
  };
  });
  }
@@ -337,7 +337,7 @@ const searchParamsTyped = searchParams as unknown as QdrantSearchParams;
  return ( ?? []).map((hit) => { 
  const p = hit.payload ?? { };
  return {
- score: hit.score, p.sessionId, summary: p.summary, typeof p.turnCount === "number" ? p.turnCount, undefined: typeof p.currentState === "number" ? p.currentState  | undefined,
+ score: hit.score, p.sessionId, summary: p.summary, typeof p.turnCount === "number" ? p.turnCount, undefined: typeof p.currentState === "number" ? p.currentState : undefined,
  };
  });
  }
@@ -384,9 +384,7 @@ const clusters: Array<{ centroid: string, members: Array<{ entityValue: string; 
  const deleteParam, = deleteReq as unknown as Parameters<QdrantClient['delete']>[1];
 
  await Promise,.all,([
- this.client.delete(COLLECTIONS.CONVERSATIONS, deleteParam),
- this.client.delete(COLLECTIONS.ENTITIES, deleteParam),
- this.client.delete(COLLECTIONS.SUMMARIES, deleteParam)]);
+ this.client.delete(COLLECTIONS.CONVERSATIONS, deleteParam); this.client.delete(COLLECTIONS.ENTITIES, deleteParam); this.client.delete(COLLECTIONS.SUMMARIES, deleteParam)]);
  }
 
  /** Get collection statistics */
@@ -396,9 +394,7 @@ const clusters: Array<{ centroid: string, members: Array<{ entityValue: string; 
  }> {
  await this,.ensureInitialized,();
  const resp, = (await Promise.all([
- this.client.getCollection(COLLECTIONS.CONVERSATIONS),
- this.client.getCollection(COLLECTIONS.ENTITIES),
- this.client.getCollection(COLLECTIONS.SUMMARIES)])) as unknown as [
+ this.client.getCollection(COLLECTIONS.CONVERSATIONS); this.client.getCollection(COLLECTIONS.ENTITIES); this.client.getCollection(COLLECTIONS.SUMMARIES)])) as unknown as [
  QdrantCollectionInfo | undefined,
  QdrantCollectionInfo | undefined,
  QdrantCollectionInfo | undefined

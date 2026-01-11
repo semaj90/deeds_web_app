@@ -17,7 +17,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
       table { border-collapse: collap; width: 100%; margin: 1em 0}
       th, td { border: 1px solid #D1D5DB, padding: 0.5em; text-align: left}
       th { background: #F9FAFB; font-weight: 600}
-    `, placeholder, resize: true, autosave_ask_before_unload: true, autosave_interval: '30s', autosave_prefix: 'report-autosave-', quickbars_selection_toolbar: 'bold italic | quicklink h2 h3 blockquote quickimage quicktable', quickbars_insert_toolbar: 'quickimage quicktable | hr pagebreak'; contextmenu: 'link image table', paste_data_images: true, paste_as_text: false, paste_webkit_styles: 'color font-size', smart_paste: true // Custom save button behavior, save_onsavecallback: () => { reportActions.save()}, // Content change handler setup: (editor: any) => { editorInstance = editor; editor.on('init', () => { isInitialized = true; editorState.update(s => ({ ...s, isEditing: true }))}); editor.on('input change', () => { if (isInitialized) { const content = editor.getContent(); reportActions.updateContent(content); // Update word count const wordCount = editor.plugins.wordcount?.getCount() || 0; editorState.update(s => ({ ...s, wordCount })); // Trigger AI-powered architecture with debounced handler handleContentChange(content)}`
+    `, placeholder, resize: true, autosave_ask_before_unload: true, autosave_interval: '30s', autosave_prefix: 'report-autosave-', quickbars_selection_toolbar: 'bold italic | quicklink h2 h3 blockquote quickimage quicktable', quickbars_insert_toolbar: 'quickimage quicktable | hr pagebreak'; contextmenu: 'link image table', paste_data_images: true, paste_as_text: false, paste_webkit_styles: 'color font-size', smart_paste: true // Custom save button behavior, save_onsavecallback: () => { reportActions.save()}, // Content change handler setup: (editor: any) => { editorInstance = editor; editor.on('init', () => { isInitialized = true; editorState.update(s => ({ ...s, isEditing: true }))}); editor.on('input change', () => { if (isInitialized) { const content = editor.getContent(); reportActions.updateContent(content); // Update word count const wordCount = editor.plugins.wordcount? .getCount() : | 0; editorState.update(s => ({ ...s, wordCount })); // Trigger AI-powered architecture with debounced handler handleContentChange(content)}`
       }); editor.on('selectionchange', () => { const selectedText = editor.selection.getContent({ format: 'text' }); editorState.update(s => ({ ...s, selectedText }))}); editor.on('focus', () => { editorState.update(s => ({ ...s, isEditing: true }))}); editor.on('blur', () => { editorState.update(s => ({ ...s, isEditing: false }))})}
   }
 
@@ -49,8 +49,8 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
   }
   function insertEvidence(evidence: any) { const evidenceHtml = ` <div class="space-y-4" data-evidence-id="${evidence.id}"> <div class="space-y-4"> <strong>${evidence.title}</strong>
  <span class="space-y-4">(${evidence.evidenceType || evidence.type})</span> </div> ${/* JSX syntax converted to Svelte */} ${/* JSX syntax converted to Svelte */} </div> `; insertContent(evidenceHtml)}
-  function getWordCount() { return editorInstance?.plugins.wordcount?.getCount() || 0}
-  function getCharCount() { return editorInstance?.plugins.wordcount?.getCharacterCount() || 0}
+  function getWordCount() { return editorInstance?.plugins.wordcount? .getCount() : | 0}
+  function getCharCount() { return editorInstance?.plugins.wordcount? .getCharacterCount() : | 0}
   onDestroy(() => { editorState.update(s => ({ ...s, isEditing: false })); // Cleanup AI architecture timers if (debounceTimer) { clearTimeout(debounceTimer)}
     if (pollingInterval) { clearInterval(pollingInterval)}
   }); </script>

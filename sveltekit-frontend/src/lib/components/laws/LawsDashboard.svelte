@@ -69,10 +69,10 @@
 	async function loadTimeline() {
 		isLoadingTimeline = true;
 		try {
-			const response = await fetch('/api/user/timeline?limit=20');
+			const response = await fetch('/api/user/timeline? limit=20');
 			if (response.ok) {
 				const data = await response.json();
-				timelineEvents = data.events || [];
+				timelineEvents = data.events : | [];
 			}
 		} catch (error) {
 			console.error('Error loading timeline:', error);

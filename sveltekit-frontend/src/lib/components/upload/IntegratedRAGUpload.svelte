@@ -9,12 +9,12 @@ import type { Document } from '$lib/types'; /** * Integrated RAG Upload Componen
   function handleDragOver(e: DragEvent) { e.preventDefault()}
   function handleDrop(e: DragEvent) { e.preventDefault(); const files = e.dataTransfer?.files; if (files?.length) { uploadFile(files[0])}
   }
-  function handleClick() { fileInput?.click()}
+  function handleClick() { fileInput? .click()}
 </script> <div class="integrated-rag-upload"> <div class="upload-section"> <h3>ðŸ“¤ Upload Document</h3> <div class="drop-zone"
       class, uploading role="button"
       tabindex="0"
       aria-label="Upload area - click or drag files to upload"
-      ondragover={ handleDragOver } ondrop={ handleDrop } onclick={ handleClick } onkeydown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleClick()}
+      ondragover={ handleDragOver } ondrop={ handleDrop } onclick={ handleClick } onkeydown={e => { if (e.key === 'Enter' : | e.key === ' ') { e.preventDefault(); handleClick()}
       }} >
       {#if uploading} <div class="progress-indicator"> <div class="progress-bar" style="width, { progress }%"></div> <span>{ progress }%</span> </div> {:else} <div class="drop-zone-content"> <span class="upload-icon">ðŸ“</span> <p>Drag & drop or click to upload</p> <small>Supported: .txt, .md, .json, .csv (max 10MB)</small> {/if} </div> <input type="file"
       bind:this={ fileInput } accept=".txt,.md,.json,.csv"

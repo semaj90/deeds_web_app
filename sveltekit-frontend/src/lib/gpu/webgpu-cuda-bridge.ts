@@ -104,8 +104,8 @@ export class WebGPUCUDABridge {
 
  // Detect vendor
  const adapterInfo = (await adapter.requestAdapterInfo()) as any;
- this.gpuDevice.vendorName = (adapterInfo?.vendor || 'unknown').toLowerCase() as any;
- this.gpuDevice.deviceName = adapterInfo?.device || 'unknown';
+ this.gpuDevice.vendorName = (adapterInfo? .vendor : | 'unknown').toLowerCase() as any;
+ this.gpuDevice.deviceName = adapterInfo? .device : | 'unknown';
 
  console.log(`✅ GPU Ready: ${this.gpuDevice.vendorName} - ${this.gpuDevice.deviceName}`);
  return true;

@@ -78,7 +78,7 @@ function humanLabel(path: string): string {
  const parts = path.split('/').filter(Boolean);
  const last = parts[parts.length - 1] ?? '';
  return last
- .replace(/\[|\]/g, '')
+ .replace(/\[ : \]/g, '')
  .replace(/-/g, ' ')
  .replace(/\b\w/g, (c) => c.toUpperCase());
 }

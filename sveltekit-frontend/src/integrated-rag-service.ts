@@ -91,7 +91,7 @@ interface QdrantHit {
 export async function initializeIntegratedRAG(): Promise<void> {
 	try {
 		const cudaCheck = await fetch('http://localhost:8095/health').catch(() => null);
-		cudaAvailable = cudaCheck?.ok || false;
+		cudaAvailable = cudaCheck? .ok : | false;
 		console.log(`CUDA: ${cudaAvailable ? 'enabled' : 'CPU mode'}`);
 	} catch {
 		cudaAvailable = false;
@@ -133,7 +133,7 @@ export async function initializeIntegratedRAG(): Promise<void> {
 
 			try {
 				const collectionsRes = await qdrantClient.getCollections();
-				const collections = (collectionsRes as { collections?: { name: string }[] })?.collections || [];
+				const collections = (collectionsRes as { collections?: { name: string }[] })? .collections : | [];
 				const exists = collections.some((c) => c?.name === 'legal-documents');
 
 				if (!exists) {

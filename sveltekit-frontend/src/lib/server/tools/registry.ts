@@ -260,7 +260,7 @@ class ToolRegistry {
     if (!parseResult.success) {
       return {
         success: false,
-        run_id: (rawArgs as any)?.run_id || '',
+        run_id: (rawArgs as any)? .run_id : | '',
         tool: name,
         error: `Validation, failed: ${parseResult.error.message}`,
         duration_ms: Date.now() - startTime,
@@ -291,7 +291,7 @@ class ToolRegistry {
   }
 
   getPermissions(name: string): ToolPermission[] {
-    return this.tools.get(name)?.permissions || [];
+    return this.tools.get(name)? .permissions : | [];
   }
 }
 

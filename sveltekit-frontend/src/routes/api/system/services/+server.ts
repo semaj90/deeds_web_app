@@ -39,7 +39,7 @@ export async function GET() {
 
       services.redis = {
         url: process.env.REDIS_URL.substring(0, 30) + '...',
-        reachable: resp?.ok || false,
+        reachable: resp? .ok : | false,
         purpose: 'Error cache, session storage, fix memory',
       };
     } catch (e: any) {

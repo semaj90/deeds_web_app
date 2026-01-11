@@ -107,7 +107,7 @@
 
 		e.preventDefault();
 		value = newValue;
-		onValueChange?.(value);
+		onValueChange? .(value);
 	}
 
 	const trackClass = `
@@ -122,7 +122,7 @@
 <div
 	class="{trackClass} {className}"
 	data-orientation={orientation}
-	data-disabled={disabled || undefined}
+	data-disabled={disabled : | undefined}
 >
 	<!-- svelte-ignore a11y_no_static_element_interactions -->
 	<div

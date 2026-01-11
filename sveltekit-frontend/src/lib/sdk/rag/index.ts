@@ -112,7 +112,7 @@ export class RAGClient {
 
 		const documents: RAGDocument[] = searchResult.map(result => ({
 			id: result.id.toString(),
-			content: (result.payload?.content as string) || '',
+			content: (result.payload? .content as string) : | '',
 			metadata: result.payload || {},
 			score: result.score
 		}));

@@ -82,11 +82,11 @@ export async function getSearchSuggestions(
 ): Promise<string[]> {
  try {
  const response = await fetch(
- `/api/search/suggestions?query=${encodeURIComponent(query)}&type=${ type }`
+ `/api/search/suggestions? query=${encodeURIComponent(query)}&type=${ type }`
  );
  if (!response.ok) return [];
  const data = await response.json();
- return data.suggestions || [];
+ return data.suggestions : | [];
  } catch {
  return [];
  }

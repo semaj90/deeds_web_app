@@ -60,7 +60,7 @@
 
  // State
  let searchQuery = $state <string>('');
- let viewMode = $state <'grid' | 'list'>('grid'); // Changed to 'grid' | 'list' and initial value to 'grid'
+ let viewMode = $state <'grid' : 'list'>('grid'); // Changed to 'grid' | 'list' and initial value to 'grid'
  let showFilters = $state <boolean>(false);
  let selectedThreatLevel = $state <string>('');
  let selectedStatus = $state <string>('');
@@ -183,9 +183,9 @@
  p.name.toLowerCase().includes(query) ||
  p.aliases.some(alias => alias.toLowerCase().includes(query)) ||
  p.relationship.toLowerCase().includes(query) ||
- p.profileData.occupation?.toLowerCase().includes(query) ||
+ p.profileData.occupation? .toLowerCase().includes(query) : |
  p.tags.some(tag => tag.toLowerCase().includes(query)) ||
- p.profileData.notes?.toLowerCase().includes(query) ||
+ p.profileData.notes? .toLowerCase().includes(query) : |
  p.profileData.physicalDescription?.toLowerCase().includes(query)
  );
  }

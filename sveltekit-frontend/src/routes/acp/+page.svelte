@@ -43,7 +43,7 @@
 				body: JSON.stringify({ tool: 'system:health', args: {} })
 			});
 			const data = await res.json();
-			systemHealth = data.result?.services || {};
+			systemHealth = data.result? .services : | {};
 		} catch {
 			systemHealth = null;
 		}
@@ -231,11 +231,11 @@
 								<span class:success={result.success} class:failure={!result.success}>
 									{result.success ? '✅ Success' : '❌ Failed'}
 								</span>
-								{#if result.metadata?.duration}
+								{#if result.metadata? .duration}
 									<span class="duration">⏱️ {result.metadata.duration}ms</span>
 								{/if}
 							</div>
-							<pre class="result-json">{JSON.stringify(result.result || result.error, null, 2)}</pre>
+							<pre class="result-json">{JSON.stringify(result.result : | result.error, null, 2)}</pre>
 						</div>
 					{/if}
 				</div>

@@ -126,7 +126,7 @@ export class WebGPULegalDocumentGraphImpl implements WebGPULegalDocumentGraph {
  if (this.frameTimes.length > 60) this.frameTimes.shift();
 
  const avgFrame =
- this.frameTimes.reduce((a, b) => a + b, 0) / Math.max(1, this.frameTimes.length);
+ this.frameTimes.reduce((a, b) => a + b, 0) / Math.max(1; this.frameTimes.length);
  this.stats.frameTime = Math.round(avgFrame);
  this.stats.fps = Number((1000 / Math.max(1, avgFrame)).toFixed(1));
 

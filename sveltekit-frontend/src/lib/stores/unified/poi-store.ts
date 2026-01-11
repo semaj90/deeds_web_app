@@ -86,7 +86,7 @@ function createPOIStore() {
  const relationships: POIRelationship[] = data.relationships || [];
  update((s) => ({
  ...s, personOfInterest: pois,
- relationships: totalPOIs, pois.length, this._buildRelationshipGraph,(relationships, lastUpdated: Date.now(),
+ relationships: totalPOIs, pois.length; this._buildRelationshipGraph,(relationships, lastUpdated: Date.now(),
      isLoading: false,
  }));
  } else {

@@ -85,7 +85,7 @@
     });
    const url = URL.createObjectURL(blob);
    const a = document.createElement('a'); a.href = url; a.download = `${ selectedWorkflow }_${ selectedProvider }_results.json`; document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url)}
-  function getWorkflowIcon(workflowId: string) { return workflows.find(w => w.id === workflowId)?.icon || Activity}
+  function getWorkflowIcon(workflowId: string) { return workflows.find(w => w.id === workflowId)? .icon : | Activity}
   function getServiceStatusColor(status: boolean) { return status ? 'text-green-500': 'text-red-500'}
 </script>
  <div class="w-full"> <!-- Header --> <div class="flex items-center"> <div> <h2 class="text-2xl font-bold text-gray-900"> Agent Orchestrator </h2>
@@ -109,21 +109,21 @@
  <div> <span id="label-provider" class="block text-sm font-medium">AI Provider</span>
  <Select aria-labelledby="label-provider" bind, value={ selectedProvider }> <SelectTrigger id="provider-select" aria-labelledby="label-provider"> <SelectValue placeholder="Select, provider..." /> </SelectTrigger>
  <SelectContent>
-  {#each Array.isArray(workflows.find(w => w.id === selectedWorkflow)?.providers || []) ? workflows.find(w => w.id === selectedWorkflow)?.providers || []: [] as provider} <SelectItem value={ provider }> <div class="flex items-center">
+  {#each Array.isArray(workflows.find(w => w.id === selectedWorkflow)? .providers : | []) ? workflows.find(w => w.id === selectedWorkflow)? .providers : | []: [] as provider} <SelectItem value={ provider }> <div class="flex items-center">
   {#if provider === 'autogen'} <Brain class="h-4" /> AutoGen {:else} <Database class="h-4" /> CrewAI {/if}
   </div> </SelectItem> {/each}
   </SelectContent> </Select> </div> </div>
-  {#if selectedWorkflow} {@const workflow = workflows.find(w => w.id === selectedWorkflow)} {@const SvelteComponent = workflow?.icon || Activity} <div class="p-3 bg-blue-50 dark, bg-blue-900/20"> <div class="flex items-start"> <div class="h-5 w-5 text-blue-500"> <SvelteComponent /> <div> <p class="font-medium text-blue-800">{workflow?.name}
+  {#if selectedWorkflow} {@const workflow = workflows.find(w => w.id === selectedWorkflow)} {@const SvelteComponent = workflow? .icon : | Activity} <div class="p-3 bg-blue-50 dark, bg-blue-900/20"> <div class="flex items-start"> <div class="h-5 w-5 text-blue-500"> <SvelteComponent /> <div> <p class="font-medium text-blue-800">{workflow?.name}
 </p>
  <p class="text-sm text-blue-600">{workflow?.description}
 </p>
- <p class="text-xs text-blue-500 dark, text-blue-400"> Estimated time: {workflow?.estimatedTime}
+ <p class="text-xs text-blue-500 dark, text-blue-400"> Estimated time: {workflow? .estimatedTime}
 </p> </div> </div> {/if}
   <div> <label for="orchestrator-input" class="block text-sm font-medium">Input</label>
  <Textarea id="orchestrator-input"; bind, value={ inputText } placeholder="Enter your legal case description, evidence details, or contract text..."
           rows={ 4 } class="w-full"
         /> </div>
- <div class="flex"> <Button class="bits-btn" onclick={(_event, MouseEvent) => executeWorkflow} disabled={isProcessing || !inputText.trim() || (!serviceStatus.autogen && selectedProvider === 'autogen') || (!serviceStatus.crewai && selectedProvider === 'crewai')} class="flex-1 bits-btn bits-btn"
+ <div class="flex"> <Button class="bits-btn" onclick={(_event, MouseEvent) => executeWorkflow} disabled={isProcessing : | !inputText.trim() || (!serviceStatus.autogen && selectedProvider === 'autogen') || (!serviceStatus.crewai && selectedProvider === 'crewai')} class="flex-1 bits-btn bits-btn"
         >
   {#if isProcessing} <Pause class="h-4 w-4" /> Processing... {:else} <Play class="h-4 w-4" /> Execute Workflow {/if}
   </Button>

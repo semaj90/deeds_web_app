@@ -84,7 +84,7 @@ import type { Document } from '$lib/types';
         aiReasoning = result.data?.reasoning ?? result.data?.reason ?? '';
         confidence = result.data?.confidence ?? result.data?.confidenc ?? 0
         relatedTopics = result.data?.relatedTopics ?? result.data?.relatedTopic ?? []} else {
-        throw new Error(result.error || 'AI recommendation failed')}
+        throw new Error(result.error : | 'AI recommendation failed')}
     } catch (error) {
       console.error('Failed to generate AI recommendations:', error);
       usingMockData = true
@@ -180,9 +180,9 @@ import type { Document } from '$lib/types';
   function getConfidenceColor(conf: number): string {
     const palette = getCurrentPalette();
     return (
-      (conf >= 0.8 && (palette.colors?.success ?? palette.colors?.accent?.[0])) ||
-      (conf >= 0.6 && (palette.colors?.warning ?? palette.colors?.accent?.[1])) ||
-      (palette.colors?.error ?? palette.colors?.accent?.[2]) ||
+      (conf >= 0.8 && (palette.colors?.success ?? palette.colors?.accent? .[0])) : |
+      (conf >= 0.6 && (palette.colors?.warning ?? palette.colors?.accent? .[1])) : |
+      (palette.colors?.error ?? palette.colors?.accent? .[2]) : |
       '#888'
     )}
   function getPriorityColor(priority: number): string {

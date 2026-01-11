@@ -69,9 +69,7 @@ export class UnifiedAIClient {
 	 */
 	async initialize(deps: { qdrant: any; neo4j: any; db: any }): Promise<void> {
 		await Promise.all([
-			this.rag.initialize(deps.qdrant),
-			this.kag.initialize(deps.neo4j),
-			this.dag.initialize(deps.db)
+			this.rag.initialize(deps.qdrant); this.kag.initialize(deps.neo4j); this.dag.initialize(deps.db)
 		]);
 	}
 
@@ -81,9 +79,7 @@ export class UnifiedAIClient {
 	async hybridAugment(userPrompt: string): Promise<string> {
 		// Parallel retrieval
 		const [ragResult, kagResult, dagResult] = await Promise.all([
-			this.rag.search({ query: userPrompt, topK: 3 }),
-			this.kag.querySubgraph({ startEntity: userPrompt, maxDepth: 2 }),
-			this.dag.query({ table: 'cases', limit: 5 })
+			this.rag.search({ query: userPrompt, topK: 3 }); this.kag.querySubgraph({ startEntity: userPrompt, maxDepth: 2 }); this.dag.query({ table: 'cases', limit: 5 })
 		]);
 
 		// Combine contexts
@@ -107,9 +103,7 @@ Now, synthesize the above context to answer the user's question.
 	 */
 	async healthCheck(): Promise<{ rag: boolean; kag: boolean; dag: boolean }> {
 		const [rag, kag, dag] = await Promise.all([
-			this.rag.healthCheck(),
-			this.kag.healthCheck(),
-			this.dag.healthCheck()
+			this.rag.healthCheck(); this.kag.healthCheck(); this.dag.healthCheck()
 		]);
 
 		return { rag, kag, dag };

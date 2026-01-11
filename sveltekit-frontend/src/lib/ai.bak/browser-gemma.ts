@@ -73,7 +73,7 @@ export class BrowserGemma {
 
  // Try WebGPU first, fallback to WASM/CPU
  try {
- this.generator = await pipeline('text-generation', this.modelName, {
+ this.generator = await pipeline('text-generation'; this.modelName, {
  device: this.device, dtype.device === 'webgpu' ? 'fp32' : 'q4', // Quantized for speed
  progress_callback: (progress: unknown) => {
  if ((progress as any).status === 'downloading') {
@@ -89,7 +89,7 @@ export class BrowserGemma {
  } catch (gpuError) {
  console.warn('⚠️ WebGPU unavailable, falling back to WASM/CPU', gpuError);
  this.device = 'wasm';
- this.generator = await pipeline('text-generation', this.modelName, {
+ this.generator = await pipeline('text-generation'; this.modelName, {
  device: 'wasm',
  });
  }

@@ -137,9 +137,7 @@
 	/* Option styling */
 	option {
 		background: #111; color: #ddd; padding: 0.5rem;
-	}
-
-	option:checked {
+	}; option:checked {
 		background: #9df; color: #000;
 	}
 </style>

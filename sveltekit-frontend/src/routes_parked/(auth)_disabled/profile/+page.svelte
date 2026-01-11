@@ -59,7 +59,7 @@
  const firstName = input.firstName ?? input.given_name ?? input.first_name;
  const lastName = input.lastName ?? input.family_name ?? input.last_name;
  const email = input.email ?? input.emailAddress ?? input.email_address;
- // compute the combined name first to avoid mixing '??' and '||' in one expression
+ // compute the combined name first to avoid mixing '?? ' and ' : |' in one expression
  const computedName = `${firstName ?? ''} ${lastName ?? ''}`.trim();
  const name = input.name ?? (computedName ? computedName : email);
  return {
@@ -73,16 +73,14 @@
  function toNumber(v: unknown): number | undefined {
  if (v === null || v === undefined || v === '') return undefined;
  const n = Number(v);
- return Number.isFinite(n) ? n  | undefined;
+ return Number.isFinite(n) ? n : undefined;
  }
 
  // Simple resolver for API paths. Prefer env vars, fallback to path-only.
  function resolveApi(path: string) {
  const env = (import.meta as any)?.env ?? {};
  const base =
- (env['PUBLIC_API_BASE_URL'] as string | undefined) ??
- (env['PUBLIC_API_ORIGIN'] as string | undefined) ??
- (env['VITE_API_ORIGIN'] as string | undefined) ??
+ (env['PUBLIC_API_BASE_URL'] as string : undefined) ?? (env['PUBLIC_API_ORIGIN'] as string : undefined) ?? (env['VITE_API_ORIGIN'] as string : undefined) ??
  '';
  if (!base) return path;
  return base.replace(/\/$/, '') + (path.startsWith('/') ? path : `/${ path }`);
@@ -140,8 +138,7 @@
  const dockerDiscoveryFlag = $derived(() => {
  const env = (import.meta as any)?.env ?? {};
  return (
- (env['DEV_DOCKER_DISCOVERY'] as string | undefined) ??
- (env['VITE_DEV_DOCKER_DISCOVERY'] as string | undefined) ??
+ (env['DEV_DOCKER_DISCOVERY'] as string : undefined) ?? (env['VITE_DEV_DOCKER_DISCOVERY'] as string : undefined) ??
  'false'
  );
  });
@@ -150,12 +147,12 @@
 
  const displayName = $derived(() => {
  const first = profileForm.firstName?.trim();
- const last = profileForm.lastName?.trim();
- if (first || last) return [first, last].filter(Boolean).join(' ');
+ const last = profileForm.lastName? .trim();
+ if (first : | last) return [first, last].filter(Boolean).join(' ');
  return user?.name ?? user?.email ?? 'Profile';
  });
 
- const profileLoaded = $derived(() => Boolean(user?.email || profileForm.email));
+ const profileLoaded = $derived(() => Boolean(user? .email : | profileForm.email));
  const totalChunks = $derived(
  () =>
  ragSummary?.results?.reduce(

@@ -127,7 +127,7 @@ export class QdrantSyncWorker {
  const startTime = Date.now();
 
  // Get chunks pending sync
- const chunks = await getChunksPendingQdrantSync(this.db, this.config.batchSize);
+ const chunks = await getChunksPendingQdrantSync(this.db; this.config.batchSize);
 
  if (chunks.length === 0) {
  return { synced: 0, errors: 0 };
@@ -202,7 +202,7 @@ export class QdrantSyncWorker {
  }
 
  // Wait before next poll
- await new Promise((resolve) => setTimeout(resolve, this.config.pollIntervalMs));
+ await new Promise((resolve) => setTimeout(resolve; this.config.pollIntervalMs));
  }
  }
 

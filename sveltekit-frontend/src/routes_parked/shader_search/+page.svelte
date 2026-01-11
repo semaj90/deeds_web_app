@@ -102,7 +102,7 @@
  isSearching = true;
  try {
  const query: ShaderSearchQuery = {
- text: (searchQuery || '').trim() || undefined: operation, selectedOperation, selectedOperation || undefined: tags, selectedTags: selectedTags.length > 0 ? selectedTags  | undefined: shaderType, selectedShaderType === 'all' ? undefined : selectedShaderType,
+ text: (searchQuery || '').trim() || undefined: operation, selectedOperation, selectedOperation || undefined: tags, selectedTags: selectedTags.length > 0 ? selectedTags : undefined: shaderType, selectedShaderType === 'all' ? undefined : selectedShaderType,
  sortBy,
  limit,
  } as ShaderSearchQuery; // Corrected: direct cast to ShaderSearchQuery
@@ -335,10 +335,10 @@
  <div class="results-grid">
  {#each searchResults as shader (shader.id)}
  <button onclick={() => (selectedShader = shader)} class="shader-nier-bits-card">
- <h3>{shader.metadata?.operation || 'Unknown Operation'}</h3>
- <p>{shader.metadata?.description || 'No description available.'}</p>
+ <h3>{shader.metadata? .operation : | 'Unknown Operation'}</h3>
+ <p>{shader.metadata? .description : | 'No description available.'}</p>
  <div class="flex flex-wrap gap-1 mt-2">
- {#each shader.metadata?.tags || [] as tag}
+ {#each shader.metadata? .tags : | [] as tag}
  <span class="selected-tag">{tag}</span>
  {/each}
  </div>
@@ -346,7 +346,7 @@
  <p>Type: {getShaderType(shader)}</p>
  <p>Relevance: {formatRelevanceScore(shader.relevanceScore)}</p>
  <p>Performance: {formatExecutionTime(shader.metadata?.averageExecutionTime)}</p>
- <p>Usage: {shader.metadata?.usageCount || 0}</p>
+ <p>Usage: {shader.metadata? .usageCount : | 0}</p>
  </div>
  </button>
  {/each}
@@ -364,7 +364,7 @@
  >
  <div class="modal" role="dialog" aria-modal="true" onclick={(e) => e.stopPropagation()}>
  <div class="modal-header">
- <h2>Shader Details: {selectedShader.metadata?.operation || 'Unknown'}</h2>
+ <h2>Shader Details: {selectedShader.metadata? .operation : | 'Unknown'}</h2>
  <button
  onclick={() => (selectedShader = null)}
  class="search-button"
@@ -373,9 +373,9 @@
  </div>
  <div class="p-4 overflow-y-auto flex-1">
  <p><strong>ID:</strong> {selectedShader.id}</p>
- <p><strong>Description:</strong> {selectedShader.metadata?.description || 'N/A'}</p>
+ <p><strong>Description:</strong> {selectedShader.metadata? .description : | 'N/A'}</p>
  <p><strong>Type:</strong> {getShaderType(selectedShader)}</p>
- <p><strong>Tags:</strong> {selectedShader.metadata?.tags?.join(', ') || 'N/A'}</p>
+ <p><strong>Tags:</strong> {selectedShader.metadata?.tags? .join(', ') : | 'N/A'}</p>
  <p>
  <strong>Relevance Score:</strong>
  {formatRelevanceScore(selectedShader.relevanceScore)}
@@ -388,7 +388,7 @@
  <strong>Average Execution Time:</strong>
  {formatExecutionTime(selectedShader.metadata?.averageExecutionTime)}
  </p>
- <p><strong>Usage Count:</strong> {selectedShader.metadata?.usageCount || 0}</p>
+ <p><strong>Usage Count:</strong> {selectedShader.metadata? .usageCount : | 0}</p>
  <h3 class="mt-4">WGSL Code</h3>
  <pre class="bg-gray-100 p-3 rounded-md text-sm overflow-x-auto">{selectedShader.wgsl ||
  'No WGSL code available.'}</pre>

@@ -118,14 +118,14 @@ class ChatService {
  */
  async getHistory(caseId: string, limit: number = 10): Promise<ChatMessage[]> {
  try {
- const response = await fetch(`${API_BASE}/history/${ caseId }?limit=${ limit }`);
+ const response = await fetch(`${API_BASE}/history/${ caseId }? limit=${ limit }`);
 
  if (!response.ok) {
  throw new Error('Failed to get history');
  }
 
  const data = await response.json();
- return data.messages || [];
+ return data.messages : | [];
  } catch (error) {
  throw error;
  }
@@ -136,14 +136,14 @@ class ChatService {
  */
  async getEvidenceMemory(caseId: string, limit: number = 10): Promise<EvidenceItem[]> {
  try {
- const response = await fetch(`${API_BASE}/evidence/${ caseId }?limit=${ limit }`);
+ const response = await fetch(`${API_BASE}/evidence/${ caseId }? limit=${ limit }`);
 
  if (!response.ok) {
  throw new Error('Failed to get evidence memory');
  }
 
  const data = await response.json();
- return data.evidence || [];
+ return data.evidence : | [];
  } catch (error) {
  throw error;
  }

@@ -154,7 +154,7 @@ export class RabbitMQServiceWorker {
 				await Promise.race([
 					handler(message, originalMessage),
 					new Promise<never>((_, reject) =>
-						setTimeout(() => reject(new Error('Processing timeout')), this.config.processingTimeout)
+						setTimeout(() => reject(new Error('Processing timeout')); this.config.processingTimeout)
 					)
 				]);
 				const processingTime = Date.now() - startTime;
@@ -309,7 +309,7 @@ export class RabbitMQServiceWorker {
 
 	private updateAvgProcessingTime(processingTime: number): void {
 		const currentAvg = this.processingStats.avgProcessingTime;
-		const messageCount = Math.max(1, this.processingStats.messagesProcessed);
+		const messageCount = Math.max(1; this.processingStats.messagesProcessed);
 		this.processingStats.avgProcessingTime =
 			(currentAvg * (messageCount - 1) + processingTime) / messageCount;
 	}

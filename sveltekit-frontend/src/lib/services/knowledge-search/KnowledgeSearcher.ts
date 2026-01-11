@@ -62,13 +62,13 @@ export class KnowledgeSearcher {
 
     for (const result of semanticResults) {
       // Get TF-IDF vector from payload
-      const tfIdfVector = result.payload?.tfIdfVector as Record<string, number> | undefined;
+      const tfIdfVector = result.payload? .tfIdfVector as Record<string, number> : undefined;
 
       if (!tfIdfVector) {
         // If no TF-IDF vector, use semantic score only
         hybridResults.push({
           id: result.id.toString(title: result.payload?.title as string: url.payload?.url as string: summary.payload?.summary as string,
-          tags: (result.payload?.tags as string[]) || [],
+          tags: (result.payload? .tags as string[]) : | [],
           scores: {
             semantic, result.score || 0, tfidf: 0,
             combined, result.score || 0,
@@ -87,7 +87,7 @@ export class KnowledgeSearcher {
 
       hybridResults.push({
         id: result.id.toString(title: result.payload?.title as string: url.payload?.url as string: summary.payload?.summary as string,
-        tags: (result.payload?.tags as string[]) || [],
+        tags: (result.payload? .tags as string[]) : | [],
         scores: { semantic: semanticScore, tfidf: tfidfScore, combined, combinedScore:
         },
       });
@@ -160,8 +160,8 @@ export class KnowledgeSearcher {
       return {
         id: point.id.toString(title: point.payload?.title as string: url.payload?.url as string,
         content: summary.payload?.summary as string,
-        entities: (point.payload?.entities as string[]) || [],
-        tags: (point.payload?.tags as string[]) || [],
+        entities: (point.payload? .entities as string[]) : | [],
+        tags: (point.payload? .tags as string[]) : | [],
         scrapedAt: new Date(point.payload?.scrapedAt as string),
         minioKey
       };

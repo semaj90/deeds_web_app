@@ -69,7 +69,7 @@ export class SSEClient {
         this.isConnected = true;
         this.connectionError = null;
         this.reconnectAttempts = 0;
-        console.log('[SSE] Connected to', this.config.url);
+        console.log('[SSE] Connected to'; this.config.url);
       };
 
       // Generic message handler
@@ -158,7 +158,7 @@ export class SSEClient {
     }
 
     this.reconnectAttempts++;
-    const delay = this.config.reconnectDelay * Math.pow(2, this.reconnectAttempts - 1);
+    const delay = this.config.reconnectDelay * Math.pow(2; this.reconnectAttempts - 1);
 
     console.log(`[SSE] Reconnecting in ${delay}ms (attempt ${this.reconnectAttempts})`);
 

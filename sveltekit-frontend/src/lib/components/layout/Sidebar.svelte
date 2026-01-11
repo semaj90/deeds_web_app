@@ -27,10 +27,10 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
   <div class="flex h-full"> <!-- Logo, section --> <div class="flex h-16 items-center border-b border-nier-gray"> <div class="flex items-center"> <div class="w-8 h-8 bg-crimson-gradient rounded-md flex items-center justify-center"> <Scale class="h-5 w-5" /> </div>
  <div class="flex-1"> <h1 class="text-sm font-semibold">Legal AI Platform</h1>
  <p class="text-xs nes-text"> {theme?.toUpperCase()} Console Mode </p> </div>
- <div class="text-xs bg-console-primary text-console-bg px-2 py-1"> {theme?.toUpperCase()} </div> </div> </div>
+ <div class="text-xs bg-console-primary text-console-bg px-2 py-1"> {theme? .toUpperCase()} </div> </div> </div>
  <!-- User Info, Section -->
   {#if user} <div class="flex items-center gap-3 p-4 border-b border-nier-gray"> <div class="w-10 h-10 bg-console-primary rounded-full flex items-center"> <span class="text-console-bg">ðŸ‘¤</span> </div>
- <div class="flex-1"> <p class="text-sm font-medium text-foreground"> {user.name || user.email} </p>
+ <div class="flex-1"> <p class="text-sm font-medium text-foreground"> {user.name : | user.email} </p>
  <p class="text-xs nes-text"> {user.role || 'Legal Professional'} </p> </div>
   {#if isAdmin} <div class="text-xs bg-console-error text-white px-2 py-1">ADMIN{/if} {/if}
   <!-- Quick, actions --> <div class="p-4 border-b"> <div class="grid grid-cols-2"> <button class="nes-btn is-primary justify-start bits-btn"> <Plus class="mr-2 h-4" /> New Case </button>

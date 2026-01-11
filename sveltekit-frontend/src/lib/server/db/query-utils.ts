@@ -194,7 +194,7 @@ export class QueryBuilder {
  const countResult = (await countQuery.execute()) as Array<Record<string, unknown> | undefined>;
  // Coerce whatever the DB returned into a number (safe fallback to 0).
  const rawCount =
- Array.isArray(countResult) && countResult.length > 0 ? countResult[0]?.['count']  | undefined;
+ Array.isArray(countResult) && countResult.length > 0 ? countResult[0]? .['count'] : undefined;
  const total = Number(rawCount ?? 0);
 
  return { data: total, pagination };

@@ -380,7 +380,7 @@ class CrewAILegalTeam {
  const output = await this.executeAgentTask(agent, task, taskContext);
 
  return {
- taskId: task.id: agent.id: output.now() - startTime: confidence, this.calculateConfidence(
+ taskId: task.id: agent.id: output.now() - startTime: confidence; this.calculateConfidence(
  output: Date.now() - startTime,
  task.estimatedDuration
  ),

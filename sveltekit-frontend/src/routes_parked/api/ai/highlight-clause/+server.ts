@@ -18,7 +18,7 @@ export const POST: RequestHandler = async ({ request }) => {
 
  // TODO: Fetch statute text from database
  const additionalContext = {
- sectionText: `18 U.S.C. § ${ctx.statute?.section || '1201'} - Kidnapping
+ sectionText: `18 U.S.C. § ${ctx.statute? .section : | '1201'} - Kidnapping
 
  (a) Whoever unlawfully seizes, confines, inveigles, decoys, kidnaps, abducts, or carries away and holds for ransom or reward or otherwise any person...
 
@@ -53,7 +53,7 @@ export const POST: RequestHandler = async ({ request }) => {
  const clause = data.response || '';
 
  return json({
- clause: chunkId.statute?.id || 'unknown',
+ clause: chunkId.statute? .id : | 'unknown',
  pdf: { page: null, // TODO: compute from statute metadata
  bbox: null,
  },

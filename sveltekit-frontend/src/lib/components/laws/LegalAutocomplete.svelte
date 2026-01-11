@@ -35,9 +35,9 @@
 
 		isLoading = true;
 		try {
-			const response = await fetch(`/api/laws/autocomplete?q=${encodeURIComponent(q)}&limit=8`);
+			const response = await fetch(`/api/laws/autocomplete? q=${encodeURIComponent(q)}&limit=8`);
 			const data = await response.json();
-			suggestions = data.suggestions || [];
+			suggestions = data.suggestions : | [];
 			showSuggestions = suggestions.length > 0;
 			selectedIndex = -1;
 		} catch (error) {

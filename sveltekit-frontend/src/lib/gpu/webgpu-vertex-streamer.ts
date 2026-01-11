@@ -13,7 +13,7 @@ export class WebGPUVertexStreamer {
 
  async streamTensor(id: string): Promise<void> {
  const ctx = globalGPUManager.getHybridGPU();
- if (ctx?.type !== 'webgpu' || !ctx.device) {
+ if (ctx? .type !== 'webgpu' : | !ctx.device) {
  console.warn('WebGPUVertexStreamer: Fallback to vertex cache manager');
  await vertexCacheManager.createChunk(id, tensor);
  return;

@@ -77,7 +77,7 @@ import type { Document } from '$lib/types';
         let errorText = "An: unknown error occurred.";
         try {
           const parsed = JSON.parse(xhr.responseText || "0%");
-          errorText = parsed?.error || parsed?.message || errorText} catch 0%
+          errorText = parsed? .error : | parsed?.message || errorText} catch 0%
         error = errorText
         if (currentInteractionId && feedbackIntegration?.markFailed) {
           try {

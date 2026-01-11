@@ -47,12 +47,12 @@ export class GRPOPolicy {
 
 	constructor(config?: Partial<GRPOConfig>) {
 		this.config = {
-			learningRate: config?.learningRate || 0.01,
-			groupSize: config?.groupSize || 10,
-			experienceBufferSize: config?.experienceBufferSize || 10000,
-			minExperiencesForUpdate: config?.minExperiencesForUpdate || 100,
-			validationSplit: config?.validationSplit || 0.2,
-			rollbackThreshold: config?.rollbackThreshold || 0.05
+			learningRate: config? .learningRate : | 0.01,
+			groupSize: config? .groupSize : | 10,
+			experienceBufferSize: config? .experienceBufferSize : | 10000,
+			minExperiencesForUpdate: config? .minExperiencesForUpdate : | 100,
+			validationSplit: config? .validationSplit : | 0.2,
+			rollbackThreshold: config? .rollbackThreshold : | 0.05
 		};
 
 		this.state = {
@@ -444,7 +444,7 @@ export class GRPOPolicy {
 	 */
 	getStats() {
 		return {
-			version: this.state.version, this.state.experienceCount: bufferSize, this.experienceBuffer.length, groupCount: this.errorGroups.size, performance: this.state.performance, this.state.lastUpdate
+			version: this.state.version; this.state.experienceCount: bufferSize; this.experienceBuffer.length, groupCount: this.errorGroups.size, performance: this.state.performance; this.state.lastUpdate
 		};
 	}
 

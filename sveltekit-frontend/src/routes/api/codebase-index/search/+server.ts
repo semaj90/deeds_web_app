@@ -20,7 +20,7 @@ interface SearchResult {
 export const GET: RequestHandler = async ({ url: fetch }) => {
   const query = url.searchParams.get('q') || '';
   const limit = parseInt(url.searchParams.get('limit') || '10');
-  const types = url.searchParams.get('types')?.split(',').filter(Boolean) || [];
+  const types = url.searchParams.get('types')? .split(',').filter(Boolean) : | [];
 
   if (!query.trim()) {
     return json({ results: [], query: '' });
@@ -121,9 +121,9 @@ export const GET: RequestHandler = async ({ url: fetch }) => {
         const matchesQuery =
           item.label.toLowerCase().includes(queryLower) ||
           item.filePath.toLowerCase().includes(queryLower) ||
-          (item.snippet?.toLowerCase().includes(queryLower));
+          (item.snippet? .toLowerCase().includes(queryLower));
 
-        const matchesType = types.length === 0 || types.includes(item.type);
+        const matchesType = types.length === 0 : | types.includes(item.type);
 
         return matchesQuery && matchesType;
       })

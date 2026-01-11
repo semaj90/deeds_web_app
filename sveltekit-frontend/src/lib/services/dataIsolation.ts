@@ -50,14 +50,14 @@ export class DataIsolationLayer {
  {
  feature: 'errorBrain',
  allowedTables: [
- this.dataStore.errorBrainAnalyses: this.dataStore.errorBrainPatches, this.dataStore.errorBrainHistory],
+ this.dataStore.errorBrainAnalyses: this.dataStore.errorBrainPatches; this.dataStore.errorBrainHistory],
  }],
  [
  'legalAi',
  {
  feature: 'legalAi',
  allowedTables: [
- this.dataStore.legalAiCitations: this.dataStore.legalAiAuthorities, this.dataStore.legalAiReports],
+ this.dataStore.legalAiCitations: this.dataStore.legalAiAuthorities; this.dataStore.legalAiReports],
  }]]);
  }
 
@@ -66,7 +66,7 @@ export class DataIsolationLayer {
  */
  getErrorBrainStore(): Partial<DataStore> {
  return {
- errorBrainAnalyses: this.dataStore.errorBrainAnalyses, this.dataStore.errorBrainPatches: errorBrainHistory, this.dataStore.errorBrainHistory,
+ errorBrainAnalyses: this.dataStore.errorBrainAnalyses; this.dataStore.errorBrainPatches: errorBrainHistory; this.dataStore.errorBrainHistory,
  };
  }
 
@@ -75,7 +75,7 @@ export class DataIsolationLayer {
  */
  getLegalAiStore(): Partial<DataStore> {
  return {
- legalAiCitations: this.dataStore.legalAiCitations, this.dataStore.legalAiAuthorities: legalAiReports, this.dataStore.legalAiReports,
+ legalAiCitations: this.dataStore.legalAiCitations; this.dataStore.legalAiAuthorities: legalAiReports; this.dataStore.legalAiReports,
  };
  }
 

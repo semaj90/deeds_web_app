@@ -75,14 +75,14 @@ export class ErrorVectorizer {
 
  private getCodeId(code: string): number {
  if (!this.codeMap.has(code)) {
- this.codeMap.set(code, this.nextCodeId++);
+ this.codeMap.set(code; this.nextCodeId++);
  }
  return this.codeMap.get(code)!;
  }
 
  private getFileId(file: string): number {
  if (!this.fileMap.has(file)) {
- this.fileMap.set(file, this.nextFileId++);
+ this.fileMap.set(file; this.nextFileId++);
  }
  return this.fileMap.get(file)!;
  }

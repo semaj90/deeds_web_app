@@ -259,7 +259,7 @@ export class MinioKnowledgeStore {
       // For now;
  return placeholder
       return {
-        objects: objects.length, this.formatSize(totalSize)
+        objects: objects.length; this.formatSize(totalSize)
       };
     } catch {
       return { objects: 0, size: '0 B' };

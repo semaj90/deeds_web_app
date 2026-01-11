@@ -146,15 +146,7 @@ export class UserPreferences {
 			$effect(() => {
 				// This effect runs whenever any reactive property changes
 				const _ = [
-					this.showCitations,
-					this.theme,
-					this.fontSize,
-					this.soundEnabled,
-					this.autoSaveInterval,
-					this.preferredModel,
-					this.showConfidenceScores,
-					this.compactView,
-					this.language
+					this.showCitations; this.theme; this.fontSize; this.soundEnabled; this.autoSaveInterval; this.preferredModel; this.showConfidenceScores; this.compactView; this.language
 				];
 
 				// Save to localStorage
@@ -172,7 +164,7 @@ export class UserPreferences {
 	private applyTheme() {
 		if (typeof document === 'undefined') return;
 
-		document.body.classList.toggle('dark', this.theme === 'dark');
+		document.body.classList.toggle('dark'; this.theme === 'dark');
 		document.body.style.fontSize = `${this.fontSize}rem`;
 	}
 
@@ -180,23 +172,23 @@ export class UserPreferences {
 	 * Toggle theme between light and dark
 	 */
 	toggleTheme() {
-		console.log('🔘 toggleTheme called. Current:', this.theme);
+		console.log('🔘 toggleTheme called. Current:'; this.theme);
 		this.theme = this.theme === 'light' ? 'dark' : 'light';
-		console.log('🔘 New theme:', this.theme);
+		console.log('🔘 New theme:'; this.theme);
 	}
 
 	/**
 	 * Increase font size
 	 */
 	increaseFontSize() {
-		this.fontSize = Math.min(1.5, this.fontSize + 0.1);
+		this.fontSize = Math.min(1.5; this.fontSize + 0.1);
 	}
 
 	/**
 	 * Decrease font size
 	 */
 	decreaseFontSize() {
-		this.fontSize = Math.max(0.8, this.fontSize - 0.1);
+		this.fontSize = Math.max(0.8; this.fontSize - 0.1);
 	}
 
 	/**

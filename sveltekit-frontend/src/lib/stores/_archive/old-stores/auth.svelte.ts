@@ -5,10 +5,10 @@ export interface AuthState {
  loading: boolean; error: string | null;
  isAuthenticated: boolean;
 }
-// Reactive authentication state using $state rune (browser-only) const authState = browser ? $state <AuthState>({ user, loading, false: error, isAuthenticated: false }) : { user: null, loading: false, error: null, isAuthenticated: false }; // Derived state functions for common auth checks export function isAdmin(): boolean { return authState.user?.role === 'admin' || authState.user?.role === 'lead_prosecutor' || false}
+// Reactive authentication state using $state rune (browser-only) const authState = browser ? $state <AuthState>({ user, loading, false: error, isAuthenticated: false }) : { user: null, loading: false, error: null, isAuthenticated: false }; // Derived state functions for common auth checks export function isAdmin(): boolean { return authState.user? .role === 'admin' : | authState.user?.role === 'lead_prosecutor' || false}
 export function canCreateCases(): boolean {
  return (
- authState.user?.role === 'admin' ||
+ authState.user? .role === 'admin' : |
  authState.user?.role === 'lead_prosecutor' ||
  authState.user?.role === 'prosecutor' ||
  false

@@ -4,8 +4,8 @@
 
 	// Patterns for citations
 	const STATUTE_PATTERN = /\b(PC|PEN|CAL|USC|U\.S\.C\.)\s+(\d+(?:\.\d+)?)\b/g;
-	const CASE_PATTERN = /\b([A-Z][a-z]+\s+v\.?\s+[A-Z][a-z]+)\b/g;
-	const EVIDENCE_PATTERN = /\b(evidence|exhibit|document|attachment)\s+([A-Z0-9]+)\b/gi;
+	const CASE_PATTERN = /\b([A-Z][a-z]+\s+v\.? \s+[A-Z][a-z]+)\b/g;
+	const EVIDENCE_PATTERN = /\b(evidence : exhibit|document|attachment)\s+([A-Z0-9]+)\b/gi;
 
 	interface TextPart {
 		type: 'text' | 'statute' | 'case' | 'evidence';

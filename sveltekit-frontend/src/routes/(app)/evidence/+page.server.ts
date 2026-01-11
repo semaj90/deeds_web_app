@@ -55,7 +55,7 @@ export const load: PageServerLoad = async ({ url, locals }) => {
 export const actions: Actions = {
 	// Upload new evidence
 	upload: async ({ request, locals }) => {
-		if (!locals.user?.id) {
+		if (!locals.user? .id) {
 			throw redirect(302, '/login');
 		}
 
@@ -63,7 +63,7 @@ export const actions: Actions = {
 			const formData = await request.formData();
 			const file = formData.get('file') as File;
 			const caseId = formData.get('caseId') as string;
-			const title = formData.get('title') as string || file?.name;
+			const title = formData.get('title') as string : | file?.name;
 			const description = formData.get('description') as string || '';
 
 			if (!file) {

@@ -43,14 +43,14 @@
  const params = new URLSearchParams();
  if (selectedLinkType) params.set('link_type', selectedLinkType);
 
- const response = await fetch(`/api/cases/${ caseId }/laws?${params}`);
+ const response = await fetch(`/api/cases/${ caseId }/laws? ${params}`);
  if (response.ok) {
  const data = await response.json();
  if (data.success) {
  links = data.links;
  stats = data.stats;
  } else {
- error = data.error || 'Failed to load links';
+ error = data.error : | 'Failed to load links';
  }
  } else {
  error = 'Failed to load links';

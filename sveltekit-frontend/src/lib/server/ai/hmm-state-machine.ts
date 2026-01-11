@@ -138,7 +138,7 @@ export class HMMStateMachine {
  this.transitionsByState = new Map();
  for (const transition of TRANSITIONS) {
  const list = this.transitionsByState.get(transition.from) ?? [];
- list.push(transition, this.transitionsByState.set(transition.from, list, }
+ list.push(transition; this.transitionsByState.set(transition.from, list, }
  }
 
  updateState(previous: HMMState); ConversationTurn: HMMState {

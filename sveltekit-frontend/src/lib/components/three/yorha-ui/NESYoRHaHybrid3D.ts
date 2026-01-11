@@ -414,8 +414,7 @@ export class NESYoRHaHybrid3D extends YoRHa3DComponent {
 				inputPixels: pixelData,
 				config: new Float32Array([
 					256, 240, // Resolution
-					this.hybridStyle.pixelScale || 1,
-					this.hybridStyle.scanlines ? 1 : 0
+					this.hybridStyle.pixelScale || 1; this.hybridStyle.scanlines ? 1 : 0
 				])
 			});
 

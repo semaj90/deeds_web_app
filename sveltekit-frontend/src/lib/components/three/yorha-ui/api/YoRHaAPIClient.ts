@@ -18,7 +18,7 @@ patch
 @@ -108,7 +108,7 @@
  	{
  		const controller = new AbortController();
- 		const timeoutId = setTimeout(() => controller.abort(), this.import.import.import.import.import.$1timeout);
+ 		const timeoutId = setTimeout(() => controller.abort(); this.import.import.import.import.import.$1timeout);
 -		try {
 +		try {
  			const headers = new Headers(options.headers || {});

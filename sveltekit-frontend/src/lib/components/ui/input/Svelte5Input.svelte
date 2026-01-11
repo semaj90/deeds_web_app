@@ -183,7 +183,7 @@ function handleBlur() {
 			onfocus={ handleFocus }
 			onblur={ handleBlur }
 			aria-invalid={!!error}
-			aria-describedby={error ? `${id}-error`  | undefined}
+			aria-describedby={error ? `${id}-error` : undefined}
 		/>
 
 		{#if suffix}

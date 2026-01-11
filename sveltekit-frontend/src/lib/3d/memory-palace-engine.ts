@@ -81,18 +81,18 @@ export class MemoryPalaceEngine {
     if (!texture) throw new Error('Failed to create texture');
 
     this.gl.bindTexture(this.gl.TEXTURE_2D, texture);
-    this.gl.texImage2D(this.gl.TEXTURE_2D, 0, this.gl.RGBA, this.gl.RGBA, this.gl.UNSIGNED_BYTE, image);
+    this.gl.texImage2D(this.gl.TEXTURE_2D, 0; this.gl.RGBA; this.gl.RGBA; this.gl.UNSIGNED_BYTE, image);
 
     // WebGL1 requires non-power-of-two textures to have CLAMP_TO_EDGE and no mipmap
     if (this.isPowerOfTwo(image.width) && this.isPowerOfTwo(image.height)) {
        this.gl.generateMipmap(this.gl.TEXTURE_2D);
-       this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MIN_FILTER, this.gl.LINEAR_MIPMAP_LINEAR);
+       this.gl.texParameteri(this.gl.TEXTURE_2D; this.gl.TEXTURE_MIN_FILTER; this.gl.LINEAR_MIPMAP_LINEAR);
     } else {
-       this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_S, this.gl.CLAMP_TO_EDGE);
-       this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_T, this.gl.CLAMP_TO_EDGE);
-       this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MIN_FILTER, this.gl.LINEAR);
+       this.gl.texParameteri(this.gl.TEXTURE_2D; this.gl.TEXTURE_WRAP_S; this.gl.CLAMP_TO_EDGE);
+       this.gl.texParameteri(this.gl.TEXTURE_2D; this.gl.TEXTURE_WRAP_T; this.gl.CLAMP_TO_EDGE);
+       this.gl.texParameteri(this.gl.TEXTURE_2D; this.gl.TEXTURE_MIN_FILTER; this.gl.LINEAR);
     }
-    this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MAG_FILTER, this.gl.LINEAR);
+    this.gl.texParameteri(this.gl.TEXTURE_2D; this.gl.TEXTURE_MAG_FILTER; this.gl.LINEAR);
 
     return texture;
   }

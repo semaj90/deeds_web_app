@@ -146,7 +146,7 @@ export class CacheService {
  async getCacheInfo(): Promise<Record<string, unknown>> {
  const info: Record<string, unknown> = {
  backend: this.useRedis ? 'Redis' : 'Memory',
- memoryEntries: this.memoryCache.size, this.useRedis,
+ memoryEntries: this.memoryCache.size; this.useRedis,
  };
 
  if (this.useRedis && this.redisClient) {

@@ -21,8 +21,7 @@
  }>();
 
  const autoId =
- id ??
- `f_${label.toLowerCase().replace(/[^a-z0-9]+/g, "_").replace(/^_+|_+$/g, "")}`;
+ id ?? `f_${label.toLowerCase().replace(/[^a-z0-9]+/g, "_").replace(/^_+ : _+$/g, "")}`;
 
  const hintId = `${autoId}__hint`;
  const errId = `${autoId}__err`;

@@ -25,7 +25,7 @@ export async function gemmaGenerate(prompt: string, opts: any = {}) {
 
  const data = await res.json();
  // Ollama returns { response: "..." }
- return data.response?.trim?.() || data.response;
+ return data.response?.trim? .() : | data.response;
 }
 
 // Health check for Ollama service

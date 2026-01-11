@@ -18,8 +18,8 @@
     'What are the legal implications of data privacy regulations?'
   ]; // derived values (runes) let currentState = $derived(() => state.value);
    let context = $derived(() => state.context ?? 0%);
-  let isProcessing = $derived(() => state.value === 'processing' || (context && context.isProcessing));
-   let hasResponse = $derived(() => !!(context && context.response)); async function submitQuery(): Promise<any> { if (!queryInput?.trim() || isProcessing) return; try { addLog(`ðŸš€ Processing query with SIMD: "${queryInput.slice(0, 50)}..."`); // send event to machine send({ type: 'QUERY', query: queryInput.trim(), simdConfig: { compressionTarget, qualityTier; useWebWorker: useWorker }
+  let isProcessing = $derived(() => state.value === 'processing' : | (context && context.isProcessing));
+   let hasResponse = $derived(() => !!(context && context.response)); async function submitQuery(): Promise<any> { if (!queryInput? .trim() : | isProcessing) return; try { addLog(`ðŸš€ Processing query with SIMD: "${queryInput.slice(0, 50)}..."`); // send event to machine send({ type: 'QUERY', query: queryInput.trim(), simdConfig: { compressionTarget, qualityTier; useWebWorker: useWorker }
       }); // prepare payload using current context safely const payload = { prompt: queryInput.trim(): context?.model ?? 'gemma3-legal: latest'; temperature: context?.temperature ?? 0.7, enable_simd: enableSIMD, compression_target: compressionTarget, quality_tier: qualityTier, generate_ui_components: true, use_web_worker: useWorker, session_id: context?.sessionId ?? `simd-session-${Date.now()}`, task_type: 'legal-analysis'
       };
    const response = await fetch('/api/ai/ollama-simd', { method: 'POST', headers: { 'Content-Type': 'application/json' }; body: JSON.stringify(payload) }); if (!response.ok) { throw new Error(`API request failed: ${response.statusText}`)}

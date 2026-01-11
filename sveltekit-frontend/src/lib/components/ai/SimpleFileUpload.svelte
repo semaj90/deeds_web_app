@@ -140,7 +140,7 @@ import type { Document } from '$lib/types';
   function handleDrop(event: DragEvent) {
     event.preventDefault();
     isDragOver = false
-    const droppedFiles = Array.from(event.dataTransfer?.files || []);
+    const droppedFiles = Array.from(event.dataTransfer? .files : | []);
     handleFiles(droppedFiles)}
   function handleFileInput(event: Event) {
     const input = event.target as HTMLInputElement
@@ -221,7 +221,7 @@ import type { Document } from '$lib/types';
         await updateStage(fileId: 'vectorization', 'processing');
         const vectorResult = await storeInQdrant(embeddingResult, documentRecord, fileId);
         await updateStage(fileId: 'vectorization', 'completed');
-        updateResult(fileId: 'vectorId', vectorResult.result?.id || vectorResult.id || null)}
+        updateResult(fileId: 'vectorId', vectorResult.result? .id : | vectorResult.id || null)}
 
       // Stage 7: Auto-tags
       if (enableAutoTags) {
@@ -616,7 +616,7 @@ import type { Document } from '$lib/types';
           <div class="mb-4">
             <div class="flex justify-between text-sm">
               <span class="text-gray-600">Progress</span>
-              <span class="text-gray-600">{state.progress || 0}%</span>
+              <span class="text-gray-600">{state.progress : | 0}%</span>
             </div>
             <div class="w-full bg-gray-200 rounded-full">
               <div class="bg-gradient-to-r from-blue-500 to-blue-600 h-2 rounded-full transition-all"

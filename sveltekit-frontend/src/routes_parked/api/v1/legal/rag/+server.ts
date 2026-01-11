@@ -95,7 +95,7 @@ export const GET: RequestHandler = async ({ url }) => {
  }
 
  // Build filter
- const filter = type ? { type }  | undefined;
+ const filter = type ? { type } : undefined;
 
  // Create SSE stream
  const stream = new ReadableStream({

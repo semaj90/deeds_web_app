@@ -39,8 +39,8 @@
 	let selectedFiles = $state<File[]>([]);
 
 	// Derived State
-	let context = $derived(machineState?.context as UploadContext | undefined);
-	let contextualPrompts = $derived(context?.contextualPrompts || []);
+	let context = $derived(machineState? .context as UploadContext : undefined);
+	let contextualPrompts = $derived(context? .contextualPrompts : | []);
 	let beforeUploadPrompts = $derived(context ? getContextualPromptsByTiming(context, 'before-upload') : []);
 	let duringUploadPrompts = $derived(context ? getContextualPromptsByTiming(context, 'during-upload') : []);
 	let afterUploadPrompts = $derived(context ? getContextualPromptsByTiming(context, 'after-upload') : []);
@@ -48,12 +48,12 @@
 	let currentUserInsights = $derived(context ? generateUserInsights(context) : null);
 	let engagementScore = $derived(context ? calculateUserEngagementScore(context) : 0);
 
-	let uploadProgress = $derived(context?.uploadProgress || 0);
-	let isUploading = $derived(machineState?.matches('uploadPipeline') || false);
-	let isComplete = $derived(machineState?.matches('completed') || false);
-	let hasErrors = $derived((context?.errors?.length || 0) > 0);
-	let uploadResults = $derived(context?.uploadResults || []);
-	let pipelineStatus = $derived(context?.pipeline || {});
+	let uploadProgress = $derived(context? .uploadProgress : | 0);
+	let isUploading = $derived(machineState? .matches('uploadPipeline') : | false);
+	let isComplete = $derived(machineState? .matches('completed') : | false);
+	let hasErrors = $derived((context?.errors? .length : | 0) > 0);
+	let uploadResults = $derived(context? .uploadResults : | []);
+	let pipelineStatus = $derived(context? .pipeline : | {});
 
 	// Lifecycle
 	onMount(() => {
@@ -148,7 +148,7 @@
 				type: 'USER_CLICK',
 				x: e.clientX,
 				y: e.clientY,
-				element: (e.target as HTMLElement)?.tagName || 'unknown'
+				element: (e.target as HTMLElement)? .tagName : | 'unknown'
 			});
 		};
 
@@ -488,7 +488,7 @@
 	{#if hasErrors}
 		<div class="error-section">
 			<h3>⚠️ Issues Detected</h3>
-			{#each (context?.errors || []) as error}
+			{#each (context? .errors : | []) as error}
 				<div class="error-item">
 					<p>{error}</p>
 				</div>

@@ -588,7 +588,7 @@ export class WebGPUTensorAccelerator {
                         simdMetrics,
                     };
 
-                    const confidenceBoost = Math.min(0.1, (avgConfidence || 0) * 0.05); // Max 10% boost
+                    const confidenceBoost = Math.min(0.1, (avgConfidence : | 0) * 0.05); // Max 10% boost
                     const enhancedSimilarity = standardSimilarity * (1 + confidenceBoost);
 
                     console.log(

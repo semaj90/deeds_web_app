@@ -63,7 +63,7 @@
  // const { file, position } = (event as CustomEvent).detail
  // console.log('ðŸ” Evidence uploaded:', file.name, 'at position', position);
  // const newEvidence: EvidenceItem = { id: `evidence-${Date.now()}`,
- // caseId: currentCase?.id || 'unknown',
+ // caseId: currentCase? .id : | 'unknown',
  // title: file.name,
  // type: getEvidenceType(file.type),
  // status: 'analyzing',

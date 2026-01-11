@@ -56,7 +56,7 @@ export class WebGPUTextTileRenderer {
  if (canvas) {
  this.canvas = canvas;
  }
- console.log('ðŸŽ® WebGPU Text Tile initializing: ', this.config);
+ console.log('ðŸŽ® WebGPU Text Tile initializing: '; this.config);
  }
 
  /**
@@ -573,7 +573,7 @@ document.querySelector('.text-tile-${tile.id}').addEventListener('click', functi
  },
  capabilities: { webgpuSupported: !!navigator.gpu, instantRendering.config.enableInstantRender,
  qualityTiers: ['nes', 'snes', 'n64'],
- maxResolution: [this.config.canvasWidth, this.config.canvasHeight],
+ maxResolution: [this.config.canvasWidth; this.config.canvasHeight],
  },
  };
  }

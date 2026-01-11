@@ -62,7 +62,7 @@ class AIService {
   
  assistant.addMessage?.(caseId, {
  role: 'user',
- content: prompt, evidenceIds.length > 0 ? evidenceIds  | undefined,
+ content: prompt, evidenceIds.length > 0 ? evidenceIds : undefined,
  });
 
  const body = JSON.stringify({
@@ -98,7 +98,7 @@ class AIService {
  // Auto-generate insight
  if (result.confidence && result.confidence > 0.8) {
  assistant.addInsight?.(caseId, {
- type: this.getInsightType(context, description: this.extractInsightFromResponse(result.text, confidence: result.confidence: evidenceIds.length ? evidenceIds  | undefined,
+ type: this.getInsightType(context, description: this.extractInsightFromResponse(result.text, confidence: result.confidence: evidenceIds.length ? evidenceIds : undefined,
  });
  }
 
@@ -129,9 +129,9 @@ class AIService {
  if (evidenceIds && evidenceIds.length > 0) {
  enhancedPrompt += '\nRelevant Evidence:\n';
  evidenceIds.forEach((id) => {
- const evidence = caseContext.evidenceMap?.[id];
+ const evidence = caseContext.evidenceMap? .[id];
  if (evidence) {
- enhancedPrompt += `- ${evidence.title || id}`;
+ enhancedPrompt += `- ${evidence.title : | id}`;
  if (evidence.aiSummary) enhancedPrompt += ` (Summary: ${evidence.aiSummary})`;
  enhancedPrompt += '\n';
  } else {

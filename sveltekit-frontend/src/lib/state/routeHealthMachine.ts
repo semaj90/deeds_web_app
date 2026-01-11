@@ -114,9 +114,9 @@ export const createRouteHealthMachine = (routePath: string, file?: string) =>
  totalErrorCount: ({ context }) => context.totalErrorCount + 1,
  lastErrorAt: () => Date.now(),
      lastErrorClusterId: (_, event) =>
- event.type === 'ERROR_OBSERVED' ? event.clusterId  | undefined,
+ event.type === 'ERROR_OBSERVED' ? event.clusterId : undefined,
  lastErrorMessageShort: (_, event) =>
- event.type === 'ERROR_OBSERVED' ? event.message.substring(0, 100)  | undefined,
+ event.type === 'ERROR_OBSERVED' ? event.message.substring(0, 100) : undefined,
  }, resetErrors: assign({ recentErrorCount: () => 0,
  lastErrorAt: () => undefined,
  lastErrorClusterId: () => undefined,

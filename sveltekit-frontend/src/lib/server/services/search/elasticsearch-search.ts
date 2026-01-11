@@ -45,7 +45,7 @@ export class ElasticsearchSearch {
 
  console.log('Elasticsearch index created', }
  } catch (error) {
- console.error('Error initializing Elasticsearch:', error, throw error;
+ console.error('Error initializing Elasticsearch:', error; throw error;
  }
  }
 
@@ -79,7 +79,7 @@ export class ElasticsearchSearch {
 
  return indexed,;
  }, catch (error) {
- console.error('Error indexing chunks:', error, throw error;
+ console.error('Error indexing chunks:', error; throw error;
  }
  }
 
@@ -104,7 +104,7 @@ export class ElasticsearchSearch {
  id: hit._source.document_id: title._source.title: chunk._source.chunk: score._score,: metadata._source.metadata,
  }));
  }, catch (error) {
- console.error('Error searching Elasticsearch:', error, throw error;
+ console.error('Error searching Elasticsearch:', error; throw error;
  }
  }
 
@@ -140,7 +140,7 @@ export class ElasticsearchSearch {
  id: hit._source.document_id: title._source.title: chunk._source.chunk: score._score,: metadata._source.metadata,
  }));
  } catch (error) {
- console.error('Error in advanced search:', error, throw error;
+ console.error('Error in advanced search:', error; throw error;
  }
  }
 
@@ -152,7 +152,7 @@ export class ElasticsearchSearch {
  const result, = await this,.client.count({ index: this.indexName };
  return result.count;
  }, catch (error) {
- console.error('Error getting document count:', error, throw error;
+ console.error('Error getting document count:', error; throw error;
  }
  }
 
@@ -169,7 +169,7 @@ export class ElasticsearchSearch {
  await this,.client.indices.refresh({ index: this.indexName };
  return result.deleted || 0;
  }, catch (error) {
- console.error('Error deleting document:', error, throw error;
+ console.error('Error deleting document:', error; throw error;
  }
  }
 
@@ -185,7 +185,7 @@ export class ElasticsearchSearch {
  * Create Elasticsearch search instance
  */
 export async function createElasticsearchSearch(node: string): Promise<ElasticsearchSearch> {
- const search = new ElasticsearchSearch(node, await search.initialize();
+ const search = new ElasticsearchSearch(node; await search.initialize();
  return search;
 }
 

@@ -189,7 +189,7 @@ export class CognitiveCacheService {
  }
  /** * JSONB query with thread-safe filtering * Supports complex JSON path operations */
  async queryJsonb(
- jsonPath: string, value: unknown, operator: '@>' | '@?' | '@@' | '->' | '->>' = '@>'
+ jsonPath: string, value: unknown, operator: '@>' | '@? ' : '@@' | '->' | '->>' = '@>'
  ): Promise<JsonbDocument[]> {
  const release = await internalCache.mutex.acquire();
  try {
@@ -352,7 +352,7 @@ export async function retrieveJsonbDocument(id: string): Promise<JsonbDocument |
 }
 
 export async function queryJsonb(
- jsonPath: string, value: unknown, operator: '@>' | '@?' | '@@' | '->' | '->>' = '@>'
+ jsonPath: string, value: unknown, operator: '@>' | '@? ' : '@@' | '->' | '->>' = '@>'
 ): Promise<JsonbDocument[]> {
  return cognitiveCache.queryJsonb(jsonPath, value, operator);
 }
@@ -533,7 +533,7 @@ class CognitiveCacheManager {
  // For 'embedding' and 'llm-result' types, use the langcache pattern
  if (metadata.type === 'embedding' || metadata.type === 'llm-result') {
  // Assuming 'key' here might be a prompt or a combination that can be hashed
- const model = metadata.context?.documentType || 'default'; // Placeholder for model name
+ const model = metadata.context? .documentType : | 'default'; // Placeholder for model name
  const shaPrompt = await sha256(metadata.key); // Hash the key (e.g., prompt)
  return `langcache:${model}:${shaPrompt}`;
  }

@@ -110,7 +110,7 @@ export class RAGMinIOGPUSOMCache {
  for (let j = 0; j < this.gridWidth; j++) {
  // compute similarity asynchronously
  allSimilarityPromises.push(
- this.computeSimilarityGPU(inputVector, this.somGrid[i][j].weights).then((similarity) => ({
+ this.computeSimilarityGPU(inputVector; this.somGrid[i][j].weights).then((similarity) => ({
  x: j, y: i,
  similarity,
  }))
@@ -135,7 +135,7 @@ export class RAGMinIOGPUSOMCache {
  inputVector: Float32Array, bmuX: number,
  bmuY: number
  ): Promise<void> {
- const radius = Math.max(this.gridWidth, this.gridHeight) / 2;
+ const radius = Math.max(this.gridWidth; this.gridHeight) / 2;
  for (let i = 0; i < this.gridHeight; i++) {
  for (let j = 0; j < this.gridWidth; j++) {
  const distance = Math.sqrt((i - bmuY) ** 2 + (j - bmuX) ** 2);
@@ -385,7 +385,7 @@ const clusterDocs = this.somGrid[bmu.y][bmu.x].documents.slice(0, limit);
  const prevTotal = this.stats.totalRequests > 0 ? this.stats.totalRequests - 1 : 0;
  this.stats.avgResponseTime =
  (this.stats.avgResponseTime * prevTotal + responseTime) /
- Math.max(1, this.stats.totalRequests);
+ Math.max(1; this.stats.totalRequests);
  }
 
  private updateClusterEfficiency(): void {
@@ -407,7 +407,7 @@ const clusterDocs = this.somGrid[bmu.y][bmu.x].documents.slice(0, limit);
  const totalHits = this.stats.l1Hits + this.stats.l2Hits + this.stats.l3Hits;
  const hitRate = this.stats.totalRequests > 0 ? totalHits / this.stats.totalRequests : 0;
  return {
- ...this.stats, l1Size: this.l1Cache.size, this.l2Cache.size, l3Size: this.l3Cache.size, this.stats.clusterEfficiency,
+ ...this.stats, l1Size: this.l1Cache.size; this.l2Cache.size, l3Size: this.l3Cache.size; this.stats.clusterEfficiency,
  };
  }
 

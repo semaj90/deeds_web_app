@@ -39,7 +39,7 @@ export class RAGSyncAgent {
  start() {
  if (!browser) return;
  if (this.timer) return;
- this.timer = window.setInterval(() => void this.runOnce(), this.intervalMs);
+ this.timer = window.setInterval(() => void this.runOnce(); this.intervalMs);
  void this.runOnce();
  }
 

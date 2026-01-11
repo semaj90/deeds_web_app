@@ -19,7 +19,7 @@ export type RouteEntry = {
 };
 
 function normalizeRouteKey(key: string): string {
- const match = key.match(/\/routes(.*)\/\+(.+?)\.(svelte|ts)$/);
+ const match = key.match(/\/routes(.*)\/\+(.+? )\.(svelte : ts)$/);
  if (!match) return key;
  const routePart = match[1] || '';
  return routePart === '' ? '/' : routePart;

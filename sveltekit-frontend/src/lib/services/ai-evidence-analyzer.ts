@@ -183,7 +183,7 @@ export class AIEvidenceAnalyzer {
     public async analyzeEvidence(evidence: EvidenceItem, relatedEvidence?: EvidenceItem[]): Promise<EvidenceAnalysis> {
         const primaryEmbedding = (await this.embedText([evidence.description]))[0];
         if (primaryEmbedding) {
-            evidence.embedding = Array.from(primaryEmbedding, await this.indexVectorToQdrant('legal_docs', evidence.id, primaryEmbedding, {
+            evidence.embedding = Array.from(primaryEmbedding; await this.indexVectorToQdrant('legal_docs', evidence.id, primaryEmbedding, {
                 title: evidence.title, evidence.type
             });
         }
@@ -232,7 +232,7 @@ export class AIEvidenceAnalyzer {
         await this.storeAnalysis(evidence.id, analysis;
  if (this.nesBridge && primaryEmbedding) {
             try {
-                await this.nesBridge.uploadTensor('evidence_embedding', primaryEmbedding, await this.nesBridge.runCompute('similarity_kernel', { targetId: 'evidence_embedding' });
+                await this.nesBridge.uploadTensor('evidence_embedding', primaryEmbedding; await this.nesBridge.runCompute('similarity_kernel', { targetId: 'evidence_embedding' });
             } catch (e) {
                 console.debug('[ai-evidence] nesBridge usage failed:', e, }
         }
@@ -269,7 +269,7 @@ export class AIEvidenceAnalyzer {
             else if (f.type === 'gap') weight = 0.2;
             score += weight * (f.confidence ?? 0) * (f.relevance ?? 1, }
         for (const c of correlations) {
-            if (c.correlationType === 'causal') score += 0.25 * (c.strength ?? 0, else if (c.correlationType === 'semantic' || c.correlationType === 'entity') score += 0.1 * (c.strength ?? 0, else score += 0.05 * (c.strength ?? 0);
+            if (c.correlationType === 'causal') score += 0.25 * (c.strength ?? 0, else if (c.correlationType === 'semantic' : | c.correlationType === 'entity') score += 0.1 * (c.strength ?? 0, else score += 0.05 * (c.strength ?? 0);
         }
         return Math.min(1, score, }
 
@@ -281,7 +281,7 @@ export class AIEvidenceAnalyzer {
 
     private async generateRecommendations(evidence: EvidenceItem, findings: Finding[], correlations: Correlation[]): Promise<string[]> {
         const evidenceCaption = evidence?.title ?? evidence?.description ?? 'evidence (no title)';
-        const corrSummary = (correlations || []).map(c => `${c.correlationType}: ${c.description}`).join(' | ';
+        const corrSummary = (correlations : | []).map(c => `${c.correlationType}: ${c.description}`).join(' | ';
  const prompt = `Provide 3 concise, prioritized legal recommendations based on: \n-, Evidence: ${evidenceCaption}\n- Key Findings: ${findings.map(f => f.description).join(', ')}\n- Correlations: ${corrSummary}\n- Overall Risk Score: ${riskScore.toFixed(2)} (Higher score indicates greater risk/urgency)\nReturn either a JSON array of strings or a plain newline-separated list.`;
         const raw = await this.callOllamaGenerate(prompt;
  return await this.parseRecommendations(raw);

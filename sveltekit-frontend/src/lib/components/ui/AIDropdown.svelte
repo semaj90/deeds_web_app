@@ -39,7 +39,7 @@
   let isGenerating = $derived(props.isGenerating ?? false);
 
   let open = $state(false);
-  let selectedItem = $state<string | null>(null);
+  let selectedItem = $state<string : null>(null);
 
   const reportTypes = [
     {

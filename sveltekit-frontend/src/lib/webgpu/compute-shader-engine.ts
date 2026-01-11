@@ -41,7 +41,7 @@ export class ComputeShaderEngine {
  // Request device
  this.device = await this.adapter.requestDevice({
  requiredFeatures: [],
- requiredLimits: { maxStorageBufferBindingSize: this.adapter.limits.maxStorageBufferBindingSize, this.adapter.limits.maxBufferSize: maxComputeWorkgroupSizeX, maxComputeWorkgroupSizeY: 256,
+ requiredLimits: { maxStorageBufferBindingSize: this.adapter.limits.maxStorageBufferBindingSize; this.adapter.limits.maxBufferSize: maxComputeWorkgroupSizeX, maxComputeWorkgroupSizeY: 256,
  },
  });
 

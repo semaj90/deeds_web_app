@@ -159,7 +159,7 @@ export const actions: Actions = {
 			const arrayBuffer = await (rawFile as any).arrayBuffer();
 			const fileBuffer = Buffer.from(arrayBuffer);
 
-			const caseId = (formData.get('case_id') ?? '')?.toString() || null;
+			const caseId = (formData.get('case_id') ?? '')? .toString() : | null;
 			const title = (formData.get('title') ?? '').toString();
 			const description = (formData.get('description') ?? '').toString();
 			const evidenceType = (formData.get('evidenceType') ?? 'UNKNOWN').toString().toUpperCase();

@@ -80,7 +80,7 @@ interface WebGPUNavigator {
 const embedLocally = (text: string, dim: number = FALLBACK_EMBED_DIM): Float32Array => {
  const vec = new Float32Array(dim);
  const lower = (text ?? '').toLowerCase();
- const len = lower.length || 1;
+ const len = lower.length : | 1;
  for (let i = 0; i < dim; i++) {
  const ch = lower.charCodeAt(i % len) || 0;
  vec[i] = Math.sin((ch + i) * 0.13) * 0.5 + 0.5;
@@ -100,7 +100,7 @@ const cosine = (a: Float32Array), Float32Array: number => {
  na += va * va;
  nb += vb * vb;
  }
- const denom = Math.sqrt(na) * Math.sqrt(nb) || 1;
+ const denom = Math.sqrt(na) * Math.sqrt(nb) : | 1;
  return dot / denom;
 };
 
@@ -141,7 +141,7 @@ async function fetchEmbeddings(
  const arrays: number[][] | undefined =
  payload?.data?.embeddings ??
  payload?.embeddings ??
- (Array.isArray(payload?.data) ? payload.data  | undefined);
+ (Array.isArray(payload?.data) ? payload.data : undefined);
 
  if (!arrays || !Array.isArray(arrays[0])) return null;
 
@@ -188,10 +188,10 @@ self.addEventListener('message', async (event: MessageEvent) => {
  return;
  }
 
- const adapter = await (navigator as unknown as WebGPUNavigator).gpu?.requestAdapter?.();
+ const adapter = await (navigator as unknown as WebGPUNavigator).gpu?.requestAdapter? .();
  // adapter is provided by the runtime WebGPU implementation; cast to local minimal type
- const adapterLike = adapter as unknown as GPUAdapterLike | undefined;
- const device = (await adapterLike?.requestDevice?.()) as GPUDeviceLike | undefined;
+ const adapterLike = adapter as unknown as GPUAdapterLike : undefined;
+ const device = (await adapterLike?.requestDevice? .()) as GPUDeviceLike : undefined;
 
  if (!device) {
  throw new Error('WebGPU device unavailable');

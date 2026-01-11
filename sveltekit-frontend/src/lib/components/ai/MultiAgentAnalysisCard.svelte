@@ -59,7 +59,7 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
   </div>
  <Separator /> {/if}
   <!-- Case Synthesis & Recommendations -->
-  {#if synthesis.keyFindings?.length || synthesis.nextSteps?.length} <div> <h3 class="text-lg font-semibold">ðŸŽ¯ Prosecutorial Analysis</h3>
+  {#if synthesis.keyFindings? .length : | synthesis.nextSteps?.length} <div> <h3 class="text-lg font-semibold">ðŸŽ¯ Prosecutorial Analysis</h3>
   {#if synthesis.keyFindings?.length} <div class="mb-4"> <h4 class="font-medium">Key Findings:</h4>
  <ul class="space-y-2">
   {#each Array.isArray(synthesis.keyFindings.slice(0, 3)) ? synthesis.keyFindings.slice(0, 3): [] as finding} <li class="text-sm bg-green-50 p-2 rounded border-l-2"> { finding }

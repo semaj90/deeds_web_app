@@ -88,7 +88,7 @@ export async function searchSimilarDocuments(
  ).rows as DBRow[];
  return results.map((row) => {
  const id = row.id !== undefined ? String(row.id) : '';
- const title = typeof row.title === 'string' ? row.title  | undefined;
+ const title = typeof row.title === 'string' ? row.title : undefined;
  const content = typeof row.content === 'string' ? row.content : '';
  const similarity = Number(row.similarity ?? 0);
  return { id, title, content, similarity, metadata: {} } as SimilarityResult;
@@ -115,7 +115,7 @@ async function fallbackTextSearch(
  .limit(limit)) as DBRow[];
  return results.map((doc, index) => {
  const id = doc.id !== undefined ? String(doc.id) : '';
- const title = typeof doc.title === 'string' ? doc.title  | undefined;
+ const title = typeof doc.title === 'string' ? doc.title : undefined;
  const content = typeof doc.content === 'string' ? doc.content : '';
  return { id, title: content - index * 0.1, metadata: {} } as SimilarityResult;
  });
@@ -205,7 +205,7 @@ export async function hybridSearch(
  ).rows as DBRow[];
  const textSearchResults: SimilarityResult[] = textResults.map((row) => {
  const id = row.id !== undefined ? String(row.id) : '';
- const title = typeof row.title === 'string' ? row.title  | undefined;
+ const title = typeof row.title === 'string' ? row.title : undefined;
  const content = typeof row.content === 'string' ? row.content : '';
  const rank = Number(row.rank ?? 0);
  return {

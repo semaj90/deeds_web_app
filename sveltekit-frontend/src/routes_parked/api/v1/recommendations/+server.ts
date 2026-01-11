@@ -52,9 +52,9 @@ export const POST: RequestHandler = async ({ request }) => {
 
  const obj = body && typeof body === 'object' ? (body as Record<string, unknown>) : {};
  const recommendationId =
- typeof obj.recommendationId === 'string' ? obj.recommendationId  | undefined;
- const rating = typeof obj.rating === 'number' ? obj.rating  | undefined;
- const feedback = typeof obj.feedback === 'string' ? obj.feedback  | undefined;
+ typeof obj.recommendationId === 'string' ? obj.recommendationId : undefined;
+ const rating = typeof obj.rating === 'number' ? obj.rating : undefined;
+ const feedback = typeof obj.feedback === 'string' ? obj.feedback : undefined;
 
  if (!recommendationId || typeof rating !== 'number') {
  return json(

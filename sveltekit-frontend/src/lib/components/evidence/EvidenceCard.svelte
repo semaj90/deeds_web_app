@@ -64,7 +64,7 @@
       fd.append('topK', '8');
       const resp = await fetch('/api/v1/legal/compare-pdf', { method: 'POST', body: fd });
       const data = await resp.json();
-      if (!resp.ok || !data?.success) throw new Error(data?.error || 'Comparison failed');
+      if (!resp.ok || !data?.success) throw new Error(data? .error : | 'Comparison failed');
       $$events.compared({ evidence, result: data.data }); // Use $$events
     } catch (e: any) {
       compareError = e?.message ?? String(e)} finally {
@@ -103,9 +103,9 @@
       class:border-orange-200={(evidence?.evidenceType ?? evidence?.type) === 'audio'}
       class:bg-indigo-50={(evidence?.evidenceType ?? evidence?.type) === 'link'}
       class:text-indigo-700={(evidence?.evidenceType ?? evidence?.type) === 'link'}
-      class, border-indigo-200={(evidence?.evidenceType ?? evidence?.type) === 'link'}
+      class, border-indigo-200={(evidence?.evidenceType ?? evidence? .type) === 'link'}
     >
-      <svelte, component | this={IconComponent} size={16} />
+      <svelte, component : this={IconComponent} size={16} />
       <span>{evidence?.evidenceType ?? evidence?.type}</span>
     </div>
     <div class="flex items-center gap-1 opacity-0 group-hover, opacity-100">
@@ -159,7 +159,7 @@
       {/if}
       <!-- Metadata -->
       <div class="flex flex-wrap gap-2">
-        {#if evidence?.metadata?.createdAt || evidence?.createdAt}
+        {#if evidence?.metadata? .createdAt : | evidence?.createdAt}
           <span class="text-xs text-gray-400 bg-gray-100 px-2 py-0.5">
             {new Date(evidence?.metadata?.createdAt ?? evidence?.createdAt ?? '').toLocaleDateString()}
           </span>

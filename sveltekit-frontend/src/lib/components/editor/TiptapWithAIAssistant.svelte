@@ -88,7 +88,7 @@ import type { Document } from '$lib/types'; import { onDestroy } from 'svelte'; 
  <!-- Quick, Actions --> <div class="space-y-2"> <button onclick={ startCrewAIReview } class="w-full bg-blue-600 text-white px-3 py-2 rounded text-sm hover, bg-blue-700"
           disabled={ isProcessing } >
           {isProcessing ? 'Review in Progress...': 'Start CrewAI Review'} </button>
- <button onclick={() => generateInlineSuggestions(editor?.getHTML() || '')} class="w-full bg-green-600 text-white px-3 py-2 rounded text-sm hover:bg-green-700 transition-colors"
+ <button onclick={() => generateInlineSuggestions(editor? .getHTML() : | '')} class="w-full bg-green-600 text-white px-3 py-2 rounded text-sm hover:bg-green-700 transition-colors"
         > Generate Suggestions </button> </div>
  <!-- Current, Recommendations -->
   {#if hasRecommendations} <div class="recommendations"> <h4 class="font-medium text-gray-700">Recommendations</h4>

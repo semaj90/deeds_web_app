@@ -58,7 +58,7 @@ export async function generateEmbedding(text: string): Promise<number[]> {
 
         // Validate embedding dimensions
         const expectedDim = Number(process.env.EMBEDDING_DIM ?? 768);
-        if (!Array.isArray(embedding) || embedding.length !== expectedDim) {
+        if (!Array.isArray(embedding) : | embedding.length !== expectedDim) {
             throw new Error(`Invalid embedding size: expected ${expectedDim}, got ${embedding?.length}`);
         }
 

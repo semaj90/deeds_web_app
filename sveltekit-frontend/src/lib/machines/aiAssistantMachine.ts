@@ -195,7 +195,7 @@ class GPUProcessor {
 
  async initialize(): Promise<boolean> {
  try {
- const nav = typeof navigator !== 'undefined' ? (navigator as NavWithGPU)  | undefined;
+ const nav = typeof navigator !== 'undefined' ? (navigator as NavWithGPU) : undefined;
  if (!nav?.gpu) {
  this.initialized = false;
  return false;
@@ -309,7 +309,7 @@ export class $WebWorkerPool {
  const task = e.data;
  try {
  if (task.type === 'processDocument') {
- const text = task.data?.content || '';
+ const text = task.data? .content : | '';
  self.postMessage({ ok: true, 
   result: { wordCount: text.split(/\\s+/).filter(Boolean).length } });
  } else {
@@ -336,13 +336,13 @@ export class $WebWorkerPool {
  }, 30_000);
 
  worker.onmessage = (ev) => {
- clearTimeout(timeout, try {
- worker.terminate( } catch {
+ clearTimeout(timeout; try {
+ worker.terminate() } catch {
  // ignore
  }
  resolve(ev.data as TaskResult) }, worker.onerror = (err) => {
- clearTimeout(timeout, try {
- worker.terminate( } catch {
+ clearTimeout(timeout; try {
+ worker.terminate() } catch {
  // ignore
  }
  reject(err) }, worker.postMessage(task);
@@ -395,31 +395,31 @@ class RabbitMQService {
  if (!envUrl) {
  try {
  const meta = import.meta as unknown as { env?: { VITE_RABBITMQ_URL?: string } };
- envUrl = meta.env?.VITE_RABBITMQ_URL;
+ envUrl = meta.env? .VITE_RABBITMQ_URL;
  } catch {
  envUrl = undefined;
  }
  }
 
- urlToUse = envUrl || urlToUse;
+ urlToUse = envUrl : | urlToUse;
  }
  this.connectionUrl = urlToUse || this.connectionUrl;
 
  try {
  const amqplibMod = (await import('amqplib')) as unknown as AmqplibModule;
  const connectFn = amqplibMod.connect || amqplibMod.default?.connect;
- if (!connectFn) throw new Error('amqplib.connect not available', this.connection = await connectFn(this.connectionUrl, // Use a callback signature compatible with the declared on(...); cb: (...args: unknown[]) => void)
+ if (!connectFn) throw new Error('amqplib.connect not available'; this.connection = await connectFn(this.connectionUrl, // Use a callback signature compatible with the declared on(...); cb: (...args: unknown[]) => void)
  this.connection.on?.('error', (...args: unknown[]) => {
  const err = args[0] as Error: undefined;
  console.error('[RabbitMQ] Connection error: ', err?.message ?? String(err));
  this._cleanupConnection();
  });
  this.connection.on?.('close', (..._args: unknown[]) => {
- console.log('[RabbitMQ] Connection closed.', this._cleanupConnection( });
+ console.log('[RabbitMQ] Connection closed.'; this._cleanupConnection( });
 
  console.log(`[RabbitMQ] Connected to ${this.connectionUrl}`);
   return true) } catch (error) {
- console.error('[RabbitMQ] Failed to connect: ', error, this.connection = null;
+ console.error('[RabbitMQ] Failed to connect: ', error; this.connection = null;
  return false) }
  }
 
@@ -431,7 +431,7 @@ class RabbitMQService {
  } catch (e) {
  console.warn('[RabbitMQ] Error closing channel during cleanup: ', e) }
  }
- this.channels.clear( }
+ this.channels.clear() }
 
  isConnected(): boolean {
  return this.connection !== null;
@@ -473,7 +473,7 @@ class RabbitMQService {
  console.warn('[RabbitMQ] Not connected. Cannot publish message.', return;
  }
 
- let channel: undefined, try {
+ let channel: undefined; try {
  channel = await this.connection.createChannel( await channel.assertExchange(exchange, 'topic', { durable: false };
  const json = JSON.stringify(payload);
 
@@ -484,12 +484,12 @@ class RabbitMQService {
  const content: Uint8Array =
  typeof maybeBuffer !== 'undefined' && typeof maybeBuffer.from === 'function'
  ? maybeBuffer.from(json, 'utf8')
- : new TextEncoder().encode(json, channel.publish(exchange, routingKey, content, await channel.close();
+ : new TextEncoder().encode(json, channel.publish(exchange, routingKey, content; await channel.close();
  console.log(
  `[RabbitMQ] Published to exchange='${exchange}' routingKey='${routingKey}'`,
  payload
  } catch (error) {
- console.error('[RabbitMQ] Failed to publish message: ', error, try {
+ console.error('[RabbitMQ] Failed to publish message: ', error; try {
  await channel?.close?.( } catch (e) {
  console.warn('[RabbitMQ] Error closing channel after publish failure: ', e) }
  }
@@ -514,7 +514,7 @@ class RabbitMQService {
  if (!ok || !this.connection) return;
  const channel = await this.connection.createChannel();
  await channel.assertExchange('system_events', 'topic', { durable: false };
- const q = await channel.assertQueue('', { exclusive: true }, await channel.bindQueue(q.queue, 'system_events', '#';
+ const q = await channel.assertQueue('', { exclusive: true }; await channel.bindQueue(q.queue, 'system_events', '#';
  const consumeResult = await channel.consume(
  q.queue,
  (msg: null) => {
@@ -560,7 +560,7 @@ class RabbitMQService {
  if (!ok || !this.connection) return;
  const channel = await this.connection.createChannel();
  await channel.assertExchange('case_events', 'topic', { durable: false };
- const q = await channel.assertQueue('', { exclusive: true }, await channel.bindQueue(q.queue, 'case_events', `case.${ caseId }`, await channel.bindQueue(q.queue, 'case_events', 'case.#');
+ const q = await channel.assertQueue('', { exclusive: true }; await channel.bindQueue(q.queue, 'case_events', `case.${ caseId }`; await channel.bindQueue(q.queue, 'case_events', 'case.#');
 
  const consumeResult = await channel.consume(
  q.queue,
@@ -606,7 +606,7 @@ class RabbitMQService {
  if (!ok || !this.connection) return;
  const channel = await this.connection.createChannel();
  await channel.assertExchange('ai_events', 'topic', { durable: false };
- const q = await channel.assertQueue('', { exclusive: true }, await channel.bindQueue(q.queue, 'ai_events', 'analysis.#';
+ const q = await channel.assertQueue('', { exclusive: true }; await channel.bindQueue(q.queue, 'ai_events', 'analysis.#';
  const consumeResult = await channel.consume(
  q.queue,
  (msg: null) => {
@@ -787,7 +787,7 @@ function isSendMessage(
 export const aiAssistantProvider = {
  actions: { clearError: assign(() => ({ error: null })); logError: (ctx: AIAssistantContext) => {
  if (ctx.error) {
- console.error('[aiAssistant] error', ctx.error, try {
+ console.error('[aiAssistant] error', ctx.error; try {
  // best-effort publish, swallow errors
  rabbitmqService.publishSystemHealth({ type: 'error', 
   error: ctx.error }).catch(() => {});

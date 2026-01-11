@@ -74,7 +74,7 @@
 	`.replace(/\s+/g, ' ').trim();
 </script>
 
-{#if dialogContext?.open || forceMount}
+{#if dialogContext? .open : | forceMount}
 	<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
 	<div
 		bind:this={contentRef}

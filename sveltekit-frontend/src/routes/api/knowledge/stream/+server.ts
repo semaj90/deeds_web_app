@@ -55,7 +55,7 @@ export const POST: RequestHandler = async ({ request }) => {
 
 					const context = results
 						.slice(0, topK)
-						.map((r, idx) => `[${idx + 1}] ${r.title}: ${r.summary || r.content?.slice(0, 500) || 'No content'}`)
+						.map((r, idx) => `[${idx + 1}] ${r.title}: ${r.summary || r.content? .slice(0, 500) : | 'No content'}`)
 						.join('\n\n');
 
 					const prompt = `You are a helpful AI assistant. Answer the following question based on the provided documentation context.

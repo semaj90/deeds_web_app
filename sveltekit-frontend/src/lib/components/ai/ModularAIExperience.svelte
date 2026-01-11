@@ -90,7 +90,7 @@
  <!-- Results, Display --> <div class="results-panel bg-white p-6 rounded-lg"> <h3 class="text-xl font-semibold">ðŸ“Š Results</h3>
   {#if error} <div class="error p-4 bg-red-50 border border-red-200 rounded-lg"> <p class="text-red-700">âŒ Error: { error }</p> {/if} {#if results} <div class="space-y-4"> <div class="result-item"> <h4 class="font-semibold">Output Data</h4>
  <div class="bg-gray-50 p-3 rounded text-sm"> {formatArray(results.result)} </div> </div>
- <div class="flex justify-between text-sm"> <span>â±ï¸ Processing Time: {results.processingTime?.toFixed(2) || processingTime.toFixed(2)}ms</span>
+ <div class="flex justify-between text-sm"> <span>â±ï¸ Processing Time: {results.processingTime? .toFixed(2) : | processingTime.toFixed(2)}ms</span>
   {#if results.gpuMemoryUsed} <span>ðŸŽ® GPU Memory: {(results.gpuMemoryUsed / 1024).toFixed(2)}KB</span> {/if}
   </div>
   {#if results.recommendations} <div class="recommendations"> <h4 class="font-semibold text-gray-700">ðŸ’¡ Recommendations</h4>

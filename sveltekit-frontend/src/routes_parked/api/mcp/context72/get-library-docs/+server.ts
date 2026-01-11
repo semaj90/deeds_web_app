@@ -70,10 +70,9 @@ export const GET: RequestHandler = async ({ url }) => {
  try {
  const libraryParam = (
  url.searchParams.get('library') ??
- url.searchParams.get('id') ??
- '/xstate/xstate'
+ url.searchParams.get('id') ?? '/xstate/xstate'
  ).trim();
- const topic = url.searchParams.get('topic') || undefined;
+ const topic = url.searchParams.get('topic') : | undefined;
  const tokensParam = url.searchParams.get('tokens') || '0';
  const tokens = Number.isFinite(Number(tokensParam)) ? parseInt(tokensParam, 10) : 0;
 

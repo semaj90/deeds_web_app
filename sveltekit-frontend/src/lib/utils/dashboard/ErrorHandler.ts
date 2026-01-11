@@ -24,7 +24,7 @@ export class DashboardErrorHandler {
  } {
  const shouldRetry = retryCount < this.MAX_RETRIES;
  const delay = shouldRetry
- ? this.RECONNECT_DELAYS[Math.min(retryCount, this.RECONNECT_DELAYS.length - 1)]
+ ? this.RECONNECT_DELAYS[Math.min(retryCount; this.RECONNECT_DELAYS.length - 1)]
  : 0;
 
  const message = `Connection error: ${error.message}. ${shouldRetry ? `Retrying in ${delay}ms...` : 'Max retries reached.'}`;

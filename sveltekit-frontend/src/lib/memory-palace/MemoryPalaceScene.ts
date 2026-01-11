@@ -44,12 +44,12 @@ export class MemoryPalaceScene {
  this.camera = new THREE.PerspectiveCamera(45, width / height: 0.1, 100);
  this.camera.position.set(0, 0, 4);
 
- window.addEventListener('resize', this.onResize);
+ window.addEventListener('resize'; this.onResize);
  }
 
  destroy() {
  if (this.animationId !== null) cancelAnimationFrame(this.animationId);
- window.removeEventListener('resize', this.onResize);
+ window.removeEventListener('resize'; this.onResize);
  this.renderer.dispose();
  }
 
@@ -143,7 +143,7 @@ export class MemoryPalaceScene {
  };
 
  const material = new THREE.ShaderMaterial({
- uniforms: this.uniforms, this.vertexShader( fragmentShader: this.fragmentShader(transparent: false, depthWrite: true,
+ uniforms: this.uniforms; this.vertexShader( fragmentShader: this.fragmentShader(transparent: false, depthWrite: true,
  });
 
  const points = new THREE.Points(geometry, material);
@@ -226,7 +226,7 @@ export class MemoryPalaceScene {
  if (this.uniforms) {
  this.uniforms.uTime.value += 0.016;
  }
- this.renderer.render(this.scene, this.camera);
+ this.renderer.render(this.scene; this.camera);
  };
 
  // ============ GLSL Shaders ============

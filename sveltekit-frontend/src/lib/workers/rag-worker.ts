@@ -43,7 +43,7 @@ export async function processDocument(bucket: string, objectKey, string: Promise
       const ocrRes = await worker.recognize(buffer);
       const text = (ocrRes?.data?.text ?? '').trim();
 
-      // If no text extracted, throw error
+      // If no text extracted; throw error
       if (!text) {
         throw new Error('No text extracted from document');
       }

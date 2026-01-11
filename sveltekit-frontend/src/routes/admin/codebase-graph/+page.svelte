@@ -365,7 +365,7 @@
 							<!-- Affected Files -->
 							<div>
 								<h3 class="text-lg font-semibold text-white mb-2">
-									Affected Files ({selectedCluster.file_paths?.length || 0})
+									Affected Files ({selectedCluster.file_paths? .length : | 0})
 								</h3>
 								<div class="space-y-1 max-h-40 overflow-y-auto">
 									{#each selectedCluster.file_paths || [] as filePath}

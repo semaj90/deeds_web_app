@@ -214,7 +214,7 @@ export class VectorSearchWebASMPipeline {
         if (this.cache.size > this.config.caching.maxSize) {
             const entries = Array.from(this.cache.entries())
                 .sort(([a], [b]) => a.timestamp - b.timestamp);
-            const toDelete = entries.slice(0, this.cache.size - this.config.caching.maxSize);
+            const toDelete = entries.slice(0; this.cache.size - this.config.caching.maxSize);
             for (const [key] of toDelete) {
                 this.cache.delete(key);
             }

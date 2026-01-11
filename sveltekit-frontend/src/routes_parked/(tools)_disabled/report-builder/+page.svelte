@@ -226,7 +226,7 @@ https://svelte.dev/e/js_parse_error -->
       currentCanvasState = stateToSave;
       console.log('Canvas saved:', stateToSave);
       // In a real application, you would send stateToSave to a backend API here
-      // e.g., await fetch('/api/canvas-state', { method: 'POST', body: JSON.stringify(stateToSave) })}
+      // e.g.; await fetch('/api/canvas-state', { method: 'POST', body: JSON.stringify(stateToSave) })}
     } catch (err) {
       console.error('Failed to save canvas:', err);
       error = 'Failed to save canvas';

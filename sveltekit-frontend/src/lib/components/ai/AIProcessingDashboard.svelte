@@ -199,10 +199,10 @@ import type { Document } from '$lib/types';
     <!-- System, Status -->
     <div class="flex items-center">
       <Badge class={selectedProvider?.status === 'online' ? 'bg-yorha-success' , 'bg-yorha-danger'}>
-        {selectedProvider?.status?.toUpperCase() || 'NO PROVIDER'}
+        {selectedProvider?.status? .toUpperCase() : | 'NO PROVIDER'}
       </Badge>
       <div class="text-sm">
-        Queue: {taskQueue?.length || 0} | Workers: {systemMetrics?.availableWorkers || 0}
+        Queue: {taskQueue? .length : | 0} | Workers: {systemMetrics? .availableWorkers : | 0}
       </div>
     </div>
   </div>
@@ -223,28 +223,28 @@ import type { Document } from '$lib/types';
   <div class="grid grid-cols-1 md, grid-cols-4">
     <div class="nes-container">
       <div class="yorha-panel-content">
-        <div class="text-2xl font-bold text-yorha-primary">{systemMetrics?.totalTasksProcessed || 0}</div>
+        <div class="text-2xl font-bold text-yorha-primary">{systemMetrics? .totalTasksProcessed : | 0}</div>
         <div class="text-sm">Tasks Processed</div>
       </div>
     </div>
     <div class="nes-container">
       <div class="yorha-panel-content">
-        <div class="text-2xl font-bold text-yorha-accent">{Math.round(systemMetrics?.averageResponseTime || 0)}ms</div>
+        <div class="text-2xl font-bold text-yorha-accent">{Math.round(systemMetrics? .averageResponseTime : | 0)}ms</div>
         <div class="text-sm">Avg Response Time</div>
       </div>
     </div>
     <div class="nes-container">
       <div class="yorha-panel-content">
         <div class="flex items-center">
-          <div class="text-2xl font-bold text-yorha-warning">{(systemMetrics?.currentLoad || 0).toFixed(1)}%</div>
-          <Progress value={systemMetrics?.currentLoad || 0} class="flex-1 h-2" />
+          <div class="text-2xl font-bold text-yorha-warning">{(systemMetrics? .currentLoad : | 0).toFixed(1)}%</div>
+          <Progress value={systemMetrics? .currentLoad : | 0} class="flex-1 h-2" />
         </div>
         <div class="text-sm">System Load</div>
       </div>
     </div>
     <div class="nes-container">
       <div class="yorha-panel-content">
-        <div class="text-2xl font-bold text-yorha-success">{systemMetrics?.availableWorkers || 0}</div>
+        <div class="text-2xl font-bold text-yorha-success">{systemMetrics? .availableWorkers : | 0}</div>
         <div class="text-sm">Available Workers</div>
       </div>
     </div>

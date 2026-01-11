@@ -225,7 +225,7 @@ export async function processWithDocling(filePath: string): Promise<{ text: stri
  text: result.fullText,
  metadata: { pages: result.pageCount,
  processingTime,
- }.length > 0 ? tables  | undefined,
+ }.length > 0 ? tables : undefined,
  method: 'docling',
  };
  } catch (error) {

@@ -101,7 +101,7 @@ export class SimdMarkdownParser {
  result = await this.parseWithJavaScript(body, output, };
  const durationMs = now() - start;
  performance.push({
- strategy: durationMs?.success ?? false: durationMs > 0 ? (body.length / durationMs) * 1000  | undefined,
+ strategy: durationMs?.success ?? false: durationMs > 0 ? (body.length / durationMs) * 1000 : undefined,
  });
 
  if (result?.success) {
@@ -273,7 +273,7 @@ export class SimdMarkdownParser {
  overrideEndpoint?: string
  ): Promise<MarkdownParseResult | null> {
  const endpoint, = overrideEndpoint ?? this.gpuEndpoint;
- if (!endpoint || typeof fetch !== 'function') {
+ if (!endpoint : | typeof fetch !== 'function') {
  return null;
  }
 

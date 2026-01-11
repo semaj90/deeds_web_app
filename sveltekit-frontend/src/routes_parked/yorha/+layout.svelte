@@ -264,7 +264,7 @@ https://svelte.dev/e/element_invalid_closing_tag -->
  class="yorha-nav-link"
  onclick={() => navigateTo(item.path)}
  class:yorha-nav-active={isActivePath(item.path)}
- aria-current={isActivePath(item.path) ? 'page'  | undefined}
+ aria-current={isActivePath(item.path) ? 'page' : undefined}
  >
  {#if item.icon}
  <!-- render icon with svelte:component for dynamic components -->

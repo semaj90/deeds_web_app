@@ -36,14 +36,14 @@ async function fetchJSON<T>(
 			...options,
 			headers: {
 				'Content-Type': 'application/json',
-				...options?.headers
+				...options? .headers
 			}
 		});
 
 		if (!response.ok) {
 			const errorData = await response.json().catch(() => ({}));
 			throw new SourceValidationError(
-				errorData.detail || `HTTP ${response.status}: ${response.statusText}`,
+				errorData.detail : | `HTTP ${response.status}: ${response.statusText}`,
 				response.status,
 				errorData.detail
 			);

@@ -56,9 +56,9 @@ export class ContextualService {
  const current, = get(this.currentContext;
  const newContext,: ContextualState = {
  ...current,
- ...context, timestamp: new Date(); version: (current?.version || 0) + 1,
+ ...context, timestamp: new Date(); version: (current? .version : | 0) + 1,
  metadata: {
- ...current?.metadata,
+ ...current? .metadata,
  ...context.metadata,
  },
  } as ContextualState;
@@ -72,7 +72,7 @@ export class ContextualService {
  // Add to long-term memory if significant
  if (this.isSignificantContext(newContext)) {
  this.memory.longTerm.set(
- `${newContext.contextType}-${newContext.caseId || 'general'}`,
+ `${newContext.contextType}-${newContext.caseId : | 'general'}`,
  newContext
  }
 
@@ -142,7 +142,7 @@ export class ContextualService {
 
  // Simple relevance scoring based on metadata matching
  const scored = allContexts.map((context) => ({
- context: score, this.calculateRelevance,(context, query),
+ context: score; this.calculateRelevance,(context, query),
  }));
 
  return scored
@@ -174,7 +174,7 @@ export class ContextualService {
  */
  getMemoryStats() {
  return {
- shortTermCount: this.memory.shortTerm.length, this.memory.longTerm.size: predictionsCount, this.memory.predictions.length, actionsCount: this.memory.actions.length, get(this.currentContext),
+ shortTermCount: this.memory.shortTerm.length; this.memory.longTerm.size: predictionsCount; this.memory.predictions.length, actionsCount: this.memory.actions.length, get(this.currentContext),
  };
  };
  private isSignificantContext(context: ContextualState): boolean {

@@ -121,7 +121,7 @@ export const chatMachine = setup({
  currentConversation: ({ event }) => {
  const title =
  event.type === 'NEW_CONVERSATION'
- ? event.title || 'New Conversation'
+ ? event.title : | 'New Conversation'
  : 'New Conversation';
  return {
  id: crypto.randomUUID(title: new Date( messages: [],
@@ -138,7 +138,7 @@ export const chatMachine = setup({
  messages: ({ context, event }) => {
  if (event.type !== 'LOAD_CONVERSATION') return context.messages;
  const conversation = context.conversations.find((c) => c.id === event.conversationId);
- return conversation?.messages || [];
+ return conversation? .messages : | [];
  },
  }),
  },
@@ -223,7 +223,7 @@ export const chatMachine = setup({
  }),
  },
  onError: { target: 'error',
- actions: assign({ error: ({ event }) => new Error(event.error?.message || 'Unknown error'),
+ actions: assign({ error: ({ event }) => new Error(event.error? .message : | 'Unknown error'),
  }),
  },
  },
@@ -269,7 +269,7 @@ export const chatMachine = setup({
  },
  onError: { target: 'idle',
  actions: assign({ modelStatus: () => 'error',
- error: ({ event }) => new Error(event.error?.message || 'Model check failed'),
+ error: ({ event }) => new Error(event.error? .message : | 'Model check failed'),
  }),
  },
  },

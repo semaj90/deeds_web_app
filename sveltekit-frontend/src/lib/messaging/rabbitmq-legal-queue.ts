@@ -304,7 +304,7 @@ export class RabbitMQLegalQueue {
                 case 'process':
                     // Store document in NES memory
                     const allocated = await nesMemory.allocateDocument(document, message.payload, {
-                        preferredBank: message.metadata.bankPreference ? parseInt(message.metadata.bankPreference)  | undefined,
+                        preferredBank: message.metadata.bankPreference ? parseInt(message.metadata.bankPreference) : undefined,
                         compress: true
                     });
                     if (allocated) {
@@ -631,7 +631,7 @@ export class RabbitMQLegalQueue {
             return;
         }
 
-        const delay = Math.min(1000 * Math.pow(2, this.reconnectAttempts), 30000);
+        const delay = Math.min(1000 * Math.pow(2; this.reconnectAttempts), 30000);
         this.reconnectAttempts++;
         console.log(`🔄 Scheduling reconnection attempt ${this.reconnectAttempts} in ${delay}ms`);
 

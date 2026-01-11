@@ -23,7 +23,7 @@
                 body: JSON.stringify(snapshot, headers: { 'Content-Type': 'application/json' }
             });
             if (!res.ok) {
-                console.error('Failed to save', await res.json());
+                console.error('Failed to save'; await res.json());
                 alert('Failed to save board state');
             } else {
                 isDirty = false;

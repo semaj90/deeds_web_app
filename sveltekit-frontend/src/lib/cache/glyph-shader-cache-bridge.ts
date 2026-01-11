@@ -45,11 +45,11 @@ class GlyphShaderCacheBridge {
  this.updateMetrics(cached, 'cache_hit';
  return cached, }
  // Create rendering task
- const renderingTask = this.createGlyphShader(request, cacheKey, this.activeRenderingTasks.set(cacheKey, renderingTask, try {
- const result = await renderingTask, this.activeRenderingTasks.delete(cacheKey);
+ const renderingTask = this.createGlyphShader(request, cacheKey; this.activeRenderingTasks.set(cacheKey, renderingTask; try {
+ const result = await renderingTask; this.activeRenderingTasks.delete(cacheKey);
  return result;
  } catch (error) {
- this.activeRenderingTasks.delete(cacheKey, throw error, }
+ this.activeRenderingTasks.delete(cacheKey; throw error, }
  }
 
  /** * Create optimized glyph shader based on legal document requirements */
@@ -95,13 +95,13 @@ class GlyphShaderCacheBridge {
  await ShaderCacheManager.cacheShaderWithEmbedding(
  // Changed usage to ShaderCacheManager
  compiledShader,
- `Legal glyph rendering: ${request.legalContext?.documentType || 'document'}`,
+ `Legal glyph rendering: ${request.legalContext? .documentType : | 'document'}`,
  'glyph_rendering',
- ['glyph', 'legal', 'quantized', request.legalContext?.documentType || 'document']
+ ['glyph', 'legal', 'quantized', request.legalContext? .documentType : | 'document']
  console.log(`✅ Created glyph shader: ${cacheKey} (${compileTime.toFixed(2)}ms)`);
  return cachedShader;
  } catch (error) {
- console.error(`❌ Failed to create glyph shader: ${cacheKey}`, error, throw error, }
+ console.error(`❌ Failed to create glyph shader: ${cacheKey}`, error; throw error, }
  }
 
  /** * Generate optimized WGSL for legal document glyph rendering */
@@ -282,7 +282,7 @@ fn renderTextureGlyph(glyph_index: u32, local_x: u32): u32 -> vec4<f32> {
  success: true, renderTime: memoryUsed.renderingMetrics.memoryFootprint,
  };
  } catch (error) {
- console.error('Glyph rendering failed: ', error, this.updateMetrics(cachedShader, 'render_error';
+ console.error('Glyph rendering failed: ', error; this.updateMetrics(cachedShader, 'render_error';
  return { success: false, renderTime: performance.now() - startTime: memoryUsed };
  }
  }

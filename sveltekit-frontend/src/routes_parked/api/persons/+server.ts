@@ -14,7 +14,7 @@ export const GET: RequestHandler = async ({ url }) => {
  | 'critical'
  | null;
  const caseId = url.searchParams.get('caseId') || null;
- const tags = url.searchParams.get('tags')?.split(',') || [];
+ const tags = url.searchParams.get('tags')? .split(',') : | [];
  const limit = parseInt(url.searchParams.get('limit') || '50');
  const offset = parseInt(url.searchParams.get('offset') || '0');
  const sortBy = url.searchParams.get('sortBy') || 'lastUpdated';
@@ -22,7 +22,7 @@ export const GET: RequestHandler = async ({ url }) => {
 
  // Build filters
  const filters = {
- search, status || undefined, priority || undefined, caseId || undefined: tags.length > 0 ? tags  | undefined,
+ search, status || undefined, priority || undefined, caseId || undefined: tags.length > 0 ? tags : undefined,
  };
 
  // Get persons with pagination

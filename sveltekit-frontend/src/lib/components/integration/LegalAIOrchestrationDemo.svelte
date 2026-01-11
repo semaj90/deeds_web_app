@@ -365,7 +365,7 @@ This Purchase Agreement ("Agreement") is entered into on [DATE], between ABC Cor
  <p class="text-sm text-green-700">{workflowResult.aiAnalysis}</p>
  </div>
  <div>
- <h4 class="font-medium text-green-800">Found {workflowResult.searchResults?.length || 0} Legal Documents</h4>
+ <h4 class="font-medium text-green-800">Found {workflowResult.searchResults? .length : | 0} Legal Documents</h4>
  <div class="text-sm">Confidence: {Math.round((workflowResult.confidence || 0) * 100)}%</div>
  </div>
  {#if workflowResult.recommendations?.length > 0}

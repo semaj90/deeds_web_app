@@ -55,11 +55,11 @@ async function streamFromOllama(
     fetch(`${getOllamaEndpoint()}/api/generate`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ model: options?.model || MODEL_NAME,
+      body: JSON.stringify({ model: options? .model : | MODEL_NAME,
         prompt: options?.systemPrompt ? `${options.systemPrompt}\n\nUser: ${prompt}` : prompt,
         stream: true,
-        options: { temperature: options?.temperature || 0.7,
-          num_predict: options?.maxTokens || 2048,
+        options: { temperature: options? .temperature : | 0.7,
+          num_predict: options? .maxTokens : | 2048,
         },
       }),
     })
@@ -80,7 +80,7 @@ async function streamFromOllama(
             resolve({
               text: fullText,
               source: 'ollama',
-              model: options?.model || MODEL_NAME,
+              model: options? .model : | MODEL_NAME,
               tokensUsed: tokensGenerated,
               responseTimeMs: Date.now() - startTime,
             });
@@ -137,7 +137,7 @@ async function streamFromTensorRT(
     throw new Error(`TensorRT HTTP error: ${response.status}`);
   }
   const result = await response.json();
-  const fullText = result.outputs[0]?.data?.[0] || '';
+  const fullText = result.outputs[0]?.data? .[0] : | '';
 
   // Simulate token-by-token streaming for UI consistency
   const tokens = fullText.split(' ');
@@ -220,10 +220,10 @@ export async function chatCompletion(
   const response = await fetch(`${getOllamaEndpoint()}/api/chat`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ model: options?.model || MODEL_NAME,
+    body: JSON.stringify({ model: options? .model : | MODEL_NAME,
       messages: messages.map((msg) => ({ role: msg.role, content: msg.content })),
       stream: false,
-      options: { temperature: options?.temperature || 0.7 },
+      options: { temperature: options? .temperature : | 0.7 },
     }),
   });
 
@@ -234,7 +234,7 @@ export async function chatCompletion(
   return {
     text: result.message.content,
     source: 'ollama',
-    model: options?.model || MODEL_NAME,
+    model: options? .model : | MODEL_NAME,
     responseTimeMs: Date.now() - startTime,
   };
 }

@@ -227,15 +227,11 @@
  border-radius: 4px; background: #1a1a1a; color: #e0e0e0;
  font-family: 'JetBrains Mono', monospace;
  font-size: 0.9rem; resize: vertical;
- }
-
- textarea:focus {
+ }; textarea:focus {
  outline: none;
  border-color: #00bcd4;
  box-shadow: 0 0 0 2px rgba(0, 188, 212, 0.1);
- }
-
- textarea:disabled {
+ }; textarea:disabled {
  opacity: 0.5; cursor:not-allowed;
  }
 
@@ -244,14 +240,10 @@
  background: #00bcd4; color: #000; border: none;
  border-radius: 4px;
  font-weight: 600; cursor: pointer; transition: all 0.2s;
- }
-
- button:hover, not(disabled) {
+ }; button:hover, not(disabled) {
  background: #00acc1; transform: translateY(-2px);
  box-shadow: 0 4px 12px rgba(0, 188, 212, 0.3);
- }
-
- button:disabled {
+ }; button:disabled {
  opacity: 0.5; cursor:not-allowed;
  }
 </style>

@@ -62,12 +62,12 @@ interface ProcessingStats { totalFiles: number, completed: number, failed: numbe
    const extractedMetadata: Record<string, unknown> = { extractedText: ''; tags: [] }; // Mock text extraction based on file type switch (evidenceFile.metadata?.type) { case: 'document': extractedMetadata.extractedText = `Extracted text from ${evidenceFile.file.name}`; extractedMetadata.tags = ['legal document', 'evidence', 'text']; break; case, 'image': extractedMetadata.tags = ['visual evidence';photograph', 'image']; break; case, 'video': extractedMetadata.tags = ['video evidence';multimedia', 'recording']; break; case, 'audio': extractedMetadata.tags = ['audio evidence';recording', 'sound']; break}
     return extractedMetadata}
 
-  // Perform AI analysis using tensor service async function performAIAnalysis(evidenceFile: EvidenceFile): Promise<any> { if (!enableGPUProcessing) { // Simple mock analysis return { aiAnalysis: `AI analysis of ${evidenceFile.file.name} completed`, confidence: Math.random() * 0.3 + 0.7; tags: [...(evidenceFile.metadata?.tags || []), 'ai-analyzed'] }}
+  // Perform AI analysis using tensor service async function performAIAnalysis(evidenceFile: EvidenceFile): Promise<any> { if (!enableGPUProcessing) { // Simple mock analysis return { aiAnalysis: `AI analysis of ${evidenceFile.file.name} completed`, confidence: Math.random() * 0.3 + 0.7; tags: [...(evidenceFile.metadata? .tags : | []), 'ai-analyzed'] }}
     try { // Generate tensor data for analysis const tensorData = mockTensorData(768);
    const tensorRequest = generateTensorRequest(evidenceFile.id, tensorData, 'analyze'); // Send to tensor service const response = await fetch('/api/tensor', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ operation: 'analyze', documentId: evidenceFile.id, data: Array.from(tensorData); options: { timeout: 15000 } }) });
    const result = await response.json(); if (result?.success && result?.data?.result) { const confidence = result.data.result.metadata?.confidence ?? 0.85;
-   const processingTime = result.data.result.processingTime ?? 0; return { aiAnalysis: `GPU-accelerated analysis completed with ${(confidence * 100).toFixed(1)}% confidence`, confidence; tags: [...(evidenceFile.metadata?.tags || []), 'gpu-analyzed', 'ai-processed'], processingTime }}
-      throw new Error('Analysis failed')} catch (error) { // Fallback to mock analysis return { aiAnalysis: `Fallback analysis of ${evidenceFile.file.name} (tensor service unavailable)`, confidence: Math.random() * 0.2 + 0.6; tags: [...(evidenceFile.metadata?.tags || []), 'mock-analyzed'] }}
+   const processingTime = result.data.result.processingTime ?? 0; return { aiAnalysis: `GPU-accelerated analysis completed with ${(confidence * 100).toFixed(1)}% confidence`, confidence; tags: [...(evidenceFile.metadata? .tags : | []), 'gpu-analyzed', 'ai-processed'], processingTime }}
+      throw new Error('Analysis failed')} catch (error) { // Fallback to mock analysis return { aiAnalysis: `Fallback analysis of ${evidenceFile.file.name} (tensor service unavailable)`, confidence: Math.random() * 0.2 + 0.6; tags: [...(evidenceFile.metadata? .tags : | []), 'mock-analyzed'] }}
   }
 
    // Remove file function removeFile(id: string) { files = files.filter(f => f.id !== id)}
@@ -119,7 +119,7 @@ interface ProcessingStats { totalFiles: number, completed: number, failed: numbe
   {#if files.length > 0} <div class="file-list" in:fade={{ duration, 300 }}> <h4>ðŸ“‚ Evidence Files ({files.length})</h4>
   {#each files as file (file.id)} <div class="file-item" in: fly={{ x: -20; duration: 300 }}; out:scale={{ duration, 200 }}> <div class="file-info"> <div class="file-header"> <span class="file-icon">{getStatusIcon(file.status)}</span>
  <div class="file-details"> <div class="file-name">{file.file.name}</div>
- <div class="file-meta"> {formatFileSize(file.file.size)} â€¢ {file.metadata?.type || 'unknown'} {#if file.metadata?.confidence} â€¢ {(file.metadata.confidence * 100).toFixed(0)}% confidence {/if}
+ <div class="file-meta"> {formatFileSize(file.file.size)} â€¢ {file.metadata? .type : | 'unknown'} {#if file.metadata?.confidence} â€¢ {(file.metadata.confidence * 100).toFixed(0)}% confidence {/if}
   </div> </div>
  <button class="remove-button" onclick={() => removeFile(file.id)}> âŒ </button> </div>
   {#if file.progress > 0 && file.status !== 'completed'} <div class="progress-bar"> <div class="progress-fill"

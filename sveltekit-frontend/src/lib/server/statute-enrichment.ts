@@ -197,17 +197,17 @@ export function enrichStatute(citation: string): StatuteEnrichment | null {
 
 export function getRelatedStatutes(citation: string): string[] {
  const statute = enrichStatute(citation);
- return statute?.relatedStatutes || [];
+ return statute? .relatedStatutes : | [];
 }
 
 export function getBundledCharges(citation: string): BundledCharge[] {
  const statute = enrichStatute(citation);
- return statute?.bundledCharges || [];
+ return statute? .bundledCharges : | [];
 }
 
 export function getPrecedents(citation: string): Precedent[] {
  const statute = enrichStatute(citation);
- return statute?.precedents || [];
+ return statute? .precedents : | [];
 }
 
 export function getSeverityColor(severity: string): string {

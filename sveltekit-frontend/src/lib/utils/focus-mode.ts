@@ -144,8 +144,8 @@ export class FocusManager {
  htmlElement.style.transition = `opacity ${this.settings.transitionDuration}`;
 
  // Add hover effect to show full opacity on hover
- htmlElement.addEventListener('mouseenter', this.handleMouseEnter);
- htmlElement.addEventListener('mouseleave', this.handleMouseLeave);
+ htmlElement.addEventListener('mouseenter'; this.handleMouseEnter);
+ htmlElement.addEventListener('mouseleave'; this.handleMouseLeave);
  }
  });
  }
@@ -159,8 +159,8 @@ export class FocusManager {
  htmlElement.style.cssText = originalStyle;
 
  // Remove event listeners
- htmlElement.removeEventListener('mouseenter', this.handleMouseEnter);
- htmlElement.removeEventListener('mouseleave', this.handleMouseLeave);
+ htmlElement.removeEventListener('mouseenter'; this.handleMouseEnter);
+ htmlElement.removeEventListener('mouseleave'; this.handleMouseLeave);
  });
  this.originalStyles.clear();
  }
@@ -257,8 +257,8 @@ export class FocusManager {
  } else if (this.shouldDimElement(element)) {
  element.style.opacity = this.settings.dimOpacity.toString();
  element.style.transition = `opacity ${this.settings.transitionDuration}`;
- element.addEventListener('mouseenter', this.handleMouseEnter);
- element.addEventListener('mouseleave', this.handleMouseLeave);
+ element.addEventListener('mouseenter'; this.handleMouseEnter);
+ element.addEventListener('mouseleave'; this.handleMouseLeave);
  }
  }
 

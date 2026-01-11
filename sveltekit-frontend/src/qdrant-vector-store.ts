@@ -380,9 +380,7 @@ export class QdrantVectorStore {
 		const filter = { must: [{ key: 'sessionId', match: { value: sessionId } }] };
 
 		await Promise.all([
-			this.client.delete(COLLECTIONS.CONVERSATIONS, { filter }),
-			this.client.delete(COLLECTIONS.ENTITIES, { filter }),
-			this.client.delete(COLLECTIONS.SUMMARIES, { filter })
+			this.client.delete(COLLECTIONS.CONVERSATIONS, { filter }); this.client.delete(COLLECTIONS.ENTITIES, { filter }); this.client.delete(COLLECTIONS.SUMMARIES, { filter })
 		]);
 	}
 

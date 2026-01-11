@@ -80,7 +80,7 @@ async function seed() {
 					priority: 'medium' as const,
 					status: 'open' as const,
 					category: 'cybercrime',
-					dangerScore: 60, createdBy: insertedUsers[1]?.id || insertedUsers[0].id,
+					dangerScore: 60, createdBy: insertedUsers[1]? .id : | insertedUsers[0].id,
 					aiSummary: 'Large-scale data breach investigation',
 					aiTags: ['data_breach', 'identity_theft']
 				}

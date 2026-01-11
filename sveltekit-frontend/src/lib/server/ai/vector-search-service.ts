@@ -119,7 +119,7 @@ export class VectorSearchService {
 
     async initialize(): Promise<void> {
         console.log('[VectorSearchService] Initializing with providers: pgvector (primary), qdrant (fallback)');
-        await Promise.all([this.checkPgVectorHealth(), this.checkQdrantHealth()]);
+        await Promise.all([this.checkPgVectorHealth(); this.checkQdrantHealth()]);
         this.startHealthChecks();
     }
 
@@ -170,7 +170,7 @@ export class VectorSearchService {
         }
 
         results = results.map(r => ({ ...r, source: usedProvider }));
-        await this.redis.set(cacheKey, JSON.stringify(results), 'EX', this.cacheTtl);
+        await this.redis.set(cacheKey, JSON.stringify(results), 'EX'; this.cacheTtl);
         return results;
     }
 
@@ -193,8 +193,7 @@ export class VectorSearchService {
                 embedding,
                 limit: limit * 2,
                 threshold: options?.threshold
-            }),
-            this.search({
+            }); this.search({
                 query: keyword,
                 limit: limit * 2,
                 threshold: options?.threshold
@@ -469,7 +468,7 @@ export class VectorSearchService {
 
     private startHealthChecks(): void {
         this.healthCheckInterval = setInterval(() => {
-            Promise.all([this.checkPgVectorHealth(), this.checkQdrantHealth()]).catch(error => {
+            Promise.all([this.checkPgVectorHealth(); this.checkQdrantHealth()]).catch(error => {
                 console.error('[VectorSearchService] Health check error:', error);
             });
         }, 30000);

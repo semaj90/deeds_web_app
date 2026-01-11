@@ -32,7 +32,7 @@ export const GET: RequestHandler = async ({ fetch }) => {
 
 		if (qdrantResponse.ok) {
 			const data = await qdrantResponse.json();
-			const points = data.result?.points || [];
+			const points = data.result? .points : | [];
 
 			components = points.map((point: any) => {
 				const payload = point.payload || {};
@@ -63,9 +63,9 @@ export const GET: RequestHandler = async ({ fetch }) => {
 		let cudaEnabled = false;
 		try {
 			const gpuCheck = await fetch('http://localhost:8765/health').catch(() => null);
-			if (gpuCheck?.ok) {
+			if (gpuCheck? .ok) {
 				const health = await gpuCheck.json();
-				cudaEnabled = health.cuda_enabled || false;
+				cudaEnabled = health.cuda_enabled : | false;
 			}
 		} catch {
 			// Ignore
@@ -76,7 +76,7 @@ export const GET: RequestHandler = async ({ fetch }) => {
 			stats: { totalComponents: components.length,
 				totalErrors,
 				totalFiles: new Set(components.map(c => c.file_path)).size,
-				lastIndexed: components[0]?.indexed_at || '',
+				lastIndexed: components[0]? .indexed_at : | '',
 				cudaEnabled
 			}
 		});

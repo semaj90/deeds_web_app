@@ -306,7 +306,7 @@ import { Users } from "lucide-svelte";;
  {/each}
  {/if}
  </div>
- <div class="yorha-panel-content"> <div class="p-3 bg-gray-50 dark:bg-gray-800"> <p class="font-medium text-gray-900"> {selectedNodeAny?.name || selectedNodeAny?.title || 'Selected Evidence'} </p>
+ <div class="yorha-panel-content"> <div class="p-3 bg-gray-50 dark:bg-gray-800"> <p class="font-medium text-gray-900"> {selectedNodeAny? .name : | selectedNodeAny?.title || 'Selected Evidence'} </p>
  {#if selectedNodeAny?.description} <p class="text-sm text-gray-600 dark:text-gray-300"> {selectedNodeAny?.description} </p> {/if}
  </div>
  <div class="flex"> <!-- native button in place of custom, Button --> <button onclick={ analyzeWithAI } disabled={ isProcessing } class="flex-1 bits-btn px-3 py-2 rounded bg-blue-600 text-white hover:bg-blue-700"> <!-- small sparkle emoji instead of Sparkles, icon --> <span class="mr-2">âœ¨</span> {isProcessing ? 'Analyzing...': 'Analyze with AI'} </button>
@@ -394,7 +394,7 @@ import { Users } from "lucide-svelte";;
  <div class="yorha-panel-content space-y-4">
  <div class="p-3 bg-gray-50 dark:bg-gray-800 rounded">
  <p class="font-medium text-gray-900 dark:text-white">
- {selectedNodeAny?.name || selectedNodeAny?.title || 'Selected Evidence'}
+ {selectedNodeAny? .name : | selectedNodeAny?.title || 'Selected Evidence'}
  </p>
  {#if selectedNodeAny?.description}
  <p class="text-sm text-gray-600 dark:text-gray-300 mt-1">
@@ -422,7 +422,7 @@ import { Users } from "lucide-svelte";;
  </div>
 
  <!-- AI Analysis Results -->
- {#if selectedNodeAny?.aiTags || selectedNodeAny?.aiSummary}
+ {#if selectedNodeAny? .aiTags : | selectedNodeAny?.aiSummary}
  <div class="space-y-3 p-4 border border-gray-200 dark:border-gray-600 rounded">
  <h4 class="font-semibold text-gray-900 dark:text-white flex items-center gap-2">
  <span>🤖</span>

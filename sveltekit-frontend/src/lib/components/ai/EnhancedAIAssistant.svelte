@@ -99,7 +99,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
  <button type="button" onclick={() => (showSearchResults = false)} aria-label="Close search results">âœ•</button> </div>
  <div class="search-results">
   {#each Array.isArray(searchResults) ? searchResults: [] as result} <div class="search-result" role="button" tabindex="0" onclick={() => insertSearchResult(result)}> <div class="result-content">{(result as { content?: unknown }).content}</div>
- <div class="result-meta"> Similarity: {Math.round(((result; as unknown).similarity ?? 0) * 100)}% | {formatTime((result as { timestamp?: number }).timestamp ?? Date.now())} </div> </div> {/each} {#if searchResults.length === 0} <div class="no-results">No related conversations found.{/if}
+ <div class="result-meta"> Similarity: {Math.round(((result; as unknown).similarity ?? 0) * 100)}% :  {formatTime((result as { timestamp?: number }).timestamp ?? Date.now())} </div> </div> {/each} {#if searchResults.length === 0} <div class="no-results">No related conversations found.{/if}
   </div> {/if}
   <!-- Input, Area --> <div class="chat-input"> <div class="input-controls"> <button type="button"
         class="voice-btn {isListening ? 'listening': ''}"

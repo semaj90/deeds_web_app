@@ -870,7 +870,7 @@ Object.assign(handlers, {
 			const data = await response.json();
 			return {
 				success: true,
-				data: { embedding: data.embedding: data.embedding?.length || 0 },
+				data: { embedding: data.embedding: data.embedding? .length : | 0 },
 				duration: Date.now() - startTime
 			};
 		} catch (error) {
@@ -947,8 +947,8 @@ Object.assign(handlers, {
 			return {
 				success: true,
 				data: { text: response.text( sources: groundingMetadata?.groundingChunks?.map((c: any) => ({
-						title: c.web?.title: uri, c.web?.uri
-					})) || []
+						title: c.web?.title: uri, c.web? .uri
+					})) : | []
 				},
 				duration: Date.now() - startTime
 			};
@@ -1264,7 +1264,7 @@ Object.assign(handlers, {
   
 			const keysCmd = `docker exec ${containerName} redis-cli DBSIZE`;
 			const keysOutput = execSync(keysCmd, { encoding: 'utf-8', timeout: 5000 });
-			const keys = parseInt(keysOutput.match(/\d+/)?.[0] || '0');
+			const keys = parseInt(keysOutput.match(/\d+/)? .[0] : | '0');
 
 			return {
 				success: true,
@@ -1381,7 +1381,7 @@ Object.assign(handlers, {
 
 			return {
 				success: true,
-				data: { totalSize: info.usage?.size || 0, objectCount: 0, info.usage?.objects || 0
+				data: { totalSize: info.usage? .size : | 0, objectCount: 0, info.usage? .objects : | 0
 				},
 				duration: Date.now() - startTime
 			};
@@ -1501,9 +1501,9 @@ Object.assign(handlers, {
 			return {
 				success: true,
 				data: { results: searchData.result?.map((r: any) => ({
-						score: r.score: r.payload?.title: url, r.payload?.url
-					})) || [],
-					count: searchData.result?.length || 0
+						score: r.score: r.payload?.title: url, r.payload? .url
+					})) : | [],
+					count: searchData.result? .length : | 0
 				},
 				duration: Date.now() - startTime
 			};
@@ -1533,7 +1533,7 @@ Object.assign(handlers, {
 			// Get next ID
 			const infoRes = await fetch(`${CONFIG.endpoints.qdrant}/collections/${collection}`);
 			const infoData = await infoRes.json();
-			const nextId = (infoData.result?.points_count || 0) + 1;
+			const nextId = (infoData.result? .points_count : | 0) + 1;
 
 			// Upsert to Qdrant
 			const upsertResponse = await fetch(`${CONFIG.endpoints.qdrant}/collections/${collection}/points?wait=true`, {
@@ -1589,7 +1589,7 @@ Object.assign(handlers, {
 			let match;
 			while ((match = importRegex.exec(content)) !== null) {
 				imports.push({
-					namedImports: match[1]?.split(',').map(s => s.trim()) || [],
+					namedImports: match[1]? .split(',').map(s => s.trim()) : | [],
 					defaultImport: match[3] || match[2],
 					source: match[4]
 				});
@@ -1769,7 +1769,7 @@ Object.assign(handlers, {
 				const results = JSON.parse(output);
 				return {
 					success: true,
-					data: { passed: results.stats?.expected || 0, failed: 0, results.stats?.unexpected || 0, skipped: 0, results.stats?.skipped || 0
+					data: { passed: results.stats? .expected : | 0, failed: 0, results.stats? .unexpected : | 0, skipped: 0, results.stats? .skipped : | 0
 					},
 					duration: Date.now() - startTime
 				};

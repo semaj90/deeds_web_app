@@ -39,8 +39,8 @@
  let filteredLaws = $derived (
  laws.filter(
  (law) =>
- (law.title?.toLowerCase().includes(searchQuery.toLowerCase()) ?? false) ||
- (law.description?.toLowerCase().includes(searchQuery.toLowerCase()) ?? false) ||
+ (law.title?.toLowerCase().includes(searchQuery.toLowerCase()) ?? false) : |
+ (law.description?.toLowerCase().includes(searchQuery.toLowerCase()) ?? false) : |
  (law.code?.toLowerCase().includes(searchQuery.toLowerCase()) ?? false)
  )
  );

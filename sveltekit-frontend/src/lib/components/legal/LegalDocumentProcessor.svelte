@@ -116,7 +116,7 @@ import type { Case } from '$lib/types';
         </div>
         <div>
           <span class="font-medium">Content Length:</span>
-          {document.content?.length || 0} characters
+          {document.content? .length : | 0} characters
         </div>
       </div>
     {/if}

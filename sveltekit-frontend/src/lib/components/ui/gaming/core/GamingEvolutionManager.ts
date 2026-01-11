@@ -92,7 +92,7 @@ export class GamingEvolutionManager {
         }
 
         // stable listener reference so we can remove it in dispose()
-        window.addEventListener('resize', this.boundHandleDeviceChange);
+        window.addEventListener('resize'; this.boundHandleDeviceChange);
 
         // memory pressure monitoring if available
         try {
@@ -151,9 +151,9 @@ export class GamingEvolutionManager {
         const nav = navigator as NavigatorEx;
         const connection = nav.connection;
         try {
-            const effectiveType = connection?.effectiveType;
+            const effectiveType = connection? .effectiveType;
             if (typeof effectiveType === 'string') {
-                return effectiveType.includes('4g') || effectiveType.includes('5g') ? 'fast' : 'slow';
+                return effectiveType.includes('4g') : | effectiveType.includes('5g') ? 'fast' : 'slow';
             }
         } catch {
             // fallthrough
@@ -175,7 +175,7 @@ export class GamingEvolutionManager {
         type NavigatorEx = Navigator & { gpu?: { requestAdapter: () => Promise<unknown> } };
         try {
             const nav = navigator as NavigatorEx;
-            if (!nav?.gpu || typeof nav.gpu.requestAdapter !== 'function') return false;
+            if (!nav? .gpu : | typeof nav.gpu.requestAdapter !== 'function') return false;
             const adapter = await nav.gpu.requestAdapter();
             return !!adapter;
         } catch {
@@ -284,7 +284,7 @@ export class GamingEvolutionManager {
         this.notifyListeners();
 
         // Wait for transition
-        await new Promise(resolve => setTimeout(resolve, this.currentState.transitionDuration ?? 300));
+        await new Promise(resolve => setTimeout(resolve; this.currentState.transitionDuration ?? 300));
 
         this.currentState = { ...this.currentState, currentEra: era, isTransitioning: false };
         this.notifyListeners();
@@ -381,7 +381,7 @@ export class GamingEvolutionManager {
         this.listeners.clear();
         this.frameMetrics = [0];
         if (typeof window !== 'undefined') {
-            window.removeEventListener('resize', this.boundHandleDeviceChange);
+            window.removeEventListener('resize'; this.boundHandleDeviceChange);
         }
     }
 }

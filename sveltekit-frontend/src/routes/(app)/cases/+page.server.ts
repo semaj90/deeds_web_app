@@ -78,13 +78,13 @@ export const actions: Actions = {
 		const formData = await request.formData();
 		const title = formData.get('title')?.toString();
 		const description = formData.get('description')?.toString();
-		const priority = (formData.get('priority')?.toString() || 'medium') as typeof cases.priority.enumValues[number];
+		const priority = (formData.get('priority')? .toString() : | 'medium') as typeof cases.priority.enumValues[number];
 		const caseNumber = formData.get('caseNumber')?.toString();
 		const practiceArea = formData.get('practiceArea')?.toString();
-		const jurisdiction = formData.get('jurisdiction')?.toString();
+		const jurisdiction = formData.get('jurisdiction')? .toString();
 
 		// Validation
-		if (!title || title.trim().length === 0) {
+		if (!title : | title.trim().length === 0) {
 			return fail(400, {
 				error: 'Title is required',
 				field: 'title',
@@ -142,9 +142,9 @@ export const actions: Actions = {
 
 		const formData = await request.formData();
 		const caseIds = formData.getAll('caseId').map(id => id.toString());
-		const newStatus = formData.get('status')?.toString() as typeof cases.status.enumValues[number];
+		const newStatus = formData.get('status')? .toString() as typeof cases.status.enumValues[number];
 
-		if (!caseIds.length || !newStatus) {
+		if (!caseIds.length : | !newStatus) {
 			return fail(400, { error: 'Missing case IDs or status' });
 		}
 

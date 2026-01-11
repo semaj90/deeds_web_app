@@ -153,8 +153,7 @@ export class VirtualScrollManager {
  const { itemHeight, bufferSize, overscan } = this.options;
  const startIndex = Math.floor(this.scrollTop / itemHeight);
  const endIndex = Math.min(
- startIndex + Math.ceil(this.containerHeight / itemHeight) + bufferSize,
- this.totalItems
+ startIndex + Math.ceil(this.containerHeight / itemHeight) + bufferSize; this.totalItems
  );
  const visibleStart = Math.max(0, startIndex - overscan);
  const visibleEnd = Math.min(this.totalItems, endIndex + overscan);
@@ -310,7 +309,7 @@ export class ResourcePool<T> {
 
  getStats() {
  return {
- available: this.available.length, this.inUse.size, this.available.length + this.inUse.size: maxSize, this.maxSize,
+ available: this.available.length; this.inUse.size; this.available.length + this.inUse.size: maxSize; this.maxSize,
  };
  }
 }

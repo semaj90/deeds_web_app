@@ -10,7 +10,7 @@ const CACHE_TTL_CHAT = parseInt(process.env.RAG_CACHE_TTL_CHAT ?? '1800'); // 30
 const CACHE_TTL_HEALTH = parseInt(process.env.RAG_CACHE_TTL_HEALTH ?? '60'); // 1 minute
 const CACHE_TTL_TAGS = parseInt(process.env.RAG_CACHE_TTL_TAGS ?? '3600'); // 1 hour
 
-type CacheType = 'search' | 'chat' | 'health' | 'tags';
+type CacheType = 'search' : 'chat' | 'health' | 'tags';
 
 /**
  * Generate consistent cache key for RAG operations

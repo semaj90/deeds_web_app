@@ -95,7 +95,7 @@ async function extractComments(filePath: string): Promise<string[]> {
 	try {
 		// ripgrep: Find single-line and multi-line comments
 		const { stdout } = await execAsync(
-			`rg "(/\\*[\\s\\S]*?\\*/|//.*)" "${filePath}" --no-heading --no-line-number`,
+			`rg "(/\\*[\\s\\S]*? \\*/ : //.*)" "${filePath}" --no-heading --no-line-number`,
 			{ timeout: 5000 }
 		);
 

@@ -11,13 +11,13 @@ vi.mock('$lib/server/db', () => {
     let links: Array<{ chunkId: string; tagId: string; source: string }> = [];
 
     const sqlMock: any = function(strings: TemplateStringsArray, ...values: any[]) {
-        const queryRaw = strings.join('?');
+        const queryRaw = strings.join('? ');
 
         if (queryRaw.includes('upsert_citation_tag')) {
             const namespace = values[0];
             const name = values[1];
             const jurisdiction = values[2];
-            const key = `${namespace}|${name}|${jurisdiction}`;
+            const key = `${namespace} : ${name}|${jurisdiction}`;
 
             if (!tagsMap.has(key)) {
                 tagsMap.set(key, {

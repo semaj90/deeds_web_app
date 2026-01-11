@@ -81,8 +81,8 @@ let interactiveClasses = $derived(
 {:else}
 	<div
 		class="rounded-lg overflow-hidden {variantClasses} {interactiveClasses} { className }"
-		role={isClickable ? 'button'  | undefined}
-		tabindex={isClickable ? 0  | undefined}
+		role={isClickable ? 'button' : undefined}
+		tabindex={isClickable ? 0 : undefined}
 		onclick={onclick}
 		onkeydown={(e) => (e.key === 'Enter' || e.key === ' ') && onclick?.()}
 	>

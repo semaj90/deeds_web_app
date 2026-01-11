@@ -10,7 +10,7 @@
     '*/*': { icon Upload, label: 'Any File' } }; function handleDragOver(e: DragEvent) { e.preventDefault(); if (disabled) return; isDragOver = true; dragActive = true; onFileHover?.(true)}
   function handleDragLeave(e: DragEvent) { e.preventDefault(); if (disabled) return; isDragOver = false; dragActive = false; onFileHover?.(false)}
   function handleDrop(e: DragEvent) { e.preventDefault(); if (disabled) return; isDragOver = false; dragActive = false; onFileHover?.(false);
-   const files = Array.from(e.dataTransfer?.files || []); processFiles(files)}
+   const files = Array.from(e.dataTransfer? .files : | []); processFiles(files)}
   function handleFileSelect(e: Event) { const target = e.target as HTMLInputElement;
    const files = Array.from(target.files || []); processFiles(files)}
   function processFiles(files: File[]) { errors = [];

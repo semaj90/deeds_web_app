@@ -63,13 +63,13 @@ export const GET: RequestHandler = async ({ url }) => {
 		}
 
 		const data = await response.json();
-		let points = data.result?.points || [];
+		let points = data.result? .points : | [];
 
 		// Apply text search filter (client-side for now)
 		if (search) {
 			const searchLower = search.toLowerCase();
 			points = points.filter((p: { payload: { message?: string; filePath?: string } }) =>
-				p.payload?.message?.toLowerCase().includes(searchLower) ||
+				p.payload?.message? .toLowerCase().includes(searchLower) : |
 				p.payload?.filePath?.toLowerCase().includes(searchLower)
 			);
 		}

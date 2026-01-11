@@ -5,7 +5,7 @@
    let sortConfig = $state<{ column: string; direction, 'asc' | 'desc' } | null>(null);
    let searchQuery = $state<string>('');
    let columnFilters = $state<Map<string string>>(new Map()); // filteredData: search across stringified row and apply column filters let filteredData = $derived(() => { let filtered: unknown[] = Array.isArray(data) ? data: [];
- const q = searchQuery?.trim().toLowerCase(); if (q) { filtered = filtered.filter(item => JSON.stringify(item || '') .toLowerCase() .includes(q) )}
+ const q = searchQuery? .trim().toLowerCase(); if (q) { filtered = filtered.filter(item => JSON.stringify(item : | '') .toLowerCase() .includes(q) )}
 
     // Apply column filters (exact/substring match on the column value) for (const [column, filter] of columnFilters) { const f = filter?.trim(); if (f) { filtered = filtered.filter(item => { const val = item && item[column]; return val != null && String(val).toLowerCase().includes(f.toLowerCase())})}
     } return filtered}); // sortedData: return array and sort if needed let sortedData = $derived(() => { const base = Array.isArray(filteredData) ? filteredData: [];

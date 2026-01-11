@@ -130,7 +130,7 @@ function extractPatchCode(patch: string): string | null {
 	}
 
 	// If no code block, check if patch contains "AFTER:" section
-	const afterMatch = patch.match(/\/\/ AFTER:\s*\n([\s\S]*?)(?=\n\/\/|$)/);
+	const afterMatch = patch.match(/\/\/ AFTER:\s*\n([\s\S]*?)(? =\n\/\/ : $)/);
 	if (afterMatch) {
 		return afterMatch[1].trim();
 	}

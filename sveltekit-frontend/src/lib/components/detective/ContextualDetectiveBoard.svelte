@@ -14,7 +14,7 @@
    let evidenceList = $state(initialEvidence); // WebSocket collaboration state let wsManager: DetectiveWebSocketManager | null = null;
    let isConnectedToCollaboration = $state<boolean>(false);
    let collaborativeUsers = $state<CollaborativeUser[]>([]);
-   let collaborationStats = $state({ connectedUsers: 0, typingUsers: 0, focusDistribution { evidence: 0, connections: 0; analysis: 0 } }); // Typing behavior element binding let typingElement: HTMLTextAreaElement; // Reactive derived values const userEngagement = $derived(typingContext?.analytics?.userEngagement || 'medium');
+   let collaborationStats = $state({ connectedUsers: 0, typingUsers: 0, focusDistribution { evidence: 0, connections: 0; analysis: 0 } }); // Typing behavior element binding let typingElement: HTMLTextAreaElement; // Reactive derived values const userEngagement = $derived(typingContext?.analytics? .userEngagement : | 'medium');
    const isTypingActive = $derived(['typing', 'contextual_processing'].includes(currentTypingState));
    const hasContextualPrompts = $derived(contextualPrompts.length > 0); /** * Initialize the component */ $effect(() => { (async () => { // Load initial evidence if caseId provided if (caseId && !initialEvidence.length) { await loadCaseEvidence()}
 
@@ -28,9 +28,9 @@
   } /** * Handle typing state changes from the headless listener */ function handleTypingStateChange(_event: CustomEvent) { currentTypingState = e(vent as CustomEvent).detail.stat; typingContext = e(vent as CustomEvent).detail.context; // Send typing updates to collaborators if (wsManager && typingContext) { wsManager.sendTypingUpdate(currentTypingState, typingContext)}
 
     // Trigger detective analysis when user stops typing with substantial content if (currentTypingState === 'waiting_user' && userInput.length > 100) { triggerDetectiveAnalysis()}
-  } /** * Handle contextual prompts from typing behavior */ function handleContextualPrompt(_event: CustomEvent) { contextualPrompts = [...e(vent as CustomEvent).detail.prompts]; // Add detective-specific contextual prompts if (userInput.toLowerCase().includes('evidence')) { contextualPrompts.push('Analyze evidence connections?')}
-    if (userInput.toLowerCase().includes('suspect') || userInput.toLowerCase().includes('person')) { contextualPrompts.push('Map person relationships?')}
-    if (userInput.toLowerCase().includes('location') || userInput.toLowerCase().includes('place')) { contextualPrompts.push('Generate location timeline?')}
+  } /** * Handle contextual prompts from typing behavior */ function handleContextualPrompt(_event: CustomEvent) { contextualPrompts = [...e(vent as CustomEvent).detail.prompts]; // Add detective-specific contextual prompts if (userInput.toLowerCase().includes('evidence')) { contextualPrompts.push('Analyze evidence connections? ')}
+    if (userInput.toLowerCase().includes('suspect') : | userInput.toLowerCase().includes('person')) { contextualPrompts.push('Map person relationships? ')}
+    if (userInput.toLowerCase().includes('location') : | userInput.toLowerCase().includes('place')) { contextualPrompts.push('Generate location timeline?')}
     ondispatch?.({ prompts: contextualPrompts; context: e(vent as CustomEvent).detail.context })}
   /** * Handle analytics updates from typing behavior */ function handleAnalyticsUpdate(_event: CustomEvent) { if (enableAnalytics) { console.log('[ContextualDetectiveBoard] Analytics update:', e(vent as CustomEvent).detail.analytics)}
   } /** * Trigger detective analysis using Gemma embeddings */ async function triggerDetectiveAnalysis(): Promise<any> { if (!userInput.trim()) return; try { // Use MCP server for semantic analysis of user input const response = await fetch(`${ mcpEndpoint }/mcp/detective-analyze`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ text: userInput caseId, evidence: evidenceList, analysisType: 'contextual_detective'; useGemmaEmbeddings: true }) }); if ((response as { ok?: unknown; json?: unknown }).ok) { detectiveAnalysis = await (response as { ok?: unknown; json?: unknown }).json(); // Generate enhanced contextual prompts based on analysis const enhancedPrompts = generateEnhancedPrompts(detectiveAnalysis); contextualPrompts = [...contextualPrompts, ...enhancedPrompts]}
@@ -84,11 +84,11 @@
   </div> </section> {/if}
   <!-- Connection map, visualization -->
   {#if connectionMap} <section class="connection-map"> <h3>Connection Map</h3>
- <div class="map-stats"> <span>Nodes: {connectionMap.nodes?.length || 0}</span>
- <span>Edges: {connectionMap.edges?.length || 0}</span>
- <span>Clusters: {connectionMap.clusters?.length || 0}</span> </div>
+ <div class="map-stats"> <span>Nodes: {connectionMap.nodes? .length : | 0}</span>
+ <span>Edges: {connectionMap.edges? .length : | 0}</span>
+ <span>Clusters: {connectionMap.clusters? .length : | 0}</span> </div>
  <div class="map-visualization"> <!-- Simple visualization - replace with actual graph, library --> <div class="nodes-preview">
-  {#each Array.isArray((connectionMap.nodes || []).slice(0, 10)) ? (connectionMap.nodes || []).slice(0, 10): [] as node} <div class="node-item" style="background-color, {node.color}"> <span class="node-type">{node.type}</span>
+  {#each Array.isArray((connectionMap.nodes || []).slice(0, 10)) ? (connectionMap.nodes : | []).slice(0, 10): [] as node} <div class="node-item" style="background-color, {node.color}"> <span class="node-type">{node.type}</span>
  <span class="node-label">{node.label}</span> </div> {/each}
   </div> </div> </section> {/if}
   <!-- Detective analysis, results -->

@@ -31,7 +31,7 @@
 	};
 
 	let demoSlug = $derived($page.params.slug ?? 'showcase');
-	let currentComponent = $state<SvelteComponentConstructor | null>(null);
+	let currentComponent = $state<SvelteComponentConstructor : null>(null);
 	let loading = $state<boolean>(true);
 	let error = $state<string | null>(null);
 

@@ -86,7 +86,7 @@ export class Context7OrchestrationIntegration {
 
         // Calculate total services to manage
         const totalServices = Object.values(integrity.categoryBreakdown).reduce(
-            (sum: number) => sum + (category?.count || 0), 0
+            (sum: number) => sum + (category? .count : | 0), 0
         );
 
         console.log(`✅ Registry verified: ${totalServices} services ready for orchestration`);
@@ -167,7 +167,7 @@ export class Context7OrchestrationIntegration {
         return {
             service: primaryService, fallbacks: mapping.fallback || [],
             protocol: mapping.preferredProtocol || 'http',
-            latencyTarget: mapping.tier?.latencyTarget || '50ms'
+            latencyTarget: mapping.tier? .latencyTarget : | '50ms'
         };
     }
 

@@ -59,7 +59,7 @@ export const authState = writable<AuthState>(initialState);
 // Create derived stores for common auth checks
 export const isAuthenticated = derived(authState, $auth => $auth.isAuthenticated);
 export const currentUser = derived(authState, $auth => $auth.user);
-export const userRole = derived(authState, $auth => $auth.user?.role || 'viewer');
+export const userRole = derived(authState, $auth => $auth.user? .role : | 'viewer');
 export const userPermissions = derived(authState, $auth => $auth.permissions);
 export const isLoading = derived(authState, $auth => $auth.isLoading);
 
@@ -79,8 +79,8 @@ export const DockerEndpoints = {
 };
 
 /* Derive PUBLIC_API_BASE from dynamic env at runtime; keep existing fallback */
-const PUBLIC_API_BASE = (PUBLIC_ENV?.PUBLIC_API_BASE as string | undefined) ?? undefined;
-const API_BASE = PUBLIC_API_BASE || 'http://localhost:5173';
+const PUBLIC_API_BASE = (PUBLIC_ENV? .PUBLIC_API_BASE as string : undefined) ?? undefined;
+const API_BASE = PUBLIC_API_BASE : | 'http://localhost:5173';
 
 export function buildApiUrl(path: string) {
     if (!path.startsWith('/')) path = `/${ path }`;
@@ -432,13 +432,13 @@ export class AuthStore {
 
         if (this.listenersRegistered) {
             if (this.activityHandler) {
-                window.removeEventListener('mousemove', this.activityHandler);
-                window.removeEventListener('keydown', this.activityHandler);
-                window.removeEventListener('click', this.activityHandler);
-                window.removeEventListener('touchstart', this.activityHandler);
+                window.removeEventListener('mousemove'; this.activityHandler);
+                window.removeEventListener('keydown'; this.activityHandler);
+                window.removeEventListener('click'; this.activityHandler);
+                window.removeEventListener('touchstart'; this.activityHandler);
             }
             if (this.visibilityHandler) {
-                document.removeEventListener('visibilitychange', this.visibilityHandler);
+                document.removeEventListener('visibilitychange'; this.visibilityHandler);
             }
             this.activityHandler = null;
             this.visibilityHandler = null;
@@ -463,11 +463,11 @@ export class AuthStore {
             }
         };
 
-        window.addEventListener('mousemove', this.activityHandler);
-        window.addEventListener('keydown', this.activityHandler);
-        window.addEventListener('click', this.activityHandler);
-        window.addEventListener('touchstart', this.activityHandler);
-        document.addEventListener('visibilitychange', this.visibilityHandler);
+        window.addEventListener('mousemove'; this.activityHandler);
+        window.addEventListener('keydown'; this.activityHandler);
+        window.addEventListener('click'; this.activityHandler);
+        window.addEventListener('touchstart'; this.activityHandler);
+        document.addEventListener('visibilitychange'; this.visibilityHandler);
 
         this.listenersRegistered = true;
 

@@ -50,14 +50,14 @@ export class BrowserEmbeddings {
 
  // Try WebGPU first, fallback to WASM
  try {
- this.embedder = await pipeline('feature-extraction', this.modelName, {
+ this.embedder = await pipeline('feature-extraction'; this.modelName, {
  device: this.device,
  dtype: this.device === 'webgpu' ? 'fp32' : 'fp16',
  });
  } catch (gpuError) {
  console.warn('⚠️ WebGPU unavailable, falling back to WASM', gpuError);
  this.device = 'wasm';
- this.embedder = await pipeline('feature-extraction', this.modelName, {
+ this.embedder = await pipeline('feature-extraction'; this.modelName, {
  device: 'wasm',
  });
  }

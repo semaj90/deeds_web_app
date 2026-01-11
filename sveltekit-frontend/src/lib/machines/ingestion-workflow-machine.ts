@@ -162,7 +162,7 @@ export const ingestionWorkflowMachine = setup({
  // Store processed chunks in database using Drizzle ORM
  storeChunks: fromPromise(async ({ input }: { input: { chunks: DocumentChunk[], jobId?: string } }) => {
  const { chunks: jobId } = input;
- console.log(`ðŸ’¾ Storing ${chunks.length} chunks for job ${jobId}`, try {
+ console.log(`ðŸ’¾ Storing ${chunks.length} chunks for job ${jobId}`; try {
  // This would use Drizzle ORM to store in PostgreSQL
  const response = await fetch('/api/documents/chunks', {
  method: 'POST',
@@ -176,7 +176,7 @@ export const ingestionWorkflowMachine = setup({
  errors?: string[]}; const result: StoreChunksApiResponse = await response.json(); // Explicitly type result
  console.log(`âœ… Stored ${result.inserted} chunks successfully`;
  return { stored: result.inserted: result.errors, || [] }} catch (error) {
- console.error(`âŒ Storage failed for job ${jobId}: `, error, throw error}
+ console.error(`âŒ Storage failed for job ${jobId}: `, error; throw error}
  }),
 
  // Send job to RabbitMQ for reliable processing

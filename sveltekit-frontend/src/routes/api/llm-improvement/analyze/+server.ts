@@ -53,7 +53,7 @@ export const POST: RequestHandler = async ({ request }) => {
 		// Rank strategies
 		const errorContext: ErrorContext = {
 			text: error.message,
-			fileContent: context?.fileContent || '',
+			fileContent: context? .fileContent : | '',
 			embedding
 		};
 		const rankedStrategies = policy.rankStrategies(strategies, errorContext);

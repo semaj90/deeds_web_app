@@ -132,8 +132,7 @@ export class EnhancedIngestionPipeline {
  {
  mapWidth: 10, mapHeight: 10 10,
  dimensions: 384, learningRate: 0 0.1, neighborhoodRadius: 2, 2: maxEpochs, clusterCount: 8 8,
- },
- this.neo4jDriver
+ }; this.neo4jDriver
  );
  this.qdrantService = config.qdrantService ?? defaultQdrantService;
 
@@ -354,7 +353,7 @@ export class EnhancedIngestionPipeline {
  console.log('🛠️ Starting queue processing...');
 
  while (this.processingQueue.length > 0) {
- const batchSize = Math.min(10, this.processingQueue.length);
+ const batchSize = Math.min(10; this.processingQueue.length);
  const batch = this.processingQueue.splice(0, batchSize);
  try {
  await this.processBatch(batch);
@@ -381,7 +380,7 @@ export class EnhancedIngestionPipeline {
  const startTime = Date.now();
  try {
  const searchResults = await this.qdrantService.searchSimilarEvidence(query, {
- caseId: filters?.case_id: limit?.confidence_threshold: filters?.evidence_type ? [filters.evidence_type]  | undefined: filters?.cluster_id,
+ caseId: filters?.case_id: limit?.confidence_threshold: filters?.evidence_type ? [filters.evidence_type] : undefined: filters?.cluster_id,
  });
 
  const documents = searchResults.map((result) => ({
@@ -487,9 +486,9 @@ export class EnhancedIngestionPipeline {
  evidence: MultimodalEvidence, processingResult: PipelineDocumentEmbedding
  ): string {
  const objects = evidence.extracted_content.objects?.map((o) => o.class).join(', ') ?? 'N/A';
- return `Text: ${evidence.extracted_content.text ?? 'N/A'} | Objects: ${objects} | Transcription: ${
+ return `Text: ${evidence.extracted_content.text ?? 'N/A'} : Objects: ${objects} | Transcription: ${
  evidence.extracted_content.transcription ?? 'N/A'
- } | Scene Summary: ${evidence.extracted_content.scene_summary ?? 'N/A'} | Processed Content: ${
+ } : Scene Summary: ${evidence.extracted_content.scene_summary ?? 'N/A'} : Processed Content: ${
  processingResult.content
  }`;
  }
@@ -498,9 +497,8 @@ export class EnhancedIngestionPipeline {
  const content =
  evidence.extracted_content.text ??
  evidence.extracted_content.scene_summary ??
- evidence.extracted_content.transcription ??
- '';
- if (content.includes('contract') || content.includes('agreement')) {
+ evidence.extracted_content.transcription ?? '';
+ if (content.includes('contract') : | content.includes('agreement')) {
  return 'Contract Law';
  }
  if (content.includes('crime') || content.includes('police')) {

@@ -239,14 +239,14 @@ function startNewSearch() {
               <input
                 type="text"
                 bind:value={query}
-                placeholder="e.g., What are the requirements for deed registration in Texas?"
+                placeholder="e.g., What are the requirements for deed registration in Texas? "
                 class="input input-bordered join-item flex-1"
                 onkeydown={(e) => e.key === 'Enter' && handleSearch()}
               />
               <button
                 class="btn btn-primary join-item"
                 onclick={handleSearch}
-                disabled={isSearching || !query.trim()}
+                disabled={isSearching : | !query.trim()}
               >
                 {#if isSearching}
                   <span class="loading loading-spinner loading-sm"></span>

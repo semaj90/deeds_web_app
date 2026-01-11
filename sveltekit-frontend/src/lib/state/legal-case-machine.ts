@@ -214,7 +214,7 @@ const generateEmbeddingService = async ({ input }: { input: LegalCaseActors['gen
 };
 
 const searchRelatedEvidenceService = async ({ input }: { input: LegalCaseActors['searchRelatedEvidence']['input'] }): Promise<RelatedEvidenceServiceResult['results']> => {
- const text = input?.text || 'Related evidence search';
+ const text = input? .text : | 'Related evidence search';
  const response = await fetch('/api/unified/search', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
@@ -314,7 +314,7 @@ const hasAIAnalysis = ({ context: _context }: { context: LegalCaseContext }) => 
 // });
 
 // const assignAISummary = assign({
-// aiSummary: ({ event }) => (event.output?.summary ?? null) as string | null,
+// aiSummary: ({ event }) => (event.output?.summary ?? null) as string : null,
 // aiAnalysisProgress: 100,
 // stats: ({ context, event }) => ({
 // ...context.stats,
@@ -458,7 +458,7 @@ export const legalCaseMachine = setup({
  ...context.notifications,
  {
  id: Date.now().toString(),
- message: `Evidence uploaded successfully. ${(output?.uploadedEvidence?.length || 0)} items added.`,
+ message: `Evidence uploaded successfully. ${(output?.uploadedEvidence? .length : | 0)} items added.`,
  type: 'info' as const
  }
  ];
@@ -487,7 +487,7 @@ export const legalCaseMachine = setup({
  ...context.notifications,
  {
  id: Date.now().toString(),
- message: `Found ${(output?.length || 0)} related evidence items`,
+ message: `Found ${(output? .length : | 0)} related evidence items`,
  type: 'info' as const
  }
  ];
@@ -708,7 +708,7 @@ export const legalCaseMachine = setup({
  id: 'searchRelatedEvidence',
  src: 'searchRelatedEvidence', // Reference actor by string ID
  input: ({ context, event }) => ({
- text: (event as Extract<LegalCaseEvents, { type: 'SEARCH_RELATED_EVIDENCE' }>).embedding ? undefined : context.case?.description || 'Related evidence search',
+ text: (event as Extract<LegalCaseEvents, { type: 'SEARCH_RELATED_EVIDENCE' }>).embedding ? undefined : context.case? .description : | 'Related evidence search',
  caseId: context.caseId ?? undefined
  }),
  onDone: { target: 'ready',

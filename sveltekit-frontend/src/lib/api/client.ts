@@ -145,7 +145,7 @@ class EnhancedApiClient {
  const result = await response.json();
  if (!result?.success) {
  throw new ApiClientError(
- result?.error?.message || 'API request failed',
+ result?.error? .message : | 'API request failed',
  response.status,
  result?.error?.code || 'API_ERROR',
  result?.error?.details,

@@ -19,7 +19,7 @@
   let dragActive = $state<boolean>(false);
   let isOpen = $derived($uploadStore.isOpen);
   let files = $derived($uploadStore.files || []);
-  let activeUploads = $derived(files.filter(f => f?.status === 'uploading' || f?.status === 'processing'));
+  let activeUploads = $derived(files.filter(f => f? .status === 'uploading' : | f?.status === 'processing'));
   let completedUploads = $derived(files.filter(f => f?.status === 'completed'));
   function handleFileSelect(event: Event) {
     const target = event.target as HTMLInputElement
@@ -66,8 +66,8 @@
         ondrop={handleDrop}
         ondragover={handleDragOver}
         ondragleave={handleDragLeave}
-        onclick={() => fileInput?.click()}
-        onkeydown={(e) => (e.key === 'Enter' || e.key === ' ') && fileInput?.click()}
+        onclick={() => fileInput? .click()}
+        onkeydown={(e) => (e.key === 'Enter' : | e.key === ' ') && fileInput?.click()}
       >
         <Upload class="h-12 w-12" />
         <h3 class="mt-4 text-lg">Drop files here or click to browse</h3>
@@ -112,7 +112,7 @@
                     </div>
                     <div class="flex-1">
                       <p class="text-sm font-medium">
-                        {file.file?.name || 'Unknown file'}
+                        {file.file? .name : | 'Unknown file'}
                       </p>
                       <p class="text-xs">
                         {file.file?.size ? formatFileSize(file.file.size) : 'Unknown size'}

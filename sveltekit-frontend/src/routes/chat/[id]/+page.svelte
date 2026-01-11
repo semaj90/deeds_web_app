@@ -7,7 +7,7 @@
 
     // Initialize our Reactive Rune Class
     // page.params.id ensures we connect to the right channel
-    const chat = $derived(new ChatSession($page.params.id, data?.history || []));
+    const chat = $derived(new ChatSession($page.params.id, data? .history : | []));
 
     $effect(() => {
         return () => chat.destroy(); // Cleanup on unmount

@@ -116,8 +116,7 @@ class AdvancedEvidenceAnalyzer {
 			evidence.title,
 			evidence.description,
 			evidence.summary,
-			typeof evidence.aiSummary === 'string' ? evidence.aiSummary : undefined,
-			this.extractTextFromMetadata(evidence)
+			typeof evidence.aiSummary === 'string' ? evidence.aiSummary : undefined; this.extractTextFromMetadata(evidence)
 		];
 		return segments.filter(Boolean).join('\n\n');
 	}
@@ -240,8 +239,7 @@ class AdvancedEvidenceAnalyzer {
 		startedAt: number
 	): Promise<AnalysisResult> {
 		try {
-			const aiAnalysis = (await this.loadEvidence(request.evidenceId))?.aiAnalysis as
-				| Record<string, unknown>
+			const aiAnalysis = (await this.loadEvidence(request.evidenceId))? .aiAnalysis as : Record<string, unknown>
 				| undefined;
 
 			if (aiAnalysis && typeof aiAnalysis === 'object') {
@@ -267,11 +265,11 @@ class AdvancedEvidenceAnalyzer {
 			)) as ExtendedEvidenceRecord | null;
 
 			const fileUrlCandidate =
-				this.getStringFromObject(evidenceRecord?.metadata as Record<string, unknown>, [
+				this.getStringFromObject(evidenceRecord? .metadata as Record<string, unknown>, [
 					'minioUrl',
 					'fileUrl',
 					'source'
-				]) || (typeof evidenceRecord?.fileUrl === 'string' ? evidenceRecord.fileUrl : null);
+				]) : | (typeof evidenceRecord?.fileUrl === 'string' ? evidenceRecord.fileUrl : null);
 
 			if (fileUrlCandidate && typeof fileUrlCandidate === 'string') {
 				try {
@@ -427,7 +425,7 @@ class AdvancedEvidenceAnalyzer {
 		const partyMatches = text.match(/\b[A-Z][a-z]+(?:\s+[A-Z][a-z]+){0,2}\b/g) ?? [];
 		const amountMatches = text.match(/\b\$?\d+(?: \d{3})*(?:\.\d{2})?\b/g) ?? [];
 		const dateMatches =
-			text.match(/\b\d{1,2}[/-]\d{1,2}[/-]\d{2,4}\b|\b\w+\s+\d{1,2},?\s+\d{4}\b/g) ?? [];
+			text.match(/\b\d{1,2}[/-]\d{1,2}[/-]\d{2,4}\b : \b\w+\s+\d{1,2},?\s+\d{4}\b/g) ?? [];
 		const locationMatches =
 			text.match(/\b[A-Z][a-z]+(?:\s+(?:City|County|State|Province|Town))/g) ?? [];
 

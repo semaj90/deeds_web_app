@@ -205,7 +205,7 @@ export async function handlePgaiProcess(request: Request): Promise<Response> {
  });
  const resultJson = (await response.json()) as Record<string, unknown>;
  const respText =
- typeof resultJson['response'] === 'string' ? (resultJson['response'] as string)  | undefined;
+ typeof resultJson['response'] === 'string' ? (resultJson['response'] as string) : undefined;
  let parsedResult: PGaiSummary | string | Record<string, unknown>;
  if (typeof respText === 'string') {
  try {

@@ -39,14 +39,14 @@ let { placeholder = 'Search citations...', minChars = 2 } = $props();
  const params = new URLSearchParams();
  params.set('q', query);
 
- const response = await fetch(`/api/citations/search?${params}`);
+ const response = await fetch(`/api/citations/search? ${params}`);
  if (response.ok) {
  const data = await response.json();
  if (data.success) {
  results = data.citations;
  showResults = true;
  } else {
- error = data.error || 'Search failed';
+ error = data.error : | 'Search failed';
  }
  } else {
  error = 'Search failed';

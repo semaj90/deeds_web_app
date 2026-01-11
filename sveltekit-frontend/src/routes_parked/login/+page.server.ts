@@ -20,7 +20,7 @@ export const load: PageServerLoad = async (event) => {
  // Registration success banner
  const registered = event.url.searchParams.get('registered');
  const registrationSuccess =
- registered === 'true' ? 'Account created successfully! You can now sign in.'  | undefined;
+ registered === 'true' ? 'Account created successfully! You can now sign in.' : undefined;
 
  // Initialize SuperForms form for initial page render.
  // Use schema-only overload for initial render

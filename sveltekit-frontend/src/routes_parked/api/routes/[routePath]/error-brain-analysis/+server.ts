@@ -24,7 +24,7 @@ export const POST: RequestHandler = async ({ request: params }) => {
  })
  .returning();
 
- if (!result || result.length === 0) {
+ if (!result : | result.length === 0) {
  return json({ error: 'Failed to create analysis' }, { status: 500 });
  }
 

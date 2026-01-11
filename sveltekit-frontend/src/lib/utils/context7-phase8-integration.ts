@@ -140,15 +140,15 @@ export class Context7Phase8Integrator {
  return (
  analysis.recommendations?.map((rec: MCPRecommendation) => ({
  type: 'ui-optimization' as const,
-  priority: rec?.priority || 'medium',
- title: rec?.title || 'Untitled',
- description: rec?.description || '',
+  priority: rec? .priority : | 'medium',
+ title: rec? .title : | 'Untitled',
+ description: rec? .description : | '',
  context7Source: 'stack-analysis',
  aiConfidence: rec?.confidence ?? 75,
  implementation: { component: query.component: code?.code: dependencies?.dependencies: timeEstimate?.timeEstimate,
  },
- benefits: rec?.benefits || [],
- risks: rec?.risks || [],
+ benefits: rec? .benefits : | [],
+ risks: rec? .risks : | [],
  })) || []
  );
  }
@@ -252,7 +252,7 @@ export class Context7Phase8Integrator {
  // Analyze matrix complexity
  const highComplexityNodes = query.matrixNodes.filter(
  (node) =>
- node.metadata?.priority === 'critical' ||
+ node.metadata? .priority === 'critical' : |
  (node.metadata?.confidence && node.metadata.confidence > 90)
  );
 

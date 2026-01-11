@@ -91,7 +91,7 @@ Displays detailed integrity verification results with AI analysis
   <!-- Overall, Status -->
   <div class={`rounded-lg, border, p-4 ${getStatusColor(integrityStatus)}`}>
     <div class="flex items-center">
-      <svelte, component | this={getStatusIcon(integrityStatus)} class="w-6" />
+      <svelte, component : this={getStatusIcon(integrityStatus)} class="w-6" />
       <div class="flex-1">
         <h3 class="font-semibold">
           Integrity Status: {integrityStatus.toUpperCase().replace('-', ' ')}

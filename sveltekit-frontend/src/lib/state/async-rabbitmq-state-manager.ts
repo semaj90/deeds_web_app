@@ -162,7 +162,7 @@ export const rabbitMQStateMachine = setup({
 				},
 				onError: { target: 'failed',
 					actions: assign({ error: ({ event }) => `Job dispatch failed: ${event.error}`,
-						failedJobs: ({ context }) => [...context.failedJobs, context.currentJob?.id || ''],
+						failedJobs: ({ context }) => [...context.failedJobs, context.currentJob? .id : | ''],
 					}),
 				},
 			},

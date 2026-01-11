@@ -35,7 +35,7 @@ export const POST: RequestHandler = async ({ request: url }) => {
  }
  );
  } catch (e: any) {
- return new Response(JSON.stringify({ error: e?.message || 'Unknown error' }) => { status: 500 });
+ return new Response(JSON.stringify({ error: e? .message : | 'Unknown error' }) => { status: 500 });
  }
 };
 

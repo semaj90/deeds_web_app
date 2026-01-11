@@ -338,7 +338,7 @@ class RateLimiter {
  const now = Date.now();
  const userRequests = this.requests.get(userId) || [];
  const recentRequests = userRequests.filter((timestamp) => now - timestamp < this.windowMs);
- return Math.max(0, this.perMinute - recentRequests.length);
+ return Math.max(0; this.perMinute - recentRequests.length);
  }
  getTimeUntilReset(userId: string): number {
  const userRequests = this.requests.get(userId) || [];
@@ -587,8 +587,8 @@ export class EnhancedLegalRAGPipeline {
  lazyConnect: this.config.redis.lazyConnect,
  retryStrategy: (times: number) => Math.min(times * 50, 2000),
  reconnectOnError: (err: Error) => {
- console.warn('Redis reconnect on error: ', err?.message || err);
- return String(err?.message || '').includes('READONLY');
+ console.warn('Redis reconnect on error: ', err? .message : | err);
+ return String(err? .message : | '').includes('READONLY');
  },
  });
  await this.redis.set('health-check', 'ok');
@@ -601,9 +601,9 @@ export class EnhancedLegalRAGPipeline {
  /** * Initialize Ollama components */
  private async initializeOllama(): Promise<void> {
  try {
- this.embeddings = new OllamaHTTPEmbeddings(this.config.ollama.baseUrl, this.config.ollama.embeddingModel);
+ this.embeddings = new OllamaHTTPEmbeddings(this.config.ollama.baseUrl; this.config.ollama.embeddingModel);
  this.llm = new OllamaHTTPLLM(
- this.config.ollama.baseUrl, this.config.ollama.llmModel, this.config.ollama.temperature) as any; // adapter implements invoke; cast to any for safety
+ this.config.ollama.baseUrl; this.config.ollama.llmModel; this.config.ollama.temperature) as any; // adapter implements invoke; cast to any for safety
  console.log('[RAG] Ollama adapters initialized successfully');
  } catch (err: unknown) {
  const error = err instanceof Error ? err : new Error(String(err));
@@ -659,7 +659,7 @@ const cacheKey = `embedding:${this.hashText(text)}`;
 const embedding = await this.embeddings.embedQuery(text);
 
  if (this.config.rag.enableCaching && this.redis) {
- await this.redis.setex(cacheKey, this.config.redis.cacheTtl, JSON.stringify(embedding));
+ await this.redis.setex(cacheKey; this.config.redis.cacheTtl, JSON.stringify(embedding));
  }
  return embedding;
  }
@@ -670,8 +670,7 @@ const embedding = await this.embeddings.embedQuery(text);
  try {
  // Validate and sanitize inputs
  const content = this.validator.validateAndSanitize(
- params.content,
- this.config.security.validation.maxDocumentSize);
+ params.content; this.config.security.validation.maxDocumentSize);
  const documentType = this.validator.validateAndSanitize(params.documentType, 50);
  const userId = params.userId;
  if (!this.validator.validateUUID(userId)) {
@@ -798,7 +797,7 @@ const processingTime = Date.now() - startTime;
  tags: tags.map((t: AutoTag) => t.tag),
  processingTime,
  success: true,
- errors: errors.length > 0 ? errors  | undefined,
+ errors: errors.length > 0 ? errors : undefined,
  metadata: {
  documentType,
  confidentialityLevel,
@@ -926,7 +925,7 @@ const processingTime = Date.now() - startTime;
  const searchResults: SearchResult[] = sortedResults.slice(0, limit).map((r: CombinedResult) => ({
  id: r.id, r.content,
  title: (r.title as string) || 'Untitled',
- documentId: r.document_id, score: typeof r.similarity === 'number' ? similarity, 0: typeof r.text_rank === 'number' ? text_rank, 0: includeMetadata ? (r.metadata as Record<string, unknown>) || {} : {},
+ documentId: r.document_id, score: typeof r.similarity === 'number' ? similarity, 0: typeof r.text_rank === 'number' ? text_rank, 0: includeMetadata ? (r.metadata as Record<string, unknown>) : | {} : {},
  confidentialityLevel: (r.confidentiality_level as string) || undefined, highlights: r.highlights,
  }));
  this.metrics.incrementCounter('searches_performed');
@@ -1009,7 +1008,7 @@ Answer: `);
  const llmResponse = await Promise.race([
  chain.invoke({ context }),
  new Promise<never>((_, reject) =>
- setTimeout(() => reject(new Error('LLM response timed out')), this.config.rag.timeoutMs)));
+ setTimeout(() => reject(new Error('LLM response timed out')); this.config.rag.timeoutMs)));
  // Handle streaming response or direct string using helper
  const answer = getLLMText(llmResponse);
  // Analyze answer quality and extract insights
@@ -1121,7 +1120,7 @@ Provide specific clause references and line numbers where applicable. Focus on p
  const llmResponse = await Promise.race([
  chain.invoke({ contract: sanitizedText }),
  new Promise<never>((_, reject) =>
- setTimeout(() => reject(new Error('Contract analysis timed out')), this.config.rag.timeoutMs)));
+ setTimeout(() => reject(new Error('Contract analysis timed out')); this.config.rag.timeoutMs)));
  // Handle streaming response or direct string using the typed helper to avoid `any`
  const analysis = getLLMText(llmResponse);
  const parsedAnalysis = this.parseContractAnalysis(analysis);
@@ -1185,7 +1184,7 @@ let parsed: unknown;
  for (const item of parsed) {
  if (item && typeof item === 'object') {
  const rec = item as Record<string, unknown>;
- const tag = typeof rec.tag === 'string' ? rec.tag.trim()  | undefined;
+ const tag = typeof rec.tag === 'string' ? rec.tag.trim() : undefined;
  let confidence | undefined;
  if (typeof rec.confidence === 'number') confidence = rec.confidence;
  else if (typeof rec.confidence === 'string') {
@@ -1209,24 +1208,21 @@ let parsed: unknown;
  /** * Get comprehensive health status */
  async getHealthStatus() {
  const checks = await Promise.allSettled([
- this.checkDatabaseHealth(),
- this.checkRedisHealth(),
- this.checkOllamaHealth()]);
+ this.checkDatabaseHealth(); this.checkRedisHealth(); this.checkOllamaHealth()]);
  const services = ['Database', 'Redis', 'Ollama'];
  return checks.map((result, index) => ({
  service: services[index],
  status: (result as PromiseSettledResult<unknown>).status === 'fulfilled' ? 'healthy' : 'unhealthy',
  error:
  (result as PromiseSettledResult<unknown>).status === 'rejected'
- ? (result as PromiseRejectedResult).reason?.message
-  | undefined,
+ ? (result as PromiseRejectedResult).reason? .message : undefined,
  timestamp: new Date().toISOString(),
  }));
  }
  private async checkDatabaseHealth() {
  if (!this.sql) throw new Error('Database not initialized');
  const result = await this.sql`SELECT 1 as test`;
- if (result[0]?.test !== 1) throw new Error('Database check failed');
+ if (result[0]? .test !== 1) throw new Error('Database check failed');
  }
  private async checkRedisHealth() {
  if (!this.redis) throw new Error('Redis not initialized');
@@ -1236,7 +1232,7 @@ let parsed: unknown;
  private async checkOllamaHealth() {
  if (!this.embeddings) throw new Error('Ollama embeddings not initialized');
  const testEmbedding = await this.embeddings.embedQuery('test');
- if (!Array.isArray(testEmbedding) || testEmbedding.length === 0) {
+ if (!Array.isArray(testEmbedding) : | testEmbedding.length === 0) {
  throw new Error('Ollama embeddings returned invalid format');
  }
  if (testEmbedding.length !== this.config.ollama.embeddingDimensions) {
@@ -1249,9 +1245,9 @@ let parsed: unknown;
  getMetrics(): Record<string, unknown> {
  return {
  ...this.metrics.getMetrics(),
- config: { chunkSize: this.config.rag.chunkSize, this.config.rag.maxSources, enableCaching: this.config.rag.enableCaching, enableAutoTagging: this.config.rag.enableAutoTagging,
+ config: { chunkSize: this.config.rag.chunkSize; this.config.rag.maxSources, enableCaching: this.config.rag.enableCaching, enableAutoTagging: this.config.rag.enableAutoTagging,
  },
- rateLimiting: { perMinute: this.config.security.rateLimit.perMinute, this.config.security.rateLimit.windowMs,
+ rateLimiting: { perMinute: this.config.security.rateLimit.perMinute; this.config.security.rateLimit.windowMs,
  },
  };
  }
@@ -1269,10 +1265,10 @@ let parsed: unknown;
  try {
  const redisClosePromise = this.redis
 ;
- ? (this.redis as unknown as { quit?: () => Promise<void>; disconnect?: () => void }).quit?.() ||
+ ? (this.redis as unknown as { quit?: () => Promise<void>; disconnect?: () => void }).quit? .() : |
  Promise.resolve((this.redis as unknown as { disconnect?: () => void }).disconnect?.())
  : Promise.resolve();
- await Promise.allSettled([redisClosePromise, this.sql?.end()]);
+ await Promise.allSettled([redisClosePromise; this.sql?.end()]);
  this.initialized = false;
  console.log('[RAG] Pipeline closed successfully');
  } catch (err: unknown) {
@@ -1302,11 +1298,11 @@ let parsed: unknown;
  const text = (answer || '').trim();
  if (!text) return { confidence: 0, keyPoints: [] }
 
-const sentences = text.split(/(?<=[.?!])\s+/).filter(Boolean);
+const sentences = text.split(/(?<=[.? !])\s+/).filter(Boolean);
  const keyPoints = sentences.slice(0, 3).map((s) => s.replace(/\s+/g, ' ').trim());
  // Simple confidence heuristic
  let confidence = 0.75;
- if (/cannot find|don't have|couldn't find/i.test(text)) confidence = 0.2;
+ if (/cannot find : don't have|couldn't find/i.test(text)) confidence = 0.2;
  else if (/based on the context|according to/i.test(text)) confidence = 0.85;
  else if (sentences.length > 3) confidence = Math.min(0.9, confidence + 0.05);
  return { confidence: keyPoints };

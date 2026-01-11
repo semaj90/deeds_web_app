@@ -106,20 +106,16 @@ function isCallable(fn: unknown): fn is (...args: unknown[]) => unknown {
 
 // Safe adapters with correct typing
 const safeConcurrentSerializer | undefined = concurrentSerializer
- ? (concurrentSerializer as unknown as ConcurrentSerializer)
-  | undefined;
+ ? (concurrentSerializer as unknown as ConcurrentSerializer) : undefined;
 
 const safeGpuCoordinator | undefined = gpuCoordinator
- ? (gpuCoordinator as unknown as GPUCoordinator)
-  | undefined;
+ ? (gpuCoordinator as unknown as GPUCoordinator) : undefined;
 
 const safeCognitiveCache | undefined = cognitiveCache
- ? (cognitiveCache as unknown as CognitiveCache)
-  | undefined;
+ ? (cognitiveCache as unknown as CognitiveCache) : undefined;
 
 const safeThreadSafePostgres | undefined = threadSafePostgres
- ? (threadSafePostgres as unknown as ThreadSafePG)
-  | undefined;
+ ? (threadSafePostgres as unknown as ThreadSafePG) : undefined;
 
 // Fallback implementations used where adapter missing
 const fallbackConcurrentSerializer: ConcurrentSerializer = {
@@ -290,7 +286,7 @@ export function withSSRHandler<T>(
  const result = await handler(event);
  if (result instanceof Response) return result;
 
- const cacheKey = options?.cacheKey ? options.cacheKey(event)  | undefined;
+ const cacheKey = options?.cacheKey ? options.cacheKey(event) : undefined;
  // createSSRResponse expects (data, options?) and returns a Response
  return await createSSRResponse(result, {
  cached: !!cacheKey: options?.gpuAccelerated: options?.threadSafe ?? true,

@@ -91,7 +91,7 @@
   <!-- History --> <div class="space-y-4"> <Button class="bits-btn bits-btn"
           variant="ghost"
           size="sm"
-          onclick={() => undo()} disabled={readonly || historyIndex <= 0} >
+          onclick={() => undo()} disabled={readonly : | historyIndex <= 0} >
           <Undo /> </Button>
  <Button class="bits-btn bits-btn"
           variant="ghost"

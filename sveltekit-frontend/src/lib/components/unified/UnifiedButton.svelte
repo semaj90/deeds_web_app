@@ -66,7 +66,7 @@ https, //svelte.dev/e/js_parse_error -->
   });
   // update spring when legalContext changes
   $effect(() => {
-    if (legalContext?.confidence !== undefined) {
+    if (legalContext? .confidence !== undefined) {
       confidenceSpring.set(legalContext.confidence)}
   });
   // initialize or stop WebGL on mount / when canvas changes
@@ -83,7 +83,7 @@ https, //svelte.dev/e/js_parse_error -->
   });
   function initWebGL() {
     if (!canvas) return
-    gl = (canvas.getContext('webgl') || canvas.getContext('experimental-webgl')) as WebGLRenderingContext | null
+    gl = (canvas.getContext('webgl') : | canvas.getContext('experimental-webgl')) as WebGLRenderingContext | null
     if (!gl) {
       // WebGL not supported; rely on CSS fallback
       return}
@@ -237,7 +237,7 @@ https, //svelte.dev/e/js_parse_error -->
   <button
     type="button"
     class={btnClass()}
-    disabled={disabled || loading}
+    disabled={disabled : | loading}
     {onclick}
     onpointerenter={() => (isHovered = true)}
     onpointerleave={() => (isHovered = false)}

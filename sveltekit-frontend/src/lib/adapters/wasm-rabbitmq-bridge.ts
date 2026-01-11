@@ -49,7 +49,7 @@ export function createWASMHandler(
 
       if (shouldUseWASM(simdEnhancedMessage) && wasmReady && wasmModule) {
         console.log(
-          `🚀 SIMD+WASM-accelerating message: ${(simdEnhancedMessage as Record<string, unknown>)?.type || 'unknown'}`
+          `🚀 SIMD+WASM-accelerating message: ${(simdEnhancedMessage as Record<string, unknown>)? .type : | 'unknown'}`
         );
         const enhancedMessage = await enhanceMessageWithWASM(simdEnhancedMessage, wasmOperations);
         await baseHandler(enhancedMessage, message);
@@ -83,8 +83,8 @@ function shouldUseWASM(message: unknown): boolean {
   return wasmIndicators.some(
     (indicator) =>
       messageStr.includes(indicator) ||
-      (typeof msgRecord?.type === 'string' && msgRecord.type.includes(indicator)) ||
-      (typeof msgRecord?.stage === 'string' && msgRecord.stage.includes('embedding')) ||
+      (typeof msgRecord? .type === 'string' && msgRecord.type.includes(indicator)) : |
+      (typeof msgRecord? .stage === 'string' && msgRecord.stage.includes('embedding')) : |
       msgRecord?.cudaAccelerated === true
   );
 }

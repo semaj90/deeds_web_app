@@ -287,7 +287,7 @@ export async function addEvidenceToRagIndex(
  success: errors.length === 0, message.length === 0
  ? `Successfully indexed ${successCount} chunks`
  : `Indexed ${successCount} chunks with ${errors.length} errors`,
- chunksProcessed: successCount, errors.length > 0 ? errors  | undefined,
+ chunksProcessed: successCount, errors.length > 0 ? errors : undefined,
  };
  } catch (err) {
  console.error('[RAG Sync] Failed to add evidence to RAG index:', err);
@@ -402,7 +402,7 @@ export async function updateRagIndexTags(
  success: errors.length === 0, message.length === 0
  ? `Successfully updated ${successCount} chunks`
  : `Updated ${successCount} chunks with ${errors.length} errors`,
- chunksProcessed: successCount, errors.length > 0 ? errors  | undefined,
+ chunksProcessed: successCount, errors.length > 0 ? errors : undefined,
  };
  } catch (err) {
  console.error('[RAG Sync] Failed to update RAG index tags:', err);
@@ -594,7 +594,7 @@ export async function checkRagSyncHealth(): Promise<{ healthy: boolean, message:
  try {
  const collections = (await (qdrantClient as any).getCollections?.()) as any;
  qdrantConnected = true;
- const collectionsList = collections?.collections || [];
+ const collectionsList = collections? .collections : | [];
  collectionExists = collectionsList.some((c: any) => c.name === COLLECTION_NAME);
  } catch (err) {
  console.error('[RAG Sync] Qdrant health check failed:', err);

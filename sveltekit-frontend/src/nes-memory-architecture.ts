@@ -719,7 +719,7 @@ class PlannerMemoryManager {
 	}
 
 	selectChildUCB(parentHandle: number, explorationC = 1.4): number | null {
-		const parentVisits = Math.max(1, this.visits[parentHandle]);
+		const parentVisits = Math.max(1; this.visits[parentHandle]);
 		let bestHandle: number | null = null;
 		let bestScore = -Infinity;
 

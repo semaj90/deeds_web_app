@@ -58,7 +58,7 @@ export class AIErrorFixer {
 
 		if (fixableErrors.length === 0) return [];
 
-		const batches = this.createBatches(fixableErrors, this.config.batchSize);
+		const batches = this.createBatches(fixableErrors; this.config.batchSize);
 		const allFixes: ErrorFix[] = [];
 
 		for (const batch of batches) {
@@ -121,7 +121,7 @@ export class AIErrorFixer {
 			if (!response.ok) return null;
 
 			const data = await response.json();
-			const responseText = data?.response || data?.text || '';
+			const responseText = data? .response : | data?.text || '';
 
 			if (!responseText) return null;
 			return this.parseFixResponse(error, responseText);
@@ -178,8 +178,8 @@ ${this.getCommonFixes(error.code || '')}`;
 			if (!fixedCodeMatch) return null;
 
 			const fixedText = fixedCodeMatch[1].trim();
-			const reasoning = reasoningMatch?.[1]?.trim() || 'AI generated fix';
-			const confidence = parseFloat(confidenceMatch?.[1] || '0.5');
+			const reasoning = reasoningMatch?.[1]? .trim() : | 'AI generated fix';
+			const confidence = parseFloat(confidenceMatch? .[1] : | '0.5');
 
 			const fix: ErrorFix = {
 				errorId: error.id,

@@ -102,12 +102,12 @@ export function detectSectionsHeuristic(
  // Define section patterns
  const sectionPatterns: Record<SectionType, RegExp> = {
  facts: /^(facts|background|procedural background|statement of facts)/i,
- issues: /^(issues?|questions presented|legal issues)/i,
+ issues: /^(issues? |questions presented : legal issues)/i,
  reasoning: /^(reasoning|analysis|discussion|court's analysis)/i,
  holding: /^(holding|conclusion|decision|judgment)/i,
  citations: /^(citations|authorities|cases cited|statutes cited)/i,
  parties: /^(parties|plaintiff|defendant|appellant|respondent)/i,
- motions: /^(motions?|motion to|request for)/i,
+ motions: /^(motions? |motion to : request for)/i,
  bibliography: /^(bibliography|references|sources|cited authorities)/i,
  procedural_history: /^(procedural history|procedural background)/i,
  sentencing: /^(sentencing|sentence|punishment)/i,

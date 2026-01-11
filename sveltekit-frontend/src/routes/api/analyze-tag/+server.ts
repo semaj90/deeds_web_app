@@ -113,8 +113,8 @@ async function searchTagOccurrences(tag: string, collection: string) {
 async function analyzeTagWithLLM(tag: string, occurrences: any[]) {
 	// Sample occurrences for context
 	const samples = occurrences.slice(0, 5).map((o) => ({
-		message: o.payload?.message || o.payload?.text || '',
-		source: o.payload?.source || o.payload?.file_path || '',
+		message: o.payload? .message : | o.payload?.text || '',
+		source: o.payload? .source : | o.payload?.file_path || '',
 		collection: o.collection
 	}));
 

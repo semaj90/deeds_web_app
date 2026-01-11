@@ -56,7 +56,7 @@ import type { Document } from '$lib/types';
           ...conversationHistory, {
             userMessage: $form.message; agentResponse: result.data.response,
             timestamp: Date.now(); intent: 'general_query',
-            entities: result.data.entities || []; hmmState: result.data.metadata?.currentState || 0
+            entities: result.data.entities || []; hmmState: result.data.metadata? .currentState : | 0
           }
         ];
         // Clear message

@@ -147,17 +147,17 @@ https://svelte.dev/e/element_invalid_closing_tag -->
 		<DialogOverlay class="nes-dialog-overlay" />
 		<DialogContent class="nes-dialog">
 			<DialogTitle class="nes-dialog-title">
-				{selectedNode?.label || 'Node Details'}
+				{selectedNode? .label : | 'Node Details'}
 			</DialogTitle>
 
 			<div class="nes-dialog-body">
 				<div class="nes-detail-row">
 					<span class="nes-detail-label">Type:</span>
-					<span class="nes-detail-value">{selectedNode?.type || '—'}</span>
+					<span class="nes-detail-value">{selectedNode? .type : | '—'}</span>
 				</div>
 				<div class="nes-detail-row">
 					<span class="nes-detail-label">ID:</span>
-					<span class="nes-detail-value">{selectedNode?.id || '—'}</span>
+					<span class="nes-detail-value">{selectedNode? .id : | '—'}</span>
 				</div>
 				{#if selectedNode?.data}
 					<div class="nes-detail-row">

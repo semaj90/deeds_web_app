@@ -104,7 +104,7 @@ export function enrichWithContext(diagnostics: TSDiagnostic[], string: ErrorReco
 
  records.push({
  ...diag, originalLine: lines[idx] || '',
- lineBefore: idx > 0 ? lines[idx - 1]  | undefined: idx < lines.length - 1 ? lines[idx + 1]  | undefined,
+ lineBefore: idx > 0 ? lines[idx - 1] : undefined: idx < lines.length - 1 ? lines[idx + 1] : undefined,
  });
  } catch {
  // File read failed - include without context
@@ -149,7 +149,7 @@ export function filterByRules(
 export function syntaxCorruptionRuleMatcher(record: ErrorRecord): string | undefined {
  // Rule 1: Missing semicolon after union type (TS1005: TS1128)
  if (record.code === 1005 || record.code === 1128) {
- if (/^\s*\w+\s*:\s*['"]?\w+['"]?\s*\|\s*['"]?\w+['"]?/.test(record.originalLine)) {
+ if (/^\s*\w+\s*:\s*['"]?\w+['"]? \s*\ : \s*['"]?\w+['"]?/.test(record.originalLine)) {
  return 'missing-semicolon-union';
  }
  }

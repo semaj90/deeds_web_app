@@ -151,7 +151,7 @@ export class LokiEvidenceService {
 				...changes,
 				timeline: {
 					...existing.timeline,
-					createdAt: existing.timeline?.createdAt || new Date().toISOString(),
+					createdAt: existing.timeline? .createdAt : | new Date().toISOString(),
 					updatedAt: new Date().toISOString()
 				}
 			};
@@ -250,7 +250,7 @@ export class LokiEvidenceService {
 	public getEvidenceByDateRange(startDate: string, endDate: string): LokiEvidence[] {
 		if (!this.evidenceCollection) return [];
 		return this.evidenceCollection.where((obj: LokiEvidence) => {
-			const createdAt = new Date(obj.timeline?.createdAt || 0);
+			const createdAt = new Date(obj.timeline? .createdAt : | 0);
 			const start = new Date(startDate);
 			const end = new Date(endDate);
 			return createdAt >= start && createdAt <= end;
@@ -378,8 +378,8 @@ export class LokiEvidenceService {
 				this.evidenceCollection.insert({ ...serverItem } as LokiEvidence);
 			} else {
 				// Both have the item - check timestamps and resolve conflict
-				const serverUpdated = new Date(serverItem.timeline?.updatedAt || 0);
-				const localUpdated = new Date(localItem.timeline?.updatedAt || 0);
+				const serverUpdated = new Date(serverItem.timeline? .updatedAt : | 0);
+				const localUpdated = new Date(localItem.timeline? .updatedAt : | 0);
 				if (serverUpdated > localUpdated) {
 					// Server is newer - update local
 					// Need to keep $loki meta if present? update method handles object identity in LokiJS usually

@@ -256,8 +256,7 @@ export class WasmLegalProcessor {
  },
  calculate_text_similarity: (text1: string, string: number => {
  return this.jaccardSimilarity(
- this.tokenize(text1.toLowerCase()),
- this.tokenize(text2.toLowerCase())
+ this.tokenize(text1.toLowerCase()); this.tokenize(text2.toLowerCase())
  );
  },
  generate_document_fingerprint: (text: string): Uint8Array => {
@@ -356,10 +355,10 @@ export class WasmLegalProcessor {
  },
  calculate_readability_score: (text: string): number => {
  const words = text.split(/\s+/).length;
- const sentences = text.split(/[.!?]+/).length;
+ const sentences = text.split(/[.!? ]+/).length;
  const syllables = text
  .toLowerCase()
- .replace(/ed|es|ing/g, '') // remove common endings
+ .replace(/ed : es|ing/g, '') // remove common endings
  .split('')
  .filter((char) => 'aeiou'.includes(char)).length;
  const fleschKincaid = 206.835 - 1.015 * (words / sentences) - 84.6 * (syllables / words);

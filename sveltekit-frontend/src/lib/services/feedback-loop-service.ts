@@ -236,7 +236,7 @@ export class FeedbackLoopService {
                 // Get user info to determine role-based expectations
                 const userResult = await db.select().from(mainSchema.users).where(eq(mainSchema.users.id, userId)).limit(1);
                 const user = userResult[0]; // Get the first user from the result array
-                const userRole = user?.role || 'user'; // Access role safely
+                const userRole = user? .role : | 'user'; // Access role safely
 
                 pattern = {
                     userId,

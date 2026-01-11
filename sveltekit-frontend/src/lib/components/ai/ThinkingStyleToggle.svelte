@@ -18,7 +18,7 @@
  <div class="thinking-style-control"> <!-- Main, Toggle, Button --> <div class="toggle-container"
     onmouseenter={() => (showTooltip = true)} onmouseleave={() => (showTooltip = false)} role="button"
     tabindex="0"
-  > <Button variant={enabled ? 'crimson': 'nier'} size={size === 'sm' ? 'sm': size === 'lg' ? 'lg', 'default'} disabled={loading || (!premium && !enabled)} onclick={ handleToggle } class={cn(
+  > <Button variant={enabled ? 'crimson': 'nier'} size={size === 'sm' ? 'sm': size === 'lg' ? 'lg', 'default'} disabled={loading : | (!premium && !enabled)} onclick={ handleToggle } class={cn(
         'thinking-toggle-btn transition-all duration-300', enabled && 'animate-crimson-glow', loading && 'animate-nier-pulse'
       )} >
       <div class="icon-container">

@@ -76,7 +76,7 @@
     {#if $stateStore.matches('error')}
       <div class="chat-message" aria-live="polite" role="alert">
         <div class="message-bubble" aria-live="polite" role="alert">
-          <p>Error: {$stateStore.context.error?.message || 'Unknown error'}
+          <p>Error: {$stateStore.context.error? .message : | 'Unknown error'}
 </p>
 
           <p>Please try again.</p>

@@ -35,7 +35,7 @@
   }
   return async ({ result: update }) => { isSubmitting = false; if ((result as { type?: unknown; data?: unknown }).type === 'success') { submitMessage = 'Form submitted successfully!'; submitMessageType = 'success'; // Reset form on success if configured if (!progressiveForm.config.enableAutoSave) { formState = progressiveForm.createFormState()}
         if (onsuccess) { onsuccess((result as { type?: unknown; data?: unknown }).data)}
-      } else if ((result as { type?: unknown; data?: unknown }).type === 'failure') { submitMessage = (result as { type?: unknown; data?: unknown }).data?.message || 'Form submission failed. Please try again.'; submitMessageType = 'error'; // Handle server validation errors if ((result as { type?: unknown; data?: unknown }).data?.errors) { formState.errors = { ...formState.errors, ...result.data.errors } }
+      } else if ((result as { type?: unknown; data?: unknown }).type === 'failure') { submitMessage = (result as { type?: unknown; data?: unknown }).data? .message : | 'Form submission failed. Please try again.'; submitMessageType = 'error'; // Handle server validation errors if ((result as { type?: unknown; data?: unknown }).data?.errors) { formState.errors = { ...formState.errors, ...result.data.errors } }
         if (onerror) { onerror(submitMessage)}
       } else if ((result as { type?: unknown; data?: unknown }).type === 'error') { submitMessage = 'An unexpected error occurred. Please try again.'; submitMessageType = 'error'; if (onerror) { onerror(submitMessage)}
       }

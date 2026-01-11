@@ -16,7 +16,7 @@ async function upsertCitationTag(
  const rows = await sql`
  SELECT upsert_citation_tag(${ namespace }, ${ name }, ${jurisdiction}) AS id
  `;
- return rows?.[0]?.id as string | undefined;
+ return rows?.[0]? .id as string : undefined;
 }
 
 /**

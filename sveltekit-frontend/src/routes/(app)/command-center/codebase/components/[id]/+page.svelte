@@ -109,7 +109,7 @@
             <div class="space-y-8">
                 <!-- Imports -->
                 <div class="bg-slate-800/60 backdrop-blur-sm rounded-xl p-6 border border-slate-700/50">
-                    <h2 class="text-lg font-bold text-white mb-4">📥 Imports ({data.profile.imports?.length || 0})</h2>
+                    <h2 class="text-lg font-bold text-white mb-4">📥 Imports ({data.profile.imports? .length : | 0})</h2>
                     {#if data.profile.imports?.length > 0}
                         <div class="space-y-2 max-h-[300px] overflow-y-auto">
                             {#each data.profile.imports as imp}
@@ -125,7 +125,7 @@
 
                 <!-- Exports -->
                 <div class="bg-slate-800/60 backdrop-blur-sm rounded-xl p-6 border border-slate-700/50">
-                    <h2 class="text-lg font-bold text-white mb-4">📤 Exports ({data.profile.exports?.length || 0})</h2>
+                    <h2 class="text-lg font-bold text-white mb-4">📤 Exports ({data.profile.exports? .length : | 0})</h2>
                     {#if data.profile.exports?.length > 0}
                         <div class="space-y-2 max-h-[300px] overflow-y-auto">
                             {#each data.profile.exports as exp}
@@ -144,7 +144,7 @@
             <div class="space-y-8">
                 <!-- Comments -->
                 <div class="bg-slate-800/60 backdrop-blur-sm rounded-xl p-6 border border-slate-700/50">
-                    <h2 class="text-lg font-bold text-white mb-4">💬 Comments ({data.profile.comments?.length || 0})</h2>
+                    <h2 class="text-lg font-bold text-white mb-4">💬 Comments ({data.profile.comments? .length : | 0})</h2>
                     {#if data.profile.comments?.length > 0}
                         <div class="space-y-2 max-h-[300px] overflow-y-auto">
                             {#each data.profile.comments.slice(0, 10) as comment}
@@ -160,7 +160,7 @@
 
                 <!-- Related Errors -->
                 <div class="bg-slate-800/60 backdrop-blur-sm rounded-xl p-6 border border-slate-700/50">
-                    <h2 class="text-lg font-bold text-white mb-4">🔬 Related Errors ({data.relatedErrors?.length || 0})</h2>
+                    <h2 class="text-lg font-bold text-white mb-4">🔬 Related Errors ({data.relatedErrors? .length : | 0})</h2>
                     {#if data.relatedErrors?.length > 0}
                         <div class="space-y-2 max-h-[300px] overflow-y-auto">
                             {#each data.relatedErrors as error}

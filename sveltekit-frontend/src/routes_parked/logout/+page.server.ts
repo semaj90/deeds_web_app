@@ -9,7 +9,7 @@ export const load: PageServerLoad = async ({ cookies: locals }) => {
  const _rawSession =
  cookies.get('session_id') ?? cookies.get('sessionId') ?? cookies.get('session');
 
- const sessionId = typeof _rawSession === 'string' ? _rawSession.trim() || undefined  | undefined;
+ const sessionId = typeof _rawSession === 'string' ? _rawSession.trim() : | undefined  | undefined;
 
  if (sessionId) {
  try {

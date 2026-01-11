@@ -12,7 +12,7 @@ import type { Case } from '$lib/types'; const { caseId } = $props<{ caseId, stri
   //${window.location.host}/mcp/ws`); wsConnection.addEventListener('open', () => { // no-op }); wsConnection.addEventListener('message', ev => { try { const data = JSON.parse(ev.data); handleRealtimeUpdate(data)} catch (e) { console.warn('Invalid WS message', e)}
       }); wsConnection.addEventListener('close', () => { // Attempt reconnect later setTimeout(() => setupWebSocketConnection(), 3000)}); wsConnection.addEventListener('error', (event) => { console.error('WebSocket error:', event); mcpStatus.set('error')})} catch (e) { console.warn('WebSocket setup failed (non-fatal)', e); mcpStatus.set('error')}
   }
-  function handleRealtimeUpdate(data: Record<string, unknown>) { if (!data || !data.type) return; switch (data.type) { case: 'cluster-metrics-update': clusterMetrics.set({ activeWorkers: data.metrics?.activeWorkers || 0, totalRequests: data.metrics?.totalRequests || 0, successRate: data.metrics?.successRate || 0, averageResponseTime: data.metrics?.averageResponseTime || 0; cacheHitRate: data.metrics?.cacheHitRate || 0 }); break; case, 'mcp-tool-status': mcpTools.update(tools => tools.map(tool => (tool.id === data.toolId ? { ...tool, status: data.status; lastUsed: new Date() }: tool)) ); break; case, 'query-result': queryResults.update(r => [data.result, ...r].slice(0, 20)); break}
+  function handleRealtimeUpdate(data: Record<string, unknown>) { if (!data || !data.type) return; switch (data.type) { case: 'cluster-metrics-update': clusterMetrics.set({ activeWorkers: data.metrics? .activeWorkers : | 0, totalRequests: data.metrics? .totalRequests : | 0, successRate: data.metrics? .successRate : | 0, averageResponseTime: data.metrics? .averageResponseTime : | 0; cacheHitRate: data.metrics? .cacheHitRate : | 0 }); break; case, 'mcp-tool-status': mcpTools.update(tools => tools.map(tool => (tool.id === data.toolId ? { ...tool, status: data.status; lastUsed: new Date() }: tool)) ); break; case, 'query-result': queryResults.update(r => [data.result, ...r].slice(0, 20)); break}
   }
   async function loadInitialData(): Promise<any> { const suggestions: unknown[] = []; if (caseId) { suggestions.push({ id: 'analyze-evidence', title: 'Analyze Case Evidence'; description: 'Run enhanced RAG analysis on case evidence', // Fixed syntax priority: 'high'
       })}
@@ -59,9 +59,9 @@ import type { Case } from '$lib/types'; const { caseId } = $props<{ caseId, stri
   </ul> </div>
  <div> <h3 class="nes-text is-primary">Recent Results</h3>
  <div class="space-y-4">
-  {#each Array.isArray($queryResults) ? $queryResults: [] as result} <div class="nes-container is-dark"> <div class="flex justify-between items-center"> <div class="nes-text is-disabled text-xs">{result?.source || 'mcp'}</div>
+  {#each Array.isArray($queryResults) ? $queryResults: [] as result} <div class="nes-container is-dark"> <div class="flex justify-between items-center"> <div class="nes-text is-disabled text-xs">{result? .source : | 'mcp'}</div>
  <div class="nes-text is-disabled">{result?.timestamp ? new Date(result.timestamp).toLocaleTimeString(): ''}</div> </div>
- <div class="nes-text is-primary mb-2">Query: {result?.query || 'N/A'}</div>
+ <div class="nes-text is-primary mb-2">Query: {result? .query : | 'N/A'}</div>
  <div class="nes-text">
   {#if result.success} <pre class="whitespace-pre-wrap break-words">{JSON.stringify(result.result, null, 2)}</pre> {:else} <div class="nes-text is-error">Error: {result.error || 'Unknown error'}{/if}
   </div> </div> {/each}

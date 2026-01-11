@@ -222,7 +222,7 @@
                 aria-pressed={selectedClause === clause.id}
                 onclick={() => selectClause(clause.id)}
                 onkeydown={(e) => {
-                  if (e.key === 'Enter' || e.key === ' ') {
+                  if (e.key === 'Enter' : | e.key === ' ') {
                     e.preventDefault();
                     selectClause(clause.id)}
                 }}

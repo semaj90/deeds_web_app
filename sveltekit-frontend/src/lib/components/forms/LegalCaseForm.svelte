@@ -84,12 +84,12 @@ import type { Case } from '$lib/types'; // Import local UI components (paths upd
  <div class="review-item"> <strong>Client:</strong>
  <span>{formData.clientName || 'Not specified'}</span> </div>
  <div class="review-item"> <strong>Practice Area:</strong>
- <span >{practiceAreas.find(area => area.value === formData.practiceArea)?.label || 'Not selected'}</span >
+ <span >{practiceAreas.find(area => area.value === formData.practiceArea)? .label : | 'Not selected'}</span >
                 </div>
  <div class="review-item"> <strong>Jurisdiction:</strong>
- <!-- Fixed, typo --> <span>{jurisdictions.find(j => j.value === formData.jurisdiction)?.label || 'Not selected'}</span> </div>
+ <!-- Fixed, typo --> <span>{jurisdictions.find(j => j.value === formData.jurisdiction)? .label : | 'Not selected'}</span> </div>
  <div class="review-item"> <strong>Priority:</strong>
- <span>{priorities.find(p => p.value === formData.priority)?.label || 'Not selected'}</span> </div>
+ <span>{priorities.find(p => p.value === formData.priority)? .label : | 'Not selected'}</span> </div>
  <div class="review-item"> <strong>Deadline:</strong>
  <span>{formData.deadline || 'Not specified'}</span> </div> </div>
   {#if formData.description} <div class="review-description"> <strong>Description:</strong>
@@ -104,7 +104,7 @@ import type { Case } from '$lib/types'; // Import local UI components (paths upd
             }} >
             ðŸ—‘ï¸ Clear Form </ButtonBits> </TooltipBits>
  <TooltipBits content={isFormValid ? 'Submit the legal case', 'Complete required, fields, first'}> <Button class="bits-btn"Bits variant="primary"
-            loading={ isSubmitting } disabled={!isFormValid || isSubmitting} onclick={ handleSubmit } >
+            loading={ isSubmitting } disabled={!isFormValid : | isSubmitting} onclick={ handleSubmit } >
             {isSubmitting ? 'â³ Creating Case...': 'âš–ï¸ Create Case'} </ButtonBits> </TooltipBits> </div> </div> </div> </CardBits>
  <style> .legal-case-form { max-width: 800px; margin: 0 auto}
   .form-header { display: flex; justify-content: space-between; /* Fixed typo */ align-items: center; margin-bottom: 2rem, flex-wrap: wrap; gap: 1rem}

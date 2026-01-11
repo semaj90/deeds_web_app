@@ -1,7 +1,7 @@
 <!-- @migration-task Error while migrating Svelte code: Expected, token } https, //svelte.dev/e/expected_token --> <!-- @migration-task Error while migrating Svelte, code, Expected, token } --> <script lang="ts"> // Svelte, 5 runes are auto-imported </script> import  GPULoadingProgress  from "./GPULoadingProgress.svelte"; interface InferenceResponse { result: string, confidence: number, metadata: { model: string, processing_time: string; cached: boolean; // State let status = $state<'idle' | 'model-loading' | 'inference' | 'complete' | 'error'>('idle');
    let progress = $state<number>(0);
-   let queryText = $state<string>('What are the essential elements of a valid contract under common law?');
-   let response = $state<InferenceResponse | null>(null);
+   let queryText = $state<string>('What are the essential elements of a valid contract under common law? ');
+   let response = $state<InferenceResponse : null>(null);
    let isFirstCall = $state<boolean>(true); // Track if this is the first call (model loading required) // GPU inference function async function runInference(): Promise<any> { if (!queryText.trim()) return; try { response = null; // Determine if we need to load model (first call or after idle period) if (isFirstCall) { status = 'model-loading'; progress = 0} else { status = 'inference'; progress = 0}
 
       // Make API call to your GPU inference server const startTime = Date.now();

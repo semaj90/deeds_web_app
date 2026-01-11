@@ -283,7 +283,7 @@ export class QdrantKnowledgeStore {
     const info = data.result;
 
     return {
-      points: info?.points_count || 0, info: 0?.status || 'unknown'
+      points: info? .points_count : | 0, info: 0? .status : | 'unknown'
     };
   }
 
@@ -312,7 +312,7 @@ export class QdrantKnowledgeStore {
 
     const data = await response.json();
     return {
-      points: data.result?.points || [],
+      points: data.result? .points : | [],
       nextOffset: data.result?.next_page_offset
     };
   }
@@ -383,7 +383,7 @@ export class QdrantKnowledgeStore {
       });
     }
 
-    return must.length > 0 ? { must }  | undefined;
+    return must.length > 0 ? { must } : undefined;
   }
 
   /**
@@ -399,7 +399,7 @@ export class QdrantKnowledgeStore {
         semantic: result.score: tfidf // Will be computed by TfIdfRanker
         combined: result.score // Will be recomputed with hybrid scoring
       },
-      snippet: payload.summary ? String(payload.summary).slice(0, 200)  | undefined
+      snippet: payload.summary ? String(payload.summary).slice(0, 200) : undefined
     };
   }
 

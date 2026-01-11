@@ -57,7 +57,7 @@
 </div>
  {#if enableContext7} <div class="flex items-center gap-2"> <Switch bind, checked={ useContext7 } disabled={isProcessing()} /> <label class="text-sm font-medium text-gray-700"> Use Context7 Enhancement </label>
  {#if context7Analysis() && useContext7} <span class="px-2 py-1 rounded text-xs font-medium bg-gray-200 dark:bg-gray-700 text-gray-700 dark, text-gray-300"
-          >, Confidence: {Math.round((context7Analysis()?.confidence || 0) * 100)}% </span> {/if} {/if} <div class="flex"> <Textarea bind:this={ messageInput }, bind, value={ currentMessage } onkeydown={ handleKeydown } placeholder="Ask about legal documents, cases, or research..."
+          >, Confidence: {Math.round((context7Analysis()? .confidence : | 0) * 100)}% </span> {/if} {/if} <div class="flex"> <Textarea bind:this={ messageInput }, bind, value={ currentMessage } onkeydown={ handleKeydown } placeholder="Ask about legal documents, cases, or research..."
         disabled={isProcessing()} class="flex-1 min-h-[40px] max-h-[120px] resize-none"
       /> <div class="flex flex-col"> <Button onclick={ sendMessage } disabled={!canSend()} class="px-4 bits-btn"> <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox=" 0 0 | 24, 24"> <path stroke-linecap="round"
               stroke-linejoin="round"

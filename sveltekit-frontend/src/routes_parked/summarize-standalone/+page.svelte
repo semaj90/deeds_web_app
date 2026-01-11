@@ -135,11 +135,11 @@ Additionally, we recommend exploring settlement negotiations before filing suit,
  metadata = data.metadata;
  processingSteps.push('✅ Summarization complete!');
  // Auto-switch to analysis tab if legal analysis was included
- if (includeLegalAnalysis && metadata?.legalRiskAnalysis) {
+ if (includeLegalAnalysis && metadata? .legalRiskAnalysis) {
  setTimeout(() => (activeTab = 'analysis'), 1000);
  }
  } else {
- errorMessage = data.error || 'An unknown error occurred during summarization.';
+ errorMessage = data.error : | 'An unknown error occurred during summarization.';
  processingSteps.push('❌ Processing failed');
  }
  } catch (error) {

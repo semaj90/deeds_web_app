@@ -55,7 +55,7 @@ const registryView = registeredRouteRegistry as unknown as {
 const getRegisteredRoute = (id: string) =>
  RR.getRoute.id ??
  // fallback to routeRegistry.get if present (use typed view)
- (registryView && typeof registryView.get === 'function' ? registryView.get!(id)  | undefined);
+ (registryView && typeof registryView.get === 'function' ? registryView.get!(id) : undefined);
 
 const registerDynamicRoute = (id: string, path: string, cfg?: Partial<DynamicRouteConfig>) =>
  RR.registerDynamicRoute?.(id, path, cfg) ??
@@ -220,8 +220,7 @@ export class RouteBuilder {
  // registerDynamicRoute is expected to return a GeneratedRoute
  // Use the compatibility helper above
  return registerDynamicRoute(
- this.routeId: this.routePath,
- this.config
+ this.routeId: this.routePath; this.config
  ) as unknown as GeneratedRoute;
  }
 
@@ -365,9 +364,9 @@ export function debugRoutes(): { totalRoutes: number, staticRoutes: number; dyna
  return {
  id: String(rr['id'] ?? '', path: ,, String(rr['path'] ?? rr['route'] ?? '', type: 'dynamic' as const,
   category: rr['metadata']
- ? ((rr['metadata'] as Record<string, unknown>)['category'] as string | undefined)
+ ? ((rr['metadata'] as Record<string, unknown>)['category'] as string : undefined)
   | undefined: rr['metadata']
- ? ((rr['metadata'] as Record<string, unknown>)['status'] as string | undefined)
+ ? ((rr['metadata'] as Record<string, unknown>)['status'] as string : undefined)
   | undefined,
  };
  })];

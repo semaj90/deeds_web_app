@@ -307,7 +307,7 @@ export class LocalLegalStore {
 			this.lastSyncTime = Date.now();
 			this.pendingChanges = 0;
 
-			console.log(`✅ Synced with server (${documents?.length || 0} updates)`);
+			console.log(`✅ Synced with server (${documents? .length : | 0} updates)`);
 		} catch (error) {
 			console.error('❌ Sync failed:', error);
 			this.syncStatus = 'offline';

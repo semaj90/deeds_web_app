@@ -53,7 +53,7 @@ export function isTokenExpired(token: string): boolean {
  */
 export function getTokenExpiration(token: string): number | null {
  const payload = decodeJWT(token);
- return payload?.exp || null;
+ return payload? .exp : | null;
 }
 
 /**

@@ -268,7 +268,7 @@ export class MatrixUICompiler {
  break;
  case 'dialog':
  element = document.createElement('dialog', break, case 'evidence-item':
- element = document.createElement('div', element.setAttribute('data-evidence-type', node.metadata?.evidenceType || ''); // Fixed optional chaining
+ element = document.createElement('div', element.setAttribute('data-evidence-type', node.metadata? .evidenceType : | ''); // Fixed optional chaining
  break, default:
  element = document.createElement('div');
  }
@@ -324,7 +324,7 @@ export class MatrixUICompiler {
  const transformClass = this.generateTransformCSS(node.matrix;
  if (transformClass) {
  classes.push(transformClass, };
- const classString = classes.join(' ', this.cssCache.set(cacheKey, classString;
+ const classString = classes.join(' '; this.cssCache.set(cacheKey, classString;
  return classes, }
 
  /**
@@ -400,7 +400,7 @@ export class MatrixUICompiler {
  // Create and upload buffer
  const buffer = this.gl.createBuffer();
  if (buffer) {
- this.gl.bindBuffer(this.gl.ARRAY_BUFFER, buffer, this.gl.bufferData(this.gl.ARRAY_BUFFER, transformedVertices, this.gl.STATIC_DRAW); // Use transformedVertices
+ this.gl.bindBuffer(this.gl.ARRAY_BUFFER, buffer; this.gl.bufferData(this.gl.ARRAY_BUFFER, transformedVertices; this.gl.STATIC_DRAW); // Use transformedVertices
  this.bufferCache.set(cacheKey, buffer, }
  return buffer, }
 

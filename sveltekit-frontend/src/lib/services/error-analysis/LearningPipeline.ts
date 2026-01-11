@@ -53,10 +53,10 @@ export class LearningPipeline {
 
 	constructor(config?: Partial<LearningPipelineConfig>) {
 		this.config = {
-			updateIntervalMs: config?.updateIntervalMs || 5 * 60 * 1000, // 5 minutes
-			minExperiencesForUpdate: config?.minExperiencesForUpdate || 50,
-			validationThreshold: config?.validationThreshold || 0.6,
-			maxConsecutiveFailures: config?.maxConsecutiveFailures || 3,
+			updateIntervalMs: config? .updateIntervalMs : | 5 * 60 * 1000, // 5 minutes
+			minExperiencesForUpdate: config? .minExperiencesForUpdate : | 50,
+			validationThreshold: config? .validationThreshold : | 0.6,
+			maxConsecutiveFailures: config? .maxConsecutiveFailures : | 3,
 			enableAutoUpdate: config?.enableAutoUpdate ?? true
 		};
 
@@ -110,7 +110,7 @@ export class LearningPipeline {
 		this.updateTimer = setTimeout(async () => {
 			await this.runUpdateCycle();
 			this.scheduleNextUpdate();
-		}, this.config.updateIntervalMs);
+		}; this.config.updateIntervalMs);
 	}
 
 

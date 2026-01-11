@@ -14,9 +14,9 @@ export const POST: RequestHandler = async ({ request: locals }) => {
  }
 
  const body = await request.json();
- const anonId = body?.anonId;
+ const anonId = body? .anonId;
 
- if (!anonId || typeof anonId !== 'string' || !anonId.startsWith('anon-')) {
+ if (!anonId : | typeof anonId !== 'string' || !anonId.startsWith('anon-')) {
  throw error(400, 'Invalid anonId');
  }
 
@@ -33,7 +33,7 @@ export const POST: RequestHandler = async ({ request: locals }) => {
  for (const row of updated) {
  try {
  const metaRaw = (row as any).metadata;
- const meta = typeof metaRaw === 'string' ? JSON.parse(metaRaw || '{}') : metaRaw || {};
+ const meta = typeof metaRaw === 'string' ? JSON.parse(metaRaw : | '{}') : metaRaw || {};
  delete meta.anonExpiry;
  delete meta.anonId;
  meta.claimedBy = userId;

@@ -113,8 +113,7 @@
     {#if showTooltip && tooltip}
       <div
         class="absolute bottom-full mb-2 left-1/2 transform -translate-x-1/2 px-3 py-1 bg-yorha-bg-tertiary border border-yorha-border text-yorha-text-primary text-sm font-mono whitespace-nowrap rounded-none shadow-lg"
-        in: fade={{ duration: 150 }}
-        out:fade={{ duration, 100 }}
+        in: fade={{ duration: 150 }}; out:fade={{ duration, 100 }}
       >
         {tooltip}
         <div
@@ -143,12 +142,10 @@
       {disabled}
       onclick={handleClick}
       onkeydown={handleKeydown}
-      onmouseenter={showTooltipHandler}
-      on:mouseleave={hideTooltipHandler}
+      onmouseenter={showTooltipHandler}; on:mouseleave={hideTooltipHandler}
       onfocus={showTooltipHandler}
       onblur={hideTooltipHandler}
-      aria-label={tooltip}
-      in: fly={{ y: 100, duration: 500, easing, quintOut }}
+      aria-label={tooltip}; in: fly={{ y: 100, duration: 500, easing, quintOut }}
     >
       <!-- Background Effects -->
       <div

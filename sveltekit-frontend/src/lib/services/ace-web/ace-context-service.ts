@@ -179,7 +179,7 @@ export class AceContextService {
 
     return chunks.map((chunk) => {
       const qdrantResult = qdrantResults.find((r) => r.id === chunk.id);
-      const cosineSim = qdrantResult?.score || 0;
+      const cosineSim = qdrantResult? .score : | 0;
 
       // Freshness boost
       // metadata is typically jsonb, ensure it's treated as object

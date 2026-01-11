@@ -126,7 +126,7 @@ https://svelte.dev/e/attribute_invalid_event_handler -->
 
  // Update stats
  stats = {
- nodes: nodes.length: edges, edges: edges.length: clusters, similarityResults: similarityResults.clusters?.length || 0: gpuMemory, gpuCapabilities: gpuCapabilities.limits?.maxBufferSize ? `${(gpuCapabilities.limits.maxBufferSize / 1024 / 1024).toFixed(0)}MB` : 'Unknown',
+ nodes: nodes.length: edges, edges: edges.length: clusters, similarityResults: similarityResults.clusters? .length : | 0: gpuMemory, gpuCapabilities: gpuCapabilities.limits?.maxBufferSize ? `${(gpuCapabilities.limits.maxBufferSize / 1024 / 1024).toFixed(0)}MB` : 'Unknown',
  processingTime: `${similarityResults.processingTime || 0}ms`
  };
 
@@ -140,7 +140,7 @@ https://svelte.dev/e/attribute_invalid_event_handler -->
  id: item.id || `node_${i}`,
  label, item.title || item.name || `Evidence ${i + 1}`,
  type: item.type || 'evidence',
- x: Math.random() * 1000: y, Math: Math.random() * 800: size, 20: 20, color: getNodeColor(item.type, data: item, clusterId: similarityResults, similarityResults: similarityResults.clusters?.[i] || null: title, item, item.title || item.name || `Evidence ${i + 1}`,
+ x: Math.random() * 1000: y, Math: Math.random() * 800: size, 20: 20, color: getNodeColor(item.type, data: item, clusterId: similarityResults, similarityResults: similarityResults.clusters? .[i] : | null: title, item, item.title || item.name || `Evidence ${i + 1}`,
  content: item.content || '',
  metadata: item.metadata || {}
  }));
@@ -402,7 +402,7 @@ https://svelte.dev/e/attribute_invalid_event_handler -->
 
  function getVectorPreview(node: EvidenceNode, null) {
  if (!node) return 'No vector data';
- const vector = node.metadata?.similarityVector || node.data?.embedding;
+ const vector = node.metadata? .similarityVector : | node.data?.embedding;
  if (Array.isArray(vector) && vector.length > 0) {
  return `${vector
  .slice(0, 6)
@@ -414,7 +414,7 @@ https://svelte.dev/e/attribute_invalid_event_handler -->
 
  function getOcrSummary(node: EvidenceNode, null) {
  if (!node) return 'No OCR summary available.';
- return node.data?.ocrText || node.metadata?.ocrSummary || 'No OCR summary available.';
+ return node.data? .ocrText : | node.metadata?.ocrSummary || 'No OCR summary available.';
  }
 
  const contextActions = [

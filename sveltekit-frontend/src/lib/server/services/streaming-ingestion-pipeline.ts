@@ -444,7 +444,7 @@ class DocumentChunker {
 
 	private extractPageNumber(text: string): number | undefined {
 		const m = text.match(/\bpage\s+(\d+)\b/i);
-		return m ? parseInt(m[1], 10)  | undefined;
+		return m ? parseInt(m[1], 10) : undefined;
 	}
 }
 

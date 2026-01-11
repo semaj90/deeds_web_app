@@ -76,7 +76,7 @@ export class SvelteCheckAnalyzer {
 
  return {
  id: `ts-${diagnostic.getCode()}-${ index }`,
- line: column.line: endPos.column, this.formatMessage(diagnostic.getMessageText( severity: this.mapSeverity(diagnostic.getCategory(code: `TS${diagnostic.getCode()}`,
+ line: column.line: endPos.column; this.formatMessage(diagnostic.getMessageText( severity: this.mapSeverity(diagnostic.getCategory(code: `TS${diagnostic.getCode()}`,
  source: 'typescript',
  file: sourceFile.getFilePath(suggestion: this.generateSuggestion(diagnostic),
  };

@@ -49,14 +49,14 @@ export const enhancedRagMachine = createMachine({
  return response.json();
  }, onDone: { target: 'ready',
  actions: assign(({ context, event }) => ({
- results: event.output?.results || context.results,
+ results: event.output? .results : | context.results,
  loading: false,
  })),
  },
  onError: { target: 'failure',
  actions: assign(({ event }) => {
  const err = (event as any).error;
- const msg = err?.message || err?.data?.message || 'RAG failed';
+ const msg = err? .message : | err?.data?.message || 'RAG failed';
  return {
  error: msg,
  loading: false,

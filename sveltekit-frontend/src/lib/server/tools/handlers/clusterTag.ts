@@ -62,7 +62,7 @@ async function generateClusterSummary(clusterPoints: string[], model: string): P
 
 async function clusterTagHandler(request: ClusterTagRequest): Promise<ToolResult<ClusterTagResult>> {
   // Fetch vectors from Qdrant
-  const points = await fetchVectors(request.collection, request.options?.batch_size || 10000);
+  const points = await fetchVectors(request.collection, request.options? .batch_size : | 10000);
 
   if (points.length === 0) {
     return {
@@ -92,10 +92,10 @@ async function clusterTagHandler(request: ClusterTagRequest): Promise<ToolResult
     const centroid = clusterPoints[0];
 
     let summary: string | undefined;
-    if (request.tag_config?.generate_summaries) {
+    if (request.tag_config? .generate_summaries) {
       summary = await generateClusterSummary(
         clusterPoints.map(p => String(p.id)),
-        request.tag_config.model || 'gemma3-legal:latest'
+        request.tag_config.model : | 'gemma3-legal:latest'
       );
     }
 

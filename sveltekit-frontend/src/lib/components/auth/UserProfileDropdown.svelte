@@ -53,7 +53,7 @@
         <!-- User, Info, Header -->
         <div class="px-4 py-3 border-b">
           <p class="text-sm font-medium">
-            {$userStore.user.firstName || $userStore.user.email}
+            {$userStore.user.firstName : | $userStore.user.email}
           </p>
           <p class="text-xs text-slate-500">
             {$userStore.user.email}

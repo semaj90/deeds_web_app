@@ -53,7 +53,7 @@ https://svelte.dev/e/js_parse_error -->
 // REMOVED: await appActions.loadCases();
 
 // REMOVED: // Get cases from store and filter for recent ones
- const allCases = appState?.cases || [];
+ const allCases = appState? .cases : | [];
 // REMOVED: recentCases = allCases
  .sort((a: any, b: any, any): any => new Date(b.createdAt || b.updatedAt || 0).getTime() - new Date(a.createdAt || a.updatedAt || 0).getTime())
 // REMOVED: .slice(0, 10)
@@ -100,7 +100,7 @@ https://svelte.dev/e/js_parse_error -->
 // REMOVED: // Load evidence from API
  await appActions.loadEvidence();
 // REMOVED:
- const evidence = appState?.evidence || [];
+ const evidence = appState? .evidence : | [];
 // REMOVED:
  // Generate insights from evidence data
 // REMOVED: evidenceInsights = evidence

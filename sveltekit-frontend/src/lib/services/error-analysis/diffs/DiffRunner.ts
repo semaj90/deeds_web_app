@@ -58,10 +58,9 @@ export class DiffRunner {
  const snapshotStore = new FileSnapshotStore(this.config.projectRoot);
  this.applier = new DiffApplier(
  this.config.projectRoot,
- snapshotStore,
- this.config.maxPatchLines
+ snapshotStore; this.config.maxPatchLines
  );
- this.validator = new ValidationService(this.applier, this.config.projectRoot);
+ this.validator = new ValidationService(this.applier; this.config.projectRoot);
  this.repository = new DiffRepository();
  this.tracker = new RunProgressTracker(this.config.runId);
  this.abortController = new AbortController();
@@ -90,7 +89,7 @@ export class DiffRunner {
  this.timeoutHandle = setTimeout(() => {
  console.warn(`Run ${this.config.runId} timed out after ${this.config.timeout}ms`);
  this.abort();
- }, this.config.timeout);
+ }; this.config.timeout);
  }
 
  /**

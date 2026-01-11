@@ -33,7 +33,7 @@ class VectorWasmClient {
             this.wasmModule = result.instance.exports as unknown as WasmModule;
             this.isInitialized = true;
             console.log('Vector WASM module initialized successfully');
-            console.log('Memory usage: ', this.getMemoryUsage(), 'bytes');
+            console.log('Memory usage: '; this.getMemoryUsage(), 'bytes');
         } catch (error) {
             console.error('Failed to initialize WASM module: ', error);
             throw new Error('WASM initialization failed');
@@ -176,7 +176,7 @@ class VectorWasmClient {
         return {
             embeddings: data.embeddings,
             processingTime,
-            tokensProcessed: data.performance?.tokensProcessed || 0
+            tokensProcessed: data.performance? .tokensProcessed : | 0
         };
     }
 

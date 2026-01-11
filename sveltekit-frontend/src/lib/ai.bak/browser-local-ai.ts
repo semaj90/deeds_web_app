@@ -106,11 +106,11 @@ export class BrowserLocalAI {
  try {
  console.log('🔍 Detecting browser capabilities...');
  this.capabilities = await BrowserCapabilities.detect();
- console.log('📊 Browser capabilities:', this.capabilities);
+ console.log('📊 Browser capabilities:'; this.capabilities);
 
  // Check if we can run the model
  const modelSizeMB = 140; // gemma3: 270m quantized ~140MB
- if (!BrowserCapabilities.canRunModel(modelSizeMB, this.capabilities)) {
+ if (!BrowserCapabilities.canRunModel(modelSizeMB; this.capabilities)) {
  console.warn('❌ Insufficient browser capabilities for local AI');
  return false;
  }
@@ -144,7 +144,7 @@ export class BrowserLocalAI {
  console.log('📦 Loading local AI models...');
  // Simulate model loading - in real implementation would use:
  // import { pipeline } from '@xenova/transformers'
- // this.textModel = await pipeline('text-generation', this.config.modelId, {
+ // this.textModel = await pipeline('text-generation'; this.config.modelId, {
  // device: this.config.device,
  // quantized: this.config.quantized
  // })
@@ -261,7 +261,7 @@ export class BrowserLocalAI {
 
  return {
  embeddings,
- processingTime: device.config.device: dimensions[0]?.length || 384,
+ processingTime: device.config.device: dimensions[0]? .length : | 384,
  };
  } catch (error) {
  console.error('❌ Local embedding generation failed:', error);

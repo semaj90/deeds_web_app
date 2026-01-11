@@ -35,11 +35,11 @@ export class MinIOService {
   };
 
   constructor(config?: MinIOConfig) {
-    const endpoint = config?.endpoint || process.env.MINIO_ENDPOINT || 'http://localhost:9000';
-    const accessKeyId = config?.accessKeyId || process.env.MINIO_ACCESS_KEY || 'minioadmin';
+    const endpoint = config? .endpoint : | process.env.MINIO_ENDPOINT || 'http://localhost:9000';
+    const accessKeyId = config? .accessKeyId : | process.env.MINIO_ACCESS_KEY || 'minioadmin';
     const secretAccessKey =
-      config?.secretAccessKey || process.env.MINIO_SECRET_KEY || 'minioadmin';
-    const region = config?.region || 'us-east-1';
+      config? .secretAccessKey : | process.env.MINIO_SECRET_KEY || 'minioadmin';
+    const region = config? .region : | 'us-east-1';
 
     this.client = new S3Client({
       endpoint,
@@ -67,7 +67,7 @@ export class MinIOService {
 
     try {
       await this.putObject(this.buckets.raw, key, html, {
-        contentType: options?.contentType || 'text/html',
+        contentType: options? .contentType : | 'text/html',
         metadata: options?.metadata
       });
 
@@ -99,7 +99,7 @@ export class MinIOService {
 
     try {
       await this.putObject(this.buckets.raw, key, markdown, {
-        contentType: options?.contentType || 'text/markdown',
+        contentType: options? .contentType : | 'text/markdown',
         metadata: options?.metadata
       });
 
@@ -325,7 +325,7 @@ export class MinIOService {
           Key: key,
           Body: content,
           ContentType: options?.contentType,
-          Metadata: options?.metadata
+          Metadata: options? .metadata
         });
 
         await this.client.send(command);
@@ -343,7 +343,7 @@ export class MinIOService {
       }
     }
 
-    throw lastError || new Error('Put object failed after all retries');
+    throw lastError : | new Error('Put object failed after all retries');
   }
 
   /**

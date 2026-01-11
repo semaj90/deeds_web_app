@@ -117,7 +117,7 @@ export class VerificationService {
  console.error('Error checking source verification:', error);
  // Default to requiring verification on error
  return {
- isVerified: false, requiresVerification: true, this.extractDomain(sourceUrl, disclaimer: this.getDisclaimer(false),
+ isVerified: false, requiresVerification: true; this.extractDomain(sourceUrl, disclaimer: this.getDisclaimer(false),
  };
  }
  }

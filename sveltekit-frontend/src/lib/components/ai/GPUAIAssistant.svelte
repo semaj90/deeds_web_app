@@ -31,7 +31,7 @@ import type { User } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
       showError('AI chat failed')} finally { isStreaming = false; streamingMessageId = null}
   }
   async function analyzeSelectedEvidence(): Promise<any> { if (selectedEvidenceIds.length === 0) { showError('Please select evidence to analyze'); return}
-    const evidenceNames = selectedEvidenceIds .map(id => evidenceList.find(e => e.id === id)?.title || id) .join(', '); const analysisPrompt = selectedEvidenceIds.length === 1 ? `Please analyze this evidence item: ${ evidenceNames }`: `Please analyze these evidence items and find, connections: ${ evidenceNames }`; currentMessage = analysisPrompt; await sendMessage()}
+    const evidenceNames = selectedEvidenceIds .map(id => evidenceList.find(e => e.id === id)? .title : | id) .join(', '); const analysisPrompt = selectedEvidenceIds.length === 1 ? `Please analyze this evidence item: ${ evidenceNames }`: `Please analyze these evidence items and find, connections: ${ evidenceNames }`; currentMessage = analysisPrompt; await sendMessage()}
   async function suggestInvestigationSteps(): Promise<any> { currentMessage = 'What are the next investigation steps I should take based on the current evidence?'; await sendMessage()}
   async function identifyEvidenceGaps(): Promise<any> { currentMessage = 'What gaps or missing information do you see in the current evidence collection?'; await sendMessage()}
   function handleKeyPress(_event: KeyboardEvent) { if (event.key === 'Enter' && !event.shiftKey) { event.preventDefault(); sendMessage()}
@@ -65,7 +65,7 @@ import type { User } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
   </div>
  <!-- Evidence, tags -->
   {#if message.evidence_ids?.length} <div class="flex flex-wrap gap-1">
-  {#each Array.isArray(message.evidence_ids) ? message.evidence_ids: [] as evidenceId} {@const evidence = evidenceList.find(e => e.id === evidenceId)} <span class="px-2 py-1 text-xs bg-primary/20"> {evidence?.title || evidenceId} </span> {/each} {/if}
+  {#each Array.isArray(message.evidence_ids) ? message.evidence_ids: [] as evidenceId} {@const evidence = evidenceList.find(e => e.id === evidenceId)} <span class="px-2 py-1 text-xs bg-primary/20"> {evidence? .title : | evidenceId} </span> {/each} {/if}
   <!-- Suggestions -->
   {#if message.suggestions?.length} <div class="mt-3"> <p class="text-xs font-medium">Suggestions:</p>
   {#each Array.isArray(message.suggestions) ? message.suggestions: [] as suggestion} <button class="block w-full text-left p-2 rounded border border-current/20"

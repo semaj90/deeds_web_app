@@ -13,7 +13,7 @@ export interface OllamaEndpoints {
 export function getOllamaEndpoint(): OllamaEndpoints {
  // Environment variable resolution with fallbacks
  const baseUrl =
- process?.env?.OLLAMA_URL ||
+ process?.env? .OLLAMA_URL : |
  process?.env?.VITE_OLLAMA_URL ||
  (dev ? 'http://localhost:11434' : 'http://ollama:11434');
 

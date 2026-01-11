@@ -80,7 +80,7 @@ export const GET: RequestHandler = async ({ url }) => {
 		}
 
 		const data = await response.json() as QdrantScrollResponse;
-		let files = data.result?.points || [];
+		let files = data.result? .points : | [];
 
 		// Client-side search if query provided
 		if (search) {

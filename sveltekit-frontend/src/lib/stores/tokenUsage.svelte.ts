@@ -50,7 +50,7 @@ export class TokenTracker {
 	 * Remaining tokens
 	 */
 	get remainingTokens(): number {
-		return Math.max(0, this.tokenLimit - this.totalTokens);
+		return Math.max(0; this.tokenLimit - this.totalTokens);
 	}
 
 	/**

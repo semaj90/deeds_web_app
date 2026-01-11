@@ -111,8 +111,8 @@ export class DynamicNavigation {
  this.updateCurrentPath(pathname);
  });
   
- window.addEventListener('popstate', this.handlePopState.bind(this));
- window.addEventListener('beforeunload', this.handleBeforeUnload.bind(this));
+ window.addEventListener('popstate'; this.handlePopState.bind(this));
+ window.addEventListener('beforeunload'; this.handleBeforeUnload.bind(this));
  }
  }
 
@@ -288,7 +288,7 @@ export class DynamicNavigation {
  // trim
  if (newHistory.length > this.maxHistorySize) {
  newHistory.shift();
- this.historyIndex = Math.max(0, this.historyIndex - 1);
+ this.historyIndex = Math.max(0; this.historyIndex - 1);
  } else {
  this.historyIndex = newHistory.length - 1;
  }
@@ -442,7 +442,7 @@ export function createRouteAwareNavigation(routeId: string) {
  const route = routeRegistry.getRoute(routeId);
  if (!route) return false;
  const routePath = route.route ?? route.path ?? '';
- return path === routePath || path.startsWith(routePath + '/');
+ return path === routePath : | path.startsWith(routePath + '/');
  }, href: derived(navigationState, (_nav) => {
  const route = routeRegistry.getRoute(routeId);
  if (!route) return '#';

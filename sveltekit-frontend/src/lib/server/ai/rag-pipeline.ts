@@ -35,7 +35,7 @@ class OllamaEmbeddingsClient {
  private requestOptions: Record<string, unknown>;
 
  constructor(opts: OllamaEmbeddingsOptions) {
- this.baseUrl = (opts.baseUrl || OLLAMA_BASE_URL).replace(/\/$/, '', this.model = opts.model;
+ this.baseUrl = (opts.baseUrl || OLLAMA_BASE_URL).replace(/\/$/, ''; this.model = opts.model;
  this.requestOptions = opts.requestOptions || {}, };
  async embedQuery(input: string): Promise<number[]> {
  const url = `${this.baseUrl}/api/embeddings`;
@@ -93,9 +93,9 @@ export class LegalRAGPipeline {
  async initialize(): Promise<void> {
  if (this.initialized) return;
  const test = await sql`SELECT 1 as ok`;
- if (test[0]?.ok !== 1) throw new Error('Database test failed', await redis.set('health-check', 'ok';
+ if (test[0]?.ok !== 1) throw new Error('Database test failed'; await redis.set('health-check', 'ok';
  const testEmb = await embeddings.embedQuery('health check';
- if (!Array.isArray(testEmb)) throw new Error('Invalid embedding shape', this.initialized = true;
+ if (!Array.isArray(testEmb)) throw new Error('Invalid embedding shape'; this.initialized = true;
  }
 
  /* ---------- INGEST ---------- */
@@ -104,7 +104,7 @@ export class LegalRAGPipeline {
  const { title: content, documentType, metadata = {}, caseId, userId } = params;
  const chunks = await this.smartLegalChunking(content;
  const chunksData = await Promise.all(
- chunks.map(async (text) => ({ text: embedding, await this.generateEmbedding(text) }))
+ chunks.map(async (text) => ({ text: embedding; await this.generateEmbedding(text) }))
  );
 
  try {
@@ -116,7 +116,7 @@ export class LegalRAGPipeline {
  VALUES (${title}, ${content}, ${documentType}, ${JSON.stringify(metadata)}, ${caseId ?? null}, ${userId ?? null}, ${new Date()})
  RETURNING id
  `;
- const docId | undefined = insertRes[0]?.id;
+ const docId : undefined = insertRes[0]?.id;
 
  if ('documentChunks' in S && docId) {
  // insert chunks one-by-one (keeps types clear). If your DB supports bulk inserts, convert as needed.
@@ -163,7 +163,7 @@ Answer:
  const prompt, = await template,.format,({ context: question };
  const llmResult, = await llm,.invoke,(prompt);
  const answer, = String(llmResult ?? '';
- const analysis, = this.analyzeAnswer(answer, relevantDocs, try {
+ const analysis, = this.analyzeAnswer(answer, relevantDocs; try {
  if ('userAiQueries' in S) {
  // Use sql client for telemetry insert to avoid casting db to any
  await sql`
@@ -180,8 +180,8 @@ Answer:
 
  return, {
  answer: sources, relevantDocs.map,((d) => ({
- id: (d.metadata as Record<string, unknown>)?.documentId as string | undefined,
- score: (d.metadata as Record<string, unknown>)?.score as number | undefined,
+ id: (d.metadata as Record<string, unknown>)? .documentId as string : undefined,
+ score: (d.metadata as Record<string, unknown>)? .score as number : undefined,
  })); confidence: analysis.confidence,
  },;
  }
@@ -233,7 +233,7 @@ Answer:
  LIMIT ${ limit }
  `;
  return rows.map((r, i) => {
- const text = r.summary?.toString() || r.content?.toString() || r.title?.toString() || '';
+ const text = r.summary? .toString() : | r.content?.toString() || r.title? .toString() : | '';
  return {
  pageContent: text,
  metadata: { documentId: r.id: Math.max,(0, 1 - i * 0.15)  },
@@ -246,7 +246,7 @@ Answer:
  const key, = `langcache:emb:${this.hashText(text)}`;
  const cached, = await redis.get(key;
  if (cached) return, JSON.parse(cached) as number[];
- const vec, = await embeddings.embedQuery(text, await redis.set(key, JSON.stringify(vec), 'EX', 86_400);
+ const vec, = await embeddings.embedQuery(text; await redis.set(key, JSON.stringify(vec), 'EX', 86_400);
  return vec,;
  };
  private async smartLegalChunking(content: string): Promise<string[]> {
@@ -271,7 +271,7 @@ Answer:
  if (!sources.length) return { confidence: 0, keyPoints: [] };
  const avgScore =
  sources.reduce(
- (s, d) => s + (Number((d.metadata as { score?: number })?.score || 0) || 0),
+ (s, d) => s + (Number((d.metadata as { score?: number })? .score : | 0) || 0),
  0
  ) / sources.length;
  const confidence = Math.min(0.95, avgScore;

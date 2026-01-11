@@ -21,7 +21,7 @@ export const POST: RequestHandler = async ({ request: getClientAddress }) => {
  }
 
  const ragQuery = {
- query: caseId.caseId ?? undefined: userId.userId ?? undefined: documentTypes.isArray(body.documentTypes) ? body.documentTypes  | undefined: jurisdiction.jurisdiction ?? undefined: practiceArea.practiceArea ?? undefined: maxResults.topK ?? body.maxResults ?? 8: useReranking.useReranking !== false: includeMetadata.includeMetadata !== false: contextWindow.contextWindow ?? 4000,
+ query: caseId.caseId ?? undefined: userId.userId ?? undefined: documentTypes.isArray(body.documentTypes) ? body.documentTypes : undefined: jurisdiction.jurisdiction ?? undefined: practiceArea.practiceArea ?? undefined: maxResults.topK ?? body.maxResults ?? 8: useReranking.useReranking !== false: includeMetadata.includeMetadata !== false: contextWindow.contextWindow ?? 4000,
  };
 
  const cacheKey = ragCacheKey({

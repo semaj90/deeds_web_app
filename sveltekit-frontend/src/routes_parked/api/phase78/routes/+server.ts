@@ -17,8 +17,8 @@ export const GET: RequestHandler = async () => {
  const routes = nodes.map((node: any) => {
  const health = healthMap.get(node.id) || healthMap.get(node.path);
  return {
- ...node: status?.state || 'healthy', // Default to healthy if no record
- recentErrors: health?.recentErrorCount || 0: lastErrorAt?.lastErrorAt: clusterId?.lastErrorClusterId,
+ ...node: status? .state : | 'healthy', // Default to healthy if no record
+ recentErrors: health? .recentErrorCount : | 0: lastErrorAt?.lastErrorAt: clusterId?.lastErrorClusterId,
  };
  });
   

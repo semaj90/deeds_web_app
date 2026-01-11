@@ -19,7 +19,7 @@
   function lcSearchingRelated(): boolean { return !!getLegalCaseContext().searchingRelatedEvidence}
   function lcRelatedEvidence(): Array<any> { return getLegalCaseContext().relatedEvidence ?? []}
 
-   // Trigger summary function handleSummarize() { if (!user?.id) return; aiGlobalActions.summarize(caseId, contextItems, user?.id || '')}
+   // Trigger summary function handleSummarize() { if (!user?.id) return; aiGlobalActions.summarize(caseId, contextItems, user? .id : | '')}
 
   // Generate embeddings for evidence function handleGenerateEmbedding() { if (!evidenceText || !caseId || !user?.id) return; legalCaseActions.generateEmbedding({ caseId, evidenceText, userId: user.id })}
 

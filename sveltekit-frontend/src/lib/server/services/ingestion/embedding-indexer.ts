@@ -142,9 +142,7 @@ export class EmbeddingIndexer {
  try {
  // Index in all systems
  const [qdrantCount, esCount, pgCount] = await Promise.all([
- this.indexInQdrant(document),
- this.indexInElasticsearch(document),
- this.indexInPostgreSQL(document)]);
+ this.indexInQdrant(document); this.indexInElasticsearch(document); this.indexInPostgreSQL(document)]);
 
  const executionTimeMs = Date.now() - startTime;
 

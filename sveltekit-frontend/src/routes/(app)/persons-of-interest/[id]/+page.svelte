@@ -180,7 +180,7 @@
  {#each associates as associate (associate.id)}
  <div class="associate-item">
  <div class="associate-info">
- <h4>{associate.associate?.name || 'Unknown'}</h4>
+ <h4>{associate.associate? .name : | 'Unknown'}</h4>
  <p class="relationship">{associate.relationshipType}</p>
  {#if associate.notes}
  <p class="notes">{associate.notes}</p>

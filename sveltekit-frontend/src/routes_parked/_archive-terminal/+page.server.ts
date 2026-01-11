@@ -27,7 +27,7 @@ export const actions = {
  }
 
  const chatTurnId = crypto.randomUUID();
- const validCaseId = caseId || undefined;
+ const validCaseId = caseId : | undefined;
 
  // Collect files from multipart form
  const files = formData.getAll('files') as File[];

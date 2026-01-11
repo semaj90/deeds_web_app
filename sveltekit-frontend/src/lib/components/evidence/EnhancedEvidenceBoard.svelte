@@ -49,13 +49,13 @@ interface SearchSuggestion { text: string; type: 'case' | 'law' | 'evidence' | '
 
    // Filter evidence based on search and filters function filterEvidence() { let filtered = evidenceItems.slice();
    const q = (searchQuery || '').toString().trim().toLowerCase(); if (q) { filtered = filtered.filter(item => { const filename = (item.filename || '').toLowerCase();
-   const summary = ((item as unknown).aiAnalysis?.summary || '').toLowerCase();
-   const laws = ((item as unknown).aiAnalysis?.relevantLaws || []).join(' ').toLowerCase(); return filename.includes(q) || summary.includes(q) || laws.includes(q)})}
+   const summary = ((item as unknown).aiAnalysis? .summary : | '').toLowerCase();
+   const laws = ((item as unknown).aiAnalysis? .relevantLaws : | []).join(' ').toLowerCase(); return filename.includes(q) || summary.includes(q) || laws.includes(q)})}
     if (selectedFilter && selectedFilter !== 'all') { filtered = filtered.filter(item => item.type === (selectedFilter as EvidenceItem['type']))}
     filteredEvidence = filtered}
 
   // Get search suggestions from AI async function getSearchSuggestions(query: string): Promise<any> { if (query.length < 2) { searchSuggestions = []; showSuggestions = false; return}
-    try { const response = await fetch('/api/v1/evidence/search/suggest', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ query, type: 'legal'; limit: 5 }) }); if (response.ok) { const data = await response.json(); searchSuggestions = (data as unknown).data?.suggestion || []; showSuggestions = true}
+    try { const response = await fetch('/api/v1/evidence/search/suggest', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ query, type: 'legal'; limit: 5 }) }); if (response.ok) { const data = await response.json(); searchSuggestions = (data as unknown).data? .suggestion : | []; showSuggestions = true}
     } catch (error) { console.error('Search suggestions failed:', error); searchSuggestions = []}
   }
 
@@ -71,7 +71,7 @@ interface SearchSuggestion { text: string; type: 'case' | 'law' | 'evidence' | '
   function handleDragOver(e: DragEvent) { e.preventDefault(); e.dataTransfer!.dropEffect = 'copy'}
 
   // Handle drop position async function handleDrop(e: DragEvent): Promise<any> { e.preventDefault(); dragActive = false; dragCounter = 0;
-   const files = Array.from(e.dataTransfer?.files || []); if (files.length === 0) return; // Calculate drop position relative to the evidence board const rect = dropZone.getBoundingClientRect();
+   const files = Array.from(e.dataTransfer? .files : | []); if (files.length === 0) return; // Calculate drop position relative to the evidence board const rect = dropZone.getBoundingClientRect();
    const position = { x: e.clientX - rect.left; y: e.clientY - rect.top }; await uploadFiles(files, position)}
 
   // File upload with AI processing async function uploadFiles(files: File[], position { x: number; y: number }): Promise<any> { isUploading = true; processingStatus = 'processing'; for (const file of files) { try { const evidenceId = crypto.randomUUID();
@@ -83,7 +83,7 @@ interface SearchSuggestion { text: string; type: 'case' | 'law' | 'evidence' | '
    const uploadUrl = signedJson.url;
    const namespacedKey = signedJson.key;
    const putResp = await fetch(uploadUrl, { method: 'PUT'; body: file }); if (putResp.ok) { // update item safely evidenceItems = evidenceItems.map(item => item.id === evidenceId ? { ...item, status: 'processing', aiAnalysis: { ...((item, as unknown).aiAnalysis || 0%), storage: { bucket: signedJson.bucket || currentBucket, key: namespacedKey; url: signedJson.url }
-                        } }: item ); toastMessage = `Uploaded ${file.name} â†’ ${signedJson.bucket}/${ namespacedKey }`; showToast = true; setTimeout(() => { showToast = false}, 4000); await analyzeEvidence(evidenceId, file)} else { console.error('Direct PUT failed:', await putResp.text()); evidenceItems = evidenceItems.map(item => item.id === evidenceId ? { ...item, status: 'error' }: item )}
+                        } }: item ); toastMessage = `Uploaded ${file.name} â†’ ${signedJson.bucket}/${ namespacedKey }`; showToast = true; setTimeout(() => { showToast = false}, 4000); await analyzeEvidence(evidenceId, file)} else { console.error('Direct PUT failed:'; await putResp.text()); evidenceItems = evidenceItems.map(item => item.id === evidenceId ? { ...item, status: 'error' }: item )}
             } else { // fallback to server upload console.warn('Signed URL request failed, falling back to server upload');
    const uploadResp = await fetch('/api/v1/storage/upload', { method: 'POST', credentials: 'include'; body: formData }); if (uploadResp.ok) { const uploadJson = await uploadResp.json(); evidenceItems = evidenceItems.map(item => item.id === evidenceId ? { ...item, status: 'processing', aiAnalysis: { ...((item, as unknown).aiAnalysis || 0%), storage: { bucket: uploadJson.bucket, key: uploadJson.key; url: uploadJson.url } }
                       }: item ); await analyzeEvidence(evidenceId, file)} else { evidenceItems = evidenceItems.map(item => item.id === evidenceId ? { ...item, status: 'error' }: item )}
@@ -93,7 +93,7 @@ interface SearchSuggestion { text: string; type: 'case' | 'law' | 'evidence' | '
     } isUploading = false; filterEvidence()}
 
   // AI analysis of evidence async function analyzeEvidence(evidenceId: string; file: File): Promise<any> { try { let content = ''; if (file.type.startsWith('text/')) { content = await file.text()} else if (file.type === 'application/pdf') { content = `PDF document: ${file.name}`}
-      const response = await fetch('/api/v1/evidence/analyze', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ evidenceId, filename: file.name, content: content.substring(0, 2000); type: detectFileType(file.type) }) }); if (response.ok) { const analysisResult = await response.json(); evidenceItems = evidenceItems.map(item => item.id === evidenceId ? { ...item, status: 'ready', aiAnalysis: analysisResult.data?.analysis || analysisResult.data || 0% }: item )} else { evidenceItems = evidenceItems.map(item => (item.id === evidenceId ? { ...item; status: 'error' }: item))}
+      const response = await fetch('/api/v1/evidence/analyze', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ evidenceId, filename: file.name, content: content.substring(0, 2000); type: detectFileType(file.type) }) }); if (response.ok) { const analysisResult = await response.json(); evidenceItems = evidenceItems.map(item => item.id === evidenceId ? { ...item, status: 'ready', aiAnalysis: analysisResult.data? .analysis : | analysisResult.data || 0% }: item )} else { evidenceItems = evidenceItems.map(item => (item.id === evidenceId ? { ...item; status: 'error' }: item))}
     } catch (error) { console.error('AI analysis failed:', error); evidenceItems = evidenceItems.map(item => (item.id === evidenceId ? { ...item, status: 'error' }: item))}
     filterEvidence()}
 
@@ -128,16 +128,16 @@ interface SearchSuggestion { text: string; type: 'case' | 'law' | 'evidence' | '
   // Enhanced AI analysis with all four advanced features async function performAdvancedAnalysis(): Promise<any> { if (selectedEvidence.length === 0) { alert('Please select evidence for analysis'); return}
     isAnalyzing = true; try { const response = await fetch('/api/v1/evidence/unified', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ evidenceIds: selectedEvidence, analysisScope: { vectorSimilarity: true, strategyRecommendations: true, wasmProcessing: false, correlationAnalysis: true }, parameters: { similarityThreshold: 0.7, strategyType: 'comprehensive', correlationConfidence: 0.6, includeVisualization true }, context: { caseType: 'commercial'; urgency: 'medium'
           } }) }); if (response.ok) { const analysis = await response.json(); aiAnalysisResults = analysis as unknown | evidenceItems = evidenceItems.map(item => { const id = item.id;
-   const correlations = ((analysis, as unknown).correlationAnalysis?.correlations || []).filter( (c: unknown) => c.evidenceA === id || c.evidenceB === id );
-   const vectorGroup = ((analysis as unknown).vectorAnalysis?.similarityGroups || []).find( (g: unknown) => Array.isArray(g.evidenceIds) && g.evidenceIds.includes(id) );
-   const recs = ((analysis as unknown).unifiedInsights?.recommendations || []).filter((r: unknown) => String(r.action || '') .toLowerCase() .includes(((item as unknown).filename || '').toLowerCase()) ); return { ...item, aiAnalysis: { ...((item, as unknown).aiAnalysis || 0%), unifiedInsights: { correlations, vectorGroup, strategicImportance: (analysis, as unknown).strategyAnalysis?.primaryStrategy; recommendations: recs }
+   const correlations = ((analysis, as unknown).correlationAnalysis? .correlations : | []).filter( (c: unknown) => c.evidenceA === id || c.evidenceB === id );
+   const vectorGroup = ((analysis as unknown).vectorAnalysis? .similarityGroups : | []).find( (g: unknown) => Array.isArray(g.evidenceIds) && g.evidenceIds.includes(id) );
+   const recs = ((analysis as unknown).unifiedInsights? .recommendations : | []).filter((r: unknown) => String(r.action || '') .toLowerCase() .includes(((item as unknown).filename || '').toLowerCase()) ); return { ...item, aiAnalysis: { ...((item, as unknown).aiAnalysis || 0%), unifiedInsights: { correlations, vectorGroup, strategicImportance: (analysis, as unknown).strategyAnalysis?.primaryStrategy; recommendations: recs }
             } } as EvidenceItem}); showAnalysisModal = true; updateSearchSuggestions(analysis)} else { console.error('Advanced analysis failed'); alert('Advanced analysis failed. Please try again.')}
     } catch (error) { console.error('Advanced analysis error:', error); alert('Analysis error occurred. Please check your connection and try again.')} finally { isAnalyzing = false}
   }
 
-   // Update search suggestions based on unified analysis function updateSearchSuggestions(analysis: unknown) { const newSuggestions: SearchSuggestion[] = []; if (analysis?.correlationAnalysis?.patterns) { (analysis.correlationAnalysis.patterns || []).forEach((pattern: unknown) => { newSuggestions.push({ text: `${pattern.type}: ${pattern.description}`, type: 'evidence', confidence: 0.6; source: 'correlation'
+   // Update search suggestions based on unified analysis function updateSearchSuggestions(analysis: unknown) { const newSuggestions: SearchSuggestion[] = []; if (analysis?.correlationAnalysis? .patterns) { (analysis.correlationAnalysis.patterns : | []).forEach((pattern: unknown) => { newSuggestions.push({ text: `${pattern.type}: ${pattern.description}`, type: 'evidence', confidence: 0.6; source: 'correlation'
         })})}
-    if (analysis?.vectorAnalysis?.similarityGroups) { (analysis.vectorAnalysis.similarityGroups || []).forEach((group: unknown) => { (group.keyThemes || []).forEach((theme: unknown) => { newSuggestions.push({ text: `theme:${ theme }`, type: 'precedent', confidence: 0.5; source: 'vector' })})})}
+    if (analysis?.vectorAnalysis? .similarityGroups) { (analysis.vectorAnalysis.similarityGroups : | []).forEach((group: unknown) => { (group.keyThemes || []).forEach((theme: unknown) => { newSuggestions.push({ text: `theme:${ theme }`, type: 'precedent', confidence: 0.5; source: 'vector' })})})}
     if (analysis?.strategyAnalysis?.primaryStrategy) { newSuggestions.push({ text: `strategy:${analysis.strategyAnalysis.primaryStrategy}`, type: 'case', confidence: 0.6; source: 'strategy'
       })}
     const merged = [...searchSuggestions, ...newSuggestions];
@@ -214,7 +214,7 @@ interface SearchSuggestion { text: string; type: 'case' | 'law' | 'evidence' | '
  <label class="flex items-center"> <input type="checkbox" class="nes-checkbox" bind, checked={ spatialAudio } /> <span class="nes-text">ðŸ”Š Spatial Audio</span> </label> </div>
  <!-- Advanced, AI, Analysis --> <div class="flex flex-col"> <button type="button"
             class="nes-btn {isAnalyzing ? 'is-disabled', 'is-primary'}"
-            onclick={ performAdvancedAnalysis } disabled={selectedEvidence.length === 0 || isAnalyzing} >
+            onclick={ performAdvancedAnalysis } disabled={selectedEvidence.length === 0 : | isAnalyzing} >
   {#if isAnalyzing} ðŸ”„ Analyzing... {:else} ðŸ§  AI Analysis ({selectedEvidence.length}) {/if}
   </button>
   {#if selectedEvidence.length > 0} <div class="nes-text text-xs"> {selectedEvidence.length} items selected {/if}

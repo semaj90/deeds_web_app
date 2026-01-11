@@ -40,7 +40,7 @@ export const RULE_MISSING_SEMICOLON_UNION: FixRule = {
  matches: (record) => {
  return (
  record.ruleId === 'missing-semicolon-union' &&
- /^\s*\w+\s*:\s*['"]?\w+['"]?\s*\|\s*['"]?\w+['"]?/.test(record.originalLine)
+ /^\s*\w+\s*:\s*['"]?\w+['"]? \s*\ : \s*['"]?\w+['"]?/.test(record.originalLine)
  );
  },
  transform: (record) => {

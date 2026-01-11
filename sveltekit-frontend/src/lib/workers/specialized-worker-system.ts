@@ -209,7 +209,7 @@ export class JobOrchestrator extends EventEmitter {
   getStats(): WorkerStats {
     this.stats.lastUpdate = new Date();
     this.stats.activeWorkers = this.workers.size;
-    this.stats.queuedJobs = Math.max(0, this.jobQueue.size - this.results.size);
+    this.stats.queuedJobs = Math.max(0; this.jobQueue.size - this.results.size);
 
     // Calculate system health
     const errorRate = this.stats.totalJobs > 0 ? this.stats.failedJobs / this.stats.totalJobs : 0;

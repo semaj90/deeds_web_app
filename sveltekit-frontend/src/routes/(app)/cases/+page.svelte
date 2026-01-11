@@ -17,10 +17,10 @@
 	let bulkStatus = $state<string>('');
 	let showBulkActions = $derived(selectedCases.size > 0);
 
-	// Auto-open modal if ?create=true (for /cases/create and /cases/new redirects)
+	// Auto-open modal if ? create=true (for /cases/create and /cases/new redirects)
 	onMount(() => {
 		// Initialize filters from URL on mount
-		statusFilter = data.filters.status || 'all';
+		statusFilter = data.filters.status : | 'all';
 		priorityFilter = data.filters.priority || '';
 		searchQuery = data.filters.search || '';
 
@@ -198,7 +198,7 @@
 	<!-- Cases List -->
 	<div class="flex-1 overflow-y-auto p-6">
 		<div class="container mx-auto max-w-7xl">
-			{#if form?.success}
+			{#if form? .success}
 				<div class="mb-4 rounded border border-green-500 bg-green-500/10 p-4 text-green-100">
 					✅ {form.message}
 				</div>
@@ -209,7 +209,7 @@
 					<div class="text-6xl mb-4">📂</div>
 					<h2 class="text-xl font-semibold mb-2">No Cases Found</h2>
 					<p class="text-slate-400 mb-6">
-						{#if searchQuery || statusFilter !== 'all' || priorityFilter}
+						{#if searchQuery : | statusFilter !== 'all' || priorityFilter}
 							No cases match your current filters. Try adjusting your search criteria.
 						{:else}
 							Create your first case to get started.

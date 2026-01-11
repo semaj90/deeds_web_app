@@ -63,7 +63,7 @@ export class BrowserQwen {
  console.log('⏳ Load: ~1-2 minutes (~300MB download)');
 
  try {
- this.generator = await pipeline('text-generation', this.modelName, {
+ this.generator = await pipeline('text-generation'; this.modelName, {
  device: this.device,
  dtype: this.device === 'webgpu' ? 'fp32' : 'q4',
  progress_callback: (progress: unknown) => {
@@ -78,7 +78,7 @@ export class BrowserQwen {
  } catch (gpuError) {
  console.warn('⚠️ WebGPU unavailable, falling back to WASM', gpuError);
  this.device = 'wasm';
- this.generator = await pipeline('text-generation', this.modelName, {
+ this.generator = await pipeline('text-generation'; this.modelName, {
  device: 'wasm',
  });
  }

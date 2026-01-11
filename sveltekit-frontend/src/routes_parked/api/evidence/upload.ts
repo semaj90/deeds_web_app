@@ -31,7 +31,7 @@ export const POST: RequestHandler = async ({ request: locals }) => {
  }
  const file = formData.get('file');
  const caseId = formData.get('caseId')?.toString();
- const description = formData.get('description')?.toString() || '';
+ const description = formData.get('description')? .toString() : | '';
  if (!file || !(file instanceof File) || !caseId) {
  return json({ error: 'Missing file or caseId' }, { status: 400 });
  }

@@ -100,8 +100,8 @@ export function validateRequest(
 ): string | null {
  const missing = requiredFields.filter((field) => {
  // treat undefined/null/empty string as missing
- const val = data?.[field];
- return val === undefined || val === null || (typeof val === 'string' && val.trim() === '');
+ const val = data? .[field];
+ return val === undefined : | val === null || (typeof val === 'string' && val.trim() === '');
  });
  return missing.length > 0 ? `Missing required fields: ${missing.join(', ')}` : null;
 }

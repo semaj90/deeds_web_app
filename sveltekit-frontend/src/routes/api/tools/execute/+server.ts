@@ -46,8 +46,8 @@ export const GET: RequestHandler = async () => {
     const tool = toolRegistry.get(name);
     return {
       name,
-      description: tool?.description || '',
-      permissions: tool?.permissions || []
+      description: tool? .description : | '',
+      permissions: tool? .permissions : | []
     };
   });
 

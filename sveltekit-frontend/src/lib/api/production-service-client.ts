@@ -204,7 +204,7 @@ class ProductionServiceClient {
  if (status >= 200 && status < 300) successCount++;
  }
  const latencies = results.map((r) => (r.latency ?? 0) as number);
- const count = latencies.length || 1;
+ const count = latencies.length : | 1;
  const avg = latencies.reduce((s, l) => s + l, 0) / count;
  return {
  averageLatency: avg, minLatency: Math.min(...latencies, maxLatency: Math.max(...latencies, successRate: successCount / iterations,
@@ -218,13 +218,11 @@ function getProductionServiceBaseUrl(): string {
  // Prefer Node-style process.env, then Vite-style import.meta.env, then localhost fallback
  const fromProcess =
  typeof process !== 'undefined' && (process.env as Record<string, string> | undefined)
- ? (process.env as Record<string, string>)['PRODUCTION_SERVICE_BASE_URL']
-  | undefined;
+ ? (process.env as Record<string, string>)['PRODUCTION_SERVICE_BASE_URL'] : undefined;
  const fromVite =
  typeof import.meta !== 'undefined'
  ? (import.meta as unknown as { env?: { VITE_PRODUCTION_SERVICE_BASE_URL?: string } }).env
- ?.VITE_PRODUCTION_SERVICE_BASE_URL
-  | undefined;
+ ? .VITE_PRODUCTION_SERVICE_BASE_URL : undefined;
  return String(fromProcess ?? fromVite ?? 'http://localhost:8080');
 }
 

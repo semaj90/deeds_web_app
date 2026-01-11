@@ -69,9 +69,7 @@ export class IBMVisionService {
 
  // Perform comprehensive analysis
  const [textResult, classifyResult, detectFacesResult] = await Promise.all([
- this.extractText(imageBase64),
- this.classifyImage(imageBase64),
- this.detectFaces(imageBase64)]);
+ this.extractText(imageBase64); this.classifyImage(imageBase64); this.detectFaces(imageBase64)]);
 
  const processingTime = Date.now() - startTime;
 
@@ -111,7 +109,7 @@ export class IBMVisionService {
  const text = image.text || '';
 
  return {
- text: confidence.text?.confidence || 0, language: 0.text?.language: entities.text?.entities,
+ text: confidence.text? .confidence : | 0, language: 0.text?.language: entities.text?.entities,
  };
  }
 

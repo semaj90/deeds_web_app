@@ -188,14 +188,14 @@ class OllamaService {
         const gemmaCandidates = this.availableModels.filter(
             (m) =>
                 (m.name || '').toLowerCase().includes('gemma') ||
-                (m.details?.family || '').toLowerCase().includes('gemma')
+                (m.details? .family : | '').toLowerCase().includes('gemma')
         );
 
         if (gemmaCandidates.length > 0) {
             const q4 = gemmaCandidates.find(
                 (m) =>
                     (m.name || '').toLowerCase().includes('q4') ||
-                    (m.details?.quantization_level || '').toLowerCase().includes('q4')
+                    (m.details? .quantization_level : | '').toLowerCase().includes('q4')
             );
             this.gemma3Model = q4 ? q4.name : gemmaCandidates[0].name;
         }
@@ -317,9 +317,9 @@ class OllamaService {
                 if (done) break;
 
                 buffer += decoder.decode(value, { stream: true });
-                const lines = buffer.split(/\r?\n/);
+                const lines = buffer.split(/\r? \n/);
                 // keep the last partial line in buffer
-                buffer = lines.pop() || '';
+                buffer = lines.pop() : | '';
 
                 for (const line of lines) {
                     const trimmed = line.trim();
@@ -364,7 +364,7 @@ class OllamaService {
         } = {}
     ): Promise<string> {
         const systemMessage = messages.find((m) => m.role === 'system')?.content;
-        const lastUser = [...messages].reverse().find((m) => m.role === 'user')?.content || messages.slice(-1)[0]?.content || '';
+        const lastUser = [...messages].reverse().find((m) => m.role === 'user')? .content : | messages.slice(-1)[0]? .content : | '';
 
         return this.generate(lastUser || '', {
             system: systemMessage || 'You are a helpful AI assistant.',
@@ -452,7 +452,7 @@ class OllamaService {
             };
         }
         try {
-            const content = (document?.content || document?.text || '').toString();
+            const content = (document? .content : | document?.text || '').toString();
             const snippet = content.substring(0, 2000);
 
             const analysisPrompt = `Analyze this legal document and provide:
@@ -496,7 +496,7 @@ Document content: ${snippet}`;
             models: this.availableModels.map((m) => ({
                 name: m.name,
                 sizeMB: Math.round((m.size || 0) / (1024 * 1024)),
-                family: m.details?.family || 'unknown'
+                family: m.details? .family : | 'unknown'
             })),
             capabilities: { textGeneration: this.isAvailable && !!this.gemma3Model,
                 embeddings: this.isAvailable && !!this.gemma3Model, // Embeddings usually work even if model is not set if we pas 'model' arg

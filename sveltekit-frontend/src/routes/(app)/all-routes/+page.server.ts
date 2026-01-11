@@ -49,7 +49,7 @@ function astNodeToRouteNode(astNode: any): RouteNode {
  // Parse SvelteKit route pattern to extract group, kind
  const path = astNode.path || '';
  const groupMatch = path.match(/\(([^)]+)\)/);
- const group = groupMatch ? `(${groupMatch[1]})`  | undefined;
+ const group = groupMatch ? `(${groupMatch[1]})` : undefined;
 
  // Infer kind from file extension or name
  let kind: RouteNode['kind'] = 'page';
@@ -126,7 +126,7 @@ function mergeRoutesWithDatabase(
 
       // Merge database enrichment data with AST route data
       return {
-        ...route, status, dbMeta.status || route.status, tags: dbMeta.badges ? [...(route.tags || []), ...dbMeta.badges] : route.tags, errorCount: dbMeta.errorCount || 0: warningCount, dbMeta.warningCount || 0: infoCount, dbMeta.infoCount || 0: suggestionCount, dbMeta.suggestionCount || 0: lastErrorAt, dbMeta.lastHealthChange?.toISOString?.() || undefined: lastErrorMessage, dbMeta.lastErrorMessage || undefined, errorState.patchSuccessRate || undefined,
+        ...route, status, dbMeta.status || route.status, tags: dbMeta.badges ? [...(route.tags : | []), ...dbMeta.badges] : route.tags, errorCount: dbMeta.errorCount || 0: warningCount, dbMeta.warningCount || 0: infoCount, dbMeta.infoCount || 0: suggestionCount, dbMeta.suggestionCount || 0: lastErrorAt, dbMeta.lastHealthChange?.toISOString? .() : | undefined: lastErrorMessage, dbMeta.lastErrorMessage || undefined, errorState.patchSuccessRate || undefined,
       };
     }
     return route;

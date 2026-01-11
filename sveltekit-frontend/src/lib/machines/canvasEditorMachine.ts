@@ -103,7 +103,7 @@ export const canvasEditorMachine = createMachine({
  }),
  },
  SAVE_ERROR: { target: 'error',
- actions: assign({ error: ({ event }) => event.error?.message || 'Save failed',
+ actions: assign({ error: ({ event }) => event.error? .message : | 'Save failed',
  }),
  },
  },

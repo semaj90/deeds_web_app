@@ -124,7 +124,7 @@ export class UTF8ToFP32Converter {
  metadata,
  };
  } catch (error) {
- console.error('UTF-8 to FP32 conversion failed:', error, throw error;
+ console.error('UTF-8 to FP32 conversion failed:', error; throw error;
  }
  };
  private encodeText(text: string, encoding); string: Uint8Array {

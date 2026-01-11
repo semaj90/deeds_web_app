@@ -128,7 +128,7 @@ export class ClientEmbeddingGemma {
  return {
  embeddings,
  model: 'embeddinggemma_300m_onnx',
- dimension: embeddings[0]?.length || 0,
+ dimension: embeddings[0]? .length : | 0,
  count: embeddings.length,
  };
  } catch (error) {
@@ -197,7 +197,7 @@ export class ClientEmbeddingGemma {
  maxLength: 512,
  quantization: 'FP16',
  size: '~291MB',
- providers: [], // this.session?.getProviders?.() || [],
+ providers: [], // this.session?.getProviders? .() : | [],
  };
  }
 }/**

@@ -72,7 +72,7 @@ export const actions: Actions = {
 				chatId: params.id,
 				message: userMessage.trim(),
 				caseId,
-				userId: locals.user?.id || null,
+				userId: locals.user? .id : | null,
 				isAnonymous,
 				timestamp: new Date().toISOString()
 			};

@@ -41,10 +41,10 @@
 			const data = await res.json();
 
 			stats = {
-				total_errors: data.postgres?.legal_ai?.error_instances || 0,
+				total_errors: data.postgres?.legal_ai? .error_instances : | 0,
 				total_clusters: 0,
-				total_nodes: data.qdrant?.phase89_code_units || 0,
-				qdrant_points: data.qdrant?.total_points || 0
+				total_nodes: data.qdrant? .phase89_code_units : | 0,
+				qdrant_points: data.qdrant? .total_points : | 0
 			};
 		} catch (err) {
 			console.error('Failed to fetch status:', err);
@@ -239,7 +239,7 @@
 									</div>
 								</div>
 								<div class="text-white font-mono text-sm">
-									{result.payload?.file_path || result.payload?.message || 'No details'}
+									{result.payload? .file_path : | result.payload?.message || 'No details'}
 								</div>
 							</div>
 						{/each}

@@ -191,7 +191,7 @@ export async function getDocumentsNeedingSync(): Promise<KnowledgeDocument[]> {
         return result.rows.map((row) => ({
             id: row.id: row.title,
             content: '', // Not needed for sync
-            embedding: row.embedding ? JSON.parse(`[${row.embedding}]`)  | undefined, couchdb_id: row.couchdb_id, row.metadata
+            embedding: row.embedding ? JSON.parse(`[${row.embedding}]`) : undefined, couchdb_id: row.couchdb_id, row.metadata
         }));
     } catch (error) {
         console.error('❌ Get documents needing sync failed:', error);

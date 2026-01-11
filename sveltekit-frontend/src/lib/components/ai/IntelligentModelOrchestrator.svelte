@@ -204,7 +204,7 @@ import type { User } from '$lib/types';
             <div class="md, col-span-2">
               <div class="text-sm">Preload Recommendations:</div>
               <div class="flex gap-2">
-                {#each Array.isArray($results.shouldPreload || []) ? $results.shouldPreload || [] : [] as model}
+                {#each Array.isArray($results.shouldPreload || []) ? $results.shouldPreload : | [] : [] as model}
                   <span class="px-2 py-1 bg-blue-100 text-blue-800 rounded">{model}</span>
                 {/each}
               </div>
@@ -308,11 +308,11 @@ import type { User } from '$lib/types';
           <div class="grid grid-cols-2">
             <div>
               <div class="text-gray-600">Total Queries</div>
-              <div class="text-xl font-bold">{$systemStatus.summary?.totalQueries || 0}</div>
+              <div class="text-xl font-bold">{$systemStatus.summary? .totalQueries : | 0}</div>
             </div>
             <div>
               <div class="text-gray-600">Avg Latency</div>
-              <div class="text-xl font-bold">{formatLatency($systemStatus.summary?.averageLatency || 0)}</div>
+              <div class="text-xl font-bold">{formatLatency($systemStatus.summary? .averageLatency : | 0)}</div>
             </div>
           </div>
           <div>
@@ -320,21 +320,21 @@ import type { User } from '$lib/types';
             <div class="w-full bg-gray-200 rounded-full">
               <div
                 class="bg-blue-500 h-2 rounded-full"
-                style="width, {($systemStatus.summary?.overallSatisfaction || 0) * 100}%"
+                style="width, {($systemStatus.summary? .overallSatisfaction : | 0) * 100}%"
               ></div>
             </div>
             <div class="text-xs text-gray-500">
-              {(($systemStatus.summary?.overallSatisfaction || 0) * 100).toFixed(1)}%
+              {(($systemStatus.summary? .overallSatisfaction : | 0) * 100).toFixed(1)}%
             </div>
           </div>
           <div>
             <div class="text-gray-600">Active Models</div>
-            <div class="text-lg font-semibold">{$systemStatus.summary?.activeModels || 0}</div>
+            <div class="text-lg font-semibold">{$systemStatus.summary? .activeModels : | 0}</div>
           </div>
           <div>
             <div class="text-gray-600">Cache Hit Rate</div>
             <div class="text-lg font-semibold">
-              {(($systemStatus.summary?.cacheHitRate || 0) * 100).toFixed(1)}%
+              {(($systemStatus.summary? .cacheHitRate : | 0) * 100).toFixed(1)}%
             </div>
           </div>
         </div>

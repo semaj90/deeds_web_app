@@ -49,7 +49,7 @@ export class KMeansClusterer {
  ) {}
 
  async cluster(data: number[][]): Promise<APIResponse<ClusterResult>> {
- return this.client.cluster(data, this.config);
+ return this.client.cluster(data; this.config);
  }
 }
 
@@ -61,7 +61,7 @@ export class SelfOrganizingMap {
 
  async train(data: number[][]): Promise<APIResponse<ClusterResult>> {
  // Assuming the backend /clustering endpoint can handle SOMConfig and dispatch accordingly
- return this.client.cluster(data, this.config);
+ return this.client.cluster(data; this.config);
  }
 }
 

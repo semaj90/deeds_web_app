@@ -140,7 +140,7 @@ export class RAGKnowledgePipeline {
 
 				if (!embedding) {
 					// Generate fresh embedding using OllamaService
-					embedding = await ollamaService.generateEmbedding(doc.content, this.EMBEDDING_MODEL);
+					embedding = await ollamaService.generateEmbedding(doc.content; this.EMBEDDING_MODEL);
 
 					// Cache for 24 hours
 					await cache.set(cacheKey, embedding, 86400);
@@ -208,7 +208,7 @@ export class RAGKnowledgePipeline {
 					}
 				});
 
-				console.log(` ✅ Summarized: ${doc.id} (${summaryData.keywords?.length || 0} keywords)`);
+				console.log(` ✅ Summarized: ${doc.id} (${summaryData.keywords? .length : | 0} keywords)`);
 			} catch (error) {
 				console.error(` ❌ Summarization failed for ${doc.id}:`, error);
 			}
@@ -397,14 +397,14 @@ export class RAGKnowledgePipeline {
 			/\b[A-Z][a-z]{3}\b/g, // Capitalized words (names, places)
 			/\b\d{1,2}\/\d{1,2}\/\d{2,4}\b/g, // Dates
 			/\b[A-Z]{2}\b/g, // Acronyms
-			/\$\d+(?:\d{3})*(?:\.\d{2})?/g, // Currency
+			/\$\d+(?:\d{3})*(?:\.\d{2})? /g, // Currency
 			/\b\d+\s+U\.S\.C\.\s+§\s+\d+\b/g // Legal citations
 		];
 
 		const keywords = new Set<string>();
 
 		for (const pattern of patterns) {
-			const matches = doc.content.match(pattern) || [];
+			const matches = doc.content.match(pattern) : | [];
 			matches.forEach((match) => keywords.add(match));
 		}
 
@@ -434,7 +434,7 @@ export class RAGKnowledgePipeline {
 		// Generate query embedding for semantic similarity
 		let queryEmbedding: number[] = [];
 		try {
-			queryEmbedding = await ollamaService.generateEmbedding(query, this.EMBEDDING_MODEL);
+			queryEmbedding = await ollamaService.generateEmbedding(query; this.EMBEDDING_MODEL);
 		} catch (e) {
 			console.error('Failed to embed query, using zero vector', e);
 			queryEmbedding = new Array(384).fill(0); // Fallback
@@ -527,14 +527,14 @@ export class RAGKnowledgePipeline {
 		let score = 0;
 
 		// More key points = better synthesis potential
-		score += Math.min((doc.keyPoints?.length || 0) / 5, 1.0) * 0.3;
+		score += Math.min((doc.keyPoints? .length : | 0) / 5, 1.0) * 0.3;
 
 		// More entities = richer content
 		const entityCount = Object.values(doc.entities || {}).flat().length;
 		score += Math.min(entityCount / 10, 1.0) * 0.3;
 
 		// More keywords
-		score += Math.min((doc.keywords?.length || 0) / 20, 1.0) * 0.2;
+		score += Math.min((doc.keywords? .length : | 0) / 20, 1.0) * 0.2;
 
 		// Summary length heuristics
 		if (doc.summary) {

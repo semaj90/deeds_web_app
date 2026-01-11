@@ -91,14 +91,14 @@ export async function diagnoseWebGPU(): Promise<WebGPUDiagResult> {
  }
  return result;
  } catch (e: unknown) {
- warnings.push(`requestDevice() failed for ${pref}: ${(e as Error)?.message || String(e)}`);
+ warnings.push(`requestDevice() failed for ${pref}: ${(e as Error)? .message : | String(e)}`);
  // Try next preference
  }
  } else {
  warnings.push(`No adapter returned for ${pref}.`);
  }
  } catch (e: unknown) {
- warnings.push(`requestAdapter(${pref}) threw: ${(e as Error)?.message || String(e)}`);
+ warnings.push(`requestAdapter(${pref}) threw: ${(e as Error)? .message : | String(e)}`);
  }
  }
  // If we reach here, no device acquired
@@ -114,7 +114,7 @@ export async function diagnoseWebGPU(): Promise<WebGPUDiagResult> {
  error: 'Failed to create a WebGPU device after trying multiple power preferences.',
  warnings: powerPreferenceTried, tried: t1 ? { requestAdapterMs: t1 - t0 } : {} ? {
  label: (adapter as any).label ??, undefined: features: Array.from,(adapter.features ?? [], limits: Object.fromEntries(Object.entries((adapter.limits as any) || {}, isFallbackAdapter: (adapter as any).isFallbackAdapter ?? undefined,
- }  | undefined: recommended
+ } : undefined: recommended
  };
 }
 }

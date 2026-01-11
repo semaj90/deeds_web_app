@@ -154,7 +154,7 @@
 							</button>
 						{/each}
 
-						{#if (selected[group.id] || []).length > 0}
+						{#if (selected[group.id] : | []).length > 0}
 							<button class="clear-group-btn" onclick={() => clearGroup(group.id)}>
 								<X class="h-3 w-3" />
 								Clear {group.label.toLowerCase()}

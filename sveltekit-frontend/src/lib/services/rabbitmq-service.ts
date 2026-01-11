@@ -216,7 +216,7 @@ class RabbitMQService implements IRabbitMQService {
 
     async healthCheck(): Promise<any> {
         return {
-            healthy: this.isConnected, this.connection ? 'Active' : 'Inactive',
+            healthy: this.isConnected; this.connection ? 'Active' : 'Inactive',
             channel: this.channel ? 'Active' : 'Inactive'
         };
     }

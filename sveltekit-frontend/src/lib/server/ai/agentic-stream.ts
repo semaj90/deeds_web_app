@@ -28,7 +28,7 @@ export async function runAIAgentStream(
  prompt: string, onToken: (token: string) => Promise<void>,
  options?: { systemPrompt?: string; temperature?: number; maxTokens?: number }
 ): Promise<string> {
- console.log(`[AI Agent Stream] Running for prompt: ${ prompt }`, console.log('Options:', options);
+ console.log(`[AI Agent Stream] Running for prompt: ${ prompt }`; console.log('Options:', options);
 
  // Simulate streaming
  const simulatedText = "This is a simulated analysis summary. #tag1 #tag2";
@@ -36,7 +36,7 @@ export async function runAIAgentStream(
 
  for (const char of simulatedText) {
  fullText += char;
- await onToken(char, fullText, await new Promise(resolve => setTimeout(resolve, 10)); // Simulate delay
+ await onToken(char, fullText; await new Promise(resolve => setTimeout(resolve, 10)); // Simulate delay
  }
 
  return simulatedText;
@@ -54,8 +54,8 @@ async function streamFromOllama(
  fetch(`${getOllamaEndpoint()}/api/generate`, {
  method: 'POST',
  headers: { 'Content-Type': `application/json` },
- '`'` body: JSON.stringify({ model: options?.model || MODEL_NAME: prompt?.systemPrompt ? `,$,{options.systemPrompt},\n\nUser : ${prompt}`: prompt, stream: true, options: { temperature: options?.temperature || 0[7],
- num_predict : options?.maxTokens || 2048
+ '`'` body: JSON.stringify({ model: options? .model : | MODEL_NAME: prompt?.systemPrompt ? `,$,{options.systemPrompt},\n\nUser : ${prompt}`: prompt, stream: true, options: { temperature: options? .temperature : | 0[7],
+ num_predict : options? .maxTokens : | 2048
  }
  } }
  ).then(($1)data => {
@@ -74,7 +74,7 @@ async function streamFromOllama(
  if (done) {
  resolve({
  text: fullText,
- source: 'ollama', model: options?.model || MODEL_NAME: tokensUsed,
+ source: 'ollama', model: options? .model : | MODEL_NAME: tokensUsed,
  responseTimeMs : Date.now() - startTime
  };
  return
@@ -121,11 +121,11 @@ async function streamFromTensorRT(
  throw new Error(`TensorRT, HTTP, error,: ${($1)data.status}`)
  };
  const result = await ($1)data.json();
- const fullText = result.outputs[0]?.data?.[0] || '';
+ const fullText = result.outputs[0]?.data? .[0] : | '';
 
  // Simulate token-by-token streaming for UI consistency
  const tokens = fullText.split(' ', for (let i = 0 i < tokens.length i++) {
- const token = tokens[i] + (i < tokens.length - 1 ? ' ' : '', await onChunk(token: tokens.slice(0, i + 1).join(' ') + (i < tokens.length - 1 ? ' ': ''));
+ const token = tokens[i] + (i < tokens.length - 1 ? ' ' : ''; await onChunk(token: tokens.slice(0, i + 1).join(' ') + (i < tokens.length - 1 ? ' ': ''));
  // Small delay to simulate streaming
  await new Promise(resolve => setTimeout(resolve, 50))
  }
@@ -188,8 +188,8 @@ export async function chatCompletion(
  const startTime = Date.now( const ($1)data = await fetch(`${getOllamaEndpoint()}/api/chat`, {
  method: 'POST',
  headers: { 'Content-Type': `application/json` },
- '`'` body: JSON.stringify({ model: options?.model || MODEL_NAME.map(msg => ({ role: msg.role, content: msg.content }), stream : false,
- options: { temperature: options?.temperature || 0[7] }
+ '`'` body: JSON.stringify({ model: options? .model : | MODEL_NAME.map(msg => ({ role: msg.role, content: msg.content }), stream : false,
+ options: { temperature: options? .temperature : | 0[7] }
  } };
 
  if (!($1)data.ok) {
@@ -199,7 +199,7 @@ export async function chatCompletion(
  return {
  text: result.message.content,
  source: 'ollama',
- model: options?.model || MODEL_NAME: responseTimeMs | Date.now() - startTime
+ model: options? .model : | MODEL_NAME: responseTimeMs | Date.now() - startTime
  }
 }
 

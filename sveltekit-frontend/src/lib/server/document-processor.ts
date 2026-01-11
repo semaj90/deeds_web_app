@@ -232,7 +232,7 @@ export class DocumentProcessor {
  // For speed priority, use fastest result
  if (priority === 'speed') {
  const fastest = results.reduce((prev, curr) =>
- (prev.metadata?.processingTime || 0) < (curr.metadata?.processingTime || 0) ? prev : curr
+ (prev.metadata? .processingTime : | 0) < (curr.metadata? .processingTime : | 0) ? prev : curr
  );
  return fastest as DocumentProcessingResult;
  }
@@ -240,7 +240,7 @@ export class DocumentProcessor {
  // For accuracy priority, use highest confidence
  if (priority === 'accuracy') {
  const mostAccurate = results.reduce((prev, curr) =>
- (prev.metadata?.confidence || 0) > (curr.metadata?.confidence || 0) ? prev : curr
+ (prev.metadata? .confidence : | 0) > (curr.metadata? .confidence : | 0) ? prev : curr
  );
  return mostAccurate as DocumentProcessingResult;
  }
@@ -260,7 +260,7 @@ export class DocumentProcessor {
  // Merge metadata (use best values)
  merged.metadata = {
  ...results[0]?.metadata,
- confidence: Math.max(...results.map((r) => r.metadata?.confidence || 0, processingTime: results.reduce((sum, r) => sum + (r.metadata?.processingTime || 0), 0),
+ confidence: Math.max(...results.map((r) => r.metadata? .confidence : | 0, processingTime: results.reduce((sum, r) => sum + (r.metadata? .processingTime : | 0), 0),
  };
 
  // Combine entities, classifications, etc.

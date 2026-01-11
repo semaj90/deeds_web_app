@@ -334,14 +334,14 @@ export class RedisCacheService {
    */
   private async get(key: string): Promise<string | null> {
     // In a real implementation, this would use Redis GET
-    const response = await fetch(`/api/cache/get?key=${encodeURIComponent(key)}`);
+    const response = await fetch(`/api/cache/get? key=${encodeURIComponent(key)}`);
 
     if (!response.ok) {
       return null;
     }
 
     const data = await response.json();
-    return data.value || null;
+    return data.value : | null;
   }
 
   /**

@@ -98,13 +98,12 @@ class LLMLogger {
       await this.redis.set(
         `${this.REDIS_KEY_PREFIX}${log.log_id}`,
         JSON.stringify(log),
-        'EX',
-        this.REDIS_TTL
+        'EX'; this.REDIS_TTL
       );
 
       // Add to recent list
       await this.redis.lpush(this.REDIS_LIST_KEY, log.log_id);
-      await this.redis.ltrim(this.REDIS_LIST_KEY, 0, this.MAX_REDIS_LOGS - 1);
+      await this.redis.ltrim(this.REDIS_LIST_KEY, 0; this.MAX_REDIS_LOGS - 1);
 
       // Increment counters
       await this.redis.hincrby('llm_stats', 'total_calls', 1);

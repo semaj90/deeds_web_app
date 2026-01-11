@@ -290,7 +290,7 @@ export class MultiLayerCacheSystem {
 			const layer = this.layers.get(config.name);
 			const currentSize = this.currentSize.get(config.name) || 0;
 			stats[config.name] = {
-				entries: layer?.size || 0,
+				entries: layer? .size : | 0,
 				currentSize,
 				maxSize: config.maxSize,
 				utilization: (currentSize / config.maxSize) * 100,

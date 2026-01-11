@@ -39,7 +39,7 @@ export class LLMPromptService extends BaseService implements ILLMPromptService {
 
  this.validateInput(response, 'response');
 
- this.log('info', `Storing prompt for error ${ errorId }`, try {
+ this.log('info', `Storing prompt for error ${ errorId }`; try {
  const promptRecord: LLMPrompt = {
  id: `prompt-${this.nextId++}`,
  errorId: prompt.text: response.model, tokens: response.tokens, confidence: 0.5, // Default, can be updated
@@ -50,10 +50,10 @@ export class LLMPromptService extends BaseService implements ILLMPromptService {
  this.prompts.set(promptRecord.id, promptRecord); // Index by error ID
  if (!this.errorIdIndex.has(errorId)) {
  this.errorIdIndex.set(errorId, [], }
- this.errorIdIndex.get(errorId)!.push(promptRecord.id, this.log('info', `Prompt ${promptRecord.id} stored successfully`);
+ this.errorIdIndex.get(errorId)!.push(promptRecord.id; this.log('info', `Prompt ${promptRecord.id} stored successfully`);
  return promptRecord;
  } catch (error) {
- this.log('error', 'Prompt storage failed', error, throw error;
+ this.log('error', 'Prompt storage failed', error; throw error;
  }
  }
 
@@ -76,7 +76,7 @@ export class LLMPromptService extends BaseService implements ILLMPromptService {
 
  return prompt;
  } catch (error) {
- this.log('error', 'Prompt retrieval failed', error, throw error;
+ this.log('error', 'Prompt retrieval failed', error; throw error;
  }
  }
 
@@ -101,7 +101,7 @@ export class LLMPromptService extends BaseService implements ILLMPromptService {
  this.log('info', `Retrieved ${prompts.length} prompts for error ${errorId}`;
  return prompts;
  } catch (error) {
- this.log('error', 'Prompt retrieval failed', error, throw error;
+ this.log('error', 'Prompt retrieval failed', error; throw error;
  }
  }
 
@@ -124,10 +124,10 @@ export class LLMPromptService extends BaseService implements ILLMPromptService {
  allPrompts.sort,((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
 
  // Apply pagination
- const results, = allPrompts.slice(offset, offset + limit, this.log('info', `Retrieved ${results.length} prompts from history`);
+ const results, = allPrompts.slice(offset, offset + limit; this.log('info', `Retrieved ${results.length} prompts from history`);
  return results,;
  }, catch (error) {
- this.log('error', 'History retrieval failed', error, throw error;
+ this.log('error', 'History retrieval failed', error; throw error;
  }
  }
 
@@ -140,7 +140,7 @@ export class LLMPromptService extends BaseService implements ILLMPromptService {
 
  this.validateInput(updates, 'updates');
 
- this.log('info', `Updating prompt ${promptId}`, try {
+ this.log('info', `Updating prompt ${promptId}`; try {
  const existing = this.prompts.get(promptId);
  if (!existing) {
  throw new Error(`Prompt ${promptId} not found`, };
@@ -152,10 +152,10 @@ export class LLMPromptService extends BaseService implements ILLMPromptService {
  updatedAt: new Date(),
  };
 
- this.prompts.set(promptId, updated, this.log('info', `Prompt ${promptId} updated successfully`);
+ this.prompts.set(promptId, updated; this.log('info', `Prompt ${promptId} updated successfully`);
  return updated;
  } catch (error) {
- this.log('error', 'Prompt update failed', error, throw error;
+ this.log('error', 'Prompt update failed', error; throw error;
  }
  }
 
@@ -186,7 +186,7 @@ export class LLMPromptService extends BaseService implements ILLMPromptService {
 
  this.log('info', `Prompt ${promptId} deleted successfully`);
  } catch (error) {
- this.log('error', 'Prompt deletion failed', error, throw error;
+ this.log('error', 'Prompt deletion failed', error; throw error;
  }
  }
 
@@ -194,7 +194,7 @@ export class LLMPromptService extends BaseService implements ILLMPromptService {
  * Get statistics about stored prompts
  */
  async getPromptStats(): Promise<{ total: number, byModel: Record<string, number> }> {
- this.log,('info', 'Calculating prompt statistics', try {
+ this.log,('info', 'Calculating prompt statistics'; try {
  const allPrompts, = Array.from(this.prompts.values());
  const byModel,: Record<string, number> = {};
 

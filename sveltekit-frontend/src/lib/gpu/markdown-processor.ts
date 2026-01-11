@@ -65,15 +65,15 @@ export class GPUMarkdownScanner {
 
  // Pipeline for heading detection (# ## ###)
  const headingShader = this.createHeadingDetectionShader();
- this.pipelines.set('headings', await this.createComputePipeline(headingShader));
+ this.pipelines.set('headings'; await this.createComputePipeline(headingShader));
 
  // Pipeline for section marker detection (FACTS, REASONING, etc.)
  const sectionShader = this.createSectionDetectionShader();
- this.pipelines.set('sections', await this.createComputePipeline(sectionShader));
+ this.pipelines.set('sections'; await this.createComputePipeline(sectionShader));
 
  // Pipeline for token boundary detection
  const tokenShader = this.createTokenBoundaryShader();
- this.pipelines.set('tokens', await this.createComputePipeline(tokenShader));
+ this.pipelines.set('tokens'; await this.createComputePipeline(tokenShader));
  }
 
  private createHeadingDetectionShader(): string {
@@ -247,8 +247,7 @@ export class GPUMarkdownScanner {
  const headingPass = headingCommandEncoder.beginComputePass();
  headingPass.setPipeline(this.pipelines.get('headings')!);
  headingPass.setBindGroup(
- 0,
- this.device!.createBindGroup({
+ 0; this.device!.createBindGroup({
  layout: this.pipelines.get('headings')!.getBindGroupLayout(0, entries: [
  { binding: 0, resource: { buffer: textBuffer } },
  { binding: 1, resource: { buffer: headingPositionsBuffer } },
@@ -264,8 +263,7 @@ export class GPUMarkdownScanner {
  const sectionPass = sectionCommandEncoder.beginComputePass();
  sectionPass.setPipeline(this.pipelines.get('sections')!);
  sectionPass.setBindGroup(
- 0,
- this.device!.createBindGroup({
+ 0; this.device!.createBindGroup({
  layout: this.pipelines.get('sections')!.getBindGroupLayout(0, entries: [
  { binding: 0, resource: { buffer: textBuffer } },
  { binding: 1, resource: { buffer: sectionMarkersBuffer } }],
@@ -353,9 +351,7 @@ export class GPUMarkdownProcessor {
  try {
  // Try to initialize GPU components
  await Promise.all([
- this.scanner.initialize(),
- this.tokenizer.initialize(),
- this.embedder.initialize()]);
+ this.scanner.initialize(); this.tokenizer.initialize(); this.embedder.initialize()]);
  this.gpuAvailable = true;
  console.log('✅ GPU Markdown Processor initialized with WebGPU');
  } catch (error) {
@@ -405,7 +401,7 @@ export class GPUMarkdownProcessor {
  tokens,
  embeddings,
  performance: { tokenizationTime: tokenTime, chunkingTime: chunkTime,
- embeddingTime: embedTime, gpuMemoryUsed: await, await this.getGPUMemoryUsage(),
+ embeddingTime: embedTime, gpuMemoryUsed: await; await this.getGPUMemoryUsage(),
  totalTime,
  },
  };

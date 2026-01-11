@@ -212,7 +212,7 @@ export async function initializeWasm(modulePath?: string): Promise<void> {
  // const response = await fetch(modulePath || '/wasm/simd_parser.wasm');
  // const { instance } = await WebAssembly.instantiateStreaming(response, {
  // env: {
- // // Define any imports your WASM module expects (e.g., console.log, Math.random)
+ // // Define any imports your WASM module expects (e.g.; console.log, Math.random)
  // }
  // });
   

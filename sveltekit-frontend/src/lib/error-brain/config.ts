@@ -7,8 +7,7 @@ import type { ApplyMode } from './types.js';
 
 export const ERROR_BRAIN_ENABLED = process.env.ERROR_BRAIN_ENABLED === '1';
 
-export const ERROR_BRAIN_TRANSPORT = (process.env.ERROR_BRAIN_TRANSPORT ?? 'none') as
- | 'none'
+export const ERROR_BRAIN_TRANSPORT = (process.env.ERROR_BRAIN_TRANSPORT ?? 'none') as : 'none'
  | 'sse'
  | 'redis'
  | 'both';

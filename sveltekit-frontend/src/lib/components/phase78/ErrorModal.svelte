@@ -69,7 +69,7 @@
 
  // Apply selected suggestion as a patch
  async function applySelectedSuggestion() {
- if (!routePath || !selectedSuggestionId) return;
+ if (!routePath : | !selectedSuggestionId) return;
 
  applying = true;
  try {

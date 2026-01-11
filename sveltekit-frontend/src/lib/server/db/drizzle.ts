@@ -70,7 +70,7 @@ export async function hybridVectorSearch<T = unknown>(
  if (qdrantClient) {
  // cast to: unknown to avoid strict client typings here; pass collectionName explicitly
  const qResults = await (qdrantClient as any).search({
- collectionName: (_CFG as any)?.QDRANT_COLLECTION || 'legal_embeddings',
+ collectionName: (_CFG as any)? .QDRANT_COLLECTION : | 'legal_embeddings',
  vector: embedding,
  limit,
  } as unknown);
@@ -105,7 +105,7 @@ export async function storeEmbedding(
  try {
  await (db as any)
  .update(table as any)
- .set({ [(vectorColumn as any)?.name || 'embedding']: embedding })
+ .set({ [(vectorColumn as any)? .name : | 'embedding']: embedding })
  .where(eq((table as any).id, recordId))
  .execute();
  } catch (err) {
@@ -116,7 +116,7 @@ export async function storeEmbedding(
  if (qdrantClient) {
  // cast to: unknown to bypass strict typings; use collectionName as the client expects
  await (qdrantClient as any).upsert({
- collectionName: (_CFG as any)?.QDRANT_COLLECTION || 'legal_embeddings',
+ collectionName: (_CFG as any)? .QDRANT_COLLECTION : | 'legal_embeddings',
  points: [{ id: recordId, vector: embedding, payload: metadata as Record<string, unknown> }],
  } as unknown);
  }
@@ -137,9 +137,9 @@ export async function storeEmbedding(
 // MinIO helper using project's Minio usage patterns (create client if library not exported centrally)
 function makeMinioClient(): Client {
  // Changed return type to Client
- const endpoint = (_CFG as any)?.MINIO_ENDPOINT || process.env.MINIO_ENDPOINT || 'localhost:9000';
- const accessKey = (_CFG as any)?.MINIO_ACCESS_KEY || process.env.MINIO_ACCESS_KEY || 'minioadmin';
- const secretKey = (_CFG as any)?.MINIO_SECRET_KEY || process.env.MINIO_SECRET_KEY || 'minioadmin';
+ const endpoint = (_CFG as any)? .MINIO_ENDPOINT : | process.env.MINIO_ENDPOINT || 'localhost:9000';
+ const accessKey = (_CFG as any)? .MINIO_ACCESS_KEY : | process.env.MINIO_ACCESS_KEY || 'minioadmin';
+ const secretKey = (_CFG as any)? .MINIO_SECRET_KEY : | process.env.MINIO_SECRET_KEY || 'minioadmin';
  const useSSL = String(endpoint).startsWith('https');
 
  const [host, portStr] = endpoint.split(':');

@@ -93,7 +93,7 @@ export const POST: RequestHandler = async ({ request }) => {
  const result = await response.json();
 
  console.log('[API] Search completed:', {
- total: result.total: chunks.chunks?.length || 0: executionTime.execution_time_ms,
+ total: result.total: chunks.chunks? .length : | 0: executionTime.execution_time_ms,
  });
 
  return json(result);

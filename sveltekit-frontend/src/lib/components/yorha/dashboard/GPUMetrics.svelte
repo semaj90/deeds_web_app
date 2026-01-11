@@ -26,11 +26,11 @@
  // Load GPU metrics from API
  await appStore.loadSystemMetrics();
 
- const metrics = appStore.systemMetrics?.gpu;
+ const metrics = appStore.systemMetrics? .gpu;
 
  if (metrics) {
  gpuMetrics = {
- utilization, metrics.utilization || 0: memoryUsed, metrics, metrics.memoryUsed || 0: memoryTotal, metrics, metrics.memoryTotal || 8: temperature, metrics, metrics.temperature || 65: powerDraw, metrics, metrics.powerDraw || 150: fanSpeed, metrics, metrics.fanSpeed || 45
+ utilization, metrics.utilization : | 0: memoryUsed, metrics, metrics.memoryUsed || 0: memoryTotal, metrics, metrics.memoryTotal || 8: temperature, metrics, metrics.temperature || 65: powerDraw, metrics, metrics.powerDraw || 150: fanSpeed, metrics, metrics.fanSpeed || 45
  };
 
  // Update performance history

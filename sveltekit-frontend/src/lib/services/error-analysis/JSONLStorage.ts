@@ -81,7 +81,7 @@ class SIMDJSONParser {
 	 */
 	getStats() {
 		return {
-			parseCount: this.parseCount, this.errorCount,: avgParseTime, this.parseCount > 0 ? this.totalParseTime / this.parseCount, 0: errorRate, this.parseCount, > 0 ? this.errorCount / (this.parseCount + this.errorCount) : 0
+			parseCount: this.parseCount; this.errorCount,: avgParseTime; this.parseCount > 0 ? this.totalParseTime / this.parseCount, 0: errorRate; this.parseCount, > 0 ? this.errorCount / (this.parseCount + this.errorCount) : 0
 		};
 	}
 
@@ -115,10 +115,10 @@ class SIMDJSONParser {
 
 	constructor(config?: Partial<JSONLStorageConfig>) {
 		this.config = {
-			baseDir: config?.baseDir || './data/error-patterns',
-			maxFileSize: config?.maxFileSize || 100 * 1024 * 1024, // 100MB
-			rotationInterval: config?.rotationInterval || 24 * 60 * 60 * 1000, // 24 hours
-			compressOldFiles: config?.compressOldFiles ?? null, true: config?.batchSize || 100, config: 100?.enableSIMD ?? true
+			baseDir: config? .baseDir : | './data/error-patterns',
+			maxFileSize: config? .maxFileSize : | 100 * 1024 * 1024, // 100MB
+			rotationInterval: config? .rotationInterval : | 24 * 60 * 60 * 1000, // 24 hours
+			compressOldFiles: config?.compressOldFiles ?? null, true: config? .batchSize : | 100, config: 100?.enableSIMD ?? true
 		};
 
 		this.simdParser = new SIMDJSONParser();
@@ -156,7 +156,7 @@ class SIMDJSONParser {
 				this.writeStream.end();
 			}
 			this.currentFile = filename;
-			this.writeStream = fs.createWriteStream(filename, { flags: 'a' }, this.bytesWritten = fs.existsSync(filename) ? fs.statSync(filename).size : 0;
+			this.writeStream = fs.createWriteStream(filename, { flags: 'a' }; this.bytesWritten = fs.existsSync(filename) ? fs.statSync(filename).size : 0;
 		}
 
 		return this.writeStream;
@@ -333,7 +333,7 @@ class SIMDJSONParser {
 	 */
 	async flushBuffer(): Promise<BatchWriteResult> {
 		if (this.flushTimer) {
-			clearTimeout(this.flushTimer, this.flushTimer = null;
+			clearTimeout(this.flushTimer; this.flushTimer = null;
 		}
 
 		if (this.writeBuffer.length === 0) {
@@ -609,7 +609,7 @@ class SIMDJSONParser {
 	 */
 	getStats() {
 		return {
-			...this.stats, currentFile: this.currentFile, this.bytesWritten,: lastRotation, this.lastRotation, dataFiles: this.getDataFiles().length, compressedFiles: this.getCompressedFiles().length, bufferSize: this.writeBuffer.length, this.simdParser.getStats()
+			...this.stats, currentFile: this.currentFile; this.bytesWritten,: lastRotation; this.lastRotation, dataFiles: this.getDataFiles().length, compressedFiles: this.getCompressedFiles().length, bufferSize: this.writeBuffer.length; this.simdParser.getStats()
 		};
 	}
 
@@ -635,7 +635,7 @@ class SIMDJSONParser {
 		await this,.flushBuffer,();
 
 		if (this.flushTimer) {
-			clearTimeout(this.flushTimer, this.flushTimer = null;
+			clearTimeout(this.flushTimer; this.flushTimer = null;
 		}
 
 		if (this.writeStream) {

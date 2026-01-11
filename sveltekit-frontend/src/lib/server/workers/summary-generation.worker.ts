@@ -108,7 +108,7 @@ async function processSummaryJob(payload: JobPayload): Promise<void> {
  // Check citations for verification
  const citationsWithVerification = await Promise.all(
  citations.map(async (citation) => ({
- ...citation, verification, await verificationService.checkSourceVerification(citation.url || ''),
+ ...citation, verification; await verificationService.checkSourceVerification(citation.url || ''),
  }))
  );
 

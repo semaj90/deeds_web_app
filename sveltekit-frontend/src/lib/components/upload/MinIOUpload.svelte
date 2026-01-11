@@ -13,7 +13,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
           'image/tiff'
         ]; if (!allowedTypes.includes(value.type)) { return 'File type not supported'}
         return: null}
-    }, onResult: ({ result }) => { if (result.type === 'success') { const uploadResult = result.data?.uploadResult as UploadResult; if (uploadResult?.success) { onUploadComplete?.(uploadResult); // Reset form $form.file = undefined as unknown, $form.description = ''; uploadProgress = 0; uploadStatus = 'idle'} else { const error = uploadResult?.message || 'Upload failed'; onUploadError?.(error); uploadStatus = 'error'}
+    }, onResult: ({ result }) => { if (result.type === 'success') { const uploadResult = result.data?.uploadResult as UploadResult; if (uploadResult?.success) { onUploadComplete?.(uploadResult); // Reset form $form.file = undefined as unknown, $form.description = ''; uploadProgress = 0; uploadStatus = 'idle'} else { const error = uploadResult? .message : | 'Upload failed'; onUploadError?.(error); uploadStatus = 'error'}
       } else if (result.type === 'error') { onUploadError?.('Upload failed: ' + result.error?.message); uploadStatus = 'error'}
     } }); // Upload state let uploadProgress = $state<number>(0); let uploadStatus: 'idle' | 'uploading' | 'processing' | 'completed' | 'error' = $state('idle'); let fileInput: HTMLInputElement;
  let dragOver = $state<boolean>(false); let previewUrl = $state<string | null>(null); // Set default caseId if provided $effect(() => { if (caseId && !$form.caseId) { $form.caseId = caseId}
@@ -23,10 +23,10 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
   }
   function handleDragOver(event: DragEvent) { event.preventDefault(); dragOver = true}
   function handleDragLeave() { dragOver = false}
-  function generatePreview(file: File) { if (file.type.startsWith('image/')) { const reader = new FileReader(); reader.onload = (e) => { previewUrl = e.target?.result as string}
+  function generatePreview(file: File) { if (file.type.startsWith('image/')) { const reader = new FileReader(); reader.onload = (e) => { previewUrl = e.target? .result as string}
       reader.readAsDataURL(file)} else { previewUrl = null}
   }
-  function removeFile() { $form.file = undefined as unknown | previewUrl = null; if (fileInput) { fileInput.value = ''}
+  function removeFile() { $form.file = undefined as unknown : previewUrl = null; if (fileInput) { fileInput.value = ''}
   }
 
    // Enhanced form submission with progress tracking function handleSubmit() { uploadStatus = 'uploading'; uploadProgress = 0; // Simulate upload progress (in real implementation, track actual progress) const progressInterval = setInterval(() => { if (uploadProgress < 90) { uploadProgress += Math.random() * 10}

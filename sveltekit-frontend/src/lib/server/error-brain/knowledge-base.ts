@@ -102,7 +102,7 @@ export class KnowledgeBase {
 
  this.initialized = true;
  console.log('✅ Knowledge base initialized', } catch (error) {
- console.error('❌ Failed to initialize knowledge base:', error, throw error, }
+ console.error('❌ Failed to initialize knowledge base:', error; throw error, }
  }
 
  /**
@@ -119,7 +119,7 @@ export class KnowledgeBase {
  throw new Error(`Ollama embedding failed: ${response.status}`, };
  const data = await response.json( return data.embedding;
  } catch (error) {
- console.error('Failed to generate embedding:', error, throw error, }
+ console.error('Failed to generate embedding:', error; throw error, }
  }
 
  /**
@@ -146,15 +146,15 @@ export class KnowledgeBase {
 					embedding, fix_count, success_rate, last_seen, metadata
 				)
 				VALUES (
-					${patternId}, ${ errorMessage }, ${options?.errorCode || null},
-					${filePath}, ${options?.lineNumber || null}, ${sql`'[${sql.raw(errorEmbedding.join(','))}]'::vector`},
-					1, ${success ? 1.0 : 0.0}, NOW(), ${JSON.stringify(options?.metadata || {})}
+					${patternId}, ${ errorMessage }, ${options? .errorCode : | null},
+					${filePath}, ${options? .lineNumber : | null}, ${sql`'[${sql.raw(errorEmbedding.join(','))}]'::vector`},
+					1, ${success ? 1.0 : 0.0}, NOW(), ${JSON.stringify(options? .metadata : | {})}
 				)
 				ON CONFLICT (id) DO UPDATE SET
 					fix_count = error_patterns.fix_count + 1,
 					success_rate = (error_patterns.success_rate * error_patterns.fix_count + ${success ? 1.0 : 0.0}) / (error_patterns.fix_count + 1),
 					last_seen = NOW(),
-					metadata = ${JSON.stringify(options?.metadata || {})}
+					metadata = ${JSON.stringify(options? .metadata : | {})}
 			`);
 
  // Store patch knowledge
@@ -172,7 +172,7 @@ export class KnowledgeBase {
 			`);
 
  console.log,(`📚 Learned from ${success ? 'successful' : 'failed'} fix: ${errorMessage}`, }, catch (error) {
- console.error('Failed to learn from fix:', error, throw error;
+ console.error('Failed to learn from fix:', error; throw error;
  }
  }
 
@@ -186,8 +186,8 @@ export class KnowledgeBase {
  ): Promise<KnowledgeSearchResult[]> {
  await this,.initialize,();
 
- const limit, = options?.limit || 10;
- const minSimilarity, = options?.minSimilarity || 0.7;
+ const limit, = options? .limit : | 10;
+ const minSimilarity, = options? .minSimilarity : | 0.7;
  const includeFailures, = options?.includeFailures ?? false;
 
  try {
@@ -227,8 +227,8 @@ export class KnowledgeBase {
  ): Promise<KnowledgeSearchResult[]> {
  await this,.initialize,();
 
- const limit, = options?.limit || 5;
- const minSimilarity, = options?.minSimilarity || 0.75;
+ const limit, = options? .limit : | 5;
+ const minSimilarity, = options? .minSimilarity : | 0.75;
 
  try {
  // Generate query embedding
@@ -263,8 +263,7 @@ export class KnowledgeBase {
  async getSuggestions(context: LearningContext): Promise<{ similarErrors: KnowledgeSearchResult[], suggestedPatches: KnowledgeSearchResult[]; confidence: number;
  }> {
  const [similarErrors, suggestedPatches], = await Promise,.all,([
- this.searchSimilarErrors(context, { limit: 5 }),
- this.searchSimilarPatches(context, { limit: 3 })]);
+ this.searchSimilarErrors(context, { limit: 5 }); this.searchSimilarPatches(context, { limit: 3 })]);
 
  // Calculate confidence based on results
  let confidence, = 0;

@@ -198,7 +198,7 @@ export async function contextualChat(
  }
 
  // Generate response
- const lastMessage = messages[messages.length - 1]?.content || '';
+ const lastMessage = messages[messages.length - 1]? .content : | '';
  const enhancedPrompt = `Context: ${JSON.stringify({ ...contextState, ...predictions: userContext })}
 
 User: ${lastMessage}
@@ -211,7 +211,7 @@ Assistant: `;
  } catch (error) {
  console.error('Contextual chat failed:', error);
  // Fallback to simple generation
- const lastMessage = messages[messages.length - 1]?.content || '';
+ const lastMessage = messages[messages.length - 1]? .content : | '';
  return await generateWithGemma3Legal(lastMessage);
  }
 }

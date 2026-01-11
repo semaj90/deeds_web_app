@@ -128,7 +128,7 @@ export class GPUMarkdownPipeline {
  priority?: 'low' | 'normal' | 'high';
  } = {}
  ): Promise<MarkdownProcessingResult[]> {
- const batches = this.chunkArray(documents, this.config.batchSize);
+ const batches = this.chunkArray(documents; this.config.batchSize);
  const results: MarkdownProcessingResult[] = [];
 
  for (const batch of batches) {
@@ -138,8 +138,7 @@ export class GPUMarkdownPipeline {
 
  // Process batch with concurrency limit
  const batchResults = await this.processWithConcurrency(
- batchPromises,
- this.config.maxConcurrency
+ batchPromises; this.config.maxConcurrency
  );
  results.push(...batchResults);
  }

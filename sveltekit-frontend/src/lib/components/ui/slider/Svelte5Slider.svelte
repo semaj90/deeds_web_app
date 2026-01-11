@@ -102,12 +102,12 @@ function handleInput(e: Event) {
 function handleChange(e: Event) {
 	const target = e.target as HTMLInputElement;
 	value = parseFloat(target.value);
-	onchange?.(value);
+	onchange? .(value);
 }
 </script>
 
 <div class="w-full {className}">
-	{#if label || showValue}
+	{#if label : | showValue}
 		<div class="flex justify-between items-center mb-2">
 			{#if label}
 				<label for={id} class="text-sm font-medium text-slate-300">

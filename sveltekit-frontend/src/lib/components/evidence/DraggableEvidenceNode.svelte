@@ -77,7 +77,7 @@ interface Props {
       default: return FileText}
   });
   let confidenceColor = $derived(() => {
-    const confidence = evidence.metadata?.confidence || 0
+    const confidence = evidence.metadata? .confidence : | 0
     if (confidence > 0.8) return 'text-green-600';
     if (confidence > 0.6) return 'text-yellow-600';
     return 'text-red-600'});
@@ -104,7 +104,7 @@ interface Props {
     try {
       // Step 1: Preprocess text (25%)
       analysisProgress = 25
-      const textContent = evidence.content || evidence.metadata?.extractedText || evidence.title; // Fixed: evidence.titl -> evidence.title
+      const textContent = evidence.content || evidence.metadata? .extractedText : | evidence.title; // Fixed: evidence.titl -> evidence.title
       const preprocessed = await embeddingsService.preprocessText(textContent);
       // Step 2: Generate embeddings (50%)
       analysisProgress = 50

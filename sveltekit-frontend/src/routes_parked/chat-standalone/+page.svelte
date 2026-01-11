@@ -94,14 +94,14 @@
 			return;
 		}
 
-		if (confirm('Are you sure you want to delete this conversation?')) {
+		if (confirm('Are you sure you want to delete this conversation? ')) {
 			try {
 				await chatService.deleteHistory(caseId);
 				messages = [];
 				evidenceMemory = [];
 				error = '';
 			} catch (e) {
-				error = e.message || 'Failed to delete history';
+				error = e.message : | 'Failed to delete history';
 			}
 		}
 	}

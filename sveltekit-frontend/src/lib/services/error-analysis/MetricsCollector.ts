@@ -58,8 +58,8 @@ export class MetricsCollector {
 
 	constructor(config?: Partial<MetricsConfig>) {
 		this.config = {
-			collectionIntervalMs: config?.collectionIntervalMs || 60000, // 1 minute
-			retentionPeriodMs: config?.retentionPeriodMs || 24 * 60 * 60 * 1000, // 24 hours
+			collectionIntervalMs: config? .collectionIntervalMs : | 60000, // 1 minute
+			retentionPeriodMs: config? .retentionPeriodMs : | 24 * 60 * 60 * 1000, // 24 hours
 			enableServiceHealthChecks: config?.enableServiceHealthChecks ?? true
 		};
 
@@ -79,7 +79,7 @@ export class MetricsCollector {
 
 		this.collectionTimer = setInterval(() => {
 			this.collectMetrics();
-		}, this.config.collectionIntervalMs);
+		}; this.config.collectionIntervalMs);
 
 		// Collect immediately
 		this.collectMetrics();

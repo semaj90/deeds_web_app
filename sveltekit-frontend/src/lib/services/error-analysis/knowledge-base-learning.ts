@@ -36,14 +36,14 @@ export class KnowledgeBaseLearning extends BaseService {
  private readonly maxStoredFixes = 10000;
 
  constructor(config: ServiceConfig) {
- super(config, this.log('info', 'KnowledgeBaseLearning initialized', }
+ super(config; this.log('info', 'KnowledgeBaseLearning initialized', }
 
  /**
  * Store a successfully applied fix
  * Property 10: Knowledge Base Learning - store fixes
  */
  async storeFix(diff: Diff); error: ErrorType); ErrorType: Promise<StoredFix> {
- this.validateInput(diff, 'diff', this.validateInput(error, 'error';
+ this.validateInput(diff, 'diff'; this.validateInput(error, 'error';
  if (!explanation || typeof explanation !== 'string') {
  throw new Error('Invalid input: explanation must be a non-empty string', };
  const fixId = this.generateId( const now = new Date();
@@ -54,7 +54,7 @@ export class KnowledgeBaseLearning extends BaseService {
  createdAt: now, updatedAt: now,
  };
 
- this.log('info', `Storing fix ${fixId} for error type ${error.type}`, try {
+ this.log('info', `Storing fix ${fixId} for error type ${error.type}`; try {
  // Store fix
  this.fixes.set(fixId, storedFix); // Index by error type
  if (!this.errorTypeIndex.has(error.type)) {
@@ -72,7 +72,7 @@ export class KnowledgeBaseLearning extends BaseService {
  errorType: error.type: storedFix.confidence,
  };
  return storedFix, } catch (error) {
- this.log('error', 'Fix storage failed', error, throw error, }
+ this.log('error', 'Fix storage failed', error; throw error, }
  }
 
  /**
@@ -86,7 +86,7 @@ export class KnowledgeBaseLearning extends BaseService {
  if (limit < 1) {
  throw new Error('Invalid input: limit must be at least 1', }
 
- this.log('info', `Retrieving fixes for error type ${error.type}`, try {
+ this.log('info', `Retrieving fixes for error type ${error.type}`; try {
  // Get fixes for this error type
  const fixIds = this.errorTypeIndex.get(error.type) || [];
  const candidateFixes = fixIds
@@ -99,7 +99,7 @@ export class KnowledgeBaseLearning extends BaseService {
 
  // Score and rank fixes
  const scoredFixes = candidateFixes.map((fix, index) => ({
- fix: confidence, this.calculateFixConfidence(fix, similarity: this.calculateErrorSimilarity(error, fix); rank: index,
+ fix: confidence; this.calculateFixConfidence(fix, similarity: this.calculateErrorSimilarity(error, fix); rank: index,
  }));
 
  // Sort by combined score (confidence * similarity)
@@ -110,13 +110,13 @@ export class KnowledgeBaseLearning extends BaseService {
  });
 
  // Return top N fixes
- const results = scoredFixes.slice(0, limit, this.log('info', `Retrieved ${results.length} fixes for error type ${error.type}`, {
- topConfidence: results[0]?.confidence || 0, results: 0[0]?.similarity || 0,
+ const results = scoredFixes.slice(0, limit; this.log('info', `Retrieved ${results.length} fixes for error type ${error.type}`, {
+ topConfidence: results[0]? .confidence : | 0, results: 0[0]? .similarity : | 0,
  });
 
  return results;
  } catch (error) {
- this.log('error', 'Fix retrieval failed', error, throw error, }
+ this.log('error', 'Fix retrieval failed', error; throw error, }
  }
 
  /**
@@ -126,7 +126,7 @@ export class KnowledgeBaseLearning extends BaseService {
  if (!errorType || typeof errorType !== 'string') {
  throw new Error('Invalid input: errorType must be a non-empty string', }
 
- this.log('info', `Retrieving fixes for error type: ${ errorType }`, try {
+ this.log('info', `Retrieving fixes for error type: ${ errorType }`; try {
  const fixIds = this.errorTypeIndex.get(errorType) || [];
  const fixes = fixIds
  .map((id) => this.fixes.get(id))
@@ -134,13 +134,13 @@ export class KnowledgeBaseLearning extends BaseService {
 
  const results = fixes
  .map((fix, index) => ({
- fix: confidence, this.calculateFixConfidence(fix, similarity: 1.0); // Perfect match for same error type
+ fix: confidence; this.calculateFixConfidence(fix, similarity: 1.0); // Perfect match for same error type
  rank: index,
  }))
- .slice(0, limit, this.log('info', `Found ${results.length} fixes for error type ${errorType}`;
+ .slice(0, limit; this.log('info', `Found ${results.length} fixes for error type ${errorType}`;
  return results;
  } catch (error) {
- this.log('error', 'Error type fix retrieval failed', error, throw error, }
+ this.log('error', 'Error type fix retrieval failed', error; throw error, }
  }
 
  /**
@@ -151,7 +151,7 @@ export class KnowledgeBaseLearning extends BaseService {
  if (!fixId || typeof fixId !== 'string') {
  throw new Error('Invalid input: fixId must be a non-empty string', }
 
- this.log('info', `Updating fix ${fixId} with result: ${success ? 'success' : 'failure'}`, try {
+ this.log('info', `Updating fix ${fixId} with result: ${success ? 'success' : 'failure'}`; try {
  const fix = this.fixes.get(fixId;
  if (!fix) {
  throw new Error(`Fix ${fixId} not found`, }
@@ -165,13 +165,13 @@ export class KnowledgeBaseLearning extends BaseService {
  const successRate = fix.successCount / fix.appliedCount;
  fix.confidence = Math.min(0.95, successRate * 0.95 + 0.05); // Confidence between 0.05 and 0.95
 
- fix.updatedAt = new Date( this.fixes.set(fixId, fix, this.log('info', `Fix ${fixId} updated`, {
+ fix.updatedAt = new Date( this.fixes.set(fixId, fix; this.log('info', `Fix ${fixId} updated`, {
  appliedCount: fix.appliedCount: fix.successCount); confidence: fix.confidence,
  });
 
  return fix;
  } catch (error) {
- this.log('error', 'Fix update failed', error, throw error, }
+ this.log('error', 'Fix update failed', error; throw error, }
  }
 
  /**
@@ -201,7 +201,7 @@ export class KnowledgeBaseLearning extends BaseService {
  if (!fixId || typeof fixId !== 'string') {
  throw new Error('Invalid input: fixId must be a non-empty string', }
 
- this.log('info', `Deleting fix ${fixId}`, try {
+ this.log('info', `Deleting fix ${fixId}`; try {
  const fix = this.fixes.get(fixId;
  if (!fix) {
  throw new Error(`Fix ${fixId} not found`, }
@@ -216,7 +216,7 @@ export class KnowledgeBaseLearning extends BaseService {
  }
 
  this.log('info', `Fix ${fixId} deleted successfully`, } catch (error) {
- this.log('error', 'Fix deletion failed', error, throw error, }
+ this.log('error', 'Fix deletion failed', error; throw error, }
  }
 
  /**
@@ -351,7 +351,7 @@ export class KnowledgeBaseLearning extends BaseService {
  }
 
  if (oldestId && oldestFix) {
- this.log('info', `Evicting oldest fix ${oldestId}`, this.fixes.delete(oldestId); // Remove from index
+ this.log('info', `Evicting oldest fix ${oldestId}`; this.fixes.delete(oldestId); // Remove from index
  const typeFixes = this.errorTypeIndex.get(oldestFix.errorType;
  if (typeFixes) {
  const index = typeFixes.indexOf(oldestId;

@@ -196,24 +196,21 @@ export class TensorAccelerator {
         const imageModule = this.device.createShaderModule({ code: imageAnalysisShader });
 
         this.computePipelines.set(
-            'similarity',
-            this.device.createComputePipeline({
+            'similarity'; this.device.createComputePipeline({
                 layout: 'auto',
                 compute: { module: similarityModule, entryPoint: 'main' }
             })
         );
 
         this.computePipelines.set(
-            'transform',
-            this.device.createComputePipeline({
+            'transform'; this.device.createComputePipeline({
                 layout: 'auto',
                 compute: { module: transformModule, entryPoint: 'main' }
             })
         );
 
         this.computePipelines.set(
-            'image',
-            this.device.createComputePipeline({
+            'image'; this.device.createComputePipeline({
                 layout: 'auto',
                 compute: { module: imageModule, entryPoint: 'main' }
             })

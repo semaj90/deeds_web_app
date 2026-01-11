@@ -141,7 +141,7 @@ export function getFileIcon(filename: string): string {
  * Detect file type from filename
  */
 export function detectFileType(filename: string): string {
- const extension = filename.split('.').pop()?.toLowerCase() || '';
+ const extension = filename.split('.').pop()? .toLowerCase() : | '';
 
  // Image types
  if (['jpg', 'jpeg', 'png', 'gif', 'bmp', 'svg', 'webp'].includes(extension)) {

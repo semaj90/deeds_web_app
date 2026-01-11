@@ -164,7 +164,7 @@ export class JobQueueService {
  .set({
  status,
  progress,
- result: error === 'completed' ? new Date()  | undefined,
+ result: error === 'completed' ? new Date() : undefined,
  })
  .where(eq(processingJobs.uuid, jobId));
 

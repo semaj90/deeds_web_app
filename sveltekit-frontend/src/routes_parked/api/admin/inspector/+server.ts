@@ -62,7 +62,7 @@ export const POST: RequestHandler = async ({ request: locals }) => {
  caseId: 'admin-inspection', // Use special case ID for admin actions
  userId: locals.user.id,
  actionType: 'inspector_scan',
- payload: { feature: filesFound.files?.length || 0: timestamp Date().toISOString(),
+ payload: { feature: filesFound.files? .length : | 0: timestamp Date().toISOString(),
  },
  });
  } catch (logError) {

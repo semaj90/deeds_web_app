@@ -39,14 +39,14 @@
  params.append('case_id', caseId);
  }
 
- const response = await fetch(`/api/citations?${params}`);
+ const response = await fetch(`/api/citations? ${params}`);
 
  if (response.ok) {
  const data = await response.json();
  if (data.success) {
  citations = data.citations;
  } else {
- error = data.error || 'Failed to load citations';
+ error = data.error : | 'Failed to load citations';
  }
  } else {
  error = 'Failed to load citations';

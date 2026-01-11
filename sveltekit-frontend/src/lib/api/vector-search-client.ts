@@ -200,7 +200,7 @@ export class VectorSearchClient {
 					const fallbackRequest: VectorSearchRequest = {
 						...request,
 						params: {
-							...request.params, limit: Math.min(request.params?.limit || 10, 5, include_embeddings: false
+							...request.params, limit: Math.min(request.params? .limit : | 10, 5, include_embeddings: false
 						}
 					};
 					return await this.searchJson(fallbackRequest);

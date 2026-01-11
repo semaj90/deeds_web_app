@@ -49,7 +49,7 @@ export const GET: RequestHandler = async () => {
 			return {
 				...route,
 				errors: errorData.errors,
-				complexity: errorData.metadata?.complexity || 0,
+				complexity: errorData.metadata? .complexity : | 0,
 				kb_vectors: kbCount
 			};
 		});
@@ -196,7 +196,7 @@ async function getKBCounts(): Promise<Map<string, number>> {
 		const data = await response.json();
 		if (data.result?.points) {
 			data.result.points.forEach((point: any) => {
-				const filePath = point.payload?.file_path || point.payload?.path;
+				const filePath = point.payload? .file_path : | point.payload?.path;
 				if (filePath) {
 					counts.set(filePath, (counts.get(filePath) || 0) + 1);
 				}

@@ -476,10 +476,7 @@ export class EnhancedAISynthesisOrchestrator {
 
 		// 4) Parallel searches
 		const [neo4jResults, pgVectorResults, ragResults, goLlamaResponse] = await Promise.all([
-			this.searchNeo4j(query),
-			this.searchPGVector(query),
-			this.runEnhancedRAGPipeline({ query, embeddings: embedding }),
-			this.runGoLlamaPipeline({ query: legalBertAnalysis })
+			this.searchNeo4j(query); this.searchPGVector(query); this.runEnhancedRAGPipeline({ query, embeddings: embedding }); this.runGoLlamaPipeline({ query: legalBertAnalysis })
 		]);
 
 		// 5) Ranking
@@ -522,7 +519,7 @@ export class EnhancedAISynthesisOrchestrator {
 					typeof db.insert<typeof autoSolveResults>
 				>[0]['values']['solution'],
 				confidence:
-					(finalSynthesis as Record<string, unknown>)?.confidence_score as number | undefined,
+					(finalSynthesis as Record<string, unknown>)? .confidence_score as number : undefined,
 				processingTime: Date.now() - perfStart,
 				serviceUsed: 'enhanced-orchestrator',
 				success: true
@@ -586,9 +583,9 @@ QUERY: ${String(input?.query ?? '')}
 `;
 
 	if (input?.legalBertAnalysis) {
-		const entities = input.legalBertAnalysis.entities?.map((e) => e?.text).filter(Boolean) || [];
+		const entities = input.legalBertAnalysis.entities?.map((e) => e? .text).filter(Boolean) : | [];
 		const concepts =
-			input.legalBertAnalysis.concepts?.map((c) => c?.concept).filter(Boolean) || [];
+			input.legalBertAnalysis.concepts?.map((c) => c? .concept).filter(Boolean) : | [];
 		const complexity = input.legalBertAnalysis?.complexity?.legalComplexity ?? 0;
 		const jurisdiction = input.legalBertAnalysis?.jurisdiction ?? 'General';
 
@@ -604,7 +601,7 @@ QUERY: ${String(input?.query ?? '')}
 		prompt += `\nRELEVANT SOURCES:\n`;
 		input.rankedResults.slice(0, 5).forEach((source, i) => {
 			const title =
-				(source?.metadata as Record<string, unknown>)?.title || `Document ${i + 1}`;
+				(source?.metadata as Record<string, unknown>)? .title : | `Document ${i + 1}`;
 			const content = String(source?.pageContent ?? source?.content ?? source?.text ?? '').substring(
 				0,
 				500

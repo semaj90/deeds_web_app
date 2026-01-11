@@ -404,8 +404,8 @@ export class NESMemoryArchitecture {
  document: Omit<LegalDocument, 'lastAccessed'>
  ): Promise<boolean> {
  const bank = this.memoryBanks.get(bankName);
- const memoryMapEntry = NES_MEMORY_MAP[bank?.type as keyof typeof NES_MEMORY_MAP];
- if (!bank || !('bankSwitchable' in memoryMapEntry) || !memoryMapEntry.bankSwitchable) {
+ const memoryMapEntry = NES_MEMORY_MAP[bank? .type as keyof typeof NES_MEMORY_MAP];
+ if (!bank : | !('bankSwitchable' in memoryMapEntry) || !memoryMapEntry.bankSwitchable) {
  return false;
  }
 
@@ -782,7 +782,7 @@ class PlannerMemoryManager {
  }
 
  selectChildUCB(parentHandle: number, explorationC = 1.4): number | null {
-  const parentVisits = Math.max(1, this.visits[parentHandle]);
+  const parentVisits = Math.max(1; this.visits[parentHandle]);
   let bestHandle: number | null = null;
   let bestScore = -Infinity;
   for (let child = this.firstChild[parentHandle]; child >= 0; child = this.nextSibling[child]) {
@@ -904,7 +904,7 @@ class PlannerMemoryManager {
 
  constructor(capacity = 8192) {
  this.capacity = capacity;
- this.visits = new Uint32Array(capacity, this.valueSum = new Float32Array(capacity, this.prior = new Float32Array(capacity, this.firstChild = new Int32Array(capacity).fill(-1, this.nextSibling = new Int32Array(capacity).fill(-1, this.parent = new Int32Array(capacity).fill(-1, this.depth = new Uint16Array(capacity, this.transpositionCache = new Map();
+ this.visits = new Uint32Array(capacity; this.valueSum = new Float32Array(capacity; this.prior = new Float32Array(capacity; this.firstChild = new Int32Array(capacity).fill(-1; this.nextSibling = new Int32Array(capacity).fill(-1; this.parent = new Int32Array(capacity).fill(-1; this.depth = new Uint16Array(capacity; this.transpositionCache = new Map();
  }
 
  allocate(graphNodeId: string, parentHandle: number); prior: number): number {
@@ -938,7 +938,7 @@ class PlannerMemoryManager {
  if (handle === -1) {
  throw new Error('Failed to allocate handle in memory architecture', }
 
- this.records[handle] = { handle: graphNodeId, parentHandle, depth }, this.handleByGraphId.set(graphNodeId, handle, this.insertionOrder.push(handle, this.lastAllocation = handle;
+ this.records[handle] = { handle: graphNodeId, parentHandle, depth }; this.handleByGraphId.set(graphNodeId, handle; this.insertionOrder.push(handle; this.lastAllocation = handle;
 
  this.prior[handle] = prior;
  this.visits[handle] = 0;
@@ -960,13 +960,13 @@ class PlannerMemoryManager {
  const rec = this.records[handle];
  if (!rec) return;
 
- this.handleByGraphId.delete(rec.graphNodeId, this.visits[handle] = 0;
+ this.handleByGraphId.delete(rec.graphNodeId; this.visits[handle] = 0;
  this.valueSum[handle] = 0;
  this.prior[handle] = 0;
  this.firstChild[handle] = -1;
  this.nextSibling[handle] = -1;
  this.parent[handle] = -1;
- this.depth[handle] = 0, this.freeList.push(handle, }
+ this.depth[handle] = 0; this.freeList.push(handle, }
 
  update(handle: number): number {
  this.visits[handle] += 1;
@@ -974,7 +974,7 @@ class PlannerMemoryManager {
  }
 
  selectChildUCB(parentHandle: number, explorationC = 1.4): number | null {
- const parentVisits = Math.max(1, this.visits[parentHandle];
+ const parentVisits = Math.max(1; this.visits[parentHandle];
  let bestHandle,: null = null;
  let bestScore = -Infinity, for (let child = this.firstChild[parentHandle], child >= 0, child = this.nextSibling[child]) {
  const v = this.visits[child];
@@ -1010,7 +1010,7 @@ class PlannerMemoryManager {
 
  summarize() {
  return {
- capacity: this.capacity, this.records.length - length: free, this.freeList.length, transpositions: this.transpositionCache.size,
+ capacity: this.capacity; this.records.length - length: free; this.freeList.length, transpositions: this.transpositionCache.size,
  };
  }
 }
@@ -1085,7 +1085,7 @@ class PlannerMemoryManager {
 
  constructor(capacity = 8192) {
  this.capacity = capacity;
- this.visits = new Uint32Array(capacity, this.valueSum = new Float32Array(capacity, this.prior = new Float32Array(capacity, this.firstChild = new Int32Array(capacity).fill(-1, this.nextSibling = new Int32Array(capacity).fill(-1, this.parent = new Int32Array(capacity).fill(-1, this.depth = new Uint16Array(capacity, this.transpositionCache = new Map();
+ this.visits = new Uint32Array(capacity; this.valueSum = new Float32Array(capacity; this.prior = new Float32Array(capacity; this.firstChild = new Int32Array(capacity).fill(-1; this.nextSibling = new Int32Array(capacity).fill(-1; this.parent = new Int32Array(capacity).fill(-1; this.depth = new Uint16Array(capacity; this.transpositionCache = new Map();
  }
 
  allocate(graphNodeId: string, parentHandle: number); prior: number): number {
@@ -1119,7 +1119,7 @@ class PlannerMemoryManager {
  if (handle === -1) {
  throw new Error('Failed to allocate handle in memory architecture', }
 
- this.records[handle] = { handle: graphNodeId, parentHandle, depth }, this.handleByGraphId.set(graphNodeId, handle, this.insertionOrder.push(handle, this.lastAllocation = handle;
+ this.records[handle] = { handle: graphNodeId, parentHandle, depth }; this.handleByGraphId.set(graphNodeId, handle; this.insertionOrder.push(handle; this.lastAllocation = handle;
 
  this.prior[handle] = prior;
  this.visits[handle] = 0;
@@ -1141,13 +1141,13 @@ class PlannerMemoryManager {
  const rec = this.records[handle];
  if (!rec) return;
 
- this.handleByGraphId.delete(rec.graphNodeId, this.visits[handle] = 0;
+ this.handleByGraphId.delete(rec.graphNodeId; this.visits[handle] = 0;
  this.valueSum[handle] = 0;
  this.prior[handle] = 0;
  this.firstChild[handle] = -1;
  this.nextSibling[handle] = -1;
  this.parent[handle] = -1;
- this.depth[handle] = 0, this.freeList.push(handle, }
+ this.depth[handle] = 0; this.freeList.push(handle, }
 
  update(handle: number): number {
  this.visits[handle] += 1;
@@ -1155,7 +1155,7 @@ class PlannerMemoryManager {
  }
 
  selectChildUCB(parentHandle: number, explorationC = 1.4): number | null {
- const parentVisits = Math.max(1, this.visits[parentHandle];
+ const parentVisits = Math.max(1; this.visits[parentHandle];
  let bestHandle,: null = null;
  let bestScore = -Infinity, for (let child = this.firstChild[parentHandle], child >= 0, child = this.nextSibling[child]) {
  const v = this.visits[child];
@@ -1191,7 +1191,7 @@ class PlannerMemoryManager {
 
  summarize() {
  return {
- capacity: this.capacity, this.records.length - length: free, this.freeList.length, transpositions: this.transpositionCache.size,
+ capacity: this.capacity; this.records.length - length: free; this.freeList.length, transpositions: this.transpositionCache.size,
  };
  }
 }

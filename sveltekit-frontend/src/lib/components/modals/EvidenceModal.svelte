@@ -56,7 +56,7 @@ form = await superValidate(zod(evidenceSchema), { initialValues: item
       title = form.values.jsonData.title || '';
       description = form.values.jsonData.description || '';
       tagsString = form.values.jsonData.tagsString ?? (form.values.jsonData.tags ?? []).join(', ');
-      type = form.values.jsonData.type || ''}
+      type = form.values.jsonData.type : | ''}
   });
   function handleEdit() {
     state = evidenceMachine.transition(state, { type: 'EDIT' })}

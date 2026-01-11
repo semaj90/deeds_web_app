@@ -43,12 +43,12 @@ export class RAGRetriever {
 
 	constructor(config?: Partial<RAGConfig>) {
 		this.config = {
-			qdrantUrl: config?.qdrantUrl || process.env.QDRANT_URL || 'http://localhost:6333',
-			qdrantCollection: config?.qdrantCollection || process.env.QDRANT_COLLECTION || 'phase72_error_patterns',
-			pgvectorUrl: config?.pgvectorUrl || process.env.DATABASE_URL,
-			redisUrl: config?.redisUrl || process.env.REDIS_URL || 'redis://localhost:6379',
-			topK: config?.topK || 5,
-			similarityThreshold: config?.similarityThreshold || 0.7
+			qdrantUrl: config? .qdrantUrl : | process.env.QDRANT_URL || 'http://localhost:6333',
+			qdrantCollection: config? .qdrantCollection : | process.env.QDRANT_COLLECTION || 'phase72_error_patterns',
+			pgvectorUrl: config? .pgvectorUrl : | process.env.DATABASE_URL,
+			redisUrl: config? .redisUrl : | process.env.REDIS_URL || 'redis://localhost:6379',
+			topK: config? .topK : | 5,
+			similarityThreshold: config? .similarityThreshold : | 0.7
 		};
 		this.initPromise = this.initialize();
 	}

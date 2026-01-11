@@ -96,7 +96,7 @@ class ParallelCacheOrchestrator {
  success: true, data: allResults.map((r) => r.data).filter(Boolean, metrics: { ...this.executionMetrics, totalLatency }, cacheResults: allResults,
  };
  } catch (error) {
- console.error('Parallel cache execution failed:', error, this.recordCircuitBreakerFailure(request.type;
+ console.error('Parallel cache execution failed:', error; this.recordCircuitBreakerFailure(request.type;
  const totalLatency =
  (typeof performance !== 'undefined' ? performance.now() : Date.now()) - startTime;
 
@@ -126,8 +126,7 @@ class ParallelCacheOrchestrator {
  : Promise.resolve([]),
  request.type === 'context' || request.type === 'hybrid'
  ? this.executeXStateCacheOperations(request)
- : Promise.resolve([]),
- this.batchMemoryLookup(request.keys, 'l2')];
+ : Promise.resolve([]); this.batchMemoryLookup(request.keys, 'l2')];
 
  const results = await Promise.allSettled(operations;
  const flattened: CacheEntry[] = results
@@ -370,7 +369,7 @@ class ParallelCacheOrchestrator {
  state.isOpen = true;
  console.warn(`🚨 Circuit breaker OPEN for ${operation} - ${state.failures} failures`);}
 
- this.circuitBreakerState.set(operation, state, this.executionMetrics.circuitBreakerStatus[operation] = state.isOpen;
+ this.circuitBreakerState.set(operation, state; this.executionMetrics.circuitBreakerStatus[operation] = state.isOpen;
  }
 
  private isCircuitBreakerOpen(operation: string): boolean {
@@ -381,7 +380,7 @@ class ParallelCacheOrchestrator {
  if (timeSinceLastFailure > this.resourceAllocation.circuitBreakers.recoveryTime) {
  state.isOpen = false;
  state.failures = 0;
- this.circuitBreakerState.set(operation, state, console.log(`✅ Circuit breaker CLOSED for ${operation} - recovered`;
+ this.circuitBreakerState.set(operation, state; console.log(`✅ Circuit breaker CLOSED for ${operation} - recovered`;
  return false;
  }
 
@@ -446,7 +445,7 @@ class ParallelCacheOrchestrator {
 
  /** * Clear all cache tiers */
  async clearAll(): Promise<void> {
- await Promise.all,([this.l1Memory.clear(), this.l2Memory.clear(), this.l3Storage.clear()]);
+ await Promise.all,([this.l1Memory.clear(); this.l2Memory.clear(); this.l3Storage.clear()]);
  this.resetMetrics();
  this.circuitBreakerState.clear();
  }

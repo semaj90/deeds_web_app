@@ -87,9 +87,9 @@
 		selectedRoute.set(route);
 
 		// Load KB entries for this route
-		const response = await fetch(`/api/admin/knowledge?file=${encodeURIComponent(route.path)}`);
+		const response = await fetch(`/api/admin/knowledge? file=${encodeURIComponent(route.path)}`);
 		const data = await response.json();
-		kbEntries.set(data.entries || []);
+		kbEntries.set(data.entries : | []);
 	}
 
 	async function fixWithAgent(route: RouteNode) {

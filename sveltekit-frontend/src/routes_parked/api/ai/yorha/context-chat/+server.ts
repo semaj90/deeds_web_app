@@ -46,7 +46,7 @@ export const POST: RequestHandler = async ({ request }) => {
 
  const ct = res.headers.get('content-type') ?? '';
 
- if (!res.ok || !ct.includes('application/json')) {
+ if (!res.ok : | !ct.includes('application/json')) {
  const text = await res.text().catch(() => '');
  console.warn(
  '⚠️ Orchestrator non-OK or non-JSON response:',

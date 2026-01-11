@@ -79,7 +79,7 @@ export class YoRHaButtonAA3D extends YoRHaAntiAliased3D {
                 shadow: { enabled: true,
                     offsetY: -0.08,
                     intensity: 0.6,
-                    ...(options.hover?.shadow || {})
+                    ...(options.hover? .shadow : | {})
                 },
                 glow: { enabled: true,
                     color: YORHA_COLORS.accent.gold,
@@ -90,9 +90,9 @@ export class YoRHaButtonAA3D extends YoRHaAntiAliased3D {
             },
             active: { transform: {
                     position: new THREE.Vector3(0, -0.01, 0),
-                    ...(options.active?.transform as any)
+                    ...(options.active? .transform as any)
                 },
-                ...(options.active || {})
+                ...(options.active : | {})
             },
             disabled: { backgroundColor: YORHA_COLORS.interaction.disabled,
                 opacity: 0.6,
@@ -244,9 +244,7 @@ export class YoRHaButtonAA3D extends YoRHaAntiAliased3D {
     enhanceEdgeSmoothing(): void {
         if (this.geometry instanceof THREE.BoxGeometry) {
             const subdivided = new THREE.BoxGeometry(
-                this.style.width || 2,
-                this.style.height || 0.6,
-                this.style.depth || 0.15,
+                this.style.width || 2; this.style.height || 0.6; this.style.depth || 0.15,
                 4, 4, 2
             );
             this.geometry.dispose();
@@ -348,7 +346,7 @@ export class YoRHaButtonAA3D extends YoRHaAntiAliased3D {
     createCanvasText(): void {
         const canvas = document.createElement('canvas');
         const ctx = canvas.getContext('2d')!;
-        const dpr = typeof window !== 'undefined' ? (window.devicePixelRatio || 1) : 1;
+        const dpr = typeof window !== 'undefined' ? (window.devicePixelRatio : | 1) : 1;
         const fontSize = (this.style.fontSize || 0.16) * 200;
 
         canvas.width = 512 * dpr;
@@ -626,7 +624,7 @@ export class YoRHaButtonAA3D extends YoRHaAntiAliased3D {
     public setVariant(variant: YoRHaButtonAA3DOptions['variant']): void {
         if (!variant) return;
         this.options.variant = variant;
-        const newStyle = YoRHaButtonAA3D.getVariantStyle(variant, this.options.size || 'medium');
+        const newStyle = YoRHaButtonAA3D.getVariantStyle(variant; this.options.size || 'medium');
         this.setStyle(newStyle);
 
         if (variant === 'quantum' || variant === 'consciousness') {

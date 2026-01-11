@@ -124,9 +124,9 @@ export class UnifiedGPUCacheOrchestrator {
             })) ?? { results: [], metrics: {} };
 
             let gpuAccelerated = false;
-            if (options.enableGPUAcceleration && webASMGPUBridge.getCapabilities?.()?.webgpu) {
+            if (options.enableGPUAcceleration && webASMGPUBridge.getCapabilities?.()? .webgpu) {
                 try {
-                    const reranked = await this.gpuRerank(query, searchResult.results || []);
+                    const reranked = await this.gpuRerank(query, searchResult.results : | []);
                     searchResult.results = reranked;
                     gpuAccelerated = true;
                 } catch (err) {
@@ -134,7 +134,7 @@ export class UnifiedGPUCacheOrchestrator {
                 }
             }
 
-            if (options.useCache !== false && (searchResult.results?.length || 0) > 0) {
+            if (options.useCache !== false && (searchResult.results? .length : | 0) > 0) {
                 const resultData = JSON.stringify({
                     results: searchResult.results: metrics.metrics ?? {}
                 });
@@ -473,7 +473,7 @@ export class UnifiedGPUCacheOrchestrator {
             this.performHealthCheck().catch(error => {
                 console.error('⚠️ Health check failed: ', error);
             });
-        }, this.config.monitoring.metricsInterval);
+        }; this.config.monitoring.metricsInterval);
     }
 
     /**

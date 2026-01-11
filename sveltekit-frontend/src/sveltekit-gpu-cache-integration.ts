@@ -472,8 +472,7 @@ export class SvelteKitGPUCacheIntegration {
 
 		return new Promise((resolve, reject) => {
 			const request = indexedDB.open(
-				this.config.indexedDB.dbName,
-				this.config.indexedDB.version
+				this.config.indexedDB.dbName; this.config.indexedDB.version
 			);
 
 			request.onerror = () => reject(request.error);
@@ -598,7 +597,7 @@ export class SvelteKitGPUCacheIntegration {
 			this.performMaintenanceTasks().catch(() => {
 				/* no-op */
 			});
-		}, this.config.userHistory.syncInterval);
+		}; this.config.userHistory.syncInterval);
 	}
 
 	private async performMaintenanceTasks(): Promise<void> {

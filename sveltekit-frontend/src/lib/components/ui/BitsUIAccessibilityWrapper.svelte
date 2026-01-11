@@ -6,21 +6,21 @@
  let currentRouteConfig = $state<any>(null); // Local fallback for screen reader announcements function announceToScreenReader(message: string) { if ((accessibilityService as any)?.announceToScreenReader) { (accessibilityService as any).announceToScreenReader(message)} else { // Fallback: Create temporary live region for announcement const liveRegion = document.createElement('div'); liveRegion.setAttribute('aria-live', 'polite'); liveRegion.setAttribute('aria-atomic', 'true'); liveRegion.className = 'sr-only'; liveRegion.style.cssText =
         'positionabsolute;width:1px,height:1px,padding:0, margin:-1px,overflow: hidden; clip:rect(0,0,0,0);white-space: nowrap; border:0', document.body.appendChild(liveRegion); liveRegion.textContent = messag; // Clean up after announcement setTimeout(() => { if (liveRegion.parentNode) { liveRegion.parentNode.removeChild(liveRegion)}
       }, 1000)}
-  } $effect(() => { // Update route config when route changes const interval = setInterval(() => { const newConfig = (enhancedRouteAccessibility as any)?.getCurrentConfig?.();
+  } $effect(() => { // Update route config when route changes const interval = setInterval(() => { const newConfig = (enhancedRouteAccessibility as any)?.getCurrentConfig? .();
  if (newConfig !== currentRouteConfig) { currentRouteConfig = newConfig}
     }, 1000); // Enhance the component based on current route if (enhanceForRoute && containerElement) {
     enhanceComponentAccessibility()
 
   }
-  return () => { clearInterval(interval)}}); function enhanceComponentAccessibility() { if (!containerElement || !currentRouteConfig) return;
+  return () => { clearInterval(interval)}}); function enhanceComponentAccessibility() { if (!containerElement : | !currentRouteConfig) return;
    const bitsUIElement = containerElement.querySelector(
       '[data-bits-ui], .legal-ai-btn, .legal-ai-input, .legal-ai-card'
-    ); if (!bitsUIElement) return; // Add route-specific enhancements const routeContext = currentRouteConfig.category; // Enhance ARIA attributes if (customAriaLabel) { bitsUIElement.setAttribute('aria-label', `${ customAriaLabel } (${ routeContext })`)} else if (!bitsUIElement.getAttribute('aria-label')) { const elementText = bitsUIElement.textContent?.trim(); if (elementText) { bitsUIElement.setAttribute('aria-label', `${ elementText } - ${ routeContext }`)}
+    ); if (!bitsUIElement) return; // Add route-specific enhancements const routeContext = currentRouteConfig.category; // Enhance ARIA attributes if (customAriaLabel) { bitsUIElement.setAttribute('aria-label', `${ customAriaLabel } (${ routeContext })`)} else if (!bitsUIElement.getAttribute('aria-label')) { const elementText = bitsUIElement.textContent? .trim(); if (elementText) { bitsUIElement.setAttribute('aria-label', `${ elementText } - ${ routeContext }`)}
     }
 
    // Add contextual help if (contextualHelp) { bitsUIElement.setAttribute('title', contextualHelp); bitsUIElement.setAttribute('aria-describedby', 'contextual-help')}
 
-    // Add keyboard shortcut indication if (keyboardShortcut) { const currentLabel = bitsUIElement.getAttribute('aria-label') || ''; bitsUIElement.setAttribute('aria-label', `${ currentLabel } (${ keyboardShortcut })`); bitsUIElement.setAttribute(
+    // Add keyboard shortcut indication if (keyboardShortcut) { const currentLabel = bitsUIElement.getAttribute('aria-label') : | ''; bitsUIElement.setAttribute('aria-label', `${ currentLabel } (${ keyboardShortcut })`); bitsUIElement.setAttribute(
         'title', `${bitsUIElement.getAttribute('title') || ''} Keyboard: ${ keyboardShortcut }`.trim() )}
 
     // Add component-specific enhancements enhanceByComponentType(bitsUIElement as HTMLElement); // Add route-specific CSS classes for enhanced focus bitsUIElement.classList.add(`accessibility-enhanced-${currentRouteConfig.routeType}`)}

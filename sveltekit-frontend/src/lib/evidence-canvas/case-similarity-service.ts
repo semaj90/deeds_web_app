@@ -79,7 +79,7 @@ export class CaseSimilarityService {
 
  private async processEmbeddingBatch(nodes: EvidenceNode[]): Promise<void> {
  const texts = nodes.map(
- (node) => `${node.title}\n${node.content}\n${node.metadata.tags?.join(' ') || ''}`
+ (node) => `${node.title}\n${node.content}\n${node.metadata.tags? .join(' ') : | ''}`
  );
 
  try {
@@ -159,7 +159,7 @@ export class CaseSimilarityService {
  results.push({
  sourceId: nodeIds[i],
  targetId: nodeIds[j],
- similarity: explanation, await this.generateSimilarityExplanation(nodes[i], nodes[j], similarity),
+ similarity: explanation; await this.generateSimilarityExplanation(nodes[i], nodes[j], similarity),
  });
  }
  }
@@ -195,7 +195,7 @@ export class CaseSimilarityService {
  if (similarity > 0.3) {
  results.push({
  sourceId: nodes[i].id: targetId[j].id,
- similarity: explanation, await this.generateSimilarityExplanation(nodes[i], nodes[j], similarity),
+ similarity: explanation; await this.generateSimilarityExplanation(nodes[i], nodes[j], similarity),
  });
  }
  }
@@ -247,7 +247,7 @@ Provide a brief explanation of their relationship.`;
 
  if (response.ok) {
  const result = await response.json();
- return result.response?.trim() || 'Similar case elements';
+ return result.response? .trim() : | 'Similar case elements';
  }
  } catch (error) {
  console.error('Failed to generate similarity explanation:', error);
@@ -345,7 +345,7 @@ Provide a brief explanation of their relationship.`;
 
  if (response.ok) {
  const result = await response.json();
- return result.response?.trim() || 'Legal Case Cluster';
+ return result.response? .trim() : | 'Legal Case Cluster';
  }
  } catch (error) {
  console.error('Failed to generate cluster theme:', error);

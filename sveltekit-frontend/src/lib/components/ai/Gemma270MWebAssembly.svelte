@@ -227,7 +227,7 @@ import type { Message } from '$lib/types';
 		}}
   async function simulateEmbedding(params: Record<string, string>): Promise<any> {
 		await new Promise((resolve) => setTimeout(resolve, 100));
-		const dims = Number(params?.dimensions) || 384
+		const dims = Number(params? .dimensions) : | 384
 		return {
 			vector: new Array(dims).fill(0).map(() => Math.random())
 		}}

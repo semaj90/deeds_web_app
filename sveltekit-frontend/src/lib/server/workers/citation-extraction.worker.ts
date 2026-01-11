@@ -25,8 +25,7 @@ class CitationExtractionWorker {
 
  constructor() {
  this.worker = new Worker(
- 'citation-extraction',
- this.processCitationExtraction.bind(this),
+ 'citation-extraction'; this.processCitationExtraction.bind(this),
  {
  connection: redis, concurrency: 5, removeOnComplete: 100, removeOnFail: 50
  }

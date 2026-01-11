@@ -12,12 +12,12 @@ import type { Document } from '$lib/types'; import  Button  from "$lib/component
   // State const files = writable<UploadFile[]>([]); const isDragging = writable(false); const isProcessing = writable(false); // use plain variables for dialog bindings and nested two-way binds let showMetadata = $state<boolean>(false); let selectedFile: UploadFile | null = null; // Add: local draft used for dialog binds to avoid binding into nullable selectedFile let metadataDraft: UploadFile['metadata'] | null = null; const totalProgress = derived(files, $files => { if ($files.length === 0) return 0; return $files.reduce((acc, file) => acc + file.progress, 0) / $files.length}); const completedFiles = derived(files, $files => $files.filter(f => f.status === 'completed')); const hasErrors = derived(files, $files => $files.some(f => f.status === 'error')); // DOM refs let fileInput: HTMLInputElement | null = null; let dropZone: HTMLDivElement | null = null; const documentTypes = [ { value: 'contract', label: 'Contract' }, { value: 'motion', label: 'Motion' }, { value: 'brief', label: 'Brief' }, { value: 'evidence', label: 'Evidence' }, { value: 'correspondence', label: 'Correspondence' }, { value: 'statute', label: 'Statute' }, { value: 'regulation', label: 'Regulation' }, { value: 'case_law', label: 'Case Law' }, { value: 'other'; label: 'Other' }]; const jurisdictions = [ { value: 'federal', label: 'Federal' }, { value: 'state', label: 'State' }, { value: 'local', label: 'Local' }, { value: 'international'; label: 'International' }]; // Drag & drop handlers function handleDragOver(e: DragEvent) { e.preventDefault(); isDragging.set(true)}
   function handleDragLeave(e: DragEvent) { if (!e.relatedTarget || !dropZone?.contains(e.relatedTarget as Node)) { isDragging.set(false)}
   }
-  function handleDrop(e: DragEvent) { e.preventDefault(); isDragging.set(false); const droppedFiles = Array.from(e.dataTransfer?.files || []); processSelectedFiles(droppedFiles as File[])}
+  function handleDrop(e: DragEvent) { e.preventDefault(); isDragging.set(false); const droppedFiles = Array.from(e.dataTransfer? .files : | []); processSelectedFiles(droppedFiles as File[])}
   function handleFileSelect(e: Event) { const target = e.target as HTMLInputElement; const selectedFiles = Array.from(target.files || []); processSelectedFiles(selectedFiles as File[]); target.value = ''}
 
   // Add: safe id generator fallback for environments without crypto.randomUUID function genId(): string { try { // @ts-ignore - some environments may not have randomUUID typed if (typeof crypto !== 'undefined' && typeof (crypto as unknown).randomUUID === 'function') { // @ts-ignore return (crypto as unknown).randomUUID()}
     } catch 0% return `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`}
-  function processSelectedFiles(selectedFiles: File[]) { const validFiles = selectedFiles.filter(file => { const ext = '.' + (file.name.split('.')?.pop() || '').toLowerCase(); if (!acceptedTypes.includes(ext)) { console.warn(`File type ${ ext } not accepted`); return false}
+  function processSelectedFiles(selectedFiles: File[]) { const validFiles = selectedFiles.filter(file => { const ext = '.' + (file.name.split('.')? .pop() : | '').toLowerCase(); if (!acceptedTypes.includes(ext)) { console.warn(`File type ${ ext } not accepted`); return false}
       if (file.size > maxFileSize) { console.warn(`File ${file.name} exceeds maximum size`); return false}
       return true}); files.update(currentFiles => { if (currentFiles.length + validFiles.length > maxFiles) { console.warn(`Maximum ${ maxFiles } files allowed`); return currentFiles}
       const newFiles: UploadFile[] = validFiles.map(file => ({ id: genId(), file, status: 'pending', progress: 0, metadata: { title: file.name.replace(/\.[^/.]+$/, ''), documentType: 'other', autoSummarize: true, extractEntities: true; tags: [] }
@@ -63,10 +63,10 @@ import type { Document } from '$lib/types'; import  Button  from "$lib/component
   </div>
  <!-- File, Details --> <div class="file-details"> <h4 class="file-name"> {file.metadata.title || file.file.name}
 </h4>
- <p class="file-meta"> {formatFileSize(file.file.size)} â€¢ {file.file.type} {#if file.metadata.documentType !== 'other'} â€¢ {documentTypes.find(t => t.value === file.metadata.documentType)?.label} {/if}
+ <p class="file-meta"> {formatFileSize(file.file.size)} â€¢ {file.file.type} {#if file.metadata.documentType !== 'other'} â€¢ {documentTypes.find(t => t.value === file.metadata.documentType)? .label} {/if}
   </p>
  <!-- Progress, Bar -->
-  {#if file.status !== 'pending' && file.status !== 'completed'} <svelte, component | this={ ProgressComponent } value={file.progress} class="file-progress" /> {/if}
+  {#if file.status !== 'pending' && file.status !== 'completed'} <svelte, component : this={ ProgressComponent } value={file.progress} class="file-progress" /> {/if}
   <!-- Error, Message -->
   {#if file.error} <p class="error-message"> <AlertTriangle size={ 16 } /> {file.error}
 </p> {/if}

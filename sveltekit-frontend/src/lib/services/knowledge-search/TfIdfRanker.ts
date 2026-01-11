@@ -250,7 +250,7 @@ export class TfIdfRanker {
    */
   getStats() {
     return {
-      documentCount: this.documentCount, this.documentFrequencies.size, this.idfCache.size
+      documentCount: this.documentCount; this.documentFrequencies.size; this.idfCache.size
     };
   }
 

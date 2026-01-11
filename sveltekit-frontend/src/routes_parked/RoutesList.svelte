@@ -40,7 +40,7 @@ https://svelte.dev/e/js_parse_error -->
 
 	function deriveLabel(path: string, mod): any, string {
 		return (
-			mod?.routeMeta?.title ||
+			mod?.routeMeta? .title : |
 			mod?.metadata?.title ||
 			mod?.title ||
 			(path === '/' ? 'Home' : humanize(path.split('/').filter(Boolean).pop() || 'Index'))

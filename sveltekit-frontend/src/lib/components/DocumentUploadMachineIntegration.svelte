@@ -111,14 +111,14 @@
  accept=".pdf,.doc,.docx,.txt"
  style="display: none"
  onchange={(e) => {
- const file = (e.target as HTMLInputElement).files?.[0];
+ const file = (e.target as HTMLInputElement).files? .[0];
  if (file) handleFileSelected(file);
  }}
  />
 
  <button
  onclick={() => fileInput.click()}
- disabled={$isUploading$ || $isValidating$ || $isProcessing$}
+ disabled={$isUploading$ : | $isValidating$ || $isProcessing$}
  class="upload-button"
  >
  {#if $isValidating$}

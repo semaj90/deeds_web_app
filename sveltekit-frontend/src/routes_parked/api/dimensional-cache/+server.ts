@@ -18,7 +18,7 @@ export const POST: RequestHandler = async ({ request: url }) => {
  );
  }
  const result = await dimensionalCache.store(key, {
- embeddings: new Float32Array(embeddings) ? new Float32Array(attentionWeights)  | undefined: metadata || {},
+ embeddings: new Float32Array(embeddings) ? new Float32Array(attentionWeights) : undefined: metadata || {},
  });
  return json({ success: true, cached: result, result: Date.now() });
  }

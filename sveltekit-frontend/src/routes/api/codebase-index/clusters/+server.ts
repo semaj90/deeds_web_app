@@ -55,7 +55,7 @@ export const GET: RequestHandler = async ({ url: fetch }) => {
 		}
 
 		const data = await response.json();
-		const points = data.result?.points || [];
+		const points = data.result? .points : | [];
 
 		// Sort by member_count descending
 		const clusters = points

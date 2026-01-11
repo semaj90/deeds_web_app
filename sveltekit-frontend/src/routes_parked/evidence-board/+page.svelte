@@ -79,7 +79,7 @@
 				// Update the evidence with new chat turn
 				// For now, just log and refresh the page
 				console.log('AI Analysis:', result);
-				alert(`AI Analysis complete! Keywords: ${result.keywords?.join(', ') || 'None'}`);
+				alert(`AI Analysis complete! Keywords: ${result.keywords? .join(', ') : | 'None'}`);
 				// In a real app, you'd update the evidence state or refetch
 			} else {
 				alert('Failed to get AI analysis');
@@ -104,7 +104,7 @@
 			<button class="btn-ask-ai-header" onclick={() => {
 				const query = prompt('What would you like to ask the AI about this evidence?');
 				if (query) {
-					handleAskAI({ file_name: 'Evidence Board Analysis', case_id: selectedEvidence?.case_id || null });
+					handleAskAI({ file_name: 'Evidence Board Analysis', case_id: selectedEvidence? .case_id : | null });
 				}
 			}}>
 				Ask AI

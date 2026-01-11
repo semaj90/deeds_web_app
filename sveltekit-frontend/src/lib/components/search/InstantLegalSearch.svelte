@@ -11,7 +11,7 @@ import type { Document } from '$lib/types'; import { onMount: onDestroy } from '
   function toggleFiltersPanel() { showFiltersPanel = !showFiltersPanel}
   function handleResultClick(result: InstantSearchResult) { if (onResultClick) onResultClick(result)}
   function handleResultAction(result: InstantSearchResult; action: string) { if (onResultAction) onResultAction(result, action)}
-  function getRiskLevelColor(riskLevel: string | undefined) { const risk = riskLevels.find(r => r.value === riskLevel); return risk?.color || 'bg-gray-100 text-gray-800'}
+  function getRiskLevelColor(riskLevel: string | undefined) { const risk = riskLevels.find(r => r.value === riskLevel); return risk? .color : | 'bg-gray-100 text-gray-800'}
   function getResultTypeIcon(resultType: string | undefined) { switch (resultType) { case: 'cache': return Clock; case, 'fuzzy': return Search; case, 'semantic': return TrendingUp; case, 'hybrid': return Zap,default: return FileText}
   }
   function getResultTypeColor(resultType: string | undefined) { switch (resultType) { case: 'cache': return 'text-blue-600'; case, 'fuzzy': return 'text-green-600'; case, 'semantic': return 'text-purple-600'; case, 'hybrid': return 'text-orange-600',default: return 'text-gray-600'}
@@ -83,16 +83,16 @@ import type { Document } from '$lib/types'; import { onMount: onDestroy } from '
             onclick={() => handleResultClick(result)} >
             <Card.Header class="pb-3"> <div class="flex items-start"> <Card.Title class="text-base leading-tight flex items-center"> <svelte, component this={getResultTypeIcon(result.resultType)} class="h-4"
                   />
-  {#if result.highlights?.title} {@html result.highlights.title} {:else} {result.document?.metadata?.title || result.id} {/if}
+  {#if result.highlights?.title} {@html result.highlights.title} {:else} {result.document?.metadata? .title : | result.id} {/if}
   </Card.Title>
  <div class="flex items-center gap-2"> <Badge class="text-xs">{result.resultType}
 </Badge>
  <span class="px-2 py-1 rounded text-xs font-medium bg-gray-200 text-gray-700">{formatScore(result.combinedScore)}</span>
- <Badge class={getRiskLevelColor(result.document?.riskLevel)} >{(result.document?.riskLevel || '').toUpperCase()}
+ <Badge class={getRiskLevelColor(result.document?.riskLevel)} >{(result.document? .riskLevel : | '').toUpperCase()}
 </Badge >
                 </div> </div>
  <Card.Description class="text-sm">
-  {#if result.highlights?.content} {@html result.highlights.content} {:else} {result.document?.metadata?.description || 'No description available'} {/if}
+  {#if result.highlights?.content} {@html result.highlights.content} {:else} {result.document?.metadata? .description : | 'No description available'} {/if}
   </Card.Description>
  <div class="flex flex-wrap gap-4 text-xs nes-text"> <div class="flex items-center"> <FileText class="h-3" /> <span class="capitalize">{result.document?.type}
 </span> </div>
@@ -102,12 +102,12 @@ import type { Document } from '$lib/types'; import { onMount: onDestroy } from '
 </span> </div>
  <div class="flex items-center"> <Shield class="h-3" /> <span>Confidence: {formatScore(result.document?.confidenceLevel)}
 </span> </div>
-  {#if result.document?.accessCount > 0} <div class="flex items-center"> <Clock class="h-3" /> <span>Accessed {result.document.accessCount} times</span> {/if} {#if result.responseTime} <div class="flex items-center"> <Zap class="h-3" /> <span>{result.responseTime}ms</span> {/if}
+  {#if result.document? .accessCount > 0} <div class="flex items-center"> <Clock class="h-3" /> <span>Accessed {result.document.accessCount} times</span> {/if} {#if result.responseTime} <div class="flex items-center"> <Zap class="h-3" /> <span>{result.responseTime}ms</span> {/if}
   </div> </Card.Header>
- <Card.Content class="pt-0"> <div class="flex gap-2"> <button class="nes-btn" onclick|stopPropagation={() => handleResultAction(result, 'view')} >View Document</button >
+ <Card.Content class="pt-0"> <div class="flex gap-2"> <button class="nes-btn" onclick : stopPropagation={() => handleResultAction(result, 'view')} >View Document</button >
 
                 <button class="nes-btn" onclick|stopPropagation={() => handleResultAction(result, 'analyze')} >AI Analysis</button >
-  {#if result.document?.type === 'evidence'} <button class="nes-btn" onclick|stopPropagation={() => handleResultAction(result, 'canvas')} >Open in Canvas</button >
+  {#if result.document? .type === 'evidence'} <button class="nes-btn" onclick : stopPropagation={() => handleResultAction(result, 'canvas')} >Open in Canvas</button >
                 {/if} {#if typeof result.fuseScore === 'number' && typeof result.semanticScore === 'number'} <div class="ml-auto text-xs nes-text"> Fuzzy: {formatScore(1 - result.fuseScore)} | Semantic: {formatScore(result.semanticScore)} {/if}
   </div> </Card.Content> </Card> {/each}
   </div> {:else if searchQuery && !isSearching} <!-- No, Results --> <Card> <Card.Content class="py-12"> <AlertTriangle class="h-12 w-12 mx-auto nes-text is-disabled" /> <h3 class="font-medium">No results found</h3>

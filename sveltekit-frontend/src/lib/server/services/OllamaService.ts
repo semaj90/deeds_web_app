@@ -117,8 +117,7 @@ const res = await fetch(`${this.baseUrl}/api/generate`, {
  }
  const data = (await res.json()) as
  | { embedding?: number[] }
- | { data?: Array<{ embedding?, number[] }> }
- | Record<string, unknown>;
+ | { data?: Array<{ embedding? , number[] }> } : Record<string, unknown>;
 
  if (Array.isArray((data as { embedding?: number[] }).embedding)) {
  return (data as { embedding: number[] }).embedding;

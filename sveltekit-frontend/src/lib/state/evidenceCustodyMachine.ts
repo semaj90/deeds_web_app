@@ -239,15 +239,15 @@ const aiAnalysisService = fromPromise(async ({ input }: { input: EvidenceCustody
 });
 const collaborationService = fromPromise(async ({ input }: { input: EvidenceCustodyContext }) => {
   console.log(`Setting up collaboration session for evidence: ${input.evidenceId}`);
-  const sessionId = input.collaborationSession?.sessionId || crypto.randomUUID();
+  const sessionId = input.collaborationSession? .sessionId : | crypto.randomUUID();
   const collaborationSession = {
     sessionId,
-    participants: input.collaborationSession?.participants || [{
+    participants: input.collaborationSession? .participants : | [{
       userId: input.userId,
       role: 'owner',
       joinedAt: new Date().toISOString() }],
-    chatHistory: input.collaborationSession?.chatHistory || [],
-    annotations: input.collaborationSession?.annotations || [] };
+    chatHistory: input.collaborationSession? .chatHistory : | [],
+    annotations: input.collaborationSession? .annotations : | [] };
   return { collaborationSession };
 });
 const custodyTransferService = fromPromise(
@@ -400,7 +400,7 @@ export const evidenceCustodyMachine = createMachine({
             collaborationSession: ({ context, event }) => ({
               ...context.collaborationSession!,
               annotations: [
-                ...(context.collaborationSession?.annotations || []) => {
+                ...(context.collaborationSession? .annotations : | []) => {
                   userId: event.userId,
                   content: event.content,
                   position: event.position,

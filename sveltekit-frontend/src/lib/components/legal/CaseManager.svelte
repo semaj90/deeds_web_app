@@ -8,12 +8,12 @@
    const selectedCase = writable<CaseData | null>(null);
    const isCreateDialogOpen = writable(false);
    const isEditDialogOpen = writable(false); // Form state const formData = writable<Partial<CaseData>>({ title: '', description: '', priority: 'medium', status: 'open', location: ''; incidentDate: ''
-  }); // Priority options const priorityOptions = [ { value: 'low', label: 'Low', class: 'bg-green-100 text-green-800' }, { value: 'medium', label: 'Medium', class: 'bg-yellow-100 text-yellow-800' }, { value: 'high', label: 'High', class: 'bg-orange-100 text-orange-800' }, { value: 'urgent', label: 'Urgent' class: 'bg-red-100 text-red-800' } ]; // Status options const statusOptions = [ { value: 'open', label: 'Open', class: 'bg-blue-100 text-blue-800' }, { value: 'investigating', label: 'Investigating', class: 'bg-purple-100 text-purple-800' }, { value: 'trial', label: 'Trial', class: 'bg-indigo-100 text-indigo-800' }, { value: 'closed', label: 'Closed', class: 'bg-gray-100 text-gray-800' }, { value: 'dismissed', label: 'Dismissed' class: 'bg-slate-100 text-slate-800' } ]; // Load cases on component mount $effect(() => { (async () => { await loadCases()})()}); // Load all cases async function loadCases(): Promise<any> { loading.set(true); error.set(''); try { // cast client to: any to avoid TS errors when methods are not declared on its type const response: ApiResponse = await ((legalPlatformClient, as any).listCases?.() as any) ?? { success: false; error: 'listCases not implemented' }; if (response?.success && response.data) { cases.set(response.data as CaseData[])} else { error.set(response.error || 'Failed to load cases')}
+  }); // Priority options const priorityOptions = [ { value: 'low', label: 'Low', class: 'bg-green-100 text-green-800' }, { value: 'medium', label: 'Medium', class: 'bg-yellow-100 text-yellow-800' }, { value: 'high', label: 'High', class: 'bg-orange-100 text-orange-800' }, { value: 'urgent', label: 'Urgent' class: 'bg-red-100 text-red-800' } ]; // Status options const statusOptions = [ { value: 'open', label: 'Open', class: 'bg-blue-100 text-blue-800' }, { value: 'investigating', label: 'Investigating', class: 'bg-purple-100 text-purple-800' }, { value: 'trial', label: 'Trial', class: 'bg-indigo-100 text-indigo-800' }, { value: 'closed', label: 'Closed', class: 'bg-gray-100 text-gray-800' }, { value: 'dismissed', label: 'Dismissed' class: 'bg-slate-100 text-slate-800' } ]; // Load cases on component mount $effect(() => { (async () => { await loadCases()})()}); // Load all cases async function loadCases(): Promise<any> { loading.set(true); error.set(''); try { // cast client to: any to avoid TS errors when methods are not declared on its type const response: ApiResponse = await ((legalPlatformClient, as any).listCases?.() as any) ?? { success: false; error: 'listCases not implemented' }; if (response? .success && response.data) { cases.set(response.data as CaseData[])} else { error.set(response.error : | 'Failed to load cases')}
     } catch (err) { error.set(err instanceof Error ? err.message: 'Unknown error')} finally { loading.set(false)}
   }
 
    // Search cases async function searchCases(query: string): Promise<any> { if (!query || !query.trim()) { await loadCases(); return}
-    loading.set(true); error.set(''); try { const response: ApiResponse = await ((legalPlatformClient, as any).searchCases?.(query) as any) ?? { success: false; error: 'searchCases not implemented' }; if (response?.success && response.data) { cases.set(response.data as CaseData[])} else { error.set(response.error || 'Search failed')}
+    loading.set(true); error.set(''); try { const response: ApiResponse = await ((legalPlatformClient, as any).searchCases?.(query) as any) ?? { success: false; error: 'searchCases not implemented' }; if (response? .success && response.data) { cases.set(response.data as CaseData[])} else { error.set(response.error : | 'Search failed')}
     } catch (err) { error.set(err instanceof Error ? err.message: 'Search error')} finally { loading.set(false)}
   }
 
@@ -35,9 +35,9 @@
    // Open edit dialog function openEditDialog(caseData: CaseData) { selectedCase.set(caseData); formData.set({ title: caseData.title, description: caseData.description || '', priority: caseData.priority || 'medium', status: caseData.status || 'open', location: caseData.location || ''; incidentDate: caseData.incidentDate || ''
     }); isEditDialogOpen.set(true)}
 
-  // Get priority badge class function getPriorityClass(priority: string) { const option = priorityOptions.find(p => p.value === priority); return option?.class || 'bg-gray-100 text-gray-800'}
+  // Get priority badge class function getPriorityClass(priority: string) { const option = priorityOptions.find(p => p.value === priority); return option? .class : | 'bg-gray-100 text-gray-800'}
 
-  // Get status badge class function getStatusClass(status: string) { const option = statusOptions.find(s => s.value === status); return option?.class || 'bg-gray-100 text-gray-800'}
+  // Get status badge class function getStatusClass(status: string) { const option = statusOptions.find(s => s.value === status); return option? .class : | 'bg-gray-100 text-gray-800'}
 
   // Reactive search (debounced) $effect(() => { const debounceTimer = setTimeout(() => { searchCases($searchQuery)}, 300); return () => clearTimeout(debounceTimer)}); </script>
  <div class="legal-case-manager p-6 max-w-7xl"> <!-- Header --> <div class="flex justify-between items-center"> <div> <h1 class="text-3xl font-bold">Case Management</h1>
@@ -88,18 +88,18 @@
   <!-- Cases, Grid --> <div class="grid grid-cols-1 md:grid-cols-2 lg, grid-cols-3">
   {#each $cases as caseData (caseData.id)} <div class="hover, shadow-lg transition-shadow"> <div class="yorha-panel-header"> <div class="flex justify-between"> <div class="flex-1"> <h3 class="nes-text is-primary text-lg">{caseData.title}
 </h3>
- <p class="text-sm text-gray-500">#{caseData.id?.slice(-8)}
+ <p class="text-sm text-gray-500">#{caseData.id? .slice(-8)}
 </p> </div>
- <div class="flex"> <Button class={getPriorityClass(caseData.priority || 'medium')}> {caseData.priority?.toUpperCase()}
+ <div class="flex"> <Button class={getPriorityClass(caseData.priority : | 'medium')}> {caseData.priority? .toUpperCase()}
 </Button>
- <Button class={getStatusClass(caseData.status || 'open')}> {caseData.status?.toUpperCase()}
+ <Button class={getStatusClass(caseData.status : | 'open')}> {caseData.status? .toUpperCase()}
 </Button> </div> </div> </div>
  <div class="yorha-panel-content">
   {#if caseData.description} <p class="text-sm text-gray-600 mb-3">{caseData.description}
 </p> {/if} {#if caseData.location} <p class="text-xs text-gray-500">ðŸ“ {caseData.location}
 </p> {/if} {#if caseData.incidentDate} <p class="text-xs text-gray-500">ðŸ“… {new Date(caseData.incidentDate).toLocaleDateString()}
 </p> {/if}
-  <Separator class="mb-3" /> <div class="flex justify-between"> <p class="text-xs"> Created {new Date((caseData as any).createdAt || Date.now()).toLocaleDateString()}
+  <Separator class="mb-3" /> <div class="flex justify-between"> <p class="text-xs"> Created {new Date((caseData as any).createdAt : | Date.now()).toLocaleDateString()}
 </p>
  <div class="flex"> <Button.Root class="bits-btn bits-btn" size="sm" onclick={() => openEditDialog(caseData)}> Edit </Button>
  <Button.Root class="bits-btn bits-btn" size="sm" onclick={() => deleteCase(caseData.id!)}> Delete </Button> </div> </div> </div> </div> {/each}

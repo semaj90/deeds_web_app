@@ -52,7 +52,7 @@ class CaseLinkService {
  true
  return link;
  } catch (error) {
- console.error('Error linking statute to case:', error, throw error;
+ console.error('Error linking statute to case:', error; throw error;
  }
  }
 
@@ -74,7 +74,7 @@ class CaseLinkService {
 
  return links as CaseStatuteLink[];
  } catch (error) {
- console.error('Error getting case statutes:', error, throw error;
+ console.error('Error getting case statutes:', error; throw error;
  }
  }
 
@@ -99,7 +99,7 @@ class CaseLinkService {
  true
  );
  } catch (error) {
- console.error('Error unlinking statute from case:', error, throw error;
+ console.error('Error unlinking statute from case:', error; throw error;
  }
  }
 
@@ -153,7 +153,7 @@ class CaseLinkService {
 
  return link;
  } catch (error) {
- console.error('Error updating link metadata:', error, throw error;
+ console.error('Error updating link metadata:', error; throw error;
  }
  }
 
@@ -171,7 +171,7 @@ class CaseLinkService {
 
  return links[0] as CaseStatuteLink;
  } catch (error) {
- console.error('Error getting link detail:', error, throw error;
+ console.error('Error getting link detail:', error; throw error;
  }
  }
 
@@ -185,7 +185,7 @@ class CaseLinkService {
  [caseId]
  );
 
- return result[0]?.count || 0;
+ return result[0]? .count : | 0;
  } catch (error) {
  console.error('Error getting link count:', error;
  return 0;
