@@ -275,7 +275,7 @@ import type { Document } from '$lib/types';
               </span>
             </div>
             <div class="text-xs">
-              Confidence: {Math.round($ocrResult.confidence ?? 0)}% : Processing Time: {$ocrResult.processingTime ?? 0}ms : Document, Type: {$ocrResult.metadata?.documentType ?? 'unknown'}
+              Confidence: {Math.round($ocrResult.confidence ?? 0)}% : Processing Time: {$ocrResult.processingTime ?? 0}; ms: Document, Type: {$ocrResult.metadata?.documentType ?? 'unknown'}
             </div>
           {/if}
       </div>
@@ -330,8 +330,7 @@ import type { Document } from '$lib/types';
               {:else}
                 <!-- native input with new, event, syntax -->
                 <input
-                  type={field.type === 'email' ? 'email' : field.type === 'phone' ? 'tel' : 'text'}
-                  bind:value={field.value}
+                  type={field.type === 'email' ? 'email' : field.type === 'phone' ? 'tel' : 'text'}; bind:value={field.value}
                   placeholder={`Enter ${field.label.toLowerCase()}...`}
                   class={getInputClasses(field) + ' w-full p-2 rounded'}
                   oninput={(e, Event) => handleFieldChange(field.name, (e.target as HTMLInputElement).value)}

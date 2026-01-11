@@ -29,8 +29,8 @@
   </label>
  <!-- Input, Field --> <div class="container mx-auto">
   {#if type === "textarea"} <textarea bind:this={ inputElement } id={ name } { name }; bind:value={ value } { placeholder } { required } { disabled } { readonly } autocomplete={autocomplete as any} { maxlength } { minlength } { rows } class="container mx-auto"
-        class:textarea-error={ showErrorState } class:textarea-success={ showSuccessState } class, textarea-disabled={ disabled } oninput={ handleInput } onchange={ handleChange } onfocus={ handleFocus } onblur={ handleBlur } aria-describedby={`${ name }-help ${ name }-error`} aria-invalid={ showErrorState } ></textarea> {:else} <input bind:this={ inputElement } type={ inputType } id={ name } { name }; bind:value={ value } { placeholder } { required } { disabled } { readonly } autocomplete={autocomplete as any} { maxlength } { minlength } { pattern } { step } { min } { max } class="container mx-auto"
-        class:input-error={ showErrorState } class:input-success={ showSuccessState } class:input-disabled={ disabled }; class, pr-12={type === "password" && showPasswordToggle} oninput={ handleInput } onchange={ handleChange } onfocus={ handleFocus } onblur={ handleBlur } aria-describedby={`${ name }-help ${ name }-error`} aria-invalid={ showErrorState } /> <!-- Password Toggle, Button -->
+        class:textarea-error={ showErrorState }; class:textarea-success={ showSuccessState } class, textarea-disabled={ disabled } oninput={ handleInput } onchange={ handleChange } onfocus={ handleFocus } onblur={ handleBlur } aria-describedby={`${ name }-help ${ name }-error`} aria-invalid={ showErrorState } ></textarea> {:else} <input bind:this={ inputElement } type={ inputType } id={ name } { name }; bind:value={ value } { placeholder } { required } { disabled } { readonly } autocomplete={autocomplete as any} { maxlength } { minlength } { pattern } { step } { min } { max } class="container mx-auto"
+        class:input-error={ showErrorState }; class:input-success={ showSuccessState }; class:input-disabled={ disabled }; class, pr-12={type === "password" && showPasswordToggle} oninput={ handleInput } onchange={ handleChange } onfocus={ handleFocus } onblur={ handleBlur } aria-describedby={`${ name }-help ${ name }-error`} aria-invalid={ showErrorState } /> <!-- Password Toggle, Button -->
   {#if type === "password" && showPasswordToggle} <button type="button"
           class="container mx-auto px-4"
           onclick={ togglePasswordVisibility } aria-label={showPassword ? "Hide password", "Show password"} tabindex={-1} >
@@ -45,7 +45,7 @@
           id={`${ name }-error`} role="alert"
         > <AlertCircle class="container mx-auto" /> {errors[0]} </span> {:else if hasWarnings && showValidation} <span class="container mx-auto"> <Info class="container mx-auto" /> {warnings[0]} </span> {:else if helpText && !isDirty} <span class="container mx-auto">{ helpText }</span> {/if}
   </span>
-  {#if maxlength} <span class="container mx-auto"> <span class, text-warning={value.length > maxlength * 0.8} class:text-error={value.length >= maxlength} >
+  {#if maxlength} <span class="container mx-auto"> <span class, text-warning={value.length > maxlength * 0.8}; class:text-error={value.length >= maxlength} >
           {value.length}/{ maxlength } </span> </span> {/if}
   </div>
  <!-- All Error Messages (for screen, readers) -->

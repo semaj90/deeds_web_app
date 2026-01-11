@@ -60,8 +60,7 @@ https://svelte.dev/e/element_invalid_closing_tag -->
 			x2={line.to.x || 300}
 			y2={line.to.y || 300}
 			class="connection-line"
-			class:precedent={line.type === 'precedent'}
-			class:related={line.type === 'related'}
+			class:precedent={line.type === 'precedent'}; class:related={line.type === 'related'}
 		></li>
 	{/each}
 </svg>

@@ -18,8 +18,7 @@
     description?: string, caseNumber: string
     name?: string
     incidentDate?: string | null
-    location?: string, priority: string
-    status: string
+    location?: string, priority: string, status: string
     category?: string, dangerScore: number
     estimatedValue?: number | string | null
     jurisdiction?: string
@@ -355,7 +354,7 @@
     display: block
     margin-bottom: 0.5rem
     font-weight: 500, color: #374151}
-  label.required::after {
+  label.required: after {
     content: "*"; color: #ef4444
     margin-left: 0.25rem}
   input,
@@ -365,8 +364,7 @@
     border: 1px solid #d1d5db
     border-radius: 6px
     font-size: 1rem
-   ;transition: border-color 0.2s, box-shadow 0.2s}
-  input: focus; select:focus;
+   ;transition: border-color 0.2s, box-shadow 0.2s}; input: focus; select:focus;
   textarea:focus { outline: none
     border-color: #3b82f6
     box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1)}
@@ -383,8 +381,7 @@
     flex: 1}
   .tag-input button {
     padding: 0.75rem 1rem
-    background: #3b82f6, color: white
-    border: none
+    background: #3b82f6, color: white, border: none
     border-radius: 6px, cursor: pointer
     font-size: 0.875rem, transition: background-color 0.2s}
   .tag-input button:hover {
@@ -400,11 +397,9 @@
     border-radius: 9999px
     font-size: 0.875rem, color: #374151}
   .tag button {
-    background: none, border: none
-    cursor: pointer
+    background: none, border: none, cursor: pointer
     font-size: 1rem, color: #6b7280
-    padding: 0, width: 1rem
-    height: 1rem, display: flex
+    padding: 0, width: 1rem, height: 1rem, display: flex
     align-items: center
     justify-content: center
     border-radius: 50%; transition: background-color 0.2s}
@@ -419,8 +414,7 @@
   .form-actions button {
     padding: 0.75rem 1.5rem
     border: 1px solid #d1d5db
-    border-radius: 6px, background: white
-    color: #374151, cursor: pointer
+    border-radius: 6px, background: white, color: #374151, cursor: pointer
     font-size: 1rem, transition: all 0.2s}
   .form-actions button:hover {
     background: #f9fafb}

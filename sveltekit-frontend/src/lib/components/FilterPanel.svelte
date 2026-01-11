@@ -73,8 +73,7 @@ let localFilters = $state({ ...filters });
 <div class="filter-panel">
  <button
  class="filter-toggle"
- onclick={() => showPanel = !showPanel}
- class:active={showPanel}
+ onclick={() => showPanel = !showPanel}; class:active={showPanel}
  >
  <span class="icon">⚙️</span>
  Filters

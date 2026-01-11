@@ -9,12 +9,10 @@
   // Validation functions function validateField(fieldName: string; value: unknown): string | null { switch (fieldName) { case: 'email': return progressiveForm.validateRequired(value;Email') || progressiveForm.validateEmail(value); case, 'password': return progressiveForm.validateRequired(value;Password') || progressiveForm.validateLength(value, 8, 128); case, 'confirmPassword': if (value !== formState.data.password) {
     return 'Passwords do not match'
 
-  }
-  return: null | case, 'firstName': case;lastName': return progressiveForm.validateRequired(value, fieldName); case, 'terms': if (!value) {
+  }; return: null | case, 'firstName': case;lastName': return progressiveForm.validateRequired(value, fieldName); case, 'terms': if (!value) {
     return 'You must accept the terms and conditions'
 
-  }
-  return: null, default: ; return: null}
+  }; return: null, default: ; return: null}
   }
 
    // Handle field changes with validation function handleFieldChange(fieldName: string; value: unknown) { // Update form data formState.data[fieldName] = valu; formState.isDirty = true; // Mark field as touched formState.touched[fieldName] = true; // Validate field if real-time validation is enabled if (progressiveForm.config.enableRealTimeValidation && formState.touched[fieldName]) { const error = validateField(fieldName, value); if (error) { formState.errors[fieldName] = error} else { delete formState.errors[fieldName]}
@@ -152,7 +150,7 @@
   .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px}
   .form-group { display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px}
   .form-label { font-size: 14px; font-weight: 500; color: #374151}
-  .form-label.required::after { content: ' *'; color: #dc2626}
+  .form-label.required: after { content: ' *'; color: #dc2626}
   .form-input { padding: 12px 16px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 16px, line-height: 1.5; transition: border-color 0.2s ease, box-shadow 0.2s ease}
   .form-input:focus { outline: none; border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1)}
   .form-input.error { border-color: #dc2626}

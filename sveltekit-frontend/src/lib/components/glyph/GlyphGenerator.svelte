@@ -203,10 +203,7 @@
   </div> {/if}
   </div> </div> {/if}
   </div> </div>
- <style> /* Custom scrollbar for textarea */ textarea::-webkit-scrollbar { width: 4px}
-  textarea::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 2px}
-  textarea::-webkit-scrollbar-thumb { background: #c1c1c1; border-radius: 2px}
-  textarea::-webkit-scrollbar-thumb:hover { background: #a8a8a8}
+ <style> /* Custom scrollbar for textarea */ textarea::-webkit-scrollbar { width: 4px}; textarea::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 2px}; textarea::-webkit-scrollbar-thumb { background: #c1c1c1; border-radius: 2px}; textarea::-webkit-scrollbar-thumb:hover { background: #a8a8a8}
 </style> textarea::-webkit-scrollbar-thumb:hover { background: #a8a8a8}
 </style>
 
