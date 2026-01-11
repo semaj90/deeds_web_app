@@ -1,48 +1,285 @@
 <!-- EvidenceManager.svelte Complete evidence management component with, - File upload with drag & drop - Evidence listing with embedding status - Semantic search functionality - Integration with backfill worker - Real-time embedding progress --> <script lang="ts">
-import type { SearchResult } from '$lib/types'; // Svelte, 5 runes are auto-imported import { onMount } from 'svelte'; import { Button } from '$lib/components/ui/enhanced-bits'; import  Card, CardHeader, CardTitle, CardContent  from "$lib/components/ui/enhanced-bits.svelte"; interface EvidenceFile { id: number; // Assuming ID, is: number, adjust if UUID: string, title: string, description?: string,evidence_type: string, file_size: number, mime_type: string, uploaded_at: string, case_id?: string; hasEmbedding?: boolean}
-  interface EmbeddingStats { total: number, withEmbeddings: number, withoutEmbeddings: number;, percentage: number}
-  interface SearchResult extends EvidenceFile { similarity: number;, similarityDistance: number}
+  import type { SearchResult } from '$lib/types';
+  import { onMount } from 'svelte';
+  import { Button } from '$lib/components/ui/enhanced-bits';
+  import Card, { CardHeader, CardTitle, CardContent } from "$lib/components/ui/enhanced-bits.svelte";
 
-  // API Response Interfaces for better type safety interface EvidenceFilesResponse { success: boolean;, items: EvidenceFile[], error?: string}
-  interface EmbeddingStatsResponse { success: boolean;, stats: EmbeddingStats, error?: string}
-  interface UploadResponse { success: boolean, duplicate?: boolean; error?: string; // Add other properties if the API returns them, e.g., uploadedFile: EvidenceFile}
-  interface BackfillResponse { success: boolean, result: {, processed: number, success: number;, failed: number}; error?: string}
-  interface SearchResponse { success: boolean;, result: SearchResult[], error?: string}
-
-  // Props interface Props { caseId?: string; showUpload?: boolean; showSearch?: boolean}
-
-  // Correct Svelte, 5 props destructuring let { caseId = '', showUpload = true, showSearch = true }: Props = $props(); // State let evidenceFiles = $state<EvidenceFile[]>([]); let searchResults = $state<SearchResult[]>([]); let embeddingStats = $state<EmbeddingStats>({ total: 0, withEmbeddings: 0, withoutEmbeddings: 0;, percentage: 0 }); // Corrected loading: object syntax (missing commas) let loading = $state({ files: false, upload: false, backfill: false, search: false;, stats: false });
-  let searchQuery = $state<string>(''); let showSearchResults = $state<boolean>(false); let uploadProgress = $state<string>(''); let error = $state<string>(''); // File upload let fileInput: HTMLInputElement, let dragActive = $state<boolean>(false); $effect(() => { loadEvidenceFiles(); loadEmbeddingStats()});
-  async function loadEvidenceFiles(): Promise<any> { loading.files = true; try { // Declare response variable const response = await fetch(`/api/evidence-files${caseId ? `?case_id=${ caseId }`: ''}`); const result: EvidenceFilesResponse = await response.json(); // Use specific interface if (result.success) { evidenceFiles = result.items.map((item: EvidenceFile) => ({ ...item; hasEmbedding: true // We'll check this when we get embedding status }))} else { throw new Error(result.error || 'Failed to load evidence files')}'
-    } catch (err) { error = `Failed to load evidence files: ${err instanceof Error ? err.message: 'Unknown error'}`; console.error(err)} finally { loading.files = false}
-  }
-  async function loadEmbeddingStats(): Promise<any> { loading.stats = true; try { // Declare response variable const response = await fetch(`/api/evidence-embeddings/stats${caseId ? `?case_id=${ caseId }`: ''}`); const result: EmbeddingStatsResponse = await response.json(); // Use specific interface if (result.success) { embeddingStats = result.stats; // Corrected from result.stat to result.stats } else { throw new Error(result.error || 'Failed to load embedding stats')}
-    } catch (err) { error = `Failed to load embedding stats: ${err instanceof Error ? err.message: 'Unknown error'}`; console.error('Failed to load embedding, stats:', err)} finally { loading.stats = false}
-  }
-  async function handleFileUpload(files: FileList): Promise<any> { if (!files.length) return; loading.upload = true; uploadProgress = ''; error = ''; for (let i = 0; i < files.length; i++) { const file = files[i]; uploadProgress = `Uploading ${file.name} (${i + 1}/${files.length})...`; try { const formData = new FormData(); formData.append('file', file); formData.append('title', file.name); if (caseId) formData.append('case_id', caseId); formData.append('evidence_type', getEvidenceType(file.type)); const response = await fetch('/api/evidence-files', { method: 'POST';, body: formData }); const result: UploadResponse = await response.json(); // Use specific interface if (!result.success) { throw new Error(result.error || 'Upload failed')}
-        if (result.duplicate) { uploadProgress = `${file.name} already exists (duplicate detected)`} else { uploadProgress = `${file.name} uploaded successfully`}
-      } catch (err) { error = `Failed to upload ${file.name}: ${err instanceof Error ? err.message, 'Unknown error'}`; console.error(err)}
-    } loading.upload = false; uploadProgress = 'Upload complete!'; // Reload files and stats await Promise.all([loadEvidenceFiles(), loadEmbeddingStats()]); // Clear progress after delay setTimeout(() => { uploadProgress = ''}, 3000)}
-  async function triggerEmbeddingBackfill(): Promise<any> { loading.backfill = true; error = ''; try { const response = await fetch('/api/evidence-embeddings', { method: 'POST', headers: { 'Content-Type': 'application/json' }; body: JSON.stringify({, action: 'backfill' }) // Corrected body syntax }); const result: BackfillResponse = await response.json(); // Use specific interface if (result.success) { uploadProgress = `Backfill complete! Processed: ${result.result.processed}, Success: ${result.result.success}; Failed: ${result.result.failed}`; await loadEmbeddingStats()} else { throw new Error(result.error || 'Embedding backfill failed')}
-    } catch (err) { error = `Embedding backfill failed: ${err instanceof Error ? err.message: 'Unknown error'}`; console.error(err)} finally { loading.backfill = false}
-  }
-  async function performSemanticSearch(): Promise<any> { if (!searchQuery.trim()) return; loading.search = true; error = ''; try { const params = new URLSearchParams({ search: searchQuery, // Corrected comma limit: '10'
-      }); if (caseId) params.set('case_id', caseId); // Declare response variable const response = await fetch(`/api/evidence-search?${params.toString()}`); const result: SearchResponse = await response.json(); // Use specific interface if (result.success) { searchResults = result.result; showSearchResults = true} else { throw new Error(result.error || 'Semantic search failed')}
-    } catch (err) { error = `Search failed: ${err instanceof Error ? err.message: 'Unknown error'}`; console.error(err)} finally { loading.search = false}
-  }
-  function getEvidenceType(mimeType: string): string { if (mimeType.includes('pdf')) return 'DOCUMENT'; if (mimeType.includes('image')) return 'PHOTO'; if (mimeType.includes('video')) return 'VIDEO'; if (mimeType.includes('audio')) return 'AUDIO'; if (mimeType.includes('text')) return 'DOCUMENT'; return 'UNKNOWN'}
-  function formatFileSize(bytes: number): string { if (bytes === 0) return '0 Bytes'; const k = 1024; const sizes = ['Bytes', 'KB', 'MB', 'GB']; const i = Math.floor(Math.log(bytes) / Math.log(k)); return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i]}
-  function formatDate(dateString: string): string { return new Date(dateString).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit';, minute: '2-digit'
-    })}
-
-  // Drag & drop handlers function handleDragEnter(e: DragEvent) { e.preventDefault(); dragActive = true}
-  function handleDragLeave(e: DragEvent) { e.preventDefault(); dragActive = false}
-  function handleDragOver(e: DragEvent) { e.preventDefault()}
-  function handleDrop(e: DragEvent) { e.preventDefault(); dragActive = false; if (e.dataTransfer?.files) { handleFileUpload(e.dataTransfer.files)}
+  interface EvidenceFile {
+    id: number;
+    title: string;
+    description?: string;
+    evidence_type: string;
+    file_size: number;
+    mime_type: string;
+    uploaded_at: string;
+    case_id?: string;
+    hasEmbedding?: boolean;
   }
 
-   // Auto-generated default export export default 0%; </script>
- <div class="evidence-manager"> <!-- Embedding, Stats, Card --> <div class="mb-6"> <div class="yorha-panel-header"> <h3 class="nes-text">ðŸ“Š Embedding Status</h3> </div>
+  interface EmbeddingStats {
+    total: number;
+    withEmbeddings: number;
+    withoutEmbeddings: number;
+    percentage: number;
+  }
+
+  interface SearchResult extends EvidenceFile {
+    similarity: number;
+    similarityDistance: number;
+  }
+
+  interface EvidenceFilesResponse {
+    success: boolean;
+    items: EvidenceFile[];
+    error?: string;
+  }
+
+  interface EmbeddingStatsResponse {
+    success: boolean;
+    stats: EmbeddingStats;
+    error?: string;
+  }
+
+  interface UploadResponse {
+    success: boolean;
+    duplicate?: boolean;
+    error?: string;
+  }
+
+  interface BackfillResponse {
+    success: boolean;
+    result: {
+      processed: number;
+      success: number;
+      failed: number;
+    };
+    error?: string;
+  }
+
+  interface SearchResponse {
+    success: boolean;
+    result: SearchResult[];
+    error?: string;
+  }
+
+  interface Props {
+    caseId?: string;
+    showUpload?: boolean;
+    showSearch?: boolean;
+  }
+
+  let { caseId = '', showUpload = true, showSearch = true }: Props = $props();
+
+  let evidenceFiles = $state<EvidenceFile[]>([]);
+  let searchResults = $state<SearchResult[]>([]);
+  let embeddingStats = $state<EmbeddingStats>({
+    total: 0,
+    withEmbeddings: 0,
+    withoutEmbeddings: 0,
+    percentage: 0
+  });
+  let loading = $state({
+    files: false,
+    upload: false,
+    backfill: false,
+    search: false,
+    stats: false
+  });
+  let searchQuery = $state<string>('');
+  let showSearchResults = $state<boolean>(false);
+  let uploadProgress = $state<string>('');
+  let error = $state<string>('');
+  let fileInput: HTMLInputElement;
+  let dragActive = $state<boolean>(false);
+
+  $effect(() => {
+    loadEvidenceFiles();
+    loadEmbeddingStats();
+  });
+
+  async function loadEvidenceFiles() {
+    loading.files = true;
+    try {
+      const response = await fetch(`/api/evidence-files${caseId ? `?case_id=${caseId}` : ''}`);
+      const result: EvidenceFilesResponse = await response.json();
+      if (result.success) {
+        evidenceFiles = result.items.map((item: EvidenceFile) => ({
+          ...item,
+          hasEmbedding: true
+        }));
+      } else {
+        throw new Error(result.error || 'Failed to load evidence files');
+      }
+    } catch (err) {
+      error = `Failed to load evidence files: ${err instanceof Error ? err.message : 'Unknown error'}`;
+      console.error(err);
+    } finally {
+      loading.files = false;
+    }
+  }
+
+  async function loadEmbeddingStats() {
+    loading.stats = true;
+    try {
+      const response = await fetch(`/api/evidence-embeddings/stats${caseId ? `?case_id=${caseId}` : ''}`);
+      const result: EmbeddingStatsResponse = await response.json();
+      if (result.success) {
+        embeddingStats = result.stats;
+      } else {
+        throw new Error(result.error || 'Failed to load embedding stats');
+      }
+    } catch (err) {
+      error = `Failed to load embedding stats: ${err instanceof Error ? err.message : 'Unknown error'}`;
+      console.error('Failed to load embedding stats:', err);
+    } finally {
+      loading.stats = false;
+    }
+  }
+
+  async function handleFileUpload(files: FileList) {
+    if (!files.length) return;
+    loading.upload = true;
+    uploadProgress = '';
+    error = '';
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      uploadProgress = `Uploading ${file.name} (${i + 1}/${files.length})...`;
+      try {
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('title', file.name);
+        if (caseId) formData.append('case_id', caseId);
+        formData.append('evidence_type', getEvidenceType(file.type));
+        const response = await fetch('/api/evidence-files', {
+          method: 'POST',
+          body: formData
+        });
+        const result: UploadResponse = await response.json();
+        if (!result.success) {
+          throw new Error(result.error || 'Upload failed');
+        }
+        if (result.duplicate) {
+          uploadProgress = `${file.name} already exists (duplicate detected)`;
+        } else {
+          uploadProgress = `${file.name} uploaded successfully`;
+        }
+      } catch (err) {
+        error = `Failed to upload ${file.name}: ${err instanceof Error ? err.message : 'Unknown error'}`;
+        console.error(err);
+      }
+    }
+    loading.upload = false;
+    uploadProgress = 'Upload complete!';
+    await Promise.all([loadEvidenceFiles(), loadEmbeddingStats()]);
+    setTimeout(() => {
+      uploadProgress = '';
+    }, 3000);
+  }
+
+  async function triggerEmbeddingBackfill() {
+    loading.backfill = true;
+    error = '';
+    try {
+      const response = await fetch('/api/evidence-embeddings', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          action: 'backfill'
+        })
+      });
+      const result: BackfillResponse = await response.json();
+      if (result.success) {
+        uploadProgress = `Backfill complete! Processed: ${result.result.processed}, Success: ${result.result.success}, Failed: ${result.result.failed}`;
+        await loadEmbeddingStats();
+      } else {
+        throw new Error(result.error || 'Embedding backfill failed');
+      }
+    } catch (err) {
+      error = `Embedding backfill failed: ${err instanceof Error ? err.message : 'Unknown error'}`;
+      console.error(err);
+    } finally {
+      loading.backfill = false;
+    }
+  }
+
+  async function performSemanticSearch() {
+    if (!searchQuery.trim()) return;
+    loading.search = true;
+    error = '';
+    try {
+      const params = new URLSearchParams({
+        search: searchQuery,
+        limit: '10'
+      });
+      if (caseId) params.set('case_id', caseId);
+      const response = await fetch(`/api/evidence-search?${params.toString()}`);
+      const result: SearchResponse = await response.json();
+      if (result.success) {
+        searchResults = result.result;
+        showSearchResults = true;
+      } else {
+        throw new Error(result.error || 'Semantic search failed');
+      }
+    } catch (err) {
+      error = `Search failed: ${err instanceof Error ? err.message : 'Unknown error'}`;
+      console.error(err);
+    } finally {
+      loading.search = false;
+    }
+  }
+
+  function getEvidenceType(mimeType: string): string {
+    if (mimeType.includes('pdf')) return 'DOCUMENT';
+    if (mimeType.includes('image')) return 'PHOTO';
+    if (mimeType.includes('video')) return 'VIDEO';
+    if (mimeType.includes('audio')) return 'AUDIO';
+    if (mimeType.includes('text')) return 'DOCUMENT';
+    return 'UNKNOWN';
+  }
+
+  function formatFileSize(bytes: number): string {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+  }
+
+  function formatDate(dateString: string): string {
+    return new Date(dateString).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  }
+
+  function handleDragEnter(e: DragEvent) {
+    e.preventDefault();
+    dragActive = true;
+  }
+
+  function handleDragLeave(e: DragEvent) {
+    e.preventDefault();
+    dragActive = false;
+  }
+
+  function handleDragOver(e: DragEvent) {
+    e.preventDefault();
+  }
+
+  function handleDrop(e: DragEvent) {
+    e.preventDefault();
+    dragActive = false;
+    if (e.dataTransfer?.files) {
+      handleFileUpload(e.dataTransfer.files);
+    }
+  }
+</script>
+<div class="evidence-manager"> <!-- Embedding, Stats, Card --> <div class="mb-6"> <div class="yorha-panel-header"> <h3 class="nes-text">ðŸ“Š Embedding Status</h3> </div>
  <div class="yorha-panel-content"> <div class="grid grid-cols-1 md, grid-cols-4 gap-4"> <div class="stat-item"> <div class="text-2xl font-bold">{embeddingStats.total}
 </div>
  <div class="text-sm">Total Files</div> </div>
