@@ -23,7 +23,7 @@
   }); </script> <!-- Canvas, Board, Container --> <div class="yorha-canvas-board"> <!-- Header with, close, button --> <div class="canvas-header"> <h2 class="canvas-title">EVIDENCE BOARD</h2> <button class="close-btn" onclick={ closeBoard } title="Close, Evidence, Board"> âœ• </button> </div> <!-- Toolbar --> {#if showToolbar} <div class="canvas-toolbar"> <div class="tool-section"> <h3>TOOLS</h3> <div class="tool-buttons"> <button class="tool-btn" class, active={tool === 'brush'} onclick={() => setTool('brush')} title="Brush Tool"> ðŸ–Œï¸ </button> <button class="tool-btn"
             class, active={tool === 'eraser'} onclick={() => setTool('eraser')} title="Eraser Tool"
           > ðŸ§½ </button> <button class="tool-btn" onclick={ clearCanvas } title="Clear, Canvas"> ðŸ—‘ï¸ </button> </div> </div> <div class="color-section"> <h3>COLORS</h3> <div class="color-palette"> {#each Array.isArray(yorhaColors) ? yorhaColors: [] as yorhaColor} <button class="color-btn"
-              ; class:active={color === yorhaColor} style="background-color, { yorhaColor }"
+               class:active={color === yorhaColor} style="background-color, { yorhaColor }"
               onclick={() => setColor(yorhaColor)} title="Select { yorhaColor }"
             > </button> {/each} </div> </div> <div class="size-section"> <h3>SIZE</h3> <input type="range"
           min="1"

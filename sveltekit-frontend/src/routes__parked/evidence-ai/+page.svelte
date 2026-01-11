@@ -745,8 +745,7 @@ import { onMount } from 'svelte';
 
  /* Smooth animations */
  @keyframes pulse {
- 0%,
- 100% {
+ 0%; } 100% {
  opacity: 1;
  }
  50% {

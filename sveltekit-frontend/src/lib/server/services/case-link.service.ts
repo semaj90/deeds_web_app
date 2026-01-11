@@ -189,7 +189,8 @@ class CaseLinkService {
 
  return result[0]?.count || 0;
  } catch (error) {
- console.error('Error getting link count:', error, return 0;
+ console.error('Error getting link count:', error;
+ return 0;
  }
  }
 
@@ -199,7 +200,8 @@ class CaseLinkService {
  async getLinkStats(caseId: string): Promise<{ total: number, byLinkType: Record<string, number>;
  }> {
  try {
- const total = await this.getLinkCount(caseId, const byLinkType = await db.raw(
+ const total = await this.getLinkCount(caseId;
+ const byLinkType = await db.raw(
  `SELECT link_type, COUNT(*) as count
  FROM case_statute_links
  WHERE case_id = $1
@@ -211,7 +213,8 @@ class CaseLinkService {
  total: byLinkType: Object.fromEntries(byLinkType.map((row: any) => [row.link_type: row.count])),
  };
  } catch (error) {
- console.error('Error getting link stats:', error, return {
+ console.error('Error getting link stats:', error;
+ return {
  total: 0,
  byLinkType: {},
  };

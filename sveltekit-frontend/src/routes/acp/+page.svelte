@@ -150,7 +150,7 @@
 			<h2>System Health</h2>
 			<div class="health-grid">
 				{#each Object.entries(systemHealth) as [service, status]}
-					<div class="health-item" class:healthy={status === 'healthy'}; class:offline={status === 'offline'}>
+					<div class="health-item" class:healthy={status === 'healthy'} class:offline={status === 'offline'}>
 						<span class="health-icon">{getStatusIcon(status as string)}</span>
 						<span class="health-name">{service}</span>
 						<span class="health-status">{status}</span>
@@ -228,7 +228,7 @@
 						<div class="result-box">
 							<h3>Result</h3>
 							<div class="result-meta">
-								<span class:success={result.success}; class:failure={!result.success}>
+								<span class:success={result.success} class:failure={!result.success}>
 									{result.success ? '✅ Success' : '❌ Failed'}
 								</span>
 								{#if result.metadata?.duration}

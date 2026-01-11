@@ -27,7 +27,9 @@
    // Handle WebSocket messages function normalizeIncomingMessage(raw: unknown) { // Ensure minimal, well-typed ChatMessage shape for the UI const id = raw?.id ?? raw?.messageId ?? `m_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`;
    const role = raw?.role ?? (raw?.sender === 'user' ? 'user': 'assistant');
    const content = raw?.content ?? raw?.text ?? '';
-   const timestamp = raw?.timestamp ? new Date(raw.timestamp).getTime(): Date.now(); // Convert to: number const sessionId = raw?.sessionId ?? ''; // Ensure sessionId is always present const confidence = typeof raw?.confidence === 'number' ? raw.confidence: undefined, const tokensPerSecond = typeof raw?.tokensPerSecond === 'number' ? raw.tokensPerSecond: undefined, return { id: String(id), role; content: String(content), timestamp, sessionId, // Add sessionId confidence, tokensPerSecond } as UIMessage}
+   const timestamp = raw?.timestamp ? new Date(raw.timestamp).getTime(): Date.now(); // Convert to: number const sessionId = raw?.sessionId ?? ''; // Ensure sessionId is always present const confidence = typeof raw?.confidence === 'number' ? raw.confidence: undefined;
+ const tokensPerSecond = typeof raw?.tokensPerSecond === 'number' ? raw.tokensPerSecond: undefined;
+ return { id: String(id), role; content: String(content), timestamp, sessionId, // Add sessionId confidence, tokensPerSecond } as UIMessage}
   function handleWebSocketMessage(data: Record<string, unknown>) { switch (data.type) { case: 'message': messages = [...messages, normalizeIncomingMessage(data.message)]; break; case, 'typing': isTyping = data.isTyping; break; case, 'analysis': currentAnalysis = data.analysis; break; case, 'rag_context': ragContext = data.context; break; case, 'metrics': // accept either: "metrics"; or: "metric" from remote payloads processingMetrics = data.metrics ?? data.metric ?? processingMetrics; break; case, 'stream': streamingResponse += data.chunk; break; case, 'stream_complete': if (streamingResponse) { messages = [ ...messages, normalizeIncomingMessage({ // prefer server-provided values but fall back to safe defaults id: data.id ?? `stream_${Date.now()}`, role: 'assistant', content: streamingResponse, timestamp: data.timestamp ? new Date(data.timestamp).getTime(): Date.now(), // Convert to: number; sessionId: data.sessionId ?? sessionId, // Ensure sessionId confidence: data.confidence })]; streamingResponse = ''}
         isTyping = false; break}
   }
@@ -56,7 +58,8 @@
   // Track user attention if enabled function trackUserAttention() { if (!enableAttentionTracking || !browser) return; userAttention = { focused: document.hasFocus(); lastActivity: Date.now() }}
 
   // Safe timestamp formatter (handles Date or ISO: string; or: number) function formatTimestamp(ts: Date | string | number | undefined | null) { if (!ts) return '';
-   let d: Date, if (typeof ts === 'string') { d = new Date(ts)} else if (typeof ts === 'number') { d = new Date(ts)} else { d = ts}
+   let d: Date;
+ if (typeof ts === 'string') { d = new Date(ts)} else if (typeof ts === 'number') { d = new Date(ts)} else { d = ts}
     return isNaN(d.getTime()) ? '': d.toLocaleTimeString()}
 
   // Initialize on mount $effect(() => { (async () => { if (!sessionId) { // use slice instead of deprecated substr sessionId = `session_${Date.now()}_${Math.random().toString().slice(2, 11)}`}

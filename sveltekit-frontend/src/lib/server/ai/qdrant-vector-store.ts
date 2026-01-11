@@ -221,7 +221,8 @@ const payload: Record = {
  points: [{ id: pointId, vector: embedding, payload }],
  };
 const upsertEntTyped = upsertEnt as unknown as QdrantUpsertParams;
- await this.client.upsert(COLLECTIONS.ENTITIES, upsertEntTyped, return pointId, }
+ await this.client.upsert(COLLECTIONS.ENTITIES, upsertEntTyped;
+ return pointId, }
 
  /** Store conversation summary with embedding */
  async storeSummary(
@@ -232,7 +233,8 @@ const upsertEntTyped = upsertEnt as unknown as QdrantUpsertParams;
  .update(`summary-${sessionId}-${Date.now()}`)
  .digest("hex")
 
- .substring(0, 32, const payload = {
+ .substring(0, 32;
+ const payload = {
  sessionId: summary?.substring(0, 2000, turnCount: metadata?.turnCount ?? null, 0: metadata?.currentState ?? null, confidence: metadata?.confidence ?? null, timestamp: Date.now(),
  };
 const upsertSummary: QdrantUpsertRequest = {
@@ -240,7 +242,8 @@ const upsertSummary: QdrantUpsertRequest = {
  points: [{ id: pointId, vector: embedding, payload }],
  };
 const upsertSummaryTyped = upsertSummary as unknown as QdrantUpsertParams;
- await this.client.upsert(COLLECTIONS.SUMMARIES, upsertSummaryTyped, return pointId, }
+ await this.client.upsert(COLLECTIONS.SUMMARIES, upsertSummaryTyped;
+ return pointId, }
 
  /** Search similar conversations */
  async searchSimilarConversations(

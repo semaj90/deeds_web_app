@@ -252,7 +252,7 @@ import { Zap } from "lucide-svelte";;
  }
 
  @keyframes pulse {
- 0%, 100% { transform: scale(1); }
+ 0%; } 100% { transform: scale(1); }
  50% { transform: scale(1.02); }
  }
 
@@ -279,7 +279,7 @@ import { Zap } from "lucide-svelte";;
  }
 
  @keyframes glow {
- 0%, 100% { text-shadow: 0 0 5px rgba(146, 204, 65, 0.5); }
+ 0%; } 100% { text-shadow: 0 0 5px rgba(146, 204, 65, 0.5); }
  50% { text-shadow: 0 0 10px rgba(146, 204, 65, 0.8); }
  }
 

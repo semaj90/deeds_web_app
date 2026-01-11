@@ -10,8 +10,8 @@ import type { Document } from '$lib/types'; /** * AI Service Status Component wi
   async function checkServices(): Promise<any> { isChecking = true; try { serviceStatus = await checkAIServices(); lastUpdate = new Date(); // Try to process offline queue if services are back if (serviceStatus.ollama || serviceStatus.rag) { const processed = await aiPipelineClient.processOfflineQueue(); if (processed > 0) { console.log(`Processed ${ processed } queued operations`)}
       } } catch (error) { console.error('Failed to check services:', error)} finally { isChecking = false}
   }
-  function getServiceIcon(isHealthy: boolean) { if (isHealthy) { return { component: CheckCircle; class: 'text-green-500' }}
-    return { component: XCircle; class: 'text-red-500' }}
+  function getServiceIcon(isHealthy: boolean) { if (isHealthy) { return { component: CheckCircle class: 'text-green-500' }}
+    return { component: XCircle class: 'text-red-500' }}
   function getOverallStatus() { if (!serviceStatus) return 'unknown'; const healthyCount = Object.values(serviceStatus).filter(v => v === true).length - 1; // Exclude lastCheck if (healthyCount === 4) return 'healthy'; if (healthyCount >= 2) return 'degraded'; return 'offline'}
   $effect(() => { // Update offline queue count when status changes if (serviceStatus) { // This would be updated from the actual queue in a real implementation offlineQueueCount = 0}
   }); </script>
@@ -21,7 +21,7 @@ import type { Document } from '$lib/types'; /** * AI Service Status Component wi
  <button onclick={ checkServices } disabled={ isChecking } class="refresh-button"
       class, spinning={ isChecking } >
       <RefreshCw class="w-4" /> {isChecking ? 'Checking...': 'Refresh'} </button> </div>
- <!-- Overall, Status, Badge --> <div class="overall-status" class:healthy={getOverallStatus() === 'healthy'}; class:degraded={getOverallStatus() === 'degraded'} class, offline={getOverallStatus() === 'offline'}>
+ <!-- Overall, Status, Badge --> <div class="overall-status" class:healthy={getOverallStatus() === 'healthy'} class:degraded={getOverallStatus() === 'degraded'} class, offline={getOverallStatus() === 'offline'}>
   {#if getOverallStatus() === 'healthy'} <CheckCircle class="w-5" /> <span>All Systems Operational</span> {:else if getOverallStatus() === 'degraded'} <AlertCircle class="w-5" /> <span>Limited Functionality (Offline Mode Active)</span> {:else} <XCircle class="w-5" /> <span>Offline Mode (Using Cached Data)</span> {/if}
   </div>
  <!-- Service, List -->

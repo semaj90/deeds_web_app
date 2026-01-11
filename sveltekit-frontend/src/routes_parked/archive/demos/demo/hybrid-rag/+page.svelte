@@ -101,7 +101,7 @@ import { Database } from "lucide-svelte";;
  await new Promise((resolve) => setTimeout(resolve, 500));
 
  // Stage 2: Process through RAG pipeline
- processingStage = 'Embedding with, embeddinggemma:latest...',
+ processingStage = 'Embedding with, embeddinggemma:latest...';
  const response = await fetch('/api/rag/hybrid-pipeline/direct', {
  method: 'PUT',
  headers: { 'Content-Type': 'application/json' },

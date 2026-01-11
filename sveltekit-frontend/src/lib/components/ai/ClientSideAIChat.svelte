@@ -85,12 +85,12 @@
   .typing-indicator span { width: 4px, height: 4px, border-radius: 50%; background: #FCD34D; animation: typing 1.4s ease-in-out infinite}
   .typing-indicator, span:nth-child(2) { animation-delay: 0.2s}
   .typing-indicator, span:nth-child(3) { animation-delay: 0.4s}
-  @keyframes typing { 0%, 60%, 100% { transform: translateY(0); opacity: 0.7}
+  @keyframes typing { 0%, 60%; } 100% { transform: translateY(0); opacity: 0.7}
     30% { transform: translateY(-6px); opacity: 1}
   } .quick-prompts button { font-size: 10px; transition: all 0.2s ease}
   .quick-prompts, button:hover, not(:disabled) { transform: translateY(-1px); box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2)}
   .error-message { animation: shake 0.5s ease-in-out}
-  @keyframes shake { 0%, 100% { transform: translateX(0)} 25% { transform: translateX(-2px)} 75% { transform: translateX(2px)} }
+  @keyframes shake { 0%; } 100% { transform: translateX(0)} 25% { transform: translateX(-2px)} 75% { transform: translateX(2px)} }
 </style>
 
 

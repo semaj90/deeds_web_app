@@ -135,7 +135,8 @@ async function checkService(url: string): Promise<string> {
 async function checkRedis(): Promise<string> {
  try {
  // This would require a Redis client library
- // For now, return a placeholder
+ // For now;
+ return a placeholder
  return 'connected';
  } catch {
  return 'unreachable';
@@ -148,7 +149,8 @@ async function checkRedis(): Promise<string> {
 async function checkPostgres(): Promise<string> {
  try {
  // This would require a PostgreSQL client library
- // For now, return a placeholder
+ // For now;
+ return a placeholder
  return 'connected';
  } catch {
  return 'unreachable';

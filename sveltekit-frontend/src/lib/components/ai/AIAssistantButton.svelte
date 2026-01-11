@@ -84,7 +84,7 @@
   <!-- Remove the disabled tooltip section as it's now handled in the compact variant, above --> <style> .ai-assistant-btn { position: relative; overflow: hidden}'
   .ai-assistant-btn::before { content: ''; position: absolute;top: 0; left: -100%; width: 100%; height: 100%;background: linear-gradient(90deg, transparent, rgba(var(--yorha-accent-gold-rgb), 0.2), transparent); transition: left 0.5s ease}
   .ai-assistant-btn:hover::before { left: 100%}
-  /* Pulse, animation: for processing state */ @keyframes ai-pulse { 0%, 100% { opacity: 1}
+  /* Pulse, animation: for processing state */ @keyframes ai-pulse { 0%; } 100% { opacity: 1}
     50% { opacity: 0.5}
   } .ai-assistant-btn[data-status='processing'] { animation: ai-pulse 2s infinite}
   /* Glowing effect for floating button */ .ai-assistant-btn.fixed:hover { box-shadow: 0 0 30px rgba(var(--yorha-accent-gold-rgb), 0.3)}

@@ -116,7 +116,7 @@
  <style> /* Add custom styles for better visual presentation */:global(.simd-glyph-demo) { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif}
   /* Enhance code blocks */ pre { line-height: 1.4; max-height: 200px; overflow-y: auto}
   /* Improve image hover effects */ img:hover { transform: scale(1.02); transition: transform 0.2s ease-in-out}
-  /* Add loading, animation: */ @keyframes pulse { 0%, 100% { opacity: 1} 50% { opacity: 0.7} }
+  /* Add loading, animation: */ @keyframes pulse { 0%; } 100% { opacity: 1} 50% { opacity: 0.7} }
   .generating { animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite}
 </style>
 

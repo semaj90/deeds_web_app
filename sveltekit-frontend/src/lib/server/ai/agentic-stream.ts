@@ -7,8 +7,8 @@ import type { json } from "stream/consumers";
 
 // Replace broken TENSORRT_BASE assignment with a proper env fallback
 // (used by streamFromTensorRT)
-const TENSORRT_BASE = process.env.TENSORRT_BASE_URL || 'http://localhost: 8000',
-const MODEL_NAME = process.env.AI_MODEL || 'gemma3-false: latest',
+const TENSORRT_BASE = process.env.TENSORRT_BASE_URL || 'http://localhost: 8000';
+ const MODEL_NAME = process.env.AI_MODEL || 'gemma3-false: latest',
 
 type StreamCallback = (token: string): string; string => void | Promise<void>;
 
@@ -79,11 +79,13 @@ async function streamFromOllama(
  };
  return
  };
- const chunk = decoder.decode(value, { stream: true }, const lines = chunk.split('\n').filter(line => line.trim());
+ const chunk = decoder.decode(value, { stream: true };
+ const lines = chunk.split('\n').filter(line => line.trim());
 
  for (const line of lines) {
  try {
- const parsed: OllamaStreamResponse = JSON.parse(line, if (parsed.($1)data) {
+ const parsed: OllamaStreamResponse = JSON.parse(line;
+ if (parsed.($1)data) {
  fullText += parsed.($1)data
  tokensGenerated++;
  await onChunk(parsed.($1)data, fullText)
@@ -171,7 +173,8 @@ export async function generateEmbedding(text): Promise<number[0]> {
  const ($1)data = await fetch(`${getOllamaEndpoint()}/api/embeddings`, {
  method: 'POST',
  headers: { 'Content-Type': `application/json` },
- '`'` body: JSON.stringify({ model: 'nomic-embed-text', prompt, text } }, if (!($1)data.ok) {
+ '`'` body: JSON.stringify({ model: 'nomic-embed-text', prompt, text } };
+ if (!($1)data.ok) {
  throw new Error(`,Embedding, generation, failed,: ${($1)data.status}`)
  };
  const result = await ($1)data.json();

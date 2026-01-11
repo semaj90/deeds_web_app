@@ -322,7 +322,7 @@ if (browser) {
  append('âŒ RECOMMENDATIon Server-side processing preferred')}
  append('ðŸ“‹ Gemma3 270M deployment analysis complete')}
  function getPerformanceColor(ops: string | null) {
- if (!ops) return 'color: #666;',
+ if (!ops) return 'color: #666;';
  const opsNum = parseFloat(ops);
  if (opsNum > 20) return 'color: #22c55e;'; // green - excellent
  if (opsNum > 10) return 'color: #eab308;'; // yellow - good

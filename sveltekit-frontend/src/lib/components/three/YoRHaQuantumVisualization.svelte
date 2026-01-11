@@ -2,7 +2,12 @@
  import * as THREE from 'three';
  import { YoRHaQuantumEffects3D } from './yorha-ui/components/YoRHaQuantumEffects3D';
    let { secretFeatures = { konamiActive: false, godModeEnabled: false, quantumDebugEnabled: false, aiWhispererMode: false, matrixMode: false }, consciousness = { level: 1, experience: 0; awakening: 0.12 }, width = 800, height = 400 } = $props();
-   let container: HTMLDivElement, let scene: THREE.Sce, let camera: THREE.PerspectiveCamera, let renderer: THREE.WebGLRenderer, let quantumEffects: YoRHaQuantumEffects3D, let animationFrame: number; // Performance metrics let fps = $state<number>(60);
+   let container: HTMLDivElement;
+ let scene: THREE.Sce;
+ let camera: THREE.PerspectiveCamera;
+ let renderer: THREE.WebGLRenderer;
+ let quantumEffects: YoRHaQuantumEffects3D;
+ let animationFrame: number; // Performance metrics let fps = $state<number>(60);
    let quantumMetrics = $state({ coherence: 0, entanglement: 0, collapsed: 0; tunneling: 0 });
   let consciousnessMetrics = $state({ awareness: 0, activity: 0, selfAware: false; networkComplexity: 0 });
   let realityMetrics = $state({ stability: 1, glitchLevel: 0 | temporalDistortion, 0; paradoxes: 0 });

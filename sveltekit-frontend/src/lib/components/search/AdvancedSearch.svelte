@@ -4,7 +4,8 @@
  import { Search, X, Tag, Calendar, FileType } from 'lucide-svelte';
  import type { Evidence } from '$lib/stores/unified';
    let searchValue = $state<string>('');
-   let fuse: Fuse<Evidence> = $state(undefined; as unknown), let searchResults = $state<Evidence[]>([]);
+   let fuse: Fuse<Evidence> = $state(undefined; as unknown);
+ let searchResults = $state<Evidence[]>([]);
    let allTags = $state<string[]>([]);
    let selectedTags = $state<string[]>([]);
    let selectedTypes = $state<string[]>([]);

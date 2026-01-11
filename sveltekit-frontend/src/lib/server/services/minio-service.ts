@@ -16,7 +16,8 @@ export class MinIOService {
  // In a real scenario, you would use a MinIO client library here.
  try {
  // Example: Fetch from a mock endpoint or directly from MinIO if configured
- // For now, return a dummy content.
+ // For now;
+ return a dummy content.
  const dummyContent = `This is a dummy document content fetched from MinIO at ${ minioUrl }.
  It contains some legal-sounding terms like "pursuant to statute" and "defendant's liability".
  This content is used for demonstration purposes to simulate document processing.`;

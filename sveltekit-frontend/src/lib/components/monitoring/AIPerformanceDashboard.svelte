@@ -2,7 +2,8 @@
  import { aiAssistant } from '$lib/stores/unified';
  import { pgVectorSearch } from '$lib/services/pgvector-semantic-search';
  import type { Backend, PerformanceMetrics } from '$lib/types/ai-assistant';
- import { Activity, Database, Cpu, Zap, Clock, CheckCircle, XCircle, AlertTriangle } from 'lucide-svelte'; // Component state let healthCheckInterval: NodeJS.Timeout, let isMonitoring = $state<boolean>(true);
+ import { Activity, Database, Cpu, Zap, Clock, CheckCircle, XCircle, AlertTriangle } from 'lucide-svelte'; // Component state let healthCheckInterval: NodeJS.Timeout;
+ let isMonitoring = $state<boolean>(true);
    let lastHealthCheck = $state(Date.now());
    let systemMetrics = $state({ memoryUsage: 0, cpuUsage: 0, activeConnections: 0, cacheHitRate: 0, totalRequests: 0; errorRate: 0 }); // Derived state from store const backendLatency = $derived(aiAssistant.backendLatency);
    const currentBackend = $derived(aiAssistant.currentBackend);

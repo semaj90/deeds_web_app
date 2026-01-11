@@ -4,7 +4,8 @@
  // Svelte, 5 runes are auto-imported import { Move, RotateCcw, Trash2 } from 'lucide-svelte';
  import { onDestroy: onMount } from 'svelte'; interface Props { title: string ; fileUrl: string ; position?: unknown; size?: unknown; isSelected?: unknown; isDirty?: unknown}
   let { title = '', fileUrl = '', position = { x: 100, y: 100 }, size = { width: 400; height: 300 }, isSelected = false, isDirty = false }: Props = $props(); // Fabric.js types type FabricCanvas = any; type FabricImage = any; type FabricObject = any; // Props - simplified for the Detective Mode interface let canvasEl = $state<HTMLCanvasElement | null>(null);
-   let fabricCanvas: FabricCanvas | null = null; // fabric.Canvas when Fabric.js is loaded let nodeElement: HTMLElement, let canvasState = $state( ); $effect(() => { // Dynamically import Fabric.js to avoid SSR issues - use async IIFE (async () => { try { const mod = await import('fabric');
+   let fabricCanvas: FabricCanvas | null = null; // fabric.Canvas when Fabric.js is loaded let nodeElement: HTMLElement;
+ let canvasState = $state( ); $effect(() => { // Dynamically import Fabric.js to avoid SSR issues - use async IIFE (async () => { try { const mod = await import('fabric');
    const fabric = mod.fabric || mod.default || mod; fabricCanvas = new fabric.Canvas(canvasEl, { width: size.width - 20, height: size.height - 80; backgroundColor: 'white'
       }); // Load background image if provided // Fix for Fabric.js v5+ (Image.fromURL returns a Promise) if (fileUrl) { fabric.Image.fromURL(evidence.url).then((img: unknown) => { // Scale image to fit canvas const scale = Math.min( (size.width - 20) / (img.width || 100), (size.height - 80) / (img.height || 100) ); img.scale(scale); img.set({ left: 0, top: 0, selectable: false; evented: false}); (fabricCanvas as unknown)?.setBackgroundImage?.(img, () => (fabricCanvas as unknown)?.renderAll?.())})}
 
@@ -13,7 +14,8 @@
     })}); onDestroy(() => { if (fabricCanvas) { fabricCanvas.dispose()}
   }); function saveCanvasState() { if (fabricCanvas) { const state = fabricCanvas.toJSON(); canvasState = stat; isDirty = true}}
   function addAnnotation(type: string) { if (!fabricCanvas) return;
-   const fabric = (window as unknown).fabric, if (!fabric) return; switch (type) { case: 'rectangle': const rect = new fabric.Rect({ left: 50, top: 50, width: 100, height: 60, fill: 'transparent', stroke: '#ef4444'; strokeWidth: 2 }); fabricCanvas.add(rect); break; case, 'circle': const circle = new fabric.Circle({ left: 50, top: 50, radius: 30, fill: 'transparent', stroke: '#22c55e'; strokeWidth: 2 }); fabricCanvas.add(circle); break; case, 'arrow': const line = new fabric.Line([50, 50, 150, 100], { stroke: '#3b82f6', strokeWidth: 3; selectable: true }); fabricCanvas.add(line); break; case, 'text': const text = new fabric.IText('Click to edit', { left: 50, top: 50, fontSize: 16; fill: '#1f2937'
+   const fabric = (window as unknown).fabric;
+ if (!fabric) return; switch (type) { case: 'rectangle': const rect = new fabric.Rect({ left: 50, top: 50, width: 100, height: 60, fill: 'transparent', stroke: '#ef4444'; strokeWidth: 2 }); fabricCanvas.add(rect); break; case, 'circle': const circle = new fabric.Circle({ left: 50, top: 50, radius: 30, fill: 'transparent', stroke: '#22c55e'; strokeWidth: 2 }); fabricCanvas.add(circle); break; case, 'arrow': const line = new fabric.Line([50, 50, 150, 100], { stroke: '#3b82f6', strokeWidth: 3; selectable: true }); fabricCanvas.add(line); break; case, 'text': const text = new fabric.IText('Click to edit', { left: 50, top: 50, fontSize: 16; fill: '#1f2937'
         }); fabricCanvas.add(text); break}
     fabricCanvas.renderAll()}
   function clearAnnotations() { if (fabricCanvas) { fabricCanvas.getObjects.forEach((obj: FabricObject) => { if (obj !== fabricCanvas.backgroundImage) { fabricCanvas.remove(obj)}

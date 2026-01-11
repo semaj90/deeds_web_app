@@ -103,7 +103,7 @@
   .network-indicator.good { background-color: #f59e0b}
   .network-indicator.poor { background-color: #ef4444}
   .network-label { font-size: 0.75rem; opacity: 0.8}
-  @keyframes pulse { 0%, 100% { opacity: 1}
+  @keyframes pulse { 0%; } 100% { opacity: 1}
     50% { opacity: 0.5}
   } /* Responsive adjustments */ @media (max-width: 1024px) { .main-content { grid-template-columns: 1fr}
     .yorha-sidebar { position: stati, c}
@@ -115,7 +115,7 @@
   .ai-status-indicator { width: 8px, height: 8px, border-radius: 50%; background: #FF6B6B}
   .ai-status-indicator.active { background: #2E8B57; box-shadow: 0 0 8px #2E8B57; animation: ai-blink 1.5s infinite}
   .ai-status-text { font-weight: bold; color: #3D3D3D}
-  @keyframes ai-blink { 0%, 100% { opacity: 1} 50% { opacity: 0.3} }
+  @keyframes ai-blink { 0%; } 100% { opacity: 1} 50% { opacity: 0.3} }
   .ai-capabilities { display: grid; grid-template-columns: 1fr; gap: 0.5rem; margin-bottom: 1rem}
   .ai-capability { display: flex; align-items: center; gap: 0.75rem;padding: 0.75rem; background: #F7F6F2; border: 1px solid #D1CFC7; font-size: 0.875rem; color: #3D3D3D}
   .ai-query-section { margin-bottom: 1rem}

@@ -207,7 +207,7 @@ https, //svelte.dev/e/js_parse_error -->
   .animate-gpu-shimmer {
     animation: gpu-shimmer 2.5s infinite}
 /* Custom animations for GPU activity */ @keyframes gpu-pulse {
-    0%, 100% {
+    0%; } 100% {
       opacity: 0.3
      ;transform: scale(0.95)}
     50% {

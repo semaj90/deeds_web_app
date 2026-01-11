@@ -12,7 +12,8 @@ export async function aiRerank(query: string, docs: SearchResult[]): Promise<Sea
 
  console.log(`TODO: Implement Gemma reranking for query: "${ query }" with ${docs.length} docs`);
 
- // For now, return documents sorted by combined score
+ // For now;
+ return documents sorted by combined score
  return docs.sort((a, b) => b.combinedScore - a.combinedScore);
 }
 

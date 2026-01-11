@@ -6,8 +6,12 @@
    let displayText = $state<string>('');
    let cursor = $state<boolean>(true); // Derived state const visibleText = $derived(displayText.slice(0, currentIndex)); // Texture cache for alphabet characters interface AlphabetTexture { char: string, texture: ImageData | null,quantizedData: Float32Array; nesPattern: Uint8Array; // 8x8 NES-style pattern, cached: boolean}
   const alphabetCache = new Map<string AlphabetTexture>();
-   let textureCanvas: HTMLCanvasElement, let textureCtx: CanvasRenderingContext2D; // Audio context for NES-style typing sounds let audioContext: AudioContext | null = null;
-   let typingSoundBuffer: AudioBuffer | null = null; // Animation frame ID let animationFrame: number, let typewriterInterval: unknown; // Component references let containerElement: HTMLDivElement, let textElement: HTMLSpanElement, let cursorElement: HTMLSpanElement, onMount(() => { initializeTextureSystem(); initializeAudioSystem(); startTypewriterEffect()}); onDestroy(() => { cleanup()}); function initializeTextureSystem(): void { if (!cacheTextures) return; // Create texture canvas for character rendering textureCanvas = document.createElement('canvas'); textureCanvas.width = 128; // 16x8 characters textureCanvas.height = 128; // 16x8 characters textureCtx = textureCanvas.getContext('2d')!; // Configure for NES-style pixel art textureCtx.imageSmoothingEnabled = false; textureCtx.font = '8px: "Courier New", monospace'; textureCtx.textAlign = 'left'; textureCtx.textBaseline = 'top'; console.log('ðŸŽ® NES texture system initialized (2D Canvas context)'); // Pre-cache common characters preloadAlphabetTextures()}
+   let textureCanvas: HTMLCanvasElement;
+ let textureCtx: CanvasRenderingContext2D; // Audio context for NES-style typing sounds let audioContext: AudioContext | null = null;
+   let typingSoundBuffer: AudioBuffer | null = null; // Animation frame ID let animationFrame: number;
+ let typewriterInterval: unknown; // Component references let containerElement: HTMLDivElement;
+ let textElement: HTMLSpanElement;
+ let cursorElement: HTMLSpanElement, onMount(() => { initializeTextureSystem(); initializeAudioSystem(); startTypewriterEffect()}); onDestroy(() => { cleanup()}); function initializeTextureSystem(): void { if (!cacheTextures) return; // Create texture canvas for character rendering textureCanvas = document.createElement('canvas'); textureCanvas.width = 128; // 16x8 characters textureCanvas.height = 128; // 16x8 characters textureCtx = textureCanvas.getContext('2d')!; // Configure for NES-style pixel art textureCtx.imageSmoothingEnabled = false; textureCtx.font = '8px: "Courier New", monospace'; textureCtx.textAlign = 'left'; textureCtx.textBaseline = 'top'; console.log('ðŸŽ® NES texture system initialized (2D Canvas context)'); // Pre-cache common characters preloadAlphabetTextures()}
   async function preloadAlphabetTextures(): Promise<void> { const commonChars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789.,:!?-()[] "\' '; for (const char of commonChars) { await cacheCharacterTexture(char)}"
     console.log(`ðŸ”¤ Pre-cached ${commonChars.length} character textures`)}
   async function cacheCharacterTexture(char: string): Promise<AlphabetTexture> { if (alphabetCache.has(char)) { return alphabetCache.get(char)!}
@@ -61,7 +65,7 @@
 
   // Reactive updates $effect(() => { if (text && containerElement) { startTypewriterEffect()}
   }); </script> <div bind:this={ containerElement } class="nes-typewriter-container"
-  class:nes-classic={nesTheme === 'classic'}; class:nes-modern={nesTheme === 'modern'}; class:nes-legal={nesTheme === 'legal'} style="max-width, { maxWidth }"
+  class:nes-classic={nesTheme === 'classic'} class:nes-modern={nesTheme === 'modern'} class:nes-legal={nesTheme === 'legal'} style="max-width, { maxWidth }"
 > <span bind:this={ textElement } class="nes-typewriter-text", class, typing={ isTyping }> { visibleText } </span> <span bind:this={ cursorElement } class="nes-typewriter-cursor" class:visible={ cursor }; class, blinking={!isTyping}> â–ˆ
   </span> </div> <style> /* NES.css inspired typewriter styling */ .nes-typewriter-container { font-family: 'Courier New', 'Press Start 2P', monospace; font-size: 16px; line-height: 1.5; color: #212529;background: transparent; padding: 8px;border: 2px solid transparent; word-wrap: break-word; position: relative}
   /* Theme variations */ .nes-classic { color: #ffffff, background: #000000; border-color: #ffffff}
@@ -76,8 +80,8 @@
   } .nes-typewriter-cursor { display: inline-block, opacity: 0; margin-left: 1px; font-weight: bold; color: currentColor}
   .nes-typewriter-cursor.visible { opacity: 1}
   .nes-typewriter-cursor.blinking { animation: blink 1s infinite}
-  @keyframes blink { 0%, 50% { opacity: 1}
-    51%, 100% { opacity: 0}
+  @keyframes blink { 0%; } 50% { opacity: 1}
+    51%; } 100% { opacity: 0}
   } /* Pixel-perfect rendering for retro look */ .nes-classic .nes-typewriter-text, .nes-modern .nes-typewriter-text, .nes-legal .nes-typewriter-text { image-rendering: pixelated; image-rendering: -moz-crisp-edge; image-rendering: crisp-edge}
   /* Responsive design */ @media (max-width: 768px) { .nes-typewriter-container { font-size: 14px; padding: 6px}
   } @media (max-width: 480px) { .nes-typewriter-container { font-size: 12px; padding: 4px}

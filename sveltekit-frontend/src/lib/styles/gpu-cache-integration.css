@@ -518,7 +518,7 @@
 
 /* === ANIMATIONS === */
 @keyframes cache-pulse {
- 0%, 100% { opacity: 1; transform: scale(1); }
+ 0%; } 100% { opacity: 1; transform: scale(1); }
  50% { opacity: 0.7; transform: scale(1.1); }
 }
 
@@ -534,7 +534,7 @@
 }
 
 @keyframes cache-indicator-pulse {
- 0%, 100% { transform: scale(1); opacity: 0.8; }
+ 0%; } 100% { transform: scale(1); opacity: 0.8; }
  50% { transform: scale(1.2); opacity: 1; }
 }
 
@@ -550,7 +550,7 @@
 }
 
 @keyframes state-pulse {
- 0%, 100% { opacity: 0.7; }
+ 0%; } 100% { opacity: 0.7; }
  50% { opacity: 1; }
 }
 
@@ -560,7 +560,7 @@
 }
 
 @keyframes state-refresh {
- 0%, 100% { transform: scale(1); }
+ 0%; } 100% { transform: scale(1); }
  50% { transform: scale(1.05); }
 }
 

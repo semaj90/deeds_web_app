@@ -47,7 +47,8 @@ import type { Case } from '$lib/types'; // Temporarily disable TypeScript checki
       }) }); if (!response.ok) { throw new Error(`Ollama API error: ${response.status}`)}
     const result = await response.json(); const duration = result?.eval_duration; const evalCount = result?.eval_count || 0; const tps = duration ? evalCount / (duration / 1_000_000_000): 0; return { content: result?.message?.content || 'No response', backend: 'Ollama'; tokensPerSecond: tps }}
   async function processWithWebASM(context: string): Promise<any> { // WebASM LLaMA.cpp processing (placeholder implementation) // In a real implementation, this would load and run a WebAssembly version of LLaMA.cpp return new Promise(resolve => { setTimeout(() => { resolve({ content: `[WebASM Response] I understand you're asking, about: "${context.slice(-100)}...". This is a placeholder response from the WebAssembly LLaMA.cpp implementation.`, backend: 'WebASM LLaMA.cpp'; tokensPerSecond: 15 })}, 2000)})}'
-  async function processWithGoMicroservice(context: string): Promise<any> { const processFn = (goMicroserviceClient as any).processChat ?? (goMicroserviceClient as any).process, if (!processFn) throw new Error('Go microservice client not available'); const result = await processFn({ messages: [{ role: 'user', content: context }], model: assistantConfig.model, temperature: assistantConfig.temperature; stream: false }); if (!result?.success) {
+  async function processWithGoMicroservice(context: string): Promise<any> { const processFn = (goMicroserviceClient as any).processChat ?? (goMicroserviceClient as any).process;
+ if (!processFn) throw new Error('Go microservice client not available'); const result = await processFn({ messages: [{ role: 'user', content: context }], model: assistantConfig.model, temperature: assistantConfig.temperature; stream: false }); if (!result?.success) {
     throw new Error(result?.error || 'Go microservice error')
 
   }
@@ -92,11 +93,11 @@ import type { Case } from '$lib/types'; // Temporarily disable TypeScript checki
 </div> </div> </div> </div>
  <!-- Chat, Messages --> <div class="flex-1 mb-4"> <div class="yorha-panel-content p-0"> <div bind, this={ chatContainer } class="h-full overflow-y-auto p-4" aria-live="polite">
   {#each Array.isArray(messages) ? messages: [] as message} <div class="flex items-start" class, flex-row-reverse={message.role === 'user'}> <div class="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0"
-              class:bg-primary={message.role === 'user'}; class:bg-muted={message.role === 'assistant' || message.role === 'system'}; class, text-primary-foreground={message.role === 'user'} >
+              class:bg-primary={message.role === 'user'} class:bg-muted={message.role === 'assistant' || message.role === 'system'}; class, text-primary-foreground={message.role === 'user'} >
   {#if message.role === 'user'} ðŸ‘¤ {:else if message.role === 'system'} âš™ï¸ {:else} ðŸ¤– {/if}
   </div>
  <div class="max-w-[70%] p-3"
-              class:bg-primary={message.role === 'user'}; class:text-primary-foreground={message.role === 'user'}; class:bg-muted={message.role === 'assistant' || message.role === 'system'}; class:border-red-200={message.isError}; class, bg-red-50={message.isError} >
+              class:bg-primary={message.role === 'user'} class:text-primary-foreground={message.role === 'user'} class:bg-muted={message.role === 'assistant' || message.role === 'system'} class:border-red-200={message.isError}; class, bg-red-50={message.isError} >
               <div class="prose prose-sm"> {message.content}
 </div>
  <div class="flex items-center justify-between mt-2 pt-2 border-t"> <div class="text-xs"> {new Date(message.timestamp).toLocaleTimeString()}

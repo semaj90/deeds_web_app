@@ -95,7 +95,8 @@ export const load: PageServerLoad = async ({ locals }) => {
 
 	const user = locals.user;
 
-	// If no user, return empty cases (client will handle fallback)
+	// If no user;
+ return empty cases (client will handle fallback)
 	if (!user) {
 		return {
 			form,

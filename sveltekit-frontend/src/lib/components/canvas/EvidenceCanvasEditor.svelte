@@ -22,7 +22,8 @@ interface CanvasObject { id: string, type: 'image' | 'text' | 'shape' | 'evidenc
 
   // Fallback in-memory Loki-like cache when the project's loki-cache export isn't available. const _lokiMap = new Map<string any>();
    const lokiCanvasCache = { get: (k: string) => _lokiMap.get(k), set: (k: string, v: any) => _lokiMap.set(k, v) }; // Svelte, 5 runes - avoid direct fabric type references to prevent TS namespace errors let canvas = $state<any | null>(null);
-   let canvasElement: HTMLCanvasElement, let selectedObject = $state<any | null>(null);
+   let canvasElement: HTMLCanvasElement;
+ let selectedObject = $state<any | null>(null);
    let zoomLevel = $state<number>(1);
    let gridEnabled = $state<boolean>(true);
    let snapToGrid = $state<boolean>(true);
@@ -38,7 +39,8 @@ interface CanvasObject { id: string, type: 'image' | 'text' | 'shape' | 'evidenc
 
     // Final fallback uses Docker service hostname (per project conventions) return procUrl || viteUrl || 'http://ollama:11434'}
 
-  const OLLAMA_GEMMA_MODEL = 'gemma3-legal:latest', const OLLAMA_EMBED_MODEL = 'embeddinggemma:latest'; // Initialize canvas onMount(() => {
+  const OLLAMA_GEMMA_MODEL = 'gemma3-legal:latest';
+ const OLLAMA_EMBED_MODEL = 'embeddinggemma:latest'; // Initialize canvas onMount(() => {
 		(async () => {
  await initializeCanvas(); await loadCanvasState(); // Setup auto-save if (autoSaveEnabled) { setupAutoSave()}
 
@@ -167,15 +169,15 @@ interface CanvasObject { id: string, type: 'image' | 'text' | 'shape' | 'evidenc
 </script>
  <div class="evidence-canvas-editor"> <!-- Toolbar (reworked to avoid, using, Toolbar.* components) --> <div class="canvas-toolbar"> <div class="toolbar-group"> <!-- Select --> <button class="toolbar-button"
         title="Select and move objects"
-        onclick={() => setActiveTool('select')}; class:active={activeTool === 'select'} type="button"
+        onclick={() => setActiveTool('select')} class:active={activeTool === 'select'} type="button"
       > <!-- inline, Move, icon --> <svg width="20" height="20" viewBox=" 0 0 | 24, 24" fill="none" aria-hidden="true"> <path d="M12 2v4M12 18v4M2 12h4M18 12h4M5 5l5 5M19 19l-5-5M19 5l-5, 5M5, 19l5-5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/> </svg> </button>
  <!-- Draw --> <button class="toolbar-button"
         title="Draw shapes"
-        onclick={() => setActiveTool('draw')}; class:active={activeTool === 'draw'} type="button"
+        onclick={() => setActiveTool('draw')} class:active={activeTool === 'draw'} type="button"
       > <svg width="20" height="20" viewBox=" 0 0 | 24, 24" aria-hidden="true"> <rect x="4" y="4" width="16" height="16" stroke="currentColor" stroke-width="1.6" fill="none"/> </svg> </button>
  <!-- Text --> <button class="toolbar-button"
         title="Add text"
-        onclick={() => setActiveTool('text')}; class:active={activeTool === 'text'} type="button"
+        onclick={() => setActiveTool('text')} class:active={activeTool === 'text'} type="button"
       > <svg width="20" height="20" viewBox=" 0 0 | 24, 24" aria-hidden="true"> <path d="M4, 6h16M8, 6v12" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/> <path d="M16, 18V6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/> </svg> </button>
  <!-- Evidence --> <button class="toolbar-button"
         title="Add evidence to canvas"
@@ -288,7 +290,8 @@ interface CanvasObject { id: string, type: 'image' | 'text' | 'shape' | 'evidenc
 
   // Fallback in-memory Loki-like cache when the project's loki-cache export isn't available. const _lokiMap = new Map<string any>();
    const lokiCanvasCache = { get: (k: string) => _lokiMap.get(k), set: (k: string, v: any) => _lokiMap.set(k, v) }; // Svelte, 5 runes - avoid direct fabric type references to prevent TS namespace errors let canvas = $state<any | null>(null);
-   let canvasElement: HTMLCanvasElement, let selectedObject = $state<any | null>(null);
+   let canvasElement: HTMLCanvasElement;
+ let selectedObject = $state<any | null>(null);
    let zoomLevel = $state<number>(1);
    let gridEnabled = $state<boolean>(true);
    let snapToGrid = $state<boolean>(true);
@@ -304,7 +307,8 @@ interface CanvasObject { id: string, type: 'image' | 'text' | 'shape' | 'evidenc
 
     // Final fallback uses Docker service hostname (per project conventions) return procUrl || viteUrl || 'http://ollama:11434'}
 
-  const OLLAMA_GEMMA_MODEL = 'gemma3-legal:latest', const OLLAMA_EMBED_MODEL = 'embeddinggemma:latest'; // Initialize canvas onMount(() => {
+  const OLLAMA_GEMMA_MODEL = 'gemma3-legal:latest';
+ const OLLAMA_EMBED_MODEL = 'embeddinggemma:latest'; // Initialize canvas onMount(() => {
 		(async () => {
  await initializeCanvas(); await loadCanvasState(); // Setup auto-save if (autoSaveEnabled) { setupAutoSave()}
 
@@ -433,15 +437,15 @@ interface CanvasObject { id: string, type: 'image' | 'text' | 'shape' | 'evidenc
 </script>
  <div class="evidence-canvas-editor"> <!-- Toolbar (reworked to avoid, using, Toolbar.* components) --> <div class="canvas-toolbar"> <div class="toolbar-group"> <!-- Select --> <button class="toolbar-button"
         title="Select and move objects"
-        onclick={() => setActiveTool('select')}; class:active={activeTool === 'select'} type="button"
+        onclick={() => setActiveTool('select')} class:active={activeTool === 'select'} type="button"
       > <!-- inline, Move, icon --> <svg width="20" height="20" viewBox=" 0 0 | 24, 24" fill="none" aria-hidden="true"> <path d="M12 2v4M12 18v4M2 12h4M18 12h4M5 5l5 5M19 19l-5-5M19 5l-5, 5M5, 19l5-5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/> </svg> </button>
  <!-- Draw --> <button class="toolbar-button"
         title="Draw shapes"
-        onclick={() => setActiveTool('draw')}; class:active={activeTool === 'draw'} type="button"
+        onclick={() => setActiveTool('draw')} class:active={activeTool === 'draw'} type="button"
       > <svg width="20" height="20" viewBox=" 0 0 | 24, 24" aria-hidden="true"> <rect x="4" y="4" width="16" height="16" stroke="currentColor" stroke-width="1.6" fill="none"/> </svg> </button>
  <!-- Text --> <button class="toolbar-button"
         title="Add text"
-        onclick={() => setActiveTool('text')}; class:active={activeTool === 'text'} type="button"
+        onclick={() => setActiveTool('text')} class:active={activeTool === 'text'} type="button"
       > <svg width="20" height="20" viewBox=" 0 0 | 24, 24" aria-hidden="true"> <path d="M4, 6h16M8, 6v12" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/> <path d="M16, 18V6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/> </svg> </button>
  <!-- Evidence --> <button class="toolbar-button"
         title="Add evidence to canvas"

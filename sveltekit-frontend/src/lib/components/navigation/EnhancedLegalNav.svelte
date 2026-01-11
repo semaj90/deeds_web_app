@@ -45,7 +45,7 @@
   .loading-shimmer { display: flex; gap: 0.75rem}
   .shimmer-case { width: 120px; height: 32px;background: linear-gradient(90deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05) ); border-radius: 16px; animation: shimmer 1.5s infinite}
   @keyframes shimmer { 0% { transform: translateX(-100%) } 100% { transform: translateX(100%) } }
-  @keyframes pulse { 0%, 100% { opacity: 1} 50% { opacity: 0.5} }
+  @keyframes pulse { 0%; } 100% { opacity: 1} 50% { opacity: 0.5} }
   /* NES-style scrollbar */ .cases-container::-webkit-scrollbar { height: 4px}
   .cases-container::-webkit-scrollbar-track { background: rgba(0, 0, 0, 0.2)}
   .cases-container::-webkit-scrollbar-thumb { background: var(--nes-primary); border-radius: 2px}

@@ -80,7 +80,8 @@
    const minutes = Math.floor(seconds / 60); if (minutes > 0) { return `${ minutes }m ${seconds % 60}s`}
     return `${ seconds }s`}
   function downloadResults() { const results = selectedProvider === 'autogen'
-      ? conversationMessages: executionResult, const blob = new Blob([JSON.stringify(results, null, 2)], { type: 'application/json'
+      ? conversationMessages: executionResult;
+ const blob = new Blob([JSON.stringify(results, null, 2)], { type: 'application/json'
     });
    const url = URL.createObjectURL(blob);
    const a = document.createElement('a'); a.href = url; a.download = `${ selectedWorkflow }_${ selectedProvider }_results.json`; document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url)}

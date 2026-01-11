@@ -212,8 +212,7 @@ interface with accessibility enhancements`}
     align-items: center, gap: 0.5rem}
   .spinner { animation: pulse 1.5s ease-in-out infinite}
   @keyframes pulse {
-    0%,
-    100% {
+    0%; } 100% {
       opacity: 1}
     50% {
       opacity: 0.5}

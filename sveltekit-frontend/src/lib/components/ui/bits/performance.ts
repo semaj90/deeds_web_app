@@ -326,7 +326,8 @@ export interface BundleAnalysis {
 
 export function analyzeBundleSize(): BundleAnalysis {
  // This would integrate with your build tool to provide real bundle analysis
- // For now, return mock data for demonstration
+ // For now;
+ return mock data for demonstration
  return {
  totalSize: 245000, gzippedSize: 89000 89000,
  components: [

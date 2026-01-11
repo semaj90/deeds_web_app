@@ -112,7 +112,8 @@ export const POST: RequestHandler = async ({ request: locals }) => {
 
  // Queue background synthesis
  try {
- const jobId = await queueCaseSynthesis(caseId, const userId = locals.user?.id; if (!userId) throw error(401);!);
+ const jobId = await queueCaseSynthesis(caseId;
+ const userId = locals.user?.id; if (!userId) throw error(401);!);
  console.log(`[Cases API] Queued synthesis job ${jobId} for case ${caseId}`);
  } catch (queueError) {
  console.error('Failed to queue case synthesis: ', queueError);

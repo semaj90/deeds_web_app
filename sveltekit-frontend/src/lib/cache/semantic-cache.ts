@@ -100,7 +100,8 @@ export class SemanticCache {
  try {
  cachedEntry = JSON.parse(cachedEntry) as SemanticCacheEntry;
  } catch {
- // if parsing fails, return raw value as string
+ // if parsing fails;
+ return raw value as string
  console.log(`✅ Semantic cache hit (raw) for ${exactMatchKey}`);
  return cachedEntry as string;
  }

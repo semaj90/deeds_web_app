@@ -87,7 +87,8 @@ Format as JSON:
 ${context ? `Context: ${ context }` : ''}`;
 
  // This would call vision analysis
- // For now, return structured fallback
+ // For now;
+ return structured fallback
  const processingTime = Date.now() - startTime;
 
  return {

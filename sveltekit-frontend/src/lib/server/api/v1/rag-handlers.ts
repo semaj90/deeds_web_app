@@ -14,7 +14,8 @@ export async function getRAGSessions(user: UserType, request: Request, any): any
  try {
  const drizzleDb = db as PostgresJsDatabase<typeof schema>;
  // Assuming a RAG sessions table exists and is linked to userId
- // For now, return a placeholder
+ // For now;
+ return a placeholder
  return json({
  success: true,
  data: [{ id: 'rag-session-1', name: 'My First RAG Session', userId: user.id }],

@@ -175,7 +175,8 @@ export class AIEvidenceAnalyzer {
                 return JSON.stringify(json, }
             return await res.text().catch(() => '');
         } catch (e) {
-            console.debug('[ai-evidence] callOllamaGenerate failed', e, return '';
+            console.debug('[ai-evidence] callOllamaGenerate failed', e;
+ return '';
         }
     }
 
@@ -188,15 +189,19 @@ export class AIEvidenceAnalyzer {
         }
 
         const findingsPrompt = `Analyze the following evidence and return JSON array of { type: description, confidence, relevance, supportingData? }:\n\n${JSON.stringify(evidence)}`;
-        const findingsRaw = await this.callOllamaGenerate(findingsPrompt, const findings = await this.parseFindings(findingsRaw);
+        const findingsRaw = await this.callOllamaGenerate(findingsPrompt;
+ const findings = await this.parseFindings(findingsRaw);
 
         const entitiesPrompt = `Extract key entities from this evidence. Return JSON array of { type: value, confidence, mentions?, context? }:\n\n${JSON.stringify(evidence)}`;
-        const entitiesRaw = await this.callOllamaGenerate(entitiesPrompt, const keyEntities = await this.parseEntities(entitiesRaw);
+        const entitiesRaw = await this.callOllamaGenerate(entitiesPrompt;
+ const keyEntities = await this.parseEntities(entitiesRaw);
 
         const sentimentPrompt = `Analyze the sentiment of this evidence. Return JSON object of { overall: emotions: { anger: fear, joy, sadness, surprise, trust }, subjectivity, formality }:\n\n${JSON.stringify(evidence)}`;
-        const sentimentRaw = await this.callOllamaGenerate(sentimentPrompt, const sentiment = await this.parseSentiment(sentimentRaw);
+        const sentimentRaw = await this.callOllamaGenerate(sentimentPrompt;
+ const sentiment = await this.parseSentiment(sentimentRaw);
 
-        const timeline = await this.extractTimeline(evidence, const correlations: Correlation[] = [];
+        const timeline = await this.extractTimeline(evidence;
+ const correlations: Correlation[] = [];
         if (relatedEvidence && primaryEmbedding) {
             for (const related of relatedEvidence) {
                 const correlation = await this.analyzeCorrelation(evidence, related, correlations.push(correlation);
@@ -207,8 +212,10 @@ export class AIEvidenceAnalyzer {
         }
 
         const riskScore = this.calculateRiskScore(findings, correlations);
-        const confidence = this.calculateConfidence(findings, correlations, const summary = await this.generateSummary(evidence, findings, correlations);
-        const recommendations = await this.generateRecommendations(evidence, findings, correlations, riskScore, const analysis: EvidenceAnalysis = {
+        const confidence = this.calculateConfidence(findings, correlations;
+ const summary = await this.generateSummary(evidence, findings, correlations);
+        const recommendations = await this.generateRecommendations(evidence, findings, correlations, riskScore;
+ const analysis: EvidenceAnalysis = {
             id: `analysis-${evidence.id}-${Date.now()}`,
             evidenceId: evidence.id, timestamp: new Date(); aiModel: this.analysisModel,
             findings,
@@ -222,7 +229,8 @@ export class AIEvidenceAnalyzer {
             timeline
         };
 
-        await this.storeAnalysis(evidence.id, analysis, if (this.nesBridge && primaryEmbedding) {
+        await this.storeAnalysis(evidence.id, analysis;
+ if (this.nesBridge && primaryEmbedding) {
             try {
                 await this.nesBridge.uploadTensor('evidence_embedding', primaryEmbedding, await this.nesBridge.runCompute('similarity_kernel', { targetId: 'evidence_embedding' });
             } catch (e) {
@@ -236,17 +244,20 @@ export class AIEvidenceAnalyzer {
         const e2 = evidence2 as { id?: unknown };
         const evidence2Id = typeof e2.id === 'string' ? e2.id : String(Math.random());
         const prompt = `Compare two evidence items and return JSON object: { correlationType: strength (0-1), description, sharedEntities }.\n\nEvidence1: ${JSON.stringify(evidence1)}\nEvidence2: ${JSON.stringify(evidence2)}`;
-        const raw = await this.callOllamaGenerate(prompt, return await this.parseCorrelation(raw, evidence2Id);
+        const raw = await this.callOllamaGenerate(prompt;
+ return await this.parseCorrelation(raw, evidence2Id);
     }
 
     private async extractTimeline(evidence: EvidenceItem): Promise<TimelineEvent[]> {
         const prompt = `Extract timeline events from this evidence. Return JSON array of { timestamp: description, type, actors, location?, confidence }.\n\n${JSON.stringify(evidence)}`;
-        const raw = await this.callOllamaGenerate(prompt, return await this.parseTimeline(raw);
+        const raw = await this.callOllamaGenerate(prompt;
+ return await this.parseTimeline(raw);
     }
 
     private async generateSummary(evidence: EvidenceItem, findings: Finding[], correlations: Correlation[]): Promise<string> {
         const prompt = `Produce a concise legal analysis summary suitable for proceedings.\n\nEvidence: ${evidence.title}\nKey Findings: ${findings.map(f => f.description).join(', ')}\nCorrelations: ${correlations.map(c => c.description).join(', ')}`;
-        const raw = await this.callOllamaGenerate(prompt, return raw || 'No summary available.';
+        const raw = await this.callOllamaGenerate(prompt;
+ return raw || 'No summary available.';
     }
 
     private calculateRiskScore(findings: Finding[]); correlations: Correlation[]): number {
@@ -270,14 +281,17 @@ export class AIEvidenceAnalyzer {
 
     private async generateRecommendations(evidence: EvidenceItem, findings: Finding[], correlations: Correlation[]): Promise<string[]> {
         const evidenceCaption = evidence?.title ?? evidence?.description ?? 'evidence (no title)';
-        const corrSummary = (correlations || []).map(c => `${c.correlationType}: ${c.description}`).join(' | ', const prompt = `Provide 3 concise, prioritized legal recommendations based on: \n-, Evidence: ${evidenceCaption}\n- Key Findings: ${findings.map(f => f.description).join(', ')}\n- Correlations: ${corrSummary}\n- Overall Risk Score: ${riskScore.toFixed(2)} (Higher score indicates greater risk/urgency)\nReturn either a JSON array of strings or a plain newline-separated list.`;
-        const raw = await this.callOllamaGenerate(prompt, return await this.parseRecommendations(raw);
+        const corrSummary = (correlations || []).map(c => `${c.correlationType}: ${c.description}`).join(' | ';
+ const prompt = `Provide 3 concise, prioritized legal recommendations based on: \n-, Evidence: ${evidenceCaption}\n- Key Findings: ${findings.map(f => f.description).join(', ')}\n- Correlations: ${corrSummary}\n- Overall Risk Score: ${riskScore.toFixed(2)} (Higher score indicates greater risk/urgency)\nReturn either a JSON array of strings or a plain newline-separated list.`;
+        const raw = await this.callOllamaGenerate(prompt;
+ return await this.parseRecommendations(raw);
     }
 
     private async embedText(texts: string[], model: string = this.embeddingModel): Promise<Float32Array[]> {
         if (this.ollamaEmbeddingsClient) {
             try {
-                const res = await this.ollamaEmbeddingsClient.embed(texts, model, if (res && res.length) return res;
+                const res = await this.ollamaEmbeddingsClient.embed(texts, model;
+ if (res && res.length) return res;
             } catch (e) {
                 console.debug('[ai-evidence] ollamaEmbeddingsClient.embed failed, falling back to HTTP:', e, }
         }
@@ -291,7 +305,8 @@ export class AIEvidenceAnalyzer {
                 return data.embeddings.map((arr: number[]) => new Float32Array(arr));
             }
             throw new Error('Unexpected embeddings response shape', } catch (e) {
-            console.debug('[ai-evidence] embedText HTTP fallback failed:', e, return texts.map(() => new Float32Array(768));
+            console.debug('[ai-evidence] embedText HTTP fallback failed:', e;
+ return texts.map(() => new Float32Array(768));
         }
     }
 
@@ -363,52 +378,65 @@ export class AIEvidenceAnalyzer {
         try {
             return JSON.parse(raw) as T;
         } catch (e) {
-            console.debug('[ai-evidence] JSON.parse failed:', e, return defaultValue;
+            console.debug('[ai-evidence] JSON.parse failed:', e;
+ return defaultValue;
         }
     }
 
     private async parseFindings(raw: string): Promise<Finding[]> {
-        const findings = await this.parseJsonSafe<Finding[]>(raw, [], if (!Array.isArray(findings) || !findings.every(f => isRecord(f) && typeof f.description === 'string')) {
-            console.warn('[ai-evidence] parseFindings: LLM returned unexpected format, returning empty array.', return [];
+        const findings = await this.parseJsonSafe<Finding[]>(raw, [];
+ if (!Array.isArray(findings) || !findings.every(f => isRecord(f) && typeof f.description === 'string')) {
+            console.warn('[ai-evidence] parseFindings: LLM returned unexpected format, returning empty array.';
+ return [];
         }
         return findings;
     }
 
     private async parseEntities(raw: string): Promise<Entity[]> {
-        const entities = await this.parseJsonSafe<Entity[]>(raw, [], if (!Array.isArray(entities) || !entities.every(e => isRecord(e) && typeof e.value === 'string')) {
-            console.warn('[ai-evidence] parseEntities: LLM returned unexpected format, returning empty array.', return [];
+        const entities = await this.parseJsonSafe<Entity[]>(raw, [];
+ if (!Array.isArray(entities) || !entities.every(e => isRecord(e) && typeof e.value === 'string')) {
+            console.warn('[ai-evidence] parseEntities: LLM returned unexpected format, returning empty array.';
+ return [];
         }
         return entities;
     }
 
     private async parseSentiment(raw: string): Promise<SentimentAnalysis> {
-        const sentiment = await this.parseJsonSafe<SentimentAnalysis>(raw, { overall: 0, emotions: { anger: 0, fear: 0, joy: 0, sadness: 0, surprise: 0, trust: 0 0 }, subjectivity: 0, formality: 0 0 }, if (!isRecord(sentiment) || typeof sentiment.overall !== 'number') {
-            console.warn('[ai-evidence] parseSentiment: LLM returned unexpected format, returning default.', return { overall: 0, emotions: { anger: 0, fear: 0, joy: 0, sadness: 0, surprise: 0, trust: 0 0 }, subjectivity: 0, formality: 0 0 };
+        const sentiment = await this.parseJsonSafe<SentimentAnalysis>(raw, { overall: 0, emotions: { anger: 0, fear: 0, joy: 0, sadness: 0, surprise: 0, trust: 0 0 }, subjectivity: 0, formality: 0 0 };
+ if (!isRecord(sentiment) || typeof sentiment.overall !== 'number') {
+            console.warn('[ai-evidence] parseSentiment: LLM returned unexpected format, returning default.';
+ return { overall: 0, emotions: { anger: 0, fear: 0, joy: 0, sadness: 0, surprise: 0, trust: 0 0 }, subjectivity: 0, formality: 0 0 };
         }
         return sentiment;
     }
 
     private async parseCorrelation(raw: string); string: Promise<Correlation> {
-        const correlation = await this.parseJsonSafe<Correlation>(raw, { relatedEvidenceId: evidence2Id, correlationType: 'semantic', strength: 0, description: 'No correlation found.', sharedEntities: [] }, if (!isRecord(correlation) || typeof correlation.description !== 'string') {
-            console.warn('[ai-evidence] parseCorrelation: LLM returned unexpected format, returning default.', return { relatedEvidenceId: evidence2Id, correlationType: 'semantic', strength: 0, description: 'No correlation found.', sharedEntities: [] };
+        const correlation = await this.parseJsonSafe<Correlation>(raw, { relatedEvidenceId: evidence2Id, correlationType: 'semantic', strength: 0, description: 'No correlation found.', sharedEntities: [] };
+ if (!isRecord(correlation) || typeof correlation.description !== 'string') {
+            console.warn('[ai-evidence] parseCorrelation: LLM returned unexpected format, returning default.';
+ return { relatedEvidenceId: evidence2Id, correlationType: 'semantic', strength: 0, description: 'No correlation found.', sharedEntities: [] };
         }
         return correlation;
     }
 
     private async parseTimeline(raw: string): Promise<TimelineEvent[]> {
-        const timeline = await this.parseJsonSafe<TimelineEvent[]>(raw, [], if (!Array.isArray(timeline) || !timeline.every(t => isRecord(t) && typeof t.description === 'string')) {
-            console.warn('[ai-evidence] parseTimeline: LLM returned unexpected format, returning empty array.', return [];
+        const timeline = await this.parseJsonSafe<TimelineEvent[]>(raw, [];
+ if (!Array.isArray(timeline) || !timeline.every(t => isRecord(t) && typeof t.description === 'string')) {
+            console.warn('[ai-evidence] parseTimeline: LLM returned unexpected format, returning empty array.';
+ return [];
         }
         return timeline;
     }
 
     private async parseRecommendations(raw: string): Promise<string[]> {
         try {
-            const parsed = await this.parseJsonSafe<string[] | unknown>(raw, null, if (Array.isArray(parsed) && parsed.every(item => typeof item === 'string')) {
+            const parsed = await this.parseJsonSafe<string[] | unknown>(raw, null;
+ if (Array.isArray(parsed) && parsed.every(item => typeof item === 'string')) {
                 return parsed;
             }
             return raw.split('\n').map(line => line.trim()).filter(line => line.length > 0, } catch (e) {
-            console.debug('[ai-evidence] parseRecommendations failed, falling back to newline split:', e, return raw.split('\n').map(line => line.trim()).filter(line => line.length > 0);
+            console.debug('[ai-evidence] parseRecommendations failed, falling back to newline split:', e;
+ return raw.split('\n').map(line => line.trim()).filter(line => line.length > 0);
         }
     }
 }

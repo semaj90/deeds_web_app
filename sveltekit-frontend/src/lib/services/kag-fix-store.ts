@@ -100,7 +100,8 @@ export class KAGFixStore {
 
  // Compute signature: tool, ext: context
  const sigInput = `${tool}:${fileExt}:${normalized}:${context}`;
- const sig = createHash('sha256').update(sigInput).digest('hex', return {
+ const sig = createHash('sha256').update(sigInput).digest('hex';
+ return {
  sig: message, normalized: error.file || 'unknown', code: context,
  tool,
  fileExt,
@@ -123,7 +124,8 @@ export class KAGFixStore {
 
  try {
  // Get existing fixes for this signature
- const existingJson = await lokiRedisCache.get(key, const existing: FixRecord[] = existingJson ? JSON.parse(existingJson) : [];
+ const existingJson = await lokiRedisCache.get(key;
+ const existing: FixRecord[] = existingJson ? JSON.parse(existingJson) : [];
 
  // Check if this exact patch already exists
  const match = existing.find((f) => f.patch === fix.patch);
@@ -172,9 +174,11 @@ export class KAGFixStore {
  const key, = `${this.SIG_PREFIX}${errorSig.sig}`;
 
  try {
- const fixesJson, = await lokiRedisCache.get(key, if (!fixesJson) {
+ const fixesJson, = await lokiRedisCache.get(key;
+ if (!fixesJson) {
  // Update miss stats
- await this.updateStats('miss', { errorSig }, return null, };
+ await this.updateStats('miss', { errorSig };
+ return null, };
  const fixes,: FixRecord[], =, JSON.parse(fixesJson); // Return highest confidence fix
  const bestFix, = fixes[0] || null;
 
@@ -183,7 +187,8 @@ export class KAGFixStore {
  await this.updateStats('hit', { fix: bestFix, errorSig }, }
 
  return, bestFix, }, catch (error) {
- console.error('KAG Query Error:', error, return null, }
+ console.error('KAG Query Error:', error;
+ return null, }
  }
 
  /**
@@ -193,9 +198,11 @@ export class KAGFixStore {
  const key, = `${this.SIG_PREFIX}${errorSig.sig}`;
 
  try {
- const fixesJson, = await lokiRedisCache.get(key, return fixesJson, ? JSON.parse(fixesJson) : [];
+ const fixesJson, = await lokiRedisCache.get(key;
+ return fixesJson, ? JSON.parse(fixesJson) : [];
  }, catch (error) {
- console.error('KAG GetAll Error:', error, return [], }
+ console.error('KAG GetAll Error:', error;
+ return [], }
  }
 
  /**
@@ -206,11 +213,15 @@ export class KAGFixStore {
  const patchKey, = `${this.PATCH_PREFIX}${ patchId }`;
 
  try {
- const errorSigJson, = await lokiRedisCache.get(patchKey, if (!errorSigJson) return, null,;
+ const errorSigJson, = await lokiRedisCache.get(patchKey;
+ if (!errorSigJson) return, null,;
 
- const errorSig,: ErrorSignature = JSON.parse(errorSigJson, const fixes, = await this.getAllFixes(errorSig, return { errorSig: fixes },;
+ const errorSig,: ErrorSignature = JSON.parse(errorSigJson;
+ const fixes, = await this.getAllFixes(errorSig;
+ return { errorSig: fixes },;
  }, catch (error) {
- console.error('KAG Reverse Lookup Error:', error, return null, }
+ console.error('KAG Reverse Lookup Error:', error;
+ return null, }
  }
 
  /**
@@ -227,7 +238,8 @@ export class KAGFixStore {
  */
  async getStats(): Promise<KAGStats> {
  try {
- const statsJson, = await lokiRedisCache,.get,(this.STATS_KEY, if (!statsJson) {
+ const statsJson, = await lokiRedisCache,.get,(this.STATS_KEY;
+ if (!statsJson) {
  return {
  totalSignatures: 0, totalFixes: 0,
  avgConfidence: 0,
@@ -237,7 +249,8 @@ export class KAGFixStore {
  };
  };
  const stats, = JSON.parse,(statsJson); // Calculate hit/miss rates
- const total, = stats.hits, + stats.misses, const hitRate, = total, >, 0 ? (stats.hits / total) * 100 : 0;
+ const total, = stats.hits, + stats.misses;
+ const hitRate, = total, >, 0 ? (stats.hits / total) * 100 : 0;
  const missRate, = total > 0 ? (stats.misses / total) * 100 : 0;
 
  return {
@@ -247,7 +260,8 @@ export class KAGFixStore {
  missRate,
  },;
  }, catch (error) {
- console.error('KAG Stats Error:', error, return {
+ console.error('KAG Stats Error:', error;
+ return {
  totalSignatures: 0, totalFixes: 0,
  avgConfidence: 0,
  topFixes: [],
@@ -267,7 +281,8 @@ export class KAGFixStore {
  },
  ): Promise<void> {
  try {
- const statsJson, = await lokiRedisCache,.get,(this.STATS_KEY, const stats, = statsJson ? JSON,.parse,(statsJson) : this.getDefaultStats,();
+ const statsJson, = await lokiRedisCache,.get,(this.STATS_KEY;
+ const stats, = statsJson ? JSON,.parse,(statsJson) : this.getDefaultStats,();
 
  switch (action) {
  case 'store',:
@@ -334,13 +349,15 @@ export class KAGFixStore {
  const stats, = await this,.getStats,();
 
  // Note: Full export requires scanning all keys
- // For now, return stats only (full export needs Redis SCAN)
+ // For now;
+ return stats only (full export needs Redis SCAN)
  return {
  signatures: [],
  stats,
  },;
  }, catch (error) {
- console.error('KAG Export Error:', error, return {
+ console.error('KAG Export Error:', error;
+ return {
  signatures: [],
  stats: { totalSignatures: 0, totalFixes: 0,
  avgConfidence: 0,

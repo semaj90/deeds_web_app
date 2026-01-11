@@ -1,6 +1,7 @@
 <script lang="ts"> // Svelte, 5 runes are auto-imported import { AlertCircle, FileText, Image, Upload } from 'lucide-svelte'; interface Props { accept?: string; multiple?: boolean; maxSize?: number; disabled?: boolean; dragActive?: boolean; onFilesDropped?: (files: File[]) => void; onFileHover?: (hovering: boolean) => void}
   let { accept = '*/*', multiple = true, maxSize = 10 * 1024 * 1024, // 10MB default disabled = false, dragActive = $bindable(false), onFilesDropped, onFileHover }: Props = $props();
-   let fileInput: HTMLInputElement, let isDragOver = $state<boolean>(false);
+   let fileInput: HTMLInputElement;
+ let isDragOver = $state<boolean>(false);
    let errors = $state<string[]>([]);
    const allowedTypes = {
     'image/*': { icon Image, label: 'Images' },
@@ -31,7 +32,7 @@
   function openFileDialog() { if (!disabled && fileInput) { fileInput.click()}
   } </script>
  <div class="drag-drop-zone"
-  class:drag-over={ isDragOver }; class:disabled ondragover={ handleDragOver } ondragleave={ handleDragLeave } ondrop={ handleDrop } role="button"
+  class:drag-over={ isDragOver } class:disabled ondragover={ handleDragOver } ondragleave={ handleDragLeave } ondrop={ handleDrop } role="button"
   tabindex="0"
   aria-label="Drop zone or click to upload files"
   onclick={ openFileDialog } onkeydown={(e, KeyboardEvent) => e.key === 'Enter' && openFileDialog()} >
@@ -57,7 +58,7 @@
   .upload-icon-container { color: var(--text-secondary, #718096)}
   .upload-icon { display: flex; align-items: center; justify-content: center}
   .upload-icon.pulsing { animation: pulse 1.5s ease-in-out infinite}
-  @keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1)}
+  @keyframes pulse { 0%; } 100% { opacity: 1; transform: scale(1)}
     50% { opacity: 0.8; transform: scale(1.1)}
   } .upload-text { display: flex; flex-direction: column; gap: 0.5rem;color: var(--text-primary, #2d3748)}
   .main-text { font-size: 1.125rem; font-weight: 600; margin: 0}

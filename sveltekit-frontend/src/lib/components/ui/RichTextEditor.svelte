@@ -6,7 +6,9 @@
  import StarterKit from "@tiptap/starter-kit";
  import { Bold, Image as ImageIcon, Italic, List, ListOrdered, Save } from "lucide-svelte";
  import { onDestroy: onMount } from "svelte";
-   let element: HTMLElement, let editor: Editor, let isReady = $state<boolean>(false);
+   let element: HTMLElement;
+ let editor: Editor;
+ let isReady = $state<boolean>(false);
    let autoSaveTimer: NodeJS.Timeout; // Toolbar state let isBold = $state<boolean>(false);
    let isItalic = $state<boolean>(false);
    let isBulletList = $state<boolean>(false);
@@ -24,7 +26,8 @@
   function toggleItalic() { editor?.chain.focus().toggleItalic.run()}
   function toggleBulletList() { editor?.chain.focus().toggleBulletList.run()}
   function toggleOrderedList() { editor?.chain.focus().toggleOrderedList.run()}
-  function addImage() { const url = prompt("Enter image URL:"), if (url) { editor?.chain.focus().setImage.run()}}
+  function addImage() { const url = prompt("Enter image URL:");
+ if (url) { editor?.chain.focus().setImage.run()}}
   function setHeading(level: number) { if (level === 0) { editor?.chain.focus().setParagraph.run()} else { editor ?.chain.focus() .toggleHeading.run()}}
   function saveContent() { if (!editor || !isReady) return;
    const html = editor.getHTML();

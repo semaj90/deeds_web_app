@@ -186,7 +186,8 @@ export async function ollamaEmbed(
  return mapped.slice(0, texts.length);
  }
 
- // unknown shape, return placeholders
+ // unknown shape;
+ return placeholders
  return texts.map(() => ({}) as EmbeddingResult);
  } catch (err: unknown) {
  console.error('ollamaEmbed failed: ', err);

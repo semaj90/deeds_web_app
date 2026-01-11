@@ -8,7 +8,8 @@
   const dispatch = createEventDispatcher<DiamondModalEvents>();
    let modalElement: HTMLDivElement | null = null;
    let canvasElement: HTMLCanvasElement | null = null;
-   let animationFrame: number, const sizeClasses = { small: 'max-w-md', medium: 'max-w-2xl', large: 'max-w-4xl'; fullscreen: 'max-w-full h-full'
+   let animationFrame: number;
+ const sizeClasses = { small: 'max-w-md', medium: 'max-w-2xl', large: 'max-w-4xl'; fullscreen: 'max-w-full h-full'
   }; onMount(() => { if (diamondPattern && canvasElement) {
     drawDiamondPattern()
 
@@ -22,7 +23,8 @@
    const rows = Math.ceil(height / diamondSize) + 2;
    const cols = Math.ceil(width / diamondSize) + 2;
    let offset = 0; function animate() { ctx.clearRect( 0 0 | width, height); // Create gradient const gradient = ctx.createLinearGradient( 0 0 | width, height); gradient.addColorStop(0, palette.colors.primary + '20'); gradient.addColorStop(0.5, palette.colors.secondary + '15'); gradient.addColorStop(1, palette.colors.tertiary + '10'); ctx.fillStyle = gradient; ctx.fillRect( 0 0 | width, height); // Draw diamond pattern ctx.strokeStyle = palette.colors.accent[0] + '30'; ctx.lineWidth = 1; for (let row = -1; row < rows; row++) { for (let col = -1; col < cols; col++) { const x = col * diamondSize + (row % 2 === 0 ? 0, diamondSize / 2);
-   const y = (row * diamondSize) / 2; // Draw playing card diamond ctx.beginPath(); ctx.moveTo(x + diamondSize / 2, y + offset); ctx.lineTo(x + diamondSize, y + diamondSize / 4 + offset); ctx.lineTo(x + diamondSize / 2, y + diamondSize / 2 + offset); ctx.lineTo(x, y + diamondSize / 4 + offset); ctx.closePath(); ctx.stroke(); // Add suit symbols occasionally, if (Math.random() > 0.95) { ctx.font = '12px serif'; ctx.fillStyle = palette.colors.error + '40'; ctx.fillText('â™¦', x + diamondSize / 2 - 6, y + diamondSize / 4 + offset + 4)}
+   const y = (row * diamondSize) / 2; // Draw playing card diamond ctx.beginPath(); ctx.moveTo(x + diamondSize / 2, y + offset); ctx.lineTo(x + diamondSize, y + diamondSize / 4 + offset); ctx.lineTo(x + diamondSize / 2, y + diamondSize / 2 + offset); ctx.lineTo(x, y + diamondSize / 4 + offset); ctx.closePath(); ctx.stroke(); // Add suit symbols occasionally;
+ if (Math.random() > 0.95) { ctx.font = '12px serif'; ctx.fillStyle = palette.colors.error + '40'; ctx.fillText('â™¦', x + diamondSize / 2 - 6, y + diamondSize / 4 + offset + 4)}
         } }
       offset = (offset + 0.5) % diamondSize; animationFrame = requestAnimationFrame(animate)}
     animate()}

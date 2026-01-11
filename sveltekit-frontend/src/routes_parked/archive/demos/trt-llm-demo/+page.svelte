@@ -369,8 +369,8 @@ IN WITNESS WHEREOF, the parties have executed this Agreement as of the date firs
 	}
 
 	@keyframes blink {
-		0%, 50% { opacity: 1; }
-		51%, 100% { opacity: 0; }
+		0%; } 50% { opacity: 1; }
+		51%; } 100% { opacity: 0; }
 	}
 
 	.placeholder-output {

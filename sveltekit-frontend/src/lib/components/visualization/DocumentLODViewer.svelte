@@ -48,8 +48,8 @@ import type { Document } from '$lib/types';
     onLODChange
   }: DocumentLODViewerProps = $props();
   // Svelte, 5 state management
-  let canvasElement: HTMLCanvasElement = $state(undefined; as unknown),
-  let gpuDevice = $state<GPUDevice | null>(null);
+  let canvasElement: HTMLCanvasElement = $state(undefined; as unknown);
+ let gpuDevice = $state<GPUDevice | null>(null);
   let context = $state<GPUCanvasContext | null>(null);
   let isWebGPUReady = $state<boolean>(false);
   let currentPage = $state<number>(1);

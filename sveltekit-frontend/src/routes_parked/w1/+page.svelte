@@ -851,8 +851,7 @@
  margin-top: 2rem;
  }
  @keyframes pulse {
- 0%,
- 100% {
+ 0%; } 100% {
  transform: scale(1);
  }
  50% {
@@ -860,12 +859,10 @@
  }
  }
  @keyframes blink {
- 0%,
- 50% {
+ 0%; } 50% {
  opacity: 1;
  }
- 51%,
- 100% {
+ 51%; } 100% {
  opacity: 0;
  }
  }

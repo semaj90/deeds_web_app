@@ -28,7 +28,8 @@ interface SearchSuggestion { text: string; type: 'case' | 'law' | 'evidence' | '
    let buckets = $state<string[]>([]); // Gaming UI state let gamingMode = $state<boolean>(true);
    let particleEffects = $state<boolean>(true);
    let spatialAudio = $state<boolean>(true);
-   let retroTerminalMode = $state<boolean>(false); // Drag and drop state let dropZone: HTMLElement, let dragCounter = 0; // Computed properties let totalEvidence = $derived(evidenceItems.length);
+   let retroTerminalMode = $state<boolean>(false); // Drag and drop state let dropZone: HTMLElement;
+ let dragCounter = 0; // Computed properties let totalEvidence = $derived(evidenceItems.length);
    let processingCount = $derived(evidenceItems.filter(item => item.status === 'processing').length);
    let readyCount = $derived(evidenceItems.filter(item => item.status === 'ready').length); $effect(() => { (async () => { try { await loadExistingEvidence(); await loadBuckets(); await checkServiceStatus(); startRealTimeUpdates(); // fetch current user info for namespacing uploads const meResp = await fetch('/api/v1/storage/me', { credentials: 'include' }); if (meResp.ok) { const j = await meResp.json(); (window as unknown).__CURRENT_USER_ID__ = j.userId || (window as unknown).__CURRENT_USER_ID__}
       } catch (e) { // ignore console.warn('startup error', e)}
@@ -253,8 +254,7 @@ interface SearchSuggestion { text: string; type: 'case' | 'law' | 'evidence' | '
  <!-- Gaming-Style Evidence Cards (Alternative Grid, View) --> <div class="grid grid-cols-1 md: grid-cols-2, lg:grid-cols-4 xl:grid-cols-5"
           style="display, none;"
         >
-  {#each filteredEvidence as evidence (evidence.id)} <div class="evidence-nier-bits-card" {selectedEvidence.includes(evidence.id) ? 'is-success': 'with-title'} relative";
-              class:n64-glow={gamingMode && selectedEvidence.includes(evidence.id)} class, yorha-selected={selectedEvidence.includes(evidence.id)} >
+  {#each filteredEvidence as evidence (evidence.id)} <div class="evidence-nier-bits-card" {selectedEvidence.includes(evidence.id) ? 'is-success': 'with-title'} relative" class:n64-glow={gamingMode && selectedEvidence.includes(evidence.id)} class, yorha-selected={selectedEvidence.includes(evidence.id)} >
   {#if !selectedEvidence.includes(evidence.id)} <p class="title">{getFileIcon(evidence.type)} Evidence File</p> {/if}
   <!-- Gaming-Style, Header --> <div class="flex items-center justify-between"> <div class="flex items-center gap-3 flex-1"> <!-- NES, Checkbox --> <label class="flex"> <input type="checkbox"
                       class="nes-checkbox"

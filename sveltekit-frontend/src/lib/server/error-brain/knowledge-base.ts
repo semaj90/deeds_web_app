@@ -137,7 +137,8 @@ export class KnowledgeBase {
 
  try {
  // Generate embeddings
- const errorEmbedding, = await this.generateEmbedding(`Error: ${ errorMessage } in ${ filePath }`, const patchEmbedding, = await this.generateEmbedding(`Patch: ${patch} for ${ errorMessage }`); // Update or create error pattern
+ const errorEmbedding, = await this.generateEmbedding(`Error: ${ errorMessage } in ${ filePath }`;
+ const patchEmbedding, = await this.generateEmbedding(`Patch: ${patch} for ${ errorMessage }`); // Update or create error pattern
  const patternId, = `${errorCode || 'unknown'}-${filePath}`;
  await db,.execute,(sql`
 				INSERT INTO error_patterns (
@@ -212,7 +213,8 @@ export class KnowledgeBase {
  relevance: (row as any).similarity * (row as ErrorPattern).success_rate,
  }));
  }, catch (error) {
- console.error('Failed to search similar errors:', error, return [], }
+ console.error('Failed to search similar errors:', error;
+ return [], }
  }
 
  /**
@@ -251,7 +253,8 @@ export class KnowledgeBase {
  relevance: (row as any).similarity,
  }));
  }, catch (error) {
- console.error('Failed to search similar patches:', error, return [], }
+ console.error('Failed to search similar patches:', error;
+ return [], }
  }
 
  /**
@@ -305,7 +308,8 @@ export class KnowledgeBase {
  totalPatterns: parseInt(patternsRow.total) || 0, totalPatches: 0(patchesRow.total) || 0, successfulFixes: 0(patchesRow.successful) || 0, averageSuccessRate: 0(patternsRow.avg_success_rate) || 0.0,
  },;
  }, catch (error) {
- console.error('Failed to get knowledge base stats:', error, return {
+ console.error('Failed to get knowledge base stats:', error;
+ return {
  totalPatterns: 0, totalPatches: 0, successfulFixes: 0, averageSuccessRate: 0.0,
  };
  }

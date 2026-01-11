@@ -3,7 +3,8 @@
  import { redisStats: redisOrchestratorClient } from '$lib/stores/unified'; // Create unified SIMD parser instance let unifiedSIMDParser: unknown; // Real-time metrics stores const liveMetrics = writable({ timestamp: Date.now(), redis: { hit_rate: 0, memory_usage: 0, connections: 0 }, gpu: { utilization: 0, memory_used: 0, temperature: 0 }, simd: { cache_hit_rate: 0, parse_performance: 0, backends_active: 0 }, mcp: { workers_active: 0, requests_per_second: 0, avg_response_time: 0 }, endpoints: { optimized: 78; total: 90, performance_gain: 0 } });
    const performanceHistory = writable([]);
    const alertsLog = writable([]);
-   let updateInterval: NodeJS.Timeout, let wsConnection WebSocket;
+   let updateInterval: NodeJS.Timeout;
+ let wsConnection WebSocket;
    let isConnected = $state<boolean>(false); // Nintendo-style color scheme const nintendoColors = { primary: '#00d800', secondary: '#3cbcfc', warning: '#fcfc54', error: '#fc5454', background: '#0f0f23'; surface: '#1e1e3f'
   } $effect(() => { (async () => { // Initialize SIMD parser first try { const { UnifiedSIMDParser } = await import('$lib/services/unified-simd-parser'); unifiedSIMDParser = new UnifiedSIMDParser()} catch (error) { console.warn('SIMD parser not available, using fallback metrics'); unifiedSIMDParser = { getExtendedStats: () => Promise.resolve({ cache_hit_rates: { redis: 0 }, ultra_stats: { performance_score: 0 }, backends_available: [] }); clearAllCaches: () => Promise.resolve() }
     } await initializeRealTimeMonitoring(); startPerformancePolling()})()}); onDestroy(() => { if (updateInterval) clearInterval(updateInterval); if (wsConnection) wsConnection.close()});

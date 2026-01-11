@@ -328,8 +328,7 @@
  }
  @keyframes thinking {
  0%,
- 80%,
- 100% {
+ 80%; } 100% {
  opacity: 0.3; transform: scale(0.8);
  }
  40% {

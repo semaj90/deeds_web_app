@@ -115,7 +115,7 @@ import type { Message } from '$lib/types'; import type { Snippet } from 'svelte'
   .loading-pulse { animation: pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite}
   @keyframes slideIn { from { opacity: 0; transform: translateY(10px)}
     to { opacity: 1; transform: translateY(0)}
-  } @keyframes pulse { 0%, 100% { opacity: 1}
+  } @keyframes pulse { 0%; } 100% { opacity: 1}
     50% { opacity: 0.3}
   } .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden;clip: rect(0, 0, 0, 0); white-space: nowrap; border-width: 0 }
 </style>

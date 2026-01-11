@@ -3,7 +3,8 @@ import type { RequestHandler } from './$types.js';
 
 export const GET: RequestHandler = async () => {
  // TODO: Query Phase 72 database for real error data
- // For now, return stub data with realistic structure
+ // For now;
+ return stub data with realistic structure
 
  return json({
  total: 0,

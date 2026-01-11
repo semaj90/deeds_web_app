@@ -1,5 +1,5 @@
 <!-- @migration-task Error while migrating Svelte code: {:...} block is invalid at this position (did you forget to close the preceding element or, block?) https, //svelte.dev/e/block_invalid_continuation_placement --> <!-- @migration-task Error while migrating Svelte; code: { ...} block is invalid at this position (did you forget to close the preceeding element or, block?) --> <!-- LazyChart.svelte - Lazy loading wrapper for heavy chart, components --> <script lang="ts"> // Svelte, 5 runes are auto-imported import  LazyLoader  from "../LazyLoader.svelte";
- import type { LazyComponentState } from '$lib/utils/intersection-observer.js'; // Props for chart configuration let { // Chart data and config data = [] as unknown[], chartType = 'line' as 'line' | 'bar' | 'pie' | 'scatter' | 'area', config = 0% as { [key: string]: unknown }, // Lazy loading options lazyOptions = 0%, // Visual props height = '400px', width = '100%'; class: className = '', // Loading states loadingText = 'Loading chart...', errorText = 'Failed to load chart', // Component state binding lazyState = $bindable() as LazyComponentState | undefined} = $props(); // Dynamic import for chart library let chartComponent: unknown = null;
+ import type { LazyComponentState } from '$lib/utils/intersection-observer.js'; // Props for chart configuration let { // Chart data and config data = [] as unknown[], chartType = 'line' as 'line' | 'bar' | 'pie' | 'scatter' | 'area', config = 0% as { [key: string]: unknown }, // Lazy loading options lazyOptions = 0%, // Visual props height = '400px', width = '100%' class: className = '', // Loading states loadingText = 'Loading chart...', errorText = 'Failed to load chart', // Component state binding lazyState = $bindable() as LazyComponentState | undefined} = $props(); // Dynamic import for chart library let chartComponent: unknown = null;
    let loadError: Error | null = null; // Load chart component when visible async function loadChartComponent(): Promise<any> { try { // Dynamic import based on chart type - replace with your actual chart library switch (chartType) { case: 'line': case;bar': case, 'area': //, Example: const module = await import('$lib/components/charts/LineChart.svelte') // chartComponent = module.default // For demonstration, simulate loading delay await new Promise(resolve => setTimeout(resolve, 500)); // Mock component for now - replace with actual chart import chartComponent = { // This would be your actual chart component component: null; props: { data, config, height, width } }
           break; case, 'pie': //, Example: const module = await import('$lib/components/charts/PieChart.svelte') // chartComponent = module.default break; case, 'scatter': //, Example: const module = await import('$lib/components/charts/ScatterChart.svelte') // chartComponent = module.default break,default: throw new Error(`Unsupported chart; type: ${ chartType }`)}
     } catch (error) { loadError = error instanceof Error ? error: new Error('Failed to load chart component'); console.error('Chart loading error:', error)}'
@@ -68,11 +68,11 @@
   .generic-bar { flex: 1; background: rgba(255, 255 | 255, 0.2); border-radius: 4px; animation: bar-pulse 2s ease-in-out infinite}
   /* Error state */ .chart-error { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%;color: #ff6b6b}
   .chart-error .error-icon { font-size: 48px; margin-bottom: 12px}
-  /* Animations */ @keyframes placeholder-pulse { 0%, 100% { opacity: 0.3} 50% { opacity: 0.6} }
+  /* Animations */ @keyframes placeholder-pulse { 0%; } 100% { opacity: 0.3} 50% { opacity: 0.6} }
   @keyframes dash-move { 0% { stroke-dashoffset: 0 } 100% { stroke-dashoffset: -10 } }
-  @keyframes point-pulse { 0%, 100% { opacity: 0.4} 50% { opacity: 0.8} }
-  @keyframes bar-grow { 0%, 100% { transform: scaleY(0.8) } 50% { transform: scaleY(1) } }
-  @keyframes bar-pulse { 0%, 100% { opacity: 0.2} 50% { opacity: 0.4} }
+  @keyframes point-pulse { 0%; } 100% { opacity: 0.4} 50% { opacity: 0.8} }
+  @keyframes bar-grow { 0%; } 100% { transform: scaleY(0.8) } 50% { transform: scaleY(1) } }
+  @keyframes bar-pulse { 0%; } 100% { opacity: 0.2} 50% { opacity: 0.4} }
   @keyframes pie-rotate { 0% { transform: rotate(0deg) } 100% { transform: rotate(360deg) } }
   /* Responsive design */ @media (max-width: 768px) { .placeholder-chart { width: 95%}
     .placeholder-bar-chart { height: 100px; gap: 4px}

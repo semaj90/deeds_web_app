@@ -46,7 +46,8 @@ import { AlertTriangle } from "lucide-svelte";; import { Button } from '$lib/com
  }
  async function submitReport(): Promise<any> { if (!uploadFile) return; isUploading = true; uploadProgress = 0; analysisError = null; analysisResult = null; try { const data = new FormData(); data.append('file', uploadFile); data.append('title', formData.title); data.append('documentType', formData.documentType); data.append('jurisdiction', formData.jurisdiction); data.append('caseNumber', formData.caseNumber); data.append('enableComparison', formData.enableComparison.toString()); uploadProgress = 25; toastInfo('ðŸ“„ Uploading PDF...'); const response = await fetch('/api/legal-report/analyze', { method: 'POST', body: data }); uploadProgress = 50; toastInfo('ðŸ” Extracting text with OCR...'); if (!response.ok) { const errorData = await response.json(); throw new Error(errorData.error || 'Analysis failed')}
 
- uploadProgress = 75; toastInfo('ðŸ§  Analyzing with gemma3-legal:latest...'), const result = await response.json(); uploadProgress = 100; if (result.success) { analysisResult = result.data; toastSuccess('âœ… Legal analysis complete!'); // Show summary toasts if (result.data.analysis.who.personsOfInterest.length > 0) { toastInfo(`ðŸ‘¥ Identified ${result.data.analysis.who.personsOfInterest.length} persons of interest`)}
+ uploadProgress = 75; toastInfo('ðŸ§  Analyzing with gemma3-legal:latest...');
+ const result = await response.json(); uploadProgress = 100; if (result.success) { analysisResult = result.data; toastSuccess('âœ… Legal analysis complete!'); // Show summary toasts if (result.data.analysis.who.personsOfInterest.length > 0) { toastInfo(`ðŸ‘¥ Identified ${result.data.analysis.who.personsOfInterest.length} persons of interest`)}
 
  if (result.data.comparison?.similarCases.length > 0) { toastInfo(`ðŸ“Š Found ${result.data.comparison.similarCases.length} similar cases`)}
 

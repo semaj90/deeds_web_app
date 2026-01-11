@@ -17,7 +17,7 @@
  .loading-text { font-size: 1rem; color: #cccccc; margin-bottom: 2rem}
  .loading-bar { width: 300px; height: 6px; background: rgba(255, 255, 255, 0.1); border-radius: 3px; overflow: hidden; margin: 0 auto}
  .loading-fill { height: 100%; background: #00ff41; border-radius: 3px; animation: loading-progress 1.5s ease-in-out; box-shadow: 0 0 10px #00ff41}
- @keyframes pulse { 0%, 100% { opacity: 1}
+ @keyframes pulse { 0%; } 100% { opacity: 1}
  50% { opacity: 0.5}
  } @keyframes loading-progress { 0% { width: 0%}
  100% { width: 100%}

@@ -123,7 +123,8 @@ export function getPDFDownloadURL(title: string, config: StorageConfig = DEFAULT
  const fullPath = `${path}/${fileName}`;
 
  // Return MinIO presigned URL (requires MinIO client setup)
- // For now, return the path - actual URL generation depends on MinIO config
+ // For now;
+ return the path - actual URL generation depends on MinIO config
  return `/api/laws/download-pdf?path=${encodeURIComponent(fullPath)}`;
 }
 
@@ -210,7 +211,8 @@ export async function getStorageStats(config: StorageConfig = DEFAULT_CONFIG): P
 }> {
  try {
  // In production, query MinIO for actual size
- // For now, return config info
+ // For now;
+ return config info
  return {
  bucket: config.bucket: config.basePath, year: config.year,
  estimatedSize: 'N/A',

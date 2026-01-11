@@ -644,7 +644,7 @@ import type { Document } from '$lib/types';
     100% { transform: rotate(360deg)}
   }
   @keyframes pulse {
-    0%, 100% { opacity: 1}
+    0%; } 100% { opacity: 1}
     50% { opacity: 0.7}
   }
   /* Scrollbar styling */

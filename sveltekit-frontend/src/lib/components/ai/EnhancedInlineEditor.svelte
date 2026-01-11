@@ -2,7 +2,8 @@
  import { interpret, type Snapshot, type Interpreter } from 'xstate'; // switched to interpret + Interpreter import { aiProcessingMachine } from '$lib/machines/ai-processing-machine'; // Adjusted path import { createAITask } from '$lib/utils/ai-task-helpers'; // Adjusted path import { enhancedRAGStore } from '$lib/stores/enhanced-rag-store'; // Adjusted path import { debounce } from 'lodash-es'; // Ensure lodash-es and @types/lodash-es are installed import { getOllamaApiUrl } from '$lib/utils/ollama-helpers'; // Import the new helper // Props using Svelte, 5 $props() let { value = $bindable(''), placeholder = 'Start typing to get AI suggestions...', aiModel = 'gemma3-legal', enableAutoComplete = true, enableGrammarCheck = true, enableSemanticSuggestions = true, minCharactersForSuggestion = 10, suggestionDelay = 800, maxSuggestions = 3, class: className = ''
   }: { value?: string; placeholder?: string; aiModel?: string; enableAutoComplete?: boolean; enableGrammarCheck?: boolean; enableSemanticSuggestions?: boolean; minCharactersForSuggestion?: number; suggestionDelay?: number; maxSuggestions?: number; class?: string} = $props(); // AI suggestion types interface AISuggestion { id: string, type: 'completion' | 'grammar' | 'semantic' | 'legal_term',text: string, replacement?: string,confidence: number; reasoning: string, range?: { start: number; end: number }}
 
-  // State management using Svelte, 5 runes let editorElement: HTMLDivElement, let suggestionPopup: HTMLDivElement | undefined = undefined; // Declared with $state let isShowingSuggestions = $state<boolean>(false);
+  // State management using Svelte, 5 runes let editorElement: HTMLDivElement;
+ let suggestionPopup: HTMLDivElement | undefined = undefined; // Declared with $state let isShowingSuggestions = $state<boolean>(false);
    let currentSuggestions = $state<AISuggestion[]>([]);
    let selectedSuggestionIndex = $state(-1);
    let cursorPosition = $state({ x: 0; y: 0 });
@@ -91,7 +92,7 @@
   .suggestions-header { display: flex; align-items: center; justify-content: space-between; /* Fixed: typo: 'space-betweennn' */ padding: 8px 12px; background: var(--console-primary, #3b82f6); color: var(--console-bg, white); font-size: 12px; font-weight: 600}
   .suggestions-title { flex: 1; /* Fixed: missing semicolon */ }
   .processing-indicator { color: var(--console-accent-1, #fbbf24); animation: pulse 1s infinite}
-  @keyframes pulse { 0%, 100% { opacity: 1}
+  @keyframes pulse { 0%; } 100% { opacity: 1}
     50% { opacity: 0.5}
   } .suggestions-list { max-height: 240px; overflow-y: auto}
   .suggestion-item { display: block; width: 100%; padding: 12px; border: none; background: transparent; text-align: left; cursor: pointer;transition: background-color 0.15s ease; border-bottom: 1px solid var(--console-accent-0, #e5e7eb)}

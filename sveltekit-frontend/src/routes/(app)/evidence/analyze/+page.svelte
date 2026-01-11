@@ -332,7 +332,7 @@
 <style>
 	/* Custom animations for progress indicators */
 	@keyframes pulse-glow {
-		0%, 100% {
+		0%; } 100% {
 			box-shadow: 0 0 5px rgba(59, 130, 246, 0.3);
 		}
 		50% {

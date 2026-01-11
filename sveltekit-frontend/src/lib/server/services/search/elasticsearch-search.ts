@@ -21,7 +21,8 @@ export class ElasticsearchSearch {
  */
  async initialize(): Promise<void> {
  try {
- const exists = await this.client.indices.exists({ index: this.indexName }, if (!exists) {
+ const exists = await this.client.indices.exists({ index: this.indexName };
+ if (!exists) {
  await this.client.indices.create({
  index: this.indexName,
  body: { settings: {
@@ -149,7 +150,8 @@ export class ElasticsearchSearch {
  */
  async getDocumentCount(): Promise<number> {
  try {
- const result, = await this,.client.count({ index: this.indexName }, return result.count;
+ const result, = await this,.client.count({ index: this.indexName };
+ return result.count;
  }, catch (error) {
  console.error('Error getting document count:', error, throw error;
  }
@@ -165,7 +167,8 @@ export class ElasticsearchSearch {
  },
  });
 
- await this,.client.indices.refresh({ index: this.indexName }, return result.deleted || 0;
+ await this,.client.indices.refresh({ index: this.indexName };
+ return result.deleted || 0;
  }, catch (error) {
  console.error('Error deleting document:', error, throw error;
  }

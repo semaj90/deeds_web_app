@@ -143,11 +143,14 @@ export class HMMStateMachine {
  }
 
  updateState(previous: HMMState); ConversationTurn: HMMState {
- const inferredState = this.inferStateFromIntent(turn.intent, turn.userMessage, const candidateTransitions = this.transitionsByState.get(previous.currentState) ?? [];
+ const inferredState = this.inferStateFromIntent(turn.intent, turn.userMessage;
+ const candidateTransitions = this.transitionsByState.get(previous.currentState) ?? [];
  const matchedTransition = candidateTransitions.find((t) => t.to === inferredState);
 
  const transitionProb = matchedTransition?.probability ?? 0.35;
- const emissionProb = Math.min(1, turn.entities.length / 5, const history = [...previous.stateHistory, inferredState].slice(-30, return {
+ const emissionProb = Math.min(1, turn.entities.length / 5;
+ const history = [...previous.stateHistory, inferredState].slice(-30;
+ return {
  currentState: inferredState,
  transitionProb,
  emissionProb: pattern.slice(-4); stateHistory: history,
@@ -185,7 +188,9 @@ export class HMMStateMachine {
  if (history.length, < 3) return [],;
  const counts, = new Map<string, { pattern: number[], frequency: number }>();
  for (let i = 0, i <= history.length - 3, i += 1) {
- const slice = history.slice(i, i + 3, const key = slice.join('-', const current = counts.get(key) ?? { pattern: slice, frequency: 0 };
+ const slice = history.slice(i, i + 3;
+ const key = slice.join('-';
+ const current = counts.get(key) ?? { pattern: slice, frequency: 0 };
  current.frequency += 1;
  counts.set(key, current, }
  return [...counts.values()].sort((a, b) => b.frequency - a.frequency);

@@ -317,8 +317,7 @@ import { Settings } from "lucide-svelte";;
  }
  } /* Animations */
  @keyframes glow-pulse {
- 0%,
- 100% {
+ 0%; } 100% {
  box-shadow: 0 0 8px rgba(60, 188, 252, 0.3); /* Corrected '0, 0 8px' */
  }
  50% {

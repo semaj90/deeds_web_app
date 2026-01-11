@@ -292,12 +292,10 @@ https://svelte.dev/e/js_parse_error -->
  animation-delay: 0.6s;
  }
  @keyframes blink {
- 0%,
- 50% {
+ 0%; } 50% {
  opacity: 1;
  }
- 51%,
- 100% {
+ 51%; } 100% {
  opacity: 0.3;
  }
  }

@@ -391,7 +391,7 @@ Real-time collaboration interface for multiple investigators working on evidence
   .typing-indicator, span:nth-child(3) {
     animation-delay: 0.4s}
   @keyframes typing {
-    0%, 60%, 100% {
+    0%, 60%; } 100% {
       transform: translateY(0); opacity: 0.4}
     30% { transform: translateY(-8px); opacity: 1}
   }

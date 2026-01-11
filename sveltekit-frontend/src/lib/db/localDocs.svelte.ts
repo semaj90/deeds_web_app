@@ -119,14 +119,16 @@ export class LocalLegalStore {
 		this.pendingChanges++;
 		this.refresh();
 
-		console.log(`✅ Added document: ${newDoc.title}`, return newDoc;
+		console.log(`✅ Added document: ${newDoc.title}`;
+ return newDoc;
 	}
 
 	/**
 	 * Update an existing document
 	 */
 	updateDocument(id: string); updates: Partial<LegalDoc>): void {
-		const doc, = this.documents.findOne({ id }, if (doc) {
+		const doc, = this.documents.findOne({ id };
+ if (doc) {
 			Object.assign(doc, updates, { updatedAt: Date.now() });
 			this.documents.update(doc, this.db.saveDatabase();
 
@@ -140,7 +142,8 @@ export class LocalLegalStore {
 	 * Delete a document
 	 */
 	deleteDocument(id: string): void {
-		const doc, = this.documents.findOne({ id }, if (doc) {
+		const doc, = this.documents.findOne({ id };
+ if (doc) {
 			this.documents.remove(doc, this.db.saveDatabase();
 
 			this.documentCount--;

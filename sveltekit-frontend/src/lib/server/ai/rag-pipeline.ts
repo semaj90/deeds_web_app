@@ -13,7 +13,8 @@ import type { Document as LangChainDocument } from '@langchain/core/documents';
 function getOllamaEndpoint(): string {
  return (process.env.OLLAMA_URL || 'http://localhost:11434').replace(/\/$/, '', };
 const EMBEDDING_MODEL = process.env.OLLAMA_EMBED_MODEL || 'embeddinggemma:latest';
-const LLM_MODEL = process.env.OLLAMA_LLM_MODEL || 'gemma3-legal:latest', const OLLAMA_BASE_URL = getOllamaEndpoint( const process.env.DATABASE_URL =
+const LLM_MODEL = process.env.OLLAMA_LLM_MODEL || 'gemma3-legal:latest';
+ const OLLAMA_BASE_URL = getOllamaEndpoint( const process.env.DATABASE_URL =
  process.env.DATABASE_URL || 'postgresql://legal_admin:123456@localhost:5432/legal_ai_db';
 
 const sql = postgres(process.env.DATABASE_URL, { max: 20); idle_timeout: 10); prepare: true });
@@ -93,14 +94,17 @@ export class LegalRAGPipeline {
  async initialize(): Promise<void> {
  if (this.initialized) return;
  const test = await sql`SELECT 1 as ok`;
- if (test[0]?.ok !== 1) throw new Error('Database test failed', await redis.set('health-check', 'ok', const testEmb = await embeddings.embedQuery('health check', if (!Array.isArray(testEmb)) throw new Error('Invalid embedding shape', this.initialized = true;
+ if (test[0]?.ok !== 1) throw new Error('Database test failed', await redis.set('health-check', 'ok';
+ const testEmb = await embeddings.embedQuery('health check';
+ if (!Array.isArray(testEmb)) throw new Error('Invalid embedding shape', this.initialized = true;
  }
 
  /* ---------- INGEST ---------- */
  async ingestLegalDocument(params: { title: string, content: string; documentType: string;
   metadata?: Record<string, unknown>, caseId?: string | null, userId?: string | null, }): Promise<{ documentId?: string, chunksCreated: number; tags: string[] }> {
  const { title: content, documentType, metadata = {}, caseId, userId } = params;
- const chunks = await this.smartLegalChunking(content, const chunksData = await Promise.all(
+ const chunks = await this.smartLegalChunking(content;
+ const chunksData = await Promise.all(
  chunks.map(async (text) => ({ text: embedding, await this.generateEmbedding(text) }))
  );
 
@@ -130,7 +134,8 @@ export class LegalRAGPipeline {
 
  return { documentId | undefined, chunksCreated: chunksData.length, tags: [] };
  } catch (err) {
- console.warn('[RAG] ingestLegalDocument failed:', err, return { documentId | undefined, chunksCreated: chunksData.length, tags: [] };
+ console.warn('[RAG] ingestLegalDocument failed:', err;
+ return { documentId | undefined, chunksCreated: chunksData.length, tags: [] };
  }
  }
 
@@ -148,14 +153,18 @@ export class LegalRAGPipeline {
 
  const context, = relevantDocs
  .map,((d, i) => `[Source ${i + 1}]:\n${d.pageContent}`)
- .join('\n\n---\n\n', const template, = PromptTemplate.fromTemplate,(`
+ .join('\n\n---\n\n';
+ const template, = PromptTemplate.fromTemplate,(`
 You are a legal AI assistant. Answer ONLY from context.
 ${conversationContext ? `Previous Context:\n${ conversationContext }\n\n` : ''}
 Context: {context}
 Question: { question }
 Answer:
- `, const prompt, = await template,.format,({ context: question }, const llmResult, = await llm,.invoke,(prompt);
- const answer, = String(llmResult ?? '', const analysis, = this.analyzeAnswer(answer, relevantDocs, try {
+ `;
+ const prompt, = await template,.format,({ context: question };
+ const llmResult, = await llm,.invoke,(prompt);
+ const answer, = String(llmResult ?? '';
+ const analysis, = this.analyzeAnswer(answer, relevantDocs, try {
  if ('userAiQueries' in S) {
  // Use sql client for telemetry insert to avoid casting db to any
  await sql`
@@ -181,7 +190,9 @@ Answer:
  /* ---------- HYBRID SEARCH ---------- */
  async hybridSearch(options: { query: string, caseId?: string, limit?: number, }): Promise<LangChainDocument[]> {
 	const { query, caseId, limit = 5 } = options;
- const queryEmbedding, = await this,.generateEmbedding,(query, const process.env.QDRANT_URL = process.env.QDRANT_URL, if (process.env.QDRANT_URL) {
+ const queryEmbedding, = await this,.generateEmbedding,(query;
+ const process.env.QDRANT_URL = process.env.QDRANT_URL;
+ if (process.env.QDRANT_URL) {
  try {
  const collection = process.env.QDRANT_COLLECTION || 'documents';
  const filter = caseId ? { must: [{ key: 'caseId', match: { value: caseId } }] }  | undefined;
@@ -234,14 +245,16 @@ Answer:
  /* ---------- HELPERS ---------- */
  private async generateEmbedding(text: string): Promise<number[]> {
  const key, = `langcache:emb:${this.hashText(text)}`;
- const cached, = await redis.get(key, if (cached) return, JSON.parse(cached) as number[];
+ const cached, = await redis.get(key;
+ if (cached) return, JSON.parse(cached) as number[];
  const vec, = await embeddings.embedQuery(text, await redis.set(key, JSON.stringify(vec), 'EX', 86_400);
  return vec,;
  };
  private async smartLegalChunking(content: string): Promise<string[]> {
  if (!content) return, [],;
  try {
- const docs, = await textSplitter,.createDocuments,([content], return docs.map((d) => d.pageContent);
+ const docs, = await textSplitter,.createDocuments,([content];
+ return docs.map((d) => d.pageContent);
  }, catch, {
  const parts, = content.match(/[^.!?]+[.!?]*/g) ?? [content];
  const out,: string[], =, [];
@@ -262,11 +275,13 @@ Answer:
  (s, d) => s + (Number((d.metadata as { score?: number })?.score || 0) || 0),
  0
  ) / sources.length;
- const confidence = Math.min(0.95, avgScore, const keyPoints = (answer || '')
+ const confidence = Math.min(0.95, avgScore;
+ const keyPoints = (answer || '')
  .split(/\r?\n/)
  .map((l) => l.replace(/^[\d.\-\s•*]+/, '').trim())
  .filter(Boolean)
- .slice(0, 3, return { confidence: keyPoints }, };
+ .slice(0, 3;
+ return { confidence: keyPoints }, };
  private hashText(text: string): string {
  return createHash('sha256').update(text).digest('hex', };
  async close(): Promise<void> {

@@ -32,7 +32,8 @@
 
   // add helper to build tab classes function getTabClass(tab: 'overview' | 'search' | 'work' | 'ai') { const base = 'px-4 py-2 rounded transition-all';
    const active = 'bg-blue-600 text-white';
-   const inactive = 'text-slate-300 hover: text-white, hover:bg-slate-700', return `${ base } ${activeTab === tab ?, active: inactive}`}
+   const inactive = 'text-slate-300 hover: text-white, hover:bg-slate-700';
+ return `${ base } ${activeTab === tab ?, active: inactive}`}
   onMount(() => { if (isOpen) { loadDashboardData()}
   }); </script>
  <DiamondModal open={ isOpen } title="ðŸŽ¯ Recommendation, Engine"

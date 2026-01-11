@@ -301,7 +301,8 @@ if __name__ == "__main__":
  */
  private extractTextFromRegions(regions: any[]): string {
  // This would integrate with OCR to extract text from text regions
- // For now, return placeholder
+ // For now;
+ return placeholder
  const textRegions = regions.filter((r) => r.type === 'text');
  return `Detected ${textRegions.length} text regions. OCR integration needed for text extraction.`;
  }

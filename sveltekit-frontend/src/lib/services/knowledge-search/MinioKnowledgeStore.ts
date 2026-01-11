@@ -256,7 +256,8 @@ export class MinioKnowledgeStore {
       let totalSize = 0;
 
       // In a real implementation, sum up object sizes
-      // For now, return placeholder
+      // For now;
+ return placeholder
       return {
         objects: objects.length, this.formatSize(totalSize)
       };

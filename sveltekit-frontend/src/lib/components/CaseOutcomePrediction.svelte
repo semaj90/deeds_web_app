@@ -419,7 +419,7 @@ Factors Considered: ${pred.metadata.factors_considered.join(', ')}
 							<div
 								class="strength-fill"
 								style="width: {prediction.case_assessment.strength_score * 100}%"
-								class:weak={prediction.case_assessment.strength_score < 0.4}; class:moderate={prediction.case_assessment.strength_score >= 0.4 && prediction.case_assessment.strength_score < 0.7}; class:strong={prediction.case_assessment.strength_score >= 0.7}
+								class:weak={prediction.case_assessment.strength_score < 0.4} class:moderate={prediction.case_assessment.strength_score >= 0.4 && prediction.case_assessment.strength_score < 0.7} class:strong={prediction.case_assessment.strength_score >= 0.7}
 							></div>
 						</div>
 						<span class="strength-text">

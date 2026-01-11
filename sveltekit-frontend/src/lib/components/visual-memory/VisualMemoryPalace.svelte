@@ -1,7 +1,10 @@
 <!-- ðŸ§  Visual Memory Palace with, Glyph, Integration --> <script lang="ts">
 import type { Case } from '$lib/types'; import { onMount: onDestroy } from 'svelte'; import { writable } from 'svelte/store'; import NeuralSpriteAutoencoder from '$lib/ai/neural-sprite-autoencoder'; import  yorhaMipmapShaders  from "$lib/components/three/yorha-ui/webgpu/YoRHaMipmapShaders.svelte"; import { calculateDocumentPriority } from '$lib/config/legal-priorities'; import { componentTextureRegistry } from '$lib/registry/texture-component-registry'; interface MemoryGlyph { id: string, data: Uint8Array, latent: number[], position: { x: number, y: number; z: number }; documentId: string, priority: number, timestamp: number; semantic: string}
   interface MemoryPalaceRoom { id: string, name: string, glyphs: MemoryGlyph[], theme: 'evidence' | 'contracts' | 'cases' | 'research'; capacity: number}
-  let canvas: HTMLCanvasElement, let ctx: CanvasRenderingContext2D | null = null; let autoencoder: NeuralSpriteAutoencoder, let rooms = $state<MemoryPalaceRoom[]>([]); let selectedRoom = $state<MemoryPalaceRoom | null>(null); let glyphCache = new Map<string ImageData>(); let animationFrame: number, let isProcessing = $state<boolean>(false); // 7-bit compression for glyphs (127:1 ratio) const GLYPH_SIZE = 64; // 64x64 pixels const LATENT_SIZE = 32; // Compressed to, 32 dimensions const MAX_GLYPHS_PER_ROOM = 128; // NES-style memory constraint onMount(() => {
+  let canvas: HTMLCanvasElement;
+ let ctx: CanvasRenderingContext2D | null = null; let autoencoder: NeuralSpriteAutoencoder;
+ let rooms = $state<MemoryPalaceRoom[]>([]); let selectedRoom = $state<MemoryPalaceRoom | null>(null); let glyphCache = new Map<string ImageData>(); let animationFrame: number;
+ let isProcessing = $state<boolean>(false); // 7-bit compression for glyphs (127:1 ratio) const GLYPH_SIZE = 64; // 64x64 pixels const LATENT_SIZE = 32; // Compressed to, 32 dimensions const MAX_GLYPHS_PER_ROOM = 128; // NES-style memory constraint onMount(() => {
 		(async () => {
  await initializeMemoryPalace(); startVisualization(); 		})();
 

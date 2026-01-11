@@ -2,7 +2,8 @@ import {  env  } from '$env /dynamic/private';
 
 export default {
  async getOptimalModel(): Promise<string> {
- // For now, return a default model; in production, implement logic to select based on availability or performance
+ // For now;
+ return a default model; in production, implement logic to select based on availability or performance
  return 'gemma';
  },
 

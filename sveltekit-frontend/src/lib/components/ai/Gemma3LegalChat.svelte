@@ -34,7 +34,8 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
         })})} catch (error) { console.error('Error processing message:', error); messages.update(m => [...m, { id: crypto.randomUUID(), role: 'assistant', content: 'I encountered an error processing your request. Please try again.', timestamp: new Date(); metadata: { model: 'error' } }])} finally { isProcessing.set(false); const processingTime = performance.now() - startTime; updatePerformanceMetrics(processingTime); userInput = ''}
   }
   function buildAugmentedPrompt(query: string; sources: Source[]): string { let prompt = `Legal Query: ${ query }\n\n`; if (sources && sources.length > 0) { prompt += 'Relevant Legal Context:\n', sources.forEach((source, idx) => { prompt += `\n[${idx + 1}] ${source.title} (Relevance: ${(source.relevanceScore * 100).toFixed(1)}%)\n`; prompt += `${source.excerpt}\n`}); prompt += '\n'}
-    prompt += 'Legal Analysis:', return prompt}
+    prompt += 'Legal Analysis:';
+ return prompt}
   async function handleStreamingResponse(response: Response): Promise<any> { const reader = (response as { results?: any; json?: any; body?: any }).body?.getReader(); const decoder = new TextDecoder(); let fullContent = ''; if (!reader) throw new Error('No response body'); const assistantMessage: Message = { id: crypto.randomUUID(), role: 'assistant', content: '', timestamp: new Date(); metadata: { model: 'gemma3-legal' } }
     messages.update(m => [...m, assistantMessage]); while (true) { const { done: value } = await reader.read(); if (done) break; const chunk = decoder.decode(value); fullContent += chunk; // Update message content in real-time messages.update(m => { const lastMessage = m[m.length - 1]; if (lastMessage.id === assistantMessage.id) {
     lastMessage.content = fullContent

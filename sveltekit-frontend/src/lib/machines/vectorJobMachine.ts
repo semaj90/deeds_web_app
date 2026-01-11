@@ -273,7 +273,8 @@ export function createVectorJob(
  data,
  priority,
  vector,
- }, return service;
+ };
+ return service;
 };
 export function processBatchVectorJobs(
  jobs: Array<{ ownerType: VectorJobContext['ownerType'];

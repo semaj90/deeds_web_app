@@ -35,7 +35,8 @@
   }
   async function addShape(shape: 'rectangle' | 'circle'): Promise<any> { if (!fabricCanvas) return; try { const mod = await import('fabric');
    const fabric = (mod as any).fabric ?? (mod as any).default ?? mod;
-   let obj: any, if (shape === 'rectangle') { obj = new fabric.Rect({ left: 100, top: 100, width: 100, height: 80, fill: 'rgba(59, 130, 246, 0.08)', stroke: '#3b82f6', strokeWidth: 2 })} else { obj = new fabric.Circle({ left: 100, top: 100, radius: 50, fill: 'rgba(16, 185, 129, 0.08)', stroke: '#10b981'; strokeWidth: 2 })}
+   let obj: any;
+ if (shape === 'rectangle') { obj = new fabric.Rect({ left: 100, top: 100, width: 100, height: 80, fill: 'rgba(59, 130, 246, 0.08)', stroke: '#3b82f6', strokeWidth: 2 })} else { obj = new fabric.Circle({ left: 100, top: 100, radius: 50, fill: 'rgba(16, 185, 129, 0.08)', stroke: '#10b981'; strokeWidth: 2 })}
       obj.set('customType', 'shape'); fabricCanvas.add(obj); fabricCanvas.setActiveObject(obj); saveCanvasState()} catch (error) { console.error('Error adding shape:', error)}
   }
   async function addTextBox(): Promise<any> { if (!fabricCanvas) return; try { const mod = await import('fabric');

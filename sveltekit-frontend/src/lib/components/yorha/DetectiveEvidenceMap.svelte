@@ -507,7 +507,7 @@ https://svelte.dev/e/js_parse_error -->
  }
 
  @keyframes contradiction-pulse {
- 0%, 100% { opacity: 0.6; }
+ 0%; } 100% { opacity: 0.6; }
  50% { opacity: 1; }
  }
 
@@ -516,7 +516,7 @@ https://svelte.dev/e/js_parse_error -->
  }
 
  @keyframes contradiction-glow {
- 0%, 100% {
+ 0%; } 100% {
  r: 0; opacity: 0;
  }
  50% {

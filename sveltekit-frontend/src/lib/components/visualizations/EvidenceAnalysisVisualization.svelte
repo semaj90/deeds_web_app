@@ -1,6 +1,11 @@
 <script lang="ts"> // Chart is dynamically imported in the browser to avoid TS/build errors / SSR issues let Chart: unknown = null; import type { EvidenceAnalysis, Finding, Correlation } from '$lib/services/ai-evidence-analyzer'; interface Props { analysis: EvidenceAnalysis; // Fixed, typo: EvidenceAnalysi -> EvidenceAnalysis }
 
-  let { analysis }: Props = $props(); let canvasRisk: HTMLCanvasElement, let canvasEntities: HTMLCanvasElement, let canvasTimeline: HTMLCanvasElement, let canvasCorrelations: HTMLCanvasElement, let canvasSentiment: HTMLCanvasElement, let charts: unknown[] = []; $effect(() => { // Guard for SSR/build-time: only run in browser if (typeof window === 'undefined') return; let cancelled = $state<boolean>(false); (async () => { if (!Chart) { // dynamic import so TS doesn't require: 'chart.js/auto' at build-time const mod = await import('chart.js/auto'); Chart = mod?.default ?? mod}'
+  let { analysis }: Props = $props(); let canvasRisk: HTMLCanvasElement;
+ let canvasEntities: HTMLCanvasElement;
+ let canvasTimeline: HTMLCanvasElement;
+ let canvasCorrelations: HTMLCanvasElement;
+ let canvasSentiment: HTMLCanvasElement;
+ let charts: unknown[] = []; $effect(() => { // Guard for SSR/build-time: only run in browser if (typeof window === 'undefined') return; let cancelled = $state<boolean>(false); (async () => { if (!Chart) { // dynamic import so TS doesn't require: 'chart.js/auto' at build-time const mod = await import('chart.js/auto'); Chart = mod?.default ?? mod}'
       if (cancelled) return; // render charts after Chart is available renderRiskChart(); renderEntitiesChart(); renderTimelineChart(); renderCorrelationsChart(); renderSentimentChart()})(); return () => { cancelled = true; charts.forEach(chart => chart.destroy())}}); function renderRiskChart() { const ctx = canvasRisk.getContext('2d'); if (!ctx) return; const chart = new Chart(ctx, { type: 'doughnut', data: { labels: ['Risk', 'Safe'], datasets: [{ //, Fixed: removed leading comma, data: [analysis.riskScore * 100, (1 - analysis.riskScore) * 100]; backgroundColor: [ `rgba(${255 * analysis.riskScore}, ${255 * (1 - analysis.riskScore)}, 0, 0.8)`,
             'rgba(34, 197, 94, 0.8)'
           ], borderWidth: 2; borderColor: '#1f2937'

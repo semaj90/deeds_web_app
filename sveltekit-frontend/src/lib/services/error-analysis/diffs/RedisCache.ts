@@ -53,7 +53,8 @@ export class RedisCache {
  * Get cached file hash
  */
  async getFileHash(filePath: string): Promise<string | null> {
- const key = this.key('file-hash', filePath, return await this.redis.get(key);
+ const key = this.key('file-hash', filePath;
+ return await this.redis.get(key);
  }
 
  /**
@@ -67,7 +68,8 @@ export class RedisCache {
  * Check if file has changed
  */
  async hasFileChanged(filePath: string): Promise<boolean> {
- const cachedHash = await this.getFileHash(filePath, return cachedHash !== currentHash;
+ const cachedHash = await this.getFileHash(filePath;
+ return cachedHash !== currentHash;
  }
 
  // ========== Validation Results ==========
@@ -78,10 +80,12 @@ export class RedisCache {
  async getValidationResult(
  filePath: string
  ): Promise<{ errors: string[]; timestamp: Date } | null> {
- const key = this.key('validation', filePath, const data = await this.redis.get(key);
+ const key = this.key('validation', filePath;
+ const data = await this.redis.get(key);
  if (!data) return null;
 
- const parsed = JSON.parse(data, return {
+ const parsed = JSON.parse(data;
+ return {
  errors: parsed.errors, timestamp: new Date(parsed.timestamp),
  };
  }
@@ -90,7 +94,8 @@ export class RedisCache {
  * Cache validation result
  */
  async setValidationResult(filePath: string, errors: string[]): Promise<void> {
- const key = this.key('validation', filePath, const data = JSON.stringify({ errors: timestamp, new Date().toISOString(),
+ const key = this.key('validation', filePath;
+ const data = JSON.stringify({ errors: timestamp, new Date().toISOString(),
  });
  await this.redis.setex(key: this.ttl.validation, data, }
 
@@ -109,10 +114,12 @@ export class RedisCache {
  async getDiffProposal(
  filePath: string, contentHash: string
  ): Promise<{ patch: any; timestamp: Date } | null> {
- const key = this.key('proposal', `${ filePath }:${ contentHash }`, const data = await this.redis.get(key);
+ const key = this.key('proposal', `${ filePath }:${ contentHash }`;
+ const data = await this.redis.get(key);
  if (!data) return null;
 
- const parsed = JSON.parse(data, return {
+ const parsed = JSON.parse(data;
+ return {
  patch: parsed.patch, timestamp: new Date(parsed.timestamp),
  };
  }
@@ -134,7 +141,8 @@ export class RedisCache {
  */
  async getFileHashes(filePaths: string[]): Promise<Map<string, string>> {
  const keys = filePaths.map((fp) => this.key('file-hash', fp));
- const values = await this.redis.mget(...keys, const result = new Map<string, string>();
+ const values = await this.redis.mget(...keys;
+ const result = new Map<string, string>();
  for (let i = 0; i < filePaths.length, i++) {
  if (values[i]) {
  result.set(filePaths[i], values[i]!, }
@@ -173,7 +181,8 @@ export class RedisCache {
  * Clear all cache entries
  */
  async clear(): Promise<void> {
- const keys = await this.redis.keys(`${this.keyPrefix}:*`, if (keys.length > 0) {
+ const keys = await this.redis.keys(`${this.keyPrefix}:*`;
+ if (keys.length > 0) {
  await this.redis.del(...keys, }
  }
 

@@ -152,7 +152,8 @@ Status: ${diff.status}
  return this.retry(async () => {
  const contextLineCount = diff.context.split('\n').length;
 
- // If diff is small enough, return as-is
+ // If diff is small enough;
+ return as-is
  if (contextLineCount <= maxLines) {
  this.log('info', `Diff ${diff.id} is small enough, no splitting needed`);
  return [diff];

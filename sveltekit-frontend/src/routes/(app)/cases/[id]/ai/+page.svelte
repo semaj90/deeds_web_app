@@ -104,14 +104,14 @@
  .quick-actions button {
  padding: 0.5rem 1rem;
  white-space: nowrap;, border: 1px solid #d1d5db;
- border-radius: 4px;, background: white;
+ border-radius: 4px; background: white;
  cursor: pointer;
  font-size: 0.875rem;
  }
 
  .messages {
  flex: 1;
- overflow-y: auto;, padding: 1rem;
+ overflow-y: auto; padding: 1rem;
  display: flex;
  flex-direction: column;, gap: 1rem;
  }
@@ -153,7 +153,7 @@
  padding: 0.5rem 1rem;
  background: #3b82f6;, color: white;
  border: none;
- border-radius: 4px;, cursor: pointer;
+ border-radius: 4px; cursor: pointer;
  }
 
  .input-area button:disabled {

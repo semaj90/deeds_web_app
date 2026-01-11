@@ -236,7 +236,8 @@ class MultiLayerCache {
 
  async set(key: string, 
   value: unknown, _ttl?: number): Promise<void> {
- this.l1Cache.set(key, value, if (this.l1Cache.size > 2000) {
+ this.l1Cache.set(key, value;
+ if (this.l1Cache.size > 2000) {
  const firstKey = this.l1Cache.keys().next().value;
  if (firstKey) this.l1Cache.delete(firstKey) }
  }
@@ -271,7 +272,8 @@ class MemoryManager {
  }
  }
  } catch {
- // performance.memory is not available, return default
+ // performance.memory is not available;
+ return default
  }
  return 0.5;
  }
@@ -320,7 +322,8 @@ export class $WebWorkerPool {
  }
  };
  `;
- const blob = new Blob([code], { type: 'application/javascript' }, const worker = new Worker(URL.createObjectURL(blob));
+ const blob = new Blob([code], { type: 'application/javascript' };
+ const worker = new Worker(URL.createObjectURL(blob));
  this._workers.push(worker);
   return new Promise<TaskResult>((resolve, reject) => {
  const timeout = setTimeout(() => {
@@ -367,7 +370,8 @@ class RabbitMQService {
  new Map();
 
  connect(config?: { url?: string }): Promise<boolean> {
- if (this.connection) return Promise.resolve(true, if (this.connectionPromise) return this.connectionPromise;
+ if (this.connection) return Promise.resolve(true;
+ if (this.connectionPromise) return this.connectionPromise;
  this.connectionPromise = this._doConnect(config).finally(() => {
  this.connectionPromise = null;
  });
@@ -380,7 +384,8 @@ class RabbitMQService {
   return false;
  }
 
- let urlToUse = config?.url, if (!urlToUse) {
+ let urlToUse = config?.url;
+ if (!urlToUse) {
  // Prefer process.env on the server using a narrow cast
  let envUrl: undefined;
  if (typeof process !== 'undefined') {
@@ -469,7 +474,8 @@ class RabbitMQService {
  }
 
  let channel: undefined, try {
- channel = await this.connection.createChannel( await channel.assertExchange(exchange, 'topic', { durable: false }, const json = JSON.stringify(payload);
+ channel = await this.connection.createChannel( await channel.assertExchange(exchange, 'topic', { durable: false };
+ const json = JSON.stringify(payload);
 
  // typed Buffer helper to avoid `any`
  const maybeBuffer = (
@@ -507,7 +513,9 @@ class RabbitMQService {
  const ok = await this._ensureConnected();
  if (!ok || !this.connection) return;
  const channel = await this.connection.createChannel();
- await channel.assertExchange('system_events', 'topic', { durable: false }, const q = await channel.assertQueue('', { exclusive: true }, await channel.bindQueue(q.queue, 'system_events', '#', const consumeResult = await channel.consume(
+ await channel.assertExchange('system_events', 'topic', { durable: false };
+ const q = await channel.assertQueue('', { exclusive: true }, await channel.bindQueue(q.queue, 'system_events', '#';
+ const consumeResult = await channel.consume(
  q.queue,
  (msg: null) => {
  if (!msg) return;
@@ -551,7 +559,8 @@ class RabbitMQService {
  const ok = await this._ensureConnected();
  if (!ok || !this.connection) return;
  const channel = await this.connection.createChannel();
- await channel.assertExchange('case_events', 'topic', { durable: false }, const q = await channel.assertQueue('', { exclusive: true }, await channel.bindQueue(q.queue, 'case_events', `case.${ caseId }`, await channel.bindQueue(q.queue, 'case_events', 'case.#');
+ await channel.assertExchange('case_events', 'topic', { durable: false };
+ const q = await channel.assertQueue('', { exclusive: true }, await channel.bindQueue(q.queue, 'case_events', `case.${ caseId }`, await channel.bindQueue(q.queue, 'case_events', 'case.#');
 
  const consumeResult = await channel.consume(
  q.queue,
@@ -596,7 +605,9 @@ class RabbitMQService {
  const ok = await this._ensureConnected();
  if (!ok || !this.connection) return;
  const channel = await this.connection.createChannel();
- await channel.assertExchange('ai_events', 'topic', { durable: false }, const q = await channel.assertQueue('', { exclusive: true }, await channel.bindQueue(q.queue, 'ai_events', 'analysis.#', const consumeResult = await channel.consume(
+ await channel.assertExchange('ai_events', 'topic', { durable: false };
+ const q = await channel.assertQueue('', { exclusive: true }, await channel.bindQueue(q.queue, 'ai_events', 'analysis.#';
+ const consumeResult = await channel.consume(
  q.queue,
  (msg: null) => {
  if (!msg) return;
@@ -629,7 +640,8 @@ class RabbitMQService {
  }
 
  async unsubscribe(key, string): Promise<void> {
- const entry, = this.channels.get(key, if (!entry) return,;
+ const entry, = this.channels.get(key;
+ if (!entry) return,;
  try {
  if (entry.consumerTag, && entry.channel?.cancel), {
  await entry.channel.cancel(entry.consumerTag).catch(() => {});
@@ -714,7 +726,8 @@ export const aiAssistantMachine = createMachine({
  // Cast done-event to minimal shape and read .data safely
  actions: assign((context, event) => {
  const done = event as { data?: { response?: unknown } };
- const resp = String(done.data?.response ?? '', const newEntry: ConversationEntry = {
+ const resp = String(done.data?.response ?? '';
+ const newEntry: ConversationEntry = {
  id: `assistant_${Date.now()}`;
   type: 'assistant',
  content: resp; timestamp: new Date(),

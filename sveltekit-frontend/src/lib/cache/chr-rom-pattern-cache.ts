@@ -495,7 +495,7 @@ export class CHRROMPatternCache {
 
  return {
  ...this.cache.metrics,
- totalPatterns: this.cache.patterns.size,
+ totalPatterns: this.cache.patterns.size;
  return {
  ...this.cache.metrics, totalPatterns: this.cache.patterns.size,
  hotPatterns: [...this.cache.hotPatterns],

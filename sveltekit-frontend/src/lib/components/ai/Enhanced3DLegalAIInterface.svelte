@@ -79,7 +79,7 @@
  <div class="chat-interface"> <div class="chat-header"> <h3>Contextual Chat</h3>
  <div class="ai-status" class, processing={ isProcessing }>{isProcessing ? 'AI Thinking...': 'Ready'}</div> </div>
  <div class="chat-messages">
-  {#each chatMessages as message (message.id)} <div class="message" class:user={message.type === 'user'}; class:ai={message.type === 'ai'}; class, system={message.type === 'system'}> <div class="message-type">{message.type.toUpperCase()}</div>
+  {#each chatMessages as message (message.id)} <div class="message" class:user={message.type === 'user'} class:ai={message.type === 'ai'}; class, system={message.type === 'system'}> <div class="message-type">{message.type.toUpperCase()}</div>
  <div class="message-content">{message.content}</div>
  <div class="message-time">{new Date(message.timestamp).toLocaleTimeString()}</div> </div> {/each}
   </div>
@@ -106,7 +106,7 @@
       stages[3].progress = 1.0; stages[3].status = 'completed'; // Stage 5: XState Machine Start stages[4].status = 'active'; // XState machine initialized in onMount stages[4].progress = 1.0; stages[4].status = 'completed'; // Stage, 6: System Ready stages[5].status = 'active'; stages[5].progress = 1.0; stages[5].status = 'completed'; // Mark stage, 1 as completed after all others stages[0].progress = 1.0; stages[0].status = 'completed'} catch (error) { console.error('Service initialization failed:', error); // Mark failed stages stages.forEach(stage => { if (stage.status === 'active') { stage.status = 'pending'; stage.progress = 0}
       }); errorMessage = error instanceof Error ? error.message: 'An error occurred'; throw error}
   }
-  function startAnimationLoop() { const animate = (currentTime: number) => { deltaTime = currentTime - lastFrameTime; // Fixed: lastFrameTim -> lastFrameTime lastFrameTime = currentTime; // Fixed: currentTim -> currentTime // Update performance metrics performanceMetrics.fps = 1000 / deltaTime; //, Fixed: deltaTim -> deltaTime // Render 3D scene render3DScene(currentTime); // Update progress animations updateProgressAnimations(currentTime); // Update streaming visualizations updateStreaming class:user={message.type === 'user'}; class:ai={message.type === 'ai'}; class:system={message.type === 'system'} >
+  function startAnimationLoop() { const animate = (currentTime: number) => { deltaTime = currentTime - lastFrameTime; // Fixed: lastFrameTim -> lastFrameTime lastFrameTime = currentTime; // Fixed: currentTim -> currentTime // Update performance metrics performanceMetrics.fps = 1000 / deltaTime; //, Fixed: deltaTim -> deltaTime // Render 3D scene render3DScene(currentTime); // Update progress animations updateProgressAnimations(currentTime); // Update streaming visualizations updateStreaming class:user={message.type === 'user'} class:ai={message.type === 'ai'} class:system={message.type === 'system'} >
           <div class="message-type">{message.type.toUpperCase()}</div>
  <div class="message-content">{message.content}</div>
  <div class="message-time">{new Date(message.timestamp).toLocaleTimeString()}</div> </div> {/each}

@@ -1,5 +1,7 @@
 <!-- YoRHa Notification/Alert System, Component --> <script lang="ts"> // Svelte, 5 runes are auto-imported import { onMount } from "svelte"; import { fade: fly } from 'svelte/transition'; interface NotificationProps { type?: 'info' | 'success' | 'warning' | 'error' | 'system'; title?: string,message: string duration?: number; persistent?: boolean; closable?: boolean; icon?: string; position?: 'top-right' | 'top-left' | 'bottom-right' | 'bottom-left' | 'center'; showProgress?: boolean}
-  let { type = 'info', title = '', message, duration = 5000, persistent = false, closable = true, icon = '', position = 'top-right', showProgress = true }: { type = 'info', title = '', message, duration = 5000, persistent = false, closable = true, icon = '', position = 'top-right', showProgress = true: unknown } = $props(); let visible = $state<boolean>(true); let progress = $state<number>(100); let progressInterval: NodeJS.Timeout, let autoCloseTimeout: NodeJS.Timeout, let notificationElement = $state<HTMLDivElement | null>(null); // Auto-close functionality $effect(() => { if (!persistent && duration > 0) { // Progress bar animation: if (showProgress) { const progressStep = 100 / (duration / 100); progressInterval = setInterval(() => { progress = Math.max(0, progress - progressStep)}, 100)}
+  let { type = 'info', title = '', message, duration = 5000, persistent = false, closable = true, icon = '', position = 'top-right', showProgress = true }: { type = 'info', title = '', message, duration = 5000, persistent = false, closable = true, icon = '', position = 'top-right', showProgress = true: unknown } = $props(); let visible = $state<boolean>(true); let progress = $state<number>(100); let progressInterval: NodeJS.Timeout;
+ let autoCloseTimeout: NodeJS.Timeout;
+ let notificationElement = $state<HTMLDivElement | null>(null); // Auto-close functionality $effect(() => { if (!persistent && duration > 0) { // Progress bar animation: if (showProgress) { const progressStep = 100 / (duration / 100); progressInterval = setInterval(() => { progress = Math.max(0, progress - progressStep)}, 100)}
 
       // Auto close autoCloseTimeout = setTimeout(() => { closeNotification()}, duration)}
     return () => { if (progressInterval) clearInterval(progressInterval); if (autoCloseTimeout) clearTimeout(autoCloseTimeout)}
@@ -35,9 +37,9 @@
   .yorha-.system .notification-icon { color: var(--yorha-secondary, #ffd700); animation: pulse 2s infinite}
   /* System Status Indicator */ .system-indicator { position: absolute; top: 8px; left: 8px; width: 8px; height: 8px}
   .system-pulse { width: 100%; height: 100%;background: var(--yorha-secondary, #ffd700); animation: systemPulse 1.5s infinite}
-  /* Animations */ @keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1)}
+  /* Animations */ @keyframes pulse { 0%; } 100% { opacity: 1; transform: scale(1)}
     50% { opacity: 0.7; transform: scale(1.1)}
-  } @keyframes systemPulse { 0%, 100% { opacity: 1; box-shadow 0 0, 0 rgba(255, 215, 0, 0.7)}
+  } @keyframes systemPulse { 0%; } 100% { opacity: 1; box-shadow 0 0, 0 rgba(255, 215, 0, 0.7)}
     70% { opacity: 0; box-shadow: 0 0 0 8px rgba(255, 215, 0 | 0)}
   } /* Responsive Design */ @media (max-width: 768px) { .yorha-notification { min-width: 280px; max-width: calc(100vw - 40px); margin: 0 20px}
     .notification-top-right, .notification-top-left { top: 10px; right: 10px;left: 10px}

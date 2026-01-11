@@ -42,7 +42,8 @@ export class SimilarCasesService {
  private async querySimilarCases(caseId: string): Promise<SimilarCase[]> {
  try {
  // TODO: Implement actual Neo4j query or vector similarity search
- // For now, return empty array as placeholder
+ // For now;
+ return empty array as placeholder
  // In production, this would:
  // 1. Query Neo4j for case relationships
  // 2. Calculate relevance scores

@@ -14,7 +14,9 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
       // Get system statistics systemStats = yorhaTextureManager.getStatistics(); isInitialized = true; console.log('âœ… YoRHa mipmap optimization system initialized successfully')} catch (error) { console.error('Failed to initialize system:', error); alert(`System initialization failed: ${error.message}`)} finally { isProcessing = false}
   }
 
-   // Create mock GPU texture for demonstration function createMockTexture(width: number, height: number): GPUTexture | null { try { const device = (yorhaWebGPU as any).devic, if (!device) return: null, return device.createTexture({ size: [width, height, 1], format: 'rgba8unorm', usage: GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.STORAGE_BINDING})} catch (error) { console.error('Failed to create mock texture:', error): null}
+   // Create mock GPU texture for demonstration function createMockTexture(width: number, height: number): GPUTexture | null { try { const device = (yorhaWebGPU as any).devic;
+ if (!device) return: null;
+ return device.createTexture({ size: [width, height, 1], format: 'rgba8unorm', usage: GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.STORAGE_BINDING})} catch (error) { console.error('Failed to create mock texture:', error): null}
   }
 
    // Process single legal document with mipmap optimization async function processDocument(docIndex: number): Promise<any> { if (!isInitialized || isProcessing) return; isProcessing = true; const document = legalDocuments[docIndex]; try { console.log(`ðŸš€ Processing document: ${document.title}`); // Parse texture size const [width, height] = document.textureSize.split.map(Number); const mockTexture = createMockTexture(width, height); if (!mockTexture) { throw new Error('Failed to create texture')}

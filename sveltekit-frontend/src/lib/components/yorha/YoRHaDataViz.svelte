@@ -79,7 +79,7 @@
     to { transform: translateX(0); opacity: 1}
   } @keyframes fadeInUp { from { transform: translate(-50%, -50%) translateY(10px); opacity: 0}
     to { transform: translate(-50%, -50%) translateY(0); opacity: 1}
-  } @keyframes pulse { 0%, 100% { opacity: 0.3} 50% { opacity: 0.1} }
+  } @keyframes pulse { 0%; } 100% { opacity: 0.3} 50% { opacity: 0.1} }
   /* Responsive Design */ @media (max-width: 768px) { .chart-header { padding: 8px 12px}
     .chart-title { font-size: 12px}
     .bar-chart { padding: 0 20px 30px 40px; gap: 8px}

@@ -78,7 +78,7 @@
   .button-spinner { animation: spin 1s linear infinite}
   .form-hints { display: flex; gap: 16px, font-size: 10px; color: var(--yorha-text-muted, #808080)}
   .hint-key { color: var(--yorha-secondary, #ffd700); font-weight: 600}
-  /* Animations */ @keyframes pulse { 0%, 100% { opacity: 1} 50% { opacity: 0.6} }
+  /* Animations */ @keyframes pulse { 0%; } 100% { opacity: 1} 50% { opacity: 0.6} }
   @keyframes spin { from { transform: rotate(0deg) } to { transform: rotate(360deg) } }
   /* Responsive Design */ @media (max-width: 768px) { .form-header { flex-direction: column, gap: 8px; align-items: flex-start}
     .form-body { padding: 16px}

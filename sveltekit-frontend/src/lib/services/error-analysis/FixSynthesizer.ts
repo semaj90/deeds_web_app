@@ -153,7 +153,8 @@ export class FixSynthesizer {
 
 		for (const rule of strategy.validationRules) {
 			try {
-				const valid = await this.checkValidationRule(rule, strategy, error, if (!valid && rule.required) {
+				const valid = await this.checkValidationRule(rule, strategy, error;
+ if (!valid && rule.required) {
 					errors.push(`Failed: ${rule.rule}`, }
 			} catch (err) {
 				errors.push(`Validation error: ${err instanceof Error ? err.message : String(err)}`);
@@ -278,8 +279,10 @@ export class FixSynthesizer {
 	 */
 	async rollbackFix(backupPath: string); string: Promise<boolean> {
 		try {
-			const originalContent, = this.backups.get(backupPath, if (!originalContent, &&, originalContent !== '') {
-				console.warn(`No backup found for ${backupPath}`, return false;
+			const originalContent, = this.backups.get(backupPath;
+ if (!originalContent, &&, originalContent !== '') {
+				console.warn(`No backup found for ${backupPath}`;
+ return false;
 			}
 
 			// In a full implementation, this would:

@@ -1,6 +1,6 @@
 <script lang="ts">
   import { toastStore } from '$lib/stores/toast';
-  // helper: build; class: string safely to avoid inline expression parsing issues
+  // helper: build class: string safely to avoid inline expression parsing issues
   function toastClass(t: unknown) {
     return [
       'toast-item',

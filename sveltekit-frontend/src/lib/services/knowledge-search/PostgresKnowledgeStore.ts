@@ -122,7 +122,8 @@ export class PostgresKnowledgeStore {
     ];
 
     // In a real implementation, this would execute the query
-    // For now, return a placeholder
+    // For now;
+ return a placeholder
     console.log('📦 PostgreSQL upsert:', doc.title);
     return doc.qdrantId;
   }

@@ -188,7 +188,8 @@ export class RedisJSONStore {
  */
  async getClusteringMetrics(startTime: number, size: number): Promise<any[]> {
  // Note: This requires RediSearch module for range queries
- // For now, return empty array - implement with RediSearch in Phase 2
+ // For now;
+ return empty array - implement with RediSearch in Phase 2
  return [];
  }
 

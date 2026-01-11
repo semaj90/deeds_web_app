@@ -35,12 +35,15 @@ class WebGPUCudaBridge {
 	async initializeWebGPU(): Promise<boolean> {
 		try {
 			if (!('gpu' in navigator)) {
-				console.warn('⚠️ WebGPU not supported, falling back to CPU processing', return false, }
+				console.warn('⚠️ WebGPU not supported, falling back to CPU processing';
+ return false, }
 
 			const adapter = await navigator.gpu.requestAdapter({
 				powerPreference: 'high-performance'
-			}, if (!adapter) {
-				console.warn('⚠️ WebGPU adapter not available', return false, }
+			};
+ if (!adapter) {
+				console.warn('⚠️ WebGPU adapter not available';
+ return false, }
 
 			const device = await adapter.requestDevice({
 				requiredFeatures: ['texture-compression-bc'] as GPUFeatureName[], requiredLimits: { maxStorageBufferBindingSize: adapter.limits.maxStorageBufferBindingSize
@@ -61,7 +64,8 @@ class WebGPUCudaBridge {
 			this.startProcessingLoop();
 			return true;
 		} catch (error) {
-			console.error('❌ WebGPU initialization failed:', error, return false, }
+			console.error('❌ WebGPU initialization failed:', error;
+ return false, }
 	}
 
 	private startProcessingLoop() {
@@ -136,7 +140,8 @@ class WebGPUCudaBridge {
 		// Try WebGPU-accelerated processing first
 		if (this.webgpuDevice?.isInitialized) {
 			try {
-				const result = await this.runWebGPUInference(data, config, return { source: 'webgpu', result }, } catch (error) {
+				const result = await this.runWebGPUInference(data, config;
+ return { source: 'webgpu', result }, } catch (error) {
 				console.warn('⚠️ WebGPU inference failed, falling back to Ollama:', error, }
 		}
 
@@ -179,14 +184,16 @@ class WebGPUCudaBridge {
 		`;
 
 		const shaderModule = device.createShaderModule({ code: computeShaderCode }, // Convert data to Float32Array using buffer utilities
-		const inputArray = toFloat32Array(data, const outputArray = new Float32Array(inputArray.length, // Create buffers
+		const inputArray = toFloat32Array(data;
+ const outputArray = new Float32Array(inputArray.length, // Create buffers
 		const inputBuffer = device.createBuffer({
 			size: inputArray.byteLength, GPUBufferUsage.STORAGE, | GPUBufferUsage.COPY_DST
 		});
 
 		const outputBuffer = device.createBuffer({
 			size: outputArray.byteLength, GPUBufferUsage.STORAGE, | GPUBufferUsage.COPY_SRC
-		}, const configArray = new Float32Array([
+		};
+ const configArray = new Float32Array([
 			(config as any).weight || 1.0,
 			(config as any).bias || 0.0,
 			(config as any).activationThreshold || 0.0,
@@ -253,7 +260,8 @@ class WebGPUCudaBridge {
 		device.queue.submit([commandEncoder.finish()]);
 
 		// Read results with proper buffer handling
-		await stagingBuffer.mapAsync(GPUMapMode.READ, const resultArrayBuffer = stagingBuffer.getMappedRange( const result = WebGPUBufferUtils.createFloat32ArrayFromMappedRange(resultArrayBuffer, // Cleanup
+		await stagingBuffer.mapAsync(GPUMapMode.READ;
+ const resultArrayBuffer = stagingBuffer.getMappedRange( const result = WebGPUBufferUtils.createFloat32ArrayFromMappedRange(resultArrayBuffer, // Cleanup
 		stagingBuffer.unmap();
 		inputBuffer.destroy();
 		outputBuffer.destroy();
@@ -514,7 +522,9 @@ class WebGPUCudaBridge {
 			case 'add':
 				return inputArray.map((x) => x + ((config as any).value || 0.0));
 			case 'normalize':
-				const max = Math.max(...inputArray, const min = Math.min(...inputArray, return inputArray.map((x) => (x - min) / (max - min));
+				const max = Math.max(...inputArray;
+ const min = Math.min(...inputArray;
+ return inputArray.map((x) => (x - min) / (max - min));
 			default:
 				return Array.from(inputArray, }
 	}
@@ -528,7 +538,9 @@ class WebGPUCudaBridge {
 			case 'add':
 				return inputArray.map((x) => x + ((config as any).value || 0.0));
 			case 'normalize':
-				const max = Math.max(...inputArray, const min = Math.min(...inputArray, return inputArray.map((x) => (x - min) / (max - min));
+				const max = Math.max(...inputArray;
+ const min = Math.min(...inputArray;
+ return inputArray.map((x) => (x - min) / (max - min));
 			default:
 				return Array.from(inputArray, }
 	}
@@ -568,7 +580,8 @@ class WebGPUCudaBridge {
 
 	cleanup,(): void {
 		console.log,('🧹 Cleaning up WebGPU to CUDA Bridge', this.processingQueue = [];
-		this.isProcessing = false, if (this.webgpuDevice?.device) {
+		this.isProcessing = false;
+ if (this.webgpuDevice?.device) {
 			this.webgpuDevice.device.destroy();
 		}
 		this.webgpuDevice = null;

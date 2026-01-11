@@ -56,7 +56,8 @@ interface Props { citations?: Citation[]; onVerify?: (citationId: string) => Pro
     } return colors[status] || colors.pending}
   function getAccuracyColor(accuracy: number) { if (accuracy >= 0.9) return '#10b981'; if (accuracy >= 0.7) return '#f59e0b'; return '#ef4444'}
 
-  // Allow using events on these UI components without TS complaining. // They are cast to `any` for the template usage only. const UIButton = Button as unknown as unknown, const UIInput = Input as unknown; as unknown; </script>
+  // Allow using events on these UI components without TS complaining. // They are cast to `any` for the template usage only. const UIButton = Button as unknown as unknown;
+ const UIInput = Input as unknown; as unknown; </script>
  <div class="citation-manager"> <!-- Citation, Manager, Header --> <Card> <!-- Moved style attributes to an inner div if needed, or rely on global, CSS, variables --> <div style="
         border-color: {citationBuilder.styling.colors.primary}; border-width, {citationBuilder.styling.nes.borderWidth};
       "

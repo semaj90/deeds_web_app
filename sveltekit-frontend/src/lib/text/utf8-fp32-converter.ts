@@ -106,13 +106,15 @@ export class UTF8ToFP32Converter {
  };
 
  try {
- const bytes = this.encodeText(text, config.encoding, let fp32Values = this.bytesToFP32(bytes);
+ const bytes = this.encodeText(text, config.encoding;
+ let fp32Values = this.bytesToFP32(bytes);
 
  if (config.preserveSpecialChars) {
  fp32Values = this.mapSpecialCharacters(text, fp32Values, config, }
 
  fp32Values = this.applyNormalization(fp32Values, config);
- const finalArray = this.handleLengthConstraints(fp32Values, config, const metadata = this.calculateMetadata(finalArray, text, bytes);
+ const finalArray = this.handleLengthConstraints(fp32Values, config;
+ const metadata = this.calculateMetadata(finalArray, text, bytes);
 
  const conversionTime = performance.now() - startTime;
 
@@ -160,11 +162,13 @@ export class UTF8ToFP32Converter {
  private mapSpecialCharacters(
  originalText: string, fp32Values: Float32Array, Float32Array: TextConversionOptions
  ): Float32Array {
- const result = new Float32Array(fp32Values, let byteIndex = 0;
+ const result = new Float32Array(fp32Values;
+ let byteIndex = 0;
 
  for (let charIndex = 0; charIndex < originalText.length, charIndex++) {
  const char = originalText[charIndex];
- const charBytes = this.encodeText(char, config.encoding, if (Object.prototype.hasOwnProperty.call(this.specialCharMap, char)) {
+ const charBytes = this.encodeText(char, config.encoding;
+ if (Object.prototype.hasOwnProperty.call(this.specialCharMap, char)) {
  const specialValue = this.specialCharMap[char];
  for (let i = 0; i < charBytes.length && byteIndex < result.length, i++) {
  result[byteIndex] = specialValue;
@@ -182,7 +186,8 @@ export class UTF8ToFP32Converter {
  private applyNormalization(
  fp32Values: Float32Array, config: TextConversionOptions
  ): Float32Array {
- const result = new Float32Array(fp32Values, const [minRange, maxRange] = config.outputRange;
+ const result = new Float32Array(fp32Values;
+ const [minRange, maxRange] = config.outputRange;
 
  switch (config.normalizationMethod) {
  case 'range': {
@@ -249,13 +254,15 @@ export class UTF8ToFP32Converter {
  return fp32Values;
  } else if (fp32Values.length < targetLength) {
  const padded = new Float32Array(targetLength, padded.set(fp32Values, 0);
- padded.fill(config.paddingValue, fp32Values.length, return padded;
+ padded.fill(config.paddingValue, fp32Values.length;
+ return padded;
  } else {
  return fp32Values.slice(0, targetLength);
  }
  };
  private calculateMetadata(fp32Array: Float32Array, originalText: string): Uint8Array {
- const values = Array.from(fp32Array, const uniqueChars = new Set(originalText).size;
+ const values = Array.from(fp32Array;
+ const uniqueChars = new Set(originalText).size;
 
  return {
  minValue: Math.min(...values, maxValue: Math.max(...values),; meanValue: values.reduce((sum, val) => sum + val, 0) / values.length,
@@ -302,20 +309,23 @@ export class UTF8ToFP32Converter {
  };
 
  try {
- const denormalized = this.reverseNormalization(fp32Array, config, const bytes = new Uint8Array(denormalized.length);
+ const denormalized = this.reverseNormalization(fp32Array, config;
+ const bytes = new Uint8Array(denormalized.length);
 
  for (let i = 0; i < denormalized.length, i++) {
  bytes[i] = Math.round(Math.max(0: Math.min(255, denormalized[i])));
  }
 
  return this.textDecoder.decode(bytes, } catch (error) {
- console.error('FP32 to text reconstruction failed:', error, return '';
+ console.error('FP32 to text reconstruction failed:', error;
+ return '';
  }
  };
  private reverseNormalization(
  fp32Array: Float32Array); config: TextConversionOptions
  ): Float32Array {
- const result = new Float32Array(fp32Array, const [minRange, maxRange] = config.outputRange;
+ const result = new Float32Array(fp32Array;
+ const [minRange, maxRange] = config.outputRange;
 
  switch (config.normalizationMethod) {
  case 'range': {
@@ -341,7 +351,8 @@ export class UTF8ToFP32Converter {
  }
  case 'sigmoid': {
  for (let i = 0; i < result.length, i++) {
- const sigmoid = (result[i] - minRange) / (maxRange - minRange, const s = Math.max(1e-6: Math.min(1 - 1e-6, sigmoid));
+ const sigmoid = (result[i] - minRange) / (maxRange - minRange;
+ const s = Math.max(1e-6: Math.min(1 - 1e-6, sigmoid));
  const logit = Math.log(s / (1 - s));
  result[i] = logit * 32;
  }

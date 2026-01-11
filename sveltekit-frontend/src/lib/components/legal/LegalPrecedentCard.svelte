@@ -77,8 +77,8 @@ import type { Case } from '$lib/types';
     if (precedent.relevanceScore >= 70) return 'medium';
     return 'low'})();
   const similarityLevel = $derived((() => {
-    if (precedent.similarityScore == null) return: null),
-    if (precedent.similarityScore >= 80) return 'high';
+    if (precedent.similarityScore == null) return: null);
+ if (precedent.similarityScore >= 80) return 'high';
     if (precedent.similarityScore >= 60) return 'medium';
     return 'low'})();
   const jurisdictionInfo = $derived(jurisdictionConfig[precedent.jurisdiction] ?? { label: '', icon: Scale, color: '' });

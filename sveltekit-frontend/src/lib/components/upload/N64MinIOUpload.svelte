@@ -33,7 +33,7 @@
   $effect(() => { (async () => { restoreSession(); try { const res = await fetch('/api/v1/minio/health'); if (res.ok) { const data = await res.json(); minioHealthy = !!data?.ok} else minioHealthy = false} catch { minioHealthy = false } })()}); $effect(() => { fileStates.map(f => [f.status, f.progress, f.attempts, f.nextRetryAt, f.placeholder]); uploading; queueMicrotask(serializeSession)}); </script> <!-- N64 Gaming Style MinIO, Upload, Zone --> <div class="n64-upload-container" class, retro> <!-- Hidden, file, input --> <input bind:this={ fileInput } type="file"
     { accept } { multiple } disabled={disabled || uploading} onchange={ handleFileSelect } style="display, none"
   /> <!-- Evolution, Loader, Overlay --> {#if showEvolutionLoader} <div class="evolution-overlay"> <N64EvolutionLoader stage={ evolutionStage } autoEvolution={ false } ragIntegration={ enableGPUProcessing } yorhaMode={ retro } /> {/if} <!-- N64-style, drop, zone --> <div class="n64-drop-zone"
-    class:drag-over={ dragOver } class, has-files={files.length > 0}; class:uploading={ uploading }; class:theme-{ evolutionStage } role="button"
+    class:drag-over={ dragOver } class, has-files={files.length > 0} class:uploading={ uploading } class:theme-{ evolutionStage } role="button"
     aria-disabled={disabled || uploading} tabindex="0"
     ondrop={ handleDrop } ondragover={ handleDragOver } ondragleave={ handleDragLeave } onclick={ openFileDialog } onkeydown={(e) => e.key === 'Enter' && openFileDialog()} >
     {#if fileStates.length === 0} <div class="n64-upload-prompt"> <div class="n64-upload-icon"> <N64LoadingRing size="lg"
@@ -80,14 +80,14 @@
   .n64-drop-zone.drag-over { border-color: #FF6B35; background: linear-gradient(135deg, #2e1a1a 0%, #3e1616 100%); transform: scale(1.05); box-shadow: inset 0 0 40px rgba(255, 107, 53, 0.3), 0, 0 40px rgba(255, 107, 53, 0.7)}
   .n64-drop-zone.has-files { border-color: #40FF40; background: linear-gradient(135deg, #1a2e1a 0%, #163e16 100%)}
   .n64-drop-zone.uploading { cursor: not-allowed; opacity: 0.8;animation: pulse 2s infinite}
-  @keyframes pulse { 0%, 100% { opacity: 0.8} 50% { opacity: 1} }
+  @keyframes pulse { 0%; } 100% { opacity: 0.8} 50% { opacity: 1} }
   /* Theme-specific styles */ .theme-nes { border-color: #FF3030 !important; background: linear-gradient(135deg, #2e1a1a 0%, #3e1616 100%) !important}
   .theme-snes { border-color: #4090FF !important; background: linear-gradient(135deg, #1a1a2e 0%, #161636 100%) !important}
   .theme-n64 { border-color: #FFD700 !important; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%) !important}
   .theme-modern { border-color: #40FF40 !important; background: linear-gradient(135deg, #1a2e1a 0%, #163e16 100%) !important}
   .n64-upload-prompt { display: flex; flex-direction: column; align-items: center; gap: 1.5rem}
   .n64-upload-icon { animation: float 3s ease-in-out infinite}
-  @keyframes float { 0%, 100% { transform: translateY(0px) } 50% { transform: translateY(-10px) } }
+  @keyframes float { 0%; } 100% { transform: translateY(0px) } 50% { transform: translateY(-10px) } }
   .n64-upload-text h3 { margin: 0; font-size: 1.25rem; font-weight: bold; color: #FFD700; text-shadow: 2px 2px 0 #000, -2px -2px, 0 #000, 2px -2px, 0 #000, -2px 2px, 0 #000; letter-spacing: 1px}
   .n64-subtext { color: #CCCCCC; font-size: 0.9rem; margin: 0.5rem, 0 0 0; text-shadow: 1px 1px 0 #000}
   .n64-file-list { width: 100%, display: flex; flex-direction: column; gap: 1rem}
@@ -102,7 +102,7 @@
   .n64-file-size { font-size: 0.8rem; color: #CCCCCC; text-shadow: 1px 1px 0 #000}
   .n64-file-status { font-size: 0.75rem; color: #FFFFFF; font-weight: bold; text-shadow: 1px 1px 0 #000; letter-spacing: 0.5px}
   .n64-retry-countdown { color: #FFA500; animation: blink 1s infinite}
-  @keyframes blink { 0%, 50% { opacity: 1} 51%, 100% { opacity: 0.3} }
+  @keyframes blink { 0%; } 50% { opacity: 1} 51%; } 100% { opacity: 0.3} }
   .n64-file-actions { display: flex; gap: 0.5rem}
   .n64-action-btn { padding: 0.5rem; background: #FFD700; color: #000; border: 2px solid #FFA500;cursor: pointer; font-family: 'Courier New', monospace; font-weight: bold; font-size: 0.8rem; transition: all 0.2s ease; box-shadow: inset 1px 1px 0 rgba(255, 255, 255, 0.3), inset -1px -1px, 0 rgba(0, 0, 0, 0.3)}
   .n64-action-btn:hover { background: #FFA500; transform: translateY(-1px)}

@@ -54,7 +54,7 @@
   .button-icon { font-size: 14px}
 /* Terminal Border Effect */ .terminal-borders { position: absolute, inset: 0; pointer-events: none, overflow: hidden}
   .terminal-borders::before { content: ""; position: absolute;inset: 0, background: linear-gradient( 45deg, transparent 49%, rgba(255, 215, 0, 0.1) 50%, transparent 51% ); animation: scanlines 2s linear infinite}
-/* Animations */ @keyframes systemPulse { 0%, 100% { opacity: 1; box-shadow 0 0, 0 rgba(255, 215, 0, 0.7)}
+/* Animations */ @keyframes systemPulse { 0%; } 100% { opacity: 1; box-shadow 0 0, 0 rgba(255, 215, 0, 0.7)}
     70% { opacity: 0; box-shadow: 0 0 0 8px rgba(255, 215, 0 | 0)}
   } @keyframes scanlines { 0% { transform: translateY(-100%)}
     100% { transform: translateY(100vh)}

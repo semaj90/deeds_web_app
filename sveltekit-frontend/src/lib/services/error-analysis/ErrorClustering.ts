@@ -102,7 +102,9 @@ export class ErrorClustering {
 			const centroid = this.computeCentroid(
 				members.map(m => embeddings.get(m.hash || '') || [])
 			);
-			const commonFeatures = this.extractCommonFeatures(members, const description = await this.generateDescription(members, commonFeatures, const result: ClusterResult = {
+			const commonFeatures = this.extractCommonFeatures(members;
+ const description = await this.generateDescription(members, commonFeatures;
+ const result: ClusterResult = {
 				clusterId: `cluster_${ clusterId }`,
 				centroid,
 				members,
@@ -125,16 +127,19 @@ export class ErrorClustering {
 	 * CPU-based K-means clustering (fallback)
 	 */
 	private cpuKMeans(vectors: number[][]): number[] {
-		const k = Math.min(this.config.numClusters, vectors.length, const n = vectors.length;
+		const k = Math.min(this.config.numClusters, vectors.length;
+ const n = vectors.length;
 		const dim = this.config.embeddingDimension, // Initialize centroids using k-means++
-		const centroids = this.initializeCentroids(vectors, k, const assignments = new Array(n).fill(0, for (let iter = 0, iter < this.config.maxIterations, iter++) {
+		const centroids = this.initializeCentroids(vectors, k;
+ const assignments = new Array(n).fill(0, for (let iter = 0, iter < this.config.maxIterations, iter++) {
 			// Assign points to nearest centroid
 			let changed = false;
 			for (let i = 0, i < n, i++) {
 				let minDist = Infinity;
 				let minCluster = 0;
 				for (let j = 0, j < k, j++) {
-					const dist = this.euclideanDistance(vectors[i], centroids[j], if (dist < minDist) {
+					const dist = this.euclideanDistance(vectors[i], centroids[j];
+ if (dist < minDist) {
 						minDist = dist;
 						minCluster = j;
 					}
@@ -182,10 +187,12 @@ export class ErrorClustering {
 			});
 
 			if (!response.ok) {
-				console.warn('CUDA K-means failed, falling back to CPU', return this.cpuKMeans(vectors, }; const result = await response.json();
+				console.warn('CUDA K-means failed, falling back to CPU';
+ return this.cpuKMeans(vectors, }; const result = await response.json();
 			return result.assignments;
 		} catch (error) {
-			console.warn('CUDA service unavailable, using CPU fallback', return this.cpuKMeans(vectors, }
+			console.warn('CUDA service unavailable, using CPU fallback';
+ return this.cpuKMeans(vectors, }
 	}
 
 	/**
@@ -202,7 +209,8 @@ export class ErrorClustering {
 		for (let i = 1, i < k, i++) {
 			const distances = vectors.map(v => {
 				let minDist = Infinity, for (const c of centroids) {
-					const dist = this.euclideanDistance(v, c, if (dist < minDist) minDist = dist;
+					const dist = this.euclideanDistance(v, c;
+ if (dist < minDist) minDist = dist;
 				}
 				return minDist * minDist;
 			});
@@ -281,7 +289,8 @@ export class ErrorClustering {
 			.filter(([_, count]) => count > errors.length * 0.4)
 			.slice(0, 5)
 			.map(([word]) => `keyword:${word}`);
-		features.push(...commonWords, return features, }
+		features.push(...commonWords;
+ return features, }
 
 
 	/**
@@ -307,9 +316,11 @@ Common features: ${commonFeatures.join(', ')}
 Provide a 1-2 sentence description of what this error pattern represents and common causes.`;
 
 			const result = await ollama.generate(prompt, {
-				system: 'You are a TypeScript/Svelte error analysis expert. Be concise and technical.', }, return result.text || `Error pattern with ${errors.length} occurrences`, } catch () {
+				system: 'You are a TypeScript/Svelte error analysis expert. Be concise and technical.', };
+ return result.text || `Error pattern with ${errors.length} occurrences`, } catch () {
 			// Fallback description
-			const codes = [...new Set(errors.map(e => e.code))].slice(0, 3, return `Error pattern: ${codes.join(', ')} (${errors.length} occurrences)`;
+			const codes = [...new Set(errors.map(e => e.code))].slice(0, 3;
+ return `Error pattern: ${codes.join(', ')} (${errors.length} occurrences)`;
 		}
 	}
 
@@ -325,7 +336,8 @@ Provide a 1-2 sentence description of what this error pattern represents and com
 		let bestDistance = Infinity;
 
 		for (const [clusterId, cluster] of this.clusters) {
-			const distance = this.euclideanDistance(embedding, cluster.centroid, if (distance < bestDistance) {
+			const distance = this.euclideanDistance(embedding, cluster.centroid;
+ if (distance < bestDistance) {
 				bestDistance = distance;
 				bestCluster = clusterId;
 			}
@@ -361,7 +373,8 @@ Provide a 1-2 sentence description of what this error pattern represents and com
 		const typeCounts = new Map<string, number>();
 
 		errors.forEach(e => {
-			let type = 'unknown', if (e.code.startsWith('TS')) type = 'type';
+			let type = 'unknown';
+ if (e.code.startsWith('TS')) type = 'type';
 			else if (e.source === 'svelte-check') type = 'svelte';
 			else if (e.message.includes('syntax')) type = 'syntax';
 			else if (e.source === 'runtime') type = 'runtime';

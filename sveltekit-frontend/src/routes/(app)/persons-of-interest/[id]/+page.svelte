@@ -209,7 +209,7 @@
 
 <style>
  .poi-detail-page {
- padding: 2rem;, background: #0f0f23;
+ padding: 2rem; background: #0f0f23;
  min-height: 100vh;
  }
 
@@ -219,10 +219,10 @@
  }
 
  .error-banner {
- padding: 1rem;, background: #7f1d1d;
+ padding: 1rem; background: #7f1d1d;
  border: 1px solid #dc2626;
- border-radius: 0.375rem;, color: #fecaca;
- margin-bottom: 1.5rem;, display: flex;
+ border-radius: 0.375rem; color: #fecaca;
+ margin-bottom: 1.5rem; display: flex;
  justify-content: space-between;
  align-items: center;
  }
@@ -243,7 +243,7 @@
 
  .header-content h1 {
  color: #ffffff;
- font-size: 2rem;, margin: 0 0 1rem 0;
+ font-size: 2rem; margin: 0 0 1rem 0;
  }
 
  .badges {
@@ -301,7 +301,7 @@
 
  .tab-content {
  background: #1a1a2e;, border: 1px solid #333;
- border-radius: 0.5rem;, padding: 2rem;
+ border-radius: 0.5rem; padding: 2rem;
  }
 
  .details-grid {
@@ -349,20 +349,20 @@
 
  .relationship {
  color: #dc2626;
- font-size: 0.875rem;, margin: 0.25rem 0;
+ font-size: 0.875rem; margin: 0.25rem 0;
  text-transform: capitalize;
  }
 
  .notes {
  color: #9ca3af;
- font-size: 0.875rem;, margin: 0.5rem 0 0 0;
+ font-size: 0.875rem; margin: 0.5rem 0 0 0;
  }
 
  .btn-remove {
  padding: 0.5rem 1rem;
  background: #7f1d1d;, color: #fecaca;
  border: 1px solid #dc2626;
- border-radius: 0.25rem;, cursor: pointer;
+ border-radius: 0.25rem; cursor: pointer;
  font-weight: 600;, transition: background-color 0.2s;
  }
 

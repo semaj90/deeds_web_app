@@ -102,7 +102,7 @@
  {/if}
 
  {#each messages as message (message)}
- <div class="message" class:user={message.role === 'user'}; class:assistant={message.role === 'assistant'}>
+ <div class="message" class:user={message.role === 'user'} class:assistant={message.role === 'assistant'}>
  <div class="message-content">
  {message.content}
  </div>
@@ -271,7 +271,7 @@
  }
 
  @keyframes bounce {
- 0%, 80%, 100% {
+ 0%, 80%; } 100% {
  opacity: 0.3; transform: translateY(0);
  }
  40% {

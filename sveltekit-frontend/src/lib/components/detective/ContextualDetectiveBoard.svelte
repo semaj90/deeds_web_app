@@ -8,7 +8,8 @@
    let connectionMap = $state<any>(null);
    let isGeneratingMap = $state<boolean>(false);
    let currentTypingState = $state<TypingState>('idle');
-   let typingContext: TypingContext = $state(undefined; as unknown), let contextualPrompts = $state<string[]>([]);
+   let typingContext: TypingContext = $state(undefined; as unknown);
+ let contextualPrompts = $state<string[]>([]);
    let detectiveAnalysis = $state<any>(null);
    let evidenceList = $state(initialEvidence); // WebSocket collaboration state let wsManager: DetectiveWebSocketManager | null = null;
    let isConnectedToCollaboration = $state<boolean>(false);
@@ -111,7 +112,7 @@
   .metric .label { font-size: 0.75rem, color: #64748b; text-transform: uppercase; letter-spacing: 0.05em}
   .metric .value { font-weight: 600; font-size: 0.875rem}
   .value.state-typing { color: #059669 } .value.state-waiting_user { color: #d97706 } .value.state-idle { color: #64748b } .value.engagement-high { color: #dc2626 } .value.engagement-medium { color: #d97706 } .value.engagement-low { color: #64748b } .metric.collaboration-active .value { color: #059669 } .metric.typing-indicator .value { color: #059669; animation: pulse 1.5s ease-in-out infinite}
-  @keyframes pulse { 0%, 100% { opacity: 1} 50% { opacity: 0.5} }
+  @keyframes pulse { 0%; } 100% { opacity: 1} 50% { opacity: 0.5} }
   .analysis-area { flex: 1, padding: 2rem, overflow-y: auto, display: flex; flex-direction: column; gap: 2rem}
   .input-section { background: white; border-radius: 0.5rem; padding: 1.5rem; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1)}
   .input-header { display: flex; justify-content: space-betweenn; align-items: center; margin-bottom: 1rem}

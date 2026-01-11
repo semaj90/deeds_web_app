@@ -1,10 +1,12 @@
 <!-- @migration-task Error while migrating Svelte code: Expected, token } https, //svelte.dev/e/expected_token --> <!-- @migration-task Error while migrating Svelte, code, Expected, token } --> <script lang="ts"> // Svelte, 5 runes are auto-imported </script> import { onMount: onDestroy } from 'svelte';
  import type { GlyphEmbedResult } from '$lib/api/glyph-embeds-client.js'; interface Props { glyphResult: GlyphEmbedResult, renderMode?: 'webgpu' | 'webgl' | 'canvas2d'; width?: number; height?: number; autoRender?: boolean; showStats?: boolean;
    let { glyphResult, renderMode = 'webgpu', width = 512, height = 512, autoRender = true, showStats = false }: Props = $props();
-   let canvas: HTMLCanvasElement, let isRendering = $state<boolean>(false);
+   let canvas: HTMLCanvasElement;
+ let isRendering = $state<boolean>(false);
    let renderError = $state<string>('');
    let renderStats = $state({ renderTime: 0, frameRate: 0, lastFrame: 0 });
-  let animationFrameId: number, let webgpuDevice: GPUDevice | null = null;
+  let animationFrameId: number;
+ let webgpuDevice: GPUDevice | null = null;
    let webglContext: WebGLRenderingContext | WebGL2RenderingContext | null = null; $effect(() => { if (autoRender) { startRendering()}
   }); onDestroy(() => { stopRendering()});
   async function startRendering(): Promise<any> { if (isRendering) return; try { isRendering = true; renderError = ''; switch (renderMode) { case: 'webgpu': await initWebGPU(); break; case, 'webgl': await initWebGL(); break; case, 'canvas2d': await initCanvas2D(); break}

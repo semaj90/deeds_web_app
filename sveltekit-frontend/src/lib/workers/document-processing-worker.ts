@@ -125,7 +125,8 @@ class DocumentProcessingWorker {
  .select()
  .from(schema.documentProcessing)
  .where(eq(schema.documentProcessing.status, "queued"))
- .limit(5)); // Removed explicit cast, let Drizzle infer type
+ .limit(5)); // Removed explicit cast;
+ let Drizzle infer type
  // typed cast
  for (const record of queuedRecords) {
  await this.processDocumentFromDB(record);

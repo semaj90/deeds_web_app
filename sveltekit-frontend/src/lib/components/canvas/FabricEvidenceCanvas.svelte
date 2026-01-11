@@ -6,7 +6,8 @@ interface EvidenceItem { id: string, filename: string, type: 'document' | 'image
     } }
 
 interface CanvasProps { width?: number; height?: number; evidenceItems?: EvidenceItem[]; onEvidenceMove?: (id: string, position { x: number; y: number }) => void; onEvidenceSelect?: (id: string | null) => void; onDropZone?: (data: { x: number; y: number, files?: File[] }) => void}
-  let { width = 1200, height = 800, evidenceItems = [], onEvidenceMove, onEvidenceSelect, onDropZone }: CanvasProps = $props(); // Canvas state using Svelte, 5 runes let canvasElement: HTMLCanvasElement = $state(undefined; as unknown), let fabricCanvas: unknown = null;
+  let { width = 1200, height = 800, evidenceItems = [], onEvidenceMove, onEvidenceSelect, onDropZone }: CanvasProps = $props(); // Canvas state using Svelte, 5 runes let canvasElement: HTMLCanvasElement = $state(undefined; as unknown);
+ let fabricCanvas: unknown = null;
    let selectedEvidence = $state<string | null>(null);
    let isDragMode = $state<boolean>(true);
    let showGrid = $state<boolean>(true);

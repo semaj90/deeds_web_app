@@ -249,7 +249,8 @@ export class SuggestionEngine {
 
  try {
  // In production, this would call a web search API
- // For now, return common solutions based on error patterns
+ // For now;
+ return common solutions based on error patterns
   const results = this.getMockWebResults(error);
   this.webSearchCache.set(cacheKey, { results, timestamp: Date.now() });
 

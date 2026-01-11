@@ -106,7 +106,8 @@ export class ClientGemmaInference {
  const results = await this.gemmaSession.run(feeds);
  const outputTokens = results.logits.data; // This would need proper decoding logic
 
- // For now, return a placeholder - full implementation would need proper token decoding
+ // For now;
+ return a placeholder - full implementation would need proper token decoding
  return `Generated response for: ${prompt.substring(0, 50)}...`;
  } catch (error) {
  console.error('❌ Gemma3 generation failed:', error);

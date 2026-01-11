@@ -293,8 +293,7 @@ select:focus {
 
 /* Animations */
 @keyframes pulse-red {
- 0%,
- 100% {
+ 0%; } 100% {
  opacity: 1;
  }
  50% {
@@ -307,8 +306,7 @@ select:focus {
 }
 
 @keyframes glow-green {
- 0%,
- 100% {
+ 0%; } 100% {
  text-shadow: 0 0 6px rgba(0, 255, 136, 0.75);
  }
  50% {

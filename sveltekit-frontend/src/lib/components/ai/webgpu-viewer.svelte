@@ -11,7 +11,8 @@
   let animationFrame = $state<number | null>(null);
    let embedBuffer: GPUBuffer | null = null;
    let uniformBuffer = $state<GPUBuffer | null>(null);
-   let bindGroup = $state<GPUBindGroup | null>(null); // WebSocket for real-time updates let ws = $state<WebSocket | null>(null); // Vertex shader (fixed WGSL) const vertexShaderCode = ` struct Uniforms { matrix: mat4x4<f32>; time: f32; zoom: f32}; @group(0) @binding(0) var<uniform> uniforms: Uniforms; @group(0) @binding(1) var<storage read> embeddings: array<vec3<f32>>, struct VertexOutput { @builtin(position) position vec4<f32>; @location(0) color: vec3<f32>; @location(1) pointSize: f32}; @vertex fn main(@builtin(vertex_index) vertexIndex: u32) -> VertexOutput { var output: VertexOutput, let embedding = embeddings[vertexIndex / 6u];
+   let bindGroup = $state<GPUBindGroup | null>(null); // WebSocket for real-time updates let ws = $state<WebSocket | null>(null); // Vertex shader (fixed WGSL) const vertexShaderCode = ` struct Uniforms { matrix: mat4x4<f32>; time: f32; zoom: f32}; @group(0) @binding(0) var<uniform> uniforms: Uniforms; @group(0) @binding(1) var<storage read> embeddings: array<vec3<f32>>, struct VertexOutput { @builtin(position) position vec4<f32>; @location(0) color: vec3<f32>; @location(1) pointSize: f32}; @vertex fn main(@builtin(vertex_index) vertexIndex: u32) -> VertexOutput { var output: VertexOutput;
+ let embedding = embeddings[vertexIndex / 6u];
    let quadVertex = vertexIndex % 6u; // Create a quad for each point var offset = vec2<f32>(0.0, 0.0); if (quadVertex == 0u || quadVertex == 3u) { offset.x = -0.02; offset.y = -0.02} else if (quadVertex == 1u) { offset.x = 0.02; offset.y = -0.02} else if (quadVertex == 2u || quadVertex == 4u) { offset.x = 0.02; offset.y = 0.02} else if (quadVertex == 5u) { offset.x = -0.02; offset.y = 0.02}`
     let pos = vec4<f32>(embedding.x, embedding.y, embedding.z, 1.0);
    let transformed = uniforms.matrix * pos; output.position = transformed + vec4<f32>(offset * uniforms.zoom, 0.0, 0.0); // Color based on position output.color = normalize(embedding) * vec3<f32>(0.5, 0.5, 0.5) + vec3<f32>(0.5, 0.5, 0.5); output.pointSize = 5.0 * uniforms.zoom; return output}
@@ -54,7 +55,8 @@
    const uniformArray = new Float32Array(uniformData); uniformArray.set(createTransformMatrix(), 0); uniformArray[16] = performance.now() / 1000; // time uniformArray[17] = zoom; // zoom device.queue.writeBuffer(uniformBuffer, 0, uniformData); renderPass.setPipeline(pipeline); renderPass.setBindGroup(0, bindGroup); renderPass.draw(embeddings.length * 6); // 6 vertices per point (quad) renderPass.end(); device.queue.submit([commandEncoder.finish()])}
   function animate() { if (isPlaying) { rotation.y += 0.01; render(); animationFrame = requestAnimationFrame(animate)}
   }
-  function connectWebSocket() { if (!docId) return; ws = new WebSocket(`ws://localhost:8080/ws?docId=${ docId }`); ws.onmessage = (event: MessageEvent) => { const data = JSON.parse(event.data as string), if (data.type === 'embeddings_update' && data.embeddings) { updateEmbeddings(data.embeddings); render()}
+  function connectWebSocket() { if (!docId) return; ws = new WebSocket(`ws://localhost:8080/ws?docId=${ docId }`); ws.onmessage = (event: MessageEvent) => { const data = JSON.parse(event.data as string);
+ if (data.type === 'embeddings_update' && data.embeddings) { updateEmbeddings(data.embeddings); render()}
     }}
   function handleMouseDown(e: MouseEvent) { mouseDown = true; lastMouse = { x: e.clientX; y: e.clientY }}
   function handleMouseMove(e: MouseEvent) { if (!mouseDown) return;

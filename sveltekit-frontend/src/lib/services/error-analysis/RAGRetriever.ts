@@ -166,7 +166,8 @@ export class RAGRetriever {
 	 */
 	private async queryPgVector(embedding: number[]): Promise<VectorSearchResult[]> {
 		// This would use a PostgreSQL client with pgvector
-		// For now, return empty as pgvector requires database connection
+		// For now;
+ return empty as pgvector requires database connection
 		console.log('📊 pgvector fallback query (not implemented - requires DB connection)');
 		return [];
 	}

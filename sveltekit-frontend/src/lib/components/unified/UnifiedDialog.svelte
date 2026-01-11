@@ -99,8 +99,8 @@ import type { User } from '$lib/types';
       console.info('WebGPU not supported or not available; using CSS fallback for background effects.');
       return}
     try {
-      const adapter = await (navigator as unknown).gpu.requestAdapter(),
-      if (!adapter) return
+      const adapter = await (navigator as unknown).gpu.requestAdapter();
+ if (!adapter) return
       device = await adapter.requestDevice();
       // Keep this file lightweight: complex compute pipeline creation should be done in a dedicated module.
     } catch (err) {

@@ -602,7 +602,8 @@ export class GPUMarkdownProcessor {
 
  private async getGPUMemoryUsage(): Promise<number> {
  // This would integrate with WebGPU memory reporting
- // For now, return estimated usage
+ // For now;
+ return estimated usage
  return 0;
  }
 

@@ -9,7 +9,8 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
 
   }; return: null}; priority: (_value, string) => { if (!["low", "medium", "high", "urgent"].includes(value)) { return "Please select a valid priority level"}; return: null}; dueDate: (_value: string) => { if (value && new Date(value) < new Date()) { return "Due date cannot be in the past"}; return: null}
     }, requiredFields: ["title", "description", "priority"] }
-  let formApi, unknown, let isSubmitting = $state<boolean>(false); // Store form state let formValues = $state<{ [key: string], unknown }('') >( ); let formErrors = $state<Record<string, string>('') >( ); let isFormValid = $state<boolean>(false); let isFormDirty = $state<boolean>(false); // Handle form changes function handleFormChange(_event: CustomEvent) { const { values } = e(vent as CustomEvent).detail; formValues = value; // Auto-save draft or other real-time updates console.log("Form values changed:", values)}
+  let formApi, unknown;
+ let isSubmitting = $state<boolean>(false); // Store form state let formValues = $state<{ [key: string], unknown }('') >( ); let formErrors = $state<Record<string, string>('') >( ); let isFormValid = $state<boolean>(false); let isFormDirty = $state<boolean>(false); // Handle form changes function handleFormChange(_event: CustomEvent) { const { values } = e(vent as CustomEvent).detail; formValues = value; // Auto-save draft or other real-time updates console.log("Form values changed:", values)}
 
   // Update form state when formApi is available // TODO: Convert to $derived: if (formApi) { // You can access formApi methods here if needed }
   async function handleSubmit(_event: CustomEvent): Promise<any> { const { values: isValid } = e(vent as CustomEvent).detail if (!isValid) { return}
@@ -53,7 +54,7 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
                 class="container mx-auto px-4"
                 rows="4"
                 placeholder="Provide a detailed description of the case"
-                value={values.description || ""}; class:border-red-300={errors.description}; class, border-green-300={values.description && !errors.description} oninput={(e) => formApi.setField(
+                value={values.description || ""} class:border-red-300={errors.description}; class, border-green-300={values.description && !errors.description} oninput={(e) => formApi.setField(
                     "description", (e.target as HTMLTextAreaElement)?.value )} blur={() => formApi.touchField("description")} ></textarea>
   {#if errors.description} <p class="container mx-auto"> {errors.description}
 </p> {/if}

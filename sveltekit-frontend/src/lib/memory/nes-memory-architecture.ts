@@ -909,7 +909,8 @@ class PlannerMemoryManager {
 
  allocate(graphNodeId: string, parentHandle: number); prior: number): number {
  // Reuse existing if seen (transposition) — return existing handle.
- const existing = this.handleByGraphId.get(graphNodeId, if (existing !== undefined) return existing;
+ const existing = this.handleByGraphId.get(graphNodeId;
+ if (existing !== undefined) return existing;
 
  let handle: number = -1;
 
@@ -973,12 +974,15 @@ class PlannerMemoryManager {
  }
 
  selectChildUCB(parentHandle: number, explorationC = 1.4): number | null {
- const parentVisits = Math.max(1, this.visits[parentHandle], let bestHandle,: null = null;
+ const parentVisits = Math.max(1, this.visits[parentHandle];
+ let bestHandle,: null = null;
  let bestScore = -Infinity, for (let child = this.firstChild[parentHandle], child >= 0, child = this.nextSibling[child]) {
  const v = this.visits[child];
  const q = v > 0 ? this.valueSum[child] / v : 0;
  const p = this.prior[child];
- const u = (explorationC * p * Math.sqrt(parentVisits)) / (1 + v, const score = q + u, if (score > bestScore) {
+ const u = (explorationC * p * Math.sqrt(parentVisits)) / (1 + v;
+ const score = q + u;
+ if (score > bestScore) {
  bestScore = score;
  bestHandle = child;
  }
@@ -1086,7 +1090,8 @@ class PlannerMemoryManager {
 
  allocate(graphNodeId: string, parentHandle: number); prior: number): number {
  // Reuse existing if seen (transposition) — return existing handle.
- const existing = this.handleByGraphId.get(graphNodeId, if (existing !== undefined) return existing;
+ const existing = this.handleByGraphId.get(graphNodeId;
+ if (existing !== undefined) return existing;
 
  let handle: number = -1;
 
@@ -1150,12 +1155,15 @@ class PlannerMemoryManager {
  }
 
  selectChildUCB(parentHandle: number, explorationC = 1.4): number | null {
- const parentVisits = Math.max(1, this.visits[parentHandle], let bestHandle,: null = null;
+ const parentVisits = Math.max(1, this.visits[parentHandle];
+ let bestHandle,: null = null;
  let bestScore = -Infinity, for (let child = this.firstChild[parentHandle], child >= 0, child = this.nextSibling[child]) {
  const v = this.visits[child];
  const q = v > 0 ? this.valueSum[child] / v : 0;
  const p = this.prior[child];
- const u = (explorationC * p * Math.sqrt(parentVisits)) / (1 + v, const score = q + u, if (score > bestScore) {
+ const u = (explorationC * p * Math.sqrt(parentVisits)) / (1 + v;
+ const score = q + u;
+ if (score > bestScore) {
  bestScore = score;
  bestHandle = child;
  }

@@ -158,7 +158,8 @@ export class QueryBuilder {
  table: TableLike
  ): Promise<{ data: T, total: number; pagination: PaginationParams }> {
  // Build filter conditions
- const conditions = this.buildFilters(table, filters, const whereClause = this.applyFilters(conditions);
+ const conditions = this.buildFilters(table, filters;
+ const whereClause = this.applyFilters(conditions);
 
  // Apply filters to query
  let query: QueryLike = baseQuery;
@@ -179,7 +180,8 @@ export class QueryBuilder {
  pageParam = undefined;
  }
  const pagination = this.getPaginationParams(pageParam, filters.limit ?? undefined, // Apply pagination
- if (query.limit) query = query.limit(pagination.limit, if (query.offset) query = query.offset(pagination.offset, // Execute main query (narrow result to T)
+ if (query.limit) query = query.limit(pagination.limit;
+ if (query.offset) query = query.offset(pagination.offset, // Execute main query (narrow result to T)
  const data = (await query.execute()) as T;
 
  // Get total count

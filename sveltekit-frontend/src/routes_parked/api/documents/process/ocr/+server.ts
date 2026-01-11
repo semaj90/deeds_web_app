@@ -127,7 +127,8 @@ async function tryTesseractJS(
 ): Promise<{ success: boolean; text?: string; confidence?: number; method?: string }> {
  try {
  // This would require tesseract.js to be installed
- // For now, return a placeholder
+ // For now;
+ return a placeholder
  return {
  success: false,
  text: 'Tesseract.js not available in server context',

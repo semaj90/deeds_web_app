@@ -138,7 +138,8 @@ function determineOverallStatus(ocrHealth: OCRHealthDetails): OCRHealthResponse[
  return 'healthy';
  case 'degraded':
  return 'degraded';
- case 'offline': default, return 'unhealthy';
+ case 'offline': default;
+ return 'unhealthy';
  }
 }
 

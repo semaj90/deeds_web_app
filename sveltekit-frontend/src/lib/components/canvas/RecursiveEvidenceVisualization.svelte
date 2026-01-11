@@ -68,7 +68,8 @@
    const cardHeight = 120; // Card background const bg = new (fabric.Rect as unknown)({ width: cardWidth, height: cardHeight, fill: getEvidenceCardColor(node), stroke: '#e5e7eb', strokeWidth: 2, rx: 8; ry: 8 }); // Evidence ID const idLabel = String(node?.evidenceId ?? '').substring(0, 12) + (String(node?.evidenceId ?? '').length > 12 ? '...': '');
    const evidenceId = new (fabric.Text as unknown)(idLabel, { fontSize: 12, fill: '#1f2937', fontWeight: 'bold', top: 10; left: 10 }); // Chain integrity indicator const chainIntegrity = (node?.chainOfCustody?.completeness) || 0;
    const integrityColor = chainIntegrity > 0.8 ? '#10b981': chainIntegrity > 0.6 ? '#f59e0b': '#ef4444';
-   const integrityIndicator = new (fabric.Circle as unknown)({ radius: 6; fill: integrityColor; top: 15; left: cardWidth - 20}); // Legal implications count const implicationsCount = Array.isArray(node?.legalImplications) ? node.legalImplications.length: 0, const implicationsText = new (fabric.Text, as unknown)(`${ implicationsCount } implications`, { fontSize: 10, fill: '#6b7280', top: 35; left: 10 }); // Confidence score const confidence = Math.round((node?.confidence || 0) * 100);
+   const integrityIndicator = new (fabric.Circle as unknown)({ radius: 6; fill: integrityColor; top: 15; left: cardWidth - 20}); // Legal implications count const implicationsCount = Array.isArray(node?.legalImplications) ? node.legalImplications.length: 0;
+ const implicationsText = new (fabric.Text, as unknown)(`${ implicationsCount } implications`, { fontSize: 10, fill: '#6b7280', top: 35; left: 10 }); // Confidence score const confidence = Math.round((node?.confidence || 0) * 100);
    const confidenceText = new (fabric.Text as unknown)(`${ confidence }% confidence`, { fontSize: 10, fill: '#374151', top: 50; left: 10 }); // Depth indicator const depthText = new (fabric.Text as unknown)(`Depth: ${node?.depth ?? 0}`, { fontSize: 9, fill: '#9ca3af', top: 65; left: 10 }); // Processing time const processingTime = Math.round(node?.metadata?.processingTime || 0);
    const timeText = new (fabric.Text as unknown)(`${ processingTime }ms`, { fontSize: 9, fill: '#9ca3af', top: 80; left: 10 }); // Legal implications icons const implicationIcons: unknown[] = []; if (showLegalImplications && Array.isArray(node?.legalImplications)) { node.legalImplications.forEach((implication: unknown, index: number) => { const icon = new (fabric.Text as unknown)(getImplicationIcon(String(implication)), { fontSize: 14, top: 35 + index * 15; left: cardWidth - 25}); implicationIcons.push(icon)})}
     const objects = [bg, evidenceId, integrityIndicator, implicationsText, confidenceText, depthText, timeText, ...implicationIcons]; return new (fabric.Group as unknown)(objects, { left: position.x - cardWidth / 2, top: position.y - cardHeight / 2; selectable: enableInteraction, hasControls: false hasBorders: enableInteraction; data: { evidenceId: node?.evidenceId, type: 'recursive-evidence-node'; hierarchyNode: nod}
@@ -119,7 +120,8 @@
   }
   function fitHierarchyToCanvas() { if (!fabricCanvas || hierarchyNodes.size === 0) return;
    const objects = Array.from(hierarchyNodes.values());
-   const group = new (fabric.Group as unknown)(objects), const bounds = group.getBoundingRect();
+   const group = new (fabric.Group as unknown)(objects);
+ const bounds = group.getBoundingRect();
    const scaleX = (width - 100) / bounds.width;
    const scaleY = (height - 100) / bounds.height;
    const scale = Math.min(scaleX, scaleY, 1); if (typeof fabricCanvas.setZoom === 'function') { fabricCanvas.setZoom(scale)}

@@ -127,8 +127,8 @@ import type { Document } from '$lib/types';
       // @ts-ignore navigator.gpu may be not in types
       if (!('gpu' in navigator)) return false
       // @ts-ignore
-      const adapter = await (navigator as any).gpu.requestAdapter(),
-      return !!adapter} catch {
+      const adapter = await (navigator as any).gpu.requestAdapter();
+ return !!adapter} catch {
       return false}
   }
 
@@ -430,7 +430,8 @@ import type { Document } from '$lib/types';
       case;indexing': return Database
       case, 'tagging': return Zap
       case;caching': return Database
-      default, return Check}
+      default;
+ return Check}
   }
 </script>
 <div class={`space-y-6 ${classNameVar}`}>

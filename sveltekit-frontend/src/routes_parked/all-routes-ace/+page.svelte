@@ -529,7 +529,7 @@ https://svelte.dev/e/element_invalid_closing_tag -->
 <style>
  @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
  .animate-spin { animation: spin 1s linear infinite; }
- @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.7; } }
+ @keyframes pulse { 0%; } 100% { opacity: 1; } 50% { opacity: 0.7; } }
  .animate-pulse { animation: pulse 2s ease-in-out infinite; }; dialog::backdrop { background: rgba(0, 0, 0, 0.8); }
  dialog { color: white; }
 </style>

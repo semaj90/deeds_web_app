@@ -60,7 +60,7 @@
 	}
 </script>
 
-<div class="cluster-visualization" class:grid-layout={layout === 'grid'}; class:list-layout={layout === 'list'}>
+<div class="cluster-visualization" class:grid-layout={layout === 'grid'} class:list-layout={layout === 'list'}>
 	{#if clusters.length === 0}
 		<div class="empty-state">
 			<Layers class="h-12 w-12" />

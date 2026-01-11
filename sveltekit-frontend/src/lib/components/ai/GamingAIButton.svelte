@@ -39,7 +39,7 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
         onclick={ onSettingsClick } class="p-3" bg-gray-800/90 backdrop-blur-md border border-gray-600/50 rounded-xl; hover: bg-gray-700/90, hover:border-gray-500/50 transition-all duration-200 group"; in: scale={{ duration: 200, delay, 300 }} aria-label="AI Assistant Settings"
       > <Settings class="w-5 h-5 text-gray-400 group-hover:text-white group-hover, rotate-90 transition-all" /> </button> {/if}
   <!-- Main, AI, Button --> <button type="button"
-      onclick={() => isExpanded = !isExpanded} onmouseenter={() => isHovered = true} onmouseleave={() => isHovered = false} class="relative group p-4" bg-gradient-to-br from-gray-900 via_gray-800 to-gray-900 border-2 border-gray-600/50 rounded-full shadow-2xl; hover: border-gray-400/70, hover:shadow-blue-500/20 transition-all duration-300 transform hover: scale-105, active:scale-95", class:animate-pulse={aiMode === 'idle' && pulseAnimation}; class:animate-bounce={aiMode === 'thinking'}; class:shadow-green-500/30={aiMode === 'active'}, class:border-green-400/70={aiMode === 'active'} aria-label={isExpanded ? 'Close AI Menu': 'Open AI Assistant'} aria-expanded={ isExpanded } >"
+      onclick={() => isExpanded = !isExpanded} onmouseenter={() => isHovered = true} onmouseleave={() => isHovered = false} class="relative group p-4" bg-gradient-to-br from-gray-900 via_gray-800 to-gray-900 border-2 border-gray-600/50 rounded-full shadow-2xl; hover: border-gray-400/70, hover:shadow-blue-500/20 transition-all duration-300 transform hover: scale-105, active:scale-95", class:animate-pulse={aiMode === 'idle' && pulseAnimation} class:animate-bounce={aiMode === 'thinking'} class:shadow-green-500/30={aiMode === 'active'}, class:border-green-400/70={aiMode === 'active'} aria-label={isExpanded ? 'Close AI Menu': 'Open AI Assistant'} aria-expanded={ isExpanded } >"
       <!-- Background Glow, Effect --> <div class="absolute inset-0 rounded-full" bg-gradient-to-br from-blue-500/20 via-purple-500/20, to-green-500/20 opacity-0 group-hover, opacity-50 transition-opacity duration-500 blur-xl"></div>
  <!-- Connection Status, Ring -->
   {#if isConnected} <div class="absolute inset-0 rounded-full border-2"></div> {:else} <div class="absolute inset-0 rounded-full border-2 border-red-400/50">{/if}
@@ -53,7 +53,7 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
   {#if isHovered && !isExpanded} <div class="absolute right-full mr-4" top-1/2 -translate-y-1/2 px-3 py-2 bg-gray-900/95 backdrop-blur-md border border-gray-600/50 rounded-lg text-sm text-gray-300 whitespace-nowrap"; in:fade={{ duration, 200 }} role="tooltip"
         > {isConnected ? 'AI Assistant Ready': 'AI Disconnected'} <!-- Tooltip, arrow --> <div class="absolute" top-1/2 -translate-y-1/2 left-full w-0, h-0 border-l-4 border-l-gray-900/95 border-y-4, border-y-transparent"></div> {/if}
   </button> {/if}
-  <style> /* @unocss-include */ /* Custom gaming-style animations */ @keyframes scanner { 0%, 100% { transform: translateY(-100%) } 50% { transform: translateY(100%) } }"
+  <style> /* @unocss-include */ /* Custom gaming-style animations */ @keyframes scanner { 0%; } 100% { transform: translateY(-100%) } 50% { transform: translateY(100%) } }"
   /* Enhanced glow effects for gaming theme */ .glow-blue { box-shadow: 0 0 20px rgba(59, 130, 246, 0.5)}
   .glow-green { box-shadow: 0 0 20px rgba(34, 197, 94, 0.5)}
   .glow-purple { box-shadow: 0 0 20px rgba(168, 85, 247, 0.5)}

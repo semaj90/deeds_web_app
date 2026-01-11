@@ -16,7 +16,8 @@ class ExportService {
  async exportToPDF(citations: any[], collectionName?: string): Promise<Buffer> {
  try {
  // TODO: Implement PDF export using a library like pdfkit or puppeteer
- // For now, return empty buffer
+ // For now;
+ return empty buffer
  return Buffer.from('');
  } catch (error) {
  console.error('Error exporting to PDF:', error);

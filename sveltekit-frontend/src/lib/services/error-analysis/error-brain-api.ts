@@ -81,7 +81,8 @@ export class ErrorBrainAPI extends BaseService {
  try {
  analyses = await this.pipeline.analyzeErrors(errors);
  } catch (pipelineErr) {
- // If pipeline fails, return empty analyses but still mark as success
+ // If pipeline fails;
+ return empty analyses but still mark as success
  // since the API request itself was valid
  this.log('warn', `Pipeline analysis failed, returning empty analyses`);
  analyses = [];

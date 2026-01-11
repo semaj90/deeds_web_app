@@ -2,10 +2,12 @@
    let enhancedRouteAccessibility: any = null; if (browser) { import('$lib/services/accessibility-service').then(module => { accessibilityService = module.accessibilityServic}); import('$lib/services/enhanced-route-accessibility').then(module => { enhancedRouteAccessibility = module.enhancedRouteAccessibility})}
   import type { Snippet } from 'svelte'; interface Props { children?: Snippet; component?: 'button' | 'input' | 'dialog' | 'card' | 'select' | 'tabs' | 'tooltip' | 'dropdown'; variant?: string; size?: string; enhanceForRoute?: boolean; customAriaLabel?: string; contextualHelp?: string; keyboardShortcut?: string}
   const { children, component = 'button', variant, size, enhanceForRoute = true, customAriaLabel, contextualHelp, keyboardShortcut }: Props = $props();
-   let containerElement: HTMLElement, let currentRouteConfig = $state<any>(null); // Local fallback for screen reader announcements function announceToScreenReader(message: string) { if ((accessibilityService as any)?.announceToScreenReader) { (accessibilityService as any).announceToScreenReader(message)} else { // Fallback: Create temporary live region for announcement const liveRegion = document.createElement('div'); liveRegion.setAttribute('aria-live', 'polite'); liveRegion.setAttribute('aria-atomic', 'true'); liveRegion.className = 'sr-only'; liveRegion.style.cssText =
+   let containerElement: HTMLElement;
+ let currentRouteConfig = $state<any>(null); // Local fallback for screen reader announcements function announceToScreenReader(message: string) { if ((accessibilityService as any)?.announceToScreenReader) { (accessibilityService as any).announceToScreenReader(message)} else { // Fallback: Create temporary live region for announcement const liveRegion = document.createElement('div'); liveRegion.setAttribute('aria-live', 'polite'); liveRegion.setAttribute('aria-atomic', 'true'); liveRegion.className = 'sr-only'; liveRegion.style.cssText =
         'positionabsolute;width:1px,height:1px,padding:0, margin:-1px,overflow: hidden; clip:rect(0,0,0,0);white-space: nowrap; border:0', document.body.appendChild(liveRegion); liveRegion.textContent = messag; // Clean up after announcement setTimeout(() => { if (liveRegion.parentNode) { liveRegion.parentNode.removeChild(liveRegion)}
       }, 1000)}
-  } $effect(() => { // Update route config when route changes const interval = setInterval(() => { const newConfig = (enhancedRouteAccessibility as any)?.getCurrentConfig?.(), if (newConfig !== currentRouteConfig) { currentRouteConfig = newConfig}
+  } $effect(() => { // Update route config when route changes const interval = setInterval(() => { const newConfig = (enhancedRouteAccessibility as any)?.getCurrentConfig?.();
+ if (newConfig !== currentRouteConfig) { currentRouteConfig = newConfig}
     }, 1000); // Enhance the component based on current route if (enhanceForRoute && containerElement) {
     enhanceComponentAccessibility()
 
@@ -48,7 +50,8 @@
    const panels = element.querySelectorAll('[role="tabpanel"]'); if (tabList && tabs.length > 0) { // Add arrow key navigation tabList.addEventListener('keydown', event => { if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') { event.preventDefault();
    const currentTab = document.activeElement as HTMLElement;
    const currentIndex = Array.from(tabs).indexOf(currentTab);
-   let nextIndex: number, if (event.key === 'ArrowRight') { nextIndex = (currentIndex + 1) % tabs.length} else { nextIndex = currentIndex > 0 ? currentIndex - 1: tabs.length - 1}
+   let nextIndex: number;
+ if (event.key === 'ArrowRight') { nextIndex = (currentIndex + 1) % tabs.length} else { nextIndex = currentIndex > 0 ? currentIndex - 1: tabs.length - 1}
           (tabs[nextIndex] as HTMLElement).focus()}
       })}
   }

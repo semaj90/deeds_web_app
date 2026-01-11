@@ -460,12 +460,10 @@ https://svelte.dev/e/js_parse_error -->
  }
  /* Animation for typing indicator */
  @keyframes blink {
- 0%,
- 50% {
+ 0%; } 50% {
  opacity: 1;
  }
- 51%,
- 100% {
+ 51%; } 100% {
  opacity: 0;
  }
  }
@@ -473,8 +471,7 @@ https://svelte.dev/e/js_parse_error -->
  50% {
  opacity: 1;
  }
- 51%,
- 100% {
+ 51%; } 100% {
  opacity: 0;
  }
  }

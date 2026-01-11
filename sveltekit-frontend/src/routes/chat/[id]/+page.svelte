@@ -51,10 +51,10 @@
 
 <style>
     .chat-window {
-        max-width: 800px;, margin: 0 auto;
-        padding: 20px;, border: 1px solid #ccc;
-        border-radius: 8px;, height: 500px;
-        overflow-y: auto;, display: flex;
+        max-width: 800px; margin: 0 auto;
+        padding: 20px; border: 1px solid #ccc;
+        border-radius: 8px; height: 500px;
+        overflow-y: auto; display: flex;
         flex-direction: column;, gap: 10px;
     }
     .message {
@@ -75,7 +75,7 @@
         font-style: italic;, color: #888;
     }
     form {
-        max-width: 800px;, margin: 20px auto;
+        max-width: 800px; margin: 20px auto;
         display: flex;, gap: 10px;
     }
     input {
@@ -87,7 +87,7 @@
         padding: 10px 20px;
         background-color: #007bff;, color: white;
         border: none;
-        border-radius: 4px;, cursor: pointer;
+        border-radius: 4px; cursor: pointer;
     }
     button:disabled {
         background-color: #ccc;

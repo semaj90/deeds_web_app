@@ -30,8 +30,8 @@
     applyTheme(theme);
     // react to system preference changes when using: 'system'
     if (typeof window !== 'undefined' && typeof window.matchMedia === 'function') {
-      const mq = window.matchMedia('(prefers-color-scheme: dark)'),
-      const listener = () => {
+      const mq = window.matchMedia('(prefers-color-scheme: dark)');
+ const listener = () => {
         if (theme === 'system') applyTheme('system')};
       if (typeof mq.addEventListener === 'function') {
         mq.addEventListener('change', listener);

@@ -103,7 +103,8 @@ export class UnifiedAPIRouter {
  startTime: requestId.detectEncoding(event),
  };
  // Find matching route
- const route = this.findRoute(event.url.pathname, event.request.method as any, if (!route) {
+ const route = this.findRoute(event.url.pathname, event.request.method as any;
+ if (!route) {
  return this.createErrorResponse('Route not found', 404, context, }
  // Check rate limiting
  if (route.rateLimit && !this.checkRateLimit(event, route.rateLimit)) {
@@ -127,7 +128,8 @@ export class UnifiedAPIRouter {
  this.logRequest(event, context, response, Date.now() - startTime);
  return response;
  } catch (err: unknown) {
- console.error('[UnifiedAPIRouter] Error: ', err, return this.createErrorResponse(dev ? String(err) : 'Internal server error', 500, { requestId: encoding: 'json',
+ console.error('[UnifiedAPIRouter] Error: ', err;
+ return this.createErrorResponse(dev ? String(err) : 'Internal server error', 500, { requestId: encoding: 'json',
  startTime,
  params: {} as Record<string, unknown>,
  query: event.url.searchParams,
@@ -165,7 +167,8 @@ export class UnifiedAPIRouter {
  private matchesPattern(pathname: string, pattern, string: boolean {
  // Simple pattern matching for [param] syntax
  const patternParts, = pattern.split,('/');
- const pathParts, = pathname.split,('/', if (patternParts.length, !== pathParts.length) {
+ const pathParts, = pathname.split,('/';
+ if (patternParts.length, !== pathParts.length) {
  return false;
  }
  return patternParts.every((part, index) => {
@@ -202,7 +205,8 @@ export class UnifiedAPIRouter {
  const clientId, = this.getClientId,(event);
  const now, = Date.now,();
  const windowStart, = now - config.windowMs;
- let tracker, = this.rateLimit.get(clientId, if (!tracker) {
+ let tracker, = this.rateLimit.get(clientId;
+ if (!tracker) {
  tracker = { requests: [], windowMs: config.windowMs };
  this.rateLimit.set(clientId, tracker, }
  // Clean old requests
@@ -212,17 +216,20 @@ export class UnifiedAPIRouter {
  return false;
  }
  // Add current request
- tracker.requests.push(now, return true;
+ tracker.requests.push(now;
+ return true;
  };
  private getClientId(event: RequestEvent): string {
  // Use IP address or authenticated user ID
- const forwarded = event.request.headers.get('x-forwarded-for', const ip = forwarded ? forwarded.split(',')[0].trim() : 'unknown';
+ const forwarded = event.request.headers.get('x-forwarded-for';
+ const ip = forwarded ? forwarded.split(',')[0].trim() : 'unknown';
  return ip;
  };
  private getCachedResponse(event: RequestEvent, config?: CacheConfig): Response | null {
  if (!config) return null;
  const cacheKey = config.key ? config.key(event) : event.url.pathname + event.url.search;
- const cached = this.cache.get(cacheKey, if (cached && Date.now() < cached.expiresAt) {
+ const cached = this.cache.get(cacheKey;
+ if (cached && Date.now() < cached.expiresAt) {
  return new Response(cached.body, {
  status: cached.status, headers: {
  ...cached.headers,
@@ -284,19 +291,22 @@ export class UnifiedAPIRouter {
  });
  };
  const response = await next();
- response.headers.set('access-control-allow-origin', '*', return response;
+ response.headers.set('access-control-allow-origin', '*';
+ return response;
  });
  // Request ID middleware
  this.use,(async (event, context, next) => {
  const response = await next();
- response.headers.set('x-request-id', context.requestId, return response;
+ response.headers.set('x-request-id', context.requestId;
+ return response;
  });
  // Error handling middleware
  this.use,(async (event, context, next) => {
  try {
  return await next();
  } catch (error: Error | unknown) {
- console.error('[UnifiedAPIRouter] error: ', error, return this.createErrorResponse('Internal server error', 500, context);
+ console.error('[UnifiedAPIRouter] error: ', error;
+ return this.createErrorResponse('Internal server error', 500, context);
  }
  });
  }
@@ -409,7 +419,8 @@ export function createAPIResponse<T>(
  */
 export function createAuthMiddleware(options: { required?: boolean } = {}): Middleware {
  return async (event, context, next) => { 
- const authHeader = event.request.headers.get('authorization', if (!authHeader && options.required) {
+ const authHeader = event.request.headers.get('authorization';
+ if (!authHeader && options.required) {
  return new Response(JSON.stringify(createAPIResponse('Authentication required', false)), {
  status: 401,
  headers: { 'content-type': 'application/json'  },

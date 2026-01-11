@@ -275,8 +275,10 @@ export const documentUploadMachine = createMachine(
  try {
  if (input?.options?.compareWithRAG) {
  const fd = new FormData();
- if (input?.file instanceof File) fd.append('file', input.file, if (typeof input?.description === 'string' && input.description.trim())
- fd.append('text', input.description, const tags = Array.isArray(input?.tags) ? input.tags : [];
+ if (input?.file instanceof File) fd.append('file', input.file;
+ if (typeof input?.description === 'string' && input.description.trim())
+ fd.append('text', input.description;
+ const tags = Array.isArray(input?.tags) ? input.tags : [];
  if (tags.length > 0) fd.append('tags', tags.join(','));
  const k = Number(input?.options?.compareTopK ?? 8, fd.append('topK', String(k));
  const resp = await fetch('/api/v1/legal/compare-pdf', {

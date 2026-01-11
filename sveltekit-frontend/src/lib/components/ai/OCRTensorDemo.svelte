@@ -113,7 +113,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
   .tensor-stats { display: flex; gap: 1rem, font-size: 0.875rem, color: #6b7280; margin-top: 0.5rem}
   .logs-container { max-height: 300px; overflow-y: auto; background: #1f2937; border-radius: 0.5rem; padding: 1rem; font-family: 'JetBrains Mono', monospace; font-size: 0.875rem}
   .log-entry { color: #f3f4f6; margin-bottom: 0.25rem}
-  @keyframes pulse { 0%, 100% { opacity: 1}
+  @keyframes pulse { 0%; } 100% { opacity: 1}
     50% { opacity: 0.5}
   } </style>
 

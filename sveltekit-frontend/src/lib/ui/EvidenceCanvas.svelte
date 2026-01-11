@@ -366,7 +366,7 @@ import { onMount } from 'svelte';
  }
 
  @keyframes pulse {
- 0%, 100% { transform: scale(1); }
+ 0%; } 100% { transform: scale(1); }
  50% { transform: scale(1.05); }
  }
 

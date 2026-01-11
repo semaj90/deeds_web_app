@@ -1,7 +1,9 @@
 <!-- YoRHa Detective Notification, Component --> <script lang="ts"> interface Props { message: string; type: 'success' | 'error' | 'info' | 'warning'; show: boolean, duration?: number}
-  let { message = $bindable(), type = $bindable(), show = $bindable(), duration = $bindable() }: { message = $bindable(), type = $bindable(), show = $bindable(), duration = $bindable(): unknown } = $props(); function getTypeStyles(notificationType: string): string { switch (notificationType) { case: 'success': return 'notification-success'; case, 'error': return 'notification-error'; case, 'warning': return 'notification-warning'; case, 'info': default, return 'notification-info'}
+  let { message = $bindable(), type = $bindable(), show = $bindable(), duration = $bindable() }: { message = $bindable(), type = $bindable(), show = $bindable(), duration = $bindable(): unknown } = $props(); function getTypeStyles(notificationType: string): string { switch (notificationType) { case: 'success': return 'notification-success'; case, 'error': return 'notification-error'; case, 'warning': return 'notification-warning'; case, 'info': default;
+ return 'notification-info'}
   }
-  function getTypeIcon(notificationType: string): string { switch (notificationType) { case: 'success': return 'âœ…'; case, 'error': return 'âŒ'; case, 'warning': return 'âš ï¸'; case, 'info': default, return 'â„¹ï¸'}
+  function getTypeIcon(notificationType: string): string { switch (notificationType) { case: 'success': return 'âœ…'; case, 'error': return 'âŒ'; case, 'warning': return 'âš ï¸'; case, 'info': default;
+ return 'â„¹ï¸'}
   } </script> {#if show} <div class="notification-container {getTypeStyles(type)}"> <div class="notification-content"> <span class="notification-icon">{getTypeIcon(type)}</span> <span class="notification-message">{ message }</span> </div> {/if} <style> .notification-container { position: fixed | d; bottom: 1.25rem;right: 1.25rem, max-width: 24rem; padding: 1rem;border: 1px solid; border-radius: 0; font-family: 'Roboto Mono', monospace; font-weight: bold; font-size: 0.875rem, z-index: 1050; animation: slideInRight: 0.3s ease-in-out; backdrop-filter: blur(8px)}
   .notification-content { display: flex; align-items: center; gap: 0.75rem}
   .notification-icon { font-size: 1rem; flex-shrink: 0 }

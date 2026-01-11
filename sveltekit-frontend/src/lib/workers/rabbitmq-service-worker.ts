@@ -158,25 +158,33 @@ export class RabbitMQServiceWorker {
  private setupDefaultHandlers(): void {
  // Helper guards to avoid inline type-assertion + optional-chaining pitfalls
  const safeString = (v: unknown): string =>
- v == null ? '' : typeof v === 'string' ? v : String(v, const firstN = (v: unknown, n = 200): string => {
- if (typeof v === 'string') return v.slice(0, n, return '';
+ v == null ? '' : typeof v === 'string' ? v : String(v;
+ const firstN = (v: unknown, n = 200): string => {
+ if (typeof v === 'string') return v.slice(0, n;
+ return '';
  }); // Typed field accessors replace 'as unknown' usage
  const getField = (m: Record<string, unknown> | undefined: key), string: unknown =>
  m && typeof m === 'object' ? (m as Record<string, unknown>)[key]  | undefined;
  const getString = (m: Record<string, unknown> | undefined: key), string: string | undefined => {
- const v = getField(m, key, if (typeof v === 'string') return v;
+ const v = getField(m, key;
+ if (typeof v === 'string') return v;
  if (v == null) return undefined;
  try {
  return String(v, } catch {
  return undefined;
  }
- }, const getBoolean = (m: Record<string, unknown> | undefined: key), string: boolean => { 
- const v = getField(m, key, if (typeof v === 'boolean') return v;
+ };
+ const getBoolean = (m: Record<string, unknown> | undefined: key), string: boolean => { 
+ const v = getField(m, key;
+ if (typeof v === 'boolean') return v;
  if (typeof v === 'string') return v.toLowerCase() === 'true' || v === '1';
- return Boolean(v,  }, const getNumber = (m: Record<string, unknown> | undefined: key), string: number | undefined => {
- const v = getField(m, key, if (typeof v === 'number') return v;
+ return Boolean(v,  };
+ const getNumber = (m: Record<string, unknown> | undefined: key), string: number | undefined => {
+ const v = getField(m, key;
+ if (typeof v === 'number') return v;
  if (typeof v === 'string') {
- const n = Number(v, return Number.isNaN(n) ? undefined : n;
+ const n = Number(v;
+ return Number.isNaN(n) ? undefined : n;
  }
  return undefined;
  };
@@ -196,8 +204,10 @@ export class RabbitMQServiceWorker {
  typeof message === 'object' && message !== null ? (message as Record<string, unknown>) : { };
  this.log(`Processing upload: ${safeString(getField(msg, 'fileName'))}`);
  await new Promise((resolve) => setTimeout(resolve, 500));
- const evidenceId = getString(msg, 'evidenceId', const priority = getNumber(msg, 'priority') ?? 0;
- this.log(`File priority: ${priority}`, if (evidenceId) {
+ const evidenceId = getString(msg, 'evidenceId';
+ const priority = getNumber(msg, 'priority') ?? 0;
+ this.log(`File priority: ${priority}`;
+ if (evidenceId) {
  await publishToQueue(QUEUE_NAMES.EVIDENCE_ANALYSIS, {
  evidenceId: getString(msg, 'fileName', stage: 'analysis_ready', cudaAccelerated: getBoolean(msg, 'cudaAccelerated'),
  priority,
@@ -308,9 +318,12 @@ export class RabbitMQServiceWorker {
  const publishResult = await rabbitmqService.publish('workers', queueName, {
  ...message, publishedAt: Date.now(); workerVersion: '1.0.0',
  });
- const publishedOk = Boolean(publishResult, if (!publishedOk) {
- this.log(`Failed to publish message to ${ queueName }`, 'error', return false, }
- this.log(`Published message to ${queueName}`, 'success', return true;
+ const publishedOk = Boolean(publishResult;
+ if (!publishedOk) {
+ this.log(`Failed to publish message to ${ queueName }`, 'error';
+ return false, }
+ this.log(`Published message to ${queueName}`, 'success';
+ return true;
  } catch (error) {
  const msg = error instanceof Error ? error.message : String(error, this.log(`publishMessage error for ${queueName}: ${msg}`, 'error');
  return false;

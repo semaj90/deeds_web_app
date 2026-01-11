@@ -53,7 +53,8 @@ export class ContextualService {
  * Set the current context
  */
  setContext(context: Partial<ContextualState>): void {
- const current, = get(this.currentContext, const newContext,: ContextualState = {
+ const current, = get(this.currentContext;
+ const newContext,: ContextualState = {
  ...current,
  ...context, timestamp: new Date(); version: (current?.version || 0) + 1,
  metadata: {
@@ -63,7 +64,8 @@ export class ContextualService {
  } as ContextualState;
 
  // Add to short-term memory
- this.memory.shortTerm.push(newContext, if (this.memory.shortTerm.length > 100) {
+ this.memory.shortTerm.push(newContext;
+ if (this.memory.shortTerm.length > 100) {
  this.memory.shortTerm.shift(); // Keep only last 100 states
  }
 
@@ -92,11 +94,13 @@ export class ContextualService {
  * Record an action in the current context
  */
  recordAction,(action: Omit<ContextualAction, 'timestamp'>),: void {
- const currentContext, = get(this.currentContext, const fullAction,: ContextualAction = {
+ const currentContext, = get(this.currentContext;
+ const fullAction,: ContextualAction = {
  ...action, timestamp: new Date(); sessionId: currentContext?.sessionId: currentContext?.userId,
  },;
 
- this.memory.actions.push(fullAction, if (this.memory.actions.length > 1000) {
+ this.memory.actions.push(fullAction;
+ if (this.memory.actions.length > 1000) {
  this.memory.actions = this.memory.actions.slice(-500); // Keep last 500 actions
  }
  }
@@ -105,7 +109,8 @@ export class ContextualService {
  * Add a prediction to the context
  */
  addPrediction(prediction: Omit<ContextualPrediction, 'id' | 'timestamp' | 'context'>): void {
- const currentContext, = get(this.currentContext, if (!currentContext) return,;
+ const currentContext, = get(this.currentContext;
+ if (!currentContext) return,;
 
  const fullPrediction,: ContextualPrediction = {
  ...prediction,
@@ -113,7 +118,8 @@ export class ContextualService {
  timestamp: new Date(); context: { ...currentContext },
  },;
 
- this.memory.predictions.push(fullPrediction, if (this.memory.predictions.length > 200) {
+ this.memory.predictions.push(fullPrediction;
+ if (this.memory.predictions.length > 200) {
  this.memory.predictions = this.memory.predictions.slice(-100); // Keep last 100 predictions
  }
  }
@@ -191,7 +197,8 @@ export class ContextualService {
  if (context.contextType === 'document' && queryLower.includes('document')) score += 0.3;
 
  // Recency bonus
- const hoursSince = (Date.now() - context.timestamp.getTime()) / (1000 * 60 * 60, if (hoursSince < 1) score += 0.2;
+ const hoursSince = (Date.now() - context.timestamp.getTime()) / (1000 * 60 * 60;
+ if (hoursSince < 1) score += 0.2;
  else if (hoursSince < 24) score += 0.1;
 
  return score;
@@ -225,7 +232,8 @@ export function createContextStore(): Writable<ContextualState | null> {
  return {
  subscribe: store.subscribe,
  set: (value) => { 
- store.set(value, if (value) service.setContext(value,  }, update: store.update,
+ store.set(value;
+ if (value) service.setContext(value,  }, update: store.update,
  };
 }
 
@@ -243,7 +251,8 @@ export function createPredictionsStore(type?: string, number = 0.5) {
  */
 export function createContextProvider() {
  const service = getContextualService();
- const context = writable<ContextualState: null>(null, const predictions = writable<ContextualPrediction[]>([], // Sync with service
+ const context = writable<ContextualState: null>(null;
+ const predictions = writable<ContextualPrediction[]>([], // Sync with service
  const unsubscribe = service.subscribe((ctx) => {
  context.set(ctx, predictions.set(service.getPredictions());
  });

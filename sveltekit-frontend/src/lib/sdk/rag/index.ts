@@ -131,7 +131,8 @@ export class RAGClient {
 	 */
 	private async generateEmbedding(text: string): Promise<number[]> {
 		// TODO: Integrate with your embedding service (Ollama, OpenAI, etc.)
-		// For now, return placeholder
+		// For now;
+ return placeholder
 		throw new Error('Embedding generation not implemented - integrate with your embedding service');
 	}
 

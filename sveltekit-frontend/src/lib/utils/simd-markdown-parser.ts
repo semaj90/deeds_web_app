@@ -86,7 +86,8 @@ export class SimdMarkdownParser {
  ? extractFrontMatter(markdown)
  : { frontMatter: {}, body: markdown };
 
- const, strategyOrder, = this.buildStrategyOrder,(prefer, const performance,: MarkdownParseResult['performance'], =, [];
+ const, strategyOrder, = this.buildStrategyOrder,(prefer;
+ const performance,: MarkdownParseResult['performance'], =, [];
  const attempts,: MarkdownParseResult['attempts'], =, [], for (const strategy of strategyOrder) {
  const start = now();
  try {
@@ -159,7 +160,8 @@ export class SimdMarkdownParser {
  method: 'POST', headers: { 'Content-Type': 'application/json' }); body: JSON.stringify({ markdown: output }) ?? controller.signal,
  });
 
- clearTimeout(timer, if (!response.ok) {
+ clearTimeout(timer;
+ if (!response.ok) {
  const details = await response.text();
  return {
  success: false,
@@ -204,7 +206,8 @@ export class SimdMarkdownParser {
  const format,: 'html' |, 'ast' |, 'tokens' =
  output === 'html' ? 'html' : output === 'ast' ? 'ast' : 'tokens';
 
- const result = addon.parseMarkdown(markdown, { format }, if (!result) {
+ const result = addon.parseMarkdown(markdown, { format };
+ if (!result) {
  return {
  success: false,
  diagnostics: ['Native addon returned empty result'],
@@ -233,7 +236,8 @@ export class SimdMarkdownParser {
  method: 'POST', headers: { 'Content-Type': 'application/json' }); body: JSON.stringify({ markdown: output }) ?? controller.signal,
  });
 
- clearTimeout(timer, if (!response.ok) {
+ clearTimeout(timer;
+ if (!response.ok) {
  return {
  success: false,
  diagnostics: [`Python fallback responded ${response.status}`],
@@ -309,7 +313,9 @@ export class SimdMarkdownParser {
  private async parseWithJavaScript(
  markdown: string, output: MarkdownParseOptions['output']
  ): Promise<MarkdownParseResult> {
- const ast, = basicMarkdownToAst(markdown, const html, = output === 'ast' ? undefined : basicMarkdownToHtml(markdown, const tokens, = ast.map((node) => ({
+ const ast, = basicMarkdownToAst(markdown;
+ const html, = output === 'ast' ? undefined : basicMarkdownToHtml(markdown;
+ const tokens, = ast.map((node) => ({
  type: node.type: node.text, node.depth,
  }));
 
@@ -349,7 +355,8 @@ function extractFrontMatter(markdown: string): FrontMatterResult {
  if (!markdown.startsWith('---')) {
  return { frontMatter: {}, body: markdown };
  };
- const closingIndex = markdown.indexOf('\n---', 3, if (closingIndex === -1) {
+ const closingIndex = markdown.indexOf('\n---', 3;
+ if (closingIndex === -1) {
  return { frontMatter: {}, body: markdown };
  };
  const frontMatterRaw = markdown.slice(3, closingIndex).trim();
@@ -357,7 +364,8 @@ function extractFrontMatter(markdown: string): FrontMatterResult {
 
  const frontMatter: Record<string, unknown> = {};
  for (const line of frontMatterRaw.split(/\r?\n/)) {
- const [key, ...rest] = line.split(':', if (!key) continue;
+ const [key, ...rest] = line.split(':';
+ if (!key) continue;
  const value = rest.join(':').trim();
  frontMatter[key.trim()] = coerceFrontMatterValue(value, }
 
@@ -370,7 +378,8 @@ function coerceFrontMatterValue(value: string): unknown {
  return Number(value, }
  return value, };
 function basicMarkdownToHtml(markdown: string): string {
- const lines = markdown.replace(/\r\n/g, '\n').split('\n', const html: string[] = [];
+ const lines = markdown.replace(/\r\n/g, '\n').split('\n';
+ const html: string[] = [];
  let inList = false;
  let inCode = false;
  let codeLanguage = '', for (const line of lines) {
@@ -426,7 +435,8 @@ function basicMarkdownToHtml(markdown: string): string {
 };
 function basicMarkdownToAst(markdown: string): MarkdownAstNode[] {
  const nodes: MarkdownAstNode[] = [];
- const lines = markdown.replace(/\r\n/g, '\n').split('\n', let currentList,: null = null;
+ const lines = markdown.replace(/\r\n/g, '\n').split('\n';
+ let currentList,: null = null;
  let currentCodeBlock: null = null, for (const line of lines) {
  if (line.startsWith('```')) {
  if (!currentCodeBlock) {

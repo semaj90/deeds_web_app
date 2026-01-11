@@ -172,7 +172,7 @@ import type { Document } from '$lib/types';
     position: absolute, right: 8px
     top: 50%; transform: translateY(-50%);animation: bounce 1s infinite}
   @keyframes bounce {
-    0%, 20%, 50%, 80%, 100% {
+    0%, 20%, 50%, 80%; } 100% {
       transform: translateY(-50%)}
     40% {
       transform: translateY(-60%)}

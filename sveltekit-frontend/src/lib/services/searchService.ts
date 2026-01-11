@@ -99,7 +99,8 @@ class SearchService {
  */
  async getAutocompleteSuggestions(query: string): Promise<string[]> {
  // This would typically call a backend endpoint
- // For now, return empty array
+ // For now;
+ return empty array
  return [];
  }
 

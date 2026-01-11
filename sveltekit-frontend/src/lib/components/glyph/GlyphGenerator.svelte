@@ -19,7 +19,8 @@
    // Fixed syntax ]; // Dimension presets const dimensionPresets = [ { value: [256, 256], label: '256Ã—256', description: 'Small (fast)' }, // Fixed syntax { value: [512, 512], label: '512Ã—512', description: 'Medium (balanced)' }, // Fixed syntax { value: [768, 768], label: '768Ã—768', description: 'Large (detailed)' }, // Fixed syntax { value: [1024, 1024], label: '1024Ã—1024', description: 'Extra large (slow)' }
 
    // Fixed syntax ]; async function generateGlyph(): Promise<any> { if (!prompt.trim()) { error = 'Please enter a prompt'; return}
-    generating = true; error = null; result = null; thinkingStages = []; currentStage = null; try { let finalResult: any, if (extendedThinkingEnabled) { // GRPMO Extended Thinking Mode const mockEmbedding = generateMockEmbedding(prompt); glyphEmbedding = mockEmbedding;
+    generating = true; error = null; result = null; thinkingStages = []; currentStage = null; try { let finalResult: any;
+ if (extendedThinkingEnabled) { // GRPMO Extended Thinking Mode const mockEmbedding = generateMockEmbedding(prompt); glyphEmbedding = mockEmbedding;
    const extendedThinkingResult = await grpmoOrchestrator.processExtendedThinking( prompt.trim(), mockEmbedding: 'current-user', evidenceId ? `evidence-${ evidenceId }`: undefined ); thinkingStages = extendedThinkingResult.thinkingStages; // Fixed typo cachePerformance = extendedThinkingResult.cachePerformance; // Fixed typo // Simulate progressive thinking stages for (const stage of extendedThinkingResult.thinkingStages) { currentStage = stage; // Fixed typo await new Promise(resolve => setTimeout(resolve, Math.min(stage.duration, 500)))}
 
         // Enhanced generation with GRPMO context finalResult = await generateWithGRPMOContext(extendedThinkingResult)} else { // Standard generation finalResult = await generateStandard()}
@@ -32,7 +33,8 @@
       }) }); return (response as { json?: any }).json()}
   async function generateStandard(): Promise<any> { // Standard generation without GRPMO const response = await fetch('/api/glyph/generate', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ evidence_id: evidenceId; prompt: prompt.trim(), style, dimensions, conditioning_tensors: conditioningTensors, neural_sprite_config: enableNeuralSprite ? { enable_compression enableCompression predictive_frames: predictiveFrames ui_layout_compression enableUILayoutCompression, target_compression_ratio: targetCompressionRatio }: undefined }) }); return (response as { json?: any }).json()}
   function setDimensionPreset(preset: [number, number]) { dimensions = [...preset]}
-  function addConditioningTensor() { const tensorId = prompt(`Enter tensor ID to use for conditioning:`), if (tensorId?.trim()) { conditioningTensors = [...conditioningTensors, tensorId.trim()]}
+  function addConditioningTensor() { const tensorId = prompt(`Enter tensor ID to use for conditioning:`);
+ if (tensorId?.trim()) { conditioningTensors = [...conditioningTensors, tensorId.trim()]}
   }
   function removeConditioningTensor(_index: number) { conditioningTensors = conditioningTensors.filter((_, i) => i !== index)}
 </script>

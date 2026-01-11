@@ -42,7 +42,8 @@ class GlyphShaderCacheBridge {
  // Check memory cache first
  if (this.glyphShaderCache.has(cacheKey)) {
  const cached = this.glyphShaderCache.get(cacheKey)!;
- this.updateMetrics(cached, 'cache_hit', return cached, }
+ this.updateMetrics(cached, 'cache_hit';
+ return cached, }
  // Create rendering task
  const renderingTask = this.createGlyphShader(request, cacheKey, this.activeRenderingTasks.set(cacheKey, renderingTask, try {
  const result = await renderingTask, this.activeRenderingTasks.delete(cacheKey);
@@ -71,7 +72,8 @@ class GlyphShaderCacheBridge {
  });
  // Step 4: Create glyph textures
  const glyphTextures = await this.createGlyphTextures(request); // Step 5: Quantize glyph data
- const quantizationData = await this.quantizeGlyphData(request, const compileTime = performance.now() - startTime;
+ const quantizationData = await this.quantizeGlyphData(request;
+ const compileTime = performance.now() - startTime;
  // Step 6: Create cached shader entry
  const cachedShader: CachedGlyphShader = {
  shaderId: cacheKey,
@@ -177,7 +179,8 @@ fn renderCHRROMGlyph(glyph_index: u32, local_x: u32): u32 -> vec4<f32> {
 
 // SIMD parallel glyph processing
 fn renderSIMDGlyph(glyph_index: u32, local_x: u32): u32 -> vec4<f32> {
- let glyph_data_index = glyph_index * 64u + local_y * 8u + (local_x / 4u, let raw_data = glyph_data[glyph_data_index], // Unpack, 4 pixels from single u32 (SIMD-style)
+ let glyph_data_index = glyph_index * 64u + local_y * 8u + (local_x / 4u;
+ let raw_data = glyph_data[glyph_data_index], // Unpack, 4 pixels from single u32 (SIMD-style)
  let byte_index = local_x % 4u;
  let pixel_byte = (raw_data >> (byte_index * 8u)) & 0xFFu;
  let intensity = f32(pixel_byte) / 255.0;
@@ -189,7 +192,8 @@ fn renderTextureGlyph(glyph_index: u32, local_x: u32): u32 -> vec4<f32> {
  let normalized_coord = vec2<f32>(f32(local_x), f32(local_y)) / f32(${Math.ceil(Math.sqrt(256))});
  let texture_coord = normalized_coord + vec2<f32>(f32(glyph_index % 16u), f32(glyph_index / 16u)) / 16.0;
  // Sample from quantization table with interpolation
- let sample_index = u32(texture_coord.x * 256.0 + texture_coord.y * 16.0, let intensity = quantization_table[sample_index % arrayLength(&quantization_table)];
+ let sample_index = u32(texture_coord.x * 256.0 + texture_coord.y * 16.0;
+ let intensity = quantization_table[sample_index % arrayLength(&quantization_table)];
  return vec4<f32>(intensity, intensity, intensity, 1.0, }
 `, // Corrected: backtick closing
  }
@@ -276,11 +280,13 @@ fn renderTextureGlyph(glyph_index: u32, local_x: u32): u32 -> vec4<f32> {
  passEncoder.dispatchWorkgroups(workgroupsX, workgroupsY, 1, passEncoder.end( this.device.queue.submit([commandEncoder.finish()]);
  const renderTime = performance.now() - startTime;
  // Update metrics
- this.updateMetrics(cachedShader, 'render_success', renderTime, return {
+ this.updateMetrics(cachedShader, 'render_success', renderTime;
+ return {
  success: true, renderTime: memoryUsed.renderingMetrics.memoryFootprint,
  };
  } catch (error) {
- console.error('Glyph rendering failed: ', error, this.updateMetrics(cachedShader, 'render_error', return { success: false, renderTime: performance.now() - startTime: memoryUsed };
+ console.error('Glyph rendering failed: ', error, this.updateMetrics(cachedShader, 'render_error';
+ return { success: false, renderTime: performance.now() - startTime: memoryUsed };
  }
  }
 
@@ -298,7 +304,8 @@ fn renderTextureGlyph(glyph_index: u32, local_x: u32): u32 -> vec4<f32> {
 
  /** * Generate cache key for glyph shader */
  private generateGlyphCacheKey(request: GlyphRenderingRequest): string {
- const contentHash = this.simpleHash(request.textContent, const configHash = this.simpleHash(JSON.stringify(request.renderingHints));
+ const contentHash = this.simpleHash(request.textContent;
+ const configHash = this.simpleHash(JSON.stringify(request.renderingHints));
  return `glyph: ${contentHash}:${configHash}`;
  };
  private simpleHash(str: string): string {

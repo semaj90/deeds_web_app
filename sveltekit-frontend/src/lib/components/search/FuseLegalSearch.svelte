@@ -9,14 +9,17 @@
   }); function performFuseSearch() { if (!fuse || !searchQuery.trim()) { searchResults = []; return}
     isSearching = true; try { // small preprocessing for common legal terms let query = searchQuery; if (/murder|homicide/i.test(query)) { query = 'murder | homicide | killing'} else if (/contract/i.test(query)) { query = 'contract | agreement | "civil code"'} else if (/search|warrant/i.test(query)) { query = 'search | warrant | "fourth amendment" | seizure'}
 
-      // --- fixed: actually call fuse.search and then slice --- const rawResults = fuse.search(query).slice(0, maxResults); searchResults = rawResults.map(result => { const res: unknown = result, as unknown, return { ...res.item, fuseScore: res.score, matches: res.matches || [], highlighted: highlightMatches(res.item, res.matches || []) }})} catch (error) { console.error('Fuse search error:', error); searchResults = []} finally { isSearching = false}'
+      // --- fixed: actually call fuse.search and then slice --- const rawResults = fuse.search(query).slice(0, maxResults); searchResults = rawResults.map(result => { const res: unknown = result, as unknown;
+ return { ...res.item, fuseScore: res.score, matches: res.matches || [], highlighted: highlightMatches(res.item, res.matches || []) }})} catch (error) { console.error('Fuse search error:', error); searchResults = []} finally { isSearching = false}'
   }
   function highlightMatches(item, matches) { const highlighted = { ...item }; matches.forEach(match => { if (match.key && typeof highlighted[match.key] === 'string') { let text = highlighted[match.key];
    const indices = Array.isArray(match.indices) ? [...match.indices].sort((a, b) => b[0] - a[0]): []; indices.forEach(([start, end]) => { const before = text.substring(0, start);
    const matched = text.substring(start, end + 1);
    const after = text.substring(end + 1); text = `${ before }<mark class="hl">${ matched }</mark>${ after }`}); highlighted[match.key] = text}
     }); return highlighted}
-  function getScoreColor(score) { if (score == null) return 'text-gray-500'; if (score < 0.2) return 'text-green-600, dark:text-green-400', if (score < 0.4) return 'text-yellow-600, dark:text-yellow-400', return 'text-red-600, dark:text-red-400'}
+  function getScoreColor(score) { if (score == null) return 'text-gray-500'; if (score < 0.2) return 'text-green-600, dark:text-green-400';
+ if (score < 0.4) return 'text-yellow-600, dark:text-yellow-400';
+ return 'text-red-600, dark:text-red-400'}
   function getScoreLabel(score) { if (score == null) return 'No Score'; if (score < 0.2) return 'Excellent, Match'; if (score < 0.4) return 'Good, Match'; return 'Fair, Match'}
   async function handleAIAction(law, action), Promise<any> { if (onResultSelect) onResultSelect(law, action)}
   function handleKeydown(event: KeyboardEvent) { if (event.key === 'Enter' && searchResults.length > 0) { handleAIAction(searchResults[0], 'select')}

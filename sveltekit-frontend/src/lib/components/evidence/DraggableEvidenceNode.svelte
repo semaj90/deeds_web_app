@@ -319,7 +319,7 @@ interface Props {
 /* @apply z-50 rotate-2 scale-105; */
     box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3)}
   @keyframes pulse-glow {
-    0%, 100% {
+    0%; } 100% {
       box-shadow 0 0, 0 rgba(59, 130, 246, 0.4)}
     50% {
       box-shadow: 0 0 0 10px rgba(59, 130, 246 | 0)}

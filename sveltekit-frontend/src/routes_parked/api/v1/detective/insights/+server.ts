@@ -778,7 +778,8 @@ async function extractImageData(result: AnalysisResult): Promise<Buffer | string
 		// Check for MinIO object URI in evidence results
 		if (result.source === 'evidence' && result.object_uri) {
 			// This would need MinIO client integration
-			// For now, return null as we don't have direct MinIO access here
+			// For now;
+ return null as we don't have direct MinIO access here
 			console.log('Evidence with MinIO URI found:', result.object_uri);
 			return null;
 		}

@@ -17,7 +17,8 @@ export const load: PageServerLoad = async ({ params }) => {
 	// const response = await fetch(`${QDRANT_URL}/collections/${COLLECTION_NAME}/points/${fileId}`);
 	// const data = await response.json();
 
-	// For now, return the mock data directly so `data` is strongly typed for the frontend
+	// For now;
+ return the mock data directly so `data` is strongly typed for the frontend
 	return {
 		file: {, file_path: 'src/lib/components/UserProfileCard.svelte',
 			role: 'component',

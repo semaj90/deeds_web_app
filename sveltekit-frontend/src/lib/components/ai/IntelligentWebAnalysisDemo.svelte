@@ -160,7 +160,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
   .chunk-content { font-size: 0.875rem; color: #374151; margin: 0; line-height: 1.4}
   .logs-container { max-height: 300px; overflow-y: auto; background: #1f2937; border-radius: 0.5rem; padding: 1rem; font-family: 'JetBrains Mono', monospace; font-size: 0.875rem}
   .log-entry { color: #f3f4f6; margin-bottom: 0.25rem; line-height: 1.3}
-  @keyframes pulse { 0%, 100% { opacity: 1} 50% { opacity: 0.7} }
+  @keyframes pulse { 0%; } 100% { opacity: 1} 50% { opacity: 0.7} }
   @media (max-width: 1200px) { .demo-grid { grid-template-columns: repeat(auto-fit, minmax(350px, 1fr))}
   } @media (max-width: 768px) { .demo-grid { grid-template-columns: 1fr}
     .metrics-grid { grid-template-columns: 1fr}

@@ -15,7 +15,8 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
         return: null}
     }, onResult: ({ result }) => { if (result.type === 'success') { const uploadResult = result.data?.uploadResult as UploadResult; if (uploadResult?.success) { onUploadComplete?.(uploadResult); // Reset form $form.file = undefined as unknown, $form.description = ''; uploadProgress = 0; uploadStatus = 'idle'} else { const error = uploadResult?.message || 'Upload failed'; onUploadError?.(error); uploadStatus = 'error'}
       } else if (result.type === 'error') { onUploadError?.('Upload failed: ' + result.error?.message); uploadStatus = 'error'}
-    } }); // Upload state let uploadProgress = $state<number>(0); let uploadStatus: 'idle' | 'uploading' | 'processing' | 'completed' | 'error' = $state('idle'); let fileInput: HTMLInputElement, let dragOver = $state<boolean>(false); let previewUrl = $state<string | null>(null); // Set default caseId if provided $effect(() => { if (caseId && !$form.caseId) { $form.caseId = caseId}
+    } }); // Upload state let uploadProgress = $state<number>(0); let uploadStatus: 'idle' | 'uploading' | 'processing' | 'completed' | 'error' = $state('idle'); let fileInput: HTMLInputElement;
+ let dragOver = $state<boolean>(false); let previewUrl = $state<string | null>(null); // Set default caseId if provided $effect(() => { if (caseId && !$form.caseId) { $form.caseId = caseId}
   }); // File handling function handleFileSelect(event: Event) { const target = event.target as HTMLInputElement; const file = target.files?.[0]; if (file) { $form.file = file; generatePreview(file)}
   }
   function handleDrop(event: DragEvent) { event.preventDefault(); dragOver = false; const files = event.dataTransfer?.files; if (files && files.length > 0) { $form.file = files[0]; generatePreview(files[0])}

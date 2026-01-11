@@ -269,8 +269,8 @@ https, //svelte.dev/e/js_parse_error -->
     if (!('gpu' in navigator)) return false
     try {
       // @ts-ignore
-      const adapter = await (navigator as unknown).gpu.requestAdapter?.(),
-      return !!adapter} catch {
+      const adapter = await (navigator as unknown).gpu.requestAdapter?.();
+ return !!adapter} catch {
       return false}
   }
 
@@ -283,8 +283,8 @@ https, //svelte.dev/e/js_parse_error -->
 		return
     try {
       // @ts-ignore
-      const adapter = await (navigator as unknown).gpu.requestAdapter?.(),
-      if (!adapter) throw new Error('No GPU adapter found');
+      const adapter = await (navigator as unknown).gpu.requestAdapter?.();
+ if (!adapter) throw new Error('No GPU adapter found');
       // @ts-ignore
       device = await adapter.requestDevice?.();
       dispatch('ready', { supported: true, device 

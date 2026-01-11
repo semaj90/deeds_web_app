@@ -88,7 +88,7 @@
  padding: 0.5rem 1rem;
  background: #3b82f6;, color: white;
  border: none;
- border-radius: 4px;, cursor: pointer;
+ border-radius: 4px; cursor: pointer;
  font-size: 0.875rem;
  }
 
@@ -96,7 +96,7 @@
  padding: 0.75rem 1.5rem;
  background: #3b82f6;, color: white;
  border: none;
- border-radius: 4px;, cursor: pointer;
+ border-radius: 4px; cursor: pointer;
  }
 
  .loading,
@@ -117,7 +117,7 @@
 
  .person-card {
  border: 1px solid #e5e7eb;
- border-radius: 8px;, padding: 1rem;
+ border-radius: 8px; padding: 1rem;
  background: #f9fafb;
  }
 
@@ -131,7 +131,7 @@
  }
 
  .person-role {
- font-size: 0.875rem;, color: #6b7280;
+ font-size: 0.875rem; color: #6b7280;
  }
 
  .person-details {

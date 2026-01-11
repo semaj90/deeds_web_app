@@ -125,7 +125,8 @@ class RAGIngestionWorker {
 
  // helper: convert various binary types to ArrayBuffer
  private toArrayBuffer(input: ArrayBuffer | ArrayBufferView | Uint8Array | unknown): ArrayBuffer {
- // If already an ArrayBuffer, return as-is
+ // If already an ArrayBuffer;
+ return as-is
  if (input instanceof ArrayBuffer) return input;
  // If it's a view (Uint8Array / Buffer / etc.), handle safely
  if (ArrayBuffer.isView(input)) {
@@ -163,7 +164,8 @@ class RAGIngestionWorker {
  // No known coercion path found
  return new ArrayBuffer(0);
  } catch (e) {
- // As a last resort, return an empty buffer to avoid throwing inside worker
+ // As a last resort;
+ return an empty buffer to avoid throwing inside worker
  return new ArrayBuffer(0);
  }
  }

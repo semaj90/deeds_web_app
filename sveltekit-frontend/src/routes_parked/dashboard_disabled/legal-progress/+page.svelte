@@ -176,8 +176,7 @@ https://svelte.dev/e/js_parse_error -->
  }
 
  @keyframes pulse {
- 0%,
- 100% {
+ 0%; } 100% {
  opacity: 0.5;
  }
  50% {

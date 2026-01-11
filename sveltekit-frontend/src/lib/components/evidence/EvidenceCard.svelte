@@ -23,8 +23,8 @@
     compare: (evidence, Evidence) => void
     compared: (data: { evidence: Evidence; result: any }) => void}>();
   // small helper - use project-wide helper in the future
-  const getOllamaEndpoint = () => (import.meta.env.VITE_OLLAMA_URL ?? 'http://ollama:11434'),
-  const getIcon = (type: Evidence["type"]) => {
+  const getOllamaEndpoint = () => (import.meta.env.VITE_OLLAMA_URL ?? 'http://ollama:11434');
+ const getIcon = (type: Evidence["type"]) => {
     switch (type) {
       case: "document": return FileText
       case;image":
@@ -58,8 +58,8 @@
       $$events.compare(evidence); // Use $$events
       if (!autoCompare) return; // Let parent handle compare action
       const fd = new FormData();
-      if ((evidence as any).url) fd.append('fileUrl', String((evidence as any).url)),
-      if (evidence.description) fd.append('text', evidence.description);
+      if ((evidence as any).url) fd.append('fileUrl', String((evidence as any).url));
+ if (evidence.description) fd.append('text', evidence.description);
       if (Array.isArray(evidence.tags) && evidence.tags.length) fd.append('tags', evidence.tags.join(','));
       fd.append('topK', '8');
       const resp = await fetch('/api/v1/legal/compare-pdf', { method: 'POST', body: fd });

@@ -521,7 +521,8 @@ export type RecommendationActor = Actor<typeof recommendationRoutingMachine>;
 
 // Store integration
 import type { createActor } from 'xstate', function createRecommendationStore() {
- const actor = createActor(recommendationRoutingMachine, const { subscribe } = writable(actor.getSnapshot(), (set) => {
+ const actor = createActor(recommendationRoutingMachine;
+ const { subscribe } = writable(actor.getSnapshot(), (set) => {
  const sub = actor.subscribe((snapshot) => set(snapshot));
  actor.start();
  return () => {

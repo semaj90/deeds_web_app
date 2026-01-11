@@ -11,7 +11,8 @@
    const toggleFullscreen = () => { reportUI.update(ui => ({ ...ui, fullscreen: !ui.fullscreen }))};
    const toggleLayout = () => { const layouts = ['single', 'dual', 'masonry'] as const;
    const currentLayout = (get(report) as { settings?: { layout?: (typeof layouts)[number] } })?.settings?.layout ?? 'single';
-   const currentIndex = layouts.indexOf(currentLayout as unknown), const nextLayout = layouts[(currentIndex + 1) % layouts.length]; reportActions.updateSettings({ layout: nextLayout })};
+   const currentIndex = layouts.indexOf(currentLayout as unknown);
+ const nextLayout = layouts[(currentIndex + 1) % layouts.length]; reportActions.updateSettings({ layout: nextLayout })};
 </script>
 
 <div class="report-toolbar container mx-auto">

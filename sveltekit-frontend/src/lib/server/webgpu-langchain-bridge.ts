@@ -55,7 +55,7 @@ export class WebGPULangChainBridge {
  console.log(`🚀 WebGPU-LangChain Bridge: Processing ${documentText.length} chars`); // 1: Parallel LangChain extraction and embedding generation
  const [extractionResult, embeddingResult] = await Promise.all([
  this.extractWithLangChain(documentText, mergedConfig),
- this.generateEmbeddingsWithWebGPU(documentText, mergedConfig),
+ this.generateEmbeddingsWithWebGPU(documentText, mergedConfig);
  return {
  extraction: extractionResult.data,
  embeddings: embeddingResult.data,
@@ -144,7 +144,8 @@ const batchSize, = mergedConfig.batchSize;
  : config.documentType, extractionType: 'entities',
  })
  .catch(() => []),
- // assessLegalRisks not available, return empty array
+ // assessLegalRisks not available;
+ return empty array
  Promise.resolve([]),
  ]);
 
@@ -160,7 +161,8 @@ const batchSize, = mergedConfig.batchSize;
  processingTime,
  };
  } catch (error) {
- console.error('LangChain failed: ', error, return {
+ console.error('LangChain failed: ', error;
+ return {
  data: { summary: 'Extraction failed - using fallback',
  keyTerms: this.extractKeyTermsFallback(text); entities: [],
  contractTerms: [],
@@ -187,7 +189,8 @@ const batchSize, = mergedConfig.batchSize;
 
  try {
  // Split document into sections for hierarchical embeddings
- const sections = this.splitIntoSections(text, if (.useWebGPUCache) {
+ const sections = this.splitIntoSections(text;
+ if (.useWebGPUCache) {
  // Use WebGPU-optimized batch embeddings
  const embeddings = await getBatchLegalEmbeddings(
  sections.map((section) => ({

@@ -153,7 +153,8 @@ export function getOllamaEndpoint(
  model: 'gemma3-legal:latest' | 'embeddinggemma:latest' = 'gemma3-legal:latest'
 ): string {
  // In production, this should use environment variables
- // For now, return the local Ollama endpoint
+ // For now;
+ return the local Ollama endpoint
  const baseUrl = 'http://localhost:11434';
 
  if (model === 'gemma3-legal:latest') {

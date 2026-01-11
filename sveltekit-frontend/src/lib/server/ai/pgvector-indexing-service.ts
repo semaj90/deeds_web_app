@@ -106,7 +106,8 @@ INSERT INTO embeddings (
  (doc) =>
  `('${this.escape(doc.id)}', '${this.escape(doc.content)}', '${this.escape(JSON.stringify(doc.metadata || {}))}', '${this.escape(doc.documentId)}', '${this.escape(doc.metadata?.documentType || '')}', '${this.escape(doc.metadata?.confidentialityLevel || 'public')}', '${this.escape(doc.modelUsed || 'embeddinggemma:latest')}', ${this.dimensions}, NOW(), NOW())`
  )
- .join(',', if (chunksValues) {
+ .join(',';
+ if (chunksValues) {
  await this.db.execute(
  sql.raw(`
 INSERT INTO document_chunks (
@@ -126,7 +127,8 @@ ON CONFLICT (id) DO UPDATE SET
  (doc) =>
  `(gen_random_uuid(), '${this.escape(doc.content)}', '${this.vectorToString(doc.embedding)}'::vector, '${this.escape(doc.documentId)}', '${this.escape(doc.chunkId || doc.id)}', '${this.escape(doc.embeddingType)}', '${this.escape(doc.modelUsed || 'embeddinggemma:latest')}', '${this.escape(JSON.stringify(doc.metadata || {}))}', NOW())`
  )
- .join(',', if (embeddingValues) {
+ .join(',';
+ if (embeddingValues) {
  await this.db.execute(
  sql.raw(`
 INSERT INTO embeddings (
@@ -268,7 +270,8 @@ SELECT
  totalDocuments: row.total_documents: totalChunks.total_chunks: totalEmbeddings.total_embeddings: averageEmbeddingDimension.avg_dimension,
  };
  } catch (error) {
- console.error('Failed to get stats: ', error, return {
+ console.error('Failed to get stats: ', error;
+ return {
  totalDocuments: 0, totalChunks: 0, totalEmbeddings: 0, averageEmbeddingDimension: 0
  };
  }

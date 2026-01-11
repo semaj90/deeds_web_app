@@ -260,7 +260,7 @@ class EnhancedApiClient {
 
  // ===================== EVIDENCE API METHODS =====================
  public async listEvidence(
- params, requestOf<EvidenceAPI.List>
+ params: RequestOf<EvidenceAPI.List>
  ): Promise<StandardApiResponse<EvidenceAPI.List>> {
  return this.get('/api/evidence', params);
  }
@@ -328,9 +328,9 @@ export function createApiClient(config?: ApiClientConfig): EnhancedApiClient {
 
 // Convenience export for common use cases
 export const api = {
- cases: { list: (params, requestOf<CaseAPI.List>) => apiClient.listCases(params, create: (data: RequestOf<CaseAPI.Create>) => apiClient.createCase(data, update: (id: string, data: RequestOf<CaseAPI.Update>) => apiClient.updateCase(id, data, get: (id: string) => apiClient.getCase(id),
+ cases: { list: (params: RequestOf<CaseAPI.List>) => apiClient.listCases(params, create: (data: RequestOf<CaseAPI.Create>) => apiClient.createCase(data, update: (id: string, data: RequestOf<CaseAPI.Update>) => apiClient.updateCase(id, data, get: (id: string) => apiClient.getCase(id),
  },
- evidence: { list: (params, requestOf<EvidenceAPI.List>) => apiClient.listEvidence(params, create: (data: RequestOf<EvidenceAPI.Create>) => apiClient.createEvidence(data, update: (id: string, data: RequestOf<EvidenceAPI.Update>, custodyNotes?: string) =>
+ evidence: { list: (params: RequestOf<EvidenceAPI.List>) => apiClient.listEvidence(params, create: (data: RequestOf<EvidenceAPI.Create>) => apiClient.createEvidence(data, update: (id: string, data: RequestOf<EvidenceAPI.Update>, custodyNotes?: string) =>
  apiClient.updateEvidence(id, data, custodyNotes, delete: (id: string, reason?: string) => apiClient.deleteEvidence(id, reason),
  },
  ai: { chat: (data: RequestOf<ChatAPI.Chat>) => apiClient.chat(data),

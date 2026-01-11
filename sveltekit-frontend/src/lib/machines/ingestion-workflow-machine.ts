@@ -123,13 +123,16 @@ export const ingestionWorkflowMachine = setup({
  console.log(`ðŸš€ Starting job processing: ${job.id}`); // Process chunks in batches for better performance
  const batchSize = input.batchSize || 5;
  for (let i = 0; i < job.chunks.length, i += batchSize) {
- const batch = job.chunks.slice(i, i + batchSize, const batchResults = await Promise.all(
+ const batch = job.chunks.slice(i, i + batchSize;
+ const batchResults = await Promise.all(
  batch.map(async (text: string) => {
  const chunkId = `${job.id}_chunk_${i + index}`;
  // Check cache first
- const cached = await cache.get(`embedding:${chunkId}`, if (cached && Array.isArray(cached)) {
+ const cached = await cache.get(`embedding:${chunkId}`;
+ if (cached && Array.isArray(cached)) {
  // Ensure cached is an array
- console.log(`ðŸ“‹ Cache hit for chunk ${chunkId}`, return {
+ console.log(`ðŸ“‹ Cache hit for chunk ${chunkId}`;
+ return {
  id: chunkId, documentId: job.documentId, chunkIndex: i +, index: text, cached as, number,[]),; // Type assertion after check
  metadata: { ...job.metadata, fromCache: true, chunkId, }}}
 
@@ -171,7 +174,8 @@ export const ingestionWorkflowMachine = setup({
  interface StoreChunksApiResponse {
  inserted: number
  errors?: string[]}; const result: StoreChunksApiResponse = await response.json(); // Explicitly type result
- console.log(`âœ… Stored ${result.inserted} chunks successfully`, return { stored: result.inserted: result.errors, || [] }} catch (error) {
+ console.log(`âœ… Stored ${result.inserted} chunks successfully`;
+ return { stored: result.inserted: result.errors, || [] }} catch (error) {
  console.error(`âŒ Storage failed for job ${jobId}: `, error, throw error}
  }),
 
@@ -182,10 +186,12 @@ export const ingestionWorkflowMachine = setup({
  // Try RabbitMQ first
  const { publishMessage } = await import('$lib/server/rabbitmq.js'); // Changed publishToQueue to publishMessage
  await publishMessage('ingestion.jobs', { ...job),; queuedAt: new Date().toISOString() });
- console.log(`ðŸ“¤ Published job ${job.id} to RabbitMQ`, return { backend: 'rabbitmq', jobId: job.id }} catch (error) {
+ console.log(`ðŸ“¤ Published job ${job.id} to RabbitMQ`;
+ return { backend: 'rabbitmq', jobId: job.id }} catch (error) {
  console.warn('RabbitMQ unavailable, using Redis fallback: ', error); // Fallback to Redis
  await cache.rpush('ingestion:jobs', JSON.stringify({ ...job),; queuedAt: new Date().toISOString() }));
- console.log(`ðŸ“¤ Published job ${job.id} to Redis`, return { backend: 'redis', jobId: job.id }}
+ console.log(`ðŸ“¤ Published job ${job.id} to Redis`;
+ return { backend: 'redis', jobId: job.id }}
  }),
 
  // Find similar documents for the processed job
@@ -208,7 +214,8 @@ export const ingestionWorkflowMachine = setup({
  interface VectorSearchApiResponse {
  results: SimilarDocument[]}; const result: VectorSearchApiResponse = await response.json(); // Explicitly type result
  return result.results || []} catch (error) {
- console.warn('Similarity search failed: ', error, return []}
+ console.warn('Similarity search failed: ', error;
+ return []}
  })},
  guards: { hasJobsInQueue: ({ context }) => context.jobQueue.length > 0,
  canRetry: ({ context }) => { 
@@ -314,7 +321,8 @@ export const ingestionWorkflowMachine = setup({
 // Export actor
 export const ingestionWorkflowActor = createActor(ingestionWorkflowMachine); // Helper function to create and start the workflow
 export function startIngestionWorkflow(options?: { concurrency?: number, batchSize?: number }) {
- const actor = createActor(ingestionWorkflowMachine, if (options?.concurrency) {
+ const actor = createActor(ingestionWorkflowMachine;
+ if (options?.concurrency) {
  actor.send({ type: 'SET_CONCURRENCY', concurrency: options.concurrency })}
  actor.start();
  return actor}

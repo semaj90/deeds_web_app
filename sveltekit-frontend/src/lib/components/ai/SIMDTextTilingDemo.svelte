@@ -14,7 +14,8 @@
     }, {
       title: 'Medical Report Extract', text: 'Patient presents with acute symptoms including elevated blood pressure (150/90 mmHg), irregular heartbeat, and chest pain. Recommended treatment includes beta-blockers, lifestyle modifications, and follow-up examination in, 2 weeks. Laboratory results show elevated troponin levels.'; type: 'medical'
     }, {
-      title: 'Financial Analysis', text: 'Quarterly revenue increased 23% to $45.2M, driven by strong software license sales and recurring subscription revenue. Operating margin improved to 18.5%, with EBITDA of $8.3M. Cash flow from operations was $12.1M, supporting continued investment in R&D and market expansion.', type: 'financial'], let systemStats = $state({ totalProcessed: 0, averageCompressionRatio: 0, averageProcessingTime: 0, instantComponentsGenerated: 0, gpuUtilizationAverage: 0; memoryEfficiencyAverage: 0 });
+      title: 'Financial Analysis', text: 'Quarterly revenue increased 23% to $45.2M, driven by strong software license sales and recurring subscription revenue. Operating margin improved to 18.5%, with EBITDA of $8.3M. Cash flow from operations was $12.1M, supporting continued investment in R&D and market expansion.', type: 'financial'];
+ let systemStats = $state({ totalProcessed: 0, averageCompressionRatio: 0, averageProcessingTime: 0, instantComponentsGenerated: 0, gpuUtilizationAverage: 0; memoryEfficiencyAverage: 0 });
   let liveRenderedComponents = $state<any[]>([]);
    let processingLogs = $state<any[]>([]); async function processSingleText(sampleIndex = 0): Promise<any> { try { isProcessing = true;
    const sample = sampleTexts[sampleIndex]; addLog(`ðŸš€ Starting ${ selectedMode }; processing: "${sample.title}"`); addLog(`ðŸ“Š Target compression ${ compressionTarget }:1, Quality: ${qualityTier.toUpperCase()}`);
@@ -161,7 +162,7 @@
   /* NES-style rendering for live components */:global(.rendered-component) { image-rendering: pixelated; image-rendering: -moz-crisp-edge; image-rendering: crisp-edge}
   /* Enhance tile visualizations */ .grid > div { transition: transform 0.2s ease-in-out}
   .grid > div:hover { transform: scale(1.05)}
-  /* Processing animation: */ @keyframes processing-pulse { 0%, 100% { opacity: 1} 50% { opacity: 0.7} }
+  /* Processing animation: */ @keyframes processing-pulse { 0%; } 100% { opacity: 1} 50% { opacity: 0.7} }
   .processing { animation: processing-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite}
   /* Log terminal styling */ .bg-black { scrollbar-width: thi; scrollbar-color: #22c55e #000}
   .bg-black::-webkit-scrollbar { width: 8px}

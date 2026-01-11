@@ -33,7 +33,7 @@
   } @media (max-width: 768px) { .yorha-status-bar { flex-direction: column; gap: 8px;padding: 12px 16px}
     .status-left, .status-right { flex-wrap: wrap; gap: 12px}
     .metric-group { min-width: auto}
-  } /* Animation for critical status */ @keyframes pulse-critical { 0%, 100% { opacity: 1}
+  } /* Animation for critical status */ @keyframes pulse-critical { 0%; } 100% { opacity: 1}
     50% { opacity: 0.5}
   } .status-dot.bg-red-400 { animation: pulse-critical 1s infinite}
 </style>

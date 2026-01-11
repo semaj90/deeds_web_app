@@ -7,7 +7,8 @@
  import  DiamondModal  from "$lib/components/ui/DiamondModal.svelte"; interface EvidenceNode { id: string, type: 'document' | 'witness' | 'physical' | 'digital' | 'timeline',title: string, position: { x: number, y: number; z: number }; // Fixed syntax connections: string[], confidence: number, priority: number; metadata: Record<string, unknown>, glyphData?: Uint8Array}
 
 interface EvidenceConnection { from string, to: string, strength: number, type: 'causal' | 'temporal' | 'evidential' | 'contradictory'; bidirectional: boolean}
-  let canvas: HTMLCanvasElement, let ctx: CanvasRenderingContext2D | null = null;
+  let canvas: HTMLCanvasElement;
+ let ctx: CanvasRenderingContext2D | null = null;
    let nodes = $state<EvidenceNode[]>([]);
    let connections = $state<EvidenceConnection[]>([]);
    let selectedNode = $state<EvidenceNode | null>(null);
@@ -17,7 +18,8 @@ interface EvidenceConnection { from string, to: string, strength: number, type: 
   let showNodeDetails = $state<boolean>(false);
    let isProcessing = $state<boolean>(false);
    let cacheHitRate = $state<number>(0); // N64-style rendering constraints const MAX_VISIBLE_NODES = 64; // N64 polygon limit simulation const LOD_DISTANCES = [100, 300, 600, 1000];
-   const TEXTURE_CACHE_SIZE = 1024; // 1KB per node texture let animationFrame: number, let mousePos = { x: 0; y: 0 } let isDragging = $state<boolean>(false);
+   const TEXTURE_CACHE_SIZE = 1024; // 1KB per node texture let animationFrame: number;
+ let mousePos = { x: 0; y: 0 } let isDragging = $state<boolean>(false);
    let lastMousePos = { x: 0; y: 0 } onMount(() => {
 		(async () => {
  await initializeBoard(); await loadSampleData(); startRendering()		})();
@@ -88,7 +90,8 @@ interface EvidenceConnection { from string, to: string, strength: number, type: 
 
       // Highlight hovered/selected nodes if (node === hoveredNode) { ctx.shadowColor = palette.colors.warning; ctx.shadowBlur = 20} else if (node === selectedNode) { ctx.shadowColor = palette.colors.success; // Fixed typo ctx.shadowBlur = 25}
 
-      // Draw node based on LOD level if (lodLevel <= 1) { // High detail: Draw shape based on type drawDetailedNode(ctx, screenPos, size, node, nodeColor)} else, if (lodLevel <= 2) { // Medium detail: Simple circle ctx.fillStyle = nodeColor; ctx.beginPath(); ctx.arc(screenPos.x, screenPos.y, size / 2, 0, Math.PI * 2); ctx.fill()} else { // Low detail: Pixel, ctx.fillStyle = nodeColor; ctx.fillRect(screenPos.x - 2, screenPos.y - 2, 4, 4)}
+      // Draw node based on LOD level if (lodLevel <= 1) { // High detail: Draw shape based on type drawDetailedNode(ctx, screenPos, size, node, nodeColor)} else;
+ if (lodLevel <= 2) { // Medium detail: Simple circle ctx.fillStyle = nodeColor; ctx.beginPath(); ctx.arc(screenPos.x, screenPos.y, size / 2, 0, Math.PI * 2); ctx.fill()} else { // Low detail: Pixel, ctx.fillStyle = nodeColor; ctx.fillRect(screenPos.x - 2, screenPos.y - 2, 4, 4)}
 
       // Draw label for high LOD if (lodLevel === 0) { ctx.shadowBlur = 0; ctx.fillStyle = palette.colors.foreground; ctx.font = '12px monospace'; ctx.textAlign = 'center'; ctx.fillText(node.title, screenPos.x, screenPos.y + size + 15)}
     } ctx.shadowBlur = 0}

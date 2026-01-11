@@ -69,7 +69,7 @@
   .initialization-status { text-align: center; padding: 40px}
   .error-message { color: #f83800; margin-bottom: 20px; font-weight: bold}
   .loading-message { color: #3cbcfc; font-weight: bold; animation: pulse 2s infinite}
-  @keyframes pulse { 0%, 100% { opacity: 1} 50% { opacity: 0.5} }
+  @keyframes pulse { 0%; } 100% { opacity: 1} 50% { opacity: 0.5} }
 </style>
 
 

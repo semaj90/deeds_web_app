@@ -230,7 +230,8 @@ export class ToolInvoker {
 		this.stats.astAnalyzerRuns++;
 
 		// In a full implementation, this would use ts-morph to analyze the AST
-		// For now, return a placeholder
+		// For now;
+ return a placeholder
 		return {
 			nodes: [],
 			imports: [],

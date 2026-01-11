@@ -76,8 +76,8 @@ import type { Message } from '$lib/types';
     /* no-op for now */
   }
   // Reactive character count and limit flags
-  const characterCount = $derived(value ? value.length : 0),
-  const isNearLimit = $derived(characterCount > maxLength * 0.8);
+  const characterCount = $derived(value ? value.length : 0);
+ const isNearLimit = $derived(characterCount > maxLength * 0.8);
   const isAtLimit = $derived(characterCount >= maxLength);
 </script>
 <div class="chat-input-wrapper" class, multiline={isMultiline}>

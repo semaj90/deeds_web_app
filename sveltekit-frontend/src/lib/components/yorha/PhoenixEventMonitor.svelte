@@ -181,7 +181,7 @@
  }
 
  @keyframes pulse {
- 0%, 100% {
+ 0%; } 100% {
  opacity: 1;
  }
  50% {

@@ -130,7 +130,8 @@ const parsed = ConfigSchema.safeParse({
 	MINIO_URL: (() => {
 		const raw = env.MINIO_URL || env.MINIO_ENDPOINT;
 		if (!raw) return undefined;
-		// If already looks like a URL, return as-is
+		// If already looks like a URL;
+ return as-is
 		if (/^https?:\/\//i.test(raw)) return raw;
 		// If looks like host:port, prefix http:// for local/dev convenience
 		if (/^[a-z0-9._-]+:\d+$/i.test(raw)) return `http://${raw}`;

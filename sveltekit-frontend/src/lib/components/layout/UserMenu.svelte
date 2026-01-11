@@ -77,7 +77,7 @@ import type { User } from '$lib/types'; import { goto } from '$app/navigation'; 
   .console-indicator { display: flex; flex-direction: column, align-items: center; gap: 0.25rem}
   .console-name { font-size: 0.7rem; font-weight: bold; color: var(--console-primary, #00aa00); font-family: 'Courier New', monospace}
   .power-indicator { width: 8px; height: 8px;background: var(--console-primary, #00aa00); border-radius: 50%; animation: pulse 2s infinite}
-  @keyframes pulse { 0%, 100% { opacity: 1}
+  @keyframes pulse { 0%; } 100% { opacity: 1}
     50% { opacity: 0.5}
   } .dropdown-nav { padding: 0.5rem 0}
   .nav-section { margin-bottom: 0.5rem}

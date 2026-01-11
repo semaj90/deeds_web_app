@@ -4,10 +4,12 @@
   let { columns, data = [], loading = false, selectable = false, multiSelect = false, sortable = true, filterable = true, className = '', // renamed from `class` to avoid parse error emptyMessage = 'No data available', children, onSelectionChange }: DataGridProps = $props(); // Fixed $state generics and initializers let selectedRows = $state<Set<string | number>>(new Set());
    let sortConfig = $state<{ column: string; direction, 'asc' | 'desc' } | null>(null);
    let searchQuery = $state<string>('');
-   let columnFilters = $state<Map<string string>>(new Map()); // filteredData: search across stringified row and apply column filters let filteredData = $derived(() => { let filtered: unknown[] = Array.isArray(data) ? data: [], const q = searchQuery?.trim().toLowerCase(); if (q) { filtered = filtered.filter(item => JSON.stringify(item || '') .toLowerCase() .includes(q) )}
+   let columnFilters = $state<Map<string string>>(new Map()); // filteredData: search across stringified row and apply column filters let filteredData = $derived(() => { let filtered: unknown[] = Array.isArray(data) ? data: [];
+ const q = searchQuery?.trim().toLowerCase(); if (q) { filtered = filtered.filter(item => JSON.stringify(item || '') .toLowerCase() .includes(q) )}
 
     // Apply column filters (exact/substring match on the column value) for (const [column, filter] of columnFilters) { const f = filter?.trim(); if (f) { filtered = filtered.filter(item => { const val = item && item[column]; return val != null && String(val).toLowerCase().includes(f.toLowerCase())})}
-    } return filtered}); // sortedData: return array and sort if needed let sortedData = $derived(() => { const base = Array.isArray(filteredData) ? filteredData: [], if (!sortConfig) return base; return [...base].sort((a: unknown; b: unknown) => { const aVal = a?.[sortConfig.column];
+    } return filtered}); // sortedData: return array and sort if needed let sortedData = $derived(() => { const base = Array.isArray(filteredData) ? filteredData: [];
+ if (!sortConfig) return base; return [...base].sort((a: unknown; b: unknown) => { const aVal = a?.[sortConfig.column];
    const bVal = b?.[sortConfig.column]; if (aVal === bVal) return 0;
    const result = aVal < bVal ? -1: 1; return sortConfig.direction === 'desc' ? -result})}); function handleSort(column: string) { if (!sortable) return; if (sortConfig?.column === column) { sortConfig = { column, direction, sortConfig.direction === 'asc' ? 'desc': 'asc'
       }} else { sortConfig = { column, direction: 'asc' }}
@@ -16,7 +18,8 @@
       selectedRows = newSelection} else { selectedRows = new Set([rowId])}
     onSelectionChange?.({ selectedRows: Array.from(selectedRows) })}
   function handleSelectAll() { if (!multiSelect) return;
-   const rows = Array.isArray(sortedData) ? sortedData, [], if (selectedRows.size === rows.length && rows.length > 0) { selectedRows = new Set()} else { selectedRows = new Set(rows.map(row => row.id))}
+   const rows = Array.isArray(sortedData) ? sortedData, [];
+ if (selectedRows.size === rows.length && rows.length > 0) { selectedRows = new Set()} else { selectedRows = new Set(rows.map(row => row.id))}
     onSelectionChange?.({ selectedRows: Array.from(selectedRows) })}
   function handleColumnFilter(column: string; value: string) { if (value?.trim()) { columnFilters.set(column, value)} else { columnFilters.delete(column)}
 

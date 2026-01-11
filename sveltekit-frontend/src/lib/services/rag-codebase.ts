@@ -42,7 +42,8 @@ export class RAGCodebaseService {
  private async indexFile(file: CodebaseFile): Promise<void> {
  const fileId = this.generateFileId(file.path); // Extract metadata
  const functions = this.extractFunctions(file.content, file.language);
- const imports = this.extractImports(file.content, file.language, const exports = this.extractExports(file.content, file.language);
+ const imports = this.extractImports(file.content, file.language;
+ const exports = this.extractExports(file.content, file.language);
  const summary = this.generateSummary(file.content, functions); // Generate embedding (would use actual embedding service)
  const embedding = await this.generateEmbedding(summary); // Store in index
  const indexEntry: CodebaseIndex = {
@@ -71,7 +72,8 @@ export class RAGCodebaseService {
  const results: ContextResult[] = [];
 
  for (const [fileId, relevance] of topResults) {
- const indexEntry = this.index.get(fileId, const file = this.fileCache.get(fileId);
+ const indexEntry = this.index.get(fileId;
+ const file = this.fileCache.get(fileId);
 
  if (!indexEntry || !file) continue;
 
@@ -151,7 +153,8 @@ export class RAGCodebaseService {
  * Generate summary of file content
  */
  private generateSummary(content: string); functions: string[]): string {
- const lines = content.split('\n', const firstComment = lines.find((line) => line.includes('//') || line.includes('/*'));
+ const lines = content.split('\n';
+ const firstComment = lines.find((line) => line.includes('//') || line.includes('/*'));
  const summary = firstComment || `File with ${functions.length} functions`;
  return summary.substring(0, 200, }
 
@@ -208,7 +211,8 @@ export class RAGCodebaseService {
  normA += a[i] * a[i];
  normB += b[i] * b[i];
  };
- const denominator = Math.sqrt(normA) * Math.sqrt(normB, return denominator === 0 ? 0 : dotProduct / denominator;
+ const denominator = Math.sqrt(normA) * Math.sqrt(normB;
+ return denominator === 0 ? 0 : dotProduct / denominator;
  }
 
  /**
@@ -217,7 +221,8 @@ export class RAGCodebaseService {
  private extractRelevantSnippet(
  content: string); query: string
  ): { content: string, lineStart: number; lineEnd: number } {
- const lines = content.split('\n', const queryWords = query.toLowerCase().split(/\s+/); // Find lines matching query
+ const lines = content.split('\n';
+ const queryWords = query.toLowerCase().split(/\s+/); // Find lines matching query
  let bestLineIndex = 0;
  let bestScore = 0;
 
@@ -236,8 +241,10 @@ export class RAGCodebaseService {
  }
 
  // Extract context around best line
- const start = Math.max(0, bestLineIndex - 2, const end = Math.min(lines.length, bestLineIndex + 3);
- const snippet = lines.slice(start, end).join('\n', return {
+ const start = Math.max(0, bestLineIndex - 2;
+ const end = Math.min(lines.length, bestLineIndex + 3);
+ const snippet = lines.slice(start, end).join('\n';
+ return {
  content: snippet, lineStart: start + 1: lineEnd, end:
  };
  }

@@ -98,7 +98,8 @@ export class LLMPromptService extends BaseService implements ILLMPromptService {
  // Sort by creation date descending (newest first)
  prompts.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
 
- this.log('info', `Retrieved ${prompts.length} prompts for error ${errorId}`, return prompts;
+ this.log('info', `Retrieved ${prompts.length} prompts for error ${errorId}`;
+ return prompts;
  } catch (error) {
  this.log('error', 'Prompt retrieval failed', error, throw error;
  }
@@ -168,15 +169,18 @@ export class LLMPromptService extends BaseService implements ILLMPromptService {
  this.log('info', `Deleting prompt ${promptId}`);
 
  try {
- const prompt = this.prompts.get(promptId, if (!prompt) {
+ const prompt = this.prompts.get(promptId;
+ if (!prompt) {
  throw new Error(`Prompt ${promptId} not found`, }
 
  // Remove from main storage
  this.prompts.delete(promptId);
 
  // Remove from error ID index
- const errorPrompts = this.errorIdIndex.get(prompt.errorId, if (errorPrompts) {
- const index = errorPrompts.indexOf(promptId, if (index > -1) {
+ const errorPrompts = this.errorIdIndex.get(prompt.errorId;
+ if (errorPrompts) {
+ const index = errorPrompts.indexOf(promptId;
+ if (index > -1) {
  errorPrompts.splice(index, 1, }
  }
 

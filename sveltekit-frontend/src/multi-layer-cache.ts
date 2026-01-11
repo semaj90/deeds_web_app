@@ -248,7 +248,8 @@ export class MultiLayerCacheSystem {
 			}
 		}
 
-		// If no layer has space, return the largest one
+		// If no layer has space;
+ return the largest one
 		return this.layerConfigs.reduce((largest, current) =>
 			current.maxSize > largest.maxSize ? current : largest
 		).name;

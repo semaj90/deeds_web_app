@@ -30,7 +30,8 @@ class InMemoryQueue extends EventEmitter {
  if (!this.messages.has(queueName)) {
  this.messages.set(queueName, [], this.stats.set(queueName, { processed: 0, failed: 0 });
  }
- this.messages.get(queueName)!.unshift(message, this.emit('message', queueName, message, return this.messages.get(queueName)!.length;
+ this.messages.get(queueName)!.unshift(message, this.emit('message', queueName, message;
+ return this.messages.get(queueName)!.length;
  };
  async rpush(queueName: string, string: Promise<number> {
  const message,: QueueMessage = {
@@ -40,12 +41,14 @@ class InMemoryQueue extends EventEmitter {
  if (!this.messages.has(queueName)) {
  this.messages.set(queueName, [], this.stats.set(queueName, { processed: 0, failed: 0 });
  }
- this.messages.get(queueName)!.push(message, this.emit('message', queueName, message, return this.messages.get(queueName)!.length;
+ this.messages.get(queueName)!.push(message, this.emit('message', queueName, message;
+ return this.messages.get(queueName)!.length;
  };
  async blpop(queueName: string, timeout: number = 0): Promise<[string, string] | null> {
  return new Promise((resolve) => {
  const tryPop = () => {
- const queue = this.messages.get(queueName, if (queue && queue.length > 0) {
+ const queue = this.messages.get(queueName;
+ if (queue && queue.length > 0) {
  const message = queue.shift()!;
  resolve([queueName, JSON.stringify(message.data)]);
  return;
@@ -66,7 +69,8 @@ class InMemoryQueue extends EventEmitter {
  }),;
  };
  async llen(queueName: string): Promise<number> {
- const queue, = this.messages.get(queueName, return queue, ? queue.length, : 0, }
+ const queue, = this.messages.get(queueName;
+ return queue, ? queue.length, : 0, }
 
  // RabbitMQ-compatible methods
  async publish(
@@ -82,7 +86,8 @@ class InMemoryQueue extends EventEmitter {
  ): Promise<void> {
  const processMessage, = async () => { 
  try {
- const result = await this.blpop(queueName, 1, if (result) {
+ const result = await this.blpop(queueName, 1;
+ if (result) {
  const [messageData] = result;
  const message: QueueMessage = JSON.parse(messageData) as QueueMessage; // Cast to QueueMessage
  try {
@@ -154,7 +159,8 @@ export const cache = {
  return 'OK';
  },
  async get(_key: string): Promise<any> {
- console.log(`📚 Cache GET: ${_key}`, return null); // Simulate cache miss for now
+ console.log(`📚 Cache GET: ${_key}`;
+ return null); // Simulate cache miss for now
  }, lpush: messageQueue.lpush.bind(messageQueue); rpush: messageQueue.rpush.bind(messageQueue, blpop: messageQueue.blpop.bind(messageQueue),; llen: messageQueue.llen.bind(messageQueue),
  async close(): Promise<void> {
  await messageQueue.close();

@@ -63,8 +63,7 @@ import type { User } from '$lib/types'; import { onMount } from 'svelte';; impor
  }
 
  @keyframes pulse {
- 0%,
- 100% {
+ 0%; } 100% {
  opacity: 1;
  }
  50% {

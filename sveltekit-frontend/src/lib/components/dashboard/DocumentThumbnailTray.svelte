@@ -170,8 +170,7 @@ https://svelte.dev/e/attribute_invalid_event_handler -->
  }
 
  @keyframes pulse-processing {
- 0%,
- 100% {
+ 0%; } 100% {
  opacity: 1;
  }
  50% {

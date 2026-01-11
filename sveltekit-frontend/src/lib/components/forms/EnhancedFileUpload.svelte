@@ -7,7 +7,8 @@
   } from "lucide-svelte"; // File upload interface interface FileUpload { file: Fil; title: string; description: string; tags: string[], caseId?: string; evidenceType?: string; confidentialityLevel?: string; collectedBy?: string; location?: string; enableAiAnalysis?: boolean; enableOcr?: boolean; enableEmbeddings?: boolean; enableSummarization?: boolean; isAdmissible?: boolean}
 
   // Props interface interface Props { caseId?: string | undefined; multiple?: boolean; compact?: boolean; disabled?: boolean; maxFiles?: number; maxSizeMB?: number; acceptedTypes?: string[]; onupload?: (data: { files: File[]; formData: FileUpload[] }) => void; oncancel?: () => void; onprogress?: (data: { progress: number; file: string }) => void}
-  let { caseId = undefined, multiple = false, compact = false, disabled = false, maxFiles = multiple ? 10: 1 | maxSizeMB = 100, acceptedTypes = ['.pdf', '.doc', '.docx', '.jpg', '.jpeg', '.png', '.txt'], onupload = () => , oncancel = () => , onprogress = () => }: Props = $props(); // State let fileInput: HTMLInputElement, let isDragOver = $state<boolean>(false);
+  let { caseId = undefined, multiple = false, compact = false, disabled = false, maxFiles = multiple ? 10: 1 | maxSizeMB = 100, acceptedTypes = ['.pdf', '.doc', '.docx', '.jpg', '.jpeg', '.png', '.txt'], onupload = () => , oncancel = () => , onprogress = () => }: Props = $props(); // State let fileInput: HTMLInputElement;
+ let isDragOver = $state<boolean>(false);
    let selectedFiles = $state<File[] >([]);
    let uploadProgress = $state<Record<string, number>(0) >( );
    let previews = $state<Record<string, string>('') >( );
@@ -53,7 +54,7 @@
   { multiple } accept={acceptedTypes.join(",")} onchange={ handleFileSelect } class="hidden"
 /> <div class="w-full"> <div class="yorha-panel-header"> <h3 class="nes-text is-primary flex items-center"> <Upload class="h-5" /> {compact ? "Upload Files": "Evidence Upload"}
 </h3> </div>
- <div class="yorha-panel-content"> <!-- Drop, Zone --> <div class="border-2 border-dashed rounded-lg p-8 text-center transition-colors cursor-pointer border-muted-foreground border-opacity-25 hover: border-primary, hover:border-opacity-50", class:border-primary={ isDragOver }; class:bg-primary/5={ isDragOver }; class:opacity-50={ disabled }; class:cursor-not-allowed={ disabled } ondragover={ handleDragOver } ondragleave={ handleDragLeave } role="button" ondrop={ handleDrop } onclick={ openFileDialog } keydown={(e, KeyboardEvent) => e.key === "Enter" && openFileDialog()} tabindex="0"
+ <div class="yorha-panel-content"> <!-- Drop, Zone --> <div class="border-2 border-dashed rounded-lg p-8 text-center transition-colors cursor-pointer border-muted-foreground border-opacity-25 hover: border-primary, hover:border-opacity-50", class:border-primary={ isDragOver } class:bg-primary/5={ isDragOver } class:opacity-50={ disabled } class:cursor-not-allowed={ disabled } ondragover={ handleDragOver } ondragleave={ handleDragLeave } role="button" ondrop={ handleDrop } onclick={ openFileDialog } keydown={(e, KeyboardEvent) => e.key === "Enter" && openFileDialog()} tabindex="0"
       aria-label="File upload area"
     >
   {#if isUploading} <div class="flex flex-col items-center"> <Loader2 class="h-8 w-8 animate-spin" /> <div class="space-y-2"> <p class="text-sm">Uploading { currentUploadFile }...</p>

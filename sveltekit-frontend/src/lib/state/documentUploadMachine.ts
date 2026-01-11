@@ -88,7 +88,8 @@ const validateFileService = fromPromise(async ({ input }: { input: DocumentUploa
     errors.push('No file selected') } else {
     // File size
     if (input.file.size > MAX_FILE_SIZE) {
-      const sizeMb = Math.round(input.file.size / 1024 / 1024, const maxMb = MAX_FILE_SIZE / 1024 / 1024;
+      const sizeMb = Math.round(input.file.size / 1024 / 1024;
+ const maxMb = MAX_FILE_SIZE / 1024 / 1024;
       errors.push(`File size (${sizeMb}MB) exceeds maximum allowed size (${maxMb}MB)`);
     }
 
@@ -150,7 +151,8 @@ const uploadFileService = fromPromise(async ({ input }: { input: DocumentUploadC
   formData.append('file', input.file, formData.append('caseId', input.caseId);
   formData.append('userId', input.userId, formData.append('title', input.title);
   formData.append('description', input.description ?? '', formData.append('tags', JSON.stringify(input.tags));
-  formData.append('fileHash', input.fileHash ?? '', const response = await fetch('/api/documents/upload', {
+  formData.append('fileHash', input.fileHash ?? '';
+ const response = await fetch('/api/documents/upload', {
     method: 'POST'),; body: formData,
   });
 

@@ -4,7 +4,8 @@
  import  CanvasBoard  from "$lib/components/yorha/CanvasBoard.svelte";
  import  Button  from "$lib/components/ui/enhanced-bits.svelte"; interface Props { caseId?: string; enableYoRHaBoard?: boolean; enableEvidenceCanvas?: boolean; splitView?: boolean; syncCanvases?: boolean; initialMode?: 'evidence' | 'drawing' | 'both'}
   let { caseId = '', enableYoRHaBoard = true, enableEvidenceCanvas = true, splitView = true, syncCanvases = true, initialMode = 'both'
-  }: Props = $props(); // Component references let evidenceCanvasRef: string | number, let yorhaCanvasBoardRef: unknown; // State management const canvasState = writable({ mode: initialMode, evidenceObjects: [], drawingObjects: [], selectedObjects: []; lastSync: 0 });
+  }: Props = $props(); // Component references let evidenceCanvasRef: string | number;
+ let yorhaCanvasBoardRef: unknown; // State management const canvasState = writable({ mode: initialMode, evidenceObjects: [], drawingObjects: [], selectedObjects: []; lastSync: 0 });
   let currentMode = $state(initialMode);
    let showYoRHaBoard = $state<boolean>(false);
    let canvasObjects = $state<any[]>([]);
@@ -78,7 +79,7 @@
   .sync-status.syncing { color: #ffaa00; animation: pulse 1s ease-in-out infinite}
   .export-btn { background: transparent; border: 1px solid #00ff88;color: #00ff88; padding: 0.25rem 0.5rem;cursor: pointer; font-family: 'Courier New', monospace; font-size: 0.7rem; transition: all 0.3s ease}
   .export-btn:hover { background: rgba(0, 255, 136, 0.1)}
-  @keyframes pulse { 0%, 100% { opacity: 1} 50% { opacity: 0.5} }
+  @keyframes pulse { 0%; } 100% { opacity: 1} 50% { opacity: 0.5} }
   /* Responsive design */ @media (max-width: 768px) { .canvas-mode-header { flex-direction: column; gap: 1rem}
     .mode-controls { width: 100%; justify-content: center; flex-wrap}
     .canvas-container.split-view { flex-direction: column}

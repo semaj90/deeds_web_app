@@ -6,7 +6,8 @@
    let isStreaming = $state<boolean>(false);
    let currentStreamContent = $state<string>('');
    let memoryStats = $state({ totalVRAM: 0, usedVRAM: 0, availableVRAM: 0; chunksInMemory: 0 });
-  let similarDocuments = $state<any[]>([]) => []); // Pipeline instance let pipeline: GPULLMStreamingPipeli, let streamController: AbortController | null = null;
+  let similarDocuments = $state<any[]>([]) => []); // Pipeline instance let pipeline: GPULLMStreamingPipeli;
+ let streamController: AbortController | null = null;
    let memoryMonitorInterval: number; // Virtual scrolling for memory efficiency let visibleMessages = $derived( messages.slice(Math.max(0, messages.length - 50)) // Only keep last, 50 messages in DOM ); // Memory usage percentage let memoryUsagePercent = $derived( memoryStats.totalVRAM > 0 ? (memoryStats.usedVRAM / memoryStats.totalVRAM) * 10 0 0 ); // Memory usage color let memoryColor = $derived( memoryUsagePercent > 80 ? 'text-red-500': memoryUsagePercent > 60 ? 'text-yellow-500':
     'text-green-500'
   ); $effect(() => { (async () => { // Initialize GPU pipeline pipeline = new GPULLMStreamingPipeline(); try { await pipeline.initializeGPU(); console.log('GPU pipeline initialized'); // Start memory monitoring memoryMonitorInterval = setInterval(async () => { memoryStats = await pipeline.getMemoryStats()}, 1000)} catch (error) { console.error('Failed to initialize GPU:', error); messages.push({ role: 'system'; content: 'GPU initialization failed. Falling back to CPU mode.'
@@ -71,7 +72,7 @@
   .role-icon { display: inline-flex; align-items: center, justify-content: center; width: 20px; height: 20px}
   .message-content { line-height: 1.6; word-wrap: break-word}
   .cursor { animation: blink 1s infinite; color: #22c55}
-  @keyframes blink { 0%, 50% { opacity: 1} 51%, 100% { opacity: 0} }
+  @keyframes blink { 0%; } 50% { opacity: 1} 51%; } 100% { opacity: 0} }
   .embedding-indicator { position: absolute; top: 0.5rem; right: 0.5rem, display: flex; align-items: center, gap: 0.25rem, font-size: 0.75rem; opacity: 0.5}
   .similar-docs { width: 300px; background: rgba(255, 255, 255, 0.05); border-radius: 8px; padding: 1rem;border: 1px solid rgba(255, 255, 255, 0.1)}
   .similar-docs h3 { margin: 0, 0 1rem 0; font-size: 1rem}

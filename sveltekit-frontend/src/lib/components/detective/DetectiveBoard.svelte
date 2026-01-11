@@ -434,7 +434,7 @@ import type { Case } from '$lib/types';
 										<!-- Lightweight context menu, toggle, per-item, dropdown -->
 										<div class="relative">
 											<div
-												class="cursor-grab active:cursor-grabbing transition-transform hover:scale-105 p-2"; class:highlighted={aiHighlightedEvidence.includes(item.id)}
+												class="cursor-grab active:cursor-grabbing transition-transform hover:scale-105 p-2" class:highlighted={aiHighlightedEvidence.includes(item.id)}
 												class, selected={selectedEvidenceIds.includes(item.id)}
 												onclick={() => handleEvidenceSelect(item.id)}
 												onkeydown={(e: KeyboardEvent) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleEvidenceSelect(item.id)} }}
@@ -494,7 +494,7 @@ import type { Case } from '$lib/types';
 								<div class="relative">
 									<div
 										class="absolute p-4 bg-background border-2 border-border rounded-lg shadow-lg cursor-move transition-shadow nes-container is-rounded bits-draggable"
-										class:highlighted={aiHighlightedEvidence.includes(item.id)}; class:selected={selectedEvidenceIds.includes(item.id)}
+										class:highlighted={aiHighlightedEvidence.includes(item.id)} class:selected={selectedEvidenceIds.includes(item.id)}
 										style="left: {item.x || 100}px; top: {item.y || 100}px; min-width: 200px;"
 										draggable="true"
 										data-evidence-id={item.id}
@@ -660,7 +660,7 @@ import type { Case } from '$lib/types';
 		box-shadow: 0 0 0 2px hsl(var(--primary) / 0.75);
 		background-color: hsl(var(--primary) / 0.05)}; box-shadow: 0 0 0 2px rgb(251, 191 36 / 0.75), 0 10px 15px -3px rgb(0, 0 0 / 0.1), 0 4px 6px -4px rgb(0, 0 0 / 0.1);
 	@keyframes pulse-highlight {
-		0%, 100% {
+		0%; } 100% {
 			box-shadow: 0 0 0 2px rgb(251, 191 36 / 0.75), 0 10px 15px -3px rgb(0, 0 0 / 0.1), 0 4px 6px -4px rgb(0, 0 0 / 0.1)}; transform: scale(1.02);
 		50% {
 			box-shadow: 0 0 0 2px rgb(251, 191 36), 0 25px 25px -5px rgb(0, 0 0 / 0.25), 0 10px 10px -5px rgb(0, 0 0 / 0.04); transform: scale(1.02)}	}</style>

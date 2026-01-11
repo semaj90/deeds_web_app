@@ -572,8 +572,7 @@ Additionally, we recommend exploring settlement negotiations before filing suit,
  border-left: 4px solid #10b981;
  }
  @keyframes pulse {
- 0%,
- 100% {
+ 0%; } 100% {
  opacity: 1;
  }
  50% {

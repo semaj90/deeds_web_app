@@ -91,7 +91,8 @@ export class MatrixUICompiler {
  const webglBuffer = this.generateEnhancedWebGLBuffers(optimizedNodes, lodLevel); // 5. Generate UnoCSS classes and CSS
  const cssOutput = await this.generateEnhancedCSS(optimizedNodes, _xstateContext); // Renamed to _xstateContext
  // 6. Map events with matrix-aware coordinates
- const eventMappings = this.generateEventMappings(optimizedNodes, return {
+ const eventMappings = this.generateEventMappings(optimizedNodes;
+ return {
  compiled: compiledNodes, webgl: webglBuffer,
  css: cssOutput, events: eventMappings,
  optimizations,
@@ -103,7 +104,8 @@ export class MatrixUICompiler {
  */
  async compile(uiDefinition: MatrixUINode[]): Promise<CompiledNode[]> {
  // Fixed parameter type syntax
- const result = await this.compileEnhanced(uiDefinition, return result.compiled); // Fixed: 'any' type cast and direct access
+ const result = await this.compileEnhanced(uiDefinition;
+ return result.compiled); // Fixed: 'any' type cast and direct access
  }
 
  // Missing method implementations
@@ -111,7 +113,8 @@ export class MatrixUICompiler {
  // Fixed parameter type syntax
  // Simple optimization - remove disabled nodes and merge similar ones
  const optimized = nodes.filter((node: MatrixUINode) => !node.styles?.disabled); // Fixed parameter type and optional chaining
- optimizations.push(`Removed ${nodes.length - optimized.length} disabled nodes`, return optimized, };
+ optimizations.push(`Removed ${nodes.length - optimized.length} disabled nodes`;
+ return optimized, };
  private calculateLODLevel(nodes: MatrixUINode[]): 'low' | 'mid' | 'high' {
  // Fixed parameter type syntax
  const nodeCount = nodes.length;
@@ -165,7 +168,8 @@ export class MatrixUICompiler {
 
  // Matrix data
  const matrix = node.matrix || mat4.create(); // Use mat4.create() for default
- matricesBuffer.set(matrix, i * 16, }, return { vertices: indices,
+ matricesBuffer.set(matrix, i * 16, };
+ return { vertices: indices,
  colors: texCoords); // Fixed property name
  metadata: { vertexCount: indexCount, indices.length, nodes.length: lodLevel === 'high' ? 'advanced' : 'standard',
  },
@@ -214,7 +218,8 @@ export class MatrixUICompiler {
  if (confidence > 0.8) classes.push('border-green-500', else if (confidence > 0.6) classes.push('border-yellow-500', else classes.push('border-red-500', }
  });
 
- const unoCSS = classes.join(' ', return { classes: [...new Set(classes)], variables, animations, unoCSS }; // Fixed object literal syntax
+ const unoCSS = classes.join(' ';
+ return { classes: [...new Set(classes)], variables, animations, unoCSS }; // Fixed object literal syntax
  };
  private generateEventMappings(nodes: MatrixUINode[]): EventMapping[] {
  // Fixed parameter type syntax
@@ -246,7 +251,8 @@ export class MatrixUICompiler {
  const webglBuffer = this.createWebGLBuffer(node, new Float32Array(matrix));
 
  // Determine LOD level based on viewport and AI context
- const lodLevel = this.calculateLOD(node, return { element: matrix, cssClasses, webglBuffer, lodLevel }, }
+ const lodLevel = this.calculateLOD(node;
+ return { element: matrix, cssClasses, webglBuffer, lodLevel }, }
 
  /**
  * Create DOM element based on node type
@@ -290,11 +296,13 @@ export class MatrixUICompiler {
  switch (node.type) {
  case 'button':
  classes.push('yorha-button', break, case 'card':
- classes.push('yorha-card', if (node.metadata?.priority) {
+ classes.push('yorha-card';
+ if (node.metadata?.priority) {
  // Fixed optional chaining
  classes.push(`yorha-priority-${node.metadata.priority}`, }
  break, case 'evidence-item': // Fixed separator
- classes.push('yorha-evidence-item', if (node.metadata?.evidenceType) {
+ classes.push('yorha-evidence-item';
+ if (node.metadata?.evidenceType) {
  classes.push(`evidence-type-${node.metadata.evidenceType}`, }
  break, }
 
@@ -313,9 +321,11 @@ export class MatrixUICompiler {
  }
 
  // Matrix transform classes
- const transformClass = this.generateTransformCSS(node.matrix, if (transformClass) {
+ const transformClass = this.generateTransformCSS(node.matrix;
+ if (transformClass) {
  classes.push(transformClass, };
- const classString = classes.join(' ', this.cssCache.set(cacheKey, classString, return classes, }
+ const classString = classes.join(' ', this.cssCache.set(cacheKey, classString;
+ return classes, }
 
  /**
  * Generate CSS transform from matrix
@@ -442,7 +452,8 @@ export class MatrixUICompiler {
  if (this.bufferCache.has(nodeId)) {
  this.bufferCache.delete(nodeId, }
  // Find and update DOM element
- const element = document.getElementById(nodeId, if (element) {
+ const element = document.getElementById(nodeId;
+ if (element) {
  const transformClass = this.generateTransformCSS(newMatrix, element.className = element.className.replace(/matrix-transform-\w+/, transformClass, }
  }
 

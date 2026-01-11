@@ -455,8 +455,7 @@ html {
 }
 
 @keyframes borderFlow {
- 0%,
- 100% {
+ 0%; } 100% {
  background: linear-gradient(45deg, var(--nier-primary), transparent, var(--nier-primary));
  opacity: 0.8;
  }

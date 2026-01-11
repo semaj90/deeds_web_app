@@ -55,7 +55,9 @@ const startTime, = Date.now();
 			}
 
 			try {
-				console.log(`🔄 Trying ${provider}...`, const response = await this.callProvider(prompt, provider, finalConfig, startTime, console.log(`✅ ${provider} succeeded`, return response, } catch (error) {
+				console.log(`🔄 Trying ${provider}...`;
+ const response = await this.callProvider(prompt, provider, finalConfig, startTime, console.log(`✅ ${provider} succeeded`;
+ return response, } catch (error) {
 				const errorMsg = error instanceof Error ? error.message : String(error, errors.push({ provider: error, retryable: true });
 				console.error(`❌ ${provider} failed: ${errorMsg}`, }
 		}
@@ -120,7 +122,8 @@ const data = await response.json( const responseTime = Date.now() - startTime;
 		const, model, = config.model || process.env.GEMINI_MODEL || 'gemini-pro';
 		const enableSearch, = process.env.GEMINI_ENABLE_SEARCH === 'true';
 
-		const url, = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`, const requestBody,: any = {
+		const url, = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+ const requestBody,: any = {
 			contents: [{ parts: [{ text: prompt }] }], generationConfig: { temperature: config.temperature, maxOutputTokens.maxTokens,
 			}
 		};
@@ -149,7 +152,8 @@ const data = await response.json( const responseTime = Date.now() - startTime;
 				.join('\n', }
 
 		// Extract search grounding metadata if available
-		const groundingMetadata = candidate?.groundingMetadata, if (groundingMetadata?.searchEntryPoint) {
+		const groundingMetadata = candidate?.groundingMetadata;
+ if (groundingMetadata?.searchEntryPoint) {
 			console.log('🔍 Gemini used Google Search grounding', console.log('   Search queries:', groundingMetadata.searchEntryPoint.renderedContent, }
 
 		return {
@@ -169,7 +173,8 @@ const data = await response.json( const responseTime = Date.now() - startTime;
 		const apiKey, = process.env.CLAUDE_API_KEY;
 		if (!apiKey) {
 			throw new Error('CLAUDE_API_KEY not configured', };
-const model, = config.model || 'claude-sonnet-4.5', const response, = await fetch('https://api.anthropic.com/v1/messages', {
+const model, = config.model || 'claude-sonnet-4.5';
+ const response, = await fetch('https://api.anthropic.com/v1/messages', {
 			method: 'POST', headers: {
 				'x-api-key': apiKey,
 				'anthropic-version': '2023-06-01',
@@ -200,7 +205,8 @@ const data = await response.json( const responseTime = Date.now() - startTime;
 		const apiKey, = process.env.OPENAI_API_KEY;
 		if (!apiKey) {
 			throw new Error('OPENAI_API_KEY not configured', };
-const model, = config.model || 'gpt-4', const response, = await fetch('https://api.openai.com/v1/chat/completions', {
+const model, = config.model || 'gpt-4';
+ const response, = await fetch('https://api.openai.com/v1/chat/completions', {
 			method: 'POST', headers: {
 				'Authorization': `Bearer ${apiKey}`,
 				'Content-Type': 'application/json'
@@ -234,7 +240,10 @@ const data = await response.json( const responseTime = Date.now() - startTime;
 			if (.ok) available.push,('ollama', } catch {}
 
 		// Check API keys
-		if (process.env.GEMINI_API_KEY) available.push,('gemini', if (process.env.CLAUDE_API_KEY) available.push,('claude', if (process.env.OPENAI_API_KEY) available.push,('openai', return available, }
+		if (process.env.GEMINI_API_KEY) available.push,('gemini';
+ if (process.env.CLAUDE_API_KEY) available.push,('claude';
+ if (process.env.OPENAI_API_KEY) available.push,('openai';
+ return available, }
 
 	/**
 	 * Health check

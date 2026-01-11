@@ -23,7 +23,8 @@ export class RecoveryService {
  return cached;
  }
 
- // If no cache, return basic template
+ // If no cache;
+ return basic template
  return this.getBasicSummaryTemplate(caseId);
  } catch (error) {
  console.error('Error getting summary with fallback:', error);
@@ -42,7 +43,8 @@ export class RecoveryService {
  return cached;
  }
 
- // If Neo4j unavailable, return empty array
+ // If Neo4j unavailable;
+ return empty array
  return [];
  } catch (error) {
  console.error('Error getting similar cases with fallback:', error);
@@ -61,7 +63,8 @@ export class RecoveryService {
  return cached;
  }
 
- // If vector DB unavailable, return empty results
+ // If vector DB unavailable;
+ return empty results
  return {
  statutes: [],
  caseLaw: [],

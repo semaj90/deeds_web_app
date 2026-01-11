@@ -1,6 +1,8 @@
 <!-- YoRHa, Terminal/Console, Component --> <script lang="ts">
 import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported import { onMount } from 'svelte'; interface TerminalProps { title?: string; prompt?: string; history?: string[]; currentInput?: string; isActive?: boolean; onCommand?: (command: string) => void; maxLines?: number}
-  let { title = 'YORHA LEGAL TERMINAL v4.0.0', prompt = 'YoRHa:legal>', history = [], currentInput = '', isActive = true, onCommand, maxLines = 100 } = $props<Partial<TerminalProps>>(); let terminalRef: HTMLDivElement, let inputRef: HTMLInputElement, let terminalHistory = $state([
+  let { title = 'YORHA LEGAL TERMINAL v4.0.0', prompt = 'YoRHa:legal>', history = [], currentInput = '', isActive = true, onCommand, maxLines = 100 } = $props<Partial<TerminalProps>>(); let terminalRef: HTMLDivElement;
+ let inputRef: HTMLInputElement;
+ let terminalHistory = $state([
     'YoRHa Legal AI System v4.0.0',
     'Copyright (c) 2024 YoRHa Command Division',
     'Legal Analysis Module Loaded',
@@ -117,9 +119,9 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
   .cursor.blink { opacity: 1}
   .processing-indicator { color: var(--yorha-warning, #ffaa00); font-size: 12px; animation: pulse 1.5s infinite}
   .terminal-line.processing .prompt-text { color: var(--yorha-warning, #ffaa00)}
-  @keyframes blink { 0%, 50% { opacity: 1}
-    51%, 100% { opacity: 0}
-  } @keyframes pulse { 0%, 100% { opacity: 1}
+  @keyframes blink { 0%; } 50% { opacity: 1}
+    51%; } 100% { opacity: 0}
+  } @keyframes pulse { 0%; } 100% { opacity: 1}
     50% { opacity: 0.5}
   } /* Responsive Design */ @media (max-width: 768px) { .yorha-terminal { height: 400px; font-size: 12px}
     .terminal-header { padding: 6px 12px}

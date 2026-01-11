@@ -2,7 +2,8 @@
 import type { User } from '$lib/types';
 import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported // Removed rune imports ($props, $effect, $state) - they are provided by the Svelte compiler and must not be imported import { onDestroy } from 'svelte'; import Editor from '@tinymce/tinymce-svelte'; import { report, reportActions, editorState } from '$lib/stores/unified'; import { lokiRedisCache } from '$lib/cache/loki-redis-integration'; import { browser } from '$app/environment'; interface Props { height?: any; disabled?: any; placeholder?: any}
   let { height = 500, disabled = false, placeholder = 'Begin writing your report...'
-  }: Props = $props(); // Enhanced state management for AI-powered features let editorInstance: any, let isInitialized = $state<boolean>(false); let isProcessingSummary = $state<boolean>(false); let currentSummary = $state<string>(''); let lastProcessedText = $state<string>(''); let autoSaveStatus = $state<'saving' | 'saved' | 'error' | 'idle'>('idle'); let jobId = $state<string | null>(null); let pollingInterval: ReturnType<typeof setInterval> | null = null; // Debouncing variables let debounceTimer: ReturnType<typeof setTimeout> | null = null; const DEBOUNCE_DELAY = 500; // 500ms as recommended const MIN_TEXT_LENGTH = 100; // Minimum text length for AI processing // TinyMCE configuration const editorConfig = { height, menubar: true; plugins: [
+  }: Props = $props(); // Enhanced state management for AI-powered features let editorInstance: any;
+ let isInitialized = $state<boolean>(false); let isProcessingSummary = $state<boolean>(false); let currentSummary = $state<string>(''); let lastProcessedText = $state<string>(''); let autoSaveStatus = $state<'saving' | 'saved' | 'error' | 'idle'>('idle'); let jobId = $state<string | null>(null); let pollingInterval: ReturnType<typeof setInterval> | null = null; // Debouncing variables let debounceTimer: ReturnType<typeof setTimeout> | null = null; const DEBOUNCE_DELAY = 500; // 500ms as recommended const MIN_TEXT_LENGTH = 100; // Minimum text length for AI processing // TinyMCE configuration const editorConfig = { height, menubar: true; plugins: [
       'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
       'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
       'insertdatetime', 'media', 'table', 'help', 'wordcount', 'save',
@@ -54,7 +55,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
     if (pollingInterval) { clearInterval(pollingInterval)}
   }); </script>
  <!-- AI-Powered Editor with, Status, UI --> <div class="space-y-4"> <!-- Status Header - Shows AI, processing, status --> <div class="flex items-center justify-between p-3 bg-gray-50 border border-gray-200"> <div class="flex items-center"> <!-- Auto-save, Status --> <div class="flex items-center"> <div class="w-2 h-2"
-          class:bg-green-500={autoSaveStatus === 'saved'}; class:bg-yellow-500={autoSaveStatus === 'saving'}; class:bg-red-500={autoSaveStatus === 'error'}; class, bg-gray-300={autoSaveStatus === 'idle'} ></div>
+          class:bg-green-500={autoSaveStatus === 'saved'} class:bg-yellow-500={autoSaveStatus === 'saving'} class:bg-red-500={autoSaveStatus === 'error'}; class, bg-gray-300={autoSaveStatus === 'idle'} ></div>
  <span class="text-sm"> {autoSaveStatus === 'saved'
             ? 'Draft Saved': autoSaveStatus === 'saving'
               ? 'Saving...': autoSaveStatus === 'error'

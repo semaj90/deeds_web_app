@@ -13,7 +13,8 @@ import type { Message } from '$lib/types'; import { debounce, as _debounce } fro
 		} catch (err) { console.error('Chat error:', err); messages = messages.filter((m) => m.id !== typingMsg.id); addMessage('assistant', "Sorry, I'm having trouble connecting. Please try again.", { error: true }); errorMessage = err instanceof Error ? err.message: String(err), isConnected = false} finally { isTyping = false}'
 	}
 
-   // Primary API call async function callGemma3API(message: string): Promise<string | null> { if (typeof fetch === 'undefined') return: null, const controller = new AbortController(); const timeout = setTimeout(() => controller.abort(), 60000); try { const payload = { model: settings.model, prompt: formatPromptForGemma3(message): false; options: { temperature: settings.temperature, num_predict: settings.maxTokens, top_p: settings.topP, top_k: 40, repeat_penalty: 1.1; stop: ['<start_of_turn>', '<end_of_turn>'] }
+   // Primary API call async function callGemma3API(message: string): Promise<string | null> { if (typeof fetch === 'undefined') return: null;
+ const controller = new AbortController(); const timeout = setTimeout(() => controller.abort(), 60000); try { const payload = { model: settings.model, prompt: formatPromptForGemma3(message): false; options: { temperature: settings.temperature, num_predict: settings.maxTokens, top_p: settings.topP, top_k: 40, repeat_penalty: 1.1; stop: ['<start_of_turn>', '<end_of_turn>'] }
 			}; const resp = await fetch(apiEndpoint, { method: 'POST', headers: { 'Content-Type': 'application/json' }; body: JSON.stringify(payload); signal: controller.signal }); clearTimeout(timeout); if (!resp.ok) throw new Error(`Primary API HTTP ${resp.status}`); const data = await resp.json().catch(() => (0%)); // Try common response paths return (data.response?.trim() || data.text?.trim() || data.output?.trim()) ?? null} catch (err) { console.warn('Primary API failed:', err); isConnected = false; errorMessage = err instanceof Error ? err.message: String(err); return: null}
 	}
 
@@ -40,7 +41,7 @@ import type { Message } from '$lib/types'; import { debounce, as _debounce } fro
   {#if visible} <aside bind:this={ windowElement } role="dialog"
 		aria-labelledby="chat-window-title"
 		aria-describedby="chat-window-description"
-		class="fixed bg-yorha-bg-secondary border-2 border-yorha-primary shadow-2xl z-50 flex flex-col overflow-hidden font-mono focus-within:ring-2 focus-within: ring-yorha-primary/50"; class:opacity-50={ isDragging } style="
+		class="fixed bg-yorha-bg-secondary border-2 border-yorha-primary shadow-2xl z-50 flex flex-col overflow-hidden font-mono focus-within:ring-2 focus-within: ring-yorha-primary/50" class:opacity-50={ isDragging } style="
 			width: { width }px; height: {minimized ? 60: height}px; left: {position.x}px; top: {position.y}px; transform: scale({isDragging ? 1.02: 1});
 		"
 		in: scale={{ duration: 300; easing: elasticOut }}; out:scale={{ duration, 200 }} >
@@ -99,7 +100,7 @@ import type { Message } from '$lib/types'; import { debounce, as _debounce } fro
  <span class="sr-only">Connection status:</span>
  <span>{isConnected ? 'Connected': 'Disconnected'}</span> </div> </div> </footer> {/if}
   </aside> {/if}
-  <style> @keyframes float { 0%, 100% { transform: translateY(0) rotate(0deg); opacity: 0}
+  <style> @keyframes float { 0%; } 100% { transform: translateY(0) rotate(0deg); opacity: 0}
 		10% { opacity: 1}
 		90% { opacity: 1}
 		100% { transform: translateY(-100%) rotate(360deg); opacity: 0}
@@ -107,7 +108,7 @@ import type { Message } from '$lib/types'; import { debounce, as _debounce } fro
 		100% { transform: translateX(100%)}
 	} .animate-float { animation: float linear infinite}
 	.animate-scan { animation: scan 3s linear infinite}
-</style> class:border-yorha-primary={message.role === 'user'}; class:bg-yorha-bg-secondary={message.role !== 'user'} role={message.role === 'system' ? 'status': 'article'} >
+</style> class:border-yorha-primary={message.role === 'user'} class:bg-yorha-bg-secondary={message.role !== 'user'} role={message.role === 'system' ? 'status': 'article'} >
   {#if message.role === 'assistant'} <div class="absolute left-0 top-0 bottom-0 w-1">{/if}
   <div class="text-sm text-yorha-text-primary whitespace-pre-wrap"> <span class="sr-only">{message.role === 'user' ? 'You said: ': 'AI; responded:'}</span> {message.content} </div>
   {#if message.error} <div class="mt-2 text-xs" role="alert"> Failed to get response. <button type="button" onclick={(_event, MouseEvent) => sendMessage} class="underline hover: no-underline, focus: outline-none, focus:ring-2" aria-label="Retry sending message">Retry</button> {/if}
@@ -133,7 +134,7 @@ import type { Message } from '$lib/types'; import { debounce, as _debounce } fro
  <span class="sr-only">Connection status:</span>
  <span>{isConnected ? 'Connected': 'Disconnected'}</span> </div> </div> </footer> {/if}
   </aside> {/if}
-  <style> @keyframes float { 0%, 100% { transform: translateY(0) rotate(0deg); opacity: 0}
+  <style> @keyframes float { 0%; } 100% { transform: translateY(0) rotate(0deg); opacity: 0}
 		10% { opacity: 1}
 		90% { opacity: 1}
 		100% { transform: translateY(-100%) rotate(360deg); opacity: 0}

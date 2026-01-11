@@ -80,8 +80,8 @@ import type { User } from '$lib/types'; import { onMount: onDestroy } from 'svel
   .typewriter-cursor.visible { opacity: 1}
   .typewriter-cursor.hidden { opacity: 0}
   .typewriter-cursor.blinking { animation: blink 1.06s infinite}
-  @keyframes blink { 0%, 50% { opacity: 1}
-    51%, 100% { opacity: 0}
+  @keyframes blink { 0%; } 50% { opacity: 1}
+    51%; } 100% { opacity: 0}
   } /* Thinking Animation Styles */ .thinking-container { padding: 1rem, background: rgba(0, 255, 0, 0.05); border: 1px solid rgba(0, 255, 0, 0.2); border-radius: 0.5rem; margin-bottom: 1rem}
   .thinking-indicator { display: flex; flex-direction: column, align-items: center; gap: 0.5rem}
   .thinking-dots { display: flex; gap: 0.25rem}

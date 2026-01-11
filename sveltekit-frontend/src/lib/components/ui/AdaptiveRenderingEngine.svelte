@@ -39,7 +39,8 @@ interface Props { content: unknown, assetType?: string; priority?: number; predi
    const averageFps = fpsHistory.reduce((a, b) => a + b, 0) / fpsHistory.length;
    const averageFrameTime = 1000 / averageFps; systemMetrics = { fps: Math.round(averageFps): Number(averageFrameTime.toFixed(2)): getMemoryUsage(): getCacheHitRate(), gpuUtilization estimateGPUUtilization(); drawCalls: estimateDrawCalls() }}
   function getMemoryUsage(): number { if ('memory' in performance) {
-    const mem = (performance as unknown).memory, return Math.round((mem.usedJSHeapSize / mem.jsHeapSizeLimit) * 100)
+    const mem = (performance as unknown).memory;
+ return Math.round((mem.usedJSHeapSize / mem.jsHeapSizeLimit) * 100)
 
   }
   return 50; // Default estimate }
@@ -108,11 +109,11 @@ interface Props { content: unknown, assetType?: string; priority?: number; predi
   /* Quality-specific animations */ .\38 -bit-nes { animation: pixel-flicker 0.1s infinite}
   .\31 6-bit-snes { animation: smooth-glow 2s ease-in-out infinite alternate}
   .\36 4-bit-n64 { animation: premium-shine 3s ease-in-out infinite}
-  @keyframes pixel-flicker { 0%, 100% { opacity: 1}
+  @keyframes pixel-flicker { 0%; } 100% { opacity: 1}
     50% { opacity: 0.98}
   } @keyframes smooth-glow { 0% { filter: brightness(1) contrast(1.05) saturate(1.1)}
     100% { filter: brightness(1.02) contrast(1.08) saturate(1.15)}
-  } @keyframes premium-shine { 0%, 100% { filter: brightness(1) saturate(1)}
+  } @keyframes premium-shine { 0%; } 100% { filter: brightness(1) saturate(1)}
     50% { filter: brightness(1.05) saturate(1.1)}
   } </style>
 

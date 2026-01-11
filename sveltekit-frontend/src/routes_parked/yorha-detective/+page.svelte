@@ -171,8 +171,7 @@
  line-height: 1.5;
  }
  @keyframes glow-pulse {
- 0%,
- 100% {
+ 0%; } 100% {
  text-shadow: 0 0 20px #00ff41;
  transform: scale(1);
  }
@@ -182,8 +181,7 @@
  }
  }
  @keyframes loading-dots {
- 0%,
- 20% {
+ 0%; } 20% {
  opacity: 0;
  }
  40% {
@@ -192,8 +190,7 @@
  60% {
  opacity: 1;
  }
- 80%,
- 100% {
+ 80%; } 100% {
  opacity: 0;
  }
  }

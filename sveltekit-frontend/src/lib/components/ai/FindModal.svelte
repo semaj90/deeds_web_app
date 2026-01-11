@@ -186,11 +186,11 @@
   .nier-priority-indicator.low { background-color: #22c55e; box-shadow: 0 0 8px rgba(16, 185, 129, 0.6)}
   .nier-icon-container { width: 2rem; height: 2rem; background-color: rgba(251, 191, 36, 0.2); border: 1px solid rgba(251, 191, 36, 0.5); display: flex; align-items: center; justify-content: center; clip-path: polygon(0, 0, calc(100% - 6px) 0, 100% 6px, 100% 100%, 6px 100%, 0 calc(100% - 6px))}
   .line-clamp-2 { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden}
-  /* Animations */ @keyframes borderFlow { 0%, 100% { background: linear-gradient(45deg, #fbbf24, transparent, transparent, #fbbf24); opacity: 0.8}
+  /* Animations */ @keyframes borderFlow { 0%; } 100% { background: linear-gradient(45deg, #fbbf24, transparent, transparent, #fbbf24); opacity: 0.8}
     25% { background: linear-gradient(135deg, transparent, #fbbf24, transparent, transparent); opacity: 1}
     50% { background: linear-gradient(225deg, transparent, transparent, #fbbf24, transparent); opacity: 0.8}
     75% { background: linear-gradient(315deg, transparent, transparent, transparent, #fbbf24); opacity: 1}
-  } @keyframes glowPulse { 0%, 100% { opacity: 0.6} 50% { opacity: 1} }
+  } @keyframes glowPulse { 0%; } 100% { opacity: 0.6} 50% { opacity: 1} }
   .nier-spinner { animation: spin 1s linear infinite}
   @keyframes spin { from { transform: rotate(0deg)} to { transform: rotate(360deg)} }
   /* Responsive Design */ @media (max-width: 768px) { .nier-container { clip-path: polygon(0, 0, calc(100% - 15px) 0, 100% 15px, 100% 100%, 15px 100%, 0 calc(100% - 15px)); margin: 1rem; max-height: calc(100vh - 2rem)}

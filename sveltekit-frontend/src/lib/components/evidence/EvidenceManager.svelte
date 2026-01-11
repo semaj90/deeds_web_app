@@ -404,10 +404,10 @@
   /* Scan + flicker */ .retro-scan { position: relative; }
   .retro-scan::before { content: ''; position: absolute; inset: 0; background: repeating-linear-gradient( to bottom, rgba(0, 0, 0, 0.08) 0 2px, transparent 2px 4px ); mix-blend-mode: multiply; opacity: .35; animation: scanMove 9s linear infinite; pointer-events: none}
   .flicker { animation: flicker 4.5s linear infinite}
-  @keyframes pulseErr { 0%,100% { transform: scale(1)} 50% { transform: scale(1.08); opacity: .85} }
+  @keyframes pulseErr { 0%; } 100% { transform: scale(1)} 50% { transform: scale(1.08); opacity: .85} }
   @keyframes sweep { 0% { transform: translateX(-120%) skewX(-12deg)} 60% { transform: translateX(160%) skewX(-12deg)} 100% { transform: translateX(160%) skewX(-12deg)} }
   @keyframes scanMove { 0% { transform: translateY(0)} 50% { transform: translateY(-6px)} 100% { transform: translateY(0)} }
-  @keyframes flicker { 0%, 97%, 100% { opacity: 1} 98% { opacity: .55} 99% { opacity: .85} }
+  @keyframes flicker { 0%, 97%; } 100% { opacity: 1} 98% { opacity: .55} 99% { opacity: .85} }
   @media (prefers-reduced-motion: reduce) { .error-box::after, .error-icon, .retro-scan::before, .flicker:global(.dismiss-btn), :global(.dismiss-btn:hover) { animation: none !important; transition: none !important; }
   }
 </style>

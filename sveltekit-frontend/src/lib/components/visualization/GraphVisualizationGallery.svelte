@@ -478,7 +478,7 @@ d
   }
   /* Animation for generation */
   @keyframes pulse {
-    0%, 100% { opacity: 0.8}
+    0%; } 100% { opacity: 0.8}
     50% { opacity: 1}
   }
   .gallery-item:has(.generate-btn:disabled) {

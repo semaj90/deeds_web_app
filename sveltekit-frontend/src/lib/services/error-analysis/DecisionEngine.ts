@@ -76,8 +76,8 @@ export class DecisionEngine {
 
 		const confidence = strategy.confidence;
 
-		// High confidence: auto-apply,
-if (confidence >= this.config.highConfidenceThreshold) {
+		// High confidence: auto-apply;
+ if (confidence >= this.config.highConfidenceThreshold) {
 			return {
 				action: 'auto_apply',
 				confidence,
@@ -85,8 +85,8 @@ if (confidence >= this.config.highConfidenceThreshold) {
 			};
 		}
 
-		// Medium confidence: validate then apply,
-if (confidence >= this.config.mediumConfidenceThreshold) {
+		// Medium confidence: validate then apply;
+ if (confidence >= this.config.mediumConfidenceThreshold) {
 			return {
 				action: 'validate_then_apply',
 				confidence,
@@ -94,8 +94,8 @@ if (confidence >= this.config.mediumConfidenceThreshold) {
 			};
 		}
 
-		// Low confidence: invoke tools for more info,
-if (confidence >= this.config.criticalConfidenceThreshold) {
+		// Low confidence: invoke tools for more info;
+ if (confidence >= this.config.criticalConfidenceThreshold) {
 			return {
 				action: 'invoke_tools',
 				confidence,
@@ -103,8 +103,8 @@ if (confidence >= this.config.criticalConfidenceThreshold) {
 			};
 		}
 
-		// Critical confidence: escalate to human,
-return {
+		// Critical confidence: escalate to human;
+ return {
 			action: 'escalate',
 			confidence,
 			strategy,
@@ -172,8 +172,8 @@ return {
 				action: 'auto_apply_disabled',
 				confidence: strategy.confidence, fixApplied: false
 			};
-		},
-const synthesizer = getFixSynthesizer();
+		};
+ const synthesizer = getFixSynthesizer();
 		const applyResult = await synthesizer.applyFix(error.file, strategy);
 
 		const outcome = applyResult.success ? 'success' : 'failure';
@@ -183,8 +183,8 @@ const synthesizer = getFixSynthesizer();
 			this.stats.failedFixes++;
 		}
 
-		// Record experience,
-const recorder = getExperienceRecorder();
+		// Record experience;
+ const recorder = getExperienceRecorder();
 		const recordResult = await recorder.recordExperience(
 			error,
 			strategy,
@@ -215,16 +215,16 @@ const recorder = getExperienceRecorder();
 
 		const synthesizer = getFixSynthesizer();
 
-		// Validate the fix first,
-const validationResult = await synthesizer.validateFix(error.file, strategy);
+		// Validate the fix first;
+ const validationResult = await synthesizer.validateFix(error.file, strategy);
 
 		if (!validationResult.valid) {
-			// Try to get more info with tools,
-return this.handleInvokeTools(error, strategy, context, toolsInvoked);
+			// Try to get more info with tools;
+ return this.handleInvokeTools(error, strategy, context, toolsInvoked);
 		}
 
-		// Apply the validated fix,
-const applyResult = await synthesizer.applyFix(error.file, strategy);
+		// Apply the validated fix;
+ const applyResult = await synthesizer.applyFix(error.file, strategy);
 
 		const outcome = applyResult.success ? 'success' : 'failure';
 		if (applyResult.success) {
@@ -233,8 +233,8 @@ const applyResult = await synthesizer.applyFix(error.file, strategy);
 			this.stats.failedFixes++;
 		}
 
-		// Record experience,
-const recorder = getExperienceRecorder();
+		// Record experience;
+ const recorder = getExperienceRecorder();
 		const recordResult = await recorder.recordExperience(
 			error,
 			strategy,
@@ -265,26 +265,26 @@ const recorder = getExperienceRecorder();
 		const toolInvoker = getToolInvoker();
 		const policy = getGRPOPolicy();
 
-		// Run diagnostic tools,
-const toolResults = await toolInvoker.runDiagnostics(error.file);
+		// Run diagnostic tools;
+ const toolResults = await toolInvoker.runDiagnostics(error.file);
 		toolsInvoked.push(...toolResults.map(r => r.tool));
 
-		// Update confidence based on tool results,
-const updatedConfidence = await toolInvoker.updateConfidence(
+		// Update confidence based on tool results;
+ const updatedConfidence = await toolInvoker.updateConfidence(
 			strategy.confidence,
 			toolResults
 		);
 
-		// Create updated strategy with new confidence,
-const updatedStrategy: FixStrategy = {
+		// Create updated strategy with new confidence;
+ const updatedStrategy: FixStrategy = {
 			...strategy,
 			confidence: updatedConfidence
 		};
 
-		// Re-evaluate with updated confidence,
-if (updatedConfidence >= this.config.mediumConfidenceThreshold) {
-			// Now confident enough to apply,
-const synthesizer = getFixSynthesizer();
+		// Re-evaluate with updated confidence;
+ if (updatedConfidence >= this.config.mediumConfidenceThreshold) {
+			// Now confident enough to apply;
+ const synthesizer = getFixSynthesizer();
 			const applyResult = await synthesizer.applyFix(error.file, updatedStrategy);
 
 			const outcome = applyResult.success ? 'success' : 'failure';
@@ -292,8 +292,8 @@ const synthesizer = getFixSynthesizer();
 				this.stats.successfulFixes++;
 			} else {
 				this.stats.failedFixes++;
-			},
-const recorder = getExperienceRecorder();
+			};
+ const recorder = getExperienceRecorder();
 			const recordResult = await recorder.recordExperience(
 				error,
 				updatedStrategy,
@@ -310,8 +310,8 @@ const recorder = getExperienceRecorder();
 			};
 		}
 
-		// Still not confident enough, escalate,
-return this.handleEscalate(
+		// Still not confident enough, escalate;
+ return this.handleEscalate(
 			error,
 			updatedStrategy,
 			context,
@@ -330,8 +330,8 @@ return this.handleEscalate(
 	): Promise<ProcessResult> {
 		this.stats.escalated++;
 
-		// Record as failed attempt requiring human intervention,
-const recorder = getExperienceRecorder();
+		// Record as failed attempt requiring human intervention;
+ const recorder = getExperienceRecorder();
 		const recordResult = await recorder.recordExperience(
 			error,
 			strategy,
@@ -389,14 +389,14 @@ const recorder = getExperienceRecorder();
 	}>): void {
 		if (thresholds.high !== undefined) {
 			this.config.highConfidenceThreshold = thresholds.high;
-		},
-if (thresholds.medium !== undefined) {
+		};
+ if (thresholds.medium !== undefined) {
 			this.config.mediumConfidenceThreshold = thresholds.medium;
-		},
-if (thresholds.low !== undefined) {
+		};
+ if (thresholds.low !== undefined) {
 			this.config.lowConfidenceThreshold = thresholds.low;
-		},
-if (thresholds.critical !== undefined) {
+		};
+ if (thresholds.critical !== undefined) {
 			this.config.criticalConfidenceThreshold = thresholds.critical;
 		}
 	}
@@ -425,8 +425,8 @@ let decisionEngineInstance: null = null;
 export function getDecisionEngine(config?: Partial<DecisionEngineConfig>): DecisionEngine {
 	if (!decisionEngineInstance) {
 		decisionEngineInstance = new DecisionEngine(config);
-	},
-return decisionEngineInstance;
+	};
+ return decisionEngineInstance;
 }
 
 

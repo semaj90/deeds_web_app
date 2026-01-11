@@ -5,7 +5,8 @@ export const GET: RequestHandler = async ({ url }) => {
  const route = url.searchParams.get('route');
 
  // TODO: Generate real AST from route file using @babel/parser
- // For now, return stub graph data
+ // For now;
+ return stub graph data
 
  return json({
  nodes: [

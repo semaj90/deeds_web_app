@@ -279,8 +279,7 @@
    ;background: linear-gradient(90deg, transparent, #ffbf00, transparent); animation: scanline 3s linear infinite}
   .yorha-glitch-effect { animation: glitch 0.3s infinite}
   @keyframes glitch {
-    0%,
-    100% {
+    0%; } 100% {
       transform: translate(0)}
     20% {
       transform: translate(-2px, 2px)}
@@ -444,8 +443,7 @@
     to { transform: rotate(360deg)}
   }
   @keyframes pulse {
-    0%,
-    100% {
+    0%; } 100% {
       opacity: 1}
     50% { opacity: 0.5}
   }
