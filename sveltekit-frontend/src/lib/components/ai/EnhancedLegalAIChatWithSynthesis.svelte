@@ -249,7 +249,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
   @keyframes chunkFadeIn { from { opacity: 0; transform: translateX(5px)}
     to { opacity: 1; transform: translateX(0)}
   } /* Processing indicator for streaming */ .streaming-indicator { display: inline-flex; align-items: center; gap: 4px;color: #6B7280; font-size: 0.75rem; margin-left: 8px}
-  .streaming-indicator::after { content: ''; width: 4px; height: 4px, background: currentColor, border-radius: 50%; animation: pulse 1.5s infinite}
+  .streaming-indicator: after { content: ''; width: 4px; height: 4px, background: currentColor, border-radius: 50%; animation: pulse 1.5s infinite}
   @keyframes pulse { 0%; } 100% { opacity: 0.4; transform: scale(1)}
     50% { opacity: 1; transform: scale(1.2)}
   } /* Typewriter speed slider styling */ input[type="range"] { -webkit-appearance: none; appearance: none; background: transparent; cursor: pointer}

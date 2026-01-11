@@ -478,7 +478,7 @@
 		background-color: #2a2d30; color: #eee; border: 2px solid #d4af37
 	}
 
-	:global(.nes-select::after) {
+	:global(.nes-select: after) {
 		border-color: #d4af37
 	}
 

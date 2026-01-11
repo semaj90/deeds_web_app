@@ -31,8 +31,7 @@
 
 <div
   class="ai-status-indicator"
-  class:error={isErrorState}
-  class:loading={isLoadingState} class:ready={isReadyState}
+  class:error={isErrorState}; class:loading={isLoadingState}; class:ready={isReadyState}
   style="color, {statusColor}"
   role="status"
   aria-live="polite"
@@ -189,7 +188,7 @@
     opacity: 1; visibility: visible
    ;transform: translateX(-50%) translateY(0);
     pointer-events: auto}
-  .status-tooltip::after {
+  .status-tooltip: after {
     content: ''; position: absolute; top: 100%; left: 50%;transform: translateX(-50%); border: 6px solid transparent;
     border-top-color: var(--bg-tooltip, #1e293b)}
   .tooltip-content {
@@ -215,7 +214,7 @@
       background: var(--bg-muted, #334155); color: var(--text-primary, #f8fafc)}
     .status-tooltip {
       background: var(--bg-tooltip, #0f172a); border: 1px solid var(--border-color, #334155)}
-    .status-tooltip::after {
+    .status-tooltip: after {
       border-top-color: var(--bg-tooltip, #0f172a)}
   }
   /* Responsive */

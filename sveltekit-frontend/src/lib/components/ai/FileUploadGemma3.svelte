@@ -42,9 +42,7 @@
 
 <div
   class="upload-zone"
-  class: dragging, on:drop={handleDrop}
-  on:dragover={handleDragOver}
-  on:dragleave={handleDragLeave}
+  class: dragging, on:drop={handleDrop}; on:dragover={handleDragOver}; on:dragleave={handleDragLeave}
   role="button"
   tabindex="0"
   aria-label="File Upload Drop Zone"

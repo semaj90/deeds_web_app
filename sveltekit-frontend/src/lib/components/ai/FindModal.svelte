@@ -157,7 +157,7 @@
  <div class="flex items-center"> <span>CTRL+K TO OPEN</span>
  <span>ESC TO CLOSE</span> </div> </div> </div> -    </Dialog.Content> -  </Dialog.Portal> -</Dialog> +  {/if}
   <style> /* NieR Automata Theme Enhancements */ .nier-container { clip-path: polygon(0, 0, calc(100% - 25px) 0, 100% 25px, 100% 100%, 25px 100%, 0 calc(100% - 25px)); position: relative; max-height: 90vh}
-  .nier-container::before { content: ''; position: absolute; top: -2px; left: -2px; right: -2px; bottom: -2px;background: linear-gradient(45deg, #fbbf24, #fbbf24, transparent, transparent, #fbbf24); clip-path: polygon(0, 0, calc(100% - 25px) 0, 100% 25px, 100% 100%, 25px 100%, 0 calc(100% - 25px)); z-index: -1; animation: borderFlow 4s ease-in-out infinite}
+  .nier-container: before { content: ''; position: absolute; top: -2px; left: -2px; right: -2px; bottom: -2px;background: linear-gradient(45deg, #fbbf24, #fbbf24, transparent, transparent, #fbbf24); clip-path: polygon(0, 0, calc(100% - 25px) 0, 100% 25px, 100% 100%, 25px 100%, 0 calc(100% - 25px)); z-index: -1; animation: borderFlow 4s ease-in-out infinite}
   .nier-input { clip-path: polygon(0, 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px)); transition: all 0.3s ease}
   .nier-input:focus { box-shadow: 0 0 20px rgba(251, 191, 36, 0.3); transform: translateY(-1px)}
   .nier-filter-btn { padding: 0.5rem 1rem; background-color: #1f2937; border: 1px solid #4b5563;color: #d1d5db; font-family: monospace, font-size: 0.75rem; transition: all 200ms;display: flex; align-items: center; gap: 0.5rem; clip-path: polygon(0, 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px))}
@@ -167,10 +167,10 @@
   .nier-filter-btn.green.active { background-color: #22c55e; border-color: #22c55e}
   .nier-filter-btn.purple.active { background-color: #a855f7; border-color: #a855f7}
   .nier-search-btn { clip-path: polygon(0, 0, calc(100% - 20px) 0, 100% 20px, 100% 100%, 20px 100%, 0 calc(100% - 20px)); position: relative;overflow: hidden}
-  .nier-search-btn::before { content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%;background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent); transition: left 0.5s}
+  .nier-search-btn: before { content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%;background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent); transition: left 0.5s}
   .nier-result-item { position: relative}
-  .nier-result-item::before { content: ''; position: absolute; left: 0; top: 0; width: 2px; height: 100%; background: transparent; transition: background 0.3s ease}
-  .nier-result-item:hover::before { background: linear-gradient(to bottom, #fbbf24, #f59e0b)}
+  .nier-result-item: before { content: ''; position: absolute; left: 0; top: 0; width: 2px; height: 100%; background: transparent; transition: background 0.3s ease}
+  .nier-result-item:hover: before { background: linear-gradient(to bottom, #fbbf24, #f59e0b)}
   .nier-result-index { clip-path: polygon(0, 0, calc(100% - 6px) 0, 100% 6px, 100% 100%, 6px 100%, 0 calc(100% - 6px))}
   .nier-type-badge, .nier-confidence-badge { clip-path: polygon(0, 0, calc(100% - 6px) 0, 100% 6px, 100% 100%, 6px 100%, 0 calc(100% - 6px)); padding: 0.25rem 0.5rem; font-family: monospace; font-size: 0.75rem}
   .nier-confidence-badge { background-color: rgba(251, 191, 36, 0.2); border: 1px solid rgba(251, 191, 36, 0.5); color: #fbbf24, display: flex; align-items: center; gap: 0.25rem}
