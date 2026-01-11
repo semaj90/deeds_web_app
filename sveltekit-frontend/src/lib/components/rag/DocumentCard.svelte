@@ -3,10 +3,7 @@ import type { Document } from '$lib/types';
   import { FileText, Trash2, Eye, Clock } from 'lucide-svelte';
   import  Button  from "$lib/components/ui/button/Button.svelte";
   interface Document {
-    id: string, filename: string
-    fileSize: number, mimeType: string
-    summary: string, embeddingModel: string
-    uploadedAt: string
+    id: string, filename: string, fileSize: number, mimeType: string, summary: string, embeddingModel: string, uploadedAt: string
     metadata?: {
       pageCount?: number
       language?: string

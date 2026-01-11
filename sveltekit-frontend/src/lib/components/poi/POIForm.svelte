@@ -122,8 +122,7 @@
  <select
  id="status"
  name="status"
- bind:value={$form.status}
- class:error={$errors.status}
+ bind:value={$form.status}; class:error={$errors.status}
  >
  <option value="">Select status</option>
  {#each statusOptions as option}
@@ -141,8 +140,7 @@
  <select
  id="priority"
  name="priority"
- bind:value={$form.priority}
- class:error={$errors.priority}
+ bind:value={$form.priority}; class:error={$errors.priority}
  >
  <option value="">Select priority</option>
  {#each priorityOptions as option}
@@ -160,8 +158,7 @@
  <select
  id="threatLevel"
  name="threatLevel"
- bind:value={$form.threatLevel}
- class:error={$errors.threatLevel}
+ bind:value={$form.threatLevel}; class:error={$errors.threatLevel}
  >
  <option value="">Select threat level</option>
  {#each threatLevelOptions as option}
@@ -244,9 +241,7 @@
  border-radius: 0.375rem; color: #ffffff;
  font-family: inherit;
  font-size: 0.875rem; transition: border-color 0.2s;
- }
-
- input:focus, select:focus,
+ }; input:focus, select:focus,
  textarea:focus {
  outline: none;
  border-color: #dc2626;

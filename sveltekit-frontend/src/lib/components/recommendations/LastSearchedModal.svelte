@@ -104,7 +104,7 @@ interface Props { open: boolean}
   .modal-header { margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 1px solid rgba(255, 255, 255, 0.1)}
   .search-controls { display: flex; gap: 1rem; margin-bottom: 1rem}
   .search-input { flex: 1; padding: 0.75rem;background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 8px; color: #fff; font-size: 0.9rem}
-  .search-input::placeholder { color: rgba(255, 255, 255, 0.5)}
+  .search-input: placeholder { color: rgba(255, 255, 255, 0.5)}
   .type-filter { padding: 0.75rem, background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 8px; color: #fff; font-size: 0.9rem; min-width: 150px}
   .ai-suggestions { background: rgba(138, 43, 226, 0.1); border: 1px solid rgba(138, 43, 226, 0.3); border-radius: 8px; padding: 1rem}
   .ai-suggestions h4 { margin: 0, 0 0.75rem 0; color: rgba(255, 255, 255, 0.9); font-size: 0.9rem}

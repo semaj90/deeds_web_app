@@ -176,9 +176,7 @@ function formatTime(ms: number): string {
           <div class="flex items-center gap-3 p-2 bg-base-200 rounded">
             <input type="checkbox" class="checkbox checkbox-sm" />
             <span class="flex-1 text-sm">{action.description}</span>
-            <span class="badge badge-xs" class:badge-error={action.priority === 'high'}
-                  class:badge-warning={action.priority === 'medium'}
-                  class:badge-info={action.priority === 'low'}>
+            <span class="badge badge-xs" class:badge-error={action.priority === 'high'}; class:badge-warning={action.priority === 'medium'}; class:badge-info={action.priority === 'low'}>
               {action.priority}
             </span>
             {#if onCreateTask}

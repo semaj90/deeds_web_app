@@ -8,12 +8,9 @@ import type { Document } from '$lib/types';
   import  DiamondModal  from "$lib/components/ui/DiamondModal.svelte";
   import { getCurrentPalette } from '$lib/themes/retro-console-palettes';
   interface AIRecommendation {
-    id: string, type: 'case' | 'document' | 'search' | 'workflow' | 'precedent'; title: string, description: string
-    confidence: number, priority: number
-    metadata: any, aiInsight: string}
+    id: string, type: 'case' | 'document' | 'search' | 'workflow' | 'precedent'; title: string, description: string, confidence: number, priority: number, metadata: any, aiInsight: string}
   interface AIAction {
-    action: string, description: string
-    priority: 'low' | 'medium' | 'high' | 'critical'; estimatedTime: string
+    action: string, description: string, priority: 'low' | 'medium' | 'high' | 'critical'; estimatedTime: string
     tools?: string[]}
   interface Props { open: boolean
     context?: {
@@ -391,8 +388,7 @@ import type { Document } from '$lib/types';
    ;background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.2);
     border-radius: 8px
    ;color: rgba(255, 255, 255, 0.8);
-    font-size: 0.85rem, cursor: pointer
-    transition: all 0.2s
+    font-size: 0.85rem, cursor: pointer, transition: all 0.2s
     text-align: left}
   .type-btn:hover { background: rgba(255, 255, 255, 0.1);
     border-color: rgba(138, 43, 226, 0.5)}
@@ -406,7 +402,7 @@ import type { Document } from '$lib/types';
    ;background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.2);
     border-radius: 8px, color: #fff
     font-size: 0.9rem}
-  .query-input::placeholder { color: rgba(255, 255, 255, 0.5)}
+  .query-input: placeholder { color: rgba(255, 255, 255, 0.5)}
   .analyze-btn {
     padding: 0.75rem 1.5rem
    ;background: linear-gradient(135deg, rgba(138, 43, 226, 0.3), rgba(138, 43, 226, 0.5)); border: 1px solid rgba(138, 43, 226, 0.6);
@@ -485,8 +481,7 @@ import type { Document } from '$lib/types';
     display: flex
     flex-direction: column, gap: 1rem}
   .recommendation-card { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 8px, padding: 1rem
-    transition: all 0.2s}
+    border-radius: 8px, padding: 1rem, transition: all 0.2s}
   .recommendation-card:hover { background: rgba(255, 255, 255, 0.05);
     border-color: rgba(255, 255, 255, 0.2)}
   .rec-header {
@@ -616,8 +611,7 @@ import type { Document } from '$lib/types';
    ;background: rgba(138, 43, 226, 0.1); border: 1px solid rgba(138, 43, 226, 0.3);
     border-radius: 16px
    ;color: rgba(255, 255, 255, 0.8);
-    font-size: 0.8rem, cursor: pointer
-    transition: all 0.2s}
+    font-size: 0.8rem, cursor: pointer, transition: all 0.2s}
   .topic-tag:hover { background: rgba(138, 43, 226, 0.2);
     border-color: rgba(138, 43, 226, 0.5)}
   .empty-state {

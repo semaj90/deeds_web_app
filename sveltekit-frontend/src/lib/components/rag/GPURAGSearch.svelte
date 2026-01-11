@@ -35,7 +35,7 @@ import type { Document } from '$lib/types'; /** * GPU-Accelerated RAG Search Com
   .search-input-wrapper:focus-within { border-color: rgba(6, 182, 212, 0.6)}
   .search-icon { width: 1.25rem; height: 1.25rem;color: rgba(6, 182, 212, 0.6); flex-shrink: 0}
   .search-input { flex: 1; background: transparent; border: none; outline: none;color: #e6eef8; font-size: 0.875rem; font-family: 'Courier New', monospace}
-  .search-input::placeholder { color: rgba(230, 238, 248, 0.4)}
+  .search-input: placeholder { color: rgba(230, 238, 248, 0.4)}
   .search-input:disabled { opacity: 0.5; cursor:not-allowed}
   .search-button { flex-shrink: 0; /* keep existing spacing/styling for the native button */ }
   .error-message { padding: 0.75rem; background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); border-radius: 0.375rem}

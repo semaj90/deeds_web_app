@@ -16,8 +16,7 @@ import type { SearchResult } from '$lib/types';
   let rootEl: HTMLElement | null = null
   // Types
   interface SearchResult {
-    id: string, title: string
- type: 'case' | 'evidence' | 'precedent' | 'statute' | 'criminal' | 'document' | 'recent';
+    id: string, title: string, type: 'case' | 'evidence' | 'precedent' | 'statute' | 'criminal' | 'document' | 'recent';
     content?: string
     score?: number
     metadata?: {

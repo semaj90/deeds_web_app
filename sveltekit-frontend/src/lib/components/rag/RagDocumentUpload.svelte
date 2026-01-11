@@ -4,10 +4,7 @@ import type { Document } from '$lib/types';
   import  Button  from "$lib/components/ui/button/Button.svelte";
   interface UploadResult {
     success: boolean, message: string
-    document?: { id: string
-      filename: string, title: string
-      chunks: number, hasOCR: boolean
- embeddingModel: string};
+    document?: { id: string, filename: string, title: string, chunks: number, hasOCR: boolean, embeddingModel: string};
     error?: string}
   let files = $state<FileList | null>(null);
   let tags = $state<string>('');
