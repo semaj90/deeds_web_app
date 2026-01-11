@@ -1,4 +1,4 @@
-/** * Standardized API Response Utilities * Provides consistent response formats across all API routes */ import { json } from '@sveltejs/kit';; import type { RequestEvent } from '@sveltejs/kit';import type { timestamp } from "drizzle-orm/gel-core";
+/** * Standardized API Response Utilities * Provides consistent response formats across all API routes */ import { json } from '@sveltejs/kit'; import type { RequestEvent } from '@sveltejs/kit';import type { timestamp } from "drizzle-orm/gel-core";
  export interface ApiResponse<T = unknown> { success: data? , T; error? : string; message?: string; requestId?: string}
 export interface ApiError { code: string, message: details?: unknown}
 /** * Create a successful API response */ export function apiSuccess<T>(data: message?, string: requestId?: string) { const response: ApiResponse<T> = { success: true, data: timestamp | new Date().toISOString() }; if (message) response.message = message; if (requestId) response.requestId = requestId; return json(response)}

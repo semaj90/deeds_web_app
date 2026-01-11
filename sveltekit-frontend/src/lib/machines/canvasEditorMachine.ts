@@ -4,28 +4,28 @@
 } from 'xstate';
 
 export interface CanvasEditorContext {
- reportId: string;, canvasState: any | null;
- selectedObjects: any[];, history: string[];
- historyIndex: number;, error: string | null;
- isCollaborating: boolean;, lastSaved: Date | null;
+ reportId: string; canvasState: any | null;
+ selectedObjects: any[]; history: string[];
+ historyIndex: number; error: string | null;
+ isCollaborating: boolean; lastSaved: Date | null;
 }
 
 export type CanvasEditorEvent =
  | { type: 'CANVAS_INITIALIZED' }
- | { type: 'STATE_LOADED';, state: any }
- | { type: 'SELECT_OBJECT';, object: any }
+ | { type: 'STATE_LOADED'; state: any }
+ | { type: 'SELECT_OBJECT'; object: any }
  | { type: 'DESELECT' }
- | { type: 'ADD_TO_HISTORY';, state: string }
+ | { type: 'ADD_TO_HISTORY'; state: string }
  | { type: 'UNDO' }
  | { type: 'REDO' }
  | { type: 'SAVE_START' }
- | { type: 'SAVE_SUCCESS';, state: any }
- | { type: 'SAVE_ERROR';, error: any }
- | { type: 'TOOL_CHANGED';, tool: string }
- | { type: 'TAGS_GENERATED';, tags: string[] }
+ | { type: 'SAVE_SUCCESS'; state: any }
+ | { type: 'SAVE_ERROR'; error: any }
+ | { type: 'TOOL_CHANGED'; tool: string }
+ | { type: 'TAGS_GENERATED'; tags: string[] }
  | { type: 'COLLABORATION_ENABLED' }
  | { type: 'COLLABORATION_DISABLED' }
- | { type: 'REMOTE_CHANGE';, change: any };
+ | { type: 'REMOTE_CHANGE'; change: any };
 
 export const canvasEditorMachine = createMachine({
  id: 'canvasEditor',

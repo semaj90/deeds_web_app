@@ -16,16 +16,16 @@ export interface EmbeddingInput {
 }
 
 export interface EmbeddingOutput {
-  embedding: number[];, dimension: number; model: string;, metadata: { textLength: number;, processingTime: number;
+  embedding: number[]; dimension: number; model: string; metadata: { textLength: number; processingTime: number;
     caseId?: string;
     evidenceId?: string;
     documentType?: string;
-    priority?: string;, timestamp: Date;
+    priority?: string; timestamp: Date;
   };
 }
 
 export interface EmbeddingError {
-  message: string;, code: 'OLLAMA_UNAVAILABLE' | 'TIMEOUT' | 'INVALID_INPUT' | 'MODEL_ERROR';
+  message: string; code: 'OLLAMA_UNAVAILABLE' | 'TIMEOUT' | 'INVALID_INPUT' | 'MODEL_ERROR';
   details?: any;
 }
 

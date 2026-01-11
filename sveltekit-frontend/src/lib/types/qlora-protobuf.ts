@@ -8,22 +8,22 @@ import * as pako from 'pako';
 
 export interface QLoRAProtobufTopologyRequest {
     query: string;
-    context?: string;, topologyType: 'legal' | 'general' | 'technical';
-    accuracyTarget: number;, useCache: boolean;
-    trainingMode: boolean;, binaryResponse: boolean;
+    context?: string; topologyType: 'legal' | 'general' | 'technical';
+    accuracyTarget: number; useCache: boolean;
+    trainingMode: boolean; binaryResponse: boolean;
     timestamp: number;
 }
 
 export interface QLoRAProtobufMetrics {
-    hmmPredictionScore: number;, somClusterAccuracy: number;
-    webgpuOptimizationGain: number;, cacheEfficiency: number;
+    hmmPredictionScore: number; somClusterAccuracy: number;
+    webgpuOptimizationGain: number; cacheEfficiency: number;
     tensorOperations?: number;
     memoryUsage?: number;
     gpuUtilization?: number;
 }
 
 export interface QLoRAProtobufLearningData {
-    dataFlywheelSamples: number;, modelUpdateApplied: boolean;
+    dataFlywheelSamples: number; modelUpdateApplied: boolean;
     accuracyImprovement: number;
     trainingIterations?: number;
     lossReduction?: number;
@@ -32,21 +32,21 @@ export interface QLoRAProtobufLearningData {
 
 export interface QLoRAProtobufTopologyResponse {
     prediction: {, type: string;
-        confidence: number;, vectors: Float32Array; // 1536-dimension vectors
-        clusters: number[];, topology: {
-            nodes: number;, edges: number;
+        confidence: number; vectors: Float32Array; // 1536-dimension vectors
+        clusters: number[]; topology: {
+            nodes: number; edges: number;
             connectivity: number;
         };
     };
-    accuracy: number;, topology: {
-        structure: string;, complexity: number;
+    accuracy: number; topology: {
+        structure: string; complexity: number;
         patternMatch: number;
     };
-    cacheHit: boolean;, processingTime: number;
+    cacheHit: boolean; processingTime: number;
     metrics: QLoRAProtobufMetrics;
-    learningData?: QLoRAProtobufLearningData;, binaryMetadata: {
-        compressionRatio: number;, originalSize: number;
-        compressedSize: number;, encoding: 'gzip' | 'brotli' | 'lz4';
+    learningData?: QLoRAProtobufLearningData; binaryMetadata: {
+        compressionRatio: number; originalSize: number;
+        compressedSize: number; encoding: 'gzip' | 'brotli' | 'lz4';
     };
 }
 
@@ -91,7 +91,7 @@ export class QLoRABinaryCodec {
      * Calculate compression statistics
      */
     static getCompressionStats(original: QLoRAProtobufTopologyResponse, compressed: Uint8Array): {, compressionRatio: number;
-        originalSize: number;, compressedSize: number;
+        originalSize: number; compressedSize: number;
     } {
         // Basic approximation of original size
         const originalSize = JSON.stringify(original).length;

@@ -1,5 +1,5 @@
 export interface MarkdownEvidenceInput {
- id?: string;, content: string;
+ id?: string; content: string;
  metadata?: Record<string, unknown>;
 }
 
@@ -35,8 +35,8 @@ export interface FactClaim {
 }
 
 export interface FactCluster {
- id: string;, raw: string;
- html?: string;, facts: FactClaim[];
+ id: string; raw: string;
+ html?: string; facts: FactClaim[];
  strategy?: string;
  metadata?: Record<string, unknown>;
 }
@@ -64,12 +64,12 @@ export interface UISpec {
 }
 
 export interface FactContradiction {
- first: FactClaim;, second: FactClaim;
+ first: FactClaim; second: FactClaim;
  context?: string;
 }
 
 export interface UIContradiction {
- route: string;, type: string;
+ route: string; type: string;
  details: {, expected: UISpec;
  actual: UISemanticSnapshot;
  message?: string;
@@ -86,7 +86,7 @@ export interface ContradictionEngineInput {
 
 export interface TimelineFact {
  clusterId: string;
- sourceId?: string;, claim: string;
+ sourceId?: string; claim: string;
  actor?: string;
  subject?: string;
  time?: number;
@@ -105,17 +105,17 @@ export type TimelineContradictionType =
  | 'duration-contradiction';
 
 export interface TimelineContradiction {
- type: TimelineContradictionType;, first: TimelineFact;
+ type: TimelineContradictionType; first: TimelineFact;
  second: TimelineFact;
  details?: Record<string, unknown>;
 }
 
 export interface ContradictionEngineResult {
- factContradictions: FactContradiction[];, uiContradictions: UIContradiction[];
+ factContradictions: FactContradiction[]; uiContradictions: UIContradiction[];
  timelineContradictions?: TimelineContradiction[];
- timelineDescriptions?: string[];, reasoning: string;
+ timelineDescriptions?: string[]; reasoning: string;
  objection: {, triggered: boolean;
- message: string;, level: 'critical' | 'warning' | 'none';
+ message: string; level: 'critical' | 'warning' | 'none';
  };
  ragSuggestions?: Record<string, unknown>;
 }

@@ -26,12 +26,12 @@
 
 <style>
 	.select {
-		width: 100%;, padding: 0.5rem 0.75rem;
+		width: 100%; padding: 0.5rem 0.75rem;
 		border: 1px solid #d1d5db;
 		border-radius: 0.375rem;
 		font-size: 0.875rem;
 		line-height: 1.25rem;
-		background-color: white;, cursor: pointer;
+		background-color: white; cursor: pointer;
 		transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
 	}
 
@@ -42,12 +42,12 @@
 	}
 
 	.select:disabled {
-		background-color: #f3f4f6;, cursor:not-allowed;
+		background-color: #f3f4f6; cursor:not-allowed;
 	}
 
 	:global(.dark) .select {
 		background-color: #374151;
-		border-color: #4b5563;, color: white;
+		border-color: #4b5563; color: white;
 	}
 
 	:global(.dark) .select:focus {

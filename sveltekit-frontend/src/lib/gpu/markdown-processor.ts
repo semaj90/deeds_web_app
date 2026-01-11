@@ -6,8 +6,8 @@
  */
 
 export interface MarkdownProcessingResult {
- sections: MarkdownSection[];, tokens: Token[];
- embeddings: Float32Array[];, performance: ProcessingMetrics;
+ sections: MarkdownSection[]; tokens: Token[];
+ embeddings: Float32Array[]; performance: ProcessingMetrics;
 }
 
 export interface MarkdownSection {
@@ -19,19 +19,19 @@ export interface MarkdownSection {
  | 'reasoning'
  | 'holding'
  | 'conclusion';
- level?: number;, content: string;
- startOffset: number;, endOffset: number;
+ level?: number; content: string;
+ startOffset: number; endOffset: number;
  metadata?: Record<string, any>;
 }
 
 export interface Token {
- text: string;, type: 'word' | 'punctuation' | 'number' | 'legal_term';
- position: number;, confidence: number;
+ text: string; type: 'word' | 'punctuation' | 'number' | 'legal_term';
+ position: number; confidence: number;
 }
 
 export interface ProcessingMetrics {
- tokenizationTime: number;, chunkingTime: number;
- embeddingTime: number;, gpuMemoryUsed: number;
+ tokenizationTime: number; chunkingTime: number;
+ embeddingTime: number; gpuMemoryUsed: number;
  totalTime: number;
 }
 
@@ -211,7 +211,7 @@ export class GPUMarkdownScanner {
  /**
  * Scan markdown text for headings and sections using GPU
  */
- async scanMarkdown(text: string): Promise<{, headings: Array<{ position: number;, level: number }>;
+ async scanMarkdown(text: string): Promise<{, headings: Array<{ position: number; level: number }>;
  sections: Array<{, position: number; type: string }>;
  }> {
  if (!this.device) await this.initialize();
@@ -522,7 +522,7 @@ export class GPUMarkdownProcessor {
  return result;
  }
 
- private scanMarkdownCPU(text: string): {, headings: Array<{ position: number;, level: number }>;
+ private scanMarkdownCPU(text: string): {, headings: Array<{ position: number; level: number }>;
  sections: Array<{, position: number; type: string }>;
  } {
  const headings: Array<{, position: number; level: number }> = [];

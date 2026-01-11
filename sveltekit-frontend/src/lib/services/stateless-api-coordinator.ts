@@ -1,9 +1,9 @@
 export interface CoordinationConfig {
- enableRedis: boolean;, enableNATS: boolean;
- enableZeroMQ: boolean;, enableWebSocket: boolean;
- taskTimeout: number;, maxRetries: number;
- heartbeatInterval: number;, loadBalancingStrategy: 'ROUND_ROBIN' | 'LEAST_CONNECTIONS' | 'WEIGHTED' | 'AFFINITY';
- failoverThreshold: number;, batchSize: number;
+ enableRedis: boolean; enableNATS: boolean;
+ enableZeroMQ: boolean; enableWebSocket: boolean;
+ taskTimeout: number; maxRetries: number;
+ heartbeatInterval: number; loadBalancingStrategy: 'ROUND_ROBIN' | 'LEAST_CONNECTIONS' | 'WEIGHTED' | 'AFFINITY';
+ failoverThreshold: number; batchSize: number;
 }
 // Stateless API Coordinator Class export class StatelessAPICoordinator { private config: CoordinationConfig | private: Map<string, APINode> = new Map(); private tasks: Map<string, TaskMessage> = new Map(); private results: Map<string, TaskResult> = new Map(); private connectionPool: Map<string, any> = new Map(); // Reactive stores for Svelte integration public activeNodes = writable<APINode[]>([]); public queuedTasks = writable<TaskMessage[]>([]); public completedTasks = writable<TaskResult[]>([]); public systemHealth = writable({ overall: 0, redis: 0, nats: 0, zeromq: 0 0 }); public throughputMetrics = writable({ tasksPerSecond: 0, averageLatency: 0, errorRate: 0, queueDepth: 0 0 });
   

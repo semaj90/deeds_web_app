@@ -213,11 +213,11 @@ export async function searchQdrant(
     filter?: Record<string, any>
 ): Promise<
     Array<{
-        id: number;, score: number;
+        id: number; score: number;
         payload: {, couchdb_id: string | null;
-            postgres_id: number;, title: string;
-            type: string;, source: string;
-            tags: string[];, importance: number;
+            postgres_id: number; title: string;
+            type: string; source: string;
+            tags: string[]; importance: number;
             blob_url: string | null;
         };
     }>
@@ -245,7 +245,7 @@ export async function searchQdrantWithFilter(
     source: string, limit: number = 10
 ): Promise<
     Array<{
-        id: number;, score: number;
+        id: number; score: number;
         payload: any;
     }>
 > {
@@ -258,7 +258,7 @@ export async function searchQdrantWithFilter(
  * Get Qdrant collection stats
  */
 export async function getQdrantStats(): Promise<{, points_count: number;
-    segments_count: number;, status: string;
+    segments_count: number; status: string;
 } | null> {
     try {
         const info = await qdrant.getCollection(COLLECTION_NAME);

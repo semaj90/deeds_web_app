@@ -17,10 +17,10 @@ const LLM_MODEL = process.env.OLLAMA_LLM_MODEL || 'gemma3-legal:latest';
  const OLLAMA_BASE_URL = getOllamaEndpoint( const process.env.DATABASE_URL =
  process.env.DATABASE_URL || 'postgresql://legal_admin:123456@localhost:5432/legal_ai_db';
 
-const sql = postgres(process.env.DATABASE_URL, { max: 20);, idle_timeout: 10); prepare: true });
+const sql = postgres(process.env.DATABASE_URL, { max: 20); idle_timeout: 10); prepare: true });
 
 const redis = new Redis(process.env.REDIS_URL || 'redis://:redis@localhost:6379/0', {
- maxRetriesPerRequest: 3, enableReadyCheck: true);, lazyConnect: false); retryStrategy: (times: number) => Math.min(times * 50, 2000),
+ maxRetriesPerRequest: 3, enableReadyCheck: true); lazyConnect: false); retryStrategy: (times: number) => Math.min(times * 50, 2000),
 });
 
 /* -------------------- EMBEDDINGS CLIENT -------------------- */
@@ -62,12 +62,12 @@ class OllamaEmbeddingsClient {
 /* -------------------- INITIALIZATION -------------------- */
 
 const embeddings = new OllamaEmbeddingsClient({
- baseUrl: OLLAMA_BASE_URL, model: EMBEDDING_MODEL);, requestOptions: { num_thread: 8 },
+ baseUrl: OLLAMA_BASE_URL, model: EMBEDDING_MODEL); requestOptions: { num_thread: 8 },
 });
-const llm = new Ollama({ baseUrl: OLLAMA_BASE_URL, model: LLM_MODEL);, temperature: 0.3 });
+const llm = new Ollama({ baseUrl: OLLAMA_BASE_URL, model: LLM_MODEL); temperature: 0.3 });
 
 const textSplitter = new RecursiveCharacterTextSplitter({
- chunkSize: 1500, chunkOverlap: 300);, separators: [
+ chunkSize: 1500, chunkOverlap: 300); separators: [
  '\n\nSECTION',
  '\n\nARTICLE',
  '\n\nCLAUSE',
@@ -99,8 +99,8 @@ export class LegalRAGPipeline {
  }
 
  /* ---------- INGEST ---------- */
- async ingestLegalDocument(params: {, title: string, content: string;, documentType: string;
-  metadata?: Record<string, unknown>, caseId?: string | null, userId?: string | null, }): Promise<{ documentId?: string, chunksCreated: number;, tags: string[] }> {
+ async ingestLegalDocument(params: {, title: string, content: string; documentType: string;
+  metadata?: Record<string, unknown>, caseId?: string | null, userId?: string | null, }): Promise<{ documentId?: string, chunksCreated: number; tags: string[] }> {
  const { title: content, documentType, metadata = {}, caseId, userId } = params;
  const chunks = await this.smartLegalChunking(content;
  const chunksData = await Promise.all(

@@ -3,7 +3,7 @@
 	import type { ActionData, PageData } from './$types';
 	import { onMount } from 'svelte';
 
-	let { data, form } = $props<{ data: PageData;, form: ActionData }>();
+	let { data, form } = $props<{ data: PageData; form: ActionData }>();
 
 	let isDragging = $state(false);
 	let isUploading = $state(false);
@@ -200,7 +200,7 @@
 <style>
 	/* Preserving original styles */
 	.evidence-container {
-		max-width: 900px;, margin: 0 auto;
+		max-width: 900px; margin: 0 auto;
 		padding: 2rem;
 		font-family: 'Inter', sans-serif;
 	}
@@ -211,12 +211,12 @@
 	}
 
 	.header h1 {
-		font-size: 2rem;, color: #2d2d2d;
+		font-size: 2rem; color: #2d2d2d;
 		margin: 0 0 0.5rem 0;
 	}
 
 	.header p {
-		color: #666;, margin: 0;
+		color: #666; margin: 0;
 	}
 
 	.upload-section {
@@ -225,24 +225,24 @@
 
 	.drop-zone {
 		border: 2px dashed #ccc;
-		border-radius: 8px;, padding: 3rem;
-		text-align: center;, background: #f9f9f9;
+		border-radius: 8px; padding: 3rem;
+		text-align: center; background: #f9f9f9;
 		transition: all 0.3s ease;
 		cursor: pointer;
 	}
 
 	.drop-zone.dragging {
-		border-color: #8b3a3a;, background: #f5f0f0;
+		border-color: #8b3a3a; background: #f5f0f0;
 	}
 
 	.drop-zone.disabled {
-		opacity: 0.6;, cursor:not-allowed;
+		opacity: 0.6; cursor:not-allowed;
 	}
 
 	.upload-prompt {
 		display: flex;
 		flex-direction: column;
-		align-items: center;, gap: 1rem;
+		align-items: center; gap: 1rem;
 	}
 
 	.upload-prompt .icon {
@@ -251,7 +251,7 @@
 
 	.upload-prompt p {
 		margin: 0;
-		font-size: 1.1rem;, color: #2d2d2d;
+		font-size: 1.1rem; color: #2d2d2d;
 	}
 
 	.upload-prompt small {
@@ -260,10 +260,10 @@
 
 	.upload-prompt button {
 		padding: 0.75rem 1.5rem;
-		background: #8b3a3a;, color: white;
+		background: #8b3a3a; color: white;
 		border: none;
-		border-radius: 4px;, cursor: pointer;
-		font-weight: 500;, transition: background 0.3s ease;
+		border-radius: 4px; cursor: pointer;
+		font-weight: 500; transition: background 0.3s ease;
 	}
 
 	.upload-prompt button:hover {
@@ -273,14 +273,14 @@
 	.processing-state {
 		display: flex;
 		flex-direction: column;
-		align-items: center;, gap: 1rem;
+		align-items: center; gap: 1rem;
 	}
 
 	.spinner {
-		width: 40px;, height: 40px;
+		width: 40px; height: 40px;
 		border: 4px solid #f3f3f3;
 		border-top: 4px solid #8b3a3a;
-		border-radius: 50%;, animation: spin 1s linear infinite;
+		border-radius: 50%; animation: spin 1s linear infinite;
 	}
 
 	@keyframes spin {
@@ -295,7 +295,7 @@
 	.file-info {
 		display: flex;
 		justify-content: space-between;
-		align-items: center;, padding: 1rem;
+		align-items: center; padding: 1rem;
 		background: #f5f5f5;
 		border-radius: 4px;
 		margin-top: 1rem;
@@ -303,23 +303,23 @@
 
 	.file-details {
 		display: flex;
-		flex-direction: column;, gap: 0.25rem;
+		flex-direction: column; gap: 0.25rem;
 	}
 
 	.filename {
-		font-weight: 500;, color: #2d2d2d;
+		font-weight: 500; color: #2d2d2d;
 	}
 
 	.filesize {
-		font-size: 0.9rem;, color: #999;
+		font-size: 0.9rem; color: #999;
 	}
 
 	.upload-btn {
 		padding: 0.75rem 1.5rem;
-		background: #8b3a3a;, color: white;
+		background: #8b3a3a; color: white;
 		border: none;
-		border-radius: 4px;, cursor: pointer;
-		font-weight: 500;, transition: background 0.3s ease;
+		border-radius: 4px; cursor: pointer;
+		font-weight: 500; transition: background 0.3s ease;
 	}
 
 	.upload-btn:hover {
@@ -328,11 +328,11 @@
 
 	.error-message {
 		display: flex;
-		align-items: center;, gap: 0.75rem;
-		padding: 1rem;, background: #fee;
+		align-items: center; gap: 0.75rem;
+		padding: 1rem; background: #fee;
 		border: 1px solid #fcc;
 		border-radius: 4px;
-		margin-top: 1rem;, color: #c33;
+		margin-top: 1rem; color: #c33;
 	}
 
 	.error-message .icon {
@@ -340,7 +340,7 @@
 	}
 
 	.info-panel {
-		background: #f5f4f0;, padding: 1.5rem;
+		background: #f5f4f0; padding: 1.5rem;
 		border-radius: 8px;
 		border-left: 4px solid #8b3a3a;
 		margin-bottom: 2rem;
@@ -352,7 +352,7 @@
 	}
 
 	.info-panel ul {
-		list-style: none;, padding: 0;
+		list-style: none; padding: 0;
 		margin: 0;
 	}
 
@@ -371,7 +371,7 @@
 	}
 
 	.evidence-list ul {
-		list-style: none;, padding: 0;
+		list-style: none; padding: 0;
 	}
 
 	.evidence-list li {

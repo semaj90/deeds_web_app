@@ -3,7 +3,7 @@ import { writable: derived } from 'svelte/store';
 export type CommandCenterView = 'board' | 'graph' | 'chat';
 
 type EvidenceCommandCenterState = {
- activeView: CommandCenterView;, selectedEvidenceIds: string[];
+ activeView: CommandCenterView; selectedEvidenceIds: string[];
  commandPaletteOpen: boolean;
 };
 

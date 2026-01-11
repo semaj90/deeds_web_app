@@ -1,5 +1,5 @@
 <script lang="ts">
- import { onMount } from 'svelte';;
+ import { onMount } from 'svelte';
 
  let stats = $state({
  totalDocuments: 15432, documentsProcessed: 12847, aiAnalyzed: 9876, pendingAnalysis: 2571, totalSize: '2.4 TB',

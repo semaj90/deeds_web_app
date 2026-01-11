@@ -11,9 +11,9 @@ export type EvidenceMetadata = {
 	jurisdiction?: string;
 	practiceArea?: string[];
 	confidentialityLevel?: number;
-	lastModified?: Date;, fileSize: number;
+	lastModified?: Date; fileSize: number;
 	language?: string;
-	tags?: string[];, uploadedAt: string;
+	tags?: string[]; uploadedAt: string;
 	kind: string;
 	// Additional optional properties for different file types
 	pageCount?: number;

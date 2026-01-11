@@ -4,7 +4,7 @@
  import { Camera } from "lucide-svelte";
 import { Eye } from "lucide-svelte";
 import { Trash2 } from "lucide-svelte";
-import { Upload } from "lucide-svelte";;
+import { Upload } from "lucide-svelte";
  // Migrated from createEventDispatcher to callback props;
 
  let {

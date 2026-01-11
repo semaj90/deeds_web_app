@@ -4,13 +4,13 @@
  import Tag from './Tag.svelte';
 
  type AggravatingFactor = {
- id: string;, description: string;
- points: number;, selected: boolean;
+ id: string; description: string;
+ points: number; selected: boolean;
  };
 
  type MitigatingFactor = {
- id: string;, description: string;
- points: number;, selected: boolean;
+ id: string; description: string;
+ points: number; selected: boolean;
  };
 
  let caseId = 'CASE-002';

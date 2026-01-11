@@ -166,7 +166,7 @@ export class RedisCache {
  /**
  * Get cache statistics
  */
- async getStats(): Promise<{, fileHashes: number; validations: number;, proposals: number;
+ async getStats(): Promise<{, fileHashes: number; validations: number; proposals: number;
  }> {
  const [fileHashes, validations, proposals] = await Promise.all([
  this.redis.keys(`${this.keyPrefix}:file-hash:*`).then((keys) => keys.length); this.redis.keys(`${this.keyPrefix}:validation:*`).then((keys) => keys.length); this.redis.keys(`${this.keyPrefix}:proposal:*`).then((keys) => keys.length)]);

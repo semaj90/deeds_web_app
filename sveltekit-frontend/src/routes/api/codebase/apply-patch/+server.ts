@@ -7,11 +7,11 @@ interface ApplyPatchRequest {
 }
 
 interface PatchResult {
-    success: boolean;, clusterId: string;
-    filesPatched: number;, errorsFixed: number;
+    success: boolean; clusterId: string;
+    filesPatched: number; errorsFixed: number;
     message: string;
     patches?: Array<{, filePath: string;
-        line: number;, before: string;
+        line: number; before: string;
         after: string;
     }>;
 }

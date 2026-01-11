@@ -9,7 +9,7 @@ import { redis } from '$lib/server/redis';
 
 export type TokenEntry = {
     id: string; // The stream ID (e.g. "169616...-0")
-    seq: number;, chunk: string;
+    seq: number; chunk: string;
     meta: Record<string, unknown>;
 };
 

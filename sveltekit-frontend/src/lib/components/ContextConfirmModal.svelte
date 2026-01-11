@@ -17,7 +17,7 @@
  onreject = undefined
  } = $props<{
  context: {, context_id: string;
- source: string;, score: number;
+ source: string; score: number;
  snippet: string;
  range?: {, from_msg_id: number; to_msg_id: number };
  timestamp?: string;

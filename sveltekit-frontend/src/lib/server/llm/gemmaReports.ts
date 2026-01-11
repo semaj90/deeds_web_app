@@ -6,7 +6,7 @@ const OLLAMA_URL = process.env.OLLAMA_URL ?? 'http://localhost:11434';
 const OLLAMA_MODEL = process.env.OLLAMA_MODEL ?? 'gemma3-legal:latest';
 
 export async function generateReportWithGemma(opts: {, caseTitle: string;
- caseId: string;, template: ReportTemplate;
+ caseId: string; template: ReportTemplate;
  narrative?: string | null;
  who?: string | null;
  what?: string | null;

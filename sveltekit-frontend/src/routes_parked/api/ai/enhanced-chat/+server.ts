@@ -34,10 +34,10 @@ export interface EnhancedChatResponse {
  response: string;
  synthesizedInput?: unknown;
  legalAnalysis?: unknown;
- ragResults?: unknown;, confidence: number;
- processingTime: number;, metadata: {
+ ragResults?: unknown; confidence: number;
+ processingTime: number; metadata: {
  model: string;
- tokensUsed?: number;, enabledFeatures: string[];
+ tokensUsed?: number; enabledFeatures: string[];
  fallbacksUsed?: string[];
  cacheHits?: string[];
  };

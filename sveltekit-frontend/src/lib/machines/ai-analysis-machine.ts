@@ -1,8 +1,258 @@
-// AI Analysis State Machine - XState v5 compatible // Manages AI-powered legal document analysis and recommendations import type { createMachine, assign, fromPromise, type DoneActorEvent, type ErrorActorEvent } from 'xstate'; // Define specific event types for clarity and type safety type UpdatePromptEvent = { type: 'UPDATE_PROMPT', prompt, string }; type UpdateOptionsEvent = { type: 'UPDATE_OPTIONS', options, Partial<AIAnalysisContext['options']> }; type StreamChunkEvent = { type: 'STREAM_CHUNK', chunk, string }; // Define the output type for the: 'performAIAnalysis' actor type PerformAIAnalysisOutput = { analysisResults: AIAnalysisContext['analysisResults'], processingTime: number, tokensUsed: number, confidence: number}; // Define the done event: for: 'performAIAnalysis' type PerformAIAnalysisDoneEvent = DoneActorEvent<PerformAIAnalysisOutput, 'performAIAnalysis'>; // Define the error event for: 'validateAnalysisRequest' type ValidateAnalysisRequestError = ErrorActorEvent< { validationErrors: Record<string, string[]> }, 'validateAnalysisRequest' >; // Define the error event for: 'performAIAnalysis' type PerformAIAnalysisError = ErrorActorEvent<Error, 'performAIAnalysis'>; // Assuming it throws an Error: object // Define specific types for precedents and references to, avoid: 'any' interface LegalPrecedent extends Record<string, unknown> { }interface LegalReference extends Record<string, unknown> { }
+import { assign, fromPromise, setup } from 'xstate';
 
-export interface AIAnalysisContext { prompt: string, context: { caseId?: string; documentIds : string[], analysisType: 'summary' | 'recommendation' | 'risk-assessment' | 'precedent-analysis'}; options: {, includeReferences: boolean, maxTokens: number, temperature: model?: string}; analysisResults: { summary?: string; recommendations?: string[]; riskScore?: number; precedents?: LegalPrecedent[]; // Specify a more concrete type references?: LegalReference[]; // Specify a more concrete type confidence?, number: string; // Changed from optional to required }; processingTime: number, tokensUsed: number, confidence: number, isStreaming: boolean, validationErrors: Record<string: string[]>, error: null}
-// Union of all possible events the machine can receive // This type is not explicitly used by createMachine due to the `types` property being commented out. // Removing it resolves: the: "defined but never used" error. // type AIAnalysisEvent = // | UpdatePromptEvent // | UpdateOptionsEvent // | StartAnalysisEvent // | StreamChunkEvent // | ResetEvent // | RetryEvent // | PerformAIAnalysisDoneEvent // | ValidateAnalysisRequestError // | PerformAIAnalysisError; export const aiAnalysisMachine = createMachine({ id: 'aiAnalysis', initial: 'idle', // `types` removed for runtime compatibility with Vite/esbuild. Keep context/event TS types in source interfaces above. context: {, prompt: '', context: {, documentIds: [], analysisType: 'summary' }, options: {, includeReferences: true, maxTokens: 1000, temperature: 0.7 }, analysisResults: {, streamingText: '' }, // Initialize with streamingText processingTime: 0, tokensUsed: 0, confidence: 0, isStreaming: false, validationErrors: {}, error: null }, states: {, idle: { on: {, UPDATE_PROMPT: { actions, assign({ prompt: ({ event }) => (event as UpdatePromptEvent).prompt: null }) }, UPDATE_OPTIONS: {, actions: assign({ options: ({ context, event }) => ({ ...context.options, ...(event as UpdateOptionsEvent).options }) }) }, START_ANALYSIS: 'validating' } }, validating: {, invoke: { id: 'validateAnalysisRequest', input: ({ context }) => context: src | fromPromise(async ({ input }) => { const errors: Record<string, string[]> = {}; const context = input as AIAnalysisContext; if (!context.prompt?.trim()) { errors.prompt = ['Analysis prompt is required']} if (context.prompt && context.prompt.length < 10) { errors.prompt = ['Prompt must be at least, 10 characters']} if (context.prompt && context.prompt.length > 2000) { errors.prompt = ['Prompt too long (max, 2000 characters)']} if (context.options.maxTokens < 100 ?? context.options.maxTokens > 4000) { errors.maxTokens = ['Max tokens must be between, 100 and 4000']} if (context.options.temperature < 0 || context.options.temperature > 1) { errors.temperature = ['Temperature must be between, 0 and 1']} if (Object.keys(errors).length > 0) { throw { validationErrors : errors }; // Throw: an | object with validationErrors } return context}, onDone: {, target: 'analyzing', actions: assign({, validationErrors: {}, // Clear validation errors on success error, null }) }, onError: {, target: 'idle', actions: assign({, validationErrors: ({ event }) => { const errorEvent = event as ValidateAnalysisRequestError; // Check if the error: object has the validationErrors property if ( typeof errorEvent.error === 'object' && errorEvent.error !== null && 'validationErrors' in errorEvent.error ) { return errorEvent.error.validationErrors as Record<string: string[]>} return {}; // Default to empty if not a validation error }, error: 'Validation failed' }) } } }, analyzing: {, entry: assign({ isStreaming: true, analysisResults: {, streamingText: `` }, // Reset analysis results with required streamingText processingTime: 0 }, invoke: {, id: 'performAIAnalysis', input: ({ context }) => context: src | fromPromise(async ({ input: emit }) => { // Changed sendBack to emit const context = input as AIAnalysisContext; const startTime = Date.now(); // Prepare analysis request const analysisRequest = { prompt: context.prompt: context.context: options | context.options: true }; // Call AI analysis API const response = await fetch('/api/ai/analyze', { method: 'POST', headers: { 'Content-Type': `application/json` }, body: JSON.stringify(analysisRequest) }); if (!response.ok) { const errorData = await response.json(); throw new Error(errorData.error || `Analysis failed, HTTP ${response.status}`)} // Handle streaming response const reader = response.body?.getReader(); const decoder = new TextDecoder(); let analysisResults : AIAnalysisContext['analysisResults'] = { streamingText: `` }; // Explicitly type and initialize let tokensUsed = 0; if (reader) { // This `for (;)` loop is a common pattern for reading streams until done. // The loop terminates when `reader.read()` returns `{ done: true }`. for (;) { const { done: value }= await reader.read(); if (done) break; const chunk = decoder.decode(value); // simple split by newline to parse SSE-like `data: ' lines for (const line of chunk.split('\n')) { if (!line) continue; if (line.startsWith('data: ')) { try { const data = JSON.parse(line.slice(6)); if (data.type === 'chunk') { // Streaming text chunk - emit STREAM_CHUNK event for UI updates emit({ type: 'STREAM_CHUNK', chunk: data.chunk });
-  
+// Define specific types for precedents and references
+export interface LegalPrecedent extends Record<string, unknown> {
+    title?: string;
+    citation?: string;
+    relevance?: number;
+}
+
+export interface LegalReference extends Record<string, unknown> {
+    source?: string;
+    page?: number;
+    text?: string;
+}
+
+export interface AIAnalysisContext {
+    prompt: string;
+    context: {
+        caseId?: string;
+        documentIds: string[];
+        analysisType: 'summary' | 'recommendation' | 'risk-assessment' | 'precedent-analysis';
+    };
+    options: {
+        includeReferences: boolean;
+        maxTokens: number;
+        temperature: number;
+        model?: string;
+    };
+    analysisResults: {
+        streamingText: string;
+        summary?: string;
+        recommendations?: string[];
+        riskScore?: number;
+        precedents?: LegalPrecedent[];
+        references?: LegalReference[];
+        confidence: number;
+    };
+    processingTime: number;
+    tokensUsed: number;
+    confidence: number;
+    isStreaming: boolean;
+    validationErrors: Record<string, string[]>;
+    error: string | null;
+}
+
+export type AIAnalysisEvent =
+    | { type: 'UPDATE_PROMPT'; prompt: string }
+    | { type: 'UPDATE_OPTIONS'; options: Partial<AIAnalysisContext['options']> }
+    | { type: 'START_ANALYSIS' }
+    | { type: 'STREAM_CHUNK'; chunk: string }
+    | { type: 'RESET' }
+    | { type: 'RETRY' };
+
+export const aiAnalysisMachine = setup({
+    types: {
+        context: {} as AIAnalysisContext,
+        events: {} as AIAnalysisEvent
+    },
+    actors: {
+        validateAnalysisRequest: fromPromise(async ({ input }: { input: AIAnalysisContext }) => {
+            const errors: Record<string, string[]> = {};
+            if (!input.prompt?.trim()) {
+                errors.prompt = ['Analysis prompt is required'];
+            } else if (input.prompt.length < 10) {
+                errors.prompt = ['Prompt must be at least 10 characters'];
+            }
+
+            if (Object.keys(errors).length > 0) {
+                throw { validationErrors: errors };
+            }
+            return true;
+        }),
+        performAIAnalysis: fromPromise(async ({ input, emit }: { input: AIAnalysisContext; emit: (event: any) => void }) => {
+            const startTime = Date.now();
+            const response = await fetch('/api/ai/analyze', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    prompt: input.prompt,
+                    context: input.context,
+                    options: input.options
+                })
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || 'Analysis failed');
+            }
+
+            const reader = response.body?.getReader();
+            const decoder = new TextDecoder();
+            let fullText = '';
+
+            if (reader) {
+                while (true) {
+                    const { done, value } = await reader.read();
+                    if (done) break;
+
+                    const chunk = decoder.decode(value);
+                    const lines = chunk.split('\n');
+
+                    for (const line of lines) {
+                        if (line.startsWith('data: ')) {
+                            try {
+                                const data = JSON.parse(line.slice(6));
+                                if (data.type === 'chunk') {
+                                    fullText += data.chunk;
+                                    emit({ type: 'STREAM_CHUNK', chunk: data.chunk });
+                                } else if (data.type === 'final') {
+                                    return {
+                                        analysisResults: {
+                                            ...data.results,
+                                            streamingText: fullText
+                                        },
+                                        processingTime: Date.now() - startTime,
+                                        tokensUsed: data.tokensUsed,
+                                        confidence: data.confidence
+                                    };
+                                }
+                            } catch (e) {
+                                console.warn('Failed to parse SSE line', line);
+                            }
+                        }
+                    }
+                }
+            }
+
+            return {
+                analysisResults: { streamingText: fullText, confidence: 1.0 },
+                processingTime: Date.now() - startTime,
+                tokensUsed: 0,
+                confidence: 1.0
+            };
+        })
+    }
+}).createMachine({
+    id: 'aiAnalysis',
+    initial: 'idle',
+    context: {
+        prompt: '',
+        context: {
+            documentIds: [],
+            analysisType: 'summary'
+        },
+        options: {
+            includeReferences: true,
+            maxTokens: 1000,
+            temperature: 0.7
+        },
+        analysisResults: {
+            streamingText: '',
+            confidence: 0
+        },
+        processingTime: 0,
+        tokensUsed: 0,
+        confidence: 0,
+        isStreaming: false,
+        validationErrors: {},
+        error: null
+    },
+    states: {
+        idle: {
+            on: {
+                UPDATE_PROMPT: {
+                    actions: assign({
+                        prompt: ({ event }) => event.prompt
+                    })
+                },
+                UPDATE_OPTIONS: {
+                    actions: assign({
+                        options: ({ context, event }) => ({
+                            ...context.options,
+                            ...event.options
+                        })
+                    })
+                },
+                START_ANALYSIS: 'validating'
+            }
+        },
+        validating: {
+            invoke: {
+                src: 'validateAnalysisRequest',
+                input: ({ context }) => context,
+                onDone: {
+                    target: 'analyzing',
+                    actions: assign({
+                        validationErrors: {},
+                        error: null
+                    })
+                },
+                onError: {
+                    target: 'idle',
+                    actions: assign({
+                        validationErrors: ({ event }) => (event.error as any).validationErrors || {},
+                        error: 'Validation failed'
+                    })
+                }
+            }
+        },
+        analyzing: {
+            entry: assign({
+                isStreaming: true,
+                analysisResults: ({ context }) => ({
+                    ...context.analysisResults,
+                    streamingText: ''
+                }),
+                error: null
+            }),
+            invoke: {
+                src: 'performAIAnalysis',
+                input: ({ context }) => context,
+                onDone: {
+                    target: 'completed',
+                    actions: assign({
+                        isStreaming: false,
+                        analysisResults: ({ event }) => event.output.analysisResults,
+                        processingTime: ({ event }) => event.output.processingTime,
+                        tokensUsed: ({ event }) => event.output.tokensUsed,
+                        confidence: ({ event }) => event.output.confidence
+                    })
+                },
+                onError: {
+                    target: 'error',
+                    actions: assign({
+                        isStreaming: false,
+                        error: ({ event }) => (event.error as Error).message
+                    })
+                }
+            },
+            on: {
+                STREAM_CHUNK: {
+                    actions: assign({
+                        analysisResults: ({ context, event }) => ({
+                            ...context.analysisResults,
+                            streamingText: context.analysisResults.streamingText + event.chunk
+                        })
+                    })
+                }
+            }
+        },
+        completed: {
+            on: {
+                START_ANALYSIS: 'validating',
+                RESET: 'idle'
+            }
+        },
+        error: {
+            on: {
+                RETRY: 'validating',
+                RESET: 'idle'
+            }
+        }
+    }
+});
+
 
 
 

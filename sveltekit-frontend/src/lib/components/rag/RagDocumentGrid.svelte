@@ -1,7 +1,7 @@
 <script lang="ts"> import { Upload, Search, Filter, Grid, List } from 'lucide-svelte';
  import  Button  from "$lib/components/ui/button/Button.svelte";
  import  DocumentCard  from "./DocumentCard.svelte";
- import  DocumentModal  from "./DocumentModal.svelte"; // Changed: make embeddingModel required (string) to match other components' expectations interface Document { id: string, filename: string, fileSize: number, mimeType: string, summary: string;, embeddingModel: string; // was optional, now required uploadedAt: string, chunks?: number; status?: string; tags?: string[]; contentHash?: string; metadata?: { pageCount?: number; language?: string; confidence?: number}}'
+ import  DocumentModal  from "./DocumentModal.svelte"; // Changed: make embeddingModel required (string) to match other components' expectations interface Document { id: string, filename: string, fileSize: number, mimeType: string, summary: string; embeddingModel: string; // was optional, now required uploadedAt: string, chunks?: number; status?: string; tags?: string[]; contentHash?: string; metadata?: { pageCount?: number; language?: string; confidence?: number}}'
   let documents = $state<Document[]>([]);
    let loading = $state<boolean>(true);
    let searchQuery = $state<string>('');

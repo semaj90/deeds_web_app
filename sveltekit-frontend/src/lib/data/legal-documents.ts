@@ -1,9 +1,9 @@
 // Mock legal documents data for Fuse.js search
 // This provides immediate search functionality while backend services are being configured
 export interface LegalDocument {
- id: string;, title: string;
- description: string;, content: string;
- jurisdiction: string;, category: string;
+ id: string; title: string;
+ description: string; content: string;
+ jurisdiction: string; category: string;
  code: string;
  url?: string;
  sections?: string[];

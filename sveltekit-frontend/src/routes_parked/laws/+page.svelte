@@ -70,13 +70,13 @@
 	.layout {
 		display: grid;
 		grid-template-columns: 1fr 2.4fr 1.2fr; /* Golden ratio */
-		min-height: 100vh;, background: #f4f1e5;
+		min-height: 100vh; background: #f4f1e5;
 		font-family: 'Source Sans 3', sans-serif;
 	}
 
 	.sidebar {
 		display: flex;
-		flex-direction: column;, background: #d8c7a0;
+		flex-direction: column; background: #d8c7a0;
 		padding: 1.5rem 1rem;
 		border-right: 2px solid #b09a6a;
 		font-family: 'Crimson Text', serif;
@@ -84,14 +84,14 @@
 
 	.logo {
 		font-size: 1.3rem;
-		font-weight: bold;, color: #2d2d2d;
+		font-weight: bold; color: #2d2d2d;
 		margin-bottom: 1.5rem;
 		text-align: center;
 	}
 
 	nav {
 		display: flex;
-		flex-direction: column;, gap: 0.5rem;
+		flex-direction: column; gap: 0.5rem;
 		flex: 1;
 	}
 
@@ -117,7 +117,7 @@
 
 	.sidebar-footer {
 		display: flex;
-		flex-direction: column;, gap: 0.5rem;
+		flex-direction: column; gap: 0.5rem;
 		padding-top: 1rem;
 		border-top: 1px solid #b09a6a;
 		font-size: 0.85rem;
@@ -125,17 +125,17 @@
 
 	.status {
 		display: flex;
-		align-items: center;, gap: 0.5rem;
+		align-items: center; gap: 0.5rem;
 		color: #666;
 	}
 
 	.dot {
-		width: 8px;, height: 8px;
-		border-radius: 50%;, background: #999;
+		width: 8px; height: 8px;
+		border-radius: 50%; background: #999;
 	}
 
 	.dot.online {
-		background: #4caf50;, animation: pulse 2s infinite;
+		background: #4caf50; animation: pulse 2s infinite;
 	}
 
 	@keyframes pulse {
@@ -149,12 +149,12 @@
 
 	.workspace {
 		padding: 1.5rem 2rem;
-		overflow-y: auto;, background: #f4f1e5;
+		overflow-y: auto; background: #f4f1e5;
 	}
 
 	.right-rail {
 		display: flex;
-		flex-direction: column;, background: #efe7d2;
+		flex-direction: column; background: #efe7d2;
 		border-left: 2px solid #b09a6a;
 		padding: 1rem 0.8rem;
 		gap: 1rem;

@@ -39,7 +39,7 @@ export const messages = pgTable('messages', {
 
     // RAG Citations
     citations: jsonb('citations').$type<{, sourceId: string;
-        text: string;, relevanceScore: number;
+        text: string; relevanceScore: number;
     }[]>().default([]),
 
     // Tool calls (if any)

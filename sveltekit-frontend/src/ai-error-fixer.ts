@@ -5,17 +5,17 @@
 import { writable, derived } from 'svelte/store';
 
 export interface FixAttempt {
-	id: string;, errorId: string; strategy: string;, originalCode: string; fixedCode: string;, confidence: number; applied: boolean;, result: 'success' | 'failed' | 'partial';
+	id: string; errorId: string; strategy: string; originalCode: string; fixedCode: string; confidence: number; applied: boolean; result: 'success' | 'failed' | 'partial';
 	timestamp: Date;
 	llmModel?: string;
 }
 
 export interface ErrorFix {
-	errorId: string;, file: string; line: number;, originalText: string; fixedText: string;, strategy: string; confidence: number;, reasoning: string; dependencies: string[];, validated: boolean;
+	errorId: string; file: string; line: number; originalText: string; fixedText: string; strategy: string; confidence: number; reasoning: string; dependencies: string[]; validated: boolean;
 }
 
 export interface AIFixConfig {
-	model: string;, endpoint: string; maxRetries: number;, confidenceThreshold: number; batchSize: number;, validateFixes: boolean; embeddingModel: string;
+	model: string; endpoint: string; maxRetries: number; confidenceThreshold: number; batchSize: number; validateFixes: boolean; embeddingModel: string;
 }
 
 export interface ErrorAnalysisResult {
@@ -251,7 +251,7 @@ ${this.getCommonFixes(error.code || '')}`;
 		this.fixHistory.set(errorId, history);
 	}
 
-	async applyFixes(fixes: ErrorFix[]): Promise<{, applied: number; failed: number;, results: unknown[] }> {
+	async applyFixes(fixes: ErrorFix[]): Promise<{, applied: number; failed: number; results: unknown[] }> {
 		const results: unknown[] = [];
 		let applied = 0;
 		let failed = 0;

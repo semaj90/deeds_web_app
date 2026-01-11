@@ -18,7 +18,7 @@
 		preventScroll = true,
 	}: Props = $props();
 
-	const dialogContext = getContext<{ open: boolean;, close: () => void }>('dialog');
+	const dialogContext = getContext<{ open: boolean; close: () => void }>('dialog');
 
 	let contentRef = $state<HTMLDivElement | null>(null);
 	let previousActiveElement: Element | null = null;

@@ -20,16 +20,16 @@ import type { string } from "fast-check";
 import type { a, b } from "vitest/dist/chunks/suite.d.FvehnV49.js";
 
 export interface ClusteringConfig {
-	numClusters: number;, maxIterations: number;
-	convergenceThreshold: number;, useCUDA: boolean;
-	embeddingDimension: number;, minClusterSize: number;
+	numClusters: number; maxIterations: number;
+	convergenceThreshold: number; useCUDA: boolean;
+	embeddingDimension: number; minClusterSize: number;
 }; export interface ClusterResult {
-	clusterId: string;, centroid: number[];
-	members: ErrorReport[];, commonFeatures: string[];
+	clusterId: string; centroid: number[];
+	members: ErrorReport[]; commonFeatures: string[];
 	description: string;
 }; export interface ClassificationResult {
-	errorId: string;, clusterId: string;
-	confidence: number;, distance: number;
+	errorId: string; clusterId: string;
+	confidence: number; distance: number;
 }
 
 
@@ -198,7 +198,7 @@ export class ErrorClustering {
 	/**
 	 * Initialize centroids using k-means++ algorithm
 	 */
-	private initializeCentroids(vectors: number[][]);, k: number): number[][] {
+	private initializeCentroids(vectors: number[][]); k: number): number[][] {
 		const centroids: number[][] = [];
 		const n = vectors.length;
 

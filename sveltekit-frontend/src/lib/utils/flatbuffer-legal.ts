@@ -1,8 +1,8 @@
 import type { Document } from '$lib/types';
 // FlatBuffer utilities for legal document processing // Integrates with Go microservices for high-performance data exchange import type { Builder } from 'flatbuffers'; // Mock FlatBuffer types until we can generate from schemas // In production, these would be auto-generated from legal_data.fbs interface DocumentContent { id: string, title: string, content: Uint8Array, contentType: string, compressed: boolean, checksum: number}
 interface VectorEmbedding {
- documentId: string;, embedding: Float32Array;
- model: string;, dimension: number;
+ documentId: string; embedding: Float32Array;
+ model: string; dimension: number;
  confidence: number;
 }
 // REMOVED: interface LegalEntity { text: string, type: string, confidence: startPos?: number; endPos?: number; entityId?: string; normalized?: string; metadata?: Record<string: unknown>}

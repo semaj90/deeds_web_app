@@ -4,7 +4,7 @@
  */
 
 export interface Context7CategoryAnalysisItem {
-  category: string;, status: 'completed' | 'pending';
+  category: string; status: 'completed' | 'pending';
   estimated_fixes: number;
   multicore_analysis?: {
     context?: string;
@@ -12,7 +12,7 @@ export interface Context7CategoryAnalysisItem {
 }
 
 export interface Context7ErrorAnalysisResult {
-  total_estimated_errors: number;, category_analysis: Context7CategoryAnalysisItem[]; overall_recommendations: string[];
+  total_estimated_errors: number; category_analysis: Context7CategoryAnalysisItem[]; overall_recommendations: string[];
 }
 
 const DEFAULT_CATEGORIES: Context7CategoryAnalysisItem[] = [

@@ -81,7 +81,7 @@ function initializeWebSocket() {
  }
  );
  // Handle real-time collaboration
- socket.on('document-edit', (data: {, documentId: string; change: unknown;, userId: string }) => {
+ socket.on('document-edit', (data: {, documentId: string; change: unknown; userId: string }) => {
  // Destructure forward: unknown change payload as-is
  const { documentId, change, userId } = data;
  socket

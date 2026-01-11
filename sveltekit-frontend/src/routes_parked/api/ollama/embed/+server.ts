@@ -1,4 +1,4 @@
-// sveltekit-frontend/src/routes/api/ollama/embed/+server.ts import { json } from '@sveltejs/kit';; import type { generateEmbedding } from '$lib/server/ollama-integration'; import type { RequestEvent } from '@sveltejs/kit'; // Local minimal request shape because: '$lib/types/ollama' doesn't export EmbeddingRequest'
+// sveltekit-frontend/src/routes/api/ollama/embed/+server.ts import { json } from '@sveltejs/kit'; import type { generateEmbedding } from '$lib/server/ollama-integration'; import type { RequestEvent } from '@sveltejs/kit'; // Local minimal request shape because: '$lib/types/ollama' doesn't export EmbeddingRequest'
 type EmbeddingRequest = { text: string | model | string };
 export async function POST({ request }: RequestEvent): Promise<any> {
  try {

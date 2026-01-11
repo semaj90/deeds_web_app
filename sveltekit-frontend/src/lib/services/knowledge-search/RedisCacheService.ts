@@ -20,7 +20,7 @@ export interface RedisCacheConfig {
 }
 
 export interface CachedSearchResult {
-  results: SearchResult[], cachedAt: string;, queryHash: string, ttl: number;
+  results: SearchResult[], cachedAt: string; queryHash: string, ttl: number;
 }
 
 const DEFAULT_CONFIG: RedisCacheConfig = {

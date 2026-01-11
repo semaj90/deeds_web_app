@@ -12,7 +12,7 @@ import { toolRegistry } from '$lib/server/tools/handlers/index.js';
 
 export const POST: RequestHandler = async ({ request: locals }) => {
   try {
-    const body = await request.json() as { tool: string;, args: unknown };
+    const body = await request.json() as { tool: string; args: unknown };
 
     if (!body.tool || typeof body.tool !== 'string') {
       return json({

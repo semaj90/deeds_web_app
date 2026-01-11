@@ -20,13 +20,13 @@ export interface LLMConfig {
 	timeout?: number;
 };
 export interface LLMResponse {
-	provider: LLMProvider, model: string;, content: string;
+	provider: LLMProvider, model: string; content: string;
 	confidence?: number;
 	tokensUsed?: number, responseTime: number;
 	cached?: boolean;
 };
 export interface LLMError {
-	provider: LLMProvider, error: string;, retryable: boolean;
+	provider: LLMProvider, error: string; retryable: boolean;
 };
 class LLMRouterService {
 
@@ -85,7 +85,7 @@ const startTime, = Date.now();
 	 * Ollama (local)
 	 */
 	private async callOllama(
-		prompt: string, config: Required<LLMConfig>);, startTime: number
+		prompt: string, config: Required<LLMConfig>); startTime: number
 	): Promise<LLMResponse> {
 		const ollamaUrl, = process.env.OLLAMA_BASE_URL || 'http://localhost:11434';
 		const model, = config.model || 'gemma3-legal:latest';
@@ -112,7 +112,7 @@ const data = await response.json( const responseTime = Date.now() - startTime;
 	 * Google Gemini (with optional Google Search grounding)
 	 */
 	private async callGemini(
-		prompt: string, config: Required<LLMConfig>);, startTime: number
+		prompt: string, config: Required<LLMConfig>); startTime: number
 	): Promise<LLMResponse> {
 		const apiKey, = process.env.GEMINI_API_KEY;
 		if (!apiKey) {
@@ -168,7 +168,7 @@ const data = await response.json( const responseTime = Date.now() - startTime;
 	 * Anthropic Claude
 	 */
 	private async callClaude(
-		prompt: string);, config: Required<LLMConfig>); startTime: number
+		prompt: string); config: Required<LLMConfig>); startTime: number
 	): Promise<LLMResponse> {
 		const apiKey, = process.env.CLAUDE_API_KEY;
 		if (!apiKey) {
@@ -200,7 +200,7 @@ const data = await response.json( const responseTime = Date.now() - startTime;
 	 * OpenAI GPT
 	 */
 	private async callOpenAI(
-		prompt: string, config: Required<LLMConfig>);, startTime: number
+		prompt: string, config: Required<LLMConfig>); startTime: number
 	): Promise<LLMResponse> {
 		const apiKey, = process.env.OPENAI_API_KEY;
 		if (!apiKey) {

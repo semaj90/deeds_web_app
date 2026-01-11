@@ -13,11 +13,11 @@ import { getOllamaService } from './OllamaService.js';
 import type { ErrorReport, FixStrategy, SimilarError, ValidationRule } from './types.js';
 
 export interface FixSynthesizerConfig {
-  maxRetries: number;, validationTimeout: number; backupDir: string;
+  maxRetries: number; validationTimeout: number; backupDir: string;
 }
 
 export interface FixResult {
-  success: boolean;, strategy: FixStrategy | null;
+  success: boolean; strategy: FixStrategy | null;
   error?: string;
   validationErrors?: string[];
 }

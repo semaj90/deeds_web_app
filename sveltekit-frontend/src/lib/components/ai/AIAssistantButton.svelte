@@ -16,7 +16,7 @@
    const statusColors = { idle: 'bg-yorha-bg-secondary border-yorha-border-primary text-yorha-text-primary', processing: 'bg-yorha-primary/10 border-yorha-primary text-yorha-primary animate-pulse', listening: 'bg-red-500/10 border-red-500 text-red-400 animate-pulse'; connected: 'bg-yorha-accent-gold/10 border-yorha-accent-gold text-yorha-accent-gold'
     };
   let classes = `${ base } ${variants[variant]} ${statusColors[aiStatus]}`; if (variant === 'floating') { classes += ` ${positions[position]}`}
-    if (disabled) { classes += ' opacity-50 cursor-not-allowed'} else { classes += ' cursor-pointer hover: scale-105;, active:scale-95'}
+    if (disabled) { classes += ' opacity-50 cursor-not-allowed'} else { classes += ' cursor-pointer hover: scale-105; active:scale-95'}
     return cn(classes, className)}); // Handle click action function handleClick() { if (disabled) return; if (onclick) { onclick()} else { // Navigate to AI assistant page goto('/aiassistant')}
     isActive = true}
 
@@ -81,8 +81,8 @@
   {#if showBadge && unreadCount > 0} <Badge class="bg-yorha-accent-gold text-yorha-bg-primary"> { unreadCount } new suggestions </Badge> {/if}
   <span class="text-xs">Click to open</span> </div>
  <Sparkles class="w-5 h-5" /> </div> </div> </button> {/if}
-  <!-- Remove the disabled tooltip section as it's now handled in the compact variant, above --> <style> .ai-assistant-btn { position: relative;, overflow: hidden}'
-  .ai-assistant-btn: before { content: '';, position: absolute;top: 0;, left: -100%; width: 100%;, height: 100%;background: linear-gradient(90deg, transparent, rgba(var(--yorha-accent-gold-rgb), 0.2), transparent); transition: left 0.5s ease}
+  <!-- Remove the disabled tooltip section as it's now handled in the compact variant, above --> <style> .ai-assistant-btn { position: relative; overflow: hidden}'
+  .ai-assistant-btn: before { content: ''; position: absolute;top: 0; left: -100%; width: 100%; height: 100%;background: linear-gradient(90deg, transparent, rgba(var(--yorha-accent-gold-rgb), 0.2), transparent); transition: left 0.5s ease}
   .ai-assistant-btn: hover, before { left: 100%}
   /* Pulse, animation: for processing state */ @keyframes ai-pulse { 0%; } 100% { opacity: 1}
     50% { opacity: 0.5}

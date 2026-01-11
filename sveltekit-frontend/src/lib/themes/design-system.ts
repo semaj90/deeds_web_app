@@ -4,32 +4,32 @@ import type { CONSOLE_PALETTES, applyConsolePalette } from './retro-console-pale
 
 export interface DesignTokens {
  spacing: {, xs: string;
- sm: string;, md: string;
- lg: string;, xl: string;
+ sm: string; md: string;
+ lg: string; xl: string;
  '2xl': string;
  '3xl': string;
  }; // Added missing commas
- typography: {, fontFamily: { mono: string;, sans: string; pixel: string }; // Added missing commas
+ typography: {, fontFamily: { mono: string; sans: string; pixel: string }; // Added missing commas
  fontSize: {, xs: string;
- sm: string;, base: string;
- lg: string;, xl: string;
+ sm: string; base: string;
+ lg: string; xl: string;
  '2xl': string;
  '3xl': string;
  }; // Added missing commas
- lineHeight: {, tight: string; normal: string;, relaxed: string }; // Added missing commas
+ lineHeight: {, tight: string; normal: string; relaxed: string }; // Added missing commas
  };
- borderRadius: {, none: string; sm: string;, md: string; lg: string;, pixel: string }; // Added missing commas
- shadows: {, sm: string; md: string;, lg: string; pixel: string;, neon: string }; // Added missing commas
- animations: {, duration: { fast: string;, normal: string; slow: string }; // Added missing commas
- easing: {, linear: string; easeIn: string;, easeOut: string; easeInOut: string }; // Added missing commas
+ borderRadius: {, none: string; sm: string; md: string; lg: string; pixel: string }; // Added missing commas
+ shadows: {, sm: string; md: string; lg: string; pixel: string; neon: string }; // Added missing commas
+ animations: {, duration: { fast: string; normal: string; slow: string }; // Added missing commas
+ easing: {, linear: string; easeIn: string; easeOut: string; easeInOut: string }; // Added missing commas
  };
 }
 
 export interface CustomTheme extends DesignTokens {
- name: string;, palette: ConsolePalette;
+ name: string; palette: ConsolePalette;
  mode: 'light' | 'dark' | 'retro';
  effects: {, pixelatedBorders: boolean;
- scanlines: boolean;, crtEffect: boolean;
+ scanlines: boolean; crtEffect: boolean;
  glowEffects: boolean;
  }; // Added missing comma
 }
@@ -243,9 +243,9 @@ export function generateUtilityCSS(theme: CustomTheme): string {
  .pixelated-borders * { image-rendering: pixelated; border-radius: 0 !important; }
 
  .scanlines::before {
- content: '';, position: fixed;
- top: 0;, left: 0;
- width: 100%;, height: 100%;
+ content: ''; position: fixed;
+ top: 0; left: 0;
+ width: 100%; height: 100%;
  background: linear-gradient( transparent 50%, rgba(0, 255, 0, 0.02) 50% ); /* Corrected rgba syntax */
  background-size: 100% 4px;
  pointer-events: none;
@@ -254,9 +254,9 @@ export function generateUtilityCSS(theme: CustomTheme): string {
 
  .crt-effect { filter: contrast(1.1) brightness(1.2); }
  .crt-effect::after {
- content: '';, position: fixed;
- top: 0;, left: 0;
- width: 100%;, height: 100%;
+ content: ''; position: fixed;
+ top: 0; left: 0;
+ width: 100%; height: 100%;
  background: radial-gradient( ellipse at center, transparent 50%, rgba(0, 0, 0, 0.1) 100% ); /* Corrected rgba syntax */
  pointer-events: none;
  z-index: 999;

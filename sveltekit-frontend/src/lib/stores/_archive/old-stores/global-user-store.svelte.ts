@@ -21,14 +21,14 @@ export interface GlobalUserState {
  profile: UserProfile | null;
  preferences: UserPreferences;
  // AI & Chat State
- chatHistory: AIMessage[];, recommendations: RecommendationResult[];
+ chatHistory: AIMessage[]; recommendations: RecommendationResult[];
  analytics: ChatAnalytics | null;
  // Behavioral Analytics
  patterns: UserPattern | null;
  lastActivity: Date | null;
  sessionMetrics: SessionMetrics;
  // Vector & Search State
- recentEmbeddings: EmbeddingCache[];, searchHistory: SearchQuery[];
+ recentEmbeddings: EmbeddingCache[]; searchHistory: SearchQuery[];
  // Real-time Sync State
  syncStatus: 'idle' | 'syncing' | 'error' | 'offline';
  lastSync: Date | null;
@@ -36,56 +36,56 @@ export interface GlobalUserState {
 }
 
 export interface UserProfile {
- id: string;, email: string;
+ id: string; email: string;
  firstName?: string;
  lastName?: string;
- name?: string;, role: string;
+ name?: string; role: string;
  department?: string;
  jurisdiction?: string;
- avatarUrl?: string;, createdAt: Date;
+ avatarUrl?: string; createdAt: Date;
  updatedAt: Date;
 }
 
 export interface UserPreferences {
  theme: 'light' | 'dark' | 'yorha' | 'nes';
- language: string;, timezone: string;
+ language: string; timezone: string;
  aiAssistant: {, model: string;
- temperature: number;, maxTokens: number;
- enableStreaming: boolean;, autoComplete: boolean;
+ temperature: number; maxTokens: number;
+ enableStreaming: boolean; autoComplete: boolean;
  };
  notifications: {, email: boolean;
- push: boolean;, desktop: boolean;
+ push: boolean; desktop: boolean;
  legal: boolean;
  };
  privacy: {, shareAnalytics: boolean;
- storeSearchHistory: boolean;, enableRecommendations: boolean;
+ storeSearchHistory: boolean; enableRecommendations: boolean;
  };
 }
 
 export interface AIMessage {
  id: string;
- sessionId?: string;, role: 'user' | 'assistant' | 'system';
+ sessionId?: string; role: 'user' | 'assistant' | 'system';
  content: string;
  embedding?: number[];
  metadata?: { [key: string]: any };
- timestamp: Date;, isSuccessful: boolean;
+ timestamp: Date; isSuccessful: boolean;
  processingTime?: number;
  tokensUsed?: number;
 }
 
 export interface SessionMetrics {
- startTime: Date;, duration: number;
- queriesCount: number;, successRate: number;
- averageResponseTime: number;, topTopics: string[];
+ startTime: Date; duration: number;
+ queriesCount: number; successRate: number;
+ averageResponseTime: number; topTopics: string[];
 }
 
 export interface EmbeddingCache {
- textHash: string;, embedding: number[];
- model: string;, createdAt: Date;
+ textHash: string; embedding: number[];
+ model: string; createdAt: Date;
 }
 
 export interface SearchQuery {
- query: string;, results: number;
+ query: string; results: number;
  timestamp: Date;
  context?: string;
 }

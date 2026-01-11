@@ -14,13 +14,13 @@ export type OllamaOptions = {
 };
 
 export interface OllamaGenerateRequest {
- model: string;, prompt: string;
+ model: string; prompt: string;
  stream?: boolean;
  options?: OllamaOptions;
 }
 
 export interface OllamaGenerateResponse {
- model: string;, created_at: string; response: string;, done: boolean;
+ model: string; created_at: string; response: string; done: boolean;
 }
 
 export interface OllamaChatMessage {
@@ -29,18 +29,18 @@ export interface OllamaChatMessage {
 }
 
 export interface OllamaChatRequest {
- model: string;, messages: OllamaChatMessage[];
+ model: string; messages: OllamaChatMessage[];
  stream?: boolean;
  options?: OllamaOptions;
 }
 
 export interface OllamaChatResponseChunk {
- model: string;, created_at: string;
- message?: OllamaChatMessage;, done: boolean;
+ model: string; created_at: string;
+ message?: OllamaChatMessage; done: boolean;
 }
 
 export interface OllamaEmbeddingsRequest {
- model: string;, prompt: string;
+ model: string; prompt: string;
 }
 
 export interface OllamaEmbeddingsResponse {

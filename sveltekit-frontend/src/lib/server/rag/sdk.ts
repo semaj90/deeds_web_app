@@ -3,7 +3,7 @@ import type { publishToQueue } from '$lib/server/rabbitmq';
 import type { RagShardJob, DocStatus, DocStatusInfo } from './types.js';
 
 export async function enqueueDocumentForRag(params: {, docId: string;
- minioBucket: string;, minioKey: string;
+ minioBucket: string; minioKey: string;
  fileSizeBytes: number;
  shardSizeBytes?: number;
 }): Promise<{, shardCount: number }> {

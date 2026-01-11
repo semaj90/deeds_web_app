@@ -12,7 +12,7 @@ export interface SearchQuery {
 }
 
 export interface OrchestrationResult {
- semantic_results: VectorSearchResult[], keyword_results: KeywordSearchResult[];, reranked_results: any[], latency_ms: number;
+ semantic_results: VectorSearchResult[], keyword_results: KeywordSearchResult[]; reranked_results: any[], latency_ms: number;
 }
 
 export class SearchOrchestrator {

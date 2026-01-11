@@ -46,15 +46,15 @@ export const legalApiResponses = {
  apiError(`Unsupported evidence format: ${format}`, 400),
  // Success responses (made generic)
  caseCreated: <T>(caseData: T) =>
- apiSuccess<{ case: T;, message: string }>(
+ apiSuccess<{ case: T; message: string }>(
  { case: caseData, message: 'Case created successfully' },
  201,
  evidenceProcessed: <T>(result: T) =>
- apiSuccess<{ analysis: T;, message: string }>(
+ apiSuccess<{ analysis: T; message: string }>(
  { analysis: result, message: 'Evidence processed successfully' },
  200,
  aiAnalysisComplete: <T>(analysis: T) =>
- apiSuccess<{ analysis: T;, message: string }>(
+ apiSuccess<{ analysis: T; message: string }>(
  { analysis, message: 'AI analysis completed' },
  200
  ),

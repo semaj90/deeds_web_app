@@ -32,7 +32,7 @@ function isEmbeddingsResponse(obj: unknown): obj is { embedding: number[] } {
 
 export interface OllamaModelInfo {
     name: string;
-    modified_at?: string;, size: number;
+    modified_at?: string; size: number;
     digest?: string;
     details?: {
         family?: string;
@@ -77,22 +77,22 @@ export interface OllamaGenerateResponse {
 
 export interface OllamaSystemStatus {
     ollama: {, available: boolean;
-        baseUrl: string;, models: number;
+        baseUrl: string; models: number;
         gemma3Model: string | null;
         healthy?: boolean;
     };
     models: Array<{, name: string;
-        sizeMB: number;, family: string;
+        sizeMB: number; family: string;
     }>;
     capabilities: {, textGeneration: boolean;
-        embeddings: boolean;, streaming: boolean;
+        embeddings: boolean; streaming: boolean;
     };
     timestamp: string;
 }
 
 export interface DocumentAnalysisResult {
     summary: string;
-    keyPoints?: string[];, confidence: number;
+    keyPoints?: string[]; confidence: number;
     error?: string;
     embeddings?: number[];
     model?: string;

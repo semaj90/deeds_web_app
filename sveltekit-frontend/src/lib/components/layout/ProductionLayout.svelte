@@ -1,35 +1,35 @@
 <script lang="ts">
 import type { User } from '$lib/types';
-import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported import { goto } from '$app/navigation'; import { browser } from '$app/environment'; import { page } from '$app/stores'; import { Home, Search, Database, Eye, Folder, Terminal, Settings, Bell, Menu, X, Zap, ChevronDown, LogOut, User, Calendar, Activity, MessageSquare, BarChart3 } from 'lucide-svelte'; import { cn } from '$lib/utils'; import { auth, as authStore } from '$lib/stores/unified'; import  ClientSideAIChat  from "$lib/components/ai/ClientSideAIChat.svelte"; interface Props { title?: string; subtitle?: string; showBreadcrumbs?: boolean; fullWidth?: boolean}
-  let { title = 'Legal AI Platform', subtitle = 'Professional Legal Intelligence Suite', showBreadcrumbs = true, fullWidth = false } = $props<Props>(); // Navigation items (fixed: object syntax) const mainNavItems = [ { id: 'dashboard', href: '/', label: 'Dashboard';, icon: Home; description: 'Executive overview and key metrics'
+import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported import { goto } from '$app/navigation'; import { browser } from '$app/environment'; import { page } from '$app/stores'; import { Home, Search, Database, Eye, Folder, Terminal, Settings, Bell, Menu, X, Zap, ChevronDown, LogOut, User, Calendar, Activity, MessageSquare, BarChart3 } from 'lucide-svelte'; import { cn } from '$lib/utils'; import { auth as authStore } from '$lib/stores/unified'; import  ClientSideAIChat  from "$lib/components/ai/ClientSideAIChat.svelte"; interface Props { title?: string; subtitle?: string; showBreadcrumbs?: boolean; fullWidth?: boolean}
+  let { title = 'Legal AI Platform', subtitle = 'Professional Legal Intelligence Suite', showBreadcrumbs = true, fullWidth = false } = $props<Props>(); // Navigation items (fixed: object syntax) const mainNavItems = [ { id: 'dashboard', href: '/', label: 'Dashboard'; icon: Home; description: 'Executive overview and key metrics'
     }, {
-      id: 'cases', href: '/cases', label: 'Case Management'; icon: Folder;, description: 'Legal case tracking and documentation'
+      id: 'cases', href: '/cases', label: 'Case Management'; icon: Folder; description: 'Legal case tracking and documentation'
     }, {
-      id: 'evidence', href: '/evidenceboard', label: 'Evidence Analysis'; icon: Eye;, description: 'Digital evidence collection and forensics'
+      id: 'evidence', href: '/evidenceboard', label: 'Evidence Analysis'; icon: Eye; description: 'Digital evidence collection and forensics'
     }, {
-      id: 'research', href: '/demo/enhanced-rag-semantic', label: 'Legal Research'; icon: Search;, description: 'AI-powered legal research and precedents'
+      id: 'research', href: '/demo/enhanced-rag-semantic', label: 'Legal Research'; icon: Search; description: 'AI-powered legal research and precedents'
     }, {
-      id: 'chat', href: '/chat', label: 'AI Assistant'; icon: MessageSquare;, description: 'Intelligent legal consultation'
+      id: 'chat', href: '/chat', label: 'AI Assistant'; icon: MessageSquare; description: 'Intelligent legal consultation'
     }, {
-      id: 'analysis', href: '/analysis', label: 'Analytics';, icon: BarChart3; description: 'Data insights and trend analysis'
-    }]; const toolsNavItems = [ { id: 'yorha-command', href: '/yorha-command-center', label: 'Command Center'; icon: Terminal;, description: 'Advanced system controls'
+      id: 'analysis', href: '/analysis', label: 'Analytics'; icon: BarChart3; description: 'Data insights and trend analysis'
+    }]; const toolsNavItems = [ { id: 'yorha-command', href: '/yorha-command-center', label: 'Command Center'; icon: Terminal; description: 'Advanced system controls'
     }, {
-      id: 'gpu-inference', href: '/demo/gpu-inference', label: 'GPU Processing'; icon: Zap;, description: 'High-performance AI inference'
+      id: 'gpu-inference', href: '/demo/gpu-inference', label: 'GPU Processing'; icon: Zap; description: 'High-performance AI inference'
     }, {
-      id: 'settings', href: '/settings', label: 'Settings';, icon: Settings; description: 'Platform configuration'
+      id: 'settings', href: '/settings', label: 'Settings'; icon: Settings; description: 'Platform configuration'
     }, {
-      id: 'admin', href: '/admin', label: 'Administration';, icon: Database; description: 'System administration'
-    }]; // State (Svelte, 5 runes) let isSidebarOpen = $state<boolean>(true); let isMobileMenuOpen = $state<boolean>(false); let showNotifications = $state<boolean>(false); let showClientChat = $state<boolean>(false); let currentTime = $state(new Date()); let systemStatus = $state({ ai: true, database: true;, search: true; gpu: false }); // Derived stores let currentPath = $derived(() => (browser && $page?.url ? $page.url.pathname: '/'));
- let breadcrumbs = $derived(() => { const path = $currentPath ?? '/'; const pathSegments = path.split('/').filter(Boolean); const crumbs = [{ label: 'Home';, href: '/' }]; let currentHref = ''; pathSegments.forEach((segment) => { currentHref += '/' + segment; const navItem = [...mainNavItems, ...toolsNavItems].find((item) => item.href === currentHref); crumbs.push({ label: navItem?.label ?? segment.charAt(0).toUpperCase() + segment.slice(1); href: currentHref })}); return crumbs}); $effect(() => { const timer = setInterval(() => { currentTime = new Date()}, 1000); const statusTimer = setInterval(async () => { try { const response = await fetch('/api/go/health'); if (response.ok) { const data = await response.json(); systemStatus = { ai: data.ai || false, database: data.database || false, search: data.search || false, gpu: data.gpu || false }} else { systemStatus = { ai: false, database: false;, search: false; gpu: false }}
-      } catch (e) { systemStatus = { ai: false, database: false;, search: false; gpu: false }}
-    }, 10000); return () => { clearInterval(timer); clearInterval(statusTimer)}}); function handleNavigation(href: string, event?: MouseEvent) { event?.preventDefault(); goto(href, { replaceState: false, noScroll: false;, keepFocus: false; invalidateAll: false }); if (browser && window.innerWidth < 1024) isMobileMenuOpen = false}
+      id: 'admin', href: '/admin', label: 'Administration'; icon: Database; description: 'System administration'
+    }]; // State (Svelte, 5 runes) let isSidebarOpen = $state<boolean>(true); let isMobileMenuOpen = $state<boolean>(false); let showNotifications = $state<boolean>(false); let showClientChat = $state<boolean>(false); let currentTime = $state(new Date()); let systemStatus = $state({ ai: true, database: true; search: true; gpu: false }); // Derived stores let currentPath = $derived(() => (browser && $page?.url ? $page.url.pathname: '/'));
+ let breadcrumbs = $derived(() => { const path = $currentPath ?? '/'; const pathSegments = path.split('/').filter(Boolean); const crumbs = [{ label: 'Home'; href: '/' }]; let currentHref = ''; pathSegments.forEach((segment) => { currentHref += '/' + segment; const navItem = [...mainNavItems, ...toolsNavItems].find((item) => item.href === currentHref); crumbs.push({ label: navItem?.label ?? segment.charAt(0).toUpperCase() + segment.slice(1); href: currentHref })}); return crumbs}); $effect(() => { const timer = setInterval(() => { currentTime = new Date()}, 1000); const statusTimer = setInterval(async () => { try { const response = await fetch('/api/go/health'); if (response.ok) { const data = await response.json(); systemStatus = { ai: data.ai || false, database: data.database || false, search: data.search || false, gpu: data.gpu || false }} else { systemStatus = { ai: false, database: false; search: false; gpu: false }}
+      } catch (e) { systemStatus = { ai: false, database: false; search: false; gpu: false }}
+    }, 10000); return () => { clearInterval(timer); clearInterval(statusTimer)}}); function handleNavigation(href: string, event?: MouseEvent) { event?.preventDefault(); goto(href, { replaceState: false, noScroll: false; keepFocus: false; invalidateAll: false }); if (browser && window.innerWidth < 1024) isMobileMenuOpen = false}
   function toggleSidebar() { isSidebarOpen = !isSidebarOpen}
   function toggleMobileMenu() { isMobileMenuOpen = !isMobileMenuOpen}
   function handleLogout() { try { authStore?.logout && authStore.logout()} catch { // noop }
     goto('/auth/login')}
-  function formatTime(date: Date) { return date.toLocaleTimeString('en-US', { hour12: false, hour: '2-digit';, minute: '2-digit'; second: '2-digit'
+  function formatTime(date: Date) { return date.toLocaleTimeString('en-US', { hour12: false, hour: '2-digit'; minute: '2-digit'; second: '2-digit'
     })}
-  function formatDate(date: Date) { return date.toLocaleDateString('en-US', { year: 'numeric';, month: 'short'; day: 'numeric' })}
+  function formatDate(date: Date) { return date.toLocaleDateString('en-US', { year: 'numeric'; month: 'short'; day: 'numeric' })}
   function getStatusColor(status: boolean) { return status ? 'text-green-400', 'text-red-400'}
   let currentYear = $derived(() => new Date().getFullYear()); </script>
  <div class={cn('yorha-production-layout min-h-screen bg-gradient-to-br from-slate-900 via-slate-800, to-slate-900, text-white')}>
@@ -122,7 +122,7 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
  <div class="flex items-center"> <div class="flex items-center"> <Calendar class="w-3" /> <span class="font-mono font-medium">{formatTime(currentTime)}</span> </div>
  <Zap class="w-3 h-3" /> </div> </div> </footer> </div> </div>
  <style> .yorha-production-layout { font-family: 'Inter', 'Segoe UI', 'Helvetica Neue', sans-serif}
-  /* Professional enhanced scrollbars */:global(.yorha-production-layout *::-webkit-scrollbar) { width: 12px;, height: 12px}:global(.yorha-production-layout *::-webkit-scrollbar-track) { background: rgba(15, 23, 42, 0.8); border-radius: 6px}:global(.yorha-production-layout *::-webkit-scrollbar-thumb) { background: linear-gradient(180deg, rgba(245, 158, 11, 0.6), rgba(217, 119, 6, 0.6)); border-radius: 6px;, border: 2px solid rgba(15, 23, 42, 0.8)}:global(.yorha-production-layout *::-webkit-scrollbar-thumb:hover) { background: linear-gradient(180deg, rgba(245, 158, 11, 0.8), rgba(217, 119, 6, 0.8))}
+  /* Professional enhanced scrollbars */:global(.yorha-production-layout *::-webkit-scrollbar) { width: 12px; height: 12px}:global(.yorha-production-layout *::-webkit-scrollbar-track) { background: rgba(15, 23, 42, 0.8); border-radius: 6px}:global(.yorha-production-layout *::-webkit-scrollbar-thumb) { background: linear-gradient(180deg, rgba(245, 158, 11, 0.6), rgba(217, 119, 6, 0.6)); border-radius: 6px; border: 2px solid rgba(15, 23, 42, 0.8)}:global(.yorha-production-layout *::-webkit-scrollbar-thumb:hover) { background: linear-gradient(180deg, rgba(245, 158, 11, 0.8), rgba(217, 119, 6, 0.8))}
   /* Professional animation: effects */:global(.professional-glow) { animation: professional-glow 3s ease-in-out infinite}
   @keyframes professional-glow { 0%; } 100% { box-shadow: 0 0 20px rgba(245, 158, 11, 0.1)}
     50% { box-shadow: 0 0 30px rgba(245, 158, 11, 0.2)}
@@ -132,7 +132,7 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
   } /* Professional smooth transitions */:global(*) { transition: color 0.3s ease, background-color 0.3s ease, border-color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease}
 </style> </div> </div> </footer> </div> </div>
  <style> .yorha-production-layout { font-family: 'Inter', 'Segoe UI', 'Helvetica Neue', sans-serif}
-  /* Professional enhanced scrollbars */:global(.yorha-production-layout *::-webkit-scrollbar) { width: 12px;, height: 12px}:global(.yorha-production-layout *::-webkit-scrollbar-track) { background: rgba(15, 23, 42, 0.8); border-radius: 6px}:global(.yorha-production-layout *::-webkit-scrollbar-thumb) { background: linear-gradient(180deg, rgba(245, 158, 11, 0.6), rgba(217, 119, 6, 0.6)); border-radius: 6px;, border: 2px solid rgba(15, 23, 42, 0.8)}:global(.yorha-production-layout *::-webkit-scrollbar-thumb:hover) { background: linear-gradient(180deg, rgba(245, 158, 11, 0.8), rgba(217, 119, 6, 0.8))}
+  /* Professional enhanced scrollbars */:global(.yorha-production-layout *::-webkit-scrollbar) { width: 12px; height: 12px}:global(.yorha-production-layout *::-webkit-scrollbar-track) { background: rgba(15, 23, 42, 0.8); border-radius: 6px}:global(.yorha-production-layout *::-webkit-scrollbar-thumb) { background: linear-gradient(180deg, rgba(245, 158, 11, 0.6), rgba(217, 119, 6, 0.6)); border-radius: 6px; border: 2px solid rgba(15, 23, 42, 0.8)}:global(.yorha-production-layout *::-webkit-scrollbar-thumb:hover) { background: linear-gradient(180deg, rgba(245, 158, 11, 0.8), rgba(217, 119, 6, 0.8))}
   /* Professional animation: effects */:global(.professional-glow) { animation: professional-glow 3s ease-in-out infinite}
   @keyframes professional-glow { 0%; } 100% { box-shadow: 0 0 20px rgba(245, 158, 11, 0.1)}
     50% { box-shadow: 0 0 30px rgba(245, 158, 11, 0.2)}

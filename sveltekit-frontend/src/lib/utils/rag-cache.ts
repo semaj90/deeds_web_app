@@ -7,8 +7,8 @@ import type { Redis } from 'ioredis';
 import { getRedisClient } from './redis-helper.js';
 
 export interface RAGCacheEntry {
- query: string;, results: any[];
- timestamp: number;, ttl: number;
+ query: string; results: any[];
+ timestamp: number; ttl: number;
  metadata?: {
  model?: string;
  confidence?: number;
@@ -18,7 +18,7 @@ export interface RAGCacheEntry {
 
 export interface CacheConfig {
  defaultTTL: number; // seconds
- maxEntries: number;, keyPrefix: string;
+ maxEntries: number; keyPrefix: string;
 }
 
 const DEFAULT_CONFIG: CacheConfig = {

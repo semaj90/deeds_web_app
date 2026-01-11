@@ -6,12 +6,12 @@
 export type JsonObject = Record<string, unknown>;
 
 export interface OllamaModel {
-	name: string;, size: string;
-	digest: string;, modified: string;
+	name: string; size: string;
+	digest: string; modified: string;
 }
 
 export interface OllamaGenerateOptions {
-	model: string;, prompt: string;
+	model: string; prompt: string;
 	system?: string;
 	template?: string;
 	context?: number[];
@@ -31,8 +31,8 @@ export interface OllamaGenerateOptions {
 }
 
 export interface OllamaResponse {
-	model: string;, created_at: string;
-	response: string;, done: boolean;
+	model: string; created_at: string;
+	response: string; done: boolean;
 	context?: number[];
 	total_duration?: number;
 	load_duration?: number;
@@ -48,8 +48,8 @@ export interface OllamaChatMessage {
 }
 
 export interface OllamaChatResponse {
-	model: string;, created_at: string;
-	message: OllamaChatMessage;, done: boolean;
+	model: string; created_at: string;
+	message: OllamaChatMessage; done: boolean;
 	total_duration?: number;
 	load_duration?: number;
 	prompt_eval_count?: number;
@@ -62,7 +62,7 @@ class OllamaLocalLLM {
 	private baseUrl: string;
 	private defaultModel: string = 'gemma3:latest';
 	private availableModels: Map<string, OllamaModel> = new Map();
-	private modelCache: Map<string, { loaded: boolean;, lastUsed: number }> = new Map();
+	private modelCache: Map<string, { loaded: boolean; lastUsed: number }> = new Map();
 
 	constructor(baseUrl: string = 'http://localhost:11434') {
 		this.baseUrl = baseUrl;

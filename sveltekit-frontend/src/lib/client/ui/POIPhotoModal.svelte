@@ -12,14 +12,14 @@ import { RotateCcw } from "lucide-svelte";
 import { Tag } from "lucide-svelte";
 import { X } from "lucide-svelte";
 import { ZoomIn } from "lucide-svelte";
-import { ZoomOut } from "lucide-svelte";;
+import { ZoomOut } from "lucide-svelte";
 
  let {
  open,
  photo,
  onClose
  } = $props<{
- open: boolean;, photo: { url: string;
+ open: boolean; photo: { url: string;
  thumbnailUrl?: string;
  metadata?: {
  exif?: Record<string, any>;
@@ -247,14 +247,14 @@ import { ZoomOut } from "lucide-svelte";;
 <style>
  .analysis-card {
  border: 1px solid #e5e7eb;
- border-radius: 0.5rem;, background: #fff;
+ border-radius: 0.5rem; background: #fff;
  }
  .analysis-card-header {
  padding: 0.75rem 1rem 0.25rem;
  border-bottom: 1px solid #f3f4f6;
  }
  .analysis-card-title {
- font-weight: 600;, color: #111827;
+ font-weight: 600; color: #111827;
  }
  .analysis-card-body {
  padding: 0.75rem 1rem 1rem;
@@ -262,15 +262,15 @@ import { ZoomOut } from "lucide-svelte";;
  .nio-btn {
  display: inline-flex;
  align-items: center;
- justify-content: center;, gap: 0.25rem; padding: 0.35rem 0.6rem;
- border-radius: 0.35rem;, border: 1px solid #d1d5db;
- background: #fff;, color: #111827; transition: background 0.15s;
+ justify-content: center; gap: 0.25rem; padding: 0.35rem 0.6rem;
+ border-radius: 0.35rem; border: 1px solid #d1d5db;
+ background: #fff; color: #111827; transition: background 0.15s;
  }
  .nio-btn:hover {
  background: #f3f4f6;
  }
  .nio-btn.ghost {
- border: none;, background: transparent; color: #6b7280;
+ border: none; background: transparent; color: #6b7280;
  }
 </style>
 

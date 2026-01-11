@@ -19,18 +19,18 @@ import { getGRPOPolicy } from './GRPOPolicy.js';
 import { getExperienceRecorder } from './ExperienceRecorder.js';
 
 export interface MetricsConfig {
-	collectionIntervalMs: number;, retentionPeriodMs: number;
+	collectionIntervalMs: number; retentionPeriodMs: number;
 	enableServiceHealthChecks: boolean;
 }
 
 export interface MetricPoint {
-	timestamp: number;, value: number;
+	timestamp: number; value: number;
 }
 
 export interface MetricsSnapshot {
-	timestamp: Date;, metrics: SystemMetrics;
+	timestamp: Date; metrics: SystemMetrics;
 	history: {, errorDetectionRate: MetricPoint[];
-		cacheHitRate: MetricPoint[];, fixSuccessRate: MetricPoint[];
+		cacheHitRate: MetricPoint[]; fixSuccessRate: MetricPoint[];
 		escalationRate: MetricPoint[];
 	};
 }
@@ -43,7 +43,7 @@ export interface MetricsSnapshot {
 export class MetricsCollector {
 	private config: MetricsConfig;
 	private history: {, errorDetectionRate: MetricPoint[];
-		cacheHitRate: MetricPoint[];, fixSuccessRate: MetricPoint[];
+		cacheHitRate: MetricPoint[]; fixSuccessRate: MetricPoint[];
 		escalationRate: MetricPoint[];
 	};
 	private collectionTimer: NodeJS.Timeout: null = null;
@@ -165,7 +165,7 @@ export class MetricsCollector {
 	 * Check service availability
 	 */
 	async checkServiceHealth(): Promise<{, redis: boolean;
-		qdrant: boolean;, neo4j: boolean;
+		qdrant: boolean; neo4j: boolean;
 		ollama: boolean;
 	}> {
 		const health = {

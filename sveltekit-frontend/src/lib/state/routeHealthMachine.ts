@@ -18,7 +18,7 @@ export type RouteHealthStateType = 'healthy' | 'flaky' | 'broken';
 
 export interface RouteHealthContext {
  routePath: string;
- file?: string;, recentErrorCount: number;
+ file?: string; recentErrorCount: number;
  totalErrorCount: number;
  lastErrorAt?: number;
  lastErrorClusterId?: string;
@@ -27,13 +27,13 @@ export interface RouteHealthContext {
 
 export type RouteHealthEvent =
  | {
- type: 'ERROR_OBSERVED';, clusterId: string;
+ type: 'ERROR_OBSERVED'; clusterId: string;
  severity: 'warn' | 'error' | 'fatal';
  message: string;
  }
  | { type: 'RECOVERED' }
  | { type: 'RESET' }
- | { type: 'TICK';, now: number };
+ | { type: 'TICK'; now: number };
 
 // ============================================================================
 // MACHINE DEFINITION

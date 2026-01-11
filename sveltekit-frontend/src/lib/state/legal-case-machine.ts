@@ -34,7 +34,7 @@ interface SearchServiceResult {
 }
 
 interface EmbeddingServiceResult {
- embedding: number[], text: string;, model: string, dimensions: number;
+ embedding: number[], text: string; model: string, dimensions: number;
 }
 
 interface RelatedEvidenceServiceResult {
@@ -52,7 +52,7 @@ export interface LegalCaseContext {
  aiAnalysisProgress: number, aiSummary: string | null;
  similarCases: Array<any>;
  // Search and filtering
- searchQuery: string, searchResults: unknown[];, relatedEvidence: unknown[], lastEmbedding: number[] | null;
+ searchQuery: string, searchResults: unknown[]; relatedEvidence: unknown[], lastEmbedding: number[] | null;
  filters: {
  evidenceType?: string;
  dateRange?: {, start: Date, end: Date };
@@ -60,7 +60,7 @@ export interface LegalCaseContext {
  isAdmissible?: boolean;
  };
  // UI state
- activeTab: 'overview' | 'evidence' | 'analysis' | 'search', isLoading: boolean;, error: string | null;
+ activeTab: 'overview' | 'evidence' | 'analysis' | 'search', isLoading: boolean; error: string | null;
  // Form data
  formData: {, caseForm: Partial<NewCase>, evidenceForm: Partial<NewEvidence>;
  };
@@ -69,7 +69,7 @@ export interface LegalCaseContext {
  // Collaboration
  collaborators: Array<any>, notifications: Array<any>;
  // Performance tracking
- stats: {, totalEvidence: number, processedEvidence: number;, averageConfidence: number, processingTime: number;
+ stats: {, totalEvidence: number, processedEvidence: number; averageConfidence: number, processingTime: number;
  };
 }
 // Event types
@@ -121,7 +121,7 @@ export type LegalCaseActors = {
  loadEvidence: {, input: { caseId?: string };
  output: Evidence[];
  };
- uploadEvidence: {, input: { files: File[], caseId: string;, documentType: string };
+ uploadEvidence: {, input: { files: File[], caseId: string; documentType: string };
  output: UploadEvidenceServiceResult;
  };
  processEvidence: {, input: { evidenceId: string };

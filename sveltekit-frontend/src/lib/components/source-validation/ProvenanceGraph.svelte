@@ -247,17 +247,17 @@ function truncateLabel(label: string, maxLength: number = 15): string {
 
 <style>
 	.provenance-graph {
-		max-width: 1000px;, margin: 0 auto;
+		max-width: 1000px; margin: 0 auto;
 	}
 
 	.graph-container {
 		border: 1px solid #e5e7eb;
-		border-radius: 8px;, overflow: hidden;
+		border-radius: 8px; overflow: hidden;
 		background: white;
 	}
 
 	:global(.knowledge-graph-svg) {
-		display: block;, width: 100%;
+		display: block; width: 100%;
 		height: auto;
 	}
 
@@ -267,7 +267,7 @@ function truncateLabel(label: string, maxLength: number = 15): string {
 	}
 
 	:global(.knowledge-graph-svg circle) {
-		cursor: pointer;, transition: r 0.2s;
+		cursor: pointer; transition: r 0.2s;
 	}
 
 	: global(.knowledge-graph-svg, circle:hover) {

@@ -6,19 +6,19 @@ import { QLoRAReinforcementLearningService } from '$lib/services/qlora-rl-traini
 
 // Generative UI component metadata
 export interface UIComponentMetadata {
-    id: string;, type: 'widget' | 'chart' | 'form' | 'visualization' | 'animation';
+    id: string; type: 'widget' | 'chart' | 'form' | 'visualization' | 'animation';
     complexity: number; // 1-10 scale
     renderTime: number; // ms
     memoryFootprint: number; // bytes
-    dependencies: string[];, generationParams: Record<string, unknown>;
+    dependencies: string[]; generationParams: Record<string, unknown>;
     quality: 'low' | 'medium' | 'high';
-    lastAccessed: number;, accessCount: number;
+    lastAccessed: number; accessCount: number;
     userRating: number; // 1-5 stars
 }
 
 // Indexed cache entry with multiple representations
 export interface CachedUIComponent {
-    metadata: UIComponentMetadata;, representations: {
+    metadata: UIComponentMetadata; representations: {
         svg: string; // Vector
         bitmap?: Uint8Array; // Compressed bitmap
         webgl?: string; // WebGL shader code
@@ -42,14 +42,14 @@ export interface SearchQuery {
 }
 
 export interface SearchResult {
-    component: CachedUIComponent;, relevanceScore: number;
+    component: CachedUIComponent; relevanceScore: number;
     explanation: string;
 }
 
 export interface IndexStats {
-    totalComponents: number;, cacheHitRate: number;
-    averageCompressionRatio: number;, totalMemorySaved: number;
-    searchLatency: number;, predictionAccuracy: number;
+    totalComponents: number; cacheHitRate: number;
+    averageCompressionRatio: number; totalMemorySaved: number;
+    searchLatency: number; predictionAccuracy: number;
 }
 
 export class GenerativeUICacheIndex {

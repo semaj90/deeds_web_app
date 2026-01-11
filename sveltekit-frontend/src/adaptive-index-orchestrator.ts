@@ -8,13 +8,13 @@ import { getOllamaEndpoint } from '$lib/utils/ollama-utils';
 
 // Configuration interface
 interface ExtendedConfig {
-	OLLAMA_URL: string;, TRITON_URL: string; QDRANT_URL: string;, REDIS_URL: string; REDIS_PASSWORD: string;, NEO4J_URL: string; NEO4J_USER: string;
+	OLLAMA_URL: string; TRITON_URL: string; QDRANT_URL: string; REDIS_URL: string; REDIS_PASSWORD: string; NEO4J_URL: string; NEO4J_USER: string;
 	RABBITMQ_URL?: string;
 	MINIO_URL?: string;
 	MINIO_ACCESS_KEY?: string;
 	MINIO_SECRET_KEY?: string;
 	CADDY_URL?: string;
-	POSTGRES_URL?: string;, CACHE_EMBEDDING_TTL_SEC: number;
+	POSTGRES_URL?: string; CACHE_EMBEDDING_TTL_SEC: number;
 	GPU_EMBEDDING_MODEL?: string;
 	QUIC_ENABLED?: boolean;
 	AUTO_STORE_PGVECTOR?: boolean;
@@ -28,26 +28,26 @@ export type RoutingDecision = 'gpu' | 'quic' | 'cache' | 'cpu';
 
 // Router input features
 interface RouterInputFeatures {
-	queryLatencyMs: number;, userFeedbackScore: number; embeddingCostUsd: number;, gpuLoadPercent: number; similarityScoreVariance: number;, cacheHitRate: number; fileSizeKb: number;, docType: 'document' | 'evidence' | 'query';
-	vectorDensity: number;, ragConfidence: number; textLength: number;, caseId: string; currentVectorCount: number;
+	queryLatencyMs: number; userFeedbackScore: number; embeddingCostUsd: number; gpuLoadPercent: number; similarityScoreVariance: number; cacheHitRate: number; fileSizeKb: number; docType: 'document' | 'evidence' | 'query';
+	vectorDensity: number; ragConfidence: number; textLength: number; caseId: string; currentVectorCount: number;
 }
 
 // Router output logits
 interface RoutingLogits {
-	useGpu: number;, useCpu: number; useQuic: number;, useRest: number; cacheHit: number;, reindex: number; useQdrantForStorage: number;, usePgVectorForStorage: number;
+	useGpu: number; useCpu: number; useQuic: number; useRest: number; cacheHit: number; reindex: number; useQdrantForStorage: number; usePgVectorForStorage: number;
 }
 
 // Embedding orchestration payload
 interface EmbeddingOrchestrationPayload {
-	id: string;, caseId: string; type: 'document' | 'evidence' | 'query';
-	text: string;, title: string;
+	id: string; caseId: string; type: 'document' | 'evidence' | 'query';
+	text: string; title: string;
 	metadata?: Record<string, unknown>;
 }
 
 // Document upsert payload
 interface DocumentUpsertPayload {
-	id: string;, caseId: string; type: 'document' | 'evidence' | 'query';
-	title: string;, content: string; embedding: number[];, timestamp: string;
+	id: string; caseId: string; type: 'document' | 'evidence' | 'query';
+	title: string; content: string; embedding: number[]; timestamp: string;
 	[key: string]: unknown;
 }
 
@@ -63,7 +63,7 @@ export class AdaptiveIndexOrchestrator {
 	/**
 	 * Decide routing based on context
 	 */
-	async decideRouting(context: {, caseId: string; fileSize: number;, textLength: number;
+	async decideRouting(context: {, caseId: string; fileSize: number; textLength: number;
 	}): Promise<RoutingDecision> {
 		// Simple heuristic-based routing
 		if (context.fileSize > 1024 * 256) return 'gpu';

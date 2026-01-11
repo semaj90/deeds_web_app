@@ -4,7 +4,7 @@ import {  browser  } from '$app/environment';
 
 // Re-define Session interface for the machine's context
 export interface Session {
- id: string;, user: User;
+ id: string; user: User;
  fresh?: boolean;
  expiresAt?: Date;
 }
@@ -12,16 +12,16 @@ export interface Session {
 export interface SessionContext {
  user: User | null;
  session: Session | null;
- lastSyncAt: number;, error: string | null;
+ lastSyncAt: number; error: string | null;
 }
 
 type SessionEvent =
  | { type: 'INIT'; pageData?: any }
- | { type: 'SET_SESSION';, user: null; session: null }
+ | { type: 'SET_SESSION'; user: null; session: null }
  | { type: 'CLEAR_SESSION' }
  | { type: 'REFRESH' }
- | { type: 'REFRESH_SUCCESS';, user: null; session: null }
- | { type: 'REFRESH_FAILURE';, error: string };
+ | { type: 'REFRESH_SUCCESS'; user: null; session: null }
+ | { type: 'REFRESH_FAILURE'; error: string };
 
 const initialContext: SessionContext = {
  user: null, session: null,
@@ -71,7 +71,7 @@ export const sessionMachine = createMachine({
  context: initialContext,
  initial: 'idle',
  types: {} as {
- context: SessionContext;, events: SessionEvent;
+ context: SessionContext; events: SessionEvent;
  },
  states: {, idle: {
  on: {, INIT: {

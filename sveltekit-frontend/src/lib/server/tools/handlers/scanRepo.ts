@@ -18,8 +18,8 @@ import {
 const execAsync = promisify(exec);
 
 interface RipgrepMatch {
-  file: string;, line: number;
-  column?: number;, content: string;
+  file: string; line: number;
+  column?: number; content: string;
   pattern_name?: string;
   context?: string[];
 }
@@ -28,8 +28,8 @@ async function runRipgrep(
   pattern: string,
   paths: string[],
   options: {, caseSensitive: boolean;
-    maxResults: number;, includeLineNumbers: boolean;
-    includeContext: number;, excludes: string[];
+    maxResults: number; includeLineNumbers: boolean;
+    includeContext: number; excludes: string[];
     isRegex: boolean;
   }
 ): Promise<RipgrepMatch[]> {

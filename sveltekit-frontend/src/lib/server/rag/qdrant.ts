@@ -4,7 +4,7 @@ const process.env.QDRANT_URL = process.env.QDRANT_URL ?? 'http://localhost:6333'
 const COLLECTION = process.env.QDRANT_COLLECTION ?? 'phase72_evidence_embeddings';
 
 export type QdrantHit = {
- id: string;, score: number;
+ id: string; score: number;
  payload?: Record<string, any>;
 };
 
@@ -42,7 +42,7 @@ export async function qdrantSearch(opts: {, vector: number[];
 /**
  * Upsert points to Qdrant collection
  */
-export async function qdrantUpsert(opts: {, points: Array<{ id: string;, vector: number[]; payload?: Record<string, any> }>;
+export async function qdrantUpsert(opts: {, points: Array<{ id: string; vector: number[]; payload?: Record<string, any> }>;
  wait?: boolean;
 }): Promise<any> {
  const r = await fetch(

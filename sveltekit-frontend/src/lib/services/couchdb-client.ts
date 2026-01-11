@@ -27,9 +27,9 @@ interface CouchDBDoc {
 }
 
 interface ViewResult<T> {
-  total_rows: number;, offset: number;
+  total_rows: number; offset: number;
   rows: Array<{, id: string;
-    key: unknown;, value: T;
+    key: unknown; value: T;
     doc?: T;
   }>;
 }
@@ -210,8 +210,8 @@ class CouchDBClient {
    * Get database info
    */
   async info(database: string): Promise<{, db_name: string;
-    doc_count: number;, doc_del_count: number;
-    update_seq: string;, disk_size: number;
+    doc_count: number; doc_del_count: number;
+    update_seq: string; disk_size: number;
   }> {
     return this.request(`/${database}`);
   }
@@ -223,12 +223,12 @@ export const couchdb = new CouchDBClient();
 // Convenience functions for ACE databases
 export const aceGraphs = {
   async storeASTNode(node: {, file_path: string;
-    language: string;, node_type: string;
+    language: string; node_type: string;
     name: string;
     children?: unknown[];
     imports?: string[];
     exports?: string[];
-    errors?: {, line: number; code: string;, message: string }[];
+    errors?: {, line: number; code: string; message: string }[];
   }) {
     const doc = {
       _id: `ast_${Buffer.from(node.file_path).toString('base64').slice(0, 20)}_${node.name}`,
@@ -240,7 +240,7 @@ export const aceGraphs = {
   },
 
   async storeFileGraph(graph: {, file_path: string;
-    imports: string[];, exports: string[];
+    imports: string[]; exports: string[];
     dependencies: string[];
   }) {
     const doc = {
@@ -253,9 +253,9 @@ export const aceGraphs = {
   },
 
   async storeCluster(cluster: {, cluster_id: number;
-    collection: string;, size: number;
-    centroid_id: string;, summary: string;
-    tags: string[];, sample_ids: string[];
+    collection: string; size: number;
+    centroid_id: string; summary: string;
+    tags: string[]; sample_ids: string[];
   }) {
     const doc = {
       _id: `cluster_${cluster.collection}_${cluster.cluster_id}`,
@@ -267,7 +267,7 @@ export const aceGraphs = {
   },
 
   async storeErrorRelation(relation: {, source_error: string;
-    target_error: string;, relation_type: 'caused_by' | 'similar_to' | 'fixed_by' | 'blocks';
+    target_error: string; relation_type: 'caused_by' | 'similar_to' | 'fixed_by' | 'blocks';
     confidence: number;
     evidence?: string[];
   }) {
@@ -283,8 +283,8 @@ export const aceGraphs = {
 
 export const aceLLM = {
   async storeSummary(summary: {, source_type: 'cluster' | 'file' | 'component' | 'error_pattern';
-    source_id: string;, model: string;
-    summary_text: string;, tags: string[];
+    source_id: string; model: string;
+    summary_text: string; tags: string[];
     confidence: number;
   }) {
     const doc = {

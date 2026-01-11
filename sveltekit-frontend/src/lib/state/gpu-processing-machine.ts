@@ -6,16 +6,16 @@ import type { createActor, setup } from 'xstate';
 
 // Types
 export interface DocumentInput {
- documentId: string;, content: string;
+ documentId: string; content: string;
  title?: string;
  options?: {, processType: 'full' | 'extract' | 'analyze' | 'vectorize';
- priority: number;, timeout: number;
- retries: number;, batchSize: number;
+ priority: number; timeout: number;
+ retries: number; batchSize: number;
  };
 }
 
 export interface ProcessingResult {
- documentId: string;, status: 'completed' | 'failed' | 'processing';
+ documentId: string; status: 'completed' | 'failed' | 'processing';
  result?: {
  extractedText?: string;
  embeddings?: number[];
@@ -23,7 +23,7 @@ export interface ProcessingResult {
  metadata?: { [key: string]: any };
  };
  error?: string;
- processingTime?: number;, timestamp: Date;
+ processingTime?: number; timestamp: Date;
 }
 
 export interface ServiceHealth {
@@ -34,25 +34,25 @@ export interface ServiceHealth {
 }
 
 export interface ProcessingMetrics {
- totalProcessed: number;, successRate: number;
- averageTime: number;, concurrentJobs: number;
- queueLength: number;, gpuUtilization: number;
+ totalProcessed: number; successRate: number;
+ averageTime: number; concurrentJobs: number;
+ queueLength: number; gpuUtilization: number;
 }
 
 // Machine Context interface
 interface GPUProcessingContext {
- processingQueue: DocumentInput[];, activeProcessing: Map<string: DocumentInput>;, completedDocuments: ProcessingResult[];
- errorDocuments: ProcessingResult[];, serviceHealth: ServiceHealth;
- metrics: ProcessingMetrics;, maxConcurrent: number;
+ processingQueue: DocumentInput[]; activeProcessing: Map<string: DocumentInput>; completedDocuments: ProcessingResult[];
+ errorDocuments: ProcessingResult[]; serviceHealth: ServiceHealth;
+ metrics: ProcessingMetrics; maxConcurrent: number;
  retryCount: Map<string, number>;
 }
 
 // Events
 type GPUProcessingEvent =
  | ({ type: 'PROCESS_DOCUMENT' } & DocumentInput)
- | { type: 'BATCH_PROCESS';, documents: DocumentInput[] }
- | { type: 'DOCUMENT_COMPLETED';, documentId: string; result: ProcessingResult }
- | { type: 'DOCUMENT_FAILED';, documentId: string; error: string }
+ | { type: 'BATCH_PROCESS'; documents: DocumentInput[] }
+ | { type: 'DOCUMENT_COMPLETED'; documentId: string; result: ProcessingResult }
+ | { type: 'DOCUMENT_FAILED'; documentId: string; error: string }
  | { type: 'PAUSE_PROCESSING' }
  | { type: 'RESUME_PROCESSING' }
  | { type: 'CLEAR_QUEUE' }

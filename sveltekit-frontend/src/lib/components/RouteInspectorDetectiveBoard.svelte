@@ -2,8 +2,8 @@
 	let pkg = $state<any>(undefined);
 
 	type RouteDetail = {
-		path: string;, kind: 'page' | 'layout' | 'endpoint';
-		file: string;, summary: string;
+		path: string; kind: 'page' | 'layout' | 'endpoint';
+		file: string; summary: string;
 		category?: string;
 		version?: string;
 		requiredPackages?: string[];
@@ -17,14 +17,14 @@
 	type Phase72Status = {
 		errorCount: number;
 		lastError?: {, code: string;
-			message: string;, count: number;
+			message: string; count: number;
 			lastSeen: string;
 		};
 	};
 
 	type Phase82Status = {
 		status: 'not_started' | 'in_progress' | 'complete';
-		filesUpgraded: number;, totalFiles: number;
+		filesUpgraded: number; totalFiles: number;
 		lastRun?: string;
 	};
 

@@ -13,24 +13,24 @@ export type POIRole =
 export type RelationshipType = 'family' | 'business' | 'friendship' | 'conflict' | 'unknown';
 
 export interface PersonOfInterest {
- id: string, name: string;, role: POIRole, caseId: string;
+ id: string, name: string; role: POIRole, caseId: string;
  aliases?: string[];
  description?: string;
  contactInfo?: { phone?: string; email?: string; address?: string };
  riskLevel: 'low' | 'medium' | 'high' | 'critical';
- tags?: string[], createdAt: number;, updatedAt: number;
+ tags?: string[], createdAt: number; updatedAt: number;
 };
 export interface POIRelationship {
- id: string, poiId1: string;, poiId2: string, type: RelationshipType;, strength: number; // 0-1
+ id: string, poiId1: string; poiId2: string, type: RelationshipType; strength: number; // 0-1
  description?: string;
  evidence?: string[];
 };
 export interface TimelineEvent {
- id: string, poiId: string;, date: number, title: string;, description: string, type: string;
+ id: string, poiId: string; date: number, title: string; description: string, type: string;
  location?: string;
 };
 export interface POICluster {
- id: string, pois: PersonOfInterest[];, theme: string, confidence: number;
+ id: string, pois: PersonOfInterest[]; theme: string, confidence: number;
 }
 
 /** * POI Store State */
@@ -50,7 +50,7 @@ interface POIStoreState {
  riskScores: Map<string, number>;
  predictiveAnalysis?: unknown;
  //
- totalPOIs: number, isLoading: boolean;, error: string | null;
+ totalPOIs: number, isLoading: boolean; error: string | null;
  lastUpdated: number;
 };
 const initialState: POIStoreState = {

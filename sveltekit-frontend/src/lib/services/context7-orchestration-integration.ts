@@ -17,22 +17,22 @@ interface ServiceMapping {
 }
 
 interface CategoryData {
-    count: number;, priority: number;
+    count: number; priority: number;
 }
 
 export interface Context7Config {
-    enableMulticore: boolean;, maxThreads: number;
+    enableMulticore: boolean; maxThreads: number;
     priorityLevels: {, critical: number;
-        high: number;, standard: number;
+        high: number; standard: number;
         background: number;
     };
     autoScaling: boolean;
 }
 
 export interface OrchestrationMetrics {
-    activeThreads: number;, queueDepth: number;
-    averageLatency: number;, throughput: number;
-    errorRate: number;, serviceHealth: Record<string, 'healthy' | 'degraded' | 'down'>;
+    activeThreads: number; queueDepth: number;
+    averageLatency: number; throughput: number;
+    errorRate: number; serviceHealth: Record<string, 'healthy' | 'degraded' | 'down'>;
 }
 
 /**

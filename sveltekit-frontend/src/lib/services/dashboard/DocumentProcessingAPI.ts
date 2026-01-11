@@ -9,7 +9,7 @@ export interface ProcessingCommand {
 }
 
 export interface ProcessingResponse {
- success: boolean;, message: string;
+ success: boolean; message: string;
  data?: unknown;
 }
 
@@ -112,8 +112,8 @@ export class DocumentProcessingAPI {
  * Get processing status
  */
  async getStatus(documentId: string): Promise<{, documentId: string;
- status: string;, progress: number;
- currentPage: number;, totalPages: number;
+ status: string; progress: number;
+ currentPage: number; totalPages: number;
  stage: string;
  }> {
  try {
@@ -139,8 +139,8 @@ export class DocumentProcessingAPI {
  */
  async getHistory(documentId: string): Promise<
  Array<{
- timestamp: string;, stage: string;
- status: string;, page: number;
+ timestamp: string; stage: string;
+ status: string; page: number;
  percent: number;
  }>
  > {
@@ -172,7 +172,7 @@ export class DocumentProcessingAPI {
  file: File,
  metadata?: Record<string, string>
  ): Promise<{, documentId: string;
- fileName: string;, fileSize: number;
+ fileName: string; fileSize: number;
  uploadedAt: string;
  }> {
  try {

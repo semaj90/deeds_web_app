@@ -6,8 +6,8 @@
   interface Props {
     caseItem: {, id: string;
       title: string;
-      description?: string;, priority: string;
-      status: string;, updatedAt: string | Date;
+      description?: string; priority: string;
+      status: string; updatedAt: string | Date;
     };
     class?: string;
   }

@@ -1,18 +1,18 @@
 interface Evidence {
- id: string;, filename: string;
+ id: string; filename: string;
  type: 'document' | 'communication' | 'data' | 'media';
- description: string;, uploadedAt: Date;
+ description: string; uploadedAt: Date;
  metadata?: Record<string, any>;
 }
 
 interface Report {
- id: string;, title: string;
- content: string;, createdAt: Date;
+ id: string; title: string;
+ content: string; createdAt: Date;
  generatedBy: string;
 }
 
 export interface RAGDemoQuery {
- query: string;, caseId: string;
+ query: string; caseId: string;
  evidence?: Evidence[];
  reports?: Report[];
  maxTokens?: number;
@@ -20,8 +20,8 @@ export interface RAGDemoQuery {
 }
 
 export interface RAGDemoResponse {
- response: string;, sources: Array<any>;
- confidence: number;, tokensUsed: number;
+ response: string; sources: Array<any>;
+ confidence: number; tokensUsed: number;
  reasoning: string[];
 }
 

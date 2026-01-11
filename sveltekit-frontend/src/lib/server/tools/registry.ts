@@ -168,42 +168,42 @@ export type CrawlDocsRequest = z.infer<typeof CrawlDocsRequestSchema>;
 // ============================================================================
 
 export interface ToolResult<T = unknown> {
-  success: boolean;, run_id: string;
+  success: boolean; run_id: string;
   tool: string;
   data?: T;
-  error?: string;, duration_ms: number;
+  error?: string; duration_ms: number;
   timestamp: string;
 }
 
 export interface ScanRepoResult {
   matches: Array<{, file: string;
     line: number;
-    column?: number;, content: string;
+    column?: number; content: string;
     pattern_name?: string;
     context?: string[];
   }>;
-  total_matches: number;, files_scanned: number;
+  total_matches: number; files_scanned: number;
 }
 
 export interface LangExtractResult {
   extractions: Array<{, doc_url: string;
-    entities: Array<{, type: string; name: string;, confidence: number }>;
-    relations: Array<{, type: string; source: string;, target: string; confidence: number }>;
+    entities: Array<{, type: string; name: string; confidence: number }>;
+    relations: Array<{, type: string; source: string; target: string; confidence: number }>;
   }>;
-  total_entities: number;, total_relations: number;
+  total_entities: number; total_relations: number;
 }
 
 export interface ClusterTagResult {
   clusters: Array<{, id: number;
-    size: number;, centroid_id: string;
-    summary?: string;, tags: string[];
+    size: number; centroid_id: string;
+    summary?: string; tags: string[];
   }>;
-  total_clusters: number;, noise_points: number;
+  total_clusters: number; noise_points: number;
 }
 
 export interface KBSearchResult {
   results: Array<{, id: string;
-    score: number;, content: string;
+    score: number; content: string;
     metadata?: Record<string, unknown>;
   }>;
   total_results: number;
@@ -216,8 +216,8 @@ export interface KBSearchResult {
 export type ToolPermission = 'read_files' | 'write_files' | 'network' | 'gpu' | 'database';
 
 export interface ToolDefinition<TRequest, TResult> {
-  name: string;, description: string;
-  schema: z.ZodSchema<TRequest>;, permissions: ToolPermission[];
+  name: string; description: string;
+  schema: z.ZodSchema<TRequest>; permissions: ToolPermission[];
   handler: (request: TRequest) => Promise<ToolResult<TResult>>;
 }
 
@@ -303,7 +303,7 @@ export const toolRegistry = new ToolRegistry();
 // ============================================================================
 
 export function getToolDefinitions(): Array<{, name: string;
-  description: string;, permissions: ToolPermission[];
+  description: string; permissions: ToolPermission[];
 }> {
   return toolRegistry.list().map(name => {
     const tool = toolRegistry.get(name)!;

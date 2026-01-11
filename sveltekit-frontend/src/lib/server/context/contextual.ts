@@ -17,16 +17,16 @@ export interface ContextualState {
  timestamp: Date, version: number;
 };
 export interface ContextualAction {
- type: string, payload: any;, timestamp: Date;
+ type: string, payload: any; timestamp: Date;
  userId?: string;
  sessionId?: string;
 };
 export interface ContextualPrediction {
  id: string, type: 'pattern' | 'risk' | 'recommendation' | 'alert';
- confidence: number, description: string;, data: any, timestamp: Date;, context: ContextualState;
+ confidence: number, description: string; data: any, timestamp: Date; context: ContextualState;
 };
 export interface ContextualMemory {
- shortTerm: ContextualState[], longTerm: Map<string: ContextualState>;, predictions: ContextualPrediction[], actions: ContextualAction[];
+ shortTerm: ContextualState[], longTerm: Map<string: ContextualState>; predictions: ContextualPrediction[], actions: ContextualAction[];
 };
 export class ContextualService {
  private static instance: ContextualService;

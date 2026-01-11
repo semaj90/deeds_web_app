@@ -3,7 +3,7 @@
 
 // Experimental types for WebGPU that might not be in default TS libs
 interface GPUAdapterInfo {
- vendor: string;, architecture: string;
+ vendor: string; architecture: string;
  device?: string;
  description?: string;
 }
@@ -17,10 +17,10 @@ interface NavigatorWithGPU extends Navigator {
 }
 
 export interface WebGPUDiagnostics {
- isSupported: boolean;, browserSupport: {
- hasNavigatorGPU: boolean;, browserName: string;
- browserVersion: string;, isChrome: boolean;
- isFirefox: boolean;, isEdge: boolean;
+ isSupported: boolean; browserSupport: {
+ hasNavigatorGPU: boolean; browserName: string;
+ browserVersion: string; isChrome: boolean;
+ isFirefox: boolean; isEdge: boolean;
  isSafari: boolean;
  };
  adapterInfo?: {, vendor: string;
@@ -33,7 +33,7 @@ export interface WebGPUDiagnostics {
  maxBufferSize?: number;
  maxComputeWorkgroupSize?: number;
  };
- errors: string[];, recommendations: string[];
+ errors: string[]; recommendations: string[];
 }
 
 export class WebGPUDiagnosticsService {

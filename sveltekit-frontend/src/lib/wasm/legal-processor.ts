@@ -16,39 +16,39 @@ interface WasmModule {
  extract_legal_citations(text: string): string;
  calculate_readability_score(text: string): number;
  detect_sensitive_information(text: string): string;
- compress_document_features(features: Uint8Array): Uint8Array;, memory: WebAssembly.Memory;
+ compress_document_features(features: Uint8Array): Uint8Array; memory: WebAssembly.Memory;
 }
 
 interface ProcessingResult {
- text: string;, documentType: string;
- legalEntities: LegalEntity[];, citations: LegalCitation[];
- sensitiveInfo: SensitiveInfo[];, fingerprint: string;
- similarity?: number;, readabilityScore: number;
+ text: string; documentType: string;
+ legalEntities: LegalEntity[]; citations: LegalCitation[];
+ sensitiveInfo: SensitiveInfo[]; fingerprint: string;
+ similarity?: number; readabilityScore: number;
  processingTime: number;
 }
 
 interface LegalEntity {
  type: 'person' | 'organization' | 'location' | 'legal_concept';
- text: string;, confidence: number;
- startIndex: number;, endIndex: number;
+ text: string; confidence: number;
+ startIndex: number; endIndex: number;
  context: string;
 }
 
 interface LegalCitation {
  type: 'case' | 'statute' | 'regulation' | 'rule';
- citation: string;, jurisdiction: string;
- year?: number;, relevance: number;
+ citation: string; jurisdiction: string;
+ year?: number; relevance: number;
 }
 
 interface SensitiveInfo {
  type: 'ssn' | 'credit_card' | 'phone' | 'email' | 'address' | 'account_number';
- value: string;, masked: string;
- confidence: number;, location: { start: number;, end: number };
+ value: string; masked: string;
+ confidence: number; location: { start: number; end: number };
 }
 
 // Add a concrete type for the structure analysis
 interface DocumentStructure {
- paragraphs: number;, sections: number;
+ paragraphs: number; sections: number;
  headers: number;
 }
 // WebAssembly Legal Processor Class
@@ -163,7 +163,7 @@ export class WasmLegalProcessor {
  async analyzeTextRealtime(
  text: string
  ): Promise<{, entities: LegalEntity[];
- citations: LegalCitation[];, documentType: string;
+ citations: LegalCitation[]; documentType: string;
  readability: number;
  }> {
  await this.ensureInitialized();
@@ -186,8 +186,8 @@ export class WasmLegalProcessor {
  async compareDocuments(
  doc1: ProcessingResult, doc2: ProcessingResult
  ): Promise<{, similarity: number;
- commonEntities: LegalEntity[];, commonCitations: LegalCitation[];
- uniqueToDoc1: string[];, uniqueToDoc2: string[];
+ commonEntities: LegalEntity[]; commonCitations: LegalCitation[];
+ uniqueToDoc1: string[]; uniqueToDoc2: string[];
  fingerprintMatch: boolean;
  }> {
  await this.ensureInitialized();

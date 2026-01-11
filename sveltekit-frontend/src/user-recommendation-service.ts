@@ -8,35 +8,35 @@ import { eq, and, sql, count, desc } from 'drizzle-orm';
 
 // User behavior pattern interfaces
 export interface UserPattern {
-	userId: string;, commonQueries: string[];
-	frequentCases: string[];, preferredTopics: string[];
+	userId: string; commonQueries: string[];
+	frequentCases: string[]; preferredTopics: string[];
 	queryComplexity: 'simple' | 'moderate' | 'complex';
 	usageFrequency: 'low' | 'medium' | 'high';
 	timePatterns: {, mostActiveHours: number[];
-		averageSessionLength: number;, queriesPerSession: number;
+		averageSessionLength: number; queriesPerSession: number;
 	};
 }
 
 export interface RecommendationResult {
 	type: 'query' | 'case' | 'document' | 'legal_precedent';
-	content: string;, confidence: number;
-	reasoning: string;, relatedItems: string[];
+	content: string; confidence: number;
+	reasoning: string; relatedItems: string[];
 }
 
 export interface ChatAnalytics {
-	totalQueries: number;, successRate: number;
-	averageProcessingTime: number;, topTopics: Array<{ topic: string;, count: number }>;
-	userSatisfaction: number;, improvementSuggestions: string[];
+	totalQueries: number; successRate: number;
+	averageProcessingTime: number; topTopics: Array<{ topic: string; count: number }>;
+	userSatisfaction: number; improvementSuggestions: string[];
 }
 
 interface TimeRange {
-	from: Date;, to: Date;
+	from: Date; to: Date;
 }
 
 interface StoreAiChatParams {
 	userId: string;
 	sessionId?: string;
-	caseId?: string;, query: string;
+	caseId?: string; query: string;
 	response: string;
 	embedding?: number[];
 	metadata?: Record<string, unknown>;

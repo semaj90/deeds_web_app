@@ -9,16 +9,16 @@ import { unifiedSIMDParser, ParseMode } from './unified-simd-parser.js';
 import { redisOptimized } from '../middleware/redis-orchestrator-middleware.js';
 
 interface WebGPUSIMDConfig {
-    enableWebGPU: boolean;, enableSIMD: boolean;
-    enableRedisCache: boolean;, maxBatchSize: number;
-    gpuMemoryLimit: number;, workgroupSize: number;
+    enableWebGPU: boolean; enableSIMD: boolean;
+    enableRedisCache: boolean; maxBatchSize: number;
+    gpuMemoryLimit: number; workgroupSize: number;
     preferredDevice: 'discrete' | 'integrated' | 'auto';
 }
 
 interface AccelerationResult {
     data: Record<string, unknown>;
-    processing_time_ms: number;, acceleration_method: string;
-    gpu_memory_used: number;, simd_backend: string;
+    processing_time_ms: number; acceleration_method: string;
+    gpu_memory_used: number; simd_backend: string;
     cache_status: 'hit' | 'miss' | 'bypass';
     performance_gain: number;
 }
@@ -334,7 +334,7 @@ export class WebGPUSIMDAccelerator {
      * Categorize batch inputs by optimal processing method
      */
     private categorizeBatches(jsonStrings: string[]): {, webgpu: string[];
-        simd: string[];, standard: string[];
+        simd: string[]; standard: string[];
     } {
         const batches = {
             webgpu: [] as string[],

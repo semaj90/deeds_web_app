@@ -5,19 +5,19 @@
  */
 
 export interface SOMConfig {
- width: number;, height: number;
- epochs: number;, initialLearningRate: number;
+ width: number; height: number;
+ epochs: number; initialLearningRate: number;
  finalLearningRate: number;
 }
 
 export interface Neuron {
- weights: number[];, x: number;
+ weights: number[]; x: number;
  y: number;
 }
 
 export interface SOMGrid {
- width: number;, height: number;
- neurons: Neuron[][];, config: SOMConfig;
+ width: number; height: number;
+ neurons: Neuron[][]; config: SOMConfig;
 }
 
 const DEFAULT_CONFIG: SOMConfig = {
@@ -63,7 +63,7 @@ function euclideanDistance(a: number[], b: number[]): number {
 /**
  * Find Best Matching Unit (BMU) for input vector
  */
-function findBMU(input: number[], SOMGrid: {, x: number; y: number;, distance: number } {
+function findBMU(input: number[], SOMGrid: {, x: number; y: number; distance: number } {
  let minDistance = Infinity;
  let bmuX = 0;
  let bmuY = 0;

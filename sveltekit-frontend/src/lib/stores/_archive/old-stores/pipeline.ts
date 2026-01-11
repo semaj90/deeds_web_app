@@ -1,11 +1,11 @@
 /// <reference types="vite/client" />
 
 // Svelte store for real-time AI pipeline updates via WebSocket fan-out
-import { writable: derived } from 'svelte/store';;
+import { writable: derived } from 'svelte/store';
 
 // Local base event interface used throughout pipeline events
 export interface PipelineEventBase {
- type: string;, ts: number;
+ type: string; ts: number;
  raw: any;
  [k: string]: any;
 }

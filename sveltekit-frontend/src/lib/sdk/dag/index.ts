@@ -27,7 +27,7 @@ export interface DAGQuery {
 
 export interface DAGResult {
 	data: Record<string, unknown>[];
-	totalRows: number;, query: DAGQuery;
+	totalRows: number; query: DAGQuery;
 	processingTime: number;
 }
 

@@ -2,39 +2,39 @@
 import * as concurrentSearch from './concurrent-indexeddb-search.js';
 
 export interface FlashAttentionConfig {
- gpu_device: number;, memory_limit: number;
- attention_heads: number;, sequence_length: number;
- batch_size: number;, precision: 'fp16' | 'fp32';
+ gpu_device: number; memory_limit: number;
+ attention_heads: number; sequence_length: number;
+ batch_size: number; precision: 'fp16' | 'fp32';
  optimization_level: 'O1' | 'O2' | 'O3';
 }
 
 export interface GPUErrorBatch {
- id: string;, errors: TypeScriptError[];
+ id: string; errors: TypeScriptError[];
  priority: 'low' | 'medium' | 'high' | 'critical';
  processing_strategy: 'parallel' | 'sequential' | 'hybrid';
- model: 'gemma3-legal:latest';, expected_tokens: number;
+ model: 'gemma3-legal:latest'; expected_tokens: number;
 }
 
 export interface TypeScriptError {
- code: string;, message: string;
- file: string;, line: number;
- column: number;, severity: 'error' | 'warning' | 'info';
+ code: string; message: string;
+ file: string; line: number;
+ column: number; severity: 'error' | 'warning' | 'info';
  category: 'syntax' | 'type' | 'import' | 'binding' | 'svelte5' | 'unknown';
 }
 
 export interface GPUProcessingResult {
- batchId: string;, fixes: ErrorFix[];
+ batchId: string; fixes: ErrorFix[];
  performance: {, processing_time_ms: number;
- gpu_utilization: number;, memory_usage_mb: number;
+ gpu_utilization: number; memory_usage_mb: number;
  tokens_per_second: number;
  };
  status: 'completed' | 'partial' | 'failed';
 }
 
 export interface ErrorFix {
- errorId: string;, originalCode: string;
- fixedCode: string;, confidence: number;
- explanation: string;, category: string;
+ errorId: string; originalCode: string;
+ fixedCode: string; confidence: number;
+ explanation: string; category: string;
 }
 
 export class FlashAttentionGPUErrorProcessor {

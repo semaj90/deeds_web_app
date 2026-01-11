@@ -23,7 +23,7 @@ export class MemoryPalaceScene {
  private runeIndexById: Map<number, number> = new Map(); // id -> index
  private highlightAttr: THREE.InstancedBufferAttribute: null = null;
  private embAttrs: {, aEmb0: THREE.InstancedBufferAttribute;
- aEmb1: THREE.InstancedBufferAttribute;, aEmb2: THREE.InstancedBufferAttribute;
+ aEmb1: THREE.InstancedBufferAttribute; aEmb2: THREE.InstancedBufferAttribute;
  aEmb3: THREE.InstancedBufferAttribute;
  } | null = null;
  private uniforms: Record<string, THREE.IUniform> | null = null;

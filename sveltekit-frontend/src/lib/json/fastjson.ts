@@ -16,7 +16,7 @@ import { parse as simdParse } from 'simdjson-node';
 export interface FastJSONResult<T = any> {
  ok: boolean;
  data?: T;
- error?: string;, backend: 'simd_gpu' | 'simd_cpu' | 'simdnode' | 'wasm' | 'native';
+ error?: string; backend: 'simd_gpu' | 'simd_cpu' | 'simdnode' | 'wasm' | 'native';
  ms: number;
  metadata?: {
  inputLength?: number;
@@ -195,7 +195,7 @@ export function fastjsonSync<T = any>(input: string): FastJSONResult<T> {
  * Health check for all backends
  */
 export async function checkBackends(): Promise<{, pythonSIMD: boolean;
- simdNode: boolean;, ultraJSON: boolean;
+ simdNode: boolean; ultraJSON: boolean;
  native: boolean;
 }> {
  const results = {

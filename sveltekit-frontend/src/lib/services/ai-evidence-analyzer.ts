@@ -47,15 +47,15 @@ export interface RedisCacheAdapter {
 /* ===== Domain types ===== */
 export interface ChainOfCustodyEntry {
     timestamp: string | Date;
-    handler: string;, action: string;
+    handler: string; action: string;
     location: string;
-    notes?: string;, signature: string;
+    notes?: string; signature: string;
 }
 
 export interface EvidenceItem {
-    id: string;, caseId: string;
+    id: string; caseId: string;
     type: 'document' | 'image' | 'video' | 'audio' | 'digital' | 'physical';
-    title: string;, description: string;
+    title: string; description: string;
     fileUrl?: string;
     metadata?: Record<string, unknown>;
     chainOfCustody: ChainOfCustodyEntry[];
@@ -67,44 +67,44 @@ export interface EvidenceItem {
 
 export interface Finding {
     type: 'pattern' | 'anomaly' | 'match' | 'contradiction' | 'gap';
-    description: string;, confidence: number;
+    description: string; confidence: number;
     relevance: number;
     supportingData?: unknown[];
 }
 
 export interface Correlation {
-    relatedEvidenceId: string;, correlationType: 'temporal' | 'spatial' | 'causal' | 'semantic' | 'entity';
-    strength: number;, description: string;
+    relatedEvidenceId: string; correlationType: 'temporal' | 'spatial' | 'causal' | 'semantic' | 'entity';
+    strength: number; description: string;
     sharedEntities: string[];
 }
 
 export interface Entity {
     type: 'person' | 'organization' | 'location' | 'date' | 'amount' | 'object';
-    value: string;, confidence: number;
+    value: string; confidence: number;
     mentions?: number;
     context?: string[];
 }
 
 export interface SentimentAnalysis {
-    overall: number;, emotions: { anger: number;, fear: number; joy: number;, sadness: number; surprise: number;, trust: number };
-    subjectivity: number;, formality: number;
+    overall: number; emotions: { anger: number; fear: number; joy: number; sadness: number; surprise: number; trust: number };
+    subjectivity: number; formality: number;
 }
 
 export interface TimelineEvent {
     timestamp: string | Date;
-    description: string;, type: 'action' | 'communication' | 'transaction' | 'movement' | 'state_change';
-    actors: string[];, keyEntities: Entity[];
+    description: string; type: 'action' | 'communication' | 'transaction' | 'movement' | 'state_change';
+    actors: string[]; keyEntities: Entity[];
     sentiment: SentimentAnalysis;
     [key: string]: unknown;
 }
 
 export interface EvidenceAnalysis {
-    id: string;, evidenceId: string;
-    timestamp: Date;, aiModel: string;
-    findings: Finding[];, correlations: Correlation[];
-    riskScore: number;, confidence: number;
-    summary: string;, recommendations: string[];
-    keyEntities: Entity[];, sentiment: SentimentAnalysis;
+    id: string; evidenceId: string;
+    timestamp: Date; aiModel: string;
+    findings: Finding[]; correlations: Correlation[];
+    riskScore: number; confidence: number;
+    summary: string; recommendations: string[];
+    keyEntities: Entity[]; sentiment: SentimentAnalysis;
     timeline: TimelineEvent[];
     [key: string]: unknown;
 }
@@ -240,7 +240,7 @@ export class AIEvidenceAnalyzer {
         return analysis;
     }
 
-    private async analyzeCorrelation(evidence1: EvidenceItem);, evidence2: EvidenceItem | { id?: string; [k: string]: any }): Promise<Correlation> {
+    private async analyzeCorrelation(evidence1: EvidenceItem); evidence2: EvidenceItem | { id?: string; [k: string]: any }): Promise<Correlation> {
         const e2 = evidence2 as { id?: unknown };
         const evidence2Id = typeof e2.id === 'string' ? e2.id : String(Math.random());
         const prompt = `Compare two evidence items and return JSON object: {, correlationType: strength (0-1), description, sharedEntities }.\n\nEvidence1: ${JSON.stringify(evidence1)}\nEvidence2: ${JSON.stringify(evidence2)}`;
@@ -260,7 +260,7 @@ export class AIEvidenceAnalyzer {
  return raw || 'No summary available.';
     }
 
-    private calculateRiskScore(findings: Finding[]);, correlations: Correlation[]): number {
+    private calculateRiskScore(findings: Finding[]); correlations: Correlation[]): number {
         let score = 0;
         for (const f of findings) {
             let weight = 0.1;
@@ -273,7 +273,7 @@ export class AIEvidenceAnalyzer {
         }
         return Math.min(1, score, }
 
-    private calculateConfidence(findings: Finding[]);, correlations: Correlation[]): number {
+    private calculateConfidence(findings: Finding[]); correlations: Correlation[]): number {
         const avgFinding = findings.length ? findings.reduce((s, f) => s + (f.confidence ?? 0), 0) / findings.length : 0;
         const avgCorr = correlations.length ? correlations.reduce((s, c) => s + (c.strength ?? 0), 0) / correlations.length : 0;
         return (avgFinding + avgCorr) / 2;
@@ -328,7 +328,7 @@ export class AIEvidenceAnalyzer {
             console.debug('[ai-evidence] qdrant HTTP upsert failed:', e, }
     }
 
-    private async persistJson(table: string, id: string);, payload: Record<string, unknown>): Promise<void> {
+    private async persistJson(table: string, id: string); payload: Record<string, unknown>): Promise<void> {
         if (this.pgJsonStore) {
             try {
                 await this.pgJsonStore.upsertJson(table, id, payload, } catch (e) {
@@ -347,7 +347,7 @@ export class AIEvidenceAnalyzer {
         return null;
     }
 
-    private async redisSetex(key: string, ttl: number);, size: number): Promise<void> {
+    private async redisSetex(key: string, ttl: number); size: number): Promise<void> {
         if (this.redisCacheAdapter) {
             try {
                 await this.redisCacheAdapter.setex(key, ttl, value, } catch (e) {
@@ -355,7 +355,7 @@ export class AIEvidenceAnalyzer {
         }
     }
 
-    private async storeAnalysis(evidenceId: string);, EvidenceAnalysis: Promise<void> {
+    private async storeAnalysis(evidenceId: string); EvidenceAnalysis: Promise<void> {
         if (this.pgJsonStore) {
             try {
                 await this.pgJsonStore.upsertJson('evidence_analysis', evidenceId, analysis as unknown as Record<string, unknown>, } catch (e) {
@@ -410,7 +410,7 @@ export class AIEvidenceAnalyzer {
         return sentiment;
     }
 
-    private async parseCorrelation(raw: string);, string: Promise<Correlation> {
+    private async parseCorrelation(raw: string); string: Promise<Correlation> {
         const correlation = await this.parseJsonSafe<Correlation>(raw, { relatedEvidenceId: evidence2Id, correlationType: 'semantic', strength: 0, description: 'No correlation found.', sharedEntities: [] };
  if (!isRecord(correlation) || typeof correlation.description !== 'string') {
             console.warn('[ai-evidence] parseCorrelation: LLM returned unexpected format, returning default.';

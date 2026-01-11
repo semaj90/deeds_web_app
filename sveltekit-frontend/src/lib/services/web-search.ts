@@ -7,15 +7,15 @@
 import type { timestamp } from "drizzle-orm/gel-core";
 
 interface SearchResult {
- id: string;, title: string;
- url: string;, snippet: string;
+ id: string; title: string;
+ url: string; snippet: string;
  source: string;
- favicon?: string;, relevance: number;
+ favicon?: string; relevance: number;
  timestamp?: Date;
 }
 
 interface CacheEntry {
- results: SearchResult[];, timestamp: number;
+ results: SearchResult[]; timestamp: number;
  ttl: number; // milliseconds
 }
 

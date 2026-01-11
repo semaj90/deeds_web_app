@@ -8,13 +8,13 @@ import type { AITask, APIResponse, WorkerStatus, WorkerMessage, WorkerMessageTyp
 export type ServiceStatus = 'operational' | 'degraded' | 'offline' | 'unknown';
 
 export interface Evidence {
-    id: string;, type: string;
+    id: string; type: string;
     content: string;
     metadata?: { [key: string]: any };
 }
 
 export interface LegalCase {
-    id: string;, title: string;
+    id: string; title: string;
     status: string;
     description?: string;
 }

@@ -1,5 +1,5 @@
 export type ExtractedPerson = {
- fullName: string;, role: 'suspect' | 'victim' | 'witness' | 'other';
+ fullName: string; role: 'suspect' | 'victim' | 'witness' | 'other';
  riskLevel?: 'low' | 'medium' | 'high';
  notes?: string;
 };

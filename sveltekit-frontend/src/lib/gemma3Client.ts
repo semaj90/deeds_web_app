@@ -6,7 +6,7 @@ export interface ChatMessage {
 }
 
 export interface ChatCompletionRequest {
-	model?: string;, messages: ChatMessage[];
+	model?: string; messages: ChatMessage[];
 	temperature?: number;
 	top_p?: number;
 	max_tokens?: number;
@@ -14,18 +14,18 @@ export interface ChatCompletionRequest {
 }
 
 export interface ChatCompletionResponse {
-	id: string;, object: string;
-	created: number;, model: string;
+	id: string; object: string;
+	created: number; model: string;
 	choices: Array<{
 		index?: number;
 		message?: { role?: string; content?: string };
 		finish_reason?: string;
 	}>;
-	usage?: {, prompt_tokens: number; completion_tokens: number;, total_tokens: number };
+	usage?: {, prompt_tokens: number; completion_tokens: number; total_tokens: number };
 }
 
 export interface CompletionRequest {
-	model?: string;, prompt: string;
+	model?: string; prompt: string;
 	temperature?: number;
 	top_p?: number;
 	max_tokens?: number;
@@ -33,10 +33,10 @@ export interface CompletionRequest {
 }
 
 export interface CompletionResponse {
-	id: string;, object: string;
-	created: number;, model: string;
+	id: string; object: string;
+	created: number; model: string;
 	choices: Array<{ index?: number; text?: string; finish_reason?: string }>;
-	usage?: {, prompt_tokens: number; completion_tokens: number;, total_tokens: number };
+	usage?: {, prompt_tokens: number; completion_tokens: number; total_tokens: number };
 }
 
 export type ServerInfo = { backend?: string; version?: string; [k: string]: unknown };

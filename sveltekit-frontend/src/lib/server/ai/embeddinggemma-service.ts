@@ -13,13 +13,13 @@ export interface EmbeddingOptions {
 }
 
 export interface EmbeddingResult {
- embedding: number[];, model: string;
- dimensions: number;, cached: boolean;
+ embedding: number[]; model: string;
+ dimensions: number; cached: boolean;
  processingTimeMs: number;
 }
 
 export interface BatchEmbeddingResult {
- embeddings: EmbeddingResult[];, totalProcessingTimeMs: number;
+ embeddings: EmbeddingResult[]; totalProcessingTimeMs: number;
  cacheHitRatio: number;
 }
 

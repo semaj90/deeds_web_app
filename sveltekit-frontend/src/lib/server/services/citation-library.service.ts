@@ -8,17 +8,17 @@ import { redis } from '$lib/server/redis';
 import { auditService } from './audit.service.js';
 
 export interface CitationCollection {
- id: string, user_id: string;, name: string;
- description?: string;, is_public: boolean;
- citation_count?: number;, created_at: Date, updated_at: Date;
+ id: string, user_id: string; name: string;
+ description?: string; is_public: boolean;
+ citation_count?: number; created_at: Date, updated_at: Date;
 }
 
 export interface CollectionCitation {
- id: string, collection_id: string;, citation_id: string, added_at: Date;
+ id: string, collection_id: string; citation_id: string, added_at: Date;
 }
 
 export interface CitationTag {
- id: string, citation_id: string;, tag: string, created_at: Date;
+ id: string, citation_id: string; tag: string, created_at: Date;
 }
 
 export interface CreateCollectionRequest {

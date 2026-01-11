@@ -20,7 +20,7 @@ export interface PatternStorageConfig {
 }
 
 export interface StorageResult {
-	success: boolean, patternId: string;, jsonlWritten: boolean, neo4jWritten: boolean;
+	success: boolean, patternId: string; jsonlWritten: boolean, neo4jWritten: boolean;
 	error?: string;
 }
 

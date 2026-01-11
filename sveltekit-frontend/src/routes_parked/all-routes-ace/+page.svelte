@@ -35,7 +35,7 @@ https://svelte.dev/e/element_invalid_closing_tag -->
  let viewMode = $state<'pipeline' | 'errors' | 'routes'>('pipeline');
 
  // ACE Pipeline State
- let pipelineState = $state<Record<StageKey, { progress: number;, status: StageStatus; results?: any }>>({
+ let pipelineState = $state<Record<StageKey, { progress: number; status: StageStatus; results?: any }>>({
  webCrawl: {, progress: 0, status: 'idle' },
  vlmProcess: {, progress: 0, status: 'idle' },
  graphBuild: {, progress: 0, status: 'idle' },
@@ -44,15 +44,15 @@ https://svelte.dev/e/element_invalid_closing_tag -->
  });
 
  let isProcessing = $state(false);
- let processingLogs = $state<Array<{ time: string;, stage: string; message: string;, level: 'info' | 'success' | 'error' | 'warn' }>>([]);
+ let processingLogs = $state<Array<{ time: string; stage: string; message: string; level: 'info' | 'success' | 'error' | 'warn' }>>([]);
 
  // Error Detection Results
  let detectedErrors = $state<Array<{
- id: string;, route: string;
+ id: string; route: string;
  type: 'syntax' | 'runtime' | 'ui' | 'accessibility' | 'performance';
  severity: 'critical' | 'high' | 'medium' | 'low';
- message: string;, suggestion: string;
- autoFixable: boolean;, fixed: boolean;
+ message: string; suggestion: string;
+ autoFixable: boolean; fixed: boolean;
  }>>([]);
 
  // Route Discovery

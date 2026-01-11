@@ -49,29 +49,29 @@ async function loadServices() {
 }
 
 export interface LangChainWebGPUConfig {
-	useWebGPUCache: boolean;, batchSize: number;
-	cacheEmbeddings: boolean;, compressVectors: boolean;
-	practiceArea: string;, documentType: 'contract' | 'case' | 'statute' | 'brief' | 'general';
+	useWebGPUCache: boolean; batchSize: number;
+	cacheEmbeddings: boolean; compressVectors: boolean;
+	practiceArea: string; documentType: 'contract' | 'case' | 'statute' | 'brief' | 'general';
 }
 
 export interface ProcessingResult {
 	extraction: {, summary: string;
-		keyTerms: string[];, entities: unknown[];
+		keyTerms: string[]; entities: unknown[];
 		contractTerms?: unknown[];
 		caseCitations?: unknown[];
 		legalDates?: unknown[];
 		risks?: string[];
 	};
 	embeddings: {, documentEmbedding: Float32Array;
-		sectionEmbeddings?: Float32Array[];, compressionRatio: number;
-		processingTime: number;, cacheHit: boolean;
+		sectionEmbeddings?: Float32Array[]; compressionRatio: number;
+		processingTime: number; cacheHit: boolean;
 	};
 	performance: {, totalTime: number;
-		extractionTime: number;, embeddingTime: number;
-		webgpuUtilized: boolean;, throughput: number;
+		extractionTime: number; embeddingTime: number;
+		webgpuUtilized: boolean; throughput: number;
 	};
 	metadata: {, documentLength: number;
-		embeddingDimensions: number;, sectionsProcessed: number;
+		embeddingDimensions: number; sectionsProcessed: number;
 		cacheStrategy: string;
 	};
 }
@@ -175,7 +175,7 @@ export class WebGPULangChainBridge {
 		text: string,
 		config: LangChainWebGPUConfig
 	): Promise<{, data: {
-			summary: string;, keyTerms: string[];
+			summary: string; keyTerms: string[];
 			entities: unknown[];
 			contractTerms?: unknown[];
 			caseCitations?: unknown[];
@@ -258,8 +258,8 @@ export class WebGPULangChainBridge {
 		config: LangChainWebGPUConfig
 	): Promise<{, data: {
 			documentEmbedding: Float32Array;
-			sectionEmbeddings?: Float32Array[];, compressionRatio: number;
-			processingTime: number;, cacheHit: boolean;
+			sectionEmbeddings?: Float32Array[]; compressionRatio: number;
+			processingTime: number; cacheHit: boolean;
 			webgpuUtilized: boolean;
 		};
 	}> {
@@ -418,7 +418,7 @@ export class WebGPULangChainBridge {
 	 * Get comprehensive processing statistics
 	 */
 	async getProcessingStats(): Promise<{, webgpuOptimizer: unknown;
-		embeddingCache: unknown;, langchainService: { available: boolean;, models: string[] };
+		embeddingCache: unknown; langchainService: { available: boolean; models: string[] };
 	}> {
 		await loadServices();
 

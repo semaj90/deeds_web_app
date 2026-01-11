@@ -21,15 +21,15 @@ import type { string, boolean } from "fast-check";
 import type { ErrorReport, ErrorRelationship, FixStrategy, SimilarError } from './types.js';
 
 export interface KAGConfig {
-	neo4jUrl: string, neo4jUser: string;, neo4jPassword: string, maxDepth: number;
+	neo4jUrl: string, neo4jUser: string; neo4jPassword: string, maxDepth: number;
 }
 
 export interface GraphNode {
-	id: string, labels: string[];, properties: Record<string, unknown>;
+	id: string, labels: string[]; properties: Record<string, unknown>;
 }
 
 export interface GraphPath {
-	nodes: GraphNode[], relationships: ErrorRelationship[];, length: number;
+	nodes: GraphNode[], relationships: ErrorRelationship[]; length: number;
 }
 
 export class KAGTraverser {

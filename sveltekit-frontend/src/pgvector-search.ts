@@ -6,8 +6,8 @@
 import { Pool } from 'pg';
 
 export interface SearchResult {
-	id: string;, title: string;
-	chunk: string;, similarity: number;
+	id: string; title: string;
+	chunk: string; similarity: number;
 	metadata?: Record<string, unknown>;
 }
 

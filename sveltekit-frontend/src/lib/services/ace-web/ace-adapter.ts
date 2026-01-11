@@ -18,7 +18,7 @@ import type { ContextBundle, ToolPlan } from './ace-context-service.js';
 
 export interface AceRequest {
   userRequest: string;
-  errorContext?: {, message: string; filePath: string;, lineNumber: number;
+  errorContext?: {, message: string; filePath: string; lineNumber: number;
     code?: string;
   };
   systemRules?: string;
@@ -27,11 +27,11 @@ export interface AceRequest {
 }
 
 export interface AceResponse {
-  response: string;, context: ContextBundle;
+  response: string; context: ContextBundle;
   toolCalls: Array<{, tool: string; params: Record<string, unknown>;
     reason: string;
   }>;
-  metadata: {, sessionId: string; timestamp: string;, contextQuality: 'sufficient' | 'stale' | 'insufficient'; webSearchTriggered: boolean;, llmProvider: string;
+  metadata: {, sessionId: string; timestamp: string; contextQuality: 'sufficient' | 'stale' | 'insufficient'; webSearchTriggered: boolean; llmProvider: string;
   };
 }
 

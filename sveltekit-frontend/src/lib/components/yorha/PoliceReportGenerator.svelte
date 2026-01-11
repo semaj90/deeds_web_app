@@ -3,7 +3,7 @@ import { createEventDispatcher } from 'svelte';
  // Migrated from createEventDispatcher to callback props;
 
  interface Evidence {
- id: string;, title: string;
+ id: string; title: string;
  description?: string;
  content?: string;
  fileName?: string;
@@ -11,11 +11,11 @@ import { createEventDispatcher } from 'svelte';
 
  interface PoliceReport {
  id: string;
- caseId?: string;, generatedAt: string;
- type: string;, content: string;
+ caseId?: string; generatedAt: string;
+ type: string; content: string;
  sections: Array<{, title: string; content: string }>;
  metadata: {, narrativeProvided: boolean;
- evidenceCount: number;, model: string;
+ evidenceCount: number; model: string;
  };
  }
 
@@ -109,7 +109,7 @@ import { createEventDispatcher } from 'svelte';
  body { font-family: 'Times New Roman', serif; margin: 40px; line-height: 1.6; }
  h1 { color: #1f2937; border-bottom: 2px solid #1f2937; padding-bottom: 10px; }
  h2 { color: #374151; margin-top: 30px; }
- .metadata { background: #f3f4f6;, padding: 15px; border-radius: 5px;, margin: 20px 0; }
+ .metadata { background: #f3f4f6; padding: 15px; border-radius: 5px; margin: 20px 0; }
  .section { margin: 20px 0; }
  </style>
  </head>

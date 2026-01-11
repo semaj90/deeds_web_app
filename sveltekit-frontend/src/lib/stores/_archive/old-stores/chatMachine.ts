@@ -8,52 +8,52 @@ import type { setup, assign, fromPromise } from 'xstate';
 
 // Local chat types to satisfy references
 export interface ChatMessage {
- id: string;, content: string;
+ id: string; content: string;
  role: 'user' | 'assistant' | 'system';
  timestamp: Date;
  conversationId?: string;
 }
 
 export interface Conversation {
- id: string;, title: string;
- createdAt: Date;, messages: ChatMessage[];
+ id: string; title: string;
+ createdAt: Date; messages: ChatMessage[];
 }
 
 export interface ChatSettings {
- model: string;, temperature: number;
- maxTokens: number;, streaming: boolean;
+ model: string; temperature: number;
+ maxTokens: number; streaming: boolean;
  contextWindow: number;
  proactiveMode?: boolean;
  emotionalMode?: boolean;
 }
 
 export interface ChatContext {
- messages: ChatMessage[];, conversations: Conversation[];
+ messages: ChatMessage[]; conversations: Conversation[];
  currentConversation: Conversation | null;
  error: Error | null;
- settings: ChatSettings;, stream: ReadableStream<string> | null;
+ settings: ChatSettings; stream: ReadableStream<string> | null;
  modelStatus: 'unknown' | 'loading' | 'ready' | 'error';
  contextInjection: {, enabled: boolean;
- documents: string[];, vectorResults: any[];
+ documents: string[]; vectorResults: any[];
  };
 }
 
 export type ChatEvent =
- | { type: 'SEND_MESSAGE';, message: string }
- | { type: 'RECEIVE_MESSAGE';, message: string; metadata?: any }
+ | { type: 'SEND_MESSAGE'; message: string }
+ | { type: 'RECEIVE_MESSAGE'; message: string; metadata?: any }
  | { type: 'START_STREAMING' }
- | { type: 'STREAM_CHUNK';, chunk: string }
+ | { type: 'STREAM_CHUNK'; chunk: string }
  | { type: 'STREAM_COMPLETE' }
- | { type: 'STREAM_ERROR';, error: Error }
+ | { type: 'STREAM_ERROR'; error: Error }
  | { type: 'NEW_CONVERSATION'; title?: string }
- | { type: 'LOAD_CONVERSATION';, conversationId: string }
- | { type: 'DELETE_CONVERSATION';, conversationId: string }
- | { type: 'UPDATE_SETTINGS';, settings: Partial<ChatSettings> }
- | { type: 'INJECT_CONTEXT';, documents: string[] }
+ | { type: 'LOAD_CONVERSATION'; conversationId: string }
+ | { type: 'DELETE_CONVERSATION'; conversationId: string }
+ | { type: 'UPDATE_SETTINGS'; settings: Partial<ChatSettings> }
+ | { type: 'INJECT_CONTEXT'; documents: string[] }
  | { type: 'CLEAR_CONTEXT' }
  | { type: 'CHECK_MODEL_STATUS' }
  | { type: 'MODEL_READY' }
- | { type: 'MODEL_ERROR';, error: Error }
+ | { type: 'MODEL_ERROR'; error: Error }
  | { type: 'CLEAR_ERROR' }
  | { type: 'RESET_CHAT' };
 

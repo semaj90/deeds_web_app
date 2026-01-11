@@ -19,13 +19,13 @@
 
 <style>
   .theme-provider {
-    min-height: 100%;, display: block;
+    min-height: 100%; display: block;
   }
   .theme-provider.light {
-    --bg: #ffffff --text: #111111 background-color: var(--bg);, color: var(--text);
+    --bg: #ffffff --text: #111111 background-color: var(--bg); color: var(--text);
   }
   .theme-provider.dark {
-    --bg: #0b0b0b --text: #f5f5f5 background-color: var(--bg);, color: var(--text);
+    --bg: #0b0b0b --text: #f5f5f5 background-color: var(--bg); color: var(--text);
   }
 </style>
 

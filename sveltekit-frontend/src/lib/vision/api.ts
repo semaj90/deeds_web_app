@@ -4,14 +4,14 @@
  */
 
 export interface ImageAnalysisResult {
- qdrant_id: string;, object_key: string;
+ qdrant_id: string; object_key: string;
  vector?: number[];
  thumbnail_url?: string;
 }
 
 export interface VideoAnalysisResult {
  frames: Array<{, qdrant_id: string;
- thumb_key: string;, frame_index: number;
+ thumb_key: string; frame_index: number;
  timestamp_ms: number;
  }>;
 }
@@ -47,7 +47,7 @@ export async function getSimilaritySearch(
  limit: number = 10
 ): Promise<
  Array<{
- id: string;, score: number;
+ id: string; score: number;
  payload?: any;
  }>
 > {

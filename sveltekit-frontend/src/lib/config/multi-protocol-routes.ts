@@ -7,15 +7,15 @@
  */
 
 export interface ServiceConfig {
- name: string;, port: number;
+ name: string; port: number;
  protocols: ('http' | 'grpc' | 'quic' | 'ws' | 'sse')[];
  healthEndpoint: string;
- binary?: string;, tier: number;
+ binary?: string; tier: number;
  priority: 'critical' | 'high' | 'medium' | 'low';
 }
 
 export interface ProtocolRoute {
- service: string;, endpoint: string;
+ service: string; endpoint: string;
  protocols: {
  http?: string;
  grpc?: string;
@@ -23,7 +23,7 @@ export interface ProtocolRoute {
  ws?: string;
  sse?: string;
  };
- fallback: string[];, timeout: number;
+ fallback: string[]; timeout: number;
 }
 
 // Complete 37 Services Configuration using existing binaries

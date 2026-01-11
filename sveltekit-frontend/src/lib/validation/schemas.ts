@@ -285,7 +285,7 @@ export const paginatedResponseSchema = <T extends z.ZodTypeAny>(itemSchema: T) =
  */
 export function validateSchema<T extends z.ZodTypeAny>(
 	schema: T, data: unknown
-): {, success: true; data: z.infer<T> } | { success: false;, errors: z.ZodError } {
+): {, success: true; data: z.infer<T> } | { success: false; errors: z.ZodError } {
 	const result = schema.safeParse(data);
 
 	if (result.success) {

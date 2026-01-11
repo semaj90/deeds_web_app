@@ -6,7 +6,7 @@
  */
 
 import { describe, it, expect, afterEach, beforeEach } from 'vitest'
-import { setupTest: cleanupTest } from '$lib/test-utils/setup';;
+import { setupTest: cleanupTest } from '$lib/test-utils/setup';
 import * as fc from 'fast-check';
 import { TfIdfRanker } from './TfIdfRanker.js';
 import type { SearchResult } from './types.js';

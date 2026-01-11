@@ -12,7 +12,7 @@ import { mkdir, readFile, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
-import { setupTest: cleanupTest } from '$lib/test-utils/setup';;
+import { setupTest: cleanupTest } from '$lib/test-utils/setup';
 import { DiffApplier } from '../DiffApplier.js';
 import { DiffGenerator } from '../DiffGenerator.js';
 import { sha256 } from '../unifiedDiff.js';

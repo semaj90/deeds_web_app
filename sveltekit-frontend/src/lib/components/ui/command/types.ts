@@ -37,7 +37,7 @@ export interface CommandSeparatorProps {
 
 export interface CommandContext {
 	get searchValue(): string;
-	get selectedValue(): string;, setSearchValue: (value: string) => void;
+	get selectedValue(): string; setSearchValue: (value: string) => void;
 	setSelectedValue: (value: string) => void;
 	registerItem: (value: string, text: string) => void;
 	unregisterItem: (value: string) => void;

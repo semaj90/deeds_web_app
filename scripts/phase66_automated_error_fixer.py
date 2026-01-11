@@ -68,7 +68,10 @@ def get_error_patterns() -> str:
             shell=True
         )
 
-        output = result.stdout + result.stderr
+        # Helper to safely get string content
+        stdout_str = result.stdout if result.stdout else ""
+        stderr_str = result.stderr if result.stderr else ""
+        output = stdout_str + stderr_str
 
         patterns = {
             "css_parsing_errors": [],
@@ -156,7 +159,9 @@ def run_specialized_fixer(fixer_name: str) -> str:
 
     scripts = {
         'fix-type-imports': 'scripts/fix-type-imports.mjs',
-        'fix-formdata-corruption': 'scripts/fix-formdata-corruption.mjs'
+        'fix-formdata-corruption': 'scripts/fix-formdata-corruption.mjs',
+        'fix-object-literals': 'scripts/fix-object-literals.mjs',
+        'fix-css-selectors': 'scripts/fix-css-selectors.mjs'
     }
 
     if fixer_name not in scripts:

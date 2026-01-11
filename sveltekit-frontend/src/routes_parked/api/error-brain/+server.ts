@@ -24,10 +24,10 @@ interface AnalyzeErrorRequest {
  * Error analysis response
  */
 interface AnalysisResult {
- id: string;, errorMessage: string;
+ id: string; errorMessage: string;
  analysis: {, errorType: string;
  severity: 'low' | 'medium' | 'high' | 'critical';
- rootCause: string;, suggestedFixes: string[];
+ rootCause: string; suggestedFixes: string[];
  };
  timestamp: string;
  userId?: string;
@@ -37,7 +37,7 @@ interface AnalysisResult {
  * Patch generation request payload
  */
 interface GeneratePatchRequest {
- analysisId: string;, selectedFix: number;
+ analysisId: string; selectedFix: number;
  context?: Record<string, unknown>;
 }
 
@@ -45,10 +45,10 @@ interface GeneratePatchRequest {
  * Patch generation response
  */
 interface PatchResult {
- id: string;, analysisId: string;
+ id: string; analysisId: string;
  patch: {, filePath: string;
  changes: Array<{, type: 'add' | 'remove' | 'modify';
- line: number;, content: string;
+ line: number; content: string;
  }>;
  };
  timestamp: string;
@@ -59,7 +59,7 @@ interface PatchResult {
  * History entry
  */
 interface HistoryEntry {
- id: string;, type: 'analysis' | 'patch' | 'applied';
+ id: string; type: 'analysis' | 'patch' | 'applied';
  data: AnalysisResult | PatchResult;
  timestamp: string;
  userId?: string;

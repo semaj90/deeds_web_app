@@ -75,8 +75,8 @@ https://svelte.dev/e/attribute_invalid_event_handler -->
 
 <style>
  .modal-overlay {
- position: fixed;, top: 0;
- left: 0;, right: 0;
+ position: fixed; top: 0;
+ left: 0; right: 0;
  bottom: 0;
  background-color: rgba(0, 0, 0, 0.5);
  display: flex;
@@ -89,7 +89,7 @@ https://svelte.dev/e/attribute_invalid_event_handler -->
  background: white;
  border-radius: 8px;
  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
- max-width: 500px;, width: 90%;
+ max-width: 500px; width: 90%;
  max-height: 80vh;
  overflow-y: auto;
  }
@@ -97,20 +97,20 @@ https://svelte.dev/e/attribute_invalid_event_handler -->
  .modal-header {
  display: flex;
  justify-content: space-between;
- align-items: center;, padding: 1.5rem;
+ align-items: center; padding: 1.5rem;
  border-bottom: 1px solid #e0e0e0;
  }
 
  .modal-header h2 {
  margin: 0;
- font-size: 1.25rem;, color: #d9534f;
+ font-size: 1.25rem; color: #d9534f;
  }
 
  .close-btn {
- background: none;, border: none;
- font-size: 1.5rem;, cursor: pointer;
- color: #999;, padding: 0;
- width: 30px;, height: 30px;
+ background: none; border: none;
+ font-size: 1.5rem; cursor: pointer;
+ color: #999; padding: 0;
+ width: 30px; height: 30px;
  display: flex;
  align-items: center;
  justify-content: center;
@@ -125,23 +125,23 @@ https://svelte.dev/e/attribute_invalid_event_handler -->
  }
 
  .warning-text {
- font-size: 1rem;, color: #333;
+ font-size: 1rem; color: #333;
  margin: 0 0 1rem 0;
  }
 
  .source-info {
- background-color: #f5f5f5;, padding: 1rem;
+ background-color: #f5f5f5; padding: 1rem;
  border-radius: 4px;
  margin-bottom: 1rem;
  }
 
  .source-info strong {
  display: block;
- margin-bottom: 0.5rem;, color: #333;
+ margin-bottom: 0.5rem; color: #333;
  }
 
  .source-info code {
- background-color: #e8e8e8;, padding: 0.25rem 0.5rem;
+ background-color: #e8e8e8; padding: 0.25rem 0.5rem;
  border-radius: 3px;
  font-family: monospace;
  font-size: 0.9rem;
@@ -160,7 +160,7 @@ https://svelte.dev/e/attribute_invalid_event_handler -->
 
  .instructions ul {
  margin: 0;
- padding-left: 1.5rem;, color: #666;
+ padding-left: 1.5rem; color: #666;
  }
 
  .instructions li {
@@ -168,23 +168,23 @@ https://svelte.dev/e/attribute_invalid_event_handler -->
  }
 
  .legal-notice {
- background-color: #fff3cd;, border: 1px solid #ffc107;
- border-radius: 4px;, padding: 1rem;
+ background-color: #fff3cd; border: 1px solid #ffc107;
+ border-radius: 4px; padding: 1rem;
  margin-bottom: 1rem;
  }
 
  .legal-notice strong {
- color: #856404;, display: block;
+ color: #856404; display: block;
  margin-bottom: 0.5rem;
  }
 
  .legal-notice p {
- margin: 0;, color: #856404;
+ margin: 0; color: #856404;
  font-size: 0.9rem;
  }
 
  .modal-footer {
- display: flex;, gap: 1rem;
+ display: flex; gap: 1rem;
  padding: 1.5rem;
  border-top: 1px solid #e0e0e0;
  justify-content: flex-end;
@@ -194,13 +194,13 @@ https://svelte.dev/e/attribute_invalid_event_handler -->
  .btn-acknowledge {
  padding: 0.75rem 1.5rem;
  border: none;
- border-radius: 4px;, cursor: pointer;
+ border-radius: 4px; cursor: pointer;
  font-size: 0.95rem;
- font-weight: 500;, transition: all 0.2s;
+ font-weight: 500; transition: all 0.2s;
  }
 
  .btn-cancel {
- background-color: #e9ecef;, color: #333;
+ background-color: #e9ecef; color: #333;
  }
 
  .btn-cancel:hover {
@@ -208,7 +208,7 @@ https://svelte.dev/e/attribute_invalid_event_handler -->
  }
 
  .btn-acknowledge {
- background-color: #d9534f;, color: white;
+ background-color: #d9534f; color: white;
  }
 
  .btn-acknowledge:hover {

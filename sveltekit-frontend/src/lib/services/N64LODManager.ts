@@ -6,8 +6,8 @@ import type { Document } from '$lib/types';
  description: string;
 }
 export interface TextureChunk {
- assetId: string;, lodLevel: LODLevel['level'];
- data: ArrayBuffer;, format: 'rgba8unorm' | 'bc1-rgba-unorm';
+ assetId: string; lodLevel: LODLevel['level'];
+ data: ArrayBuffer; format: 'rgba8unorm' | 'bc1-rgba-unorm';
  timestamp: number;
 }
 export interface LODContext {

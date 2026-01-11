@@ -5,8 +5,8 @@
 import {  env  } from '$env /dynamic/public';
 
 export interface JWTPayload {
- sub: string;, email: string;
- role?: string;, exp: number;
+ sub: string; email: string;
+ role?: string; exp: number;
  iat: number;
  [key: string]: any;
 }

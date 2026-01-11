@@ -8,7 +8,7 @@ https://svelte.dev/e/attribute_invalid_name -->
 https://svelte.dev/e/attribute_invalid_name -->
 <!-- src/routes/rag-demo/+page.svelte -->
 <script lang="ts">
- import { onMount } from 'svelte';;
+ import { onMount } from 'svelte';
 
  let documentUrl = '';
  let jobId: string | null = null;

@@ -11,10 +11,10 @@ import { couchdb: aceGraphs } from './couchdb-client.js';
 
 // Universal AST Node types
 export interface UniversalASTNode {
-  id: string;, type: ASTNodeType;
+  id: string; type: ASTNodeType;
   name?: string;
-  kind?: string;, start: number;
-  end: number;, children: UniversalASTNode[];
+  kind?: string; start: number;
+  end: number; children: UniversalASTNode[];
   metadata: Record<string, unknown>;
 }
 
@@ -44,31 +44,31 @@ export type ASTNodeType =
 
 // File analysis result
 export interface FileAST {
-  id: string;, file_path: string;
+  id: string; file_path: string;
   language: 'typescript' | 'javascript' | 'svelte' | 'json' | 'css' | 'unknown';
-  root: UniversalASTNode;, imports: ImportInfo[];
-  exports: ExportInfo[];, dependencies: string[];
-  errors: ErrorInfo[];, metadata: {
-    lines: number;, bytes: number;
-    hash: string;, analyzed_at: string;
+  root: UniversalASTNode; imports: ImportInfo[];
+  exports: ExportInfo[]; dependencies: string[];
+  errors: ErrorInfo[]; metadata: {
+    lines: number; bytes: number;
+    hash: string; analyzed_at: string;
   };
 }
 
 export interface ImportInfo {
-  source: string;, specifiers: string[];
+  source: string; specifiers: string[];
   type: 'default' | 'named' | 'namespace' | 'side-effect';
   line: number;
 }
 
 export interface ExportInfo {
-  name: string;, type: 'default' | 'named' | 'all';
+  name: string; type: 'default' | 'named' | 'all';
   kind: 'function' | 'class' | 'variable' | 'type' | 'interface' | 'component' | 'unknown';
   line: number;
 }
 
 export interface ErrorInfo {
-  line: number;, column: number;
-  code: string;, message: string;
+  line: number; column: number;
+  code: string; message: string;
   severity: 'error' | 'warning' | 'info';
 }
 

@@ -76,7 +76,7 @@ export function getCollectionName(baseName: string): string {
 
 // Export environment check
 export function checkVectorEnvironment(): {, postgres: boolean;
- qdrant: boolean;, ollama: boolean;
+ qdrant: boolean; ollama: boolean;
  redis: boolean;
 } {
  return {

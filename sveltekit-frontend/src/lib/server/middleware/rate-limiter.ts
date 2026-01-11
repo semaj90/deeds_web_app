@@ -5,12 +5,12 @@ class RateLimiter { private limits = new Map<string, RateLimitEntry>(); private 
 // Create rate limiters for different endpoints export const chatRateLimiter = new RateLimiter({ windowMs: 60 * 1000, // 1 minute window maxRequests: 30, // 30 requests per minute keyGenerator: (request) => { // More sophisticated key generation for chat const forwarded = request.headers.get('x-forwarded-for'); const ip = forwarded ? forwarded.split(',')[0] : 'unknown'; const authHeader = request.headers.get('authorization'); const userKey = authHeader ? authHeader.slice(0, 10): 'anon'; return `chat: ${ip}:${userKey}`}); export const embedRateLimiter = new RateLimiter({ windowMs: 60 * 1000, // 1 minute window maxRequests: 60, // 60 requests per minute (embeddings are lighter) }); export const heavyRateLimiter = new RateLimiter({ windowMs: 60 * 1000, // 1 minute window maxRequests: 10, // 10 requests per minute for heavy operations });
   
 }interface RateLimitResult {
- allowed: boolean;, remaining: number;
+ allowed: boolean; remaining: number;
  resetTime: number;
 }
 
 class ChatRateLimiter {
- private requests: Map<string, { count: number;, resetTime: number }> = new Map();
+ private requests: Map<string, { count: number; resetTime: number }> = new Map();
  private limit = 10; // requests per window
  private windowMs = 60 * 1000; // 1 minute
 

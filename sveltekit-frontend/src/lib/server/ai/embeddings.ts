@@ -14,7 +14,7 @@ export interface EmbeddingOptions {
  maxTokens?: number;
 }
 // Simple in-memory TTL cache for embeddings (safe fallback for server-side process)
-const _embeddingCache: Map<string, { value: number[];, expiresAt: number }> = new Map();
+const _embeddingCache: Map<string, { value: number[]; expiresAt: number }> = new Map();
 
 // Default TTL: 24 hours
 const DEFAULT_CACHE_TTL_MS = 24 * 60 * 60 * 1000;

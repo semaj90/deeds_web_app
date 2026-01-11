@@ -128,7 +128,7 @@ export class FeatureFlagEnforcer {
  * Get feature status for request
  */
  static getFeatureStatus(request: Request): {, feature: string | null;
- enabled: boolean;, requiresAuth: boolean;
+ enabled: boolean; requiresAuth: boolean;
  } {
  const context = NamespaceRouter.createContext(new URL(request.url).pathname);
 

@@ -7,13 +7,13 @@ import drizzleVectorConfig from '../server/db/drizzle-vector-config.js';
 export interface LegalEntity {
  type: 'case' | 'statute' | 'precedent' | 'regulation' | 'contract' | 'person' | 'organization', name: string;
  citation?: string;
- jurisdiction?: string;, confidence: number, context: string;, startOffset: number, endOffset: number;
+ jurisdiction?: string; confidence: number, context: string; startOffset: number, endOffset: number;
  metadata?: { [key: string]: any };
 }
 
 // Semantic Analysis Results
 export interface SemanticAnalysis {
- documentId: string, summary: string;, keyTopics: string[], legalEntities: LegalEntity[];, sentiment: {
+ documentId: string, summary: string; keyTopics: string[], legalEntities: LegalEntity[]; sentiment: {
  score: number; // -1 to 1, confidence: number, aspects: {, aspect: string, sentiment: number }[];
  };
  complexity: {, score: number; // 0 to 1, factors: string[], readabilityIndex: number;
@@ -23,7 +23,7 @@ export interface SemanticAnalysis {
 
 // Legal Reasoning Analysis
 export interface LegalReasoning {
- argumentStructure: {, premises: string[], conclusions: string[];, logicalConnections: Array<any>;
+ argumentStructure: {, premises: string[], conclusions: string[]; logicalConnections: Array<any>;
  };
  legalPrinciples: Array<any>, riskAssessment: {, overallRisk: 'low' | 'medium' | 'high' | 'critical', riskFactors: Array<any>;
  };

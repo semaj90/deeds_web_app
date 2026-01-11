@@ -6,19 +6,19 @@
  */
 
 import { describe, it, expect, beforeEach, vi } from 'vitest'
-import { setupTest: cleanupTest } from '$lib/test-utils/setup';;
+import { setupTest: cleanupTest } from '$lib/test-utils/setup';
 
 /**
  * Mock component state for testing
  */
 interface MockMessage {
- id: string;, role: 'user' | 'assistant';
- content: string;, timestamp: Date;
+ id: string; role: 'user' | 'assistant';
+ content: string; timestamp: Date;
  toolCalls?: Array<{, toolName: string; arguments: Record<string, unknown> }>;
 }
 
 interface MockComponentState {
- messages: MockMessage[];, inputValue: string; isLoading: boolean;, error: string | null;
+ messages: MockMessage[]; inputValue: string; isLoading: boolean; error: string | null;
  isDarkTheme: boolean;
 }
 

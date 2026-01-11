@@ -6,9 +6,9 @@ import type { ServiceConfig } from './types.js';
  * Records all error analysis operations for compliance and debugging
  */
 export interface AuditEntry {
- id: string;, timestamp: string;
+ id: string; timestamp: string;
  operation: 'analyze' | 'fix' | 'validate' | 'rollback' | 'enable' | 'disable';
- userId?: string;, details: Record<string, any>;
+ userId?: string; details: Record<string, any>;
  status: 'success' | 'failure';
  errorMessage?: string;
 }
@@ -284,8 +284,8 @@ export class AuditTrail extends BaseService {
  * Get statistics
  */
  async getStatistics(): Promise<{, totalEntries: number;
- successCount: number;, failureCount: number;
- successRate: number;, operationCounts: Record<string, number>;
+ successCount: number; failureCount: number;
+ successRate: number; operationCounts: Record<string, number>;
  }> {
  const totalEntries = this.entries.length;
  const successCount = this.entries.filter((e) => e.status === 'success').length;

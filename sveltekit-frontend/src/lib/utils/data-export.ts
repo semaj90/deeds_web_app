@@ -8,14 +8,14 @@ import {  browser  } from '$app/environment';
 // Export/Import types
 
 // Mock security functions to resolve missing imports and address TODO
-const logSecurityEvent = (event: {, type: string; details: unknown;, severity: string }) => {
+const logSecurityEvent = (event: {, type: string; details: unknown; severity: string }) => {
  console.log('Security Event: ', event);
  // In a real app, this would send logs to a security monitoring service
 };
 
 interface Case {
- id?: string;, title: string;
- description: string;, status: string;
+ id?: string; title: string;
+ description: string; status: string;
  priority: string;
  assignedTo?: string;
  location?: string;
@@ -55,7 +55,7 @@ const secureDataExport = (data: Case[] | EvidenceItem[], user: string) => {
 
 export interface ExportOptions {
  format: 'json' | 'csv' | 'pdf' | 'excel';
- includeMetadata: boolean;, includeFiles: boolean;
+ includeMetadata: boolean; includeFiles: boolean;
  dateRange?: {, start: Date; end: Date };
  filters?: CaseFilters | EvidenceFilters;
  compression?: boolean;
@@ -64,21 +64,21 @@ export interface ExportOptions {
 
 export interface ImportOptions {
  format: 'json' | 'csv' | 'excel';
- validateData: boolean;, mergeStrategy: 'replace' | 'merge' | 'append';
+ validateData: boolean; mergeStrategy: 'replace' | 'merge' | 'append';
  handleDuplicates: 'skip' | 'overwrite' | 'rename';
 }
 
 export interface ExportResult {
- success: boolean;, filename: string;
- size: number;, recordCount: number;
- errors: string[];, warnings: string[];
+ success: boolean; filename: string;
+ size: number; recordCount: number;
+ errors: string[]; warnings: string[];
  blob?: Blob;
 }
 
 export interface ImportResult {
- success: boolean;, imported: number;
- skipped: number;, errors: string[];
- warnings: string[];, summary: Record<string, number>;
+ success: boolean; imported: number;
+ skipped: number; errors: string[];
+ warnings: string[]; summary: Record<string, number>;
 }
 
 // Local lightweight type for evidence items used by export utilities
@@ -454,7 +454,7 @@ function parseCSV(csvText: string): Record<string, unknown>[] {
 function validateImportData(
  data: Record<string, unknown> | Case[] | EvidenceItem[],
  type: 'cases' | 'evidence'
-): {, success: boolean; errors: string[];, warnings: string[] } {
+): {, success: boolean; errors: string[]; warnings: string[] } {
  const errors: string[] = [];
  const warnings: string[] = [];
 

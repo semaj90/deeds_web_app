@@ -261,8 +261,8 @@
  transform: translateY(-1px);
  }
  .metric-group {
- padding: 1rem;, background: rgba(31, 41, 55, 0.5);
- border-radius: 0.5rem;, border: 1px solid rgba(75, 85, 99, 0.3);
+ padding: 1rem; background: rgba(31, 41, 55, 0.5);
+ border-radius: 0.5rem; border: 1px solid rgba(75, 85, 99, 0.3);
  }
  /* Use GPU cache CSS variables */
  :global(.status-page) {

@@ -19,42 +19,42 @@ export interface ContextFilters {
 }
 
 export interface ScoredChunk {
-  id: string;, text: string;
-  docId: string;, score: number;
+  id: string; text: string;
+  docId: string; score: number;
   metadata: {, url: string;
     title?: string;
-    heading?: string;, fetchedAt: string;
+    heading?: string; fetchedAt: string;
     domain: string;
     tags?: string[];
   };
   scoring?: {, cosine: number;
-    freshness: number;, graph: number;
+    freshness: number; graph: number;
   };
 }
 
 export interface ContextBundle {
-  chunks: ScoredChunk[];, entities: Array<{
-    entity: string;, type: string;
+  chunks: ScoredChunk[]; entities: Array<{
+    entity: string; type: string;
     docId: string;
   }>;
   edges: Array<{, src: string;
-    rel: string;, dst: string;
+    rel: string; dst: string;
     weight: number;
   }>;
-  summary: string;, totalResults: number;
+  summary: string; totalResults: number;
 }
 
 export interface ToolAction {
-  tool: string;, params: Record<string, unknown>;
+  tool: string; params: Record<string, unknown>;
   reason: string;
 }
 
 export interface ToolPlan {
-  actions: ToolAction[];, shouldProceed: boolean;
+  actions: ToolAction[]; shouldProceed: boolean;
 }
 
 export interface PromptParams {
-  query: string;, bundle: ContextBundle;
+  query: string; bundle: ContextBundle;
   plan: ToolPlan;
   systemRules?: string;
   projectRules?: string;

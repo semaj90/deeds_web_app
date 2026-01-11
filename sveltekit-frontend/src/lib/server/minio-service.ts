@@ -20,19 +20,19 @@ import type { Readable } from 'stream';
 
 interface MinIOConfig {
  endpoint: string;
- region?: string;, accessKeyId: string; secretAccessKey: string;
+ region?: string; accessKeyId: string; secretAccessKey: string;
  forcePathStyle?: boolean;
 }
 
 export interface FileMetadata {
- key: string;, size: number;
+ key: string; size: number;
  lastModified: Date;
- contentType?: string;, bucket: string;
+ contentType?: string; bucket: string;
 }
 
 export interface TextExtractionResult {
- content: string;, metadata: {
- originalSize: number;, extractedSize: number;
+ content: string; metadata: {
+ originalSize: number; extractedSize: number;
  contentType: string | null; processingTime: number;
  };
 }

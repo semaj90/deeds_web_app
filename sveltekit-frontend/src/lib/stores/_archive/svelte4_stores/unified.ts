@@ -69,7 +69,7 @@ import { xstateIntegration } from '$lib/services/xstate-integration';
 
 // --- User Store Types and Store ---
 export interface UserStoreState {
- isLoggedIn: boolean;, id: string | null; // Added: 'id' property to resolve compilation error
+ isLoggedIn: boolean; id: string | null; // Added: 'id' property to resolve compilation error
  name: string | null;
  email: string | null;
  // ... other user-related properties
@@ -85,12 +85,12 @@ export const user: Readable<UserStoreState> = { subscribe: _user.subscribe };
 
 // --- AI Assistant Store Types and Store ---
 export interface AIMessage {
- id: string;, role: 'user' | 'assistant';
- content: string;, timestamp: number;
+ id: string; role: 'user' | 'assistant';
+ content: string; timestamp: number;
 }
 
 export interface AIAssistantStoreState {
- isOpen: boolean;, currentMessages: AIMessage[]; // Added: 'currentMessages' to resolve compilation error
+ isOpen: boolean; currentMessages: AIMessage[]; // Added: 'currentMessages' to resolve compilation error
  isProcessing: boolean; // Added: 'isProcessing' to resolve compilation error
  error: string | null; // Added: 'error' to resolve compilation error
  currentCaseId: string | null; // To store the caseId for context
@@ -115,9 +115,9 @@ const AI_ASSISTANT_MACHINE_ID = 'aiAssistantMachine'; // As per copilot-instruct
 export type AIAssistantEvent =
  | { type: 'OPEN' }
  | { type: 'CLOSE' }
- | { type: 'SEND_MESSAGE';, payload: { content: string; model?: AIModel; caseId?: string } }
- | { type: 'RECEIVE_MESSAGE';, payload: AIMessage }
- | { type: 'SET_CASE';, payload: { caseId: null } }
+ | { type: 'SEND_MESSAGE'; payload: { content: string; model?: AIModel; caseId?: string } }
+ | { type: 'RECEIVE_MESSAGE'; payload: AIMessage }
+ | { type: 'SET_CASE'; payload: { caseId: null } }
  // Fallback to allow custom/extension events while still avoiding `any`
  | { type: string; [key: string]: unknown };
 
@@ -129,10 +129,10 @@ export function sendToAIAssistant(event: AIAssistantEvent) {
 
 // --- Websocket Store and Helpers ---
 type WebsocketState = {
- connected: boolean;, connecting: boolean;
- dashboardData: {, cases: unknown[]; evidence: unknown[];, stats: Record<string, unknown> };
- processingJobs: unknown[];, recentActivity: unknown[];
- systemHealth: {, api: string; database: string;, aiServices: string; jobQueue: string };
+ connected: boolean; connecting: boolean;
+ dashboardData: {, cases: unknown[]; evidence: unknown[]; stats: Record<string, unknown> };
+ processingJobs: unknown[]; recentActivity: unknown[];
+ systemHealth: {, api: string; database: string; aiServices: string; jobQueue: string };
  activeEditors: Record<string, string[]>;
 };
 

@@ -13,20 +13,20 @@ import { webASMInferenceService } from './webasm-inference-service.js';
 
 export interface UnifiedCacheConfig {
     webasm: {, enableSIMD: boolean;
-        memoryPages: number;, threadCount: number;
+        memoryPages: number; threadCount: number;
         modelCaching: boolean;
     };
     gpu: {, enableWebGPU: boolean;
-        fallbackToWebGL: boolean;, computeShaders: boolean;
+        fallbackToWebGL: boolean; computeShaders: boolean;
         memoryPoolSize: number;
     };
     minio: {, enableCompression: boolean;
-        compressionLevel: number;, cacheTTL: number;
+        compressionLevel: number; cacheTTL: number;
         batchOperations: boolean;
     };
     monitoring: {, enableMetrics: boolean;
-        metricsInterval: number;, performanceThresholds: {
-            maxInferenceTime: number;, minCacheHitRate: number;
+        metricsInterval: number; performanceThresholds: {
+            maxInferenceTime: number; minCacheHitRate: number;
             maxMemoryUsage: number;
         };
     };
@@ -35,18 +35,18 @@ export interface UnifiedCacheConfig {
 export interface SystemHealthMetrics {
     overall: {, healthScore: number;
         status: 'excellent' | 'good' | 'degraded' | 'critical';
-        bottlenecks: string[];, recommendations: string[];
+        bottlenecks: string[]; recommendations: string[];
     };
     webasm: {, activeInferences: number;
-        averageInferenceTime: number;, memoryUsage: number;
+        averageInferenceTime: number; memoryUsage: number;
         throughput: number;
     };
     gpu: {, utilization: number;
-        memoryBandwidth: number;, computeEfficiency: number;
+        memoryBandwidth: number; computeEfficiency: number;
         powerUsage: number;
     };
     cache: {, hitRate: number;
-        compressionRatio: number;, responseTime: number;
+        compressionRatio: number; responseTime: number;
         storageUsage: number;
     };
     timestamp: number;
@@ -55,8 +55,8 @@ export interface SystemHealthMetrics {
 export interface OptimizationSuggestion {
     category: 'performance' | 'memory' | 'cache' | 'gpu';
     priority: 'low' | 'medium' | 'high' | 'critical';
-    issue: string;, solution: string;
-    expectedImprovement: string;, autoApplicable: boolean;
+    issue: string; solution: string;
+    expectedImprovement: string; autoApplicable: boolean;
 }
 
 /**
@@ -100,7 +100,7 @@ export class UnifiedGPUCacheOrchestrator {
     async semanticSearch(
         query: string,
         options: { topK?: number; useCache?: boolean; enableGPUAcceleration?: boolean; filters?: Record<string, unknown> } = {}
-    ): Promise<{, results: unknown[]; metrics: {, totalTime: number; cacheHitRate: number;, gpuAcceleration: boolean; compressionSavings: number } }> {
+    ): Promise<{, results: unknown[]; metrics: {, totalTime: number; cacheHitRate: number; gpuAcceleration: boolean; compressionSavings: number } }> {
         const startTime = performance.now();
         try {
             const cacheKey = `search:${typeof window !== 'undefined' ? btoa(JSON.stringify({ query: options })) : Buffer.from(JSON.stringify({, query: options })).toString('base64')}`;

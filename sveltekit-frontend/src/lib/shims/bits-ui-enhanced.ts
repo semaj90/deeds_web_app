@@ -5,24 +5,24 @@ import type { SvelteComponent } from 'svelte';
 
 // Enhanced Design System Tokens
 export interface DesignTokens {
- colors: {, primary: string; secondary: string;, success: string; warning: string;, error: string; info: string;, background: string; surface: string;, text: {
- primary: string;, secondary: string;
+ colors: {, primary: string; secondary: string; success: string; warning: string; error: string; info: string; background: string; surface: string; text: {
+ primary: string; secondary: string;
  muted: string;
  };
  };
- spacing: {, xs: string; sm: string;, md: string; lg: string;, xl: string; xxl: string;
+ spacing: {, xs: string; sm: string; md: string; lg: string; xl: string; xxl: string;
  };
- borderRadius: {, sm: string; md: string;, lg: string; xl: string;
+ borderRadius: {, sm: string; md: string; lg: string; xl: string;
  };
- shadows: {, sm: string; md: string;, lg: string; xl: string;
+ shadows: {, sm: string; md: string; lg: string; xl: string;
  };
- typography: {, fontFamily: string; fontSize: {, xs: string; sm: string;, md: string; lg: string;, xl: string; xxl: string;
+ typography: {, fontFamily: string; fontSize: {, xs: string; sm: string; md: string; lg: string; xl: string; xxl: string;
  };
- fontWeight: {, normal: number; medium: number;, bold: number;
+ fontWeight: {, normal: number; medium: number; bold: number;
  };
  };
  animations: {, duration: {
- fast: string;, normal: string;
+ fast: string; normal: string;
  slow: string;
  };
  easing: string;
@@ -228,7 +228,7 @@ export {
 
 // Integration helpers
 export interface BitsUIEnhancedConfig {
-	theme: DesignTokens;, component: SvelteComponent;
+	theme: DesignTokens; component: SvelteComponent;
 	variant?: 'nes' | 'minimal' | 'custom';
 	accessibility?: boolean;
 	animations?: boolean;

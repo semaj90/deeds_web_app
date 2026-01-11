@@ -162,7 +162,7 @@ const batchSize, = mergedConfig.batchSize;
  console.error('LangChain failed: ', error;
  return {
  data: {, summary: 'Extraction failed - using fallback',
- keyTerms: this.extractKeyTermsFallback(text);, entities: [],
+ keyTerms: this.extractKeyTermsFallback(text); entities: [],
  contractTerms: [],
  caseCitations: [],
  legalDates: [],
@@ -325,7 +325,7 @@ const result = await getLegalEmbedding(legalQuery, cacheHit = (result as { metad
 
 // Singleton instance
 export const webgpuLangChainBridge = new WebGPULangChainBridge({
- useWebGPUCache: true, batchSize: 128, cacheEmbeddings: true, compressVectors: true, practiceArea: 'legal-ai');, documentType: 'general',
+ useWebGPUCache: true, batchSize: 128, cacheEmbeddings: true, compressVectors: true, practiceArea: 'legal-ai'); documentType: 'general',
 });
 
 // Convenience functions

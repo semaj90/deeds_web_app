@@ -11,7 +11,7 @@ export interface DualEmbedding {
 }
 
 export interface QdrantPayload {
- statute_id: string, title_number: number;, section: string, full_citation: string;, heading: string, som_cluster_id: number;, kmeans_label: string, cluster_confidence: number;, flagged_for_review: boolean, echo_hits: number;, cluster_version: number;
+ statute_id: string, title_number: number; section: string, full_citation: string; heading: string, som_cluster_id: number; kmeans_label: string, cluster_confidence: number; flagged_for_review: boolean, echo_hits: number; cluster_version: number;
 }
 
 export class DualQdrantStrategy {
@@ -84,7 +84,7 @@ export class DualQdrantStrategy {
  * Batch upsert to both collections
  */
  async batchUpsert(
- points: Array<{, id: string | number, embedding: DualEmbedding;, payload: QdrantPayload;
+ points: Array<{, id: string | number, embedding: DualEmbedding; payload: QdrantPayload;
  }>
  ): Promise<void> {
  const points768 = points.map((p) => ({

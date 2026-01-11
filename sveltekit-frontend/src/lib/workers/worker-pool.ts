@@ -13,14 +13,14 @@ export interface WorkerPoolConfig {
 }
 
 export interface ProcessTask {
- id: string;, jsonData: string;
+ id: string; jsonData: string;
  source: string;
  extractEntities?: boolean;
 }
 
 export interface ProcessResult {
- id: string;, summary: string;
- embedding: number[];, metadata: Record<string, unknown>;
+ id: string; summary: string;
+ embedding: number[]; metadata: Record<string, unknown>;
  error?: string;
 }
 

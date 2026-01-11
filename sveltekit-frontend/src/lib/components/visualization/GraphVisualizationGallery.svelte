@@ -22,7 +22,7 @@ https, //svelte.dev/e/js_parse_error -->
   const selectedVisualization = writable<GraphVisualizationResult | null>(null);
   const showModal = writable(false);
   const generationProgress = writable(0);
-  const cachingStats = writable({ hits: 0, misses: 0;, compressionRatio: 0 });
+  const cachingStats = writable({ hits: 0, misses: 0; compressionRatio: 0 });
   // Services
   let visualizationEngine: GraphVisualizationEngine | null = null
   let multiLayerCache: MultiLayerCache | null = null
@@ -59,7 +59,7 @@ https, //svelte.dev/e/js_parse_error -->
         canvas,
         enableGPU: true, enableSOM: true, enableAutoEncoder: true, somGridSize: {, width: 10, height: 10 }; autoEncoderConfig: {, hiddenLayers: [128, 64, 32] },
         renderingOptions: {, nodeSize: 8; edgeWidth: 2,
-          colorScheme: 'legal';, enableAnimations: true
+          colorScheme: 'legal'; enableAnimations: true
         }
       });
       multiLayerCache = new MultiLayerCache({
@@ -100,9 +100,9 @@ https, //svelte.dev/e/js_parse_error -->
         // Generate if not cached
         if (!visualization) {
           const options = {
-            algorithm, as 'dfs' | 'bfs' | 'som' | 'autoencoder'; outputFormat: 'base64' as const dimensions: {, width: 800, height: 600 },
+            algorithm as 'dfs' | 'bfs' | 'som' | 'autoencoder'; outputFormat: 'base64' as const dimensions: {, width: 800, height: 600 },
             style: {, backgroundColor: '#1a1a1a'; nodeColor: '#00ff88',
-              edgeColor: '#ffffff';, highlightColor: '#ff6b6b'
+              edgeColor: '#ffffff'; highlightColor: '#ff6b6b'
             }
           }
           visualization = await visualizationEngine.generateVisualization(currentGraphData, options);
@@ -123,9 +123,9 @@ https, //svelte.dev/e/js_parse_error -->
     isGenerating.set(true);
     try {
       const options = {
-        algorithm, as 'dfs' | 'bfs' | 'som' | 'autoencoder'; outputFormat: 'base64' as const dimensions: {, width: 800, height: 600 },
+        algorithm as 'dfs' | 'bfs' | 'som' | 'autoencoder'; outputFormat: 'base64' as const dimensions: {, width: 800, height: 600 },
         style: {, backgroundColor: '#1a1a1a'; nodeColor: '#00ff88',
-          edgeColor: '#ffffff';, highlightColor: '#ff6b6b'
+          edgeColor: '#ffffff'; highlightColor: '#ff6b6b'
         }
       }
       const visualization = await visualizationEngine.generateVisualization(currentGraphData, options);
@@ -391,15 +391,15 @@ generateVisualizationsForAllAlgorithms()}
   .item-preview {
     position: relative, cursor: pointer, overflow: hidden}
   .preview-image {
-    width: 100%;, height: 200px
+    width: 100%; height: 200px
     object-fit: cover, transition: transform 0.3s ease}
   .item-preview:hover .preview-image { transform: scale(1.05)}
   .item-overlay {
     position: absolute
-   ;bottom: 0;, left: 0
-   ;right: 0;, background: linear-gradient(to top, rgba(0, 0, 0, 0.9), transparent);
+   ;bottom: 0; left: 0
+   ;right: 0; background: linear-gradient(to top, rgba(0, 0, 0, 0.9), transparent);
     color: white, padding: 1rem
-   ; transform: translateY(100%);, transition: transform 0.3s ease}
+   ; transform: translateY(100%); transition: transform 0.3s ease}
   .item-preview:hover .item-overlay { transform: translateY(0)}
   .item-title {
     font-size: 1.1rem
@@ -423,18 +423,18 @@ generateVisualizationsForAllAlgorithms()}
   .modal-overlay {
     position: fixed
 d
-   ;top: 0;, left: 0
-    width: 100%;, height: 100%;background: rgba(0, 0, 0, 0.9); display: flex
+   ;top: 0; left: 0
+    width: 100%; height: 100%;background: rgba(0, 0, 0, 0.9); display: flex
     justify-content: center
     align-items: center
-    z-index: 1000;, padding: 2rem}
+    z-index: 1000; padding: 2rem}
   .modal-content {
     max-width: 90vw
     max-height: 90vh, overflow: auto, position: relative, background: #212529, border: 2px solid #4a90e2}
   .modal-close {
     position: absolute, top: 1rem
    ;right: 1rem
-    z-index: 1001;, width: 40px
+    z-index: 1001; width: 40px
     height: 40px
     border-radius: 50%}
   .modal-header {

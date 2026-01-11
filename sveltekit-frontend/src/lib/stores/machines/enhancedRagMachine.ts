@@ -2,12 +2,12 @@ import { createMachine, fromPromise, assign } from 'xstate';
 import { writable } from 'svelte/store';
 
 export interface RagContext {
- query: string;, results: any[];
+ query: string; results: any[];
  error: string | null;
  loading: boolean;
 }
 
-type RagEvent = { type: 'EXECUTE';, query: string } | { type: 'RESET' } | { type: 'RETRY' };
+type RagEvent = { type: 'EXECUTE'; query: string } | { type: 'RESET' } | { type: 'RETRY' };
 
 export const enhancedRagMachine = createMachine({
  id: 'enhancedRag',

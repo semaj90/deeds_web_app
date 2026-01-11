@@ -2,17 +2,17 @@ import type { PageServerLoad } from './$types';
 
 // Define types for the data we return
 interface FileProfile {
-	file_path: string;, role: string;
-	surface: string[];, dependencies: string[];
-	exports: string[];, imports: string[];
-	comments: string[];, risk: string;
-	change_frequency: string;, related_routes: string[];
-	tags: string[];, summary: string;
+	file_path: string; role: string;
+	surface: string[]; dependencies: string[];
+	exports: string[]; imports: string[];
+	comments: string[]; risk: string;
+	change_frequency: string; related_routes: string[];
+	tags: string[]; summary: string;
 	generated_at: string;
 }
 
 interface Stats {
-	totalFiles: number;, byRole: Record<string, number>;
+	totalFiles: number; byRole: Record<string, number>;
 	byRisk: Record<string, number>;
 	bySurface: Record<string, number>;
 }

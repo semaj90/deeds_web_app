@@ -10,7 +10,7 @@ export type RankExplain = {
 };
 
 export type RankedHit = QdrantHit & {
- finalScore: number;, explain: RankExplain;
+ finalScore: number; explain: RankExplain;
 };
 
 /**
@@ -19,7 +19,7 @@ export type RankedHit = QdrantHit & {
 export function rerankLegalAware(opts: {, hits: QdrantHit[];
  queryTagIds?: string[];
  jurisdiction?: string | null;
- weights?: {, cosine: number; sharedTags: number;, sameJurisdiction: number };
+ weights?: {, cosine: number; sharedTags: number; sameJurisdiction: number };
 }): RankedHit[] {
  const w = opts.weights ?? { cosine: 0.75, sharedTags: 0.15, sameJurisdiction: 0.1 };
  const qTags = new Set(opts.queryTagIds ?? []);

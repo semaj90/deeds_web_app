@@ -1,13 +1,13 @@
 <script lang="ts">
  import type { Document } from '$lib/types';
  import type { browserRAG } from '$lib/ai/browser-rag-chain';
- import { onMount } from 'svelte';;
+ import { onMount } from 'svelte';
  import { Database } from "lucide-svelte";
 import { Lock } from "lucide-svelte";
 import { Zap } from "lucide-svelte";
 import { FileText } from "lucide-svelte";
 import { MessageSquare } from "lucide-svelte";
-import { AlertCircle } from "lucide-svelte";;
+import { AlertCircle } from "lucide-svelte";
 
  // State
  let isInitialized = $state <boolean>(false);
@@ -146,8 +146,8 @@ import { AlertCircle } from "lucide-svelte";;
 
 <style>
  .demo-container {
- min-height: 100vh;, background: #212529;
- color: #d4af37;, padding: 2rem;
+ min-height: 100vh; background: #212529;
+ color: #d4af37; padding: 2rem;
  font-family: 'Press Start 2P', 'Courier New', monospace;
  }
 
@@ -157,14 +157,14 @@ import { AlertCircle } from "lucide-svelte";;
  }
 
  .subtitle {
- font-size: 0.75rem;, color: #9ca3af;
+ font-size: 0.75rem; color: #9ca3af;
  }
 
  .privacy-badge {
  display: inline-flex;
- align-items: center;, gap: 0.5rem;
+ align-items: center; gap: 0.5rem;
  padding: 0.5rem 1rem;
- background: #16a34a;, color: white;
+ background: #16a34a; color: white;
  border-radius: 4px;
  margin-top: 1rem;
  font-size: 0.75rem;
@@ -173,11 +173,11 @@ import { AlertCircle } from "lucide-svelte";;
  .stats-grid {
  display: grid;
  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
- gap: 1rem;, margin: 1.5rem 0;
+ gap: 1rem; margin: 1.5rem 0;
  }
 
  .answer-box {
- background: #1a1d20;, padding: 1rem;
+ background: #1a1d20; padding: 1rem;
  border-radius: 4px;
  margin-top: 0.5rem;
  }

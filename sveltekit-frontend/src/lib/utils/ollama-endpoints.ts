@@ -28,7 +28,7 @@ export function getOllamaEndpoint(): OllamaEndpoints {
  * Health check for Ollama services
  */
 export async function checkOllamaHealth(): Promise<{, gemma3Legal: boolean;
- embeddingGemma: boolean;, latency: number;
+ embeddingGemma: boolean; latency: number;
  models: string[];
 }> {
  const endpoints = getOllamaEndpoint();
@@ -127,7 +127,7 @@ export async function generateLegalAnalysis(
  temperature?: number;
  } = {}
 ): Promise<{, analysis: string;
- confidence: number;, keyFindings: string[];
+ confidence: number; keyFindings: string[];
  recommendations: string[];
 }> {
  const endpoints = getOllamaEndpoint();

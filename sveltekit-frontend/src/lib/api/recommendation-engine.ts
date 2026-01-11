@@ -7,15 +7,15 @@ import type { Document } from '$lib/types';
  */
 
 interface RecentCaseResponse {
- success: boolean;, data: RecentCase[]; fromCache: boolean;, timestamp: string;
- meta?: {, totalCases: number; returnedCases: number;, highestPriority: number; algorithm: string;, cacheExpiry: number;
+ success: boolean; data: RecentCase[]; fromCache: boolean; timestamp: string;
+ meta?: {, totalCases: number; returnedCases: number; highestPriority: number; algorithm: string; cacheExpiry: number;
  };
 }
 
 interface RecentCase {
- id: string;, title: string; status: 'active' | 'pending' | 'closed';
- lastAccessed: string;, confidence: number; priority: number;, caseType: string; urgency: 'low' | 'normal' | 'high' | 'critical';
- glyphSignature?: string;, metadata: { clientName: string;, practiceArea: string; daysOpen: number;, documentCount: number; lastActivity: string;
+ id: string; title: string; status: 'active' | 'pending' | 'closed';
+ lastAccessed: string; confidence: number; priority: number; caseType: string; urgency: 'low' | 'normal' | 'high' | 'critical';
+ glyphSignature?: string; metadata: { clientName: string; practiceArea: string; daysOpen: number; documentCount: number; lastActivity: string;
  };
 }
 

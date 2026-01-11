@@ -34,7 +34,7 @@ export const GET: RequestHandler = async () => {
     const activityKeys = await client.keys('phase89:activity:*');
     const activity: Array<{, id: string;
       type: 'fix' | 'embed' | 'learn';
-      message: string;, timestamp: string;
+      message: string; timestamp: string;
       data?: any;
     }> = [];
 

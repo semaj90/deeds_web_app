@@ -4,8 +4,8 @@
 	import { default as Bot, default as Loader2, default as Send, default as Users } from 'lucide-svelte';
 
  type ChatMessage = {
- id: string;, role: 'user' | 'assistant';
- content: string;, timestamp: Date;
+ id: string; role: 'user' | 'assistant';
+ content: string; timestamp: Date;
  keywords?: string[];
  keyPhrases?: string[];
  suggestions?: string[];

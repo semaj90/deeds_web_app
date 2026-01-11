@@ -1,5 +1,5 @@
 interface AutoPatchInput {
- route: string;, details: Record<string, unknown>;
+ route: string; details: Record<string, unknown>;
 }
 
 const MCP_ENDPOINT = process.env.CONTRADICTION_MCP_URL ?? 'http://localhost:3003/mcp/ui-autofix';

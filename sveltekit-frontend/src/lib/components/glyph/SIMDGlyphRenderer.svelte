@@ -19,7 +19,7 @@
     const adapter = await navigator.gpu.requestAdapter(); if (!adapter) { throw new Error('No WebGPU adapter found')}
     webgpuDevice = await adapter.requestDevice();
    const context = canvas.getContext('webgpu'); if (!context) { throw new Error('Failed to get WebGPU context')}
-    const presentationFormat = navigator.gpu.getPreferredCanvasFormat(); context.configure({ device: webgpuDevice;, format: presentationFormat}); // Create texture from tiled data const tiledData = glyphResult.simd_shader_data.tiled_data;
+    const presentationFormat = navigator.gpu.getPreferredCanvasFormat(); context.configure({ device: webgpuDevice; format: presentationFormat}); // Create texture from tiled data const tiledData = glyphResult.simd_shader_data.tiled_data;
    const texture = webgpuDevice.createTexture({ size: {, width: height }, format: 'rgba8unorm', usage: GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST }); // Upload tiled data to texture webgpuDevice.queue.writeTexture( { texture }, new Uint8Array(tiledData.map(x => x * 255)), { bytesPerRow: width * 4, rowsPerImage: height }, { width: height } ); console.log('âœ… WebGPU initialized with SIMD texture data')}
   async function initWebGL(): Promise<void> { if (!glyphResult.simd_shader_data) { throw new Error('No SIMD shader data available')}
     webglContext = canvas.getContext('webgl2') || canvas.getContext('webgl'); if (!webglContext) { throw new Error('WebGL not supported')}

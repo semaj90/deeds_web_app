@@ -5,17 +5,17 @@ export interface DockerMemoryConfig {
 }
 
 export interface ContainerMetrics {
- name: string;, memoryMB: number;
+ name: string; memoryMB: number;
  cpu: number;
 }
 
 export interface ThroughputMetrics {
- requestsPerSec: number;, latencyMs: number;
+ requestsPerSec: number; latencyMs: number;
 }
 
 export interface MemoryOptimizationResult {
- beforeMB: number;, afterMB: number;
- freedMB: number;, actions: string[];
+ beforeMB: number; afterMB: number;
+ freedMB: number; actions: string[];
 }
 
 export class DockerMemoryOptimizer {

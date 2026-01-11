@@ -67,7 +67,7 @@ import type { Document } from '$lib/types';
     try {
       isProcessing = true
       const result: any = await ocrService.processDocument(uploadedFile, {
-        documentType: selectedDocumentType, as any,
+        documentType: selectedDocumentType as any,
         extractFields: true,
         qualityEnhancement: true
       });

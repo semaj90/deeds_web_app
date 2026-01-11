@@ -10,7 +10,7 @@ import { generateEmbedding } from './embedding-service.js';
 import { eq } from 'drizzle-orm';
 
 export interface StatuteSource {
- title: string;, content: string;
+ title: string; content: string;
  jurisdiction: string;
  section?: string;
  category?: string;
@@ -173,8 +173,8 @@ export async function searchStatuteChunks(
  topK: number = 5, threshold = 0.5
 ): Promise<
  Array<{
- id: string;, statuteId: string;
- content: string;, similarity: number;
+ id: string; statuteId: string;
+ content: string; similarity: number;
  }>
 > {
  const chunks = await db.select().from(statuteChunks);
@@ -207,8 +207,8 @@ export async function searchStatuteChunks(
  .slice(0, topK);
 
  return results.filter((item) => item !== null) as Array<{
- id: string;, statuteId: string;
- content: string;, similarity: number;
+ id: string; statuteId: string;
+ content: string; similarity: number;
  }>;
 }
 
@@ -237,8 +237,8 @@ export async function getStatuteWithChunks(statuteId: string) {
  * Get ingestion statistics
  */
 export async function getIngestionStats(): Promise<{, totalStatutes: number;
- totalChunks: number;, chunksWithEmbeddings: number;
- jurisdictions: string[];, categories: string[];
+ totalChunks: number; chunksWithEmbeddings: number;
+ jurisdictions: string[]; categories: string[];
 }> {
  const allStatutes = await db.select().from(statutes);
  const allChunks = await db.select().from(statuteChunks);

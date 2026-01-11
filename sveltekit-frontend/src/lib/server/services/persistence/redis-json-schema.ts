@@ -36,7 +36,7 @@ export class RedisJSONStore {
  async storeClusteringJob(jobId: string, data: {, status: 'pending' | 'processing' | 'completed' | 'failed';
  startedAt: number;
  completedAt?: number;
- executionTimeMs?: number;, retryCount: number;
+ executionTimeMs?: number; retryCount: number;
  error?: string;
  result?: any;
  }): Promise<void> {
@@ -58,8 +58,8 @@ export class RedisJSONStore {
  * Key: clustering, versions:{ version }
  */
  async storeClusterVersion(version: number, data: {, timestamp: number;
- clusterCount: number;, statuteCount: number;
- avgConfidence: number;, labels: Record<string, string>;
+ clusterCount: number; statuteCount: number;
+ avgConfidence: number; labels: Record<string, string>;
  changePercentage?: number;
  }): Promise<void> {
  const key = `clustering:versions:${ version }`;
@@ -80,8 +80,8 @@ export class RedisJSONStore {
  * Key: stats, echo:{statuteId}
  */
  async storeEchoStats(statuteId: string, data: {, hits: number;
- lastHit: number;, dayHits: Record<string, number>; // YYYY-MM-DD -> count
- weekHits: number;, monthHits: number;
+ lastHit: number; dayHits: Record<string, number>; // YYYY-MM-DD -> count
+ weekHits: number; monthHits: number;
  }): Promise<void> {
  const key = `stats:echo:${statuteId}`;
  await this.client.json.set(key, '$', data);
@@ -132,9 +132,9 @@ export class RedisJSONStore {
  * Key: taxonomy, categories:{clusterId}
  */
  async storeTaxonomyCategory(clusterId: string, data: {, label: string;
- description: string;, somClusterIds: number[];
- kmeansLabels: string[];, colorToken: string;
- avgConfidence: number;, statuteCount: number;
+ description: string; somClusterIds: number[];
+ kmeansLabels: string[]; colorToken: string;
+ avgConfidence: number; statuteCount: number;
  icon?: string;
  }): Promise<void> {
  const key = `taxonomy:categories:${clusterId}`;
@@ -174,8 +174,8 @@ export class RedisJSONStore {
  * Key: metrics, clustering:{ timestamp }
  */
  async storeClusteringMetrics(timestamp: number, data: {, jobCount: number;
- successCount: number;, failureCount: number;
- avgExecutionTimeMs: number;, avgRetryCount: number;
+ successCount: number; failureCount: number;
+ avgExecutionTimeMs: number; avgRetryCount: number;
  clusterQuality: number;
  }): Promise<void> {
  const key = `metrics:clustering:${timestamp}`;
@@ -198,10 +198,10 @@ export class RedisJSONStore {
  * Key: statute, metadata:{statuteId}
  */
  async storeStatuteMetadata(statuteId: string, data: {, titleNumber: number;
- section: string;, fullCitation: string;
- heading: string;, som_cluster_id: number;
- kmeans_label: string;, cluster_confidence: number;
- flagged_for_review: boolean;, echo_hits: number;
+ section: string; fullCitation: string;
+ heading: string; som_cluster_id: number;
+ kmeans_label: string; cluster_confidence: number;
+ flagged_for_review: boolean; echo_hits: number;
  cluster_version: number;
  }): Promise<void> {
  const key = `statute:metadata:${statuteId}`;
@@ -273,7 +273,7 @@ export class RedisJSONStore {
  * Get memory usage
  */
  async getMemoryUsage(): Promise<{, used: number;
- peak: number;, overhead: number;
+ peak: number; overhead: number;
  }> {
  const info = await this.client.info('memory');
  const lines = info.split('\r\n');

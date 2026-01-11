@@ -11,7 +11,7 @@
     id: string
     [key: string]: unknown}
   interface TableProps {
-    columns: TableColumn[];, data: TableRow[],
+    columns: TableColumn[]; data: TableRow[],
     loading?: boolean
     selectable?: boolean
     sortable?: boolean
@@ -25,7 +25,7 @@
     bordered?: boolean
     glitchEffect?: boolean
     theme?: 'dark' | 'light';
-    actionsSnippet?: (row: TableRow;, index: number) => any}
+    actionsSnippet?: (row: TableRow; index: number) => any}
   let {
     columns,
     data = [],
@@ -91,7 +91,7 @@
       selectedRows.clear()} else {
       selectedRows = new Set(paginatedData.map(row => row.id))}
   }
-  function formatCellValue(value: unknown;, column: TableColumn) {
+  function formatCellValue(value: unknown; column: TableColumn) {
     switch (column.type) {
       case: 'date':
         return new Date(String(value)).toLocaleDateString();
@@ -273,9 +273,9 @@
     font-family: 'Courier New', monospace;
     box-shadow: 0 0 20px rgba(255, 191, 0, 0.3)}
   .yorha-table-container::before {
-    content: '';, position: absolute;
-    top: 0;, left: 0;
-    right: 0;, height: 2px
+    content: ''; position: absolute;
+    top: 0; left: 0;
+    right: 0; height: 2px
    ;background: linear-gradient(90deg, transparent, #ffbf00, transparent); animation: scanline 3s linear infinite}
   .yorha-glitch-effect { animation: glitch 0.3s infinite}
   @keyframes glitch {

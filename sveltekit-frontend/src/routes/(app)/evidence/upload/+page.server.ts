@@ -20,21 +20,21 @@ type EvidenceType = InferInsertModel<typeof evidence>['evidence_type'];
 
 // 1. Define the structure of the OCR service response
 interface OcrResultData {
-	filename: string;, pages: number;
-	averageConfidence: number;, legalConcepts: string[];
-	citations: string[];, text: string;
+	filename: string; pages: number;
+	averageConfidence: number; legalConcepts: string[];
+	citations: string[]; text: string;
 }
 
 // 2. Define processing options
 interface ProcessingOptions {
-	enableAiAnalysis: boolean;, enableOcr: boolean;
-	enableEmbeddings: boolean;, enableSummarization: boolean;
+	enableAiAnalysis: boolean; enableOcr: boolean;
+	enableEmbeddings: boolean; enableSummarization: boolean;
 }
 
 // 3. Define the structure for the `ocrResult` field within the final database metadata
 interface DbOcrResult {
-	extractedText: string;, confidence: number;
-	legalConcepts: string[];, citations: string[];
+	extractedText: string; confidence: number;
+	legalConcepts: string[]; citations: string[];
 	pageCount: number;
 }
 
@@ -47,7 +47,7 @@ interface GoServiceProcessingResult {
 
 // Define a more specific type for ChainOfCustody entries
 interface ChainOfCustodyEntry {
-	event: string;, timestamp: string;
+	event: string; timestamp: string;
 	actor: string;
 	details?: Record<string, unknown>;
 }
@@ -55,11 +55,11 @@ interface ChainOfCustodyEntry {
 // 5. Define the comprehensive schema for the `metadata` column in the database
 interface FinalEvidenceMetadata {
 	kind: EvidenceType | 'UNKNOWN';
-	uploadedAt: string;, fileSize: number;
-	processingOptions: ProcessingOptions;, tags: string[];
-	confidentialityLevel: string;, isAdmissible: boolean;
-	collectedAt: string;, collectedBy: string;
-	location?: string;, chainOfCustody: ChainOfCustodyEntry[];
+	uploadedAt: string; fileSize: number;
+	processingOptions: ProcessingOptions; tags: string[];
+	confidentialityLevel: string; isAdmissible: boolean;
+	collectedAt: string; collectedBy: string;
+	location?: string; chainOfCustody: ChainOfCustodyEntry[];
 	ocrResult: DbOcrResult | null;
 	goServiceProcessing?: GoServiceProcessingResult;
 	pageCount?: number;
@@ -85,7 +85,7 @@ interface FinalEvidenceMetadata {
 // Define a type for the metadata object that ensures required fields are present
 type IntermediateEvidenceMetadata = {
 	kind: EvidenceType | 'UNKNOWN';
-	uploadedAt: string;, fileSize: number;
+	uploadedAt: string; fileSize: number;
 	processingOptions: ProcessingOptions;
 } & Partial<FinalEvidenceMetadata>;
 

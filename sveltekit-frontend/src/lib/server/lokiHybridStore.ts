@@ -41,10 +41,10 @@ export interface BaseKnowledgeItem {
  canvasState?: unknown;
  zoom?: number;
 }; export type KnowledgeCollectionName = 'evidence' | 'notes' | 'canvas';
-type KnowledgeRecordMap = { evidence: EvidenceItem, notes: NoteItem;, canvas: CanvasItem };
+type KnowledgeRecordMap = { evidence: EvidenceItem, notes: NoteItem; canvas: CanvasItem };
 
 interface CollectionContext<K extends KnowledgeCollectionName> {
- name: K, collection: Collection<KnowledgeRecordMap[K]>;, fuse: Fuse<KnowledgeRecordMap[K]>, fuseKeys: Array<FuseOptionKey<KnowledgeRecordMap[K]>>; // Changed from Fuse.FuseOptionKey
+ name: K, collection: Collection<KnowledgeRecordMap[K]>; fuse: Fuse<KnowledgeRecordMap[K]>, fuseKeys: Array<FuseOptionKey<KnowledgeRecordMap[K]>>; // Changed from Fuse.FuseOptionKey
 }
 
 interface CollectionSpec<K extends KnowledgeCollectionName> {
@@ -97,7 +97,7 @@ export class LokiHybridStore {
  textSplitter: RecursiveCharacterTextSplitter;
  private redis: Redis | undefined; // Explicitly typed
  private redisSubscriber: Redis | undefined; // Explicitly typed
- private qdrant?: QdrantClient;, qdrantCollection: string;
+ private qdrant?: QdrantClient; qdrantCollection: string;
  private pgPool?: Pool;
  private neo4jDriver?: Driver; // Changed to Driver
  private embeddings?: OpenAIEmbeddings;

@@ -5,12 +5,12 @@ import * as authUtils from './authUtils.js';
 import type { db } from './db/client.js';
 
 export interface Session {
- id: string;, userId: string;
+ id: string; userId: string;
  expiresAt: Date;
 }
 
 export interface User {
- id: string;, email: string;
+ id: string; email: string;
  name: string;
  firstName?: string;
  role?: string;

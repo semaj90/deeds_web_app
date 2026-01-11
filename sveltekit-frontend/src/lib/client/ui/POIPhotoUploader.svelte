@@ -1,9 +1,9 @@
 <script lang="ts">
  import Button from '$lib/components/ui/button';
  import { Camera } from "lucide-svelte";
-import { Upload } from "lucide-svelte";;
+import { Upload } from "lucide-svelte";
 
- let { poiId, disabled = false, onUpload, onError } = $props<{ poiId: number; disabled?: boolean;, onUpload: (data: any) => void; onError: (error: any) => void }>();
+ let { poiId, disabled = false, onUpload, onError } = $props<{ poiId: number; disabled?: boolean; onUpload: (data: any) => void; onError: (error: any) => void }>();
 
  let dragging = $state(false);
  let uploading = $state(false);

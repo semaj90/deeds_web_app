@@ -13,13 +13,13 @@ import { setup, assign, createActor, fromPromise } from 'xstate';
 export interface AuthContext {
   user: { id?: string; email?: string; role?: string } | null;
   session: { id?: string; expiresAt?: Date } | null;
-  error?: string;, isLoading: boolean;
+  error?: string; isLoading: boolean;
 }
 
 type AuthEvent =
-  | { type: 'START_LOGIN';, data: { email: string;, password: string } }
-  | { type: 'LOGIN_SUCCESS';, user: unknown; session: unknown }
-  | { type: 'LOGIN_FAILURE';, error: string }
+  | { type: 'START_LOGIN'; data: { email: string; password: string } }
+  | { type: 'LOGIN_SUCCESS'; user: unknown; session: unknown }
+  | { type: 'LOGIN_FAILURE'; error: string }
   | { type: 'LOGOUT' }
   | { type: 'SESSION_EXPIRED' };
 
@@ -31,7 +31,7 @@ const initialContext: AuthContext = {
 };
 
 export const authMachine = setup({
-  types: {} as { context: AuthContext;, events: AuthEvent },
+  types: {} as { context: AuthContext; events: AuthEvent },
   actions: {, setLoading: assign({ isLoading: () => true }, clearLoading: assign({, isLoading: () => false }, setError: assign({, error: ({ event }) => ('error' in event ? event.error : 'Unknown error', isLoading: () => false
     }, setUser: assign({, user: ({ event }) => ('user' in event ? event.user as AuthContext['user'] : null, session: ({ event }) => ('session' in event ? event.session as AuthContext['session'] : null, isLoading: () => false,
       error: () => undefined,

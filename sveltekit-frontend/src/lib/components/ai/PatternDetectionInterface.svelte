@@ -5,21 +5,21 @@
    let analysisResults = $state<AnalysisResult | null>(null); // Filters and controls let patternTypeFilter = $state<'all' | 'temporal' | 'behavioral' | 'financial' | 'communication'>('all');
    let confidenceThreshold = $state<number>(70);
    let timeRange = $state<'1d' | '7d' | '30d' | '90d' | 'all'>('30d');
-   let selectedDataSources = $state<string[]>(['evidence', 'communications', 'financial']); interface DetectedPattern { id: string, type: 'temporal' | 'behavioral' | 'financial' | 'communication' | 'location',title: string, description: string, confidence: number, significance: number, frequency: number, timeframe: {, start: string, end: string;, duration: string}; entities: PatternEntity[], evidence: string[], correlations: PatternCorrelation[], riskLevel: 'low' | 'medium' | 'high' | 'critical'; recommendations: string[]}
+   let selectedDataSources = $state<string[]>(['evidence', 'communications', 'financial']); interface DetectedPattern { id: string, type: 'temporal' | 'behavioral' | 'financial' | 'communication' | 'location',title: string, description: string, confidence: number, significance: number, frequency: number, timeframe: {, start: string, end: string; duration: string}; entities: PatternEntity[], evidence: string[], correlations: PatternCorrelation[], riskLevel: 'low' | 'medium' | 'high' | 'critical'; recommendations: string[]}
 
-interface PatternEntity { id: string, type: 'person' | 'organization' | 'location' | 'event' | 'document',name: string, role: string;, involvement: number}
+interface PatternEntity { id: string, type: 'person' | 'organization' | 'location' | 'event' | 'document',name: string, role: string; involvement: number}
 
 interface PatternCorrelation { patternId: string, strength: number, type: 'temporal' | 'causal' | 'associative'; description: string}
 
-interface AnalysisResult { timestamp: string, totalPatterns: number, newPatterns: number, highRiskPatterns: number;, insights: string[]; recommendations: string[]}
+interface AnalysisResult { timestamp: string, totalPatterns: number, newPatterns: number, highRiskPatterns: number; insights: string[]; recommendations: string[]}
   $effect(() => { loadExistingPatterns()});
-  async function loadExistingPatterns(): Promise<any> { try { const response = await fetch('/api/ai/pattern-detection', { method: 'GET';, headers: {
+  async function loadExistingPatterns(): Promise<any> { try { const response = await fetch('/api/ai/pattern-detection', { method: 'GET'; headers: {
           'Content-Type': 'application/json'
         } }); if (response.ok) { const data = await response.json(); patterns = data.patterns || []}
     } catch (error) { console.error('Error loading patterns:', error)}
   }
   async function runPatternAnalysis(): Promise<any> { isAnalyzing = true; try { const analysisRequest = { dataSources: selectedDataSources, timeRange, confidenceThreshold: confidenceThreshold / 100, patternTypes: patternTypeFilter === 'all' ?; undefined: [patternTypeFilter] };
-   const response = await fetch('/api/ai/pattern-detection', { method: 'POST';, headers: {
+   const response = await fetch('/api/ai/pattern-detection', { method: 'POST'; headers: {
           'Content-Type': 'application/json'
         }, body: JSON.stringify(analysisRequest) }); if (response.ok) { const result = await response.json(); analysisResults = result.analysis ?? null; patterns = result.patterns ?? []} else { throw new Error(`Analysis failed: ${response.statusText}`)}
     } catch (error) { console.error('Error running pattern analysis:', error)} finally { isAnalyzing = false}
@@ -32,7 +32,7 @@ interface AnalysisResult { timestamp: string, totalPatterns: number, newPatterns
   } let filteredPatterns = $derived(() => { let filtered = patterns.slice(); // Apply type filter if (patternTypeFilter !== 'all') { filtered = filtered.filter(p => p.type === patternTypeFilter)}
 
     // Apply confidence threshold filtered = filtered.filter(p => p.confidence >= confidenceThreshold); // Sort by significance (highest first) filtered.sort((a, b) => b.significance - a.significance); return filtered}); function openPatternDetails(pattern: DetectedPattern) { selectedPattern = pattern; showPatternDetails = true}
-  function formatDuration(duration: string): string { // Convert duration: string to human readable format (expects, like: "3d", or: "12h";, or: "30m") const match = duration.match(/(\d+)([dhm])/); if (match) { const value = match[1];
+  function formatDuration(duration: string): string { // Convert duration: string to human readable format (expects, like: "3d", or: "12h"; or: "30m") const match = duration.match(/(\d+)([dhm])/); if (match) { const value = match[1];
    const unit = match[2]; switch (unit) { case: 'd': return `${ value } day${value !== '1' ? 's': ''}`; case, 'h': return `${ value } hour${value !== '1' ? 's': ''}`; case, 'm': return `${ value } minute${value !== '1' ? 's': ''}`}
     } return duration}
 </script>
@@ -175,83 +175,83 @@ interface AnalysisResult { timestamp: string, totalPatterns: number, newPatterns
   </div> </section> {/if} {/if}
   </div> </Dialog.Content> {/if}
   </Dialog.Portal> </Dialog>
- <style> .pattern-detection-interface { max-width: 1400px;, margin: 0 auto;padding: 2rem; font-family: system-ui, -apple-system, sans-serif}
+ <style> .pattern-detection-interface { max-width: 1400px; margin: 0 auto;padding: 2rem; font-family: system-ui, -apple-system, sans-serif}
   .detection-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 2rem; padding-bottom: 1rem; border-bottom: 1px solid #e2e8f0}
-  .detection-title { font-size: 2rem; font-weight: 700;, color: #1e293b;margin: 0}
-  .detection-subtitle { color: #64748b;, margin: 0.5rem, 0 0 0}
-  .controls-section { margin-bottom: 2rem;, padding: 1.5rem; background: #f8fafc; border-radius: 0.5rem}
+  .detection-title { font-size: 2rem; font-weight: 700; color: #1e293b;margin: 0}
+  .detection-subtitle { color: #64748b; margin: 0.5rem, 0 0 0}
+  .controls-section { margin-bottom: 2rem; padding: 1.5rem; background: #f8fafc; border-radius: 0.5rem}
   .controls-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem}
-  .control-group { display: flex; flex-direction: column;, gap: 0.5rem}
-  .control-group label { font-size: 0.875rem; font-weight: 500;, color: #374151}
-  .control-select { padding: 0.5rem;, border: 1px solid #d1d5db; border-radius: 0.375rem; font-size: 0.875rem}
+  .control-group { display: flex; flex-direction: column; gap: 0.5rem}
+  .control-group label { font-size: 0.875rem; font-weight: 500; color: #374151}
+  .control-select { padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 0.375rem; font-size: 0.875rem}
   .control-range { width: 100%}
-  .checkbox-group { display: flex;, gap: 1rem; flex-wrap}
-  .checkbox-label { display: flex; align-items: center;, gap: 0.5rem; font-size: 0.875rem;, cursor: pointer}
+  .checkbox-group { display: flex; gap: 1rem; flex-wrap}
+  .checkbox-label { display: flex; align-items: center; gap: 0.5rem; font-size: 0.875rem; cursor: pointer}
   .results-summary { margin-bottom: 2rem}
   .summary-card { border: 1px solid #e2e8f0}
   .summary-metrics { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; margin-bottom: 1rem}
   .metric { text-align: center}
-  .metric-value { display: block; font-size: 2rem, font-weight: 700;, color: #1e293b}
-  .metric-label { display: block; font-size: 0.875rem;, color: #64748b; margin-top: 0.25rem}
-  .insights-section h4 { margin: 0, 0 0.5rem 0; font-size: 0.875rem;, color: #374151}
-  .insights-list { list-style: none;, padding: 0; margin: 0}
-  .insights-list li { padding: 0.5rem; margin-bottom: 0.25rem;, background: #f0f9ff; border-left: 3px solid #3b82f6; border-radius: 0.25rem; font-size: 0.875rem}
+  .metric-value { display: block; font-size: 2rem, font-weight: 700; color: #1e293b}
+  .metric-label { display: block; font-size: 0.875rem; color: #64748b; margin-top: 0.25rem}
+  .insights-section h4 { margin: 0, 0 0.5rem 0; font-size: 0.875rem; color: #374151}
+  .insights-list { list-style: none; padding: 0; margin: 0}
+  .insights-list li { padding: 0.5rem; margin-bottom: 0.25rem; background: #f0f9ff; border-left: 3px solid #3b82f6; border-radius: 0.25rem; font-size: 0.875rem}
   .patterns-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(400px, 1fr)); gap: 1.5rem}
-  .pattern-card { border: 1px solid #e2e8f0; border-radius: 0.5rem;, overflow: hidden; transition: box-shadow 0.2s; padding: 1rem}
+  .pattern-card { border: 1px solid #e2e8f0; border-radius: 0.5rem; overflow: hidden; transition: box-shadow 0.2s; padding: 1rem}
   .pattern-card:hover { box-shadow: 0 4px 12px rgba(0, 0 | 0, 0.1)}
-  .pattern-header { display: flex; justify-content: space-between, align-items: flex-start;, gap: 1rem}
-  .pattern-title-section { display: flex; align-items: flex-start;, gap: 0.75rem}
+  .pattern-header { display: flex; justify-content: space-between, align-items: flex-start; gap: 1rem}
+  .pattern-title-section { display: flex; align-items: flex-start; gap: 0.75rem}
   .pattern-icon { font-size: 1.5rem; margin-top: 0.25rem}
   .pattern-title { margin: 0, 0 0.5rem 0}
-  .pattern-type-badge { padding: 0.25rem 0.5rem; border-radius: 0.25rem; font-size: 0.75rem, font-weight: 600;, border: 1px solid; text-transform: uppercase}
-  .pattern-metrics-header { display: flex; flex-direction: column, align-items: flex-end;, gap: 0.25rem}
-  .confidence-score { font-size: 1.25rem; font-weight: 700;, color: #374151}
+  .pattern-type-badge { padding: 0.25rem 0.5rem; border-radius: 0.25rem; font-size: 0.75rem, font-weight: 600; border: 1px solid; text-transform: uppercase}
+  .pattern-metrics-header { display: flex; flex-direction: column, align-items: flex-end; gap: 0.25rem}
+  .confidence-score { font-size: 1.25rem; font-weight: 700; color: #374151}
   .risk-level { font-size: 0.75rem; font-weight: 600; text-transform: uppercase}
   .pattern-description { margin: 0.5rem, 0 0 0; color: #64748b}
-  .pattern-stats { display: flex; flex-direction: column;, gap: 1rem; margin-bottom: 1rem}
-  .stat { display: flex; align-items: center;, gap: 0.75rem}
+  .pattern-stats { display: flex; flex-direction: column; gap: 1rem; margin-bottom: 1rem}
+  .stat { display: flex; align-items: center; gap: 0.75rem}
   .stat-label { font-size: 0.75rem, color: #64748b; min-width: 80px}
-  .stat-bar { flex: 1;, height: 0.5rem; background: #e2e8f0; border-radius: 0.25rem;, overflow: hidden}
-  .stat-fill { height: 100%;, background: linear-gradient(90deg, #10b981, #f59e0b, #ef4444); transition: width 0.3s}
-  .stat-value { font-size: 0.75rem; font-weight: 600;, color: #374151; min-width: 60px; text-align: right}
-  .pattern-entities h4, .pattern-correlations h4 { margin: 0, 0 0.5rem 0; font-size: 0.875rem;, color: #374151}
-  .entities-list { display: flex; flex-wrap: wrap;, gap: 0.5rem}
-  .entity-tag { padding: 0.25rem 0.5rem; background: #e5e7eb; border-radius: 0.25rem, font-size: 0.75rem;, color: #374151; cursor: help}
+  .stat-bar { flex: 1; height: 0.5rem; background: #e2e8f0; border-radius: 0.25rem; overflow: hidden}
+  .stat-fill { height: 100%; background: linear-gradient(90deg, #10b981, #f59e0b, #ef4444); transition: width 0.3s}
+  .stat-value { font-size: 0.75rem; font-weight: 600; color: #374151; min-width: 60px; text-align: right}
+  .pattern-entities h4, .pattern-correlations h4 { margin: 0, 0 0.5rem 0; font-size: 0.875rem; color: #374151}
+  .entities-list { display: flex; flex-wrap: wrap; gap: 0.5rem}
+  .entity-tag { padding: 0.25rem 0.5rem; background: #e5e7eb; border-radius: 0.25rem, font-size: 0.75rem; color: #374151; cursor: help}
   .entity-more { padding: 0.25rem 0.5rem; background: #f3f4f6; border-radius: 0.25rem, font-size: 0.75rem, color: #6b7280; font-style: italic}
-  .correlations-preview { font-size: 0.75rem;, color: #64748b}
-  .card-actions { display: flex;, gap: 0.5rem; justify-content: flex-end}
-  .loading-state, .empty-state { grid-column: 1 / -1; text-align: center;, padding: 3rem; color: #64748b}
-  .loading-spinner { width: 2rem;, height: 2rem; border: 2px solid #e2e8f0; border-top: 2px solid #3b82f6; border-radius: 50%;, animation: spin 1s linear infinite;margin: 0 auto 1rem}
+  .correlations-preview { font-size: 0.75rem; color: #64748b}
+  .card-actions { display: flex; gap: 0.5rem; justify-content: flex-end}
+  .loading-state, .empty-state { grid-column: 1 / -1; text-align: center; padding: 3rem; color: #64748b}
+  .loading-spinner { width: 2rem; height: 2rem; border: 2px solid #e2e8f0; border-top: 2px solid #3b82f6; border-radius: 50%; animation: spin 1s linear infinite;margin: 0 auto 1rem}
   .loading-detail { font-size: 0.875rem; margin-top: 0.5rem}
   @keyframes spin { to { transform: rotate(360deg)} }
   /* Dialog Styles */ .pattern-details-dialog { max-width: 900px; max-height: 90vh; overflow-y: auto}
-  .pattern-details-content { display: flex; flex-direction: column;, gap: 2rem}
-  .pattern-overview { display: grid; grid-template-columns: 2fr 1fr; gap: 2rem;padding: 1.5rem;, background: #f8fafc; border-radius: 0.5rem}
+  .pattern-details-content { display: flex; flex-direction: column; gap: 2rem}
+  .pattern-overview { display: grid; grid-template-columns: 2fr 1fr; gap: 2rem;padding: 1.5rem; background: #f8fafc; border-radius: 0.5rem}
   .overview-metrics { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem}
-  .overview-metric { display: flex; flex-direction: column;, gap: 0.25rem}
+  .overview-metric { display: flex; flex-direction: column; gap: 0.25rem}
   .overview-label { font-size: 0.75rem, color: #64748b; text-transform: uppercase; font-weight: 500}
-  .overview-value { font-size: 1rem; font-weight: 600;, color: #374151}
+  .overview-value { font-size: 1rem; font-weight: 600; color: #374151}
   .timeframe-info h4 { margin: 0, 0 0.5rem 0; color: #374151}
-  .timeframe-info p { margin: 0.25rem 0; font-size: 0.875rem;, color: #64748b}
+  .timeframe-info p { margin: 0.25rem 0; font-size: 0.875rem; color: #64748b}
   .entities-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem}
-  .entity-card { padding: 1rem;, border: 1px solid #e5e7eb; border-radius: 0.375rem;, background: #fafafa}
+  .entity-card { padding: 1rem; border: 1px solid #e5e7eb; border-radius: 0.375rem; background: #fafafa}
   .entity-card h4 { margin: 0, 0 0.5rem 0; color: #374151}
-  .entity-type .entity-role { margin: 0.25rem 0; font-size: 0.75rem;, color: #6b7280}
-  .involvement-meter { width: 100%;, height: 0.5rem; background: #e5e7eb; border-radius: 0.25rem;, overflow: hidden;margin: 0.5rem, 0 0.25rem 0}
-  .involvement-fill { height: 100%;, background: #3b82f6; transition: width 0.3s}
-  .involvement-percentage { font-size: 0.75rem; font-weight: 600;, color: #374151}
-  .correlations-list { display: flex; flex-direction: column;, gap: 1rem}
-  .correlation-item { padding: 1rem;, border: 1px solid #e5e7eb; border-radius: 0.375rem;, background: #fafafa}
+  .entity-type .entity-role { margin: 0.25rem 0; font-size: 0.75rem; color: #6b7280}
+  .involvement-meter { width: 100%; height: 0.5rem; background: #e5e7eb; border-radius: 0.25rem; overflow: hidden;margin: 0.5rem, 0 0.25rem 0}
+  .involvement-fill { height: 100%; background: #3b82f6; transition: width 0.3s}
+  .involvement-percentage { font-size: 0.75rem; font-weight: 600; color: #374151}
+  .correlations-list { display: flex; flex-direction: column; gap: 1rem}
+  .correlation-item { padding: 1rem; border: 1px solid #e5e7eb; border-radius: 0.375rem; background: #fafafa}
   .correlation-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem}
-  .correlation-type { font-size: 0.75rem; font-weight: 600;, color: #374151; text-transform: uppercase}
-  .correlation-strength { font-size: 0.75rem;, color: #6b7280}
-  .correlation-description { margin: 0; font-size: 0.875rem;, color: #64748b}
-  .recommendations-list { list-style: none;, padding: 0; margin: 0}
-  .recommendation-item { padding: 0.75rem; margin-bottom: 0.5rem;, background: #f0f9ff; border-left: 4px solid #3b82f6; border-radius: 0.25rem; font-size: 0.875rem;, color: #374151}
+  .correlation-type { font-size: 0.75rem; font-weight: 600; color: #374151; text-transform: uppercase}
+  .correlation-strength { font-size: 0.75rem; color: #6b7280}
+  .correlation-description { margin: 0; font-size: 0.875rem; color: #64748b}
+  .recommendations-list { list-style: none; padding: 0; margin: 0}
+  .recommendation-item { padding: 0.75rem; margin-bottom: 0.5rem; background: #f0f9ff; border-left: 4px solid #3b82f6; border-radius: 0.25rem; font-size: 0.875rem; color: #374151}
   .evidence-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0.5rem}
-  .evidence-item { padding: 0.5rem, background: #f3f4f6; border-radius: 0.25rem; font-size: 0.75rem;, color: #6b7280; font-family: monospace}
-  .dialog-actions { display: flex;, gap: 0.5rem; justify-content: flex-end; margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid #e2e8f0}
-  @media (max-width: 768px) { .detection-header { flex-direction: column;, gap: 1rem}
+  .evidence-item { padding: 0.5rem, background: #f3f4f6; border-radius: 0.25rem; font-size: 0.75rem; color: #6b7280; font-family: monospace}
+  .dialog-actions { display: flex; gap: 0.5rem; justify-content: flex-end; margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid #e2e8f0}
+  @media (max-width: 768px) { .detection-header { flex-direction: column; gap: 1rem}
     .controls-grid { grid-template-columns: 1fr}
     .patterns-grid { grid-template-columns: 1fr}
     .pattern-overview { grid-template-columns: 1fr}

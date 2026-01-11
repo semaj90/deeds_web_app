@@ -8,9 +8,9 @@ import { featureLogger } from '../services/featureLogger.js';
 
 export interface AuthContext {
  feature: 'errorBrain' | 'legalAi' | null;
- requiresAuth: boolean;, authType: 'development' | 'production' | 'none';
+ requiresAuth: boolean; authType: 'development' | 'production' | 'none';
  userId?: string;
- token?: string;, isAuthenticated: boolean;
+ token?: string; isAuthenticated: boolean;
 }
 
 export interface AuthResult {
@@ -242,7 +242,7 @@ export class AuthSeparation {
  * Get auth requirements for feature
  */
  static getAuthRequirements(feature: 'errorBrain' | 'legalAi'): {, authType: 'development' | 'production';
- requiresToken: boolean;, requiresUserId: boolean;
+ requiresToken: boolean; requiresUserId: boolean;
  } {
  if (feature === 'errorBrain') {
  return {

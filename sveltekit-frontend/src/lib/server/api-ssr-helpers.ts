@@ -37,8 +37,8 @@ const cognitiveCache =
  undefined;
 
 export interface SSRResponse<T = unknown> {
- success: boolean;, data: T | null;
- meta: {, timestamp: string; cached: boolean;, source: 'ssr' | 'api' };
+ success: boolean; data: T | null;
+ meta: {, timestamp: string; cached: boolean; source: 'ssr' | 'api' };
  error?: string;
 }
 

@@ -3,8 +3,8 @@
  */
 
 export interface ErrorContext {
- timestamp: Date;, stage: string;
- message: string;, recoverable: boolean;
+ timestamp: Date; stage: string;
+ message: string; recoverable: boolean;
  retryCount?: number;
  maxRetries?: number;
 }
@@ -20,7 +20,7 @@ export class DashboardErrorHandler {
  static handleConnectionError(
  error: Error, retryCount: number = 0
  ): {, shouldRetry: boolean;
- delay: number;, message: string;
+ delay: number; message: string;
  } {
  const shouldRetry = retryCount < this.MAX_RETRIES;
  const delay = shouldRetry
@@ -171,7 +171,7 @@ export class DashboardErrorHandler {
  * Notify user of error/warning
  */
  private static notifyUser(notification: {, type: 'error' | 'warning' | 'info';
- title: string;, message: string;
+ title: string; message: string;
  stage?: string;
  }): void {
  // This would typically dispatch to a notification store

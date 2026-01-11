@@ -5,8 +5,8 @@ import type { RAGService } from '$lib/server/rag';
 import { db } from "$lib/server/db";
 
 interface UserType {
- id: string;, email: string;
- firstName: string;, lastName: string;
+ id: string; email: string;
+ firstName: string; lastName: string;
  role: string;
 }
 

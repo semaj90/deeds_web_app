@@ -4,7 +4,7 @@
  import { Brain, Cpu, Zap, Clock, CheckCircle, XCircle, AlertCircle } from 'lucide-svelte';
    let { isLoading = false, title = 'Processing...', description = '', progress = 0, status = 'loading', showProgress = true, showEstimate = false, estimatedTime = 0, operation = 'ai', size = 'md', variant = 'inline'
   }: { isLoading?: boolean; title?: string; description?: string; progress?: number; status?: 'loading' | 'success' | 'error' | 'warning'; showProgress?: boolean; showEstimate?: boolean; estimatedTime?: number; operation?: string; size?: 'sm' | 'md' | 'lg'; variant?: 'overlay' | 'inline' | 'modal'} = $props();
-   const progressTween = tweened(0, { duration: 300;, easing: cubicOut});
+   const progressTween = tweened(0, { duration: 300; easing: cubicOut});
   let startTime = Date.now();
    let elapsedTime = $state<number>(0);
    let intervalId: ReturnType<typeof setInterval> | null = null; $effect(() => { progressTween.set(progress) });
@@ -114,8 +114,8 @@
   .ai-loading-component.overlay { /* @apply bg-transparent; */ }
   @keyframes shimmer { 0% { transform: translateX(-100%)}
     100% { transform: translateX(100%)}
-  } .loading-shimmer { position: relative;, overflow: hidden}
-  .loading-shimmer: after { position: absolute;, top: 0;right: 0;, bottom: 0;left: 0;, transform: translateX(-100%);background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent); animation: shimmer 2s infinite;content: ''}
+  } .loading-shimmer { position: relative; overflow: hidden}
+  .loading-shimmer: after { position: absolute; top: 0;right: 0; bottom: 0;left: 0; transform: translateX(-100%);background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent); animation: shimmer 2s infinite;content: ''}
 </style>
 
 

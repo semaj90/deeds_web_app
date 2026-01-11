@@ -14,8 +14,8 @@ import type { text } from "stream/consumers";
 
 // Service availability tracking
 export interface ServiceStatus {
-	ollama: boolean;, embedding: boolean;
-	qdrant: boolean;, rag: boolean;
+	ollama: boolean; embedding: boolean;
+	qdrant: boolean; rag: boolean;
 	lastCheck: number;
 }
 

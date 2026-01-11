@@ -6,7 +6,7 @@ import type { RAGResponse, UploadResponse } from '$lib/services/goServiceClient.
 
 // Define context and event types
 export interface AgentShellContext {
-  input: string;, response: string;
+  input: string; response: string;
   jobId?: string;
   rating?: number;
   searchQuery?: string;
@@ -14,17 +14,17 @@ export interface AgentShellContext {
   uploadResults?: UploadResponse;
   userId?: string;
   caseId?: string;
-  serviceHealth?: {, enhancedRAG: boolean; uploadService: boolean;, kratosServer: boolean;
+  serviceHealth?: {, enhancedRAG: boolean; uploadService: boolean; kratosServer: boolean;
   };
 }
 
 type AgentShellEvent =
-  | { type: 'PROMPT';, input: string; userId?: string; caseId?: string }
-  | { type: 'xstate.done.actor.callAgent';, data: string }
-  | { type: 'ACCEPT_PATCH';, jobId: string; userId: string;, patchContent: string }
-  | { type: 'RATE_SUGGESTION';, jobId: string; rating: number;, userId: string; feedback?: string }
-  | { type: 'SEMANTIC_SEARCH';, query: string; userId: string; caseId?: string }
-  | { type: 'FILE_UPLOAD';, file: File; userId: string; caseId?: string }
+  | { type: 'PROMPT'; input: string; userId?: string; caseId?: string }
+  | { type: 'xstate.done.actor.callAgent'; data: string }
+  | { type: 'ACCEPT_PATCH'; jobId: string; userId: string; patchContent: string }
+  | { type: 'RATE_SUGGESTION'; jobId: string; rating: number; userId: string; feedback?: string }
+  | { type: 'SEMANTIC_SEARCH'; query: string; userId: string; caseId?: string }
+  | { type: 'FILE_UPLOAD'; file: File; userId: string; caseId?: string }
   | { type: 'CHECK_HEALTH' };
 
 export const agentShellMachine = createMachine({
@@ -34,7 +34,7 @@ export const agentShellMachine = createMachine({
     response: '',
   } as AgentShellContext,
   types: {} as {
-    context: AgentShellContext;, events: AgentShellEvent;
+    context: AgentShellContext; events: AgentShellEvent;
   },
   states: {, idle: { on: {, PROMPT: { target: 'processing',
           actions: assign({, input: ({ event }) => (event as any).input || '',

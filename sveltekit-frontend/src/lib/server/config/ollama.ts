@@ -4,7 +4,7 @@
  */
 
 export interface OllamaConfig {
- baseUrl: string;, model: string;
+ baseUrl: string; model: string;
  timeout: number;
 }
 

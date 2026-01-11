@@ -25,7 +25,7 @@ import { vi } from 'vitest';
 
 export interface MockQdrantPoint {
 	id: string | number;
-	vector: number[];, payload: Record<string, any>;
+	vector: number[]; payload: Record<string, any>;
 }
 
 export interface MockRedisEntry {
@@ -34,7 +34,7 @@ export interface MockRedisEntry {
 }
 
 export interface MockMinIOObject {
-	bucket: string;, key: string;
+	bucket: string; key: string;
 	data: Buffer | string;
 	contentType?: string;
 	metadata?: Record<string, string>;
@@ -91,7 +91,7 @@ class MockQdrantClient {
 		limit: number;
 		filter?: Record<string, any>;
 		scoreThreshold?: number;
-	}): Promise<Array<{, id: string | number; score: number;, payload: Record<string, any> }>> {
+	}): Promise<Array<{, id: string | number; score: number; payload: Record<string, any> }>> {
 		if (!this.collections.has(collectionName)) {
 			return [];
 		}
@@ -524,7 +524,7 @@ export function resetAllMocks(): void {
 // ═══════════════════════════════════════════════════════════════════════
 
 export interface MockFetchResponse {
-	url: string;, status: number;
+	url: string; status: number;
 	data: any;
 }
 

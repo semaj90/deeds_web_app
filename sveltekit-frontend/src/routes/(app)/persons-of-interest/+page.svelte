@@ -157,7 +157,7 @@
 
 <style>
  .poi-list-page {
- padding: 2rem;, background: #0f0f23;
+ padding: 2rem; background: #0f0f23;
  min-height: 100vh;
  }
 
@@ -170,15 +170,15 @@
 
  .page-header h1 {
  color: #ffffff;
- font-size: 2rem;, margin: 0;
+ font-size: 2rem; margin: 0;
  }
 
  .btn-create {
  padding: 0.75rem 1.5rem;
- background: #dc2626;, color: #ffffff;
+ background: #dc2626; color: #ffffff;
  text-decoration: none;
  border-radius: 0.375rem;
- font-weight: 600;, transition: background-color 0.2s;
+ font-weight: 600; transition: background-color 0.2s;
  }
 
  .btn-create:hover {
@@ -186,32 +186,32 @@
  }
 
  .error-banner {
- padding: 1rem;, background: #7f1d1d;
+ padding: 1rem; background: #7f1d1d;
  border: 1px solid #dc2626;
- border-radius: 0.375rem;, color: #fecaca;
- margin-bottom: 1.5rem;, display: flex;
+ border-radius: 0.375rem; color: #fecaca;
+ margin-bottom: 1.5rem; display: flex;
  justify-content: space-between;
  align-items: center;
  }
 
  .error-banner button {
  padding: 0.5rem 1rem;
- background: #dc2626;, color: #ffffff;
+ background: #dc2626; color: #ffffff;
  border: none;
- border-radius: 0.25rem;, cursor: pointer;
+ border-radius: 0.25rem; cursor: pointer;
  }
 
  .filters {
- display: flex;, gap: 1rem;
+ display: flex; gap: 1rem;
  margin-bottom: 2rem;
  flex-wrap: wrap;
  }
 
  .search-input,
  .filter-select {
- padding: 0.75rem;, background: #1a1a2e;
+ padding: 0.75rem; background: #1a1a2e;
  border: 1px solid #333;
- border-radius: 0.375rem;, color: #ffffff;
+ border-radius: 0.375rem; color: #ffffff;
  font-size: 0.875rem;
  }
 
@@ -227,20 +227,20 @@
  }
 
  .loading {
- text-align: center;, color: #9ca3af;
+ text-align: center; color: #9ca3af;
  padding: 2rem;
  }
 
  .empty-state {
- text-align: center;, padding: 3rem;
+ text-align: center; padding: 3rem;
  color: #9ca3af;
  }
 
  .empty-state .btn-primary {
- margin-top: 1rem;, padding: 0.75rem 1.5rem;
- background: #dc2626;, color: #ffffff;
+ margin-top: 1rem; padding: 0.75rem 1.5rem;
+ background: #dc2626; color: #ffffff;
  text-decoration: none;
- border-radius: 0.375rem;, display: inline-block;
+ border-radius: 0.375rem; display: inline-block;
  }
 
  .poi-grid {
@@ -251,10 +251,10 @@
 
  .poi-card {
  display: flex;
- flex-direction: column;, background: #1a1a2e;
+ flex-direction: column; background: #1a1a2e;
  border: 1px solid #333;
- border-radius: 0.5rem;, padding: 1.5rem;
- text-decoration: none;, color: inherit;
+ border-radius: 0.5rem; padding: 1.5rem;
+ text-decoration: none; color: inherit;
  transition: all 0.2s;
  }
 
@@ -268,12 +268,12 @@
  }
 
  .card-header h3 {
- color: #ffffff;, margin: 0 0 0.5rem 0;
+ color: #ffffff; margin: 0 0 0.5rem 0;
  font-size: 1.125rem;
  }
 
  .badges {
- display: flex;, gap: 0.5rem;
+ display: flex; gap: 0.5rem;
  flex-wrap: wrap;
  }
 
@@ -281,7 +281,7 @@
  padding: 0.25rem 0.75rem;
  border-radius: 0.25rem;
  font-size: 0.75rem;
- font-weight: 600;, color: #ffffff;
+ font-weight: 600; color: #ffffff;
  text-transform: capitalize;
  }
 
@@ -306,7 +306,7 @@
  align-items: center;
  padding-top: 1rem;
  border-top: 1px solid #333;
- font-size: 0.75rem;, color: #9ca3af;
+ font-size: 0.75rem; color: #9ca3af;
  }
 
  .threat-level {

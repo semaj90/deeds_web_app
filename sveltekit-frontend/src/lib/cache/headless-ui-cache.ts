@@ -3,9 +3,9 @@ import vectorWasm from '../wasm/vector-wasm-wrapper.js';
 import {  browser  } from '$app/environment';
 
 export interface CacheEntry<T = unknown> {
- // Changed default type parameter from 'any' to 'unknown', key: string;, data: T; timestamp: number;, ttl: number; version: string;
+ // Changed default type parameter from 'any' to 'unknown', key: string; data: T; timestamp: number; ttl: number; version: string;
  embedding?: Float32Array;
- metadata?: {, size: number; hits: number;, lastAccess: number; source: 'server' | 'client' | 'hybrid';
+ metadata?: {, size: number; hits: number; lastAccess: number; source: 'server' | 'client' | 'hybrid';
  computeCost: number; // Relative cost to regenerate
  };
 }

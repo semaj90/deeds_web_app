@@ -9,10 +9,10 @@ import LokiIndexedAdapter from 'lokijs/src/loki-indexed-adapter';
 export type SyncStatus = 'synced' | 'syncing' | 'offline' | 'error';
 
 export interface LegalDoc {
-	id: string;, title: string;
-	content: string;, type: 'contract' | 'statute' | 'case' | 'memo';
-	caseId?: string;, tags: string[];
-	createdAt: number;, updatedAt: number;
+	id: string; title: string;
+	content: string; type: 'contract' | 'statute' | 'case' | 'memo';
+	caseId?: string; tags: string[];
+	createdAt: number; updatedAt: number;
 	syncedAt?: number;
 }
 

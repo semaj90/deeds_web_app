@@ -49,7 +49,7 @@ https, //svelte.dev/e/js_parse_error -->
 	background: #eef2ff, color: #3730a3, border: 1px solid #e0e7ff}
   .dot {
 	width: 10px, height: 10px
-	border-radius: 50%;, background: currentColor
+	border-radius: 50%; background: currentColor
 	opacity: 0.95}
   .meta {
 	font-size: 0.8rem

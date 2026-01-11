@@ -4,19 +4,19 @@ import crypto from 'crypto';
 /** * CrewAI Multi-Agent Service * Handles role-based agent crews for specialized legal workflows */
 
 export interface CrewAIAgent {
- id: string;, role: string;
- goal: string;, backstory: string;
- tools: string[];, llmConfig: {
- model: string;, temperature: number;
+ id: string; role: string;
+ goal: string; backstory: string;
+ tools: string[]; llmConfig: {
+ model: string; temperature: number;
  maxTokens: number;
  apiBase?: string;
  };
- maxExecution: number;, memory: boolean;
- verbose: boolean;, allowDelegation: boolean;
+ maxExecution: number; memory: boolean;
+ verbose: boolean; allowDelegation: boolean;
 }
 
 export interface CrewAITask {
- id: string;, description: string;
+ id: string; description: string;
  expectedOutput: string;
  agent?: string;
  tools?: string[];
@@ -25,27 +25,27 @@ export interface CrewAITask {
 }
 
 export interface CrewAICrew {
- id: string;, name: string;
- description: string;, agents: CrewAIAgent[];
- tasks: CrewAITask[];, process: 'sequential' | 'hierarchical' | 'consensus';
- manager?: string;, verbose: boolean;
+ id: string; name: string;
+ description: string; agents: CrewAIAgent[];
+ tasks: CrewAITask[]; process: 'sequential' | 'hierarchical' | 'consensus';
+ manager?: string; verbose: boolean;
  memoryEnabled: boolean;
 }
 
 export interface CrewExecution {
- id: string;, crewId: string;
+ id: string; crewId: string;
  status: 'pending' | 'running' | 'completed' | 'failed' | 'cancelled';
  startTime: number;
- endTime?: number;, results: CrewTaskResult[];
- finalOutput?: string;, metrics: {
- totalTime: number;, tasksCompleted: number;
- agentInteractions: number;, tokensUsed: number;
+ endTime?: number; results: CrewTaskResult[];
+ finalOutput?: string; metrics: {
+ totalTime: number; tasksCompleted: number;
+ agentInteractions: number; tokensUsed: number;
  };
 }
 
 export interface CrewTaskResult {
- taskId: string;, agentId: string;
- output: string;, executionTime: number;
+ taskId: string; agentId: string;
+ output: string; executionTime: number;
  status: 'completed' | 'failed' | 'delegated';
  metadata?: { [key: string]: any };
 }

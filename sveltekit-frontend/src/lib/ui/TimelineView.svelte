@@ -5,8 +5,8 @@
  import Tag from './Tag.svelte';
 
  type TimelineEvent = {
- id: string;, timestamp: Date;
- title: string;, description: string;
+ id: string; timestamp: Date;
+ title: string; description: string;
  type: 'evidence' | 'person' | 'location' | 'action';
  evidenceIds?: string[];
  personIds?: string[];

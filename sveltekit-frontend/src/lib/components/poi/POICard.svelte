@@ -15,7 +15,7 @@ https://svelte.dev/e/js_parse_error -->
 import { Edit } from "lucide-svelte";
 import { Eye } from "lucide-svelte";
 import { Trash2 } from "lucide-svelte";
-import { User } from "lucide-svelte";;
+import { User } from "lucide-svelte";
 
  let {
  poi,
@@ -25,13 +25,13 @@ import { User } from "lucide-svelte";;
  } = $props<{
  poi: {, id: string;
  name: string;
- alias?: string;, threatLevel: string;
+ alias?: string; threatLevel: string;
  photos?: Array<{, url: string;
  thumbnailUrl: string;
  metadata?: any;
  ai?: any;
  }>;
- notes?: string;, createdAt: string;
+ notes?: string; createdAt: string;
  };
  onView?: (poi: any) => void;
  onEdit?: (poi: any) => void;
@@ -152,9 +152,9 @@ import { User } from "lucide-svelte";;
 
 <style>
  .line-clamp-2 {
- line-clamp: 2;, display: -webkit-box;
+ line-clamp: 2; display: -webkit-box;
  -webkit-line-clamp: 2;
- -webkit-box-orient: vertical;, overflow: hidden;
+ -webkit-box-orient: vertical; overflow: hidden;
  }
 </style>
 

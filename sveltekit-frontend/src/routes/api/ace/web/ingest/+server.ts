@@ -58,7 +58,7 @@ const IngestRequestSchema = z.object({
 type IngestRequest = z.infer<typeof IngestRequestSchema>;
 
 interface IngestResponse {
-  success: boolean;, jobIds: string[];
+  success: boolean; jobIds: string[];
   message: string;
   errors?: string[];
 }

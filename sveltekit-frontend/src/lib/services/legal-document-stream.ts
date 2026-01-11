@@ -3,33 +3,33 @@ import type { Case } from '$lib/types';
 // Legal Document types
 export interface LegalDocument {
     id: string;
-    title?: string;, name: string;
-    content: string;, type: string;
+    title?: string; name: string;
+    content: string; type: string;
     complexity?: number;
     size?: number;
     priority?: number;
 }
 
 export interface LegalEntity {
-    text: string;, type: string;
-    relevance: number;, start: number;
+    text: string; type: string;
+    relevance: number; start: number;
     end: number;
 }
 
 export interface SemanticAnalysis {
-    embedding: number[];, legalEntities: LegalEntity[];
-    keyTopics: string[];, complexity: number;
+    embedding: number[]; legalEntities: LegalEntity[];
+    keyTopics: string[]; complexity: number;
     sentiment: 'positive' | 'negative' | 'neutral';
-    similarDocuments: Array<{, id: string; similarity: number;, title: string }>;
+    similarDocuments: Array<{, id: string; similarity: number; title: string }>;
 }
 
 export interface LegalReasoning {
-    summary: string;, riskAssessment: {
+    summary: string; riskAssessment: {
         overallRisk: 'low' | 'medium' | 'high' | 'critical';
         details: string;
     };
-    legalPrinciples: string[];, precedentAnalysis: {
-        relevantCases: Array<{, id: string; title: string;, relevance: number }>;
+    legalPrinciples: string[]; precedentAnalysis: {
+        relevantCases: Array<{, id: string; title: string; relevance: number }>;
         summary: string;
     };
 }
@@ -82,16 +82,16 @@ export type StreamEventType =
 
 // Stream Event Structure
 export interface StreamEvent {
-    eventType: StreamEventType;, timestamp: string;
+    eventType: StreamEventType; timestamp: string;
     documentId?: string;
     batchId?: string;
     data?: any;
     progress?: {, current: number;
-        total: number;, percentage: number;
+        total: number; percentage: number;
         stage: string;
     };
     performance?: {, processingTime: number;
-        throughput: number;, memoryUsage: number;
+        throughput: number; memoryUsage: number;
         gpuUtilization?: number;
     };
     error?: {, code: string;
@@ -102,26 +102,26 @@ export interface StreamEvent {
 
 // Document Stream Configuration
 export interface StreamConfig {
-    enableRealTimeAnalysis: boolean;, batchSize: number;
-    maxConcurrentAnalyses: number;, enableGPUAcceleration: boolean;
-    enableProgressStreaming: boolean;, retryAttempts: number;
-    timeoutMs: number;, compressionLevel: number;
+    enableRealTimeAnalysis: boolean; batchSize: number;
+    maxConcurrentAnalyses: number; enableGPUAcceleration: boolean;
+    enableProgressStreaming: boolean; retryAttempts: number;
+    timeoutMs: number; compressionLevel: number;
 }
 
 // Stream Statistics
 export interface StreamStatistics {
-    documentsProcessed: number;, totalProcessingTime: number;
-    averageLatency: number;, throughputPerSecond: number;
-    errorRate: number;, activeConnections: number;
-    gpuUtilization: number;, memoryUsage: number;
+    documentsProcessed: number; totalProcessingTime: number;
+    averageLatency: number; throughputPerSecond: number;
+    errorRate: number; activeConnections: number;
+    gpuUtilization: number; memoryUsage: number;
     peakConcurrency: number;
 }
 
 // Connection State
 export interface StreamConnection {
-    id: string;, userId: string;
-    connectedAt: Date;, lastActivity: Date;
-    documentsProcessed: number;, isActive: boolean;
+    id: string; userId: string;
+    connectedAt: Date; lastActivity: Date;
+    documentsProcessed: number; isActive: boolean;
     capabilities: string[];
 }
 

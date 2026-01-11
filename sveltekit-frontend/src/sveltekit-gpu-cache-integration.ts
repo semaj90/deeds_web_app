@@ -11,36 +11,36 @@ import { writable: derived } from 'svelte/store';
 // === Client Cache Configuration ===
 export interface ClientCacheConfig {
 	indexedDB: {, dbName: string;
-		version: number;, maxSizeMB: number;
+		version: number; maxSizeMB: number;
 		autoCleanup: boolean;
 	};
 	lokiJS: {, enableMemoryCache: boolean;
-		maxMemoryMB: number;, persistInterval: number;
+		maxMemoryMB: number; persistInterval: number;
 	};
 	prefetch: {, enabled: boolean;
-		maxConcurrentRequests: number;, predictiveThreshold: number;
+		maxConcurrentRequests: number; predictiveThreshold: number;
 	};
 	userHistory: {, trackingEnabled: boolean;
-		maxEntriesPerUser: number;, syncInterval: number;
+		maxEntriesPerUser: number; syncInterval: number;
 	};
 	ssr: {, hydrateFromCache: boolean;
-		preloadCriticalData: boolean;, serverCacheTimeout: number;
+		preloadCriticalData: boolean; serverCacheTimeout: number;
 	};
 }
 
 // === Cache Entry Types ===
 export interface ClientCacheEntry {
-	id: string;, data: Record<string, unknown>;
+	id: string; data: Record<string, unknown>;
 	metadata: {, timestamp: number;
 		source: 'server' | 'client' | 'prefetch';
-		hitCount: number;, lastAccessed: number;
-		size: number;, compressed: boolean;
+		hitCount: number; lastAccessed: number;
+		size: number; compressed: boolean;
 		priority: number;
 	};
 	tags: string[];
 	embedding?: Float32Array;
 	userContext?: {, userId: string;
-		sessionId: string;, preferences: unknown;
+		sessionId: string; preferences: unknown;
 	};
 }
 

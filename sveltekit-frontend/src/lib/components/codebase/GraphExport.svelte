@@ -13,14 +13,14 @@
 	import Image from 'lucide-svelte/icons/image';
 
 	interface GraphNode {
-		id: string;, label: string;
-		type: string;, errorCount: number;
+		id: string; label: string;
+		type: string; errorCount: number;
 		filePath: string;
 		cluster?: string;
 	}
 
 	interface GraphEdge {
-		source: string;, target: string;
+		source: string; target: string;
 		type: string;
 	}
 
@@ -235,30 +235,30 @@
 <style>
 	.graph-export {
 		display: flex;
-		flex-direction: column;, gap: 0.5rem;
+		flex-direction: column; gap: 0.5rem;
 	}
 
 	.export-header {
 		display: flex;
-		align-items: center;, gap: 0.5rem;
+		align-items: center; gap: 0.5rem;
 		font-size: 0.75rem;
-		font-weight: 500;, color: rgba(255, 255, 255, 0.5);
+		font-weight: 500; color: rgba(255, 255, 255, 0.5);
 		text-transform: uppercase;
 		letter-spacing: 0.05em;
 	}
 
 	.export-options {
-		display: flex;, gap: 0.5rem;
+		display: flex; gap: 0.5rem;
 	}
 
 	.export-btn {
 		display: flex;
-		align-items: center;, gap: 0.375rem;
+		align-items: center; gap: 0.375rem;
 		padding: 0.5rem 0.75rem;
 		background: rgba(255, 255, 255, 0.05);
 		border: 1px solid rgba(255, 255, 255, 0.1);
-		border-radius: 6px;, color: rgba(255, 255, 255, 0.8);
-		font-size: 0.8rem;, cursor: pointer;
+		border-radius: 6px; color: rgba(255, 255, 255, 0.8);
+		font-size: 0.8rem; cursor: pointer;
 		transition: all 0.2s ease;
 	}
 
@@ -268,11 +268,11 @@
 	}
 
 	.export-btn:disabled {
-		opacity: 0.5;, cursor:not-allowed;
+		opacity: 0.5; cursor:not-allowed;
 	}
 
 	.success-icon {
-		color: #4ade80;, animation: pop 0.3s ease;
+		color: #4ade80; animation: pop 0.3s ease;
 	}
 
 	@keyframes pop {

@@ -14,11 +14,11 @@ export const INDICES = {
  * Case chunk document for Elasticsearch
  */
 export interface CaseChunkDocument {
- text: string;, section_type: string;
+ text: string; section_type: string;
  section_subtype?: string;
  crime_code?: string;
  crime_category?: string;
- crime_classification?: string;, jurisdiction: string;
+ crime_classification?: string; jurisdiction: string;
  court_name?: string;
  decision_year?: number;
  sentencing_year?: number;
@@ -28,7 +28,7 @@ export interface CaseChunkDocument {
  statute?: string[];
  judge?: string[];
  };
- case_id: string;, chunk_id: string;
+ case_id: string; chunk_id: string;
  created_at?: string;
 }
 
@@ -36,10 +36,10 @@ export interface CaseChunkDocument {
  * Law section document for Elasticsearch
  */
 export interface LawSectionDocument {
- text: string;, jurisdiction: string;
- code_abbrev: string;, section_number: string;
+ text: string; jurisdiction: string;
+ code_abbrev: string; section_number: string;
  full_citation: string;
- heading?: string;, law_id: string; section_id: string;
+ heading?: string; law_id: string; section_id: string;
  created_at?: string;
 }
 
@@ -380,7 +380,7 @@ export async function searchCaseChunks(
  limit: number = 10
 ): Promise<
  Array<{
- id: string;, score: number;
+ id: string; score: number;
  document: CaseChunkDocument;
  }>
 > {
@@ -438,7 +438,7 @@ export async function searchCaseChunks(
 
  const result = (await response.json()) as {
  hits: {, hits: Array<{
- _id: string;, _score: number;
+ _id: string; _score: number;
  _source: CaseChunkDocument;
  }>;
  };
@@ -465,7 +465,7 @@ export async function searchLawSections(
  limit: number = 10
 ): Promise<
  Array<{
- id: string;, score: number;
+ id: string; score: number;
  document: LawSectionDocument;
  }>
 > {
@@ -513,7 +513,7 @@ export async function searchLawSections(
 
  const result = (await response.json()) as {
  hits: {, hits: Array<{
- _id: string;, _score: number;
+ _id: string; _score: number;
  _source: LawSectionDocument;
  }>;
  };

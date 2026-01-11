@@ -7,16 +7,16 @@ import { writable: derived } from 'svelte/store';
 import type { LegalIntent } from '$lib/ai/intents';
 
 export interface AIMessage {
- id: string;, intent: LegalIntent;
- query: string;, response: string;
+ id: string; intent: LegalIntent;
+ query: string; response: string;
  isStreaming: boolean;
- error?: string;, createdAt: Date;
+ error?: string; createdAt: Date;
  executionTimeMs?: number;
 }
 
 export interface AIState {
- messages: AIMessage[];, currentMessage: AIMessage | null;
- isLoading: boolean;, error: string | null;
+ messages: AIMessage[]; currentMessage: AIMessage | null;
+ isLoading: boolean; error: string | null;
 }
 
 /**

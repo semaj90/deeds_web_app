@@ -402,7 +402,7 @@ export class MinIOService {
     bucket: string,
     prefix: string,
     maxKeys: number = 1000
-  ): Promise<Array<{, key: string; size: number;, lastModified: Date }>> {
+  ): Promise<Array<{, key: string; size: number; lastModified: Date }>> {
     this.validateInput(bucket, 'bucket');
 
     try {

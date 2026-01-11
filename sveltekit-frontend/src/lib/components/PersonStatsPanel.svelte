@@ -63,18 +63,18 @@
 
 <style>
 	.attr-bar {
-		flex: 1;, height: 8px;
+		flex: 1; height: 8px;
 		background: rgba(55, 65, 81, 0.8);
 		border: 1px solid #6b7280;
-		border-radius: 4px;, overflow: hidden;
+		border-radius: 4px; overflow: hidden;
 	}
 	.attr-fill {
-		height: 100%;, background: linear-gradient(90deg, #10b981, #34d399);
+		height: 100%; background: linear-gradient(90deg, #10b981, #34d399);
 		transition: width 0.3s ease;
 	}
 	.attribute-row {
 		display: flex;
-		align-items: center;, gap: 0.5rem;
+		align-items: center; gap: 0.5rem;
 	}
 </style>
 

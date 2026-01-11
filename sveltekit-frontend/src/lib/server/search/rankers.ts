@@ -1,5 +1,5 @@
 type DocLike = {
- title: string;, description: string;
+ title: string; description: string;
  content: string;
 };
 

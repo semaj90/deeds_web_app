@@ -2,12 +2,12 @@ import type { createMachine, assign, createActor } from 'xstate';
 import type { AnyActorLogic } from 'xstate';
 import { z } from 'zod'; // Enhanced Types for Legal AI Integration
 export interface UploadContext {
- files: File[];, uploadProgress: number;
- uploadResults: UploadResult[];, errors: string[];
- userAnalytics: UserAnalytics;, contextualPrompts: ContextualPrompt[];
+ files: File[]; uploadProgress: number;
+ uploadResults: UploadResult[]; errors: string[];
+ userAnalytics: UserAnalytics; contextualPrompts: ContextualPrompt[];
  pipeline: PipelineStatus; // Legal enhancements
  caseId?: string;
- legalContext?: LegalContext;, aiAnalysisResults: AIAnalysisResult[]; evidenceMetadata: EvidenceMetadata[];
+ legalContext?: LegalContext; aiAnalysisResults: AIAnalysisResult[]; evidenceMetadata: EvidenceMetadata[];
  riskAssessment?: RiskAssessment; // Production integrations
  authSession?: AuthSession;
  dbConnection?: DatabaseConnection;
@@ -24,83 +24,83 @@ export interface LegalContext {
 }
 
 export interface AIAnalysisResult {
- fileId: string;, fileName: string;
- confidence: number;, summary: string;
- keyEntities: EntityExtraction[];, legalCitations: Citation[];
- privileged: boolean;, needsRedaction: boolean;
- evidenceType: string;, relevanceScore: number;
- suggestedTags: string[];, riskFactors: string[];
+ fileId: string; fileName: string;
+ confidence: number; summary: string;
+ keyEntities: EntityExtraction[]; legalCitations: Citation[];
+ privileged: boolean; needsRedaction: boolean;
+ evidenceType: string; relevanceScore: number;
+ suggestedTags: string[]; riskFactors: string[];
 }
 
 export interface EntityExtraction {
- type: 'person' | 'organization' | 'location' | 'date' | 'money' | 'legal_term'; value: string;, confidence: number; startPos: number;, endPos: number;
+ type: 'person' | 'organization' | 'location' | 'date' | 'money' | 'legal_term'; value: string; confidence: number; startPos: number; endPos: number;
 }
 
 export interface Citation {
- type: 'case' | 'statute' | 'regulation'; citation: string;, relevance: number; jurisdiction: string;
+ type: 'case' | 'statute' | 'regulation'; citation: string; relevance: number; jurisdiction: string;
 }
 
 export interface EvidenceMetadata {
- fileId: string;, chain_of_custody: ChainOfCustodyEntry[];
- hash: string;, source: string;
- acquisition_date: string;, authenticity_verified: boolean;
+ fileId: string; chain_of_custody: ChainOfCustodyEntry[];
+ hash: string; source: string;
+ acquisition_date: string; authenticity_verified: boolean;
 }
 
 export interface ChainOfCustodyEntry {
- timestamp: string;, actor: string;
- action: string;, details: string;
+ timestamp: string; actor: string;
+ action: string; details: string;
 }
 
 export interface RiskAssessment {
- level: 'low' | 'medium' | 'high' | 'critical'; factors: string[];, privilegedMaterialDetected: boolean; redactionRequired: boolean;, ethicalConcerns: string[];
+ level: 'low' | 'medium' | 'high' | 'critical'; factors: string[]; privilegedMaterialDetected: boolean; redactionRequired: boolean; ethicalConcerns: string[];
 }
 
 export interface AuthSession {
- userId: string;, role: 'paralegal' | 'associate' | 'senior' | 'partner' | 'admin';
+ userId: string; role: 'paralegal' | 'associate' | 'senior' | 'partner' | 'admin';
  permissions: string[];
- barNumber?: string;, firmId: string;
+ barNumber?: string; firmId: string;
 }
 
 export interface DatabaseConnection {
- connected: boolean;, lastSync: string;
+ connected: boolean; lastSync: string;
  pendingOperations: number;
 }
 
 export interface OllamaConfig {
- endpoint: string;, model: string;
- connected: boolean;, capabilities: string[];
+ endpoint: string; model: string;
+ connected: boolean; capabilities: string[];
 }
 
 export interface UserAnalytics {
- userId: string;, sessionId: string;
- behaviorPattern: 'novice' | 'intermediate' | 'expert' | 'power_user'; uploadHistory: {, totalUploads: number; successRate: number;, averageFileSize: number; preferredFormats: string[];, commonUploadTimes: string[];
+ userId: string; sessionId: string;
+ behaviorPattern: 'novice' | 'intermediate' | 'expert' | 'power_user'; uploadHistory: {, totalUploads: number; successRate: number; averageFileSize: number; preferredFormats: string[]; commonUploadTimes: string[];
  };
- interactionMetrics: {, typingSpeed: number; clickPatterns: ClickPattern[];, scrollBehavior: { depth: number;, speed: number };
+ interactionMetrics: {, typingSpeed: number; clickPatterns: ClickPattern[]; scrollBehavior: { depth: number; speed: number };
  focusTime: number;
  };
  contextualPreferences: {, preferredAIPromptStyle: 'concise' | 'detailed' | 'technical'; helpLevel: 'minimal' | 'moderate' | 'extensive';
- autoSuggestions: boolean;, proactiveInsights: boolean;
+ autoSuggestions: boolean; proactiveInsights: boolean;
  };
  caseContext: {, activeCases: string[];
- currentCaseId?: string;, workflowStage: 'intake' | 'discovery' | 'preparation' | 'trial' | 'appeal'; expertise: 'paralegal' | 'associate' | 'senior' | 'partner';
+ currentCaseId?: string; workflowStage: 'intake' | 'discovery' | 'preparation' | 'trial' | 'appeal'; expertise: 'paralegal' | 'associate' | 'senior' | 'partner';
  };
 }
 
 export interface ClickPattern {
- x: number;, y: number;
- timestamp: number;, element: string;
+ x: number; y: number;
+ timestamp: number; element: string;
  legalContext?: string;
 }
 
 export interface ContextualPrompt {
- id: string;, content: string;
+ id: string; content: string;
  category: 'optimization' | 'guidance' | 'insight' | 'warning' | 'recommendation'; timing: 'before-upload' | 'during-upload' | 'after-upload';
- confidence: number;, relevance: number;
- actionable: boolean;, legalSpecific: boolean;
+ confidence: number; relevance: number;
+ actionable: boolean; legalSpecific: boolean;
 }
 
 export interface UploadResult {
- fileName: string;, success: boolean;
+ fileName: string; success: boolean;
  documentId?: string;
  error?: string;
  aiInsights?: {, summary: string;
@@ -137,10 +137,10 @@ export const LegalContextSchema = z.object({
  matterNumber: z.string().optional(),
 });
 // --- small response types to avoid `any` ---
-type AnalyzeBehaviorResponse = { analytics: UserAnalytics;, insights: unknown; score: number };
+type AnalyzeBehaviorResponse = { analytics: UserAnalytics; insights: unknown; score: number };
 type GeneratePromptsResponse = { prompts: ContextualPrompt[] };
 type AnalyzeDocResult = {
- documentId: string;, summary: string;
+ documentId: string; summary: string;
  entities?: EntityExtraction[];
  tags?: string[];
  confidence?: number;
@@ -151,8 +151,8 @@ type AnalyzeDocResult = {
 // Enhanced Production Services (replaced fromPromise with plain async functions)
 export async function analyzeUserBehaviorService({
  input,
-}: {, input: { userAnalytics: UserAnalytics;, context: UploadContext };
-}): Promise<{, updatedAnalytics: UserAnalytics; insights: unknown;, behaviorScore: number }> {
+}: {, input: { userAnalytics: UserAnalytics; context: UploadContext };
+}): Promise<{, updatedAnalytics: UserAnalytics; insights: unknown; behaviorScore: number }> {
  try {
  // Production API call to user behavior analysis service
  const response = await fetch('/api/ai/ollama/analyze-behavior', {
@@ -190,7 +190,7 @@ export async function analyzeUserBehaviorService({
 }
 export async function generateContextualPromptsService({
  input,
-}: {, input: { context: UploadContext;, timing: string };
+}: {, input: { context: UploadContext; timing: string };
 }): Promise<ContextualPrompt[]> {
  try {
  // Production Ollama service call
@@ -247,7 +247,7 @@ export async function generateContextualPromptsService({
 }
 export async function performAIAnalysisService({
  input,
-}: {, input: { files: File[];, context: UploadContext };
+}: {, input: { files: File[]; context: UploadContext };
 }): Promise<UploadResult[]> {
  try {
  // Production legal AI analysis service
@@ -331,7 +331,7 @@ export async function performAIAnalysisService({
 }
 export async function saveToDatabaseService({
  input,
-}: {, input: { results: UploadResult[];, context: UploadContext };
+}: {, input: { results: UploadResult[]; context: UploadContext };
 }): Promise<void> {
  try {
  // Production Drizzle ORM integration
@@ -391,9 +391,9 @@ export function calculateUserEngagementScore(context: UploadContext): number {
 }
 // tighten generateUserInsights return type
 export interface LegalInsights {
- behaviorPattern: UploadContext['userAnalytics']['behaviorPattern'];, engagementLevel: 'high' | 'medium' | 'low';
- uploadEfficiency: number;, legalExpertise: string;
- workflowOptimization: string;, recommendations: string[];
+ behaviorPattern: UploadContext['userAnalytics']['behaviorPattern']; engagementLevel: 'high' | 'medium' | 'low';
+ uploadEfficiency: number; legalExpertise: string;
+ workflowOptimization: string; recommendations: string[];
 }
 
 export function generateUserInsights(context: UploadContext): LegalInsights {
@@ -424,13 +424,13 @@ export function generateUserInsights(context: UploadContext): LegalInsights {
 }
 // Add a concrete UploadEvent union to replace `any` usage
 type UploadEvent = : {, type: 'SELECT_FILES'; files: File[]; caseId?: string }
- | { type: 'AUTH_SESSION_UPDATED';, session: AuthSession }
- | { type: 'UPDATE_LEGAL_CONTEXT';, context: LegalContext }
- | { type: 'USER_TYPING';, speed: number }
- | { type: 'USER_CLICK';, x: number; y: number;, element: string; legalContext?: string }
- | { type: 'TRACK_USER_ACTION';, data: { caseId?: string } }
+ | { type: 'AUTH_SESSION_UPDATED'; session: AuthSession }
+ | { type: 'UPDATE_LEGAL_CONTEXT'; context: LegalContext }
+ | { type: 'USER_TYPING'; speed: number }
+ | { type: 'USER_CLICK'; x: number; y: number; element: string; legalContext?: string }
+ | { type: 'TRACK_USER_ACTION'; data: { caseId?: string } }
  | { type: 'START_UPLOAD' }
- | { type: 'USER_REACTED_TO_PROMPT';, promptId: string; reaction: string }
+ | { type: 'USER_REACTED_TO_PROMPT'; promptId: string; reaction: string }
  | { type: 'REQUEST_AI_SUGGESTIONS' }
  | { type: 'CANCEL_UPLOAD' }
  | { type: 'RESET' }

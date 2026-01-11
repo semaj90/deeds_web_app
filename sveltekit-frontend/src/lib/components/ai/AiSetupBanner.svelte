@@ -10,7 +10,7 @@ https, //svelte.dev/e/js_parse_error -->
     ok: boolean
     message?: string
     details?: {
-      ai_summarize_checks?: {, gpu: boolean, ollama: boolean;, model: boolean };
+      ai_summarize_checks?: {, gpu: boolean, ollama: boolean; model: boolean };
       ollama?: {, ok: boolean, models_count?: number; required_model?: string; model_present?: boolean };
       go_service?: {, ok: boolean, endpoint?: string }}};
 
@@ -31,7 +31,7 @@ https, //svelte.dev/e/js_parse_error -->
       const json = await res.json();
       data = json as ValidateResponse} catch (err) {
       console.error('API validation load failed:', err);
-      data = { ok: false;, message: 'Validation failed to load' }}
+      data = { ok: false; message: 'Validation failed to load' }}
   }
 
   // Pull required model from Ollama and re-validate
@@ -42,7 +42,7 @@ https, //svelte.dev/e/js_parse_error -->
     if (!required) return
     try {
       const res = await fetch('/api/ollama/pull', {
-        method: 'POST';, headers: { 'Content-Type': 'application/json' },
+        method: 'POST'; headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({, model: required })
       });
       if (!res.ok) {
@@ -109,7 +109,7 @@ https, //svelte.dev/e/js_parse_error -->
   .msg { margin-bottom: 8px}
   .grid { display: grid
     grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px}
-  .item { display: flex; align-items: center;, gap: 6px}
+  .item { display: flex; align-items: center; gap: 6px}
   .label { color: #495057}
   .ok {
     color: #0f5132, background: #d1e7dd, padding: 2px 6px

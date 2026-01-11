@@ -5,25 +5,25 @@ import { timestamp } from "drizzle-orm/gel-core";
 
 // --- TYPES ---
 export interface DocumentProcessingJob {
-    documentId: string;, s3Key: string;
+    documentId: string; s3Key: string;
     s3Bucket: string;
     caseId?: string;
-    userId?: string;, originalName: string;
-    mimeType: string;, fileSize: number;
+    userId?: string; originalName: string;
+    mimeType: string; fileSize: number;
     processingType: 'ocr' | 'embedding' | 'summarization' | 'full_analysis';
     priority?: number;
     timestamp?: string;
 }
 
 export interface DLQMessage extends DocumentProcessingJob {
-    error: string;, retries: number;
+    error: string; retries: number;
     timestamp: string;
 }
 
 export interface RabbitMQConfig {
-    url: string;, queues: {
-        documentProcessing: string;, ocrProcessing: string;
-        embeddingProcessing: string;, summarization: string;
+    url: string; queues: {
+        documentProcessing: string; ocrProcessing: string;
+        embeddingProcessing: string; summarization: string;
         deadLetter: string;
     };
     exchanges: {, documents: string;

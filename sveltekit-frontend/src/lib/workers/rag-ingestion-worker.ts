@@ -14,19 +14,19 @@ type ProcessDocumentPayload = {
 };
 type GenerateEmbeddingsPayload = { text: string; model?: string };
 type SIMDParsePayload = { buffer: ArrayBuffer };
-type IndexVectorsPayload = { documentId: string;, embedding: Float32Array };
+type IndexVectorsPayload = { documentId: string; embedding: Float32Array };
 type SearchSimilarityPayload = { queryEmbedding: Float32Array; limit?: number; threshold?: number };
 // Renamed to avoid collision with global/ambient WorkerMessage types
 type IngestionWorkerMessage =
- | { id: string;, type: 'process_document'; payload: ProcessDocumentPayload }
- | { id: string;, type: 'generate_embeddings'; payload: GenerateEmbeddingsPayload }
- | { id: string;, type: 'simd_parse'; payload: SIMDParsePayload }
- | { id: string;, type: 'index_vectors'; payload: IndexVectorsPayload }
- | { id: string;, type: 'search_similarity'; payload: SearchSimilarityPayload };
+ | { id: string; type: 'process_document'; payload: ProcessDocumentPayload }
+ | { id: string; type: 'generate_embeddings'; payload: GenerateEmbeddingsPayload }
+ | { id: string; type: 'simd_parse'; payload: SIMDParsePayload }
+ | { id: string; type: 'index_vectors'; payload: IndexVectorsPayload }
+ | { id: string; type: 'search_similarity'; payload: SearchSimilarityPayload };
 // Generic, typed worker response payload
 type WorkerResponse<T = Record<string, unknown>> = {
  id: string | null;
- success: boolean;, stage: string;
+ success: boolean; stage: string;
  status?: string;
  error?: string;
  payload?: T;
@@ -64,12 +64,12 @@ interface EvidenceGraphService {
 }
 
 interface GraphNode {
- id: string;, type: 'Evidence' | 'Entity' | 'Case';
+ id: string; type: 'Evidence' | 'Entity' | 'Case';
  label: string;
 }
 
 interface GraphEdge {
- from: string;, to: string;
+ from: string; to: string;
  relation: string;
 }
 

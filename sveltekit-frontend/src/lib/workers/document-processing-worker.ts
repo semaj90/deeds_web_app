@@ -19,13 +19,13 @@ interface IRabbitMQService {
 const rabbitMQService: IRabbitMQService = rawRabbitMQService as unknown as IRabbitMQService; // Cast to unknown first for non-overlapping types
 
 export interface DocumentProcessingJob {
- documentId: string;, s3Key: string;
+ documentId: string; s3Key: string;
  s3Bucket: string;
  caseId?: string;
- userId?: string;, originalName: string;
- mimeType: string;, fileSize: number;
+ userId?: string; originalName: string;
+ mimeType: string; fileSize: number;
  processingType: "ocr" | "embedding" | "summarization" | "full_analysis";
- priority: number;, timestamp: string;
+ priority: number; timestamp: string;
 }
 export interface ProcessingContext {
  job: DocumentProcessingJob;
@@ -36,11 +36,11 @@ export interface ProcessingContext {
  summary?: string;
 }
 export interface DocumentChunk {
- id: string;, content: string;
- metadata: {, chunkIndex: number; startPosition: number;, endPosition: number; wordCount: number };
+ id: string; content: string;
+ metadata: {, chunkIndex: number; startPosition: number; endPosition: number; wordCount: number };
 }
 export interface EmbeddingResult {
- chunkId: string;, embedding: number[];
+ chunkId: string; embedding: number[];
  model: string;
 }
 // Corrected: Use Drizzle's inferred select type for DocumentProcessingRecord

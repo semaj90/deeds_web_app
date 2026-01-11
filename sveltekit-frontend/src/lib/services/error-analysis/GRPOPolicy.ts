@@ -33,9 +33,9 @@ import type {
 } from './types.js';
 
 export interface GRPOConfig {
-	learningRate: number;, groupSize: number;
-	experienceBufferSize: number;, minExperiencesForUpdate: number;
-	validationSplit: number;, rollbackThreshold: number;
+	learningRate: number; groupSize: number;
+	experienceBufferSize: number; minExperiencesForUpdate: number;
+	validationSplit: number; rollbackThreshold: number;
 }
 
 export class GRPOPolicy {

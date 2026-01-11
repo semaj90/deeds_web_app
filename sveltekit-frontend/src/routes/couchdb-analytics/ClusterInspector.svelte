@@ -8,10 +8,10 @@
 	let { apiBase }: Props = $props();
 
 	interface Cluster {
-		cluster_id: string;, cluster_label: string;
-		affected_files: string[];, severity: string;
-		first_seen: string;, last_seen: string;
-		occurrence_count: number;, source: string;
+		cluster_id: string; cluster_label: string;
+		affected_files: string[]; severity: string;
+		first_seen: string; last_seen: string;
+		occurrence_count: number; source: string;
 	}
 
 	let clusters = $state<Cluster[]>([]);
@@ -236,23 +236,23 @@
 	}
 
 	.controls h3 {
-		margin: 0;, color: #1f2937;
+		margin: 0; color: #1f2937;
 		font-size: 1.25rem;
 	}
 
 	.control-group {
-		display: flex;, gap: 0.5rem;
+		display: flex; gap: 0.5rem;
 	}
 
 	.control-group select {
 		padding: 0.5rem 0.75rem;
 		border: 2px solid #e5e7eb;
 		border-radius: 6px;
-		font-size: 0.875rem;, cursor: pointer;
+		font-size: 0.875rem; cursor: pointer;
 	}
 
 	.loading, .empty-state {
-		text-align: center;, padding: 3rem;
+		text-align: center; padding: 3rem;
 		color: #6b7280;
 	}
 
@@ -262,7 +262,7 @@
 	}
 
 	.empty-state code {
-		background: #f3f4f6;, padding: 0.25rem 0.5rem;
+		background: #f3f4f6; padding: 0.25rem 0.5rem;
 		border-radius: 4px;
 		font-family: monospace;
 	}
@@ -270,7 +270,7 @@
 	.cluster-grid {
 		display: grid;
 		grid-template-columns: 400px 1fr;
-		gap: 1.5rem;, height: calc(100% - 60px);
+		gap: 1.5rem; height: calc(100% - 60px);
 	}
 
 	.clusters-list {
@@ -279,18 +279,18 @@
 	}
 
 	.cluster-card {
-		background: white;, border: 2px solid #e5e7eb;
-		border-radius: 8px;, padding: 1rem;
-		margin-bottom: 0.75rem;, cursor: pointer;
+		background: white; border: 2px solid #e5e7eb;
+		border-radius: 8px; padding: 1rem;
+		margin-bottom: 0.75rem; cursor: pointer;
 		transition: all 0.2s;
 	}
 
 	.cluster-card:hover {
-		border-color: #667eea;, transform: translateX(4px);
+		border-color: #667eea; transform: translateX(4px);
 	}
 
 	.cluster-card.selected {
-		border-color: #667eea;, background: #f0f4ff;
+		border-color: #667eea; background: #f0f4ff;
 		box-shadow: 0 4px 6px rgba(102, 126, 234, 0.1);
 	}
 
@@ -303,10 +303,10 @@
 
 	.severity-badge {
 		padding: 0.25rem 0.75rem;
-		border-radius: 12px;, color: white;
+		border-radius: 12px; color: white;
 		font-size: 0.75rem;
-		font-weight: bold;, display: inline-flex;
-		align-items: center;, gap: 0.25rem;
+		font-weight: bold; display: inline-flex;
+		align-items: center; gap: 0.25rem;
 	}
 
 	.severity-badge.large {
@@ -315,7 +315,7 @@
 	}
 
 	.file-count {
-		font-size: 0.875rem;, color: #6b7280;
+		font-size: 0.875rem; color: #6b7280;
 		font-weight: 500;
 	}
 
@@ -328,13 +328,13 @@
 
 	.cluster-meta {
 		display: flex;
-		flex-direction: column;, gap: 0.25rem;
+		flex-direction: column; gap: 0.25rem;
 	}
 
 	.meta-item {
 		display: flex;
-		align-items: center;, gap: 0.5rem;
-		font-size: 0.75rem;, color: #6b7280;
+		align-items: center; gap: 0.5rem;
+		font-size: 0.75rem; color: #6b7280;
 	}
 
 	.meta-icon {
@@ -343,12 +343,12 @@
 
 	.cluster-detail {
 		border: 2px solid #e5e7eb;
-		border-radius: 8px;, overflow: hidden;
+		border-radius: 8px; overflow: hidden;
 		background: white;
 	}
 
 	.detail-header {
-		background: #f9fafb;, padding: 1.5rem;
+		background: #f9fafb; padding: 1.5rem;
 		border-bottom: 2px solid #e5e7eb;
 		display: flex;
 		justify-content: space-between;
@@ -356,8 +356,8 @@
 	}
 
 	.detail-header h3 {
-		margin: 0;, color: #1f2937;
-		font-size: 1.25rem;, flex: 1;
+		margin: 0; color: #1f2937;
+		font-size: 1.25rem; flex: 1;
 	}
 
 	.detail-body {
@@ -375,17 +375,17 @@
 
 	.info-item {
 		display: flex;
-		flex-direction: column;, gap: 0.25rem;
+		flex-direction: column; gap: 0.25rem;
 	}
 
 	.info-label {
-		font-size: 0.75rem;, color: #6b7280;
+		font-size: 0.75rem; color: #6b7280;
 		text-transform: uppercase;
 		letter-spacing: 0.5px;
 	}
 
 	.info-value {
-		font-size: 1rem;, color: #1f2937;
+		font-size: 1rem; color: #1f2937;
 		font-weight: 600;
 	}
 
@@ -401,12 +401,12 @@
 
 	.timeline {
 		background: #f9fafb;
-		border-radius: 8px;, padding: 1rem;
+		border-radius: 8px; padding: 1rem;
 	}
 
 	.timeline-item {
 		display: flex;
-		justify-content: space-between;, padding: 0.5rem 0;
+		justify-content: space-between; padding: 0.5rem 0;
 		border-bottom: 1px solid #e5e7eb;
 	}
 
@@ -415,11 +415,11 @@
 	}
 
 	.timeline-label {
-		font-size: 0.875rem;, color: #6b7280;
+		font-size: 0.875rem; color: #6b7280;
 	}
 
 	.timeline-value {
-		font-size: 0.875rem;, color: #1f2937;
+		font-size: 0.875rem; color: #1f2937;
 		font-weight: 500;
 	}
 
@@ -430,8 +430,8 @@
 
 	.file-item {
 		display: flex;
-		align-items: center;, gap: 0.5rem;
-		padding: 0.5rem;, background: #f9fafb;
+		align-items: center; gap: 0.5rem;
+		padding: 0.5rem; background: #f9fafb;
 		border-radius: 4px;
 		margin-bottom: 0.25rem;
 		font-size: 0.875rem;
@@ -442,7 +442,7 @@
 	}
 
 	.file-path {
-		font-family: monospace;, color: #374151;
+		font-family: monospace; color: #374151;
 		word-break: break-all;
 	}
 
@@ -450,9 +450,9 @@
 		display: flex;
 		flex-direction: column;
 		align-items: center;
-		justify-content: center;, height: 100%;
+		justify-content: center; height: 100%;
 		padding: 2rem;
-		text-align: center;, color: #6b7280;
+		text-align: center; color: #6b7280;
 	}
 
 	.no-selection .icon {
@@ -461,7 +461,7 @@
 	}
 
 	.stats {
-		display: flex;, gap: 2rem;
+		display: flex; gap: 2rem;
 		margin-top: 2rem;
 	}
 
@@ -471,13 +471,13 @@
 
 	.stat-box .stat-value {
 		font-size: 2.5rem;
-		font-weight: bold;, color: #667eea;
+		font-weight: bold; color: #667eea;
 		line-height: 1;
 		margin-bottom: 0.5rem;
 	}
 
 	.stat-box .stat-label {
-		font-size: 0.75rem;, color: #6b7280;
+		font-size: 0.75rem; color: #6b7280;
 		text-transform: uppercase;
 		letter-spacing: 0.5px;
 	}

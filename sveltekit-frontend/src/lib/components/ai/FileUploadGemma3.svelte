@@ -71,8 +71,8 @@
 <style>
   .upload-zone {
     border: 2px dashed #ccc;
-    border-radius: 8px;, padding: 2rem;
-    text-align: center;, transition: all 0.2s;
+    border-radius: 8px; padding: 2rem;
+    text-align: center; transition: all 0.2s;
   }
   .upload-zone.dragging {
     border-color: var(--primary, blue);

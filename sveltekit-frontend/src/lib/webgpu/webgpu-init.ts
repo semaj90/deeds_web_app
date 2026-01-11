@@ -1,7 +1,7 @@
 import type { GPU } from 'gpu.js';
 
 export interface WebGPUCapabilities {
- hasWebGPU: boolean, hasWebGL: boolean;, maxTextureSize: number, maxComputeWorkgroupsPerDimension: number;, maxComputeWorkgroupSizeX: number, maxComputeWorkgroupSizeY: number;, maxComputeWorkgroupSizeZ: number, maxComputeInvocationsPerWorkgroup: number;, maxStorageBufferBindingSize: number, maxUniformBufferBindingSize: number;, maxVertexAttributes: number, maxVertexBuffers: number;, maxInterStageShaderComponents: number, maxColorAttachments: number;, maxComputeWorkgroupStorageSize: number;
+ hasWebGPU: boolean, hasWebGL: boolean; maxTextureSize: number, maxComputeWorkgroupsPerDimension: number; maxComputeWorkgroupSizeX: number, maxComputeWorkgroupSizeY: number; maxComputeWorkgroupSizeZ: number, maxComputeInvocationsPerWorkgroup: number; maxStorageBufferBindingSize: number, maxUniformBufferBindingSize: number; maxVertexAttributes: number, maxVertexBuffers: number; maxInterStageShaderComponents: number, maxColorAttachments: number; maxComputeWorkgroupStorageSize: number;
 }
 
 export class WebGPUInit {

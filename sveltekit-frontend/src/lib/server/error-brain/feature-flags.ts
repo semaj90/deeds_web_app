@@ -18,9 +18,9 @@ export type ErrorBrainTransport = 'none' | 'sse' | 'redis' | 'both';
 export type ErrorBrainApplyMode = 'off' | 'safe' | 'full';
 
 export interface ErrorBrainConfig {
- enabled: boolean;, transport: ErrorBrainTransport;
- applyMode: ErrorBrainApplyMode;, maxPatchSize: number;
- confidenceThreshold: number;, dryRunDefault: boolean;
+ enabled: boolean; transport: ErrorBrainTransport;
+ applyMode: ErrorBrainApplyMode; maxPatchSize: number;
+ confidenceThreshold: number; dryRunDefault: boolean;
 }
 
 /**

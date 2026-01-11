@@ -17,10 +17,10 @@ import type {
 } from './types.js';
 
 export interface KnowledgeIndexerConfig {
-  qdrantUrl: string;, qdrantCollection: string;
-  postgresUrl: string;, minioEndpoint: string;
-  minioBucket: string;, redisUrl: string;
-  ollamaUrl: string;, embeddingModel: string;
+  qdrantUrl: string; qdrantCollection: string;
+  postgresUrl: string; minioEndpoint: string;
+  minioBucket: string; redisUrl: string;
+  ollamaUrl: string; embeddingModel: string;
   summaryModel: string;
 }
 

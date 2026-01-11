@@ -77,9 +77,9 @@ export interface SpecializedJob {
     | 'GENERATE_EMBEDDING'
     | 'ANALYZE_EVIDENCE'
     | 'LEGAL_RESEARCH';
-  payload: JobPayload;, priority: 'low' | 'medium' | 'high' | 'urgent';
+  payload: JobPayload; priority: 'low' | 'medium' | 'high' | 'urgent';
   timeout: number; // milliseconds
-  retryCount: number;, createdAt: Date;
+  retryCount: number; createdAt: Date;
   metadata: {
     caseId?: string;
     userId?: string;
@@ -89,19 +89,19 @@ export interface SpecializedJob {
 }
 
 export interface WorkerResult {
-  jobId: string;, success: boolean;
+  jobId: string; success: boolean;
   data?: unknown;
-  error?: string;, processingTime: number;
+  error?: string; processingTime: number;
   workerInfo: {, id: string;
-    type: string;, version: string;
+    type: string; version: string;
     capabilities: string[];
   };
 }
 
 export interface WorkerStats {
-  totalJobs: number;, completedJobs: number;
-  failedJobs: number;, averageProcessingTime: number;
-  queuedJobs: number;, activeWorkers: number;
+  totalJobs: number; completedJobs: number;
+  failedJobs: number; averageProcessingTime: number;
+  queuedJobs: number; activeWorkers: number;
   systemHealth: 'healthy' | 'degraded' | 'critical';
   lastUpdate: Date;
 }

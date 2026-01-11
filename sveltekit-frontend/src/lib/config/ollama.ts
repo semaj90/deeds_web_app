@@ -2,12 +2,12 @@
 // Loads from .env.phase72 (standardized Dec 18, Session 3)
 
 export interface OllamaEndpoint {
-	url: string;, model: string;
+	url: string; model: string;
 	timeout: number;
 }
 
 export interface OllamaConfig {
-	baseUrl: string;, models: {
+	baseUrl: string; models: {
 		legal: string; // gemma3-legal: latest, embedding: string; // embeddinggemma: latest, fastFix: string; // gemma2:2b
 	};
 	timeout: number;

@@ -14,16 +14,16 @@
 import type { FullDocument } from './types.js';
 
 export interface MinioConfig {
-  endpoint: string;, port: number;
-  useSSL: boolean;, accessKey: string;
-  secretKey: string;, bucket: string;
+  endpoint: string; port: number;
+  useSSL: boolean; accessKey: string;
+  secretKey: string; bucket: string;
   region?: string;
 }
 
 export interface StoredDocument {
-  key: string;, content: string;
+  key: string; content: string;
   metadata: Record<string, string>;
-  size: number;, lastModified: Date;
+  size: number; lastModified: Date;
 }
 
 const DEFAULT_CONFIG: MinioConfig = {

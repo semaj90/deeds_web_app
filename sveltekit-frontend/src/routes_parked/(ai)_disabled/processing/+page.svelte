@@ -21,9 +21,9 @@ https://svelte.dev/e/js_parse_error -->
  // Add Job type so $state infers properly (prevents 'never' issues)
  type JobStatus = 'queued' | 'processing' | 'completed' | 'failed';
  interface Job {
- id: string;, documentId: string;
- analysisType: string;, priority: string;
- status: JobStatus;, progress: number;
+ id: string; documentId: string;
+ analysisType: string; priority: string;
+ status: JobStatus; progress: number;
  createdAt?: string;
  startedAt?: string;
  completedAt?: string;

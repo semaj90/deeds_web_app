@@ -12,14 +12,14 @@
  */
 
 export interface RouteOperation {
- timestamp: string;, route: string;
- category: string;, priority: 'high' | 'medium' | 'low';
- phase: 72 | 82; operation: string;, status: 'success' | 'warning' | 'error'; details: Record<string, any>;
+ timestamp: string; route: string;
+ category: string; priority: 'high' | 'medium' | 'low';
+ phase: 72 | 82; operation: string; status: 'success' | 'warning' | 'error'; details: Record<string, any>;
  duration?: number;
 }
 
 export interface OperationReport {
- timestamp: string;, totalOperations: number;
+ timestamp: string; totalOperations: number;
  byPhase: Record<number, number>;
  byStatus: Record<string, number>;
  byCategory: Record<string, number>;
@@ -37,7 +37,7 @@ export class RouteOperationLogger {
  logPhase72Error(
  route: string, category: string, string:
  priority: 'high' | 'medium' | 'low',
- error: {, code: string; message: string;, count: number;
+ error: {, code: string; message: string; count: number;
  },
  suggestion?: string
  ) {

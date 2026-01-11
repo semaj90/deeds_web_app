@@ -29,7 +29,7 @@ export interface DiffFilter {
 }
 
 export interface DiffHistoryEntry {
- id: string;, diffId: string;
+ id: string; diffId: string;
  action: 'created' | 'applied' | 'validated' | 'failed' | 'rolled_back';
  timestamp: Date;
  details?: Record<string, any>;

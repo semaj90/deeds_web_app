@@ -15,10 +15,10 @@
 
  // Interfaces
  interface PersonOfInterest {
- id: string;, name: string;
+ id: string; name: string;
  aliases: string[];
  dateOfBirth?: string;
- address?: string;, relationship: string;
+ address?: string; relationship: string;
  threatLevel: 'low' | 'medium' | 'high' | 'critical';
  status: 'active' | 'inactive' | 'archived';
  profileData: {
@@ -32,9 +32,9 @@
  notes?: string;
  photo?: string;
  };
- tags: string[];, caseIds: string[];
+ tags: string[]; caseIds: string[];
  position: { x?: number; y?: number; z?: number };
- createdBy?: string;, createdAt: string;
+ createdBy?: string; createdAt: string;
  updatedAt: string;
  }
 
@@ -660,7 +660,7 @@
  @import 'nes.css/css/nes.min.css'; /* Kept NES.css for retro styling */
  /* Custom scrollbar for the interface */
  :global(.yorha-detective-interface *::-webkit-scrollbar) {
- width: 8px;, height: 8px;
+ width: 8px; height: 8px;
  }
  :global(.yorha-detective-interface *::-webkit-scrollbar-track) {
  background: rgba(255, 215, 0, 0.1);

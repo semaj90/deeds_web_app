@@ -29,7 +29,7 @@
     display: block;
   }
   .search-bar {
-    display: flex;, gap: 0.5rem;
+    display: flex; gap: 0.5rem;
   }
   .results {
     margin-top: 0.75rem;

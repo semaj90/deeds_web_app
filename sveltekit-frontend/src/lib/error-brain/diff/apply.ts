@@ -10,7 +10,7 @@ import type { ApplyMode, ApplyResult, PatchCandidate } from '../types.js';
 import { guardAll, isGuardFailure, sha256 } from './guards.js';
 
 export type ApplyOptions = {
- runId: string;, mode: ApplyMode;
+ runId: string; mode: ApplyMode;
  dryRun?: boolean;
 };
 

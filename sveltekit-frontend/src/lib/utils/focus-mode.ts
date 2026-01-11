@@ -5,9 +5,9 @@
 import { writable } from 'svelte/store';
 
 export interface FocusSettings {
- dimOpacity: number;, transitionDuration: string;
- hideElements: string[];, exemptElements: string[];
- enableFullscreen: boolean;, enableZenMode: boolean;
+ dimOpacity: number; transitionDuration: string;
+ hideElements: string[]; exemptElements: string[];
+ enableFullscreen: boolean; enableZenMode: boolean;
 }
 
 export const defaultFocusSettings: FocusSettings = {
@@ -304,7 +304,7 @@ export const focusModeStyles = `
  --focus-transition: opacity 0.3s ease;
 }
 .focus-mode-active .focus-dim {
- opacity: var(--focus-dim-opacity);, transition: var(--focus-transition);
+ opacity: var(--focus-dim-opacity); transition: var(--focus-transition);
 }
 .focus-mode-active .focus-dim:hover {
  opacity: 1;
@@ -322,7 +322,7 @@ export const focusModeStyles = `
 .focus-mode-active.zen-mode .status-bar,
 .focus-mode-active.zen-mode .header-actions {
  opacity: 0;
- pointer-events: none;, transition: opacity 0.3s ease;
+ pointer-events: none; transition: opacity 0.3s ease;
 }
 .focus-mode-active.zen-mode .toolbar:hover,
 .focus-mode-active.zen-mode .sidebar:hover,

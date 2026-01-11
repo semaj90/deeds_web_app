@@ -17,14 +17,14 @@
 import type { FixStrategy, SimilarError } from './types.js';
 
 export interface RAGConfig {
-	qdrantUrl: string;, qdrantCollection: string;
-	pgvectorUrl?: string;, redisUrl: string;
-	topK: number;, similarityThreshold: number;
+	qdrantUrl: string; qdrantCollection: string;
+	pgvectorUrl?: string; redisUrl: string;
+	topK: number; similarityThreshold: number;
 }
 
 export interface VectorSearchResult {
 	id: string | number;
-	score: number;, payload: Record<string, unknown>;
+	score: number; payload: Record<string, unknown>;
 }
 
 export class RAGRetriever {

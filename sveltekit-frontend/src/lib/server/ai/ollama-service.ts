@@ -15,8 +15,8 @@ type OllamaGenerateRequest = {
 };
 
 type OllamaResponse = {
-    model: string;, created_at: string;
-    response: string;, done: boolean;
+    model: string; created_at: string;
+    response: string; done: boolean;
     context?: number[];
     total_duration?: number;
     load_duration?: number;
@@ -29,7 +29,7 @@ type OllamaResponse = {
 type LegalDocument = {
     id: string;
     type?: string;
-    title?: string;, content: string;
+    title?: string; content: string;
     metadata?: {
         dateCreated?: Date;
         dateModified?: Date;
@@ -41,15 +41,15 @@ type LegalDocument = {
 };
 
 type AnalysisResult = {
-    documentId: string;, summary: string;
-    keyPoints: string[];, entities: {
-        people: string[];, organizations: string[];
-        dates: string[];, locations: string[];
+    documentId: string; summary: string;
+    keyPoints: string[]; entities: {
+        people: string[]; organizations: string[];
+        dates: string[]; locations: string[];
         legalConcepts: string[];
         [key: string]: unknown;
     };
-    sentiment: string;, riskFactors: string[];
-    recommendations: string[];, citations: string[];
+    sentiment: string; riskFactors: string[];
+    recommendations: string[]; citations: string[];
     metadata?: Record<string, unknown>;
 };
 

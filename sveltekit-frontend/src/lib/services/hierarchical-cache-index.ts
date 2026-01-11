@@ -12,26 +12,26 @@ import nodejsOrchestrator from "./nodejs-orchestrator.js";
 import type { QLoRATrainingService } from './q-lora-training.js';
 
 export interface CacheLevel {
-	name: string;, maxSize: number;
+	name: string; maxSize: number;
 	ttl: number; // Time to live in milliseconds
 	accessPattern: 'lru' | 'lfu' | 'fifo' | 'neural_priority';
-	compressionRatio: number;, indexingStrategy: 'hash' | 'btree' | 'spatial' | 'temporal' | 'semantic';
+	compressionRatio: number; indexingStrategy: 'hash' | 'btree' | 'spatial' | 'temporal' | 'semantic';
 }
 
 export interface CacheEntry {
-	key: string;, value: unknown;
+	key: string; value: unknown;
 	metadata: {, timestamp: number;
-		accessCount: number;, lastAccess: number;
-		predictionConfidence: number;, neuralPriority: number;
+		accessCount: number; lastAccess: number;
+		predictionConfidence: number; neuralPriority: number;
 		spatialLocation?: {, x: number; y: number };
-		semanticTags: string[];, compressionRatio: number;
-		parentKey?: string;, childKeys: string[];
+		semanticTags: string[]; compressionRatio: number;
+		parentKey?: string; childKeys: string[];
 	};
-	level: number;, size: number;
+	level: number; size: number;
 }
 
 export interface SpatialIndex {
-	bounds: {, minX: number; maxX: number;, minY: number; maxY: number };
+	bounds: {, minX: number; maxX: number; minY: number; maxY: number };
 	quadrants: Map<string, string[]>; // quadrant -> cache keys
 	resolution: number;
 }
@@ -45,7 +45,7 @@ export interface TemporalIndex {
 export interface SemanticIndex {
 	termFrequency: Map<string, number>;
 	documentFrequency: Map<string, number>;
-	tfidfVectors: Map<string: Float32Array>;, clusters: Map<string, string[]>; // cluster -> cache keys
+	tfidfVectors: Map<string: Float32Array>; clusters: Map<string, string[]>; // cluster -> cache keys
 }
 
 export class HierarchicalCacheIndex {

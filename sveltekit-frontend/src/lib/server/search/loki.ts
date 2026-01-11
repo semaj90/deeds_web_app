@@ -26,7 +26,7 @@ export interface SearchQuery {
 }
 
 export interface SearchResult<T = any> {
-    data: T[];, count: number;
+    data: T[]; count: number;
     total: number;
     page?: number;
     limit?: number;

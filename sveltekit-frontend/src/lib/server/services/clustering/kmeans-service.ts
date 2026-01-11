@@ -4,20 +4,20 @@
  */
 
 export interface KMeansConfig {
- k: number;, maxIterations: number;
+ k: number; maxIterations: number;
  tolerance: number;
 }
 
 export interface KMeansCluster {
- id: number;, centroid: number[];
+ id: number; centroid: number[];
  members: string[];
  label?: string;
  avgConfidence?: number;
 }
 
 export interface ClusterAssignment {
- statuteId: string;, clusterId: number;
- label: string;, confidence: number;
+ statuteId: string; clusterId: number;
+ label: string; confidence: number;
  flaggedForReview: boolean;
 }
 
@@ -287,7 +287,7 @@ export function calculateClusterQuality(
  assignments: ClusterAssignment[],
  clusters: KMeansCluster[]
 ): {, silhouetteScore: number;
- daviesBouldinIndex: number;, avgConfidence: number;
+ daviesBouldinIndex: number; avgConfidence: number;
 } {
  let silhouetteSum = 0;
  let daviesBouldinSum = 0;
@@ -347,7 +347,7 @@ export function calculateClusterQuality(
  * Get cluster statistics
  */
 export function getClusterStats(clusters: KMeansCluster[]): {, clusterSizes: number[];
- avgClusterSize: number;, minClusterSize: number;
+ avgClusterSize: number; minClusterSize: number;
  maxClusterSize: number;
 } {
  const clusterSizes = clusters.map((c) => c.members.length);

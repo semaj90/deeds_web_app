@@ -20,15 +20,15 @@ import type { DiffPatch } from './diffTypes.js';
 const execAsync = promisify(exec);
 
 export interface ValidationResult {
- success: boolean;, errorCount: number;
- errors: string[];, validatedFiles: string[];
+ success: boolean; errorCount: number;
+ errors: string[]; validatedFiles: string[];
  duration: number;
  reason?: string;
 }
 
 export interface RegressionResult {
- hasRegression: boolean;, newErrors: string[];
- fixedErrors: string[];, netChange: number;
+ hasRegression: boolean; newErrors: string[];
+ fixedErrors: string[]; netChange: number;
 }
 
 export class ValidationService {

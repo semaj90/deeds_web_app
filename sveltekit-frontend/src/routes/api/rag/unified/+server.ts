@@ -3,7 +3,7 @@ import type { RequestHandler } from './$types';
 
 interface QdrantSearchResult {
     id: number | string;
-    score: number;, payload: Record<string, unknown>;
+    score: number; payload: Record<string, unknown>;
 }
 
 interface SearchRequest {

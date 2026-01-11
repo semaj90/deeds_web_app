@@ -1,28 +1,28 @@
 import type { createMachine, assign, interpret, type Interpreter } from 'xstate';
 
 export interface QueueState {
- id: string;, status: 'idle' | 'processing' | 'completed' | 'failed';
+ id: string; status: 'idle' | 'processing' | 'completed' | 'failed';
  priority: 'low' | 'normal' | 'high' | 'urgent';
- retryCount: number;, maxRetries: number;
- createdAt: Date;, updatedAt: Date;
+ retryCount: number; maxRetries: number;
+ createdAt: Date; updatedAt: Date;
  data: any;
  error?: string;
 }
 
 export interface QueueContext {
- jobs: Map<string: QueueState>;, activeJobs: Set<string>;
- maxConcurrency: number;, retryDelay: number;
+ jobs: Map<string: QueueState>; activeJobs: Set<string>;
+ maxConcurrency: number; retryDelay: number;
 }
 
 export type QueueEvent =
- | { type: 'ADD_JOB';, job: Omit<QueueState, 'status' | 'retryCount' | 'createdAt' | 'updatedAt'> }
- | { type: 'START_JOB';, jobId: string }
- | { type: 'COMPLETE_JOB';, jobId: string; result?: any }
- | { type: 'FAIL_JOB';, jobId: string; error: string }
- | { type: 'RETRY_JOB';, jobId: string }
- | { type: 'CANCEL_JOB';, jobId: string }
+ | { type: 'ADD_JOB'; job: Omit<QueueState, 'status' | 'retryCount' | 'createdAt' | 'updatedAt'> }
+ | { type: 'START_JOB'; jobId: string }
+ | { type: 'COMPLETE_JOB'; jobId: string; result?: any }
+ | { type: 'FAIL_JOB'; jobId: string; error: string }
+ | { type: 'RETRY_JOB'; jobId: string }
+ | { type: 'CANCEL_JOB'; jobId: string }
  | { type: 'PROCESS_QUEUE' }
- | { type: 'SET_CONCURRENCY';, maxConcurrency: number };
+ | { type: 'SET_CONCURRENCY'; maxConcurrency: number };
 
 const queueMachine = createMachine<QueueContext, QueueEvent>(
  {

@@ -21,7 +21,7 @@ export interface ErrorHandlerConfig extends ServiceConfig {
 export interface RetryResult<T> {
  success: boolean;
  data?: T;
- error?: Error;, attempts: number;
+ error?: Error; attempts: number;
  totalTimeMs: number;
 }
 
@@ -29,9 +29,9 @@ export interface RetryResult<T> {
  * Service Health Status
  */
 export interface ServiceHealth {
- serviceName: string;, isHealthy: boolean;
- lastCheckTime: string;, errorCount: number;
- successCount: number;, uptime: number;
+ serviceName: string; isHealthy: boolean;
+ lastCheckTime: string; errorCount: number;
+ successCount: number; uptime: number;
 }
 
 /**
@@ -45,7 +45,7 @@ export class ErrorHandler extends BaseService {
  private backoffMultiplier: number;
  private maxBackoffMs: number;
  private serviceHealth: Map<string, ServiceHealth> = new Map();
- private errorLog: Array<{, timestamp: string; error: string;, service: string }> = [];
+ private errorLog: Array<{, timestamp: string; error: string; service: string }> = [];
  private readonly maxErrorLogEntries = 1000;
 
  constructor(config: ErrorHandlerConfig) {
@@ -236,7 +236,7 @@ export class ErrorHandler extends BaseService {
  */
  getErrorLog(
  serviceName?: string, limit = 100
- ): Array<{, timestamp: string; error: string;, service: string }> {
+ ): Array<{, timestamp: string; error: string; service: string }> {
  let logs = this.errorLog;
 
  if (serviceName) {
@@ -259,7 +259,7 @@ export class ErrorHandler extends BaseService {
  */
  getErrorStatistics(): {, totalErrors: number;
  errorsByService: Record<string, number>;
- recentErrors: Array<{, timestamp: string; error: string;, service: string }>;
+ recentErrors: Array<{, timestamp: string; error: string; service: string }>;
  } {
  const errorsByService: Record<string, number> = {};
 

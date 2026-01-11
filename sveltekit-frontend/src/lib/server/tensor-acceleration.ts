@@ -4,7 +4,7 @@
  * Supports image analysis, similarity operations, and embedding transforms
  */
 interface GPUTensorConfig {
-    tileSize: number;, workgroupSize: [number, number, number];
+    tileSize: number; workgroupSize: [number, number, number];
     precision: 'fp16' | 'fp32';
     memoryOptimized: boolean;
 }
@@ -19,21 +19,21 @@ export interface TensorAccelerationOptions {
 
 // Add typed result interfaces to replace Promise<any>
 interface GPUMeta {
-    gpuProcessed: boolean;, tileSize: number;
-    computeTime: number;, memoryUsage: number;
-    kernelType: string;, precision: string;
+    gpuProcessed: boolean; tileSize: number;
+    computeTime: number; memoryUsage: number;
+    kernelType: string; precision: string;
 }
 
 export interface SimilarityResult {
-    similarity: number;, gpuMeta: GPUMeta;
+    similarity: number; gpuMeta: GPUMeta;
 }
 
 export interface TransformResult {
-    transformed: Float32Array;, gpuMeta: GPUMeta;
+    transformed: Float32Array; gpuMeta: GPUMeta;
 }
 
 export interface ImageAnalysisResult {
-    features: Float32Array;, gpuMeta: GPUMeta;
+    features: Float32Array; gpuMeta: GPUMeta;
 }
 
 export class TensorAccelerator {

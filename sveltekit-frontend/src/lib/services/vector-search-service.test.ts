@@ -16,7 +16,7 @@ interface VectorSearchConfig {
 }
 
 interface CollectionStatus {
-  vectorDimension: number;, documentCount: number;
+  vectorDimension: number; documentCount: number;
 }
 
 // Mock service implementation

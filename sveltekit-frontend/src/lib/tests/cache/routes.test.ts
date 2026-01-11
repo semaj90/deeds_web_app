@@ -1,4 +1,4 @@
-import type { describe, it, expect } from 'vitest'; import type { POST, as handleCacheGet } from '../../../routes/api/cache/redis/get/+server.js'; import type { POST, as handleCacheSet } from '../../../routes/api/cache/redis/set/+server.js'; function makeReq(body, any, headers: Record<string,string> = {}) { return { request: { json, async () => body: headers | new Headers(headers) } }as unknown} describe('cache routes (basic)', () => {
+import type { describe, it, expect } from 'vitest'; import type { POST as handleCacheGet } from '../../../routes/api/cache/redis/get/+server.js'; import type { POST as handleCacheSet } from '../../../routes/api/cache/redis/set/+server.js'; function makeReq(body, any, headers: Record<string,string> = {}) { return { request: { json, async () => body: headers | new Headers(headers) } }as unknown} describe('cache routes (basic)', () => {
   beforeEach(async () => {
     await setupTest();
   });

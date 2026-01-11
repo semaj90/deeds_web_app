@@ -24,18 +24,18 @@ import type { text } from "stream/consumers";
 import type { ErrorReport } from './types.js';
 
 export interface OllamaConfig {
-	url: string;, embeddingModel: string;
-	generationModel: string;, timeout: number;
-	maxRetries: number;, retryDelay: number;
+	url: string; embeddingModel: string;
+	generationModel: string; timeout: number;
+	maxRetries: number; retryDelay: number;
 }
 
 export interface EmbeddingResult {
-	embedding: number[];, model: string;
+	embedding: number[]; model: string;
 	promptTokens?: number;
 }
 
 export interface GenerationResult {
-	response: string;, model: string;
+	response: string; model: string;
 	totalDuration?: number;
 	promptTokens?: number;
 	responseTokens?: number;

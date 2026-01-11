@@ -18,9 +18,9 @@ export interface FileProcessingOptions {
 
 export interface ProcessedFile {
  file: File;
- preview?: string;, metadata: {
- name: string;, size: number;
- type: string;, lastModified: number;
+ preview?: string; metadata: {
+ name: string; size: number;
+ type: string; lastModified: number;
  };
 }
 

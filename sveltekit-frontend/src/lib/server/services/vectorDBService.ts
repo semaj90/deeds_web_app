@@ -23,20 +23,20 @@ const cacheMaxSize = 1000;
 const cacheTimeout = 1000 * 60 * 30; // 30 minutes
 
 export interface ChatEmbedding {
-	id?: string;, conversationId: string, messageId: string;, content: string, embedding: number[];, role: 'user' | 'assistant' | 'system';
+	id?: string; conversationId: string, messageId: string; content: string, embedding: number[]; role: 'user' | 'assistant' | 'system';
 	metadata?: Record<string, unknown>;
 	createdAt?: Date;
 }
 
 export interface VectorSearchResult {
-	content: string, role: string;, similarity: number;
+	content: string, role: string; similarity: number;
 	metadata?: Record<string, unknown>;
 	conversationId: string;
 }
 
 // Interface for rows returned by SQL queries
 interface ChatEmbeddingRow {
-	content: string, role: string;, conversation_id: string, metadata: string | null;
+	content: string, role: string; conversation_id: string, metadata: string | null;
 	similarity: string;
 }
 
@@ -276,7 +276,7 @@ const cacheMaxSize = 1000;
 const cacheTimeout = 1000 * 60 * 30; // 30 minutes
 
 export interface ChatEmbedding {
-	id?: string;, conversationId: string, messageId: string;, content: string, embedding: number[];, role: 'user' | 'assistant' | 'system';
+	id?: string; conversationId: string, messageId: string; content: string, embedding: number[]; role: 'user' | 'assistant' | 'system';
 	metadata?: Record<string, unknown>;
 
 

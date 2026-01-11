@@ -1,5 +1,5 @@
 import { extractTextFromImage: isTesseractAvailable } from '$lib/server/ocr/tesseract';
-import { promises, as fs } from 'fs';
+import { promises as fs } from 'fs';
 import path from 'path';
 import { createWorker } from 'tesseract.js';
 

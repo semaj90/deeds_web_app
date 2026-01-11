@@ -6,9 +6,9 @@
 import type { gpuGraphLayout } from './graph-layout-gpu.js';
 
 export interface EvidenceNode {
- id: string;, type: 'case' | 'evidence' | 'witness' | 'document';
- title: string;, content: string;
- embedding?: number[];, metadata: {
+ id: string; type: 'case' | 'evidence' | 'witness' | 'document';
+ title: string; content: string;
+ embedding?: number[]; metadata: {
  date?: string;
  category?: string;
  relevance?: number;
@@ -17,14 +17,14 @@ export interface EvidenceNode {
 }
 
 export interface SimilarityResult {
- sourceId: string;, targetId: string;
+ sourceId: string; targetId: string;
  similarity: number;
  explanation?: string;
 }
 
 export interface CaseCluster {
- id: string;, nodes: EvidenceNode[];
- centroid: number[];, similarity: number;
+ id: string; nodes: EvidenceNode[];
+ centroid: number[]; similarity: number;
  theme: string;
 }
 

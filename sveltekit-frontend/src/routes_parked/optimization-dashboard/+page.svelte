@@ -5,7 +5,7 @@ import { enhancedRAGStore } from '$lib/stores/enhanced-rag-store.js';
 import type { WorkerStats } from '$lib/workers/specialized-worker-system.js';
 import { onMount } from 'svelte';
 
- type PerfPoint = { time: Date;, value: number };
+ type PerfPoint = { time: Date; value: number };
 
  // Reactive state using Svelte, 5 runes
  let systemStatus = $state ({

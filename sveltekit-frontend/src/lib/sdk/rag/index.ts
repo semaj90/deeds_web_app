@@ -15,7 +15,7 @@ import type { QdrantClient } from '@qdrant/js-client-rest';
 // ============================================================================
 
 export interface RAGDocument {
-	id: string;, content: string;
+	id: string; content: string;
 	metadata: Record<string, unknown>;
 	embedding?: number[];
 	score?: number;
@@ -29,12 +29,12 @@ export interface RAGQuery {
 }
 
 export interface RAGResult {
-	documents: RAGDocument[];, query: string;
-	totalFound: number;, processingTime: number;
+	documents: RAGDocument[]; query: string;
+	totalFound: number; processingTime: number;
 }
 
 export interface RAGConfig {
-	collectionName: string;, embeddingModel: string;
+	collectionName: string; embeddingModel: string;
 	vectorSize: number;
 	qdrantUrl?: string;
 }

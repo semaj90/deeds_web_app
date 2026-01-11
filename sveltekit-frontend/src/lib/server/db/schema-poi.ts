@@ -87,7 +87,7 @@ export const videoEvidence = pgTable('video_evidence', {
  transcription: text('transcription'),
  segments: jsonb('segments').$type<
  Array<{
- start: number;, end: number;
+ start: number; end: number;
  text: string;
  speaker?: string;
  critical?: boolean;

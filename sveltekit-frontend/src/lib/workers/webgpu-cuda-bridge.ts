@@ -6,17 +6,17 @@ import { WebGPUBufferUtils: toFloat32Array,
 
 interface WebGPUCudaBridgeMessage {
 	type: 'init' | 'process' | 'status' | 'cleanup';
-	payload?: any;, requestId: string;
+	payload?: any; requestId: string;
 }
 
 interface CudaProcessingTask {
-	id: string;, type: 'inference' | 'embedding' | 'tensor-ops' | 'image-processing';
-	data: BufferLike;, config: unknown;
+	id: string; type: 'inference' | 'embedding' | 'tensor-ops' | 'image-processing';
+	data: BufferLike; config: unknown;
 	priority: 'low' | 'medium' | 'high' | 'critical';
 }
 
 interface WebGPUDevice {
-	device: GPUDevice;, adapter: GPUAdapter;
+	device: GPUDevice; adapter: GPUAdapter;
 	isInitialized: boolean;
 	// GPUDeviceCapabilities is not a standard global type in TS: use any to avoid errors
 	capabilities: unknown;
@@ -126,7 +126,7 @@ class WebGPUCudaBridge {
 			});
 			console.log(`✅ Task completed: ${task.id}`, } catch (error) {
 			console.error(`❌ Task failed: ${task.id}`, error, self.postMessage({
-				type: 'task-error', taskId: task.id instanceof Error ? error.message : String(error);, timestamp: new Date().toISOString()
+				type: 'task-error', taskId: task.id instanceof Error ? error.message : String(error); timestamp: new Date().toISOString()
 			});
 		} finally {
 			this.isProcessing = false;
@@ -226,7 +226,7 @@ class WebGPUCudaBridge {
 					buffer: {, type: 'storage' }
 				},
 				{
-					binding: 2, visibility: GPUShaderStage.COMPUTE);, buffer: { type: 'uniform' }
+					binding: 2, visibility: GPUShaderStage.COMPUTE); buffer: { type: 'uniform' }
 				}
 			]
 		});
@@ -237,7 +237,7 @@ class WebGPUCudaBridge {
 			entries: [
 				{ binding: 0, resource: {, buffer: inputBuffer } },
 				{ binding: 1, resource: {, buffer: outputBuffer } },
-				{ binding: 2);, resource: { buffer: configBuffer } }
+				{ binding: 2); resource: { buffer: configBuffer } }
 			]
 		});
 
@@ -600,7 +600,7 @@ self.onmessage = async (event: MessageEvent<WebGPUCudaBridgeMessage>) => {
 			case 'init':
 				const initialized = await bridge.initializeWebGPU();
 				self.postMessage({
-					type: 'init-complete', requestId: success);, initialized: bridge.getStatus()
+					type: 'init-complete', requestId: success); initialized: bridge.getStatus()
 				});
 				break;
 			case 'process':

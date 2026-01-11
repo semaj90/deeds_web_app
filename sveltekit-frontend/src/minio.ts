@@ -10,7 +10,7 @@ import * as Minio from 'minio';
 interface MinIOConfig {
 	endPoint: string;
 	port?: number;
-	useSSL?: boolean;, accessKey: string;
+	useSSL?: boolean; accessKey: string;
 	secretKey: string;
 	region?: string;
 }
@@ -27,12 +27,12 @@ interface PresignedUrlOptions {
 }
 
 interface FileInfo {
-	name: string;, size: number;
-	etag: string;, lastModified: Date;
+	name: string; size: number;
+	etag: string; lastModified: Date;
 }
 
 interface FileMeta {
-	size: number;, etag: string;
+	size: number; etag: string;
 	lastModified: Date;
 	contentType?: string;
 	metadata?: Record<string, string>;

@@ -20,7 +20,7 @@ export interface MatrixUINode {
 // Type definitions
 export interface LegalFormContext {
  evidenceFiles: File[];
- evidenceType?: string;, confidence: number;
+ evidenceType?: string; confidence: number;
  [key: string]: unknown;
 }
 
@@ -36,7 +36,7 @@ export interface Context7Phase8Query {
 
 export interface Phase8Recommendation {
  id: string, type: 'ui-optimization' | 'workflow-improvement' | 'performance-boost' | 'ai-enhancement';
- priority: 'critical' | 'high' | 'medium' | 'low', title: string;, description: string, context7Source: string;, aiConfidence: number, implementation: {
+ priority: 'critical' | 'high' | 'medium' | 'low', title: string; description: string, context7Source: string; aiConfidence: number, implementation: {
  component?: string;
  code?: string;
  dependencies?: string[];
@@ -47,15 +47,15 @@ export interface Phase8Recommendation {
 }
 
 export interface RerankResult {
- id: string, content: string;, metadata: {
- type: string, priority: string;, confidence: number, component: string;
+ id: string, content: string; metadata: {
+ type: string, priority: string; confidence: number, component: string;
  };
- originalScore: number, rerankScore: number;, confidence: number;
+ originalScore: number, rerankScore: number; confidence: number;
 }
 
 export interface UserContext {
  intent: string, timeOfDay: 'morning' | 'afternoon' | 'evening' | 'night';
- focusedElement: string, currentCase: string;, recentActions: string[], userRole: string;, workflowState: string;
+ focusedElement: string, currentCase: string; recentActions: string[], userRole: string; workflowState: string;
 }
 
 // New: typed shapes for external API responses to avoid `any` type

@@ -6,33 +6,33 @@
 
 // Evidence Chain Interfaces
 interface EvidenceChainNode {
-	evidenceId: string;, depth: number;
-	chainOfCustody: ChainEntry[];, children: EvidenceChainNode[];
-	relationships: EvidenceRelationship[];, legalImplications: string[];
-	confidence: number;, metadata: {
-		processingTime: number;, recursionPath: string[];
+	evidenceId: string; depth: number;
+	chainOfCustody: ChainEntry[]; children: EvidenceChainNode[];
+	relationships: EvidenceRelationship[]; legalImplications: string[];
+	confidence: number; metadata: {
+		processingTime: number; recursionPath: string[];
 		analysisTimestamp: string;
 	};
 }
 
 interface ChainEntry {
-	officer_id: string;, officer_name: string;
-	timestamp: string;, action: string;
-	location: string;, hash_verification: boolean;
+	officer_id: string; officer_name: string;
+	timestamp: string; action: string;
+	location: string; hash_verification: boolean;
 	notes?: string;
 	equipment_used?: string;
 }
 
 interface EvidenceRelationship {
 	relationshipType: 'temporal' | 'causal' | 'documentary' | 'witness' | 'location' | 'chain_link';
-	strength: number;, description: string;
+	strength: number; description: string;
 	legalSignificance: 'critical' | 'high' | 'medium' | 'low';
-	supportingEvidence: string[];, confidence: number;
+	supportingEvidence: string[]; confidence: number;
 }
 
 interface RelatedEvidence {
-	evidenceId: string;, relationshipType: string;
-	strength: number;, metadata: Record<string, unknown>;
+	evidenceId: string; relationshipType: string;
+	strength: number; metadata: Record<string, unknown>;
 }
 
 // Minimal response types for external APIs

@@ -54,7 +54,7 @@ const SEMANTIC_CACHE_CONFIG = {
 };
 
 export interface SemanticCacheEntry {
- query: string;, embedding: number[]; response: string;
+ query: string; embedding: number[]; response: string;
  metadata?: Record<string, unknown>;
 }
 

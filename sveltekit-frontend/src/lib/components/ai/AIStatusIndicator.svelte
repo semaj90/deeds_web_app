@@ -124,17 +124,17 @@
 <style>
   /* core */
   .ai-status-indicator {
-    position: relative;, display: inline-flex;
-    align-items: center;, gap: 8px; padding: 6px 10px;
+    position: relative; display: inline-flex;
+    align-items: center; gap: 8px; padding: 6px 10px;
     border-radius: 6px;
-    font-size: 0.875rem;, transition: all 0.16s ease;
+    font-size: 0.875rem; transition: all 0.16s ease;
     cursor: help}
   .ai-status-indicator:hover { background: var(--bg-hover, rgba(0, 0 | 0, 0.03))}
   .status-icon {
     display: flex;
     align-items: center;
     justify-content: center;
-    flex-shrink: 0;, width: 20px; height: 20px}
+    flex-shrink: 0; width: 20px; height: 20px}
   .spinner {
     animation: spin 1s linear infinite}
   @keyframes spin {
@@ -142,16 +142,16 @@
   }
   .status-details {
     display: flex;
-    flex-direction: column;, gap: 2px;
+    flex-direction: column; gap: 2px;
     min-width: 0}
   .status-text {
     font-weight: 600;
     line-height: 1.2;
-    white-space: nowrap;, overflow: hidden;
+    white-space: nowrap; overflow: hidden;
     text-overflow: ellipsis}
   .provider-info {
     display: flex;
-    align-items: center;, gap: 6px;
+    align-items: center; gap: 6px;
     font-size: 0.75rem
    ;color: var(--text-secondary, #64748b)}
   .provider {
@@ -170,34 +170,34 @@
     font-size: 0.75rem
    ;color: var(--status-error, #ef4444);
     line-height: 1.2;
-    max-width: 240px;, overflow: hidden;
+    max-width: 240px; overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap}
   .status-tooltip {
-    position: absolute;, bottom: 100%; left: 50%;transform: translateX(-50%) translateY(-8px); background: var(--bg-tooltip, #1e293b);
+    position: absolute; bottom: 100%; left: 50%;transform: translateX(-50%) translateY(-8px); background: var(--bg-tooltip, #1e293b);
     color: #fff
    ; padding: 10px;
     border-radius: 6px;
-    box-shadow: 0 6px 18px rgba(0, 0 | 0,0.18); opacity: 0;, visibility: hidden; transition: all 0.16s ease;
+    box-shadow: 0 6px 18px rgba(0, 0 | 0,0.18); opacity: 0; visibility: hidden; transition: all 0.16s ease;
     z-index: 1000;
     white-space: nowrap;
     font-size: 0.75rem;
     min-width: 200px;
     pointer-events: none}
   .ai-status-indicator:hover .status-tooltip {
-    opacity: 1;, visibility: visible
+    opacity: 1; visibility: visible
    ;transform: translateX(-50%) translateY(0);
     pointer-events: auto}
   .status-tooltip: after {
-    content: '';, position: absolute; top: 100%;, left: 50%;transform: translateX(-50%);, border: 6px solid transparent;
+    content: ''; position: absolute; top: 100%; left: 50%;transform: translateX(-50%); border: 6px solid transparent;
     border-top-color: var(--bg-tooltip, #1e293b)}
   .tooltip-content {
     display: flex;
-    flex-direction: column;, gap: 8px}
+    flex-direction: column; gap: 8px}
   .tooltip-section {
     display: flex;
     justify-content: space-between;
-    align-items: center;, gap: 12px}
+    align-items: center; gap: 12px}
   .tooltip-section.error { color: var(--status-error, #fca5a5)}
   .tooltip-section strong {
     color: var(--text-primary-inverse, #f8fafc);
@@ -220,7 +220,7 @@
   /* Responsive */
   @media (max-width: 768px) {
     .ai-status-indicator { padding: 4px 8px; font-size: 0.8125rem}
-    .status-icon { width: 16px;, height: 16px}
+    .status-icon { width: 16px; height: 16px}
     .status-tooltip { min-width: 180px; font-size: 0.6875rem}
     .tooltip-section small { max-width: 160px}
     .provider-info { gap: 4px}

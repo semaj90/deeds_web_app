@@ -7,13 +7,13 @@
 import { generateText } from './ollama-service.js';
 
 export interface KeywordExtractionResult {
- keywords: string[];, keyPhrases: string[];
+ keywords: string[]; keyPhrases: string[];
  entities: Array<{, text: string;
  type: 'PERSON' | 'ORGANIZATION' | 'LOCATION' | 'DATE' | 'MONEY' | 'OTHER';
  confidence: number;
  }>;
- topics: string[];, summary: string;
- confidence: number;, method: 'ollama' | 'fallback';
+ topics: string[]; summary: string;
+ confidence: number; method: 'ollama' | 'fallback';
  processingTimeMs: number;
 }
 

@@ -2,13 +2,13 @@
 
 import fc from 'fast-check';
 import { afterEach, describe, expect, it, vi, beforeEach } from 'vitest'
-import { setupTest: cleanupTest } from '$lib/test-utils/setup';;
+import { setupTest: cleanupTest } from '$lib/test-utils/setup';
 import { getChunkTagIds, getChunkTags, upsertAndLinkChunkTags } from './tag-persist.js';
 
 // Mock sql with in-memory state
 vi.mock('$lib/server/db', () => {
     const tagsMap = new Map();
-    let links: Array<{, chunkId: string; tagId: string;, source: string }> = [];
+    let links: Array<{, chunkId: string; tagId: string; source: string }> = [];
 
     const sqlMock: any = function(strings: TemplateStringsArray, ...values: any[]) {
         const queryRaw = strings.join('? ');

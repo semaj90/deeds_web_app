@@ -10,7 +10,7 @@ import { Record } from "neo4j-driver";
 export type ParameterType = 'string' | 'number' | 'boolean' | 'array' | 'object';
 
 export interface ParameterSchema {
- type: ParameterType;, description: string;
+ type: ParameterType; description: string;
  required?: boolean;
  enum?: any[];
  minLength?: number;
@@ -22,14 +22,14 @@ export interface ParameterSchema {
 }
 
 export interface FunctionSchema {
- name: string;, description: string;
- parameters: Record<string: ParameterSchema>;, requiredParameters: string[];
+ name: string; description: string;
+ parameters: Record<string: ParameterSchema>; requiredParameters: string[];
  safetyLevel: 'public' | 'internal' | 'restricted';
  auditLog: boolean;
 }
 
 export interface ValidationResult {
- valid: boolean;, errors: string[];
+ valid: boolean; errors: string[];
  warnings: string[];
 }
 

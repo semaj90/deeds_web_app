@@ -8,14 +8,14 @@ export interface Recommendation {
  | 'evidence_review'
  | 'legal_precedent'
  | 'workflow_optimization';
- title: string;, description: string;
+ title: string; description: string;
  confidence: number; // 0-1, priority: 'low' | 'medium' | 'high' | 'urgent';
  category: string;
- actionUrl?: string;, metadata: {
+ actionUrl?: string; metadata: {
  caseId?: string;
  documentId?: string;
- evidenceId?: string;, aiModel: string;
- reasoning: string;, estimatedImpact: 'low' | 'medium' | 'high';
+ evidenceId?: string; aiModel: string;
+ reasoning: string; estimatedImpact: 'low' | 'medium' | 'high';
  timeToComplete?: string;
  };
  createdAt: number;
@@ -27,16 +27,16 @@ export interface TrendItem {
  date: string; //, Or: number for timestamp: number; // Add other relevant trend metrics if known: e.g., activityCount: number
 }
 export interface UserAnalytics {
- userId: string;, profile: {
+ userId: string; profile: {
  userType: 'attorney' | 'paralegal' | 'investigator' | 'administrator';
  experienceLevel: 'junior' | 'mid' | 'senior' | 'expert';
- specializations: string[];, workPatterns: {
- mostActiveHours: number[];, averageSessionLength: number;
- documentsPerWeek: number;, casesHandled: number;
+ specializations: string[]; workPatterns: {
+ mostActiveHours: number[]; averageSessionLength: number;
+ documentsPerWeek: number; casesHandled: number;
  };
  };
  behavior: {, searchPatterns: string[];
- documentTypes: string[];, commonQueries: string[];
+ documentTypes: string[]; commonQueries: string[];
  toolUsage: Record<string, number>;
  navigationPaths: string[];
  };
@@ -51,20 +51,20 @@ export interface UserAnalytics {
 }
 export interface RecommendationState {
  // Recommendations
- recommendations: Recommendation[];, activeRecommendations: Recommendation[];
+ recommendations: Recommendation[]; activeRecommendations: Recommendation[];
  dismissedRecommendations: Recommendation[];
  // User Analytics
  userAnalytics: UserAnalytics | null;
  behaviorInsights: {, patterns: string[];
- suggestions: string[];, trends: Array<TrendItem>; // Changed from Array<any>
+ suggestions: string[]; trends: Array<TrendItem>; // Changed from Array<any>
  };
  // AI Models
- isAnalyzing: boolean;, lastAnalysisTime: number | null;
- aiModelsStatus: {, nvidia_llama: boolean; gemma3_legal: boolean;, recommendation_engine: boolean };
+ isAnalyzing: boolean; lastAnalysisTime: number | null;
+ aiModelsStatus: {, nvidia_llama: boolean; gemma3_legal: boolean; recommendation_engine: boolean };
  // Performance
- analyticsLatency: number;, recommendationAccuracy: number; // User feedback based
+ analyticsLatency: number; recommendationAccuracy: number; // User feedback based
  // Settings
- enableRealTimeAnalysis: boolean;, privacyLevel: 'minimal' | 'standard' | 'enhanced';
+ enableRealTimeAnalysis: boolean; privacyLevel: 'minimal' | 'standard' | 'enhanced';
  error: string | null;
 }
 const initialState: RecommendationState = {
@@ -203,7 +203,7 @@ export const recommendationActions = {
  /** * Analyze user behavior and update analytics */
  async analyzeUserBehavior(
  userId: string,
- activityData: {, action: string; context: any;, timestamp: number; duration?: number }
+ activityData: {, action: string; context: any; timestamp: number; duration?: number }
  ): Promise<void> {
  if (!initialState.enableRealTimeAnalysis) return;
  try {

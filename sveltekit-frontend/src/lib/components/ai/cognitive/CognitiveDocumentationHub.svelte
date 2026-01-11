@@ -52,11 +52,11 @@ https://svelte.dev/e/js_parse_error -->
  }
 
  interface DocumentationSection {
- title: string;, icon: string; content: DocumentationItem[];
+ title: string; icon: string; content: DocumentationItem[];
  }
 
  interface SearchResult extends DocumentationItem {
- sectionKey: string;, sectionTitle: string;
+ sectionKey: string; sectionTitle: string;
  }
 
  // Props with proper typing

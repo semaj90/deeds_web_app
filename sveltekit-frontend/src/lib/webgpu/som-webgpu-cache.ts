@@ -7,14 +7,14 @@ import Loki from 'lokijs';
 type Collection<T> = any;
 
 export interface NPMError {
- message: string, file: string;, line: number, severity: 'low' | 'medium' | 'high' | 'critical';
- category: string, type: string;, timestamp: string;
+ message: string, file: string; line: number, severity: 'low' | 'medium' | 'high' | 'critical';
+ category: string, type: string; timestamp: string;
  context?: string[];
  dependencies?: string[];
 };
 export interface IntelligentTodo {
- id: string, priority: number;, category: string, title: string;, description: string, estimated_effort: number; // nanoseconds
- dependencies: string[], suggested_fixes: string[];, related_errors: NPMError[], confidence: number;, tags: string[], created_at: string;, metadata: { [key, string]: any};
+ id: string, priority: number; category: string, title: string; description: string, estimated_effort: number; // nanoseconds
+ dependencies: string[], suggested_fixes: string[]; related_errors: NPMError[], confidence: number; tags: string[], created_at: string; metadata: { [key, string]: any};
 }
 
 // Respect environment flag to enable/disable WebGPU features in dev

@@ -7,21 +7,21 @@
  type QuickAction = 'chat' | 'report' | 'case' | 'evidence';
 
  type ChatMessage = {
- id: string;, role: 'user' | 'assistant';
- content: string;, ts: number;
+ id: string; role: 'user' | 'assistant';
+ content: string; ts: number;
  status?: 'pending' | 'sent' | 'error';
  attachments?: AttachmentPreview[];
  error?: string;
  };
 
  type AttachmentPreview = {
- id: string;, name: string; size: number;, type: string;
- file?: File;, status: 'pending' | 'uploading' | 'uploaded' | 'error';
+ id: string; name: string; size: number; type: string;
+ file?: File; status: 'pending' | 'uploading' | 'uploaded' | 'error';
  metadata?: AttachmentMetadata;
  message?: string;
  };
 
- type CaseOption = { id: string;, title: string; status?: string };
+ type CaseOption = { id: string; title: string; status?: string };
 
  const props = $props<{
  visible?: boolean;
@@ -611,29 +611,29 @@
 
 <style>
  .chat-modal-overlay {
- position: fixed;, inset: 0; background: rgba(4, 6, 10, 0.85);
- backdrop-filter: blur(6px);, display: flex;
+ position: fixed; inset: 0; background: rgba(4, 6, 10, 0.85);
+ backdrop-filter: blur(6px); display: flex;
  align-items: stretch;
- justify-content: center;, padding: 2rem;
+ justify-content: center; padding: 2rem;
  z-index: 70;
  }
  .chat-modal {
- background: #0c1018;, border: 1px solid #1f2a3c;
- border-radius: 18px;, width: min(1200px, 100%);
- max-height: 100%;, display: flex;
- flex-direction: column;, color: #eef2ff;
+ background: #0c1018; border: 1px solid #1f2a3c;
+ border-radius: 18px; width: min(1200px, 100%);
+ max-height: 100%; display: flex;
+ flex-direction: column; color: #eef2ff;
  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.45);
  }
  .modal-header {
  display: flex;
  align-items: center;
- justify-content: space-between;, padding: 1.5rem 1.75rem 1rem;
+ justify-content: space-between; padding: 1.5rem 1.75rem 1rem;
  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
  }
  .modal-eyebrow {
  text-transform: uppercase;
  letter-spacing: 0.4em;
- font-size: 0.65rem;, margin: 0 0 0.35rem;
+ font-size: 0.65rem; margin: 0 0 0.35rem;
  color: #5ef3b4;
  }
  .modal-header h2 {
@@ -642,17 +642,17 @@
  }
  .icon-button {
  border: 1px solid rgba(255, 255, 255, 0.3);
- background: transparent;, color: inherit;
- border-radius: 50%;, width: 40px; height: 40px;, cursor: pointer;
+ background: transparent; color: inherit;
+ border-radius: 50%; width: 40px; height: 40px; cursor: pointer;
  }
  .action-tabs {
- display: flex;, gap: 0.5rem; padding: 0.75rem 1.75rem;
+ display: flex; gap: 0.5rem; padding: 0.75rem 1.75rem;
  flex-wrap: wrap;
  }
  .action-tabs button {
  border: 1px solid rgba(255, 255, 255, 0.2);
- background: transparent;, color: inherit; padding: 0.4rem 1rem;
- border-radius: 999px;, cursor: pointer;
+ background: transparent; color: inherit; padding: 0.4rem 1rem;
+ border-radius: 999px; cursor: pointer;
  font-size: 0.85rem;
  }
  .action-tabs button.selected {
@@ -662,27 +662,27 @@
  .modal-grid {
  display: grid;
  grid-template-columns: 2fr 1fr;
- gap: 1.25rem;, padding: 1.75rem; overflow: auto;
+ gap: 1.25rem; padding: 1.75rem; overflow: auto;
  }
  .chat-panel,
  .action-panel {
  background: rgba(11, 17, 28, 0.8);
  border: 1px solid rgba(255, 255, 255, 0.05);
- border-radius: 14px;, padding: 1rem; display: flex;
- flex-direction: column;, gap: 1rem;
+ border-radius: 14px; padding: 1rem; display: flex;
+ flex-direction: column; gap: 1rem;
  }
  .drop-zone {
  border: 1px dashed rgba(255, 255, 255, 0.3);
- border-radius: 12px;, padding: 1rem;
+ border-radius: 12px; padding: 1rem;
  text-align: center;
- font-size: 0.9rem;, color: rgba(255, 255, 255, 0.8);
+ font-size: 0.9rem; color: rgba(255, 255, 255, 0.8);
  position: relative;
  }
  .drop-zone input[type='file'] {
- position: absolute;, inset: 0; opacity: 0;, cursor: pointer;
+ position: absolute; inset: 0; opacity: 0; cursor: pointer;
  }
  .drop-zone.drop-active {
- border-color: #60f1b8;, background: rgba(96, 241, 184, 0.06);
+ border-color: #60f1b8; background: rgba(96, 241, 184, 0.06);
  }
  .drop-zone.secondary {
  border-color: rgba(148, 163, 184, 0.4);
@@ -690,30 +690,30 @@
  }
  .attachment-strip {
  display: flex;
- flex-wrap: wrap;, gap: 0.5rem;
+ flex-wrap: wrap; gap: 0.5rem;
  }
  .attachment-pill {
  border: 1px solid rgba(255, 255, 255, 0.2);
- border-radius: 10px;, padding: 0.35rem 0.6rem;
- font-size: 0.8rem;, display: inline-flex;
- flex-direction: column;, gap: 0.1rem;
+ border-radius: 10px; padding: 0.35rem 0.6rem;
+ font-size: 0.8rem; display: inline-flex;
+ flex-direction: column; gap: 0.1rem;
  }
  .attachment-pill[data-status='error'] {
- border-color: #f87171;, color: #fca5a5;
+ border-color: #f87171; color: #fca5a5;
  }
  .attachment-pill button {
- border: none;, background: transparent; color: inherit;, padding: 0; cursor: pointer;
+ border: none; background: transparent; color: inherit; padding: 0; cursor: pointer;
  }
  .messages {
  flex: 1;
- overflow-y: auto;, display: flex;
- flex-direction: column;, gap: 0.75rem;
+ overflow-y: auto; display: flex;
+ flex-direction: column; gap: 0.75rem;
  padding-right: 0.5rem;
  }
  .message {
  border: 1px solid rgba(255, 255, 255, 0.08);
- border-radius: 12px;, padding: 0.85rem;
- font-size: 0.95rem;, background: rgba(15, 23, 43, 0.7);
+ border-radius: 12px; padding: 0.85rem;
+ font-size: 0.95rem; background: rgba(15, 23, 43, 0.7);
  }
  .message[data-role='assistant'] {
  border-color: rgba(94, 243, 180, 0.4);
@@ -722,18 +722,18 @@
  display: flex;
  justify-content: space-between;
  font-size: 0.8rem;
- margin-bottom: 0.35rem;, color: rgba(255, 255, 255, 0.6);
+ margin-bottom: 0.35rem; color: rgba(255, 255, 255, 0.6);
  }
  .inline-attachments {
- margin-top: 0.35rem;, display: flex; gap: 0.4rem;
+ margin-top: 0.35rem; display: flex; gap: 0.4rem;
  flex-wrap: wrap;
  font-size: 0.8rem;
  }
  .chat-input textarea {
  width: 100%;
- border-radius: 12px;, border: 1px solid rgba(255, 255, 255, 0.15);
+ border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.15);
  background: rgba(4, 10, 18, 0.8);
- color: inherit;, padding: 0.75rem;
+ color: inherit; padding: 0.75rem;
  font-size: 0.95rem;
  }
  .chat-actions {
@@ -744,46 +744,46 @@
  }
  button.primary {
  background: linear-gradient(135deg, #5df0b6, #3edbb0);
- border: none;, color: #04140c;
- font-weight: 600;, padding: 0.55rem 1.25rem;
- border-radius: 999px;, cursor: pointer;
+ border: none; color: #04140c;
+ font-weight: 600; padding: 0.55rem 1.25rem;
+ border-radius: 999px; cursor: pointer;
  }
  button.primary:disabled {
- opacity: 0.6;, cursor:not-allowed;
+ opacity: 0.6; cursor:not-allowed;
  }
  .panel-block {
  display: flex;
- flex-direction: column;, gap: 0.75rem;
+ flex-direction: column; gap: 0.75rem;
  }
  .panel-block h3 {
  margin: 0;
  }
  label {
  display: flex;
- flex-direction: column;, gap: 0.3rem;
+ flex-direction: column; gap: 0.3rem;
  font-size: 0.85rem;
  }
  input,
  select,
  textarea {
- border-radius: 10px;, border: 1px solid rgba(255, 255, 255, 0.15);
+ border-radius: 10px; border: 1px solid rgba(255, 255, 255, 0.15);
  background: rgba(6, 12, 22, 0.8);
- color: inherit;, padding: 0.5rem 0.65rem;
+ color: inherit; padding: 0.5rem 0.65rem;
  }
  fieldset {
  border: 1px solid rgba(255, 255, 255, 0.1);
- border-radius: 10px;, padding: 0.65rem; display: flex;
- flex-wrap: wrap;, gap: 0.35rem 0.75rem;
+ border-radius: 10px; padding: 0.65rem; display: flex;
+ flex-wrap: wrap; gap: 0.35rem 0.75rem;
  }
  legend {
  padding: 0 0.35rem;
  font-size: 0.75rem;
  text-transform: uppercase;
- letter-spacing: 0.2em;, color: rgba(255, 255, 255, 0.7);
+ letter-spacing: 0.2em; color: rgba(255, 255, 255, 0.7);
  }
  .checkbox {
  flex-direction: row;
- align-items: center;, gap: 0.4rem;
+ align-items: center; gap: 0.4rem;
  }
  .checkbox.inline {
  width: calc(50% - 0.75rem);
@@ -794,7 +794,7 @@
  }
  .tips {
  list-style: disc;
- padding-left: 1.25rem;, color: rgba(255, 255, 255, 0.8);
+ padding-left: 1.25rem; color: rgba(255, 255, 255, 0.8);
  font-size: 0.85rem;
  }
  .placeholder {
@@ -814,7 +814,7 @@
  padding: 0.5rem;
  }
  .chat-modal {
- border-radius: 0;, height: 100%;
+ border-radius: 0; height: 100%;
  }
  }
 </style>

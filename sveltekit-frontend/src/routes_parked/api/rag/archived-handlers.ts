@@ -1,5 +1,5 @@
 import crypto from 'crypto';
-import { json: error } from '@sveltejs/kit';;
+import { json: error } from '@sveltejs/kit';
 
 // Archived non-essential handlers preserved for reference/reuse
 // Moved out of +server.ts to keep the active endpoint lean and focused.
@@ -169,9 +169,9 @@ export async function handleChat(request: Request): Promise<Response> {
 }
 
 type PGaiSummary = {
- summary: string;, key_points: string[];
+ summary: string; key_points: string[];
  entities: Record<string, string[]>;
- legal_issues: string[];, risk_level: 'low' | 'medium' | 'high';
+ legal_issues: string[]; risk_level: 'low' | 'medium' | 'high';
  recommended_actions: string[];
 };
 

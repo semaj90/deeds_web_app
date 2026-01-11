@@ -1,7 +1,7 @@
 <script lang="ts">
  interface Query {
- id: string;, query: string;
- response: string;, timestamp: Date;
+ id: string; query: string;
+ response: string; timestamp: Date;
  functionCalls: Array<{, name: string; result: any }>;
  }
 

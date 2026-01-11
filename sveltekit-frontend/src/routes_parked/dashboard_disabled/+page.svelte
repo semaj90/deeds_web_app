@@ -3,15 +3,15 @@
  import { onMount } from 'svelte';
 
  interface Case {
- id: string;, title: string;
+ id: string; title: string;
  status: 'active' | 'closed';
- createdAt: string;, updatedAt: string;
+ createdAt: string; updatedAt: string;
  evidence: Array<{, id: string; status: string }>;
  }
 
  interface DashboardStats {
- activeCases: number;, pendingEvidence: number;
- approvedEvidence: number;, personsOfInterest: number;
+ activeCases: number; pendingEvidence: number;
+ approvedEvidence: number; personsOfInterest: number;
  }
 
  let cases: Case[] = $state([]);

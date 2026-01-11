@@ -20,16 +20,16 @@ import nodejsOrchestrator from "$lib/services/nodejs-orchestrator.js";
 const typedRedisService = redisService as RedisService;
 
 interface EmbeddingCacheEntry {
-    text: string;, embedding: number[] | string;
-    model: string;, timestamp: number;
+    text: string; embedding: number[] | string;
+    model: string; timestamp: number;
     accessCount?: number; // Made optional to handle undefined in cached data
-    lastAccessed: number;, compressed: boolean;
+    lastAccessed: number; compressed: boolean;
 }
 
 interface QueryCacheEntry {
-    query: string;, results: unknown[]; // Changed from any[]
+    query: string; results: unknown[]; // Changed from any[]
     metadata: Record<string, unknown>; // Changed from any
-    timestamp: number;, ttl: number;
+    timestamp: number; ttl: number;
 }
 
 class EmbeddingCacheService {

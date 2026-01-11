@@ -7,15 +7,15 @@ export interface TableState {
  sortColumn: string | null;
  sortDirection: 'asc' | 'desc';
  selectedRows: Set<string | number>;
- currentPage: number;, pageSize: number;
- searchQuery: string;, columnFilters: Map<string, string>;
+ currentPage: number; pageSize: number;
+ searchQuery: string; columnFilters: Map<string, string>;
  columnWidths: Map<string, number>;
  expandedRows: Set<string | number>;
 }
 
 export interface TableNotification {
- id: string;, type: 'info' | 'success' | 'warning' | 'error';
- title?: string;, message: string;
+ id: string; type: 'info' | 'success' | 'warning' | 'error';
+ title?: string; message: string;
  timestamp: Date;
  duration?: number;
  persistent?: boolean;

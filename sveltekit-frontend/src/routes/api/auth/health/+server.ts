@@ -16,11 +16,11 @@ declare global {
 }
 
 interface HealthWarning {
- code: string;, message: string;
+ code: string; message: string;
 }
 
 interface RecentSession {
- id: string;, userId: string;
+ id: string; userId: string;
  expiresAt: Date;
 }
 

@@ -74,7 +74,7 @@ export const getIsLoading = () =>
 
 // Utility functions for upload operations
 export const getUserForUpload = (): {, uploadedBy: string;
- uploaderRole: string;, uploaderEmail: string | null;
+ uploaderRole: string; uploaderEmail: string | null;
 } => {
  const currentUser = sessionStore.getCurrentUser();
  if (currentUser?.id) {

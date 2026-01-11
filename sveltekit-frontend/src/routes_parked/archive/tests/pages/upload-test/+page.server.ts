@@ -1,5 +1,5 @@
 import { superValidate } from 'sveltekit-superforms/server'
-import { zod } from 'sveltekit-superforms/adapters';;
+import { zod } from 'sveltekit-superforms/adapters';
 import { uploadSchema } from '$lib/schemas/upload';
 import type { PageServerLoad } from './$types.js';
 
@@ -15,7 +15,7 @@ export const load: PageServerLoad = async () => {
 // but for this fix, only the load function is necessary.
 /*
 import { fail } from '@sveltejs/kit';
-import type { message, type Actions } from '@sveltejs/kit';;
+import type { message, type Actions } from '@sveltejs/kit';
 
 export const actions: Actions = {
 	default: async ({ request }) => {

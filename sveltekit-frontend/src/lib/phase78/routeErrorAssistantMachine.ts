@@ -7,20 +7,20 @@ import type {
 } from './route-types.js';
 
 interface RouteErrorAssistantContext extends ErrorAssistantState {
- history: RouteErrorCluster[];, suggestions: PatchSuggestion[];
- selectedSuggestionIndex: number;, lastUpdated: string | null;
+ history: RouteErrorCluster[]; suggestions: PatchSuggestion[];
+ selectedSuggestionIndex: number; lastUpdated: string | null;
 }
 
 export type RouteErrorAssistantEvent =
- | { type: 'ANALYZE_ROUTE';, route: RouteMeta }
- | { type: 'SELECT_SUGGESTION';, index: number }
+ | { type: 'ANALYZE_ROUTE'; route: RouteMeta }
+ | { type: 'SELECT_SUGGESTION'; index: number }
  | { type: 'APPLY_PATCH'; index?: number }
  | { type: 'VERIFY_SUCCESS' }
  | { type: 'RESET' }
  | { type: 'RETRY' };
 
 interface AnalyzeRouteOutput {
- cluster: RouteErrorCluster;, suggestions: PatchSuggestion[];
+ cluster: RouteErrorCluster; suggestions: PatchSuggestion[];
 }
 
 const createInitialContext = (): RouteErrorAssistantContext => ({

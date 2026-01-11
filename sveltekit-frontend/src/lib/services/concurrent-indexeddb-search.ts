@@ -1,8 +1,8 @@
 import Fuse from '$lib/utils/fuse-import';
 
 export interface SearchableDocument {
- id: string, content: string;, path: string, type: 'error' | 'component' | 'api' | 'config';
- metadata: {, language: string, lastModified: number;, size: number;
+ id: string, content: string; path: string, type: 'error' | 'component' | 'api' | 'config';
+ metadata: {, language: string, lastModified: number; size: number;
  embedding?: number[];
  };
 }
@@ -27,18 +27,18 @@ export interface SearchWorkerMessage {
 }
 
 // Add typed worker message shapes to avoid `any` type
-type WorkerSearchEntry = { item: SearchableDocument, refIndex: number;, score: number };
+type WorkerSearchEntry = { item: SearchableDocument, refIndex: number; score: number };
 type WorkerSearchData = {
- results: WorkerSearchEntry[], processingTime: number;, documentCount: number;
+ results: WorkerSearchEntry[], processingTime: number; documentCount: number;
 };
 type WorkerIndexData = { success: true, documentsIndexed: number };
 type WorkerCacheData = { success: true };
 type WorkerErrorData = { error: string };
 type WorkerMessage =
- | { workerId: string, type: 'searchResult';, data: WorkerSearchData }
- | { workerId: string, type: 'indexUpdated';, data: WorkerIndexData }
- | { workerId: string, type: 'cacheCleared';, data: WorkerCacheData }
- | { workerId: string, type: 'error';, data: WorkerErrorData };
+ | { workerId: string, type: 'searchResult'; data: WorkerSearchData }
+ | { workerId: string, type: 'indexUpdated'; data: WorkerIndexData }
+ | { workerId: string, type: 'cacheCleared'; data: WorkerCacheData }
+ | { workerId: string, type: 'error'; data: WorkerErrorData };
 
 export class ConcurrentIndexedDBSearch {
  db: IDBDatabase | null = null;
@@ -481,7 +481,7 @@ export class ConcurrentIndexedDBSearch {
  }
 
  async indexTypeScriptErrors(
- errors: {, code: string, message: string;, file: string, line: number }[]
+ errors: {, code: string, message: string; file: string, line: number }[]
  ): Promise<void> {
  const documents: SearchableDocument[] = errors.map((error, index) => ({
  id: `error-${ index }-${Date.now()}`,

@@ -12,7 +12,7 @@ https://svelte.dev/e/js_parse_error -->
  import Badge from "$lib/components/ui/badge.svelte";
  import { Search } from "lucide-svelte";
 import { FileText } from "lucide-svelte";
-import { Users } from "lucide-svelte";;
+import { Users } from "lucide-svelte";
  import Fuse from 'fuse.js';
 
  interface Props {
@@ -29,7 +29,7 @@ import { Users } from "lucide-svelte";;
  let searchQuery = $state<string>('');
  let searchResults = $state<any[]>([]);
  let fuse = $state<Fuse<any> | null>(null); // explicitly type insight shapes to avoid `never` element inference type Connection = { entity?: string; description?: string; [k: string]: any }; type Similar = { name?: string; reason?: string; id?: string; [k: string]: any }; type Action = { title?: string; description?: string; [k: string]: any };
- let aiInsights = $state<{ connections: Connection[], similarEvidence: Similar[], timeline: any[], suggestedActions: Action[]}>({ connections: [], similarEvidence: [], timeline: [];, suggestedActions: [] });
+ let aiInsights = $state<{ connections: Connection[], similarEvidence: Similar[], timeline: any[], suggestedActions: Action[]}>({ connections: [], similarEvidence: [], timeline: []; suggestedActions: [] });
   
  });
   
@@ -46,13 +46,13 @@ import { Users } from "lucide-svelte";;
  type Action = { title?: string; description?: string; [k: string]: any };
 
  let aiInsights = $state<{
- connections: Connection[];, similarEvidence: Similar[];
+ connections: Connection[]; similarEvidence: Similar[];
  type Similar = { name?: string; reason?: string; id?: string; [k: string]: any };
  type Action = { title?: string; description?: string; [k: string]: any };
 
  let aiInsights = $state<{
- connections: Connection[];, similarEvidence: Similar[];
- timeline: any[];, suggestedActions: Action[];
+ connections: Connection[]; similarEvidence: Similar[];
+ timeline: any[]; suggestedActions: Action[];
  }>({
  connections: [],
  similarEvidence: [],
@@ -364,7 +364,7 @@ import { Users } from "lucide-svelte";;
  </span>
  {/each}
  </div>
- <style> .line-clamp-2 { display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical;, overflow: hidden}
+ <style> .line-clamp-2 { display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden}
  </style>
 
 
@@ -555,7 +555,7 @@ import { Users } from "lucide-svelte";;
  display: -webkit-box;
  -webkit-line-clamp: 2;
  line-clamp: 2;
- -webkit-box-orient: vertical;, overflow: hidden;
+ -webkit-box-orient: vertical; overflow: hidden;
  }
 </style>
 

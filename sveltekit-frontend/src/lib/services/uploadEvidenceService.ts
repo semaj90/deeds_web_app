@@ -6,18 +6,18 @@
 import type { ProcessingEvent } from './types.js';
 
 export interface UploadInitiation {
- evidence_id: string;, job_id: string;
- presigned_url: string;, expires_in: number;
- bucket: string;, object_name: string;
+ evidence_id: string; job_id: string;
+ presigned_url: string; expires_in: number;
+ bucket: string; object_name: string;
 }
 
 export interface UploadCompletion {
- evidence_id: string;, job_id: string;
- status: string;, message: string;
+ evidence_id: string; job_id: string;
+ status: string; message: string;
 }
 
 export interface UploadStatus {
- stage: string;, percentage: number;
+ stage: string; percentage: number;
  eta_seconds: number | null;
  last_update: string;
 }

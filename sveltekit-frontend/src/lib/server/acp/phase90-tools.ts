@@ -36,21 +36,21 @@ interface RedisClientExt {
 
 // Types
 interface GlyphData {
-  errorCode: string;, filePath: string;
-  line: number;, message: string;
-  clusterId: number;, tech: string[];
+  errorCode: string; filePath: string;
+  line: number; message: string;
+  clusterId: number; tech: string[];
 }
 
 interface SearchResult {
-  score: number;, message: string;
-  file: string;, code: string;
-  line: number;, clusterId: number;
+  score: number; message: string;
+  file: string; code: string;
+  line: number; clusterId: number;
   tech: string[];
 }
 
 interface ClusterInfo {
-  clusterId: number;, errorCount: number;
-  topCodes: string[];, topFiles: string[];
+  clusterId: number; errorCount: number;
+  topCodes: string[]; topFiles: string[];
   summary?: string;
 }
 
@@ -267,7 +267,7 @@ export async function phase90_get_cluster(clusterId: number): Promise<ClusterInf
   };
 }
 
-export async function phase90_get_fix_order(): Promise<{, clusterId: number; errorCount: number;, priority: number }[]> {
+export async function phase90_get_fix_order(): Promise<{, clusterId: number; errorCount: number; priority: number }[]> {
   const client = await getQdrant();
 
   // Get all clusters
@@ -331,8 +331,8 @@ export async function phase90_query_glyphs(
   return glyphs;
 }
 
-export async function phase90_get_stats(): Promise<{, qdrant: { embeddings: number;, clusters: number; recommendations: number };
-  redis: {, totalKeys: number; glyphKeys: number;, embedKeys: number };
+export async function phase90_get_stats(): Promise<{, qdrant: { embeddings: number; clusters: number; recommendations: number };
+  redis: {, totalKeys: number; glyphKeys: number; embedKeys: number };
 }> {
   const qdrantClient = await getQdrant();
   const redisClient = await getRedis();
@@ -398,7 +398,7 @@ export async function phase90_get_file_errors(
 }
 
 export async function phase90_get_fix_recommendation(clusterId: number): Promise<{, clusterId: number;
-  recommendation: string;, priority: string;
+  recommendation: string; priority: string;
   affectedFiles: string[];
 } | null> {
   const client = await getQdrant();

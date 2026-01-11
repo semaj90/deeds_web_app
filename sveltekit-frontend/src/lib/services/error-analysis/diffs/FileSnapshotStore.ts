@@ -2,7 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 export type FileSnapshot = {
- filePath: string;, beforeText: string;
+ filePath: string; beforeText: string;
  beforeSha256: string;
  bakPath?: string;
 };

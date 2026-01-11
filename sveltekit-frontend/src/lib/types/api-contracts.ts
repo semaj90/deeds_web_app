@@ -13,7 +13,7 @@ export type { StandardApiResponse };
 
 // Base API response wrapper
 export interface ApiContract<TRequest = unknown, TResponse = unknown> {
-    request: TRequest;, response: StandardApiResponse<TResponse>;
+    request: TRequest; response: StandardApiResponse<TResponse>;
 }
 
 // ==================== CASE API CONTRACTS ====================
@@ -31,13 +31,13 @@ export interface CaseListRequest {
 }
 
 export interface CaseListResponse {
-    cases: Case[];, pagination: {
-        page: number;, limit: number;
-        total: number;, hasNext: boolean;
+    cases: Case[]; pagination: {
+        page: number; limit: number;
+        total: number; hasNext: boolean;
         hasPrev: boolean;
     };
     search?: {, term: string;
-        resultsCount: number;, vectorSearchUsed: boolean;
+        resultsCount: number; vectorSearchUsed: boolean;
     } | null;
 }
 
@@ -54,7 +54,7 @@ export interface CaseCreateRequest {
 }
 
 export interface CaseCreateResponse {
-    case: Case;, message: string;
+    case: Case; message: string;
 }
 
 export type CaseCreate = ApiContract<CaseCreateRequest, CaseCreateResponse>;
@@ -68,7 +68,7 @@ export interface CaseUpdateRequest {
 }
 
 export interface CaseUpdateResponse {
-    case: Case;, message: string;
+    case: Case; message: string;
 }
 
 export type CaseUpdate = ApiContract<CaseUpdateRequest, CaseUpdateResponse>;
@@ -102,20 +102,20 @@ export interface EvidenceListRequest {
 }
 
 export interface EvidenceListResponse {
-    evidence: Evidence[];, pagination: {
-        page: number;, limit: number;
-        total: number;, hasNext: boolean;
+    evidence: Evidence[]; pagination: {
+        page: number; limit: number;
+        total: number; hasNext: boolean;
         hasPrev: boolean;
     };
     search?: {, term: string;
-        resultsCount: number;, vectorSearchUsed: boolean;
+        resultsCount: number; vectorSearchUsed: boolean;
     } | null;
 }
 
 export type EvidenceList = ApiContract<EvidenceListRequest, EvidenceListResponse>;
 
 export interface EvidenceCreateRequest {
-    caseId?: string;, title: string;
+    caseId?: string; title: string;
     description?: string;
     evidenceType?? 'document'
         | 'photograph'
@@ -142,7 +142,7 @@ export interface EvidenceCreateRequest {
 }
 
 export interface EvidenceCreateResponse {
-    evidence: Evidence;, message: string;
+    evidence: Evidence; message: string;
 }
 
 export type EvidenceCreate = ApiContract<EvidenceCreateRequest, EvidenceCreateResponse>;
@@ -167,7 +167,7 @@ export interface EvidenceUpdateRequest {
 }
 
 export interface EvidenceUpdateResponse {
-    evidence: Evidence;, message: string;
+    evidence: Evidence; message: string;
 }
 
 export type EvidenceUpdate = ApiContract<EvidenceUpdateRequest, EvidenceUpdateResponse>;
@@ -178,7 +178,7 @@ export interface EvidenceDeleteRequest {
 }
 
 export interface EvidenceDeleteResponse {
-    message: string;, evidenceId: string;
+    message: string; evidenceId: string;
 }
 
 export type EvidenceDelete = ApiContract<EvidenceDeleteRequest, EvidenceDeleteResponse>;
@@ -186,13 +186,13 @@ export type EvidenceDelete = ApiContract<EvidenceDeleteRequest, EvidenceDeleteRe
 // ==================== AI/CHAT API CONTRACTS ====================
 
 export interface ChatVectorSearchResult {
-    id: string;, content: string;
-    score: number;, type: 'case' | 'evidence' | 'statute' | 'document';
+    id: string; content: string;
+    score: number; type: 'case' | 'evidence' | 'statute' | 'document';
     metadata?: Record<string, unknown>;
 }
 
 export interface ChatMessage {
-    id: string;, content: string;
+    id: string; content: string;
     role: 'user' | 'assistant' | 'system';
     timestamp: string; // ISO date
     metadata?: {
@@ -228,10 +228,10 @@ export interface ChatResponse {
     response: string;
     synthesizedInput?: any;
     legalAnalysis?: unknown;
-    ragResults?: unknown;, confidence: number;
-    processingTime: number;, metadata: {
+    ragResults?: unknown; confidence: number;
+    processingTime: number; metadata: {
         model: string;
-        tokensUsed?: number;, enabledFeatures: string[];
+        tokensUsed?: number; enabledFeatures: string[];
         fallbacksUsed?: string[];
         cacheHits?: string[];
     };
@@ -257,11 +257,11 @@ export interface VectorSearchSearchRequest {
 
 export interface VectorSearchSearchResponse {
     results: {, id: string;
-        content: string;, score: number;
+        content: string; score: number;
         type: 'case' | 'evidence' | 'statute' | 'document';
         metadata?: Record<string, unknown>;
     }[];
-    total: number;, query: string;
+    total: number; query: string;
     took: string;
     metadata?: {
         model?: string;
@@ -285,11 +285,11 @@ export interface ServiceStatus {
 
 export interface HealthResponse {
     status: 'healthy' | 'degraded' | 'unhealthy';
-    timestamp: string;, version: string;
-    uptime: number;, environment: string;
+    timestamp: string; version: string;
+    uptime: number; environment: string;
     services: {, database: ServiceStatus;
-        ollama: ServiceStatus;, enhancedRAG: ServiceStatus;
-        uploadService: ServiceStatus;, memory: ServiceStatus;
+        ollama: ServiceStatus; enhancedRAG: ServiceStatus;
+        uploadService: ServiceStatus; memory: ServiceStatus;
         cache: ServiceStatus;
     };
     performance: {, responseTime: number;
@@ -297,8 +297,8 @@ export interface HealthResponse {
     };
     errors?: string[];
     system?: {, nodeVersion: string;
-        platform: string;, arch: string;
-        cpuUsage: NodeJS.CpuUsage;, env: Record<string, string>;
+        platform: string; arch: string;
+        cpuUsage: NodeJS.CpuUsage; env: Record<string, string>;
     };
 }
 
@@ -330,7 +330,7 @@ export type ApiClient<T extends ApiContract<unknown, unknown>> = (
 
 export interface ApiEndpoint<T extends ApiContract<unknown, unknown>> {
     method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
-    path: string;, contract: T;
+    path: string; contract: T;
 }
 
 // ==================== API ENDPOINT DEFINITIONS ====================

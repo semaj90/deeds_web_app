@@ -199,8 +199,8 @@
 
 <style>
  .demo-container {
- height: 100vh;, display: flex;
- flex-direction: column;, background: #1a1a1a;
+ height: 100vh; display: flex;
+ flex-direction: column; background: #1a1a1a;
  color: #ffffff;
  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
  }
@@ -220,12 +220,12 @@
  }
 
  .demo-header p {
- margin: 0;, color: #cccccc;
+ margin: 0; color: #cccccc;
  font-size: 1.1rem;
  }
 
  .demo-controls {
- display: flex;, gap: 2rem;
+ display: flex; gap: 2rem;
  padding: 1.5rem 2rem;
  background: #2a2a2a;
  border-bottom: 1px solid #444;
@@ -234,7 +234,7 @@
 
  .control-group {
  display: flex;
- flex-direction: column;, gap: 0.5rem;
+ flex-direction: column; gap: 0.5rem;
  }
 
  .control-group label {
@@ -244,9 +244,9 @@
  }
 
  .control-group select {
- padding: 0.5rem;, background: #333;
+ padding: 0.5rem; background: #333;
  border: 1px solid #555;
- border-radius: 4px;, color: #ffffff;
+ border-radius: 4px; color: #ffffff;
  font-size: 0.9rem;
  min-width: 150px;
  }
@@ -267,7 +267,7 @@
  }
 
  .demo-info li {
- margin-bottom: 0.5rem;, color: #cccccc;
+ margin-bottom: 0.5rem; color: #cccccc;
  line-height: 1.4;
  }
 
@@ -276,11 +276,11 @@
  }
 
  .canvas-section {
- flex: 1;, position: relative;
+ flex: 1; position: relative;
  }
 
  .demo-footer {
- background: #2a2a2a;, padding: 1.5rem 2rem;
+ background: #2a2a2a; padding: 1.5rem 2rem;
  border-top: 1px solid #444;
  text-align: center;
  }
@@ -293,7 +293,7 @@
 
  .demo-footer a {
  color: #4fc3f7;
- text-decoration: none;, margin: 0 1rem;
+ text-decoration: none; margin: 0 1rem;
  }
 
  .demo-footer a:hover {
@@ -302,7 +302,7 @@
 
  @media (max-width: 768px) {
  .demo-controls {
- flex-direction: column;, gap: 1rem;
+ flex-direction: column; gap: 1rem;
  }
 
  .demo-header h1 {

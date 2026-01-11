@@ -2,11 +2,11 @@
  import { onMount } from 'svelte';
 
  interface Citation {
- id: string;, statute_code: string;
+ id: string; statute_code: string;
  statute_title?: string;
  jurisdiction?: string;
- severity?: string;, source_type: 'manual' | 'auto_extracted';
- notes?: string;, created_at: string;
+ severity?: string; source_type: 'manual' | 'auto_extracted';
+ notes?: string; created_at: string;
  }
 
  let { caseId = null, limit = 20 } = $props<{
@@ -212,7 +212,7 @@
 <style>
  .citation-list-container {
  display: flex;
- flex-direction: column;, gap: 1rem;
+ flex-direction: column; gap: 1rem;
  }
 
  .list-header {
@@ -226,12 +226,12 @@
  .list-header h3 {
  margin: 0;
  font-family: 'Crimson Text', Georgia, serif;
- font-size: 1.3rem;, color: #2c2c2c;
+ font-size: 1.3rem; color: #2c2c2c;
  }
 
  .refresh-btn {
- background: none;, border: none;
- font-size: 1.2rem;, cursor: pointer;
+ background: none; border: none;
+ font-size: 1.2rem; cursor: pointer;
  transition: transform 0.2s;
  }
 
@@ -240,21 +240,21 @@
  }
 
  .refresh-btn:disabled {
- opacity: 0.5;, cursor:not-allowed;
+ opacity: 0.5; cursor:not-allowed;
  }
 
  .loading,
  .error,
  .empty-state {
  padding: 2rem;
- text-align: center;, color: #666;
+ text-align: center; color: #666;
  }
 
  .spinner {
- width: 30px;, height: 30px;
+ width: 30px; height: 30px;
  border: 3px solid #e0e0e0;
  border-top-color: #8b4513;
- border-radius: 50%;, animation: spin 1s linear infinite;
+ border-radius: 50%; animation: spin 1s linear infinite;
  margin: 0 auto 1rem;
  }
 
@@ -265,10 +265,10 @@
  }
 
  .error button {
- margin-top: 1rem;, padding: 0.5rem 1rem;
- background-color: #8b4513;, color: white;
+ margin-top: 1rem; padding: 0.5rem 1rem;
+ background-color: #8b4513; color: white;
  border: none;
- border-radius: 4px;, cursor: pointer;
+ border-radius: 4px; cursor: pointer;
  }
 
  .citations-grid {
@@ -279,8 +279,8 @@
 
  .citation-card {
  padding: 1rem;
- background-color: white;, border: 2px solid #e0d5c7;
- border-radius: 6px;, cursor: pointer;
+ background-color: white; border: 2px solid #e0d5c7;
+ border-radius: 6px; cursor: pointer;
  transition: all 0.2s;
  }
 
@@ -298,13 +298,13 @@
  display: flex;
  justify-content: space-between;
  align-items: flex-start;
- margin-bottom: 0.75rem;, gap: 0.5rem;
+ margin-bottom: 0.75rem; gap: 0.5rem;
  }
 
  .statute-code {
  font-family: 'Monaco', 'Courier New', monospace;
  font-size: 0.9rem;
- font-weight: 600;, color: #8b4513;
+ font-weight: 600; color: #8b4513;
  }
 
  .source-badge {
@@ -318,12 +318,12 @@
  .statute-title {
  margin: 0 0 0.5rem 0;
  font-size: 0.95rem;
- font-weight: 500;, color: #2c2c2c;
+ font-weight: 500; color: #2c2c2c;
  }
 
  .card-meta {
  display: flex;
- flex-wrap: wrap;, gap: 0.5rem;
+ flex-wrap: wrap; gap: 0.5rem;
  margin-bottom: 0.75rem;
  }
 
@@ -331,12 +331,12 @@
  padding: 0.25rem 0.5rem;
  background-color: #f0ebe0;
  border-radius: 3px;
- font-size: 0.8rem;, color: #666;
+ font-size: 0.8rem; color: #666;
  }
 
  .notes {
  margin: 0.75rem 0;
- font-size: 0.85rem;, color: #666;
+ font-size: 0.85rem; color: #666;
  line-height: 1.4;
  }
 
@@ -354,9 +354,9 @@
  }
 
  .delete-btn {
- background: none;, border: none;
- font-size: 1rem;, cursor: pointer;
- opacity: 0.6;, transition: opacity 0.2s;
+ background: none; border: none;
+ font-size: 1rem; cursor: pointer;
+ opacity: 0.6; transition: opacity 0.2s;
  }
 
  .delete-btn:hover {
@@ -365,7 +365,7 @@
 
  .detail-panel {
  padding: 1rem;
- background-color: #f0ebe0;, border: 1px solid #d4a574;
+ background-color: #f0ebe0; border: 1px solid #d4a574;
  border-radius: 6px;
  }
 
@@ -380,26 +380,26 @@
 
  .detail-header h4 {
  margin: 0;
- font-size: 1rem;, color: #2c2c2c;
+ font-size: 1rem; color: #2c2c2c;
  }
 
  .close-btn {
- background: none;, border: none;
- font-size: 1.2rem;, cursor: pointer;
+ background: none; border: none;
+ font-size: 1.2rem; cursor: pointer;
  color: #666;
  }
 
  .detail-content {
  display: flex;
- flex-direction: column;, gap: 0.75rem;
+ flex-direction: column; gap: 0.75rem;
  }
 
  .detail-item {
- display: flex;, gap: 0.75rem;
+ display: flex; gap: 0.75rem;
  }
 
  .label {
- font-weight: 600;, color: #2c2c2c;
+ font-weight: 600; color: #2c2c2c;
  min-width: 100px;
  }
 

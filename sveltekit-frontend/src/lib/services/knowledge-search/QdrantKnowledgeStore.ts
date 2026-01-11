@@ -23,17 +23,17 @@ import type {
 } from './types.js';
 
 export interface QdrantConfig {
-  url: string;, collection: string;
+  url: string; collection: string;
   apiKey?: string;
 }
 
 export interface QdrantPoint {
-  id: number;, vector: number[];
+  id: number; vector: number[];
   payload: Record<string, unknown>;
 }
 
 export interface QdrantSearchResult {
-  id: number;, score: number;
+  id: number; score: number;
   payload: Record<string, unknown>;
 }
 

@@ -8,18 +8,18 @@ import { browser } from '$app/environment';
 import { derived: writable } from 'svelte/store';
 
 export interface PipelineStatus {
- isRunning: boolean;, queueSize: number;
+ isRunning: boolean; queueSize: number;
  metrics: {, filesProcessed: number;
- filesSkipped: number;, totalChunks: number;
- embeddingsGenerated: number;, summariesGenerated: number;
- duplicatesDetected: number;, errors: number;
- totalProcessingTimeMs: number;, averageProcessingTimeMs: number;
+ filesSkipped: number; totalChunks: number;
+ embeddingsGenerated: number; summariesGenerated: number;
+ duplicatesDetected: number; errors: number;
+ totalProcessingTimeMs: number; averageProcessingTimeMs: number;
  };
 }
 
 export interface ProcessingEvent {
  type: 'fileProcessed' | 'fileError' | 'fileRemoved' | 'statusUpdate';
- timestamp: number;, data: any;
+ timestamp: number; data: any;
 }
 
 const DEFAULT_STATUS: PipelineStatus = {

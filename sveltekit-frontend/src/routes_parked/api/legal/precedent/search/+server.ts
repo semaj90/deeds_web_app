@@ -14,43 +14,43 @@ interface PrecedentSearchRequest {
 }
 
 interface PrecedentMatch {
- id: string;, title: string;
- citation: string;, fullCitation: string;
- court: string;, jurisdiction: string;
+ id: string; title: string;
+ citation: string; fullCitation: string;
+ court: string; jurisdiction: string;
  dateDecided: string;
- judges?: string[];, similarityScore: number;
- factualSimilarity: number;, legalSimilarity: number;
+ judges?: string[]; similarityScore: number;
+ factualSimilarity: number; legalSimilarity: number;
  precedentialValue: 'BINDING' | 'PERSUASIVE' | 'DISTINGUISHED' | 'OVERRULED';
- keyFacts: string[];, legalHolding: string;
- reasoningChain: string[];, citationCount: number;
- recentCitations: number;, distinguishingFactors: string[];
- applicabilityScore: number;, strengthIndicators: {
- factualAlignment: number;, legalPrinciples: number;
- jurisdictionalRelevance: number;, temporalRelevance: number;
+ keyFacts: string[]; legalHolding: string;
+ reasoningChain: string[]; citationCount: number;
+ recentCitations: number; distinguishingFactors: string[];
+ applicabilityScore: number; strengthIndicators: {
+ factualAlignment: number; legalPrinciples: number;
+ jurisdictionalRelevance: number; temporalRelevance: number;
  };
- relatedTopics: string[];, practiceAreas: string[];
+ relatedTopics: string[]; practiceAreas: string[];
  embedding?: number[];
 }
 
 interface CitationNetwork {
- caseId: string;, citingCases: string[];
- citedCases: string[];, authorityScore: number;
- influenceRank: number;, networkPosition: 'CORE' | 'PERIPHERAL' | 'BRIDGE';
+ caseId: string; citingCases: string[];
+ citedCases: string[]; authorityScore: number;
+ influenceRank: number; networkPosition: 'CORE' | 'PERIPHERAL' | 'BRIDGE';
  citationGraph: {, depth: number;
- breadth: number;, clusters: string[];
+ breadth: number; clusters: string[];
  };
 }
 
 interface LegalReasoningStep {
- stepNumber: number;, legalPrinciple: string;
- supportingCases: string[];, factualBasis: string;
- logicalConnection: string;, strengthScore: number;
- vulnerabilities: string[];, counterarguments: string[];
+ stepNumber: number; legalPrinciple: string;
+ supportingCases: string[]; factualBasis: string;
+ logicalConnection: string; strengthScore: number;
+ vulnerabilities: string[]; counterarguments: string[];
 }
 
 interface LegalReasoningChain {
- steps: LegalReasoningStep[];, overallCoherence: number;
- logicalGaps: string[];, alternativeTheories: string[];
+ steps: LegalReasoningStep[]; overallCoherence: number;
+ logicalGaps: string[]; alternativeTheories: string[];
 }
 
 export const POST: RequestHandler = async ({ request }) => {

@@ -4,7 +4,7 @@ import { createHash } from 'crypto';
 import type { Readable } from 'stream';
 import { db } from '../db';
 
-import { redis, as ensureRedisReady } from '$lib/server/redis-client';
+import { redis as ensureRedisReady } from '$lib/server/redis-client';
 import {
 	legalDocumentChunks,
 	embeddingCache512,
@@ -29,11 +29,11 @@ interface DocumentMetadata {
 }
 
 interface ChunkingOptions {
- maxTokens: number, overlapTokens: number;, preserveSentences: boolean, minChunkSize: number;
+ maxTokens: number, overlapTokens: number; preserveSentences: boolean, minChunkSize: number;
 }
 
 interface ProcessingResult {
- documentId: string, totalChunks: number;, totalTokens: number, embeddingsGenerated: number;, cacheHits: number, processingTimeMs: number;, errors: string[];
+ documentId: string, totalChunks: number; totalTokens: number, embeddingsGenerated: number; cacheHits: number, processingTimeMs: number; errors: string[];
 }
 
 export class StreamingIngestionPipeline {
@@ -326,7 +326,7 @@ export class StreamingIngestionPipeline {
 
 // Supporting classes and interfaces
 interface DocumentChunk {
- index: number, text: string;, tokenCount: number;
+ index: number, text: string; tokenCount: number;
  pageNumber?: number;
  entities?: unknown[];
  keyTerms?: string[];

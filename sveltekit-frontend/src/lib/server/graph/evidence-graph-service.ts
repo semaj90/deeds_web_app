@@ -42,7 +42,7 @@ export interface EntityInput {
  type?: string | null;
 };
 export interface EdgeInput {
- from: string, to: string;, relation: string;
+ from: string, to: string; relation: string;
 };
 export interface EvidenceGraphUpsertInput {
  evidenceId: string;

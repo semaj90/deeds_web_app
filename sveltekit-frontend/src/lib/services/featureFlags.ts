@@ -5,16 +5,16 @@
 
 export interface FeatureFlags {
  errorBrain: {, enabled: boolean;
- requireAuth: boolean;, logLevel: 'debug' | 'info' | 'warn' | 'error';
+ requireAuth: boolean; logLevel: 'debug' | 'info' | 'warn' | 'error';
  };
  legalAi: {, enabled: boolean;
- requireAuth: boolean;, logLevel: 'debug' | 'info' | 'warn' | 'error';
+ requireAuth: boolean; logLevel: 'debug' | 'info' | 'warn' | 'error';
  };
 }
 
 export interface FeatureFlagConfig {
  environment: 'development' | 'staging' | 'production';
- flags: FeatureFlags;, lastUpdated: Date;
+ flags: FeatureFlags; lastUpdated: Date;
 }
 
 /**

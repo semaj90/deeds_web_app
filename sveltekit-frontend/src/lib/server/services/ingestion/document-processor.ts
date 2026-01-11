@@ -7,23 +7,23 @@ import * as fs from 'fs';
 import * as path from 'path';
 
 export interface ProcessedDocument {
- id: string;, title: string;
- source: string;, rawText: string;
- chunks: DocumentChunk[];, citations: Citation[];
- holding: string;, metadata: DocumentMetadata;
+ id: string; title: string;
+ source: string; rawText: string;
+ chunks: DocumentChunk[]; citations: Citation[];
+ holding: string; metadata: DocumentMetadata;
 }
 
 export interface DocumentChunk {
- id: string;, documentId: string;
- text: string;, startIndex: number;
- endIndex: number;, tokenCount: number;
+ id: string; documentId: string;
+ text: string; startIndex: number;
+ endIndex: number; tokenCount: number;
  chunkIndex: number;
 }
 
 export interface Citation {
- id: string;, text: string;
+ id: string; text: string;
  type: 'case' | 'statute' | 'regulation';
- referencedId?: string;, confidence: number;
+ referencedId?: string; confidence: number;
 }
 
 export interface DocumentMetadata {
@@ -31,7 +31,7 @@ export interface DocumentMetadata {
  court?: string;
  judges?: string[];
  parties?: string[];
- keywords?: string[];, processedAt: Date;
+ keywords?: string[]; processedAt: Date;
 }
 
 /**
@@ -310,7 +310,7 @@ export async function processDocument(
  * Batch process documents
  */
 export async function batchProcessDocuments(
- documents: Array<{, id: string; title: string;, text: string; source: string }>
+ documents: Array<{, id: string; title: string; text: string; source: string }>
 ): Promise<ProcessedDocument[]> {
  const processed: ProcessedDocument[] = [];
 
@@ -330,8 +330,8 @@ export async function batchProcessDocuments(
  * Get processing statistics
  */
 export function getProcessingStats(documents: ProcessedDocument[]): {, totalDocuments: number;
- totalChunks: number;, totalCitations: number;
- avgChunksPerDoc: number;, avgCitationsPerDoc: number;
+ totalChunks: number; totalCitations: number;
+ avgChunksPerDoc: number; avgCitationsPerDoc: number;
 } {
  const totalChunks = documents.reduce((sum, doc) => sum + doc.chunks.length, 0);
  const totalCitations = documents.reduce((sum, doc) => sum + doc.citations.length, 0);

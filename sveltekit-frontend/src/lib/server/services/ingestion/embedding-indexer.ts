@@ -8,9 +8,9 @@ import { getRedisJSONStore } from '../persistence/redis-json-schema.js';
 import type { ProcessedDocument, DocumentChunk } from './document-processor.js';
 
 export interface IndexingResult {
- documentId: string;, chunksIndexed: number;
- embeddingsGenerated: number;, qdrantIndexed: number;
- elasticsearchIndexed: number;, executionTimeMs: number;
+ documentId: string; chunksIndexed: number;
+ embeddingsGenerated: number; qdrantIndexed: number;
+ elasticsearchIndexed: number; executionTimeMs: number;
 }
 
 export class EmbeddingIndexer {
@@ -187,7 +187,7 @@ export class EmbeddingIndexer {
  /**
  * Get indexing statistics
  */
- getIndexingStats(results: IndexingResult[]): {, totalDocuments: number; totalChunks: number;, totalEmbeddings: number; avgTimePerDocument: number;, totalTimeMs: number;
+ getIndexingStats(results: IndexingResult[]): {, totalDocuments: number; totalChunks: number; totalEmbeddings: number; avgTimePerDocument: number; totalTimeMs: number;
  } {
  const totalChunks = results.reduce((sum, r) => sum + r.chunksIndexed, 0);
  const totalEmbeddings = results.reduce((sum, r) => sum + r.embeddingsGenerated, 0);

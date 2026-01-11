@@ -14,7 +14,7 @@ type LibraryMetadata = {
 const libraryDocs: Record<
  string,
  {
- content: string;, metadata: LibraryMetadata;
+ content: string; metadata: LibraryMetadata;
  snippets?: Array<{, title: string; code: string; description?: string }>;
  }
 > = {

@@ -21,13 +21,13 @@ import { searchStatuteChunks } from './statute-ingestion-service.js';
 
 export interface RAGSource {
  type: 'statute' | 'evidence' | 'note' | 'message' | 'summary';
- content: string;, weight: number;
+ content: string; weight: number;
  relevance: number;
  metadata?: Record<string, unknown>;
 }
 
 export interface WeightedRAGContext {
- sources: RAGSource[];, totalWeight: number;
+ sources: RAGSource[]; totalWeight: number;
  formattedContext: string;
 }
 
@@ -375,7 +375,7 @@ Remember: This is legal analysis, not legal advice. Always recommend consulting 
  */
 export function getRetrievalStats(context: WeightedRAGContext): {, totalSources: number;
  byType: Record<string, number>;
- totalWeight: number;, averageRelevance: number;
+ totalWeight: number; averageRelevance: number;
 } {
  const byType: Record<string, number> = {
  statute: 0, evidence: 0, note: 0, message: 0, summary: 0,

@@ -7,11 +7,11 @@ import db from '$lib/server/db';
 import { auditLog } from '$lib/server/db/schema';
 
 export interface AuditLogEntry {
- userId: string, action: string;, resourceType: string, resourceId: string;, details: Record<string, any>;
+ userId: string, action: string; resourceType: string, resourceId: string; details: Record<string, any>;
  success: boolean;
  error?: string;
  ipAddress?: string;
- userAgent?: string;, timestamp: Date;
+ userAgent?: string; timestamp: Date;
 }
 
 class AuditService {
@@ -255,7 +255,7 @@ class AuditService {
  /**
  * Get audit statistics
  */
- async getAuditStatistics(hoursBack: number = 24): Promise<{, totalOperations: number, successfulOperations: number;, failedOperations: number, successRate: number;, operationsByType: Record<string, number>;
+ async getAuditStatistics(hoursBack: number = 24): Promise<{, totalOperations: number, successfulOperations: number; failedOperations: number, successRate: number; operationsByType: Record<string, number>;
  }> {
  try {
  const since = new Date(Date.now() - hoursBack * 60 * 60 * 1000);

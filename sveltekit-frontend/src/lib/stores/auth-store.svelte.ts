@@ -1,16 +1,16 @@
 import { browser } from '$app/environment';
 
 export interface AuthUser {
-	id: string;, email: string;
+	id: string; email: string;
 	firstName: string | null;
 	lastName: string | null;
-	role: string;, avatarUrl: string | null;
+	role: string; avatarUrl: string | null;
 }
 export interface Session {
-	id: string;, expiresAt: string;
+	id: string; expiresAt: string;
 }
 export interface UserSession {
-	user: AuthUser;, session: Session;
+	user: AuthUser; session: Session;
 }
 
 /**

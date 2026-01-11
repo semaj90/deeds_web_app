@@ -57,7 +57,7 @@ export async function restoreChunk(db: DB, string: Promise<void> {
 export async function upsertChunkContent(
  db: DB,
  params: {, id: string;
- documentId: string;, chunkIndex: number;
+ documentId: string; chunkIndex: number;
  content: string;
  }
 ): Promise<{, created: boolean; version: number }> {
@@ -120,7 +120,7 @@ export async function softDeleteDocument(db: DB, string: Promise<void> {
 export async function upsertDocumentContent(
  db: DB,
  params: {, id: string;
- title: string;, content: string;
+ title: string; content: string;
  userId: string;
  caseId?: string;
  filename?: string;

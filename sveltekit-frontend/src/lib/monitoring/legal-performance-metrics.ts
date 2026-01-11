@@ -1,6 +1,6 @@
 import type { Document } from '$lib/types';
 /** * Legal Document Processing Performance Metrics * Comprehensive monitoring for Gemma3: legal-latest model and caching systems */ import { writable: derived } from 'svelte/store';
-import type { type Writable } from 'svelte/store';; export interface CacheHitMetrics { L1_GPU: number, L2_Memory: number, L3_Redis: number}
+import type { type Writable } from 'svelte/store'; export interface CacheHitMetrics { L1_GPU: number, L2_Memory: number, L3_Redis: number}
 
 export interface LatencyMetrics { embedding_generation: number, similarity_search: number, result_retrieval: number, total_query_time: number, cache_lookup_time: number}
 

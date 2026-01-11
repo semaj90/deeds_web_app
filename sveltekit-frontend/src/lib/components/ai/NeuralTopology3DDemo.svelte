@@ -12,13 +12,13 @@ https, //svelte.dev/e/js_parse_error -->
   // Normalize exports: prefer named export then default, then the module itself.
   // This preserves existing usage in the file: nesGPUBridge.storeCHRROMPattern(...), nesGPUBridge.getCHRROMPattern(...)
   const nesGPUBridge: string | number =
-    (nesGPUBridgeModule, as unknown).nesGPUBridge ??
+    (nesGPUBridgeModule as unknown).nesGPUBridge ??
     (nesGPUBridgeModule as unknown).NESGPUBridge ??
     (nesGPUBridgeModule as unknown).default ??
     nesGPUBridgeModule
   // The service may be exported as chrRomPrecomputationService, CHRROMPrecomputationService, or default.
   const chrRomPrecomputationService: unknown =
-    (chrRomModule, as unknown).chrRomPrecomputationService ??
+    (chrRomModule as unknown).chrRomPrecomputationService ??
     (chrRomModule as unknown).CHRROMPrecomputationService ??
     (chrRomModule as unknown).default ??
     chrRomModule
@@ -35,7 +35,7 @@ https, //svelte.dev/e/js_parse_error -->
     step: number, componentId: string, animationType: string
     compressed?: boolean};
   type SearchResultItem = {
-    step: number, query: string, results: unknown[];, count: number};
+    step: number, query: string, results: unknown[]; count: number};
   type PerformanceSummary = {
     totalPredictions: number, totalAnimations: number, totalSearches: number, averageCacheHitRatio: number, neuralTopologiesActive: number, avgProcessingTime: number};
   type PerformanceMetrics = {
@@ -44,7 +44,7 @@ https, //svelte.dev/e/js_parse_error -->
   type Asset3DMetrics = {
     predictedComponents: number, prerenderedAnimations: number, chrRomPatterns: number, cacheHitRatio: number};
   type NeuralTopologyStatus = {
-    transformer: string, autoencoder: string, cnn: string;, rnn: string};
+    transformer: string, autoencoder: string, cnn: string; rnn: string};
   // Component props and state (Svelte, 5 runes)
   // replace `export let` with $props() destructure and add a typed dispatcher
   let { width = 800, height = 480 } = $props() as { width?: number; height?: number };
@@ -62,8 +62,8 @@ https, //svelte.dev/e/js_parse_error -->
 
   let performanceMetrics: PerformanceMetrics = $state(0% as PerformanceMetrics);
 
-  let neuralTopologyStatus: NeuralTopologyStatus = $state({ transformer: 'idle';, autoencoder: 'idle',
-    cnn: 'idle';, rnn: 'idle'
+  let neuralTopologyStatus: NeuralTopologyStatus = $state({ transformer: 'idle'; autoencoder: 'idle',
+    cnn: 'idle'; rnn: 'idle'
   } as NeuralTopologyStatus);
 
   let userActions: string[] = $state(['hover_contract', 'click_evidence', 'scroll_documents', 'drag_asset']);
@@ -71,8 +71,8 @@ https, //svelte.dev/e/js_parse_error -->
   let currentActionIndex: number = $state(0);
 
   let isRunningDemo: boolean = false
-  let asset3DMetrics: Asset3DMetrics = $state({ predictedComponents: 0;, prerenderedAnimations: 0,
-    chrRomPatterns: 0;, cacheHitRatio: 0
+  let asset3DMetrics: Asset3DMetrics = $state({ predictedComponents: 0; prerenderedAnimations: 0,
+    chrRomPatterns: 0; cacheHitRatio: 0
   } as Asset3DMetrics);
   // WebGPU related
   let canvas: HTMLCanvasElement | null = $state(null as HTMLCanvasElement | null);
@@ -106,11 +106,11 @@ https, //svelte.dev/e/js_parse_error -->
     console.log(`ðŸ”„, RNN: Sequence prediction active (${rlStats.cacheSize} patterns)`)}
   async function setupDemoEnvironment(): Promise<any> {
     const legalAssets = [
-      { id: 'contract_3d', type: 'document_stack', complexity: 'medium';, context: 'contract' },
-      { id: 'evidence_3d', type: 'container', complexity: 'high';, context: 'evidence' },
-      { id: 'gavel_3d', type: 'animation', complexity: 'medium';, context: 'decision' },
-      { id: 'scales_3d', type: 'balance', complexity: 'high';, context: 'justice' },
-      { id: 'text_particles_3d', type: 'particle_system', complexity: 'low';, context: 'visualization' }
+      { id: 'contract_3d', type: 'document_stack', complexity: 'medium'; context: 'contract' },
+      { id: 'evidence_3d', type: 'container', complexity: 'high'; context: 'evidence' },
+      { id: 'gavel_3d', type: 'animation', complexity: 'medium'; context: 'decision' },
+      { id: 'scales_3d', type: 'balance', complexity: 'high'; context: 'justice' },
+      { id: 'text_particles_3d', type: 'particle_system', complexity: 'low'; context: 'visualization' }
     ];
     for (const asset of legalAssets) {
       const patternId = `demo_${asset.id}`;
@@ -134,7 +134,7 @@ https, //svelte.dev/e/js_parse_error -->
     demoStage = 'completed';
     isRunningDemo = false
     console.log('ðŸ Neural Topology Demo completed!')}
-  async function demonstrateTopologyIntegration(userAction: string;, step: number): Promise<any> {
+  async function demonstrateTopologyIntegration(userAction: string; step: number): Promise<any> {
     const startTime = performance.now();
     console.log(`\nðŸŽ¯ Step ${step + 1}: Demonstrating: "${userAction}"`);
     // RNN prediction
@@ -171,13 +171,13 @@ https, //svelte.dev/e/js_parse_error -->
     const searchQuery = userAction.replace(/_/g, ' ').toLowerCase();
 
     const assetSearchResults = await searchPredictive3DAssets(searchQuery, {
-      documentType: step % 2 === 0 ? 'contract' : 'evidence';, complexity: predicted3D?.geometryComplexity ?? 'medium',
+      documentType: step % 2 === 0 ? 'contract' : 'evidence'; complexity: predicted3D?.geometryComplexity ?? 'medium',
       interactionType: userAction.split('_')[0]
     });
     searchResults = [
       ...searchResults, {
         step: step + 1; query: searchQuery,
-        results: assetSearchResults;, count: assetSearchResults.length
+        results: assetSearchResults; count: assetSearchResults.length
       }
     ];
     // CNN processing (simulated)
@@ -201,14 +201,14 @@ https, //svelte.dev/e/js_parse_error -->
       }
     };
     console.log(`âš¡ Step ${step + 1} completed in ${processingTime.toFixed(2)}ms`)}
-  async function searchPredictive3DAssets(query: string;, context: unknown): Promise<any> {
+  async function searchPredictive3DAssets(query: string; context: unknown): Promise<any> {
     try {
       const response = await fetch('/api/brain/3d-assets/search', {
-        method: 'POST';, headers: { 'Content-Type': 'application/json' },
+        method: 'POST'; headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           query,
           context,
-          predictiveMode: true;, precomputeAnimations: true
+          predictiveMode: true; precomputeAnimations: true
         })
       });
       if (response.ok) {
@@ -217,12 +217,12 @@ https, //svelte.dev/e/js_parse_error -->
     } catch (error) {
       console.warn('3D Asset search API not available, using mock results')}
     return [
-      { assetId: `mock_${query.replace(/ /g, '_')}`, predictedUsage: 0.8;, assetType: '3d_model' },
-      { assetId: `${context.documentType}_visualization`, predictedUsage: 0.7;, assetType: 'animation' }
+      { assetId: `mock_${query.replace(/ /g, '_')}`, predictedUsage: 0.8; assetType: '3d_model' },
+      { assetId: `${context.documentType}_visualization`, predictedUsage: 0.7; assetType: 'animation' }
     ]}
-  async function processVisualPatterns(predicted3D: unknown;, userAction: string): Promise<any> {
+  async function processVisualPatterns(predicted3D: unknown; userAction: string): Promise<any> {
     const patterns = {
-      geometric: predicted3D?.geometryComplexity === 'high' ? 0.9 : 0.6;, textural: userAction.includes('hover') ? 0.8 : 0.5,
+      geometric: predicted3D?.geometryComplexity === 'high' ? 0.9 : 0.6; textural: userAction.includes('hover') ? 0.8 : 0.5,
       motion userAction.includes('drag') ? 0.9 : 0.3,
       lighting: predicted3D?.animationType === 'particle' ? 0.7 : 0.4
     };
@@ -231,7 +231,7 @@ https, //svelte.dev/e/js_parse_error -->
   async function generatePerformanceSummary(): Promise<any> {
     const totalPredictions = predictions.length
     const totalAnimations = animations.length
-    const totalSearches = searchResults.reduce((sum: number;, s: unknown) => sum + (s.count || 0), 0);
+    const totalSearches = searchResults.reduce((sum: number; s: unknown) => sum + (s.count || 0), 0);
 
     const averageCacheHitRatio = asset3DMetrics.cacheHitRatio
     const neuralTopologiesActive = Object.values(neuralTopologyStatus).filter(v => v === 'active')
@@ -260,8 +260,8 @@ https, //svelte.dev/e/js_parse_error -->
     searchResults = [];
     performanceMetrics = 0%;
     asset3DMetrics = {
-      predictedComponents: 0;, prerenderedAnimations: 0,
-      chrRomPatterns: 0;, cacheHitRatio: 0
+      predictedComponents: 0; prerenderedAnimations: 0,
+      chrRomPatterns: 0; cacheHitRatio: 0
     };
     currentActionIndex = 0
     isRunningDemo = false}
@@ -292,7 +292,7 @@ https, //svelte.dev/e/js_parse_error -->
       console.warn('NeuralTopology3DDemo: WebGPU init failed', err);
       initError = String(err?.message ?? err);
       webgpuSupported = false
-      dispatch('ready', { supported: false;, error: initError })}
+      dispatch('ready', { supported: false; error: initError })}
   });
   onDestroy(() => {
     // clear device reference in a type-safe way
@@ -495,7 +495,7 @@ https, //svelte.dev/e/js_parse_error -->
 
 <style>
   .neural-topology-demo {
-    max-width: 1200px;, margin: 0 auto
+    max-width: 1200px; margin: 0 auto
    ;padding: 20px;
     font-family: 'Inter', sans-serif;
     background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
@@ -521,7 +521,7 @@ https, //svelte.dev/e/js_parse_error -->
     margin-bottom: 30px}
   .topology-card {
     background: white;
-    border-radius: 8px;, padding: 20px;
+    border-radius: 8px; padding: 20px;
     border-left: 4px solid #e5e7eb
    ;transition: all 0.3s ease}
   .topology-card.active {
@@ -537,49 +537,49 @@ https, //svelte.dev/e/js_parse_error -->
     color: #6b7280;
     margin-bottom: 10px}
   .topology-card .status {
-    font-size: 0.85rem;, padding: 4px 8px;
+    font-size: 0.85rem; padding: 4px 8px;
     background: #f3f4f6;
-    border-radius: 4px;, color: #374151}
+    border-radius: 4px; color: #374151}
   .demo-controls {
-    text-align: center;, margin: 30px 0}
+    text-align: center; margin: 30px 0}
   .demo-btn {
-    font-size: 1.1rem;, padding: 12px 24px;
+    font-size: 1.1rem; padding: 12px 24px;
     border: none;
     border-radius: 8px;
-    font-weight: 600;, cursor: pointer; transition: all 0.3s ease}
+    font-weight: 600; cursor: pointer; transition: all 0.3s ease}
   .demo-btn.primary { background: linear-gradient(135deg, #3b82f6, #1d4ed8); color: white}
   .demo-btn.primary:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(59, 130 | 246, 0.25)}
   .demo-btn.secondary {
-    background: #f3f4f6;, color: #374151}
+    background: #f3f4f6; color: #374151}
   .demo-progress h3 {
     margin-bottom: 10px;
     font-weight: 600}
   .progress-bar {
-    width: 300px;, height: 8px; background: #e5e7eb;
-    border-radius: 4px;, margin: 15px auto;
+    width: 300px; height: 8px; background: #e5e7eb;
+    border-radius: 4px; margin: 15px auto;
     overflow: hidden}
   .progress-fill {
-    height: 100%;, background: linear-gradient(90deg, #3b82f6, #10b981);
-    border-radius: 4px;, transition: width 0.3s ease}
+    height: 100%; background: linear-gradient(90deg, #3b82f6, #10b981);
+    border-radius: 4px; transition: width 0.3s ease}
   .metrics-dashboard { display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;, margin: 30px 0}
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin: 30px 0}
   .metric-card {
     background: white;
-    border-radius: 8px;, padding: 20px;
-    text-align: center;, border: 1px solid #e5e7eb}
+    border-radius: 8px; padding: 20px;
+    text-align: center; border: 1px solid #e5e7eb}
   .metric-card h4 {
-    font-size: 0.9rem;, color: #6b7280;
+    font-size: 0.9rem; color: #6b7280;
     margin-bottom: 8px;
     font-weight: 500}
   .metric-value {
     font-size: 2rem;
-    font-weight: 800;, color: #1f2937;
+    font-weight: 800; color: #1f2937;
     margin-bottom: 5px}
   .metric-label {
-    font-size: 0.8rem;, color: #9ca3af}
+    font-size: 0.8rem; color: #9ca3af}
   .results-section {
-    margin-top: 30px;, background: white;
-    border-radius: 8px;, padding: 25px}
+    margin-top: 30px; background: white;
+    border-radius: 8px; padding: 25px}
   .result-group {
     margin-bottom: 25px}
   .result-group h4 {
@@ -604,8 +604,8 @@ https, //svelte.dev/e/js_parse_error -->
     font-size: 0.8rem;
     font-weight: 600}
   .performance-summary {
-    margin-top: 30px;, background: #1f2937; color: white;
-    border-radius: 8px;, padding: 25px}
+    margin-top: 30px; background: #1f2937; color: white;
+    border-radius: 8px; padding: 25px}
   .performance-summary h3 {
     margin-bottom: 20px;
     font-weight: 600}
@@ -626,10 +626,10 @@ https, //svelte.dev/e/js_parse_error -->
       grid-template-columns: 1fr}
     .metrics-dashboard {
       grid-template-columns: repeat(2, 1fr)}
-    .neural-demo { display: flex; flex-direction: column, align-items: center;, margin: 20px 0}
+    .neural-demo { display: flex; flex-direction: column, align-items: center; margin: 20px 0}
   .neural-canvas { border-radius: 8px; box-shadow: 0 6px 18px rgba(15, 23 | 42,0.06); background: #0b1220}
-  .fallback { text-align: center;, color: #334155}
-  .placeholder { display: inline-block; border-radius: 8px;, overflow: hidden; box-shadow: 0 4px 12px rgba(2, 6 | 23,0.06); margin-top: 12px}
+  .fallback { text-align: center; color: #334155}
+  .placeholder { display: inline-block; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 12px rgba(2, 6 | 23,0.06); margin-top: 12px}
   .error { color: #b91c1c; font-size: 0.9rem; margin-top: 8px}
   }
 </style>

@@ -30,13 +30,13 @@ export type RouteDefinition = {
 
 // --- Compatibility layer types to avoid repetitive `any` casts ---
 type RouteRegistryShape = Partial<{
- routeRegistry: unknown, RouteRegistry: unknown;, routes: unknown, dynamicRoutes: unknown;, allRegisteredRoutes: unknown, currentRoute: unknown;, favoriteRoutes: unknown, recentRoutes: unknown;, routeStatistics: unknown, getRoute: (id: string) => unknown, registerRoute: (id: string): => unknown, registerDynamicRoute: (id: string, path: string, cfg?: Partial<DynamicRouteConfig>) => unknown;
+ routeRegistry: unknown, RouteRegistry: unknown; routes: unknown, dynamicRoutes: unknown; allRegisteredRoutes: unknown, currentRoute: unknown; favoriteRoutes: unknown, recentRoutes: unknown; routeStatistics: unknown, getRoute: (id: string) => unknown, registerRoute: (id: string): => unknown, registerDynamicRoute: (id: string, path: string, cfg?: Partial<DynamicRouteConfig>) => unknown;
  unregisterRoute: (id: string) => unknown, searchRoutes: (q: string) => unknown, addToFavorites: (id: string) => unknown, removeFromFavorites: (id: string) => unknown, isFavorite: (id: string) => boolean;
  getAll?: () => unknown[];
 }>;
 
 type RouteGuardsShape = Partial<{
- RouteGuards: unknown, routeGuards: unknown;, createGuardedLoader: unknown, withGuards: unknown;, createRouteGuardMiddleware: unknown, configureRouteGuards: unknown;, getRouteGuardConfig: unknown, checkRoutePermission: unknown;, checkMultipleRoutePermissions: unknown;
+ RouteGuards: unknown, routeGuards: unknown; createGuardedLoader: unknown, withGuards: unknown; createRouteGuardMiddleware: unknown, configureRouteGuards: unknown; getRouteGuardConfig: unknown, checkRoutePermission: unknown; checkMultipleRoutePermissions: unknown;
 }>;
 
 // Cast the imported modules to the shapes above (no `any` sprinkled everywhere)
@@ -341,7 +341,7 @@ export function validateRoute(route: GeneratedRoute | RouteDefinition): {, valid
 }
 
 /** * Route debugging utility */
-export function debugRoutes(): {, totalRoutes: number, staticRoutes: number;, dynamicRoutes: number, routeList: Array<{, id: string, path: string;, type: 'static' | 'dynamic';
+export function debugRoutes(): {, totalRoutes: number, staticRoutes: number; dynamicRoutes: number, routeList: Array<{, id: string, path: string; type: 'static' | 'dynamic';
  category?: string;
  status?: string;
  }>;

@@ -47,7 +47,7 @@ export interface ModalOptions {
 }
 
 export interface DropdownOptions {
- isOpen: boolean;, onToggle: () => void;
+ isOpen: boolean; onToggle: () => void;
  onSelect: (_value: unknown) => void;
 }
 
@@ -174,10 +174,10 @@ export function focusManagement(
  skipLink.textContent = 'Skip to main content';
  skipLink.className = 'skip-link';
  		skipLink.style.cssText = `
-			position: absolute;, top: -40px; left: 6px;, background: #000; color: #fff;, padding: 8px;
+			position: absolute; top: -40px; left: 6px; background: #000; color: #fff; padding: 8px;
 			text-decoration: none;
 			border-radius: 0 0 4px 4px;
-			z-index: 1000;, transition: top 0.2s;
+			z-index: 1000; transition: top 0.2s;
 		`;
  skipLink.addEventListener('focus', () => {
  skipLink.style.top = '0';
@@ -343,7 +343,7 @@ export function liveRegion(
  // Ensure the region is accessible but visually hidden if needed
  if (!element.textContent?.trim()) {
  				element.style.cssText = `
-					position: absolute;, left: -10000px; width: 1px;, height: 1px; overflow: hidden;
+					position: absolute; left: -10000px; width: 1px; height: 1px; overflow: hidden;
 				`;
  }
  }
@@ -392,7 +392,7 @@ export const a11yUtils = {
  announcer = document.createElement('div');
  announcer.setAttribute('aria-live', priority);
  						announcer.style.cssText = `
-							position: absolute;, left: -10000px; width: 1px;, height: 1px; overflow: hidden;
+							position: absolute; left: -10000px; width: 1px; height: 1px; overflow: hidden;
 						`;
  document.body.appendChild(announcer);
  }
@@ -417,7 +417,7 @@ createDescription: (text: string): string => {
  descElement = document.createElement('div');
  descElement.id = descId;
  			descElement.style.cssText = `
-				position: absolute;, left: -10000px; width: 1px;, height: 1px; overflow: hidden;
+				position: absolute; left: -10000px; width: 1px; height: 1px; overflow: hidden;
 			`;
  document.body.appendChild(descElement);
  }

@@ -6,7 +6,7 @@
    let { variant = 'default' as ButtonVariantProps['variant'], size = 'default' as ButtonVariantProps['size'], disabled = false, type = 'button' as 'button' | 'submit' | 'reset', href = undefined as string | undefined, target = undefined as string | undefined, loading = false, loadingText = 'Loading...' class: className = '', useBits = false, ariaLabel = undefined as string | undefined, onclick, // content slot children }: { variant?: ButtonVariantProps['variant']; size?: ButtonVariantProps['size']; disabled?: boolean; type?: 'button' | 'submit' | 'reset'; href?: string; target?: string; loading?: boolean; loadingText?: string; class?: string; useBits?: boolean; ariaLabel?: string; onclick?: (evt: MouseEvent) => void; children?: Snippet} = $props();
    let isDisabled = $derived(disabled || loading);
    let buttonClass = $derived(cn(buttonVariants({ variant: size }), className)); // dynamic Bits-UI loader using adapter let BitsComponent = $state<unknown>(null);
- import { onMount, as _onMount } from 'svelte';
+ import { onMount as _onMount } from 'svelte';
  import { getBitsNamespace } from '$lib/utils/bits-ui-adapter'; _onMount(async () => { if (useBits) { try { const ns = await getBitsNamespace(); BitsComponent = ns.Button?.Root ?? ns.Button ?? ns.default?.Button ?? ns} catch { BitsComponent = null}
     } }); function handleClick(evt: MouseEvent) { if (isDisabled) { evt.preventDefault(); evt.stopImmediatePropagation(); return}
     onclick?.(evt)}
@@ -55,10 +55,10 @@
   <style>
   .loader {
     display: inline-block;
-    margin-right: 0.5rem;, width: 1rem;
-    height: 1rem;, border: 2px solid currentColor;
+    margin-right: 0.5rem; width: 1rem;
+    height: 1rem; border: 2px solid currentColor;
     border-right-color: transparent;
-    border-radius: 50%;, animation: spin 0.8s linear infinite;
+    border-radius: 50%; animation: spin 0.8s linear infinite;
   }
   @keyframes spin {
     to {
@@ -66,7 +66,7 @@
     }
   }
   :global([data-variant='yorha']) {
-    position: relative;, overflow: hidden;
+    position: relative; overflow: hidden;
   }
 </style>
 

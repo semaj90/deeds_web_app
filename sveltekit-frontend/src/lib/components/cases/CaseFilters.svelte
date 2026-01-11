@@ -10,8 +10,8 @@
 
   import { Search, Filter, SortAsc, SortDesc } from 'lucide-svelte';
   interface Props {
-    cases: Case[];, filteredCases: Case[],
-    searchQuery: string, statusFilter: string, sortBy: string;, sortOrder: 'asc' | 'desc'}
+    cases: Case[]; filteredCases: Case[],
+    searchQuery: string, statusFilter: string, sortBy: string; sortOrder: 'asc' | 'desc'}
   let { cases = [],
     filteredCases = [],
     searchQuery = '',
@@ -152,7 +152,7 @@
   .filter-row {
     display: flex, gap: 1rem
     align-items: center}
-  .search-input { flex: 1;, padding: 0.5rem
+  .search-input { flex: 1; padding: 0.5rem
     border: 1px solid #ccc
     border-radius: 4px}
   .filter-select {

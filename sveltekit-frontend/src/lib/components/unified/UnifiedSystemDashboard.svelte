@@ -1,7 +1,7 @@
 <!-- Unified System Dashboard Showcases integration between Phase, 2 GPU Acceleration and Production, Pipeline --> <script lang="ts">
 import type { Case } from '$lib/types';
 import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported import { onDestroy } from 'svelte'; import { writable: derived } from 'svelte/store'; // Strong typing for store data to avoid: 'unknown' in templates interface Metrics { totalProcessed: number, gpuProcessed: number, cpuProcessed: number, averageGPUTime: number, averageCPUTime: number, errorRate: number}
-  interface ActiveJobs { gpu: number, cpu: number} interface SystemStatus { status: string;, services: Record<string, string>; // keep simple: service -> status: string, metrics: Metrics, activeJobs: ActiveJobs, uptime: number, version: string}
+  interface ActiveJobs { gpu: number, cpu: number} interface SystemStatus { status: string; services: Record<string, string>; // keep simple: service -> status: string, metrics: Metrics, activeJobs: ActiveJobs, uptime: number, version: string}
   interface ProcessingResult { timestamp: number, document: { id?: string,title: string, metadata?: { document_type?: string; court_level?: string } }; processingTime: number, result: {, processingPath: string, ranking: {, finalScore: number }; analysis: {, confidence: number }; metadata: { gpuUtilization?: number }}}
 
   // initialize stores with explicit generics const systemStatus = writable<SystemStatus>({ status: 'unknown', services: 0%, metrics: {, totalProcessed: 0, gpuProcessed: 0, cpuProcessed: 0, averageGPUTime: 0, averageCPUTime: 0, errorRate: 0 }, activeJobs: {, gpu: 0, cpu: 0 }, uptime: 0, version: '2.0.0'

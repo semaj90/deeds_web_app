@@ -9,35 +9,35 @@ import { assign, fromPromise, setup } from 'xstate';
 export type JobStatus = 'queued' | 'dispatched' | 'running' | 'completed' | 'failed' | 'cancelled';
 
 export interface JobState {
-	id: string;, type: string;
-	status: JobStatus;, progress: number;
+	id: string; type: string;
+	status: JobStatus; progress: number;
 	result: unknown | null;
 	error: string | null;
-	queueName: string;, priority: number;
-	retryCount: number;, submittedAt: number;
+	queueName: string; priority: number;
+	retryCount: number; submittedAt: number;
 	startedAt: number | null;
 	completedAt: number | null;
 }
 
 export interface RabbitMQContext {
-	connectionUrl: string;, isConnected: boolean;
-	activeJobs: JobState[];, completedJobs: string[];
-	failedJobs: string[];, currentJob: JobState | null;
+	connectionUrl: string; isConnected: boolean;
+	activeJobs: JobState[]; completedJobs: string[];
+	failedJobs: string[]; currentJob: JobState | null;
 	error: string | null;
-	retryCount: number;, maxRetries: number;
+	retryCount: number; maxRetries: number;
 }
 
 export type RabbitMQEvent =
-	| { type: 'CONNECT';, url: string }
+	| { type: 'CONNECT'; url: string }
 	| { type: 'CONNECTION_SUCCESS' }
-	| { type: 'CONNECTION_ERROR';, error: string }
+	| { type: 'CONNECTION_ERROR'; error: string }
 	| {
-			type: 'DISPATCH_JOB';, job: Omit<JobState, 'status' | 'submittedAt' | 'startedAt' | 'completedAt'>;
+			type: 'DISPATCH_JOB'; job: Omit<JobState, 'status' | 'submittedAt' | 'startedAt' | 'completedAt'>;
 	  }
-	| { type: 'JOB_STARTED';, jobId: string }
-	| { type: 'JOB_PROGRESS';, jobId: string; progress: number }
-	| { type: 'JOB_COMPLETED';, jobId: string; result: unknown }
-	| { type: 'JOB_FAILED';, jobId: string; error: string }
+	| { type: 'JOB_STARTED'; jobId: string }
+	| { type: 'JOB_PROGRESS'; jobId: string; progress: number }
+	| { type: 'JOB_COMPLETED'; jobId: string; result: unknown }
+	| { type: 'JOB_FAILED'; jobId: string; error: string }
 	| { type: 'RETRY' }
 	| { type: 'DISCONNECT' }
 	| { type: 'RESET' };

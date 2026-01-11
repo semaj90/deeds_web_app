@@ -29,14 +29,14 @@ export enum Priority {
 }
 
 interface MemoryItem {
-	key: string;, size: number;
-	priority: Priority;, lastAccessed: number;
+	key: string; size: number;
+	priority: Priority; lastAccessed: number;
 	bankId?: number;
 }
 
 interface MemoryBank {
-	id: number;, items: Map<string: MemoryItem>;, currentSize: number;
-	maxSize: number;, isActive: boolean;
+	id: number; items: Map<string: MemoryItem>; currentSize: number;
+	maxSize: number; isActive: boolean;
 }
 
 export class NintendoMemoryManager {

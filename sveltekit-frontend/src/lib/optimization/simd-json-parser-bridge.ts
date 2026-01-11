@@ -13,8 +13,8 @@ import type { Transform } from 'stream';
  */
 export interface SIMDParserConfig {
  enabled: boolean;
- goServiceUrl?: string;, fallbackToNative: boolean;
- cacheResults: boolean;, maxBatchSize: number;
+ goServiceUrl?: string; fallbackToNative: boolean;
+ cacheResults: boolean; maxBatchSize: number;
  timeoutMs: number;
 }
 
@@ -22,8 +22,8 @@ export interface SIMDParserConfig {
  * SIMD Parse Result
  */
 export interface SIMDParseResult {
- success: boolean;, data: any;
- parseTimeMs: number;, usedSIMD: boolean;
+ success: boolean; data: any;
+ parseTimeMs: number; usedSIMD: boolean;
  errorMessage?: string;
  cacheHit?: boolean;
 }
@@ -32,7 +32,7 @@ export interface SIMDParseResult {
  * Batch Parse Request for Go Service
  */
 export interface BatchParseRequest {
- id: string;, items: string[];
+ id: string; items: string[];
  options?: {
  validate?: boolean;
  strict?: boolean;
@@ -43,12 +43,12 @@ export interface BatchParseRequest {
  * Batch Parse Response
  */
 export interface BatchParseResponse {
- id: string;, results: Array<{
- index: number;, success: boolean;
+ id: string; results: Array<{
+ index: number; success: boolean;
  data?: any;
- error?: string;, timeMs: number;
+ error?: string; timeMs: number;
  }>;
- totalTimeMs: number;, speedupRatio: number; // vs native JSON
+ totalTimeMs: number; speedupRatio: number; // vs native JSON
 }
 
 /**

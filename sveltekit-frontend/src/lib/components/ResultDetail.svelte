@@ -90,56 +90,56 @@
 <style>
 	.detail-panel {
 		display: flex;
-		flex-direction: column;, height: 100%;
+		flex-direction: column; height: 100%;
 		background: white;
 	}
 
 	.detail-header {
 		padding: 1rem;
 		border-bottom: 1px solid #e0ddd8;
-		background: #fafaf8;, display: flex;
+		background: #fafaf8; display: flex;
 		justify-content: space-between;
 		align-items: center;
 	}
 
 	.detail-header h2 {
 		margin: 0;
-		font-size: 1.1rem;, color: #2d2d2d;
+		font-size: 1.1rem; color: #2d2d2d;
 	}
 
 	.score-display {
 		display: flex;
-		flex-direction: column;, gap: 0.25rem;
+		flex-direction: column; gap: 0.25rem;
 		align-items: flex-end;
 	}
 
 	.score-label {
-		font-size: 0.75rem;, color: #999;
+		font-size: 0.75rem; color: #999;
 		font-weight: 600;
 		text-transform: uppercase;
 	}
 
 	.score-value {
 		font-size: 1.3rem;
-		font-weight: 700;, color: #8b3a3a;
+		font-weight: 700; color: #8b3a3a;
 	}
 
 	.detail-content {
 		flex: 1;
-		overflow-y: auto;, padding: 1rem;
+		overflow-y: auto; padding: 1rem;
 		display: flex;
-		flex-direction: column;, gap: 1.5rem;
+		flex-direction: column; gap: 1.5rem;
 	}
 
 	.section {
 		display: flex;
-		flex-direction: column;, gap: 0.75rem;
+		flex-direction: column; gap: 0.75rem;
 	}
 
 	.section h3 {
 		margin: 0;
 		font-size: 0.95rem;
-		font-weight: 600;, color: #2d2d2d;
+		font-weight: 600; color: #2d2d2d;
 		text-transform: uppercase;
 		letter-spacing: 0.5px;
 	}
@@ -152,29 +152,29 @@
 
 	.metadata-item {
 		display: flex;
-		flex-direction: column;, gap: 0.25rem;
-		padding: 0.5rem;, background: #fafaf8;
-		border-radius: 4px;, border: 1px solid #e0ddd8;
+		flex-direction: column; gap: 0.25rem;
+		padding: 0.5rem; background: #fafaf8;
+		border-radius: 4px; border: 1px solid #e0ddd8;
 	}
 
 	.metadata-item .label {
-		font-size: 0.75rem;, color: #999;
+		font-size: 0.75rem; color: #999;
 		font-weight: 600;
 		text-transform: uppercase;
 	}
 
 	.metadata-item .value {
-		font-size: 0.9rem;, color: #2d2d2d;
+		font-size: 0.9rem; color: #2d2d2d;
 		font-family: 'Courier New', monospace;
 		word-break: break-all;
 	}
 
 	.text-content {
-		padding: 1rem;, background: #fafaf8;
+		padding: 1rem; background: #fafaf8;
 		border: 1px solid #e0ddd8;
 		border-radius: 4px;
 		font-size: 0.95rem;
-		line-height: 1.6;, color: #2d2d2d;
+		line-height: 1.6; color: #2d2d2d;
 		font-family: 'Crimson Text', serif;
 		max-height: 300px;
 		overflow-y: auto;
@@ -182,9 +182,9 @@
 
 	.copy-btn {
 		padding: 0.5rem 1rem;
-		background: #f0f0f0;, border: 1px solid #d0ccc7;
-		border-radius: 4px;, cursor: pointer;
-		font-size: 0.9rem;, transition: background 0.2s;
+		background: #f0f0f0; border: 1px solid #d0ccc7;
+		border-radius: 4px; cursor: pointer;
+		font-size: 0.9rem; transition: background 0.2s;
 	}
 
 	.copy-btn:hover {
@@ -193,19 +193,19 @@
 
 	.bounding-boxes {
 		display: flex;
-		flex-direction: column;, gap: 0.5rem;
+		flex-direction: column; gap: 0.5rem;
 	}
 
 	.bbox-item {
-		display: flex;, gap: 0.5rem;
-		padding: 0.5rem;, background: #fafaf8;
+		display: flex; gap: 0.5rem;
+		padding: 0.5rem; background: #fafaf8;
 		border: 1px solid #e0ddd8;
 		border-radius: 4px;
 		font-size: 0.85rem;
 	}
 
 	.bbox-label {
-		font-weight: 600;, color: #2d2d2d;
+		font-weight: 600; color: #2d2d2d;
 		min-width: 50px;
 	}
 
@@ -216,16 +216,16 @@
 
 	.actions {
 		display: flex;
-		flex-direction: column;, gap: 0.5rem;
+		flex-direction: column; gap: 0.5rem;
 		padding-top: 1rem;
 		border-top: 1px solid #e0ddd8;
 	}
 
 	.action-btn {
 		padding: 0.75rem 1rem;
-		background: #f0f0f0;, border: 1px solid #d0ccc7;
-		border-radius: 4px;, cursor: pointer;
-		font-size: 0.9rem;, transition: all 0.2s;
+		background: #f0f0f0; border: 1px solid #d0ccc7;
+		border-radius: 4px; cursor: pointer;
+		font-size: 0.9rem; transition: all 0.2s;
 	}
 
 	.action-btn:hover {
@@ -233,7 +233,7 @@
 	}
 
 	.action-btn.primary {
-		background: #8b3a3a;, color: white;
+		background: #8b3a3a; color: white;
 		border-color: #8b3a3a;
 	}
 
@@ -244,7 +244,7 @@
 	.empty-state {
 		display: flex;
 		align-items: center;
-		justify-content: center;, height: 100%;
+		justify-content: center; height: 100%;
 		color: #999;
 		font-size: 1rem;
 	}
@@ -255,7 +255,7 @@
 		}
 
 		.detail-header {
-			flex-direction: column;, gap: 0.5rem;
+			flex-direction: column; gap: 0.5rem;
 			align-items: flex-start;
 		}
 

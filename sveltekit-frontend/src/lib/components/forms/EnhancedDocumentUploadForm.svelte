@@ -9,7 +9,7 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
 
   // ============================================================================ // FORM ACTIONS // ============================================================================ function handleSubmit() { if ($isValid && selectedFile) { actor.send({ type: "UPLOAD" })}
   }
-  function handleReset() { actor.send({ type: "RESET" }); selectedFile = null; $formData = { title: "", description: "", documentType: "other", jurisdiction: undefined;, tags: [], file: null, aiProcessing: {, generateSummary: true, extractEntities: true, riskAssessment: true, generateRecommendations: false }
+  function handleReset() { actor.send({ type: "RESET" }); selectedFile = null; $formData = { title: "", description: "", documentType: "other", jurisdiction: undefined; tags: [], file: null, aiProcessing: {, generateSummary: true, extractEntities: true, riskAssessment: true, generateRecommendations: false }
     } persistence.clear()}
   function handleSaveDraft() { persistence.save($formData)}
   function loadDraft() { const draft = persistence.load(); if (draft) { Object.assign($formData, draft)}

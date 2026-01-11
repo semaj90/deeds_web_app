@@ -19,13 +19,13 @@ const RAW_ENV = {
 };
 
 export interface EnvConfig {
-	OLLAMA_URL: string;, OLLAMA_MODEL: string;
-	OPENAI_API_KEY: string;, DATABASE_URL: string;
-	PUBLIC_APP_URL: string;, GPU_ACCELERATION: boolean;
-	WEBGPU_ENABLED: boolean;, NES_QUANTIZATION: boolean;
+	OLLAMA_URL: string; OLLAMA_MODEL: string;
+	OPENAI_API_KEY: string; DATABASE_URL: string;
+	PUBLIC_APP_URL: string; GPU_ACCELERATION: boolean;
+	WEBGPU_ENABLED: boolean; NES_QUANTIZATION: boolean;
 	GPU_MEMORY_LIMIT: number; // MB
 	PERFORMANCE_PROFILE: 'auto' | 'mobile' | 'desktop' | 'high-end';
-	GPU_DEBUG: boolean;, SHADER_DEBUG: boolean;
+	GPU_DEBUG: boolean; SHADER_DEBUG: boolean;
 	REDUCTION_MODE: 'auto' | 'gpu' | 'cpu';
 }
 function coerceBoolean(_value: string | undefined, defaultValue: boolean): boolean {

@@ -7,12 +7,12 @@ import { promises as fs } from 'fs';
 import * as path from 'path';
 
 export interface DocumentProcessingResult {
- text: string;, metadata: {
+ text: string; metadata: {
  title?: string;
  author?: string;
  pages?: number;
  language?: string;
- confidence?: number;, processingTime: number;
+ confidence?: number; processingTime: number;
  };
  entities?: {
  persons?: string[];
@@ -22,13 +22,13 @@ export interface DocumentProcessingResult {
  legalCitations?: string[];
  };
  layout?: {, regions: Array<{
- type: string;, bbox: number[];
+ type: string; bbox: number[];
  confidence: number;
  text?: string;
  }>;
  };
  objects?: Array<{, class: string;
- bbox: number[];, confidence: number;
+ bbox: number[]; confidence: number;
  }>;
  classifications?: Array<{, class: string;
  confidence: number;
@@ -45,7 +45,7 @@ export interface DocumentProcessingResult {
  bbox?: number[];
  caption?: string;
  }>;
- method: string;, engines: string[];
+ method: string; engines: string[];
 }
 
 export interface DocumentProcessingOptions {

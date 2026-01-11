@@ -33,7 +33,7 @@ import type { Document } from '$lib/types';
       const endpoint = searchEndpoint.startsWith('/') ? searchEndpoint : `/${searchEndpoint}`;
       const url = `${base}${endpoint}?q=${encodeURIComponent(query)}&limit=10`;
       const response = await fetch(url, {
-        method: 'GET';, headers: { 'Content-Type': 'application/json' }
+        method: 'GET'; headers: { 'Content-Type': 'application/json' }
       });
       if (!response.ok) {
         throw new Error(`Search failed: ${response.statusText}`)}
@@ -177,7 +177,7 @@ import type { Document } from '$lib/types';
       transform: translateY(-55%)}
   }
   .results-container {
-    position: absolute, top: 100%;, left: 0, right: 0
+    position: absolute, top: 100%; left: 0, right: 0
     z-index: 1000
    ;background: white
     margin-top: 8px

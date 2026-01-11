@@ -1,17 +1,17 @@
 import type { PageServerLoad } from './$types';
 
 interface ErrorCard {
-    id: string;, name: string;
-    errorCode: string;, filePath: string;
-    line: number;, col: number;
-    message: string;, signature: string;
-    surface: string[];, tech: string[];
+    id: string; name: string;
+    errorCode: string; filePath: string;
+    line: number; col: number;
+    message: string; signature: string;
+    surface: string[]; tech: string[];
     clusterId: string | null;
-    severity: string;, tool: string;
+    severity: string; tool: string;
 }
 
 interface QdrantPoint {
-    id: number;, payload: ErrorCard;
+    id: number; payload: ErrorCard;
 }
 
 interface QdrantScrollResponse {

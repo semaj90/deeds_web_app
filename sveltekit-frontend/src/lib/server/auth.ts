@@ -63,7 +63,7 @@ declare module 'lucia' {
  DatabaseUserAttributes: {, email: string;
  firstName: string | null;
  lastName: string | null;
- role: string;, isActive: boolean;
+ role: string; isActive: boolean;
  avatarUrl: string | null;
  };
  }

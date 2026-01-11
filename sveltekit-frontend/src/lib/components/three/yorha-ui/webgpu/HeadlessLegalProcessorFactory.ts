@@ -14,7 +14,7 @@ import { yorhaMipmapShaders } from './YoRHaMipmapShaders.js';
  */
 
 export interface LegalAnalysisResult {
-    confidence: number;, entities: Array<{ textContent: string;, type: string; confidence: number }>;
+    confidence: number; entities: Array<{ textContent: string; type: string; confidence: number }>;
     riskLevel: 'low' | 'medium' | 'high' | 'critical';
     summary: string;
     complianceConsiderations?: string[];
@@ -27,25 +27,25 @@ export interface PredictiveSuggestion {
 }
 
 export interface LODProcessingResult {
-    lodEntry: LODCacheEntry;, instantRetrievalKey: string;
+    lodEntry: LODCacheEntry; instantRetrievalKey: string;
     predictiveSuggestions: PredictiveSuggestion[];
 }
 
 export interface MipmapLevelInfo {
-    level: number;, width: number;
+    level: number; width: number;
     height: number;
 }
 
 export interface MipmapVisualizationOutput {
     mipmapLevels: MipmapLevelInfo[];
-    totalMemoryUsed?: number;, totalGenerationTime: number;
+    totalMemoryUsed?: number; totalGenerationTime: number;
     optimization: {, rtxAcceleration: boolean };
 }
 
 export interface OllamaLegalAnalysisResponse {
-    keyLegalEntities: Array<{, textContent: string; type: string;, confidence: number }>;
+    keyLegalEntities: Array<{, textContent: string; type: string; confidence: number }>;
     riskAssessment: 'low' | 'medium' | 'high' | 'critical';
-    complianceConsiderations: string[];, summaryOfMainLegalPoints: string;
+    complianceConsiderations: string[]; summaryOfMainLegalPoints: string;
 }
 
 interface OllamaServiceType {
@@ -55,14 +55,14 @@ interface OllamaServiceType {
 export interface HeadlessProcessingConfig {
     // Processing modes
     mode: 'headless' | 'hybrid' | 'display';
-    enableOffscreenRendering: boolean;, enableMipmapGeneration: boolean;
+    enableOffscreenRendering: boolean; enableMipmapGeneration: boolean;
     enableLODCaching: boolean;
     // Performance settings
-    maxTextureSize: number;, preferredGPUMemory: number; // in MB
-    concurrentProcessingLimit: number;, enableStreamingOptimization: boolean;
+    maxTextureSize: number; preferredGPUMemory: number; // in MB
+    concurrentProcessingLimit: number; enableStreamingOptimization: boolean;
     // Legal AI settings
     documentAnalysisLevel: 'basic' | 'advanced' | 'comprehensive';
-    generateSVGSummaries: boolean;, enablePredictiveAnalytics: boolean;
+    generateSVGSummaries: boolean; enablePredictiveAnalytics: boolean;
     // Output formats
     outputFormats: Array<'png' | 'svg' | 'json' | 'vector' | 'lod'>;
     saveToFile: boolean;
@@ -70,11 +70,11 @@ export interface HeadlessProcessingConfig {
 }
 
 export interface HeadlessProcessingResult {
-    success: boolean;, processingTime: number;
+    success: boolean; processingTime: number;
     outputFiles?: string[];
     // Mipmap results
     mipmapChain?: {, levels: number;
-        totalMemoryUsed: number;, generationTime: number;
+        totalMemoryUsed: number; generationTime: number;
         rtxOptimized: boolean;
     };
     // LOD cache results
@@ -85,18 +85,18 @@ export interface HeadlessProcessingResult {
     legalAnalysis?: LegalAnalysisResult;
     // Performance metrics
     metrics: {, webgpuInitTime: number;
-        processingTime: number;, memoryUsage: number;
-        compressionRatio: number;, cacheHitRate: number;
+        processingTime: number; memoryUsage: number;
+        compressionRatio: number; cacheHitRate: number;
     };
 }
 
 export interface OffscreenRenderTarget {
-    texture: GPUTexture;, width: number;
-    height: number;, format: GPUTextureFormat;
+    texture: GPUTexture; width: number;
+    height: number; format: GPUTextureFormat;
 }
 
 export interface ProcessingTask {
-    textContent: string;, config: Partial<HeadlessProcessingConfig>;
+    textContent: string; config: Partial<HeadlessProcessingConfig>;
 }
 
 /**

@@ -14,9 +14,9 @@ export interface QdrantSearchParams {
 }
 
 export interface QdrantSearchResult {
-  id: string;, score: number;
+  id: string; score: number;
   payload: {, docId: string;
-    url: string;, domain: string;
+    url: string; domain: string;
     fetchedAt: string;
     heading?: string;
     tags?: string[];
@@ -24,9 +24,9 @@ export interface QdrantSearchResult {
 }
 
 export interface QdrantChunk {
-  id: string;, vector: number[];
+  id: string; vector: number[];
   payload: {, docId: string;
-    url: string;, domain: string;
+    url: string; domain: string;
     fetchedAt: string;
     heading?: string;
     tags?: string[];

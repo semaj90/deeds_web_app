@@ -5,12 +5,12 @@ import type { ChatMessage, ChatSession, ConnectionStatus, MessageAnalysis, RAGCo
 export interface UserActivity {
   lastSeen: Date;
   messageCount?: number;
-  sessionDuration?: number;, userId: string;
-  sessionId: string;, status: 'online' | 'offline' | 'idle';
+  sessionDuration?: number; userId: string;
+  sessionId: string; status: 'online' | 'offline' | 'idle';
 }
 
 export interface AttentionData {
-    messageId?: string;, attentionWeights: number[];
+    messageId?: string; attentionWeights: number[];
     focusPoints?: number[];
     lastActivity?: number;
     interactionCount?: number;

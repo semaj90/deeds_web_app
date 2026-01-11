@@ -16,9 +16,9 @@ export class EvidenceDetectiveService {
 
  async analyzeEvidence(params: {, caseId: string;
  query: string;
- evidenceIds?: string[];, userId: string;
+ evidenceIds?: string[]; userId: string;
  }): Promise<{, analysis: string;
- evidence: any[];, connections: any[];
+ evidence: any[]; connections: any[];
  recommendations: string[];
  }> {
  const { caseId, query, evidenceIds, userId } = params;

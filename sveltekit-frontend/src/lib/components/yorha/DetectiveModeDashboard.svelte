@@ -14,7 +14,7 @@ https://svelte.dev/e/js_parse_error -->
  import TimelineReconstructionEngine from './TimelineReconstructionEngine.svelte';
 
  interface Evidence {
- id: string;, title: string;
+ id: string; title: string;
  description?: string;
  content?: string;
  fileName?: string;
@@ -23,14 +23,14 @@ https://svelte.dev/e/js_parse_error -->
  }
 
  interface Witness {
- id: string;, name: string;
+ id: string; name: string;
  statement?: string;
  credibility?: number;
  }
 
  interface Case {
- id: string;, title: string;
- description?: string;, status: 'active' | 'closed' | 'pending';
+ id: string; title: string;
+ description?: string; status: 'active' | 'closed' | 'pending';
  createdAt: string;
  }
 

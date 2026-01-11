@@ -140,14 +140,14 @@
 
 <style>
  .progress-card {
- background: white;, border: 1px solid #e5e7eb;
- border-radius: 8px;, padding: 16px;
+ background: white; border: 1px solid #e5e7eb;
+ border-radius: 8px; padding: 16px;
  margin: 16px 0;
  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
  }
 
  .progress-card.error {
- border-color: #fca5a5;, background: #fef2f2;
+ border-color: #fca5a5; background: #fef2f2;
  }
 
  .card-header {
@@ -158,7 +158,7 @@
  }
 
  .header-title {
- display: flex;, gap: 12px;
+ display: flex; gap: 12px;
  flex: 1;
  }
 
@@ -170,17 +170,17 @@
  .header-title h3 {
  margin: 0;
  font-size: 1rem;
- font-weight: 600;, color: #111827;
+ font-weight: 600; color: #111827;
  word-break: break-word;
  }
 
  .stage-label {
  margin: 4px 0 0 0;
- font-size: 0.875rem;, color: #6b7280;
+ font-size: 0.875rem; color: #6b7280;
  }
 
  .header-stats {
- display: flex;, gap: 16px;
+ display: flex; gap: 16px;
  text-align: right;
  }
 
@@ -190,82 +190,82 @@
  }
 
  .stat-label {
- font-size: 0.75rem;, color: #6b7280;
+ font-size: 0.75rem; color: #6b7280;
  text-transform: uppercase;
  letter-spacing: 0.5px;
  }
 
  .stat-value {
  font-size: 1.25rem;
- font-weight: 600;, color: #111827;
+ font-weight: 600; color: #111827;
  }
 
  .progress-bar {
- height: 8px;, background: #e5e7eb;
- border-radius: 4px;, overflow: hidden;
+ height: 8px; background: #e5e7eb;
+ border-radius: 4px; overflow: hidden;
  margin-bottom: 12px;
  }
 
  .progress-fill {
- height: 100%;, background: linear-gradient(90deg, #3b82f6, #2563eb);
+ height: 100%; background: linear-gradient(90deg, #3b82f6, #2563eb);
  transition: width 0.3s ease;
  }
 
  .metrics {
- display: flex;, gap: 16px;
- padding: 12px;, background: #f9fafb;
+ display: flex; gap: 16px;
+ padding: 12px; background: #f9fafb;
  border-radius: 6px;
  margin-bottom: 12px;
  }
 
  .metric {
  display: flex;
- flex-direction: column;, flex: 1;
+ flex-direction: column; flex: 1;
  }
 
  .metric-label {
- font-size: 0.75rem;, color: #6b7280;
+ font-size: 0.75rem; color: #6b7280;
  text-transform: uppercase;
  letter-spacing: 0.5px;
  }
 
  .metric-value {
  font-size: 1rem;
- font-weight: 600;, color: #111827;
+ font-weight: 600; color: #111827;
  }
 
  .error-section {
- background: #fee2e2;, border: 1px solid #fca5a5;
- border-radius: 6px;, padding: 12px;
+ background: #fee2e2; border: 1px solid #fca5a5;
+ border-radius: 6px; padding: 12px;
  margin-top: 12px;
  }
 
  .error-message {
- color: #991b1b;, margin: 0 0 8px 0;
+ color: #991b1b; margin: 0 0 8px 0;
  font-size: 0.875rem;
  }
 
  .success-section {
- background: #dcfce7;, border: 1px solid #86efac;
- border-radius: 6px;, padding: 12px;
+ background: #dcfce7; border: 1px solid #86efac;
+ border-radius: 6px; padding: 12px;
  margin-top: 12px;
  }
 
  .success-message {
- color: #166534;, margin: 0;
+ color: #166534; margin: 0;
  font-size: 0.875rem;
  font-weight: 500;
  }
 
  .btn {
  padding: 6px 12px;
- border-radius: 4px;, border: none;
- font-weight: 500;, cursor: pointer;
- font-size: 0.875rem;, transition: all 0.2s;
+ border-radius: 4px; border: none;
+ font-weight: 500; cursor: pointer;
+ font-size: 0.875rem; transition: all 0.2s;
  }
 
  .btn-retry {
- background: #ef4444;, color: white;
+ background: #ef4444; color: white;
  }
 
  .btn-retry:hover, not(disabled) {
@@ -273,7 +273,7 @@
  }
 
  .btn:disabled {
- opacity: 0.5;, cursor:not-allowed;
+ opacity: 0.5; cursor:not-allowed;
  }
 </style>
 

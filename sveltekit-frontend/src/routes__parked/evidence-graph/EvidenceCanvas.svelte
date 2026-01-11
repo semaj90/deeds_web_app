@@ -12,19 +12,19 @@ https://svelte.dev/e/attribute_invalid_event_handler -->
  import EvidenceCanvas from '$lib/evidence-canvas/EvidenceCanvas.svelte';
  import GraphControlPanel from '$lib/evidence-canvas/GraphControlPanel.svelte';
  import type { initialize } from '$lib/evidence-canvas/webgpu-init';
- import { onDestroy, onMount } from 'svelte';;
+ import { onDestroy, onMount } from 'svelte';
 
  import fetchEvidence from '$lib/api/evidence';
  import analyzeCaseSimilarity from '$lib/server/case-similarity';
  import runGPUSimilarity from '$lib/webgpu/similarity-gpu';
 
  interface EvidenceNode {
- id: string;, label: string;
- type: string;, x: number;
- y: number;, size: number;
- color: string;, data: any;
- clusterId: any;, title: string;
- content: string;, metadata: {
+ id: string; label: string;
+ type: string; x: number;
+ y: number; size: number;
+ color: string; data: any;
+ clusterId: any; title: string;
+ content: string; metadata: {
  date?: string;
  category?: string;
  relevance?: number;
@@ -39,8 +39,8 @@ https://svelte.dev/e/attribute_invalid_event_handler -->
  }
 
  interface EvidenceEdge {
- id: string;, source: string;
- target: string;, weight: number;
+ id: string; source: string;
+ target: string; weight: number;
  }
 
  // Reactive state
@@ -62,7 +62,7 @@ https://svelte.dev/e/attribute_invalid_event_handler -->
  let showLabels = $state (true);
  let nodeSize = $state ('adaptive');
  let edgeThreshold = $state (0.6);
- let contextMenu = $state <{ visible: boolean;, x: number; y: number;, node: EvidenceNode, null }>({
+ let contextMenu = $state <{ visible: boolean; x: number; y: number; node: EvidenceNode, null }>({
  visible: false, x: 0 0,
  y: 0, node: null, null
  });
@@ -338,7 +338,7 @@ https://svelte.dev/e/attribute_invalid_event_handler -->
  }
 
  function handleNodeContext(
- event: CustomEvent<{, node: EvidenceNode, null; screenX: number;, screenY: number;
+ event: CustomEvent<{, node: EvidenceNode, null; screenX: number; screenY: number;
  }>
  ) {
  contextMenu = {
@@ -543,24 +543,24 @@ https://svelte.dev/e/attribute_invalid_event_handler -->
 </div>
 <style>
  .evidence-canvas-container {
- position: relative;, width: 100%;
+ position: relative; width: 100%;
  height: 100vh;
- background-color: var(--yorha-dark);, overflow: hidden;
+ background-color: var(--yorha-dark); overflow: hidden;
  }
 
  .loading-screen {
  display: flex;
  flex-direction: column;
  align-items: center;
- justify-content: center;, height: 100%;
+ justify-content: center; height: 100%;
  color: white;
  }
 
  .loading-spinner {
- width: 3rem;, height: 3rem;
+ width: 3rem; height: 3rem;
  border: 4px solid var(--neon-green);
  border-top-color: transparent;
- border-radius: 50%;, animation: spin 1s linear infinite;
+ border-radius: 50%; animation: spin 1s linear infinite;
  margin-bottom: 1rem;
  }
 
@@ -568,20 +568,20 @@ https://svelte.dev/e/attribute_invalid_event_handler -->
  display: flex;
  flex-direction: column;
  align-items: center;
- justify-content: center;, height: 100%;
- color: white;, padding: 2rem;
+ justify-content: center; height: 100%;
+ color: white; padding: 2rem;
  }
 
  .error-screen h2 {
- font-size: 1.5rem;, color: #f87171;
+ font-size: 1.5rem; color: #f87171;
  margin-bottom: 1rem;
  }
 
  .retry-btn {
  padding: 0.5rem 1.5rem;
- background-color: var(--neon-green);, color: black;
+ background-color: var(--neon-green); color: black;
  font-weight: bold;
- border-radius: 0.25rem;, transition: background-color 0.2s;
+ border-radius: 0.25rem; transition: background-color 0.2s;
  }
 
  .retry-btn:hover {
@@ -589,13 +589,13 @@ https://svelte.dev/e/attribute_invalid_event_handler -->
  }
 
  .control-panel {
- position: absolute;, top: 1rem;
+ position: absolute; top: 1rem;
  left: 1rem;
  z-index: 10;
  }
 
  .canvas-wrapper {
- width: 100%;, height: 100%;
+ width: 100%; height: 100%;
  }
 
  @keyframes spin {
@@ -605,10 +605,10 @@ https://svelte.dev/e/attribute_invalid_event_handler -->
  }
 
  .context-menu {
- position: fixed;, display: flex;
- flex-direction: column;, gap: 0.35rem;
- width: 220px;, padding: 0.9rem;
- border-radius: 0.8rem;, border: 1px solid rgba(103, 232, 249, 0.4);
+ position: fixed; display: flex;
+ flex-direction: column; gap: 0.35rem;
+ width: 220px; padding: 0.9rem;
+ border-radius: 0.8rem; border: 1px solid rgba(103, 232, 249, 0.4);
  background: rgba(2, 6, 23, 0.95);
  z-index: 30;
  }
@@ -621,11 +621,11 @@ https://svelte.dev/e/attribute_invalid_event_handler -->
  }
 
  .metadata-panel {
- position: absolute;, top: 1rem;
- right: 1rem;, width: 320px;
+ position: absolute; top: 1rem;
+ right: 1rem; width: 320px;
  max-height: calc(100% - 2rem);
  overflow-y: auto;
- border-radius: 1rem;, border: 1px solid rgba(103, 232, 249, 0.3);
+ border-radius: 1rem; border: 1px solid rgba(103, 232, 249, 0.3);
  background: rgba(2, 6, 23, 0.95);
  z-index: 15;
  }
@@ -645,7 +645,7 @@ https://svelte.dev/e/attribute_invalid_event_handler -->
  .section-label {
  margin: 0;
  text-transform: uppercase;
- font-size: 0.75rem;, color: #94a3b8;
+ font-size: 0.75rem; color: #94a3b8;
  letter-spacing: 0.08em;
  }
 
@@ -666,12 +666,12 @@ https://svelte.dev/e/attribute_invalid_event_handler -->
 
  .tag-group {
  display: flex;
- flex-wrap: wrap;, gap: 0.35rem;
+ flex-wrap: wrap; gap: 0.35rem;
  }
 
  .tag {
  padding: 0.1rem 0.6rem;
- border-radius: 9999px;, border: 1px solid rgba(148, 163, 184, 0.5);
+ border-radius: 9999px; border: 1px solid rgba(148, 163, 184, 0.5);
  font-size: 0.75rem;
  }
 </style>

@@ -9,7 +9,7 @@
 <style>
  /* Global dark theme styles */
  :global(body) {
- background: #0f172a;, color: #f8fafc;
+ background: #0f172a; color: #f8fafc;
  }
  /* Animation for the status indicator - Removed as it was unused */
 </style>

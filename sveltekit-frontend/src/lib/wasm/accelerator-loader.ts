@@ -8,7 +8,7 @@
  */
 
 type ParseResult<T> = {
- data: T;, backend: 'http' | 'wasm' | 'wasi' | 'fallback';
+ data: T; backend: 'http' | 'wasm' | 'wasi' | 'fallback';
  parseTimeMs: number;
 };
 

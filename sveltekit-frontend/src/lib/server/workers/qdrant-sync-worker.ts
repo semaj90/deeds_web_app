@@ -20,8 +20,8 @@ import type { DocumentChunk } from './schema-phase90-hardened.js';
 import * as schema from './schema-phase90-hardened.js';
 
 interface QdrantSyncConfig {
- qdrantUrl: string;, batchSize: number;
- pollIntervalMs: number;, retryAttempts: number;
+ qdrantUrl: string; batchSize: number;
+ pollIntervalMs: number; retryAttempts: number;
 }
 
 const DEFAULT_CONFIG: QdrantSyncConfig = {

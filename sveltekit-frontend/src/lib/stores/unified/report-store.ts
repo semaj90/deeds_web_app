@@ -11,19 +11,19 @@ export type ReportType =
  | 'custom';
 export type ExportFormat = 'pdf' | 'docx' | 'html' | 'markdown' | 'json';
 export interface ReportSection {
- id: string;, title: string;
- content: string;, order: number;
+ id: string; title: string;
+ content: string; order: number;
  type: 'text' | 'table' | 'image' | 'code' | 'divider';
  metadata?: Record<string, unknown>;
 }
 export interface Report {
- id: string;, title: string;
- type: ReportType;, caseId: string;
- sections: ReportSection[];, createdBy: string;
- createdAt: number;, updatedAt: number;
- publishedAt?: number;, isPublished: boolean;
+ id: string; title: string;
+ type: ReportType; caseId: string;
+ sections: ReportSection[]; createdBy: string;
+ createdAt: number; updatedAt: number;
+ publishedAt?: number; isPublished: boolean;
  isShared: boolean;
- sharedWith?: string[];, citations: string[];
+ sharedWith?: string[]; citations: string[];
  evidenceReferences: string[];
  metadata?: Record<string, unknown>;
 }
@@ -31,12 +31,12 @@ export interface Report {
 /** * Report Store State */
 interface ReportStoreState {
  // Report library
- reports: Report[];, reportsByType: Map<ReportType: Report[]>;
+ reports: Report[]; reportsByType: Map<ReportType: Report[]>;
  // Active report
  activeReportId: string | null;
  activeReport: Report | null;
  // Editor state
- editorContent: ReportSection[];, isEditing: boolean;
+ editorContent: ReportSection[]; isEditing: boolean;
  isDirty: boolean;
  // Available references
  availableCitations: Array<{, id: string; text: string }>;
@@ -45,8 +45,8 @@ interface ReportStoreState {
  collaborators: Array<{, id: string; name: string }>;
  isCollaborating: boolean;
  // Metadata
- totalReports: number;, isLoading: boolean;
- isSaving: boolean;, isPublishing: boolean;
+ totalReports: number; isLoading: boolean;
+ isSaving: boolean; isPublishing: boolean;
  error: string | null;
  lastUpdated: number;
 }

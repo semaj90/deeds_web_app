@@ -6,13 +6,13 @@ import type { DocumentProcessingJob } from './rabbitmq-service.js';
 import { rabbitmqService } from './rabbitmq-service.js';
 
 interface RetryAttempt {
-	attemptNumber: number;, timestamp: string;
+	attemptNumber: number; timestamp: string;
 	errorMessage?: string;
 }
 
 interface DLQMessage extends DocumentProcessingJob {
-	retryAttempts: RetryAttempt[];, maxRetries: number;
-	firstFailedAt: string;, lastFailedAt: string;
+	retryAttempts: RetryAttempt[]; maxRetries: number;
+	firstFailedAt: string; lastFailedAt: string;
 	originalQueue: string;
 }
 export class DLQMonitor {

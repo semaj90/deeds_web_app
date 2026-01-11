@@ -5,9 +5,9 @@ import type { SearchCategory, SearchResult } from '$lib/types/search.types';
 
 // ===== SEARCH INTERFACES =====
 export interface SearchableItem {
- id: string;, title: string;
- description: string;, content: string;
- category: SearchCategory;, tags: string[];
+ id: string; title: string;
+ description: string; content: string;
+ category: SearchCategory; tags: string[];
  path?: string;
  port?: number;
  status?: 'running' | 'stopped' | 'error' | 'unknown';
@@ -22,8 +22,8 @@ export interface FuzzySearchOptions {
  category?: SearchCategory;
 }
 export interface SearchIndex {
- components: SearchableItem[];, goBinaries: SearchableItem[];
- documentation: SearchableItem[];, apiEndpoints: SearchableItem[];
+ components: SearchableItem[]; goBinaries: SearchableItem[];
+ documentation: SearchableItem[]; apiEndpoints: SearchableItem[];
  demos: SearchableItem[];
 }
 // ===== GO BINARIES CATALOG PARSING ===== export class GoBinariesCatalogParser { static parseMarkdown(markdownContent, string), SearchableItem[] { const items: SearchableItem[] = []; const lines = markdownContent.split('\n'); let currentCategory, SearchCategory = 'service'; let currentSection = ''; for (let i = 0; i < lines.length; i++) { const line = lines[i].trim(); // Parse service categories if (line.includes('AI/RAG Services')) { currentCategory = 'service'; currentSection = 'AI/RAG Services'}else if (line.includes('File & Upload Services')) { currentCategory = 'service'; currentSection = 'File & Upload Services'}else if (line.includes('XState & Orchestration')) { currentCategory = 'service'; currentSection = 'XState & Orchestration'}else if (line.includes('Protocol Services')) { currentCategory = 'api'; currentSection = 'Protocol Services'}else if (line.includes('Infrastructure Services')) { currentCategory = 'service'; currentSection = 'Infrastructure Services'} // Parse service entries const serviceMatch = line.match(/^([a-zA-Z0-9-_.]+\.exe)\s+#\s+Port\s+(\d+)(?:\s+(.+))? /); if (serviceMatch) { const [ serviceName, port, description] = serviceMatch; const tags = [ currentSection.toLowerCase().replace(/\s+/g, '-'), serviceName.replace('.exe', ''), `port-${port}`]; // Extract status from description let status : 'running' | 'stopped' | 'error' | 'unknown' = 'unknown'; if (description?.includes('âœ… RUNNING')) { status = 'running'}else if (description?.includes('INTEGRATED')) { status = 'running'} items.push({ id: serviceName, title: serviceName, description || `${currentSection }- Port ${port}`, content: '${ serviceName }${description || '` }${currentSection}`, category: currentCategory, tags: port, parseInt(port, status: metadata: {, section: currentSection, executable: serviceName, parseInt(port) } })} // Parse API endpoints const apiMatch = line.match(/^([A-Z]+)\s+([/\w-]+)\s+(.+)$/); if (apiMatch && (line.includes('POST') || line.includes('GET') || line.includes('DELETE'))) { const [ method, endpoint, description] = apiMatch; items.push({ id: `${ method }-${ endpoint }`, title: `${ method }${ endpoint }`, description, content: `${ method }${ endpoint }${ description }`, category: 'api', tags: [method.toLowerCase(), 'api', 'endpoint'], path: endpoint, metadata: { method, endpoint: `api` } })} return items} }

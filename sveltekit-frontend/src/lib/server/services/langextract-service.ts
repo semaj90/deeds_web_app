@@ -23,8 +23,8 @@ export type SectionType =
  */
 export interface LangExtractSection {
  section_type: SectionType;
- section_subtype?: string;, text: string;
- start_offset: number;, end_offset: number;
+ section_subtype?: string; text: string;
+ start_offset: number; end_offset: number;
  confidence?: number;
 }
 
@@ -45,7 +45,7 @@ export interface CrimeMetadata {
  * LangExtract API response
  */
 export interface LangExtractOutput {
- doc_id: string;, sections: LangExtractSection[];
+ doc_id: string; sections: LangExtractSection[];
  metadata: CrimeMetadata;
  language?: string;
  language_confidence?: number;

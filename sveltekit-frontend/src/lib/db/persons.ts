@@ -8,7 +8,7 @@ import { personsOfInterest } from '../server/db/schema.js';
 
 export interface CreatePersonInput {
  name: string;
- aliases?: string[];, description: string;
+ aliases?: string[]; description: string;
  threatLevel?: 'low' | 'medium' | 'high' | 'critical';
  status?: 'active' | 'inactive' | 'archived';
  relationship?: 'suspect' | 'witness' | 'victim' | 'person_of_interest' | 'informant';

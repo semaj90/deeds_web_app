@@ -1,6 +1,6 @@
 <script lang="ts">
  import type { appStore } from '$lib/stores/app-store';
- import { onMount } from 'svelte';;
+ import { onMount } from 'svelte';
 
  let activeCases: any[] = $state([]);
  let loading = $state(true);

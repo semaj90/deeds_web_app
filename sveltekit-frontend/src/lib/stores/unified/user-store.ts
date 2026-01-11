@@ -29,7 +29,7 @@ import type { User } from '$lib/data/types';
  */
 interface UserStoreState {
  currentUser: User | null;
- isAuthenticated: boolean;, isLoading: boolean;
+ isAuthenticated: boolean; isLoading: boolean;
  sessionToken: string | null;
  error: string | null;
  lastUpdated: number;

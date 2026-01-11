@@ -68,7 +68,7 @@ export type ExtendedCaseScoringRequest = BaseCaseScoringRequest & {
 };
 
 interface CaseScoringServiceResult {
-	score: number;, explanation: string;
+	score: number; explanation: string;
 }
 // Define the final output type for the agentic scoring result export interface AgenticScoringResult extends CaseScoringServiceResult { contextualSummary: string}
 /** * Local LLMRequest type matching the fields used in this file */ type LLMRequest = { prompt: model?: string; temperature? : number; maxTokens?: number}; // Use getOllamaEndpoint() for process.env.OLLAMA_URL
@@ -133,7 +133,7 @@ async function summarizeWithGemma(params: {, query: string;
  * Represents a document record used in retrieval and reranking.
  */
 export interface DocumentRecord {
-	id: string;, content: string;
+	id: string; content: string;
 	score?: number;
 	meta?: Record<string, unknown>;
 	embedding?: number[];
@@ -147,11 +147,11 @@ export interface VectorSearchResult extends DocumentRecord {}
  * Agentic task result
  */
 export interface AgentTaskResult {
-	transcript?: string;, summary: string;
-	audioOutput?: string;, entities: LegalEntity[];
-	usedDocs: DocumentRecord[];, confidence: number;
-	processingTime: number;, steps: Array<{
-		name: string;, duration: number;
+	transcript?: string; summary: string;
+	audioOutput?: string; entities: LegalEntity[];
+	usedDocs: DocumentRecord[]; confidence: number;
+	processingTime: number; steps: Array<{
+		name: string; duration: number;
 		cached: boolean;
 	}>;
 }

@@ -189,22 +189,22 @@ https://svelte.dev/e/block_unexpected_close -->
 <style>
 	.search-container {
 		display: flex;
-		flex-direction: column;, gap: 1.5rem;
+		flex-direction: column; gap: 1.5rem;
 	}
 
 	.search-header {
-		display: flex;, gap: 1rem;
+		display: flex; gap: 1rem;
 		align-items: flex-start;
 	}
 
 	.search-input-group {
-		display: flex;, gap: 0.5rem;
+		display: flex; gap: 0.5rem;
 		flex: 1;
 	}
 
 	.search-input {
-		flex: 1;, padding: 0.75rem 1rem;
-		font-size: 0.95rem;, border: 2px solid #b09a6a;
+		flex: 1; padding: 0.75rem 1rem;
+		font-size: 0.95rem; border: 2px solid #b09a6a;
 		border-radius: 4px;
 		font-family: 'Source Sans 3', sans-serif;
 		transition: border-color 0.2s ease;
@@ -216,17 +216,17 @@ https://svelte.dev/e/block_unexpected_close -->
 	}
 
 	.search-input:disabled {
-		opacity: 0.6;, cursor:not-allowed;
+		opacity: 0.6; cursor:not-allowed;
 	}
 
 	.search-btn {
 		padding: 0.75rem 1.5rem;
-		background: #8b0000;, color: white;
+		background: #8b0000; color: white;
 		border: none;
-		border-radius: 4px;, cursor: pointer;
-		font-weight: 600;, transition: background 0.2s ease;
+		border-radius: 4px; cursor: pointer;
+		font-weight: 600; transition: background 0.2s ease;
 		display: flex;
-		align-items: center;, gap: 0.5rem;
+		align-items: center; gap: 0.5rem;
 		white-space: nowrap;
 	}
 
@@ -235,14 +235,14 @@ https://svelte.dev/e/block_unexpected_close -->
 	}
 
 	.search-btn:disabled {
-		opacity: 0.7;, cursor:not-allowed;
+		opacity: 0.7; cursor:not-allowed;
 	}
 
 	.filter-toggle {
 		padding: 0.75rem 1rem;
-		background: #efe7d2;, border: 2px solid #b09a6a;
-		border-radius: 4px;, cursor: pointer;
-		font-weight: 600;, transition: all 0.2s ease;
+		background: #efe7d2; border: 2px solid #b09a6a;
+		border-radius: 4px; cursor: pointer;
+		font-weight: 600; transition: all 0.2s ease;
 	}
 
 	.filter-toggle:hover {
@@ -251,31 +251,31 @@ https://svelte.dev/e/block_unexpected_close -->
 
 	.filters-panel {
 		display: flex;
-		flex-direction: column;, gap: 1rem;
-		padding: 1rem;, background: #efe7d2;
-		border-radius: 4px;, border: 1px solid #b09a6a;
+		flex-direction: column; gap: 1rem;
+		padding: 1rem; background: #efe7d2;
+		border-radius: 4px; border: 1px solid #b09a6a;
 	}
 
 	.filter-group {
 		display: flex;
-		flex-direction: column;, gap: 0.5rem;
+		flex-direction: column; gap: 0.5rem;
 	}
 
 	.filter-group label {
 		font-weight: 600;
-		font-size: 0.9rem;, color: #2d2d2d;
+		font-size: 0.9rem; color: #2d2d2d;
 	}
 
 	.chips {
 		display: flex;
-		flex-wrap: wrap;, gap: 0.5rem;
+		flex-wrap: wrap; gap: 0.5rem;
 	}
 
 	.chip {
 		padding: 0.4rem 0.8rem;
-		background: white;, border: 1px solid #b09a6a;
-		border-radius: 20px;, cursor: pointer;
-		font-size: 0.85rem;, transition: all 0.2s ease;
+		background: white; border: 1px solid #b09a6a;
+		border-radius: 20px; cursor: pointer;
+		font-size: 0.85rem; transition: all 0.2s ease;
 	}
 
 	.chip:hover {
@@ -283,7 +283,7 @@ https://svelte.dev/e/block_unexpected_close -->
 	}
 
 	.chip.active {
-		background: #8b0000;, color: white;
+		background: #8b0000; color: white;
 		border-color: #8b0000;
 	}
 
@@ -291,15 +291,15 @@ https://svelte.dev/e/block_unexpected_close -->
 		display: flex;
 		flex-direction: column;
 		align-items: center;
-		justify-content: center;, padding: 3rem 1rem;
+		justify-content: center; padding: 3rem 1rem;
 		gap: 1rem;
 	}
 
 	.spinner {
-		width: 40px;, height: 40px;
+		width: 40px; height: 40px;
 		border: 4px solid #f3f3f3;
 		border-top: 4px solid #8b0000;
-		border-radius: 50%;, animation: spin 1s linear infinite;
+		border-radius: 50%; animation: spin 1s linear infinite;
 	}
 
 	@keyframes spin {
@@ -312,18 +312,18 @@ https://svelte.dev/e/block_unexpected_close -->
 	}
 
 	.loading-state p {
-		margin: 0;, color: #2d2d2d;
+		margin: 0; color: #2d2d2d;
 		font-weight: 500;
 	}
 
 	.loading-state .subtitle {
-		font-size: 0.85rem;, color: #666;
+		font-size: 0.85rem; color: #666;
 		font-weight: normal;
 	}
 
 	.results {
 		display: flex;
-		flex-direction: column;, gap: 1rem;
+		flex-direction: column; gap: 1rem;
 	}
 
 	.results-header {
@@ -337,19 +337,19 @@ https://svelte.dev/e/block_unexpected_close -->
 	.results-header h3 {
 		margin: 0;
 		font-family: 'Crimson Text', serif;
-		font-size: 1.2rem;, color: #2d2d2d;
+		font-size: 1.2rem; color: #2d2d2d;
 	}
 
 	.count {
-		font-size: 0.85rem;, color: #666;
-		background: #efe7d2;, padding: 0.25rem 0.75rem;
+		font-size: 0.85rem; color: #666;
+		background: #efe7d2; padding: 0.25rem 0.75rem;
 		border-radius: 12px;
 	}
 
 	.law-card {
-		padding: 1rem;, background: white;
+		padding: 1rem; background: white;
 		border: 1px solid #b09a6a;
-		border-radius: 4px;, cursor: pointer;
+		border-radius: 4px; cursor: pointer;
 		transition: all 0.2s ease;
 	}
 
@@ -367,31 +367,31 @@ https://svelte.dev/e/block_unexpected_close -->
 	.law-header {
 		display: flex;
 		justify-content: space-between;
-		align-items: flex-start;, gap: 1rem;
+		align-items: flex-start; gap: 1rem;
 		margin-bottom: 0.5rem;
 	}
 
 	.law-title {
 		margin: 0;
 		font-family: 'Crimson Text', serif;
-		font-size: 1.05rem;, color: #2d2d2d;
+		font-size: 1.05rem; color: #2d2d2d;
 		flex: 1;
 	}
 
 	.score {
-		font-weight: 600;, color: #8b0000;
+		font-weight: 600; color: #8b0000;
 		font-size: 0.9rem;
 		white-space: nowrap;
 	}
 
 	.law-snippet {
 		margin: 0.5rem 0;
-		font-size: 0.9rem;, color: #666;
+		font-size: 0.9rem; color: #666;
 		line-height: 1.5;
 	}
 
 	.law-meta {
-		display: flex;, gap: 0.5rem;
+		display: flex; gap: 0.5rem;
 		flex-wrap: wrap;
 		margin-top: 0.75rem;
 	}
@@ -399,17 +399,17 @@ https://svelte.dev/e/block_unexpected_close -->
 	.jurisdiction,
 	.charge-type,
 	.severity {
-		font-size: 0.75rem;, padding: 0.25rem 0.5rem;
+		font-size: 0.75rem; padding: 0.25rem 0.5rem;
 		background: #efe7d2;
-		border-radius: 3px;, color: #666;
+		border-radius: 3px; color: #666;
 	}
 
 	.empty-state {
 		display: flex;
 		flex-direction: column;
 		align-items: center;
-		justify-content: center;, padding: 3rem 1rem;
-		gap: 0.5rem;, color: #999;
+		justify-content: center; padding: 3rem 1rem;
+		gap: 0.5rem; color: #999;
 	}
 
 	.empty-state p {
@@ -418,7 +418,7 @@ https://svelte.dev/e/block_unexpected_close -->
 	}
 
 	.empty-state .subtitle {
-		font-size: 0.85rem;, color: #bbb;
+		font-size: 0.85rem; color: #bbb;
 	}
 </style>
 

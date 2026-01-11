@@ -7,8 +7,8 @@
 
  interface Props {
  statute: {, titleNumber: number;
- section: string;, id: string;
- fullCitation: string;, text: string;
+ section: string; id: string;
+ fullCitation: string; text: string;
  heading?: string;
  };
  relatedCases?: any[];
@@ -22,8 +22,8 @@
  let error = writable('');
 
  const actions: Array<{, id: LegalIntent;
- label: string;, icon: string;
- description: string;, color: string;
+ label: string; icon: string;
+ description: string; color: string;
  }> = [
  {
  id: 'EXPLAIN_STATUTE',
@@ -169,7 +169,7 @@
  .action-panel {
  margin: 2rem 0;
  display: flex;
- flex-direction: column;, gap: 1rem;
+ flex-direction: column; gap: 1rem;
  }
 
  .action-buttons {
@@ -181,10 +181,10 @@
  .action-button {
  display: flex;
  flex-direction: column;
- align-items: center;, gap: 0.5rem;
- padding: 1rem;, border: 1px solid #e0e0e0;
- border-radius: 8px;, background: white;
- cursor: pointer;, transition: all 0.2s;
+ align-items: center; gap: 0.5rem;
+ padding: 1rem; border: 1px solid #e0e0e0;
+ border-radius: 8px; background: white;
+ cursor: pointer; transition: all 0.2s;
  font-size: 0.875rem;
  font-weight: 500;
  }
@@ -195,7 +195,7 @@
  }
 
  .action-button:disabled {
- opacity: 0.6;, cursor:not-allowed;
+ opacity: 0.6; cursor:not-allowed;
  }
 
  .icon {
@@ -207,17 +207,17 @@
  }
 
  .response-panel {
- background: white;, border: 1px solid #e0e0e0;
- border-radius: 8px;, padding: 1.5rem;
+ background: white; border: 1px solid #e0e0e0;
+ border-radius: 8px; padding: 1.5rem;
  animation: slideIn 0.3s ease-out;
  }
 
  @keyframes slideIn {
  from {
- opacity: 0;, transform: translateY(-10px);
+ opacity: 0; transform: translateY(-10px);
  }
  to {
- opacity: 1;, transform: translateY(0);
+ opacity: 1; transform: translateY(0);
  }
  }
 
@@ -232,13 +232,13 @@
 
  .panel-header h3 {
  margin: 0;
- font-size: 1.1rem;, color: #1a1a1a;
+ font-size: 1.1rem; color: #1a1a1a;
  }
 
  .close-btn {
- background: none;, border: none;
- font-size: 1.5rem;, cursor: pointer;
- color: #999;, transition: color 0.2s;
+ background: none; border: none;
+ font-size: 1.5rem; cursor: pointer;
+ color: #999; transition: color 0.2s;
  }
 
  .close-btn:hover {
@@ -248,15 +248,15 @@
  .loading {
  display: flex;
  flex-direction: column;
- align-items: center;, gap: 1rem;
+ align-items: center; gap: 1rem;
  padding: 2rem;
  }
 
  .spinner {
- width: 40px;, height: 40px;
+ width: 40px; height: 40px;
  border: 3px solid #e0e0e0;
  border-top-color: #0066cc;
- border-radius: 50%;, animation: spin 0.8s linear infinite;
+ border-radius: 50%; animation: spin 0.8s linear infinite;
  }
 
  @keyframes spin {
@@ -266,15 +266,15 @@
  }
 
  .error-message {
- padding: 1rem;, background: #fff3cd;
+ padding: 1rem; background: #fff3cd;
  border: 1px solid #ffc107;
- border-radius: 6px;, color: #856404;
+ border-radius: 6px; color: #856404;
  }
 
  .response-content {
- line-height: 1.6;, color: #333;
+ line-height: 1.6; color: #333;
  max-height: 400px;
- overflow-y: auto;, padding: 1rem;
+ overflow-y: auto; padding: 1rem;
  background: #f9f9f9;
  border-radius: 6px;
  }

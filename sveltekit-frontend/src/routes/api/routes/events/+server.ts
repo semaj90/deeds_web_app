@@ -79,7 +79,7 @@ export const GET: RequestHandler = async () => {
  * @param data - Health change event data
  */
 export function broadcastHealthChange(data: {, routeId: string;
-  oldStatus: string;, newStatus: string;
+  oldStatus: string; newStatus: string;
   timestamp: string;
   reason?: string;
 }) {
@@ -116,7 +116,7 @@ export function broadcastHealthChange(data: {, routeId: string;
 export function broadcastErrorCountChange(data: {, routeId: string;
   errorCount: number;
   warningCount?: number;
-  infoCount?: number;, timestamp: string;
+  infoCount?: number; timestamp: string;
 }) {
   const message = `data: ${JSON.stringify({, type: 'error_count_change',
     ...data,

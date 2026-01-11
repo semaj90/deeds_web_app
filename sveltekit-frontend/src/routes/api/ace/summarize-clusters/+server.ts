@@ -14,8 +14,8 @@ const QDRANT_URL = process.env.QDRANT_URL || 'http://localhost:6333';
 const OLLAMA_URL = process.env.OLLAMA_URL || 'http://localhost:11434';
 
 interface CollectionSummary {
-  collection: string;, points: number;
-  summary: string;, tags: string[];
+  collection: string; points: number;
+  summary: string; tags: string[];
   summarized_at: string;
 }
 
@@ -38,7 +38,7 @@ async function sampleCollection(name: string, limit: number = 10): Promise<Array
       body: JSON.stringify({ limit, with_payload: true, with_vector: false })
     });
     if (!response.ok) return [];
-    const data = await response.json() as { result: {, points: Array<{ id: string;, payload: Record<string, unknown> }> } };
+    const data = await response.json() as { result: {, points: Array<{ id: string; payload: Record<string, unknown> }> } };
     return data.result.points;
   } catch {
     return [];
@@ -130,8 +130,8 @@ export const GET: RequestHandler = async () => {
   try {
     // Get existing summaries from CouchDB
     const { docs } = await couchdb.find<{
-      source_id: string;, summary_text: string;
-      tags: string[];, created_at: string;
+      source_id: string; summary_text: string;
+      tags: string[]; created_at: string;
     }>('llm_summaries', { type: 'llm_summary', source_type: 'cluster' }, { limit: 100 });
 
     const listResponse = await fetch(`${QDRANT_URL}/collections`);

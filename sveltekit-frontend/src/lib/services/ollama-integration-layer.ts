@@ -28,11 +28,11 @@ export interface IntegratedChatRequest {
     metadata?: Record<string, unknown>;
   };
   summaryOptions?: {, includeSummary: boolean;
-    includeKeyPoints: boolean;, includeLegalAnalysis: boolean;
+    includeKeyPoints: boolean; includeLegalAnalysis: boolean;
     includeEmbeddings: boolean;
   };
   advancedOptions?: {, useGPU: boolean;
-    enableStreaming: boolean;, enableCaching: boolean;
+    enableStreaming: boolean; enableCaching: boolean;
     fallbackModel?: string;
   };
 }
@@ -45,14 +45,14 @@ export interface IntegratedChatResponse {
     processingTime?: number;
   };
   integration?: {, servicesUsed: string[];
-    processingPath: string;, performance: {
+    processingPath: string; performance: {
       totalTime: number;
       summaryTime?: number;
       chatTime?: number;
     };
   };
   performance?: {, duration: number;
-    tokens: number;, tokensPerSecond: number;
+    tokens: number; tokensPerSecond: number;
     model: string;
   };
   relatedCases?: string[];

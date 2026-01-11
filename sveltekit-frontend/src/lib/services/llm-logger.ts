@@ -17,15 +17,15 @@ const OLLAMA_URL = process.env.OLLAMA_URL || 'http://localhost:11434';
 
 // LLM Log Schema
 export interface LLMLog {
-  log_id: string;, timestamp: string;
-  model: string;, task_type: 'error_fix' | 'code_gen' | 'summary' | 'extraction' | 'chat' | 'analysis';
+  log_id: string; timestamp: string;
+  model: string; task_type: 'error_fix' | 'code_gen' | 'summary' | 'extraction' | 'chat' | 'analysis';
   input: {, prompt: string;
     context_chunks?: string[];
     system_prompt?: string;
     metadata?: Record<string, unknown>;
   };
   output: {, response: string;
-    tokens_in: number;, tokens_out: number;
+    tokens_in: number; tokens_out: number;
     latency_ms: number;
   };
   evaluation: {, success: boolean;
@@ -38,10 +38,10 @@ export interface LLMLog {
 
 // Instruction Tuning Format
 export interface InstructionSample {
-  instruction: string;, input: string;
+  instruction: string; input: string;
   output: string;
   metadata?: {, source: string;
-    task_type: string;, ace_score: number;
+    task_type: string; ace_score: number;
     model: string;
   };
 }
@@ -346,7 +346,7 @@ export async function logLLMCall(
   prompt: string,
   response: string,
   metrics: {, tokensIn: number;
-    tokensOut: number;, latencyMs: number;
+    tokensOut: number; latencyMs: number;
   },
   evaluation: {, success: boolean;
     errorsFixed?: number;

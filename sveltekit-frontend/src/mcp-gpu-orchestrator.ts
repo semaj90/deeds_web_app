@@ -46,8 +46,8 @@ export interface GPUTaskConfig {
 }
 
 export interface GPUTaskResult {
-	taskId: string;, success: boolean;
-	result: unknown;, metrics: {
+	taskId: string; success: boolean;
+	result: unknown; metrics: {
 		processingTime: number;
 		gpuUtilization?: number;
 		memoryUsage?: number;
@@ -66,18 +66,18 @@ export interface GPUTaskResult {
 
 export interface ClusterMetrics {
 	spawned: Record<string, number>;
-	deferredActive: number;, deferredTotal: number;
+	deferredActive: number; deferredTotal: number;
 	lastAllocation: {, type: string;
-		port: number;, timestamp: string;
+		port: number; timestamp: string;
 	};
-	events: unknown[];, workers: unknown[];
+	events: unknown[]; workers: unknown[];
 	deferredQueue: unknown[];
 }
 
 export interface AutosolveContext {
-	errorCount: number;, errorTypes: string[];
-	clusterMetrics: ClusterMetrics;, threshold: number;
-	lastRun: string;, suggestedActions: string[];
+	errorCount: number; errorTypes: string[];
+	clusterMetrics: ClusterMetrics; threshold: number;
+	lastRun: string; suggestedActions: string[];
 }
 
 class MCPGPUOrchestrator {
@@ -653,7 +653,7 @@ Provide a complete, working fix with explanation.`;
 	 */
 	async getClusterStatus(): Promise<{, metrics: ClusterMetrics | null;
 		autosolveContext: AutosolveContext | null;
-		activeGPUTasks: number;, queueSize: number;
+		activeGPUTasks: number; queueSize: number;
 	}> {
 		return {
 			metrics: this.clusterMetrics,

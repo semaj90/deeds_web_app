@@ -31,7 +31,7 @@ const ERROR_SEVERITY: Record<string, number> = {
 
 interface ErrorEvent {
  type: 'error' | 'status' | 'summary';
- timestamp: string;, data: Record<string, unknown>;
+ timestamp: string; data: Record<string, unknown>;
 }
 
 export const GET: RequestHandler = async ({ request }) => {

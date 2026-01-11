@@ -221,8 +221,8 @@ https://svelte.dev/e/attribute_invalid_event_handler -->
 
 <style>
  .modal-overlay {
- position: fixed;, top: 0;
- left: 0;, right: 0;
+ position: fixed; top: 0;
+ left: 0; right: 0;
  bottom: 0;
  background-color: rgba(0, 0, 0, 0.5);
  display: flex;
@@ -235,7 +235,7 @@ https://svelte.dev/e/attribute_invalid_event_handler -->
  background-color: white;
  border-radius: 8px;
  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
- max-width: 600px;, width: 90%;
+ max-width: 600px; width: 90%;
  max-height: 90vh;
  overflow-y: auto;
  }
@@ -243,7 +243,7 @@ https://svelte.dev/e/attribute_invalid_event_handler -->
  .modal-header {
  display: flex;
  justify-content: space-between;
- align-items: center;, padding: 1.5rem;
+ align-items: center; padding: 1.5rem;
  border-bottom: 2px solid #d4a574;
  background-color: #f5f1e8;
  }
@@ -251,13 +251,13 @@ https://svelte.dev/e/attribute_invalid_event_handler -->
  .modal-header h2 {
  margin: 0;
  font-family: 'Crimson Text', Georgia, serif;
- font-size: 1.5rem;, color: #2c2c2c;
+ font-size: 1.5rem; color: #2c2c2c;
  }
 
  .close-btn {
- background: none;, border: none;
- font-size: 1.5rem;, cursor: pointer;
- color: #666;, padding: 0;
+ background: none; border: none;
+ font-size: 1.5rem; cursor: pointer;
+ color: #666; padding: 0;
  transition: color 0.2s;
  }
 
@@ -266,14 +266,14 @@ https://svelte.dev/e/attribute_invalid_event_handler -->
  }
 
  .citation-form {
- padding: 1.5rem;, display: flex;
- flex-direction: column;, gap: 1.5rem;
+ padding: 1.5rem; display: flex;
+ flex-direction: column; gap: 1.5rem;
  }
 
  .error-message {
  padding: 1rem;
- background-color: #ffe6e6;, border: 1px solid #ff6b6b;
- border-radius: 4px;, color: #c92a2a;
+ background-color: #ffe6e6; border: 1px solid #ff6b6b;
+ border-radius: 4px; color: #c92a2a;
  }
 
  .error-message p {
@@ -283,21 +283,21 @@ https://svelte.dev/e/attribute_invalid_event_handler -->
 
  .form-group {
  display: flex;
- flex-direction: column;, gap: 0.5rem;
+ flex-direction: column; gap: 0.5rem;
  }
 
  .form-group label {
- font-weight: 600;, color: #2c2c2c;
+ font-weight: 600; color: #2c2c2c;
  font-size: 0.9rem;
  }
 
  .form-group input,
  .form-group select,
  .form-group textarea {
- padding: 0.75rem;, border: 1px solid #d4a574;
+ padding: 0.75rem; border: 1px solid #d4a574;
  border-radius: 4px;
  font-family: 'Source Sans 3', sans-serif;
- font-size: 0.95rem;, transition: all 0.2s;
+ font-size: 0.95rem; transition: all 0.2s;
  }
 
  .form-group input:focus,
@@ -311,7 +311,7 @@ https://svelte.dev/e/attribute_invalid_event_handler -->
  .form-group input:disabled,
  .form-group select:disabled,
  .form-group textarea:disabled {
- background-color: #f0ebe0;, color: #999;
+ background-color: #f0ebe0; color: #999;
  }
 
  .form-group textarea {
@@ -325,7 +325,7 @@ https://svelte.dev/e/attribute_invalid_event_handler -->
  }
 
  .form-actions {
- display: flex;, gap: 1rem;
+ display: flex; gap: 1rem;
  justify-content: flex-end;
  padding-top: 1rem;
  border-top: 1px solid #e0d5c7;
@@ -336,13 +336,13 @@ https://svelte.dev/e/attribute_invalid_event_handler -->
  padding: 0.75rem 1.5rem;
  border: none;
  border-radius: 4px;
- font-weight: 600;, cursor: pointer;
+ font-weight: 600; cursor: pointer;
  transition: all 0.2s;
  font-size: 0.95rem;
  }
 
  .btn-cancel {
- background-color: #e0d5c7;, color: #2c2c2c;
+ background-color: #e0d5c7; color: #2c2c2c;
  }
 
  .btn-cancel:hover, not(disabled) {
@@ -350,7 +350,7 @@ https://svelte.dev/e/attribute_invalid_event_handler -->
  }
 
  .btn-save {
- background-color: #8b4513;, color: #f5f1e8;
+ background-color: #8b4513; color: #f5f1e8;
  }
 
  .btn-save:hover, not(disabled) {
@@ -359,7 +359,7 @@ https://svelte.dev/e/attribute_invalid_event_handler -->
 
  .btn-cancel:disabled,
  .btn-save:disabled {
- opacity: 0.6;, cursor:not-allowed;
+ opacity: 0.6; cursor:not-allowed;
  }
 </style>
 

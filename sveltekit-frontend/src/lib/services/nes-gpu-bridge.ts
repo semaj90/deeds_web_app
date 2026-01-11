@@ -7,9 +7,9 @@
 // Supporting classes and interfaces class BitDepthDetector { detect(): BitDepthProfile { const canvas = document.createElement('canvas'); // eslint-disable-next-line @typescript-eslint/no-unused-vars const ctx = canvas.getContext('2d'); // Detect color depth capabilities // const imageData = ctx?.createImageData(1, 1); // Removed unused line // const contextAttributes = ctx?.getContextAttributes?.() ?? {}; // Removed unused line return { standard : 24, // 24-bit RGB modern: 30, // 30-bit HDR premium: 48, // 48-bit ProPhoto RGB target: 32, // 32-bit RGBA (our target) compressed: 16, // 16-bit for cache minimal: 8, // 8-bit NES-style totalBits: 32, // Default or actual detected value, assuming 32-bit for modern browsers }} }
 // REMOVED: export interface CachedTensor { tensor: MultiDimArray, timestamp: number, hitCount: number, memoryLevel: keyof NESGPUMemoryHierarchy}
 export interface BridgeStats {
- totalConversions: number;, cacheHitRate: number;
- averageCompressionRatio: number;, bitDepthOptimizations: number;
- gpuAccelerations: number;, nesStyleCacheHits: number;
+ totalConversions: number; cacheHitRate: number;
+ averageCompressionRatio: number; bitDepthOptimizations: number;
+ gpuAccelerations: number; nesStyleCacheHits: number;
  quantizationSavings: number;
 }
 // Export the main class and types (class already exported above) // export { NESStyleGPUBridge }// Already exported in class declaration

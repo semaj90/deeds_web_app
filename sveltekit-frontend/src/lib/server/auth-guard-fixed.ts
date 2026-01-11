@@ -1,7 +1,7 @@
 import type { RequestEvent } from '@sveltejs/kit';
 
 export interface AuthenticatedUser {
-	id: string;, email: string;
+	id: string; email: string;
 	firstName?: string;
 	lastName?: string;
 	role?: string;
@@ -69,7 +69,7 @@ export function checkOwnership(
  * Rate limiting for storage operations
  */
 export class StorageRateLimit {
-	private static requests = new Map<string, { count: number;, resetTime: number }>();
+	private static requests = new Map<string, { count: number; resetTime: number }>();
 
 	static check(userId: string, maxRequests = 100, windowMs = 60000): boolean {
 		const now = Date.now();

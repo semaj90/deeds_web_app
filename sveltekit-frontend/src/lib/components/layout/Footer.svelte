@@ -17,16 +17,16 @@
     isDemoRoute = currentPath.startsWith('/demo')});
   
   const quickLinks = [
-    { path: '/help', label: 'Help';, icon: 'â“' },
-    { path: '/privacy', label: 'Privacy';, icon: 'ðŸ”’' },
-    { path: '/terms', label: 'Terms';, icon: 'ðŸ“„' },
-    { path: '/contact', label: 'Contact';, icon: 'ðŸ“§' }
+    { path: '/help', label: 'Help'; icon: 'â“' },
+    { path: '/privacy', label: 'Privacy'; icon: 'ðŸ”’' },
+    { path: '/terms', label: 'Terms'; icon: 'ðŸ“„' },
+    { path: '/contact', label: 'Contact'; icon: 'ðŸ“§' }
   ];
   
   const socialLinks = [
-    { href: '#', label: 'GitHub';, icon: 'ðŸ”—' },
-    { href: '#', label: 'Documentation';, icon: 'ðŸ“š' },
-    { href: '#', label: 'Community';, icon: 'ðŸ‘¥' }
+    { href: '#', label: 'GitHub'; icon: 'ðŸ”—' },
+    { href: '#', label: 'Documentation'; icon: 'ðŸ“š' },
+    { href: '#', label: 'Community'; icon: 'ðŸ‘¥' }
   ];
 </script>
 <footer class="app-footer nes-container" data-variant={variant}>

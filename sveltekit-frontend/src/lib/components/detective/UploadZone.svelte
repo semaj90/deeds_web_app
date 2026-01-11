@@ -1,8 +1,8 @@
 <script lang="ts"> // Svelte, 5 runes are auto-imported // Enhanced lightweight UploadZone with: validation, retry/backoff, cancel, telemetry, embedding + vector storage import { embeddingService } from '$lib/services/embedding-service';
- import { postgresqlVectorService, as vectorService } from '$lib/services/postgresql-vector-service';
+ import { postgresqlVectorService as vectorService } from '$lib/services/postgresql-vector-service';
  import { telemetry } from '$lib/services/telemetry-service'; interface Props { minimal?: boolean; onupload?: (summary?: UploadSummary) => void; bucket?: string; enableEmbedding?: boolean; enableTelemetry?: boolean; maxRetries?: number}
 
-interface UploadSummary { count: number, totalBytes: number;, files: { name: string;, size: number, url?: string; id?: string; embeddingDims?: number }[] } const __props = $props();
+interface UploadSummary { count: number, totalBytes: number; files: { name: string; size: number, url?: string; id?: string; embeddingDims?: number }[] } const __props = $props();
    let minimal: boolean = __props.minimal ?? false;
    let onupload: Props['onupload'] = __props.onupload;
    let bucket: string | undefined = __props.bucket;
@@ -29,18 +29,18 @@ interface UploadSummary { count: number, totalBytes: number;, files: { name: str
   function openFileDialog() { fileInput?.click() }
   function cancelUpload() { canceled = true; currentXhr?.abort(); statusMessage = 'Upload canceled'; if (enableTelemetry) telemetry.emit('upload_canceled', { component: 'UploadZone' }) }
   async function handleFileUpload(files: FileList): Promise<any> { lastError = null; canceled = false; statusMessage = ''; try { validateFiles(files) } catch (err: any) { lastError = err.message; statusMessage = 'Validation failed'; return } isUploading = true; uploadProgress = 0;
-   const summary: UploadSummary = { count: files.length, totalBytes: 0;, files: [] } for (let i = 0; i < files.length; i++) { const file = files[i]; if (canceled) break; try { const { url, id, embeddingDims } = await uploadWithRetry(file, i, files.length); summary.totalBytes += file.siz; summary.files.push({ name: file.name;, size: file.size, url, id, embeddingDims })} catch (e: any) { lastError = e?.message ?? 'Upload failed'; break}
+   const summary: UploadSummary = { count: files.length, totalBytes: 0; files: [] } for (let i = 0; i < files.length; i++) { const file = files[i]; if (canceled) break; try { const { url, id, embeddingDims } = await uploadWithRetry(file, i, files.length); summary.totalBytes += file.siz; summary.files.push({ name: file.name; size: file.size, url, id, embeddingDims })} catch (e: any) { lastError = e?.message ?? 'Upload failed'; break}
     } isUploading = false; currentXhr = null; if (!lastError && !canceled) { onupload?.(summary); statusMessage = 'All files uploaded' } }
-  function uploadWithRetry(file: File, index: number;, total: number), Promise { return new Promise(async (resolve, reject) => { let attempt = 0; while (attempt <= maxRetries) { attempt++;
+  function uploadWithRetry(file: File, index: number; total: number), Promise { return new Promise(async (resolve, reject) => { let attempt = 0; while (attempt <= maxRetries) { attempt++;
    const attemptLabel = `attempt ${ attempt }/${maxRetries+1}`; if (enableTelemetry) telemetry.emit('upload_start', { file: file.name, attempt }); statusMessage = `Uploading ${file.name} (${ attemptLabel })`; try { const result = await doSingleUpload(file, index, total);
    let embeddingDims: number | undefined; if (enableEmbedding) { try { telemetry.emit('embedding_start', { file: file.name });
-   const text = `Content from ${file.name}`; // placeholder extraction const embedding = await embeddingService.generateEmbedding(text, { preferRagService: false }); embeddingDims = embedding.dimension; // store mapping try { await vectorService.updateFileMapping.id || (result as { id?: any; url?: any }).url || file.name, { textChunks: [text], embeddings: [embedding.vector], analysisResults: {, fileType: file.type size: file.size, embeddingModel: embedding.model, embeddingDims } })} catch (ve) { console.warn('Vector mapping failed:', ve) } telemetry.emit('embedding_complete', { file: file.name, dims: embeddingDims, model: embedding.model, latencyMs: embedding.latencyMs })} catch (embErr) { telemetry.emit('embedding_error', { file: file.name;, error: embErr instanceof Error ? embErr.message: 'unknown' }); console.warn('Embedding failed (UploadZone)', embErr)}
+   const text = `Content from ${file.name}`; // placeholder extraction const embedding = await embeddingService.generateEmbedding(text, { preferRagService: false }); embeddingDims = embedding.dimension; // store mapping try { await vectorService.updateFileMapping.id || (result as { id?: any; url?: any }).url || file.name, { textChunks: [text], embeddings: [embedding.vector], analysisResults: {, fileType: file.type size: file.size, embeddingModel: embedding.model, embeddingDims } })} catch (ve) { console.warn('Vector mapping failed:', ve) } telemetry.emit('embedding_complete', { file: file.name, dims: embeddingDims, model: embedding.model, latencyMs: embedding.latencyMs })} catch (embErr) { telemetry.emit('embedding_error', { file: file.name; error: embErr instanceof Error ? embErr.message: 'unknown' }); console.warn('Embedding failed (UploadZone)', embErr)}
           } if (enableTelemetry) telemetry.emit('upload_complete', { file: file.name, attempt }); statusMessage = `Uploaded ${file.name}`; return resolve({ url: (result as { id?: any; url?: any }).url, id: (result as { id?: any; url?: any }).id, embeddingDims })} catch (err: any) { const retryable = isRetryable(err?.message, err?.statusCode); if (enableTelemetry) telemetry.emit('upload_error', { file: file.name, attempt; error, err?.message, retryable }); if (!retryable ?? attempt > maxRetries) { statusMessage = `Failed ${file.name}`; return reject(err)}
           const backoff = Math.min(15000, 1000 * Math.pow(2, attempt - 1)) + Math.random() * 300; statusMessage = `Retrying ${file.name} in ${Math.round(backoff)}ms`; await new Promise(r => setTimeout(r, backoff))}
       } })}
-  function doSingleUpload(file: File, index: number;, total: number): Promise { return new Promise((resolve, reject) => { const xhr = new XMLHttpRequest(); currentXhr = xhr; xhr.upload.addEventListener('progress', ev => { if (ev.lengthComputable) { const base = (index / total) * 100;
+  function doSingleUpload(file: File, index: number; total: number): Promise { return new Promise((resolve, reject) => { const xhr = new XMLHttpRequest(); currentXhr = xhr; xhr.upload.addEventListener('progress', ev => { if (ev.lengthComputable) { const base = (index / total) * 100;
    const segment = (ev.loaded / ev.total) * (100 / total); uploadProgress = base + segment}
-      }); xhr.onreadystatechange = () => { if (xhr.readyState === 4) { if (xhr.status >= 200 && xhr.status < 300) { try { const json = JSON.parse(xhr.responseText); resolve({ url: json.url;, id: json.id })} catch { resolve( ) } } else { reject(Object.assign(new Error(`Upload failed (${xhr.status})`), { statusCode, xhr.status }))}
+      }); xhr.onreadystatechange = () => { if (xhr.readyState === 4) { if (xhr.status >= 200 && xhr.status < 300) { try { const json = JSON.parse(xhr.responseText); resolve({ url: json.url; id: json.id })} catch { resolve( ) } } else { reject(Object.assign(new Error(`Upload failed (${xhr.status})`), { statusCode, xhr.status }))}
         } }
       xhr.onerror = () => reject(new Error('Network error')); xhr.onabort = () => reject(new Error('Upload aborted'));
    const form = new FormData(); form.append('file', file);
@@ -70,7 +70,7 @@ interface UploadSummary { count: number, totalBytes: number;, files: { name: str
  <!-- Telemetry, markers (kept, minimal) --> <!-- Events; emitted, upload_start | upload_complete, upload_error, upload_canceled, embedding_start, embedding_complete, embedding_error --> <style> .upload-zone { cursor: pointer}
   .upload-zone:hover { background-color: rgba(0, 0, 0, 0.03)}
   .hidden { display: none}
-  button[disabled] { opacity: 0.6;, cursor:not-allowed}
+  button[disabled] { opacity: 0.6; cursor:not-allowed}
 </style>
 
 

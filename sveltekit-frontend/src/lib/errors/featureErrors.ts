@@ -19,9 +19,9 @@ export type FeatureErrorType =
  * Feature error response
  */
 export interface FeatureErrorResponse {
- error: string;, errorType: FeatureErrorType;
+ error: string; errorType: FeatureErrorType;
  feature: 'errorBrain' | 'legalAi' | null;
- status: number;, timestamp: string;
+ status: number; timestamp: string;
  details?: Record<string, unknown>;
 }
 

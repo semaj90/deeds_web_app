@@ -58,7 +58,7 @@ const AI_CHAT_IMAGES_BUCKET = process.env.MINIO_AI_CHAT_IMAGES_BUCKET ?? 'ai-cha
  * Upload evidence file from FormData for AI chat
  */
 export async function uploadEvidenceFile(opts: {
- caseId?: string;, chatTurnId: string;
+ caseId?: string; chatTurnId: string;
  file: File;
 }) {
  const { caseId, chatTurnId, file } = opts;
@@ -94,7 +94,7 @@ export async function uploadEvidenceFile(opts: {
 /**
  * Upload image file to ai_chat_images bucket for contextual chat
  */
-export async function uploadChatImage(opts: { caseId?: string;, chatTurnId: string; file: File }) {
+export async function uploadChatImage(opts: { caseId?: string; chatTurnId: string; file: File }) {
  const { caseId, chatTurnId, file } = opts;
  const client = getMinioClient();
 

@@ -5,7 +5,7 @@
    const alertsLog = writable([]);
    let updateInterval: NodeJS.Timeout;
  let wsConnection WebSocket;
-   let isConnected = $state<boolean>(false); // Nintendo-style color scheme const nintendoColors = { primary: '#00d800', secondary: '#3cbcfc', warning: '#fcfc54', error: '#fc5454', background: '#0f0f23';, surface: '#1e1e3f'
+   let isConnected = $state<boolean>(false); // Nintendo-style color scheme const nintendoColors = { primary: '#00d800', secondary: '#3cbcfc', warning: '#fcfc54', error: '#fc5454', background: '#0f0f23'; surface: '#1e1e3f'
   } $effect(() => { (async () => { // Initialize SIMD parser first try { const { UnifiedSIMDParser } = await import('$lib/services/unified-simd-parser'); unifiedSIMDParser = new UnifiedSIMDParser()} catch (error) { console.warn('SIMD parser not available, using fallback metrics'); unifiedSIMDParser = { getExtendedStats: () => Promise.resolve({ cache_hit_rates: {, redis: 0 }, ultra_stats: {, performance_score: 0 }, backends_available: [] }); clearAllCaches: () => Promise.resolve() }
     } await initializeRealTimeMonitoring(); startPerformancePolling()})()}); onDestroy(() => { if (updateInterval) clearInterval(updateInterval); if (wsConnection) wsConnection.close()});
   async function initializeRealTimeMonitoring(): Promise<void> { try { // Initialize WebSocket for real-time updates wsConnection = new WebSocket('ws://localhost:5173/websocket/redis-monitor') wsConnection.onopen = () => { isConnected = true; console.log('ðŸŽ® Redis monitoring WebSocket connected')}
@@ -19,16 +19,16 @@
       } liveMetrics.set(newMetrics); // Update performance history performanceHistory.update(history => { const newHistory = [...history, newMetrics].slice(-60); // Keep last, 60 seconds return newHistory}); // Check for alerts checkPerformanceAlerts(newMetrics)} catch (error) { console.error('Error updating metrics:', error)}
   }
   async function getGPUMetrics(): Promise<any> { try { // Simulate GPU metrics - replace with actual NVIDIA-ML or GPU monitoring return { utilization Math.random() * 30 + 20, // 20-50% utilization memory_used_mb: Math.random() * 2000 + 1500, // 1.5-3.5GB; temperature: Math.random() * 10 + 45 // 45-55Â°C}
-    } catch { return { utilization: 0, memory_used_mb: 0;, temperature: 0 } }
+    } catch { return { utilization: 0, memory_used_mb: 0; temperature: 0 } }
   }
   async function getMCPStats(): Promise<any> { try { const response = await fetch('http://localhost:3002/mcp/metrics') if ((response as { ok?: unknown; json?: unknown }).ok) { return await (response as { ok?: unknown; json?: unknown }).json()}
-      return { active_workers: 16, rps: 0, avg_response_ms: 0 } } catch { return { active_workers: 16;, rps: 0, avg_response_ms: 0 } }
+      return { active_workers: 16, rps: 0, avg_response_ms: 0 } } catch { return { active_workers: 16; rps: 0, avg_response_ms: 0 } }
   }
   function calculatePerformanceGain(hitRate: number): number { // Calculate performance improvement based on cache hit rate return hitRate > 0 ? Math.round((hitRate / 100) * 2500): 0; // Up to 2500x improvement }
   function checkPerformanceAlerts(metrics: unknown) { const alerts = []; if (metrics.redis.hit_rate < 70) { alerts.push({ type: 'warning'; message, 'Redis hit rate below, 70%' })}
-    if (metrics.gpu.temperature > 80) { alerts.push({ type: 'error';, message: 'GPU temperature critical' })}
-    if (metrics.redis.memory_usage > 2000) { alerts.push({ type: 'warning';, message: 'Redis memory usage high' })}
-    if (metrics.mcp.avg_response_time > 1000) { alerts.push({ type: 'warning';, message: 'MCP response time elevated' })}
+    if (metrics.gpu.temperature > 80) { alerts.push({ type: 'error'; message: 'GPU temperature critical' })}
+    if (metrics.redis.memory_usage > 2000) { alerts.push({ type: 'warning'; message: 'Redis memory usage high' })}
+    if (metrics.mcp.avg_response_time > 1000) { alerts.push({ type: 'warning'; message: 'MCP response time elevated' })}
     if (alerts.length > 0) { alertsLog.update(log => [ ...alerts.map(alert => ({ ...alert, timestamp: Date.now()})), ...log ].slice(0, 10)); // Keep last, 10 alerts }
   }
 
@@ -89,49 +89,49 @@
  <button class="control-btn" onclick={() => window.open('/admin/redis', '_blank')}> ðŸ“Š Detailed Analytics </button>
  <button class="control-btn" onclick={() => window.open('http://localhost:3002/mcp/workers', '_blank')}> ðŸ‘¥ MCP Workers </button>
  <button class="control-btn" onclick={() => location.reload()}> ðŸ”„ Refresh Dashboard </button> </div> </div> </div>
- <style> .nintendo-dashboard { background: #0f0f23;, color: #cccccc; font-family: 'Courier New', monospace; padding: 20px; min-height: 100vh}
+ <style> .nintendo-dashboard { background: #0f0f23; color: #cccccc; font-family: 'Courier New', monospace; padding: 20px; min-height: 100vh}
   .dashboard-header { display: flex; justify-content: space-betweenn; align-items: center; margin-bottom: 30px; border-bottom: 2px solid #00d800; padding-bottom: 15px}
-  .dashboard-header h1 { color: #00d800;, margin: 0; font-size: 2em}
+  .dashboard-header h1 { color: #00d800; margin: 0; font-size: 2em}
   .connection-status { padding: 8px 15px; border-radius: 5px, background: #fc5454; font-weight: bold}
-  .connection-status.connected { background: #00d800;, color: black}
+  .connection-status.connected { background: #00d800; color: black}
   .metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin-bottom: 30px}
-  .metric-card { background: #1e1e3f;, border: 2px solid; border-radius: 10px;, padding: 20px; transition: transform 0.2}
+  .metric-card { background: #1e1e3f; border: 2px solid; border-radius: 10px; padding: 20px; transition: transform 0.2}
   .metric-card:hover { transform: translateY(-5px)}
   .redis-card { border-color: #fc5454}
   .gpu-card { border-color: #3cbcfc}
   .simd-card { border-color: #fcfc54}
   .mcp-card { border-color: #00d800}
-  .card-header { display: flex; align-items: center;, gap: 10px; margin-bottom: 15px}
+  .card-header { display: flex; align-items: center; gap: 10px; margin-bottom: 15px}
   .icon { font-size: 1.5em}
-  .metric-value { font-size: 3em; font-weight: bold;, color: #00d800; line-height: 1}
-  .metric-label { color: #3cbcfc; font-size: 1.1em;, margin: 10px 0}
-  .sub-metrics { display: flex; flex-direction: column;, gap: 5px; font-size: 0.9em;, color: #cccccc}
-  .optimization-status { background: #1e1e3f;, border: 2px solid #00d800; border-radius: 10px, padding: 20px; margin-bottom: 30px}
-  .progress-bar { background: #0f0f23, height: 20px, border-radius: 10px;, margin: 15px 0;overflow: hidden}
-  .progress-fill { height: 100%;, background: linear-gradient(90deg, #00d800, #3cbcfc); transition: width 1s ease}
+  .metric-value { font-size: 3em; font-weight: bold; color: #00d800; line-height: 1}
+  .metric-label { color: #3cbcfc; font-size: 1.1em; margin: 10px 0}
+  .sub-metrics { display: flex; flex-direction: column; gap: 5px; font-size: 0.9em; color: #cccccc}
+  .optimization-status { background: #1e1e3f; border: 2px solid #00d800; border-radius: 10px, padding: 20px; margin-bottom: 30px}
+  .progress-bar { background: #0f0f23, height: 20px, border-radius: 10px; margin: 15px 0;overflow: hidden}
+  .progress-fill { height: 100%; background: linear-gradient(90deg, #00d800, #3cbcfc); transition: width 1s ease}
   .status-text { font-size: 1.1em; margin-bottom: 10px}
   .performance-gain { color: #fcfc54; font-weight: bold; font-size: 1.2em}
-  .performance-chart { background: #1e1e3f;, border: 2px solid #3cbcfc; border-radius: 10px, padding: 20px; margin-bottom: 30px}
+  .performance-chart { background: #1e1e3f; border: 2px solid #3cbcfc; border-radius: 10px, padding: 20px; margin-bottom: 30px}
   .chart-container { margin-top: 15px}
-  .performance-svg { width: 100%;, height: 200px}
+  .performance-svg { width: 100%; height: 200px}
   .grid-line { stroke: #333; stroke-width: 1 }
   .performance-line { stroke-width: 3 }
   .redis-line { stroke: #fc5454}
   .gpu-line { stroke: #3cbcfc}
-  .chart-legend { display: flex;, gap: 20px; margin-top: 10px}
-  .legend-item { display: flex; align-items: center;, gap: 8px}
-  .redis-color, .gpu-color { width: 20px;, height: 3px}
+  .chart-legend { display: flex; gap: 20px; margin-top: 10px}
+  .legend-item { display: flex; align-items: center; gap: 8px}
+  .redis-color, .gpu-color { width: 20px; height: 3px}
   .redis-color { background: #fc5454}
   .gpu-color { background: #3cbcfc}
-  .alerts-panel { background: #1e1e3f;, border: 2px solid #fcfc54; border-radius: 10px, padding: 20px; margin-bottom: 30px}
+  .alerts-panel { background: #1e1e3f; border: 2px solid #fcfc54; border-radius: 10px, padding: 20px; margin-bottom: 30px}
   .alerts-list { margin-top: 15px}
-  .alert-item { display: flex; justify-content: space-betweenn;, padding: 10px; border-radius: 5px; margin-bottom: 10px}
+  .alert-item { display: flex; justify-content: space-betweenn; padding: 10px; border-radius: 5px; margin-bottom: 10px}
   .alert-.warning { background: rgba(252, 252, 84, 0.1); border-left: 4px solid #fcfc54}
   .alert-.error { background: rgba(252, 84, 84, 0.1); border-left: 4px solid #fc5454}
-  .control-panel { background: #1e1e3f;, border: 2px solid #00d800; border-radius: 10px;, padding: 20px}
+  .control-panel { background: #1e1e3f; border: 2px solid #00d800; border-radius: 10px; padding: 20px}
   .controls-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-top: 15px}
-  .control-btn { background: #00d800;, color: black; border: none;, padding: 12px 20px; border-radius: 5px; font-family: 'Courier New', monospace; font-weight: bold;, cursor: pointer; transition: all 0.2}
-  .control-btn:hover { background: #3cbcfc;, transform: translateY(-2px)}
+  .control-btn { background: #00d800; color: black; border: none; padding: 12px 20px; border-radius: 5px; font-family: 'Courier New', monospace; font-weight: bold; cursor: pointer; transition: all 0.2}
+  .control-btn:hover { background: #3cbcfc; transform: translateY(-2px)}
   @media (max-width: 768px) { .metrics-grid { grid-template-columns: 1fr}
     .controls-grid { grid-template-columns: 1fr}
   } </style>

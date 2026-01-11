@@ -3,22 +3,22 @@
  */
 
 export interface Citation {
- code: string;, jurisdiction: string;
+ code: string; jurisdiction: string;
  title: string;
  url?: string;
 }
 
 export interface CaseSummary {
- id: string;, caseId: string;
- text: string;, citations: Citation[];
- holding: string;, version: number;
- createdAt: string;, createdBy: string;
+ id: string; caseId: string;
+ text: string; citations: Citation[];
+ holding: string; version: number;
+ createdAt: string; createdBy: string;
  isCurrent: boolean;
 }
 
 export interface CaseSummaryVersion {
- id: string;, version: number;
- createdAt: string;, createdBy: string;
+ id: string; version: number;
+ createdAt: string; createdBy: string;
  isCurrent: boolean;
 }
 
@@ -37,13 +37,13 @@ export interface CaseSummaryResponse {
 }
 
 export interface SimilarCase {
- id: string;, title: string;
- charges: string[];, outcome: string;
+ id: string; title: string;
+ charges: string[]; outcome: string;
  relevanceScore: number;
 }
 
 export interface SimilarCasesResponse {
- success: boolean;, cases: SimilarCase[];
+ success: boolean; cases: SimilarCase[];
  error?: string;
 }
 

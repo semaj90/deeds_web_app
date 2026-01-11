@@ -6,15 +6,15 @@
 import type { ASTError } from './svelte-check-analyzer.js';
 
 export interface ErrorVector {
- id: string, file: string;, code: string, message: string;, vector: number[]; // Will be Float32Array in WASM, metadata: {, line: number, severity: string;, source: string;
+ id: string, file: string; code: string, message: string; vector: number[]; // Will be Float32Array in WASM, metadata: {, line: number, severity: string; source: string;
  };
 }
 
 export interface WebGPUExport {
- vectors: Array<{, id: string, vector: number[];, metadata: { file: string, code: string;, line: number, severity: string;
+ vectors: Array<{, id: string, vector: number[]; metadata: { file: string, code: string; line: number, severity: string;
  };
  }>;
- dimensions: number, count: number;, codebook: Record<string, number>;
+ dimensions: number, count: number; codebook: Record<string, number>;
  filebook: Record<string, number>;
 }
 

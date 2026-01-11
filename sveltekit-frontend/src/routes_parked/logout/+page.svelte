@@ -1,5 +1,5 @@
 <script lang="ts">
- import { onMount } from 'svelte';;
+ import { onMount } from 'svelte';
  import type { goto, invalidateAll } from '$app/navigation';
 
  onMount(() => {

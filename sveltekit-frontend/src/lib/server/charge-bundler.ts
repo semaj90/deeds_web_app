@@ -3,14 +3,14 @@
 import type { query } from "$app/server";
 
 interface BundledCharge {
- statuteCode: string;, title: string;
- reason: string;, confidence: number;
+ statuteCode: string; title: string;
+ reason: string; confidence: number;
  frequency: number; // How often filed together (0-1)
 }
 
 interface ChargeBundle {
- victimClass: string;, penaltyLevel: string;
- suggestedBundles: BundledCharge[];, confidence: number;
+ victimClass: string; penaltyLevel: string;
+ suggestedBundles: BundledCharge[]; confidence: number;
 }
 
 // Penalty classification patterns (HMM-inspired states)

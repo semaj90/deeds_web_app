@@ -18,7 +18,7 @@ interface EmbedRequest {
  dimensions?: number;
 }
 interface EmbedResponse {
- embedding: number[];, model: string;
+ embedding: number[]; model: string;
  dimensions: number;
  tokens?: number;
 }

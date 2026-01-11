@@ -51,7 +51,7 @@ describe('Phase 10.6: Message Batching', () => {
  // would need to simulate message batching
  const maxHistory = 100;
  const messages: Array<{, type: 'health_update';
- route_path: string;, new_status: 'healthy';
+ route_path: string; new_status: 'healthy';
  timestamp: string;
  }> = [];
 

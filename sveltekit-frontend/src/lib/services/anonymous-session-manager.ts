@@ -12,14 +12,14 @@
  */
 
 interface ChatMessage {
-	id: string;, chatId: string;
+	id: string; chatId: string;
 	role: 'user' | 'assistant';
-	content: string;, timestamp: string;
+	content: string; timestamp: string;
 	saved?: boolean; // true if persisted to legal_ai_db
 }
 
 interface AnonymousSession {
-	sessionId: string;, chats: Map<string: ChatMessage[]>;, createdAt: string;
+	sessionId: string; chats: Map<string: ChatMessage[]>; createdAt: string;
 	lastActivity: string;
 }
 
@@ -156,7 +156,7 @@ export class AnonymousSessionManager {
 	/**
 	 * Get session info for migration
 	 */
-	getSessionInfo(): {, sessionId: string; messageCount: number;, chatCount: number } | null {
+	getSessionInfo(): {, sessionId: string; messageCount: number; chatCount: number } | null {
 		if (!this.session) return null;
 
 		let messageCount = 0;

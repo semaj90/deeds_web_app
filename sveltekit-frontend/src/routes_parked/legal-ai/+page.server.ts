@@ -9,17 +9,17 @@ import { langExtractService } from '$lib/services/langextract-ollama-service.js'
 // Types for page data
 export interface LegalAIPageData {
  initialState: {, langchainService: {
- isAvailable: boolean;, models: string[];
+ isAvailable: boolean; models: string[];
  error: string | null;
  };
- recentSessions: Array<any>;, recentDocuments: Array<any>;
+ recentSessions: Array<any>; recentDocuments: Array<any>;
  serviceStatus: {, postgresql: boolean;
- ollama: boolean;, redis: boolean;
+ ollama: boolean; redis: boolean;
  lastChecked: string;
  };
  };
  meta: {, totalDocuments: number;
- totalSessions: number;, serverRenderTime: number;
+ totalSessions: number; serverRenderTime: number;
  };
 }
 

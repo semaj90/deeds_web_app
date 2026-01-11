@@ -3,9 +3,9 @@ import type { User } from 'lucia';
 
 export interface UserSession {
  user: {, id: string;
- email: string;, firstName: string | null;
+ email: string; firstName: string | null;
  lastName: string | null;
- role: string;, avatarUrl: string | null;
+ role: string; avatarUrl: string | null;
  };
  session: {, id: string;
  expiresAt: string;

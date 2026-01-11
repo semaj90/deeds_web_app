@@ -36,10 +36,10 @@ export interface MatrixUINode {
  component?: string;
  };
  content?: string;
- bounds?: {, x: number, y: number;, width: number, height: number }; // Fixed syntax
+ bounds?: {, x: number, y: number; width: number, height: number }; // Fixed syntax
 };
 export interface EnhancedWebGLBuffer {
- vertices: Float32Array, indices: Uint16Array;, colors: Float32Array, texCoords: Float32Array;, matrices: Float32Array, metadata: {, vertexCount: number, indexCount: number;, nodeCount: number, lodLevel: 'low' | 'mid' | 'high';
+ vertices: Float32Array, indices: Uint16Array; colors: Float32Array, texCoords: Float32Array; matrices: Float32Array, metadata: {, vertexCount: number, indexCount: number; nodeCount: number, lodLevel: 'low' | 'mid' | 'high';
  shaderComplexity: 'basic' | 'standard' | 'advanced';
  };
 };
@@ -48,7 +48,7 @@ export interface CSSOutput {
  animations: string[], unoCSS: string;
 };
 export interface EventMapping {
- nodeId: string, events: {, type: string, handler: string;, matrix: number[], bounds: {, x: number, y: number;, width: number, height: number };
+ nodeId: string, events: {, type: string, handler: string; matrix: number[], bounds: {, x: number, y: number; width: number, height: number };
  }[]; // Added array type for events
 };
 export interface CompiledNode {
@@ -77,7 +77,7 @@ export class MatrixUICompiler {
  async compileEnhanced(
  nodes: MatrixUINode[],
  _xstateContext?: unknown // Renamed to _xstateContext
- ): Promise<{, compiled: CompiledNode[], webgl: EnhancedWebGLBuffer;, css: CSSOutput, events: EventMapping[];, optimizations: string[];
+ ): Promise<{, compiled: CompiledNode[], webgl: EnhancedWebGLBuffer; css: CSSOutput, events: EventMapping[]; optimizations: string[];
  }> {
  // Fixed return type syntax
  const optimizations: string[] = []; // Fixed syntax

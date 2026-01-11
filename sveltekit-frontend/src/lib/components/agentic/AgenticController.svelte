@@ -1,8 +1,8 @@
-<!-- Agentic, Controller, Interface - OCR â†’ Embeddings â†’ RAG --> <script lang="ts"> import { onMount } from 'svelte'; interface AgenticStatus { status: string, system: {, redisConnected: boolean, agenticControllerActive: boolean;, watcherStatus: string}; activity: {, recentASTProcessing: number, pendingErrors: number;, lastActivity: string}}
+<!-- Agentic, Controller, Interface - OCR â†’ Embeddings â†’ RAG --> <script lang="ts"> import { onMount } from 'svelte'; interface AgenticStatus { status: string, system: {, redisConnected: boolean, agenticControllerActive: boolean; watcherStatus: string}; activity: {, recentASTProcessing: number, pendingErrors: number; lastActivity: string}}
 
-interface ErrorEmbedding { id: number, text: string, screenshotPath?: string,confidence: number, resolved: boolean;, createdAt: string}
+interface ErrorEmbedding { id: number, text: string, screenshotPath?: string,confidence: number, resolved: boolean; createdAt: string}
 
-interface FixSuggestion { suggestion: string, successRate: number, similarError: string;, relevance: number}
+interface FixSuggestion { suggestion: string, successRate: number, similarError: string; relevance: number}
 
   // State let status: AgenticStatus | null = null;
    let recentErrors: ErrorEmbedding[] = [];
@@ -23,7 +23,7 @@ interface FixSuggestion { suggestion: string, successRate: number, similarError:
   }
 
    // Upload screenshot async function uploadScreenshot(): Promise<any> { if (!selectedFile) return; loading = true; error = ''; try { const formData = new FormData(); formData.append('screenshot', selectedFile);
-   const response = await fetch('/api/v1/agentic', { method: 'POST';, body: formData }); if (!response.ok) { throw new Error(`Upload failed: ${response.status}`)}
+   const response = await fetch('/api/v1/agentic', { method: 'POST'; body: formData }); if (!response.ok) { throw new Error(`Upload failed: ${response.status}`)}
       const result = await response.json(); console.log('Screenshot uploaded:', result); // Reset form selectedFile = null; // Refresh errors list after a short delay setTimeout(fetchRecentErrors, 2000)} catch (err: unknown) { error = `Upload failed: ${err.message}`; console.error('Upload, error:', err)} finally { loading = false}'
   }
 
@@ -79,36 +79,36 @@ interface FixSuggestion { suggestion: string, successRate: number, similarError:
   </div> {/each}
   </div> {/if}
   </div>
- <style> .agentic-controller { max-width: 1200px;, margin: 0 auto;padding: 2rem;, background: var(--nier-bg-primary, #0a0a0a); color: var(--nier-text-primary, #f0f0f0); font-family: 'JetBrains Mono', monospace}
+ <style> .agentic-controller { max-width: 1200px; margin: 0 auto;padding: 2rem; background: var(--nier-bg-primary, #0a0a0a); color: var(--nier-text-primary, #f0f0f0); font-family: 'JetBrains Mono', monospace}
   .agentic-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; padding-bottom: 1rem; border-bottom: 2px solid var(--nier-accent-cool, #00ccff)}
-  .agentic-title { margin: 0;, color: var(--nier-accent-cool, #00ccff); font-size: 1.8rem}
-  .agentic-subtitle { font-size: 0.9rem;, color: var(--nier-text-muted, #999); margin-left: 1rem}
-  .refresh-btn { padding: 0.5rem 1rem; background: var(--nier-bg-secondary, #1a1a1a); border: 1px solid var(--nier-accent-cool, #00ccff); color: var(--nier-accent-cool, #00ccff); border-radius: 0.5rem;, cursor: pointer;transition: all 0.3s ease}
+  .agentic-title { margin: 0; color: var(--nier-accent-cool, #00ccff); font-size: 1.8rem}
+  .agentic-subtitle { font-size: 0.9rem; color: var(--nier-text-muted, #999); margin-left: 1rem}
+  .refresh-btn { padding: 0.5rem 1rem; background: var(--nier-bg-secondary, #1a1a1a); border: 1px solid var(--nier-accent-cool, #00ccff); color: var(--nier-accent-cool, #00ccff); border-radius: 0.5rem; cursor: pointer;transition: all 0.3s ease}
   .refresh-btn:hover, not(disabled) { background: var(--nier-accent-cool, #00ccff); color: var(--nier-bg-primary, #0a0a0a); box-shadow: 0 0 10px rgba(0, 204, 255, 0.5)}
-  .refresh-btn:disabled { opacity: 0.5;, cursor:not-allowed}
-  .error-alert { background: rgba(255, 0, 0, 0.1); border: 1px solid #ff4444;color: #ff6666, padding: 1rem; border-radius: 0.5rem; margin-bottom: 1rem;, display: flex; justify-content: space-between; align-items: center}
-  .error-alert button { background: none;, border: none; color: #ff6666; font-size: 1.2rem;, cursor: pointer}
+  .refresh-btn:disabled { opacity: 0.5; cursor:not-allowed}
+  .error-alert { background: rgba(255, 0, 0, 0.1); border: 1px solid #ff4444;color: #ff6666, padding: 1rem; border-radius: 0.5rem; margin-bottom: 1rem; display: flex; justify-content: space-between; align-items: center}
+  .error-alert button { background: none; border: none; color: #ff6666; font-size: 1.2rem; cursor: pointer}
   .status-card { background: var(--nier-bg-secondary, #1a1a1a); border: 1px solid var(--nier-border-primary, #333); border-radius: 0.5rem, padding: 1.5rem; margin-bottom: 2rem}
   .status-card h3 { margin: 0, 0 1rem 0; color: var(--nier-accent-warm, #d4af37)}
   .status-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem}
-  .status-item { display: flex; justify-content: space-between;, padding: 0.5rem;background: var(--nier-bg-tertiary, #2a2a2a); border-radius: 0.25rem}
+  .status-item { display: flex; justify-content: space-between; padding: 0.5rem;background: var(--nier-bg-tertiary, #2a2a2a); border-radius: 0.25rem}
   .status-label { font-weight: bold}
   .status-value { color: var(--nier-text-muted, #999)}
   .status-value.connected { color: var(--nier-accent-cool, #00ccff)}
-  .upload-section, .query-section, .errors-section { background: var(--nier-bg-secondary, #1a1a1a); border: 1px solid var(--nier-border-primary, #333); border-radius: 0.5rem;, padding: 1.5rem; margin-bottom: 2rem}
+  .upload-section, .query-section, .errors-section { background: var(--nier-bg-secondary, #1a1a1a); border: 1px solid var(--nier-border-primary, #333); border-radius: 0.5rem; padding: 1.5rem; margin-bottom: 2rem}
   .upload-section h3, .query-section h3, .errors-section h3 { margin: 0, 0 1rem 0; color: var(--nier-accent-warm, #d4af37)}
-  .drop-zone { border: 2px dashed var(--nier-border-muted, #555); border-radius: 0.5rem, padding: 2rem, text-align: center;, cursor: pointer;transition: all 0.3s ease; margin-bottom: 1rem}
+  .drop-zone { border: 2px dashed var(--nier-border-muted, #555); border-radius: 0.5rem, padding: 2rem, text-align: center; cursor: pointer;transition: all 0.3s ease; margin-bottom: 1rem}
   .drop-zone.drag-active { border-color: var(--nier-accent-cool, #00ccff); background: rgba(0, 204, 255, 0.1)}
   .drop-zone:hover { border-color: var(--nier-accent-cool, #00ccff)}
-  .file-selected { display: flex; align-items: center, justify-content: center;, gap: 1rem;color: var(--nier-accent-cool, #00ccff)}
-  .file-selected button { background: none;, border: none; color: #ff6666; font-size: 1.2rem;, cursor: pointer}
+  .file-selected { display: flex; align-items: center, justify-content: center; gap: 1rem;color: var(--nier-accent-cool, #00ccff)}
+  .file-selected button { background: none; border: none; color: #ff6666; font-size: 1.2rem; cursor: pointer}
   .file-input-label { color: var(--nier-accent-cool, #00ccff); cursor: pointer; text-decoration: underline}
   .file-input-label input { display: none}
-  .upload-btn, .query-btn { padding: 0.75rem 1.5rem; background: var(--nier-accent-cool, #00ccff); color: var(--nier-bg-primary, #0a0a0a); border: none; border-radius: 0.5rem, font-weight: bold;, cursor: pointer;transition: all 0.3s ease}
+  .upload-btn, .query-btn { padding: 0.75rem 1.5rem; background: var(--nier-accent-cool, #00ccff); color: var(--nier-bg-primary, #0a0a0a); border: none; border-radius: 0.5rem, font-weight: bold; cursor: pointer;transition: all 0.3s ease}
   .upload-btn:hover, not(disabled), .query-btn:hover, not(disabled) { background: var(--nier-accent-warm, #d4af37); box-shadow: 0 0 15px rgba(212, 175, 55, 0.5)}
-  .upload-btn:disabled, .query-btn:disabled { opacity: 0.5;, cursor:not-allowed}
-  .query-input-group { display: flex;, gap: 1rem; margin-bottom: 1rem}
-  .query-input { flex: 1;, padding: 0.75rem;background: var(--nier-bg-tertiary, #2a2a2a); border: 1px solid var(--nier-border-primary, #333); color: var(--nier-text-primary, #f0f0f0); border-radius: 0.5rem; font-family: inherit}
+  .upload-btn:disabled, .query-btn:disabled { opacity: 0.5; cursor:not-allowed}
+  .query-input-group { display: flex; gap: 1rem; margin-bottom: 1rem}
+  .query-input { flex: 1; padding: 0.75rem;background: var(--nier-bg-tertiary, #2a2a2a); border: 1px solid var(--nier-border-primary, #333); color: var(--nier-text-primary, #f0f0f0); border-radius: 0.5rem; font-family: inherit}
   .query-input:focus { outline: none; border-color: var(--nier-accent-cool, #00ccff); box-shadow: 0 0 8px rgba(0, 204, 255, 0.3)}
   .fix-suggestions { margin-top: 1rem}
   .fix-suggestions h4 { margin: 0, 0 1rem 0; color: var(--nier-accent-cool, #00ccff)}
@@ -116,16 +116,16 @@ interface FixSuggestion { suggestion: string, successRate: number, similarError:
   .fix-header { display: flex; justify-content: space-between; margin-bottom: 0.5rem; font-size: 0.9rem}
   .fix-relevance, .fix-success { color: var(--nier-accent-warm, #d4af37)}
   .fix-content { margin-bottom: 0.5rem; line-height: 1.6}
-  .fix-similar { font-size: 0.9rem;, color: var(--nier-text-muted, #999)}
+  .fix-similar { font-size: 0.9rem; color: var(--nier-text-muted, #999)}
   .errors-list { max-height: 400px; overflow-y: auto}
-  .error-item { background: var(--nier-bg-tertiary, #2a2a2a); border: 1px solid var(--nier-border-muted, #444); border-radius: 0.5rem;, padding: 1rem; margin-bottom: 1rem}
+  .error-item { background: var(--nier-bg-tertiary, #2a2a2a); border: 1px solid var(--nier-border-muted, #444); border-radius: 0.5rem; padding: 1rem; margin-bottom: 1rem}
   .error-item.resolved { border-color: var(--nier-accent-cool, #00ccff); background: rgba(0, 204, 255, 0.05)}
-  .error-header { display: flex;, gap: 1rem; margin-bottom: 0.5rem; font-size: 0.9rem}
+  .error-header { display: flex; gap: 1rem; margin-bottom: 0.5rem; font-size: 0.9rem}
   .error-id { color: var(--nier-accent-cool, #00ccff); font-weight: bold}
   .error-confidence, .error-date { color: var(--nier-text-muted, #999)}
   .error-status { color: var(--nier-accent-warm, #d4af37)}
   .error-text { margin-bottom: 0.5rem; line-height: 1.5}
-  .error-screenshot { font-size: 0.9rem;, color: var(--nier-text-muted, #999)}
+  .error-screenshot { font-size: 0.9rem; color: var(--nier-text-muted, #999)}
   /* Custom scrollbar */ .errors-list::-webkit-scrollbar { width: 8px}
   .errors-list::-webkit-scrollbar-track { background: var(--nier-bg-primary, #0a0a0a)}
   .errors-list::-webkit-scrollbar-thumb { background: var(--nier-accent-cool, #00ccff); border-radius: 4px}
@@ -134,7 +134,7 @@ interface FixSuggestion { suggestion: string, successRate: number, similarError:
     .agentic-header { flex-direction: column, gap: 1rem; align-items: stretch}
     .status-grid { grid-template-columns: 1fr}
     .query-input-group { flex-direction: column}
-    .error-header { flex-direction: column;, gap: 0.5rem}
+    .error-header { flex-direction: column; gap: 0.5rem}
   } </style>
 
 

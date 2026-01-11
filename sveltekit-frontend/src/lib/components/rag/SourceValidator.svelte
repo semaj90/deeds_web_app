@@ -13,7 +13,7 @@ import type {
 } from '$lib/types/rag-source-validation';
 
 interface SourceValidatorProps {
-  chunks: RetrievedChunk[];, caseId: string;
+  chunks: RetrievedChunk[]; caseId: string;
   initialQuery?: string;
   query?: string;
   isLoading?: boolean;

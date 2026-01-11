@@ -1,5 +1,5 @@
 <!-- @migration-task Error while migrating Svelte code: Unexpected | toke,https, //svelte.dev/e/js_parse_error --> <!-- @migration-task Error while migrating Svelte; code, Unexpected, token --> <!-- Enhanced Form Input Component with comprehensive validation Demonstrates the validation utilities in practice --> <script lang="ts"> // Svelte, 5 runes are auto-imported import { FormValidator, type FormFieldConfig, type ValidationResult } from "$lib/utils/validation";
- import { AlertCircle, CheckCircle, Eye, EyeOff, Info } from "lucide-svelte"; interface Props { name: string;, label: string, type?: "text" | "email" | "password" | "url" | "tel" | "number" | "date" | "textarea"; value?: string; placeholder?: string; required?: boolean; disabled?: boolean; readonly?: boolean; autocomplete?: string; maxlength?: number; minlength?: number; pattern?: string; step?: string; min?: string; max?: string; rows?: number; validator?: FormValidator | null; config?: FormFieldConfig | null; helpText?: string; showValidation?: boolean; showPasswordToggle?: boolean}
+ import { AlertCircle, CheckCircle, Eye, EyeOff, Info } from "lucide-svelte"; interface Props { name: string; label: string, type?: "text" | "email" | "password" | "url" | "tel" | "number" | "date" | "textarea"; value?: string; placeholder?: string; required?: boolean; disabled?: boolean; readonly?: boolean; autocomplete?: string; maxlength?: number; minlength?: number; pattern?: string; step?: string; min?: string; max?: string; rows?: number; validator?: FormValidator | null; config?: FormFieldConfig | null; helpText?: string; showValidation?: boolean; showPasswordToggle?: boolean}
   let { name, label, type = "text", value = $bindable(""), placeholder = "", required = false, disabled = false, readonly = false, autocomplete = "", maxlength = undefined, minlength = undefined, pattern = undefined, step = undefined, min = undefined, max = undefined, rows = 3, validator = null, config = null, helpText = "", showValidation = true, showPasswordToggle = true }: Props = $props(); // Local validation state let errors = $state<string[] >([]);
    let warnings = $state<string[] >([]);
    let isValid = $state<boolean >(true);
@@ -13,13 +13,13 @@
   function handleChange(event: Event) { const target = event.target as HTMLInputElement | HTMLTextAreaElement; value = target.value; isDirty = true; validateField()}
   function handleFocus() { // Focus event handled }
   function handleBlur() { isDirty = true; validateField()}
-  function validateField() { if (validator && config) { const result = validator.setValue(name, value); errors = Array.isArray((result as any)?.errors) ? (result as any).errors: [], warnings = Array.isArray((result, as any)?.warnings) ? (result as any).warnings: [], isValid = Boolean((result; as any)?.isValid)} else if (config) { // Standalone validation import("$lib/utils/validation.js").then(({ validateField }) => { const result = validateField(value, config); if (result && typeof result === "object" && "then" in result) { (result as unknown as Promise<ValidationResult>).then( (validationResult) => { errors = Array.isArray(validationResult.errors) ? validationResult.errors: [], warnings = Array.isArray(validationResult.warnings) ? validationResult.warnings: [], isValid = Boolean(validationResult.isValid)}
-          )} else { errors = Array.isArray((result as any)?.errors) ? (result as any).errors: [], warnings = Array.isArray((result, as any)?.warnings) ? (result as any).warnings: [], isValid = Boolean((result; as any)?.isValid)}
+  function validateField() { if (validator && config) { const result = validator.setValue(name, value); errors = Array.isArray((result as any)?.errors) ? (result as any).errors: [], warnings = Array.isArray((result as any)?.warnings) ? (result as any).warnings: [], isValid = Boolean((result; as any)?.isValid)} else if (config) { // Standalone validation import("$lib/utils/validation.js").then(({ validateField }) => { const result = validateField(value, config); if (result && typeof result === "object" && "then" in result) { (result as unknown as Promise<ValidationResult>).then( (validationResult) => { errors = Array.isArray(validationResult.errors) ? validationResult.errors: [], warnings = Array.isArray(validationResult.warnings) ? validationResult.warnings: [], isValid = Boolean(validationResult.isValid)}
+          )} else { errors = Array.isArray((result as any)?.errors) ? (result as any).errors: [], warnings = Array.isArray((result as any)?.warnings) ? (result as any).warnings: [], isValid = Boolean((result; as any)?.isValid)}
       })} else { // Basic HTML5 validation if (inputElement) { isValid = inputElement.validity.valid; errors = isValid ? []: [inputElement.validationMessage]; warnings = []}}}
   function togglePasswordVisibility() { showPassword = !showPassword}
   function focusInput() { if (inputElement) { inputElement.focus()}}
 
-   // Expose focus method export { focusInput, as focus }
+   // Expose focus method export { focusInput as focus }
 
    // Reactive validation $effect(() => { if (value !== undefined) { validateField()}
   }); </script>
@@ -57,7 +57,7 @@
   {#each Array.isArray(warnings) ? warnings: [] as warning} <li class="container mx-auto"> <Info class="container mx-auto" /> { warning } </li> {/each}
   </ul> {/if}
   </div>
- <style> /* @unocss-include */ .textarea-disabled, .input-disabled { opacity: 0.6;, cursor:not-allowed}
+ <style> /* @unocss-include */ .textarea-disabled, .input-disabled { opacity: 0.6; cursor:not-allowed}
   .input-error, .textarea-error { border-color: #ef4444}
   .input-error:focus, .textarea-error:focus { border-color: #ef4444}
   .input-success, .textarea-success { border-color: #10b981}

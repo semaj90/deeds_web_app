@@ -142,11 +142,11 @@ function handleMouseLeave() {
 <style>
 	/* NES.css inspired base styles as fallback */
 	:global(.nes-btn) {
-		position: relative;, display: inline-block;
+		position: relative; display: inline-block;
 		padding: 6px 8px;
 		margin: 4px;
 		text-align: center;
-		vertical-align: middle;, cursor: pointer;
+		vertical-align: middle; cursor: pointer;
 		user-select: none;
 		border-style: solid;
 		border-width: 4px;
@@ -155,9 +155,9 @@ function handleMouseLeave() {
 
 	/* Pixel-perfect shadow effect */
 	:global(.nes-btn: after) {
-		position: absolute;, top: -4px;
-		right: -4px;, bottom: -4px;
-		left: -4px;, content: "";
+		position: absolute; top: -4px;
+		right: -4px; bottom: -4px;
+		left: -4px; content: "";
 		box-shadow:
 			inset -4px -4px #adafbc;
 	}

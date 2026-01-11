@@ -2,9 +2,9 @@ import { env } from '$lib/env';
 import { Client } from 'minio';
 
 export interface MinioS3ClientConfig {
-  endPoint: string;, port: number;
-  useSSL: boolean;, accessKey: string;
-  secretKey: string;, bucket: string;
+  endPoint: string; port: number;
+  useSSL: boolean; accessKey: string;
+  secretKey: string; bucket: string;
 }
 
 export function getMinioConfig(): MinioS3ClientConfig {
@@ -51,7 +51,7 @@ export class MinIOService {
     }
   }
 
-  async uploadFile(file: File, userId: string): Promise<{, bucket: string; key: string;, url: string }> {
+  async uploadFile(file: File, userId: string): Promise<{, bucket: string; key: string; url: string }> {
     try {
       await this.ensureBucketExists();
 

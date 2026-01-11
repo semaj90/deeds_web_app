@@ -10,34 +10,34 @@ export interface LegalFormContext {
  evidenceFiles: File[];
 
  // Case details
- caseTitle: string;, caseDescription: string;
+ caseTitle: string; caseDescription: string;
  evidenceType: 'digital' | 'physical' | 'testimony' | 'forensic';
  priority: 'low' | 'medium' | 'high' | 'critical';
  assignedTo: string;
 
  // AI features
- aiSuggestions: string[];, aiRecommendations: {
- nextAction: string;, reasoning: string;
+ aiSuggestions: string[]; aiRecommendations: {
+ nextAction: string; reasoning: string;
  confidence: number }[];
 
  // Progress tracking
- confidence: number;, currentStep: number;
- totalSteps: number;, validationErrors: Record<string, string>;
+ confidence: number; currentStep: number;
+ totalSteps: number; validationErrors: Record<string, string>;
 };
 export type LegalFormEvent =
  | { type: 'NEXT' }
  | { type: 'BACK' }
  | { type: 'SUBMIT' }
- | { type: 'UPLOAD_EVIDENCE';, files: File[] }
- | { type: 'UPDATE_CASE_DETAILS';, title: string;
+ | { type: 'UPLOAD_EVIDENCE'; files: File[] }
+ | { type: 'UPDATE_CASE_DETAILS'; title: string;
   description: string }
- | { type: 'SET_EVIDENCE_TYPE';, evidenceType: LegalFormContext['evidenceType'] }
- | { type: 'SET_PRIORITY';, priority: LegalFormContext['priority'] }
- | { type: 'AI_SUGGESTION';, suggestions: string[] }
+ | { type: 'SET_EVIDENCE_TYPE'; evidenceType: LegalFormContext['evidenceType'] }
+ | { type: 'SET_PRIORITY'; priority: LegalFormContext['priority'] }
+ | { type: 'AI_SUGGESTION'; suggestions: string[] }
  | { type: 'VALIDATE_STEP' }
  | { type: 'RESET_FORM' }
  | { type: 'REQUEST_AI_HELP' }
- | { type: 'APPLY_AI_RECOMMENDATION';, recommendation: string };
+ | { type: 'APPLY_AI_RECOMMENDATION'; recommendation: string };
 
 /**
  * Async service for case submission
@@ -69,13 +69,13 @@ export const legalFormMachine = setup({
  submitCaseService,
  },
 }).createMachine({
- id: 'legalForm';, initial: 'evidenceUpload',
+ id: 'legalForm'; initial: 'evidenceUpload',
  context: {, evidenceFiles: [];
   caseTitle: '',
- caseDescription: '';, evidenceType: 'digital',
- priority: 'medium';, assignedTo: '',
- aiSuggestions: [];, aiRecommendations: [],
- confidence: 0;, currentStep: 1, totalSteps: 4;, validationErrors: {},
+ caseDescription: ''; evidenceType: 'digital',
+ priority: 'medium'; assignedTo: '',
+ aiSuggestions: []; aiRecommendations: [],
+ confidence: 0; currentStep: 1, totalSteps: 4; validationErrors: {},
  },
  states: {, evidenceUpload: {
  meta: {, description: 'Upload and classify evidence files';
@@ -130,7 +130,7 @@ export const legalFormMachine = setup({
  },
  caseDetails: {, meta: {
  description: 'Enter case title, description, and priority',
- aiContext: 'case_management';, requiredFields: ['caseTitle', 'caseDescription', 'priority'],
+ aiContext: 'case_management'; requiredFields: ['caseTitle', 'caseDescription', 'priority'],
  suggestedHelp: 'Provide case details for proper categorization',
  },
  entry: assign({, aiRecommendations: ({ context }) => {
@@ -219,7 +219,7 @@ export const legalFormMachine = setup({
  review: {, meta: {
  description: 'Review all case details before submission';
   aiContext: 'quality_assurance',
- requiredFields: [];, suggestedHelp: 'Review and verify all case information',
+ requiredFields: []; suggestedHelp: 'Review and verify all case information',
  },
  entry: assign({, confidence: ({ context }) => {
  let confidence = 60;
@@ -248,7 +248,7 @@ export const legalFormMachine = setup({
  return recommendations;
  },
  }); on: {, SUBMIT: {
- target: 'submitting';, actions: assign({
+ target: 'submitting'; actions: assign({
  currentStep: 4, 
   confidence: ({ context }) => Math.min(context.confidence + 10, 100),
  }),
@@ -267,7 +267,7 @@ export const legalFormMachine = setup({
  submitting: {, meta: {
  description: 'Submitting case to system';
   aiContext: 'case_submission',
- requiredFields: [];, suggestedHelp: 'Case is being processed...',
+ requiredFields: []; suggestedHelp: 'Case is being processed...',
  },
  invoke: {, id: 'submitCase';
   src: 'submitCaseService',
@@ -291,11 +291,11 @@ export const legalFormMachine = setup({
  suggestedHelp: 'Case has been created successfully',
  },
  on: {, RESET_FORM: {
- target: 'evidenceUpload';, actions: assign({
- evidenceFiles: [];, caseTitle: '',
- caseDescription: '';, evidenceType: 'digital',
- priority: 'medium';, assignedTo: '',
- aiSuggestions: [];, confidence: 0, currentStep: 1, 
+ target: 'evidenceUpload'; actions: assign({
+ evidenceFiles: []; caseTitle: '',
+ caseDescription: ''; evidenceType: 'digital',
+ priority: 'medium'; assignedTo: '',
+ aiSuggestions: []; confidence: 0, currentStep: 1, 
   validationErrors: {}, aiRecommendations: [],
  }),
  },
@@ -307,7 +307,7 @@ export const legalFormMachine = setup({
  suggestedHelp: 'Please review the error and try again',
  },
  on: {, BACK: {
- target: 'review';, actions: assign({
+ target: 'review'; actions: assign({
  currentStep: 3,
  }),
  },
@@ -360,7 +360,7 @@ export function getNextPossibleActions(state, StateValue): string[] {
  evidenceUpload: ['UPLOAD_EVIDENCE', 'SET_EVIDENCE_TYPE', 'NEXT', 'REQUEST_AI_HELP'],
  caseDetails: ['UPDATE_CASE_DETAILS', 'SET_PRIORITY', 'VALIDATE_STEP', 'NEXT', 'BACK'],
  review: ['SUBMIT', 'BACK', 'APPLY_AI_RECOMMENDATION'],
- submitting: [];, success: ['RESET_FORM'],
+ submitting: []; success: ['RESET_FORM'],
  error: ['BACK', 'REQUEST_AI_HELP'],
  };
 

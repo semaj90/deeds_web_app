@@ -9,17 +9,17 @@ import { featureLogger } from './featureLogger.js';
  * Retry configuration
  */
 export interface RetryConfig {
- maxRetries: number;, initialDelayMs: number;
- maxDelayMs: number;, backoffMultiplier: number;
+ maxRetries: number; initialDelayMs: number;
+ maxDelayMs: number; backoffMultiplier: number;
 }
 
 /**
  * Recovery result
  */
 export interface RecoveryResult {
- success: boolean;, attempts: number;
+ success: boolean; attempts: number;
  lastError?: Error;
- recoveredAt?: Date;, fallbackUsed: boolean;
+ recoveredAt?: Date; fallbackUsed: boolean;
 }
 
 /**
@@ -27,10 +27,10 @@ export interface RecoveryResult {
  */
 export interface SafeDefaults {
  errorBrain: {, enabled: boolean;
- requireAuth: boolean;, logLevel: 'debug' | 'info' | 'warn' | 'error';
+ requireAuth: boolean; logLevel: 'debug' | 'info' | 'warn' | 'error';
  };
  legalAi: {, enabled: boolean;
- requireAuth: boolean;, logLevel: 'debug' | 'info' | 'warn' | 'error';
+ requireAuth: boolean; logLevel: 'debug' | 'info' | 'warn' | 'error';
  };
 }
 

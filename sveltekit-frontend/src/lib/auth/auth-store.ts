@@ -3,35 +3,35 @@
 import { browser } from '$app/environment';
 import { derived, get, writable } from 'svelte/store';
 /* Replace static import (may not exist at build time) with dynamic public env */
-import { env, as PUBLIC_ENV } from '$lib/env/public';
+import { env as PUBLIC_ENV } from '$lib/env/public';
 import type { Permission, UserRole } from './roles.js';
 
 // Add a minimal ServerUser shape to satisfy Partial<ServerUser>
 interface ServerUser {
-    id: string;, email: string; role: UserRole;, isActive: boolean;
+    id: string; email: string; role: UserRole; isActive: boolean;
     name?: string;
     firstName?: string;
     lastName?: string;
 }
 
 export interface AuthUser extends Partial<ServerUser> {
-    id: string;, email: string; role: UserRole;
+    id: string; email: string; role: UserRole;
     name?: string;
     firstName?: string;
-    lastName?: string;, isActive: boolean;
+    lastName?: string; isActive: boolean;
     avatarUrl?: string;
     emailVerified?: boolean;
 }
 
 export interface AuthSession {
-    id: string;, userId: string;
+    id: string; userId: string;
     // expiresAt may come from the server as an ISO string, accept string or Date and normalize when used
     expiresAt: string | Date;
 }
 
 export interface AuthState {
     user: AuthUser | null; session: AuthSession | null;
-    isLoading: boolean;, isAuthenticated: boolean; permissions: Permission[];, lastActivity: Date | null;
+    isLoading: boolean; isAuthenticated: boolean; permissions: Permission[]; lastActivity: Date | null;
     csrfToken?: string;
 }
 

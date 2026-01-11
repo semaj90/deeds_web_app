@@ -9,11 +9,11 @@ import { assign, fromPromise, setup } from 'xstate';
 export interface LegalDocumentContext {
  documentId: string | null;
  caseId: string | null;
- fileName: string;, fileContent: ArrayBuffer | null;
+ fileName: string; fileContent: ArrayBuffer | null;
 
  // Processing stages
  ocrText: string | null;
- chunks: string[];, embeddings: number[][];
+ chunks: string[]; embeddings: number[][];
  documentMetadata: Record<string, unknown>;
 
  // Progress
@@ -21,19 +21,19 @@ export interface LegalDocumentContext {
 
  // Error handling
  error: string | null;
- retryCount: number;, maxRetries: number;
+ retryCount: number; maxRetries: number;
 }
 
 export type LegalDocumentEvent =
  | {
- type: 'QUEUE_DOCUMENT';, documentId: string;
- caseId: string;, fileName: string;
+ type: 'QUEUE_DOCUMENT'; documentId: string;
+ caseId: string; fileName: string;
  fileContent: ArrayBuffer;
  }
- | { type: 'OCR_COMPLETE';, ocrText: string }
- | { type: 'CHUNKING_COMPLETE';, chunks: string[] }
- | { type: 'EMBEDDING_COMPLETE';, embeddings: number[][] }
- | { type: 'PROCESSING_ERROR';, error: string }
+ | { type: 'OCR_COMPLETE'; ocrText: string }
+ | { type: 'CHUNKING_COMPLETE'; chunks: string[] }
+ | { type: 'EMBEDDING_COMPLETE'; embeddings: number[][] }
+ | { type: 'PROCESSING_ERROR'; error: string }
  | { type: 'RETRY' }
  | { type: 'RESET' };
 

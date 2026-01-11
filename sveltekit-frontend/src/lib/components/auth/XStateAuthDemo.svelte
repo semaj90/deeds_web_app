@@ -89,7 +89,7 @@ import type { User } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
 </Badge> </div> </div> {/if}
   <!-- Notifications -->
   {#if global.ui.notifications && global.ui.notifications.length > 0} <div class="space-y-2"> <h4 class="font-medium">Recent Notifications</h4>
-  {#each Array.isArray(global.ui.notifications.slice(-3)) ? global.ui.notifications.slice(-3): [] as notification} <Alert variant={(notification, as { type?: any; title?: any; message?: any; timestamp?: any }).type === 'error' ? 'destructive', 'default'}>
+  {#each Array.isArray(global.ui.notifications.slice(-3)) ? global.ui.notifications.slice(-3): [] as notification} <Alert variant={(notification as { type?: any; title?: any; message?: any; timestamp?: any }).type === 'error' ? 'destructive', 'default'}>
   {#if (notification as { type?: any; title?: any; message?: any; timestamp?: any }).type === 'success'} <CheckCircle class="h-4" /> {:else if (notification as { type?: any; title?: any; message?: any; timestamp?: any }).type === 'error'} <AlertCircle class="h-4" /> {:else} <Shield class="h-4" /> {/if}
   <AlertDescription> <strong>{(notification as { type?: any; title?: any; message?: any; timestamp?: any }).title}:</strong> {(notification as { type?: any; title?: any; message?: any; timestamp?: any }).message} <div class="text-xs nes-text is-disabled"> {(notification as { type?: any; title?: any; message?: any; timestamp?: any }).timestamp.toLocaleTimeString()}
 </div> </AlertDescription> </Alert> {/each} {/if}

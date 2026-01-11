@@ -9,12 +9,12 @@ import { graphService } from './graph.service.js';
 import { auditService } from './audit.service.js';
 
 export interface CaseStatuteLink {
-  id: string;, case_id: string; statute_code: string;, linked_by: string; link_type: string;
-  notes?: string;, created_at: Date; updated_at: Date;
+  id: string; case_id: string; statute_code: string; linked_by: string; link_type: string;
+  notes?: string; created_at: Date; updated_at: Date;
 }
 
 export interface LinkCaseStatuteRequest {
-  statute_code: string;, link_type: string;
+  statute_code: string; link_type: string;
   notes?: string;
 }
 

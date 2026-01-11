@@ -3,7 +3,7 @@
 	let onfocus = $state<any>(undefined);
 	let onblur = $state<any>(undefined);
 
- import { Search } from "lucide-svelte";;
+ import { Search } from "lucide-svelte";
 
  interface Props {
  placeholder?: string;

@@ -32,7 +32,7 @@ async function fetchVectors(collection: string, limit: number): Promise<Array<{,
     throw new Error(`Failed to fetch vectors: ${response.statusText}`);
   }
 
-  const data = await response.json() as { result: {, points: Array<{ id: string;, vector: number[] }> } };
+  const data = await response.json() as { result: {, points: Array<{ id: string; vector: number[] }> } };
   return data.result.points;
 }
 
@@ -80,8 +80,8 @@ async function clusterTagHandler(request: ClusterTagRequest): Promise<ToolResult
 
   // Simple clustering simulation (in production, call CUDA script)
   const clusters: Array<{, id: number;
-    size: number;, centroid_id: string;
-    summary?: string;, tags: string[];
+    size: number; centroid_id: string;
+    summary?: string; tags: string[];
   }> = [];
 
   const clusterSize = Math.max(5, Math.floor(points.length / 10));

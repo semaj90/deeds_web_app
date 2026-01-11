@@ -22,22 +22,22 @@ export interface KnowledgeNode {
     _rev?: string; // CouchDB revision
     type: 'concept' | 'document' | 'entity' | 'topic';
     postgres_id: number;
-    qdrant_id?: string;, title: string;
-    content?: string;, connected_to: string[]; // Array of node IDs this connects to
+    qdrant_id?: string; title: string;
+    content?: string; connected_to: string[]; // Array of node IDs this connects to
     parent_id?: string; // For hierarchical relationships
     metadata: {, created_at: string;
-        updated_at: string;, source: string; // 'svelte-docs', 'typescript-docs', etc.
+        updated_at: string; source: string; // 'svelte-docs', 'typescript-docs', etc.
         tags?: string[];
         importance?: number; // 0-1 score for graph ranking
     };
     embeddings_metadata?: {, model: string;
-        dimensions: number;, synced_at: string;
+        dimensions: number; synced_at: string;
     };
 }
 
 export interface KnowledgeEdge {
     _id: string; // Format: "edge: { from_id }, { to_id }"
-    _rev?: string;, type: 'edge';
+    _rev?: string; type: 'edge';
     from_id: string; // node:{ id }
     to_id: string;   // node:{ id }
     relationship: 'related_to' | 'parent_of' | 'references' | 'implements' | 'extends';

@@ -34,9 +34,9 @@ export const actions = {
 
  // Process files with multi-engine document processing
  const uploaded: {, bucket: string; objectName: string }[] = [];
- const chatImages: {, bucket: string; objectName: string;, url: string }[] = [];
+ const chatImages: {, bucket: string; objectName: string; url: string }[] = [];
  const processedFiles: Array<{, filename: string;
- text: string;, method: string;
+ text: string; method: string;
  engines: string[];
  metadata?: any;
  keywords?: string[];

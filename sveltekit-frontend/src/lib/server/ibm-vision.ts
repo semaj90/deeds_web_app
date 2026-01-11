@@ -15,7 +15,7 @@ interface MockIamAuthenticator {
 }
 
 export interface IBMVisionResult {
- text: string;, confidence: number;
+ text: string; confidence: number;
  language?: string;
  entities?: {
  persons?: string[];
@@ -31,11 +31,11 @@ export interface IBMVisionResult {
  gender?: string;
  emotions?: Record<string, number>;
  }>;
- processingTime: number;, method: 'ibm-vision';
+ processingTime: number; method: 'ibm-vision';
 }
 
 export interface IBMVisionConfig {
- apiKey: string;, serviceUrl: string;
+ apiKey: string; serviceUrl: string;
  version?: string;
 }
 

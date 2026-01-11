@@ -6,69 +6,69 @@ import { assign, createMachine, type ActorRefFrom } from 'xstate';
 
 // Type definitions
 export interface User {
-  id: string;, email: string;
-  name: string;, role: string;
+  id: string; email: string;
+  name: string; role: string;
 }
 
 export interface LegalCase {
-  id: string;, title: string;
-  status: string;, createdAt: Date;
+  id: string; title: string;
+  status: string; createdAt: Date;
 }
 
 export interface Evidence {
-  id: string;, title: string;
-  type: string;, caseId: string;
+  id: string; title: string;
+  type: string; caseId: string;
   uploadedAt: Date;
 }
 
 export interface WorkflowContext {
-  caseId?: string;, userId: string;
-  currentStep: string;, progress: number;
-  errors: string[];, data: { [key: string]: any };
+  caseId?: string; userId: string;
+  currentStep: string; progress: number;
+  errors: string[]; data: { [key: string]: any };
 }
 
 export interface UserWorkflowContext extends WorkflowContext {
   user?: User;
   activeCase?: LegalCase;
-  activeEvidence?: Evidence;, workflow: {
-    id?: string;, type: 'case_creation' | 'evidence_processing' | 'document_review' | 'collaboration' | 'case_closure';
+  activeEvidence?: Evidence; workflow: {
+    id?: string; type: 'case_creation' | 'evidence_processing' | 'document_review' | 'collaboration' | 'case_closure';
     status: 'pending' | 'in_progress' | 'completed' | 'cancelled' | 'error';
-    steps: string[];, currentStepIndex: number;
+    steps: string[]; currentStepIndex: number;
     totalSteps: number;
     startedAt?: Date;
     completedAt?: Date;
   };
-  collaborators: User[];, notifications: Array<any>;
+  collaborators: User[]; notifications: Array<any>;
   preferences: {, autoSave: boolean;
-    notifications: boolean;, collaborationMode: 'real-time' | 'async';
+    notifications: boolean; collaborationMode: 'real-time' | 'async';
   };
 }
 
 export type UserWorkflowEvent =
-  | { type: 'LOGIN';, user: User }
+  | { type: 'LOGIN'; user: User }
   | { type: 'LOGOUT' }
-  | { type: 'START_WORKFLOW';, workflowType: 'case_creation' | 'evidence_processing' | 'document_review' | 'collaboration' | 'case_closure'; data?: any }
+  | { type: 'START_WORKFLOW'; workflowType: 'case_creation' | 'evidence_processing' | 'document_review' | 'collaboration' | 'case_closure'; data?: any }
   | { type: 'NEXT_STEP'; data?: any }
   | { type: 'PREVIOUS_STEP' }
-  | { type: 'COMPLETE_STEP';, stepData: any }
+  | { type: 'COMPLETE_STEP'; stepData: any }
   | { type: 'CANCEL_WORKFLOW' }
   | { type: 'COMPLETE_WORKFLOW' }
-  | { type: 'SET_ACTIVE_CASE';, case: LegalCase }
-  | { type: 'SET_ACTIVE_EVIDENCE';, evidence: Evidence }
-  | { type: 'ADD_COLLABORATOR';, collaborator: User }
-  | { type: 'REMOVE_COLLABORATOR';, userId: string }
-  | { type: 'ADD_NOTIFICATION';, notification: { type: 'info' | 'warning' | 'error' | 'success'; message: string } }
-  | { type: 'MARK_NOTIFICATION_READ';, notificationId: string }
+  | { type: 'SET_ACTIVE_CASE'; case: LegalCase }
+  | { type: 'SET_ACTIVE_EVIDENCE'; evidence: Evidence }
+  | { type: 'ADD_COLLABORATOR'; collaborator: User }
+  | { type: 'REMOVE_COLLABORATOR'; userId: string }
+  | { type: 'ADD_NOTIFICATION'; notification: { type: 'info' | 'warning' | 'error' | 'success'; message: string } }
+  | { type: 'MARK_NOTIFICATION_READ'; notificationId: string }
   | { type: 'CLEAR_NOTIFICATIONS' }
-  | { type: 'UPDATE_PREFERENCES';, preferences: Partial<UserWorkflowContext['preferences']> }
-  | { type: 'ERROR';, error: string }
+  | { type: 'UPDATE_PREFERENCES'; preferences: Partial<UserWorkflowContext['preferences']> }
+  | { type: 'ERROR'; error: string }
   | { type: 'RETRY' }
   | { type: 'RESET' };
 
 export const userWorkflowMachine = createMachine({
   id: 'userWorkflow',
   types: {} as {
-    context: UserWorkflowContext;, events: UserWorkflowEvent;
+    context: UserWorkflowContext; events: UserWorkflowEvent;
   },
   initial: 'idle',
   context: {, userId: '',

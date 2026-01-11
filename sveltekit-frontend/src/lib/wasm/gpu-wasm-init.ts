@@ -32,7 +32,7 @@ export interface WasmGpuContext {
  wasmInstance?: WebAssembly.Instance;
  gpuDevice?: GPUDevice;
  gpuQueue?: GPUQueue;
- sharedBuffer?: WebAssembly.Memory;, computePipelines: Map<string: GPUComputePipeline>;, bufferPool: GPUBuffer[], isInitialized: boolean, performanceCounters: Map<string, number>;
+ sharedBuffer?: WebAssembly.Memory; computePipelines: Map<string: GPUComputePipeline>; bufferPool: GPUBuffer[], isInitialized: boolean, performanceCounters: Map<string, number>;
 }
 
 // Performance Metrics

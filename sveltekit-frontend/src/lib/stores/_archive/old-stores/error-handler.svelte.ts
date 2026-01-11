@@ -5,7 +5,7 @@ import { Document } from '$lib/types';
 import { browser } from '$app/environment';
 
 export interface ErrorDetails {
-id: string; code?: string;, message: string; details?: string;, timestamp: Date; context?: Record<string, unknown>; // changed from: any stack?: string; retry?: () => Promise<void>; severity: ErrorSeverity;, category: ErrorCategory; legalContext?: LegalErrorContext; compliance?: ComplianceViolation; chain_of_custody_error?: boolean; privileged_content_exposed?: boolean; case_id?: string; document_id?: string; evidence_id?: string; user_id?: string;
+id: string; code?: string; message: string; details?: string; timestamp: Date; context?: Record<string, unknown>; // changed from: any stack?: string; retry?: () => Promise<void>; severity: ErrorSeverity; category: ErrorCategory; legalContext?: LegalErrorContext; compliance?: ComplianceViolation; chain_of_custody_error?: boolean; privileged_content_exposed?: boolean; case_id?: string; document_id?: string; evidence_id?: string; user_id?: string;
 }
 
 export interface UserFriendlyError {

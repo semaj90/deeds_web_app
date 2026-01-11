@@ -93,9 +93,9 @@ export interface NESYoRHaHybridStyle {
 }
 
 export interface DOMSyncData {
-	domElement: HTMLElement;, position: THREE.Vector3;
-	rotation: THREE.Euler;, scale: THREE.Vector3;
-	opacity: number;, nesCssClasses: string[];
+	domElement: HTMLElement; position: THREE.Vector3;
+	rotation: THREE.Euler; scale: THREE.Vector3;
+	opacity: number; nesCssClasses: string[];
 	syncFrequency: number;
 }
 

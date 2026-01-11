@@ -38,11 +38,11 @@ export interface VectorJobContext {
  error?: string;
  startTime?: number;
  endTime?: number;
- processingTimeMs?: number, attempts: number;, maxAttempts: number, useWebGPU: boolean;, webGPUAvailable: boolean;
+ processingTimeMs?: number, attempts: number; maxAttempts: number, useWebGPU: boolean; webGPUAvailable: boolean;
 };
 export type VectorJobEvent =
  | {
- type: 'SUBMIT_JOB';, jobId: string, ownerType: VectorJobContext['ownerType'];, ownerId: string, operation: VectorJobContext['operation'];
+ type: 'SUBMIT_JOB'; jobId: string, ownerType: VectorJobContext['ownerType']; ownerId: string, operation: VectorJobContext['operation'];
  data?: unknown;
  priority?: VectorJobContext['priority'];
  vector?: number[];
@@ -50,8 +50,8 @@ export type VectorJobEvent =
  | { type: 'PROCESSING_STARTED' }
  | { type: 'CUDA_PROCESSING'; progress?: number }
  | { type: 'WEBGPU_FALLBACK' }
- | { type: 'PROCESSING_COMPLETED';, result: VectorJobResult }
- | { type: 'PROCESSING_FAILED';, error: string }
+ | { type: 'PROCESSING_COMPLETED'; result: VectorJobResult }
+ | { type: 'PROCESSING_FAILED'; error: string }
  | { type: 'RETRY' }
  | { type: 'CANCEL' }
  | { type: 'RESET' };

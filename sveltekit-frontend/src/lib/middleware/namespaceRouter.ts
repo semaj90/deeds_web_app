@@ -8,9 +8,9 @@ import { featureFlagManager } from '../services/featureFlags.js';
 export type Feature = 'errorBrain' | 'legalAi';
 
 export interface NamespaceContext {
- feature: Feature;, enabled: boolean;
- authRequired: boolean;, logLevel: string;
- path: string;, timestamp: Date;
+ feature: Feature; enabled: boolean;
+ authRequired: boolean; logLevel: string;
+ path: string; timestamp: Date;
 }
 
 /**

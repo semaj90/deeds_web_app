@@ -4,7 +4,7 @@
  */
 
 export interface WebGPUCapabilities {
- isSupported: boolean;, adapter: GPUAdapter | null;
+ isSupported: boolean; adapter: GPUAdapter | null;
  device: GPUDevice | null;
  limits: GPUSupportedLimits | null;
  features: GPUSupportedFeatures | null;

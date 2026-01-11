@@ -20,7 +20,7 @@
   }
   async function setCacheValue(): Promise<any> { if (!cacheKey.trim() || !cacheValue.trim()) { addTestResult('error', 'Key and value are required'); return}
     isLoading.set(true); try { const tags = selectedTags.split.map(t => t.trim()).filter(t => t);
-   const response = await fetch('/api/cache', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({, key: cacheKey, value: cacheValue;, options: { ttl: parseInt(selectedTTL) * 1000, // Convert to millisecond, priority: selectedPriority;, tags: tags.length > 0 ?, tags: undefined}
+   const response = await fetch('/api/cache', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({, key: cacheKey, value: cacheValue; options: { ttl: parseInt(selectedTTL) * 1000, // Convert to millisecond, priority: selectedPriority; tags: tags.length > 0 ?, tags: undefined}
         }) });
    const data = await (response as { json?: any }).json(); if ((data as { success?: any; stats?: any; health?: any; error?: any; cached?: any; value?: any }).success) { addTestResult('success', `Cached, "${ cacheKey }" successfully`); cacheKey = ''; cacheValue = ''} else { addTestResult('error', `Failed to cache: ${(data as { success?: any; stats?: any; health?: any; error?: any; cached?: any; value?: any }).error}`)}
     } catch (error) { addTestResult('error', `Cache error: ${ error }`)} finally { isLoading.set(false); await refreshStats()}

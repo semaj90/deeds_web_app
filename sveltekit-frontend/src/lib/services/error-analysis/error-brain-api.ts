@@ -110,7 +110,7 @@ export class ErrorBrainAPI extends BaseService {
  * Returns the status of the error-brain system
  */
  async getStatus(): Promise<{, enabled: boolean;
- status: string;, features: Record<string, boolean>;
+ status: string; features: Record<string, boolean>;
  timestamp: string;
  }> {
  try {

@@ -52,7 +52,7 @@
 	let dragNodesStart = $state<Map<string, Vec2>>(new Map());
 
 	// Text editing overlay
-	let editing = $state<{ id: string;, value: string; mode: 'title' | 'body' } | null>(null);
+	let editing = $state<{ id: string; value: string; mode: 'title' | 'body' } | null>(null);
 
 	// Canvas internals
 	let ctx = $state<CanvasRenderingContext2D | null>(null);
@@ -253,7 +253,7 @@
 		if (!readonly) setDirty(true);
 	});
   
-	function selectedBounds(): {, x: number; y: number;, w: number; h: number } | null {
+	function selectedBounds(): {, x: number; y: number; w: number; h: number } | null {
 		const ids = [...selected];
 		if (ids.length === 0) return null;
 

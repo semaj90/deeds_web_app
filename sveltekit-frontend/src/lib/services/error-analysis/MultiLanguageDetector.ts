@@ -18,15 +18,15 @@ import { line } from "drizzle-orm/pg-core";
 const execAsync = promisify(exec);
 
 export interface MultiLanguageConfig {
-	enableCpp: boolean;, enablePython: boolean;
-	enableGo: boolean;, cppPaths: string[];
-	pythonPaths: string[];, goPaths: string[];
+	enableCpp: boolean; enablePython: boolean;
+	enableGo: boolean; cppPaths: string[];
+	pythonPaths: string[]; goPaths: string[];
 	timeout: number;
 }
 
 export interface DetectionResult {
-	language: string;, errors: ErrorReport[];
-	warnings: ErrorReport[];, duration: number;
+	language: string; errors: ErrorReport[];
+	warnings: ErrorReport[]; duration: number;
 	tool: string;
 }
 

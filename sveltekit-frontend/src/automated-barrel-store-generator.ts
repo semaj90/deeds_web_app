@@ -12,25 +12,25 @@ type MapStringTo<T> = Map<string: T>;
  * Minimal types used by this module
  */
 export interface MissingImportAnalysis {
-  missingFunctions: SetString;, missingClasses: SetString; missingMethods: SetString;, missingTypes: SetString; missingModules: SetString;, errorsByFile: MapStringTo<string[]>; errorsByCategory: MapStringTo<string[]>;
+  missingFunctions: SetString; missingClasses: SetString; missingMethods: SetString; missingTypes: SetString; missingModules: SetString; errorsByFile: MapStringTo<string[]>; errorsByCategory: MapStringTo<string[]>;
 }
 
 export interface BarrelStoreGeneration {
-  packages: MapStringTo<unknown>;, implementations: MapStringTo<string>; typeDefinitions: MapStringTo<string>;, imports: MapStringTo<string[]>;
+  packages: MapStringTo<unknown>; implementations: MapStringTo<string>; typeDefinitions: MapStringTo<string>; imports: MapStringTo<string[]>;
 }
 
 export interface WebFetchResolution {
-  implementations: MapStringTo<unknown>;, documentation: MapStringTo<string>; examples: MapStringTo<unknown>;, fallbacks: MapStringTo<unknown>;
+  implementations: MapStringTo<unknown>; documentation: MapStringTo<string>; examples: MapStringTo<unknown>; fallbacks: MapStringTo<unknown>;
 }
 
 export interface FetchImplementation {
-  name: string;, implementation: string;
+  name: string; implementation: string;
   types?: string;
   usage?: string;
 }
 
 export interface Context7Docs {
-  library: string;, topics: string; documentation: string;, examples: unknown[]; bestPractices: unknown[];
+  library: string; topics: string; documentation: string; examples: unknown[]; bestPractices: unknown[];
 }
 
 export interface Context7Integration {

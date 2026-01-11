@@ -3,7 +3,7 @@
   // PermissionGuard component - Permission-based access control - Svelte, 5 compatible
   import { auth } from '$lib/stores/unified';
   interface Props {
-    children?: import('svelte').Snippet;, permissions: string | string[];
+    children?: import('svelte').Snippet; permissions: string | string[];
     fallback?: import('svelte').Snippet;
     requireAll?: boolean; // For multiple permissions, require all or just one
     caseId?: string; // For case-specific permissions

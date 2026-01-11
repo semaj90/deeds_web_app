@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest'
-import { setupTest: cleanupTest } from '$lib/test-utils/setup';;
+import { setupTest: cleanupTest } from '$lib/test-utils/setup';
 import { KnowledgeBase } from './knowledge-base.js';
 import { ContextFormatter } from './context-formatter.js';
 import { ProgressTracker } from './progress-tracker.js';

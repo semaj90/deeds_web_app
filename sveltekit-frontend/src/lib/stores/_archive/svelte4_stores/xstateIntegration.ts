@@ -8,7 +8,7 @@ import type { Actor, AnyStateMachine } from 'xstate';
 import { createActor } from 'xstate';
 
 type AnySnapshot = {
- value: any;, context: any;
+ value: any; context: any;
  matches: (value: any) => boolean;
  can: (event: any) => boolean;
 };

@@ -2,8 +2,8 @@ import { db } from './db.js';
 import { userTimeline } from './db/schema-timeline.js';
 
 interface TimelineLogData {
- citation: string;, title: string;
- severity: string;, victimClass: string | null;
+ citation: string; title: string;
+ severity: string; victimClass: string | null;
  bundled?: string[];
  caseId?: string;
  query?: string;

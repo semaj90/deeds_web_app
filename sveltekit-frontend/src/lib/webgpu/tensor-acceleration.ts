@@ -7,20 +7,20 @@ import type { SIMDGPUTilingEngine } from '$lib/evidence/simd-gpu-tiling-engine.j
 export interface WebGPUTensorConfig {
  deviceType: 'discrete' | 'integrated' | 'auto';
  powerPreference: 'high-performance' | 'low-power';
- enableDebug: boolean;, maxBufferSize: number;
+ enableDebug: boolean; maxBufferSize: number;
  shaderCacheEnabled: boolean;
 }
 
 export interface TensorOperation {
- id: string;, type: 'vectorSimilarity' | 'embedding' | 'reduction' | 'transform';
- inputShapes: number[][];, outputShape: number[];
+ id: string; type: 'vectorSimilarity' | 'embedding' | 'reduction' | 'transform';
+ inputShapes: number[][]; outputShape: number[];
  parameters: Record<string, unknown>;
 }
 
 export interface GPUMetrics {
- memoryUsage: number;, computeUtilization: number;
- operationsPerSecond: number;, averageLatency: number;
- totalOperations: number;, errorCount: number;
+ memoryUsage: number; computeUtilization: number;
+ operationsPerSecond: number; averageLatency: number;
+ totalOperations: number; errorCount: number;
  lastError?: string;
 }
 

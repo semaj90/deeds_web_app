@@ -5,7 +5,7 @@ import { FileText } from "lucide-svelte";
 import { Home } from "lucide-svelte";
 import { Library } from "lucide-svelte";
 import { Terminal } from "lucide-svelte";
-import { Users } from "lucide-svelte";;
+import { Users } from "lucide-svelte";
  import { WorkspaceStore } from '../stores/WorkspaceStore';
 
  const tabs = [

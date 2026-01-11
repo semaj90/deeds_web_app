@@ -1,5 +1,5 @@
 <script lang="ts">
- import { onMount } from 'svelte';;
+ import { onMount } from 'svelte';
 
  let activities: any[] = $state([]);
  let loading = $state(true);

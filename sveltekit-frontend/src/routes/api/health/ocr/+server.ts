@@ -2,19 +2,19 @@ import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types.js';
 
 interface OCRHealthDetails {
- service: string;, status: 'operational' | 'degraded' | 'offline';
- port?: number;, endpoint: string;
+ service: string; status: 'operational' | 'degraded' | 'offline';
+ port?: number; endpoint: string;
  features?: string[];
  performance?: {, avgProcessingTime: number;
- documentsProcessed: number;, errorRate: number;
+ documentsProcessed: number; errorRate: number;
  };
- version?: string;, lastChecked: string;
+ version?: string; lastChecked: string;
  responseTime: number;
 }
 
 interface OCRHealthResponse {
  status: 'healthy' | 'degraded' | 'unhealthy';
- timestamp: string;, ocr: OCRHealthDetails;
+ timestamp: string; ocr: OCRHealthDetails;
  metadata: {, checkDuration: number;
  environment: string;
  };

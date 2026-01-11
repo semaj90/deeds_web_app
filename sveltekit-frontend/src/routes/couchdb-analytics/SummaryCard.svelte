@@ -8,12 +8,12 @@
 	let { apiBase }: Props = $props();
 
 	interface Summary {
-		file_path: string;, summary: string;
-		key_entities: string[];, llm_provider: string;
+		file_path: string; summary: string;
+		key_entities: string[]; llm_provider: string;
 		generated_at: string;
 		metadata?: {, error_count: number;
-			classes: string[];, functions: string[];
-			language: string;, lines_of_code: number;
+			classes: string[]; functions: string[];
+			language: string; lines_of_code: number;
 		};
 	}
 
@@ -179,21 +179,21 @@
 	}
 
 	.controls {
-		display: flex;, gap: 1rem;
+		display: flex; gap: 1rem;
 		margin-bottom: 1.5rem;
 	}
 
 	.search-box {
-		flex: 1;, position: relative;
+		flex: 1; position: relative;
 	}
 
 	.search-icon {
-		position: absolute;, left: 12px;
-		top: 50%;, transform: translateY(-50%);
+		position: absolute; left: 12px;
+		top: 50%; transform: translateY(-50%);
 	}
 
 	.search-box input {
-		width: 100%;, padding: 0.75rem 0.75rem 0.75rem 2.5rem;
+		width: 100%; padding: 0.75rem 0.75rem 0.75rem 2.5rem;
 		border: 2px solid #e5e7eb;
 		border-radius: 8px;
 		font-size: 0.875rem;
@@ -203,11 +203,11 @@
 		padding: 0.75rem 1rem;
 		border: 2px solid #e5e7eb;
 		border-radius: 8px;
-		font-size: 0.875rem;, cursor: pointer;
+		font-size: 0.875rem; cursor: pointer;
 	}
 
 	.loading, .empty-state {
-		text-align: center;, padding: 3rem;
+		text-align: center; padding: 3rem;
 		color: #6b7280;
 	}
 
@@ -217,7 +217,7 @@
 	}
 
 	.empty-state code {
-		background: #f3f4f6;, padding: 0.25rem 0.5rem;
+		background: #f3f4f6; padding: 0.25rem 0.5rem;
 		border-radius: 4px;
 		font-family: monospace;
 	}
@@ -232,8 +232,8 @@
 
 	.summary-item {
 		border: 2px solid #e5e7eb;
-		border-radius: 8px;, padding: 1rem;
-		cursor: pointer;, transition: all 0.2s;
+		border-radius: 8px; padding: 1rem;
+		cursor: pointer; transition: all 0.2s;
 	}
 
 	.summary-item:hover {
@@ -243,25 +243,25 @@
 	}
 
 	.file-path {
-		font-weight: 600;, color: #1f2937;
+		font-weight: 600; color: #1f2937;
 		margin-bottom: 0.5rem;
 		font-size: 0.875rem;
 	}
 
 	.summary-preview {
-		font-size: 0.875rem;, color: #4b5563;
+		font-size: 0.875rem; color: #4b5563;
 		line-height: 1.5;
 		margin-bottom: 0.75rem;
 	}
 
 	.entities {
 		display: flex;
-		flex-wrap: wrap;, gap: 0.25rem;
+		flex-wrap: wrap; gap: 0.25rem;
 		margin-bottom: 0.75rem;
 	}
 
 	.entity-tag {
-		background: #ede9fe;, color: #6d28d9;
+		background: #ede9fe; color: #6d28d9;
 		padding: 0.25rem 0.5rem;
 		border-radius: 4px;
 		font-size: 0.75rem;
@@ -269,29 +269,29 @@
 	}
 
 	.entity-tag.more {
-		background: #f3f4f6;, color: #6b7280;
+		background: #f3f4f6; color: #6b7280;
 	}
 
 	.meta {
-		display: flex;, gap: 1rem;
-		font-size: 0.75rem;, color: #6b7280;
+		display: flex; gap: 1rem;
+		font-size: 0.75rem; color: #6b7280;
 	}
 
 	.modal-overlay {
-		position: fixed;, top: 0;
-		left: 0;, right: 0;
-		bottom: 0;, background: rgba(0, 0, 0, 0.5);
+		position: fixed; top: 0;
+		left: 0; right: 0;
+		bottom: 0; background: rgba(0, 0, 0, 0.5);
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		z-index: 1000;, padding: 2rem;
+		z-index: 1000; padding: 2rem;
 	}
 
 	.modal-content {
 		background: white;
 		border-radius: 12px;
-		max-width: 800px;, width: 100%;
-		max-height: 80vh;, overflow: hidden;
+		max-width: 800px; width: 100%;
+		max-height: 80vh; overflow: hidden;
 		display: flex;
 		flex-direction: column;
 	}
@@ -299,20 +299,20 @@
 	.modal-header {
 		display: flex;
 		justify-content: space-between;
-		align-items: center;, padding: 1.5rem;
+		align-items: center; padding: 1.5rem;
 		border-bottom: 2px solid #e5e7eb;
 	}
 
 	.modal-header h3 {
-		margin: 0;, color: #1f2937;
+		margin: 0; color: #1f2937;
 		font-size: 1.25rem;
 	}
 
 	.close-btn {
-		background: none;, border: none;
-		font-size: 1.5rem;, cursor: pointer;
-		color: #6b7280;, width: 32px;
-		height: 32px;, display: flex;
+		background: none; border: none;
+		font-size: 1.5rem; cursor: pointer;
+		color: #6b7280; width: 32px;
+		height: 32px; display: flex;
 		align-items: center;
 		justify-content: center;
 		border-radius: 4px;
@@ -328,7 +328,7 @@
 	}
 
 	.summary-full {
-		line-height: 1.6;, color: #374151;
+		line-height: 1.6; color: #374151;
 		margin-bottom: 1.5rem;
 		white-space: pre-wrap;
 	}
@@ -345,7 +345,7 @@
 
 	.entities-full {
 		display: flex;
-		flex-wrap: wrap;, gap: 0.5rem;
+		flex-wrap: wrap; gap: 0.5rem;
 	}
 
 	table {
@@ -359,7 +359,7 @@
 	}
 
 	table td:first-child {
-		font-weight: 600;, color: #6b7280;
+		font-weight: 600; color: #6b7280;
 		width: 40%;
 	}
 </style>

@@ -1,7 +1,7 @@
 import { topKSimilar } from './webgl-shader-cache.js';
 
 export interface PalaceNode {
- id: string;, position: { x: number;, y: number; z?: number };
+ id: string; position: { x: number; y: number; z?: number };
  embedding: Float32Array;
  metadata?: Record<string, unknown>;
 }

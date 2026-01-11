@@ -10,78 +10,78 @@ import type { Evidence } from '$lib/server/db/complete-introspected-schema';
 // Types for the custody workflow state machine
 export interface EvidenceCustodyContext {
   // Core evidence data
-  evidenceId: string;, caseId: string;
+  evidenceId: string; caseId: string;
   userId: string;
   evidenceData?: Evidence;
   // Custody chain tracking
-  custodyChainId?: string;, currentCustodian: string;
+  custodyChainId?: string; currentCustodian: string;
   previousCustodian?: string;
   transferReason?: string;
   // Verification and integrity
   originalHash: string;
-  currentHash?: string;, integrityStatus: 'pending' | 'verified' | 'compromised' | 'requires-attention';
+  currentHash?: string; integrityStatus: 'pending' | 'verified' | 'compromised' | 'requires-attention';
   verificationResults?: {, hashMatch: boolean;
-    metadataIntact: boolean;, timestampValid: boolean;
-    digitalSignatureValid: boolean;, aiAnalysisScore: number;
+    metadataIntact: boolean; timestampValid: boolean;
+    digitalSignatureValid: boolean; aiAnalysisScore: number;
     riskAssessment: string;
   };
   // AI analysis and recommendations
   aiAnalysis?: {, authenticity: number;
-    completeness: number;, relevance: number;
+    completeness: number; relevance: number;
     riskLevel: 'low' | 'medium' | 'high' | 'critical';
-    recommendations: string[];, flaggedAnomalies: string[];
+    recommendations: string[]; flaggedAnomalies: string[];
   };
   // Collaboration state
   activeCollaborators: string[];
   collaborationSession?: {, sessionId: string;
     participants: Array<{, userId: string;
-      role: string;, joinedAt: string;
+      role: string; joinedAt: string;
     }>;
     chatHistory: Array<{, userId: string;
-      message: string;, timestamp: string;
+      message: string; timestamp: string;
     }>;
     annotations: Array<{, userId: string;
-      content: string;, position: unknown;
+      content: string; position: unknown;
       timestamp: string;
     }>;
   };
   // Workflow progress
-  workflowStage: string;, progress: number;
+  workflowStage: string; progress: number;
   requiresApproval: boolean;
   approvalStatus?: 'pending' | 'approved' | 'rejected';
   // Documentation and audit trail
   custodyEvents: Array<{, id: string;
-    eventType: string;, timestamp: string;
-    userId: string;, details: unknown;
+    eventType: string; timestamp: string;
+    userId: string; details: unknown;
     signature: string;
   }>;
   // Performance and timing
-  startTime: number;, stageStartTime: number;
+  startTime: number; stageStartTime: number;
   stageTimes: Record<string, number>;
   // Error handling
-  error?: string;, warnings: string[];
-  retryCount: number;, maxRetries: number;
+  error?: string; warnings: string[];
+  retryCount: number; maxRetries: number;
 }
 
 export type EvidenceCustodyEvent =
   | {
-      type: 'START_CUSTODY_WORKFLOW';, evidenceId: string;
-      caseId: string;, userId: string;
+      type: 'START_CUSTODY_WORKFLOW'; evidenceId: string;
+      caseId: string; userId: string;
       originalHash: string;
     }
   | { type: 'VERIFY_INTEGRITY' }
   | { type: 'START_AI_ANALYSIS' }
-  | { type: 'JOIN_COLLABORATION';, userId: string; role: string }
-  | { type: 'LEAVE_COLLABORATION';, userId: string }
-  | { type: 'ADD_ANNOTATION';, userId: string; content: string;, position: unknown }
-  | { type: 'TRANSFER_CUSTODY';, newCustodian: string; reason: string }
+  | { type: 'JOIN_COLLABORATION'; userId: string; role: string }
+  | { type: 'LEAVE_COLLABORATION'; userId: string }
+  | { type: 'ADD_ANNOTATION'; userId: string; content: string; position: unknown }
+  | { type: 'TRANSFER_CUSTODY'; newCustodian: string; reason: string }
   | { type: 'APPROVE_CUSTODY' }
-  | { type: 'REJECT_CUSTODY';, reason: string }
+  | { type: 'REJECT_CUSTODY'; reason: string }
   | { type: 'FINALIZE_CUSTODY' }
   | { type: 'RETRY' }
   | { type: 'CANCEL_WORKFLOW' }
   | { type: 'FORCE_COMPLETE' }
-  | { type: 'UPDATE_PROGRESS';, progress: number; stage: string };
+  | { type: 'UPDATE_PROGRESS'; progress: number; stage: string };
 // Helper functions
 async function generateEvidenceHash(evidence: Evidence): Promise<string> {
   const content = JSON.stringify(evidence);
@@ -251,7 +251,7 @@ const collaborationService = fromPromise(async ({ input }: {, input: EvidenceCus
   return { collaborationSession };
 });
 const custodyTransferService = fromPromise(
-  async ({ input }: {, input: EvidenceCustodyContext & { newCustodian: string;, reason: string } }) => {
+  async ({ input }: {, input: EvidenceCustodyContext & { newCustodian: string; reason: string } }) => {
     console.log(`Transferring custody from ${input.currentCustodian} to ${input.newCustodian}`);
     const custodyEvent = {
       id: crypto.randomUUID(),

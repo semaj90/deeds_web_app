@@ -1,7 +1,7 @@
 import { writable, derived, get } from 'svelte/store';
 
 export interface FormField<TValue = unknown> {
- name: string;, value: TValue;
+ name: string; value: TValue;
  error?: string | null;
  touched: boolean;
  required?: boolean;
@@ -10,9 +10,9 @@ export interface FormField<TValue = unknown> {
 
 export interface FormState<T extends Record<string, unknown>> {
  fields: Partial<{ [K in keyof T]: FormField<T[K]> }>;
- values: Partial<T>;, errors: Record<string, string>;
- isSubmitting: boolean;, isValid: boolean;
- isDirty: boolean;, submitCount: number;
+ values: Partial<T>; errors: Record<string, string>;
+ isSubmitting: boolean; isValid: boolean;
+ isDirty: boolean; submitCount: number;
 }
 
 export interface FormOptions<T extends Record<string, unknown>> {

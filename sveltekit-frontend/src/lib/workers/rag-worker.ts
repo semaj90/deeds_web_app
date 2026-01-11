@@ -8,8 +8,8 @@ import fetch from 'node-fetch';
 import { createWorker } from 'tesseract.js';
 
 interface IngestResult {
-  title: string;, contentLength: number;
-  embeddingSize: number;, mirroredToQdrant: boolean;
+  title: string; contentLength: number;
+  embeddingSize: number; mirroredToQdrant: boolean;
 }
 
 function minioClient() {

@@ -6,18 +6,18 @@
 import { browser } from '$app/environment';
 
 export interface WebAssemblyAIConfig {
-	ollamaEndpoint: string;, pythonMiddlewareEndpoint: string; maxTokens: number;, temperature: number; enableGPU: boolean;, fallbackStrategy: 'ollama' | 'python' | 'auto';
+	ollamaEndpoint: string; pythonMiddlewareEndpoint: string; maxTokens: number; temperature: number; enableGPU: boolean; fallbackStrategy: 'ollama' | 'python' | 'auto';
 }
 
 export interface WebAssemblyAIResponse {
-	content: string;, metadata: { tokensGenerated: number;, processingTime: number; confidence: number;, method: 'ollama' | 'python' | 'fallback';
-		modelUsed: string;, fromCache: boolean; gpuAccelerated: boolean;
+	content: string; metadata: { tokensGenerated: number; processingTime: number; confidence: number; method: 'ollama' | 'python' | 'fallback';
+		modelUsed: string; fromCache: boolean; gpuAccelerated: boolean;
 	};
 }
 
 export interface ConversationEntry {
-	id: string;, type: 'user' | 'assistant';
-	content: string;, timestamp: Date;
+	id: string; type: 'user' | 'assistant';
+	content: string; timestamp: Date;
 }
 
 const defaultConfig: WebAssemblyAIConfig = {
@@ -129,7 +129,7 @@ export class WebAssemblyAIAdapter {
 		return prompt;
 	}
 
-	getStatus(): {, initialized: boolean; method: string;, gpu: boolean } {
+	getStatus(): {, initialized: boolean; method: string; gpu: boolean } {
 		return { initialized: this.initialized, method: this.activeMethod, gpu: this.gpuAvailable };
 	}
 }

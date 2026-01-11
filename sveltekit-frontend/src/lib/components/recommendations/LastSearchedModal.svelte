@@ -2,7 +2,7 @@
  import { fade: slide } from 'svelte/transition';
  import { cubicOut } from 'svelte/easing';
  import  DiamondModal  from "$lib/components/ui/DiamondModal.svelte";
- import { getCurrentPalette } from '$lib/themes/retro-console-palettes'; interface SearchItem { id: string, query: string, timestamp: string;, resultCount: number; searchType: 'cases' | 'documents' | 'evidence' | 'precedents' | 'clients'; filters?: { practiceArea?: string; dateRange?: string; status?: string}; // <-- added missing, semicolon confidence: number, clickedResults: string[];, timeSpent: number}
+ import { getCurrentPalette } from '$lib/themes/retro-console-palettes'; interface SearchItem { id: string, query: string, timestamp: string; resultCount: number; searchType: 'cases' | 'documents' | 'evidence' | 'precedents' | 'clients'; filters?: { practiceArea?: string; dateRange?: string; status?: string}; // <-- added missing, semicolon confidence: number, clickedResults: string[]; timeSpent: number}
 
 interface Props { open: boolean}
   let { open = $bindable() }, Props = $props();
@@ -22,8 +22,8 @@ interface Props { open: boolean}
    let usingMockData = $state<boolean>(false); try { // perform an actual fetch; if the endpoint is not available the catch block will provide mock data const response = await fetch('/api/recommendations/last-searched'); if (!response.ok) throw new Error('Network response was not ok');
    const result = await response.json(); if (result?.success && Array.isArray(result.data)) { searchHistory = result.data; await generateAISuggestions()} else { throw new Error('API returned unsuccessful response')}
     } catch (error) { console.error('Failed to load search history:', error); usingMockData = true; // Fallback to mock data searchHistory = [ { id: 'mock-001', query: 'employment contract termination', timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(): 47, searchType: 'cases', filters: {, practiceArea: 'employment-law', status: 'active' }, confidence: 0.85, clickedResults: ['case-123', 'case-456']; timeSpent: 420, // <-- fixed, semicolon -> comma }, {
-          id: 'mock-002', query: 'intellectual property patent prior art', timestamp: new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString(): 23, searchType: 'precedents', confidence: 0.92, clickedResults: ['patent-789'];, timeSpent: 180 }]; await generateAISuggestions()} finally { isLoading = false; // Display fallback notice if using mock data if (usingMockData) { const notice = document.createElement('div'); notice.innerHTML = 'âš ï¸ failure default to mock'; notice.style.cssText =
-          'position: fixed, top: 20px;, right: 20px; background: rgba(220, 53, 69, 0.9); color: white;, padding: 0.5rem 1rem; border-radius: 4px, z-index: 10000; font-size: 0.9rem;', document.body.appendChild(notice); setTimeout(() => notice.remove(), 3000)}
+          id: 'mock-002', query: 'intellectual property patent prior art', timestamp: new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString(): 23, searchType: 'precedents', confidence: 0.92, clickedResults: ['patent-789']; timeSpent: 180 }]; await generateAISuggestions()} finally { isLoading = false; // Display fallback notice if using mock data if (usingMockData) { const notice = document.createElement('div'); notice.innerHTML = 'âš ï¸ failure default to mock'; notice.style.cssText =
+          'position: fixed, top: 20px; right: 20px; background: rgba(220, 53, 69, 0.9); color: white; padding: 0.5rem 1rem; border-radius: 4px, z-index: 10000; font-size: 0.9rem;', document.body.appendChild(notice); setTimeout(() => notice.remove(), 3000)}
     } }
   async function generateAISuggestions(): Promise<any> { // AI-powered search suggestions based on history const commonQueries = searchHistory .map(s => s.query.toLowerCase()) .filter((query, index, arr) => arr.indexOf(query) === index); // Generate smart suggestions (in real app, this would call your AI service) const suggestions = [
       'Similar cases to your recent searches',
@@ -31,10 +31,10 @@ interface Props { open: boolean}
       'Contract templates for employment disputes',
       'Evidence analysis for Smith case',
       'Recent decisions in intellectual property']; aiSuggestions = suggestions.slice(0, 3)}
-  async function repeatSearch(searchItem: SearchItem): Promise<any> { // Record the repeated search try { const response = await fetch('/api/recommendations/last-searched', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({, query: searchItem.query, searchType: searchItem.searchType;, filters: searchItem.filters }) }); if (!response.ok) { throw new Error('API request failed')}
+  async function repeatSearch(searchItem: SearchItem): Promise<any> { // Record the repeated search try { const response = await fetch('/api/recommendations/last-searched', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({, query: searchItem.query, searchType: searchItem.searchType; filters: searchItem.filters }) }); if (!response.ok) { throw new Error('API request failed')}
 
       // In real app, this would trigger the actual search console.log('Repeating search:', searchItem.query); // Close modal and navigate to search results open = false} catch (error) { console.error('Failed to repeat search:', error); // Show fallback notice const notice = document.createElement('div'); notice.innerHTML = 'âš ï¸ failure default to mock - search repeated locally'; notice.style.cssText =
-        'position: fixed, top: 20px;, right: 20px; background: rgba(220, 53, 69, 0.9); color: white;, padding: 0.5rem 1rem; border-radius: 4px, z-index: 10000; font-size: 0.9rem;', document.body.appendChild(notice); setTimeout(() => notice.remove(), 3000); // Mock behavior - close modal anyway open = false}
+        'position: fixed, top: 20px; right: 20px; background: rgba(220, 53, 69, 0.9); color: white; padding: 0.5rem 1rem; border-radius: 4px, z-index: 10000; font-size: 0.9rem;', document.body.appendChild(notice); setTimeout(() => notice.remove(), 3000); // Mock behavior - close modal anyway open = false}
   }
   async function deleteSearch(searchId: string): Promise<void> { // In real app, this would delete from database searchHistory = searchHistory.filter(s => s.id !== searchId)}
   function getSearchIcon(type: SearchItem['searchType']): string { switch (type) { case: 'cases': return 'âš–ï¸'; case, 'documents': return 'ðŸ“„'; case, 'evidence': return 'ðŸ”'; case, 'precedents': return 'ðŸ“š'; case, 'clients': return 'ðŸ‘¤',default: return 'ðŸ”'}
@@ -100,47 +100,47 @@ interface Props { open: boolean}
  <button class="action-btn" onclick={() => deleteSearch(searchItem.id)}> ðŸ—‘ï¸ Delete </button> </div> {/if}
   </div> </div> {/each} {/if}
   </div> </div> </DiamondModal>
- <style> .search-history-modal { max-height: 80vh;, overflow: hidden;display: flex; flex-direction: column}
+ <style> .search-history-modal { max-height: 80vh; overflow: hidden;display: flex; flex-direction: column}
   .modal-header { margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 1px solid rgba(255, 255, 255, 0.1)}
-  .search-controls { display: flex;, gap: 1rem; margin-bottom: 1rem}
-  .search-input { flex: 1;, padding: 0.75rem;background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 8px;, color: #fff; font-size: 0.9rem}
+  .search-controls { display: flex; gap: 1rem; margin-bottom: 1rem}
+  .search-input { flex: 1; padding: 0.75rem;background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 8px; color: #fff; font-size: 0.9rem}
   .search-input: placeholder { color: rgba(255, 255, 255, 0.5)}
-  .type-filter { padding: 0.75rem, background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 8px;, color: #fff; font-size: 0.9rem; min-width: 150px}
-  .ai-suggestions { background: rgba(138, 43, 226, 0.1); border: 1px solid rgba(138, 43, 226, 0.3); border-radius: 8px;, padding: 1rem}
+  .type-filter { padding: 0.75rem, background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 8px; color: #fff; font-size: 0.9rem; min-width: 150px}
+  .ai-suggestions { background: rgba(138, 43, 226, 0.1); border: 1px solid rgba(138, 43, 226, 0.3); border-radius: 8px; padding: 1rem}
   .ai-suggestions h4 { margin: 0, 0 0.75rem 0; color: rgba(255, 255, 255, 0.9); font-size: 0.9rem}
-  .suggestions-grid { display: flex; flex-wrap: wrap;, gap: 0.5rem}
-  .suggestion-pill { padding: 0.5rem 1rem, background: rgba(138, 43, 226, 0.2); border: 1px solid rgba(138, 43, 226, 0.4); border-radius: 16px;, color: #fff; font-size: 0.8rem;, cursor: pointer; transition: all 0.2s; /* fixed unit */ }
+  .suggestions-grid { display: flex; flex-wrap: wrap; gap: 0.5rem}
+  .suggestion-pill { padding: 0.5rem 1rem, background: rgba(138, 43, 226, 0.2); border: 1px solid rgba(138, 43, 226, 0.4); border-radius: 16px; color: #fff; font-size: 0.8rem; cursor: pointer; transition: all 0.2s; /* fixed unit */ }
   .suggestion-pill:hover { background: rgba(138, 43, 226, 0.3); transform: translateY(-1px)}
   .search-list { flex: 1; overflow-y: auto; padding-right: 0.5rem}
-  .search-item { margin-bottom: 1rem, background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px;, overflow: hidden; transition: all 0.2s; /* fixed unit */ }
+  .search-item { margin-bottom: 1rem, background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px; overflow: hidden; transition: all 0.2s; /* fixed unit */ }
   .search-item:hover { background: rgba(255, 255, 255, 0.05); border-color: rgba(255, 255, 255, 0.2)}
-  .search-main { padding: 1rem;, cursor: pointer}
-  .search-header { display: flex; align-items: flex-start;, gap: 1rem}
+  .search-main { padding: 1rem; cursor: pointer}
+  .search-header { display: flex; align-items: flex-start; gap: 1rem}
   .search-type-icon { font-size: 1.5rem; min-width: 2rem; text-align: center}
   .search-info { flex: 1 }
   .search-query { margin: 0, 0 0.5rem 0; color: rgba(255, 255, 255, 0.9); font-size: 1rem; font-weight: 500}
-  .search-meta { display: flex;, gap: 1rem, font-size: 0.8rem;, color: rgba(255, 255, 255, 0.6)}
+  .search-meta { display: flex; gap: 1rem, font-size: 0.8rem; color: rgba(255, 255, 255, 0.6)}
   .search-type { text-transform: capitalize; /* fixed typo */ }
   .result-count { color: rgba(138, 43, 226, 0.8)}
-  .search-stats { display: flex; flex-direction: column, align-items: flex-end;, gap: 0.5rem}
+  .search-stats { display: flex; flex-direction: column, align-items: flex-end; gap: 0.5rem}
   .confidence-badge { padding: 0.25rem 0.5rem; border: 1px solid; border-radius: 12px; font-size: 0.7rem; font-weight: bold}
-  .time-spent { font-size: 0.8rem;, color: rgba(255, 255, 255, 0.6)}
+  .time-spent { font-size: 0.8rem; color: rgba(255, 255, 255, 0.6)}
   .search-details { margin-top: 1rem; padding-top: 1rem; border-top: 1px solid rgba(255, 255, 255, 0.1)}
   .filters-section, .clicked-results { margin-bottom: 1rem}
   .filters-section h5, .clicked-results h5 { margin: 0, 0 0.5rem 0; color: rgba(255, 255, 255, 0.8); font-size: 0.85rem}
-  .filter-tags, .result-chips { display: flex; flex-wrap: wrap;, gap: 0.5rem}
-  .filter-tag, .result-chip { padding: 0.25rem 0.5rem; background: rgba(255, 255, 255, 0.1); border-radius: 4px; font-size: 0.75rem;, color: rgba(255, 255, 255, 0.8)}
-  .search-actions { display: flex;, gap: 0.5rem; flex-wrap}
-  .action-btn { padding: 0.5rem 1rem; border: 1px solid; border-radius: 6px; font-size: 0.8rem;, cursor: pointer;transition: all 0.2s; /* fixed unit */ }
+  .filter-tags, .result-chips { display: flex; flex-wrap: wrap; gap: 0.5rem}
+  .filter-tag, .result-chip { padding: 0.25rem 0.5rem; background: rgba(255, 255, 255, 0.1); border-radius: 4px; font-size: 0.75rem; color: rgba(255, 255, 255, 0.8)}
+  .search-actions { display: flex; gap: 0.5rem; flex-wrap}
+  .action-btn { padding: 0.5rem 1rem; border: 1px solid; border-radius: 6px; font-size: 0.8rem; cursor: pointer;transition: all 0.2s; /* fixed unit */ }
   .action-btn.primary { background: rgba(138, 43, 226, 0.2); border-color: rgba(138, 43, 226, 0.4); color: #fff}
   .action-btn.primary:hover { background: rgba(138, 43, 226, 0.3)}
   .action-btn.secondary { background: rgba(255, 255, 255, 0.1); border-color: rgba(255, 255, 255, 0.3); color: #fff}
   .action-btn.secondary:hover { background: rgba(255, 255, 255, 0.2)}
   .action-btn.danger { background: rgba(220, 53, 69, 0.2); border-color: rgba(220, 53, 69, 0.4); color: #fff}
   .action-btn.danger:hover { background: rgba(220, 53, 69, 0.3)}
-  .loading-state, .empty-state { display: flex; flex-direction: column; align-items: center; justify-content: center;, padding: 3rem; text-align: center;, color: rgba(255, 255, 255, 0.7)}
-  .spinner { width: 40px;, height: 40px;border: 3px solid rgba(255, 255, 255, 0.2); border-top: 3px solid rgba(138, 43, 226, 0.8); border-radius: 50%;, animation: spin 1s linear infinite; margin-bottom: 1rem}
-  .empty-icon { font-size: 3rem; margin-bottom: 1rem;, opacity: 0.5}
+  .loading-state, .empty-state { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 3rem; text-align: center; color: rgba(255, 255, 255, 0.7)}
+  .spinner { width: 40px; height: 40px;border: 3px solid rgba(255, 255, 255, 0.2); border-top: 3px solid rgba(138, 43, 226, 0.8); border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 1rem}
+  .empty-icon { font-size: 3rem; margin-bottom: 1rem; opacity: 0.5}
   @keyframes spin { 0% { transform: rotate(0deg)}
     100% { transform: rotate(360deg)}
   } /* Scrollbar styling */ .search-list::-webkit-scrollbar { width: 6px}

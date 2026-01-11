@@ -2,22 +2,22 @@
   import { onMount } from 'svelte';
 
   interface IndexingStatus {
-    success: boolean;, collections: {
-      codebase: {, points_count: number };
-      errors: {, points_count: number };
+    success: boolean; collections: {
+      codebase: { points_count: number };
+      errors: { points_count: number };
     };
     timestamp: string;
   }
 
   interface SearchResult {
-    file: string;, chunk: number;
-    similarity: string;, language: string;
+    file: string; chunk: number;
+    similarity: string; language: string;
     content: string;
   }
 
   interface ErrorResult {
-    code: string;, file: string;
-    count: number;, similarity: string;
+    code: string; file: string;
+    count: number; similarity: string;
     message: string;
   }
 
@@ -54,7 +54,7 @@
       const response = await fetch('/api/indexing/codebase', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({, rootPath: indexPath })
+        body: JSON.stringify({ rootPath: indexPath })
       });
 
       const result = await response.json();
@@ -107,7 +107,7 @@
       const response = await fetch(`/api/indexing/${endpoint}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({, query: searchQuery, limit: 5 })
+        body: JSON.stringify({ query: searchQuery, limit: 5 })
       });
 
       const result = await response.json();
@@ -400,7 +400,7 @@
 
 <style>
   .container {
-    max-width: 1200px;, margin: 0 auto;
+    max-width: 1200px; margin: 0 auto;
     padding: 20px;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   }
@@ -411,7 +411,7 @@
   }
 
   header h1 {
-    font-size: 32px;, margin: 0 0 8px 0;
+    font-size: 32px; margin: 0 0 8px 0;
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -419,23 +419,23 @@
   }
 
   header p {
-    color: #666;, margin: 0;
+    color: #666; margin: 0;
   }
 
   .tabs {
-    display: flex;, gap: 12px;
+    display: flex; gap: 12px;
     margin-bottom: 24px;
     border-bottom: 2px solid #eee;
   }
 
   .tabs button {
     padding: 12px 20px;
-    border: none;, background: none;
-    cursor: pointer;, color: #666;
+    border: none; background: none;
+    cursor: pointer; color: #666;
     font-size: 14px;
     font-weight: 500;
     border-bottom: 2px solid transparent;
-    margin-bottom: -2px;, transition: all 0.3s ease;
+    margin-bottom: -2px; transition: all 0.3s ease;
   }
 
   .tabs button.active {
@@ -453,10 +453,10 @@
 
   @keyframes fadeIn {
     from {
-      opacity: 0;, transform: translateY(10px);
+      opacity: 0; transform: translateY(10px);
     }
     to {
-      opacity: 1;, transform: translateY(0);
+      opacity: 1; transform: translateY(0);
     }
   }
 
@@ -469,10 +469,10 @@
   }
 
   .status-card {
-    display: flex;, gap: 16px;
-    padding: 20px;, background: white;
+    display: flex; gap: 16px;
+    padding: 20px; background: white;
     border: 1px solid #eee;
-    border-radius: 8px;, transition: all 0.3s ease;
+    border-radius: 8px; transition: all 0.3s ease;
   }
 
   .status-card:hover {
@@ -490,30 +490,30 @@
 
   .status-info h3 {
     margin: 0 0 8px 0;
-    font-size: 14px;, color: #666;
+    font-size: 14px; color: #666;
     font-weight: 500;
   }
 
   .big-number {
     margin: 0;
     font-size: 28px;
-    font-weight: 600;, color: #667eea;
+    font-weight: 600; color: #667eea;
   }
 
   .small-text {
     margin: 0;
     font-size: 16px;
-    font-weight: 600;, color: #667eea;
+    font-weight: 600; color: #667eea;
   }
 
   .label {
     margin: 4px 0 0 0;
-    font-size: 12px;, color: #999;
+    font-size: 12px; color: #999;
   }
 
   /* Info Box */
   .info-box {
-    padding: 16px;, background: #f5f7ff;
+    padding: 16px; background: #f5f7ff;
     border-left: 4px solid #667eea;
     border-radius: 4px;
     margin-bottom: 24px;
@@ -559,12 +559,12 @@
     display: block;
     margin-bottom: 8px;
     font-size: 14px;
-    font-weight: 500;, color: #333;
+    font-weight: 500; color: #333;
   }
 
   .form-group input {
     width: 100%;
-    max-width: 400px;, padding: 8px 12px;
+    max-width: 400px; padding: 8px 12px;
     border: 1px solid #ddd;
     border-radius: 4px;
     font-size: 14px;
@@ -578,7 +578,7 @@
     border: none;
     border-radius: 6px;
     font-size: 14px;
-    font-weight: 500;, cursor: pointer;
+    font-weight: 500; cursor: pointer;
     transition: all 0.3s ease;
   }
 
@@ -587,16 +587,16 @@
     color: white;
   }
 
-  .btn-primary: hover, not(disabled) {
+  .btn-primary:hover:not(:disabled) {
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
   }
 
   .btn-secondary {
-    background: #f0f0f0;, color: #333;
+    background: #f0f0f0; color: #333;
   }
 
-  .btn-secondary: hover, not(disabled) {
+  .btn-secondary:hover:not(:disabled) {
     background: #e0e0e0;
   }
 
@@ -605,13 +605,13 @@
     color: white;
   }
 
-  .btn-search: hover, not(disabled) {
+  .btn-search:hover:not(:disabled) {
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
   }
 
   button:disabled {
-    opacity: 0.6;, cursor:not-allowed;
+    opacity: 0.6; cursor:not-allowed;
   }
 
   /* Results */
@@ -627,12 +627,12 @@
 
   .result-list {
     display: flex;
-    flex-direction: column;, gap: 12px;
+    flex-direction: column; gap: 12px;
   }
 
   .result-item {
-    display: flex;, gap: 12px;
-    padding: 12px;, background: white;
+    display: flex; gap: 12px;
+    padding: 12px; background: white;
     border: 1px solid #eee;
     border-radius: 6px;
   }
@@ -650,17 +650,17 @@
   .file-name {
     margin: 0 0 4px 0;
     font-size: 14px;
-    font-weight: 500;, color: #333;
+    font-weight: 500; color: #333;
   }
 
   .file-meta,
   .error-count {
     margin: 0;
-    font-size: 12px;, color: #999;
+    font-size: 12px; color: #999;
   }
 
   .result-card {
-    padding: 16px;, background: white;
+    padding: 16px; background: white;
     border: 1px solid #eee;
     border-radius: 6px;
   }
@@ -670,46 +670,46 @@
   }
 
   .result-header {
-    display: flex;, gap: 8px;
+    display: flex; gap: 8px;
     margin-bottom: 12px;
   }
 
   .file-badge,
   .error-code,
   .similarity-badge {
-    display: inline-block;, padding: 4px 8px;
+    display: inline-block; padding: 4px 8px;
     border-radius: 4px;
     font-size: 12px;
     font-weight: 500;
   }
 
   .file-badge {
-    background: #e8f0ff;, color: #667eea;
+    background: #e8f0ff; color: #667eea;
   }
 
   .error-code {
-    background: #ffe8e8;, color: #ff6b6b;
+    background: #ffe8e8; color: #ff6b6b;
   }
 
   .similarity-badge {
-    background: #e8ffe8;, color: #51cf66;
+    background: #e8ffe8; color: #51cf66;
     margin-left: auto;
   }
 
   .file-path {
     margin: 0 0 8px 0;
-    font-size: 14px;, color: #333;
+    font-size: 14px; color: #333;
   }
 
   .chunk-info {
     margin: 0 0 8px 0;
-    font-size: 12px;, color: #999;
+    font-size: 12px; color: #999;
   }
 
   .content-preview,
   .message-preview {
     margin: 0;
-    font-size: 13px;, color: #666;
+    font-size: 13px; color: #666;
     line-height: 1.4;
     font-family: 'Monaco', 'Courier New', monospace;
   }
@@ -725,13 +725,13 @@
   }
 
   .search-type {
-    display: flex;, gap: 16px;
+    display: flex; gap: 16px;
     margin-bottom: 16px;
   }
 
   .search-type label {
     display: flex;
-    align-items: center;, gap: 8px;
+    align-items: center; gap: 8px;
     cursor: pointer;
     font-size: 14px;
   }
@@ -741,11 +741,11 @@
   }
 
   .search-box {
-    display: flex;, gap: 8px;
+    display: flex; gap: 8px;
   }
 
   .search-box input {
-    flex: 1;, padding: 10px 16px;
+    flex: 1; padding: 10px 16px;
     border: 1px solid #ddd;
     border-radius: 6px;
     font-size: 14px;
@@ -759,7 +759,7 @@
 
   /* No Results */
   .no-results {
-    text-align: center;, padding: 40px 20px;
+    text-align: center; padding: 40px 20px;
     color: #999;
   }
 

@@ -2,7 +2,7 @@ import Fuse, { type IFuseOptions } from 'fuse.js';
 import { get as idbGet, set as idbSet } from 'idb-keyval';
 
 export interface LocalLegalDoc {
- id: string;, title: string;
+ id: string; title: string;
  content?: string;
  type?: string;
  status?: string;
@@ -80,7 +80,7 @@ export function localSearch(query: string, limit = 50) {
 
 // Merge helper: combine local + remote results with weighting & dedupe
 export interface HybridResult extends LocalLegalDoc {
- relevance: number;, source: 'local' | 'remote' | 'hybrid';
+ relevance: number; source: 'local' | 'remote' | 'hybrid';
 }
 
 export function mergeResults(

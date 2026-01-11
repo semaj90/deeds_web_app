@@ -1,11 +1,11 @@
 import type { QuantizedEmbedding } from '$lib/shared/embedding-types';
 
 export interface SimilarityResult {
- index: number;, score: number;
+ index: number; score: number;
 }
 
 export interface WebGPUSimilarityConfig {
- workgroupSize: number;, maxBatchSize: number;
+ workgroupSize: number; maxBatchSize: number;
  enableProfiling: boolean;
 }
 

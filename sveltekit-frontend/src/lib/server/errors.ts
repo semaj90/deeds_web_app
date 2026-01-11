@@ -10,7 +10,7 @@
  * All auth-related errors inherit from this for consistent handling
  */
 export class AuthError extends Error {
- code: string;, status: number;
+ code: string; status: number;
  context?: Record<string, unknown>;
 
  constructor(

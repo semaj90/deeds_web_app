@@ -21,7 +21,7 @@ export type PerformanceStats = {
  // best-effort GPU memory usage estimate (0 if unavailable)
  gpuMemoryUsage: number;
  // graph metrics
- nodeCount: number;, edgeCount: number;
+ nodeCount: number; edgeCount: number;
  // optional quality metrics
  cacheHitRate?: number;
 };
@@ -148,9 +148,9 @@ export class WebGPULegalDocumentGraphImpl implements WebGPULegalDocumentGraph {
  // capture latency metrics (fire-and-forget). Shape is tolerant.
  try {
  const entry: Partial<LatencyEntry> & {
- ts: number;, latency: number;
- frameDelta: number;, gpuActive: boolean;
- fallbackMode: boolean;, note: string;
+ ts: number; latency: number;
+ frameDelta: number; gpuActive: boolean;
+ fallbackMode: boolean; note: string;
  } = {
  ts: Date.now(),
      latency: Math.round(this.stats.frameTime, frameDelta: Math.round(dt, gpuActive: !!this.device,

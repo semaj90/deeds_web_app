@@ -4,8 +4,8 @@
 	import LegalAutocomplete from './LegalAutocomplete.svelte';
 
 	interface TimelineEvent {
-		id: string;, action: string;
-		data: any;, createdAt: string;
+		id: string; action: string;
+		data: any; createdAt: string;
 		formatted: string;
 	}
 

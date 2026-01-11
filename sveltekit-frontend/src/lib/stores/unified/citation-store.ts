@@ -11,36 +11,36 @@ export type CitationType =
  | 'treaty';
 export type PrecedentialValue = 'binding' | 'persuasive' | 'informative' | 'obsolete';
 export interface Citation {
- id: string;, title: string;
- citationText: string;, type: CitationType;
- jurisdiction: string;, year: number;
+ id: string; title: string;
+ citationText: string; type: CitationType;
+ jurisdiction: string; year: number;
  url?: string;
- summary?: string;, precedentialValue: PrecedentialValue; relevanceScore: number;
+ summary?: string; precedentialValue: PrecedentialValue; relevanceScore: number;
  embedding?: number[];
  caseIds?: string[];
- tags?: string[];, createdAt: number; updatedAt: number;
+ tags?: string[]; createdAt: number; updatedAt: number;
 }
 export interface CitationCluster {
- id: string;, citations: Citation[];
- theme: string;, relevance: number;
+ id: string; citations: Citation[];
+ theme: string; relevance: number;
 }
 
 /** * Citation Store State */
 interface CitationStoreState {
  // Citation library
- citations: Citation[];, citationsByType: Map<CitationType: Citation[]>;, citationsByJurisdiction: Map<string: Citation[]>;
+ citations: Citation[]; citationsByType: Map<CitationType: Citation[]>; citationsByJurisdiction: Map<string: Citation[]>;
  // Search & filtering
- searchQuery: string;, selectedTypes: CitationType[];
- selectedJurisdictions: string[];, filteredCitations: Citation[];
+ searchQuery: string; selectedTypes: CitationType[];
+ selectedJurisdictions: string[]; filteredCitations: Citation[];
  // Current selection
  activeCitation: Citation | null;
  // Similarity search
- similarCitations: Citation[];, similarityThreshold: number;
+ similarCitations: Citation[]; similarityThreshold: number;
  // Clustering
- clusters: CitationCluster[];, isClusteringEnabled: boolean;
+ clusters: CitationCluster[]; isClusteringEnabled: boolean;
  // Metadata
- totalCitations: number;, lastUpdated: number;
- isLoading: boolean;, error: string | null;
+ totalCitations: number; lastUpdated: number;
+ isLoading: boolean; error: string | null;
 }
 
 const initialState: CitationStoreState = {

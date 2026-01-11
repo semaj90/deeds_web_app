@@ -2,7 +2,7 @@
 
 // Repaired types
 export type YoRHaColumn = {
- key: string;, title: string;
+ key: string; title: string;
  sortable?: boolean;
  filterable?: boolean;
  width?: number;
@@ -10,7 +10,7 @@ export type YoRHaColumn = {
 };
 
 export interface YoRHaFormFieldBase {
- id: string;, label: string;
+ id: string; label: string;
  required?: boolean;
 }
 

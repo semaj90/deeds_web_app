@@ -11,9 +11,9 @@ import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 
 interface SearchResult {
-  id: string;, filePath: string;
-  label: string;, type: string;
-  score: number;, errorCount: number;
+  id: string; filePath: string;
+  label: string; type: string;
+  score: number; errorCount: number;
   snippet?: string;
 }
 

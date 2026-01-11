@@ -6,16 +6,16 @@ import type { Case } from '$lib/types';
  */
 
 export interface EvidenceNode {
- id: string;, title: string;
- content: string;, type: 'document' | 'photo' | 'testimony' | 'physical' | 'digital';
- tags: string[];, position: { x: number;, y: number };
+ id: string; title: string;
+ content: string; type: 'document' | 'photo' | 'testimony' | 'physical' | 'digital';
+ tags: string[]; position: { x: number; y: number };
  connections: string[]; // IDs of nodes
  metadata: {, dateCreated: number;
  lastModified: number;
  source?: string;
  relevanceScore?: number;
  aiAnalysis?: {, summary: string;
- keyTerms: string[];, confidence: number;
+ keyTerms: string[]; confidence: number;
  suggestedConnections: string[];
  };
  };
@@ -24,25 +24,25 @@ export interface EvidenceNode {
 }
 
 export interface LegalCase {
- id: string;, title: string;
- description: string;, jurisdiction: string;
- practiceArea: string;, nodes: EvidenceNode[];
+ id: string; title: string;
+ description: string; jurisdiction: string;
+ practiceArea: string; nodes: EvidenceNode[];
  connections: Array<{, id: string;
- fromNodeId: string;, toNodeId: string;
- relationship: string;, strength: number;
+ fromNodeId: string; toNodeId: string;
+ relationship: string; strength: number;
  aiGenerated: boolean;
  }>;
  metadata: {, dateCreated: number;
- lastModified: number;, status: 'active' | 'archived' | 'completed';
+ lastModified: number; status: 'active' | 'archived' | 'completed';
  priority: 'low' | 'medium' | 'high' | 'urgent';
  };
 }
 
 export interface UIState {
- selectedNodeIds: string[];, draggedNodeId: string | null;
- modalOpen: boolean;, modalType: 'add' | 'edit' | 'delete' | 'connect' | null;
+ selectedNodeIds: string[]; draggedNodeId: string | null;
+ modalOpen: boolean; modalType: 'add' | 'edit' | 'delete' | 'connect' | null;
  editingNode: EvidenceNode | null;
- showAISuggestions: boolean;, filterBy: {
+ showAISuggestions: boolean; filterBy: {
  type?: string;
  status?: string;
  tags?: string[];

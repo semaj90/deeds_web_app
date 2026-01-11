@@ -11,9 +11,9 @@
 import { redis } from './cache/redis';
 
 interface GPUMetrics {
-    gpuUtilization: number;, memoryUsage: number;
-    tensorCoreLoad: number;, thermalStatus: 'cool' | 'warm' | 'hot';
-    availableComputeUnits: number;, queueDepth: number;
+    gpuUtilization: number; memoryUsage: number;
+    tensorCoreLoad: number; thermalStatus: 'cool' | 'warm' | 'hot';
+    availableComputeUnits: number; queueDepth: number;
 }
 
 interface CacheWorkload {
@@ -25,8 +25,8 @@ interface CacheWorkload {
 }
 
 interface ParallelCacheJob {
-    id: string;, workload: CacheWorkload;
-    data: any;, key: string;
+    id: string; workload: CacheWorkload;
+    data: any; key: string;
     ttl?: number;
     threadAffinity?: number;
 }

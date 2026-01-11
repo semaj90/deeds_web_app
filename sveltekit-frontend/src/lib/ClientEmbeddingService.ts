@@ -83,7 +83,7 @@ export class ClientEmbeddingService {
  maxLength?: number;
  batchSize?: number;
  } = {}
- ): Promise<{, embeddings: number[][]; model: string;, dimension: number; count: number;
+ ): Promise<{, embeddings: number[][]; model: string; dimension: number; count: number;
  }> {
  if (!this.isInitialized) {
  await this.initialize();

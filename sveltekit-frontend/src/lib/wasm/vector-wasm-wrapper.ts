@@ -24,7 +24,7 @@ export interface VectorWasmModule {
  __new(size: number, id?: number): number;
  __pin(ptr: number): number;
  __unpin(ptr: number): void;
- __collect(): void;, memory: WebAssembly.Memory;
+ __collect(): void; memory: WebAssembly.Memory;
 }
 
 export class VectorWasmWrapper {

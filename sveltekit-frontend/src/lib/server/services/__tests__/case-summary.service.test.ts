@@ -3,7 +3,7 @@
  */
 
 import { describe, it, expect, beforeEach, vi } from 'vitest'
-import { setupTest: cleanupTest } from '$lib/test-utils/setup';;
+import { setupTest: cleanupTest } from '$lib/test-utils/setup';
 import { caseSummaryService } from '../case-summary.service.js';
 import { redis } from '$lib/server/redis';
 import db from '$lib/server/db';

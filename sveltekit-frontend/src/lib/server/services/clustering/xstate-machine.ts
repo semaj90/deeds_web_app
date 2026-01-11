@@ -6,30 +6,30 @@
 import { setup, createActor, type SnapshotFrom } from 'xstate';
 
 export interface Statute {
- id: string;, embedding: number[] | null;
- text: string;, titleNumber: number;
+ id: string; embedding: number[] | null;
+ text: string; titleNumber: number;
  section: string;
 }
 
 export interface SOMGrid {
- width: number;, height: number;
- neurons: Array<Array<{, weights: number[]; x: number;, y: number }>>;
+ width: number; height: number;
+ neurons: Array<Array<{, weights: number[]; x: number; y: number }>>;
 }
 
 export interface KMeansCluster {
- id: number;, centroid: number[];
+ id: number; centroid: number[];
  members: string[];
  label?: string;
  avgConfidence?: number;
 }
 
 export interface ClusteringContext {
- jobId: string;, statutes: Statute[];
+ jobId: string; statutes: Statute[];
  somGrid?: SOMGrid;
  kmeansClusters?: KMeansCluster[];
  previousLabels?: Map<string, string>;
  currentLabels?: Map<string, string>;
- changePercentage?: number;, version: number;
+ changePercentage?: number; version: number;
  retryCount: number;
  error?: Error;
 }
@@ -41,7 +41,7 @@ export type ClusteringEvent =
  | { type: 'TAG' }
  | { type: 'INDEX' }
  | { type: 'COMPLETE' }
- | { type: 'ERROR';, error: Error };
+ | { type: 'ERROR'; error: Error };
 
 const MAX_RETRIES = 3;
 

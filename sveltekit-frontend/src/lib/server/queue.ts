@@ -4,8 +4,8 @@
 // import type { timestamp } from "drizzle-orm/gel-core";
 
 interface QueueJob {
- id: string;, queueName: string;
- payload: any;, timestamp: number;
+ id: string; queueName: string;
+ payload: any; timestamp: number;
 }
 
 const jobQueue: QueueJob[] = [];

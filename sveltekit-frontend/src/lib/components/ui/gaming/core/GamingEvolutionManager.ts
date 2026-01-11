@@ -14,10 +14,10 @@ import { constructor } from 'function Object() { [native code] }';
 
 interface DeviceCapabilities {
     memory: number; // GB
-    cores: number;, gpu: 'basic' | 'discrete' | 'integrated' | 'unknown';
+    cores: number; gpu: 'basic' | 'discrete' | 'integrated' | 'unknown';
     connection: 'slow' | 'fast' | 'unknown';
     screenSize: {, width: number; height: number };
-    pixelRatio: number;, webgl: boolean;
+    pixelRatio: number; webgl: boolean;
     webgpu: boolean;
 }
 

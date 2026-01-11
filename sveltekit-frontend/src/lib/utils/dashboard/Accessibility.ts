@@ -149,7 +149,7 @@ export class AccessibilityUtils {
  */
  static checkColorContrast(
  foreground: string, background: string
- ): {, ratio: number, wcagAA: boolean;, wcagAAA: boolean;
+ ): {, ratio: number, wcagAA: boolean; wcagAAA: boolean;
  } {
  const fgLuminance = this.getLuminance(foreground);
  const bgLuminance = this.getLuminance(background);

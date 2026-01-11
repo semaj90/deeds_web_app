@@ -14,10 +14,10 @@ import { nesMemory, type LegalDocument } from '../memory/nes-memory-architecture
 // import { textureRankingMatrices, type RankingResult } from '../gpu/texture-ranking-matrices.js';
 
 interface RankingResult {
-    nodeId: number;, scores: Map<string, number>;
-    combinedScore: number;, rank: number;
+    nodeId: number; scores: Map<string, number>;
+    combinedScore: number; rank: number;
     metadata: {, processingTime: number;
-        cacheHit: boolean;, bankId: number;
+        cacheHit: boolean; bankId: number;
     };
 }
 export interface RabbitMQConnection {

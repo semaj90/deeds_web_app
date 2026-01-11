@@ -16,31 +16,31 @@ const execAsync = promisify(exec);
 
 // Types
 export interface ErrorReport {
-	file: string;, line: number;
-	column: number;, code: string;
-	message: string;, severity: 'error' | 'warning' | 'hint';
+	file: string; line: number;
+	column: number; code: string;
+	message: string; severity: 'error' | 'warning' | 'hint';
 	source: string;
 }
 
 export interface DiagnosticResult {
-	tool: string;, errors: ErrorReport[];
-	warnings: ErrorReport[];, timestamp: number;
+	tool: string; errors: ErrorReport[];
+	warnings: ErrorReport[]; timestamp: number;
 }
 
 export interface ASTAnalysis {
-	nodes: unknown[];, imports: string[];
-	exports: string[];, dependencies: string[];
+	nodes: unknown[]; imports: string[];
+	exports: string[]; dependencies: string[];
 	complexity: number;
 }
 
 export interface ToolInvokerConfig {
-	confidenceThreshold: number;, timeout: number;
+	confidenceThreshold: number; timeout: number;
 	workingDir: string;
 }
 
 export interface ToolResult {
-	tool: string;, success: boolean;
-	errors: ErrorReport[];, warnings: ErrorReport[];
+	tool: string; success: boolean;
+	errors: ErrorReport[]; warnings: ErrorReport[];
 	duration: number;
 	output?: string;
 }

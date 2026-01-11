@@ -5,29 +5,29 @@ import { createEventDispatcher } from 'svelte';
  // Migrated from createEventDispatcher to callback props;
 
  interface Evidence {
- id: string;, title: string;
+ id: string; title: string;
  description?: string;
  content?: string;
  fileName?: string;
  }
 
  interface Witness {
- id: string;, name: string;
+ id: string; name: string;
  statement?: string;
  credibility?: number;
  }
 
  interface CrossExamQuestion {
- id: string;, question: string;
+ id: string; question: string;
  type: 'general' | 'timeline' | 'credibility' | 'contradiction';
  priority: 'high' | 'medium' | 'low';
- category: string;, reasoning: string;
+ category: string; reasoning: string;
  followUp?: string[];
  }
 
  interface CrossExamSession {
- id: string;, witness: Witness;
- questions: CrossExamQuestion[];, generatedAt: string;
+ id: string; witness: Witness;
+ questions: CrossExamQuestion[]; generatedAt: string;
  strategy: string;
  }
 

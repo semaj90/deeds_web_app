@@ -10,7 +10,7 @@
 export interface SIMDParseResult {
  success: boolean;
  data?: any;
- performance?: {, method: string; timeMs: number;, throughputMBps: number;
+ performance?: {, method: string; timeMs: number; throughputMBps: number;
  };
  error?: string;
 }
@@ -135,7 +135,7 @@ class SIMDJSONParser {
  async benchmark(
  jsonString: string,
  iterations = 100
- ): Promise<{, method: string; iterations: number;, avgTimeMs: number; throughputMBps: number;
+ ): Promise<{, method: string; iterations: number; avgTimeMs: number; throughputMBps: number;
  }> {
  const results = [];
 

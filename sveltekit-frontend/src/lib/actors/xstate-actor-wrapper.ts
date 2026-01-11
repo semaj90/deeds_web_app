@@ -14,7 +14,7 @@ export interface EmbeddingActorInput {
 }
 
 export interface EmbeddingActorOutput {
-  embedding: number[];, dimensions: number; model: string;, processingTime: number;
+  embedding: number[]; dimensions: number; model: string; processingTime: number;
   tokenCount?: number;
 }
 
@@ -61,7 +61,7 @@ export interface DocumentProcessingOutput {
   summary?: string;
   entities?: Array<unknown>;
   embeddings?: {, chunks: number; dimensions: number };
-  processingTime: number;, success: boolean;
+  processingTime: number; success: boolean;
 }
 
 export const documentProcessingActor = fromPromise(
@@ -103,7 +103,7 @@ export interface LegalAnalysisInput {
 }
 
 export interface LegalAnalysisOutput {
-  riskScore: number;, riskFactors: string[]; recommendations: string[];, precedents: Array<unknown>; confidence: number;, processingTime: number;
+  riskScore: number; riskFactors: string[]; recommendations: string[]; precedents: Array<unknown>; confidence: number; processingTime: number;
 }
 
 export const legalAnalysisActor = fromPromise(async ({ input }: {, input: LegalAnalysisInput }) => {
@@ -145,7 +145,7 @@ export interface RAGSearchInput {
 }
 
 export interface RAGSearchOutput {
-  results: Array<unknown>;, totalResults: number; processingTime: number;, model: string;
+  results: Array<unknown>; totalResults: number; processingTime: number; model: string;
 }
 
 export const ragSearchActor = fromPromise(async ({ input }: {, input: RAGSearchInput }) => {
@@ -204,7 +204,7 @@ export interface WorkflowInput {
 
 export interface WorkflowOutput {
   results: { [key: string]: unknown };
-  totalTime: number;, success: boolean; errors: Array<{, step: string; error: string }>;
+  totalTime: number; success: boolean; errors: Array<{, step: string; error: string }>;
 }
 
 export const workflowActor = fromPromise(

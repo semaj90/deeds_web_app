@@ -6,27 +6,27 @@
 import type { ASTError } from './svelte-check-analyzer.js';
 
 export interface Suggestion {
- id: string;, title: string; description: string;, code: string; confidence: number;, cluster: ClusterInfo; sources: SuggestionSource[];
+ id: string; title: string; description: string; code: string; confidence: number; cluster: ClusterInfo; sources: SuggestionSource[];
  appliedAt?: Date;
 }
 
 export interface ClusterInfo {
- id: number;, label: string; color: string;, icon: string;
+ id: number; label: string; color: string; icon: string;
 }
 
 export interface SuggestionSource {
  type: 'rag' | 'web' | 'ai' | 'local';
  name: string;
- url?: string;, relevance: number;
+ url?: string; relevance: number;
 }
 
 export interface CodebaseContext {
  files: {, path: string; content: string }[];
- dependencies: string[];, projectType: 'sveltekit' | 'svelte' | 'typescript' | 'javascript';
+ dependencies: string[]; projectType: 'sveltekit' | 'svelte' | 'typescript' | 'javascript';
 }
 
 export interface WebSearchResult {
- title: string;, url: string; snippet: string;, source: string; relevance: number;
+ title: string; url: string; snippet: string; source: string; relevance: number;
 }
 
 // Cluster type mappings
@@ -44,8 +44,8 @@ const CLUSTER_TYPES: Record<string, ClusterInfo> = {
  * Agentic Suggestion Engine
  */
 export class SuggestionEngine {
- private webSearchCache = new Map<string, { results: WebSearchResult[];, timestamp: number }>();
- private ragCache = new Map<string, { context: string[];, timestamp: number }>();
+ private webSearchCache = new Map<string, { results: WebSearchResult[]; timestamp: number }>();
+ private ragCache = new Map<string, { context: string[]; timestamp: number }>();
  private cacheTTL = 24 * 60 * 60 * 1000; // 24 hours
 
  /**

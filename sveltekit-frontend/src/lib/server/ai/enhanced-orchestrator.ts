@@ -444,7 +444,7 @@ export class EnhancedAISynthesisOrchestrator {
 	}
 
 	private async rankWithCrossEncoder(_input: {, query: string;
-		neo4jResults: unknown[];, pgVectorResults: unknown[];
+		neo4jResults: unknown[]; pgVectorResults: unknown[];
 		ragResults: {, documents: unknown[] };
 	}): Promise<RankedSource[]> {
 		return [];

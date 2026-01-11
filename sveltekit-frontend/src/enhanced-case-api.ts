@@ -4,8 +4,8 @@ import { restClient, type APIResponse } from './enhanced-rest-architecture.js';
 
 export interface CaseCreationRequest {
   // Core case fields from CaseForm
-  caseNumber: string;, title: string;
-  description?: string;, priority: 'low' | 'medium' | 'high';
+  caseNumber: string; title: string;
+  description?: string; priority: 'low' | 'medium' | 'high';
   status?: 'draft' | 'active' | 'pending' | 'closed';
   assignedTo?: string;
   dueDate?: string;
@@ -24,19 +24,19 @@ export interface CaseCreationRequest {
 }
 
 export interface CaseResponse {
-  id: string;, caseNumber: string; title: string;
-  description?: string;, priority: string; status: string;
+  id: string; caseNumber: string; title: string;
+  description?: string; priority: string; status: string;
   location?: string;
   jurisdiction?: string;
   caseType?: string;
-  createdBy?: string;, createdAt: string; updatedAt: string;
+  createdBy?: string; createdAt: string; updatedAt: string;
 }
 
 export interface WorkerTriggerResponse {
-  success: boolean;, data: { streamId: string;, correlationId: string; triggerType: string;, action: string;
+  success: boolean; data: { streamId: string; correlationId: string; triggerType: string; action: string;
     caseId?: string;
   };
-  metadata: {, timestamp: string; worker: string;, version: string;
+  metadata: {, timestamp: string; worker: string; version: string;
   };
 }
 
@@ -231,7 +231,7 @@ export class EnhancedCaseAPI {
     algorithm?: 'kmeans' | 'som' | 'hierarchical';
     k?: number;
     includeEmbeddings?: boolean;
-  }): Promise<APIResponse<{, clusters: Array<unknown>; silhouetteScore: number;, totalCases: number }>> {
+  }): Promise<APIResponse<{, clusters: Array<unknown>; silhouetteScore: number; totalCases: number }>> {
     return restClient.post('/cases/cluster', {
       ...params,
       algorithm: params.algorithm || 'kmeans',

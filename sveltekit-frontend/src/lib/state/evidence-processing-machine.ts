@@ -11,12 +11,12 @@ import type { createMachine, assign, fromPromise } from 'xstate';
 
 // Temporary type definitions until services are available
 interface LegalAIMetadata {
- version: string, created_at: string;, evidence_id: string, analysis_results: unknown;
+ version: string, created_at: string; evidence_id: string, analysis_results: unknown;
  neural_sprite_data?: unknown;
 }
 
 interface GlyphRequest {
- evidence_id: number, prompt: string;, style: string, dimensions: [number, number];
+ evidence_id: number, prompt: string; style: string, dimensions: [number, number];
  neural_sprite_config?: unknown;
 }
 
@@ -29,38 +29,38 @@ interface GlyphResponse {
 // Evidence processing context
 export interface EvidenceProcessingContext {
  evidenceId: string;
- file?: File;, uploadProgress: number;
- analysisResults?: {, confidence: number, classifications: string[];, entities: Array<any>, risk_assessment: 'low' | 'medium' | 'high' | 'critical';
+ file?: File; uploadProgress: number;
+ analysisResults?: {, confidence: number, classifications: string[]; entities: Array<any>, risk_assessment: 'low' | 'medium' | 'high' | 'critical';
  summary: string;
  };
  glyphGeneration?: {, request: GlyphRequest;
- result?: GlyphResponse;, neuralSpriteEnabled: boolean;
+ result?: GlyphResponse; neuralSpriteEnabled: boolean;
  };
  portableArtifact?: {, enhancedPngUrl: string, metadata: LegalAIMetadata;
  compressionRatio?: number;
  };
- minioStorage?: {, artifactId: string, storageUrl: string;, indexed: boolean;
+ minioStorage?: {, artifactId: string, storageUrl: string; indexed: boolean;
  };
- errors: string[], processingTimeMs: number;, streamingUpdates: Array<any>;
+ errors: string[], processingTimeMs: number; streamingUpdates: Array<any>;
 }
 
 // Events for the evidence processing machine
 export type EvidenceProcessingEvent =
- | { type: 'UPLOAD_FILE', file: File;, evidenceId: string }
+ | { type: 'UPLOAD_FILE', file: File; evidenceId: string }
  | { type: 'CONFIGURE_NEURAL_SPRITE', config: GlyphRequest['neural_sprite_config'] }
  | { type: 'START_ANALYSIS' }
- | { type: 'ANALYSIS_PROGRESS', progress: number;, message: string }
+ | { type: 'ANALYSIS_PROGRESS', progress: number; message: string }
  | { type: 'ANALYSIS_SUCCESS', results: EvidenceProcessingContext['analysisResults'] }
  | { type: 'ANALYSIS_ERROR', error: string }
  | { type: 'START_GLYPH_GENERATION' }
- | { type: 'GLYPH_PROGRESS', progress: number;, message: string }
+ | { type: 'GLYPH_PROGRESS', progress: number; message: string }
  | { type: 'GLYPH_SUCCESS', result: GlyphResponse }
  | { type: 'GLYPH_ERROR', error: string }
  | { type: 'START_PNG_EMBEDDING' }
- | { type: 'PNG_EMBEDDING_SUCCESS', enhancedPngUrl: string;, metadata: LegalAIMetadata }
+ | { type: 'PNG_EMBEDDING_SUCCESS', enhancedPngUrl: string; metadata: LegalAIMetadata }
  | { type: 'PNG_EMBEDDING_ERROR', error: string }
  | { type: 'START_MINIO_STORAGE' }
- | { type: 'STORAGE_SUCCESS', artifactId: string;, storageUrl: string }
+ | { type: 'STORAGE_SUCCESS', artifactId: string; storageUrl: string }
  | { type: 'STORAGE_ERROR', error: string }
  | { type: 'RETRY_CURRENT_STEP' }
  | { type: 'CANCEL_PROCESSING' }
@@ -128,7 +128,7 @@ const generateGlyphService = fromPromise(
 const embedPNGService = fromPromise(
  async ({
  input,
- }: {, input: { glyphResult: GlyphResponse, analysisResults: unknown;, evidenceId: string };
+ }: {, input: { glyphResult: GlyphResponse, analysisResults: unknown; evidenceId: string };
  }) => {
  // PNG embedding with metadata happens in the glyph generation API
  // This service represents additional processing if needed
@@ -145,7 +145,7 @@ const embedPNGService = fromPromise(
 const storeInMinIOService = fromPromise(
  async ({
  input,
- }: {, input: { enhancedPngUrl: string, metadata: LegalAIMetadata;, evidenceId: string };
+ }: {, input: { enhancedPngUrl: string, metadata: LegalAIMetadata; evidenceId: string };
  }) => {
  // Store in MinIO and index in PostgreSQL
  // This would call the Go artifact indexing service

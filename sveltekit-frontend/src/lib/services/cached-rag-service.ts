@@ -4,19 +4,19 @@ import enhancedCachingService from './advanced-result-cache.js';
 import type { RAGQuery, RAGResponse } from './enhanced-rag-semantic-analyzer.js';
 
 export interface CachedRAGResult {
- response: RAGResponse;, cacheStats: {
- embeddingCacheHit: boolean;, queryCacheHit: boolean;
- responseCacheHit: boolean;, totalCacheTime: number;
- totalProcessingTime: number;, gpuTimeSaved: number;
+ response: RAGResponse; cacheStats: {
+ embeddingCacheHit: boolean; queryCacheHit: boolean;
+ responseCacheHit: boolean; totalCacheTime: number;
+ totalProcessingTime: number; gpuTimeSaved: number;
  };
 }
 export interface DocumentIngestionResult {
- documentId: string;, chunksProcessed: number;
- embeddingsGenerated: number;, embeddingsCached: number;
- processingTime: number;, storedInPgVector: boolean;
+ documentId: string; chunksProcessed: number;
+ embeddingsGenerated: number; embeddingsCached: number;
+ processingTime: number; storedInPgVector: boolean;
 }
 // Add explicit types to avoid `any` type
-type DocumentToIngest = { id: string;, content: string; metadata?: Record<string, unknown> };
+type DocumentToIngest = { id: string; content: string; metadata?: Record<string, unknown> };
 type VectorMatch = {
  id?: string;
  documentId?: string;

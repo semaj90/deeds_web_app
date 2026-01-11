@@ -29,15 +29,15 @@ if (!browser) {
 
 // Thread synchronization primitives
 interface ThreadSafeCache {
- mutex: AsyncMutex;, data: Map<string, unknown>;
+ mutex: AsyncMutex; data: Map<string, unknown>;
  jsonbIndex: Map<string, JsonbDocument>;
  gpuAccelerated: boolean;
 }
 
 interface JsonbDocument {
- id: string;, content: unknown;
+ id: string; content: unknown;
  metadata: {, lastModified: number;
- accessCount: number;, gpuProcessed: boolean;
+ accessCount: number; gpuProcessed: boolean;
  threadId?: string;
  [key: string]: unknown;
  };
@@ -79,8 +79,8 @@ const internalCache: ThreadSafeCache = {
 };
 
 interface CacheStoreState {
- totalEntries: number;, gpuAccelerated: boolean;
- threadSafe: boolean;, lastOperation: string;
+ totalEntries: number; gpuAccelerated: boolean;
+ threadSafe: boolean; lastOperation: string;
 }
 
 // Svelte 5 reactive state management using $state rune
@@ -323,7 +323,7 @@ export class CognitiveCacheService {
  }
  /** * Get cache statistics */
  getCacheStats(): {, totalEntries: number;
- gpuProcessedCount: number;, averageAccessCount: number;
+ gpuProcessedCount: number; averageAccessCount: number;
  threadSafe: boolean;
  } {
  const docs = Array.from(internalCache.jsonbIndex.values());
@@ -358,7 +358,7 @@ export async function queryJsonb(
 }
 // Legal AI specific utilities
 export interface LegalDocument {
- caseId: string, title: string;, content: string, metadata: {, court: string, date: string, parties: unknown[], classification: string[];, riskLevel: 'low' | 'medium' | 'high' | 'critical';
+ caseId: string, title: string; content: string, metadata: {, court: string, date: string, parties: unknown[], classification: string[]; riskLevel: 'low' | 'medium' | 'high' | 'critical';
  };
  embedding?: Float32Array;
 }
@@ -392,7 +392,7 @@ export async function queryLegalDocuments(
 interface CacheContext {
  action: string;
  documentId?: string;
- documentType?: string;, priority: 'low' | 'medium' | 'high';
+ documentType?: string; priority: 'low' | 'medium' | 'high';
 }
 
 /** * Cache Entry Metadata * Contains metadata for each cache entry, including key, type, and context */
@@ -462,7 +462,7 @@ class CognitiveCacheManager {
  }
 
  async get<T>(key: string, metadataType?: CacheEntryMetadata['type']): Promise<T | null> {
- let entry: {, data: unknown; metadata: CacheEntryMetadata;, options: CacheOptions; timestamp: number } | undefined;
+ let entry: {, data: unknown; metadata: CacheEntryMetadata; options: CacheOptions; timestamp: number } | undefined;
 
  if (!browser && redisClient && redisClient.isReady) {
  try {

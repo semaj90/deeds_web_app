@@ -28,8 +28,8 @@ export interface DocumentContext {
  documentId?: string;
  document?: _FallbackLegalDocument;
  evidence?: _FallbackEvidence;
- aiAnalysis?: _FallbackAIAnalysis;, processingProgress: number;
- errors: string[];, processingSteps: string[];
+ aiAnalysis?: _FallbackAIAnalysis; processingProgress: number;
+ errors: string[]; processingSteps: string[];
  currentStep?: string;
  extractedText?: string;
  embedding?: number[];
@@ -40,15 +40,15 @@ export interface DocumentContext {
 }
 
 export type DocumentEvent =
- | { type: 'UPLOAD';, document: _FallbackLegalDocument }
+ | { type: 'UPLOAD'; document: _FallbackLegalDocument }
  | { type: 'START_PROCESSING' }
- | { type: 'EXTRACT_TEXT';, text: string }
- | { type: 'ANALYZE_AI';, analysis: _FallbackAIAnalysis }
- | { type: 'GENERATE_EMBEDDING';, embedding: number[] }
- | { type: 'EXTRACT_ENTITIES';, entities: any[] }
- | { type: 'CALCULATE_RISK';, riskScore: number; confidence: number }
+ | { type: 'EXTRACT_TEXT'; text: string }
+ | { type: 'ANALYZE_AI'; analysis: _FallbackAIAnalysis }
+ | { type: 'GENERATE_EMBEDDING'; embedding: number[] }
+ | { type: 'EXTRACT_ENTITIES'; entities: any[] }
+ | { type: 'CALCULATE_RISK'; riskScore: number; confidence: number }
  | { type: 'PROCESSING_COMPLETE' }
- | { type: 'ERROR';, error: string }
+ | { type: 'ERROR'; error: string }
  | { type: 'RETRY' }
  | { type: 'CANCEL' }
  | { type: 'RESET' };

@@ -12,8 +12,8 @@
  import { onMount } from 'svelte';
 
  type CandidateContext = {
- context_id: string;, source: string;
- score: number;, snippet: string;
+ context_id: string; source: string;
+ score: number; snippet: string;
  range?: {, from_msg_id: number; to_msg_id: number };
  timestamp?: string;
  };

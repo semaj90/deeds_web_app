@@ -31,9 +31,9 @@ const gunzip = promisify((data: Buffer, callback: (err: Error | null, result?: B
  * Compression statistics
  */
 export interface CompressionStats {
-  originalSizeBytes: number;, compressedSizeBytes: number;
-  compressionRatio: number;, compressionTimeMs: number;
-  decompressionTimeMs: number;, itemCount: number;
+  originalSizeBytes: number; compressedSizeBytes: number;
+  compressionRatio: number; compressionTimeMs: number;
+  decompressionTimeMs: number; itemCount: number;
 }
 
 /**

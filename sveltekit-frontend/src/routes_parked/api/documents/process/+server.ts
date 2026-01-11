@@ -123,11 +123,11 @@ export const POST: RequestHandler = async ({ request }) => {
  * Extract citations from text
  */
 function extractCitationsFromText(text: string): Array<{, type: string;
- code: string;, text: string;
+ code: string; text: string;
  context: string;
 }> {
  const citations: Array<{, type: string;
- code: string;, text: string;
+ code: string; text: string;
  context: string;
  }> = [];
 

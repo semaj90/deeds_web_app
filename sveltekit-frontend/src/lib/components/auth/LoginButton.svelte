@@ -2,7 +2,7 @@
   // LoginButton component - Svelte, 5 with bits-ui Button
   import * as unified from '$lib/stores/unified';
   const authStore: any =
-    (unified, as any).auth ??
+    (unified as any).auth ??
     (unified as any).authStore ??
     (unified as any).default ??
     (unified as any),

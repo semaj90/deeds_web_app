@@ -119,7 +119,7 @@ export class KAGFixStore {
  * 5. Store with 30-day TTL
  * 6. Index by patch ID for reverse lookup
  */
- async storeFix(errorSig: ErrorSignature);, FixRecord: Promise<void> {
+ async storeFix(errorSig: ErrorSignature); FixRecord: Promise<void> {
  const key = `${this.SIG_PREFIX}${errorSig.sig}`;
 
  try {

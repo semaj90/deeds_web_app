@@ -16,33 +16,33 @@ export interface BaseMachineContext {
 
 export interface CacheContext {
  cacheKey: string | null;
- cachedData: unknown;, cacheHit: boolean; cacheMetadata: {, timestamp: number; source: 'memory' | 'indexeddb' | 'server' | 'semantic' | 'cache' | 'none';
- hitRatio: number;, responseTime: number;
+ cachedData: unknown; cacheHit: boolean; cacheMetadata: {, timestamp: number; source: 'memory' | 'indexeddb' | 'server' | 'semantic' | 'cache' | 'none';
+ hitRatio: number; responseTime: number;
  } | null;
- semanticQuery?: string;, computationCost: number;
+ semanticQuery?: string; computationCost: number;
 }
 
 export type CacheEvent =
- | { type: 'CACHE_LOOKUP';, key: string; semanticQuery?: string }
- | { type: 'CACHE_HIT';, data: Record<string, unknown>; metadata: CacheContext['cacheMetadata'] }
+ | { type: 'CACHE_LOOKUP'; key: string; semanticQuery?: string }
+ | { type: 'CACHE_HIT'; data: Record<string, unknown>; metadata: CacheContext['cacheMetadata'] }
  | { type: 'CACHE_MISS' }
- | { type: 'CACHE_STORE';, key: string; data: unknown; semanticText?: string }
+ | { type: 'CACHE_STORE'; key: string; data: unknown; semanticText?: string }
  | { type: 'CACHE_INVALIDATE'; key?: string; pattern?: string }
  | { type: 'CACHE_SYNC' }
- | { type: 'COMPUTE_REQUIRED';, cost: number }
+ | { type: 'COMPUTE_REQUIRED'; cost: number }
  | { type: 'FETCH_DATA' }; // Added for createCachedMachineStates example
 
 // Define the return type of cacheActor for better type safety in onDone
 type CacheActorResult =
  | {
- success: true;, hit: true; data: Record<string, unknown>;
+ success: true; hit: true; data: Record<string, unknown>;
  metadata: CacheContext['cacheMetadata'];
  }
- | { success: false;, hit: false; data: null;, metadata: CacheContext['cacheMetadata'] }
- | { success: true;, stored: true; key: string;, responseTime: number }
- | { success: true;, invalidated: true; responseTime: number }
- | { success: true;, synced: true; responseTime: number }
- | { success: false;, error: string; responseTime: number };
+ | { success: false; hit: false; data: null; metadata: CacheContext['cacheMetadata'] }
+ | { success: true; stored: true; key: string; responseTime: number }
+ | { success: true; invalidated: true; responseTime: number }
+ | { success: true; synced: true; responseTime: number }
+ | { success: false; error: string; responseTime: number };
 
 /** * XState Cache Actor - manages caching operations */
 export const cacheActor = fromPromise(

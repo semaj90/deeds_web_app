@@ -22,14 +22,14 @@ import Fuse from 'fuse.js';
 // ============================================================================
 
 export interface RAGDocument {
-	id: string;, content: string;
-	title: string;, source: string;
+	id: string; content: string;
+	title: string; source: string;
 	createdAt: Date;
 	metadata?: Record<string, unknown>;
 }
 
 export interface EmbeddedDocument extends RAGDocument {
-	embedding: number[];, embeddingModel: string;
+	embedding: number[]; embeddingModel: string;
 	tensorSlice?: Float32Array; // For potential GPU processing
 	chunkIndex?: number;
 	totalChunks?: number;
@@ -42,17 +42,17 @@ export interface SummarizedDocument extends EmbeddedDocument {
 	keywords: string[]; // Extracted keywords
 	entities: {
 		// Named entity extraction
-		people: string[];, organizations: string[];
-		locations: string[];, dates: string[];
+		people: string[]; organizations: string[];
+		locations: string[]; dates: string[];
 		legalCitations: string[];
 	};
 }
 
 export interface GemmaExtractionResult {
-	summary: string;, keyPoints: string[];
-	keywords: string[];, entities: {
-		people: string[];, organizations: string[];
-		locations: string[];, dates: string[];
+	summary: string; keyPoints: string[];
+	keywords: string[]; entities: {
+		people: string[]; organizations: string[];
+		locations: string[]; dates: string[];
 		legalCitations: string[];
 	};
 }
@@ -81,13 +81,13 @@ export interface SynthesisRankingConfig {
 }
 
 export interface RAGPipelineResult {
-	documents: RankedDocument[];, totalProcessed: number;
+	documents: RankedDocument[]; totalProcessed: number;
 	timing: {, embedding: number;
-		summarization: number;, indexing: number;
-		ranking: number;, total: number;
+		summarization: number; indexing: number;
+		ranking: number; total: number;
 	};
-	cacheHits: number;, metadata: {
-		embeddingModel: string;, synthesisModel: string;
+	cacheHits: number; metadata: {
+		embeddingModel: string; synthesisModel: string;
 		rankingAlgorithm: string;
 	};
 }

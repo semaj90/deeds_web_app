@@ -6,7 +6,7 @@
 
 	// Define missing types
 	type SearchResult = {
-		status: string;, sessionId: string;
+		status: string; sessionId: string;
 		analysisResults: {
 			summary?: string;
 			confidence?: number;
@@ -20,14 +20,14 @@
 			model?: string;
 			processedAt?: string;
 			documentType?: string;
-			personsOfInterest?: {, name: string; role: string;, confidence: number }[];
-			timeline?: {, event: string; date: string;, importance: string }[];
+			personsOfInterest?: {, name: string; role: string; confidence: number }[];
+			timeline?: {, event: string; date: string; importance: string }[];
 			legalImplications?: string;
 			confidenceScore?: number;
 			nextSteps?: string[];
 		};
 		metadata?: {, source: string;
-			processingTime: string;, model: string;
+			processingTime: string; model: string;
 		};
 	};
 
@@ -141,7 +141,7 @@
 			// Show fallback notice
 			const notice = document.createElement('div');
 			notice.innerHTML = '⚠️ Failure, defaulting to mock';
-			notice.style.cssText = 'position: fixed;, top: 20px; right: 20px;, background: rgba(220, 53, 69, 0.9); color: white;, padding: 0.5rem 1rem; border-radius: 4px; z-index: 10000; font-size: 0.9rem;';
+			notice.style.cssText = 'position: fixed; top: 20px; right: 20px; background: rgba(220, 53, 69, 0.9); color: white; padding: 0.5rem 1rem; border-radius: 4px; z-index: 10000; font-size: 0.9rem;';
 			document.body.appendChild(notice);
 			setTimeout(() => notice.remove(), 3000);
 			// Generate mock analysis results

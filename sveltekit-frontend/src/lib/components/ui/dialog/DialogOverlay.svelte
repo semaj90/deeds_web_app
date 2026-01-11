@@ -14,7 +14,7 @@
 		forceMount = false,
 	}: Props = $props();
 
-	const dialogContext = getContext<{ open: boolean;, close: () => void }>('dialog');
+	const dialogContext = getContext<{ open: boolean; close: () => void }>('dialog');
 
 	function handleClick() {
 		dialogContext?.close();

@@ -36,8 +36,8 @@ export interface MirrorQueryResult {
     // Vector search results from Qdrant
     vector_results: Array<{, postgres_id: number;
         couchdb_id: string | null;
-        score: number;, title: string;
-        type: string;, source: string;
+        score: number; title: string;
+        type: string; source: string;
     }>;
 
     // Graph topology from CouchDB
@@ -48,7 +48,7 @@ export interface MirrorQueryResult {
 
     // Enriched metadata from PostgreSQL
     metadata: Array<{, id: number;
-        title: string;, content: string;
+        title: string; content: string;
         source_url?: string;
         metadata?: any;
         blob_url?: string;
@@ -65,8 +65,8 @@ export interface MirrorQueryResult {
 
     // Performance metrics
     performance: {, qdrant_ms: number;
-        couchdb_ms: number;, postgres_ms: number;
-        minio_ms: number;, total_ms: number;
+        couchdb_ms: number; postgres_ms: number;
+        minio_ms: number; total_ms: number;
     };
 }
 
@@ -370,7 +370,7 @@ export async function findRelatedDocuments(
  * Health check for all layers
  */
 export async function healthCheckAllLayers(): Promise<{, postgres: boolean;
-    qdrant: boolean;, couchdb: boolean;
+    qdrant: boolean; couchdb: boolean;
     minio: boolean;
 }> {
     const { postgresHealthCheck } = await import('./postgres-knowledge');

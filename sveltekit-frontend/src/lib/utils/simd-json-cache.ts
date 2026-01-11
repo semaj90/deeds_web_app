@@ -16,22 +16,22 @@ interface SIMDJSONModule {
 
 // Cache Configuration
 interface CacheConfig {
-	redisUrl: string;, defaultTTL: number;
-	compressionEnabled: boolean;, compressionThreshold: number;
-	maxKeyLength: number;, enableMetrics: boolean;
+	redisUrl: string; defaultTTL: number;
+	compressionEnabled: boolean; compressionThreshold: number;
+	maxKeyLength: number; enableMetrics: boolean;
 }
 
 // Performance Metrics
 interface ParseMetrics {
-	totalParses: number;, simdParses: number;
-	nativeParses: number;, cacheHits: number;
-	cacheMisses: number;, averageParseTime: number;
-	averageSIMDTime: number;, averageNativeTime: number;
-	totalDataProcessed: number;, compressionRatio: number;
+	totalParses: number; simdParses: number;
+	nativeParses: number; cacheHits: number;
+	cacheMisses: number; averageParseTime: number;
+	averageSIMDTime: number; averageNativeTime: number;
+	totalDataProcessed: number; compressionRatio: number;
 }
 
 interface CacheEntry<T = unknown> {
-	data: T;, timestamp: number;
+	data: T; timestamp: number;
 	ttl: number;
 }
 
@@ -317,7 +317,7 @@ class SIMDJSONCache {
 		return { ...this.metrics };
 	}
 
-	public getSIMDStatus(): {, loaded: boolean; available: boolean;, performance: string } {
+	public getSIMDStatus(): {, loaded: boolean; available: boolean; performance: string } {
 		const simdPerformance =
 			this.metrics.simdParses > 0 && this.metrics.nativeParses > 0
 				? `${Math.round((this.metrics.averageNativeTime / this.metrics.averageSIMDTime) * 100) / 100}x faster`
@@ -334,7 +334,7 @@ class SIMDJSONCache {
 		this.cache.clear();
 	}
 
-	public getCacheStats(): {, memoryEntries: number; hitRate: number;, compressionRatio: number } {
+	public getCacheStats(): {, memoryEntries: number; hitRate: number; compressionRatio: number } {
 		const hitRate =
 			this.metrics.totalParses > 0
 				? this.metrics.cacheHits / this.metrics.totalParses

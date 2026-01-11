@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 /**
- * Schema for a TokenEntry, as seen in redis-streams.
+ * Schema for a TokenEntry as seen in redis-streams.
  * This provides a unified validation and type definition for token data.
  */
 export const TokenEntrySchema = z.object({

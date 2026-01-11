@@ -3,10 +3,10 @@
  import { onMount } from 'svelte';
 
  interface ClusterHealth {
- timestamp: string;, metrics: YoRHaSystemMetrics;
+ timestamp: string; metrics: YoRHaSystemMetrics;
  thresholds: {, cpu_warning: number;
- cpu_critical: number;, memory_warning: number;
- memory_critical: number;, gpu_warning: number;
+ cpu_critical: number; memory_warning: number;
+ memory_critical: number; gpu_warning: number;
  gpu_critical: number;
  };
  }
@@ -261,7 +261,7 @@
 
 <style>
  .yorha-command-center {
- padding: 2rem;, background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+ padding: 2rem; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
  color: #e0e0e0;
  min-height: 100vh;
  font-family: 'Courier New', monospace;
@@ -278,16 +278,16 @@
 
  .header h1 {
  margin: 0;
- font-size: 2rem;, color: #00d4ff;
+ font-size: 2rem; color: #00d4ff;
  text-shadow: 0 0 10px rgba(0, 212, 255, 0.5);
  }
 
  .refresh-btn {
  padding: 0.5rem 1rem;
- background: #00d4ff;, color: #1a1a2e;
+ background: #00d4ff; color: #1a1a2e;
  border: none;
- border-radius: 4px;, cursor: pointer;
- font-weight: bold;, transition: all 0.3s;
+ border-radius: 4px; cursor: pointer;
+ font-weight: bold; transition: all 0.3s;
  }
 
  .refresh-btn:hover, not(disabled) {
@@ -296,14 +296,14 @@
  }
 
  .refresh-btn:disabled {
- opacity: 0.6;, cursor:not-allowed;
+ opacity: 0.6; cursor:not-allowed;
  }
 
  .error-message {
- padding: 1rem;, background: #8b0000;
+ padding: 1rem; background: #8b0000;
  border: 1px solid #ff6b6b;
  border-radius: 4px;
- margin-bottom: 1rem;, color: #ff6b6b;
+ margin-bottom: 1rem; color: #ff6b6b;
  }
 
  .metrics-section {
@@ -311,7 +311,7 @@
  }
 
  .metrics-section h2 {
- font-size: 1.5rem;, color: #00d4ff;
+ font-size: 1.5rem; color: #00d4ff;
  margin-bottom: 1rem;
  border-left: 3px solid #00d4ff;
  padding-left: 0.5rem;
@@ -326,7 +326,7 @@
  .metric-card {
  background: rgba(0, 212, 255, 0.05);
  border: 1px solid #00d4ff;
- border-radius: 4px;, padding: 1rem;
+ border-radius: 4px; padding: 1rem;
  transition: all 0.3s;
  }
 
@@ -336,26 +336,26 @@
  }
 
  .metric-label {
- font-size: 0.9rem;, color: #00d4ff;
+ font-size: 0.9rem; color: #00d4ff;
  margin-bottom: 0.5rem;
  text-transform: uppercase;
  }
 
  .metric-value {
  font-size: 2rem;
- font-weight: bold;, color: #00ff00;
+ font-weight: bold; color: #00ff00;
  margin-bottom: 0.5rem;
  }
 
  .metric-bar {
- width: 100%;, height: 8px;
+ width: 100%; height: 8px;
  background: rgba(0, 0, 0, 0.3);
- border-radius: 4px;, overflow: hidden;
+ border-radius: 4px; overflow: hidden;
  margin-bottom: 0.5rem;
  }
 
  .metric-fill {
- height: 100%;, background: #00ff00;
+ height: 100%; background: #00ff00;
  transition: width 0.3s;
  }
 
@@ -370,7 +370,7 @@
  .metric-cores,
  .metric-details,
  .metric-temp {
- font-size: 0.85rem;, color: #a0a0a0;
+ font-size: 0.85rem; color: #a0a0a0;
  }
 
  .metric-status {
@@ -382,7 +382,7 @@
 
  .metric-stats {
  display: flex;
- flex-direction: column;, gap: 0.5rem;
+ flex-direction: column; gap: 0.5rem;
  }
 
  .stat {
@@ -405,7 +405,7 @@
  }
 
  .cases-section h2 {
- font-size: 1.5rem;, color: #00d4ff;
+ font-size: 1.5rem; color: #00d4ff;
  margin-bottom: 1rem;
  border-left: 3px solid #00d4ff;
  padding-left: 0.5rem;
@@ -420,7 +420,7 @@
  .case-card {
  background: rgba(0, 212, 255, 0.05);
  border: 1px solid #00d4ff;
- border-radius: 4px;, padding: 1rem;
+ border-radius: 4px; padding: 1rem;
  transition: all 0.3s;
  }
 
@@ -437,41 +437,41 @@
  }
 
  .case-number {
- font-weight: bold;, color: #00ff00;
+ font-weight: bold; color: #00ff00;
  font-size: 0.9rem;
  }
 
  .case-priority {
- font-size: 0.75rem;, padding: 0.25rem 0.5rem;
+ font-size: 0.75rem; padding: 0.25rem 0.5rem;
  border-radius: 3px;
  text-transform: uppercase;
  font-weight: bold;
  }
 
  .priority-low {
- background: #00aa00;, color: #000;
+ background: #00aa00; color: #000;
  }
 
  .priority-medium {
- background: #ffaa00;, color: #000;
+ background: #ffaa00; color: #000;
  }
 
  .priority-high {
- background: #ff6600;, color: #fff;
+ background: #ff6600; color: #fff;
  }
 
  .priority-critical {
- background: #ff0000;, color: #fff;
+ background: #ff0000; color: #fff;
  }
 
  .case-title {
  font-size: 1.1rem;
- font-weight: bold;, color: #e0e0e0;
+ font-weight: bold; color: #e0e0e0;
  margin-bottom: 0.5rem;
  }
 
  .case-description {
- font-size: 0.9rem;, color: #a0a0a0;
+ font-size: 0.9rem; color: #a0a0a0;
  margin-bottom: 0.5rem;
  line-height: 1.4;
  }
@@ -479,7 +479,7 @@
  .case-footer {
  display: flex;
  justify-content: space-between;
- font-size: 0.85rem;, color: #a0a0a0;
+ font-size: 0.85rem; color: #a0a0a0;
  border-top: 1px solid rgba(0, 212, 255, 0.2);
  padding-top: 0.5rem;
  }
@@ -489,12 +489,12 @@
  }
 
  .empty-state {
- text-align: center;, padding: 2rem;
+ text-align: center; padding: 2rem;
  color: #a0a0a0;
  }
 
  .loading {
- text-align: center;, padding: 2rem;
+ text-align: center; padding: 2rem;
  color: #a0a0a0;
  }
 </style>

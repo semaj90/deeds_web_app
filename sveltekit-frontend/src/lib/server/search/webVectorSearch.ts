@@ -6,10 +6,10 @@ import type { aiRerank } from '$lib/server/ai/rerank-gemma';
 import { url } from "inspector";
 
 export interface SearchResult {
- id: string;, url: string;
- title: string;, content: string;
- source: string;, vectorScore: number;
- bm25Score: number;, combinedScore: number;
+ id: string; url: string;
+ title: string; content: string;
+ source: string; vectorScore: number;
+ bm25Score: number; combinedScore: number;
  createdAt: Date;
 }
 

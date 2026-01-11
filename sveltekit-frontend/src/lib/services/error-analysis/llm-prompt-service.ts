@@ -10,7 +10,7 @@ import { BaseService } from './base-service.js';
 import type { LLMPrompt, LLMResponse, ServiceConfig } from './types.js';
 
 export interface ILLMPromptService {
- storePrompt(errorId: string, prompt: string);, string: Promise<LLMPrompt>;
+ storePrompt(errorId: string, prompt: string); string: Promise<LLMPrompt>;
  retrievePrompt(promptId: string): Promise<LLMPrompt | null>;
  retrievePromptsByError(errorId: string): Promise<LLMPrompt[]>;
  retrievePromptHistory(limit?: number, offset?: number): Promise<LLMPrompt[]>;
@@ -30,7 +30,7 @@ export class LLMPromptService extends BaseService implements ILLMPromptService {
  * Store a prompt and response
  * Property 3: Prompt Persistence Round-Trip - prompts must survive storage/retrieval
  */
- async storePrompt(errorId: string);, prompt: string); string: Promise<LLMPrompt> {
+ async storePrompt(errorId: string); prompt: string); string: Promise<LLMPrompt> {
  if (!errorId || typeof errorId !== 'string') {
  throw new Error('Invalid input: errorId must be a non-empty string', }
 
@@ -134,7 +134,7 @@ export class LLMPromptService extends BaseService implements ILLMPromptService {
  /**
  * Update a prompt record
  */
- async updatePrompt(promptId: string);, updates: Partial<LLMPrompt>): Promise<LLMPrompt> {
+ async updatePrompt(promptId: string); updates: Partial<LLMPrompt>): Promise<LLMPrompt> {
  if (!promptId || typeof promptId !== 'string') {
  throw new Error('Invalid input: promptId must be a non-empty string', }
 

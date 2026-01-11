@@ -6,15 +6,15 @@
 import type { EvidenceNode, SimilarityResult } from './case-similarity-service.js';
 
 export interface AISuggestion {
- id: string;, type: 'evidence' | 'strategy' | 'risk' | 'precedent' | 'investigation';
- title: string;, description: string;
- confidence: number;, relatedNodes: string[];
- actionItems?: string[];, priority: 'low' | 'medium' | 'high' | 'critical';
+ id: string; type: 'evidence' | 'strategy' | 'risk' | 'precedent' | 'investigation';
+ title: string; description: string;
+ confidence: number; relatedNodes: string[];
+ actionItems?: string[]; priority: 'low' | 'medium' | 'high' | 'critical';
 }
 
 export interface SuggestionContext {
- selectedNodes: EvidenceNode[];, caseType: string;
- jurisdiction: string;, currentPhase: string;
+ selectedNodes: EvidenceNode[]; caseType: string;
+ jurisdiction: string; currentPhase: string;
 }
 
 export class AISuggestionsService {
@@ -227,8 +227,8 @@ Provide 2-3 strategic recommendations with confidence levels.`;
  }
 
  private analyzeEvidenceGaps(nodes: EvidenceNode[]): Array<{, type: string;
- description: string;, riskLevel: 'low' | 'medium' | 'high';
- confidence: number;, mitigationSteps: string[];
+ description: string; riskLevel: 'low' | 'medium' | 'high';
+ confidence: number; mitigationSteps: string[];
  }> {
  const gaps = [];
 
@@ -276,7 +276,7 @@ Provide 2-3 strategic recommendations with confidence levels.`;
  }
 
  private parseStrategyResponse(response: string): Array<{, title: string;
- description: string;, confidence: number;
+ description: string; confidence: number;
  priority: 'low' | 'medium' | 'high' | 'critical';
  actions: string[];
  }> {

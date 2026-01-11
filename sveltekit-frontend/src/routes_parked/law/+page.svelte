@@ -1,6 +1,6 @@
 <script lang="ts">
  // Svelte, 5 runes are auto-imported
- import { onMount } from 'svelte';;
+ import { onMount } from 'svelte';
 
  // 1. Define Law interface
  interface Law {

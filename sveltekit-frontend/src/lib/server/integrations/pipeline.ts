@@ -48,15 +48,15 @@ interface DocumentMetadata {
 }
 
 interface ProcessedDocument {
- id: string;, content: string;
- embedding: Float32Array;, metadata: DocumentMetadata;
+ id: string; content: string;
+ embedding: Float32Array; metadata: DocumentMetadata;
  cached: boolean;
 }
 
 interface RAGResponse {
- answer: string;, sources: SearchResult[];
+ answer: string; sources: SearchResult[];
  model: string;
- tokensUsed?: number;, cacheHit: boolean;
+ tokensUsed?: number; cacheHit: boolean;
  processingTimeMs: number;
 }
 
@@ -68,8 +68,8 @@ interface RAGResponse {
  * - MinIO (document storage)
  */
 export class LegalAIPipeline {
- ollama: OllamaService;, redis: RedisCacheService;
- qdrant: QdrantVectorService;, minio: MinIOStorageService;
+ ollama: OllamaService; redis: RedisCacheService;
+ qdrant: QdrantVectorService; minio: MinIOStorageService;
  private config: Required<PipelineConfig>;
 
  constructor(config: PipelineConfig = {}) {
@@ -400,7 +400,7 @@ export class LegalAIPipeline {
  */
  async healthCheck(): Promise<{, overall: 'healthy' | 'degraded' | 'unavailable';
  services: {, ollama: any;
- redis: any;, qdrant: any;
+ redis: any; qdrant: any;
  minio: any;
  };
  }> {

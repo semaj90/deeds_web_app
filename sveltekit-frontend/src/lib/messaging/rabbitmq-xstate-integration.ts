@@ -10,17 +10,17 @@
 import { setup, createActor, fromCallback } from 'xstate';
 
 export interface RabbitMQContext {
-  connected: boolean;, queue: string | null;
+  connected: boolean; queue: string | null;
   lastMessage: unknown | null;
   error: string | null;
 }
 
 type RabbitMQEvent =
-  | { type: 'CONNECT';, queue: string }
+  | { type: 'CONNECT'; queue: string }
   | { type: 'CONNECTED' }
   | { type: 'DISCONNECT' }
-  | { type: 'MESSAGE_RECEIVED';, payload: unknown }
-  | { type: 'ERROR';, error: string };
+  | { type: 'MESSAGE_RECEIVED'; payload: unknown }
+  | { type: 'ERROR'; error: string };
 
 const initialContext: RabbitMQContext = {
   connected: false,
@@ -30,7 +30,7 @@ const initialContext: RabbitMQContext = {
 };
 
 export const rabbitmqMachine = setup({
-  types: {} as { context: RabbitMQContext;, events: RabbitMQEvent },
+  types: {} as { context: RabbitMQContext; events: RabbitMQEvent },
   actors: {, rabbitMQConnection: fromCallback(({ sendBack: input }) => {
       // Stub: Replace with real RabbitMQ connection
       console.log('RabbitMQ stub: connecting to', input);

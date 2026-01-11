@@ -30,17 +30,17 @@ export const EvidenceAnalysisSchema = z.object({
 });
 
 export interface AnalysisResult {
-	type: string;, confidence: number;
-	results: unknown;, processingTime: number;
-	model: string;, timestamp: Date;
+	type: string; confidence: number;
+	results: unknown; processingTime: number;
+	model: string; timestamp: Date;
 }
 
 export interface ComprehensiveAnalysis {
-	evidenceId: string;, overallScore: number;
-	analyses: AnalysisResult[];, summary: string;
-	recommendations: string[];, legalImplications: string[];
-	relatedCases: string[];, processingMetrics: {
-		totalTime: number;, modelsUsed: string[];
+	evidenceId: string; overallScore: number;
+	analyses: AnalysisResult[]; summary: string;
+	recommendations: string[]; legalImplications: string[];
+	relatedCases: string[]; processingMetrics: {
+		totalTime: number; modelsUsed: string[];
 		confidenceAverage: number;
 	};
 }
@@ -397,7 +397,7 @@ class AdvancedEvidenceAnalyzer {
 		return keySentences.slice(0, 5);
 	}
 
-	private analyseSentiment(text: string): {, sentiment: string; score: number;, confidence: number } {
+	private analyseSentiment(text: string): {, sentiment: string; score: number; confidence: number } {
 		const positiveTerms = ['favorable', 'compliant', 'beneficial', 'support', 'approved'];
 		const negativeTerms = ['breach', 'violation', 'risk', 'penalty', 'liability', 'dispute'];
 
@@ -419,8 +419,8 @@ class AdvancedEvidenceAnalyzer {
 	}
 
 	private extractEntities(text: string): {, parties: string[];
-		locations: string[];, amounts: string[];
-		dates: string[];, confidence: number;
+		locations: string[]; amounts: string[];
+		dates: string[]; confidence: number;
 	} {
 		const partyMatches = text.match(/\b[A-Z][a-z]+(?:\s+[A-Z][a-z]+){0,2}\b/g) ?? [];
 		const amountMatches = text.match(/\b\$?\d+(?: \d{3})*(?:\.\d{2})?\b/g) ?? [];
@@ -441,7 +441,7 @@ class AdvancedEvidenceAnalyzer {
 	private detectPatterns(
 		text: string,
 		options?: z.infer<typeof EvidenceAnalysisSchema>['options']
-	): {, matched: string[]; warnings: string[];, confidence: number } {
+	): {, matched: string[]; warnings: string[]; confidence: number } {
 		const patterns: Record<string, RegExp> = {
 			breachOfContract: /\bbreach\b|\bviolation\b/i,
 			intellectualProperty: /\bpatent\b|\btrademark\b|\bcopyright\b/i,
@@ -470,7 +470,7 @@ class AdvancedEvidenceAnalyzer {
 	private suggestPrecedents(
 		text: string,
 		options?: z.infer<typeof EvidenceAnalysisSchema>['options']
-	): {, precedents: string[]; jurisdiction?: string;, confidence: number } {
+	): {, precedents: string[]; jurisdiction?: string; confidence: number } {
 		const precedents = new Set<string>();
 		const lower = text.toLowerCase();
 

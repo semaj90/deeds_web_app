@@ -7,7 +7,7 @@ import { Lucia } from 'lucia';
 
 // Define the expected return type for createUserSession
 export interface CreateUserSessionResult {
-  sessionId: string;, userId: string;
+  sessionId: string; userId: string;
   expiresAt: Date;
 }
 
@@ -40,9 +40,9 @@ declare module 'lucia' {
 }
 
 interface DatabaseUserAttributes {
-  email: string;, firstName: string;
-  lastName: string;, role: string;
-  isActive: boolean;, avatarUrl: string;
+  email: string; firstName: string;
+  lastName: string; role: string;
+  isActive: boolean; avatarUrl: string;
 }
 
 /**
@@ -76,9 +76,9 @@ export async function verifyPassword(password: string, hashedPassword: string): 
 }
 
 export interface ValidatedUser {
-  id: string;, email: string;
-  firstName: string;, lastName: string;
-  role: string;, isActive: boolean;
+  id: string; email: string;
+  firstName: string; lastName: string;
+  role: string; isActive: boolean;
   avatarUrl: string;
 }
 

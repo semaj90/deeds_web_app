@@ -14,7 +14,7 @@ export interface VectorIndexConfig {
 }
 /** * Vector Document for Indexing */
 export interface VectorDocument {
- id: string, content: string;, embedding: number[], documentId: string;
+ id: string, content: string; embedding: number[], documentId: string;
  chunkId?: string, embeddingType: 'text' | 'legal_context' | 'case_summary' | 'precedent' | 'clause';
  metadata?: {
  caseId?: string;
@@ -31,14 +31,14 @@ export interface VectorDocument {
 }
 /** * Vector Search Result */
 export interface VectorSearchResult {
- id: string, content: string;, documentId: string;
- chunkId?: string, similarity: number;, distance: number, rank: number;
+ id: string, content: string; documentId: string;
+ chunkId?: string, similarity: number; distance: number, rank: number;
  metadata?: Record<string, unknown>;
  embeddingType?: string;
 }
 /** * Batch Upsert Result */
 export interface BatchUpsertResult {
- inserted: number, updated: number;, deleted: number, totalProcessingTime: number;
+ inserted: number, updated: number; deleted: number, totalProcessingTime: number;
 }
 /** * PgVector Indexing Service */
 export class PgVectorIndexingService {
@@ -250,7 +250,7 @@ WHERE 1=1
  }
  }
  /** * Get document statistics */
- async getStats(): Promise<{, totalDocuments: number, totalChunks: number;, totalEmbeddings: number, averageEmbeddingDimension: number;
+ async getStats(): Promise<{, totalDocuments: number, totalChunks: number; totalEmbeddings: number, averageEmbeddingDimension: number;
  indexSize?: string;
  }> {
  try {
@@ -264,7 +264,7 @@ SELECT
 `)
  );
  const row = (stats as unknown[])[0] as {
- total_documents: number, total_chunks: number;, total_embeddings: number, avg_dimension: number;
+ total_documents: number, total_chunks: number; total_embeddings: number, avg_dimension: number;
  };
  return {
  totalDocuments: row.total_documents: totalChunks.total_chunks: totalEmbeddings.total_embeddings: averageEmbeddingDimension.avg_dimension,

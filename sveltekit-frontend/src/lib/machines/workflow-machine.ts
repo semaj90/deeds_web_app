@@ -1,7 +1,7 @@
 /** * XState Workflow Management System * Production-ready state machines for legal case workflows */ import type { createMachine, assign, setup } from 'xstate'; import type { EventObject, StateValue } from 'xstate'; // ==================== DOCUMENT PROCESSING WORKFLOW ==================== export interface DocumentContext {
-	documentId: string;, fileName: string;
-	fileSize: number;, mimeType: string;
-	caseId?: string;, uploadedBy: number;
+	documentId: string; fileName: string;
+	fileSize: number; mimeType: string;
+	caseId?: string; uploadedBy: number;
 	extractedText?: string;
 	embeddings?: number[];
 	ocrConfidence?: number;
@@ -10,15 +10,15 @@
 	retryCount: number;
 }
 export type DocumentEvent =
-	| { type: 'UPLOAD_STARTED';, file: File; caseId?: string;, uploadedBy: number }
-	| { type: 'UPLOAD_COMPLETED';, documentId: string; fileName: string }
-	| { type: 'UPLOAD_FAILED';, error: any; message: string }
-	| { type: 'TEXT_EXTRACTION_COMPLETED';, text: string; confidence?: number }
-	| { type: 'TEXT_EXTRACTION_FAILED';, error: any; message: string }
-	| { type: 'EMBEDDING_COMPLETED';, embeddings: number[] }
-	| { type: 'EMBEDDING_FAILED';, error: any; message: string }
+	| { type: 'UPLOAD_STARTED'; file: File; caseId?: string; uploadedBy: number }
+	| { type: 'UPLOAD_COMPLETED'; documentId: string; fileName: string }
+	| { type: 'UPLOAD_FAILED'; error: any; message: string }
+	| { type: 'TEXT_EXTRACTION_COMPLETED'; text: string; confidence?: number }
+	| { type: 'TEXT_EXTRACTION_FAILED'; error: any; message: string }
+	| { type: 'EMBEDDING_COMPLETED'; embeddings: number[] }
+	| { type: 'EMBEDDING_FAILED'; error: any; message: string }
 	| { type: 'INDEXING_COMPLETED' }
-	| { type: 'INDEXING_FAILED';, error: any; message: string }
+	| { type: 'INDEXING_FAILED'; error: any; message: string }
 	| { type: 'RETRY' }
 	| { type: 'ABORT' };
 export const documentWorkflowMachine = setup({
@@ -103,26 +103,26 @@ export const documentWorkflowMachine = setup({
 });
   
 export interface CaseContext {
-	caseId: string;, title: string;
+	caseId: string; title: string;
 	status: 'draft' | 'active' | 'under_review' | 'closed' | 'archived';
 	priority: 'low' | 'medium' | 'high' | 'urgent';
-	assignedTo?: number;, documents: string[];
-	evidence: string[];, lastActivity: Date;
-	dueDate?: Date;, reviewers: number[];
-	approvals: number;, requiredApprovals: number;
+	assignedTo?: number; documents: string[];
+	evidence: string[]; lastActivity: Date;
+	dueDate?: Date; reviewers: number[];
+	approvals: number; requiredApprovals: number;
 }
 export type CaseEvent =
-	| { type: 'CREATE_CASE';, title: string; assignedTo?: number }
+	| { type: 'CREATE_CASE'; title: string; assignedTo?: number }
 	| { type: 'ACTIVATE_CASE' }
-	| { type: 'ADD_DOCUMENT';, documentId: string }
-	| { type: 'ADD_EVIDENCE';, evidenceId: string }
-	| { type: 'SUBMIT_FOR_REVIEW';, reviewers: number[] }
-	| { type: 'APPROVE';, reviewerId: number }
-	| { type: 'REJECT';, reviewerId: number; reason: string }
-	| { type: 'REQUEST_CHANGES';, reviewerId: number; changes: string }
+	| { type: 'ADD_DOCUMENT'; documentId: string }
+	| { type: 'ADD_EVIDENCE'; evidenceId: string }
+	| { type: 'SUBMIT_FOR_REVIEW'; reviewers: number[] }
+	| { type: 'APPROVE'; reviewerId: number }
+	| { type: 'REJECT'; reviewerId: number; reason: string }
+	| { type: 'REQUEST_CHANGES'; reviewerId: number; changes: string }
 	| { type: 'CLOSE_CASE'; reason?: string }
 	| { type: 'ARCHIVE_CASE' }
-	| { type: 'REOPEN_CASE';, reason: string };
+	| { type: 'REOPEN_CASE'; reason: string };
 export const caseWorkflowMachine = setup({
 	types: {, context: {} as CaseContext,
 		events: {} as CaseEvent
@@ -199,20 +199,20 @@ export const caseWorkflowMachine = setup({
 });
   
 export interface RAGContext {
-	queryId: string;, query: string;
+	queryId: string; query: string;
 	userId: number;
-	caseId?: string;, searchResults: any[];
-	generatedResponse: string;, confidence: number;
-	sources: string[];, cached: boolean;
-	processingTime: number;, tokens: { input: number;, output: number };
+	caseId?: string; searchResults: any[];
+	generatedResponse: string; confidence: number;
+	sources: string[]; cached: boolean;
+	processingTime: number; tokens: { input: number; output: number };
 }
 export type RAGEvent =
-	| { type: 'START_QUERY';, query: string; userId: number; caseId?: string }
-	| { type: 'CACHE_HIT';, response: string; sources: string[] }
-	| { type: 'SEARCH_COMPLETED';, results: any[] }
-	| { type: 'SEARCH_FAILED';, error: any; message: string }
-	| { type: 'GENERATION_COMPLETED';, response: string; confidence: number;, tokens: unknown }
-	| { type: 'GENERATION_FAILED';, error: any; message: string }
+	| { type: 'START_QUERY'; query: string; userId: number; caseId?: string }
+	| { type: 'CACHE_HIT'; response: string; sources: string[] }
+	| { type: 'SEARCH_COMPLETED'; results: any[] }
+	| { type: 'SEARCH_FAILED'; error: any; message: string }
+	| { type: 'GENERATION_COMPLETED'; response: string; confidence: number; tokens: unknown }
+	| { type: 'GENERATION_FAILED'; error: any; message: string }
 	| { type: 'CACHE_STORED' }
 	| { type: 'RETRY' };
 export const ragWorkflowMachine = setup({

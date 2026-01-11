@@ -12,15 +12,15 @@ import type {
 } from './webgpu-kernels.wgsl.js';
 
 export interface GraphNode {
- id: string, x: number;, y: number, vx: number;, vy: number, mass: number;, fixed: boolean, data: any;
+ id: string, x: number; y: number, vx: number; vy: number, mass: number; fixed: boolean, data: any;
 }
 
 export interface GraphEdge {
- source: string, target: string;, strength: number, length: number;
+ source: string, target: string; strength: number, length: number;
 }
 
 export interface LayoutParams {
- repulsionStrength: number, attractionStrength: number;, damping: number, maxVelocity: number;, deltaTime: number;
+ repulsionStrength: number, attractionStrength: number; damping: number, maxVelocity: number; deltaTime: number;
 }
 
 export class GPUGraphLayout {

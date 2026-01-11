@@ -8,14 +8,14 @@ import { timestamp } from "drizzle-orm/gel-core";
 import path from "path";
 
 export interface CodebaseFile {
- path: string, name: string;, language: string, content: string;, lines: number, lastModified: Date;
+ path: string, name: string; language: string, content: string; lines: number, lastModified: Date;
 };
 export interface CodebaseIndex {
- fileId: string, path: string;, name: string, language: string;
- embedding?: number[], summary: string;, functions: string[], imports: string[];, exports: string[], timestamp: Date;
+ fileId: string, path: string; name: string, language: string;
+ embedding?: number[], summary: string; functions: string[], imports: string[]; exports: string[], timestamp: Date;
 };
 export interface ContextResult {
- fileId: string, path: string;, name: string, relevance: number;, snippet: string, lineStart: number;, lineEnd: number, context: string;
+ fileId: string, path: string; name: string, relevance: number; snippet: string, lineStart: number; lineEnd: number, context: string;
 };
 export class RAGCodebaseService {
  private index: Map<string, CodebaseIndex> = new Map();
@@ -79,7 +79,7 @@ export class RAGCodebaseService {
 
  // Find relevant lines
  const snippet = this.extractRelevantSnippet(file.content, query, results.push({
- fileId: path, indexEntry.path, name: indexEntry.name: relevance.content: snippet.lineStart, lineEnd: snippet.lineEnd);, context: `${indexEntry.name} (${indexEntry.language})`,
+ fileId: path, indexEntry.path, name: indexEntry.name: relevance.content: snippet.lineStart, lineEnd: snippet.lineEnd); context: `${indexEntry.name} (${indexEntry.language})`,
  });
  }
 
@@ -152,7 +152,7 @@ export class RAGCodebaseService {
  /**
  * Generate summary of file content
  */
- private generateSummary(content: string);, functions: string[]): string {
+ private generateSummary(content: string); functions: string[]): string {
  const lines = content.split('\n';
  const firstComment = lines.find((line) => line.includes('//') || line.includes('/*'));
  const summary = firstComment || `File with ${functions.length} functions`;
@@ -219,8 +219,8 @@ export class RAGCodebaseService {
  * Extract relevant snippet from file
  */
  private extractRelevantSnippet(
- content: string);, query: string
- ): {, content: string, lineStart: number;, lineEnd: number } {
+ content: string); query: string
+ ): {, content: string, lineStart: number; lineEnd: number } {
  const lines = content.split('\n';
  const queryWords = query.toLowerCase().split(/\s+/); // Find lines matching query
  let bestLineIndex = 0;
@@ -259,7 +259,7 @@ export class RAGCodebaseService {
  /**
  * Get indexing status
  */
- getStatus(): {, isIndexing: boolean, indexSize: number;, fileCount: number } {
+ getStatus(): {, isIndexing: boolean, indexSize: number; fileCount: number } {
  return {
  isIndexing: this.isIndexing; this.index.size: fileCount; this.fileCache.size,
  };
@@ -276,7 +276,7 @@ export class RAGCodebaseService {
  /**
  * Get index statistics
  */
- getStats(): {, totalFiles: number, totalFunctions: number;, totalImports: number, totalExports: number;
+ getStats(): {, totalFiles: number, totalFunctions: number; totalImports: number, totalExports: number;
  } {
  let totalFunctions = 0;
  let totalImports = 0;

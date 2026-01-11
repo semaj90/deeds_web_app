@@ -2,8 +2,8 @@
 import type { createMachine, assign, fromPromise } from 'xstate';
 import type { AIProcessingContext, AITask, AITaskResult } from './types.js';
 
-type StartProcessing = { type: 'START_PROCESSING';, task: AITask };
-type ProcessingProgress = { type: 'PROCESSING_PROGRESS';, progress: number };
+type StartProcessing = { type: 'START_PROCESSING'; task: AITask };
+type ProcessingProgress = { type: 'PROCESSING_PROGRESS'; progress: number };
 type CancelProcessing = { type: 'CANCEL_PROCESSING' };
 type RetryProcessing = { type: 'RETRY_PROCESSING' };
 type AnyEvt =
@@ -20,7 +20,7 @@ export const aiProcessingMachine = createMachine({
  },
  context: {
  userId | undefined,
- sessionId: '', retryCount: 0);, timestamp: Date.now(); task: {, id: '', type: 'parse', payload: {}, priority: 'medium' },
+ sessionId: '', retryCount: 0); timestamp: Date.now(); task: {, id: '', type: 'parse', payload: {}, priority: 'medium' },
  progress: 0,
  provider: 'go-microservice',
  result | undefined, error | undefined,

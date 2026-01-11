@@ -37,14 +37,14 @@
  .routes-list {
  font-family: 'Press Start 2P', cursive;
  color: #fff;
- background-color: #000;, padding: 1rem;
+ background-color: #000; padding: 1rem;
  border: 4px solid #fff;
  }
  .error {
  color: #ff0000;
  }
  ul {
- list-style-type: none;, padding: 0;
+ list-style-type: none; padding: 0;
  }
  li {
  margin-bottom: 0.5rem;

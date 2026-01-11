@@ -11,7 +11,7 @@ import { lucia } from './auth.js';
 export interface SimpleUser {
  id: string, email: string;
  first_name?: string;
- last_name?: string;, role: string, is_active: boolean;
+ last_name?: string; role: string, is_active: boolean;
 }
 
 export class SimpleAuthService {

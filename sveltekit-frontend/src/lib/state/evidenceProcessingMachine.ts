@@ -7,16 +7,16 @@ import { assign, fromPromise, setup } from 'xstate';
 
 // Types for the state machine
 export interface EvidenceProcessingContext {
- evidenceId: string;, caseId: string;
- userId: string;, filename: string;
- content: string;, metadata: Record<string, unknown>;
+ evidenceId: string; caseId: string;
+ userId: string; filename: string;
+ content: string; metadata: Record<string, unknown>;
 
  // Processing results
  extractedText?: string;
  chunks?: Array<{, text: string; embedding?: number[] }>;
  embeddings?: number[][];
  analysis?: {, summary: string;
- entities: unknown[];, sentiment: string;
+ entities: unknown[]; sentiment: string;
  classification: string;
  riskAssessment?: string;
  recommendations?: string[];
@@ -28,33 +28,33 @@ export interface EvidenceProcessingContext {
  analysisJobId?: string;
 
  // Progress tracking
- progress: number;, stage: string;
+ progress: number; stage: string;
 
  // Error handling
- error?: string;, retryCount: number;
+ error?: string; retryCount: number;
  maxRetries: number;
 
  // Performance metrics
- startTime: number;, stageStartTime: number;
+ startTime: number; stageStartTime: number;
  processingTimes: Record<string, number>;
 };
 export type EvidenceProcessingEvent =
  | {
- type: 'START_PROCESSING';, evidenceId: string;
- caseId: string;, userId: string;
- filename: string;, content: string;
+ type: 'START_PROCESSING'; evidenceId: string;
+ caseId: string; userId: string;
+ filename: string; content: string;
  metadata?: Record<string, unknown>;
  }
  | { type: 'RETRY' }
  | { type: 'CANCEL' }
  | { type: 'FORCE_COMPLETE' }
- | { type: 'UPDATE_PROGRESS';, progress: number; stage: string }
+ | { type: 'UPDATE_PROGRESS'; progress: number; stage: string }
  | { type: 'PROCESSING_COMPLETE' }
- | { type: 'PROCESSING_FAILED';, error: string }
+ | { type: 'PROCESSING_FAILED'; error: string }
  | { type: 'EMBEDDING_COMPLETE' }
- | { type: 'EMBEDDING_FAILED';, error: string }
+ | { type: 'EMBEDDING_FAILED'; error: string }
  | { type: 'ANALYSIS_COMPLETE' }
- | { type: 'ANALYSIS_FAILED';, error: string };
+ | { type: 'ANALYSIS_FAILED'; error: string };
 
 // Helper function for API calls
 async function callProcessingAPI(
@@ -95,7 +95,7 @@ export const evidenceProcessingMachine: any = setup({
 
  return result as {
  jobId: string;
- extractedText?: string;, processingTime: number;
+ extractedText?: string; processingTime: number;
  };
  }), embeddingGeneration: fromPromise(async ({ input }: {, input: EvidenceProcessingContext }) => {
  console.log(`Generating embeddings for evidence: ${input.evidenceId}`);
@@ -122,8 +122,8 @@ export const evidenceProcessingMachine: any = setup({
  });
 
  return result as {
- summary: string;, entities: unknown[];
- sentiment: string;, classification: string;
+ summary: string; entities: unknown[];
+ sentiment: string; classification: string;
  riskAssessment?: string;
  recommendations?: string[];
  };
@@ -356,7 +356,7 @@ export type EvidenceProcessingMachine = typeof evidenceProcessingMachine;
 
 // State type helper
 type MachineState = {
- value: string;, context: EvidenceProcessingContext;
+ value: string; context: EvidenceProcessingContext;
 };
 
 // Export convenience functions

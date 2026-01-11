@@ -1,22 +1,22 @@
 // Statute enrichment: severity, victim class, and charge bundling
 
 interface StatuteEnrichment {
- citation: string;, title: string;
+ citation: string; title: string;
  severity: 'misdemeanor' | 'felony' | 'wobbler' | 'infraction';
- severityColor: string;, victimClass: 'child' | 'spouse' | 'elder' | 'disabled' | 'general' | null;
- description: string;, penalty: string;
- relatedStatutes: string[];, bundledCharges: BundledCharge[];
+ severityColor: string; victimClass: 'child' | 'spouse' | 'elder' | 'disabled' | 'general' | null;
+ description: string; penalty: string;
+ relatedStatutes: string[]; bundledCharges: BundledCharge[];
  precedents: Precedent[];
 }
 
 interface BundledCharge {
- citation: string;, title: string;
+ citation: string; title: string;
  reason: string; // e.g., "Enhancement", "Common companion", "Prior offense", frequency: number; // How often filed together (0-1)
 }
 
 interface Precedent {
- caseId: string;, title: string;
- year: number;, court: string;
+ caseId: string; title: string;
+ year: number; court: string;
  relevance: number;
 }
 

@@ -25,7 +25,7 @@ export interface VectorSearchRequest {
 }
 
 export interface VectorSearchResult {
- id: string;, score: number;
+ id: string; score: number;
  content: string;
  metadata?: Record<string, unknown>;
  document_id?: string;
@@ -34,11 +34,11 @@ export interface VectorSearchResult {
 }
 
 export interface VectorSearchResponse {
- success: boolean;, results: VectorSearchResult[];
- total_results: number;, execution_time_ms: number;
+ success: boolean; results: VectorSearchResult[];
+ total_results: number; execution_time_ms: number;
  backend: string;
  metadata?: {, cached: boolean;
- cache_hit: boolean;, filter_applied: boolean;
+ cache_hit: boolean; filter_applied: boolean;
  };
 }
 
@@ -48,7 +48,7 @@ export interface EmbeddingRequest {
 }
 
 export interface EmbeddingResponse {
- embedding: number[];, model: string;
+ embedding: number[]; model: string;
  dimension: number;
 }
 
@@ -308,8 +308,8 @@ export async function getEmbedding(request: EmbeddingRequest): Promise<Embedding
 // ============================================================================
 
 export async function healthCheck(): Promise<{, status: 'healthy' | 'degraded' | 'unhealthy';
- vectorBackend: string;, embeddingModel: string;
- redisConnected: boolean;, databaseConnected: boolean;
+ vectorBackend: string; embeddingModel: string;
+ redisConnected: boolean; databaseConnected: boolean;
  ollamaConnected: boolean;
 }> {
  const config = getConfig();

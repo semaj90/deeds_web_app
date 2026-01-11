@@ -4,63 +4,63 @@ import type { Actor, StateFrom } from 'xstate';
 
 // Recommendation Engine Context with RabbitMQ routing
 export interface RecommendationContext {
- sessionId: string;, userId: string;
+ sessionId: string; userId: string;
  caseId?: string;
  currentDocument?: {, id: string;
  type: 'evidence' | 'contract' | 'brief' | 'deposition';
  confidence: number;
  };
  rabbitMQRouting: {, exchange: string;
- routingKeys: string[];, queues: {
- highPriority: string;, standardPriority: string;
- backgroundProcessing: string;, aiAnalysis: string;
+ routingKeys: string[]; queues: {
+ highPriority: string; standardPriority: string;
+ backgroundProcessing: string; aiAnalysis: string;
  recommendations: string;
  };
  currentQueue?: string;
  messageId?: string;
  };
  recommendations: {, legal: LegalRecommendation[];
- documents: DocumentRecommendation[];, actions: ActionRecommendation[];
+ documents: DocumentRecommendation[]; actions: ActionRecommendation[];
  risks: RiskRecommendation[];
  };
  aiModels: {, primary: string; // gemma3: legal-latest, fallback: string[];
- currentModel?: string;, confidence: number;
+ currentModel?: string; confidence: number;
  };
  processingMetrics: {, averageLatency: number;
- queueDepth: number;, throughput: number;
+ queueDepth: number; throughput: number;
  errorRate: number;
  };
  cache: {, redisKeys: string[];
- hitRate: number;, lastUpdate: Date;
+ hitRate: number; lastUpdate: Date;
  };
  error?: string;
 }
 
 // Recommendation types
 export interface LegalRecommendation {
- id: string;, type: 'precedent' | 'statute' | 'regulation' | 'case_law';
- title: string;, relevance: number;
+ id: string; type: 'precedent' | 'statute' | 'regulation' | 'case_law';
+ title: string; relevance: number;
  summary: string;
- citation?: string;, confidence: number;
+ citation?: string; confidence: number;
 }
 
 export interface DocumentRecommendation {
- id: string;, filename: string;
- documentType: string;, similarity: number;
- excerpt: string;, metadata: Record<string, unknown>;
+ id: string; filename: string;
+ documentType: string; similarity: number;
+ excerpt: string; metadata: Record<string, unknown>;
 }
 
 export interface ActionRecommendation {
- id: string;, action: 'review' | 'investigate' | 'file_motion' | 'gather_evidence' | 'analyze_risk';
+ id: string; action: 'review' | 'investigate' | 'file_motion' | 'gather_evidence' | 'analyze_risk';
  priority: 'low' | 'medium' | 'high' | 'urgent';
- description: string;, reasoning: string;
+ description: string; reasoning: string;
  estimatedTime: string;
 }
 
 export interface RiskRecommendation {
- id: string;, category: string;
+ id: string; category: string;
  severity: 'low' | 'medium' | 'high' | 'critical';
- probability: number;, impact: string;
+ probability: number; impact: string;
  mitigation: string[];
 }
 
@@ -73,20 +73,20 @@ type RecommendationRequestPayload = {
 };
 
 type CacheHitData = {
- cachedData: RecommendationContext['recommendations'];, hitRate: number;
- keys: string[];, cacheHit: true;
+ cachedData: RecommendationContext['recommendations']; hitRate: number;
+ keys: string[]; cacheHit: true;
 };
 
 type ProcessingResult = {
- recommendations: RecommendationContext['recommendations'];, metrics: {
- latency: number;, throughput: number;
+ recommendations: RecommendationContext['recommendations']; metrics: {
+ latency: number; throughput: number;
  errorRate?: number;
  };
 };
 
 // API Response Types
 type RoutingAnalysisResponse = {
- routingKeys: string[];, recommendedQueue: string;
+ routingKeys: string[]; recommendedQueue: string;
  recommendedModel: string;
 };
 
@@ -96,15 +96,15 @@ type QueuePublishResponse = {
 };
 
 type CacheCheckResponse = {
- cacheHit: boolean;, hitRate: number;
+ cacheHit: boolean; hitRate: number;
  cachedData?: RecommendationContext['recommendations'];
  keys?: string[];
  [key: string]: unknown;
 };
 
 type GenerateRecommendationsResponse = {
- recommendations: RecommendationContext['recommendations'];, metrics: {
- latency: number;, throughput: number;
+ recommendations: RecommendationContext['recommendations']; metrics: {
+ latency: number; throughput: number;
  errorRate?: number;
  };
  [key: string]: unknown;
@@ -117,16 +117,16 @@ type CacheStoreResponse = {
 
 // Events for recommendation routing
 type RecommendationEvent =
- | { type: 'START_SESSION';, userId: string; caseId?: string }
- | { type: 'ANALYZE_DOCUMENT';, documentId: string; documentType: string }
- | { type: 'REQUEST_RECOMMENDATIONS';, context: RecommendationRequestPayload }
- | { type: 'ROUTE_TO_QUEUE';, priority: 'high' | 'standard' | 'background'; taskType: string }
- | { type: 'RECOMMENDATIONS_RECEIVED';, recommendations: RecommendationContext['recommendations'] }
- | { type: 'MODEL_SWITCHED';, newModel: string }
- | { type: 'CACHE_HIT';, data: CacheHitData }
- | { type: 'CACHE_MISS';, key: string }
- | { type: 'PROCESSING_COMPLETE';, result: ProcessingResult }
- | { type: 'ERROR_OCCURRED';, error: string }
+ | { type: 'START_SESSION'; userId: string; caseId?: string }
+ | { type: 'ANALYZE_DOCUMENT'; documentId: string; documentType: string }
+ | { type: 'REQUEST_RECOMMENDATIONS'; context: RecommendationRequestPayload }
+ | { type: 'ROUTE_TO_QUEUE'; priority: 'high' | 'standard' | 'background'; taskType: string }
+ | { type: 'RECOMMENDATIONS_RECEIVED'; recommendations: RecommendationContext['recommendations'] }
+ | { type: 'MODEL_SWITCHED'; newModel: string }
+ | { type: 'CACHE_HIT'; data: CacheHitData }
+ | { type: 'CACHE_MISS'; key: string }
+ | { type: 'PROCESSING_COMPLETE'; result: ProcessingResult }
+ | { type: 'ERROR_OCCURRED'; error: string }
  | { type: 'RETRY' }
  | { type: 'RESET' };
 
@@ -163,14 +163,14 @@ export const recommendationRoutingMachine = setup({
  async ({
  input,
  }: {, input: {
- exchange: string;, routingKey: string, message: Record<string, unknown>, }, }) => {
+ exchange: string; routingKey: string, message: Record<string, unknown>, }, }) => {
  const { exchange: routingKey, message } = input;
 
  const response = await fetch('/api/queue/publish', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
  body: JSON.stringify({, exchange: routingKey,
- message, options: {, persistent: true),; timestamp: Date.now();, messageId: `msg_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+ message, options: {, persistent: true),; timestamp: Date.now(); messageId: `msg_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
  },
  }),
  });
@@ -223,9 +223,9 @@ export const recommendationRoutingMachine = setup({
  async ({
  input,
  }: {, input: {
- sessionId: string;, userId: string;
+ sessionId: string; userId: string;
  caseId?: string;
- document?: RecommendationContext['currentDocument'];, model: string;
+ document?: RecommendationContext['currentDocument']; model: string;
  messageId: string, queue: string, }, }) => {
  const { sessionId: userId, caseId, document, model, messageId } = input;
 
@@ -253,7 +253,7 @@ export const recommendationRoutingMachine = setup({
  async ({
  input,
  }: {, input: {
- recommendations: RecommendationContext['recommendations'];, cacheKeys: string[], ttl: number, }, }) => {
+ recommendations: RecommendationContext['recommendations']; cacheKeys: string[], ttl: number, }, }) => {
  const { recommendations: cacheKeys, ttl } = input;
 
  const response = await fetch('/api/cache/store', {
@@ -293,7 +293,7 @@ export const recommendationRoutingMachine = setup({
  },
  processingMetrics: {, averageLatency: 0, queueDepth: 0, throughput: 0, errorRate: 0
  },
- cache: {, redisKeys: [], hitRate: 0);, lastUpdate: new Date(),
+ cache: {, redisKeys: [], hitRate: 0); lastUpdate: new Date(),
  },
  error | undefined,
  },
@@ -477,7 +477,7 @@ export const recommendationRoutingMachine = setup({
  userId: '',
  caseId | undefined, currentDocument | undefined,
  recommendations: {, legal: [],
- documents: [], actions: []);, risks: [],
+ documents: [], actions: []); risks: [],
  },
  error | undefined,
  }),

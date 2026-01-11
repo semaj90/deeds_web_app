@@ -67,7 +67,7 @@ export class ClientEmbeddingGemma {
  normalize?: boolean;
  maxLength?: number;
  } = {}
- ): Promise<{, embeddings: number[][]; model: string;, dimension: number; count: number;
+ ): Promise<{, embeddings: number[][]; model: string; dimension: number; count: number;
  }> {
  if (!this.isInitialized || !this.session || !this.tokenizer) {
  await this.initialize();

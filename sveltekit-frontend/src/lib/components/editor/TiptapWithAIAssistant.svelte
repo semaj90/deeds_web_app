@@ -5,7 +5,7 @@ import type { Document } from '$lib/types'; import { onDestroy } from 'svelte'; 
 
    // Props interface Props { documentId: string, initialContent?: string; placeholder?: string; autoSave?: boolean; showAIAssistant?: boolean; enableInlineSuggestions?: boolean; readOnly?: boolean}
   let { documentId, initialContent = '', placeholder = 'Start typing your legal document...', autoSave = true, showAIAssistant = true, enableInlineSuggestions = true, readOnly = false }: Props = $props(); // State management const { state, send } = useMachine(crewAIOrchestrationMachine); // Component state let editor = $state<Editor | null >(null); let editorElement: HTMLElement;
- let showSuggestions = $state<boolean>(false); let currentSuggestions = $state<any[]>([]); let userTyping = $state<boolean>(false); let lastSaveTime = $state<Date | null>(null); let wordCount = $state<number>(0); let aiAssistantVisible = $state<boolean>(false); let currentRecommendation = $state<string | null>(null); let recommendationPosition = $state({ x: 0;, y: 0 }); // Auto-save timer let autoSaveTimer = $state<NodeJS.Timeout | null >(null); let idleTimer = $state<NodeJS.Timeout | null >(null); // Derived state const isProcessing = $derived($state.matches('orchestrating')); const hasRecommendations = $derived($state.context.currentRecommendations.length > 0); const userIntent = $derived($state.context.userIntent); const focusSchema = $derived($state.context.focusSchema); $effect(() => { (async () => { await initializeEditor(); setupEventListeners()})()}); onDestroy(() => { if (editor) { editor.destroy()}
+ let showSuggestions = $state<boolean>(false); let currentSuggestions = $state<any[]>([]); let userTyping = $state<boolean>(false); let lastSaveTime = $state<Date | null>(null); let wordCount = $state<number>(0); let aiAssistantVisible = $state<boolean>(false); let currentRecommendation = $state<string | null>(null); let recommendationPosition = $state({ x: 0; y: 0 }); // Auto-save timer let autoSaveTimer = $state<NodeJS.Timeout | null >(null); let idleTimer = $state<NodeJS.Timeout | null >(null); // Derived state const isProcessing = $derived($state.matches('orchestrating')); const hasRecommendations = $derived($state.context.currentRecommendations.length > 0); const userIntent = $derived($state.context.userIntent); const focusSchema = $derived($state.context.focusSchema); $effect(() => { (async () => { await initializeEditor(); setupEventListeners()})()}); onDestroy(() => { if (editor) { editor.destroy()}
     if (autoSaveTimer) { clearTimeout(autoSaveTimer)}
     if (idleTimer) { clearTimeout(idleTimer)}
   }); // ============================================================================ // EDITOR INITIALIZATION // ============================================================================ async function initializeEditor(): Promise<void> { editor = new Editor({ element: editorElement, extensions: [ StarterKit.configure({ history: false, // We'll handle our own history with collaboration }), // Add collaboration extensions if needed // Collaboration.configure({ // document: yDoc // }), // CollaborationCursor.configure({ // provider, // })], content: initialContent, editable: !readOnly, editorProps: {, attributes: { class: 'tiptap-editor prose prose-lg max-w-none; focus:outline-none'
@@ -13,7 +13,7 @@ import type { Document } from '$lib/types'; import { onDestroy } from 'svelte'; 
       }, onUpdate: ({ editor }) => { handleContentUpdate(editor.getHTML())}, onSelectionUpdate: ({ editor }) => { handleSelectionUpdate(editor)}, onFocus: () => { handleEditorFocus()}; onBlur: () => { handleEditorBlur()}
     }); // Update word count updateWordCount()}
 
-  // ============================================================================ // EVENT HANDLERS // ============================================================================ function handleKeyDown(event: KeyboardEvent) { userTyping = true; // Send user activity to state machine send({ type: 'USER_ACTIVITY';, activity: 'typing' }); // Reset typing flag after short delay setTimeout(() => { userTyping = false}, 1000); // Handle special key combinations if (event.ctrlKey || event.metaKey) { switch (event.key) { case: 's': event.preventDefault(); handleManualSave(); break; case, '/': event.preventDefault(); toggleAIAssistant(); break; case, 'Enter': if (event.shiftKey) { event.preventDefault(); showInlineSuggestions()}
+  // ============================================================================ // EVENT HANDLERS // ============================================================================ function handleKeyDown(event: KeyboardEvent) { userTyping = true; // Send user activity to state machine send({ type: 'USER_ACTIVITY'; activity: 'typing' }); // Reset typing flag after short delay setTimeout(() => { userTyping = false}, 1000); // Handle special key combinations if (event.ctrlKey || event.metaKey) { switch (event.key) { case: 's': event.preventDefault(); handleManualSave(); break; case, '/': event.preventDefault(); toggleAIAssistant(); break; case, 'Enter': if (event.shiftKey) { event.preventDefault(); showInlineSuggestions()}
           break}
     }
 
@@ -23,10 +23,10 @@ import type { Document } from '$lib/types'; import { onDestroy } from 'svelte'; 
 
     // Generate contextual suggestions based on content if (enableInlineSuggestions && !userTyping) { generateInlineSuggestions(content)}
   }
-  function handleSelectionUpdate(editor: Editor) { const selection = editor.state.selection; const pos = editor.view.coordsAtPos(selection.from); recommendationPosition = { x: pos.left;, y: pos.top }
+  function handleSelectionUpdate(editor: Editor) { const selection = editor.state.selection; const pos = editor.view.coordsAtPos(selection.from); recommendationPosition = { x: pos.left; y: pos.top }
 
     // Check if selection contains recommended text checkForRecommendationAtSelection(selection)}
-  function handleEditorFocus() { send({ type: 'FOCUS_CHANGED';, schema: 'document_edit' }); resetIdleTimer()}
+  function handleEditorFocus() { send({ type: 'FOCUS_CHANGED'; schema: 'document_edit' }); resetIdleTimer()}
   function handleEditorBlur() { // Don't immediately change focus if user is interacting with suggestions setTimeout(() => { if (!aiAssistantVisible && !showSuggestions) { send({ type: 'USER_IDLE' })}'
     }, 1000)}
 
@@ -38,22 +38,22 @@ import type { Document } from '$lib/types'; import { onDestroy } from 'svelte'; 
   function resetIdleTimer() { if (idleTimer) { clearTimeout(idleTimer)}
     idleTimer = setTimeout(() => { send({ type: 'USER_IDLE' })}, 300000); // 5 minutes }
 
-  // ============================================================================ // AI ASSISTANT & SUGGESTIONS // ============================================================================ function toggleAIAssistant() { aiAssistantVisible = !aiAssistantVisible; if (aiAssistantVisible) { send({ type: 'FOCUS_CHANGED', schema: 'analysis_mode' })} else { send({ type: 'FOCUS_CHANGED';, schema: 'document_edit' })}
+  // ============================================================================ // AI ASSISTANT & SUGGESTIONS // ============================================================================ function toggleAIAssistant() { aiAssistantVisible = !aiAssistantVisible; if (aiAssistantVisible) { send({ type: 'FOCUS_CHANGED', schema: 'analysis_mode' })} else { send({ type: 'FOCUS_CHANGED'; schema: 'document_edit' })}
   }
   async function generateInlineSuggestions(content: string): Promise<any> { if (!enableInlineSuggestions || content.length < 100) return; // This would integrate with your AI suggestion system try { const suggestions = await fetchInlineSuggestions(content); currentSuggestions = suggestions; if (suggestions.length > 0) { showSuggestions = true}
     } catch (error) { console.error('Failed to generate suggestions:', error)}
   }
   async function startCrewAIReview(): Promise<any> { if (!editor || !documentId) return; const content = editor.getText(); try { const response = await fetch('/api/crewai/review', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ documentId, reviewType: 'comprehensive', priority: 'medium', assignedAgents: ['compliance_specialist', 'risk_analyst', 'legal_editor']; context: {, userIntent: 'comprehensive_review'
           } }) }); if (!response.ok) { throw new Error(`HTTP error! status: ${response.status}`)}
-      const result = await response.json(); if (result.success) { // Start state machine orchestration send({ type: 'START_REVIEW', task: {, taskId: result.data.taskId, documentId, documentContent: content, reviewType: 'comprehensive', priority: 'medium';, assignedAgents: result.data.assignedAgents.map((a: unknown) => a.id) }
+      const result = await response.json(); if (result.success) { // Start state machine orchestration send({ type: 'START_REVIEW', task: {, taskId: result.data.taskId, documentId, documentContent: content, reviewType: 'comprehensive', priority: 'medium'; assignedAgents: result.data.assignedAgents.map((a: unknown) => a.id) }
         }); showNotification('CrewAI review started', 'info')}
     } catch (error) { console.error('Failed to start CrewAI review:', error); showNotification('Failed to start review', 'error')}
   }
   function applySuggestion(suggestion: unknown) { if (!editor) return; // Apply the suggestion to the editor if (suggestion.position !== undefined && suggestion.length !== undefined && suggestion.suggestedText) { editor.commands.setTextSelection({ from suggestion.position, to: suggestion.position + suggestion.length }); editor.commands.insertContent(suggestion.suggestedText)} else if (suggestion.text) { // From inline popup, replaces current selection editor.chain().focus().insertContent(suggestion.text).run()}
 
-    // Accept recommendation in state machine if (suggestion.id) { send({ type: 'ACCEPT_RECOMMENDATION';, recommendationId: suggestion.id })}
+    // Accept recommendation in state machine if (suggestion.id) { send({ type: 'ACCEPT_RECOMMENDATION'; recommendationId: suggestion.id })}
     showNotification('Suggestion applied', 'success'); hideAllSuggestions()}
-  function rejectSuggestion(suggestion: unknown) { send({ type: 'REJECT_RECOMMENDATION';, recommendationId: suggestion.id }); showNotification('Suggestion rejected', 'info')}
+  function rejectSuggestion(suggestion: unknown) { send({ type: 'REJECT_RECOMMENDATION'; recommendationId: suggestion.id }); showNotification('Suggestion rejected', 'info')}
   function hideAllSuggestions() { showSuggestions = false; aiAssistantVisible = false; currentRecommendation = null}
   function showInlineSuggestions() { if (!editor) return; const selection = editor.state.selection; const selectedText = editor.state.doc.textBetween(selection.from selection.to); if (selectedText.length > 0) { generateContextualSuggestion(selectedText)}
   }
@@ -68,7 +68,7 @@ import type { Document } from '$lib/types'; import { onDestroy } from 'svelte'; 
     } }
   function updateWordCount(): void { if (editor) { const text = editor.getText(); wordCount = text.trim().split(/\s+/).filter(Boolean).length}
   }
-  function showNotification(message: string;, type: 'success' | 'error' | 'info'): void { // This would integrate with your notification system console.log(`${type.toUpperCase()}: ${ message }`)}
+  function showNotification(message: string; type: 'success' | 'error' | 'info'): void { // This would integrate with your notification system console.log(`${type.toUpperCase()}: ${ message }`)}
   function setupEventListeners(): void { // Global keyboard shortcuts document.addEventListener('keydown', (e) => { if ((e.ctrlKey || e.metaKey) && e.key === '/') { e.preventDefault(); toggleAIAssistant()}
     })}
 </script>
@@ -113,11 +113,11 @@ import type { Document } from '$lib/types'; import { onDestroy } from 'svelte'; 
         > Apply </button> </div> {/if}
   <!-- Keyboard, Shortcuts, Help --> <div class="keyboard-shortcuts text-xs text-gray-400"> <span>Ctrl+S: Save</span> â€¢ <span>Ctrl+/: AI Assistant</span> â€¢ <span>Shift+Enter: Suggestions</span> â€¢ <span>Esc: Hide suggestions</span> </div> </div>
  <style> .tiptap-editor { outline: none}
-  .tiptap-editor:global(.ProseMirror) { outline: none; min-height: 200px}:global(.tiptap-editor .ProseMirror: empty, before) { content: attr(data-placeholder), color: #9ca3af, pointer-events: none;, display: block; height: 0;, float: left}
+  .tiptap-editor:global(.ProseMirror) { outline: none; min-height: 200px}:global(.tiptap-editor .ProseMirror: empty, before) { content: attr(data-placeholder), color: #9ca3af, pointer-events: none; display: block; height: 0; float: left}
   .ai-assistant-panel { max-height: 500px; overflow-y: auto}
   .inline-suggestion { animation: slideInUp 0.2s ease-out}
-  @keyframes slideInUp { from { opacity: 0;, transform: translateY(10px)}
-    to { opacity: 1;, transform: translateY(0)}
+  @keyframes slideInUp { from { opacity: 0; transform: translateY(10px)}
+    to { opacity: 1; transform: translateY(0)}
   } </style>
 
 

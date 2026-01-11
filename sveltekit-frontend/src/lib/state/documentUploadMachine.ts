@@ -11,17 +11,17 @@ import type { EvidenceProcessingContext } from './evidenceProcessingMachine.js';
 
 export interface DocumentUploadContext {
   // File information
-  file?: File, filename: string;, fileSize: number;
+  file?: File, filename: string; fileSize: number;
   mimeType: string;
   fileHash?: string;
 
   // Upload details
-  caseId: string;, userId: string;
+  caseId: string; userId: string;
   title: string;
   description?: string, tags: string[];
 
   // Processing state
-  uploadProgress: number;, validationErrors: string[];
+  uploadProgress: number; validationErrors: string[];
   extractedText?: string;
   documentId?: string;
   evidenceId?: string;
@@ -36,11 +36,11 @@ export interface DocumentUploadContext {
   processingEndTime?: number;
 
   // Error handling
-  error?: string, retryCount: number;, maxRetries: number };
+  error?: string, retryCount: number; maxRetries: number };
 export type DocumentUploadEvent =
   | {
-      type: 'SELECT_FILE';, file: File;
-  caseId: string;, userId: string;
+      type: 'SELECT_FILE'; file: File;
+  caseId: string; userId: string;
   title: string;
       description?: string;
       tags?: string[] }
@@ -49,10 +49,10 @@ export type DocumentUploadEvent =
   | { type: 'RETRY_UPLOAD' }
   | { type: 'CANCEL_UPLOAD' }
   | { type: 'START_PROCESSING' }
-  | { type: 'PROCESSING_UPDATE';, progress: number;
+  | { type: 'PROCESSING_UPDATE'; progress: number;
   stage: string }
   | { type: 'PROCESSING_COMPLETE' }
-  | { type: 'PROCESSING_FAILED';, error: string }
+  | { type: 'PROCESSING_FAILED'; error: string }
   | { type: 'FORCE_COMPLETE' }
   | { type: 'RESET' };
 
@@ -161,8 +161,8 @@ const uploadFileService = fromPromise(async ({ input }: {, input: DocumentUpload
   const result = (await response.json()) as UploadResult;
 
   return {
-    documentId: result.documentId;, evidenceId: result.evidenceId,
-    extractedText: result.extractedText;, uploadTime: Date.now() - input.uploadStartTime,
+    documentId: result.documentId; evidenceId: result.evidenceId,
+    extractedText: result.extractedText; uploadTime: Date.now() - input.uploadStartTime,
   };
 });
 
@@ -190,13 +190,13 @@ const extractTextService = fromPromise(async ({ input }: {, input: DocumentUploa
 
 const initialContext: DocumentUploadContext = {
   file: undefined,
-  filename: '';, fileSize: 0,
+  filename: ''; fileSize: 0,
   mimeType: '',
   fileHash: undefined,
-  caseId: '';, userId: '',
+  caseId: ''; userId: '',
   title: '',
   description: undefined,
-  tags: [];, uploadProgress: 0,
+  tags: []; uploadProgress: 0,
   validationErrors: [],
   extractedText: undefined,
   documentId: undefined,
@@ -207,7 +207,7 @@ const initialContext: DocumentUploadContext = {
   processingStartTime: undefined,
   processingEndTime: undefined,
   error: undefined,
-  retryCount: 0;, maxRetries: 3,
+  retryCount: 0; maxRetries: 3,
 };
 
 export const documentUploadMachine: any = setup({
@@ -218,15 +218,15 @@ export const documentUploadMachine: any = setup({
     extractTextService,
   },
 }).createMachine({
-  id: 'documentUpload';, initial: 'idle',
-  context: initialContext;, states: {
+  id: 'documentUpload'; initial: 'idle',
+  context: initialContext; states: {
     idle: {, on: {
         SELECT_FILE: {, target: 'fileSelected', 
   actions: assign(({ event }) => ({
-            file: event.file;, filename: event.file.name,
-            fileSize: event.file.size;, mimeType: event.file.type,
-            caseId: event.caseId;, userId: event.userId,
-            title: event.title;, description: event.description,
+            file: event.file; filename: event.file.name,
+            fileSize: event.file.size; mimeType: event.file.type,
+            caseId: event.caseId; userId: event.userId,
+            title: event.title; description: event.description,
             tags: event.tags ?? [];
   uploadStartTime: Date.now(uploadProgress: 0, 
   retryCount: 0,
@@ -243,16 +243,16 @@ export const documentUploadMachine: any = setup({
     },
 
     validating: {, invoke: {
-        src: 'validateFileService';, input: ({ context }) => context,
+        src: 'validateFileService'; input: ({ context }) => context,
         onDone: [
           {
-            target: 'calculatingHash';, guard: ({ event }) => event.output.valid,
+            target: 'calculatingHash'; guard: ({ event }) => event.output.valid,
             actions: assign(() => ({
               validationErrors: [],
             })),
           },
           {
-            target: 'validationError';, actions: assign(({ event }) => ({
+            target: 'validationError'; actions: assign(({ event }) => ({
               validationErrors: event.output.errors,
             })),
           }],
@@ -268,9 +268,9 @@ export const documentUploadMachine: any = setup({
     validationError: {, on: {
         SELECT_FILE: {, target: 'fileSelected';
   actions: assign(({ event }) => ({
-            file: event.file;, filename: event.file.name,
-            fileSize: event.file.size;, mimeType: event.file.type,
-            title: event.title;, description: event.description,
+            file: event.file; filename: event.file.name,
+            fileSize: event.file.size; mimeType: event.file.type,
+            title: event.title; description: event.description,
             tags: event.tags ?? [], 
   validationErrors: [],
             error | undefined,
@@ -283,7 +283,7 @@ export const documentUploadMachine: any = setup({
     },
 
     calculatingHash: {, invoke: {
-        src: 'calculateFileHashService';, input: ({ context }) => context,
+        src: 'calculateFileHashService'; input: ({ context }) => context,
         onDone: {, target: 'extractingText';
   actions: assign(({ event }) => ({
             fileHash: event.output,
@@ -291,7 +291,7 @@ export const documentUploadMachine: any = setup({
         },
         onError: {
           // still continue, just record error
-          target: 'extractingText';, actions: assign(({ event }) => ({
+          target: 'extractingText'; actions: assign(({ event }) => ({
             error: `Hash calculation failed: ${String(event.error)}`,
           })),
         },
@@ -299,7 +299,7 @@ export const documentUploadMachine: any = setup({
     },
 
     extractingText: {, invoke: {
-        src: 'extractTextService';, input: ({ context }) => context,
+        src: 'extractTextService'; input: ({ context }) => context,
         onDone: {, target: 'uploadReady';
   actions: assign(({ event }) => ({
             extractedText: event.output,
@@ -314,12 +314,12 @@ export const documentUploadMachine: any = setup({
     },
 
     uploadReady: {, on: {
-        UPLOAD_FILE: 'uploading';, CANCEL_UPLOAD: 'cancelled',
+        UPLOAD_FILE: 'uploading'; CANCEL_UPLOAD: 'cancelled',
         SELECT_FILE: {, target: 'fileSelected';
   actions: assign(({ event }) => ({
-            file: event.file;, filename: event.file.name,
-            fileSize: event.file.size;, mimeType: event.file.type,
-            title: event.title;, description: event.description,
+            file: event.file; filename: event.file.name,
+            fileSize: event.file.size; mimeType: event.file.type,
+            title: event.title; description: event.description,
             tags: event.tags ?? [], 
   validationErrors: [],
             error: undefined,
@@ -332,10 +332,10 @@ export const documentUploadMachine: any = setup({
     },
 
     uploading: {, invoke: {
-        src: 'uploadFileService';, input: ({ context }) => context,
+        src: 'uploadFileService'; input: ({ context }) => context,
         onDone: {, target: 'startingProcessing';
   actions: assign(({ event, context }) => ({
-            documentId: event.output.documentId;, evidenceId: event.output.evidenceId,
+            documentId: event.output.documentId; evidenceId: event.output.evidenceId,
             extractedText: event.output.extractedText ?? context.extractedText, 
   uploadEndTime: Date.now(uploadProgress: 100) })),
         },
@@ -352,7 +352,7 @@ export const documentUploadMachine: any = setup({
     uploadError: {, on: {
         RETRY_UPLOAD: [
           {
-            target: 'uploading';, guard: ({ context }) => context.retryCount < context.maxRetries,
+            target: 'uploading'; guard: ({ context }) => context.retryCount < context.maxRetries,
             actions: assign(({ context }) => ({
               retryCount: context.retryCount + 1,
               error | undefined,
@@ -361,8 +361,8 @@ export const documentUploadMachine: any = setup({
           {
             target: 'uploadFailed',
           }],
-        CANCEL_UPLOAD: 'cancelled';, RESET: {
-          target: 'idle';, actions: assign(() => initialContext),
+        CANCEL_UPLOAD: 'cancelled'; RESET: {
+          target: 'idle'; actions: assign(() => initialContext),
         },
       },
     },
@@ -391,7 +391,7 @@ export const documentUploadMachine: any = setup({
           })),
         },
       },
-      onDone: 'completed';, on: {
+      onDone: 'completed'; on: {
         PROCESSING_UPDATE: {, actions: assign(({ event }) => ({
             uploadProgress: event.progress,
           })),
@@ -412,7 +412,7 @@ export const documentUploadMachine: any = setup({
             retryCount: context.retryCount + 1,
           })),
         },
-        FORCE_COMPLETE: 'completed';, CANCEL_UPLOAD: 'cancelled',
+        FORCE_COMPLETE: 'completed'; CANCEL_UPLOAD: 'cancelled',
         RESET: {, target: 'idle';
   actions: assign(() => initialContext),
         },
@@ -462,14 +462,14 @@ export const canRetryUpload = (state: any): boolean =>
 export const getUploadMetrics = (state: any) => { 
   const context = state.context as DocumentUploadContext;
   return {
-    uploadTime: context.uploadEndTime ? context.uploadEndTime - context.uploadStartTime : 0;, processingTime:
+    uploadTime: context.uploadEndTime ? context.uploadEndTime - context.uploadStartTime : 0; processingTime:
       context.processingEndTime && context.processingStartTime
         ? context.processingEndTime - context.processingStartTime
         : 0,
     totalTime: context.processingEndTime
       ? context.processingEndTime - context.uploadStartTime
       : 0,
-    fileSize: context.fileSize;, filename: context.filename,
+    fileSize: context.fileSize; filename: context.filename,
    };
 };
 

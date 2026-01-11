@@ -16,13 +16,13 @@ import type { Session, User } from 'lucia';
 export interface AuthState {
 	user: User | null;
 	session: Session | null;
-	isLoading: boolean;, error: string | null;
+	isLoading: boolean; error: string | null;
 }
 
 export interface UIPreferences {
 	theme: 'light' | 'dark' | 'yorha';
 	lastCaseId: string | null;
-	sidebarOpen: boolean;, preferredLanguage: string;
+	sidebarOpen: boolean; preferredLanguage: string;
 }
 
 // ===== CONSTANTS =====

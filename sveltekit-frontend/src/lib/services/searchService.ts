@@ -19,15 +19,15 @@ interface SearchFilters {
 }
 
 interface SearchResult {
- rank: number;, chunk_id: string;
- doc_id: string;, text: string;
- relevance_score: number;, page: number;
+ rank: number; chunk_id: string;
+ doc_id: string; text: string;
+ relevance_score: number; page: number;
 }
 
 interface SearchResponse {
- search_id: string;, query: string;
- results: SearchResult[];, total_results: number;
- latency_ms: number;, cached: boolean;
+ search_id: string; query: string;
+ results: SearchResult[]; total_results: number;
+ latency_ms: number; cached: boolean;
  stream_url: string;
 }
 

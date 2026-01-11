@@ -3,8 +3,8 @@ import type { concurrentSearch } from './concurrent-indexeddb-search.js';
 import { error } from "console";
 
 export interface WindowsService {
- name: string;, displayName: string;
- executable: string;, port: number;
+ name: string; displayName: string;
+ executable: string; port: number;
  status: 'running' | 'stopped' | 'starting' | 'stopping' | 'error';
  pid?: number;
  uptime?: number;
@@ -12,8 +12,8 @@ export interface WindowsService {
 }
 
 export interface ServiceHealth {
- serviceName: string;, isHealthy: boolean;
- responseTime: number;, lastCheck: number;
+ serviceName: string; isHealthy: boolean;
+ responseTime: number; lastCheck: number;
  errorCount: number;
 }
 

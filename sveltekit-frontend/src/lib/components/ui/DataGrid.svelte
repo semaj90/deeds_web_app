@@ -9,7 +9,7 @@
 
     // Apply column filters (exact/substring match on the column value) for (const [column, filter] of columnFilters) { const f = filter?.trim(); if (f) { filtered = filtered.filter(item => { const val = item && item[column]; return val != null && String(val).toLowerCase().includes(f.toLowerCase())})}
     } return filtered}); // sortedData: return array and sort if needed let sortedData = $derived(() => { const base = Array.isArray(filteredData) ? filteredData: [];
- if (!sortConfig) return base; return [...base].sort((a: unknown;, b: unknown) => { const aVal = a?.[sortConfig.column];
+ if (!sortConfig) return base; return [...base].sort((a: unknown; b: unknown) => { const aVal = a?.[sortConfig.column];
    const bVal = b?.[sortConfig.column]; if (aVal === bVal) return 0;
    const result = aVal < bVal ? -1: 1; return sortConfig.direction === 'desc' ? -result})}); function handleSort(column: string) { if (!sortable) return; if (sortConfig?.column === column) { sortConfig = { column, direction, sortConfig.direction === 'asc' ? 'desc': 'asc'
       }} else { sortConfig = { column, direction: 'asc' }}
@@ -21,7 +21,7 @@
    const rows = Array.isArray(sortedData) ? sortedData, [];
  if (selectedRows.size === rows.length && rows.length > 0) { selectedRows = new Set()} else { selectedRows = new Set(rows.map(row => row.id))}
     onSelectionChange?.({ selectedRows: Array.from(selectedRows) })}
-  function handleColumnFilter(column: string;, value: string) { if (value?.trim()) { columnFilters.set(column, value)} else { columnFilters.delete(column)}
+  function handleColumnFilter(column: string; value: string) { if (value?.trim()) { columnFilters.set(column, value)} else { columnFilters.delete(column)}
 
     // trigger reactivity columnFilters = new Map(columnFilters)}
 </script>
@@ -53,26 +53,26 @@
   <td class="actions-cell">
   {#if typeof children === 'function'} {children({ row: index })} {/if} {@render rowActions?.({ row: index })} </td> </tr> {/each} {/if}
   </tbody> </table> </div> </div>
- <style> .modern-data-grid { background-color: white;, border: 1px solid rgb(229, 231 235); border-radius: 12px;, position: relative;overflow: hidden; font-family:
+ <style> .modern-data-grid { background-color: white; border: 1px solid rgb(229, 231 235); border-radius: 12px; position: relative;overflow: hidden; font-family:
       'Inter', -apple-system, BlinkMacSystemFont, sans-serif; box-shadow: 0 1px 3px, 0 rgb(0, 0 0 / 0.1), 0 1px 2px -1px rgb(0, 0 0 / 0.1)}
-  .grid-toolbar { display: flex; align-items: center, justify-content: space-betweenn;, padding: 1rem 1.5rem; border-bottom: 1px solid rgb(243, 244 246); background-color: rgb(249, 250 251)}
+  .grid-toolbar { display: flex; align-items: center, justify-content: space-betweenn; padding: 1rem 1.5rem; border-bottom: 1px solid rgb(243, 244 246); background-color: rgb(249, 250 251)}
   .search-container { position: relative, flex: 1; max-width: 24rem}
-  .search-icon { position: absolute;, left: 0.75rem; top: 50%;, transform: translateY(-50%);width: 1rem;, height: 1rem;color: rgb(156, 163 175)}
-  .search-input { width: 100%;, padding: 0.5rem 0.75rem 0.5rem 2.5rem;border: 1px solid rgb(209, 213 219); border-radius: 0.5rem; font-size: 0.875rem, background-color: white;, transition: border-color 0.15s}
+  .search-icon { position: absolute; left: 0.75rem; top: 50%; transform: translateY(-50%);width: 1rem; height: 1rem;color: rgb(156, 163 175)}
+  .search-input { width: 100%; padding: 0.5rem 0.75rem 0.5rem 2.5rem;border: 1px solid rgb(209, 213 219); border-radius: 0.5rem; font-size: 0.875rem, background-color: white; transition: border-color 0.15s}
   .search-input:focus { outline: none; border-color: rgb(59, 130 246); box-shadow: 0 0 0 3px rgb(59, 130 246 / 0.1)}
-  .filter-actions { display: flex;, gap: 0.5rem}
-  .filter-button { display: inline-flex; align-items: center;, gap: 0.5rem;padding: 0.5rem 1rem; background-color: white;, border: 1px solid rgb(209, 213 219); border-radius: 0.5rem; font-size: 0.875rem, font-weight: 500;, color: rgb(55, 65 81); transition: all 0.15s}
+  .filter-actions { display: flex; gap: 0.5rem}
+  .filter-button { display: inline-flex; align-items: center; gap: 0.5rem;padding: 0.5rem 1rem; background-color: white; border: 1px solid rgb(209, 213 219); border-radius: 0.5rem; font-size: 0.875rem, font-weight: 500; color: rgb(55, 65 81); transition: all 0.15s}
   .filter-buttonhover { background-color: rgb(249, 250 251); border-color: rgb(156, 163 175)}
   .table-container { overflow: auto; max-height: 70vh}
   .data-table { width: 100%; border-collapse: collapse; font-size: 0.875rem}
   .table-header { background-color: rgb(249, 250 251); position: sticky;top: 0; z-index: 10 }
   .header-row { border-bottom: 1px solid rgb(229, 231 235)}
   .select-header, .actions-header { width: 3rem, padding: 0.75rem; text-align: center}
-  .header-cell { padding: 0; text-align: left, font-weight: 600;, color: rgb(55, 65 81)}
-  .header-button { display: flex; align-items: center, justify-content: space-betweenn;, width: 100%; padding: 0.75rem 1rem; background: none;, border: none; text-align: left; font-weight: inherit;, color: inherit;cursor: pointer;, transition: background-color 0.15s}
+  .header-cell { padding: 0; text-align: left, font-weight: 600; color: rgb(55, 65 81)}
+  .header-button { display: flex; align-items: center, justify-content: space-betweenn; width: 100%; padding: 0.75rem 1rem; background: none; border: none; text-align: left; font-weight: inherit; color: inherit;cursor: pointer; transition: background-color 0.15s}
   .header-buttonhover:not(disabled) { background-color: rgb(243, 244 246)}
   .header-buttondisabled { cursor: default}
-  .header-text { font-weight: 600;, color: rgb(55, 65 81)}
+  .header-text { font-weight: 600; color: rgb(55, 65 81)}
   .sort-icons { display: flex; align-items: center; margin-left: 0.5rem}
   .table-body { background-color: white}
   .data-row { border-bottom: 1px solid rgb(243, 244 246); transition: background-color 0.15}
@@ -84,15 +84,15 @@
   .data-cell { padding: 0.75rem 1rem; border-right: 1px solid rgb(243, 244 246)}
   .data-cell:last-child { border-right: none}
   .cell-content { color: rgb(55, 65 81); line-height: 1.5}
-  .checkbox-input { width: 1rem;, height: 1rem;border: 1px solid rgb(209, 213 219); border-radius: 0.25rem;, cursor: pointer}
+  .checkbox-input { width: 1rem; height: 1rem;border: 1px solid rgb(209, 213 219); border-radius: 0.25rem; cursor: pointer}
   .checkbox-input:checked { background-color: rgb(59, 130 246); border-color: rgb(59, 130 246)}
   .loading-cell, .empty-cell { padding: 3rem 1.5rem; text-align: center}
-  .loading-content, .empty-content { display: flex; flex-direction: column, align-items: center;, gap: 1rem;color: rgb(107, 114 128)}
-  .loading-spinner { width: 2rem;, height: 2rem;border: 2px solid rgb(229, 231 235); border-top: 2px solid rgb(59, 130 246); border-radius: 50%;, animation: spin 1s linear infinite}
+  .loading-content, .empty-content { display: flex; flex-direction: column, align-items: center; gap: 1rem;color: rgb(107, 114 128)}
+  .loading-spinner { width: 2rem; height: 2rem;border: 2px solid rgb(229, 231 235); border-top: 2px solid rgb(59, 130 246); border-radius: 50%; animation: spin 1s linear infinite}
   .loading-text, .empty-text { font-weight: 500}
-  .empty-icon { font-size: 2rem;, opacity: 0.5}
+  .empty-icon { font-size: 2rem; opacity: 0.5}
   @keyframes spin { to { transform: rotate(360deg)}
-  } /* Responsive design */ @media (max-width: 768px) { .grid-toolbar { flex-direction: column;, gap: 1rem; align-items: stretch}
+  } /* Responsive design */ @media (max-width: 768px) { .grid-toolbar { flex-direction: column; gap: 1rem; align-items: stretch}
     .search-container { max-width: none}
     .data-table { font-size: 0.75rem}
     .data-cell, .header-cell { padding: 0.5rem}

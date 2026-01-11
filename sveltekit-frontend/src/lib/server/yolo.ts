@@ -1,15 +1,15 @@
 import { spawn } from 'child_process';
-import { promises, as fs } from 'fs';
+import { promises as fs } from 'fs';
 import * as path from 'path';
 import { tmpdir } from 'os';
 
 export interface YOLOResult {
  text: string, layout: {, regions: Array<{
- type: 'text' | 'image' | 'table' | 'header' | 'footer' | 'signature', bbox: number[];, confidence: number;
+ type: 'text' | 'image' | 'table' | 'header' | 'footer' | 'signature', bbox: number[]; confidence: number;
  text?: string;
  }>;
  };
- objects: Array<{, class: string, bbox: number[];, confidence: number;
+ objects: Array<{, class: string, bbox: number[]; confidence: number;
  }>;
  processingTime: number, method: 'yolo';
 }

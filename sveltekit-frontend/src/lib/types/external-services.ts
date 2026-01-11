@@ -24,12 +24,12 @@ export interface OllamaConfig {
 
 // ===== Qdrant Vector Database =====
 export interface QdrantVectorPayload {
-  id: string;, vector: number[];
+  id: string; vector: number[];
   payload?: Record<string, unknown>;
 }
 
 export interface QdrantSearchResult<T = Record<string, unknown>> {
-  id: string;, score: number;
+  id: string; score: number;
   payload?: T;
   vector?: number[];
 }
@@ -47,7 +47,7 @@ export interface QdrantClient {
 }
 
 export interface QdrantConfig {
-  host: string;, port: number;
+  host: string; port: number;
   apiKey?: string;
   timeout?: number;
 }
@@ -78,8 +78,8 @@ export interface RedisConfig {
 
 // ===== PostgreSQL + pgvector =====
 export interface PostgresConfig {
-  host: string;, port: number;
-  database: string;, user: string;
+  host: string; port: number;
+  database: string; user: string;
   password: string;
   fallbackUser?: string;
   fallbackPassword?: string;
@@ -94,7 +94,7 @@ export interface PgVectorClient {
     collection: string,
     vector: number[],
     limit?: number
-  ): Promise<Array<{, id: string; similarity: number;, metadata: Record<string, unknown> }>>;
+  ): Promise<Array<{, id: string; similarity: number; metadata: Record<string, unknown> }>>;
   insert(
     collection: string,
     vectors: Array<{, id: string; vector: number[]; metadata?: Record<string, unknown> }>
@@ -105,8 +105,8 @@ export interface PgVectorClient {
 
 // ===== MinIO Object Storage =====
 export interface MinIOConfig {
-  endPoint: string;, port: number;
-  accessKey: string;, secretKey: string;
+  endPoint: string; port: number;
+  accessKey: string; secretKey: string;
   useSSL: boolean;
   region?: string;
 }
@@ -120,14 +120,14 @@ export interface MinIOClient {
   ): Promise<{, etag: string }>;
   getObject(bucket: string, key: string): Promise<ReadableStream>;
   removeObject(bucket: string, key: string): Promise<void>;
-  listObjects(bucket: string, prefix?: string): Promise<Array<{, name: string; size: number;, etag: string }>>;
+  listObjects(bucket: string, prefix?: string): Promise<Array<{, name: string; size: number; etag: string }>>;
   makeBucket?(bucket: string, region?: string): Promise<void>;
   bucketExists?(bucket: string): Promise<boolean>;
 }
 
 // ===== Neo4j Graph Database =====
 export interface Neo4jConfig {
-  uri: string;, user: string;
+  uri: string; user: string;
   password: string;
   database?: string;
   maxConnectionPoolSize?: number;
@@ -141,19 +141,19 @@ export interface Neo4jClient {
 
 // ===== Environment Configuration =====
 export interface ServiceEnvironment {
-  databaseUrl: string;, postgresConfig: PostgresConfig;
-  redisConfig: RedisConfig;, qdrantConfig: QdrantConfig;
-  ollamaConfig: OllamaConfig;, minioConfig: MinIOConfig;
-  neo4jConfig: Neo4jConfig;, nodeEnv: 'development' | 'production' | 'test';
-  devBypassAuth: boolean;, logLevel: 'error' | 'warn' | 'info' | 'debug';
+  databaseUrl: string; postgresConfig: PostgresConfig;
+  redisConfig: RedisConfig; qdrantConfig: QdrantConfig;
+  ollamaConfig: OllamaConfig; minioConfig: MinIOConfig;
+  neo4jConfig: Neo4jConfig; nodeEnv: 'development' | 'production' | 'test';
+  devBypassAuth: boolean; logLevel: 'error' | 'warn' | 'info' | 'debug';
 }
 
 // ===== Service URLs =====
 export interface ServiceUrls {
-  postgres: string;, redis: string;
-  qdrant: string;, ollama: string;
-  ollamaEmbeddings: string;, minio: string;
-  minioConsole: string;, neo4j: string;
+  postgres: string; redis: string;
+  qdrant: string; ollama: string;
+  ollamaEmbeddings: string; minio: string;
+  minioConsole: string; neo4j: string;
   neo4jBrowser: string;
   quicGateway?: string;
   quicVectorService?: string;

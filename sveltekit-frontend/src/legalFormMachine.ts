@@ -10,31 +10,31 @@ export interface LegalFormContext {
 	evidenceFiles: File[];
 
 	// Case details
-	caseTitle: string;, caseDescription: string; evidenceType: 'digital' | 'physical' | 'testimony' | 'forensic';
+	caseTitle: string; caseDescription: string; evidenceType: 'digital' | 'physical' | 'testimony' | 'forensic';
 	priority: 'low' | 'medium' | 'high' | 'critical';
 	assignedTo: string;
 
 	// AI features
-	aiSuggestions: string[];, aiRecommendations: { nextAction: string;, reasoning: string; confidence: number;
+	aiSuggestions: string[]; aiRecommendations: { nextAction: string; reasoning: string; confidence: number;
 	}[];
 
 	// Progress tracking
-	confidence: number;, currentStep: number; totalSteps: number;, validationErrors: Record<string, string>;
+	confidence: number; currentStep: number; totalSteps: number; validationErrors: Record<string, string>;
 }
 
 export type LegalFormEvent =
 	| { type: 'NEXT' }
 	| { type: 'BACK' }
 	| { type: 'SUBMIT' }
-	| { type: 'UPLOAD_EVIDENCE';, files: File[] }
-	| { type: 'UPDATE_CASE_DETAILS';, title: string; description: string }
-	| { type: 'SET_EVIDENCE_TYPE';, evidenceType: LegalFormContext['evidenceType'] }
-	| { type: 'SET_PRIORITY';, priority: LegalFormContext['priority'] }
-	| { type: 'AI_SUGGESTION';, suggestions: string[] }
+	| { type: 'UPLOAD_EVIDENCE'; files: File[] }
+	| { type: 'UPDATE_CASE_DETAILS'; title: string; description: string }
+	| { type: 'SET_EVIDENCE_TYPE'; evidenceType: LegalFormContext['evidenceType'] }
+	| { type: 'SET_PRIORITY'; priority: LegalFormContext['priority'] }
+	| { type: 'AI_SUGGESTION'; suggestions: string[] }
 	| { type: 'VALIDATE_STEP' }
 	| { type: 'RESET_FORM' }
 	| { type: 'REQUEST_AI_HELP' }
-	| { type: 'APPLY_AI_RECOMMENDATION';, recommendation: string };
+	| { type: 'APPLY_AI_RECOMMENDATION'; recommendation: string };
 
 /**
  * Async service for case submission

@@ -5,17 +5,17 @@
  */
 
 export interface ChangeDetectionResult {
- changePercentage: number;, changedStatutes: string[];
+ changePercentage: number; changedStatutes: string[];
  newLabels: Map<string, string>;
  previousLabels: Map<string, string>;
- shouldAlert: boolean;, alertMessage: string;
- changedCount: number;, totalCount: number;
+ shouldAlert: boolean; alertMessage: string;
+ changedCount: number; totalCount: number;
 }
 
 export interface ChangeHistory {
- timestamp: number;, version: number;
- changePercentage: number;, changedCount: number;
- totalCount: number;, alertTriggered: boolean;
+ timestamp: number; version: number;
+ changePercentage: number; changedCount: number;
+ totalCount: number; alertTriggered: boolean;
 }
 
 /**
@@ -128,8 +128,8 @@ export async function getChangeHistory(limit: number = 100): Promise<ChangeHisto
  * Analyze change trends
  */
 export function analyzeChangeTrends(history: ChangeHistory[]): {, avgChangePercentage: number;
- maxChangePercentage: number;, minChangePercentage: number;
- alertFrequency: number;, trend: 'increasing' | 'decreasing' | 'stable';
+ maxChangePercentage: number; minChangePercentage: number;
+ alertFrequency: number; trend: 'increasing' | 'decreasing' | 'stable';
 } {
  if (history.length === 0) {
  return {
@@ -174,7 +174,7 @@ export function compareVersions(
  version1: Map<string, string>,
  version2: Map<string, string>
 ): {, added: string[];
- removed: string[];, changed: string[];
+ removed: string[]; changed: string[];
  unchanged: string[];
 } {
  const added: string[] = [];

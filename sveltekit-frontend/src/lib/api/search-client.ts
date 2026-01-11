@@ -24,7 +24,7 @@ export async function search(
  if (!query) return { results: [], count: 0 };
  const url = `/api/search?q=${encodeURIComponent(query)}&limit=${encodeURIComponent(String(limit))}`;
  const res = await fetch(url, { method: 'GET', signal });
- return handleJsonResponse<{ results: SearchResult[];, count: number }>(res);
+ return handleJsonResponse<{ results: SearchResult[]; count: number }>(res);
 }
 
 export async function advancedSearch(
@@ -37,7 +37,7 @@ export async function advancedSearch(
  body: JSON.stringify(payload),
  signal,
  });
- return handleJsonResponse<{ results: SearchResult[];, count: number }>(res);
+ return handleJsonResponse<{ results: SearchResult[]; count: number }>(res);
 }
 
 // Example usage hint (not executed):

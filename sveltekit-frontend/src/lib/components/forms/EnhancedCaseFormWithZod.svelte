@@ -37,7 +37,7 @@
             let errorMsg = 'Submission failed'; if (result?.type === 'error') { // result is narrowed to { type: 'error', error: any } const err = result.error; errorMsg = err?.message ?? String(err) ?? errorMsg} else if (result?.type === 'failure') { // result is narrowed to { type: 'failure', data?: Record<string, unknown> } const data = result.data; // Prefer a: 'message' property in data, otherwise stringify the payload if (data && typeof data === 'object' && 'message' in data) { // @ts-ignore - runtime check above ensures access is safe errorMsg = (data as any).message ?? JSON.stringify(data) ?? errorMsg} else { errorMsg = JSON.stringify(data) ?? errorMsg}
             } else if (result?.type === 'redirect') { // result is narrowed to { type: 'redirect', location: string }
 
-   // Provide a helpful message when a redirect occurs // @ts-ignore - access for runtime info errorMsg = `Redirected to ${(result, as any).location}`} else { // Fallback for: unknown shapes try { errorMsg = JSON.stringify(result) || String(result) || errorMsg} catch { errorMsg = String(result) || errorMsg}
+   // Provide a helpful message when a redirect occurs // @ts-ignore - access for runtime info errorMsg = `Redirected to ${(result as any).location}`} else { // Fallback for: unknown shapes try { errorMsg = JSON.stringify(result) || String(result) || errorMsg} catch { errorMsg = String(result) || errorMsg}
             } if (onerror) onerror({ message: errorMsg }); componentError = new Error(errorMsg)}
         } finally { // always stop submitting and update form UI isSubmitting = false; await update()}
       }})}

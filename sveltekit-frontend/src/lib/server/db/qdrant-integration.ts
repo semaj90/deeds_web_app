@@ -5,7 +5,7 @@ import * as schema from './schema.js';
 import { eq, sql } from 'drizzle-orm';
 
 export interface QdrantConfig {
-    host: string;, port: number;
+    host: string; port: number;
     apiKey?: string;
 }
 

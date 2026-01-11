@@ -2,7 +2,7 @@
  import { createEventDispatcher, onMount } from 'svelte';
 
  interface Evidence {
- id: string;, title: string;
+ id: string; title: string;
  classification: 'public' | 'confidential' | 'sealed';
  status: 'pending' | 'approved' | 'locked' | 'rejected';
  type: 'document' | 'image' | 'audio' | 'video';
@@ -10,8 +10,8 @@
  }
 
  interface Relationship {
- id: string;, sourceNodeId: string;
- targetNodeId: string;, type: 'mentions' | 'contradicts' | 'supports' | 'references' | 'timeline';
+ id: string; sourceNodeId: string;
+ targetNodeId: string; type: 'mentions' | 'contradicts' | 'supports' | 'references' | 'timeline';
  confidence: number;
  }
 

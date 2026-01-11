@@ -8,18 +8,18 @@ import { webASMInferenceService } from './webasm-inference-service.js';
 
 export interface VectorSearchPipelineConfig {
     embedding: {, model: string;
-        dimensions: number;, batchSize: number;
+        dimensions: number; batchSize: number;
     };
     similarity: {, model: string;
         function: 'cosine' | 'euclidean' | 'dot_product';
         threshold: number;
     };
     caching: {, enabled: boolean;
-        ttl: number;, maxSize: number;
+        ttl: number; maxSize: number;
         compression: boolean;
     };
     webasm: {, memoryPages: number;
-        simdEnabled: boolean;, threadCount: number;
+        simdEnabled: boolean; threadCount: number;
         quantization: 'fp32' | 'fp16' | 'int8' | 'int4';
     };
 }
@@ -33,16 +33,16 @@ export interface SearchRequest {
 }
 
 export interface SearchResult {
-    id: string;, content: string;
+    id: string; content: string;
     similarity: number;
     metadata?: Record<string, unknown>;
     embedding?: Float32Array;
 }
 
 export interface PipelineMetrics {
-    totalTime: number;, embeddingTime: number;
-    searchTime: number;, cacheHitRate: number;
-    throughput: number;, wasmMemoryUsage: number;
+    totalTime: number; embeddingTime: number;
+    searchTime: number; cacheHitRate: number;
+    throughput: number; wasmMemoryUsage: number;
     gpuUtilization: number;
 }
 
@@ -52,7 +52,7 @@ export interface PipelineMetrics {
  */
 export class VectorSearchWebASMPipeline {
     private config: VectorSearchPipelineConfig;
-    private cache = new Map<string, { results: SearchResult[];, timestamp: number }>();
+    private cache = new Map<string, { results: SearchResult[]; timestamp: number }>();
     private performanceMetrics: PipelineMetrics = {
         totalTime: 0, embeddingTime: 0, searchTime: 0, cacheHitRate: 0, throughput: 0, wasmMemoryUsage: 0, gpuUtilization: 0
     };

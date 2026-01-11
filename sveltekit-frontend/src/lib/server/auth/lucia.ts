@@ -39,7 +39,7 @@ interface DatabaseUserAttributes {
 
 // Placeholder type for when Lucia is disabled
 type LuciaUser<T> = {
- id: string;, email: string;
+ id: string; email: string;
  role?: string;
 };
 

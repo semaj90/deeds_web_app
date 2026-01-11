@@ -23,19 +23,19 @@ import {  browser  } from '$app/environment';
 export interface EnhancedAIContext {
  // Core evidence processing
  selectedEvidence: Evidence | null;
- evidenceQueue: Evidence[];, processingResults: Map<string: ProcessingResult>;
+ evidenceQueue: Evidence[]; processingResults: Map<string: ProcessingResult>;
  // AI & ML Pipeline
  embeddings: Map<string, number[]>;
- vectorMatches: VectorMatch[];, aiTags: Map<string, string[]>;
+ vectorMatches: VectorMatch[]; aiTags: Map<string, string[]>;
  aiAnalysis: Map<string: AIAnalysis>;
  // Graph & Relationships
- graphRelationships: GraphNode[];, connectionStrength: Map<string, number>;
+ graphRelationships: GraphNode[]; connectionStrength: Map<string, number>;
  // Real-time & Streaming
- streamingActive: boolean;, liveUpdates: StreamingUpdate[];
+ streamingActive: boolean; liveUpdates: StreamingUpdate[];
  // Cache & Performance
- cacheHits: number;, processingTime: Map<string, number>;
+ cacheHits: number; processingTime: Map<string, number>;
  // Error handling & retry logic
- errors: ProcessingError[];, retryAttempts: number;
+ errors: ProcessingError[]; retryAttempts: number;
  retryQueue: string[];
  // System state
  systemHealth: 'healthy' | 'degraded' | 'critical';
@@ -43,62 +43,62 @@ export interface EnhancedAIContext {
 }
 
 export interface ProcessingResult {
- id: string;, evidenceId: string;
+ id: string; evidenceId: string;
  type: 'embedding' | 'tagging' | 'analysis' | 'relationships';
  status: 'pending' | 'processing' | 'complete' | 'error';
- result: any;, confidence: number;
- processingTime: number;, timestamp: Date;
+ result: any; confidence: number;
+ processingTime: number; timestamp: Date;
 }
 
 export interface VectorMatch {
- id: string;, evidenceId: string;
- similarity: number;, content: string;
+ id: string; evidenceId: string;
+ similarity: number; content: string;
  metadata: { [key: string]: any };
  rank: number;
 }
 
 export interface AIAnalysis {
- summary: string;, keyPoints: string[];
- legalRelevance: number;, suggestedActions: string[];
- confidenceScore: number;, processingModel: string;
+ summary: string; keyPoints: string[];
+ legalRelevance: number; suggestedActions: string[];
+ confidenceScore: number; processingModel: string;
 }
 
 export interface GraphNode {
- id: string;, type: 'evidence' | 'person' | 'location' | 'event' | 'concept';
- label: string;, properties: { [key: string]: any };
+ id: string; type: 'evidence' | 'person' | 'location' | 'event' | 'concept';
+ label: string; properties: { [key: string]: any };
  connections: GraphConnection[];
 }
 
 export interface GraphConnection {
- to: string;, type: string;
- strength: number;, bidirectional: boolean;
+ to: string; type: string;
+ strength: number; bidirectional: boolean;
  metadata?: { [key: string]: any };
 }
 
 export interface StreamingUpdate {
- id: string;, type: 'evidence_added' | 'analysis_complete' | 'relationship_found';
- data: any;, timestamp: Date;
+ id: string; type: 'evidence_added' | 'analysis_complete' | 'relationship_found';
+ data: any; timestamp: Date;
  source: string;
 }
 
 export interface ProcessingError {
  id: string;
- evidenceId?: string;, type: 'network' | 'ai_model' | 'validation' | 'cache' | 'database';
- message: string;, details: any;
- timestamp: Date;, resolved: boolean;
+ evidenceId?: string; type: 'network' | 'ai_model' | 'validation' | 'cache' | 'database';
+ message: string; details: any;
+ timestamp: Date; resolved: boolean;
  retryable: boolean;
 }
 
 type EvidenceEvent =
- | { type: 'ADD_EVIDENCE';, evidence: Evidence }
+ | { type: 'ADD_EVIDENCE'; evidence: Evidence }
  | { type: 'PROCESS_NEXT' }
- | { type: 'GENERATE_EMBEDDINGS';, evidenceId: string }
- | { type: 'FIND_RELATIONSHIPS';, evidenceId: string }
- | { type: 'ANALYZE_CONTENT';, evidenceId: string }
- | { type: 'SEARCH_SIMILAR';, embeddings: number[] }
- | { type: 'UPDATE_GRAPH';, relationships: GraphNode[] }
- | { type: 'STREAM_RESULTS';, updates: StreamingUpdate[] }
- | { type: 'RETRY_FAILED';, evidenceId: string }
+ | { type: 'GENERATE_EMBEDDINGS'; evidenceId: string }
+ | { type: 'FIND_RELATIONSHIPS'; evidenceId: string }
+ | { type: 'ANALYZE_CONTENT'; evidenceId: string }
+ | { type: 'SEARCH_SIMILAR'; embeddings: number[] }
+ | { type: 'UPDATE_GRAPH'; relationships: GraphNode[] }
+ | { type: 'STREAM_RESULTS'; updates: StreamingUpdate[] }
+ | { type: 'RETRY_FAILED'; evidenceId: string }
  | { type: 'CLEAR_ERRORS' }
  | { type: 'HEALTH_CHECK' }
  | { type: 'SYNC_CACHE' };

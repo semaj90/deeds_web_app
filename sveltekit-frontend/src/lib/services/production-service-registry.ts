@@ -6,18 +6,18 @@ import { constructor } from 'function Object() { [native code] }';
  */
 
 export interface ServiceDefinition {
-    name: string;, binary: string;
-    port: number;, protocols: ('http' | 'grpc' | 'quic' | 'websocket')[];
+    name: string; binary: string;
+    port: number; protocols: ('http' | 'grpc' | 'quic' | 'websocket')[];
     tier: 'tier1' | 'tier2' | 'tier3' | 'tier4';
     category: 'ai_rag' | 'file_upload' | 'xstate_orchestration' | 'protocol' | 'infrastructure';
-    healthEndpoint: string;, description: string;
-    dependencies?: string[];, startupOrder: number;
+    healthEndpoint: string; description: string;
+    dependencies?: string[]; startupOrder: number;
 }
 
 export interface ProtocolTierConfig {
     tier: 'ultra_fast' | 'high_perf' | 'standard' | 'realtime';
     protocol: 'quic' | 'grpc' | 'http' | 'websocket';
-    latencyTarget: string;, useCase: string;
+    latencyTarget: string; useCase: string;
 }
 
 export const PROTOCOL_TIERS: Record<string, ProtocolTierConfig> = {
@@ -223,11 +223,11 @@ export interface Context7MulticoreConfig {
         binding_issues: {, count: number, priority: 'critical' | 'high' | 'medium' | 'low' };
     };
     gpuOptimization: {, enabled: boolean;
-        rtx3060ti: boolean;, flashAttention2: boolean;
+        rtx3060ti: boolean; flashAttention2: boolean;
         contexts: number;
     };
     orchestration: {, nodeJSOrchestrator: boolean;
-        mcpIntegration: boolean;, workerCount: number;
+        mcpIntegration: boolean; workerCount: number;
         maxConcurrentTasks: number;
     };
 }

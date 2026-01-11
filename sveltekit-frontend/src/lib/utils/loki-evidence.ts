@@ -35,10 +35,10 @@ export type LokiEvidence = EvidenceItem & {
 };
 
 export interface SyncOperation {
-	id: string;, type: 'CREATE' | 'UPDATE' | 'DELETE';
-	collectionName: string;, recordId: string;
-	data?: unknown;, timestamp: string;
-	synced: boolean;, retryCount: number;
+	id: string; type: 'CREATE' | 'UPDATE' | 'DELETE';
+	collectionName: string; recordId: string;
+	data?: unknown; timestamp: string;
+	synced: boolean; retryCount: number;
 }
 
 export class LokiEvidenceService {

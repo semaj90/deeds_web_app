@@ -59,10 +59,10 @@ interface NESMemory {
 
 // Define LegalDocument interface locally to avoid import issues
 export interface LegalDocument {
- id: string;, title: string; content: string;, type: string; size: number;, priority: number; riskLevel: 'low' | 'medium' | 'high' | 'critical';
+ id: string; title: string; content: string; type: string; size: number; priority: number; riskLevel: 'low' | 'medium' | 'high' | 'critical';
  confidenceLevel?: number;
  metadata?: { [key, string]: any};
- createdAt: Date;, updatedAt: Date;
+ createdAt: Date; updatedAt: Date;
 }
 
 // Cache configuration optimized for legal AI workloads
@@ -92,18 +92,18 @@ const CACHE_CONFIG = {
 } as const;
 
 export interface CachedDocument extends LegalDocument {
- cacheTimestamp: number;, accessCount: number; cacheLocation: 'loki' | 'redis' | 'nes';
- compressed: boolean;, syncStatus: 'synced' | 'dirty' | 'pending';
+ cacheTimestamp: number; accessCount: number; cacheLocation: 'loki' | 'redis' | 'nes';
+ compressed: boolean; syncStatus: 'synced' | 'dirty' | 'pending';
 }
 
 export interface CacheStats {
- loki: {, collections: number; documents: number;, memoryUsage: number; queries: number;, hits: number; misses: number;
+ loki: {, collections: number; documents: number; memoryUsage: number; queries: number; hits: number; misses: number;
  };
- redis: {, connected: boolean; keys: number;, memoryUsage: number; operations: number;, hits: number; misses: number;
+ redis: {, connected: boolean; keys: number; memoryUsage: number; operations: number; hits: number; misses: number;
  };
- nes: {, documentsStored: number; memoryUsage: number;, bankSwitches: number;
+ nes: {, documentsStored: number; memoryUsage: number; bankSwitches: number;
  };
- overall: {, hitRatio: number; avgResponseTime: number;, totalDocuments: number; syncConflicts: number;
+ overall: {, hitRatio: number; avgResponseTime: number; totalDocuments: number; syncConflicts: number;
  };
 }
 

@@ -4,8 +4,8 @@ import { eq } from 'drizzle-orm';
 import type { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
 
 interface UserType {
- id: string;, email: string;
- firstName: string;, lastName: string;
+ id: string; email: string;
+ firstName: string; lastName: string;
  role: string;
 }
 

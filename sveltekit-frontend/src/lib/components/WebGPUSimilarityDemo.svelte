@@ -5,7 +5,7 @@
  import { Cpu } from "lucide-svelte";
 import { Loader } from "lucide-svelte";
 import { Search } from "lucide-svelte";
-import { Zap } from "lucide-svelte";;
+import { Zap } from "lucide-svelte";
 
  let queryText = $state('');
  let searchResults = $state<SimilaritySearchResult | null>(null);

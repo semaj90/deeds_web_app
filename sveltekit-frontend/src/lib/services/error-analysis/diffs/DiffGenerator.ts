@@ -14,7 +14,7 @@ export class DiffGenerator {
  createPatchCandidate(opts: {, runId: string;
  filePath: string; // repo-relative
  beforeText?: string; // optional override
- afterText: string;, reason: string;
+ afterText: string; reason: string;
  confidence: number;
  contextLines?: number; // default 3-5
  }): PatchCandidate {

@@ -8,14 +8,14 @@
  };
 }
 export interface FetchTimeoutError extends Error {
- name: 'TimeoutError';, code: 'FETCH_TIMEOUT';
+ name: 'TimeoutError'; code: 'FETCH_TIMEOUT';
  duration?: number;
 }
 export interface FetchAbortError extends Error {
- name: 'AbortError';, code: 'FETCH_ABORTED';
+ name: 'AbortError'; code: 'FETCH_ABORTED';
 }
 export interface FetchNetworkError extends Error {
- name: 'NetworkError';, code: 'NETWORK_ERROR';
+ name: 'NetworkError'; code: 'NETWORK_ERROR';
  status?: number;
 }
 /** * Enhanced fetch with AbortController-based timeout and retry logic */ export async function fetchWithTimeout(

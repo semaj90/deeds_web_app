@@ -81,9 +81,9 @@ export interface MemoryBank {
 	readonly type: 'INTERNAL_RAM' | 'CHR_ROM' | 'PRG_ROM' | 'SAVE_RAM' | 'EXPANSION_ROM';
 	readonly startAddress: number;
 	readonly endAddress: number;
-	readonly size: number;, used: number;
-	readonly documents: Map<string: LegalDocument>;, isActive: boolean;
-	lastBankSwitch: number;, compressionRatio: number;
+	readonly size: number; used: number;
+	readonly documents: Map<string: LegalDocument>; isActive: boolean;
+	lastBankSwitch: number; compressionRatio: number;
 }
 
 export interface MemoryStats {
@@ -612,8 +612,8 @@ export class NESMemoryArchitecture {
 // =========================================================================
 
 interface PlannerNodeRecord {
-	handle: number;, graphNodeId: string;
-	parentHandle: number;, depth: number;
+	handle: number; graphNodeId: string;
+	parentHandle: number; depth: number;
 }
 
 class PlannerMemoryManager {
@@ -629,7 +629,7 @@ class PlannerMemoryManager {
 	private handleByGraphId: Map<string, number> = new Map();
 	private insertionOrder: number[] = [];
 	private freeList: number[] = [];
-	private transpositionCache: Map<string, { visits: number;, value: number; updated: number }>;
+	private transpositionCache: Map<string, { visits: number; value: number; updated: number }>;
 	private lastAllocation = 0;
 
 	constructor(capacity = 8192) {
@@ -777,7 +777,7 @@ export const plannerMemory = new PlannerMemoryManager(4096);
 // Convenience bridge API for Neo4jAlphaGoPlanner
 export const nesPlannerBridge = {
 	allocateNode(params: {, graphNodeId: string;
-		parentHandle: number;, prior: number;
+		parentHandle: number; prior: number;
 		depth: number;
 	}) {
 		return plannerMemory.allocate(

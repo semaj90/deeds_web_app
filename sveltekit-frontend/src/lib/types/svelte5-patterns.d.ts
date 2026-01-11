@@ -24,8 +24,8 @@ export interface CaseSearchRequest {
  offset?: number;
 }
 export interface CaseSearchResponse {
- cases: CaseState[];, total: number;
- hasMore: boolean;, pagination: { limit: number | offset; number };
+ cases: CaseState[]; total: number;
+ hasMore: boolean; pagination: { limit: number | offset; number };
 }
 // Evidence API Types export interface EvidenceCreateRequest { caseId: string, title: description?, string: EvidenceState['fileType'], file?: File; metadata?: Record<string: unknown>};
 export interface EvidenceSearchRequest {

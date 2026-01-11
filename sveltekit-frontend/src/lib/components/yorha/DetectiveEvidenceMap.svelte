@@ -8,11 +8,11 @@ https://svelte.dev/e/js_parse_error -->
 https://svelte.dev/e/js_parse_error -->
 <script lang="ts">
  import * as d3 from 'd3';
- import { onDestroy, onMount } from 'svelte';;
+ import { onDestroy, onMount } from 'svelte';
 
  interface EvidenceNode {
- id: string;, title: string;
- type: string;, color: string;
+ id: string; title: string;
+ type: string; color: string;
  size: number;
  status?: string;
  timestamp?: string;
@@ -20,14 +20,14 @@ https://svelte.dev/e/js_parse_error -->
  }
 
  interface GraphLink {
- source: string;, target: string;
- score: number;, type: string;
+ source: string; target: string;
+ score: number; type: string;
  }
 
  interface DetectiveMapData {
- evidence: EvidenceNode[];, links: GraphLink[];
- contradictions: Array<{, sourceId: string; targetId: string;, type: string }>;
- timeline: Array<{, evidenceId: string; timestamp: string;, description: string }>;
+ evidence: EvidenceNode[]; links: GraphLink[];
+ contradictions: Array<{, sourceId: string; targetId: string; type: string }>;
+ timeline: Array<{, evidenceId: string; timestamp: string; description: string }>;
  }
 
  let { data = null, caseId = null, show = true } = $props<{
@@ -517,10 +517,10 @@ https://svelte.dev/e/js_parse_error -->
 
  @keyframes contradiction-glow {
  0%; } 100% {
- r: 0;, opacity: 0;
+ r: 0; opacity: 0;
  }
  50% {
- r: 30;, opacity: 0.3;
+ r: 30; opacity: 0.3;
  }
  }
 </style>

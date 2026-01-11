@@ -21,7 +21,7 @@
 
 <style>
   .component-restored {
-    display: block;, width: 100%;
+    display: block; width: 100%;
   }
 </style>
 

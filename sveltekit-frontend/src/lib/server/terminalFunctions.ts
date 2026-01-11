@@ -4,42 +4,42 @@
  */
 
 export interface SearchEvidenceResult {
- query: string;, found: number;
+ query: string; found: number;
  results: Array<{, id: string;
- title: string;, classification: string;
- status: string;, relevance: number;
+ title: string; classification: string;
+ status: string; relevance: number;
  snippet: string;
  }>;
 }
 
 export interface ExtractHoldingsResult {
- evidenceId: string;, holdings: Array<{
- text: string;, confidence: number;
+ evidenceId: string; holdings: Array<{
+ text: string; confidence: number;
  citations: string[];
  }>;
 }
 
 export interface FindCitationsResult {
- evidenceId: string;, citations: Array<{
+ evidenceId: string; citations: Array<{
  type: 'statute' | 'case' | 'regulation';
- reference: string;, title: string;
+ reference: string; title: string;
  year?: number;
  }>;
 }
 
 export interface AnalyzeRelationshipsResult {
- evidenceIds: string[];, relationships: Array<{
- source: string;, target: string;
+ evidenceIds: string[]; relationships: Array<{
+ source: string; target: string;
  type: 'mentions' | 'contradicts' | 'supports' | 'references' | 'timeline';
- confidence: number;, reasoning: string;
+ confidence: number; reasoning: string;
  }>;
 }
 
 export interface GenerateSummaryResult {
- caseId: string;, summary: {
- title: string;, status: string;
- totalEvidence: number;, keyFindings: string[];
- timeline: string;, nextSteps: string[];
+ caseId: string; summary: {
+ title: string; status: string;
+ totalEvidence: number; keyFindings: string[];
+ timeline: string; nextSteps: string[];
  };
 }
 

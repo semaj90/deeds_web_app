@@ -1,14 +1,14 @@
 // @ts-nocheck - Complex experimental service with external dependencies
 export type WebGPUDiagResult = {
- supported: boolean, adapterFound: boolean;, deviceCreated: boolean;
- error?: string;, warnings: string[], powerPreferenceTried: Array<'high-performance' | 'low-power' | 'default'>;
+ supported: boolean, adapterFound: boolean; deviceCreated: boolean;
+ error?: string; warnings: string[], powerPreferenceTried: Array<'high-performance' | 'low-power' | 'default'>;
  powerPreferenceUsed?: 'high-performance' | 'low-power' | 'default';
  timings: {
  requestAdapterMs?: number;
  requestDeviceMs?: number;
  };
  adapter?: {
- label?: string;, features: string[], limits: Record<string, number>;
+ label?: string; features: string[], limits: Record<string, number>;
  isFallbackAdapter?: boolean;
  };
  deviceLimits?: Record<string, number>;

@@ -9,7 +9,7 @@
   }); function performFuseSearch() { if (!fuse || !searchQuery.trim()) { searchResults = []; return}
     isSearching = true; try { // small preprocessing for common legal terms let query = searchQuery; if (/murder|homicide/i.test(query)) { query = 'murder | homicide | killing'} else if (/contract/i.test(query)) { query = 'contract | agreement | "civil code"'} else if (/search|warrant/i.test(query)) { query = 'search | warrant | "fourth amendment" | seizure'}
 
-      // --- fixed: actually call fuse.search and then slice --- const rawResults = fuse.search(query).slice(0, maxResults); searchResults = rawResults.map(result => { const res: unknown = result, as unknown;
+      // --- fixed: actually call fuse.search and then slice --- const rawResults = fuse.search(query).slice(0, maxResults); searchResults = rawResults.map(result => { const res: unknown = result as unknown;
  return { ...res.item, fuseScore: res.score, matches: res.matches || [], highlighted: highlightMatches(res.item, res.matches || []) }})} catch (error) { console.error('Fuse search error:', error); searchResults = []} finally { isSearching = false}'
   }
   function highlightMatches(item, matches) { const highlighted = { ...item }; matches.forEach(match => { if (match.key && typeof highlighted[match.key] === 'string') { let text = highlighted[match.key];
@@ -25,7 +25,7 @@
   function handleKeydown(event: KeyboardEvent) { if (event.key === 'Enter' && searchResults.length > 0) { handleAIAction(searchResults[0], 'select')}
   }
 
-   // Cast Input to a constructor-compatible value for svelte:component usage // (works around TypeScript error when the imported type is seen as SvelteComponentTyped instance) const InputAny: unknown = Input as unknown, as unknown; </script>
+   // Cast Input to a constructor-compatible value for svelte:component usage // (works around TypeScript error when the imported type is seen as SvelteComponentTyped instance) const InputAny: unknown = Input as unknown as unknown; </script>
  <div class="space-y-4"> <!-- Search, Input --> <div class="relative"> <Search class="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 nes-text" /> <!-- use svelte, component with the casted Input to satisfy, TypeScript --> <svelte: component | this={ InputAny } bind, value={ searchQuery } { placeholder } onkeydown={ handleKeydown } class="pl-10" />
   {#if isSearching} <Loader2 class="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 animate-spin nes-text" /> {/if}
   </div>

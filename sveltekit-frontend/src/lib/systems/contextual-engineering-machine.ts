@@ -1,31 +1,31 @@
-/** * Contextual Engineering Machine System * Tests and validates the chat vector storage with temporal learning * Implements advanced context management and query optimization */ import type { chatVectorStorage, storeChatWithVector } from '../services/chat-vector-storage.js'; import type { Base64FP32Quantizer } from '../text/base64-fp32-quantizer.js'; export interface ContextualTestResult { testName: string;, success: boolean; executionTime: number;, details: unknown; errors?: string[]; }
+/** * Contextual Engineering Machine System * Tests and validates the chat vector storage with temporal learning * Implements advanced context management and query optimization */ import type { chatVectorStorage, storeChatWithVector } from '../services/chat-vector-storage.js'; import type { Base64FP32Quantizer } from '../text/base64-fp32-quantizer.js'; export interface ContextualTestResult { testName: string; success: boolean; executionTime: number; details: unknown; errors?: string[]; }
 export interface ContextualEngineMetrics {
-	totalQueries: number;, successfulPredictions: number;
-	averageConfidence: number;, temporalPatternsDetected: number;
-	contextMaintenance: number;, queryOptimization: number;
+	totalQueries: number; successfulPredictions: number;
+	averageConfidence: number; temporalPatternsDetected: number;
+	contextMaintenance: number; queryOptimization: number;
 	// Enhanced metrics
-	memoryEfficiency: number;, learningRate: number;
-	adaptabilityScore: number;, coherenceIndex: number;
-	predictionAccuracy: number;, contextualRelevance: number;
+	memoryEfficiency: number; learningRate: number;
+	adaptabilityScore: number; coherenceIndex: number;
+	predictionAccuracy: number; contextualRelevance: number;
 }
 export interface ConversationContext {
-	sessionId: string;, userId: string;
-	conversationFlow: ChatMessage[];, currentIntent: string;
-	intentHistory: string[];, temporalPatterns: {
-		preferredTimeSlots: number[];, commonDaysOfWeek: number[];
-		seasonalTrends: string[];, timeBasedIntents: Map<string, number[]>; // Intent -> time slots when most active
+	sessionId: string; userId: string;
+	conversationFlow: ChatMessage[]; currentIntent: string;
+	intentHistory: string[]; temporalPatterns: {
+		preferredTimeSlots: number[]; commonDaysOfWeek: number[];
+		seasonalTrends: string[]; timeBasedIntents: Map<string, number[]>; // Intent -> time slots when most active
 		workflowPatterns: string[]; // Common task sequences
 	};
 	contextualMemory: {, topicsDiscussed: string[];
-		documentsReferenced: string[];, decisionsTracked: string[];
-		followUpItems: string[];, keyEntities: Array<any>;
+		documentsReferenced: string[]; decisionsTracked: string[];
+		followUpItems: string[]; keyEntities: Array<any>;
 		conceptGraph: Map<string, string[]>; // Concept -> related concepts
 		emotionalState: {, sentiment: number; // -1 to 1, stress_level: number; // 0 to 1, confidence: number; // 0 to 1, engagement: number; // 0 to 1
 		};
 	};
 	learningProfile: {, expertise_level: 'novice' | 'intermediate' | 'expert';
 		preferred_explanation_style: 'detailed' | 'concise' | 'examples';
-		common_mistakes: string[];, learning_velocity: number;
+		common_mistakes: string[]; learning_velocity: number;
 		knowledge_gaps: string[];
 	};
 }export class ContextualEngineeringMachine {

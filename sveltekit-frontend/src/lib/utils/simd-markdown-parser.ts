@@ -220,7 +220,7 @@ export class SimdMarkdownParser {
  };
  };
  private async parseWithPythonFallback(
- markdown: string);, output: MarkdownParseOptions['output'],
+ markdown: string); output: MarkdownParseOptions['output'],
  { timeoutMs: signal }: {, timeoutMs: number; signal?: AbortSignal }
  ): Promise<MarkdownParseResult | null> {
  if (typeof fetch !== 'function') {

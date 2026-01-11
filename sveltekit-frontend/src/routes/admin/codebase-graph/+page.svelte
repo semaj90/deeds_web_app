@@ -4,24 +4,24 @@
 	import { onMount } from 'svelte';
 
 	interface VectorCluster {
-		id: number;, cluster_id: number;
-		pattern: string;, error_count: number;
-		avg_similarity: number;, file_paths: string[];
-		summary: string;, tags: string[];
+		id: number; cluster_id: number;
+		pattern: string; error_count: number;
+		avg_similarity: number; file_paths: string[];
+		summary: string; tags: string[];
 		embedding: number[];
 	}
 
 	interface GraphNode {
-		id: string;, label: string;
+		id: string; label: string;
 		type: 'file' | 'error' | 'cluster' | 'fix';
 		cluster_id?: number;
-		similarity?: number;, tags: string[];
+		similarity?: number; tags: string[];
 		fix_status?: 'pending' | 'in-progress' | 'applied' | 'failed';
 	}
 
 	interface GraphEdge {
-		source: string;, target: string;
-		weight: number;, type: 'similarity' | 'dependency' | 'fix-attempt';
+		source: string; target: string;
+		weight: number; type: 'similarity' | 'dependency' | 'fix-attempt';
 	}
 
 	let clusters = $state<VectorCluster[]>([]);

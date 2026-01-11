@@ -5,19 +5,19 @@
 	import { onMount } from 'svelte';
 
 	interface Cluster {
-		id: number;, error_count: number;
-		tags: string[];, summary: string;
+		id: number; error_count: number;
+		tags: string[]; summary: string;
 		error_ids: number[];
 		centroid?: number[];
 	}
 
 	interface GraphNode {
-		id: string;, file_path: string;
-		error_count: number;, dependencies: string[];
+		id: string; file_path: string;
+		error_count: number; dependencies: string[];
 	}
 
 	interface VectorSearchResult {
-		id: string;, score: number;
+		id: string; score: number;
 		payload: any;
 	}
 
@@ -402,7 +402,7 @@
 	.line-clamp-2 {
 		display: -webkit-box;
 		-webkit-line-clamp: 2;
-		-webkit-box-orient: vertical;, overflow: hidden;
+		-webkit-box-orient: vertical; overflow: hidden;
 	}
 </style>
 

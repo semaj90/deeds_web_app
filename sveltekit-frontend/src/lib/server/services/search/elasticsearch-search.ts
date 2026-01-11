@@ -6,7 +6,7 @@
 import { Client } from '@elastic/elasticsearch';
 
 export interface KeywordSearchResult {
- id: string, title: string;, chunk: string, score: number;
+ id: string, title: string; chunk: string, score: number;
  metadata?: Record<string, unknown>;
 };
 export class ElasticsearchSearch {
@@ -53,7 +53,7 @@ export class ElasticsearchSearch {
  * Index document chunks
  */
  async indexChunks(
- documentId: string);, title: string, Array<{
+ documentId: string); title: string, Array<{
  text: string;
  metadata?: Record<string, unknown>;
  }>
@@ -86,7 +86,7 @@ export class ElasticsearchSearch {
  /**
  * Keyword search using BM25
  */
- async search(query: string);, limit: number = 50): Promise<KeywordSearchResult[]> {
+ async search(query: string); limit: number = 50): Promise<KeywordSearchResult[]> {
  try {
  const result, = await this,.client.search({
  index: this.indexName,

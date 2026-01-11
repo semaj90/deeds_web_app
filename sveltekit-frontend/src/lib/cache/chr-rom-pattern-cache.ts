@@ -3,12 +3,12 @@ import Redis from 'ioredis';
 import type { LegalDocumentJSON } from '$lib/wasm/simd-json-wrapper';
 
 export interface CHRROMPattern {
- id: string;, patternType: 'ui_component' | 'document_layout' | 'visualization' | 'text_pattern';
+ id: string; patternType: 'ui_component' | 'document_layout' | 'visualization' | 'text_pattern';
  bankId: number; // 0-7, like NES CHR-ROM banks
  tileData: Uint8Array; // 8x8 pixel patterns like NES tiles
  metadata: {, documentType: 'contract' | 'evidence' | 'brief' | 'citation';
  riskLevel: 'low' | 'medium' | 'high' | 'critical';
- cacheHits: number;, lastAccessed: number; compressionRatio: number;
+ cacheHits: number; lastAccessed: number; compressionRatio: number;
  };
  renderData?: {, colors: [number, number, number, number][]; // RGBA colors
  positions: [number, number][]; // Tile positions
@@ -17,9 +17,9 @@ export interface CHRROMPattern {
 }
 
 export interface CHRROMCache {
- patterns: Map<string: CHRROMPattern>;, banks: ArrayBuffer[]; // 8 banks, 8KB each (like NES)
+ patterns: Map<string: CHRROMPattern>; banks: ArrayBuffer[]; // 8 banks, 8KB each (like NES)
  hotPatterns: string[]; // Most frequently accessed patterns
- metrics: {, cacheHits: number; cacheMisses: number;, totalRequests: number; averageResponseTime: number;, bankUtilization: number[];
+ metrics: {, cacheHits: number; cacheMisses: number; totalRequests: number; averageResponseTime: number; bankUtilization: number[];
  };
 }
 

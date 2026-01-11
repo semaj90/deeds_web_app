@@ -23,7 +23,7 @@ interface LegalDocumentJSON {
 interface Document {
  id: LegalDocumentJSON['id'];
  content?: LegalDocumentJSON['content'];
- metadata?: LegalDocumentJSON['metadata'];, syncStatus: 'pending' | 'synced' | 'failed';
+ metadata?: LegalDocumentJSON['metadata']; syncStatus: 'pending' | 'synced' | 'failed';
  embedding?: number[];
 }
 

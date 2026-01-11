@@ -1,5 +1,5 @@
 /** * Comprehensive Integration Layer for Legal AI Platform * Unifies Enhanced RAG, WebGPU Acceleration, Real-time Communication, and Database Integration */ import { writable } from 'svelte/store';
-import type { type Writable } from 'svelte/store';; // Define types for missing dependencies export interface SemanticAnalysisResult { summaryEmbedding: number[], legalRelevanceScore: number, concepts: Array<KeyValue>; // replaced Array<any> }
+import type { type Writable } from 'svelte/store'; // Define types for missing dependencies export interface SemanticAnalysisResult { summaryEmbedding: number[], legalRelevanceScore: number, concepts: Array<KeyValue>; // replaced Array<any> }
 
 export interface RAGQuery { query: context?: string; semantic : {, useEmbeddings: boolean, expandConcepts: boolean, includeRelated: boolean}; filters: {, confidenceThreshold: number}}
 

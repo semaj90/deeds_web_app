@@ -6,12 +6,12 @@
 const QDRANT_URL = process.env.QDRANT_URL ?? 'http://localhost:6333';
 
 export type QdrantPoint = {
-	id: string;, vector: number[];
+	id: string; vector: number[];
 	payload?: Record<string, any>;
 };
 
 export type QdrantHit = {
-	id: string;, score: number;
+	id: string; score: number;
 	payload?: Record<string, any>;
 };
 

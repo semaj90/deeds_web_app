@@ -4,7 +4,7 @@
  */
 
 export interface SelectOption {
-	value: string;, label: string;
+	value: string; label: string;
 	disabled?: boolean;
 }
 
@@ -79,7 +79,7 @@ export interface SelectValueProps {
 export interface SelectContext {
 	readonly open: boolean;
 	readonly value: string;
-	readonly disabled: boolean;, setValue: (value: string) => void;
+	readonly disabled: boolean; setValue: (value: string) => void;
 	setOpen: (open: boolean) => void;
 	toggle: () => void;
 	close: () => void;

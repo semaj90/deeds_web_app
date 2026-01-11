@@ -7,7 +7,7 @@ import type { Snippet } from 'svelte';
 import { setContext, getContext } from 'svelte';
 
 interface AccordionItem {
-	id: string;, title: string;
+	id: string; title: string;
 	disabled?: boolean;
 	icon?: string;
 }
@@ -129,10 +129,10 @@ let variantClasses = $derived({
 <style>
 	@keyframes accordion-down {
 		from {
-			height: 0;, opacity: 0;
+			height: 0; opacity: 0;
 		}
 		to {
-			height: var(--accordion-content-height);, opacity: 1;
+			height: var(--accordion-content-height); opacity: 1;
 		}
 	}
 

@@ -7,10 +7,10 @@
 import { generateText } from './ollama-service.js';
 
 export interface VLMEmbeddingResult {
- embedding: number[];, modality: 'text' | 'vision' | 'layout' | 'multimodal';
- confidence: number;, metadata: {
- model: string;, quantization: string;
- dimension: number;, processingTimeMs: number;
+ embedding: number[]; modality: 'text' | 'vision' | 'layout' | 'multimodal';
+ confidence: number; metadata: {
+ model: string; quantization: string;
+ dimension: number; processingTimeMs: number;
  };
 }
 
@@ -21,7 +21,7 @@ export interface MultimodalContent {
  content: string;
  }>;
  ocrText?: string;
- seals?: Array<{, type: string; // 'notary', 'signature', 'stamp', confidence: number;, bbox: [number, number, number, number];
+ seals?: Array<{, type: string; // 'notary', 'signature', 'stamp', confidence: number; bbox: [number, number, number, number];
  }>;
 }
 

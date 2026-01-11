@@ -1,11 +1,11 @@
 <script lang="ts">
- import { onDestroy, onMount } from 'svelte';;
+ import { onDestroy, onMount } from 'svelte';
 
  interface PhoenixEvent {
  type: string;
  evidenceId?: string;
  fileName?: string;
- caseId?: string;, message: string;
+ caseId?: string; message: string;
  timestamp?: string;
  [key: string]: any;
  }

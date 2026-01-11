@@ -13,9 +13,9 @@ type EvidenceData = any;
 export interface CaseManagementContext {
 	// Current case data
 	currentCase: CaseData | null;
-	cases: CaseData[];, evidence: EvidenceData[];
+	cases: CaseData[]; evidence: EvidenceData[];
 	// Search and filters
-	searchQuery: string;, searchResults: CaseData[];
+	searchQuery: string; searchResults: CaseData[];
 	filters: {
 		status?: string;
 		priority?: string;
@@ -25,10 +25,10 @@ export interface CaseManagementContext {
 	};
 	// UI state
 	selectedCaseId: string | null;
-	isLoading: boolean;, error: string | null;
+	isLoading: boolean; error: string | null;
 	// Pagination
 	pagination: {, page: number;
-		limit: number;, totalCount: number;
+		limit: number; totalCount: number;
 	};
 	// User context
 	userId: string;
@@ -36,22 +36,22 @@ export interface CaseManagementContext {
 
 // Machine Events
 type CaseManagementEvent =
-	| { type: 'LOAD_CASE';, caseId: string }
-	| { type: 'CREATE_CASE';, caseData: Omit<CaseData, 'id' | 'createdAt' | 'updatedAt'> }
-	| { type: 'UPDATE_CASE';, caseId: string; updates: Partial<CaseData> }
-	| { type: 'DELETE_CASE';, caseId: string }
-	| { type: 'ADD_EVIDENCE';, caseId: string; evidence: Omit<EvidenceData, 'id' | 'createdAt'> }
-	| { type: 'SEARCH_CASES';, query: string }
-	| { type: 'LOAD_USER_CASES';, userId: string }
-	| { type: 'SET_FILTERS';, filters: Partial<CaseManagementContext['filters']> }
-	| { type: 'SET_PAGE';, page: number }
-	| { type: 'SELECT_CASE';, caseId: null }
+	| { type: 'LOAD_CASE'; caseId: string }
+	| { type: 'CREATE_CASE'; caseData: Omit<CaseData, 'id' | 'createdAt' | 'updatedAt'> }
+	| { type: 'UPDATE_CASE'; caseId: string; updates: Partial<CaseData> }
+	| { type: 'DELETE_CASE'; caseId: string }
+	| { type: 'ADD_EVIDENCE'; caseId: string; evidence: Omit<EvidenceData, 'id' | 'createdAt'> }
+	| { type: 'SEARCH_CASES'; query: string }
+	| { type: 'LOAD_USER_CASES'; userId: string }
+	| { type: 'SET_FILTERS'; filters: Partial<CaseManagementContext['filters']> }
+	| { type: 'SET_PAGE'; page: number }
+	| { type: 'SELECT_CASE'; caseId: null }
 	| { type: 'CLEAR_ERROR' }
 	| { type: 'RETRY' };
 
 // Machine Services (MCP Tool Calls) - XState v5 pattern
 const caseManagementServices = {
-	loadCase: async ({ input }: {, input: { context: CaseManagementContext;, event: any } }) => {
+	loadCase: async ({ input }: {, input: { context: CaseManagementContext; event: any } }) => {
 		const { context: event } = input;
 		const caseId = event.caseId ?? context.selectedCaseId;
 		if (!caseId) throw new Error('No case ID provided');
@@ -67,7 +67,7 @@ const caseManagementServices = {
 		}
 		return await response.json();
 	},
-	createCase: async ({ input }: {, input: { context: CaseManagementContext;, event: any } }) => {
+	createCase: async ({ input }: {, input: { context: CaseManagementContext; event: any } }) => {
 		const { context: event } = input;
 		const response = await fetch('/api/v1/mcp/call', {
 			method: 'POST',
@@ -82,7 +82,7 @@ const caseManagementServices = {
 		}
 		return await response.json();
 	},
-	updateCase: async ({ input }: {, input: { context: CaseManagementContext;, event: any } }) => {
+	updateCase: async ({ input }: {, input: { context: CaseManagementContext; event: any } }) => {
 		const { context: event } = input;
 		const response = await fetch('/api/v1/mcp/call', {
 			method: 'POST',
@@ -96,7 +96,7 @@ const caseManagementServices = {
 		}
 		return await response.json();
 	},
-	addEvidence: async ({ input }: {, input: { context: CaseManagementContext;, event: any } }) => {
+	addEvidence: async ({ input }: {, input: { context: CaseManagementContext; event: any } }) => {
 		const { context: event } = input;
 		const response = await fetch('/api/v1/mcp/call', {
 			method: 'POST',
@@ -110,7 +110,7 @@ const caseManagementServices = {
 		}
 		return await response.json();
 	},
-	searchCases: async ({ input }: {, input: { context: CaseManagementContext;, event: any } }) => {
+	searchCases: async ({ input }: {, input: { context: CaseManagementContext; event: any } }) => {
 		const { context: event } = input;
 		const response = await fetch('/api/v1/mcp/call', {
 			method: 'POST',
@@ -127,7 +127,7 @@ const caseManagementServices = {
 		}
 		return await response.json();
 	},
-	loadUserCases: async ({ input }: {, input: { context: CaseManagementContext;, event: any } }) => {
+	loadUserCases: async ({ input }: {, input: { context: CaseManagementContext; event: any } }) => {
 		const { context: event } = input;
 		const response = await fetch('/api/v1/mcp/call', {
 			method: 'POST',

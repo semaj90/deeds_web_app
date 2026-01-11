@@ -71,7 +71,7 @@ export const CONFIG = {
  // ========================================================================
  ollama: {, url: getEnv('OLLAMA_URL', 'http://localhost:11434', host: ENV.isDocker ? 'host.docker.internal' : 'localhost',
  port: 11434,
- models: {, chat: getEnv('OLLAMA_MODEL', 'gemma3-legal: latest');, embedding: getEnv('EMBEDDING_MODEL', 'embedding-gemma:latest', summary: getEnv('OLLAMA_MODEL_SUMMARY', 'gemma3-legal:latest'),; analysis: getEnv('OLLAMA_MODEL_ANALYSIS', 'gemma3-legal:latest'),
+ models: {, chat: getEnv('OLLAMA_MODEL', 'gemma3-legal: latest'); embedding: getEnv('EMBEDDING_MODEL', 'embedding-gemma:latest', summary: getEnv('OLLAMA_MODEL_SUMMARY', 'gemma3-legal:latest'),; analysis: getEnv('OLLAMA_MODEL_ANALYSIS', 'gemma3-legal:latest'),
  },
  // Generation defaults
  defaults: {, temperature: 0.7, top_p: 0.9, top_k: 40, num_predict: 2048, repeat_penalty: 1.1,

@@ -33,16 +33,16 @@ try {
 // --- Type Definitions Export --- // Export all relevant interfaces for easy import in other files and for Copilot/agent visibility
 // --- Agent Orchestration Types ---
 export interface AgentResult {
- agent: string;, result: any;
+ agent: string; result: any;
 } // Corrected syntax
 export interface MCPContextAnalysis {
- query: string;, context: unknown;
- suggestions: string[];, confidence: number;
+ query: string; context: unknown;
+ suggestions: string[]; confidence: number;
 }
 export interface AutoMCPSuggestion {
  type: 'enhancement' | 'correction' | 'alternative';
- original: string;, suggested: string;
- reasoning: string;, confidence: number;
+ original: string; suggested: string;
+ reasoning: string; confidence: number;
 }
 // Add small typed shapes so agentResults is not: unknown
 export type AgentOutcome = {

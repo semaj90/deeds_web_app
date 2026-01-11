@@ -7,8 +7,8 @@ interface SyncEvent extends Event {
 
 // Define CacheWarmingTask interface
 interface CacheWarmingTask {
- id: string;, type: 'legal_document' | 'vector_similarity' | 'search_results' | 'som_embeddings';
- priority: number;, payload: unknown; // Use a more specific type if the payload structure is known
+ id: string; type: 'legal_document' | 'vector_similarity' | 'search_results' | 'som_embeddings';
+ priority: number; payload: unknown; // Use a more specific type if the payload structure is known
  retries: number;
 }
 
@@ -279,7 +279,7 @@ async function cacheResponse(
  * Determine caching strategy based on request
  */
 function determineCacheStrategy(request: Request): {, useRedis: boolean;
- useSOM: boolean;, ttl: number;
+ useSOM: boolean; ttl: number;
  priority: number;
 } {
  const url = new URL(request.url);

@@ -1,8 +1,8 @@
 // Scoring types for CaseRankingService
 
 export interface CaseScoringRequest {
- caseId: string;, userId: string;
- title: string;, description: string;
+ caseId: string; userId: string;
+ title: string; description: string;
  evidenceItems?: string[];
  jurisdiction?: string;
  caseType?: string;
@@ -15,16 +15,16 @@ export interface CaseScoringRequest {
 }
 
 export interface ScoringCriteria {
- evidence_strength: number;, witness_reliability: number;
- legal_precedent: number;, public_interest: number;
- case_complexity: number;, resource_requirements: number;
+ evidence_strength: number; witness_reliability: number;
+ legal_precedent: number; public_interest: number;
+ case_complexity: number; resource_requirements: number;
 }
 
 export interface CaseScoringResult {
- caseId: string;, score: number;
- confidence: number;, criteria: ScoringCriteria;
- explanation: string;, recommendations: string[];
- scoringDate: Date;, model: string;
+ caseId: string; score: number;
+ confidence: number; criteria: ScoringCriteria;
+ explanation: string; recommendations: string[];
+ scoringDate: Date; model: string;
  version: string;
  // Additional properties used in the service
  riskLevel?: 'LOW' | 'MEDIUM' | 'HIGH';
@@ -41,16 +41,16 @@ export interface CaseScoringResult {
 }
 
 export interface ScoringAnalysis {
- overallScore: number;, criteriaScores: ScoringCriteria;
+ overallScore: number; criteriaScores: ScoringCriteria;
  strengthsWeaknesses: {, strengths: string[];
- weaknesses: string[];, riskFactors: string[];
+ weaknesses: string[]; riskFactors: string[];
  };
- recommendations: string[];, confidence: number;
+ recommendations: string[]; confidence: number;
 }
 
 // Phoenix Wright AI Search Interfaces
 export interface PhoenixWrightSearchRequest {
- caseId: string;, query: string;
+ caseId: string; query: string;
  jurisdiction?: string;
  dateRange?: {, start: string;
  end: string;
@@ -63,41 +63,41 @@ export interface PhoenixWrightSearchRequest {
 }
 
 export interface PhoenixWrightSearchResult {
- searchId: string;, caseId: string;
- query: string;, precedents: LegalPrecedent[];
- contradictions: ContradictionAnalysis[];, evidenceMatches: EvidenceMatch[];
- rankingExplanation: string;, confidence: number;
- searchTime: number;, yohaUIState: YohaUIConfig;
+ searchId: string; caseId: string;
+ query: string; precedents: LegalPrecedent[];
+ contradictions: ContradictionAnalysis[]; evidenceMatches: EvidenceMatch[];
+ rankingExplanation: string; confidence: number;
+ searchTime: number; yohaUIState: YohaUIConfig;
 }
 
 export interface LegalPrecedent {
- caseId: string;, title: string;
- citation: string;, court: string;
- date: string;, relevanceScore: number;
- similarity: number;, keyFacts: string[];
- legalPrinciples: string[];, outcome: string;
+ caseId: string; title: string;
+ citation: string; court: string;
+ date: string; relevanceScore: number;
+ similarity: number; keyFacts: string[];
+ legalPrinciples: string[]; outcome: string;
 }
 
 export interface ContradictionAnalysis {
- contradictionId: string;, type: 'factual' | 'testimony' | 'evidence' | 'legal';
+ contradictionId: string; type: 'factual' | 'testimony' | 'evidence' | 'legal';
  severity: 'minor' | 'moderate' | 'severe' | 'critical';
- description: string;, location: string;
- parties: string[];, resolution: string;
+ description: string; location: string;
+ parties: string[]; resolution: string;
  confidence: number;
 }
 
 export interface EvidenceMatch {
- evidenceId: string;, type: 'document' | 'testimony' | 'physical' | 'digital';
- description: string;, relevanceScore: number;
+ evidenceId: string; type: 'document' | 'testimony' | 'physical' | 'digital';
+ description: string; relevanceScore: number;
  strength: 'weak' | 'moderate' | 'strong' | 'conclusive';
- supportingFacts: string[];, contradictingFacts: string[];
+ supportingFacts: string[]; contradictingFacts: string[];
  legalWeight: number;
 }
 
 export interface YohaUIConfig {
- dramaticMode: boolean;, objectionAnimation: boolean;
- evidenceHighlighting: boolean;, testimonyPlayback: boolean;
- crossExaminationMode: boolean;, verdictAnimation: boolean;
+ dramaticMode: boolean; objectionAnimation: boolean;
+ evidenceHighlighting: boolean; testimonyPlayback: boolean;
+ crossExaminationMode: boolean; verdictAnimation: boolean;
 }
 
 

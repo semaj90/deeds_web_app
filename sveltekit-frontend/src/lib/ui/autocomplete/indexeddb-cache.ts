@@ -7,19 +7,19 @@
 import Fuse from 'fuse.js';
 
 export interface CachedStatute {
- id: string;, titleNumber: number;
- section: string;, fullCitation: string;
- heading: string;, text: string;
+ id: string; titleNumber: number;
+ section: string; fullCitation: string;
+ heading: string; text: string;
  embedding256?: number[]; // Matryoshka truncated
  som_cluster_id?: number;
  kmeans_label?: string;
  cluster_confidence?: number;
- echo_hits?: number;, lastUpdated: number; // timestamp
+ echo_hits?: number; lastUpdated: number; // timestamp
 }
 
 export interface AutocompleteResult {
- id: string;, citation: string;
- heading: string;, source: 'local' | 'semantic' | 'server';
+ id: string; citation: string;
+ heading: string; source: 'local' | 'semantic' | 'server';
  confidence: number;
  echoHits?: number;
 }

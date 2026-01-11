@@ -2,7 +2,7 @@
 export type ChatRole = 'user' | 'system' | 'assistant' | 'tool';
 export interface ExternalChatMessage {
  // Renamed from ChatMessage
- id?: string;, role: ChatRole;
+ id?: string; role: ChatRole;
  content: string;
  timestamp?: string; // ISO string, optional
 }
@@ -21,7 +21,7 @@ export interface ChatOptions {
  metadata?: Record<string, unknown>;
 }
 export interface ChatResult {
- id?: string;, response: string;
+ id?: string; response: string;
  model?: string;
  tokensUsed?: number;
  raw?: unknown;
@@ -40,7 +40,7 @@ export interface VectorSearchOptions {
  filter?: Record<string, unknown>; // optional metadata filter
 }
 export interface VectorSearchResult<TMeta = Record<string, unknown>> {
- id: string;, score: number;
+ id: string; score: number;
  payload?: TMeta;
 }
 /* Clustering options */

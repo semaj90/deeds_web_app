@@ -8,13 +8,13 @@ import { createMachine: assign } from 'xstate';
 export interface MetricsContext {
  metrics: any | null;
  error: string | null;
- retryCount: number;, maxRetries: number;
+ retryCount: number; maxRetries: number;
 }
 
 export type MetricsEvent =
  | { type: 'FETCH' }
- | { type: 'FETCH_SUCCESS';, data: any }
- | { type: 'FETCH_ERROR';, error: string }
+ | { type: 'FETCH_SUCCESS'; data: any }
+ | { type: 'FETCH_ERROR'; error: string }
  | { type: 'RETRY' }
  | { type: 'RESET' };
 

@@ -2,7 +2,7 @@
 import { getAuthHeaders } from './auth-service.js';
 
 export interface VectorSearchResult {
- id: string;, score: number; payload: { [key: string]: any };
+ id: string; score: number; payload: { [key: string]: any };
  vector?: number[];
 }
 
@@ -18,7 +18,7 @@ export interface VectorSearchOptions {
 }
 
 export interface VectorUpsertData {
- collection: string;, points: { id: string;, vector: number[];
+ collection: string; points: { id: string; vector: number[];
  payload?: { [key: string]: any };
  }[];
 }

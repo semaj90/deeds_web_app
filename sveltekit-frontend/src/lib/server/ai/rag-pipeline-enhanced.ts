@@ -21,50 +21,50 @@ import { join } from "path";
 declare module '$lib/server/db/schema-postgres' {
  // Example Drizzle table type (simplified)
  interface DrizzleTable<TName extends string, TColumns extends Record<string, any>> {
- _?: {, name: TName; columns: TColumns;, dialect: 'pg'; schema | undefined;
+ _?: {, name: TName; columns: TColumns; dialect: 'pg'; schema | undefined;
  };
  }
 
 export const legal_documents: DrizzleTable<'legal_documents', {
- id: string;, title: string;
- content: string;, previewContent: string;
- fullText: string;, documentType: string;
- keywords: string[];, topics: string[];
+ id: string; title: string;
+ content: string; previewContent: string;
+ fullText: string; documentType: string;
+ keywords: string[]; topics: string[];
  jurisdiction?: string;
- caseId?: string;, createdBy: string; confidentialityLevel: string;
- clientId?: string;, metadata: Record<string, unknown>;
- embedding: string;, createdAt: Date;
+ caseId?: string; createdBy: string; confidentialityLevel: string;
+ clientId?: string; metadata: Record<string, unknown>;
+ embedding: string; createdAt: Date;
  updatedAt: Date;
  }>;
 
  export const documentChunks: DrizzleTable<'documentChunks', {
- id: string;, documentId: string;
- documentType: string;, chunkIndex: number;
- content: string;, embedding: string;
+ id: string; documentId: string;
+ documentType: string; chunkIndex: number;
+ content: string; embedding: string;
  metadata: Record<string, unknown>;
  createdAt: Date;
  }>;
 
  export const autoTags: DrizzleTable<'autoTags', {
- id: string;, entityId: string;
- entityType: string;, tag: string;
- confidence: number;, source: string;
- model: string;, createdAt: Date;
+ id: string; entityId: string;
+ entityType: string; tag: string;
+ confidence: number; source: string;
+ model: string; createdAt: Date;
  }>;
 
  export const userAiQueries: DrizzleTable<'userAiQueries', {
- id: string;, userId: string;
- caseId?: string;, query: string; response: string;, model: string; queryType: string;, confidence: string; processingTime: number;, contextUsed: string[]; embedding: string;, metadata: Record<string, unknown>;
+ id: string; userId: string;
+ caseId?: string; query: string; response: string; model: string; queryType: string; confidence: string; processingTime: number; contextUsed: string[]; embedding: string; metadata: Record<string, unknown>;
  isSuccessful?: boolean;
- errorMessage?: string;, createdAt: Date;
+ errorMessage?: string; createdAt: Date;
  }>;
 }
 
 // ===== CONFIGURATION & CONSTANTS =====
 /** * RAG Pipeline Configuration */
 export interface RAGConfig {
- database: DatabaseConfig;, redis: RedisConfig;
- ollama: OllamaConfig;, rag: RAGSettings;
+ database: DatabaseConfig; redis: RedisConfig;
+ ollama: OllamaConfig; rag: RAGSettings;
  security: SecuritySettings;
 }
 
@@ -74,7 +74,7 @@ export interface DatabaseConfig {
  port?: number;
  database?: string;
  username?: string;
- password?: string;, databaseUrl: string; max: number;, idle_timeout: number; ssl: boolean | 'require' | 'allow' | 'prefer' | 'verify-full';
+ password?: string; databaseUrl: string; max: number; idle_timeout: number; ssl: boolean | 'require' | 'allow' | 'prefer' | 'verify-full';
  connect_timeout: number;
 }
 
@@ -82,23 +82,23 @@ export interface DatabaseConfig {
 export interface RedisConfig {
  host?: string;
  port?: number;
- db?: number;, redisUrl: string; maxRetriesPerRequest: number;, cacheTtl: number; enableReadyCheck: boolean;, lazyConnect: boolean;
+ db?: number; redisUrl: string; maxRetriesPerRequest: number; cacheTtl: number; enableReadyCheck: boolean; lazyConnect: boolean;
 }
 
 /** * Ollama Configuration */
 export interface OllamaConfig {
- baseUrl: string;, embeddingModel: string;
- llmModel: string;, embeddingDimensions: number;
- timeout: number;, temperature: number;
- numCtx: number;, numPredict: number;
+ baseUrl: string; embeddingModel: string;
+ llmModel: string; embeddingDimensions: number;
+ timeout: number; temperature: number;
+ numCtx: number; numPredict: number;
 }
 
 /** * RAG Settings */
 export interface RAGSettings {
- chunkSize: number;, chunkOverlap: number;
- maxSources: number;, similarityThreshold: number;
- timeoutMs: number;, enableMetrics: boolean;
- enableAutoTagging: boolean;, enableCaching: boolean;
+ chunkSize: number; chunkOverlap: number;
+ maxSources: number; similarityThreshold: number;
+ timeoutMs: number; enableMetrics: boolean;
+ enableAutoTagging: boolean; enableCaching: boolean;
  batchSize: number;
 }
 
@@ -106,9 +106,9 @@ export interface RAGSettings {
 export interface SecuritySettings {
  rateLimit: {, perMinute: number; windowMs: number;
  };
- validation: {, maxInputLength: number; maxDocumentSize: number;, allowedDocumentTypes: string[];
+ validation: {, maxInputLength: number; maxDocumentSize: number; allowedDocumentTypes: string[];
  };
- sanitization: {, removeHtmlTags: boolean; removeSqlChars: boolean;, maxLineLength: number;
+ sanitization: {, removeHtmlTags: boolean; removeSqlChars: boolean; maxLineLength: number;
  };
 }
 
@@ -166,10 +166,10 @@ const createDefaultConfig = (): RAGConfig => ({
 // ===== INTERFACES & TYPES =====
 /** * Document Ingestion Parameters */
 export interface DocumentIngestionParams {
- title: string;, content: string;
+ title: string; content: string;
  documentType: string;
  metadata?: JsonObject;
- caseId?: string;, userId: string;
+ caseId?: string; userId: string;
  confidentialityLevel?: 'public' | 'confidential' | 'privileged' | 'attorney_client';
  jurisdiction?: string;
  clientId?: string;
@@ -190,7 +190,7 @@ export interface SearchParams {
 /** * Question Answering Parameters */
 export interface QuestionParams {
  question: string;
- caseId?: string;, userId: string;
+ caseId?: string; userId: string;
  conversationContext?: string;
  confidentialityLevel?: string;
  requireSources?: boolean;
@@ -199,18 +199,18 @@ export interface QuestionParams {
 
 /** * Search Result Document */
 export interface SearchResult {
- id: string;, content: string;
- title: string;, documentId: string;
- score: number;, similarity: number;
- textRank: number;, metadata: JsonObject;
+ id: string; content: string;
+ title: string; documentId: string;
+ score: number; similarity: number;
+ textRank: number; metadata: JsonObject;
  confidentialityLevel?: string;
  highlights?: string[];
 }
 
 /** * Answer Result */
 export interface AnswerResult {
- answer: string;, sources: SourceRef[];
- confidence: number;, keyPoints: string[];
+ answer: string; sources: SourceRef[];
+ confidence: number; keyPoints: string[];
  processingTime: number;
  citations?: string[];
  legalPrecedents?: string[];
@@ -219,18 +219,18 @@ export interface AnswerResult {
 
 /** * Contract Analysis Result */
 export interface ContractAnalysisResult {
- contractType: string;, parties: string[];
- keyTerms: string[];, risks: Risk[];
- legalIssues: string[];, recommendations: string[];
- confidence: number;, processingTime: number;
+ contractType: string; parties: string[];
+ keyTerms: string[]; risks: Risk[];
+ legalIssues: string[]; recommendations: string[];
+ confidence: number; processingTime: number;
  complianceFlags?: string[];
  jurisdiction?: string;
 }
 
 /** * Ingestion Result */
 export interface IngestionResult {
- documentId: string;, chunksCreated: number;
- tags: string[];, processingTime: number;
+ documentId: string; chunksCreated: number;
+ tags: string[]; processingTime: number;
  success: boolean;
  errors?: string[];
  metadata?: JsonObject;
@@ -239,21 +239,21 @@ export interface IngestionResult {
 type JsonObject = { [key, string]: unknown }
 
 interface DBChunkRow {
- id: string;, content: string;
+ id: string; content: string;
  metadata: JsonObject | null;
- document_id: string;, title: string | null;
+ document_id: string; title: string | null;
  confidentiality_level: string | null;
  similarity?: number | null;
  text_rank?: number | null;
  [key, string]: unknown;
 }
-type CombinedResult = DBChunkRow & { score: number;, highlights: string[] }
+type CombinedResult = DBChunkRow & { score: number; highlights: string[] }
 
 export interface AutoTag {
- tag: string;, confidence: number;
+ tag: string; confidence: number;
 }
 interface Risk {
- description: string;, severity: 'low' | 'medium' | 'high';
+ description: string; severity: 'low' | 'medium' | 'high';
  category: string;
 }
 
@@ -351,7 +351,7 @@ class RateLimiter {
 /** * Minimal MetricsCollector class. */
 class MetricsCollector {
  private counters: Map<string, number> = new Map();
- private timings: Map<string, { total: number;, count: number; last: number }> = new Map();
+ private timings: Map<string, { total: number; count: number; last: number }> = new Map();
  incrementCounter(name: string, value: number = 1): void {
  this.counters.set(name, (this.counters.get(name) || 0) + value);
  }
@@ -740,8 +740,8 @@ const embedding = await this.embeddings.embedQuery(text);
  }
  }));
  type DocumentChunkInsert = {
- documentId: string;, documentType: string;
- chunkIndex: number;, content: string;
+ documentId: string; documentType: string;
+ chunkIndex: number; content: string;
  embedding: string, metadata: Record<string, unknown>;
  }
 

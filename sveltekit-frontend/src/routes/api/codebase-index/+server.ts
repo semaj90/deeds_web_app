@@ -5,17 +5,17 @@ const QDRANT_URL = process.env.QDRANT_URL || 'http://localhost:6333';
 const COLLECTION_NAME = 'fastmcp_file_profiles';
 
 interface FileProfile {
-	file_path: string;, role: string;
-	surface: string[];, dependencies: string[];
-	exports: string[];, imports: string[];
-	comments: string[];, risk: string;
-	change_frequency: string;, related_routes: string[];
-	tags: string[];, summary: string;
+	file_path: string; role: string;
+	surface: string[]; dependencies: string[];
+	exports: string[]; imports: string[];
+	comments: string[]; risk: string;
+	change_frequency: string; related_routes: string[];
+	tags: string[]; summary: string;
 	generated_at: string;
 }
 
 interface QdrantPoint {
-	id: number;, payload: FileProfile;
+	id: number; payload: FileProfile;
 	vector?: number[];
 }
 

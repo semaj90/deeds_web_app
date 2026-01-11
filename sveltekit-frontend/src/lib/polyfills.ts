@@ -10,10 +10,10 @@ declare global {
 	interface Window {
 		global: typeof globalThis;
 		process: {, env: Record<string, string>;
-			browser: boolean;, cwd: () => string;
+			browser: boolean; cwd: () => string;
 			nextTick: (callback: () => void) => void;
-			version: string;, versions: { node: string };
-			platform: string;, arch: string;
+			version: string; versions: { node: string };
+			platform: string; arch: string;
 		};
 		Buffer: any;
 	}

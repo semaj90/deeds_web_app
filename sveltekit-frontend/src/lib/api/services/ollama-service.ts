@@ -2,11 +2,11 @@
 import { getAuthHeaders } from './auth-service.js';
 
 export interface OllamaModel {
- name: string;, modified_at: string; size: number;, digest: string; details: {, format: string; family: string;, families: string[]; parameter_size: string;, quantization_level: string };
+ name: string; modified_at: string; size: number; digest: string; details: {, format: string; family: string; families: string[]; parameter_size: string; quantization_level: string };
 }
 
 export interface OllamaResponse {
- model: string;, created_at: string; response: string;, done: boolean;
+ model: string; created_at: string; response: string; done: boolean;
  context?: number[];
  total_duration?: number;
  load_duration?: number;
@@ -16,7 +16,7 @@ export interface OllamaResponse {
  eval_duration?: number }
 
 export interface OllamaChatResponse {
- model: string;, created_at: string; message: {, role: string; content: string;
+ model: string; created_at: string; message: {, role: string; content: string;
  images?: string[] };
  done: boolean;
  total_duration?: number;
@@ -27,7 +27,7 @@ export interface OllamaChatResponse {
  eval_duration?: number }
 
 export interface OllamaGenerateOptions {
- model: string;, prompt: string;
+ model: string; prompt: string;
  system?: string;
  template?: string;
  context?: number[];
@@ -45,7 +45,7 @@ export interface OllamaGenerateOptions {
 }
 
 export interface OllamaChatOptions {
- model: string;, messages: { role: 'system' | 'user' | 'assistant';
+ model: string; messages: { role: 'system' | 'user' | 'assistant';
  content: string;
  images?: string[] }[];
  stream?: boolean;

@@ -10,11 +10,11 @@ const MODEL_NAME = process.env.AI_MODEL || 'gemma3-legal:latest';
 type StreamCallback = (token: string, fullText: string) => void | Promise<void>;
 
 interface OllamaStreamResponse {
-  model: string;, created_at: string; response: string;, done: boolean;
+  model: string; created_at: string; response: string; done: boolean;
 }
 
 interface TensorRTRequest {
-  model_name: string;, inputs: Array<{ name: string;, shape: number[]; datatype: string;, data: string[] }>;
+  model_name: string; inputs: Array<{ name: string; shape: number[]; datatype: string; data: string[] }>;
   outputs: Array<{, name: string }>;
 }
 

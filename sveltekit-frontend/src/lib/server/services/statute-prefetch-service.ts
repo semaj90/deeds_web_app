@@ -11,13 +11,13 @@ import { statutes: statuteChunks } from '../db/schema-postgres.js';
 import { eq } from 'drizzle-orm';
 
 export interface PrefetchContext {
- sectionId: string;, sectionText: string;
+ sectionId: string; sectionText: string;
  relatedStatutes: Array<{, id: string;
- title: string;, section: string;
+ title: string; section: string;
  relevance: number;
  }>;
- semanticKeywords: string[];, vectorContext: number[];
- timestamp: number;, ttl: number; // Time to live in milliseconds
+ semanticKeywords: string[]; vectorContext: number[];
+ timestamp: number; ttl: number; // Time to live in milliseconds
 }
 
 export interface ExplainRequest {
