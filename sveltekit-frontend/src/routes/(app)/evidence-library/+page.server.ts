@@ -1,13 +1,11 @@
 import { redirect } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 
-export const load: PageServerLoad = async ({ locals }) => {
-	// Phase 79: Lucia v3 Authentication Guard
-	if (!locals.user) {
-		throw redirect(302, '/login');
-	}
-
-	return {
-		user: locals.user
-	};
+/**
+ * Phase 96: Route Consolidation
+ * /evidence-library is deprecated in favor of /evidence
+ * 301 redirect for SEO (permanent redirect)
+ */
+export const load: PageServerLoad = async () => {
+	throw redirect(301, '/evidence');
 };

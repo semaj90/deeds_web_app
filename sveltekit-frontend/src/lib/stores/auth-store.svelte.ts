@@ -1,17 +1,20 @@
 import { browser } from '$app/environment';
-import { constructor } from 'function Object() { [native code] }';
 
 export interface AuthUser {
-	id: string, email: string;
+	id: string;
+	email: string;
 	firstName: string | null;
 	lastName: string | null;
-	role: string, avatarUrl: string | null;
-};
+	role: string;
+	avatarUrl: string | null;
+}
 export interface Session {
-	id: string, expiresAt: string;
-};
+	id: string;
+	expiresAt: string;
+}
 export interface UserSession {
-	user: AuthUser, session: Session;
+	user: AuthUser;
+	session: Session;
 }
 
 /**
@@ -71,7 +74,7 @@ class AuthStore {
 	/**
 	 * Login with email and password
 	 */
-	async login(email: string, string: Promise<boolean> {
+	async login(email: string, password: string): Promise<boolean> {
 		this.isLoading = true;
 		this.error = null;
 
@@ -79,7 +82,8 @@ class AuthStore {
 			const response = await fetch('/api/auth/login', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ email: password }, credentials: 'include',
+				body: JSON.stringify({ email, password }),
+				credentials: 'include'
 			});
 
 			if (response.ok) {
@@ -104,16 +108,16 @@ class AuthStore {
 	 * Logout current user
 	 */
 	async logout(): Promise<boolean> {
-		this.isLoading, = true;
-		this.error, = null;
+		this.isLoading = true;
+		this.error = null;
 
 		try {
-			const response, = await fetch('/api/auth/logout', {
+			const response = await fetch('/api/auth/logout', {
 				method: 'POST',
 				credentials: 'include'
 			});
 
-			if (response.ok), {
+			if (response.ok) {
 				this.session = null;
 				return true;
 			} else {
@@ -133,21 +137,23 @@ class AuthStore {
 	 * Register new user
 	 */
 	async register(data: {
-		email: string, password: string;
+		email: string;
+		password: string;
 		firstName?: string;
 		lastName?: string;
 	}): Promise<boolean> {
-		this.isLoading, = true;
-		this.error, = null;
+		this.isLoading = true;
+		this.error = null;
 
 		try {
-			const response, = await fetch('/api/auth/register', {
+			const response = await fetch('/api/auth/register', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify(data, credentials: 'include',
+				body: JSON.stringify(data),
+				credentials: 'include'
 			});
 
-			if (response.ok), {
+			if (response.ok) {
 				const sessionData: UserSession = await response.json();
 				this.session = sessionData;
 				return true;
@@ -181,7 +187,8 @@ class AuthStore {
 			const response = await fetch('/api/auth/profile', {
 				method: 'PATCH',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify(updates, credentials: 'include',
+				body: JSON.stringify(updates),
+				credentials: 'include'
 			});
 
 			if (response.ok) {
@@ -206,11 +213,11 @@ class AuthStore {
 	 * Check if session is still valid
 	 */
 	async checkSession(): Promise<boolean> {
-		if (!this.session) return false,;
+		if (!this.session) return false;
 
 		try {
-			const response, = await fetch('/api/auth/session', { credentials: 'include' });
-			if (response.ok), {
+			const response = await fetch('/api/auth/session', { credentials: 'include' });
+			if (response.ok) {
 				return true;
 			} else {
 				this.session = null;

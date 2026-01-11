@@ -1,4 +1,4 @@
-import { createActor: setup } from 'xstate';
+import { createActor, setup } from 'xstate';
 
 // 1. Define the State Machine
 const machine = setup({
@@ -12,10 +12,10 @@ const machine = setup({
         approved: { type: 'final' }
     }
 });
-  
+
 export class CaseManager {
     // The "snapshot" is the reactive part the UI listens to
-    state = $state() as any;
+    state = $state<any>();
     private actor;
 
     constructor() {
@@ -25,7 +25,7 @@ export class CaseManager {
     }
 
     get isLocked() {
-        return this.state.matches('review') || this.state.matches('approved');
+        return this.state?.matches('review') || this.state?.matches('approved');
     }
 
     submit() { this.actor.send({ type: 'SUBMIT' }); }

@@ -8,7 +8,7 @@ interface NativeMarkdownAddon {
  markdown: string,
  options?: {
  format?: 'html' | 'ast' | 'tokens', }
- ) => { 
+ ) => {
  success?: boolean;
  html?: string;
  ast?: MarkdownAstNode[];
@@ -83,9 +83,9 @@ export class SimdMarkdownParser {
  output = 'html-and-ast',
  timeoutMs = 5000,
  signal,
- }, = options;
+	} = options;
 
- const { frontMatter: body }, = includeFrontMatter
+	const { frontMatter, body } = includeFrontMatter
  ? extractFrontMatter(markdown)
  : { frontMatter: {}, body: markdown };
 

@@ -1,0 +1,176 @@
+# 🚀 Phase 96: Langfuse v3 + ClickHouse + Neo4j + PyTorch
+# Advanced LLM Observability with Knowledge Graph Integration
+# Uses your existing: Postgres 17, Neo4j, PyTorch
+# Usage: docker-compose -f docker/langfuse.yml up -d
+
+version: '3.8'
+
+services:
+  # ClickHouse - Fast analytics database for traces (Langfuse v3 requirement)
+  clickhouse:
+    image: clickhouse/clickhouse-server:latest
+    container_name: langfuse-clickhouse
+    restart: unless-stopped
+    ports:
+      - "5123:8123"  # HTTP interface on port 5123 (safe range)
+      - "5900:9000"  # Native protocol on port 5900 (fallback range)
+    environment:
+      CLICKHOUSE_DB: langfuse
+      CLICKHOUSE_USER: default
+      CLICKHOUSE_PASSWORD: clickhouse_password
+    volumes:
+      - clickhouse-data:/var/lib/clickhouse
+      - ./clickhouse/init:/docker-entrypoint-initdb.d  # Auto-create tables on first start
+    healthcheck:
+      test: ["CMD", "clickhouse-client", "--query", "SELECT 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    ulimits:
+      nofile:
+        soft: 262144
+        hard: 262144
+
+  # Langfuse v3 - Main observability server
+  langfuse-server:
+    image: langfuse/langfuse:latest  # v3 with ClickHouse support
+    container_name: langfuse-server
+    restart: unless-stopped
+    depends_on:
+      clickhouse:
+        condition: service_healthy
+    ports:
+      - "3030:3000"  # Langfuse UI at http://localhost:3030
+    environment:
+      # Postgres (metadata) - Uses your existing Postgres 17
+      DATABASE_URL: postgresql://user:pass@host.docker.internal:5434/langfuse?connect_timeout=10&pool_timeout=10
+
+      # ClickHouse (traces/analytics) - Uses local ClickHouse
+      CLICKHOUSE_URL: http://clickhouse:8123  # Internal Docker network (no port conflict)
+      CLICKHOUSE_MIGRATION_URL: http://clickhouse:8123
+      CLICKHOUSE_USER: default
+      CLICKHOUSE_PASSWORD: clickhouse_password
+
+      # Server
+      NEXTAUTH_URL: http://localhost:3030
+      NEXTAUTH_SECRET: langfuse-secret-key-change-in-production-min-32-chars
+      SALT: langfuse-salt-change-in-production
+
+      # Auth (disable for local dev)
+      AUTH_DISABLE_USERNAME_PASSWORD: "false"
+      AUTH_DISABLE_SIGNUP: "false"
+
+      # Telemetry
+      TELEMETRY_ENABLED: "false"
+
+      # Feature flags
+      LANGFUSE_ENABLE_EXPERIMENTAL_FEATURES: "true"
+
+      # Neo4j integration (your existing graph DB)
+      NEO4J_URI: bolt://host.docker.internal:7687
+      NEO4J_USER: neo4j
+      NEO4J_PASSWORD: your-neo4j-password
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:3000/api/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    extra_hosts:
+      - "host.docker.internal:host-gateway"  # Access host services
+
+  # Data Mirror Service - Syncs Postgres/Qdrant → ClickHouse with Ollama auto-tagging
+  clickhouse-mirror:
+    build:
+      context: ./clickhouse-mirror
+      dockerfile: Dockerfile
+    container_name: clickhouse-mirror
+    restart: unless-stopped
+    depends_on:
+      clickhouse:
+        condition: service_healthy
+    environment:
+      POSTGRES_URL: postgresql://user:pass@host.docker.internal:5434/legal
+      CLICKHOUSE_HOST: clickhouse
+      CLICKHOUSE_PORT: "8123"  # Internal Docker network port
+      CLICKHOUSE_USER: default
+      CLICKHOUSE_PASSWORD: clickhouse_password
+      OLLAMA_URL: http://host.docker.internal:11434
+      OLLAMA_MODEL: gemma3-legal:latest
+      SYNC_INTERVAL: "60"  # Sync every 60 seconds
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+volumes:
+  clickhouse-data:
+    name: langfuse-clickhouse-data
+
+# 📊 ARCHITECTURE:
+# ┌─────────────────────────────────────────────────────────┐
+# │                   CrewAI Agents                         │
+# │              (Legal, Document, Case)                    │
+# └────────────┬────────────────────────────────────────────┘
+#              │
+#              ▼
+# ┌─────────────────────────────────────────────────────────┐
+# │              Langfuse v3 (Port 3030)                    │
+# │  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐     │
+# │  │  Postgres   │  │ ClickHouse  │  │   Neo4j     │     │
+# │  │ (metadata)  │  │  (traces)   │  │  (graphs)   │     │
+# │  └─────────────┘  └─────────────┘  └─────────────┘     │
+# └─────────────────────────────────────────────────────────┘
+#              │
+#              ▼
+# ┌─────────────────────────────────────────────────────────┐
+# │           PyTorch Analytics Service                     │
+# │  - Trace embedding generation                           │
+# │  - Agent behavior clustering                            │
+# │  - Anomaly detection in LLM calls                       │
+# │  - Cost optimization recommendations                    │
+# └─────────────────────────────────────────────────────────┘
+#
+# 🚀 USAGE:
+# 1. Start stack:
+#    docker-compose -f docker/langfuse.yml up -d
+#
+# 2. Access UI: http://localhost:3030
+#    - Create account (first visit)
+#    - Settings > API Keys → Get keys
+#
+# 3. Integration:
+#    export LANGFUSE_PUBLIC_KEY="pk-lf-..."
+#    export LANGFUSE_SECRET_KEY="sk-lf-..."
+#    export LANGFUSE_HOST="http://localhost:3030"
+#
+# 4. CrewAI with Langfuse:
+#    from langfuse import Langfuse
+#    langfuse = Langfuse()  # Auto-reads env vars
+#
+# 📈 FEATURES:
+# ✅ ClickHouse: Fast trace storage (10x faster than Postgres for analytics)
+# ✅ Neo4j: Agent relationship graphs, decision trees
+# ✅ PyTorch: Embedding-based search, clustering, anomaly detection
+# ✅ Your stack: Postgres 17, Qdrant, Redis, MinIO
+#
+# 🔍 MONITORING:
+# - Langfuse UI: http://localhost:3030
+# - ClickHouse: http://localhost:8123/play
+# - Neo4j Browser: http://localhost:7474 (your existing instance)
+#
+# 📊 QUERY EXAMPLES:
+# # ClickHouse: Top 10 slowest traces
+# SELECT name, avg(latency) FROM langfuse.traces GROUP BY name ORDER BY avg(latency) DESC LIMIT 10
+#
+# # Neo4j: Agent interaction graph
+# MATCH (a1:Agent)-[r:CALLED]->(a2:Agent) RETURN a1, r, a2
+#
+# 🐳 COMMANDS:
+# - Start: docker-compose -f docker/langfuse.yml up -d
+# - Stop: docker-compose -f docker/langfuse.yml down
+# - Logs: docker-compose -f docker/langfuse.yml logs -f langfuse-server
+# - ClickHouse shell: docker exec -it langfuse-clickhouse clickhouse-client
+# - Reset (CAUTION): docker-compose -f docker/langfuse.yml down -v

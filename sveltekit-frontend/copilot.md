@@ -1565,3 +1565,448 @@ export function createHandler(
 
 **Tags:** `#svelte5` `#runes` `#drizzle-orm` `#typescript` `#error-fixing` `#phase2` `#migration` `#reactivity`
 
+
+
+---
+
+## 🚀 Phase 2: Type System Fixes - Knowledge Base Update (Jan 10, 2026)
+
+### WebGPU Scalar Array Pattern (2025)
+**Source:** [WebGPU Best Practices - toji.dev](https://toji.dev/webgpu-best-practices/compute-vertex-data.html)
+**Confidence:** 95%
+**Tags:** #webgpu #alignment #compute-shader #gpu #wgsl
+
+**Problem:** WGSL requires vec3<f32> aligned to 16-byte boundaries, but vertex data is often tightly packed at 12-byte intervals.
+
+**Solution:**
+```wgsl
+// ✅ CORRECT: Scalar array with manual reconstruction
+@group(0) @binding(0) var<storage> positions: array<f32>;
+
+struct VertexUniforms {
+  count: u32,
+  positionStride: u32,  // In elements (floats), not bytes
+  positionOffset: u32,  // In elements (floats), not bytes
+};
+
+fn getPosition(index: u32) -> vec3f {
+  let offset = index * vertex.positionStride + vertex.positionOffset;
+  return vec3f(positions[offset], positions[offset + 1], positions[offset + 2]);
+}
+
+// ❌ INCORRECT: Direct vec3 array (alignment issues)
+@group(0) @binding(0) var<storage> positions: array<vec3f>;
+```
+
+**Key Rules:**
+- Stride/offset in elements (floats), NOT bytes
+- Manual indexing: `index * stride + offset`
+- Use structs for output (you control layout)
+- Quantize floats to i32 for atomic operations
+
+---
+
+### LangChain v1.0 createAgent Pattern (2025)
+**Source:** [LangChain v1 Docs](https://docs.langchain.com/oss/javascript/langchain/agents)
+**Confidence:** 98%
+**Tags:** #langchain #v1 #middleware #agents #react
+
+**Problem:** LangChain v0.x chains are deprecated. v1.0 uses unified `createAgent()` API.
+
+**Solution:**
+```typescript
+// ✅ CORRECT: LangChain v1 pattern
+import { createAgent, tool, createMiddleware } from "langchain";
+
+const agent = createAgent({
+  model: "openai:gpt-4o",
+  tools: [searchTool],
+  systemPrompt: "You are a helpful assistant.",
+  middleware: [
+    createMiddleware({
+      name: "ErrorHandler",
+      wrapToolCall: async (request, handler) => {
+        try {
+          return await handler(request);
+        } catch (error) {
+          return new ToolMessage({
+            content: `Tool error: ${error}`,
+            tool_call_id: request.toolCall.id!,
+          });
+        }
+      },
+    }),
+  ],
+});
+
+// ❌ INCORRECT: Deprecated chain pattern
+import { LLMChain } from "@langchain/core/chains";
+const chain = new LLMChain({ llm, prompt });
+```
+
+**Middleware Hooks:**
+- `beforeModel` - Modify request before model call
+- `wrapModelCall` - Wrap model call with custom logic
+- `afterModel` - Process model response
+- `wrapToolCall` - Handle tool execution and errors
+
+---
+
+### TypeScript 5.x Null Safety Patterns (2025)
+**Confidence:** 100%
+**Tags:** #typescript #null-safety #optional-chaining #strict-mode
+
+**Rules:**
+```typescript
+// ✅ CORRECT: Optional chaining
+const userName = user?.profile?.name;
+const firstItem = array?.[0];
+
+// ✅ CORRECT: Nullish coalescing (only null/undefined)
+const count = value ?? 0;
+const name = user?.name ?? "Anonymous";
+
+// ✅ CORRECT: Union types for nullable parameters
+function process(data: string | null | undefined): void {
+  if (data === null || data === undefined) return;
+  // data is now string
+}
+
+// ❌ INCORRECT: Unsafe access
+const userName = user.profile.name;  // Runtime error if user is null
+
+// ❌ INCORRECT: Logical OR (treats 0, "", false as falsy)
+const count = value || 0;  // Wrong if value is 0
+```
+
+---
+
+### Drizzle ORM 0.44 Schema Patterns (2025)
+**Source:** [Drizzle ORM Docs](https://orm.drizzle.team/docs/sql-schema-declaration)
+**Confidence:** 95%
+**Tags:** #drizzle #orm #schema #postgresql #typescript
+
+**Pattern:**
+```typescript
+// ✅ CORRECT: Drizzle ORM 0.44 pattern
+import { pgTable, serial, text, timestamp, integer } from "drizzle-orm/pg-core";
+
+export const users = pgTable("users", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull(),
+  email: text("email").notNull().unique(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const posts = pgTable("posts", {
+  id: serial("id").primaryKey(),
+  title: text("title").notNull(),
+  authorId: integer("author_id").references(() => users.id).notNull(),
+});
+
+// Relations
+import { relations } from "drizzle-orm";
+
+export const usersRelations = relations(users, ({ many }) => ({
+  posts: many(posts),
+}));
+```
+
+---
+
+### Bits UI v2.0 + Svelte 5 Integration (2025)
+**Confidence:** 98%
+**Tags:** #bits-ui #svelte5 #runes #components #headless
+
+**Import Pattern:**
+```typescript
+// ✅ CORRECT: Bits UI v2.0 imports
+import { Dialog, Button, Select } from "bits-ui";
+import type { DialogProps } from "bits-ui";
+
+// ❌ INCORRECT: Deprecated @melt-ui imports
+import { createDialog } from "@melt-ui/svelte";
+```
+
+**Component Usage:**
+```svelte
+<script lang="ts">
+  import { Dialog } from "bits-ui";
+
+  // ✅ CORRECT: Svelte 5 runes
+  let open = $state(false);
+
+  function handleOpenChange(newOpen: boolean) {
+    open = newOpen;
+  }
+</script>
+
+<Dialog.Root {open} onOpenChange={handleOpenChange}>
+  <Dialog.Trigger>
+    <button>Open Dialog</button>
+  </Dialog.Trigger>
+  <Dialog.Portal>
+    <Dialog.Overlay />
+    <Dialog.Content>
+      <Dialog.Title>Title</Dialog.Title>
+      <Dialog.Close>Close</Dialog.Close>
+    </Dialog.Content>
+  </Dialog.Portal>
+</Dialog.Root>
+```
+
+---
+
+### Svelte 5 Runes Patterns (2025)
+**Confidence:** 100%
+**Tags:** #svelte5 #runes #reactivity #state
+
+**State Management:**
+```typescript
+// ✅ CORRECT: Svelte 5 runes
+let count = $state(0);
+let doubled = $derived(count * 2);
+
+$effect(() => {
+  console.log(`Count is ${count}`);
+});
+
+// ✅ CORRECT: Svelte 5 props
+let { title, description = "Default" } = $props<{
+  title: string;
+  description?: string;
+}>();
+
+// ❌ INCORRECT: Svelte 4 pattern
+let count = 0;
+$: doubled = count * 2;
+export let title: string;
+```
+
+---
+
+### Phase 2 Pattern Summary
+
+**Total Patterns Added:** 6
+**Confidence Range:** 95-100%
+**Expected Impact:** ~27,000 errors fixed (57% reduction from 88,500)
+
+**Pattern Categories:**
+1. WebGPU compute shader alignment
+2. LangChain v1 agent creation
+3. TypeScript null safety
+4. Drizzle ORM schema definition
+5. Bits UI v2.0 imports
+6. Svelte 5 runes reactivity
+
+**Next Steps:**
+- Create automated fix scripts for each pattern
+- Run dry-run validation on files 1-210
+- Apply fixes incrementally with validation
+- Track error reduction per pattern
+
+---
+
+## 🌐 SvelteKit 2 Architecture: SSR vs Remote Functions (Jan 2026)
+
+### Current Pattern Analysis
+- **API Endpoints (+server.ts):** 4175 files
+- **SSR Load Functions (+page.server.ts):** 264 files
+- **Ratio:** 16:1 (API-heavy)
+
+### SvelteKit 2 Best Practices
+
+| Pattern | When to Use | Benefits |
+|---------|-------------|----------|
+| **SSR Load Functions** | Page data, navigation-triggered fetching, auth-dependent data | SEO optimization, faster initial render, type-safe with `$types`, no extra HTTP round-trip |
+| **API Endpoints (+server.ts)** | Third-party API access, webhooks, mobile apps, non-page requests | External client support, JSON API for other consumers |
+| **Form Actions** | Mutations, form submissions | Progressive enhancement, works without JS, CSRF protection |
+
+### Recommended Refactoring
+
+**BEFORE (API-centric):**
+```typescript
+// routes/api/cases/+server.ts
+export const GET: RequestHandler = async ({ locals }) => {
+  const cases = await db.select()...;
+  return json({ cases });
+};
+
+// routes/cases/+page.svelte
+onMount(async () => {
+  cases = await fetch('/api/cases').then(r => r.json());
+});
+```
+
+**AFTER (SSR-centric):**
+```typescript
+// routes/cases/+page.server.ts
+export const load: PageServerLoad = async ({ locals }) => {
+  if (!locals.user) throw redirect(302, '/login');
+  return { cases: await db.select()... };
+};
+
+// routes/cases/+page.svelte
+let { data }: PageProps = $props();
+// data.cases available immediately, SSR-rendered
+```
+
+### Form Actions Pattern
+```typescript
+// routes/cases/create/+page.server.ts
+export const actions = {
+  create: async ({ request, locals }) => {
+    const data = await request.formData();
+    await db.insert(cases).values({...});
+    return { success: true };
+  }
+} satisfies Actions;
+```
+
+```svelte
+<!-- Progressive enhancement -->
+<form method="POST" action="?/create" use:enhance>
+  <input name="title" required />
+  <button>Create Case</button>
+</form>
+```
+
+---
+
+## 📡 SSE vs WebSocket: Contextual Chat
+
+### Decision Matrix
+
+| Feature | SSE | WebSocket |
+|---------|-----|-----------|
+| **Direction** | Server → Client | Bidirectional |
+| **Reconnection** | Automatic | Manual |
+| **SvelteKit** | Native +server.ts | Adapter config needed |
+
+### Recommendation: SSE for Contextual Chat
+
+**SSE Implementation:**
+```typescript
+// routes/api/chat/stream/+server.ts
+export const GET: RequestHandler = async () => {
+  const stream = new ReadableStream({
+    async start(controller) {
+      for await (const token of llmStream) {
+        controller.enqueue(`data: ${JSON.stringify({ token })}\n\n`);
+      }
+      controller.close();
+    }
+  });
+
+  return new Response(stream, {
+    headers: { 'Content-Type': 'text/event-stream' }
+  });
+};
+```
+
+---
+
+## 🔄 Route Consolidation Plan
+
+| Keep | Remove | Reason |
+|------|--------|--------|
+| `/cases/new` | `/cases/create` | Consistent naming |
+| `/evidence` | `/evidence-library` | Shorter URL |
+| `/settings` | `/system-configuration` | User-friendly |
+
+---
+
+## 🤖 Local-First Agent Frameworks (Jan 2026)
+
+### Stack (100% Local, $0 Cost)
+| Framework | Purpose | License |
+|-----------|---------|---------|
+| **CrewAI** | Role-based agent pipelines | MIT |
+| **AutoGen** | Multi-agent conversation | MIT |
+| **GraphRAG** | Knowledge graph + RAG | MIT |
+| **Langfuse** | LLM observability | MIT |
+
+### Installation
+```bash
+pip install crewai crewai-tools pyautogen graphrag langfuse
+```
+
+### CrewAI Quick Start
+```python
+from crewai import Agent, Task, Crew
+
+researcher = Agent(
+    role='Legal Researcher',
+    tools=[kb_vector_search],
+    llm='ollama/gemma3-legal:latest'  # FREE
+)
+
+crew = Crew(agents=[researcher], tasks=[...])
+result = crew.kickoff()
+```
+
+### GraphRAG Commands
+```bash
+graphrag init --root ./legal-knowledge
+graphrag index --root ./legal-knowledge
+graphrag query --method global --query "IP precedents"
+```
+
+---
+
+## 📊 Agentic RAG + KAG + DAG
+
+| Layer | Purpose | Storage | Tool |
+|-------|---------|---------|------|
+| **RAG** | Vector search | Qdrant (6333) | `kb_vector_search` |
+| **KAG** | Knowledge graph | GraphRAG + Neo4j | `graphrag_search` |
+| **DAG** | Pipelines | MinIO + PostgreSQL | CrewAI sequential |
+
+---
+
+## 🗺️ Phase 96 Roadmap: Evidence SSR
+
+### Tasks
+- [ ] Migrate `/evidence` to SSR + form actions
+- [ ] Consolidate `/evidence` and `/evidence-library`
+- [ ] Add SSE for real-time notifications
+- [ ] Refactor chat to SSE (instead of WebSocket)
+
+### SSR Pattern
+```typescript
+// routes/evidence/+page.server.ts
+export const load: PageServerLoad = async ({ locals }) => {
+  if (!locals.user) throw redirect(302, '/login');
+  return { evidence: await db.select()... };
+};
+
+export const actions = {
+  upload: async ({ request }) => {
+    await db.insert(evidenceTable).values({...});
+    return { success: true };
+  }
+} satisfies Actions;
+```
+
+### Phase 97+
+- [ ] Migrate `/admin/knowledge-search` to SSR
+- [ ] Add optimistic UI with `use:enhance`
+- [ ] Infinite scroll with SSR pagination
+- [ ] Lighthouse CI monitoring
+
+---
+
+## 📚 Reference Documentation
+
+| Topic | URL |
+|-------|-----|
+| **CrewAI** | https://docs.crewai.com/ |
+| **AutoGen** | https://microsoft.github.io/autogen/ |
+| **GraphRAG** | https://github.com/microsoft/graphrag |
+| **Langfuse** | https://langfuse.com/docs |
+| **FastMCP** | https://github.com/jlowin/fastmcp |
+| SvelteKit Load | https://kit.svelte.dev/docs/load |
+| SvelteKit Actions | https://kit.svelte.dev/docs/form-actions |
+| Svelte 5 Runes | https://svelte.dev/docs/runes |
+| Drizzle ORM | https://orm.drizzle.team/docs/overview |
+

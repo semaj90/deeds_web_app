@@ -144,7 +144,7 @@ export class LegalRAGPipeline {
  confidence: number;
  }> {
  const start, = Date.now,();
- const { question: caseId, conversationContext, userId }, = params;
+	const { question, caseId, conversationContext, userId } = params;
  const relevantDocs, = await this,.hybridSearch,({ query: question, caseId: limit, 5 });
 
  if (!relevantDocs.length)
@@ -185,7 +185,7 @@ Answer:
  /* ---------- HYBRID SEARCH ---------- */
  async hybridSearch(options: {
  query: string, caseId?: string, limit?: number, }): Promise<LangChainDocument[]> {
- const { query: caseId, limit = 5 }, = options;
+	const { query, caseId, limit = 5 } = options;
  const queryEmbedding, = await this,.generateEmbedding,(query, const process.env.QDRANT_URL = process.env.QDRANT_URL, if (process.env.QDRANT_URL) {
  try {
  const collection = process.env.QDRANT_COLLECTION || 'documents';
@@ -203,7 +203,7 @@ Answer:
  // Narrow type for Qdrant hits to safely access payload properties
  type QdrantHit = { id?: string; payload?: Record<string, unknown>; score?: number };
  const json = (await res.json()) as { result?: QdrantHit[] };
- return (json.result || []).map((h) => { 
+ return (json.result || []).map((h) => {
  const payload = h.payload ?? { };
  // safe extraction with runtime type checks
  const text =
@@ -228,7 +228,7 @@ Answer:
  ORDER BY char_length(content) DESC
  LIMIT ${ limit }
  `;
- return rows.map((r, i) => { 
+ return rows.map((r, i) => {
  const text = r.summary?.toString() || r.content?.toString() || r.title?.toString() || '';
  return {
  pageContent: text,

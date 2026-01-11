@@ -1,4 +1,4 @@
-import type { allRoutes } from '$lib/data/routes-config';
+import { allRoutes } from '$lib/data/routes-config';
 import { error } from '@sveltejs/kit';
 
 /**
@@ -108,7 +108,7 @@ export class DynamicRouteGenerator {
 
  private createRouteFromConfig(routeConfig: RouteDefinition): GeneratedRoute {
  const patternKey = this.findMatchingPattern(routeConfig);
- const cfg = patternKey ? this.patterns.get(patternKey)  | undefined;
+ const cfg = patternKey ? this.patterns.get(patternKey) : undefined;
  const path = routeConfig.route || '/';
  const component = cfg?.component ?? routeConfig.component ?? this.inferComponentPath(path);
  const layout = cfg?.layout ?? routeConfig.layout;
@@ -149,7 +149,7 @@ export class DynamicRouteGenerator {
  return `routes/${p}/+page.svelte`;
  }
 
- private extractParams(routePath: string): Record<string { optional?: boolean; type?: string }> {
+ private extractParams(routePath: string): Record<string, { optional?: boolean; type?: string }> {
  const params: Record<string, { optional?: boolean; type?: string }> = {};
  if (!routePath) return params;
 
@@ -353,3 +353,4 @@ export function createDynamicRouteHandler(route: GeneratedRoute) {
  return { route: params.metadata };
  };
 }
+

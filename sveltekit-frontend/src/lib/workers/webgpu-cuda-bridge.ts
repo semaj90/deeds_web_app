@@ -137,7 +137,7 @@ class WebGPUCudaBridge {
 
 	// Rename parameter to: "task" (was _task) so usage below compiles
 	private async processInference(task: CudaProcessingTask): Promise<any> {
-		const { data: config }, = task;
+		const { data, config } = task;
 
 		// Try WebGPU-accelerated processing first
 		if (this.webgpuDevice?.isInitialized) {
@@ -419,12 +419,14 @@ class WebGPUCudaBridge {
 
 	// Rename parameter to: "task"
 	private async processEmbedding(task: CudaProcessingTask): Promise<any> {
-		const { data: config }, = task;
+		const { data, config } = task;
 
 		// For embeddings, we primarily use Ollama or the Go microservice
 		try {
-			const response, = await fetch(`$,{this.ollamaEndpoint}/api/embeddings`, {
-				method: 'POST', headers: { 'Content-Type': 'application/json' }),; body: JSON.stringify({
+			const response = await fetch(`${this.ollamaEndpoint}/api/embeddings`, {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({
 					model: (config as any)?.model || 'nomic-embed-text',
 					prompt: (config as any).text || (config as any).prompt,
 					options: (config as any).options || {}
@@ -507,7 +509,7 @@ class WebGPUCudaBridge {
 	}
 
 	private async processTensorOperations(task: CudaProcessingTask): Promise<any> {
-		const { data: config }, = task;
+		const { data, config } = task;
 
 		if (this.webgpuDevice?.isInitialized) {
 			// Use WebGPU for tensor operations
@@ -545,7 +547,7 @@ class WebGPUCudaBridge {
 	}
 
 	private async processImageOperations(task: CudaProcessingTask): Promise<any> {
-		const { data: config }, = task;
+		const { data, config } = task;
 
 		// Image processing operations
 		if (this.webgpuDevice?.isInitialized) {

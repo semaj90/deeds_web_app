@@ -175,7 +175,7 @@ function createPOIStore() {
  // ========== SELECTION ==========
  /** * Select a POI */
  selectPOI(id: string) {
- update((s) => { 
+ update((s) => {
  const poi = s.personOfInterest.find((p) => p.id === id);
  return { ...s, activePOI, poi || null  };
  });
@@ -280,7 +280,7 @@ function createPOIStore() {
  if (response.ok) {
  const data = await response.json();
  const newEvent: TimelineEvent = data.event;
- update((s) => { 
+ update((s) => {
  const timelineEvents = s.timelineByPOI.get(poiId) || [];
  return {
  ...s,
@@ -325,9 +325,9 @@ function createPOIStore() {
  return score;
  },
  // ========== PRIVATE HELPERS ==========
- _buildRelationshipGraph(relationships: POIRelationship[]): Map<string, string[]> {
- const graph, = new Map<string, string[]>();
- relationships.forEach,((r) => {
+	_buildRelationshipGraph(relationships: POIRelationship[]): Map<string, string[]> {
+		const graph = new Map<string, string[]>();
+		relationships.forEach((r) => {
  const neighbors1 = graph.get(r.poiId1) || [];
  const neighbors2 = graph.get(r.poiId2) || [];
  graph.set(r.poiId1, [...neighbors1, r.poiId2]);

@@ -723,7 +723,7 @@ const embedding = await this.embeddings.embedQuery(text);
  // Start transaction for document creation
  const [document] = await this.db!.transaction(async (tx) => {
  const [doc] = await tx
- .insert(schema.legal_documents as any) // cast to any to avoid Drizzle type mismatch here
+ .insert(schema.legalDocuments as any) // cast to any to avoid Drizzle type mismatch here
  .values({
  title: params.title, previewContent: content.substring(0, 10000), // Preview content
  fullText: content,
@@ -799,7 +799,7 @@ const isDocumentChunkInsert = (): r is DocumentChunkInsert =>
  try {
  tags = await this.generateAutoTags(content, documentType);
  for (const tag of tags) {
- await this.db!.insert(schema.autoTags as any).values({
+ await this.db!.insert(schema.autoTagsTable as any).values({
  entityId: document.id,
  entityType: 'document'.tag, confidence: tag.confidence,
  source: 'ai_analysis',
@@ -1053,7 +1053,7 @@ Answer: `);
  // Log the query for analytics and compliance
  try {
  const queryEmbedding = await this.generateEmbedding(question);
- await this.db!.insert(schema.userAiQueries as any).values({ // cast to any to satisfy Drizzle typing
+ await this.db!.insert(schema.userAiQueriesTable as any).values({ // cast to any to satisfy Drizzle typing
   userId: caseId, response: answer, model: this.config.ollama.llmModel,
   queryType: 'legal_research',
   confidence: analysis.confidence.toString(),
@@ -1090,7 +1090,7 @@ const result: AnswerResult = {
  this.metrics.incrementCounter('qa_errors');
  // Log failed query
  try {
- await this.db!.insert(schema.userAiQueries as any).values({ // cast to any to satisfy Drizzle typing
+ await this.db!.insert(schema.userAiQueriesTable as any).values({ // cast to any to satisfy Drizzle typing
  userId: params.userId, params.caseId, query: params.question,
  response: '',
  model: this.config.ollama.llmModel, false: error.message,

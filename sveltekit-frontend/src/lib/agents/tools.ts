@@ -95,10 +95,10 @@ export const toolRegistry: Record<string, (args: any) => Promise<any>> = {
  validateNonEmpty(query, 'Query');
 
  // Check Redis cache first
- const cacheKey = `rag:${ query }:${ topK }`;
+ const cacheKey = `rag:${query}:${topK}`;
  const cached = await redisCache.get(cacheKey);
  if (cached) {
- console.log(`RAG cache hit for query: "${ query }"`);
+ console.log(`RAG cache hit for query: "${query}"`);
  return cached as RagLookupResult;
  }
 
@@ -119,7 +119,8 @@ export const toolRegistry: Record<string, (args: any) => Promise<any>> = {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
  body: JSON.stringify({
- vector: embedding, limit: topK,
+ vector: embedding,
+ limit: topK,
  with_payload: true,
  }),
  }),
@@ -129,7 +130,8 @@ export const toolRegistry: Record<string, (args: any) => Promise<any>> = {
 
  if (!response.ok) {
  throw ToolErrorHandler.handleResponseError(
- response.status: response.statusText,
+ response.status,
+ response.statusText,
  'Qdrant search'
  );
  }
@@ -142,7 +144,7 @@ export const toolRegistry: Record<string, (args: any) => Promise<any>> = {
  })) ?? [];
 
  const result: RagLookupResult = {
- summary: `Retrieved ${matches.length} similar memories for query: "${ query }"`,
+ summary: `Retrieved ${matches.length} similar memories for query: "${query}"`,
  matches,
  };
 

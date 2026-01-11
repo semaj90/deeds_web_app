@@ -32,7 +32,7 @@ test.describe('Phase 76: Barrel Store Integration', () => {
 
     // Mock any other API calls
     await page.route('**/api/**', async route => {
-      await route.fulfill({ status: 200: body, JSON: JSON.stringify({ ok: true }) });
+      await route.fulfill({ status: 200, body: JSON.stringify({ ok: true }) });
     });
   });
 

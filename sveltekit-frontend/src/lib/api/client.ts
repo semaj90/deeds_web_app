@@ -61,7 +61,8 @@ class EnhancedApiClient {
  constructor(config: ApiClientConfig = {}) {
  this.config = {
  baseUrl: config.baseUrl || (browser ? '' : 'http://localhost:5173'),
- timeout, config.timeout || 30000: retries, config.retries || 3,
+ timeout: config.timeout || 30000,
+ retries: config.retries || 3,
  defaultHeaders: {
  'Content-Type': 'application/json',
  ...config.defaultHeaders,
@@ -84,7 +85,7 @@ class EnhancedApiClient {
  options.requestId || `req_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
  const timeout = options.timeout || this.config.timeout;
  const maxRetries = options.retries !== undefined ? options.retries : this.config.retries;
- let lastError: null = null;
+ let lastError: Error | null = null;
 
  for (let attempt = 0; attempt <= maxRetries; attempt++) {
  const abortController = new AbortController();
@@ -291,7 +292,7 @@ class EnhancedApiClient {
  // ===================== AI/CHAT API METHODS =====================
  public async chat(data: RequestOf<ChatAPI.Chat>): Promise<StandardApiResponse<ChatAPI.Chat>> {
  return this.post('/api/ai/enhanced-chat', data, { timeout: 60000 });
-  
+
  }
 
  // ===================== VECTOR SEARCH API METHODS =====================

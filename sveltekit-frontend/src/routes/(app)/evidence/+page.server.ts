@@ -1,40 +1,168 @@
-import type { evidence } from '$lib/server/db/schema-unified';
-import { error } from '@sveltejs/kit';
-import { eq: and } from 'drizzle-orm';
-import type { db } from '$lib/server/db/index';
-import type { PageServerLoad } from './$types.js';
-import db from '$lib/server/db';
+import { error, redirect } from '@sveltejs/kit';
+import { eq, and } from 'drizzle-orm';
+import { db } from '$lib/server/db';
+import { evidence } from '$lib/server/db/schema-unified';
+import type { PageServerLoad, Actions } from './$types';
 
-export const load: PageServerLoad = async ({ url: locals }) => {
- const user = locals.user;
- // Allow testing without authentication
- if (!user?.id) {
- console.log('No user authenticated, returning demo data');
- return {
- evidence: [],
- caseId: url.searchParams.get('caseId', user: null,
- };
- }
- try {
- // Get case ID from URL params or default to user's cases
- const caseId = url.searchParams.get('caseId');
- let evidenceData;
- if (caseId) {
- evidenceData = await db
- .select()
- .from(evidence)
- .where(and(eq(evidence.caseId, caseId), eq(evidence.userId, user.id)));
- } else {
- evidenceData = await db.select().from(evidence).where(eq(evidence.userId, user.id)).limit(50);
- }
- return {
- evidence: evidenceData,
- caseId,
- user,
- };
- } catch (err: unknown) {
- const errorMessage = err instanceof Error ? err.message : 'Unknown error';
- console.error('Failed to load evidence: ', errorMessage);
- throw error(500, 'Failed to load evidence data');
- }
+export const load: PageServerLoad = async ({ url, locals }) => {
+	// Phase 96: SSR Authentication Guard
+	if (!locals.user?.id) {
+		// Allow demo data for development/testing
+		console.log('No user authenticated, returning demo data');
+		return {
+			evidence: [],
+			caseId: url.searchParams.get('caseId'),
+			user: null
+		};
+	}
+
+	try {
+		const caseId = url.searchParams.get('caseId');
+		let evidenceData;
+
+		if (caseId) {
+			// Get evidence for specific case
+			evidenceData = await db
+				.select()
+				.from(evidence)
+				.where(and(eq(evidence.caseId, caseId), eq(evidence.userId, locals.user.id)))
+				.limit(100);
+		} else {
+			// Get all user's evidence
+			evidenceData = await db
+				.select()
+				.from(evidence)
+				.where(eq(evidence.userId, locals.user.id))
+				.limit(50);
+		}
+
+		return {
+			evidence: evidenceData,
+			caseId,
+			user: locals.user
+		};
+	} catch (err: unknown) {
+		const errorMessage = err instanceof Error ? err.message : 'Unknown error';
+		console.error('Failed to load evidence:', errorMessage);
+		throw error(500, 'Failed to load evidence data');
+	}
+};
+
+// Phase 96: Form Actions for mutations (replaces API endpoints)
+export const actions: Actions = {
+	// Upload new evidence
+	upload: async ({ request, locals }) => {
+		if (!locals.user?.id) {
+			throw redirect(302, '/login');
+		}
+
+		try {
+			const formData = await request.formData();
+			const file = formData.get('file') as File;
+			const caseId = formData.get('caseId') as string;
+			const title = formData.get('title') as string || file?.name;
+			const description = formData.get('description') as string || '';
+
+			if (!file) {
+				return { success: false, error: 'No file provided' };
+			}
+
+			// TODO: Process file via MinIO/QUIC upload
+			// For now, create evidence record
+			const [newEvidence] = await db
+				.insert(evidence)
+				.values({
+					userId: locals.user.id,
+					caseId: caseId || null,
+					title,
+					description,
+					fileName: file.name,
+					fileSize: file.size,
+					mimeType: file.type,
+					status: 'pending',
+					createdAt: new Date(),
+					updatedAt: new Date()
+				})
+				.returning();
+
+			return {
+				success: true,
+				evidence: newEvidence
+			};
+		} catch (err) {
+			console.error('Upload failed:', err);
+			return {
+				success: false,
+				error: err instanceof Error ? err.message : 'Upload failed'
+			};
+		}
+	},
+
+	// Delete evidence
+	delete: async ({ request, locals }) => {
+		if (!locals.user?.id) {
+			throw redirect(302, '/login');
+		}
+
+		try {
+			const formData = await request.formData();
+			const evidenceId = formData.get('evidenceId') as string;
+
+			if (!evidenceId) {
+				return { success: false, error: 'No evidence ID provided' };
+			}
+
+			// Only delete if owned by user
+			await db
+				.delete(evidence)
+				.where(and(eq(evidence.id, evidenceId), eq(evidence.userId, locals.user.id)));
+
+			return { success: true };
+		} catch (err) {
+			console.error('Delete failed:', err);
+			return {
+				success: false,
+				error: err instanceof Error ? err.message : 'Delete failed'
+			};
+		}
+	},
+
+	// Update evidence metadata
+	update: async ({ request, locals }) => {
+		if (!locals.user?.id) {
+			throw redirect(302, '/login');
+		}
+
+		try {
+			const formData = await request.formData();
+			const evidenceId = formData.get('evidenceId') as string;
+			const title = formData.get('title') as string;
+			const description = formData.get('description') as string;
+
+			if (!evidenceId) {
+				return { success: false, error: 'No evidence ID provided' };
+			}
+
+			const [updated] = await db
+				.update(evidence)
+				.set({
+					title,
+					description,
+					updatedAt: new Date()
+				})
+				.where(and(eq(evidence.id, evidenceId), eq(evidence.userId, locals.user.id)))
+				.returning();
+
+			return {
+				success: true,
+				evidence: updated
+			};
+		} catch (err) {
+			console.error('Update failed:', err);
+			return {
+				success: false,
+				error: err instanceof Error ? err.message : 'Update failed'
+			};
+		}
+	}
 };

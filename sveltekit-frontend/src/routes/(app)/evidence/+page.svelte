@@ -1,12 +1,14 @@
 <script lang="ts">
-	let $isProcessing = $state<any>(undefined);
-
-	import { isProcessing, registerServiceWorker, uploadFileViaQUIC, uploadProgress } from '$lib/mlp';
+	import { enhance, applyAction } from '$app/forms';
+	import type { ActionData, PageData } from './$types';
 	import { onMount } from 'svelte';
 
-	let selectedFile = $state<File | null>(null);
+	let { data, form } = $props<{ data: PageData; form: ActionData }>();
+
 	let isDragging = $state(false);
+	let isUploading = $state(false);
 	let uploadError = $state<string | null>(null);
+	let selectedFile = $state<File | null>(null);
 
 	function formatFileSize(bytes: number): string {
 		if (bytes === 0) return '0 B';
@@ -16,14 +18,7 @@
 		return Math.round((bytes / Math.pow(k, i)) * 100) / 100 + ' ' + sizes[i];
 	}
 
-	onMount(() => {
- (async () => {
- 		// Register service worker for background uploads
- 		await registerServiceWorker();
- })();
- });
-
-	async function handleFileSelect(event: Event) {
+	function handleFileSelect(event: Event) {
 		const input = event.target as HTMLInputElement;
 		if (input.files?.[0]) {
 			selectedFile = input.files[0];
@@ -31,75 +26,51 @@
 		}
 	}
 
-	async function handleDragOver(event: DragEvent) {
+	function handleDragOver(event: DragEvent) {
 		event.preventDefault();
 		isDragging = true;
 	}
 
-	async function handleDragLeave(event: DragEvent) {
+	function handleDragLeave(event: DragEvent) {
 		event.preventDefault();
 		isDragging = false;
 	}
 
-	async function handleDrop(event: DragEvent) {
+	function handleDrop(event: DragEvent) {
 		event.preventDefault();
 		isDragging = false;
-
 		if (event.dataTransfer?.files?.[0]) {
 			selectedFile = event.dataTransfer.files[0];
 			uploadError = null;
-			await startUpload();
+
+			// Manually set the file input if needed for form submission
+			// But for drag and drop with form actions, we typically need to bind or simulate input
+			// Here we just set state, the user still needs to click "Start Upload" which submits the form
+			// If we want auto-submit, we'd need to manually trigger submit
 		}
 	}
 
-	async function startUpload() {
-		if (!selectedFile) {
-			uploadError = 'Please select a file';
-			return;
+	// Real-time updates via SSE
+	onMount(() => {
+		if (typeof EventSource !== 'undefined') {
+			const sse = new EventSource('/api/evidence/realtime');
+			sse.onmessage = (event) => {
+				try {
+					const data = JSON.parse(event.data);
+					if (data.type === 'progress') {
+						console.log('Processing progress:', data.progress);
+					} else if (data.type === 'complete') {
+						console.log('Processing complete:', data.docId);
+						isUploading = false;
+						// Trigger a refresh/invalidation if needed
+					}
+				} catch (e) {
+					console.error('SSE Error:', e);
+				}
+			};
+			return () => sse.close();
 		}
-
-		try {
-			uploadError = null;
-			const docId = await uploadFileViaQUIC(selectedFile, (progress) => {
-				// Progress is automatically updated in the store
-			});
-
-			console.log('✅ Upload complete:', docId);
-		} catch (error) {
-			uploadError = error instanceof Error ? error.message : 'Upload failed';
-			console.error('Upload error:', error);
-		}
-	}
-
-	function getProgressColor(stage: string): string {
-		switch (stage) {
-			case 'uploading':
-				return 'bg-blue-500';
-			case 'processing':
-				return 'bg-amber-500';
-			case 'mirroring':
-				return 'bg-purple-500';
-			case 'complete':
-				return 'bg-green-500';
-			default:
-				return 'bg-gray-500';
-		}
-	}
-
-	function getStageLabel(stage: string): string {
-		switch (stage) {
-			case 'uploading':
-				return '📤 Uploading...';
-			case 'processing':
-				return '🔄 Processing (DocLing GPU)...';
-			case 'mirroring':
-				return '🪞 Mirroring to Qdrant + Postgres...';
-			case 'complete':
-				return '✅ Complete!';
-			default:
-				return 'Ready';
-		}
-	}
+	});
 </script>
 
 <div class="evidence-container">
@@ -111,107 +82,83 @@
 
 	<!-- Upload Area -->
 	<div class="upload-section">
-		<div
-			class="drop-zone"
-			class:dragging={isDragging}
-			class:disabled={$isProcessing}
-			ondragover={ handleDragOver }
-			ondragleave={ handleDragLeave }
-			ondrop={ handleDrop }
-			role="button"
-			tabindex="0"
+		<form
+			method="POST"
+			action="?/upload"
+			use:enhance={() => {
+				isUploading = true;
+				return async ({ result }) => {
+					isUploading = false;
+					if (result.type === 'failure') {
+						uploadError = result.data?.error as string;
+					} else if (result.type === 'success') {
+						selectedFile = null;
+						// Optionally invalidateAll() here to refresh the list
+					}
+					await applyAction(result);
+				};
+			}}
+			enctype="multipart/form-data"
 		>
-			{#if $isProcessing}
-				<div class="processing-state">
-					<div class="spinner"></div>
-					<p>{getStageLabel($uploadProgress.stage)}</p>
-				</div>
-			{:else}
-				<div class="upload-prompt">
-					<span class="icon">📁</span>
-					<p>Drop files here or click to upload</p>
-					<small>PDF, Images, Documents</small>
-					<input
-						type="file"
-						accept=".pdf,image/*,.doc,.docx"
-						onchange={handleFileSelect}
-						style="display: none"
-						id="file-input"
-					/>
-					<button onclick={() => document.getElementById('file-input')?.click()}>
-						Choose File
+			<div
+				class="drop-zone"
+				class:dragging={isDragging}
+				class:disabled={isUploading}
+				ondragover={handleDragOver}
+				ondragleave={handleDragLeave}
+				ondrop={handleDrop}
+				role="button"
+				tabindex="0"
+			>
+				{#if isUploading}
+					<div class="processing-state">
+						<div class="spinner"></div>
+						<p>Uploading and Processing...</p>
+					</div>
+				{:else}
+					<div class="upload-prompt">
+						<span class="icon">📁</span>
+						<p>Drop files here or click to upload</p>
+						<small>PDF, Images, Documents</small>
+
+						<input
+							type="file"
+							name="file"
+							accept=".pdf,image/*,.doc,.docx"
+							onchange={handleFileSelect}
+							id="file-input"
+							class="hidden-input"
+							style="display: none;"
+						/>
+						<button type="button" onclick={() => document.getElementById('file-input')?.click()}>
+							Choose File
+						</button>
+					</div>
+				{/if}
+			</div>
+
+			<!-- Selected File Info & Submit -->
+			{#if selectedFile && !isUploading}
+				<div class="file-info">
+					<div class="file-details">
+						<span class="filename">{selectedFile.name}</span>
+						<span class="filesize">{formatFileSize(selectedFile.size)}</span>
+					</div>
+					<button type="submit" class="upload-btn">
+						Start Upload
 					</button>
 				</div>
 			{/if}
-		</div>
 
-		<!-- Selected File Info -->
-		{#if selectedFile && !$isProcessing}
-			<div class="file-info">
-				<div class="file-details">
-					<span class="filename">{selectedFile.name}</span>
-					<span class="filesize">{formatFileSize(selectedFile.size)}</span>
+			<!-- Server Error Message -->
+			{#if form?.error || uploadError}
+				<div class="error-message">
+					<span class="icon">⚠️</span>
+					<p>{form?.error || uploadError}</p>
 				</div>
-				<button class="upload-btn" onclick={startUpload}>
-					Start Upload
-				</button>
-			</div>
-		{/if}
-
-		<!-- Error Message -->
-		{#if uploadError}
-			<div class="error-message">
-				<span class="icon">⚠️</span>
-				<p>{uploadError}</p>
-			</div>
-		{/if}
+			{/if}
+		</form>
 	</div>
-
-	<!-- Progress Bar -->
-	{#if $isProcessing}
-		<div class="progress-section">
-			<div class="progress-header">
-				<span class="stage-label">{getStageLabel($uploadProgress.stage)}</span>
-				<span class="percentage">{Math.round($uploadProgress.percentage)}%</span>
-			</div>
-
-			<div class="progress-bar">
-				<div
-					class="progress-fill {getProgressColor($uploadProgress.stage)}"
-					style="width: {$uploadProgress.percentage}%"
-				></div>
-			</div>
-
-			<div class="progress-details">
-				<span class="uploaded">
-					{formatFileSize($uploadProgress.uploadedBytes)} / {formatFileSize($uploadProgress.fileSize)}
-				</span>
-				<span class="timestamp">
-					{new Date($uploadProgress.timestamp).toLocaleTimeString()}
-				</span>
-			</div>
-
-			<!-- Stage Indicators -->
-			<div class="stage-indicators">
-				<div class="stage" class:active={$uploadProgress.stage === 'uploading'}>
-					<span class="dot"></span>
-					<span>Upload</span>
-				</div>
-				<div class="stage" class:active={$uploadProgress.stage === 'processing'}>
-					<span class="dot"></span>
-					<span>Process</span>
-				</div>
-				<div class="stage" class:active={$uploadProgress.stage === 'mirroring'}>
-					<span class="dot"></span>
-					<span>Mirror</span>
-				</div>
-				<div class="stage" class:active={$uploadProgress.stage === 'complete'}>
-					<span class="dot"></span>
-					<span>Complete</span>
-				</div>
-			</div>
-		</div>
-	{/if}
 
 	<!-- Info Panel -->
 	<div class="info-panel">
@@ -234,9 +181,24 @@
 			</li>
 		</ul>
 	</div>
+
+	<!-- Evidence List (Server Data) -->
+	<div class="evidence-list">
+		<h3>Recent Uploads</h3>
+		{#if data.evidence && data.evidence.length > 0}
+			<ul>
+				{#each data.evidence as doc}
+					<li>{doc.title} ({doc.status}) - {new Date(doc.createdAt).toLocaleDateString()}</li>
+				{/each}
+			</ul>
+		{:else}
+			<p>No evidence found.</p>
+		{/if}
+	</div>
 </div>
 
 <style>
+	/* Preserving original styles */
 	.evidence-container {
 		max-width: 900px;
 		margin: 0 auto;
@@ -402,94 +364,12 @@
 		font-size: 1.5rem;
 	}
 
-	.progress-section {
-		background: #f9f9f9;
-		padding: 2rem;
-		border-radius: 8px;
-		margin-bottom: 2rem;
-	}
-
-	.progress-header {
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
-		margin-bottom: 1rem;
-	}
-
-	.stage-label {
-		font-weight: 500;
-		color: #2d2d2d;
-	}
-
-	.percentage {
-		font-size: 1.5rem;
-		font-weight: 600;
-		color: #8b3a3a;
-	}
-
-	.progress-bar {
-		width: 100%;
-		height: 8px;
-		background: #e0e0e0;
-		border-radius: 4px;
-		overflow: hidden;
-		margin-bottom: 1rem;
-	}
-
-	.progress-fill {
-		height: 100%;
-		transition: width 0.3s ease;
-	}
-
-	.progress-details {
-		display: flex;
-		justify-content: space-between;
-		font-size: 0.9rem;
-		color: #666;
-		margin-bottom: 1.5rem;
-	}
-
-	.stage-indicators {
-		display: flex;
-		justify-content: space-between;
-		gap: 1rem;
-	}
-
-	.stage {
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		gap: 0.5rem;
-		opacity: 0.5;
-		transition: opacity 0.3s ease;
-	}
-
-	.stage.active {
-		opacity: 1;
-	}
-
-	.stage .dot {
-		width: 12px;
-		height: 12px;
-		background: #ccc;
-		border-radius: 50%;
-		transition: background 0.3s ease;
-	}
-
-	.stage.active .dot {
-		background: #8b3a3a;
-	}
-
-	.stage span:last-child {
-		font-size: 0.85rem;
-		color: #666;
-	}
-
 	.info-panel {
 		background: #f5f4f0;
 		padding: 1.5rem;
 		border-radius: 8px;
 		border-left: 4px solid #8b3a3a;
+		margin-bottom: 2rem;
 	}
 
 	.info-panel h3 {
@@ -511,5 +391,19 @@
 
 	.info-panel strong {
 		color: #2d2d2d;
+	}
+
+	.evidence-list {
+		margin-top: 2rem;
+	}
+
+	.evidence-list ul {
+		list-style: none;
+		padding: 0;
+	}
+
+	.evidence-list li {
+		padding: 0.75rem;
+		border-bottom: 1px solid #eee;
 	}
 </style>

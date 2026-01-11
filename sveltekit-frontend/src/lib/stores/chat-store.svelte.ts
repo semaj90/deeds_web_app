@@ -4,14 +4,20 @@ import type { ChatMessage, ChatSession, ConnectionStatus, MessageAnalysis, RAGCo
 // Re-export for UserActivity type
 export interface UserActivity {
   lastSeen: Date;
-  messageCount: number;
-  sessionDuration: number;
+  messageCount?: number;
+  sessionDuration?: number;
+  userId: string;
+  sessionId: string;
+  status: 'online' | 'offline' | 'idle';
 }
 
 export interface AttentionData {
-  layer: number;
-  head: number;
-  scores: number[];
+    messageId?: string;
+    attentionWeights: number[];
+    focusPoints?: number[];
+    lastActivity?: number;
+    interactionCount?: number;
+    focused?: boolean;
 }
 
 export class ChatStore {
@@ -22,7 +28,7 @@ export class ChatStore {
 
     // Connection state
     isConnected = $state(false);
-    connectionStatus = $state<'connecting' | 'connected' | 'disconnected' | 'error'>('disconnected');
+    connectionStatus = $state<ConnectionStatus>('disconnected');
     lastConnectionTime = $state<Date | null>(null);
 
     // Real-time communication
@@ -41,9 +47,9 @@ export class ChatStore {
     isProcessing = $state(false);
     processingStage = $state<'analyzing' | 'embedding' | 'searching' | 'generating' | 'complete'>('complete');
     processingMetrics = $state({ responseTime: 0, tokenCount: 0, confidenceScore: 0, somCluster: -1, embeddingTime: 0, searchTime: 0, generationTime: 0 });
-  
+
     lastError = $state<string | null>(null);
-    errorHistory = $state<Array<any>>([]);
+    errorHistory = $state<Array<{ timestamp: Date, error: string, context?: any }>>([]);
 
     // User interaction
     userAttention = $state<AttentionData>({ messageId: '', attentionWeights: [], focusPoints: [] });
@@ -51,7 +57,8 @@ export class ChatStore {
 
     // Chat configuration
     chatConfig = $state({ maxMessages: 100, enableAttentionTracking: true, enableWebGPU: true, enableAnalysisPanel: true, autoScroll: true, showTypingIndicators: true, enableRecommendations: true, streamingEnabled: true });
-  
+
+    // Derived
     messageCount = $derived(this.messages.length);
     lastUserMessage = $derived(this.messages.filter(item => item.role === 'user').slice(-1)[0] || null);
     lastAIResponse = $derived(this.messages.filter(item => item.role === 'assistant').slice(-1)[0] || null);
@@ -61,7 +68,9 @@ export class ChatStore {
         const aiMessages = this.messages.filter(item => item.role === 'assistant');
         const totalTokens = this.messages.reduce((sum, m) => sum + (m.token_count || 0), 0);
         return {
-            totalMessages: this.messages.length.length.length, totalTokens, avgTokensPerMessage: this.messages.length > 0 ? Math.round(totalTokens / this.messages.length) : 0
+            totalMessages: this.messages.length,
+            totalTokens,
+            avgTokensPerMessage: this.messages.length > 0 ? Math.round(totalTokens / this.messages.length) : 0
         };
     });
 
@@ -70,8 +79,14 @@ export class ChatStore {
     sessionMetrics = $derived.by(() => {
         if (!this.session) return null;
         const sessionMessages = this.messages.filter(m => m.session_id === this.session!.id);
+        const startTime = this.session!.start_time ? new Date(this.session!.start_time).getTime() : Date.now();
+        const duration = Date.now() - startTime;
+
         return {
-            messageCount: sessionMessages.length, tokensUsed: sessionMessages.reduce((sum, m) => sum + (m.token_count || 0), 0, duration: Date.now() - new Date(this.session!.start_time).getTime( lastActivity: this.session!.last_activity
+            messageCount: sessionMessages.length,
+            tokensUsed: sessionMessages.reduce((sum, m) => sum + (m.token_count || 0), 0),
+            duration,
+            lastActivity: this.session!.last_activity
         };
     });
 
@@ -213,7 +228,9 @@ export class ChatStore {
     trackActivity(userId: string, sessionId: string, isTyping: boolean = false): void {
         const activity: UserActivity = {
             userId,
-            sessionId: isTyping.now( status: 'online'
+            sessionId,
+            lastSeen: new Date(),
+            status: 'online'
         };
         const updated = [...this.userActivities, activity];
         // Keep only last 100 activities
@@ -222,7 +239,7 @@ export class ChatStore {
         // Update attention data
         this.userAttention = {
             ...this.userAttention, lastActivity: Date.now(),
-     interactionCount: (this.userAttention.interactionCount || 0) + 1
+            interactionCount: (this.userAttention.interactionCount || 0) + 1
         };
     }
 
@@ -231,7 +248,7 @@ export class ChatStore {
     }
 
     addError(message: string, context?: any): void {
-        const error = { timestamp: new Date( error: message, context };
+        const error = { timestamp: new Date(), error: message, context };
         this.lastError = message;
         this.errorHistory = [...this.errorHistory, error].slice(-50); // Keep last 50 errors
     }
@@ -275,7 +292,7 @@ export class ChatStore {
         const messages = this.messages;
         const analysis = this.currentAnalysis;
         const context = this.ragContext;
-        return JSON.stringify({ session, messages, analysis: context Date().toISOString() }, null, 2);
+        return JSON.stringify({ session, messages, analysis, context, exportedAt: new Date().toISOString() }, null, 2);
     }
 
     reset(): void {

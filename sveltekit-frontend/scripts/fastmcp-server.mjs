@@ -543,6 +543,320 @@ async function runCommand(args) {
 }
 
 // =============================================================================
+// Langfuse Tools: Phase 66 Observability Integration
+// =============================================================================
+
+/**
+ * Tool: Log LLM trace to Langfuse
+ * Tracks agent calls, token usage, costs, and performance metrics
+ */
+async function langfuseLogTrace(args) {
+	const {
+		name,
+		input,
+		output,
+		metadata = {},
+		model = 'gemma3-legal:latest',
+		usage = {},
+		tags = []
+	} = args;
+
+	const langfuseUrl = process.env.LANGFUSE_URL || 'http://localhost:3000';
+	const publicKey = process.env.LANGFUSE_PUBLIC_KEY;
+	const secretKey = process.env.LANGFUSE_SECRET_KEY;
+
+	if (!publicKey || !secretKey) {
+		return {
+			ok: false,
+			error: 'Langfuse API keys not configured. Set LANGFUSE_PUBLIC_KEY and LANGFUSE_SECRET_KEY env vars.',
+			suggestion: 'Visit http://localhost:3000 to generate API keys'
+		};
+	}
+
+	try {
+		// Create trace in Langfuse
+		const tracePayload = {
+			name,
+			input,
+			output,
+			metadata: {
+				...metadata,
+				source: 'fastmcp_autogen',
+				timestamp: new Date().toISOString()
+			},
+			tags
+		};
+
+		// If usage provided, add generation span
+		if (usage.total_tokens || usage.prompt_tokens || usage.completion_tokens) {
+			tracePayload.generation = {
+				model,
+				input,
+				output,
+				usage: {
+					promptTokens: usage.prompt_tokens || 0,
+					completionTokens: usage.completion_tokens || 0,
+					totalTokens: usage.total_tokens || 0
+				}
+			};
+		}
+
+		const response = await fetch(`${langfuseUrl}/api/public/traces`, {
+			method: 'POST',
+			headers: {
+				'Authorization': `Bearer ${publicKey}:${secretKey}`,
+				'Content-Type': 'application/json'
+			},
+			body: JSON.stringify(tracePayload)
+		});
+
+		if (!response.ok) {
+			const errorText = await response.text();
+			return {
+				ok: false,
+				error: `Langfuse API error: ${response.status} ${response.statusText}`,
+				details: errorText
+			};
+		}
+
+		const result = await response.json();
+
+		return {
+			ok: true,
+			trace_id: result.id,
+			url: `${langfuseUrl}/traces/${result.id}`,
+			logged_at: new Date().toISOString(),
+			meta: {
+				tool: 'langfuse_log_trace',
+				model,
+				tokens: usage.total_tokens || 0
+			}
+		};
+	} catch (error) {
+		return {
+			ok: false,
+			error: error.message,
+			langfuse_url: langfuseUrl
+		};
+	}
+}
+
+/**
+ * Tool: Get recent traces from Langfuse
+ * Query trace history with filters
+ */
+async function langfuseGetTraces(args) {
+	const {
+		limit = 50,
+		page = 1,
+		tags = [],
+		name = null,
+		userId = null,
+		fromTimestamp = null,
+		toTimestamp = null
+	} = args;
+
+	const langfuseUrl = process.env.LANGFUSE_URL || 'http://localhost:3000';
+	const publicKey = process.env.LANGFUSE_PUBLIC_KEY;
+	const secretKey = process.env.LANGFUSE_SECRET_KEY;
+
+	if (!publicKey || !secretKey) {
+		return {
+			ok: false,
+			error: 'Langfuse API keys not configured. Set LANGFUSE_PUBLIC_KEY and LANGFUSE_SECRET_KEY env vars.',
+			suggestion: 'Visit http://localhost:3000 to generate API keys'
+		};
+	}
+
+	try {
+		// Build query parameters
+		const params = new URLSearchParams({
+			page: page.toString(),
+			limit: limit.toString()
+		});
+
+		if (name) params.append('name', name);
+		if (userId) params.append('userId', userId);
+		if (fromTimestamp) params.append('fromTimestamp', fromTimestamp);
+		if (toTimestamp) params.append('toTimestamp', toTimestamp);
+		tags.forEach(tag => params.append('tags', tag));
+
+		const response = await fetch(`${langfuseUrl}/api/public/traces?${params.toString()}`, {
+			method: 'GET',
+			headers: {
+				'Authorization': `Bearer ${publicKey}:${secretKey}`,
+				'Content-Type': 'application/json'
+			}
+		});
+
+		if (!response.ok) {
+			const errorText = await response.text();
+			return {
+				ok: false,
+				error: `Langfuse API error: ${response.status} ${response.statusText}`,
+				details: errorText
+			};
+		}
+
+		const result = await response.json();
+
+		return {
+			ok: true,
+			traces: result.data || [],
+			total_count: result.meta?.totalItems || 0,
+			page,
+			limit,
+			meta: {
+				tool: 'langfuse_get_traces',
+				filters: { tags, name, userId, fromTimestamp, toTimestamp }
+			}
+		};
+	} catch (error) {
+		return {
+			ok: false,
+			error: error.message,
+			langfuse_url: langfuseUrl
+		};
+	}
+}
+
+/**
+ * Tool: Query Langfuse analytics via ClickHouse
+ * Run custom analytics queries on LLM traces, costs, performance
+ */
+async function langfuseQueryAnalytics(args) {
+	const { query_type = 'cost_summary', hours = 24, model = null } = args;
+
+	// Import pg dynamically
+	const { Pool } = await import('pg');
+
+	// Connect to ClickHouse via HTTP interface using postgres driver
+	// (ClickHouse supports PostgreSQL wire protocol on port 5123)
+	const clickhouseUrl = process.env.CLICKHOUSE_URL || 'http://localhost:5123';
+	const clickhousePassword = process.env.CLICKHOUSE_PASSWORD || 'default';
+
+	try {
+		// Pre-built analytics queries
+		const queries = {
+			cost_summary: `
+				SELECT
+					model,
+					COUNT(*) as total_calls,
+					SUM(prompt_tokens) as total_prompt_tokens,
+					SUM(completion_tokens) as total_completion_tokens,
+					SUM(total_tokens) as total_tokens,
+					AVG(latency_ms) as avg_latency_ms,
+					SUM(total_cost) as total_cost
+				FROM llm_traces
+				WHERE timestamp >= now() - INTERVAL ${hours} HOUR
+				${model ? `AND model = '${model}'` : ''}
+				GROUP BY model
+				ORDER BY total_cost DESC
+			`,
+			error_trends: `
+				SELECT
+					toStartOfHour(timestamp) as hour,
+					error_type,
+					COUNT(*) as error_count,
+					AVG(impact_score) as avg_impact
+				FROM error_embeddings
+				WHERE timestamp >= now() - INTERVAL ${hours} HOUR
+				GROUP BY hour, error_type
+				ORDER BY hour DESC, error_count DESC
+				LIMIT 100
+			`,
+			agent_performance: `
+				SELECT
+					agent_name,
+					COUNT(*) as total_runs,
+					AVG(duration_ms) as avg_duration_ms,
+					SUM(CASE WHEN status = 'success' THEN 1 ELSE 0 END) as successful_runs,
+					SUM(CASE WHEN status = 'error' THEN 1 ELSE 0 END) as failed_runs,
+					AVG(confidence_score) as avg_confidence
+				FROM agent_runs
+				WHERE timestamp >= now() - INTERVAL ${hours} HOUR
+				GROUP BY agent_name
+				ORDER BY total_runs DESC
+			`,
+			cache_performance: `
+				SELECT
+					cache_type,
+					COUNT(*) as total_hits,
+					AVG(latency_ms) as avg_latency_ms,
+					SUM(bytes_saved) as total_bytes_saved
+				FROM gpu_cache_hits
+				WHERE timestamp >= now() - INTERVAL ${hours} HOUR
+				GROUP BY cache_type
+				ORDER BY total_hits DESC
+			`
+		};
+
+		const selectedQuery = queries[query_type];
+		if (!selectedQuery) {
+			return {
+				ok: false,
+				error: `Unknown query_type: ${query_type}`,
+				available: Object.keys(queries)
+			};
+		}
+
+		// Execute query via HTTP interface (simpler than PostgreSQL wire protocol)
+		const response = await fetch(clickhouseUrl, {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'text/plain',
+				'X-ClickHouse-User': 'default',
+				'X-ClickHouse-Key': clickhousePassword,
+				'X-ClickHouse-Format': 'JSONCompact'
+			},
+			body: selectedQuery
+		});
+
+		if (!response.ok) {
+			const errorText = await response.text();
+			return {
+				ok: false,
+				error: `ClickHouse query error: ${response.status} ${response.statusText}`,
+				details: errorText,
+				query: selectedQuery
+			};
+		}
+
+		const result = await response.json();
+
+		// Parse JSONCompact format (meta + data)
+		const columns = result.meta?.map(col => col.name) || [];
+		const rows = result.data?.map(row => {
+			const obj = {};
+			columns.forEach((col, idx) => {
+				obj[col] = row[idx];
+			});
+			return obj;
+		}) || [];
+
+		return {
+			ok: true,
+			query_type,
+			hours,
+			rows,
+			row_count: rows.length,
+			meta: {
+				tool: 'langfuse_query_analytics',
+				columns,
+				clickhouse_url: clickhouseUrl
+			}
+		};
+	} catch (error) {
+		return {
+			ok: false,
+			error: error.message,
+			query_type,
+			clickhouse_url: clickhouseUrl
+		};
+	}
+}
+
+// =============================================================================
 // ACE Tools: Phase 92/93 Integration (Event Sourcing + Smart Filtering)
 // =============================================================================
 
@@ -764,7 +1078,11 @@ const tools = {
 	// ACE Phase 92/93 Tools
 	ace_smart_search: aceSmartSearch,      // 🧠 Hierarchical retrieval with GPU rerank
 	ace_timeline_recent: aceTimelineRecent, // 📊 Recent edits from event log
-	ace_timeline_verify: aceTimelineVerify  // ✅ Verify timeline collection
+	ace_timeline_verify: aceTimelineVerify, // ✅ Verify timeline collection
+	// Langfuse Phase 66 Observability Tools
+	langfuse_log_trace: langfuseLogTrace,          // 📊 Log LLM traces to Langfuse
+	langfuse_get_traces: langfuseGetTraces,        // 🔍 Query trace history
+	langfuse_query_analytics: langfuseQueryAnalytics // 📈 Query ClickHouse analytics
 };
 
 // Removed deprecated handleFunctionCall - tools are called directly from registry
@@ -966,10 +1284,16 @@ server.listen(CONFIG.port, async () => {
 	console.log(`   - ace_smart_search: 🧠 Hierarchical retrieval (filter → HNSW → GPU rerank)`);
 	console.log(`   - ace_timeline_recent: 📊 Recent edits from event sourcing timeline`);
 	console.log(`   - ace_timeline_verify: ✅ Verify timeline collection status`);
+	console.log(`   - langfuse_log_trace: 📊 Log LLM traces to Langfuse observability`);
+	console.log(`   - langfuse_get_traces: 🔍 Query trace history with filters`);
+	console.log(`   - langfuse_query_analytics: 📈 Query ClickHouse analytics (costs, performance, errors)`);
 	console.log(`\n💡 Agent tip: Always call knowledge_retrieve FIRST before generating code!`);
 	console.log(`   This ensures Svelte 5 runes, SvelteKit 2 routing, and Bits-UI patterns.`);
 	console.log(`\n🧠 ACE Tools: Use ace_smart_search for intent-based retrieval with 87-98% search reduction!`);
 	console.log(`   Phase 92/93: Event sourcing + Smart filtering with GPU reranking on RTX 3060 Ti`);
+	console.log(`\n📊 Langfuse Observability: Track agent performance, costs, and LLM traces!`);
+	console.log(`   Phase 66: Langfuse (UI) → PostgreSQL + ClickHouse ← Mirror Service ← Ollama`);
+	console.log(`   Visit: http://localhost:3000 (generate API keys in Settings → API Keys)`);
 	console.log(`\n✨ Ready for autonomous error fixing with KB grounding!\n`);
 });
 

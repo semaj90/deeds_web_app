@@ -1209,12 +1209,12 @@ export const casesRelations = relations(cases, ({ one, many }) => ({
  canvasStates: many(canvasStates),
 }));
 
-export const criminalsRelations = relations(criminals, ({ many: one }) => ({
+export const criminalsRelations = relations(criminals, ({ one, many }) => ({
  createdBy: one(users, { fields: [criminals.createdBy], references: [users.id] }),
  evidence: many(evidence),
 }));
 
-export const evidenceRelations = relations(evidence, ({ one: many }) => ({
+export const evidenceRelations = relations(evidence, ({ one, many }) => ({
  uploadedBy: one(users, { fields: [evidence.uploadedBy], references: [users.id] }),
  case: one(cases, { fields: [evidence.caseId], references: [cases.id] }),
  criminal: one(criminals, { fields: [evidence.criminalId], references: [criminals.id] }),
@@ -1224,7 +1224,7 @@ export const evidenceRelations = relations(evidence, ({ one: many }) => ({
  hashVerifications: many(hashVerifications),
 }));
 
-export const documentsRelations = relations(documents, ({ many: one }) => ({
+export const documentsRelations = relations(documents, ({ one, many }) => ({
  case: one(cases, { fields: [documents.caseId], references: [cases.id] }),
  user: one(users, { fields: [documents.userId], references: [users.id] }),
  documentProcessing: many(documentProcessing),
@@ -1232,7 +1232,7 @@ export const documentsRelations = relations(documents, ({ many: one }) => ({
  documentSummaries: many(documentSummaries),
 }));
 
-export const legalDocumentsRelations = relations(legalDocuments, ({ one: many }) => ({
+export const legalDocumentsRelations = relations(legalDocuments, ({ one, many }) => ({
  case: one(cases, { fields: [legalDocuments.caseId], references: [cases.id] }),
  user: one(users, {
  fields: [legalDocuments.userId],
@@ -1274,7 +1274,7 @@ export const attachmentVerificationsRelations = relations(attachmentVerification
  }), // Assuming attachmentId refers to evidence
 }));
 
-export const canvasStatesRelations = relations(canvasStates, ({ one: many }) => ({
+export const canvasStatesRelations = relations(canvasStates, ({ one, many }) => ({
  case: one(cases, { fields: [canvasStates.caseId], references: [cases.id] }),
  user: one(users, { fields: [canvasStates.userId], references: [users.id] }),
  annotations: many(canvasAnnotations),
@@ -1310,7 +1310,7 @@ export const citationsRelations = relations(citations, ({ one }) => ({
  createdBy: one(users, { fields: [citations.createdBy], references: [users.id] }),
 }));
 
-export const reportsRelations = relations(reports, ({ one: many }) => ({
+export const reportsRelations = relations(reports, ({ one, many }) => ({
  case: one(cases, { fields: [reports.caseId], references: [cases.id] }),
  createdBy: one(users, { fields: [reports.createdBy], references: [users.id] }),
  savedReports: many(savedReports),
@@ -1326,7 +1326,7 @@ export const themesRelations = relations(themes, ({ one }) => ({
  user: one(users, { fields: [themes.userId], references: [users.id] }),
 }));
 
-export const personsOfInterestRelations = relations(personsOfInterest, ({ one: many }) => ({
+export const personsOfInterestRelations = relations(personsOfInterest, ({ one, many }) => ({
  case: one(cases, { fields: [personsOfInterest.caseId], references: [cases.id] }),
  createdBy: one(users, { fields: [personsOfInterest.createdBy], references: [users.id] }),
  photos: many(poiPhotos),
@@ -1618,12 +1618,12 @@ export const caseEmbeddingsRelations = relations(caseEmbeddings, ({ one }) => ({
  case: one(cases, { fields: [caseEmbeddings.caseId], references: [cases.id] }),
 }));
 
-export const ragSessionsRelations = relations(ragSessions, ({ one: many }) => ({
+export const ragSessionsRelations = relations(ragSessions, ({ one, many }) => ({
  user: one(users, { fields: [ragSessions.userId], references: [users.id] }),
  messages: many(ragMessages),
 }));
 
-export const ragMessagesRelations = relations(ragMessages, ({ one: many }) => ({
+export const ragMessagesRelations = relations(ragMessages, ({ one, many }) => ({
  session: one(ragSessions, { fields: [ragMessages.sessionId], references: [ragSessions.id] }),
  chatEmbeddings: many(chatEmbeddings),
 }));
@@ -1710,7 +1710,7 @@ export const evidenceBoardConnectionsRelations = relations(evidenceBoardConnecti
  }),
 }));
 
-export const workspacesRelations = relations(workspaces, ({ one: many }) => ({
+export const workspacesRelations = relations(workspaces, ({ one, many }) => ({
  case: one(cases, { fields: [workspaces.caseId], references: [cases.id] }),
  createdByUser: one(users, { fields: [workspaces.createdBy], references: [users.id] }),
  sessions: many(workspaceSessions),
@@ -1949,7 +1949,7 @@ export const yorhaCasesRelations = relations(yorhaCases, ({ many }) => ({
  chat_sessions: many(yorhaChatSessions),
 }));
 
-export const yorhaEvidenceNodesRelations = relations(yorhaEvidenceNodes, ({ one: many }) => ({
+export const yorhaEvidenceNodesRelations = relations(yorhaEvidenceNodes, ({ one, many }) => ({
  case: one(yorhaCases, {
  fields: [yorhaEvidenceNodes.case_id],
  references: [yorhaCases.id],
@@ -1979,7 +1979,7 @@ export const yorhaEvidenceConnectionsRelations = relations(yorhaEvidenceConnecti
  }),
 }));
 
-export const yorhaChatSessionsRelations = relations(yorhaChatSessions, ({ one: many }) => ({
+export const yorhaChatSessionsRelations = relations(yorhaChatSessions, ({ one, many }) => ({
  case: one(yorhaCases, {
  fields: [yorhaChatSessions.case_id],
  references: [yorhaCases.id],
@@ -2262,7 +2262,7 @@ export const errorClustersRelations = relations(errorClusters, ({ many }) => ({
  suggestions: many(errorSuggestions),
 }));
 
-export const errorSuggestionsRelations = relations(errorSuggestions, ({ one: many }) => ({
+export const errorSuggestionsRelations = relations(errorSuggestions, ({ one, many }) => ({
  cluster: one(errorClusters, {
  fields: [errorSuggestions.clusterId],
  references: [errorClusters.id],

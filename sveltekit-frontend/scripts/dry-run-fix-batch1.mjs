@@ -165,7 +165,7 @@ class DryRunFixer {
 
     // Get context around difference
     const contextStart = Math.max(0, diffStart - 50);
-    cst fixed =xtEnd = Math.min(original.length, diffStart + 150);
+    const contextEnd = Math.min(original.length, diffStart + 150);
 
     const originalSnippet = original.substring(contextStart, contextEnd);
     const modifiedSnippet = modified.substring(contextStart, Math.min(modified.length, contextStart + 200));

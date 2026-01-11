@@ -22,10 +22,9 @@ export {
 
 // ACE Web Ingestion Schema
 export {
-    aceChunks, aceCollectionChunks, aceCollections, aceDocs, aceSources, type AceChunk,
-    type AceCollection,
-    type AceCollectionChunk, type AceDoc, type AceSource
-} from '../../db/schema/ace-web/index.js';
+    aceChunks, aceDocs, aceSources, type AceChunk,
+    type AceDoc, type AceSource
+} from '../../db/schema/ace-web.js';
 
 // Canvas & Autosaves Schema (Phase 76+ / NES Integration)
 export * from './schema-canvas.js';

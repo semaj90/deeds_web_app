@@ -1,0 +1,143 @@
+services:
+  # ClickHouse - High-performance columnar analytics database
+  clickhouse:
+    image: clickhouse/clickhouse-server:latest
+    container_name: phase66-clickhouse
+    ports:
+      - "8123:8123"  # HTTP interface
+      - "9001:9000"  # Native TCP protocol (avoid MinIO port 9000)
+    volumes:
+      - clickhouse-data:/var/lib/clickhouse
+      - clickhouse-logs:/var/log/clickhouse-server
+      - ./clickhouse-init:/docker-entrypoint-initdb.d
+    environment:
+      CLICKHOUSE_DB: legal_analytics
+      CLICKHOUSE_USER: user
+      CLICKHOUSE_PASSWORD: password
+      CLICKHOUSE_DEFAULT_ACCESS_MANAGEMENT: 1
+    ulimits:
+      nofile:
+        soft: 262144
+        hard: 262144
+    healthcheck:
+      test: ["CMD", "clickhouse-client", "--query", "SELECT 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    restart: unless-stopped
+    networks:
+      - deeds-network
+
+  # Langfuse v3 - LLM observability with ClickHouse backend
+  langfuse:
+    image: langfuse/langfuse:latest
+    container_name: langfuse
+    ports:
+      - "3000:3000"
+    environment:
+      # PostgreSQL for metadata (dedicated langfuse database in phase66-postgres)
+      DATABASE_URL: "postgresql://user:pass@host.docker.internal:5434/langfuse"
+
+      # ClickHouse for high-volume trace data (uses existing langfuse-clickhouse)
+      CLICKHOUSE_URL: "http://host.docker.internal:5123"
+      CLICKHOUSE_MIGRATION_URL: "http://host.docker.internal:5123"
+      CLICKHOUSE_USER: "default"
+      CLICKHOUSE_PASSWORD: "default"
+      CLICKHOUSE_DATABASE: "legal_analytics"
+
+      # NextAuth configuration
+      NEXTAUTH_URL: "http://localhost:3000"
+      NEXTAUTH_SECRET: "langfuse-secret-key-change-in-production"
+
+      # Langfuse configuration
+      SALT: "langfuse-salt-key-change-in-production"
+      TELEMETRY_ENABLED: "false"
+      LANGFUSE_ENABLE_EXPERIMENTAL_FEATURES: "true"
+
+      # S3 storage (using MinIO from phase66)
+      LANGFUSE_S3_EVENT_UPLOAD_ENABLED: "true"
+      LANGFUSE_S3_EVENT_UPLOAD_BUCKET: "langfuse-events"
+      LANGFUSE_S3_EVENT_UPLOAD_REGION: "us-east-1"
+      LANGFUSE_S3_EVENT_UPLOAD_ENDPOINT: "http://host.docker.internal:9000"
+      LANGFUSE_S3_EVENT_UPLOAD_ACCESS_KEY_ID: "minioadmin"
+      LANGFUSE_S3_EVENT_UPLOAD_SECRET_ACCESS_KEY: "minioadmin"
+      LANGFUSE_S3_EVENT_UPLOAD_FORCE_PATH_STYLE: "true"
+
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:3000/api/public/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+    restart: unless-stopped
+    extra_hosts:
+      - "host.docker.internal:172.23.32.1"
+    networks:
+      - deeds-network
+
+  # Data Mirror Service - Sync PostgreSQL/Qdrant → ClickHouse with Ollama auto-tagging
+  clickhouse-mirror:
+    build:
+      context: .
+      dockerfile: Dockerfile.clickhouse-mirror
+    container_name: phase66-clickhouse-mirror
+    environment:
+      # Source databases (using host network, so localhost works)
+      POSTGRES_URL: "postgresql://user:password@localhost:5434/legal"
+      QDRANT_URL: "http://localhost:6333"
+      REDIS_URL: "redis://localhost:6379"
+
+      # Target database (existing langfuse-clickhouse on port 5123)
+      CLICKHOUSE_URL: "http://localhost:5123"
+      CLICKHOUSE_USER: "default"
+      CLICKHOUSE_PASSWORD: ""
+      CLICKHOUSE_DB: "legal_analytics"
+
+      # Ollama for auto-tagging
+      OLLAMA_URL: "http://localhost:11434"
+      OLLAMA_MODEL: "gemma3-legal:latest"
+
+      # Sync configuration
+      SYNC_INTERVAL_SECONDS: "300"  # 5 minutes
+      BATCH_SIZE: "1000"
+      ENABLE_AUTO_TAGGING: "true"
+      GPU_CACHE_ENABLED: "true"
+
+    restart: unless-stopped
+    network_mode: "host"  # Use host network to access all services
+
+volumes:
+  clickhouse-data:
+    driver: local
+  clickhouse-logs:
+    driver: local
+
+networks:
+  deeds-network:
+    external: true
+    name: deeds-web-app_phase66-network
+
+# Usage:
+# 1. Ensure dependencies running: docker start phase66-postgres phase66-redis phase66-qdrant
+# 2. Start full stack: docker-compose -f docker-compose.langfuse.yml up -d
+# 3. Access Langfuse UI: http://localhost:3000
+# 4. Access ClickHouse: http://localhost:8123/play (web UI)
+# 5. Monitor mirror sync: docker logs -f phase66-clickhouse-mirror
+#
+# Architecture:
+# - PostgreSQL (port 5434): Metadata + raw error embeddings
+# - Qdrant (port 6333): Vector search for RAG/KAG
+# - ClickHouse (port 8123/9000): Time-series analytics + LLM traces
+# - Redis (port 6379): GPU artifact cache for Ollama tags
+# - Mirror service: Auto-sync with Ollama gemma3-legal:latest tagging
+# 3. Access UI: http://localhost:3000
+# 4. Langfuse will auto-create tables in 'legal' database with prefix 'langfuse_'
+#
+# AutoGen Integration:
+# - Set LANGFUSE_PUBLIC_KEY and LANGFUSE_SECRET_KEY from UI
+# - Add to backend/config/autogen_llm_config.py:
+#   import langfuse
+#   langfuse_handler = langfuse.LangfuseCallbackHandler()
+#   OLLAMA_CONFIG["callbacks"] = [langfuse_handler]

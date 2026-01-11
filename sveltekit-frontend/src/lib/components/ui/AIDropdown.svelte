@@ -19,14 +19,15 @@
     isGenerating?: boolean;
   }
 
-  let {
-    disabled = false,
-    onReportGenerate = () => {},
-    onSummarize = () => {},
-    onAnalyze = () => {},
-    hasContent = false,
-    isGenerating = false,
-  }: Props = $props();
+  // Svelte 5: Use $props() with $derived for reactive defaults
+  let props = $props<Props>();
+
+  let disabled = $derived(props.disabled ?? false);
+  let onReportGenerate = $derived(props.onReportGenerate ?? (() => {}));
+  let onSummarize = $derived(props.onSummarize ?? (() => {}));
+  let onAnalyze = $derived(props.onAnalyze ?? (() => {}));
+  let hasContent = $derived(props.hasContent ?? false);
+  let isGenerating = $derived(props.isGenerating ?? false);
 
   let open = $state(false);
   let selectedItem = $state<string | null>(null);

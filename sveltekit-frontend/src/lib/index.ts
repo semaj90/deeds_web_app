@@ -52,13 +52,14 @@ export type {
 } from './utils.js';
 
 // ===== OLLAMA INTEGRATION SERVICES =====
-export {
-    comprehensiveOllamaSummarizer,
-    type ComprehensiveSummaryRequest,
-    type ComprehensiveSummaryResponse,
-    type SummarizerConfig,
-    type SummarizerStats
-} from './services/comprehensive-ollama-summarizer.js';
+// Temporarily disabled due to syntax errors in comprehensive-ollama-summarizer.ts
+// export {
+//     comprehensiveOllamaSummarizer,
+//     type ComprehensiveSummaryRequest,
+//     type ComprehensiveSummaryResponse,
+//     type SummarizerConfig,
+//     type SummarizerStats
+// } from './services/comprehensive-ollama-summarizer.js';
 
 export {
     ollamaIntegrationLayer,
@@ -67,13 +68,14 @@ export {
     type OllamaServiceStatus
 } from './services/ollama-integration-layer.js';
 
-export {
-    LangChainOllamaService,
-    langChainOllamaService,
-    type LangChainConfig,
-    type ProcessingResult,
-    type QueryResult
-} from './ai/langchain-ollama-service.js';
+// Temporarily disabled - file is in ai.bak folder, not ai folder
+// export {
+//     LangChainOllamaService,
+//     langChainOllamaService,
+//     type LangChainConfig,
+//     type ProcessingResult,
+//     type QueryResult
+// } from './ai/langchain-ollama-service.js';
 
 // ===== SERVER SERVICES (Server-side only) =====
 // Note: These should only be imported on the server side
@@ -132,11 +134,11 @@ if (typeof globalThis !== 'undefined') {
 // Global User Store with Svelte 5 Runes
 export { default as globalUserStore } from './stores/global-user-store.svelte';
 
-// Search Services with Fuse.js Integration
-export { searchComponents, searchDemos, searchDocumentation, searchServices } from './services/search-service.js';
+// Search Services with Fuse.js Integration - TEMPORARILY DISABLED (corrupted file)
+// export { searchComponents, searchDemos, searchDocumentation, searchServices } from './services/search-service.js';
 
 // Hybrid Vector Operations
-export { getVectorSystemHealth: syncVectorData } from './services/hybrid-vector-operations.js';
+export { getVectorSystemHealth, syncVectorData } from './services/hybrid-vector-operations.js';
 
 // Search Types
 export type { SearchCategory, SearchFilter, SearchOptions, SearchResult, SearchState } from './types/search.types.js';

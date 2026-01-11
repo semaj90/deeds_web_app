@@ -835,3 +835,546 @@ export function createHandler(
 
 **Tags:** `#svelte5` `#runes` `#drizzle-orm` `#typescript` `#error-fixing` `#phase2` `#migration` `#reactivity`
 
+
+
+---
+
+## 🚀 Phase 2: Type System Fixes - Knowledge Base Update (Jan 10, 2026)
+
+### Overview
+**Objective:** Systematic type system error fixes targeting ~27,000 errors (57% reduction from 88,500)
+**Approach:** AST-based automated fixes with knowledge base integration
+**Patterns:** 6 new high-confidence patterns from latest documentation
+
+---
+
+### Pattern 1: WebGPU Scalar Array (95% confidence)
+**Source:** WebGPU Best Practices (toji.dev, Feb 2024)
+**Problem:** vec3<f32> requires 16-byte alignment, but vertex data is 12-byte packed
+**Solution:** Use `array<f32>` with manual vector reconstruction
+
+```wgsl
+// ✅ Pattern
+@group(0) @binding(0) var<storage> positions: array<f32>;
+
+fn getPosition(index: u32, stride: u32, offset: u32) -> vec3f {
+  let i = index * stride + offset;
+  return vec3f(positions[i], positions[i + 1], positions[i + 2]);
+}
+```
+
+**Key Rules:**
+- Stride/offset in elements (floats), not bytes
+- Manual indexing for flexible layouts
+- Atomic operations require quantization to i32
+
+**Skip Indicators:**
+- Already using `array<f32>` pattern
+- No compute shader context
+- Render pipeline only (no storage buffers)
+
+---
+
+### Pattern 2: LangChain v1 createAgent (98% confidence)
+**Source:** LangChain v1 Documentation (Jan 2025)
+**Problem:** Deprecated chain abstractions (LLMChain, etc.)
+**Solution:** Use `createAgent()` with middleware
+
+```typescript
+// ✅ Pattern
+import { createAgent, createMiddleware } from "langchain";
+
+const agent = createAgent({
+  model: "openai:gpt-4o",
+  tools: [searchTool],
+  middleware: [
+    createMiddleware({
+      name: "ErrorHandler",
+      wrapToolCall: async (request, handler) => {
+        try {
+          return await handler(request);
+        } catch (error) {
+          return new ToolMessage({
+            content: `Tool error: ${error}`,
+            tool_call_id: request.toolCall.id!,
+          });
+        }
+      },
+    }),
+  ],
+});
+```
+
+**Key Rules:**
+- Replace `LLMChain` with `createAgent()`
+- Use middleware for customization
+- Import from `langchain`, not `@langchain/core`
+
+**Skip Indicators:**
+- Already using `createAgent()`
+- No LangChain imports
+- Using LangGraph directly
+
+---
+
+### Pattern 3: TypeScript Null Safety (100% confidence)
+**Source:** TypeScript 5.x Documentation
+**Problem:** Unsafe property access causing runtime errors
+**Solution:** Optional chaining (`?.`) and nullish coalescing (`??`)
+
+```typescript
+// ✅ Pattern
+const userName = user?.profile?.name;
+const count = value ?? 0;
+const firstItem = array?.[0];
+
+// Function parameters
+function process(data: string | null | undefined): void {
+  if (data === null || data === undefined) return;
+  // data is now string
+}
+```
+
+**Key Rules:**
+- Use `?.` for potentially undefined properties
+- Use `??` for null/undefined defaults (not `||`)
+- Use union types for nullable parameters
+- Strict equality for null checks (`=== null`)
+
+**Skip Indicators:**
+- Already using optional chaining
+- Non-nullable type context
+- Strict null checks disabled
+
+---
+
+### Pattern 4: Drizzle ORM 0.44 Schema (95% confidence)
+**Source:** Drizzle ORM Documentation (2025)
+**Problem:** Outdated schema definition patterns
+**Solution:** Use `pgTable()` with typed columns
+
+```typescript
+// ✅ Pattern
+import { pgTable, serial, text, timestamp } from "drizzle-orm/pg-core";
+import { relations } from "drizzle-orm";
+
+export const users = pgTable("users", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull(),
+  email: text("email").notNull().unique(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const usersRelations = relations(users, ({ many }) => ({
+  posts: many(posts),
+}));
+```
+
+**Key Rules:**
+- Use `pgTable()` for table definitions
+- Chain modifiers (`.notNull()`, `.unique()`)
+- Use `relations()` for foreign keys
+- Import from `drizzle-orm/pg-core`
+
+**Skip Indicators:**
+- Already using Drizzle 0.44 API
+- No Drizzle imports
+- Using different ORM
+
+---
+
+### Pattern 5: Bits UI v2.0 Imports (98% confidence)
+**Source:** Bits UI v2.0 Documentation
+**Problem:** Deprecated `@melt-ui/svelte` imports
+**Solution:** Use `bits-ui` package
+
+```typescript
+// ✅ Pattern
+import { Dialog, Button, Select } from "bits-ui";
+import type { DialogProps } from "bits-ui";
+
+// ❌ Deprecated
+import { createDialog } from "@melt-ui/svelte";
+```
+
+**Key Rules:**
+- Replace `@melt-ui/svelte` with `bits-ui`
+- Use component-based API (not builders)
+- Add `import type` for props
+- Follow Svelte 5 runes pattern
+
+**Skip Indicators:**
+- Already using `bits-ui`
+- No Melt UI imports
+- Custom component library
+
+---
+
+### Pattern 6: Svelte 5 Runes (100% confidence)
+**Source:** Svelte 5 Documentation
+**Problem:** Deprecated Svelte 4 reactivity patterns
+**Solution:** Use runes (`$state`, `$derived`, `$effect`, `$props`)
+
+```typescript
+// ✅ Pattern
+let count = $state(0);
+let doubled = $derived(count * 2);
+
+$effect(() => {
+  console.log(`Count is ${count}`);
+});
+
+let { title, description = "Default" } = $props<{
+  title: string;
+  description?: string;
+}>();
+
+// ❌ Deprecated
+let count = 0;
+$: doubled = count * 2;
+export let title: string;
+```
+
+**Key Rules:**
+- Use `$state()` for reactive variables
+- Use `$derived()` for computed values
+- Use `$effect()` for side effects
+- Use `$props()` for component props
+- Remove `export let` declarations
+
+**Skip Indicators:**
+- Already using runes
+- Svelte 4 project
+- No reactive declarations
+
+---
+
+### Implementation Strategy
+
+**Phase 2 Execution Plan:**
+1. **Task 0:** Fetch docs, update knowledge base, create AST analyzer
+2. **Task 1:** Bits UI imports (~5,000 errors)
+3. **Task 2:** Null safety (~4,000 errors)
+4. **Task 3:** WebGPU types (~3,000 errors)
+5. **Task 4:** LangChain v1 (~2,000 errors)
+6. **Task 5:** Generic types (~10,000 errors)
+7. **Task 6:** Type mismatches (~8,000 errors)
+8. **Task 7:** Import types (~2,000 errors)
+
+**Validation:**
+- Dry-run on files 1-210 before full execution
+- svelte-check + tsc validation after each task
+- Incremental commits with rollback capability
+- Knowledge base hit rate >90%
+
+**Expected Outcome:**
+- ~27,000 errors fixed (57% reduction)
+- Build success rate 100%
+- Test pass rate 100%
+- Production-ready codebase
+
+---
+
+## 🌐 SvelteKit 2 Architecture: SSR vs Remote Functions (Jan 2026)
+
+### Current Pattern Analysis
+- **API Endpoints (+server.ts):** 4175 files
+- **SSR Load Functions (+page.server.ts):** 264 files
+- **Ratio:** 16:1 (API-heavy, needs refactoring)
+
+### SvelteKit 2 Best Practices
+
+| Pattern | When to Use | Benefits |
+|---------|-------------|----------|
+| **SSR Load Functions** | Page data, navigation-triggered fetching, auth-dependent data | SEO optimization, faster initial render, type-safe with `$types`, no extra HTTP round-trip |
+| **API Endpoints (+server.ts)** | Third-party API access, webhooks, mobile apps, non-page requests | External client support, JSON API for other consumers |
+| **Form Actions** | Mutations, form submissions | Progressive enhancement, works without JS, CSRF protection |
+
+### Recommended Refactoring Pattern
+
+**BEFORE (API-centric):**
+```typescript
+// routes/api/cases/+server.ts
+export const GET: RequestHandler = async ({ locals }) => {
+  const cases = await db.select()...;
+  return json({ cases });
+};
+
+// routes/cases/+page.svelte
+onMount(async () => {
+  cases = await fetch('/api/cases').then(r => r.json());
+});
+```
+
+**AFTER (SSR-centric):**
+```typescript
+// routes/cases/+page.server.ts
+export const load: PageServerLoad = async ({ locals }) => {
+  if (!locals.user) throw redirect(302, '/login');
+  return { cases: await db.select()... };
+};
+
+// routes/cases/+page.svelte
+let { data }: PageProps = $props();
+// data.cases available immediately, SSR-rendered
+```
+
+### Form Actions (Progressive Enhancement)
+```typescript
+// routes/cases/create/+page.server.ts
+export const actions = {
+  create: async ({ request, locals }) => {
+    const data = await request.formData();
+    await db.insert(cases).values({...});
+    return { success: true };
+  }
+} satisfies Actions;
+```
+
+```svelte
+<form method="POST" action="?/create" use:enhance>
+  <input name="title" required />
+  <button>Create Case</button>
+</form>
+```
+
+---
+
+## 📡 SSE vs WebSocket: Contextual Chat Architecture
+
+### Decision Matrix
+
+| Feature | SSE (Server-Sent Events) | WebSocket |
+|---------|--------------------------|-----------|
+| **Direction** | Server → Client (unidirectional) | Bidirectional |
+| **Reconnection** | Automatic | Manual implementation |
+| **SvelteKit Integration** | Native with +server.ts | Requires adapter config |
+| **Edge Deployment** | ✅ Vercel/Cloudflare compatible | ⚠️ May need custom handling |
+
+### Recommendation: SSE for Contextual Chat
+
+**SSE Implementation Pattern:**
+```typescript
+// routes/api/chat/stream/+server.ts
+export const GET: RequestHandler = async ({ request }) => {
+  const stream = new ReadableStream({
+    async start(controller) {
+      for await (const token of llmStream) {
+        controller.enqueue(`data: ${JSON.stringify({ type: 'token', content: token })}\n\n`);
+      }
+      controller.enqueue(`data: ${JSON.stringify({ type: 'done' })}\n\n`);
+      controller.close();
+    }
+  });
+
+  return new Response(stream, {
+    headers: {
+      'Content-Type': 'text/event-stream',
+      'Cache-Control': 'no-cache',
+      'Connection': 'keep-alive'
+    }
+  });
+};
+```
+
+---
+
+## 🏗️ ADK TypeScript Architecture (RAG, KAG, DAG)
+
+### Separation of Concerns
+
+| Layer | Purpose | Location |
+|-------|---------|----------|
+| **User Functions** | Auth, profile, preferences, cases CRUD | `src/lib/server/user/` |
+| **RAG (Retrieval)** | Vector search, document retrieval | `src/lib/server/rag/` |
+| **KAG (Knowledge)** | Pattern learning, fix confidence | `src/lib/server/kag/` |
+| **DAG (Document)** | Document processing, chunking | `src/lib/server/dag/` |
+
+### User Functions (Separate from ADK)
+```typescript
+// src/lib/server/user/index.ts
+export async function getUserCases(userId: string) {
+  return db.select().from(cases).where(eq(cases.userId, userId));
+}
+
+export async function updateUserPreferences(id: string, prefs: Partial<UserPrefs>) {
+  return db.update(users).set({ preferences: prefs }).where(eq(users.id, id));
+}
+```
+
+### RAG Functions (AI/Search - Separate)
+```typescript
+// src/lib/server/rag/index.ts
+export async function searchKnowledgeBase(query: string, topK = 5) {
+  const embedding = await generateEmbedding(query);
+  return qdrant.search('knowledge_base', embedding, topK);
+}
+```
+
+---
+
+## 🔄 Route Consolidation Plan
+
+### Duplicate Routes to Merge
+| Keep | Remove | Reason |
+|------|--------|--------|
+| `/cases/new` | `/cases/create` | Consistent naming |
+| `/evidence` | `/evidence-library` | Shorter URL |
+| `/settings` | `/system-configuration` | User-friendly |
+
+### Implementation Pattern
+```typescript
+// routes/cases/create/+page.server.ts (old route - redirect)
+export const load = () => redirect(301, '/cases/new');
+```
+
+---
+
+## 🤖 Local-First Agent Frameworks (Jan 2026)
+
+### Preferred Stack ($0 Cost, 100% Local)
+- **CrewAI** - Structured role-based agent pipelines
+- **AutoGen** (Microsoft) - Conversational multi-agent collaboration
+- **GraphRAG** (Microsoft) - Knowledge graph + RAG hybrid
+- **Langfuse** - Open-source LLM observability (LangSmith alternative)
+
+### Installation
+```bash
+pip install crewai crewai-tools pyautogen graphrag langfuse
+```
+
+### CrewAI with Ollama (FREE)
+```python
+from crewai import Agent, Task, Crew
+
+researcher = Agent(
+    role='Legal Researcher',
+    goal='Find relevant case law',
+    tools=[kb_vector_search, web_search],
+    llm='ollama/gemma3-legal:latest'  # FREE LOCAL
+)
+
+crew = Crew(agents=[researcher], tasks=[...])
+result = crew.kickoff()
+```
+
+### Microsoft GraphRAG
+```bash
+graphrag init --root ./legal-knowledge
+graphrag index --root ./legal-knowledge
+graphrag query --method global --query "IP precedents"
+```
+
+### Langfuse (Self-Hosted LangSmith Alternative)
+```bash
+docker-compose -f docker/langfuse.yml up -d
+# Access at http://localhost:3000
+```
+
+---
+
+## 📊 Agentic RAG + KAG + DAG Architecture
+
+### RAG (Retrieval-Augmented Generation)
+**Purpose:** Vector similarity search for semantic document retrieval
+**Storage:** Qdrant (Port 6333)
+**Tool:** `kb_vector_search`
+
+### KAG (Knowledge-Augmented Generation)
+**Purpose:** Graph-based entity relationships via GraphRAG
+**Storage:** GraphRAG parquet + Neo4j (Port 7687)
+**Tool:** `graphrag_search`
+
+### DAG (Document-Augmented Generation)
+**Purpose:** Structured document processing pipelines
+**Storage:** MinIO (Port 9000) + PostgreSQL
+**Pattern:** CrewAI sequential process
+
+---
+
+## 🗺️ Phase 96 Roadmap: Evidence Management SSR
+
+### Immediate Tasks
+- [ ] Migrate `/evidence` to SSR + form actions
+- [ ] Consolidate `/evidence` and `/evidence-library` routes
+- [ ] Add SSE for real-time notifications
+- [ ] Refactor `/cases/[id]/chat` to use SSE instead of WebSocket
+
+### SSR Migration Pattern
+```typescript
+// routes/evidence/+page.server.ts
+export const load: PageServerLoad = async ({ locals }) => {
+  if (!locals.user) throw redirect(302, '/login');
+  return { evidence: await db.select().from(evidenceTable)... };
+};
+
+export const actions = {
+  upload: async ({ request, locals }) => {
+    const formData = await request.formData();
+    await db.insert(evidenceTable).values({...});
+    return { success: true };
+  }
+} satisfies Actions;
+```
+
+### SSE Implementation for Chat
+```typescript
+// routes/api/chat/stream/+server.ts
+export const GET: RequestHandler = async ({ url }) => {
+  const prompt = url.searchParams.get('prompt');
+
+  const stream = new ReadableStream({
+    async start(controller) {
+      for await (const token of llmStream(prompt)) {
+        controller.enqueue(`data: ${JSON.stringify({ token })}\n\n`);
+      }
+      controller.close();
+    }
+  });
+
+  return new Response(stream, {
+    headers: { 'Content-Type': 'text/event-stream' }
+  });
+};
+```
+
+### Long-term (Phase 97+)
+- [ ] Migrate `/admin/knowledge-search` to SSR (SEO boost)
+- [ ] Add optimistic UI updates with `use:enhance` callbacks
+- [ ] Infinite scroll with SSR pagination
+- [ ] Lighthouse CI for performance monitoring
+
+### Expected Impact
+- **Performance:** 30-50% faster page loads
+- **SEO:** Score 95+/100 across all pages
+
+---
+
+## 📚 Reference Documentation
+
+| Topic | Resource |
+|-------|----------|
+| **CrewAI** | https://docs.crewai.com/ |
+| **AutoGen** | https://microsoft.github.io/autogen/ |
+| **GraphRAG** | https://github.com/microsoft/graphrag |
+| **Langfuse** | https://langfuse.com/docs |
+| **FastMCP** | https://github.com/jlowin/fastmcp |
+| SvelteKit Load | https://kit.svelte.dev/docs/load |
+| SvelteKit Actions | https://kit.svelte.dev/docs/form-actions |
+| Svelte 5 Runes | https://svelte.dev/docs/runes |
+| Drizzle ORM | https://orm.drizzle.team/docs/overview |
+
+---
+
+## 💰 Cost Summary (Local Stack)
+
+| Framework | License | LLM Cost | Notes |
+|-----------|---------|----------|-------|
+| CrewAI | MIT | FREE | Uses Ollama |
+| AutoGen | MIT | FREE | Uses Ollama |
+| GraphRAG | MIT | FREE | Uses Ollama |
+| Langfuse | MIT | N/A | Self-hosted |
+| FastMCP | MIT | FREE | Uses Ollama |
+
+**Total Monthly Cost:** $0
+

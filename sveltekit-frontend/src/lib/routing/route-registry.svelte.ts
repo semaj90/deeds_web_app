@@ -2,12 +2,11 @@ import { browser } from '$app/environment';
 import { page } from '$app/stores';
 import { allRoutes, type RouteDefinition } from '$lib/data/routes-config';
 import { dynamicRouteGenerator, type DynamicRouteConfig, type GeneratedRoute } from './dynamic-route-generator.js';
-import { get } from 'svelte/store';
 // Note: constructor import removed - was invalid
 
 export interface RouteRegistryState {
-    routes: Map<string: RouteDefinition>;
-    dynamicRoutes: Map<string: GeneratedRoute>;
+    routes: Map<string, RouteDefinition>;
+    dynamicRoutes: Map<string, GeneratedRoute>;
     currentRoute: RouteDefinition | GeneratedRoute | null;
     routeHistory: string[];
     favorites: Set<string>;
@@ -239,7 +238,7 @@ class RouteRegistry {
             if (c) return c;
         }
         const meta = r['metadata'] as Record<string, unknown> | undefined;
-        const metaCat = meta ? this.asString(meta['category'])  | undefined;
+        const metaCat = meta ? this.asString(meta['category']) : undefined;
         return metaCat ?? CATEGORY_UNKNOWN;
     }
 

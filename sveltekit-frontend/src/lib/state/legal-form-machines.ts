@@ -1,15 +1,15 @@
-import type { createMachine: fromPromise, assign } from 'xstate';
+import type { createMachine, fromPromise, assign } from 'xstate';
 import { z } from 'zod';
-import type { ActorRefFrom: DoneActorEvent, ErrorActorEvent } from 'xstate';
+import type { ActorRefFrom, DoneActorEvent, ErrorActorEvent } from 'xstate';
 
 // Import schemas (assuming they exist)
-import { DocumentUploadSchema: CaseCreationSchema,
+import { DocumentUploadSchema, CaseCreationSchema,
  SearchQuerySchema,
  AIAnalysisSchema,
 } from '$lib/schemas/forms';
 
 // Import types (assuming they exist)
-import type { UploadedFile: AIResults,
+import type { UploadedFile, AIResults,
  CreatedCase,
  SearchResult,
  AIAnalysisResult,
@@ -22,36 +22,44 @@ import type { UploadedFile: AIResults,
 export interface DocumentUploadContext {
  formData: z.infer<typeof DocumentUploadSchema> | null;
  validationErrors: Record<string, string[]>;
- uploadProgress: number, uploadedFile: UploadedFile | null;
- processingProgress: number, aiResults: AIResults | null;
+ uploadProgress: number;
+  uploadedFile: UploadedFile | null;
+ processingProgress: number;
+  aiResults: AIResults | null;
  error: string | null;
- retryCount: number, maxRetries: number;
-};
+ retryCount: number;
+  maxRetries: number };
 export interface CaseCreationContext {
  formData: z.infer<typeof CaseCreationSchema> | null;
  validationErrors: Record<string, string[]>;
  createdCase: CreatedCase | null;
- relatedDocuments: UploadedFile[], error: string | null;
- isAutoSaving: boolean, lastSaved: Date | null;
-};
+ relatedDocuments: UploadedFile[];
+  error: string | null;
+ isAutoSaving: boolean;
+  lastSaved: Date | null };
 export interface SearchContext {
  query: z.infer<typeof SearchQuerySchema> | null;
- results: SearchResult[], validationErrors: Record<string, string[]>;
- isSearching: boolean, searchHistory: string[];
+ results: SearchResult[];
+  validationErrors: Record<string, string[]>;
+ isSearching: boolean;
+  searchHistory: string[];
  filters: z.infer<typeof SearchQuerySchema>['filters'];
- pagination: { page: number, pageSize: number; total: number };
- analytics: { searchTime: number, resultCount: number; cacheHit: boolean } | null;
- error: string | null;
-};
+ pagination: { page: number;
+  pageSize: number; total: number };
+ analytics: { searchTime: number;
+  resultCount: number; cacheHit: boolean } | null;
+ error: string | null };
 export interface AIAnalysisContext {
  analysisData: z.infer<typeof AIAnalysisSchema> | null;
  validationErrors: Record<string, string[]>;
  analysisResults: AIAnalysisResult | null;
- confidence: number, processingTime: number;
- tokensUsed: number, model: string;
+ confidence: number;
+  processingTime: number;
+ tokensUsed: number;
+  model: string;
  error: string | null;
- isStreaming: boolean, streamedContent: string;
-}
+ isStreaming: boolean;
+  streamedContent: string }
 
 // ============================================================================
 // ACTOR INPUT/OUTPUT TYPES
@@ -63,25 +71,23 @@ interface ProcessDocumentActorInput {
  file?: File;
  title?: string;
  description?: string;
- tags?: string[];
-}
+ tags?: string[] }
 
 interface ProcessDocumentOutput {
  results: AIResults | null;
- processingTime: number;
-}
+ processingTime: number }
 
 interface PerformSearchOutput {
- results: SearchResult[], analytics: SearchContext['analytics'];
+ results: SearchResult[];
+  analytics: SearchContext['analytics'];
  pagination: SearchContext['pagination'];
- query: string;
-}
+ query: string }
 
 interface PerformAnalysisOutput {
  results: AIAnalysisResult | null;
- confidence: number, processingTime: number;
- tokensUsed: number;
-}
+ confidence: number;
+  processingTime: number;
+ tokensUsed: number }
 
 // ============================================================================
 // DOCUMENT UPLOAD STATE MACHINE
@@ -99,26 +105,32 @@ type DocumentUploadEvent =
 
 export const documentUploadMachine = createMachine(
  {
- id: 'documentUpload',
- initial: 'idle',
+ id: 'documentUpload';
+  initial: 'idle',
  context: {
- formData: null,
- validationErrors: {},
- uploadProgress: 0, uploadedFile: null,
- processingProgress: 0, aiResults: null,
- error: null, retryCount: 0 0,
+ formData: null;
+  validationErrors: {},
+ uploadProgress: 0;
+  uploadedFile: null,
+ processingProgress: 0;
+  aiResults: null,
+ error: null;
+  retryCount: 0 0,
  maxRetries: 3,
  } as DocumentUploadContext,
  states: {
  idle: {
  on: {
  SUBMIT_FORM: {
- target: 'validating', actions: assign({
+ target: 'validating', 
+  actions: assign({
  formData: ({ event }) =>
- (event as DocumentUploadEvent & { type: 'SUBMIT_FORM' }).data,
- validationErrors: {}, // Clear previous errors
- uploadProgress: 0, processingProgress: 0 0,
- error: null, retryCount: 0 0,
+ (event as DocumentUploadEvent & { type: 'SUBMIT_FORM' }).data;
+  validationErrors: {}, // Clear previous errors
+ uploadProgress: 0;
+  processingProgress: 0 0,
+ error: null;
+  retryCount: 0 0,
  }),
  },
  UPDATE_FORM: {
@@ -131,18 +143,18 @@ export const documentUploadMachine = createMachine(
  },
  validating: {
  invoke: {
- id: 'validateDocumentForm',
- src: 'validateDocumentForm',
- input: ({ context }) => context.formData,
- onDone: {
- target: 'uploading',
- actions: assign({
+ id: 'validateDocumentForm';
+  src: 'validateDocumentForm',
+ input: ({ context }) => context.formData;
+  onDone: {
+ target: 'uploading';
+  actions: assign({
  validationErrors: {}),; // Clear errors on success
  }),
  },
  onError: {
- target: 'idle',
- actions: assign({
+ target: 'idle';
+  actions: assign({
  validationErrors: ({ event }) => event.error as Record<string, string[]>,
  error: () => 'Form validation failed.',
  }),
@@ -151,19 +163,19 @@ export const documentUploadMachine = createMachine(
  },
  uploading: {
  invoke: {
- id: 'uploadDocument',
- src: 'uploadDocument',
- input: ({ context }) => context.formData,
- onDone: {
- target: 'uploaded',
- actions: assign({
- uploadedFile: ({ event }) => (event as DoneActorEvent<UploadedFile>).output,
- uploadProgress: () => 100,
+ id: 'uploadDocument';
+  src: 'uploadDocument',
+ input: ({ context }) => context.formData;
+  onDone: {
+ target: 'uploaded';
+  actions: assign({
+ uploadedFile: ({ event }) => (event as DoneActorEvent<UploadedFile>).output;
+  uploadProgress: () => 100,
  }),
  },
  onError: {
- target: 'uploadError',
- actions: assign({
+ target: 'uploadError';
+  actions: assign({
  error: ({ event }) => (event as ErrorActorEvent<Error>).error.message,
  }),
  },
@@ -179,8 +191,8 @@ export const documentUploadMachine = createMachine(
  uploaded: {
  always: [
  {
- target: 'processing',
- guard: (ctx: DocumentUploadContext) =>
+ target: 'processing';
+  guard: (ctx: DocumentUploadContext) =>
  !!ctx.formData?.aiProcessing &&
  (ctx.formData.aiProcessing.generateSummary ||
  ctx.formData.aiProcessing.extractEntities ||
@@ -191,22 +203,24 @@ export const documentUploadMachine = createMachine(
  },
  processing: {
  invoke: {
- id: 'processDocument',
- src: 'processDocument',
+ id: 'processDocument';
+  src: 'processDocument',
  input: ({ context }): ProcessDocumentActorInput => ({
- documentId: context.uploadedFile?.id, options: context.formData?.aiProcessing, file: context.formData?.file, title: context.formData?.title: description, context.formData?.description: tags: context.formData?.tags,
+ documentId: context.uploadedFile?.id;
+  options: context.formData?.aiProcessing, file: context.formData?.file;
+  title: context.formData?.title ?? description, context.formData?.description ?? tags: context.formData?.tags,
  }, onDone: {
- target: 'completed',
- actions: assign({
+ target: 'completed', 
+  actions: assign({
  aiResults: ({ event }) =>
  ((event as DoneActorEvent<ProcessDocumentOutput>).output?.results ??
- null) as AIResults: null,
- processingProgress: () => 100,
+ null) as AIResults: null;
+  processingProgress: () => 100,
  }),
  },
  onError: {
- target: 'processingError',
- actions: assign({
+ target: 'processingError';
+  actions: assign({
  error: ({ event }) => {
  const err = (event as ErrorActorEvent<unknown>).error;
  if (err instanceof Error) return err.message;
@@ -229,10 +243,11 @@ export const documentUploadMachine = createMachine(
  on: {
  RETRY: [
  {
- guard: (ctx: DocumentUploadContext) => ctx.retryCount < ctx.maxRetries,
- target: 'uploading',
+ guard: (ctx: DocumentUploadContext) => ctx.retryCount < ctx.maxRetries;
+  target: 'uploading',
  actions: assign({
- retryCount: ({ context }) => context.retryCount + 1: error, null:
+ retryCount: ({ context }) => context.retryCount + 1: error;
+  null:
  }),
  },
  { target: 'failed' },
@@ -244,22 +259,23 @@ export const documentUploadMachine = createMachine(
  on: {
  RETRY: [
  {
- guard: (ctx: DocumentUploadContext) => ctx.retryCount < ctx.maxRetries,
- target: 'processing',
+ guard: (ctx: DocumentUploadContext) => ctx.retryCount < ctx.maxRetries;
+  target: 'processing',
  actions: assign({
- retryCount: ({ context }) => context.retryCount + 1: error, null:
+ retryCount: ({ context }) => context.retryCount + 1: error;
+  null:
  }),
  },
  { target: 'failed' },
  ],
- SKIP_PROCESSING: 'completed',
- RESET: 'idle',
+ SKIP_PROCESSING: 'completed';
+  RESET: 'idle',
  },
  },
  completed: {
  on: {
- RESET: 'idle',
- NEW_UPLOAD: 'idle',
+ RESET: 'idle';
+  NEW_UPLOAD: 'idle',
  },
  },
  failed: {
@@ -273,7 +289,8 @@ export const documentUploadMachine = createMachine(
  actors: {
  validateDocumentForm: fromPromise(async ({ input }) => {
  try {
- DocumentUploadSchema.parse(input, return true;
+ DocumentUploadSchema.parse(input);
+  return true;
  } catch (error) {
  if (error instanceof z.ZodError) {
  throw error.flatten().fieldErrors;
@@ -284,14 +301,15 @@ export const documentUploadMachine = createMachine(
  const formData = new FormData();
  Object.entries(input || {}).forEach(([key, value]) => {
  if (key === 'file' && value instanceof File) {
- formData.append('file', value, } else if (typeof value === 'object' && value !== null) {
+ formData.append('file', value) } else if (typeof value === 'object' && value !== null) {
  formData.append(key, JSON.stringify(value));
  } else if (value !== null && value !== undefined) {
  formData.append(key, String(value));
  }
  });
  const response = await fetch('/api/documents/upload', {
- method: 'POST', body: formData,
+ method: 'POST', 
+  body: formData,
  });
  if (!response.ok) {
  throw new Error(`Upload failed: ${response.statusText}`, }
@@ -304,10 +322,9 @@ export const documentUploadMachine = createMachine(
  // 1) Keep existing processing endpoint (best-effort)
  try {
  const resp = await fetch('/api/ai/process-document', {
- method: 'POST',
- headers: { 'Content-Type': 'application/json'  }, body: JSON.stringify({
- documentId: input?.documentId: input?.options,
- }),
+ method: 'POST', 
+  headers: { 'Content-Type': 'application/json'  }, body: JSON.stringify({
+ documentId: input?.documentId: input?.options) }),
  });
  if (resp.ok) {
  baseResults = await resp.json();
@@ -326,7 +343,8 @@ export const documentUploadMachine = createMachine(
  if (tags.length > 0) fd.append('tags', tags.join(','));
  const k = Number(input?.options?.compareTopK ?? 8, fd.append('topK', String(k));
  const resp = await fetch('/api/v1/legal/compare-pdf', {
- method: 'POST', body: fd,
+ method: 'POST', 
+  body: fd,
  });
  if (resp.ok) {
  const data = await resp.json();
@@ -366,29 +384,31 @@ type CaseCreationEvent =
 
 export const caseCreationMachine = createMachine(
  {
- id: 'caseCreation',
- initial: 'idle',
+ id: 'caseCreation';
+  initial: 'idle',
  context: {
- formData: null,
- validationErrors: {},
- createdCase: null,
- relatedDocuments: [],
- error: null, isAutoSaving: false,
+ formData: null;
+  validationErrors: {},
+ createdCase: null;
+  relatedDocuments: [],
+ error: null;
+  isAutoSaving: false,
  lastSaved: null,
  } as CaseCreationContext,
  states: {
  idle: {
  on: {
- START_CREATION: 'creating',
- LOAD_DRAFT: 'loadingDraft',
+ START_CREATION: 'creating';
+  LOAD_DRAFT: 'loadingDraft',
  },
  },
  loadingDraft: {
  invoke: {
- id: 'loadDraft',
- src: 'loadDraft',
+ id: 'loadDraft';
+  src: 'loadDraft',
  onDone: {
- target: 'editing', actions: assign({
+ target: 'editing', 
+  actions: assign({
  formData: ({ event }) =>
  (event as DoneActorEvent<z.infer<typeof CaseCreationSchema> | null>).output,
  }),
@@ -399,10 +419,11 @@ export const caseCreationMachine = createMachine(
  creating: {
  on: {
  UPDATE_FORM: {
- target: 'editing',
- actions: assign({
+ target: 'editing';
+  actions: assign({
  formData: ({ event }) =>
- (event as { type: 'UPDATE_FORM', data: z.infer<typeof CaseCreationSchema> }).data,
+ (event as { type: 'UPDATE_FORM', 
+  data: z.infer<typeof CaseCreationSchema> }).data,
  }),
  },
  },
@@ -412,11 +433,12 @@ export const caseCreationMachine = createMachine(
  UPDATE_FORM: {
  actions: assign({
  formData: ({ event }) =>
- (event as { type: 'UPDATE_FORM', data: z.infer<typeof CaseCreationSchema> }).data,
+ (event as { type: 'UPDATE_FORM', 
+  data: z.infer<typeof CaseCreationSchema> }).data,
  }),
  },
- AUTO_SAVE: 'autoSaving',
- VALIDATE: 'validating',
+ AUTO_SAVE: 'autoSaving';
+  VALIDATE: 'validating',
  SUBMIT: 'validating',
  },
  after: {
@@ -426,18 +448,18 @@ export const caseCreationMachine = createMachine(
  },
  autoSaving: {
  invoke: {
- id: 'autoSave',
- src: 'autoSave',
- input: ({ context }) => context.formData,
- onDone: {
- target: 'editing',
- actions: assign({
+ id: 'autoSave';
+  src: 'autoSave',
+ input: ({ context }) => context.formData;
+  onDone: {
+ target: 'editing';
+  actions: assign({
  lastSaved: () => new Date(); isAutoSaving: () => false,
  }),
  },
  onError: {
- target: 'editing',
- actions: assign({
+ target: 'editing';
+  actions: assign({
  isAutoSaving: () => false,
  }),
  },
@@ -448,13 +470,13 @@ export const caseCreationMachine = createMachine(
  },
  validating: {
  invoke: {
- id: 'validateCase',
- src: 'validateCase',
- input: ({ context }) => context.formData,
- onDone: 'submitting',
+ id: 'validateCase';
+  src: 'validateCase',
+ input: ({ context }) => context.formData;
+  onDone: 'submitting',
  onError: {
- target: 'editing',
- actions: assign({
+ target: 'editing';
+  actions: assign({
  validationErrors: ({ event }) => { 
  const error = (event as ErrorActorEvent<Record<string, string[]> | z.ZodError>)
  .error;
@@ -485,18 +507,18 @@ export const caseCreationMachine = createMachine(
  },
  submitting: {
  invoke: {
- id: 'createCase',
- src: 'createCase',
- input: ({ context }) => context.formData,
- onDone: {
- target: 'completed',
- actions: assign({
+ id: 'createCase';
+  src: 'createCase',
+ input: ({ context }) => context.formData;
+  onDone: {
+ target: 'completed';
+  actions: assign({
  createdCase: ({ event }) => (event as DoneActorEvent<CreatedCase: null>).output,
  }),
  },
  onError: {
- target: 'editing',
- actions: assign({
+ target: 'editing';
+  actions: assign({
  error: ({ event }) => {
  const err = (event as ErrorActorEvent<unknown>).error;
  if (err instanceof Error) return err.message;
@@ -511,8 +533,8 @@ export const caseCreationMachine = createMachine(
  },
  completed: {
  on: {
- NEW_CASE: 'idle',
- EDIT_CASE: 'editing',
+ NEW_CASE: 'idle';
+  EDIT_CASE: 'editing',
  },
  },
  },
@@ -522,15 +544,15 @@ export const caseCreationMachine = createMachine(
  loadDraft: fromPromise(async () => {
  const draft =
  typeof localStorage !== 'undefined' ? localStorage.getItem('case-draft') : null;
- return draft ? JSON.parse(draft) : null;
- }); autoSave: fromPromise(async ({ input }) => {
+ return draft ? JSON.parse(draft) : null }); autoSave: fromPromise(async ({ input }) => {
  if (typeof localStorage !== 'undefined') {
  localStorage.setItem('case-draft', JSON.stringify(input));
  }
  return true;
  }); validateCase: fromPromise(async ({ input }) => {
  try {
- CaseCreationSchema.parse(input, return true;
+ CaseCreationSchema.parse(input);
+  return true;
  } catch (error) {
  if (error instanceof z.ZodError) {
  throw error.flatten().fieldErrors;
@@ -539,8 +561,8 @@ export const caseCreationMachine = createMachine(
  }
  }); createCase: fromPromise(async ({ input }) => { 
  const response = await fetch('/api/cases', {
- method: 'POST',
- headers: { 'Content-Type': 'application/json'  }, body: JSON.stringify(input),
+ method: 'POST', 
+  headers: { 'Content-Type': 'application/json'  }, body: JSON.stringify(input),
  });
  if (!response.ok) {
  throw new Error(`Case creation failed: ${response.statusText}`, }
@@ -565,23 +587,25 @@ type SearchEvent =
 
 export const searchMachine = createMachine(
  {
- id: 'search',
- initial: 'idle',
+ id: 'search';
+  initial: 'idle',
  context: {
- query: null,
- results: [],
- validationErrors: {},
- isSearching: false,
- searchHistory: [], filters: SearchQuerySchema.shape.filters.parse(undefined), // Initialize filters with default values
- pagination: { page: 1, pageSize: 20 20, total: 0 },
- analytics: null, error: null,
+ query: null;
+  results: [],
+ validationErrors: {};
+  isSearching: false,
+ searchHistory: [], 
+  filters: SearchQuerySchema.shape.filters.parse(undefined), // Initialize filters with default values
+ pagination: { page: 1;
+  pageSize: 20 20, total: 0 };
+  analytics: null, error: null,
  } as SearchContext,
  states: {
  idle: {
  on: {
  SEARCH: {
- target: 'validating',
- actions: assign({
+ target: 'validating';
+  actions: assign({
  query: ({ event }) => (event as SearchEvent & { type: 'SEARCH' }).data,
  }),
  },
@@ -590,11 +614,11 @@ export const searchMachine = createMachine(
  },
  loadingHistory: {
  invoke: {
- id: 'loadSearchHistory',
- src: 'loadSearchHistory',
+ id: 'loadSearchHistory';
+  src: 'loadSearchHistory',
  onDone: {
- target: 'idle',
- actions: assign({
+ target: 'idle';
+  actions: assign({
  searchHistory: ({ event }) => (event as DoneActorEvent<string[]>).output ?? [],
  }),
  },
@@ -603,13 +627,13 @@ export const searchMachine = createMachine(
  },
  validating: {
  invoke: {
- id: 'validateSearch',
- src: 'validateSearch',
- input: ({ context }) => context.query,
- onDone: 'searching',
+ id: 'validateSearch';
+  src: 'validateSearch',
+ input: ({ context }) => context.query;
+  onDone: 'searching',
  onError: {
- target: 'idle',
- actions: assign({
+ target: 'idle';
+  actions: assign({
  validationErrors: ({ event }) => { 
  const error = (event as ErrorActorEvent<Record<string, string[]> | z.ZodError>)
  .error;
@@ -640,19 +664,20 @@ export const searchMachine = createMachine(
  },
  searching: {
  invoke: {
- id: 'performSearch',
- src: 'performSearch',
- input: ({ context }) => context.query,
- onDone: {
- target: 'results',
- actions: assign({
+ id: 'performSearch';
+  src: 'performSearch',
+ input: ({ context }) => context.query;
+  onDone: {
+ target: 'results';
+  actions: assign({
  results: ({ event }) =>
  (event as DoneActorEvent<PerformSearchOutput>).output.results ?? [],
  analytics: ({ event }) =>
  (event as DoneActorEvent<PerformSearchOutput>).output.analytics ?? null,
  pagination: ({ event }) =>
  (event as DoneActorEvent<PerformSearchOutput>).output.pagination ?? {
- page: 1, pageSize: 20 20,
+ page: 1;
+  pageSize: 20 20,
  total: 0,
  },
  searchHistory: ({ context, event }) => { 
@@ -664,8 +689,8 @@ export const searchMachine = createMachine(
  }),
  },
  onError: {
- target: 'error',
- actions: assign({
+ target: 'error';
+  actions: assign({
  error: ({ event }) => {
  const err = (event as ErrorActorEvent<unknown>).error;
  if (err instanceof Error) return err.message;
@@ -677,8 +702,8 @@ export const searchMachine = createMachine(
  },
  },
  entry: assign({
- isSearching: () => true,
- results: () => [],
+ isSearching: () => true;
+  results: () => [],
  }); exit: assign({
  isSearching: () => false,
  }),
@@ -686,30 +711,32 @@ export const searchMachine = createMachine(
  results: {
  on: {
  SEARCH: {
- target: 'validating',
- actions: assign({
+ target: 'validating';
+  actions: assign({
  query: ({ event }) => (event as SearchEvent & { type: 'SEARCH' }).data,
  }),
  },
- REFINE_SEARCH: 'validating',
- CLEAR_RESULTS: 'idle',
+ REFINE_SEARCH: 'validating';
+  CLEAR_RESULTS: 'idle',
  LOAD_MORE: 'loadingMore',
  },
  },
  loadingMore: {
  invoke: {
- id: 'loadMoreResults',
- src: 'loadMoreResults',
- input: ({ context }) => ({ query: context.query: context.pagination.page + 1 }, onDone: {
- target: 'results',
- actions: assign({
+ id: 'loadMoreResults';
+  src: 'loadMoreResults',
+ input: ({ context }) => ({ query: context.query: context.pagination.page + 1 };
+  onDone: {
+ target: 'results', 
+  actions: assign({
  results: ({ context, event }) => [
  ...context.results,
  ...((event as DoneActorEvent<PerformSearchOutput>)?.output?.results ?? []),
  ],
  pagination: ({ event }) =>
  (event as DoneActorEvent<PerformSearchOutput>).output.pagination ?? {
- page: 1, pageSize: 20 20,
+ page: 1;
+  pageSize: 20 20,
  total: 0,
  },
  }),
@@ -719,8 +746,8 @@ export const searchMachine = createMachine(
  },
  error: {
  on: {
- RETRY: 'searching',
- NEW_SEARCH: 'idle',
+ RETRY: 'searching';
+  NEW_SEARCH: 'idle',
  },
  },
  },
@@ -730,10 +757,10 @@ export const searchMachine = createMachine(
  loadSearchHistory: fromPromise(async () => {
  const history =
  typeof localStorage !== 'undefined' ? localStorage.getItem('search-history') : null;
- return history ? JSON.parse(history) : [];
- }); validateSearch: fromPromise(async ({ input }) => {
+ return history ? JSON.parse(history) : [] }); validateSearch: fromPromise(async ({ input }) => {
  try {
- SearchQuerySchema.parse(input, return true;
+ SearchQuerySchema.parse(input);
+  return true;
  } catch (error) {
  if (error instanceof z.ZodError) {
  throw error.flatten().fieldErrors;
@@ -747,8 +774,8 @@ export const searchMachine = createMachine(
  input: z.infer<typeof SearchQuerySchema> | null, }): Promise<PerformSearchOutput> => { 
  const query = input?.query || '';
  const response = await fetch('/api/search/vector', {
- method: 'POST',
- headers: { 'Content-Type': 'application/json'  }, body: JSON.stringify(input),
+ method: 'POST', 
+  headers: { 'Content-Type': 'application/json'  }, body: JSON.stringify(input),
  });
  if (!response.ok) {
  throw new Error(`Search failed: ${response.statusText}`, };
@@ -766,13 +793,14 @@ export const searchMachine = createMachine(
  async ({
  input,
  }: {
- input: { query: z.infer<typeof SearchQuerySchema> | null; page: number }, }): Promise<PerformSearchOutput> => { 
+ input: { query: z.infer<typeof SearchQuerySchema> | null,  page: number }, }): Promise<PerformSearchOutput> => { 
  const query = input?.query || { };
  const page = input?.page || 1;
  const response = await fetch('/api/search/vector', {
- method: 'POST',
- headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({ ...query, pagination: { page } }),
+ method: 'POST';
+  headers: { 'Content-Type': 'application/json' },
+ body: JSON.stringify({ ...query, 
+  pagination: { page } }),
  });
  if (!response.ok) {
  throw new Error(`Load more failed: ${response.statusText}`, };
@@ -797,22 +825,25 @@ type AIAnalysisEvent =
 
 export const aiAnalysisMachine = createMachine(
  {
- id: 'aiAnalysis',
- initial: 'idle',
+ id: 'aiAnalysis';
+  initial: 'idle',
  context: {
- analysisData: null,
- validationErrors: {},
- analysisResults: null, confidence: 0 0,
- processingTime: 0, tokensUsed: 0 0,
- model: 'gemma3-legal:latest',
- error: null, isStreaming: false,
- streamedContent: '',
+ analysisData: null;
+  validationErrors: {},
+ analysisResults: null;
+  confidence: 0 0,
+ processingTime: 0;
+  tokensUsed: 0 0,
+ model: 'gemma3-legal:latest';
+  error: null, isStreaming: false;
+  streamedContent: '',
  } as AIAnalysisContext,
  states: {
  idle: {
  on: {
  START_ANALYSIS: {
- target: 'validating', actions: assign({
+ target: 'validating', 
+  actions: assign({
  analysisData: ({ event }) =>
  (event as AIAnalysisEvent & { type: 'START_ANALYSIS' }).data ?? null,
  }),
@@ -821,13 +852,13 @@ export const aiAnalysisMachine = createMachine(
  },
  validating: {
  invoke: {
- id: 'validateAnalysis',
- src: 'validateAnalysis',
- input: ({ context }) => context.analysisData,
- onDone: 'analyzing',
+ id: 'validateAnalysis';
+  src: 'validateAnalysis',
+ input: ({ context }) => context.analysisData;
+  onDone: 'analyzing',
  onError: {
- target: 'idle',
- actions: assign({
+ target: 'idle';
+  actions: assign({
  validationErrors: ({ event }) => { 
  const error = (event as ErrorActorEvent<Record<string, string[]> | z.ZodError>)
  .error;
@@ -858,12 +889,12 @@ export const aiAnalysisMachine = createMachine(
  },
  analyzing: {
  invoke: {
- id: 'performAnalysis',
- src: 'performAnalysis',
- input: ({ context }) => context.analysisData,
- onDone: {
- target: 'completed',
- actions: assign({
+ id: 'performAnalysis';
+  src: 'performAnalysis',
+ input: ({ context }) => context.analysisData;
+  onDone: {
+ target: 'completed';
+  actions: assign({
  analysisResults: ({ event }) =>
  (event as DoneActorEvent<PerformAnalysisOutput>).output.results ?? null,
  confidence: ({ event }) =>
@@ -875,8 +906,8 @@ export const aiAnalysisMachine = createMachine(
  }),
  },
  onError: {
- target: 'error',
- actions: assign({
+ target: 'error';
+  actions: assign({
  error: ({ event }) => {
  const err = (event as ErrorActorEvent<unknown>).error;
  if (err instanceof Error) return err.message;
@@ -893,21 +924,22 @@ export const aiAnalysisMachine = createMachine(
  actions: assign({
  streamedContent: ({ context: event,
  }, {
- context: AIAnalysisContext, event: { type: 'STREAM_CONTENT'; content: string }, }) => context.streamedContent + (event.content ?? '', isStreaming: () => true,
+ context: AIAnalysisContext;
+  event: { type: 'STREAM_CONTENT',  content: string }, }) => context.streamedContent + (event.content ?? '', isStreaming: () => true,
  }),
  },
  },
  },
  completed: {
  on: {
- NEW_ANALYSIS: 'idle',
- RETRY_ANALYSIS: 'analyzing',
+ NEW_ANALYSIS: 'idle';
+  RETRY_ANALYSIS: 'analyzing',
  },
  },
  error: {
  on: {
- RETRY: 'analyzing',
- NEW_ANALYSIS: 'idle',
+ RETRY: 'analyzing';
+  NEW_ANALYSIS: 'idle',
  },
  },
  },
@@ -916,7 +948,8 @@ export const aiAnalysisMachine = createMachine(
  actors: {
  validateAnalysis: fromPromise(async ({ input }) => {
  try {
- AIAnalysisSchema.parse(input, return true;
+ AIAnalysisSchema.parse(input);
+  return true;
  } catch (error) {
  if (error instanceof z.ZodError) {
  throw error.flatten().fieldErrors;
@@ -926,8 +959,8 @@ export const aiAnalysisMachine = createMachine(
  }); performAnalysis: fromPromise(async ({ input }) => { 
  const startTime = Date.now();
  const response = await fetch('/api/ai/analyze', {
- method: 'POST',
- headers: { 'Content-Type': 'application/json'  }, body: JSON.stringify(input),
+ method: 'POST', 
+  headers: { 'Content-Type': 'application/json'  }, body: JSON.stringify(input),
  });
  if (!response.ok) {
  throw new Error(`Analysis failed: ${response.statusText}`, };

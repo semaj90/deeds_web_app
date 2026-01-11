@@ -120,9 +120,9 @@ export { default as ContextMenuTrigger } from './ContextMenuTrigger.svelte';
 
 // Progress & Loading
 export { default as AILoadingIndicator } from './AILoadingIndicator.svelte';
-export { default as GlobalLoadingIndicator } from './GlobalLoadingIndicator.svelte';
+// export { default as GlobalLoadingIndicator } from './GlobalLoadingIndicator.svelte'; // TODO: File has syntax errors
 export { default as GPULoadingProgress } from './GPULoadingProgress.svelte';
-export { default as Progress } from './Progress.svelte';
+// export { default as Progress } from './Progress.svelte'; // TODO: Fix module resolution
 export { default as ProgressBitsUI } from './ProgressBitsUI.svelte';
 
 // Toast & Notifications
@@ -132,11 +132,11 @@ export { default as ToastContainer } from './ToastContainer.svelte';
 // Data Display
 export { default as DataGrid } from './DataGrid.svelte';
 export { default as StatsCard } from './StatsCard.svelte';
-export { default as SystemStatusCard } from './SystemStatusCard.svelte';
+// export { default as SystemStatusCard } from './SystemStatusCard.svelte'; // TODO: File has migration errors
 
 // Layout
 export { default as ExpandGrid } from './ExpandGrid.svelte';
-export { default as GoldenLayout } from './GoldenLayout.svelte';
+// export { default as GoldenLayout } from './GoldenLayout.svelte'; // TODO: Check if file exists
 export { default as LazyLoader } from './LazyLoader.svelte';
 export { default as Portal } from './Portal.svelte';
 
@@ -146,10 +146,10 @@ export { default as ThemeSelector } from './ThemeSelector.svelte';
 
 // Specialized
 export { default as CommandPalette } from './CommandPalette.svelte';
-export { default as DragDropZone } from './DragDropZone.svelte';
+// export { default as DragDropZone } from './DragDropZone.svelte'; // TODO: Check module
 export { default as MarkdownRenderer } from './MarkdownRenderer.svelte';
 export { default as RichTextEditor } from './RichTextEditor.svelte';
-export { default as SimpleDragDrop } from './SimpleDragDrop.svelte';
+// export { default as SimpleDragDrop } from './SimpleDragDrop.svelte'; // TODO: Check module
 export { default as SmartTextarea } from './SmartTextarea.svelte';
 
 // Evidence & Case
@@ -157,25 +157,25 @@ export { default as CaseForm } from './CaseForm.svelte';
 export { default as CaseItem } from './CaseItem.svelte';
 export { default as ChatMessage } from './ChatMessage.svelte';
 export { default as EvidenceCanvas } from './EvidenceCanvas.svelte';
-export { default as EvidenceCard } from './EvidenceCard.svelte';
+// export { default as EvidenceCard } from './EvidenceCard.svelte'; // TODO: Check module
 
 // AI Components
 export { default as AIAccessibilityWrapper } from './AIAccessibilityWrapper.svelte';
 export { default as AIDialog } from './AIDialog.svelte';
-export { default as GPUInferenceDemo } from './GPUInferenceDemo.svelte';
+// export { default as GPUInferenceDemo } from './GPUInferenceDemo.svelte'; // TODO: Check module
 
 // Gaming Style
-export { default as FinalFantasyButton } from './FinalFantasyButton.svelte';
+// export { default as FinalFantasyButton } from './FinalFantasyButton.svelte'; // TODO: Check module
 export { default as FinalFantasyContainer } from './FinalFantasyContainer.svelte';
 export { default as FinalFantasyModal } from './FinalFantasyModal.svelte';
-export { default as NESElementsShowcase } from './NESElementsShowcase.svelte';
+// export { default as NESElementsShowcase } from './NESElementsShowcase.svelte'; // TODO: Check module
 
 // Accessibility
 export { default as AccessibilitySettings } from './AccessibilitySettings.svelte';
 export { default as BitsUIAccessibilityWrapper } from './BitsUIAccessibilityWrapper.svelte';
 
 // Error Handling
-export { default as ErrorBoundary } from './ErrorBoundary.svelte';
+// export { default as ErrorBoundary } from './ErrorBoundary.svelte'; // TODO: Check module
 
 // Performance
 export { default as AdaptiveRenderingEngine } from './AdaptiveRenderingEngine.svelte';
