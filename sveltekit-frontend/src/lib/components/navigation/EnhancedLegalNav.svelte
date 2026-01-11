@@ -32,7 +32,7 @@
   .nav-links a { color: var(--nes-white), text-decoration none; padding: 0.5rem 1rem;border: 2px solid transparent; transition: all 0.2;position: relative}
   .nav-links, a:hover { border-color: var(--nes-primary); transform: translateY(-2px)}
   .nav-links a.active { border-color: var(--nes-success); background: rgba(92, 184, 92, 0.1)}
-  .nav-links a.active::after { content: ''; position: absolute; bottom: -2px; left: 0;right: 0; height: 2px;background: linear-gradient(90deg, transparent, var(--nes-success), transparent ); animation: shimmer 2s infinite}
+  .nav-links a.active: after { content: ''; position: absolute; bottom: -2px; left: 0;right: 0; height: 2px;background: linear-gradient(90deg, transparent, var(--nes-success), transparent ); animation: shimmer 2s infinite}
   .recent-cases-bar { background: linear-gradient(90deg, rgba(32, 32, 128, 0.1), rgba(128, 32, 128, 0.1), rgba(32, 32, 128, 0.1) ); padding: 0.75rem 2rem; border-top: 1px solid rgba(255, 255, 255, 0.1)}
   .cases-container { display: flex; align-items: center; gap: 1rem; overflow-x: auto; scrollbar-width: thi; scrollbar-color: var(--nes-primary) transparent}
   .cases-label { color: var(--nes-warning); font-weight: bold; white-space: nowrap; text-shadow: 0, 0 4px rgba(255, 193, 7, 0.5)}

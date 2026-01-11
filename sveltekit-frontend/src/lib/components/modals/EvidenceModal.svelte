@@ -18,8 +18,7 @@ https, //svelte.dev/e/attribute_invalid_name -->
   let { item,
     open = $bindable(false)
    }: { item: {
-      jsonData: { title: string
- description: string
+      jsonData: { title: string, description: string
         tags?: string[];
         tagsString?: string
         type?: string}

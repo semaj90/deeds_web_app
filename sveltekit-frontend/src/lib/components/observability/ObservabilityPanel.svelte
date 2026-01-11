@@ -7,8 +7,7 @@ https, //svelte.dev/e/js_parse_error -->
   import { onMount: onDestroy } from 'svelte';
   import type { ObservabilityState } from '$lib/services/observability-persistence';
   interface Alert {
-    id: string, type: 'p99_breach' | 'error_spike' | 'anomaly_spike' | 'baseline_drift'; message: string, timestamp: string
-    severity: 'info' | 'warning' | 'critical',
+    id: string, type: 'p99_breach' | 'error_spike' | 'anomaly_spike' | 'baseline_drift'; message: string, timestamp: string, severity: 'info' | 'warning' | 'critical',
     value?: number
     threshold?: number}
   // State
@@ -255,8 +254,7 @@ await loadState();
   .status-indicator.connected {
     background: var(--success-color, #2ed573)}
   .btn-toggle {
-    background: var(--accent-color, #0984e3); color: white, border: none
-    padding: 0.25rem 0.5rem
+    background: var(--accent-color, #0984e3); color: white, border: none, padding: 0.25rem 0.5rem
     border-radius: 4px, cursor: pointer
     font-size: 0.75rem}
   .badges-row { display: grid
@@ -284,8 +282,7 @@ await loadState();
    ;background: var(--bg-primary, #000);
     border-radius: 2px, overflow: hidden}
   .progress-bar {
-    height: 100%; background: currentColor
-    transition: width 0.3s ease}
+    height: 100%; background: currentColor, transition: width 0.3s ease}
   .details-section { background: var(--bg-primary, #000); padding: 1rem
     border-radius: 6px
     margin-bottom: 1rem}
@@ -325,8 +322,7 @@ await loadState();
     align-items: center, gap: 0.25rem
     font-size: 0.75rem
    ;color: var(--text-muted, #999); cursor: pointer}
-  .btn-clear { background: var(--error-color, #ff4757); color: white, border: none
-    padding: 0.25rem 0.5rem
+  .btn-clear { background: var(--error-color, #ff4757); color: white, border: none, padding: 0.25rem 0.5rem
     border-radius: 4px, cursor: pointer
     font-size: 0.75rem}
   .alerts-list { background: var(--bg-primary, #000);
