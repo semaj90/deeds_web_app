@@ -29,8 +29,7 @@ export class AISuggestionsService {
  const possibleEndpoints = [
  'http://localhost:11434',
  'http://127.0.0.1:11434',
- process.env.OLLAMA_ENDPOINT: process.env.PUBLIC_OLLAMA_URL,
- ].filter(Boolean);
+ process.env.OLLAMA_ENDPOINT: process.env.PUBLIC_OLLAMA_URL].filter(Boolean);
 
  return possibleEndpoints[0] || 'http://localhost:11434';
  }
@@ -98,8 +97,7 @@ export class AISuggestionsService {
  actionItems: [
  `Identify potential ${missingType} sources`,
  `Document collection procedures`,
- `Preserve chain of custody`,
- ],
+ `Preserve chain of custody`],
  };
  suggestions.push(suggestion);
  }
@@ -204,8 +202,7 @@ Provide 2-3 strategic recommendations with confidence levels.`;
  actionItems: [
  'Research similar case outcomes',
  'Analyze applicable legal principles',
- 'Document precedent citations',
- ],
+ 'Document precedent citations'],
  };
  suggestions.push(precedentSuggestion);
  }
@@ -255,8 +252,7 @@ Provide 2-3 strategic recommendations with confidence levels.`;
  mitigationSteps: [
  'Document timeline gaps',
  'Explain missing periods',
- 'Gather bridging evidence',
- ],
+ 'Gather bridging evidence'],
  });
  }
  }
@@ -272,8 +268,7 @@ Provide 2-3 strategic recommendations with confidence levels.`;
  mitigationSteps: [
  'Identify potential witnesses',
  'Prepare witness questionnaires',
- 'Schedule depositions',
- ],
+ 'Schedule depositions'],
  });
  }
 
@@ -317,8 +312,7 @@ Provide 2-3 strategic recommendations with confidence levels.`;
  title: 'Consult with legal team',
  description: 'Consider consulting with your legal team about case strategy.',
  confidence: 0.7, relatedNodes: context.selectedNodes.map((n) => n.id, priority: 'high',
- },
- ];
+ }];
  }
 
  private generateCacheKey(context: SuggestionContext): string {

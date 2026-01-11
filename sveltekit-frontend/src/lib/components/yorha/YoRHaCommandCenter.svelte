@@ -290,7 +290,7 @@
  font-weight: bold; transition: all 0.3s;
  }
 
- .refresh-btn:hover, not(:disabled) {
+ .refresh-btn:hover, not(disabled) {
  background: #00a8cc;
  box-shadow: 0 0 10px rgba(0, 212, 255, 0.5);
  }

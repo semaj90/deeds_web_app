@@ -3,7 +3,7 @@ import { POST: GET } from './+server.js';
 import * as queries from '$lib/db';
 
 vi.mock('$lib/db', () => ({
- getRouteMetadata: vi.fn(, createHealthEvent: vi.fn( getHealthEvents: vi.fn(, updateRouteMetadata: vi.fn(),
+ getRouteMetadata: vi.fn(createHealthEvent: vi.fn( getHealthEvents: vi.fn(updateRouteMetadata: vi.fn(),
 }));
 
 describe('POST /api/routes/:routeId/health-event', () => {
@@ -39,14 +39,14 @@ describe('POST /api/routes/:routeId/health-event', () => {
 
  const request = new Request('http://localhost/api/routes/cases%2Fnew/health-event', {
  method: 'POST',
- body: JSON.stringify({, oldStatus: 'healthy',
+ body: JSON.stringify({oldStatus: 'healthy',
  newStatus: 'broken',
  reason: 'error_cluster_created',
  }),
  });
 
  const response = await POST({
- params: {, routeId: '/cases/new' },
+ params: {routeId: '/cases/new' },
  request,
  } as any);
  const data = await response.json();
@@ -84,13 +84,13 @@ describe('POST /api/routes/:routeId/health-event', () => {
 
  const request = new Request('http://localhost/api/routes/cases%2Fnew/health-event', {
  method: 'POST',
- body: JSON.stringify({, newStatus: 'flaky',
+ body: JSON.stringify({newStatus: 'flaky',
  reason: 'warning_detected',
  }),
  });
 
  const response = await POST({
- params: {, routeId: '/cases/new' },
+ params: {routeId: '/cases/new' },
  request,
  } as any);
  const data = await response.json();
@@ -104,12 +104,12 @@ describe('POST /api/routes/:routeId/health-event', () => {
 
  const request = new Request('http://localhost/api/routes/nonexistent/health-event', {
  method: 'POST',
- body: JSON.stringify({, newStatus: 'broken',
+ body: JSON.stringify({newStatus: 'broken',
  }),
  });
 
  const response = await POST({
- params: {, routeId: '/nonexistent' },
+ params: {routeId: '/nonexistent' },
  request,
  } as any);
  const data = await response.json();
@@ -130,12 +130,12 @@ describe('POST /api/routes/:routeId/health-event', () => {
 
  const request = new Request('http://localhost/api/routes/cases%2Fnew/health-event', {
  method: 'POST',
- body: JSON.stringify({, newStatus: 'invalid',
+ body: JSON.stringify({newStatus: 'invalid',
  }),
  });
 
  const response = await POST({
- params: {, routeId: '/cases/new' },
+ params: {routeId: '/cases/new' },
  request,
  } as any);
  const data = await response.json();
@@ -156,12 +156,12 @@ describe('POST /api/routes/:routeId/health-event', () => {
 
  const request = new Request('http://localhost/api/routes/cases%2Fnew/health-event', {
  method: 'POST',
- body: JSON.stringify({, oldStatus: 'healthy',
+ body: JSON.stringify({oldStatus: 'healthy',
  }),
  });
 
  const response = await POST({
- params: {, routeId: '/cases/new' },
+ params: {routeId: '/cases/new' },
  request,
  } as any);
  const data = await response.json();
@@ -200,15 +200,14 @@ describe('GET /api/routes/:routeId/health-history', () => {
  newStatus: 'flaky',
  reason: 'error_resolved',
  createdAt: new Date(),
- },
- ] as const;
+ }] as const;
 
  vi.mocked(queries.getRouteMetadata).mockResolvedValue(mockRoute as any);
  vi.mocked(queries.getHealthEvents).mockResolvedValue(mockEvents as any);
 
  const url = new URL('http://localhost/api/routes/cases%2Fnew/health-history?limit=20&offset=0');
  const response = await GET({
- params: {, routeId: '/cases/new' },
+ params: {routeId: '/cases/new' },
  url,
  } as any);
  const data = await response.json();
@@ -235,15 +234,14 @@ describe('GET /api/routes/:routeId/health-history', () => {
  newStatus: 'broken',
  reason: 'error_cluster_created',
  createdAt: new Date(),
- },
- ] as const;
+ }] as const;
 
  vi.mocked(queries.getRouteMetadata).mockResolvedValue(mockRoute as any);
  vi.mocked(queries.getHealthEvents).mockResolvedValue(mockEvents as any);
 
  const url = new URL('http://localhost/api/routes/cases%2Fnew/health-history?limit=10&offset=5');
  const response = await GET({
- params: {, routeId: '/cases/new' },
+ params: {routeId: '/cases/new' },
  url,
  } as any);
  const data = await response.json();
@@ -258,7 +256,7 @@ describe('GET /api/routes/:routeId/health-history', () => {
 
  const url = new URL('http://localhost/api/routes/nonexistent/health-history');
  const response = await GET({
- params: {, routeId: '/nonexistent' },
+ params: {routeId: '/nonexistent' },
  url,
  } as any);
  const data = await response.json();

@@ -28,22 +28,19 @@ export const userRoleEnum = pgEnum('user_role', [
  'detective',
  'admin',
  'analyst',
- 'paralegal',
-]);
+ 'paralegal']);
 export const caseStatusEnum = pgEnum('case_status', [
  'open',
  'in_progress',
  'pending_review',
  'closed',
- 'archived',
-]);
+ 'archived']);
 export const casePriorityEnum = pgEnum('case_priority', [
  'low',
  'medium',
  'high',
  'critical',
- 'urgent',
-]);
+ 'urgent']);
 export const evidenceTypeEnum = pgEnum('evidence_type', [
  'document',
  'photo',
@@ -52,8 +49,7 @@ export const evidenceTypeEnum = pgEnum('evidence_type', [
  'physical',
  'digital',
  'witness_statement',
- 'forensic',
-]);
+ 'forensic']);
 export const evidenceRelationshipTypeEnum = pgEnum('evidence_relationship_type', [
  'supports',
  'contradicts',
@@ -72,13 +68,11 @@ export const evidenceRelationshipTypeEnum = pgEnum('evidence_relationship_type',
  'direct_evidence',
  'hearsay',
  'privileged',
- 'inadmissible',
-]);
+ 'inadmissible']);
 export const evidenceRelationshipStrengthEnum = pgEnum('evidence_relationship_strength', [
  'low',
  'medium',
- 'high',
-]);
+ 'high']);
 export const threatLevelEnum = pgEnum('threat_level', ['low', 'medium', 'high', 'critical']);
 export const documentTypeEnum = pgEnum('document_type', [
  'case_law',
@@ -88,35 +82,30 @@ export const documentTypeEnum = pgEnum('document_type', [
  'contract',
  'evidence',
  'report',
- 'precedent',
-]);
+ 'precedent']);
 export const confidentialityEnum = pgEnum('confidentiality_level', [
  'public',
  'standard',
  'confidential',
  'restricted',
- 'classified',
-]);
+ 'classified']);
 export const activityStatusEnum = pgEnum('activity_status', [
  'pending',
  'in_progress',
  'completed',
  'cancelled',
- 'postponed',
-]);
+ 'postponed']);
 export const reportStatusEnum = pgEnum('report_status', [
  'draft',
  'review',
  'approved',
  'published',
- 'archived',
-]);
+ 'archived']);
 export const verificationStatusEnum = pgEnum('verification_status', [
  'pending',
  'verified',
  'rejected',
- 'needs_review',
-]);
+ 'needs_review']);
 export const documentStatusEnum = pgEnum('document_status', [
  'queued',
  'processing',
@@ -127,20 +116,17 @@ export const documentStatusEnum = pgEnum('document_status', [
  'pending_embedding',
  'embedding_completed',
  'pending_summary',
- 'summary_completed',
-]);
+ 'summary_completed']);
 export const summaryTypeEnum = pgEnum('summary_type', [
  'legal_analysis',
  'executive_summary',
- 'key_facts',
-]);
+ 'key_facts']);
 export const caseRiskLevelEnum = pgEnum('case_risk_level', [
  'low',
  'medium',
  'high',
  'critical',
- 'urgent',
-]);
+ 'urgent']);
 export const patchStatusEnum = pgEnum('patch_status', ['suggested', 'applied', 'rejected']);
 
 // === TABLES FOR LEGAL AI APPLICATION ===
@@ -171,8 +157,7 @@ export const sessions = pgTable(
  columns: [table.userId],
  foreignColumns: [users.id],
  name: 'sessions_user_id_users_id_fk',
- }).onDelete('cascade'),
- ],
+ }).onDelete('cascade')],
  })
 );
 
@@ -191,8 +176,7 @@ export const emailVerificationCodes = pgTable(
  columns: [table.userId],
  foreignColumns: [users.id],
  name: `email_verification_codes_user_id_users_id_fk`,
- }).onDelete('cascade'),
- ],
+ }).onDelete('cascade')],
  uniqueConstraints: [unique('email_verification_codes_user_id_unique').on(table.userId)],
  })
 );
@@ -210,8 +194,7 @@ export const passwordResetTokens = pgTable(
  columns: [table.userId],
  foreignColumns: [users.id],
  name: `password_reset_tokens_user_id_users_id_fk`,
- }).onDelete('cascade'),
- ],
+ }).onDelete('cascade')],
  })
 );
 
@@ -251,16 +234,14 @@ export const cases = pgTable(
  indexes: [
  index('idx_cases_created_at').on(table.createdAt),
  index('idx_cases_status_priority').on(table.status, table.priority),
- index('idx_cases_status_priority_created').on(table.status, table.priority, table.createdAt),
- ],
+ index('idx_cases_status_priority_created').on(table.status, table.priority, table.createdAt)],
  foreignKeys: [
  // Added foreign key for assignedAttorney
  foreignKey({
  columns: [table.assignedAttorney],
  foreignColumns: [users.id],
  name: 'cases_assigned_attorney_users_id_fk',
- }).onDelete('set null'),
- ],
+ }).onDelete('set null')],
  })
 );
 
@@ -306,16 +287,14 @@ export const criminals = pgTable(
  index('criminals_threat_level_idx').on(table.threatLevel),
  index('criminals_status_idx').on(table.status),
  index('criminals_created_by_idx').on(table.createdBy),
- index('criminals_ssn_idx').on(table.ssn),
- ],
+ index('criminals_ssn_idx').on(table.ssn)],
  foreignKeys: [
  // Added foreign key for createdBy
  foreignKey({
  columns: [table.createdBy],
  foreignColumns: [users.id],
  name: 'criminals_created_by_users_id_fk',
- }).onDelete('set null'),
- ],
+ }).onDelete('set null')],
  })
 );
 
@@ -347,8 +326,7 @@ export const evidence = pgTable(
  index('evidence_criminal_id_idx').on(table.criminalId),
  index('evidence_type_idx').on(table.evidenceType),
  index('evidence_uploaded_by_idx').on(table.uploadedBy),
- index('evidence_uploaded_at_idx').on(table.uploadedAt),
- ],
+ index('evidence_uploaded_at_idx').on(table.uploadedAt)],
  foreignKeys: [
  foreignKey({
  columns: [table.caseId],
@@ -364,8 +342,7 @@ export const evidence = pgTable(
  columns: [table.uploadedBy],
  foreignColumns: [users.id],
  name: 'evidence_uploaded_by_users_id_fk',
- }).onDelete('set null'),
- ],
+ }).onDelete('set null')],
  })
 );
 
@@ -389,8 +366,7 @@ export const evidenceRelationships = pgTable(
  indexes: [
  index('evidence_relationships_case_id_idx').on(table.caseId),
  index('evidence_relationships_from_idx').on(table.fromEvidenceId),
- index('evidence_relationships_to_idx').on(table.toEvidenceId),
- ],
+ index('evidence_relationships_to_idx').on(table.toEvidenceId)],
  foreignKeys: [
  foreignKey({
  columns: [table.caseId],
@@ -406,8 +382,7 @@ export const evidenceRelationships = pgTable(
  columns: [table.toEvidenceId],
  foreignColumns: [evidence.id],
  name: 'evidence_relationships_to_fk',
- }).onDelete('cascade'),
- ],
+ }).onDelete('cascade')],
  })
 );
 
@@ -474,8 +449,7 @@ export const legalDocuments = pgTable(
  index('idx_legal_documents_qdrant_id').on(table.qdrantId),
  // HNSW index for contentEmbedding for fast similarity search
  // Note: HNSW indexes must be created via raw SQL migration, not in schema
- index('idx_legal_documents_content_embedding_hnsw').on(table.contentEmbedding),
- ],
+ index('idx_legal_documents_content_embedding_hnsw').on(table.contentEmbedding)],
  foreignKeys: [
  foreignKey({
  columns: [table.caseId],
@@ -498,8 +472,7 @@ export const legalDocuments = pgTable(
  columns: [table.createdBy],
  foreignColumns: [users.id],
  name: 'legal_documents_created_by_users_id_fk',
- }).onDelete('set null'),
- ],
+ }).onDelete('set null')],
  })
 );
 
@@ -525,8 +498,7 @@ export const storageFiles = pgTable(
  columns: [table.userId],
  foreignColumns: [users.id],
  name: 'storage_files_user_id_users_id_fk',
- }).onDelete('set null'),
- ],
+ }).onDelete('set null')],
  })
 );
 
@@ -577,8 +549,7 @@ export const caseScores = pgTable(
  columns: [table.calculatedBy],
  foreignColumns: [users.id],
  name: `case_scores_calculated_by_users_id_fk`,
- }).onDelete('set null'),
- ]
+ }).onDelete('set null')]
 );
 
 // === EMBEDDING CACHE ===
@@ -627,8 +598,7 @@ export const userAiQueriesTable = pgTable(
  columns: [table.caseId],
  foreignColumns: [cases.id],
  name: 'user_ai_queries_case_id_cases_id_fk',
- }).onDelete('set null'),
- ],
+ }).onDelete('set null')],
  })
 );
 
@@ -657,8 +627,7 @@ export const autoTagsTable = pgTable(
  columns: [table.confirmedBy],
  foreignColumns: [users.id],
  name: 'auto_tags_confirmed_by_users_id_fk',
- }).onDelete('set null'),
- ],
+ }).onDelete('set null')],
  indexes: [index('idx_autotags_entity').on(table.entityId, table.entityType)],
  })
 );
@@ -911,12 +880,10 @@ export const poiPhotos = pgTable(
  columns: [table.poiId],
  foreignColumns: [personsOfInterest.id],
  name: 'poi_photos_poi_id_persons_id_fk',
- }).onDelete('cascade'),
- ],
+ }).onDelete('cascade')],
  indexes: [
  index('idx_poi_photos_poi_id').on(table.poiId),
- index('idx_poi_photos_uploaded_at').on(table.uploadedAt),
- ],
+ index('idx_poi_photos_uploaded_at').on(table.uploadedAt)],
  })
 );
 
@@ -2025,15 +1992,13 @@ export const errorKindEnum = pgEnum('error_kind', [
  'build',
  'runtime',
  'api',
- 'other',
-]);
+ 'other']);
 
 export const suggestionStateEnum = pgEnum('suggestion_state', [
  'pending',
  'applied',
  'dismissed',
- 'snoozed',
-]);
+ 'snoozed']);
 
 /**
  * route_health: Current health state of each route (HMM-style state tracking)

@@ -92,8 +92,7 @@ https://svelte.dev/e/element_invalid_closing_tag -->
  icon: Search,
  description: 'Semantic search interface',
  },
- { path: '/yorha/chat', label: 'AI Chat', icon: Bot, description: 'Enhanced AI conversation' },
- ];
+ { path: '/yorha/chat', label: 'AI Chat', icon: Bot, description: 'Enhanced AI conversation' }];
 
  // runtime-safe fetch helper (try dynamic JS module first, then fetch API)
  async function fetchYoRhaStatus(): Promise<any: null> {

@@ -582,8 +582,7 @@ let cacheHit = false;
                 `Status: ${caseData.status || 'Unknown'}`,
                 `Priority: ${caseData.priority || 'Unspecified'}`,
                 `Jurisdiction: ${caseData.jurisdiction || 'Not specified'}`,
-                `Description: ${caseData.description || 'No description available'}`,
-            ].join('\n');
+                `Description: ${caseData.description || 'No description available'}`].join('\n');
         } catch (error) {
             console.warn('Failed to get context:', error);
             return 'Case context unavailable';
@@ -751,8 +750,7 @@ let cacheHit = false;
                 db
                     .select({ avgTime: sql`AVG(processing_time)`, count: sql`COUNT(*)` })
                     .from(schema.userAiQueries)
-                    .where(sql`created_at > NOW() - INTERVAL '24 hours' AND query_type = 'rag_legal'`),
-            ]);
+                    .where(sql`created_at > NOW() - INTERVAL '24 hours' AND query_type = 'rag_legal'`)]);
 
             return {
                 documentsIndexed: Number(docCount[0].count) || 0,

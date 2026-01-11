@@ -108,8 +108,7 @@ export const COMMAND_CENTER_MANIFEST: Record<TabId, CommandCenterRoute[]> = {
  description: 'Report editor + preview',
  kind: 'page',
  group: 'Case Detail',
- },
- ],
+ }],
 
  evidence: [
  {
@@ -146,8 +145,7 @@ export const COMMAND_CENTER_MANIFEST: Record<TabId, CommandCenterRoute[]> = {
  kind: 'page',
  group: 'Evidence',
  badges: ['experimental'],
- },
- ],
+ }],
 
  persons: [
  {
@@ -157,8 +155,7 @@ export const COMMAND_CENTER_MANIFEST: Record<TabId, CommandCenterRoute[]> = {
  description: 'Global registry of persons across cases',
  kind: 'page',
  group: 'Persons',
- },
- ],
+ }],
 
  system: [
  {
@@ -187,8 +184,7 @@ export const COMMAND_CENTER_MANIFEST: Record<TabId, CommandCenterRoute[]> = {
  kind: 'page',
  group: 'System',
 		badges: ['experimental', 'system'],
-		},
-	],
+		}],
 	routes: []
 };export function getRoutesByTab(tab: TabId): CommandCenterRoute[] {
  return COMMAND_CENTER_MANIFEST[tab] ?? [];

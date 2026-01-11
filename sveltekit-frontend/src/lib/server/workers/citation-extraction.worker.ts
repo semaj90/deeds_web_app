@@ -123,8 +123,7 @@ class CitationExtractionWorker {
  regex: /(\d+)\s+C\.F\.R\.?\s*§?\s*([\d.]+)/gi,
  type: 'regulation' as const,
  jurisdiction: 'Federal',
- },
- ];
+ }];
 
  for (const pattern of patterns) {
  let match;

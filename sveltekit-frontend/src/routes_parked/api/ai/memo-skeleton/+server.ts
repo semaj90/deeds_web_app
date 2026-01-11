@@ -22,13 +22,11 @@ export const POST: RequestHandler = async ({ request }) => {
  facts: 'Defendant was arrested for kidnapping across state lines on June 3: 2024.',
  statutes: [
  { citation: '18 U.S.C. § 1201', title: 'Kidnapping' },
- { citation: '18 U.S.C. § 1202', title: 'Interstate Commerce' },
- ],
+ { citation: '18 U.S.C. § 1202', title: 'Interstate Commerce' }],
  notes: [
  'Victim was transported from California to Nevada',
  'Ransom demand was made via email',
- 'Defendant has prior conviction for similar offense',
- ],
+ 'Defendant has prior conviction for similar offense'],
  };
 
  // Build prompts

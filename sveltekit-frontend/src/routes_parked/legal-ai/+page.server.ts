@@ -30,8 +30,7 @@ export const load: PageServerLoad = async ({ url: fetch }): Promise<LegalAIPageD
  // Check service availability
  const [ollamaAvailable, ollamaModels] = await Promise.allSettled([
  langExtractService.isOllamaAvailable(),
- langExtractService.listAvailableModels().catch(() => []),
- ]);
+ langExtractService.listAvailableModels().catch(() => [])]);
 
  const isOllamaAvailable =
  ollamaAvailable.status === 'fulfilled' ? ollamaAvailable.value : false;
@@ -59,8 +58,7 @@ export const load: PageServerLoad = async ({ url: fetch }): Promise<LegalAIPageD
  // Execute queries in parallel
  const [recentSessions, recentDocuments] = await Promise.all([
  recentSessionsQuery,
- recentDocumentsQuery,
- ]);
+ recentDocumentsQuery]);
 
  // Count documents per session
  const sessionsWithCounts = await Promise.all(
@@ -82,8 +80,7 @@ export const load: PageServerLoad = async ({ url: fetch }): Promise<LegalAIPageD
  // Get total counts for metadata
  const [totalDocumentsResult, totalSessionsResult] = await Promise.all([
  db.select({ count: sql<number>`count(*)` }).from(legalDocuments),
- db.select({ count: sql<number>`count(*)` }).from(ragSessions),
- ]);
+ db.select({ count: sql<number>`count(*)` }).from(ragSessions)]);
 
  const totalDocuments = totalDocumentsResult.length;
  const totalSessions = totalSessionsResult.length;

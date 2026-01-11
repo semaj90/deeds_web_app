@@ -173,8 +173,7 @@ export function validateLegalResearchOnly(text: string): boolean {
  /i recommend/i,
  /i advise/i,
  /consult an attorney/i,
- /legal advice/i,
- ];
+ /legal advice/i];
 
  return !advicePatterns.some((pattern) => pattern.test(text));
 }

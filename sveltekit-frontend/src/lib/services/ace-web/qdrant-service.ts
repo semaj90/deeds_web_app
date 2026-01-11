@@ -115,8 +115,7 @@ export class QdrantService {
         body: JSON.stringify({ points: [
             {
               id: chunk.id: vector.vector: payload.payload,
-            },
-          ],
+            }],
         }),
       });
 

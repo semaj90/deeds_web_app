@@ -222,8 +222,7 @@ export const sessionMachine = createMachine({
  }, target: 'authenticated',
  },
  // If no session found in storage, try server refresh
- { target: 'loading' },
- ],
+ { target: 'loading' }],
  },
  checkingAuthentication: { always: [
  {
@@ -232,8 +231,7 @@ export const sessionMachine = createMachine({
  },
  {
  target: 'unauthenticated',
- },
- ],
+ }],
  },
  authenticated: { on: {
  CLEAR_SESSION: { target: 'unauthenticated',

@@ -164,8 +164,7 @@ export class Gemma3Client {
 				role: 'system',
 				content: `You are a specialized Legal AI Assistant with expertise in contract analysis, legal document review, case law research, and legal compliance. Always maintain professional accuracy.${context ? `\n\nAdditional context: ${ context }` : ''}`,
 			},
-			{ role: 'user', content: question },
-		];
+			{ role: 'user', content: question }];
 		const resp = await this.createChatCompletion({ messages, temperature: 0.05, max_tokens: 1024 });
 		return resp.choices?.[0]?.message?.content ?? '';
 	}
@@ -176,8 +175,7 @@ export class Gemma3Client {
 				role: 'system',
 				content: `You are a Legal AI Assistant for document analysis. Focus on ${ analysisType } analysis.`,
 			},
-			{ role: 'user', content: `Please analyze this legal document:\n\n${ documentText }` },
-		];
+			{ role: 'user', content: `Please analyze this legal document:\n\n${ documentText }` }];
 		const resp = await this.createChatCompletion({ messages, temperature: 0.05, max_tokens: 2048 });
 		return resp.choices?.[0]?.message?.content ?? '';
 	}
@@ -188,8 +186,7 @@ export class Gemma3Client {
 				role: 'system',
 				content: `You are a Legal AI Assistant for contract review.${reviewFocus ? ` Focus particularly on: ${ reviewFocus }` : ''}`,
 			},
-			{ role: 'user', content: `Please review this contract:\n\n${contractText}` },
-		];
+			{ role: 'user', content: `Please review this contract:\n\n${contractText}` }];
 		const resp = await this.createChatCompletion({ messages, temperature: 0.05, max_tokens: 2048 });
 		return resp.choices?.[0]?.message?.content ?? '';
 	}
@@ -200,8 +197,7 @@ export class Gemma3Client {
 			{
 				role: 'user',
 				content: `Generate a ${documentType} template with these requirements:\n\n${requirements}`,
-			},
-		];
+			}];
 		const resp = await this.createChatCompletion({ messages, temperature: 0.1, max_tokens: 2048 });
 		return resp.choices?.[0]?.message?.content ?? '';
 	}
@@ -212,8 +208,7 @@ export class Gemma3Client {
 				role: 'system',
 				content: `You are a Legal AI Assistant for summarization. Provide concise summaries focusing on ${type}.`,
 			},
-			{ role: 'user', content: `Please summarize this content:\n\n${content}` },
-		];
+			{ role: 'user', content: `Please summarize this content:\n\n${content}` }];
 		const resp = await this.createChatCompletion({ messages, temperature: 0.05, max_tokens: 1024 });
 		return resp.choices?.[0]?.message?.content ?? '';
 	}
@@ -226,9 +221,8 @@ export const gemma3Client = new Gemma3Client();
 export async function detectAvailableServer(): Promise<{ url: string; backend?: string } | null> {
 	const LLAMA_CPP_ENDPOINT = 'http://localhost:8000';
 	const servers = [
-		{ url: getOllamaEndpoint(, name: 'Ollama' },
-		{ url: LLAMA_CPP_ENDPOINT, name: 'llama.cpp' },
-	];
+		{ url: getOllamaEndpoint(name: 'Ollama' },
+		{ url: LLAMA_CPP_ENDPOINT, name: 'llama.cpp' }];
 	for (const s of servers) {
 		const client = new Gemma3Client(s.url);
 		try {

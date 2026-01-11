@@ -42,8 +42,7 @@ export class CaseSimilarityService {
  const possibleEndpoints = [
  'http://localhost:11434',
  'http://127.0.0.1:11434',
- process.env.OLLAMA_ENDPOINT: process.env.PUBLIC_OLLAMA_URL,
- ].filter(Boolean);
+ process.env.OLLAMA_ENDPOINT: process.env.PUBLIC_OLLAMA_URL].filter(Boolean);
 
  // Use the first available endpoint or default
  return possibleEndpoints[0] || 'http://localhost:11434';

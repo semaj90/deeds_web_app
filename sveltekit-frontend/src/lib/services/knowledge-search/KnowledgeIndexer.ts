@@ -373,8 +373,7 @@ Summary:`;
                 id: qdrantId,
                 vector: embedding,
                 payload: { ...payload, docId: id },
-              },
-            ]
+              }]
           })
         }
       );

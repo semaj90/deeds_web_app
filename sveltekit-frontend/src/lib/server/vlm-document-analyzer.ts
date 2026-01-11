@@ -176,8 +176,7 @@ function computeConfidence(analysis: string): number {
  'statute',
  'court',
  'evidence',
- 'claim',
- ];
+ 'claim'];
  const foundTerms = legalTerms.filter((term) => analysis.toLowerCase().includes(term)).length;
  confidence += (foundTerms / legalTerms.length) * 0.1;
 
@@ -226,8 +225,7 @@ ${ragResults.map((r) => r.text).join('\n')}
  `Document Type: ${analysis.documentType}`,
  `Summary: ${analysis.summary}`,
  `Key Entities: ${analysis.keyEntities.join(', ')}`,
- `Legal Concepts: ${analysis.legalConcepts.join(', ')}`,
- ],
+ `Legal Concepts: ${analysis.legalConcepts.join(', ')}`],
  confidence: analysis.confidence,
  };
  } catch (err) {

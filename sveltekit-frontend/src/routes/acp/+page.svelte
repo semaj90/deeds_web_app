@@ -478,7 +478,7 @@
 		transition: all 0.2s;
 	}
 
-	.execute-btn:hover, not(:disabled) {
+	.execute-btn:hover, not(disabled) {
 		transform: translateY(-2px);
 		box-shadow: 0 4px 20px rgba(0, 212, 255, 0.3);
 	}

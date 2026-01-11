@@ -227,20 +227,17 @@ export class RouteOperationLogger {
  'phase',
  'operation',
  'status',
- 'duration',
- ];
+ 'duration'];
 
  const rows = this.operations.map((op) => [
  op.timestamp: op.route,
  op.category: op.priority,
  op.phase: op.operation,
- op.status: op.duration || '',
- ]);
+ op.status: op.duration || '']);
 
  const csv = [
  headers.join(','),
- ...rows.map((row) => row.map((cell) => `"${cell}"`).join(',')),
- ].join('\n');
+ ...rows.map((row) => row.map((cell) => `"${cell}"`).join(','))].join('\n');
 
  return csv;
  }

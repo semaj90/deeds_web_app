@@ -34,8 +34,7 @@ const ALLOWED_TYPES = [
  'image/png',
  'image/jpeg',
  'image/tiff',
- 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-];
+ 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
 
 /**
  * Validate file before upload

@@ -24,8 +24,7 @@ describe('ErrorBrainAPI', () => {
           line: 10, column: 5, message: 'Type error',
           type: 'typescript',
           severity: 'error',
-        },
-      ];
+        }];
 
       const result = await api.analyzeErrors(errors);
 
@@ -45,8 +44,7 @@ describe('ErrorBrainAPI', () => {
         {
           file: 'test.ts',
           // missing required fields
-        },
-      ] as unknown as AnalysisError[];
+        }] as unknown as AnalysisError[];
 
       const result = await api.analyzeErrors(invalidErrors);
 
@@ -62,8 +60,7 @@ describe('ErrorBrainAPI', () => {
           type: 'typescript',
           severity: 'error',
           code: 'TS2322',
-        },
-      ];
+        }];
 
       const result = await api.analyzeErrors(errors);
 
@@ -77,8 +74,7 @@ describe('ErrorBrainAPI', () => {
           line: 5, column: 2, message: 'Svelte error',
           type: 'svelte',
           severity: 'warning',
-        },
-      ];
+        }];
 
       const result = await api.analyzeErrors(errors);
 
@@ -98,8 +94,7 @@ describe('ErrorBrainAPI', () => {
           line: 20, column: 10, message: 'Error 2',
           type: 'typescript',
           severity: 'warning',
-        },
-      ];
+        }];
       const result = await api.analyzeErrors(errors);
 
       expect(result.success).toBe(true);
@@ -113,8 +108,7 @@ describe('ErrorBrainAPI', () => {
           line: 10, column: 5, message: 'Type error',
           type: 'typescript',
           severity: 'error',
-        },
-      ];
+        }];
 
       const result = await api.analyzeErrors(errors);
 
@@ -130,8 +124,7 @@ describe('ErrorBrainAPI', () => {
           line: 10, column: 5, message: 'Type error',
           type: 'invalid-type', // invalid type
           severity: 'error',
-        },
-      ] as unknown as AnalysisError[];
+        }] as unknown as AnalysisError[];
 
       const result = await api.analyzeErrors(invalidErrors);
 
@@ -145,8 +138,7 @@ describe('ErrorBrainAPI', () => {
           line: 10, column: 5, message: 'Type error',
           type: 'typescript',
           severity: 'invalid-severity', // invalid severity
-        },
-      ] as unknown as AnalysisError[];
+        }] as unknown as AnalysisError[];
 
       const result = await api.analyzeErrors(invalidErrors);
 
@@ -198,8 +190,7 @@ describe('ErrorBrainAPI', () => {
         'knowledge-base-learning',
         'audit-trail',
         'progress-tracking',
-        'ace-context',
-      ];
+        'ace-context'];
 
       for (const flag of expectedFlags) {
         expect(flag in status.features).toBe(true);
@@ -289,8 +280,7 @@ describe('ErrorBrainAPI', () => {
         'knowledge-base-learning',
         'audit-trail',
         'progress-tracking',
-        'ace-context',
-      ];
+        'ace-context'];
 
       for (const flag of expectedFlags) {
         expect(flag in result.features).toBe(true);
@@ -300,7 +290,7 @@ describe('ErrorBrainAPI', () => {
     it('should have boolean values for all flags', async () => {
       const result = await api.getFeatures();
 
-      for (const [, value] of Object.entries(result.features)) {
+      for (const [value] of Object.entries(result.features)) {
         expect(typeof value).toBe('boolean');
       }
     });
@@ -351,8 +341,7 @@ describe('ErrorBrainAPI', () => {
         'knowledge-base-learning',
         'audit-trail',
         'progress-tracking',
-        'ace-context',
-      ];
+        'ace-context'];
 
       for (const flag of validFlags) {
         const result = await api.setFeature(flag, true);
@@ -374,7 +363,7 @@ describe('ErrorBrainAPI', () => {
         fc.asyncProperty(
           fc.array(
             fc.record({
-              file: fc.string(, line: fc.integer({ min: 1, max: 10000 }, column: fc.integer({ min: 1, max: 1000 }, message: fc.string(, type: fc.constantFrom('typescript', 'svelte', severity: fc.constantFrom('error', 'warning'),
+              file: fc.string(line: fc.integer({ min: 1, max: 10000 }, column: fc.integer({ min: 1, max: 1000 }, message: fc.string(type: fc.constantFrom('typescript', 'svelte', severity: fc.constantFrom('error', 'warning'),
             }),
             { minLength: 1, maxLength: 10 }
           ),
@@ -501,8 +490,7 @@ describe('ErrorBrainAPI', () => {
           line: 10, column: 5, message: 'Type error',
           type: 'typescript',
           severity: 'error',
-        },
-      ];
+        }];
 
       const analysis = await api.analyzeErrors(errors);
       expect(analysis.success).toBe(true);

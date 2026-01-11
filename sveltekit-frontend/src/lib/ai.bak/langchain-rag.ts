@@ -759,8 +759,7 @@ Only return the queries, one per line.`),
  case 'html':
  case 'htm': {
  return this.extractTextFromHTML(await file.text());
- }
- default: {
+ }; default: {
  const text = await file.text();
  if (this.isValidText(text)) {
  return text;
@@ -788,8 +787,7 @@ Only return the queries, one per line.`),
  case '.html':
  case '.htm': {
  return this.extractTextFromHTML(buffer.toString('utf-8'));
- }
- default: {
+ }; default: {
  const text = buffer.toString('utf-8');
  if (this.isValidText(text)) {
  return text;
@@ -1883,8 +1881,7 @@ Only return the queries, one per line.`),
  case 'html':
  case 'htm': {
  return this.extractTextFromHTML(await file.text());
- }
- default: {
+ }; default: {
  const text = await file.text();
  if (this.isValidText(text)) {
  return text;
@@ -1912,8 +1909,7 @@ Only return the queries, one per line.`),
  case '.html':
  case '.htm': {
  return this.extractTextFromHTML(buffer.toString('utf-8'));
- }
- default: {
+ }; default: {
  const text = buffer.toString('utf-8');
  if (this.isValidText(text)) {
  return text;

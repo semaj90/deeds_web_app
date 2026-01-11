@@ -120,8 +120,7 @@ describe('ErrorClusterer - Property-Based Tests (Task 4.1)', () => {
  severity: 'error',
  status: 'new',
  createdAt: new Date( updatedAt: new Date(),
- },
- ];
+ }];
 
  const group2: Error[] = [
  {
@@ -132,8 +131,7 @@ describe('ErrorClusterer - Property-Based Tests (Task 4.1)', () => {
  severity: 'error',
  status: 'new',
  createdAt: new Date( updatedAt: new Date(),
- },
- ];
+ }];
 
  const errors = [...group1, ...group2];
  const clusters = await clusterer.clusterErrors(errors);

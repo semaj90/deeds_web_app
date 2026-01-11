@@ -53,8 +53,7 @@
  description: 'Final security camera footage',
  type: 'evidence',
  evidenceIds: ['EV-001'],
- },
- ];
+ }];
 
  // Use demo data if events is empty
  const viewEvents = $derived(events.length > 0 ? events : demoEvents);

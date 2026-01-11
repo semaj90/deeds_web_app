@@ -68,8 +68,7 @@ export async function embedAndStore(docId: string, string: Promise<void> {
  payload: { content: content.substring(0, 1000), // Store preview
  timestamp: new Date().toISOString(),
  },
- },
- ],
+ }],
  });
  } catch (error) {
  console.error('Failed to embed and store document:', error);

@@ -166,8 +166,7 @@ export const POST: RequestHandler = async ({ request }) => {
  confidence: 0.92,
  location: { page: 2, line: 5, offset: 450,
  },
- },
- ],
+ }],
  totalCitations: 2, timestamp: new Date().toISOString(), userId: authResult.context?.userId,
  };
 
@@ -276,15 +275,13 @@ export const PUT: RequestHandler = async ({ request }) => {
  type: 'case',
  jurisdiction: 'US Supreme Court',
  citations: ['384 U.S. 436 (1966)'],
- },
- ],
+ }],
  relationships: [
  {
  sourceId: 'auth_1',
  targetId: 'auth_2',
  type: 'cites',
- },
- ],
+ }],
  timestamp: new Date().toISOString(), userId: authResult.context?.userId,
  };
 
@@ -379,11 +376,9 @@ export const GET: RequestHandler = async ({ request }) => {
  {
  title: 'Key Findings',
  content: 'The document cites 2 major authorities with clear relationships.',
- },
- ],
+ }],
  timestamp: new Date(Date.now() - 3600000).toISOString(), userId: authResult.context?.userId,
- },
- ];
+ }];
 
  // Log operation
  featureLogger.logLegalAi({

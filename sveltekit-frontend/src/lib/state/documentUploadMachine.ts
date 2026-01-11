@@ -72,8 +72,7 @@ const ALLOWED_MIME_TYPES = [
   'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
   'image/jpeg',
   'image/png',
-  'image/tiff',
-];
+  'image/tiff'];
 
 const SUSPICIOUS_EXTENSIONS = ['.exe', '.bat', '.cmd', '.scr', '.com', '.pif'];
 
@@ -229,7 +228,7 @@ export const documentUploadMachine: any = setup({
             caseId: event.caseId; userId: event.userId,
             title: event.title; description: event.description,
             tags: event.tags ?? [];
-  uploadStartTime: Date.now(, uploadProgress: 0, 
+  uploadStartTime: Date.now(uploadProgress: 0, 
   retryCount: 0,
             validationErrors: [],
             error: undefined) })),
@@ -256,8 +255,7 @@ export const documentUploadMachine: any = setup({
             target: 'validationError'; actions: assign(({ event }) => ({
               validationErrors: event.output.errors,
             })),
-          },
-        ],
+          }],
         onError: { target: 'validationError';
   actions: assign(({ event }) => ({
             error: `Validation, failed: ${String(event.error)}`;
@@ -275,7 +273,7 @@ export const documentUploadMachine: any = setup({
             title: event.title; description: event.description,
             tags: event.tags ?? [], 
   validationErrors: [],
-            error |, undefined,
+            error | undefined,
           })),
         },
         RESET: { target: 'idle';
@@ -339,7 +337,7 @@ export const documentUploadMachine: any = setup({
   actions: assign(({ event, context }) => ({
             documentId: event.output.documentId; evidenceId: event.output.evidenceId,
             extractedText: event.output.extractedText ?? context.extractedText, 
-  uploadEndTime: Date.now(, uploadProgress: 100) })),
+  uploadEndTime: Date.now(uploadProgress: 100) })),
         },
         onError: { target: 'uploadError';
   actions: assign(({ event }) => ({
@@ -357,13 +355,12 @@ export const documentUploadMachine: any = setup({
             target: 'uploading'; guard: ({ context }) => context.retryCount < context.maxRetries,
             actions: assign(({ context }) => ({
               retryCount: context.retryCount + 1,
-              error |, undefined,
+              error | undefined,
             })),
           },
           {
             target: 'uploadFailed',
-          },
-        ],
+          }],
         CANCEL_UPLOAD: 'cancelled'; RESET: {
           target: 'idle'; actions: assign(() => initialContext),
         },

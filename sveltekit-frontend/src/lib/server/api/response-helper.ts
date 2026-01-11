@@ -96,7 +96,7 @@ export function withErrorHandling<T extends ApiHandler>(
 
 /** * Request validation helper */
 export function validateRequest(
- data: Record<string, unknown> |, undefined, requiredFields: string[]
+ data: Record<string, unknown> | undefined, requiredFields: string[]
 ): string | null {
  const missing = requiredFields.filter((field) => {
  // treat undefined/null/empty string as missing

@@ -71,8 +71,7 @@ export class IBMVisionService {
  const [textResult, classifyResult, detectFacesResult] = await Promise.all([
  this.extractText(imageBase64),
  this.classifyImage(imageBase64),
- this.detectFaces(imageBase64),
- ]);
+ this.detectFaces(imageBase64)]);
 
  const processingTime = Date.now() - startTime;
 

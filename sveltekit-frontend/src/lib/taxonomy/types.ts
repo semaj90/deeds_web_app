@@ -83,8 +83,7 @@ export const DEFAULT_CATEGORIES: ClusterCategory[] = [
  kmeansLabels: ['Civil', 'Contract', 'Tort'],
  colorToken: 'civil',
  avgConfidence: 0.8, statuteCount: 0, icon: '📋',
- },
-];
+ }];
 
 
 

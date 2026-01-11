@@ -12,8 +12,7 @@
  'Establishing Connection to Command Center...',
  'Activating Detective Support System...',
  'AI Assistant 9S Online...',
- 'Investigation Interface Ready.',
- ];
+ 'Investigation Interface Ready.'];
  // Boot sequence simulation
  setTimeout(() => {
  const bootInterval = setInterval(() => {

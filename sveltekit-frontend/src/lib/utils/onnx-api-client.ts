@@ -136,10 +136,8 @@ export class ONNXApiClient {
  this.batchProcess([
  { id: 'task1', type: 'extract-entities', text: testData.contractText },
  { id: 'task2', type: 'classify-document', text: testData.courtDecision },
- { id: 'task3', type: 'generate-embeddings', text: testData.legalBrief },
- ]),
- },
- ];
+ { id: 'task3', type: 'generate-embeddings', text: testData.legalBrief }]),
+ }];
 
  const results: Array<any> = [];
  let successCount = 0;

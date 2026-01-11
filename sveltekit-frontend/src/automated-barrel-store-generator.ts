@@ -403,7 +403,7 @@ export class AutomatedBarrelStoreGenerator {
 
     const fileMatch = errorLine.match(/^([^:]+):(\d+):(\d+):/);
     if (fileMatch) {
-      const [, fileName] = fileMatch;
+      const [fileName] = fileMatch;
       if (!analysis.errorsByFile.has(fileName)) analysis.errorsByFile.set(fileName, []);
       analysis.errorsByFile.get(fileName)!.push(errorLine);
     }

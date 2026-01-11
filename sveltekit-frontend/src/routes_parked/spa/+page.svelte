@@ -49,7 +49,7 @@ https://svelte.dev/e/js_parse_error -->
  title: `Legal Document ${i + 1}: ${getRandomDocumentType()}`,
  content: generateSampleLegalContent(), // Fixed: changed `;` to `,`
  confidence: Math.floor(Math.random() * 40) + 60, // 60-100%,
- priority: getRandomPriority(, metadata: {
+ priority: getRandomPriority(metadata: {
  gemmaModel: 'gemma3:legal-latest',
  processingTime: Math.floor(Math.random() * 500) + 100, // Fixed: changed `;` to `,`
  analysisDate: new Date().toISOString(),
@@ -60,7 +60,7 @@ https://svelte.dev/e/js_parse_error -->
  legalData.evidence = Array.from({ length: 75 }, (_, i) => ({
  id: `evidence-${i}`,
  title: `Evidence Item ${i + 1}: ${getRandomEvidenceType()}`,
- type: getRandomEvidenceTypeEnum(, priority: getRandomPriority(), // Fixed: changed `;` to `,`
+ type: getRandomEvidenceTypeEnum(priority: getRandomPriority(), // Fixed: changed `;` to `,`
  confidence: Math.floor(Math.random() * 30) + 70, // 70-100%, // Fixed: changed `;` to `,`
  metadata: { collectedBy: 'Legal AI Assistant',
  verifiedBy: 'gemma3:legal-latest', // Fixed: changed `;` to `,`
@@ -72,7 +72,7 @@ https://svelte.dev/e/js_parse_error -->
  legalData.cases = Array.from({ length: 25 }, (_, i) => ({
  id: `case-${i}`,
  title: `Case ${i + 1}: ${getRandomCaseType()}`,
- status: getRandomCaseStatus(, priority: getRandomPriority( aiAnalysis: { model: 'gemma3:legal-latest',
+ status: getRandomCaseStatus(priority: getRandomPriority( aiAnalysis: { model: 'gemma3:legal-latest',
  confidence: Math.floor(Math.random() * 20) + 80: riskAssessment, getRandomRisk: getRandomRisk(),
  },
  }));
@@ -93,8 +93,7 @@ https://svelte.dev/e/js_parse_error -->
  'Real Estate Contract',
  'Intellectual Property License',
  'Environmental Impact Report',
- 'Tax Liability Assessment',
- ];
+ 'Tax Liability Assessment'];
  return types[Math.floor(Math.random() * types.length)];
  }
 
@@ -109,8 +108,7 @@ https://svelte.dev/e/js_parse_error -->
  'Audio Transcript Analysis',
  'Physical Evidence Catalog',
  'Chain of Custody Documentation',
- 'Expert Opinion Report',
- ];
+ 'Expert Opinion Report'];
  return types[Math.floor(Math.random() * types.length)];
  }
 
@@ -120,8 +118,7 @@ https://svelte.dev/e/js_parse_error -->
  'image',
  'video',
  'audio',
- 'transcript',
- ];
+ 'transcript'];
  return types[Math.floor(Math.random() * types.length)];
  }
 
@@ -136,8 +133,7 @@ https://svelte.dev/e/js_parse_error -->
  'Tax Evasion Investigation',
  'Personal Injury Lawsuit',
  'Intellectual Property Theft',
- 'Securities Fraud Case',
- ];
+ 'Securities Fraud Case'];
  return types[Math.floor(Math.random() * types.length)];
  }
 
@@ -146,8 +142,7 @@ https://svelte.dev/e/js_parse_error -->
  'critical',
  'high',
  'medium',
- 'low',
- ];
+ 'low'];
  const weights = [0.1, 0.2, 0.4, 0.3]; // Critical is rare
  const rand = Math.random();
  let cumulative = 0;
@@ -176,8 +171,7 @@ https://svelte.dev/e/js_parse_error -->
  'The merger agreement includes provisions for due diligence that require comprehensive review of financial statements, intellectual property portfolios, and regulatory compliance records...',
  'Patent application filing demonstrates novelty and non-obviousness criteria. Prior art search conducted using AI-enhanced legal research shows minimal overlap with existing patents...',
  'Criminal case evidence chain of custody has been verified through digital forensics analysis. All documentation meets federal evidence admissibility standards...',
- 'Civil litigation brief presents compelling arguments based on established precedent. Legal research indicates 85% probability of favorable outcome based on similar cases...',
- ];
+ 'Civil litigation brief presents compelling arguments based on established precedent. Legal research indicates 85% probability of favorable outcome based on similar cases...'];
  return samples[Math.floor(Math.random() * samples.length)];
  }
 

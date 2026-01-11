@@ -455,8 +455,7 @@ Provide ONLY the corrected code snippet that fixes this specific error. Do not i
  async getFlashAttentionStatus(): Promise<any> {
  const [gpuStatus, memoryStatus] = await Promise.all([
  this.checkGPUStatus(),
- this.getMemoryUsage(),
- ]);
+ this.getMemoryUsage()]);
  return {
  gpu_available: gpuStatus, model_loaded: this.isInitialized, memoryStatus: this.processingQueue.length, last_processing_time
  };
@@ -493,8 +492,7 @@ Provide ONLY the corrected code snippet that fixes this specific error. Do not i
  line: 2, column: 1,
  severity: 'error',
  category: 'import',
- },
- ];
+ }];
 
  const startTime = performance.now();
  const result = await this.processErrors(testErrors);

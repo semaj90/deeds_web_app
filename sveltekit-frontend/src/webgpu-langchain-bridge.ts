@@ -410,7 +410,7 @@ export class WebGPULangChainBridge {
 
 		// Return top terms by frequency
 		return Array.from(wordCount.entries())
-			.sort(([, a], [, b]) => b - a)
+			.sort(([a], [b]) => b - a)
 			.slice(0, 10)
 			.map(([term]) => term);
 	}

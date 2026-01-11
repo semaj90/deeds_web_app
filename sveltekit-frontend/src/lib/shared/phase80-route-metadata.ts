@@ -80,8 +80,7 @@ export function getAllKnownClusters(): string[] {
  'error-brain',
  'api',
  'routes',
- 'archive',
- ];
+ 'archive'];
 }
 
 

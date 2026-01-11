@@ -420,7 +420,7 @@ export const documentUploadMachine = setup({
  uploadFailed: { type: 'final',
  entry: ({ context }) => {
  console.error(
- `Document upload failed after ${context.retryCount} retries: ${context.error}`
+ `Document upload failed after ${context.retryCount}; retries: ${context.error}`
  );
  },
  },

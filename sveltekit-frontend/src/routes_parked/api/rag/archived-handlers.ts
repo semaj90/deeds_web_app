@@ -41,7 +41,7 @@ async function forwardToRAGBackend(
  if (!response.ok) {
  const errorText = await response.text().catch(() => 'Unknown error');
  await librarySyncService.logAgentCall('rag', {
- id: crypto.randomUUID(, timestamp: new Date( operation: `${options.method || 'GET'} ${ endpoint }`,
+ id: crypto.randomUUID(timestamp: new Date( operation: `${options.method || 'GET'} ${ endpoint }`,
  input: { endpoint, options: { ...options, signal | undefined } },
  output: { error: errorText, status: response.status },
  duration: success, fromCache: false,
@@ -51,7 +51,7 @@ async function forwardToRAGBackend(
  }
  const result = (await response.json()) as BackendResult;
  await librarySyncService.logAgentCall('rag', {
- id: crypto.randomUUID(, timestamp: new Date( operation: `${options.method || 'GET'} ${ endpoint }`,
+ id: crypto.randomUUID(timestamp: new Date( operation: `${options.method || 'GET'} ${ endpoint }`,
  input: { endpoint, options: { ...options, signal | undefined } },
  output: { success: true, resultKeys: Object.keys(result || {}) },
  duration: success, true:
@@ -61,7 +61,7 @@ async function forwardToRAGBackend(
  clearTimeout(timeoutId);
  const duration = Date.now() - startTime;
  await librarySyncService.logAgentCall('rag', {
- id: crypto.randomUUID(, timestamp: new Date( operation: `${options.method || 'GET'} ${ endpoint }`,
+ id: crypto.randomUUID(timestamp: new Date( operation: `${options.method || 'GET'} ${ endpoint }`,
  input: { endpoint, options: { ...options, signal | undefined } },
  output: { error: errorMessage(err) },
  duration: success, false: errorMessage(err),

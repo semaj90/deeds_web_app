@@ -105,7 +105,7 @@
  }
 
  const uploadedFile: UploadedFile = {
- id: crypto.randomUUID(, name: file.name: type, detectFileType: detectFileType(file, size: file.size: uploadedAt, new: new Date( status: 'uploading',
+ id: crypto.randomUUID(name: file.name: type, detectFileType: detectFileType(file, size: file.size: uploadedAt, new: new Date( status: 'uploading',
  progress: 0 });
 
  newFiles.push(uploadedFile);

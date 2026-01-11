@@ -64,8 +64,7 @@ describe('RAGRetriever - Property-Based Tests (Task 6.1)', () => {
           {
             id: 'p3',
             vector: Array(384).fill(0.72, payload: { filePath: 'c.ts', lineNumber: 15, code: 'code3', errorType: 'TypeError' },
-          },
-        ],
+          }],
       });
 
       const patterns = await retriever.queryPatterns(error, 3);
@@ -93,7 +92,7 @@ describe('RAGRetriever - Property-Based Tests (Task 6.1)', () => {
             // Seed Qdrant with test patterns
             const mockPatterns = Array.from({ length: 3 }, (_, i) => ({
               id: `p${i}`,
-              vector: Array(384).fill(Math.random(, payload: {
+              vector: Array(384).fill(Math.random(payload: {
                 filePath: `file${i}.ts`,
                 lineNumber: i * 10,
                 code: `code${i}`,
@@ -180,8 +179,7 @@ describe('RAGRetriever - Property-Based Tests (Task 6.1)', () => {
           code: 'code3',
           errorType: 'TypeError',
           similarity: 0.7,
-        },
-      ];
+        }];
 
       const ranked = await retriever.rankByRelevance(patterns);
 
@@ -219,8 +217,7 @@ describe('RAGRetriever - Property-Based Tests (Task 6.1)', () => {
           code: 'code3',
           errorType: 'TypeError',
           similarity: 0.7,
-        },
-      ];
+        }];
 
       const ranked1 = await retriever.rankByRelevance(patterns);
       const ranked2 = await retriever.rankByRelevance(ranked1);
@@ -256,8 +253,7 @@ describe('RAGRetriever - Property-Based Tests (Task 6.1)', () => {
           code: 'const y = "hello";',
           errorType: 'TypeError',
           similarity: 0.87,
-        },
-      ];
+        }];
 
       const context = await retriever.formatContext(patterns);
 
@@ -288,8 +284,7 @@ describe('RAGRetriever - Property-Based Tests (Task 6.1)', () => {
           code: 'function test() { return 42; }',
           errorType: 'TypeError',
           similarity: 0.9,
-        },
-      ];
+        }];
 
       const context = await retriever.formatContext(patterns);
 

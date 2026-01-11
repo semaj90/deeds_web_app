@@ -27,8 +27,7 @@ export const load: PageServerLoad = async ({ locals }) => {
  description: 'AI-assisted document review and summarization',
  icon: 'document',
  status: 'active',
- },
- ],
+ }],
  };
 };
 

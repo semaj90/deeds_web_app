@@ -68,8 +68,7 @@ describe('RAG System Integration Tests', () => {
   points: [
   {
   id: testChunkId, vector: testVector, payload, testPayload,
-  },
-  ],
+  }],
   wait: true,
   });
   
@@ -198,8 +197,7 @@ describe('RAG System Integration Tests', () => {
  'Case involving 18 U.S.C. § 1512 witness tampering',
  'People v. Smith (1996) precedent case',
  'Violation of Penal Code § 187 murder statute',
- 'Multiple citations: 42 U.S.C. § 1983, PC § 211, Jones v. State (2020)',
- ];
+ 'Multiple citations: 42 U.S.C. § 1983, PC § 211, Jones v. State (2020)'];
 
  // Extract tags from multiple texts rapidly
  for (let i = 0; i < iterations; i++) {

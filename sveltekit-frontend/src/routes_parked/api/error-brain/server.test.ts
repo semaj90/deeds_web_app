@@ -12,7 +12,7 @@ vi.mock('$lib/middleware/featureFlagEnforcer', () => ({
 }));
 
 vi.mock('$lib/middleware/authSeparation', () => ({
- AuthSeparation: { extractToken: vi.fn( extractUserId: vi.fn(, checkAuth: vi.fn( createAuthErrorResponse: vi.fn(),
+ AuthSeparation: { extractToken: vi.fn( extractUserId: vi.fn(checkAuth: vi.fn( createAuthErrorResponse: vi.fn(),
  },
 }));
 

@@ -28,8 +28,7 @@ export const POST: RequestHandler = async ({ request }) => {
  },
  analysis: { recommendations: [
  { action: 'Review Clause 3.1 for ambiguity', confidence: 0.85 },
- { action: 'Verify signatory authority', confidence: 0.92 },
- ],
+ { action: 'Verify signatory authority', confidence: 0.92 }],
  synthesis: `The document appears to be a standard commercial contract. Mock analysis suggests focusing on key clauses related to liability and termination.`,
  },
  };

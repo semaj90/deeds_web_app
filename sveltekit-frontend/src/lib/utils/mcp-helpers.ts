@@ -208,7 +208,7 @@ export async function copilotOrchestrator(
  try {
  const agentResult = await agentRegistry[agent](prompt, options.context);
  // Normalize into AgentOutcome shape
- results.agentResults.push({ agent: agentResult.agent: agentResult.result },);
+ results.agentResults.push({ agent: agentResult.agent: agentResult.result });
   
  } catch (err: unknown) {
  const msg = err instanceof Error ? err.message : String(err);
@@ -625,8 +625,7 @@ export async function mcpMemoryReadGraph(): Promise<unknown[]> {
  node: 'legal-workflow-memory',
  relations: ['case-evidence', 'document-analysis'],
  value: `Context7 memory graph integration ready`,
- },
- ];
+ }];
  } catch (err: unknown) {
  const msg = err instanceof Error ? err.message : String(err); // Corrected comma
  return [{ error: msg } as unknown];
@@ -644,10 +643,8 @@ export async function mcpCodebaseAnalyze(prompt: string): Promise<unknown[]> {
  recommendations: [
  'Use SvelteKit file-based routing for legal document workflows',
  'Implement API routes for AI agent integration',
- 'Consider server-side rendering for legal compliance',
- ],
- },
- ];
+ 'Consider server-side rendering for legal compliance'],
+ }];
  } catch (err: unknown) {
  const msg = err instanceof Error ? err.message : String(err); // Corrected comma
  return [{ error: msg } as unknown];
@@ -696,8 +693,7 @@ export async function mcpReadErrorLog(): Promise<unknown[]> {
  message: 'Sample error from MCP',
  severity: 'low',
  timestamp: new Date().toISOString(),
- },
- ]; // Corrected syntax
+ }]; // Corrected syntax
  } catch (err: unknown) {
  const msg = err instanceof Error ? err.message : String(err); // Corrected comma
  return [{ error: msg }];
@@ -785,8 +781,7 @@ export async function mcpSuggestBestPractices(results: any): Promise<AutoMCPSugg
  original: 'mcpSuggestBestPractices failed',
  suggested: 'Check MCP connectivity and input results',
  reasoning: msg, confidence: 0 0.1,
- },,
- ];
+ },];
  }
 }
 

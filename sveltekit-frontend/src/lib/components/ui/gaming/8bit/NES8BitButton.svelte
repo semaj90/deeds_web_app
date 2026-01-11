@@ -95,7 +95,7 @@
  -moz-osx-font-smoothing: unset;
  }
 
- button: active, not(:disabled) {
+ button: active, not(disabled) {
  transform: translate(2px, 2px);
  box-shadow: none;
  }

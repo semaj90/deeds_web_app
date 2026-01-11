@@ -41,8 +41,7 @@ export function validateEvent(data: unknown): data is ProcessingEvent {
  'percent',
  'eta',
  'details',
- 'timestamp',
- ];
+ 'timestamp'];
  for (const field of requiredFields) {
  if (!(field in event)) {
  console.warn(`[Adapter] Missing required field: ${field}`);

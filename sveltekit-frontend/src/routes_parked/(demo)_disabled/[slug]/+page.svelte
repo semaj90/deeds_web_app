@@ -66,58 +66,58 @@
 	});
 
 	const demoMetadata = {
-		webgpu: {, title: 'WebGPU Cache Optimizer',
+		webgpu: {title: 'WebGPU Cache Optimizer',
 			description: 'Hardware-accelerated cache optimization with WebGPU.',
 			tags: ['WebGPU', 'Cache', 'Performance']
 		},
-		'cuda-streaming': {, title: 'CUDA OCR & Tensor Processing',
+		'cuda-streaming': {title: 'CUDA OCR & Tensor Processing',
 			description: 'Real-time GPU-accelerated document OCR and tensor operations.',
 			tags: ['CUDA', 'OCR', 'GPU']
 		},
-		'ai-assistant': {, title: 'Enhanced RAG AI Assistant',
+		'ai-assistant': {title: 'Enhanced RAG AI Assistant',
 			description: 'Retrieval-Augmented Generation for legal research.',
 			tags: ['RAG', 'AI', 'Legal']
 		},
-		'evidence-canvas': {, title: 'Evidence Board Canvas',
+		'evidence-canvas': {title: 'Evidence Board Canvas',
 			description: 'Interactive evidence organization and visualization.',
 			tags: ['Evidence', 'Canvas', 'Visualization']
 		},
-		'legal-research': {, title: 'Legal AI Pipeline',
+		'legal-research': {title: 'Legal AI Pipeline',
 			description: 'End-to-end legal document processing pipeline.',
 			tags: ['Pipeline', 'Legal', 'AI']
 		},
-		'vector-search': {, title: 'Vector Intelligence Search',
+		'vector-search': {title: 'Vector Intelligence Search',
 			description: 'Semantic search using vector embeddings and SIMD.',
 			tags: ['Vector', 'Search', 'SIMD']
 		},
-		'gaming-ui': {, title: 'Gaming Cache Demo',
+		'gaming-ui': {title: 'Gaming Cache Demo',
 			description: 'YoRHa-inspired caching system with Redis integration.',
 			tags: ['Cache', 'Gaming', 'Redis']
 		},
-		performance: {, title: 'Cache Performance Dashboard',
+		performance: {title: 'Cache Performance Dashboard',
 			description: 'Real-time cache performance monitoring and optimization.',
 			tags: ['Performance', 'Cache', 'Monitoring']
 		},
-		'neural-topology': {, title: 'Neural Topology 3D Visualization',
+		'neural-topology': {title: 'Neural Topology 3D Visualization',
 			description: '3D visualization of neural network topology.',
 			tags: ['3D', 'Neural', 'Visualization']
 		},
-		'simd-ai': {, title: 'SIMD AI Assistant',
+		'simd-ai': {title: 'SIMD AI Assistant',
 			description: 'CPU-optimized AI assistant using SIMD instructions.',
 			tags: ['SIMD', 'AI', 'Performance']
 		},
-		'realtime-comm': {, title: 'Real-time Communication',
+		'realtime-comm': {title: 'Real-time Communication',
 			description: 'WebSocket-based real-time AI communication.',
 			tags: ['WebSocket', 'Real-time', 'Communication']
 		},
-		'autonomous-eng': {, title: 'Autonomous Engineering Copilot',
+		'autonomous-eng': {title: 'Autonomous Engineering Copilot',
 			description: 'AI-powered autonomous code generation and engineering.',
 			tags: ['Copilot', 'Autonomous', 'Engineering']
 		}
 	} satisfies Record<
 		string,
 		{
-			title: string;, description: string;
+			title: string; description: string;
 			tags: string[];
 		}
 	>;
@@ -201,7 +201,7 @@
 
 	.demo-breadcrumb {
 		display: flex;
-		align-items: center;, gap: 0.5rem;
+		align-items: center; gap: 0.5rem;
 		font-size: 0.9rem; color: var(--nier-text-muted);
 		margin-bottom: 1rem;
 	}
@@ -235,13 +235,13 @@
 	}
 
 	.demo-tags {
-		display: flex;, gap: 0.5rem;
+		display: flex; gap: 0.5rem;
 		flex-wrap: wrap;
 	}
 
 	.demo-tag {
 		padding: 0.25rem 0.75rem;
-		background: var(--nier-bg-tertiary);, border: 1px solid var(--nier-border-muted);
+		background: var(--nier-bg-tertiary); border: 1px solid var(--nier-border-muted);
 		border-radius: 4px;
 		font-size: 0.8rem; color: var(--nier-text-secondary);
 	}
@@ -257,8 +257,8 @@
 		display: flex;
 		flex-direction: column;
 		align-items: center;
-		justify-content: center;, padding: 4rem 2rem;
-		text-align: center;, background: var(--nier-bg-secondary);
+		justify-content: center; padding: 4rem 2rem;
+		text-align: center; background: var(--nier-bg-secondary);
 		border: 1px solid var(--nier-border-muted);
 		border-radius: 8px;
 	}
@@ -283,13 +283,13 @@
 	}
 
 	.error-actions {
-		display: flex;, gap: 1rem;
+		display: flex; gap: 1rem;
 		margin-top: 1.5rem;
 	}
 
 	button {
 		padding: 0.5rem 1.5rem;
-		background: var(--nier-accent-warm);, color: white;
+		background: var(--nier-accent-warm); color: white;
 		border: none;
 		border-radius: 4px; cursor: pointer;
 		font-weight: 500;
@@ -302,7 +302,7 @@
 	a {
 		padding: 0.5rem 1.5rem;
 		color: var(--nier-text-primary);
-		text-decoration: none;, border: 1px solid var(--nier-border-muted);
+		text-decoration: none; border: 1px solid var(--nier-border-muted);
 		border-radius: 4px;
 	}
 

@@ -324,8 +324,7 @@ describe('AuthSeparation', () => {
  const requests = [
  new Request('http://localhost/api/error-brain/analyze'),
  new Request('http://localhost/api/error-brain/patch'),
- new Request('http://localhost/api/error-brain/history'),
- ];
+ new Request('http://localhost/api/error-brain/history')];
 
  requests.forEach((request) => {
  const result = AuthSeparation.checkAuth(request);

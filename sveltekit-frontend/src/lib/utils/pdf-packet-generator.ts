@@ -183,8 +183,7 @@ export async function generateCaseSummaryPDF(
  type: 'summary',
  metadata: { createdAt: new Date().toISOString(), author: generatedBy,
  },
- },
- ],
+ }],
  generatedAt: new Date().toISOString(),
  generatedBy,
  };

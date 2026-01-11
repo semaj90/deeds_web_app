@@ -54,8 +54,7 @@ export const GET: RequestHandler = async () => {
  { name: 'Move /demo/* to archive', done: archivedRoutes > 0 },
  { name: 'Move /test/* to archive', done: archivedRoutes > 50 },
  { name: 'Move /game/* to archive', done: archivedRoutes > 100 },
- { name: 'Clean up duplicates', done: false },
- ],
+ { name: 'Clean up duplicates', done: false }],
  },
  {
  week: 2,
@@ -66,8 +65,7 @@ export const GET: RequestHandler = async () => {
  { name: 'Create /api/v2/ structure', done: migratedAPIs > 0 },
  { name: 'Migrate auth endpoints', done: migratedAPIs > 5 },
  { name: 'Migrate AI endpoints', done: migratedAPIs > 10 },
- { name: 'Update frontend calls', done: false },
- ],
+ { name: 'Update frontend calls', done: false }],
  },
  {
  week: 3,
@@ -79,8 +77,7 @@ export const GET: RequestHandler = async () => {
  { name: 'Integration tests', done: false },
  { name: 'Security audit', done: false },
  { name: 'Load testing', done: false },
- { name: 'Fix identified issues', done: false },
- ],
+ { name: 'Fix identified issues', done: false }],
  },
  {
  week: 4,
@@ -92,10 +89,8 @@ export const GET: RequestHandler = async () => {
  { name: 'Final code review', done: false },
  { name: 'Performance optimization', done: false },
  { name: 'Deploy to staging', done: false },
- { name: 'Deploy to production', done: false },
- ],
- },
- ],
+ { name: 'Deploy to production', done: false }],
+ }],
  };
 
  return json(status);

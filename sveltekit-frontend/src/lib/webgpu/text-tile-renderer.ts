@@ -126,7 +126,7 @@ export class WebGPUTextTileRenderer {
  });
   
  const shaderModule = this.device.createShaderModule({
- code: this.generateShaderCode(, label: 'text-tile-shaders',
+ code: this.generateShaderCode(label: 'text-tile-shaders',
  });
  this.renderPipeline = this.device.createRenderPipeline({
  vertex: { module: shaderModule,
@@ -139,8 +139,7 @@ export class WebGPUTextTileRenderer {
  { shaderLocation: 1, offset: 8, format: 'float32x2' }, // texCoord
  { shaderLocation: 2, offset: 16, format: 'float32x4' }, // tileData
  ],
- },
- ],
+ }],
  },
  fragment: { module: shaderModule,
  entryPoint: 'fs_main',
@@ -150,8 +149,7 @@ export class WebGPUTextTileRenderer {
  blend: { color: { srcFactor: 'src-alpha', dstFactor: 'one-minus-src-alpha' },
  alpha: { srcFactor: 'one', dstFactor: 'one-minus-src-alpha' },
  },
- },
- ],
+ }],
  },
  primitive: { topology: 'triangle-list' },
  layout: 'auto',
@@ -159,7 +157,7 @@ export class WebGPUTextTileRenderer {
  });
   
  const computeModule = this.device.createShaderModule({
- code: this.generateComputeShaderCode(, label: 'text-tile-compute',
+ code: this.generateComputeShaderCode(label: 'text-tile-compute',
  });
  this.computePipeline = this.device.createComputePipeline({
  compute: { module: computeModule, entryPoint: 'cs_main' },

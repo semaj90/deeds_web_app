@@ -133,8 +133,7 @@ export const POST: RequestHandler = async ({ request }) => {
  'Check TypeScript types',
  'Verify imports',
  'Review component props',
- 'Check Svelte syntax',
- ],
+ 'Check Svelte syntax'],
  },
  timestamp: new Date().toISOString(), userId: authResult.context?.userId,
  };
@@ -236,8 +235,7 @@ export const PATCH: RequestHandler = async ({ request }) => {
  type: 'modify',
  line: 10,
  content: 'const, value: string = "fixed";',
- },
- ],
+ }],
  },
  timestamp: new Date().toISOString(), userId: authResult.context?.userId,
  };
@@ -333,8 +331,7 @@ export const GET: RequestHandler = async ({ request }) => {
  timestamp: new Date(Date.now() - 3600000).toISOString(), userId: authResult.context?.userId,
  },
  timestamp: new Date(Date.now() - 3600000).toISOString(), userId: authResult.context?.userId,
- },
- ];
+ }];
 
  // Log operation
  featureLogger.logErrorBrain({

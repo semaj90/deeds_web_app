@@ -252,8 +252,7 @@ export class GPUMarkdownScanner {
  layout: this.pipelines.get('headings')!.getBindGroupLayout(0, entries: [
  { binding: 0, resource: { buffer: textBuffer } },
  { binding: 1, resource: { buffer: headingPositionsBuffer } },
- { binding: 2, resource: { buffer: headingLevelsBuffer } },
- ],
+ { binding: 2, resource: { buffer: headingLevelsBuffer } }],
  })
  );
  headingPass.dispatchWorkgroups(Math.ceil(textArray.length / 256));
@@ -269,8 +268,7 @@ export class GPUMarkdownScanner {
  this.device!.createBindGroup({
  layout: this.pipelines.get('sections')!.getBindGroupLayout(0, entries: [
  { binding: 0, resource: { buffer: textBuffer } },
- { binding: 1, resource: { buffer: sectionMarkersBuffer } },
- ],
+ { binding: 1, resource: { buffer: sectionMarkersBuffer } }],
  })
  );
  sectionPass.dispatchWorkgroups(Math.ceil(textArray.length / 256));
@@ -357,8 +355,7 @@ export class GPUMarkdownProcessor {
  await Promise.all([
  this.scanner.initialize(),
  this.tokenizer.initialize(),
- this.embedder.initialize(),
- ]);
+ this.embedder.initialize()]);
  this.gpuAvailable = true;
  console.log('✅ GPU Markdown Processor initialized with WebGPU');
  } catch (error) {
@@ -581,8 +578,7 @@ export class GPUMarkdownProcessor {
  // Simple section creation based on headings and legal sections
  const allMarkers = [
  ...headings.map((h) => ({ ...h, type: 'heading' as const })),
- ...sections.map((s) => ({ ...s, type: s.type as any })),
- ];
+ ...sections.map((s) => ({ ...s, type: s.type as any }))];
 
  allMarkers.sort((a, b) => a.position - b.position);
 

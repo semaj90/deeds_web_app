@@ -64,8 +64,7 @@ export class WebGPUSimilarityEngine {
  {
  binding: 3, visibility: GPUShaderStage.COMPUTE,
  buffer: { type: 'storage' },
- },
- ],
+ }],
  });
   
  const shaderModule = this.device.createShaderModule({
@@ -146,8 +145,7 @@ export class WebGPUSimilarityEngine {
  { binding: 0, resource: { buffer: queryBuffer } },
  { binding: 1, resource: { buffer: docsBuffer } },
  { binding: 2, resource: { buffer: scaleOffsetBuffer } },
- { binding: 3, resource: { buffer: outputBuffer } },
- ],
+ { binding: 3, resource: { buffer: outputBuffer } }],
  });
   
  const commandEncoder = this.device.createCommandEncoder();

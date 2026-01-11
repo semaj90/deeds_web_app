@@ -57,8 +57,7 @@ export async function analyzeContradictions(
 
  const factContradictions = [
  ...compareFacts(factClusters),
- ...(timeline.length ? timelineCrosscheck(factClusters) : []),
- ];
+ ...(timeline.length ? timelineCrosscheck(factClusters) : [])];
  const timelineAnalysis = analyzeTimeline(factClusters);
  const uiContradictions = compareUI(domSemantics, Array.from(specMap.values()));
 

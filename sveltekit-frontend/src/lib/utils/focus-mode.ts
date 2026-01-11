@@ -201,8 +201,7 @@ export class FocusManager {
  '[contenteditable="true"]',
  'textarea',
  'input[type="text"]',
- '.writing-area',
- ];
+ '.writing-area'];
  const isContentElement = contentSelectors.some(
  (selector) => element.matches(selector) || element.closest(selector)
  );

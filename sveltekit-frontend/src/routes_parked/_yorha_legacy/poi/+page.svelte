@@ -62,8 +62,7 @@
  summary: 'Unidentified individual seen with Chen multiple times. Facial recognition pending.',
  lastSeen: '2024-12-03, 22:10',
  connections: 2, verified: false
- },
- ];
+ }];
 
  let filteredPersons = $derived(persons.filter(p => {
  if (filterRole !== 'all' && p.role !== filterRole) return false;

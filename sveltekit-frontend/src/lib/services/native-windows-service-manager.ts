@@ -81,8 +81,7 @@ export class NativeWindowsServiceManager {
  'node -e "require(\'./src/lib/services/flashattention-gpu-error-processor.ts\').flashAttentionProcessor.initialize()"',
  port: 8095,
  status: 'stopped',
- },
- ];
+ }];
  for (const service of serviceDefinitions) {
  this.services.set(service.name, service);
  }
@@ -104,7 +103,7 @@ export class NativeWindowsServiceManager {
 
  private async detectRunningServices(): Promise<void> {
  console.log('🔍 Detecting running services...');
- for (const [, service] of this.services) {
+ for (const [service] of this.services) {
  try {
  const isRunning = await this.checkServiceStatus(service);
  if (isRunning) {
@@ -204,8 +203,7 @@ export class NativeWindowsServiceManager {
  'enhanced-rag-service',
  'upload-service',
  'gpu-error-processor',
- 'legal-ai-frontend',
- ];
+ 'legal-ai-frontend'];
  for (const serviceName of serviceOrder) {
  try {
  const success = await this.startService(serviceName);
@@ -269,7 +267,7 @@ export class NativeWindowsServiceManager {
  const endTime = performance.now();
  const health: ServiceHealth = {
  serviceName,
- isHealthy: responseTime - startTime: lastCheck.now(, errorCount: isHealthy ? 0 : 1,
+ isHealthy: responseTime - startTime: lastCheck.now(errorCount: isHealthy ? 0 : 1,
  };
  healthResults.push(health);
  if (!isHealthy && service.status === 'running') {
@@ -361,8 +359,7 @@ export class NativeWindowsServiceManager {
  'postgresql-service',
  'redis-service',
  'ollama-service',
- 'enhanced-rag-service',
- ];
+ 'enhanced-rag-service'];
  for (const serviceName of criticalServices) {
  try {
  const success = await this.startService(serviceName);

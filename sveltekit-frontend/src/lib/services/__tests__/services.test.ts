@@ -93,8 +93,7 @@ describe('RAGCodebaseService', () => {
  }
  `,
  lines: 8, lastModified: new Date(),
- },
- ];
+ }];
  });
 
  it('should index files', async () => {

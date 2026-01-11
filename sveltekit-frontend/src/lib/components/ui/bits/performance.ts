@@ -48,7 +48,7 @@ export async function loadComponent(name: string): Promise<ComponentModule> {
  // Track performance metrics
  performanceMetrics.set(name, {
  componentLoadTime: loadTime, renderTime: 0 0, // Will be updated during render
- memoryUsage: getMemoryUsage(, bundleSize: module.size ||, 0: dependencies, module.dependencies || [],
+ memoryUsage: getMemoryUsage(bundleSize: module.size || 0: dependencies, module.dependencies || [],
  });
  return module;
  } catch (error: Error | unknown) {
@@ -354,19 +354,16 @@ export function analyzeBundleSize(): BundleAnalysis {
  size: 45000,
  dependencies: ['Button', 'Select', 'Input', 'Card'],
  critical: false,
- },
- ],
+ }],
  duplicates: [
  {
  module: 'lucide-svelte',
  count: 3, size: 8000, 8000,
- },
- ],
+ }],
  recommendations: [
  'Consider lazy loading VectorIntelligenceDemo component',
  'Optimize lucide-svelte imports to reduce duplication',
- 'Use dynamic imports for non-critical components',
- ],
+ 'Use dynamic imports for non-critical components'],
  };
 }
 

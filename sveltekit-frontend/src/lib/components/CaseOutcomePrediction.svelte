@@ -748,7 +748,7 @@ Factors Considered: ${pred.metadata.factors_considered.join(', ')}
 		color: white;
 	}
 
-	.primary-button:hover, not(:disabled) {
+	.primary-button:hover, not(disabled) {
 		transform: translateY(-2px);
 		box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
 	}

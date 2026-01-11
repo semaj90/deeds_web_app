@@ -50,8 +50,7 @@
  timeAgo: '1 day ago',
  priority: 'medium',
  status: 'pending',
- },
- ]);
+ }]);
  let systemStatus = $state ([
  { message: 'System backup completed successfully', time: '10 minutes ago', type: 'success' },
  {
@@ -63,8 +62,7 @@
  message: 'New facial recognition matches found',
  time: '2 hours ago',
  type: 'success',
- },
- ]);
+ }]);
 
  let showNewCaseModal = $state (false);
  let newCaseData = $state ({

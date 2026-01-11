@@ -27,8 +27,7 @@ export const canvasAutosaves = pgTable(
 	(table) => ([
 		index('canvas_autosaves_canvas_id_idx').on(table.canvasId),
 		index('canvas_autosaves_canvas_created_idx').on(table.canvasId, table.createdAt),
-		index('canvas_autosaves_user_id_idx').on(table.userId),
-	])
+		index('canvas_autosaves_user_id_idx').on(table.userId)])
 );
 
 

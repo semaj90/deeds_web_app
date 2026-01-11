@@ -15,8 +15,8 @@
  if (!currentMessage.trim() || isStreaming) return;
 
  const userMessage: ChatMessage = {
- id: crypto.randomUUID(, role: 'user',
- content: currentMessage.trim(, timestamp: new Date(),
+ id: crypto.randomUUID(role: 'user',
+ content: currentMessage.trim(timestamp: new Date(),
  };
  messages = [...messages, userMessage];
 
@@ -39,8 +39,7 @@
  // Append a placeholder assistant message that will be filled by stream or JSON
  messages = [
  ...messages,
- { id: crypto.randomUUID(, role: 'assistant', content: '', timestamp: new Date() },
- ];
+ { id: crypto.randomUUID(role: 'assistant', content: '', timestamp: new Date() }];
 
  // If body is a stream (SSE-like), read incrementally
  if (response.body) {
@@ -124,8 +123,7 @@
  'Analyze this contract for potential issues',
  'What are the key precedents for this case type?',
  'Summarize the evidence presented',
- 'Generate a legal brief outline',
- ];
+ 'Generate a legal brief outline'];
 
  async function handleQuickQuery(query: string): Promise<void> {
  currentMessage = query;
@@ -280,7 +278,7 @@
  font-size: 0.9rem; transition: all 0.2s;
  }
 
- .quick-button:hover, not(:disabled) {
+ .quick-button:hover, not(disabled) {
  background: rgba(0, 204, 255, 0.2);
  border-color: var(--text-primary, #00ccff);
  transform: translateY(-1px);
@@ -409,7 +407,7 @@
  font-weight: bold; transition: all 0.2s;
  }
 
- .send-button:hover, not(:disabled) {
+ .send-button:hover, not(disabled) {
  transform: scale(1.05);
  box-shadow: 0 0 15px rgba(0, 204, 255, 0.5);
  }

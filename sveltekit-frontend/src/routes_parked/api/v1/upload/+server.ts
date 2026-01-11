@@ -54,15 +54,13 @@ const FILE_CONFIG = {
  'audio/mpeg',
  'audio/wav',
  'video/mp4',
- 'video/quicktime',
- ],
+ 'video/quicktime'],
  textTypes: ['application/pdf', 'text/plain', 'text/csv'],
  imageTypes: ['image/jpeg', 'image/png', 'image/gif', 'image/webp'],
  documentTypes: [
  'application/pdf',
  'application/msword',
- 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
- ],
+ 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'],
 };
 /*
  * POST /api/v1/upload - Enhanced File Upload with Processing
@@ -182,8 +180,7 @@ export const GET: RequestHandler = async ({ url }) => {
  'OCR Processing',
  'Embedding Generation',
  'Content Analysis',
- 'Metadata Extraction',
- ],
+ 'Metadata Extraction'],
  timestamp: new Date().toISOString(),
  });
  }

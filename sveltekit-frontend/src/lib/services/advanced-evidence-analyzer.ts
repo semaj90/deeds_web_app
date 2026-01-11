@@ -425,7 +425,7 @@ class AdvancedEvidenceAnalyzer {
 		dates: string[]; confidence: number;
 	} {
 		const partyMatches = text.match(/\b[A-Z][a-z]+(?:\s+[A-Z][a-z]+){0,2}\b/g) ?? [];
-		const amountMatches = text.match(/\b\$?\d+(?:,\d{3})*(?:\.\d{2})?\b/g) ?? [];
+		const amountMatches = text.match(/\b\$?\d+(?: \d{3})*(?:\.\d{2})?\b/g) ?? [];
 		const dateMatches =
 			text.match(/\b\d{1,2}[/-]\d{1,2}[/-]\d{2,4}\b|\b\w+\s+\d{1,2},?\s+\d{4}\b/g) ?? [];
 		const locationMatches =
@@ -452,7 +452,7 @@ class AdvancedEvidenceAnalyzer {
 		};
 
 		const matched = Object.entries(patterns)
-			.filter(([, regex]) => regex.test(text))
+			.filter(([regex]) => regex.test(text))
 			.map(([label]) => label);
 
 		const warnings: string[] = [];

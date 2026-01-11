@@ -204,7 +204,7 @@
  transition: background-color 0.2s;
  }
 
- .upload-button:hover, not(:disabled) {
+ .upload-button:hover, not(disabled) {
  background-color: #0052a3;
  }
 

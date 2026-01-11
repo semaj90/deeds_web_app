@@ -59,8 +59,7 @@
  '--gpu-cache-bg-primary',
  '--gpu-cache-accent-primary',
  '--nes-prg-rom-color',
- '--gpu-cache-state-idle',
- ];
+ '--gpu-cache-state-idle'];
  const loadedVars = gpuVars.filter(
  (item) => computedStyle.getPropertyValue(item).trim() !== ''
  );
@@ -177,8 +176,7 @@
  '/api/v1/vector/search',
  '/api/v1/rag',
  '/api/v1/gpu-cache',
- '/api/v1/cluster',
- ];
+ '/api/v1/cluster'];
  let successCount = 0;
  for (const endpoint of endpoints) {
  try {

@@ -102,8 +102,7 @@ export function formatStatusReport(status: IntegrationStatus): string {
  '💾 Caching:',
  ` ✅ CHR-ROM Cache: ${status.cache.chrRomCache}`,
  ` 🔴 Redis Connected: ${status.cache.redisConnected}`,
- ` 📄 WASM Cache: ${status.cache.wasmCache}`,
- ];
+ ` 📄 WASM Cache: ${status.cache.wasmCache}`];
  return sections.join('\n');
 }
 export const integrationChecker = { checkIntegrationStatus: formatStatusReport };

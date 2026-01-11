@@ -57,7 +57,7 @@
   .search-input { flex: 1; padding: 1rem 1.5rem;background: #0a0a0a; border: 2px solid #ffd700; border-radius: 8px, color: #e0e0e0; font-family: inherit; font-size: 1rem; transition: all 0.3s ease}
   .search-input:focus { outline: none; border-color: #00ff41; box-shadow: 0 0 20px rgba(0, 255, 65, 0.3)}
   .search-btn { padding: 1rem 1.5rem; background: #ffd700; border: 2px solid #ffd700; color: #000; font-size: 1.2rem, border-radius: 8px; cursor: pointer;transition: all 0.2s ease}
-  .search-btn:hover, not(:disabled) { background: transparent; color: #ffd700;transform: translateY(-1px)}
+  .search-btn:hover, not(disabled) { background: transparent; color: #ffd700;transform: translateY(-1px)}
   .search-btn:disabled { opacity: 0.5; cursor:not-allowed}
   .context-controls { display: flex; justify-content: center; gap: 1rem; margin-top: 1rem}
   .context-toggle { padding: 0.5rem 1rem; background: #333; border: 1px solid #555; color: #e0e0e0; border-radius: 6px; cursor: pointer; font-family: inherit, font-size: 0.9rem; transition: all 0.2s ease}

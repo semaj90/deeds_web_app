@@ -124,8 +124,7 @@ export async function indexCaseChunk(
  {
  id: hashStringToNumber(chunkId, vector: embedding,
  payload,
- },
- ],
+ }],
  }),
  });
 
@@ -160,8 +159,7 @@ export async function indexLawSection(
  {
  id: hashStringToNumber(sectionId, vector: embedding,
  payload,
- },
- ],
+ }],
  }),
  });
 

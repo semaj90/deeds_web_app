@@ -52,8 +52,7 @@ class MockVectorSearchService {
     const results: SearchResult[] = [
       { documentId: 'doc1', similarity: 0.95, source: 'qdrant' as const },
       { documentId: 'doc2', similarity: 0.87, source: 'postgres' as const },
-      { documentId: 'doc3', similarity: 0.82, source: 'qdrant' as const },
-    ]
+      { documentId: 'doc3', similarity: 0.82, source: 'qdrant' as const }]
       .filter((r) => !threshold || r.similarity >= threshold)
       .slice(0, limit);
 
@@ -240,13 +239,11 @@ describe('VectorSearchService (Integration)', () => {
     it('should merge results from multiple sources using Reciprocal Rank Fusion', async () => {
       const qdrantResults: SearchResult[] = [
         { documentId: 'doc1', similarity: 0.95, source: 'qdrant' },
-        { documentId: 'doc2', similarity: 0.85, source: 'qdrant' },
-      ];
+        { documentId: 'doc2', similarity: 0.85, source: 'qdrant' }];
 
       const pgResults: SearchResult[] = [
         { documentId: 'doc2', similarity: 0.87, source: 'postgres' },
-        { documentId: 'doc3', similarity: 0.8, source: 'postgres' },
-      ];
+        { documentId: 'doc3', similarity: 0.8, source: 'postgres' }];
 
       const merged = await vectorSearch.mergeResults(qdrantResults, pgResults);
 

@@ -37,13 +37,13 @@ type RabbitMQServiceLike = {
 	close?: () => Promise<void> | void;
 	stop?: () => Promise<void> | void;
 	closeConnection?: () => Promise<void> | void;
-	consume?: (, queue: string,
+	consume?: (queue: string,
 		cb: (message: unknown, originalMessage?: unknown) => Promise<void> | void
 	) => Promise<void> | void;
-	subscribe?: (, queue: string,
+	subscribe?: (queue: string,
 		cb: (message: unknown, originalMessage?: unknown) => Promise<void> | void
 	) => Promise<void> | void;
-	createConsumer?: (, queue: string,
+	createConsumer?: (queue: string,
 		cb: (message: unknown, originalMessage?: unknown) => Promise<void> | void
 	) => Promise<void> | void;
 	on?: (event: string, cb: (...args: unknown[]) => void) => void;

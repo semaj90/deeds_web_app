@@ -155,7 +155,7 @@ class UniversalASTParser {
     let match;
 
     while ((match = importRegex.exec(content)) !== null) {
-      const [, defaultImport, namedImports, namespaceImport, source] = match;
+      const [defaultImport, namedImports, namespaceImport, source] = match;
       const specifiers: string[] = [];
       let type: ImportInfo['type'] = 'side-effect';
 
@@ -191,7 +191,7 @@ class UniversalASTParser {
     // Extract exports
     const exportRegex = /export\s+(?:(default)\s+)?(?:(const|let|var|function|class|interface|type)\s+)?(\w+)/g;
     while ((match = exportRegex.exec(content)) !== null) {
-      const [, isDefault, kind, name] = match;
+      const [isDefault, kind, name] = match;
       const line = content.slice(0, match.index).split('\n').length;
 
       fileAST.exports.push({

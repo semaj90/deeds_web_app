@@ -55,7 +55,7 @@
         padding: 20px; border: 1px solid #ccc;
         border-radius: 8px; height: 500px;
         overflow-y: auto; display: flex;
-        flex-direction: column;, gap: 10px;
+        flex-direction: column; gap: 10px;
     }
     .message {
         padding: 10px;
@@ -72,20 +72,20 @@
     }
     .loading-indicator {
         align-self: center;
-        font-style: italic;, color: #888;
+        font-style: italic; color: #888;
     }
     form {
         max-width: 800px; margin: 20px auto;
-        display: flex;, gap: 10px;
+        display: flex; gap: 10px;
     }
     input {
-        flex: 1;, padding: 10px;
+        flex: 1; padding: 10px;
         border: 1px solid #ccc;
         border-radius: 4px;
     }
     button {
         padding: 10px 20px;
-        background-color: #007bff;, color: white;
+        background-color: #007bff; color: white;
         border: none;
         border-radius: 4px; cursor: pointer;
     }

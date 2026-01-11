@@ -137,8 +137,7 @@ describe('AceContextService', () => {
       expect(mockQdrantService.search).toHaveBeenCalledWith({
         vector: expect.any(Array, limit: 40, scoreThreshold: 0.15, filter: expect.objectContaining({ must: expect.arrayContaining([
             expect.objectContaining({ key: 'domain' }),
-            expect.objectContaining({ key: 'tags' }),
-          ]),
+            expect.objectContaining({ key: 'tags' })]),
         }),
       });
     });
@@ -168,8 +167,7 @@ describe('AceContextService', () => {
               fetchedAt: new Date(Date.now() - 40 * 24 * 60 * 60 * 1000).toISOString(), // 40 days ago
               domain: 'example.com',
             },
-          },
-        ],
+          }],
         entities: [],
         edges: [],
         summary: 'Test',
@@ -194,8 +192,7 @@ describe('AceContextService', () => {
             metadata: { url: 'https://example.com',
               fetchedAt: new Date().toISOString(), domain: 'example.com',
             },
-          },
-        ],
+          }],
         entities: [],
         edges: [],
         summary: 'Test',
@@ -253,8 +250,7 @@ describe('AceContextService', () => {
               fetchedAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(), // 5 days ago
               domain: 'example.com',
             },
-          },
-        ],
+          }],
         entities: [],
         edges: [],
         summary: 'Good context',
@@ -281,8 +277,7 @@ describe('AceContextService', () => {
             },
             scoring: { cosine: 0.85, freshness: 1.0, graph: 0.5,
             },
-          },
-        ],
+          }],
         entities: [{ entity: 'Svelte 5', type: 'TECH', docId: 'doc-1' }],
         edges: [{ src: 'Svelte 5', rel: 'USES', dst: 'Runes', weight: 0.9 }],
         summary: 'Found 1 relevant chunk',
@@ -323,8 +318,7 @@ describe('AceContextService', () => {
             },
             scoring: { cosine: 0.80, freshness: 1.0, graph: 0.5,
             },
-          },
-        ],
+          }],
         entities: [],
         edges: [],
         summary: 'Test',
@@ -360,8 +354,7 @@ describe('AceContextService', () => {
             tool: 'web_search',
             params: { query: 'test' },
             reason: 'No context found',
-          },
-        ],
+          }],
         shouldProceed: false,
       };
 

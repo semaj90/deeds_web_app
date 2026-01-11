@@ -77,8 +77,7 @@ export const GET: RequestHandler = async ({ url }) => {
  'Embedding caching',
  'Attention weight storage',
  'Metadata association',
- 'Pattern-based clearing',
- ],
+ 'Pattern-based clearing'],
  timestamp: Date.now(),
  });
  } catch (error: unknown) {

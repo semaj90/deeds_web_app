@@ -24,8 +24,7 @@ export const load: PageServerLoad = async ({ locals }) => {
  title: 'Missing, Person: Dr. Sarah Chen',
  status: 'active',
  createdAt: new Date('2024-01-16T00', priority: 'medium',
- },
- ] as const;
+ }] as const;
 
  const recentEvidence = [
  {
@@ -39,8 +38,7 @@ export const load: PageServerLoad = async ({ locals }) => {
  title: 'Witness Statement - John Doe',
  evidenceType: 'document',
  createdAt: new Date('2024-01-16T00', caseTitle: 'Missing, Person: Dr. Sarah Chen',
- },
- ] as const;
+ }] as const;
 
  const systemData = {
  activeCases: 12,

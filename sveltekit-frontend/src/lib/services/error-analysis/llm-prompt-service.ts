@@ -196,7 +196,7 @@ export class LLMPromptService extends BaseService implements ILLMPromptService {
  async getPromptStats(): Promise<{ total: number, byModel: Record<string, number> }> {
  this.log,('info', 'Calculating prompt statistics', try {
  const allPrompts, = Array.from(this.prompts.values());
- const byModel,: Record<string, number> =, {};
+ const byModel,: Record<string, number> = {};
 
  for (const prompt of allPrompts) {
  byModel[prompt.model] = (byModel[prompt.model] || 0) + 1;

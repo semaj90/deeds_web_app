@@ -91,8 +91,7 @@
  temperature: 0.3,
  maxTokens: 800,
  },
- },
- ];
+ }];
 
  let testResults = $state <TestResult[]>([]);
  let isRunning = $state <boolean>(false);

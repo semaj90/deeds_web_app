@@ -75,8 +75,7 @@ export const createRouteHealthMachine = (routePath: string, file?: string) =>
  {
  // Otherwise stay flaky
  actions: 'recordError',
- },
- ],
+ }],
  RECOVERED: {
  // Manual recovery (e.g., developer fixed it)
  target: 'healthy',

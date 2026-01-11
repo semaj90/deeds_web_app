@@ -78,8 +78,7 @@ export const GET: RequestHandler = async ({ url }) => {
  'State Machine Management',
  'Actor Coordination',
  'Workflow Orchestration',
- 'Real-time State Updates',
- ],
+ 'Real-time State Updates'],
  supported_events: [
  'PROMPT',
  'SEMANTIC_SEARCH',
@@ -90,8 +89,7 @@ export const GET: RequestHandler = async ({ url }) => {
  'TRANSITION',
  'COMPLETE',
  'ERROR',
- 'RESET',
- ],
+ 'RESET'],
  version: '1.0.0',
  });
  } catch (err: unknown) {

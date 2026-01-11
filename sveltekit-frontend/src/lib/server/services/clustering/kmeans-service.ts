@@ -270,8 +270,7 @@ export async function generateClusterLabels(
  'Procedural Rules',
  'Evidence Rules',
  'Civil Matters',
- 'Administrative Law',
- ];
+ 'Administrative Law'];
 
  for (let i = 0; i < clusters.length; i++) {
  labels.set(i, defaultLabels[i] || `Category ${i + 1}`);

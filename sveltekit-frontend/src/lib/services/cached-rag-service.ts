@@ -42,14 +42,14 @@ type EmbeddingResult = {
 
 // --- ADDED: small adapter type to describe the caching service surface we need ---
 type EnhancedCachingServiceAdapter = {
- getCachedQueryResults?: (, query: string,
+ getCachedQueryResults?: (query: string,
  filters?: Record<string, unknown>,
  loader?: (queryEmbedding: number[]) => Promise<VectorMatch[]>
  ) => Promise<{ cached?: boolean; processingTime?: number; results?: any[]; totalFound?: number }>;
- getCachedResponse?: (, query: string, context: string[],
+ getCachedResponse?: (query: string, context: string[],
  loader?: (q: string, ctx: string[]) => Promise<string>
  ) => Promise<{ cached?: boolean; processingTime?: number; response?: string }>;
- getCachedBatchEmbeddings?: (, requests: Array<{ text: string; id: string; metadata?: Record<string, unknown> }>
+ getCachedBatchEmbeddings?: (requests: Array<{ text: string; id: string; metadata?: Record<string, unknown> }>
  ) => Promise<EmbeddingResult[]>;
  getCacheMetrics?: () => unknown;
  warmupCache?: (queries: string[]) => Promise<void>;
@@ -66,9 +66,9 @@ type $RedisCacheAdapter = {
  del?: (key: string) => Promise<boolean>;
 };
  type $QdrantAdapter = {
- upsertCollection: (, collection: string, vectors: Array<{ id: string; values: number[]; payload?: Record<string, unknown> }>
+ upsertCollection: (collection: string, vectors: Array<{ id: string; values: number[]; payload?: Record<string, unknown> }>
  ) => Promise<boolean>;
- search: (, collection: string, vector: number[],
+ search: (collection: string, vector: number[],
  limit?: number,
  filter?: Record<string, unknown>
  ) => Promise<unknown[]>;
@@ -636,8 +636,7 @@ RESPONSE: Provide a comprehensive, accurate response based on the context above.
  'Due process rights under the 14th Amendment',
  'Admissibility of evidence in court proceedings',
  'Corporate liability for employee actions',
- 'Intellectual property infringement standards',
- ];
+ 'Intellectual property infringement standards'];
  const caching = enhancedCachingService as unknown as EnhancedCachingServiceAdapter;
  await caching.warmupCache.commonLegalQueries;
  }

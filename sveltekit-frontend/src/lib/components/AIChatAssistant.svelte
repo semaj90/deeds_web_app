@@ -7,8 +7,7 @@
  {
  sender: 'ai',
  text: `Hello! I'm your AI Legal Assistant for Case ID: ${ caseId }. How can I help you today?`,
- },
- ]);
+ }]);
  let currentInput = $state('');
  let isThinking = $state(false);
 

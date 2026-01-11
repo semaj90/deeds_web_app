@@ -19,7 +19,7 @@ export class NESCacheOrchestrator { private $1 AdvancedCacheManager, private bas
      const $1 NESCacheState = { $1 componentKey, $1 'yorha-component', $1 cacheEntry, $1 2, $1 size, $1 Date,.now,({\n  now() {
      this.updateNESAccessTime({\n  updateNESAccessTime() {
      const $1 NESCacheState = { $1 animationKey, $1 'gpu-animation', $1 animationData, $1 3, $1 size, $1 Date,.now,({\n  now() {
-     const $1 NESCacheState = { $1 shaderKey, $1 'webgpu-shader', $1 shaderData, $1 4, $1 cacheEntry,.$1, lastAccessed, |, Date.now,({\n  now() {
+     const $1 NESCacheState = { $1 shaderKey, $1 'webgpu-shader', $1 shaderData, $1 4, $1 cacheEntry,.$1, lastAccessed, | Date.now,({\n  now() {
      console.error({\n  error() {
      this.updateNESAccessTime({\n  updateNESAccessTime() {
      state.gpuBuffers.forEach({\n  forEach() {

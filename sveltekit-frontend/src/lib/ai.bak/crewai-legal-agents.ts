@@ -118,7 +118,7 @@ export class CrewAILegalReviewSystem {
  if (result.status === 'fulfilled') {
  responses.push(result.value);
  } else {
- console.error(`Agent ${assignedAgents[index]} failed:`, result.reason);
+ console.error(`Agent ${assignedAgents[index]}; failed:`, result.reason);
  responses.push({
  agentId: assignedAgents[index],
  taskId: task.taskId,

@@ -140,8 +140,7 @@ export class WebGPUAIEngine {
  this.init(),
  new Promise((_r, reject) =>
  setTimeout(() => reject(new Error('WebGPU init timeout')), timeoutMs)
- ),
- ]);
+ )]);
  return this.isReady();
  } catch (e) {
  return false;
@@ -303,8 +302,7 @@ export class WebGPUAIEngine {
  { binding: 0, visibility: GPUShaderStage.COMPUTE, buffer: { type: 'read-only-storage' } },
  { binding: 1, visibility: GPUShaderStage.COMPUTE, buffer: { type: 'read-only-storage' } },
  { binding: 2, visibility: GPUShaderStage.COMPUTE, buffer: { type: 'storage' } },
- { binding: 3, visibility: GPUShaderStage.COMPUTE, buffer: { type: 'uniform' } },
- ],
+ { binding: 3, visibility: GPUShaderStage.COMPUTE, buffer: { type: 'uniform' } }],
  });
  pipeline = device.createComputePipeline({
  layout: device.createPipelineLayout({ bindGroupLayouts: [bindGroupLayout] }, compute: { module: shaderModule, entryPoint: 'kernelAttention' },
@@ -348,8 +346,7 @@ export class WebGPUAIEngine {
  { binding: 0, resource: { buffer: inputBuffer } },
  { binding: 1, resource: { buffer: attentionBuffer } },
  { binding: 2, resource: { buffer: outputBuffer } },
- { binding: 3, resource: { buffer: paramsBuffer } },
- ],
+ { binding: 3, resource: { buffer: paramsBuffer } }],
  });
   
  const commandEncoder = device.createCommandEncoder();
@@ -380,8 +377,7 @@ export class WebGPUAIEngine {
  'Increase kernel size for better attention coverage',
  'Try different attention weight patterns',
  'Use batch processing for multiple arrays',
- 'Enable caching for repeated computations',
- ],
+ 'Enable caching for repeated computations'],
  };
  }
  /**
@@ -440,8 +436,7 @@ export class WebGPUAIEngine {
  { binding: 2, resource: { buffer: weightsBuffer } }, // Reuse for demo
  { binding: 3, resource: { buffer: weightsBuffer } }, // Reuse for demo
  { binding: 4, resource: { buffer: outputBuffer } },
- { binding: 5, resource: { buffer: paramsBuffer } },
- ],
+ { binding: 5, resource: { buffer: paramsBuffer } }],
  });
   
  const commandEncoder = device.createCommandEncoder();
@@ -474,8 +469,7 @@ export class WebGPUAIEngine {
  'Use larger models for better quality',
  'Implement proper weight loading',
  'Add layer normalization',
- 'Enable mixed precision for speed',
- ],
+ 'Enable mixed precision for speed'],
  };
  }
  /**
@@ -498,22 +492,19 @@ export class WebGPUAIEngine {
  `${ context } with kernel attention?`,
  `${ context } using T5 transformer?`,
  `${ context } with WebGPU acceleration?`,
- `${ context } with modular switching?`,
- ],
+ `${ context } with modular switching?`],
  othersSearched: [
  'kernel splicing attention',
  'dimensional array optimization',
  'T5 model fine-tuning',
  'WebGPU compute shaders',
- 'modular AI experiences',
- ],
+ 'modular AI experiences'],
  cuttingEdge: [
  'Neural architecture search with attention',
  'Hybrid CPU-GPU computation graphs',
  'Real-time model switching',
  'Adaptive kernel sizing',
- 'Self-optimizing attention weights',
- ],
+ 'Self-optimizing attention weights'],
  };
  }
  /**
@@ -587,8 +578,7 @@ export class WebGPUAIEngine {
  'Use larger workgroup sizes for better GPU utilization',
  'Implement shader caching for repeated operations',
  'Consider batching multiple computations',
- 'Use memory pools to reduce allocation overhead',
- ],
+ 'Use memory pools to reduce allocation overhead'],
  };
  }
 }

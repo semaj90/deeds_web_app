@@ -264,8 +264,7 @@ export class KnowledgeBase {
  }> {
  const [similarErrors, suggestedPatches], = await Promise,.all,([
  this.searchSimilarErrors(context, { limit: 5 }),
- this.searchSimilarPatches(context, { limit: 3 }),
- ]);
+ this.searchSimilarPatches(context, { limit: 3 })]);
 
  // Calculate confidence based on results
  let confidence, = 0;
@@ -298,8 +297,7 @@ export class KnowledgeBase {
 						COUNT(*) as total,
 						COUNT(*) FILTER (WHERE successful = true) as successful
 					FROM patch_knowledge
-				`),
- ]);
+				`)]);
 
  const patternsRow, = patternsResult.rows[0] as any;
  const patchesRow, = patchesResult.rows[0] as any;

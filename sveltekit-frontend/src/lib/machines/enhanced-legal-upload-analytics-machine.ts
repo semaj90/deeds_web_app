@@ -287,8 +287,7 @@ export async function performAIAnalysisService({
  actor: input.context.authSession?.userId || 'system',
  action: 'uploaded',
  details: `Uploaded via legal AI system with ${result.confidence ?? 'unknown'}% confidence`,
- },
- ],
+ }],
  },
  } as UploadResult;
  });
@@ -306,13 +305,11 @@ export async function performAIAnalysisService({
  type: 'date',
  value: new Date().toDateString(),
  confidence: 0.8, startPos: 0, endPos: 0,
- },
- ],
+ }],
  suggestedTags: [
  'legal_document',
  'evidence',
- input.context.legalContext?.practiceArea || 'general',
- ],
+ input.context.legalContext?.practiceArea || 'general'],
  confidenceScore: 0.7, privileged: file.name.toLowerCase().includes('privileged'),
  evidenceType: file.type.includes('pdf') ? 'document' : 'media',
  },
@@ -327,8 +324,7 @@ export async function performAIAnalysisService({
  actor: input.context.authSession?.userId || 'anonymous',
  action: 'uploaded',
  details: `Uploaded via fallback system`,
- },
- ],
+ }],
  },
  }));
  }
@@ -521,8 +517,7 @@ export const comprehensiveUploadAnalyticsMachine = createMachine(
  onError: { target: 'generatingPrompts',
  actions: assign({ errors: ({ context, event }) => [
  ...context.errors,
- `User analysis failed: ${event.error}`,
- ],
+ `User analysis failed: ${event.error}`],
  }),
  },
  },
@@ -545,8 +540,7 @@ export const comprehensiveUploadAnalyticsMachine = createMachine(
  {
  x: event.x, y: event.y, timestamp: Date.now(),
  element: event.element, legalContext: event.legalContext,
- },
- ],
+ }],
  },
  }),
  }),
@@ -576,8 +570,7 @@ export const comprehensiveUploadAnalyticsMachine = createMachine(
  onError: { target: 'waitingForUpload',
  actions: assign({ errors: ({ context, event }) => [
  ...context.errors,
- `Prompt generation failed: ${event.error}`,
- ],
+ `Prompt generation failed: ${event.error}`],
  }),
  },
  },
@@ -600,15 +593,13 @@ export const comprehensiveUploadAnalyticsMachine = createMachine(
  onDone: { target: 'waitingForUpload',
  actions: assign({ contextualPrompts: ({ context, event }) => [
  ...context.contextualPrompts,
- ...event.output,
- ],
+ ...event.output],
  }),
  },
  onError: { target: 'waitingForUpload',
  actions: assign({ errors: ({ context, event }) => [
  ...context.errors,
- `Additional prompt generation failed: ${event.error}`,
- ],
+ `Additional prompt generation failed: ${event.error}`],
  }),
  },
  },
@@ -669,8 +660,7 @@ export const comprehensiveUploadAnalyticsMachine = createMachine(
  onError: { target: '../error',
  actions: assign({ errors: ({ context, event }) => [
  ...context.errors,
- `AI analysis failed: ${event.error}`,
- ],
+ `AI analysis failed: ${event.error}`],
  pipeline: ({ context }) => ({
  ...context.pipeline,
  aiAnalysis: { status: 'failed', progress: 0 },
@@ -732,8 +722,7 @@ export const comprehensiveUploadAnalyticsMachine = createMachine(
  onError: { target: '../error',
  actions: assign({ errors: ({ context, event }) => [
  ...context.errors,
- `Database save failed: ${event.error}`,
- ],
+ `Database save failed: ${event.error}`],
  pipeline: ({ context }) => ({
  ...context.pipeline,
  dbStorage: { status: 'failed', progress: 0 },
@@ -757,15 +746,13 @@ export const comprehensiveUploadAnalyticsMachine = createMachine(
  (context.userAnalytics.uploadHistory.totalUploads + 1),
  },
  }),
- }),
- ],
+ })],
  invoke: { src: 'generateContextualPrompts',
  input: ({ context }) => ({ context, timing: 'after-upload' }),
  onDone: { actions: assign({
  contextualPrompts: ({ context, event }) => [
  ...context.contextualPrompts,
- ...event.output,
- ],
+ ...event.output],
  }),
  },
  },

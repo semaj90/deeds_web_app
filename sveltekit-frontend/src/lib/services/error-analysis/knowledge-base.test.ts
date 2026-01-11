@@ -82,8 +82,7 @@ describe('KnowledgeBase - Unit Tests (Task 7.1)', () => {
  code: '<script>let x = undefined;</script>',
  errorType: 'undefined-variable',
  similarity: 0.88,
- },
- ];
+ }];
 
  for (const pattern of patterns) {
  await kb.storePattern(pattern);
@@ -416,8 +415,7 @@ describe('KnowledgeBase - Unit Tests (Task 7.1)', () => {
  code: 'type-mismatch in code',
  errorType: 'type-mismatch',
  similarity: 0.88,
- },
- ];
+ }];
 
  for (const pattern of patterns) {
  await kb.storePattern(pattern);

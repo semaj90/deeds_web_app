@@ -52,8 +52,7 @@ export async function contextualChat(params: ContextChatRequest): Promise<Contex
  'Use the provided context when relevant, but do not hallucinate facts.',
  rag.contextText
  ? `\nRelevant context:\n${rag.contextText}`
- : '\nNo additional context was retrieved for this query.',
- ].join('\n');
+ : '\nNo additional context was retrieved for this query.'].join('\n');
 
  // 2) Call local LLM (Gemma via Ollama)
  const answer = await callOllamaChat(systemPrompt, message);

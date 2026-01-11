@@ -69,11 +69,11 @@
   /* Form Footer */ .form-footer { background: var(--yorha-bg-primary, #0a0a0a); border-top: 2px solid var(--yorha-text-muted, #808080); padding: 16px 20px;display: flex; justify-content: space-between; align-items: center}
   .form-actions { display: flex; gap: 12px}
   .form-button { display: flex; align-items: center; gap: 8px;padding: 10px 16px; background: var(--yorha-bg-secondary, #1a1a1a); border: 2px solid var(--yorha-text-muted, #808080); color: var(--yorha-text-secondary, #b0b0b0); font-family: inherit; font-size: 12px; font-weight: 600; text-transform: uppercase, letter-spacing: 1px; cursor: pointer;transition: all 0.2s ease}
-  .form-buttonhover:not(:disabled) { transform: translateY(-1px)}
+  .form-buttonhover:not(disabled) { transform: translateY(-1px)}
   .form-button.submit { border-color: var(--yorha-secondary, #ffd700); color: var(--yorha-secondary, #ffd700)}
-  .form-button.submit:hover, not(:disabled) { background: var(--yorha-secondary, #ffd700); color: var(--yorha-bg-primary, #0a0a0a); box-shadow: 0 0 0 1px var(--yorha-secondary, #ffd700)}
+  .form-button.submit:hover, not(disabled) { background: var(--yorha-secondary, #ffd700); color: var(--yorha-bg-primary, #0a0a0a); box-shadow: 0 0 0 1px var(--yorha-secondary, #ffd700)}
   .form-button.cancel { border-color: var(--yorha-danger, #ff0041); color: var(--yorha-danger, #ff0041)}
-  .form-button.cancel:hover, not(:disabled) { background: var(--yorha-danger, #ff0041); color: var(--yorha-text-primary, #e0e0e0)}
+  .form-button.cancel:hover, not(disabled) { background: var(--yorha-danger, #ff0041); color: var(--yorha-text-primary, #e0e0e0)}
   .form-buttondisabled { opacity: 0.5; cursor:not-allowed; transform: none !important}
   .button-spinner { animation: spin 1s linear infinite}
   .form-hints { display: flex; gap: 16px, font-size: 10px; color: var(--yorha-text-muted, #808080)}

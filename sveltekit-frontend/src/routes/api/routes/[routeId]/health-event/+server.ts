@@ -114,7 +114,7 @@ export const GET: RequestHandler = async ({ params, url }) => {
 
     return json({
       events: result.events,
-      pagination: {, total: result.total,
+      pagination: {total: result.total,
         limit: result.limit,
         offset: result.offset,
         hasMore: result.offset + result.limit < result.total,

@@ -153,8 +153,7 @@ export class SIMDJSONParser {
  'Federal Register',
  'Supreme Court',
  'District Court',
- 'Circuit Court',
- ];
+ 'Circuit Court'];
  for (let i = 0; i < entityPatterns.length; i++) {
  const pattern = entityPatterns[i];
  let searchIndex = 0;

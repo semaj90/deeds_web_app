@@ -170,8 +170,7 @@ export class CaseRankingService {
  request.detectContradictions !== false
  ? this.detectContradictions(request)
  : Promise.resolve([]),
- this.matchEvidence(request),
- ]);
+ this.matchEvidence(request)]);
 
  // Generate ranking explanation using AI
  const rankingExplanation = await this.generateRankingExplanation(

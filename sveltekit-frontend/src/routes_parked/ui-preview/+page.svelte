@@ -57,8 +57,7 @@
  { id: 'cards', label: 'Cards' },
  { id: 'session', label: 'Session Demo' },
  { id: 'formatting', label: 'Formatting' },
- { id: 'sidebar', label: 'Global Sidebar' },
- ];
+ { id: 'sidebar', label: 'Global Sidebar' }];
 
  function openDialog() {
  showDialog = true;
@@ -84,8 +83,7 @@
  'destructive',
  'outline',
  'ghost',
- 'link',
- ] as const;
+ 'link'] as const;
 
  // Mock session actions for demo
  const mockSessionActions = {
@@ -156,8 +154,7 @@
  'witness_statement_john_doe_transcript.docx',
  'financial_records_audit_summary.xlsx',
  'legal_precedent_research_notes.txt',
- 'deposition_video_plaintiff_testimony.mp4',
- ];
+ 'deposition_video_plaintiff_testimony.mp4'];
  const mockCases = [
  {
  title: 'Corporate Fraud Investigation - Multinational Tech Company',
@@ -166,8 +163,7 @@
  },
  { title: 'Contract Dispute Resolution', status: 'pending', priority: 'medium' },
  { title: 'Criminal Defense - Armed Robbery Case', status: 'closed', priority: 'critical' },
- { title: 'Family Law Custody Battle', status: 'open', priority: 'low' },
- ];
+ { title: 'Family Law Custody Battle', status: 'open', priority: 'low' }];
 
  let focusReady = $state <boolean>(false);
  $effect (() => {

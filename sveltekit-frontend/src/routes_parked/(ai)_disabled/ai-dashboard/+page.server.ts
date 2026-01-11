@@ -83,8 +83,7 @@ export const load: PageServerLoad = async ({ locals }) => {
  status: 'closed',
  priority: 'Low',
  lastUpdated: '2 days ago',
- },
- ];
+ }];
 
  return { user: locals.user, stats, recentCases };
 };

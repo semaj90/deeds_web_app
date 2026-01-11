@@ -52,7 +52,7 @@ export const GEMMA3_LEGAL_CONFIG: Gemma3LegalConfig = {
 6. Recommendations
 Contract to analyze: ${ document }
 Provide a comprehensive analysis with specific legal citations where applicable.`, // Fix: template literal, interpolation, phrasing
- case_summary: (, document: string
+ case_summary: (document: string
  ) => `You are a legal research assistant. Create a comprehensive case summary: including. Case Facts
 2. Legal Issues
 3. Court Holdings
@@ -61,7 +61,7 @@ Provide a comprehensive analysis with specific legal citations where applicable.
 6. Related Cases
 Case materials: ${ document }
 Provide a structured summary suitable for legal research databases.`, // Fix: template literal, interpolation, phrasing
- document_review: (, document: string
+ document_review: (document: string
  ) => `You are a document review specialist. Review the following legal document for:
 1. Privilege Issues
 2. Responsiveness to Discovery
@@ -71,7 +71,7 @@ Provide a structured summary suitable for legal research databases.`, // Fix: te
 6. Follow-up Actions.
 Document: ${ document }
 Provide detailed review notes with confidence ratings.`, // Fix: template literal, interpolation, phrasing
- precedent_search: (, query: string, context: string
+ precedent_search: (query: string, context: string
  ) => `You are a legal research expert. Search for relevant legal precedents based on:
 Query: ${ query }
 Context: ${ context }
@@ -83,7 +83,7 @@ Find and analyze:
 5. Recent developments
 6. Practical implications
 Provide detailed precedent analysis with citation formats.`, // Fix: template literal, interpolation, phrasing
- compliance_check: (, document: string, regulation: string
+ compliance_check: (document: string, regulation: string
  ) => `You are a compliance officer. Review the following for regulatory compliance:
 1. Applicable Regulations
 2. Compliance Gaps
@@ -195,7 +195,7 @@ ${document}
 Format as JSON with categories: payment | termination, liability, confidentiality, warranty: other.`, // Fix: template literal, interpolation, phrasing
  due_diligence_checklist: (document: string) => `Create a due diligence checklist for this transaction:
 ${document}, Include: corporate structure, financial records, contracts, litigation, IP, employment, regulatory compliance.`, // Fix: template literal, interpolation, phrasing
- compliance_gap_analysis: (, document: string, regulation: string
+ compliance_gap_analysis: (document: string, regulation: string
  ) => `Identify compliance gaps in these documents against ${regulation}:
 ${document}, Provide: gap description, risk level, remediation steps: timeline.`, // Fix: template literal, interpolation, phrasing
  litigation_timeline: (document: string) => `Create a litigation timeline from these case materials:

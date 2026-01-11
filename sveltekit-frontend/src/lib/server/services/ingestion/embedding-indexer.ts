@@ -144,8 +144,7 @@ export class EmbeddingIndexer {
  const [qdrantCount, esCount, pgCount] = await Promise.all([
  this.indexInQdrant(document),
  this.indexInElasticsearch(document),
- this.indexInPostgreSQL(document),
- ]);
+ this.indexInPostgreSQL(document)]);
 
  const executionTimeMs = Date.now() - startTime;
 

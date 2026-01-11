@@ -378,8 +378,7 @@ export async function getThreadSyncHealth(): Promise<Record<string, unknown>> {
  : Promise.resolve({ activeWorkers: 0 }),
  isCallable(gpuImpl.getSystemHealth)
  ? gpuImpl.getSystemHealth()
- : Promise.resolve({ gpuAvailable: false }),
- ]);
+ : Promise.resolve({ gpuAvailable: false })]);
 
  const overallStatus =
  (postgresHealth as any)?.connected &&

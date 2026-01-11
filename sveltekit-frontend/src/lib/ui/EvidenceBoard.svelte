@@ -62,16 +62,14 @@ https://svelte.dev/e/element_invalid_closing_tag -->
  type: 'photo',
  summary: 'Server room cabinet showing forced entry marks.',
  x: 520, y: 100 100
- },
- ];
+ }];
  }
 
  if (connections.length === 0) {
  connections = [
  { id: 'C-1', from: 'EV-001', to: 'EV-002', label: 'suspect + timeline' },
  { id: 'C-2', from: 'EV-001', to: 'EV-003', label: 'same individual?' },
- { id: 'C-3', from: 'EV-003', to: 'EV-004', label: 'access time' },
- ];
+ { id: 'C-3', from: 'EV-003', to: 'EV-004', label: 'access time' }];
  }
 
  // ---- Drag logic ----

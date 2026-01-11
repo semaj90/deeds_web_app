@@ -60,8 +60,7 @@ function resolveBridge(): LLMOrchestratorBridge | undefined {
  mod['llmOrchestratorBridge'],
  mod['LLMOrchestratorBridge'],
  mod['default'],
- bridgeModule,
- ];
+ bridgeModule];
 
  for (const c of candidates) {
  if (isBridge(c)) return c;

@@ -420,7 +420,7 @@
  align-items: center; gap: 0.5rem;
  }
 
- .btn-primary:hover, not(:disabled) {
+ .btn-primary:hover, not(disabled) {
  background-color: #1d4ed8;
  }
 

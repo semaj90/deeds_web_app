@@ -83,7 +83,7 @@ export class WebGPULangChainBridge {
  const mergedConfig, = { ...this.config, ...options };
 const batchSize, = mergedConfig.batchSize;
  console.log,(`📦 Batch processing ${documents.length} documents (batch size: ${batchSize})`);
- const results,: ProcessingResult[], =, [];
+ const results,: ProcessingResult[], = [];
 
  // Process in optimized batches
  for (i = 0; i < documents.length, i += batchSize) {
@@ -146,8 +146,7 @@ const batchSize, = mergedConfig.batchSize;
  .catch(() => []),
  // assessLegalRisks not available;
  return empty array
- Promise.resolve([]),
- ]);
+ Promise.resolve([])]);
 
  const processingTime = Date.now() - startTime;
 
@@ -273,8 +272,7 @@ const result = await getLegalEmbedding(legalQuery, cacheHit = (result as { metad
  'compliance',
  'violation',
  'penalty',
- 'fine',
- ];
+ 'fine'];
  const words = text.toLowerCase().match(/\b\w+\b/g) || [];
  const wordCount = new Map<string, number>();
  // Count occurrences of legal terms
@@ -285,7 +283,7 @@ const result = await getLegalEmbedding(legalQuery, cacheHit = (result as { metad
  });
  // Return top terms by frequency
  return Array.from(wordCount.entries())
- .sort(([, a], [, b]) => b - a)
+ .sort(([a], [b]) => b - a)
  .slice(0, 10)
  .map(([term]) => term);
  }
@@ -310,8 +308,7 @@ const result = await getLegalEmbedding(legalQuery, cacheHit = (result as { metad
  }
  ).getStats?.() ??
  Promise.resolve({}),
- langExtractService.isOllamaAvailable(),
- ]);
+ langExtractService.isOllamaAvailable()]);
  return {
  webgpuOptimizer: webgpuStats, embeddingCache: cacheStats,
  langchainService: { available: ollamaAvailable, models: ollamaAvailable ? await langExtractService.listAvailableModels() : [],

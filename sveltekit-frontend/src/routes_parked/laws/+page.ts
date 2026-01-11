@@ -115,8 +115,7 @@ export const load: PageLoad = async ({ fetch, url, depends }) => {
  fullTextUrl:
  'https://leginfo.legislature.ca.gov/faces/codes.xhtml?tocTitle=Health+and+Safety+Code',
  code: 'HSC',
- },
- ];
+ }];
 
  const query = url.searchParams.get('q');
  let laws: LawSearchResult[] = [];

@@ -270,8 +270,7 @@ export const gpuProcessingMachine = setup({
  target: 'idle',
  guard: ({ context }) =>
  !hasQueuedDocuments({ context }) && context.activeProcessing.size === 0,
- },
- ],
+ }],
  },
  paused: { on: {
  RESUME_PROCESSING: { target: 'processing',

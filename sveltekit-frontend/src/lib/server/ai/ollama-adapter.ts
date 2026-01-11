@@ -3,7 +3,7 @@
 // In a real scenario, this would wrap a library like: 'ollama-ts' or a custom fetcher.
 
 interface OllamaClient {
- generateCompletion: (, model: string, prompt: string,
+ generateCompletion: (model: string, prompt: string,
  options?: { temperature?: number; max_tokens?: number }
  ) => Promise<string>; // Assuming it returns a string directly
 }

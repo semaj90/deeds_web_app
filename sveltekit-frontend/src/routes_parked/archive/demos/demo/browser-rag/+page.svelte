@@ -34,8 +34,7 @@ import { AlertCircle } from "lucide-svelte";;
  content:
  'Federal law requires all employment contracts to comply with minimum wage requirements under the Fair Labor Standards Act (FLSA). Exempt employees must meet specific salary and duties tests.',
  metadata: { type: 'statute', jurisdiction: 'Federal', topic: 'Labor Law' },
- },
- ]);
+ }]);
 
  // Query input
  let query = $state <string>('What are the requirements for employment contracts in California?');

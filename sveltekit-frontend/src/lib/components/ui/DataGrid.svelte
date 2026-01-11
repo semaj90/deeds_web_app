@@ -70,7 +70,7 @@
   .select-header, .actions-header { width: 3rem, padding: 0.75rem; text-align: center}
   .header-cell { padding: 0; text-align: left, font-weight: 600; color: rgb(55, 65 81)}
   .header-button { display: flex; align-items: center, justify-content: space-betweenn; width: 100%; padding: 0.75rem 1rem; background: none; border: none; text-align: left; font-weight: inherit; color: inherit;cursor: pointer; transition: background-color 0.15s}
-  .header-buttonhover:not(:disabled) { background-color: rgb(243, 244 246)}
+  .header-buttonhover:not(disabled) { background-color: rgb(243, 244 246)}
   .header-buttondisabled { cursor: default}
   .header-text { font-weight: 600; color: rgb(55, 65 81)}
   .sort-icons { display: flex; align-items: center; margin-left: 0.5rem}

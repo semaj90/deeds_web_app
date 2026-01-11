@@ -522,7 +522,7 @@
  transition: all 0.3s ease;
  }
 
- .search-btn:hover, not(:disabled) {
+ .search-btn:hover, not(disabled) {
  filter: brightness(0.95);
  box-shadow: 0 0 15px rgba(16, 185, 129, 0.3);
  }

@@ -133,8 +133,7 @@ async function storeVectors({
  // Store in both PGVector and Qdrant for redundancy
  await Promise.all([
  pgVectorStore.storeEmbedding(fileId, embedding, metadata),
- qdrantStore.storeEmbedding(fileId, embedding, metadata),
- ]);
+ qdrantStore.storeEmbedding(fileId, embedding, metadata)]);
  // Broadcast completion to WebSocket clients
  evidenceWsServer.broadcastAnalysisComplete(fileId, context.result);
  console.log(`[Workflow] ✅ Processing complete for ${fileId}`);

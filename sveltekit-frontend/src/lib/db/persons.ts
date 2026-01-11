@@ -53,7 +53,7 @@ export async function createPerson(input: CreatePersonInput) {
  generatedAt: now, caseIds: input.caseIds || [],
  createdBy: input.createdBy,
  updatedAt: now,
- },,,,,,,,,)
+ },,,,,,,,)
  .returning();
 
  return newPerson[0];

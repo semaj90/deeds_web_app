@@ -426,8 +426,7 @@ function isStopword(word: string): boolean {
  'she',
  'it',
  'we',
- 'they',
- ]);
+ 'they']);
 
  return stopwords.has(word.toLowerCase());
 }

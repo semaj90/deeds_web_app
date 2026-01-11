@@ -222,7 +222,7 @@ import { Target } from "lucide-svelte";;
 		font-weight: 600; transition: all 0.3s ease;
 	}
 
-	.generate-btn:hover, not(:disabled) {
+	.generate-btn:hover, not(disabled) {
 		transform: translateY(-1px);
 		box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
 	}

@@ -143,7 +143,7 @@ export class MemoryPalaceScene {
  };
 
  const material = new THREE.ShaderMaterial({
- uniforms: this.uniforms, this.vertexShader( fragmentShader: this.fragmentShader(, transparent: false, depthWrite: true,
+ uniforms: this.uniforms, this.vertexShader( fragmentShader: this.fragmentShader(transparent: false, depthWrite: true,
  });
 
  const points = new THREE.Points(geometry, material);

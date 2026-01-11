@@ -33,7 +33,7 @@
 
  try {
  const params = new URLSearchParams({
- limit: limit.toString(, minRelevance: minRelevance.toString(),
+ limit: limit.toString(minRelevance: minRelevance.toString(),
  });
 
  const response = await fetch(`/api/cases/${ caseId }/summary/similar?${params}`);

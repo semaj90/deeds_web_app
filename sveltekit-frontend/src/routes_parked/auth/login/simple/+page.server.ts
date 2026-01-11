@@ -72,7 +72,7 @@ tags: formData.getAll('tags'),
 
  if (!validation.success) {
  const form = {
- valid: false, errors: validation.error.flatten(, data: {
+ valid: false, errors: validation.error.flatten(data: {
  type: formData.get('type'), 
 title: formData.get('title'), 
 isPrivate: formData.get('isPrivate') === 'true',

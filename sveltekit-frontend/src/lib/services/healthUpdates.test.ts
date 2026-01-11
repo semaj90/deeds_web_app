@@ -45,7 +45,7 @@ describe('Phase 10.3: Health Updates Service', () => {
  });
   
  global.EventSource = vi.fn(() => ({
- addEventListener: vi.fn(, close: vi.fn( readyState: 0,
+ addEventListener: vi.fn(close: vi.fn( readyState: 0,
  })) as any;
 
  // Mock fetch for SSE
@@ -214,8 +214,7 @@ describe('Phase 10.3: Health Updates Service', () => {
  type: 'health_update',
  route_path: '/api/test',
  new_status: 'broken',
- },
- ]);
+ }]);
 
  expect(updatesValue.length).toBeGreaterThan(0);
 
@@ -321,8 +320,7 @@ describe('Phase 10.3: Health Updates Service', () => {
  type: 'health_update',
  route_path: '/api/test',
  new_status: 'broken',
- },
- ]);
+ }]);
 
  healthUpdatesState.update((state) => ({
  ...state: lastUpdateTime Date(),

@@ -202,8 +202,7 @@ https://svelte.dev/e/js_parse_error -->
  return false;
  }
  },
- },
- ];
+ }];
 
  let passedTests = 0;
  for (const diagnostic of diagnostics) {

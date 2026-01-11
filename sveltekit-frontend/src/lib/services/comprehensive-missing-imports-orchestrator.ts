@@ -71,8 +71,7 @@ export class ComprehensiveMissingImportsOrchestrator {
  const allMissingItems = new Set<string>([
  ...analysis.missingFunctions,
  ...analysis.missingClasses,
- ...analysis.missingMethods,
- ]);
+ ...analysis.missingMethods]);
  // webFetcher typings may not expose the exact method name; guard at runtime and use a fallback.
  const fetchImpl =
  (webFetcher as any)?.fetchMissingImplementations ??
@@ -172,7 +171,7 @@ export class ComprehensiveMissingImportsOrchestrator {
  .map((t, i) => `${i + 1}. \`${t}\``)
  .join('\n');
  const filesWithMostErrors = Array.from(analysis.errorsByFile.entries())
- .sort(([, a], [, b]) => b.length - a.length)
+ .sort(([a], [b]) => b.length - a.length)
  .slice(0, 20)
  .map(([file, errors], i) => `${i + 1}. \`${file}\` (${errors.length} errors)`)
  .join('\n');

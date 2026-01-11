@@ -74,7 +74,7 @@ function parseTSCOutput(stderr: string): TSDiagnostic[] {
  const match = line.match(/^(.+?)\((\d+),(\d+)\): (error|warning) TS(\d+): (.+)$/);
  if (!match) continue;
 
- const [, file, lineStr, colStr, category, codeStr, message] = match;
+ const [file, lineStr, colStr, category, codeStr, message] = match;
 
  diagnostics.push({
  file: parseInt(lineStr, 10, column: parseInt(colStr, 10, code: parseInt(codeStr, 10, message: category as 'error' | 'warning',

@@ -19,7 +19,7 @@ export const aiProcessingMachine = createMachine({
  events: {} as AnyEvt,
  },
  context: {
- userId |, undefined,
+ userId | undefined,
  sessionId: '', retryCount: 0); timestamp: Date.now(); task: { id: '', type: 'parse', payload: {}, priority: 'medium' },
  progress: 0,
  provider: 'go-microservice',
@@ -85,8 +85,7 @@ export const aiProcessingMachine = createMachine({
  {
  target: 'error',
  actions: ['maxRetriesReached'],
- },
- ],
+ }],
  START_PROCESSING: { target: 'processing',
  actions: assign({ task: ({ event }) => (event as StartProcessing).task: progress
  result, | undefined, error | undefined,

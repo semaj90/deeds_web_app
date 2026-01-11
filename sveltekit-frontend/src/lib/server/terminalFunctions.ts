@@ -78,8 +78,7 @@ export async function searchEvidence(
  relevance: 0.72,
  snippet:
  'Call records show communication with victim 2 hours before incident. Location data places suspect within 500m of scene.',
- },
- ] as const;
+ }] as const;
 
  return {
  query: found.length,
@@ -109,8 +108,7 @@ export async function extractHoldings(evidenceId: string): Promise<ExtractHoldin
  text: 'Nervous behavior consistent with consciousness of guilt',
  confidence: 0.85,
  citations: ['State v. Williams (2018)'],
- },
- ],
+ }],
  },
  'ev-002': {
  evidenceId,
@@ -124,8 +122,7 @@ export async function extractHoldings(evidenceId: string): Promise<ExtractHoldin
  text: 'Timestamp establishes defendant presence during critical period',
  confidence: 0.99,
  citations: ['USC 18-1519'],
- },
- ],
+ }],
  },
  'ev-003': {
  evidenceId,
@@ -139,8 +136,7 @@ export async function extractHoldings(evidenceId: string): Promise<ExtractHoldin
  text: 'Location data places defendant near crime scene',
  confidence: 0.91,
  citations: ['Carpenter v. United States (2018)'],
- },
- ],
+ }],
  },
  };
 
@@ -152,8 +148,7 @@ export async function extractHoldings(evidenceId: string): Promise<ExtractHoldin
  text: 'Evidence supports investigation findings',
  confidence: 0.8,
  citations: [],
- },
- ],
+ }],
  }
  );
 }
@@ -182,8 +177,7 @@ export async function findCitations(evidenceId: string): Promise<FindCitationsRe
  type: 'regulation',
  reference: 'FRE 602',
  title: 'Need for Personal Knowledge',
- },
- ],
+ }],
  },
  'ev-002': {
  evidenceId,
@@ -203,8 +197,7 @@ export async function findCitations(evidenceId: string): Promise<FindCitationsRe
  type: 'regulation',
  reference: 'FRE 901',
  title: 'Authenticating or Identifying Evidence',
- },
- ],
+ }],
  },
  'ev-003': {
  evidenceId,
@@ -219,8 +212,7 @@ export async function findCitations(evidenceId: string): Promise<FindCitationsRe
  reference: 'Carpenter v. United States',
  title: 'Cell-Site Location Information Privacy',
  year: 2018,
- },
- ],
+ }],
  },
  };
 
@@ -232,8 +224,7 @@ export async function findCitations(evidenceId: string): Promise<FindCitationsRe
  type: 'statute',
  reference: 'USC 18-1001',
  title: 'General Fraud Statute',
- },
- ],
+ }],
  }
  );
 }
@@ -268,8 +259,7 @@ export async function analyzeRelationships(
   confidence: 0.72,
  reasoning:
  'Phone location data suggests defendant was elsewhere during witness statement timeframe',
- },
- ];
+ }];
 
  return {
  evidenceIds: relationships.filter(
@@ -292,16 +282,14 @@ export async function generateSummary(caseId: string): Promise<GenerateSummaryRe
  'Defendant presence at scene established through multiple sources',
  'Timeline of events corroborated by video and phone records',
  'Motive identified through financial records analysis',
- 'Communication with victim documented',
- ],
+ 'Communication with victim documented'],
  timeline:
  '22:00 - Victim last seen alive | 22:15 - Defendant enters location | 22:45 - Incident occurs | 23:30 - Police called',
  nextSteps: [
  'Await forensic analysis results',
  'Interview additional witnesses',
  'Obtain financial records subpoena',
- 'Coordinate with federal agencies if applicable',
- ],
+ 'Coordinate with federal agencies if applicable'],
  },
  };
 }

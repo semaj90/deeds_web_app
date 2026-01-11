@@ -198,8 +198,7 @@ export class WebSearchService {
  snippet: 'Comprehensive guide to researching case law and legal precedents...',
  source: 'research.legal.org',
  relevance: 0.82, timestamp: new Date(),
- },
- ],
+ }],
  'evidence preservation': [
  {
  id: '4',
@@ -208,8 +207,7 @@ export class WebSearchService {
  snippet: 'Best practices for preserving digital evidence in legal cases...',
  source: 'forensics.org',
  relevance: 0.91, timestamp: new Date(),
- },
- ],
+ }],
  };
 
  return (
@@ -221,8 +219,7 @@ export class WebSearchService {
  snippet: `No specific results found for "${ query }". Try different keywords.`,
  source: 'example.com',
  relevance: 0.5, timestamp: new Date(),
- },
- ]
+ }]
  );
  }
 

@@ -37,8 +37,7 @@ async function withBackoff<T>(fn: () => Promise<T>): Promise<T> {
  fn(),
  new Promise<never>((_, reject) =>
  setTimeout(() => reject(new Error('Redis op timeout')), REDIS_TIMEOUT_MS)
- ),
- ]);
+ )]);
  return result;
  } catch (err) {
  lastErr = err;

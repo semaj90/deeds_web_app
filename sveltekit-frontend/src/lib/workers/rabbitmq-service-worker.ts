@@ -36,13 +36,13 @@ type RabbitMQServiceLike = {
  close?: () => Promise<void> | void;
  stop?: () => Promise<void> | void;
  closeConnection?: () => Promise<void> | void;
- consume?: (, queue: string,
+ consume?: (queue: string,
  cb: (message: any, originalMessage?: unknown) => Promise<void> | void
  ) => Promise<void> | void;
- subscribe?: (, queue: string,
+ subscribe?: (queue: string,
  cb: (message: unknown, originalMessage?: unknown) => Promise<void> | void
  ) => Promise<void> | void;
- createConsumer?: (, queue: string,
+ createConsumer?: (queue: string,
  cb: (message: unknown, originalMessage?: unknown) => Promise<void> | void
  ) => Promise<void> | void;
  on?: (event: string, cb: (...args: unknown[]) => void) => void;
@@ -132,8 +132,7 @@ export class RabbitMQServiceWorker {
  handler(message, originalMessage),
  new Promise<never>((_, reject) =>
  setTimeout(() => reject(new Error('Processing timeout')), this.config.processingTimeout)
- ),
- ]);
+ )]);
  const processingTime = Date.now() - startTime;
  this.processingStats.messagesProcessed++;
  this.updateAvgProcessingTime(processingTime, this.log(`Message processed in ${processingTime}ms`, 'success', } catch (error) {

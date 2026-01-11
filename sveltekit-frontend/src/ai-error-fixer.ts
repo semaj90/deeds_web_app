@@ -219,7 +219,7 @@ ${this.getCommonFixes(error.code || '')}`;
 		if (fix.confidence < this.config.confidenceThreshold) return false;
 
 		try {
-			if (fix.strategy === 'add_punctuation' && !/[,.{}()[\]]/.test(fix.fixedText)) return false;
+			if (fix.strategy === 'add_punctuation' && !/[.{}()[\]]/.test(fix.fixedText)) return false;
 			if (fix.strategy === 'add_import' && !/import\s+/.test(fix.fixedText)) return false;
 			return true;
 		} catch {

@@ -113,8 +113,7 @@ let aiStats = $state({);
  description: 'Legal pattern and anomaly detection.',
  status: 'active',
  stats: () => 'ML models active',
- },
- ];
+ }];
 
  const recentActivities = [
  {
@@ -144,8 +143,7 @@ let aiStats = $state({);
  time: '12 minutes ago',
  user: 'Partner',
  status: 'completed',
- },
- ];
+ }];
 
  const systemHealth = {
  aiModels: 'online',

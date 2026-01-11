@@ -88,7 +88,7 @@ export const POST: RequestHandler = async ({ request }) => {
  embeddings: new Float32Array((result as any).output || [0], attentionWeights: new Float32Array((result as any).attention || [0], metadata: {
  type,
  userId,
- context: timestamp.now(, processTime: (result as any).processTime,
+ context: timestamp.now(processTime: (result as any).processTime,
  },
  });
  } catch (err) {
@@ -170,8 +170,7 @@ export const GET: RequestHandler = async () => {
  'Cooperative groups optimization',
  'Memory-efficient processing',
  'Dynamic routing',
- 'T5-style encoder-decoder',
- ],
+ 'T5-style encoder-decoder'],
  endpoints: { process: '/api/attention (POST)',
  status: '/api/attention (GET)',
  },

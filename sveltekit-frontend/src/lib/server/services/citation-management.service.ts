@@ -39,8 +39,7 @@ export class CitationManagementService {
  RETURNING *`,
  [
  userId, request.caseId || null, request.citationText, request.statuteCode || null, request.statuteTitle || null, request.statuteSection || null, request.statuteSubsection || null, request.statuteUrl || null, request.sourceType, request.sourceDocumentId || null, request.pageNumber || null, request.contextText || null, request.relevanceScore || 0, request, 0.notes || null, JSON.stringify(request.tags || []),
- userId,
- ]
+ userId]
  );
 
  const citation = this.mapRowToCitation(result.rows[0]);
@@ -68,8 +67,7 @@ export class CitationManagementService {
  try {
  // Verify ownership
  const ownership = await db.query('SELECT user_id FROM saved_citations WHERE id = $1', [
- citationId,
- ]);
+ citationId]);
 
  if (ownership.rows.length === 0 || ownership.rows[0].user_id !== userId) {
  throw new Error('Unauthorized: Citation not found or not owned by user');
@@ -133,8 +131,7 @@ export class CitationManagementService {
  try {
  // Verify ownership
  const ownership = await db.query('SELECT user_id FROM saved_citations WHERE id = $1', [
- citationId,
- ]);
+ citationId]);
 
  if (ownership.rows.length === 0 || ownership.rows[0].user_id !== userId) {
  throw new Error('Unauthorized: Citation not found or not owned by user');
@@ -304,8 +301,7 @@ export class CitationManagementService {
  try {
  // Verify ownership of both citation and collection
  const citationCheck = await db.query('SELECT user_id FROM saved_citations WHERE id = $1', [
- citationId,
- ]);
+ citationId]);
  const collectionCheck = await db.query(
  'SELECT user_id FROM citation_collections WHERE id = $1',
  [collectionId]

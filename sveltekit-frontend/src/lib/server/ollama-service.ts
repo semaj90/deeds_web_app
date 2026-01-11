@@ -65,8 +65,7 @@ export async function callOllamaChat(systemPrompt: string, userPrompt: string): 
  model: CHAT_MODEL,
  messages: [
  { role: 'system', content: systemPrompt },
- { role: 'user', content: userPrompt },
- ],
+ { role: 'user', content: userPrompt }],
  stream: false,
  };
 

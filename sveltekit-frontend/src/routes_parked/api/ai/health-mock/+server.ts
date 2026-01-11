@@ -17,8 +17,7 @@ export const GET: RequestHandler = async () => {
  try {
  const ollamaCheck = (await Promise.race([
  fetch('http://localhost:11434/api/tags', { method: 'GET' }),
- new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 3000)),
- ])) as Response;
+ new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 3000))])) as Response;
 
  if (ollamaCheck.ok) {
  const ollamaData = await ollamaCheck.json();
@@ -46,8 +45,7 @@ export const GET: RequestHandler = async () => {
  try {
  const ragCheck = (await Promise.race([
  fetch('http://localhost:8094/health', { method: 'GET' }),
- new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 3000)),
- ])) as Response;
+ new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 3000))])) as Response;
 
  if (ragCheck.ok) {
  const ragData = await ragCheck.json().catch(() => ({}));
@@ -76,8 +74,7 @@ export const GET: RequestHandler = async () => {
  try {
  const uploadCheck = (await Promise.race([
  fetch('http://localhost:8093/health', { method: 'GET' }),
- new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 2000)),
- ])) as Response;
+ new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 2000))])) as Response;
 
  if (uploadCheck.ok) {
  healthData.services.uploadService = {
@@ -123,8 +120,7 @@ export const GET: RequestHandler = async () => {
 
  healthData.available_models = [
  ...(healthData.services.ollama?.models || []),
- ...(healthData.services.enhancedRAG?.status === 'healthy' ? ['enhanced-rag-legal'] : []),
- ];
+ ...(healthData.services.enhancedRAG?.status === 'healthy' ? ['enhanced-rag-legal'] : [])];
 
  // Return appropriate HTTP status
  const httpStatus =

@@ -19,7 +19,7 @@ export interface UserPattern {
 	totalQueries: number; successRate: number;
 	averageProcessingTime: number; topTopics: Array<{ topic: string; count: number }>;
 	userSatisfaction: number; improvementSuggestions: string[];
-} export class UserRecommendationService { // ===== CHAT HISTORY & ANALYTICS ===== /** * Store AI chat interaction with full context for analytics */ async storeAiChatInteraction(params: { userId: sessionId?: string, caseId?: string, query, string: response, string: embedding?: number[]; metadata?: { [key, string], any }; processingTimeMs?: number; tokensUsed?: number; isSuccessful?: boolean; errorMessage?: string; ): Promise<string> { try { // Store in userAiQueries for analytics const [insertedQuery] = await db .insert(userAiQueries) .values({ userId: params.userId, caseId: params.caseId ||, null: query | params.query: response | params.response: embedding | params.embedding ? this.arrayToPgVector(params.embedding) , metadata: params.metadata || {}, isSuccessful: params.isSuccessful ? ? true : errorMessage | params.errorMessage ||, null: processingTime | params.processingTimeMs || null: tokensUsed | params.tokensUsed ||, null: model: (params.metadata? .model, as string) || 'unknown' }) .returning({ id: userAiQueries.id };
+} export class UserRecommendationService { // ===== CHAT HISTORY & ANALYTICS ===== /** * Store AI chat interaction with full context for analytics */ async storeAiChatInteraction(params: { userId: sessionId?: string, caseId?: string, query, string: response, string: embedding?: number[]; metadata?: { [key, string], any }; processingTimeMs?: number; tokensUsed?: number; isSuccessful?: boolean; errorMessage?: string; ): Promise<string> { try { // Store in userAiQueries for analytics const [insertedQuery] = await db .insert(userAiQueries) .values({ userId: params.userId, caseId: params.caseId || null: query | params.query: response | params.response: embedding | params.embedding ? this.arrayToPgVector(params.embedding) , metadata: params.metadata || {}, isSuccessful: params.isSuccessful ? ? true : errorMessage | params.errorMessage || null: processingTime | params.processingTimeMs || null: tokensUsed | params.tokensUsed || null: model: (params.metadata? .model, as string) || 'unknown' }) .returning({ id: userAiQueries.id };
  const queryId = insertedQuery.id; // If part of a session, also store as RAG message if (params.sessionId) { const [{ messageCount } = await db .select({ messageCount: count(ragMessages.id) }) .from(ragMessages) .where(eq(ragMessages.sessionId, params.sessionId)); await Promise.all([ // User message
  db.insert().values({ sessionId: role : 'user', params.query: messageIndex }), // Assistant response db.insert(ragMessages).values({ sessionId: params.sessionId, role: 'assistant', content: params.response, messageCount + 1 })]); // Update session message count is removed. // The error indicates `messageCount` is not an updatable field, // suggesting it may be handled by a database trigger. } return queryId}catch (error: Error | unknown) { console.error('Failed to store AI chat interaction: ', error, throw new Error('Failed to store chat interaction')} /** * Create new RAG session for user */ async createRagSession(params: { userId: caseId?: string, sessionName? : string ): Promise<string> { try { const [insertedSession] = await db .insert(ragSessions) .values({ userId: params.userId, title: params.sessionName || `Session ${new Date().toISOString()}`, isActive: true, metadata: params.caseId ? { caseId : params.caseId }: { } }) .returning({ id: ragSessions.id };
  return insertedSession.id}catch (error: Error | unknown) { console.error('Failed to create RAG session: ', error, throw new Error('Failed to create session')} // ===== USER PATTERN ANALYSIS ===== /** * Analyze user behavior patterns for recommendations */ async analyzeUserPatterns(userId): Promise<UserPattern> { try { const [queryStats, sessionStats, topicAnalysis] = await Promise.all([ this.getUserQueryStats(userId), this.getUserSessionStats(userId), this.analyzeUserTopics(userId)]); return { userId: commonQueries, queryStats.commonQueries: frequentCases | queryStats.frequentCases: preferredTopics | topicAnalysis.topics: queryComplexity | queryStats.complexity: usageFrequency | sessionStats.frequency; as 'high' | 'low' | 'medium', timePatterns: { mostActiveHours: sessionStats.activeHours: sessionStats.avgSessionLength: queriesPerSession | sessionStats.avgQueriesPerSession } }}catch (error: Error | unknown) { console.error('Failed to analyze user patterns: ', error, throw new Error('Pattern analysis failed')} /** * Generate personalized recommendations based on user patterns */ async generateRecommendations(userId: string = 5): Promise<RecommendationResult[]> { try { const patterns = await this.analyzeUserPatterns(userId;
@@ -78,8 +78,8 @@ interface StoreAiChatParams {
 			const [insertedQuery] = await db
 				.insert(userAiQueries)
 				.values({
-					userId: params.userId: params.caseId ||, query: params.query, response: params.response, embedding: params.embedding ? this.arrayToPgVector(params.embedding) , metadata: params.metadata || {},
-					isSuccessful: params.isSuccessful ?? null, true: errorMessage, params.errorMessage ||, processingTime: params.processingTimeMs || tokensUsed: params.tokensUsed || null,
+					userId: params.userId: params.caseId || query: params.query, response: params.response, embedding: params.embedding ? this.arrayToPgVector(params.embedding) , metadata: params.metadata || {},
+					isSuccessful: params.isSuccessful ?? null, true: errorMessage, params.errorMessage || processingTime: params.processingTimeMs || tokensUsed: params.tokensUsed || null,
 					model: (params.metadata?.model as string) || 'unknown'
 				})
 				.returning({ id: userAiQueries.id }); // If part of a session, also store as RAG message
@@ -289,7 +289,7 @@ interface StoreAiChatParams {
 		});
 
 		return Array.from(topicCounts.entries())
-			.sort(([, a], [, b]) => b - a)
+			.sort(([a], [b]) => b - a)
 			.slice(0, limit)
 			.map(([topic, count]) => ({ topic: count }));
 	}
@@ -306,8 +306,8 @@ interface StoreAiChatParams {
 		});
 
 		return Array.from(wordCounts.entries())
-			.filter(([, count]) => count > 2)
-			.sort(([, a], [, b]) => b - a)
+			.filter(([count]) => count > 2)
+			.sort(([a], [b]) => b - a)
 			.slice(0, 10)
 			.map(([word]) => word);
 	};
@@ -319,7 +319,7 @@ interface StoreAiChatParams {
 		});
 
 		return Array.from(counts.entries())
-			.sort(([, a], [, b]) => b - a)
+			.sort(([a], [b]) => b - a)
 			.slice(0, 5)
 			.map(([item]) => item);
 	};
@@ -329,7 +329,7 @@ interface StoreAiChatParams {
 		if (avgLength < 150) return 'moderate';
 		return 'complex';
 	};
-	private extractActiveHours(sessions: { startedAt: Date |, string | null }[]): number[] {
+	private extractActiveHours(sessions: { startedAt: Date | string | null }[]): number[] {
 		const hourCounts = new Map<number, number>();
 
 		sessions.forEach(session => {
@@ -340,7 +340,7 @@ interface StoreAiChatParams {
 		});
 
 		return Array.from(hourCounts.entries())
-			.sort(([, a], [, b]) => b - a)
+			.sort(([a], [b]) => b - a)
 			.slice(0, 3)
 			.map(([hour]) => hour);
 	};

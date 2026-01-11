@@ -96,8 +96,8 @@ https://svelte.dev/e/js_parse_error -->
  if (!currentMessage.trim() || isLoading) return;
 
  const userMessage: ChatMessage = {
- id: crypto.randomUUID(, role: 'user',
- content: currentMessage.trim(, timestamp: new Date(),
+ id: crypto.randomUUID(role: 'user',
+ content: currentMessage.trim(timestamp: new Date(),
  };
  messages = [...messages, userMessage];
 
@@ -108,7 +108,7 @@ https://svelte.dev/e/js_parse_error -->
 
  // Create assistant message placeholder
  const assistantMessage: ChatMessage = {
- id: crypto.randomUUID(, role: 'assistant',
+ id: crypto.randomUUID(role: 'assistant',
  content: '',
  timestamp: new Date(),
  };
@@ -189,11 +189,10 @@ https://svelte.dev/e/js_parse_error -->
  "Based on your query, I've identified potential legal precedents in employment law. Here's an analysis: The case pattern suggests reviewing contract termination clauses and documenting timeline inconsistencies.",
  'Legal analysis: Your employment dispute may benefit from examining wrongful termination precedents. I recommend gathering evidence of discriminatory practices.',
  'Contract review: The language appears standard, but Section 4.2 may contain problematic clauses. Consider reviewing similar cases from recent jurisprudence.',
- 'Case assessment: This shows strong indicators for favorable outcome. Key factors include procedural violations and inadequate documentation by opposing party.',
- ];
+ 'Case assessment: This shows strong indicators for favorable outcome. Key factors include procedural violations and inadequate documentation by opposing party.'];
  const randomResponse = mockResponses[Math.floor(Math.random() * mockResponses.length)];
  const mockMessage: ChatMessage = {
- id: crypto.randomUUID(, role: 'assistant',
+ id: crypto.randomUUID(role: 'assistant',
  content: `🤖 ${randomResponse} [Fallback Response - Ollama unavailable]`,
  timestamp: new Date(),
  };

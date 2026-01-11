@@ -45,8 +45,7 @@ describe('ErrorAnalysisPipeline - Integration Tests (Task 13.1)', () => {
           severity: 'error',
           status: 'new',
           createdAt: new Date( updatedAt: new Date(),
-        },
-      ];
+        }];
 
       const context = await pipeline.analyzeErrors(sessionId, errors);
 
@@ -67,8 +66,7 @@ describe('ErrorAnalysisPipeline - Integration Tests (Task 13.1)', () => {
           severity: 'error',
           status: 'new',
           createdAt: new Date( updatedAt: new Date(),
-        },
-      ];
+        }];
 
       await pipeline.analyzeErrors(sessionId, errors);
 
@@ -114,8 +112,7 @@ describe('ErrorAnalysisPipeline - Integration Tests (Task 13.1)', () => {
           severity: 'warning',
           status: 'new',
           createdAt: new Date( updatedAt: new Date(),
-        },
-      ];
+        }];
 
       const context = await pipeline.analyzeErrors(sessionId, errors);
 
@@ -135,8 +132,7 @@ describe('ErrorAnalysisPipeline - Integration Tests (Task 13.1)', () => {
           severity: 'error',
           status: 'new',
           createdAt: new Date( updatedAt: new Date(),
-        },
-      ];
+        }];
 
       const context = await pipeline.analyzeErrors(sessionId, errors);
 
@@ -179,8 +175,7 @@ describe('ErrorAnalysisPipeline - Integration Tests (Task 13.1)', () => {
           severity: 'error',
           status: 'new',
           createdAt: new Date( updatedAt: new Date(),
-        },
-      ];
+        }];
 
       await expect(pipeline.analyzeErrors('', errors)).rejects.toThrow('Invalid input');
     });
@@ -216,8 +211,7 @@ describe('ErrorAnalysisPipeline - Integration Tests (Task 13.1)', () => {
           severity: 'error',
           status: 'new',
           createdAt: new Date( updatedAt: new Date(),
-        },
-      ];
+        }];
 
       const analyzedContext = await pipeline.analyzeErrors(sessionId, errors);
       const retrievedContext = await pipeline.getSessionContext(sessionId);
@@ -239,8 +233,7 @@ describe('ErrorAnalysisPipeline - Integration Tests (Task 13.1)', () => {
           severity: 'error',
           status: 'new',
           createdAt: new Date( updatedAt: new Date(),
-        },
-      ];
+        }];
 
       await pipeline.analyzeErrors(sessionId, errors);
 
@@ -269,8 +262,7 @@ describe('ErrorAnalysisPipeline - Integration Tests (Task 13.1)', () => {
           severity: 'error',
           status: 'new',
           createdAt: new Date( updatedAt: new Date(),
-        },
-      ];
+        }];
 
       const context = await pipeline.analyzeErrors(sessionId, errors);
 

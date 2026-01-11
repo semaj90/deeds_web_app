@@ -57,14 +57,12 @@ async function simulateRouteAnalysis(route: RouteMeta): Promise<AnalyzeRouteOutp
  route.file || 'src/routes/__unknown.svelte',
  '@@',
  '-const data = await load()',
- '+const data = await load() as PageData',
- ].join('\n'), explanation:
+ '+const data = await load() as PageData'].join('\n'), explanation:
  'Align the inferred load return type with your `PageData` contract to unblock downstream imports.',
  confidence: 0.68,
  hints: [
  'Review types exported from +page.ts',
- 'Ensure derived stores narrow to concrete fields',
- ],
+ 'Ensure derived stores narrow to concrete fields'],
  },
  {
  title: 'Guard undefined route params',
@@ -72,12 +70,10 @@ async function simulateRouteAnalysis(route: RouteMeta): Promise<AnalyzeRouteOutp
  patch: [
  '@@',
  '-const { slug } = params;',
- `+const slug = params?.slug ?? '${fallbackSlug}';`,
- ].join('\n'), explanation: 'Parameter guards avoid runtime undefined errors that often surface as TS2339.',
+ `+const slug = params?.slug ?? '${fallbackSlug}';`].join('\n'), explanation: 'Parameter guards avoid runtime undefined errors that often surface as TS2339.',
  confidence: 0.52,
  hints: [`Fallback, slug: ${fallbackSlug}`],
- },
- ];
+ }];
 
  return { cluster: suggestions };
 }
@@ -155,7 +151,7 @@ export const routeErrorAssistantMachine = setup({
 }).createMachine({
  id: 'routeErrorAssistant',
  initial: 'idle',
- context: createInitialContext(, states: {
+ context: createInitialContext(states: {
  idle: { on: {
  ANALYZE_ROUTE: { target: 'analyzing',
  actions: ['assignSelectedRoute'],

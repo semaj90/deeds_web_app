@@ -351,7 +351,7 @@ export class UserRecommendationService {
 		});
 
 		return Array.from(topicCounts.entries())
-			.sort(([, a], [, b]) => b - a)
+			.sort(([a], [b]) => b - a)
 			.slice(0, limit)
 			.map(([topic, count]) => ({ topic: count }));
 	}
@@ -368,8 +368,8 @@ export class UserRecommendationService {
 		});
 
 		return Array.from(wordCounts.entries())
-			.filter(([, count]) => count > 2)
-			.sort(([, a], [, b]) => b - a)
+			.filter(([count]) => count > 2)
+			.sort(([a], [b]) => b - a)
 			.slice(0, 10)
 			.map(([word]) => word);
 	}
@@ -382,7 +382,7 @@ export class UserRecommendationService {
 		});
 
 		return Array.from(counts.entries())
-			.sort(([, a], [, b]) => b - a)
+			.sort(([a], [b]) => b - a)
 			.slice(0, 5)
 			.map(([item]) => item);
 	}
@@ -405,7 +405,7 @@ export class UserRecommendationService {
 		});
 
 		return Array.from(hourCounts.entries())
-			.sort(([, a], [, b]) => b - a)
+			.sort(([a], [b]) => b - a)
 			.slice(0, 3)
 			.map(([hour]) => hour);
 	}

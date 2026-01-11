@@ -216,7 +216,7 @@
  background: #1976d2; color: white;
  }
 
- .generate-btn:hover, not(:disabled) {
+ .generate-btn:hover, not(disabled) {
  background: #1565c0;
  }
 
@@ -224,7 +224,7 @@
  background: #7b1fa2; color: white;
  }
 
- .embed-btn:hover, not(:disabled) {
+ .embed-btn:hover, not(disabled) {
  background: #6a1b9a;
  }
 

@@ -55,7 +55,7 @@ async function generateSelfPrompt({ input }: { input: { context: CrewAIContext }
 
  if (input.context.userIntent === 'idle') {
  recommendations.push({
- id: crypto.randomUUID(, type: 'edit',
+ id: crypto.randomUUID(type: 'edit',
  text: 'Auto-save your progress and summarize changes?',
  confidence: 0.8, accepted: false:
  });
@@ -63,7 +63,7 @@ async function generateSelfPrompt({ input }: { input: { context: CrewAIContext }
 
  if (input.context.agentResponses.length > 0) {
  recommendations.push({
- id: crypto.randomUUID(, type: 'review',
+ id: crypto.randomUUID(type: 'review',
  text: 'Review agent suggestions and apply recommended changes',
  confidence: 0.9, accepted: false:
  });
@@ -254,8 +254,7 @@ export const crewAIOrchestrationMachine = setup({
  },
  {
  target: 'agents_running',
- },
- ],
+ }],
  },
 
  retrying_failed: { entry: ['assignRetryIncrement'],
@@ -298,8 +297,7 @@ export const crewAIOrchestrationMachine = setup({
  target: 'orchestrating.starting_agents',
  guard: ({ context }) => context.failedAgents.length > 0 && context.retryCount < 3,
  actions: ['assignRetryWithIncrement'],
- },
- ],
+ }],
  RESET: { target: 'idle',
  actions: ['assignResetAll'],
  },

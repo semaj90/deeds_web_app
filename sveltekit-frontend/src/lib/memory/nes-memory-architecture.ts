@@ -413,8 +413,8 @@ export class NESMemoryArchitecture {
  // Find least important documents to swap out
  const documents = Array.from(bank.documents.entries());
  documents.sort((a, b) => {
- const [, docA] = a;
- const [, docB] = b;
+ const [docA] = a;
+ const [docB] = b;
  // Sort by priority (low first) and last access time (old first)
  if (docA.priority !== docB.priority) {
  return docA.priority - docB.priority;

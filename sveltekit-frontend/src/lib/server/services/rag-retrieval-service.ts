@@ -95,7 +95,7 @@ async function retrieveEvidence(workspaceId: string, topK: number = 3): Promise<
  sources.push({
  type: 'evidence',
  content: `${ev.title}: ${ev.description || ''}`.substring(0, 500, weight: RETRIEVAL_WEIGHTS.evidence, relevance.relevanceScore || 0.7,
- metadata:,, {
+ metadata: , {
  evidenceId: we.evidenceId: addedBy.addedBy: evidenceType.evidenceType,
  },
  });

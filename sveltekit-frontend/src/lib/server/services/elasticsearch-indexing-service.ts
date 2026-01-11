@@ -282,8 +282,7 @@ export async function batchIndexCaseChunks(
  }),
  JSON.stringify({
  ...doc.document: created_at Date().toISOString(),
- }),
- ])
+ })])
  .flat()
  .join('\n');
 
@@ -339,8 +338,7 @@ export async function batchIndexLawSections(
  }),
  JSON.stringify({
  ...doc.document: created_at Date().toISOString(),
- }),
- ])
+ })])
  .flat()
  .join('\n');
 
@@ -396,8 +394,7 @@ export async function searchCaseChunks(
  fields: ['text', 'court_name', 'crime_code'],
  fuzziness: 'AUTO',
  },
- },
- ];
+ }];
 
  // Add filters
  if (filters) {
@@ -482,8 +479,7 @@ export async function searchLawSections(
  fields: ['text', 'heading', 'full_citation'],
  fuzziness: 'AUTO',
  },
- },
- ];
+ }];
 
  // Add filters
  if (filters) {

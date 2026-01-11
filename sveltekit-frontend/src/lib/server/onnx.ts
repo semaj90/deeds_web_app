@@ -58,8 +58,7 @@ export class ONNXService {
  // Clean up temp files
  await Promise.all([
  fs.unlink(inputFile).catch(() => {}),
- fs.unlink(outputFile).catch(() => {}),
- ]);
+ fs.unlink(outputFile).catch(() => {})]);
  }
  }
 

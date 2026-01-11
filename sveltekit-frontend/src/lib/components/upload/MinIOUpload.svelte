@@ -95,7 +95,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
   .progress-text { margin-top: 0.5rem; text-align: center, font-size: 0.875rem; color: var(--text-secondary)}
   .form-actions { margin-top: 2rem}
   .submit-button { width: 100%; padding: 0.875rem;background: var(--accent-primary); color: white; border: none; border-radius: 6px, font-weight: 600; cursor: pointer;transition: background-color 0.2s}
-  .submit-buttonhover:not(:disabled) { background: var(--accent-primary-dark)}
+  .submit-buttonhover:not(disabled) { background: var(--accent-primary-dark)}
   .submit-buttondisabled { opacity: 0.6; cursor:not-allowed}
   .error-message { color: var(--error-color); font-size: 0.875rem; margin-top: 0.25rem}
   .form-message { margin-top: 1rem, padding: 0.75rem, border-radius: 6px; background: var(--success-color-20);color: var(--success-color); border: 1px solid var(--success-color)}

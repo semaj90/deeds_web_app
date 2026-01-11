@@ -1211,8 +1211,7 @@ let parsed: unknown;
  const checks = await Promise.allSettled([
  this.checkDatabaseHealth(),
  this.checkRedisHealth(),
- this.checkOllamaHealth(),
- ]);
+ this.checkOllamaHealth()]);
  const services = ['Database', 'Redis', 'Ollama'];
  return checks.map((result, index) => ({
  service: services[index],

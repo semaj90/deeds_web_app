@@ -12,8 +12,7 @@
  { label: 'Analysis Center', href: '/analysis', key: 'analysis' },
  { label: 'Global Search', href: '/search', key: 'search' },
  { label: 'Terminal', href: '/terminal', key: 'terminal' },
- { label: 'System Config', href: '/settings', key: 'settings' },
- ];
+ { label: 'System Config', href: '/settings', key: 'settings' }];
 let currentPath = $state(page.url.pathname);
 </script>
 

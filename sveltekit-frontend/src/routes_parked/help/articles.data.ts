@@ -186,8 +186,7 @@ Encrypt sensitive files, audit trails.
 - Close tabs
 - Update browser
 `,
- },
-];
+ }];
 
 
 

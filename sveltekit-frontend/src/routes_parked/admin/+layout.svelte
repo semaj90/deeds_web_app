@@ -23,8 +23,7 @@
  { href: '/admin/roles', label: 'Roles', icon: 'ðŸ›¡ï¸' },
  { href: '/admin/system', label: 'System', icon: 'âš™ï¸' },
  { href: '/admin/audit', label: 'Audit Logs', icon: 'ðŸ“œ' },
- { href: '/admin/integrations', label: 'Integrations', icon: 'ðŸ”Œ' },
- ];
+ { href: '/admin/integrations', label: 'Integrations', icon: 'ðŸ”Œ' }];
 
  function isActive(pathname: string, href): boolean {
  if (pathname === href) return true;

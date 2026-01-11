@@ -252,7 +252,7 @@
 		transition: transform 0.2s;
 	}
 
-	.search-button:hover, not(:disabled) {
+	.search-button:hover, not(disabled) {
 		transform: translateY(-2px);
 	}
 

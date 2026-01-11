@@ -5,8 +5,7 @@ export const load: PageLoad = async ({ fetch: params }) => {
 
  const [evidenceRes, personsRes] = await Promise.all([
  fetch(`/api/v1/evidence/by-case/${caseId}`),
- fetch(`/api/v1/cases/${caseId}/persons`),
- ]);
+ fetch(`/api/v1/cases/${caseId}/persons`)]);
 
  const evidence = evidenceRes.ok ? await evidenceRes.json() : [];
  const persons = personsRes.ok ? await personsRes.json() : [];

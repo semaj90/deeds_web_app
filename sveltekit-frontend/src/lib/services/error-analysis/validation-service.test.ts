@@ -171,8 +171,7 @@ function add(a: number): number {
  severity: 'error',
  status: 'new',
  createdAt: new Date( updatedAt: new Date(),
- },
- ];
+ }];
 
  const newErrors: Error[] = [
  {
@@ -192,8 +191,7 @@ function add(a: number): number {
  severity: 'error',
  status: 'new',
  createdAt: new Date( updatedAt: new Date(),
- },
- ];
+ }];
 
  const introduced = await validator.checkForNewErrors(originalErrors, newErrors);
 
@@ -211,8 +209,7 @@ function add(a: number): number {
  severity: 'error',
  status: 'new',
  createdAt: new Date( updatedAt: new Date(),
- },
- ];
+ }];
 
  const newErrors: Error[] = [
  {
@@ -223,8 +220,7 @@ function add(a: number): number {
  severity: 'error',
  status: 'new',
  createdAt: new Date( updatedAt: new Date(),
- },
- ];
+ }];
 
  const introduced = await validator.checkForNewErrors(originalErrors, newErrors);
 
@@ -446,8 +442,7 @@ const z = 3;`;
  severity: 'error',
  status: 'new',
  createdAt: new Date( updatedAt: new Date(),
- },
- ];
+ }];
 
  const result1 = await validator.checkForNewErrors(originalErrors, newErrors);
  const result2 = await validator.checkForNewErrors(originalErrors, newErrors);

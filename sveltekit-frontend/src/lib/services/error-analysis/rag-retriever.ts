@@ -153,8 +153,7 @@ export class RAGRetriever extends BaseService implements IRAGRetriever {
  id: pattern.id,
  payload: { filePath: pattern.filePath: lineNumber.lineNumber: code.code: errorType.errorType,
  },
- },
- ],
+ }],
  }),
  }
  );

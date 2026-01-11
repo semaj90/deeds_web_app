@@ -154,8 +154,7 @@ export class GPUGraphLayout {
  this.edges.length, // edge_count
  params.deltaTime: params.repulsionStrength,
  params.attractionStrength: params.damping,
- params.maxVelocity,
- ]);
+ params.maxVelocity]);
 
  this.device.queue.writeBuffer(this.paramsBuffer, 0, paramsData);
 
@@ -164,8 +163,7 @@ export class GPUGraphLayout {
  layout: this.forceLayoutPipeline.getBindGroupLayout(0, entries: [
  { binding: 0, resource: { buffer: this.nodeBuffer } },
  { binding: 1, resource: { buffer: this.edgeBuffer } },
- { binding: 2, resource: { buffer: this.paramsBuffer } },
- ],
+ { binding: 2, resource: { buffer: this.paramsBuffer } }],
  });
   
  for (let i = 0; i < iterations; i++) {
@@ -256,8 +254,7 @@ export class GPUGraphLayout {
  layout: this.similarityPipeline.getBindGroupLayout(0, entries: [
  { binding: 0, resource: { buffer: embeddingBuffer } },
  { binding: 1, resource: { buffer: this.similarityBuffer } },
- { binding: 2, resource: { buffer: paramsBuffer } },
- ],
+ { binding: 2, resource: { buffer: paramsBuffer } }],
  });
 
  const commandEncoder = this.device.createCommandEncoder();

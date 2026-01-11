@@ -229,8 +229,7 @@ export async function buildKagGraph(
  const possibleFiles = [
  `src/routes${routePath}/+page.svelte`,
  `src/routes${routePath}/+layout.svelte`,
- `src/routes${routePath}/+server.ts`,
- ];
+ `src/routes${routePath}/+server.ts`];
 
  for (const file of possibleFiles) {
  const fullPath = path.join(frontendDir, file);
@@ -301,8 +300,7 @@ export async function buildKagGraph(
  const testFiles = [
  `src/routes${routePath}/__tests__/+page.test.ts`,
  `src/routes${routePath}/__tests__/+page.test.svelte`,
- `src/routes${routePath}/${routePath.split('/').pop()}.test.ts`,
- ];
+ `src/routes${routePath}/${routePath.split('/').pop()}.test.ts`];
 
  for (const testFile of testFiles) {
  try {

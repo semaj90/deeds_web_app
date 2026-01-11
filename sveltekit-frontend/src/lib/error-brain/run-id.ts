@@ -34,7 +34,7 @@ export function extractTimestamp(runId: string): Date | null {
  const match = runId.match(/^rb_(\d{ 4 })(\d{ 2 })(\d{ 2 })_(\d{ 2 })(\d{ 2 })(\d{ 2 })_/);
  if (!match) return null;
 
- const [, year, month, day, hour, minute, second] = match;
+ const [year, month, day, hour, minute, second] = match;
  return new Date(`${ year }-${ month }-${ day }T${ hour }:${minute}:${ second }Z`);
 }
 

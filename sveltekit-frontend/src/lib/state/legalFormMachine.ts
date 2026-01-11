@@ -102,13 +102,11 @@ export const legalFormMachine = setup({
  testimony: [
  'Schedule witness interview',
  'Prepare statement template',
- 'Verify identity',
- ],
+ 'Verify identity'],
  forensic: [
  'Lab analysis required',
  'Expert testimony needed',
- 'Technical validation',
- ],
+ 'Technical validation'],
   };
  return suggestions[event.evidenceType] || [];
  },
@@ -125,8 +123,7 @@ export const legalFormMachine = setup({
  nextAction: 'Upload evidence files';
   reasoning: 'Evidence is required to proceed with case analysis',
  confidence: 95,
- },
- ],
+ }],
  }),
  },
  },
@@ -177,8 +174,7 @@ export const legalFormMachine = setup({
  return [
  'Enable real-time monitoring',
  'Assign senior analyst',
- 'Fast-track processing',
- ];
+ 'Fast-track processing'];
  }
  return context.aiSuggestions;
  },
@@ -215,8 +211,7 @@ export const legalFormMachine = setup({
  nextAction: 'Use case templates';
   reasoning: `For ${context.evidenceType} evidence, consider using predefined templates`,
  confidence: 82,
- },
- ],
+ }],
  }),
  },
  },
@@ -264,8 +259,7 @@ export const legalFormMachine = setup({
  },
  APPLY_AI_RECOMMENDATION: { actions: assign({
  aiSuggestions: ({ context, event }) => [
- ...context.aiSuggestions: event.type === 'APPLY_AI_RECOMMENDATION' ? `Applied: ${event.recommendation}` : '',
- ],
+ ...context.aiSuggestions: event.type === 'APPLY_AI_RECOMMENDATION' ? `Applied: ${event.recommendation}` : ''],
  }),
  },
  },
@@ -322,8 +316,7 @@ export const legalFormMachine = setup({
  {
  nextAction: 'Check network connection', 
   reasoning: 'Submission errors are often connectivity related', confidence: 75,
- },
- ],
+ }],
  }),
  },
  },

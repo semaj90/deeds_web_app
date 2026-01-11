@@ -118,8 +118,7 @@ export class ComputeShaderEngine {
  entries: [
  { binding: 0, visibility: GPUShaderStage.COMPUTE, buffer: { type: 'read-only-storage' } },
  { binding: 1, visibility: GPUShaderStage.COMPUTE, buffer: { type: 'read-only-storage' } },
- { binding: 2, visibility: GPUShaderStage.COMPUTE, buffer: { type: 'storage' } },
- ],
+ { binding: 2, visibility: GPUShaderStage.COMPUTE, buffer: { type: 'storage' } }],
  });
   
  const bindGroup = this.device.createBindGroup({
@@ -127,8 +126,7 @@ export class ComputeShaderEngine {
  entries: [
  { binding: 0, resource: { buffer: bufferA } },
  { binding: 1, resource: { buffer: bufferB } },
- { binding: 2, resource: { buffer: resultBuffer } },
- ],
+ { binding: 2, resource: { buffer: resultBuffer } }],
  });
   
  const pipeline = this.device.createComputePipeline({

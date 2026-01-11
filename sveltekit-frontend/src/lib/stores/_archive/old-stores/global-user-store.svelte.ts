@@ -225,7 +225,7 @@ export const globalUserStore = {
  // ===== CHAT & AI ACTIONS =====
  async addAIMessage(message: Omit<AIMessage, 'id' | 'timestamp'>) {
  const aiMessage: AIMessage = {
- ...message, id: crypto.randomUUID(, timestamp: new Date(),
+ ...message, id: crypto.randomUUID(timestamp: new Date(),
  };
  globalUserState.chatHistory.push(aiMessage);
  globalUserState.sessionMetrics.queriesCount++;
@@ -298,8 +298,7 @@ export const globalUserStore = {
  'criminal',
  'civil',
  'constitutional',
- 'employment',
- ];
+ 'employment'];
  const topics: string[] = [];
  const lowercaseContent = content.toLowerCase();
  legalTerms.forEach((term) => {
@@ -428,8 +427,7 @@ export const globalUserStore = {
  await Promise.all([
  this.loadRecommendations(),
  this.loadAnalytics(),
- this.loadUserPatterns(),
- ]);
+ this.loadUserPatterns()]);
  }
  },
 

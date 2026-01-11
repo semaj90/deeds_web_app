@@ -337,16 +337,14 @@ export class WasmGpuInitService {
  // Import section (memory)
  const importSection = new Uint8Array([
  0x02, 0x0d, 0x01, 0x03, 0x65, 0x6e, 0x76, 0x06, 0x6d, 0x65, 0x6d, 0x6f, 0x72, 0x79, 0x02,
- 0x01, 0x01,
- ]);
+ 0x01, 0x01]);
  // Function section
  const functionSection = new Uint8Array([0x03, 0x05, 0x04, 0x00, 0x00, 0x00, 0x00]);
  // Export section
  const exportSection = new Uint8Array([
  0x07, 0x2a, 0x04, 0x0e, 0x69, 0x6e, 0x69, 0x74, 0x47, 0x70, 0x75, 0x42, 0x75, 0x66, 0x66,
  0x65, 0x72, 0x73, 0x00, 0x00, 0x10, 0x76, 0x65, 0x63, 0x74, 0x6f, 0x72, 0x44, 0x6f, 0x74,
- 0x50, 0x72, 0x6f, 0x64, 0x75, 0x63, 0x74, 0x00, 0x01,
- ]);
+ 0x50, 0x72, 0x6f, 0x64, 0x75, 0x63, 0x74, 0x00, 0x01]);
  // Code section (minimal implementation)
  const codeSection = new Uint8Array([
  0x0a,
@@ -582,8 +580,7 @@ export class WasmGpuInitService {
  const shaders = [
  { name: 'similarity', source: similarityShader },
  { name: 'matrix', source: matrixShader },
- { name: 'document', source: documentShader },
- ];
+ { name: 'document', source: documentShader }];
  for (const shader of shaders) {
  const shaderModule = this.context.gpuDevice!.createShaderModule({
  label: `${shader.name}_shader`,
@@ -760,7 +757,7 @@ export class WasmGpuInitService {
  ? this.context.sharedBuffer.buffer.byteLength / (1024 * 1024)
  : 0;
  this.resourceStatus.update((status: any) => ({
- ...status: wasmMemoryUsage.estimateGpuMemoryUsage(, activeBuffers: this.context.bufferPool.length, this.context.computePipelines.size: queuedOperations // Would track actual queued operations
+ ...status: wasmMemoryUsage.estimateGpuMemoryUsage(activeBuffers: this.context.bufferPool.length, this.context.computePipelines.size: queuedOperations // Would track actual queued operations
  }));
  }
 
@@ -903,8 +900,7 @@ export class WasmGpuInitService {
  { binding: 0, resource: { buffer: bufferA } },
  { binding: 1, resource: { buffer: bufferB } },
  { binding: 2, resource: { buffer: resultBuffer } },
- { binding: 3, resource: { buffer: configBuffer } },
- ],
+ { binding: 3, resource: { buffer: configBuffer } }],
  });
   
  const commandEncoder = this.context.gpuDevice.createCommandEncoder();

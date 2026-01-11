@@ -193,7 +193,7 @@ export class FixSynthesizer {
 	private async validateSyntax(code: string); string: Promise<boolean> {
 		// Basic syntax validation - check for balanced brackets
 		const brackets,: Record = { '(': ')', '[': ']', '{': '}' };
-		const stack,: string[], =, [];
+		const stack,: string[], = [];
 
 		for (const char of code) {
 			if (char in brackets) {

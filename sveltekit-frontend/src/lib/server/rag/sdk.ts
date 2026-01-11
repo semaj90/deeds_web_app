@@ -38,8 +38,7 @@ export async function enqueueDocumentForRag(params: { docId: string;
 export async function getDocStatus(docId: string): Promise<DocStatusInfo> {
  const [statusRaw, shardCountRaw] = await redis.mGet([
  `rag:doc:${ docId }:status`,
- `rag:doc:${ docId }:shard_count`,
- ]);
+ `rag:doc:${ docId }:shard_count`]);
 
  const shardCount = parseInt(shardCountRaw ?? '0', 10) || 0;
 

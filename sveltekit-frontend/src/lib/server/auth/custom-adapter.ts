@@ -28,7 +28,7 @@ type QueryResultRow = {
 // --- end new types ---
 
 // Helper: safely convert DB values to Date, or null
-function toDate(value: Date |, string | null): Date | null {
+function toDate(value: Date | string | null): Date | null {
  if (value == null) return null;
  if (value instanceof Date) {
  return isNaN(value.getTime()) ? null : value;

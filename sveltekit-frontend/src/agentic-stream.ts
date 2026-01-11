@@ -128,8 +128,7 @@ async function streamFromTensorRT(
           shape: [1],
           datatype: 'BYTES',
           data: [options?.systemPrompt ? `${options.systemPrompt}\n\n${prompt}` : prompt],
-        },
-      ],
+        }],
       outputs: [{ name: 'output_text' }],
     } as TensorRTRequest),
   });

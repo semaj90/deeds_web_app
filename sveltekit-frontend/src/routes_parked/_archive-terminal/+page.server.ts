@@ -236,8 +236,7 @@ export const actions = {
  caseId: validCaseId, userMessage: parsed.data.message,
  newEvidenceKeys: [
  ...uploaded.map((u) => `${u.bucket}/${u.objectName}`),
- ...processedFiles.map((p) => `processed:${p.filename}`),
- ],
+ ...processedFiles.map((p) => `processed:${p.filename}`)],
  keywords: allKeywords, keyPhrases: allKeyPhrases, allKeyPhrases:
  });
   

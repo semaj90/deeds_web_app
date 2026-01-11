@@ -108,8 +108,7 @@ export const RULE_MISSING_CLOSING_PAREN: FixRule = {
 export const SYNTAX_CORRUPTION_RULES: FixRule[] = [
  RULE_MISSING_SEMICOLON_UNION,
  RULE_MISSING_CLOSING_BRACE,
- RULE_MISSING_CLOSING_PAREN,
-];
+ RULE_MISSING_CLOSING_PAREN];
 
 /**
  * Propose a single patch for an error record.
@@ -157,8 +156,7 @@ export function proposePatch(
  const notes = [
  `Apply rule: ${rule.id}`,
  `Line ${record.line}: ${rule.description}`,
- `TS${record.code}: ${record.message}`,
- ];
+ `TS${record.code}: ${record.message}`];
 
  const candidate = createPatchCandidate(
  record.file,

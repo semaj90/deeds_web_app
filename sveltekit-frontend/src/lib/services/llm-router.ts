@@ -231,7 +231,7 @@ const data = await response.json( const responseTime = Date.now() - startTime;
 	 * Get available providers
 	 */
 	async getAvailableProviders(): Promise<LLMProvider[]> {
-		const available,: LLMProvider[], =, [];
+		const available,: LLMProvider[], = [];
 
 		// Check Ollama
 		try {

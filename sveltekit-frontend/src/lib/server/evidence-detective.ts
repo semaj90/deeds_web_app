@@ -63,8 +63,7 @@ Please analyze the evidence and provide:
  recommendations: [
  'Review witness statements',
  'Cross-reference with known suspects',
- 'Check for digital footprints',
- ],
+ 'Check for digital footprints'],
  };
  }
 }

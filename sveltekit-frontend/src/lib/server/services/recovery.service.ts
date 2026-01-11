@@ -184,11 +184,11 @@ export class RecoveryService {
  const health = await this.checkServiceHealth();
 
  const unavailableServices = Object.entries(health)
- .filter(([, available]) => !available)
+ .filter(([available]) => !available)
  .map(([service]) => service);
 
  const availableServices = Object.entries(health)
- .filter(([, available]) => available)
+ .filter(([available]) => available)
  .map(([service]) => service);
 
  return {

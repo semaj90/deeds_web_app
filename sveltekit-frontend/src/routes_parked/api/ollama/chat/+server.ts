@@ -33,8 +33,7 @@ export const POST: RequestHandler = async ({ request }) => {
  {
  role: 'user',
  content: prompt,
- },
- ],
+ }],
  }),
  });
 

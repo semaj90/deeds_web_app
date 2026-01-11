@@ -2,7 +2,7 @@ import { jsonb, pgTable, text, timestamp, uuid, varchar } from 'drizzle-orm/pg-c
 import { cases } from './cases.js';
 
 export const evidence = pgTable('evidence', {
- id: uuid('id').defaultRandom().primaryKey(, caseId: uuid('case_id')
+ id: uuid('id').defaultRandom().primaryKey(caseId: uuid('case_id')
  .notNull()
  .references(() => cases.id, { onDelete: 'cascade' }),
 

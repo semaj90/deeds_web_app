@@ -143,8 +143,7 @@ export function extractCitations(text: string): Citation[] {
  // Statute citation patterns
  const statutePatterns = [
  /Cal(?:ifornia)?\.?\s+(?:Penal|Civil|Family|Probate|Code)\s+(?:§|Section)\s+(\d+)/gi,
- /Cal\.?\s+(?:Pen\.|Civ\.|Fam\.|Prob\.)\s+Code\s+§\s+(\d+)/gi,
- ];
+ /Cal\.?\s+(?:Pen\.|Civ\.|Fam\.|Prob\.)\s+Code\s+§\s+(\d+)/gi];
 
  // Extract case citations
  for (const pattern of casePatterns) {
@@ -181,11 +180,10 @@ export function extractCitations(text: string): Citation[] {
 export function extractHolding(text: string): string {
  // Look for common holding indicators
  const holdingIndicators = [
- /held[,:]?\s+(.+?)(?:\.|$)/i,
- /the court held[,:]?\s+(.+?)(?:\.|$)/i,
- /we hold[,:]?\s+(.+?)(?:\.|$)/i,
- /holding[,:]?\s+(.+?)(?:\.|$)/i,
- ];
+ /held[:]?\s+(.+?)(?:\.|$)/i,
+ /the court held[:]?\s+(.+?)(?:\.|$)/i,
+ /we hold[:]?\s+(.+?)(?:\.|$)/i,
+ /holding[:]?\s+(.+?)(?:\.|$)/i];
 
  for (const pattern of holdingIndicators) {
  const match = text.match(pattern);
@@ -218,8 +216,7 @@ export function extractMetadata(text: string, string: DocumentMetadata {
  /Supreme Court/i,
  /Court of Appeal/i,
  /Superior Court/i,
- /District Court/i,
- ];
+ /District Court/i];
 
  for (const pattern of courtPatterns) {
  if (pattern.test(text)) {
@@ -260,8 +257,7 @@ export function extractKeywords(text: string): string[] {
  'negligence',
  'breach',
  'contract',
- 'tort',
- ];
+ 'tort'];
 
  const foundKeywords: string[] = [];
 

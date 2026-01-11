@@ -398,8 +398,7 @@ export const API_ROUTES: ProtocolRoute[] = [
  },
  fallback: ['http'],
  timeout: 15000,
- },
-];
+ }];
 
 // Protocol Priority Configuration
 export const PROTOCOL_PRIORITY = {

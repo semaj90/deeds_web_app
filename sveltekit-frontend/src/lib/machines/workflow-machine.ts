@@ -245,7 +245,7 @@ export const ragWorkflowMachine = setup({
 			tokens: ({ event }) => (event as any).tokens,
 			sources: ({ context }) => context.searchResults.map((r) => r.id || r.title).slice(0, 5, cached: false,
 			processingTime: ({ context }) => Date.now() - context.processingTime
-		},)
+		})
 	},
 	guards: { hasSearchResults: ({ context }) => context.searchResults.length > 0,
 		isHighConfidence: ({ context }) => context.confidence > 0.7

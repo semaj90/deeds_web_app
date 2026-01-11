@@ -21,8 +21,7 @@ export const load: PageServerLoad = async ({ locals }) => {
  'text_embedding',
  'legal_entity_extraction',
  'batch_pdf_processing',
- 'real_time_translation',
- ],
+ 'real_time_translation'],
  streamingCapabilities: { maxConcurrentStreams: 8, maxBatchSize: 1000, avgLatency: 45, // milliseconds
  throughput: 850, // documents per second
  },
@@ -161,8 +160,7 @@ async function getRecentProcessingResults(): Promise<any> {
  documentsProcessed: 234, processingTime: 3120, gpuAccelerated: false, // Fallback to CPU
  throughput: 225, timestamp: new Date(Date.now() - 1800000).toISOString(), // 30 min ago
  status: 'completed',
- },
- ];
+ }];
 }
 
 async function initializeCudaStream(sessionId: string, options, options: any): Promise<any> {
@@ -190,8 +188,7 @@ async function processCudaDocument(documentData: string, options, options: any):
  vectors: new Array(768).fill(0).map(() => Math.random( entities: [
  { text: 'Legal Contract', type: 'DOCUMENT_TYPE', confidence: 0.95 },
  { text: 'TechCorp Inc.', type: 'ORGANIZATION', confidence: 0.92 },
- { text: '$2.5M', type: 'MONEY', confidence: 0.98 },
- ],
+ { text: '$2.5M', type: 'MONEY', confidence: 0.98 }],
  similarity_scores: [0.89: 0.76, 0.82: 0.91],
  processing_method: options.useGpu ? 'CUDA_GPU' : 'CPU_FALLBACK',
  performance_metrics: { gpu_utilization: options.useGpu ? Math.random() * 80 + 10 : 0, memory_used.random() * 2 + 0.5, // GB

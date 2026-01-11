@@ -80,8 +80,7 @@
  route: alignment?.route_decision,
  resultCount: chunks.length,
  },
- ...timeline.slice(0, 9),
- ];
+ ...timeline.slice(0, 9)];
  } finally {
  loading = false;
  }

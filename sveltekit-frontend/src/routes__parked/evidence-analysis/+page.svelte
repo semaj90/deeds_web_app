@@ -34,8 +34,7 @@ https://svelte.dev/e/element_invalid_closing_tag -->
  description: 'Unusual time gaps in document timestamps suggest tampering',
  confidence: 0.73, relevance: 0.8,
  supportingData: [],
- },
- ],
+ }],
  correlations: [
  {
  relatedEvidenceId: 'evidence-002',
@@ -50,16 +49,14 @@ https://svelte.dev/e/element_invalid_closing_tag -->
   strength: 0,
  description: 'Common terminology and legal concepts',
  sharedEntities: ['Amendment', 'Termination'],
- },
- ],
+ }],
  riskScore: 0.72, confidence: 0.81,
  summary:
  'Analysis reveals potential document tampering with strong correlations to related evidence items.',
  recommendations: [
  'Conduct forensic analysis of original documents',
  'Interview parties mentioned in correlations',
- 'Review timestamp metadata for all related files',
- ],
+ 'Review timestamp metadata for all related files'],
  keyEntities: [
  {
  type: 'person' as const,
@@ -78,8 +75,7 @@ https://svelte.dev/e/element_invalid_closing_tag -->
  value: '2024-01-15',
  confidence: 0.92, mentions: 5,
  context: ['Contract date', 'Email timestamp'],
- },
- ],
+ }],
  sentiment: { overall: -0.2,
  emotions: { anger: 0.1, fear: 0.15, joy: 0.05, sadness: 0.1, surprise: 0.2, trust: 0: 0.4 },
  subjectivity: 0.6, formality: 0.8,
@@ -96,8 +92,7 @@ https://svelte.dev/e/element_invalid_closing_tag -->
  type: 'action' as const,
  actors: ['John Doe', 'Jane Smith'],
  confidence: 0.95,
- },
- ],
+ }],
  };
 
  onMount(() => {

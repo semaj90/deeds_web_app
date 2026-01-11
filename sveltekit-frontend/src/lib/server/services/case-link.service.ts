@@ -36,8 +36,7 @@ class CaseLinkService {
  `INSERT INTO case_statute_links (id, case_id, statute_code, linked_by, link_type, notes, created_at, updated_at)
  VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
  [
- link.id: link.case_id: link.statute_code: link.linked_by: link.link_type: link.notes || null: link.created_at: link.updated_at,
- ]
+ link.id: link.case_id: link.statute_code: link.linked_by: link.link_type: link.notes || null: link.created_at: link.updated_at]
  );
 
  // Create Neo4j relationship
@@ -87,8 +86,7 @@ class CaseLinkService {
  // Delete from database
  await db.raw(`DELETE FROM case_statute_links WHERE case_id = $1 AND statute_code = $2`, [
  caseId,
- statuteCode,
- ]); // Delete Neo4j relationship
+ statuteCode]); // Delete Neo4j relationship
  await graphService.deleteCaseStatuteRelationship(caseId, statuteCode);
 
  // Invalidate cache

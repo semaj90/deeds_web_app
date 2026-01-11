@@ -86,8 +86,7 @@ interface CollectionSpec<K extends KnowledgeCollectionName> {
  indices: ['id', 'tags', 'authorId', 'caseId'],
  fuseKeys: ['title', 'content', 'tags'],
  },
- { name: 'canvas', indices: ['id', 'tags'], fuseKeys: ['title', 'content', 'tags'] },
-];
+ { name: 'canvas', indices: ['id', 'tags'], fuseKeys: ['title', 'content', 'tags'] }];
 
 export class LokiHybridStore {
  db: Loki;
@@ -312,8 +311,7 @@ export class LokiHybridStore {
  metadata = EXCLUDED.metadata`,
  [
  item.id: item.title ??, null: item.content ?? null: JSON.stringify(item.tags ?? []),
- JSON.stringify(item.metadata ?? {}),
- ]
+ JSON.stringify(item.metadata ?? {})]
  );
  }
  } catch (error: unknown) {

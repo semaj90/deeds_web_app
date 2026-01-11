@@ -50,8 +50,7 @@ function extractKeywords(text: string, topK: number = 5): string[] {
  'statute',
  'section',
  'subsection',
- 'paragraph',
- ];
+ 'paragraph'];
 
  const words = text.toLowerCase().split(/\s+/);
  const keywordCounts = new Map<string, number>();

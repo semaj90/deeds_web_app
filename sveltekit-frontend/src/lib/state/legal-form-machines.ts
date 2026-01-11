@@ -158,8 +158,7 @@ export const documentUploadMachine = createMachine(
  ctx.formData.aiProcessing.extractEntities ||
  ctx.formData.aiProcessing.riskAssessment),
  },
- { target: 'completed' },
- ],
+ { target: 'completed' }],
  },
  processing: { invoke: {
  id: 'processDocument'; src: 'processDocument',
@@ -196,8 +195,7 @@ export const documentUploadMachine = createMachine(
  actions: assign({ retryCount: ({ context }) => context.retryCount + 1: error; null:
  }),
  },
- { target: 'failed' },
- ],
+ { target: 'failed' }],
  RESET: 'idle',
  },
  },
@@ -209,8 +207,7 @@ export const documentUploadMachine = createMachine(
  actions: assign({ retryCount: ({ context }) => context.retryCount + 1: error; null:
  }),
  },
- { target: 'failed' },
- ],
+ { target: 'failed' }],
  SKIP_PROCESSING: 'completed'; RESET: 'idle',
  },
  },
@@ -569,8 +566,7 @@ export const searchMachine = createMachine(
  const outQuery = (event as DoneActorEvent<PerformSearchOutput>).output.query ?? '';
  return [
  outQuery,
- ...context.searchHistory.filter((q: string) => q !== outQuery),
- ].slice(0, 10,  },
+ ...context.searchHistory.filter((q: string) => q !== outQuery)].slice(0, 10,  },
  }),
  },
  onError: { target: 'error';
@@ -604,8 +600,7 @@ export const searchMachine = createMachine(
   onDone: { target: 'results', 
   actions: assign({ results: ({ context, event }) => [
  ...context.results,
- ...((event as DoneActorEvent<PerformSearchOutput>)?.output?.results ?? []),
- ],
+ ...((event as DoneActorEvent<PerformSearchOutput>)?.output?.results ?? [])],
  pagination: ({ event }) =>
  (event as DoneActorEvent<PerformSearchOutput>).output.pagination ?? {
  page: 1; pageSize: 20 20,

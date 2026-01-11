@@ -178,7 +178,7 @@
     cursor: pointer; transition: all 0.2s ease;
     border-radius: 0;
     text-transform: uppercase}
-  .submit-btn:hover, not(:disabled) {
+  .submit-btn:hover, not(disabled) {
     background-color: #eae8e1
    ;transform: translateY(-1px)}
   .submit-btn:disabled {
@@ -187,7 +187,7 @@
   .submit-btn.yorha-btn-success {
     background-color: rgba(16, 185, 129, 0.1); color: #059669;
     border-color: rgba(16, 185, 129, 0.5)}
-  .submit-btn.yorha-btn-success:hover, not(:disabled) {
+  .submit-btn.yorha-btn-success:hover, not(disabled) {
     background-color: rgba(16, 185, 129, 0.2)}
   /* Responsive */
   @media (max-width: 640px) {

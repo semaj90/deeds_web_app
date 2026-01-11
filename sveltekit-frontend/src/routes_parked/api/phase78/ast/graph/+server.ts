@@ -27,8 +27,7 @@ export const GET: RequestHandler = async ({ url }) => {
  type: 'error',
  label: 'TS1005',
  data: {},
- },
- ],
+ }],
  edges: [
  {
  from: 'node-1',
@@ -39,8 +38,7 @@ export const GET: RequestHandler = async ({ url }) => {
  from: 'node-2',
  to: 'node-3',
  type: 'error',
- },
- ],
+ }],
  metadata: { route: timestamp Date().toISOString(),
  },
  });

@@ -69,8 +69,7 @@
       icon: Sparkles,
       shortcut: "Ctrl+Shift+I",
       description: "Investigation documentation and findings",
-    },
-  ];
+    }];
 
   const aiTools = [
     {
@@ -88,8 +87,7 @@
       shortcut: "Ctrl+Shift+A",
       description: "Comprehensive AI analysis with insights",
       requiresContent: true,
-    },
-  ];
+    }];
 
   function handleKeydown(event: KeyboardEvent) {
     if (!event.ctrlKey || !event.shiftKey) return;

@@ -24,8 +24,7 @@ function createChatContextStore() {
  title: topic.title,
  data: topic,
  timestamp: new Date(),
- },
- ];
+ }];
  });
  },
  addShard: (shard: ShardNode) => {
@@ -40,8 +39,7 @@ function createChatContextStore() {
  title: `Shard ${shard.shardId}`,
  data: shard,
  timestamp: new Date(),
- },
- ];
+ }];
  });
  },
  remove: (id: string) => {

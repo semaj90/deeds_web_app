@@ -41,8 +41,7 @@ export class BitsUIIntegrationTester {
  'DialogBits',
  'SelectBits',
  'TooltipBits',
- 'DropdownBits',
- ];
+ 'DropdownBits'];
 
  components.forEach((component) => {
  this.addResult(component, 'pass', `${component} import successful`);
@@ -60,8 +59,7 @@ export class BitsUIIntegrationTester {
  '--legal-ai-primary-dark',
  '--legal-ai-bg-primary',
  '--legal-ai-text-primary',
- '--legal-ai-border-primary',
- ];
+ '--legal-ai-border-primary'];
 
  if (typeof document !== 'undefined') {
  const computedStyle = getComputedStyle(document.documentElement);

@@ -25,8 +25,7 @@ const mockToolExecutionResponse = {
  id: '1',
  score: 0.95,
  payload: { text: 'Sample legal document' },
- },
- ],
+ }],
  },
 };
 
@@ -37,8 +36,7 @@ const mockAgentChatResponse = {
  {
  toolName: 'rag_lookup',
  arguments: { query: 'contract law' },
- },
- ],
+ }],
  context: { caseId: 'case-123',
  userId: 'user-456',
  },

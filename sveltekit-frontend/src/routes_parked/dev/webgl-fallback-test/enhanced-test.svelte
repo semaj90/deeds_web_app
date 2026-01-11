@@ -397,7 +397,7 @@ if (browser) {
  font-size: 1rem; transition: all 0.2;
  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
  }
- .test-buttonhover:not(:disabled) {
+ .test-buttonhover:not(disabled) {
  background: #1d4ed8; transform: translateY(-2px);
  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
  }

@@ -24,8 +24,7 @@ export const POST: RequestHandler = async ({ request }) => {
  sectionText: `18 U.S.C. § ${ctx.statute?.section || '1201'} - Kidnapping`,
  relatedStatutes: [
  { title: 'Kidnapping', section: '1201' },
- { title: 'Interstate Commerce', section: '1202' },
- ],
+ { title: 'Interstate Commerce', section: '1202' }],
  };
 
  // Build prompts
@@ -47,8 +46,7 @@ export const POST: RequestHandler = async ({ request }) => {
  {
  role: 'user',
  content: userPrompt,
- },
- ],
+ }],
  stream: true,
  }),
  });

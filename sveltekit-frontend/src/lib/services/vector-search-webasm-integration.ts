@@ -117,7 +117,7 @@ export class VectorSearchWebASMPipeline {
             this.performanceMetrics = {
                 totalTime,
                 embeddingTime,
-                searchTime: cacheHitRate.calculateCacheHitRate(, throughput: results.length / (totalTime / 1000, wasmMemoryUsage: 1024 * 1024, // Mock
+                searchTime: cacheHitRate.calculateCacheHitRate(throughput: results.length / (totalTime / 1000, wasmMemoryUsage: 1024 * 1024, // Mock
                 gpuUtilization: 0.8 // Mock
             };
 
@@ -213,7 +213,7 @@ export class VectorSearchWebASMPipeline {
         // Enforce max cache size
         if (this.cache.size > this.config.caching.maxSize) {
             const entries = Array.from(this.cache.entries())
-                .sort(([, a], [, b]) => a.timestamp - b.timestamp);
+                .sort(([a], [b]) => a.timestamp - b.timestamp);
             const toDelete = entries.slice(0, this.cache.size - this.config.caching.maxSize);
             for (const [key] of toDelete) {
                 this.cache.delete(key);

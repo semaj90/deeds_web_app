@@ -3,7 +3,7 @@
 	import { onMount } from 'svelte';
 
 	interface UploadProgress {
-		fileName: string;, progress: number;
+		fileName: string; progress: number;
 		status: 'pending' | 'uploading' | 'completed' | 'error';
 		error?: string;
 	}
@@ -57,8 +57,7 @@
 						progress: 0,
 						status: 'error',
 						error: validation.error,
-					},
-				];
+					}];
 				continue;
 			}
 
@@ -70,8 +69,7 @@
 					fileName: file.name,
 					progress: 0,
 					status: 'pending',
-				},
-			];
+				}];
 
 			// Upload file
 			await uploadFile(file, uploadIndex);
@@ -80,15 +78,14 @@
 		isUploading = false;
 	}
 
-	function validateFile(file: File): {, valid: boolean; error?: string } {
+	function validateFile(file: File): {valid: boolean; error?: string } {
 		const maxSize = 50 * 1024 * 1024; // 50MB
 		const allowedTypes = [
 			'application/pdf',
 			'image/png',
 			'image/jpeg',
 			'image/tiff',
-			'application/x-tiff',
-		];
+			'application/x-tiff'];
 
 		if (file.size > maxSize) {
 			return { valid: false, error: 'File size exceeds 50MB limit' };
@@ -256,7 +253,7 @@
 	.drop-zone {
 		border: 3px dashed #00d4ff;
 		border-radius: 8px; padding: 3rem;
-		text-align: center;, cursor: pointer;
+		text-align: center; cursor: pointer;
 		transition: all 0.3s;
 		background: rgba(0, 212, 255, 0.05);
 		margin-bottom: 2rem;
@@ -264,7 +261,7 @@
 
 	.drop-zone.dragging {
 		background: rgba(0, 212, 255, 0.15);
-		border-color: #00ff00;, transform: scale(1.02);
+		border-color: #00ff00; transform: scale(1.02);
 	}
 
 	.drop-content {
@@ -283,19 +280,19 @@
 	}
 
 	.drop-zone p {
-		color: #a0a0a0;, margin: 0.5rem 0;
+		color: #a0a0a0; margin: 0.5rem 0;
 	}
 
 	.file-input-label {
-		display: inline-block;, background: #00d4ff;
-		color: #1a1a2e;, padding: 0.75rem 1.5rem;
+		display: inline-block; background: #00d4ff;
+		color: #1a1a2e; padding: 0.75rem 1.5rem;
 		border-radius: 4px; cursor: pointer;
-		font-weight: bold;, margin: 1rem 0;
+		font-weight: bold; margin: 1rem 0;
 		transition: all 0.3s;
 	}
 
 	.file-input-label:hover {
-		background: #00ff00;, transform: scale(1.05);
+		background: #00ff00; transform: scale(1.05);
 	}
 
 	.file-input-label input {
@@ -322,12 +319,12 @@
 	}
 
 	.uploads-header h3 {
-		color: #00d4ff;, margin: 0;
+		color: #00d4ff; margin: 0;
 	}
 
 	.clear-btn {
-		background: #ff6b6b;, color: white;
-		border: none;, padding: 0.5rem 1rem;
+		background: #ff6b6b; color: white;
+		border: none; padding: 0.5rem 1rem;
 		border-radius: 4px; cursor: pointer;
 		font-size: 0.9rem;
 	}
@@ -338,20 +335,20 @@
 
 	.uploads-list {
 		display: flex;
-		flex-direction: column;, gap: 1rem;
+		flex-direction: column; gap: 1rem;
 	}
 
 	.upload-item {
 		display: flex;
 		justify-content: space-between;
-		align-items: center;, background: rgba(0, 0, 0, 0.3);
+		align-items: center; background: rgba(0, 0, 0, 0.3);
 		border-left: 3px solid #00d4ff;
 		padding: 1rem;
 		border-radius: 4px; transition: all 0.3s;
 	}
 
 	.upload-item.completed {
-		border-left-color: #00ff00;, opacity: 0.7;
+		border-left-color: #00ff00; opacity: 0.7;
 	}
 
 	.upload-item.error {
@@ -396,7 +393,7 @@
 	}
 
 	.spinner {
-		display: inline-block;, animation: spin 1s linear infinite;
+		display: inline-block; animation: spin 1s linear infinite;
 	}
 
 	@keyframes spin {
@@ -421,7 +418,7 @@
 	}
 
 	.info-box ul {
-		color: #a0a0a0;, margin: 0;
+		color: #a0a0a0; margin: 0;
 		padding-left: 1.5rem;
 	}
 

@@ -362,8 +362,7 @@ export function isDocumentFile(file: File): boolean {
  'application/vnd.ms-excel',
  'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
  'text/plain',
- 'application/rtf',
- ];
+ 'application/rtf'];
  return documentTypes.includes(file.type);
 }
 

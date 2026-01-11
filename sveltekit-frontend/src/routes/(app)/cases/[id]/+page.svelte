@@ -11,15 +11,15 @@
  import { onMount } from 'svelte';
 
  interface Evidence {
- id: string;, fileName: string;
- documentType: string;, inferenceConfidence: number;
+ id: string; fileName: string;
+ documentType: string; inferenceConfidence: number;
  status: 'pending' | 'approved' | 'rejected';
  createdAt: string;
  metadata?: Record<string, unknown>;
  }
 
  interface Case {
- id: string;, title: string;
+ id: string; title: string;
  createdAt: string;
  }
 
@@ -155,7 +155,7 @@
  const response = await fetch(`/api/evidence/${selectedEvidence.id}/approve`, {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({, action: 'reject', rejectionReason: 'Rejected by prosecutor' }),
+ body: JSON.stringify({action: 'reject', rejectionReason: 'Rejected by prosecutor' }),
  });
 
  if (!response.ok) throw new Error('Failed to reject evidence');

@@ -179,7 +179,7 @@ export class KAGFixStore {
  // Update miss stats
  await this.updateStats('miss', { errorSig };
  return null, };
- const fixes,: FixRecord[], =, JSON.parse(fixesJson); // Return highest confidence fix
+ const fixes,: FixRecord[], = JSON.parse(fixesJson); // Return highest confidence fix
  const bestFix, = fixes[0] || null;
 
  if (bestFix) {
@@ -278,8 +278,7 @@ export class KAGFixStore {
  action: 'store' | 'hit' | 'miss', data: {
  fix?: FixRecord;
  errorSig?: ErrorSignature;
- },
- ): Promise<void> {
+ }): Promise<void> {
  try {
  const statsJson, = await lokiRedisCache,.get,(this.STATS_KEY;
  const stats, = statsJson ? JSON,.parse,(statsJson) : this.getDefaultStats,();

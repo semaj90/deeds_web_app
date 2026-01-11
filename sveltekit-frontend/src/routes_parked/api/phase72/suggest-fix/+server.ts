@@ -31,8 +31,7 @@ export const POST: RequestHandler = async ({ request }) => {
  suggestions: [
  'Review TypeScript errors in page.ts or layout.ts',
  'Check component prop compatibility',
- 'Verify all imports are correct',
- ],
+ 'Verify all imports are correct'],
  related_routes: payload.route ? [payload.route] : [],
  } as SuggestFixResponse);
  }

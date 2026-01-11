@@ -49,16 +49,13 @@ function createMockData(): { evidence: Item[]; notes: Item[]; canvasStates: Item
  fileName: 'email.txt',
  description: 'Client email thread',
  tags: ['email', 'client'],
- },
- ],
+ }],
  notes: [
  { id: 'n1', title: 'Case summary', content: 'Important points...', tags: ['summary'] },
- { id: 'n2', title: 'Todo list', content: 'Follow up with witness...', tags: ['task'] },
- ],
+ { id: 'n2', title: 'Todo list', content: 'Follow up with witness...', tags: ['task'] }],
  canvasStates: [
  { id: 'c1', title: 'Scene Diagram', content: 'Canvas layout v1', tags: ['canvas'] },
- { id: 'c2', title: 'Relationship Map', content: 'Linked suspects', tags: ['map'] },
- ],
+ { id: 'c2', title: 'Relationship Map', content: 'Linked suspects', tags: ['map'] }],
  };
 }
 

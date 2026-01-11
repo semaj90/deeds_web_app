@@ -19,8 +19,7 @@ export async function addEvidenceToRAG(payload: { text: string;
  {
  source: payload.source,
  id: payload.id,
- },
- ]
+ }]
  );
 }
 

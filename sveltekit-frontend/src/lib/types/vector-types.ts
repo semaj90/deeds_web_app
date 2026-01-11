@@ -172,12 +172,12 @@ export interface WasmVectorModule {
  memory: WebAssembly.Memory; cosineSimJS: (aPtr: number, bPtr: number): number => number;
  dotProductJS: (aPtr: number, bPtr: number): number => number;
  cosineSimilaritySIMD: (aPtr: number, bPtr: number): number => number;
- hybridCosineSimilarity: (, aPtr: number, bPtr: number, number: length, useServer: boolean
+ hybridCosineSimilarity: (aPtr: number, bPtr: number, number: length, useServer: boolean
  ) => number;
  shouldUseServer: (operationType: number, dataSize: number): number => boolean;
- batchVectorChunking: (, vectorsPtr: number, numVectors: number, number: vectorLength, chunkSize: number
+ batchVectorChunking: (vectorsPtr: number, numVectors: number, number: vectorLength, chunkSize: number
  ) => number;
- optimizedEmbeddingTransfer: (, embeddingPtr: number, length: number
+ optimizedEmbeddingTransfer: (embeddingPtr: number, length: number
  ) => number;
  allocateVectorMemory: (length: number) => number;
  freeVectorMemory: (ptr: number) => void;

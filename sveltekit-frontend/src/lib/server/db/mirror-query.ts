@@ -174,7 +174,7 @@ export async function mirrorQuery(
             }
 
             graph_context = {
-                nodes: Array.from(allNodes.values(, neighbors: neighborsMap, traversal_depth: graphDepth
+                nodes: Array.from(allNodes.values(neighbors: neighborsMap, traversal_depth: graphDepth
             };
 
             performance.couchdb_ms = Date.now() - couchStart;

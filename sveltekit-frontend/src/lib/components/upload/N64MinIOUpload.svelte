@@ -121,7 +121,7 @@
   .n64-gpu-indicator { font-size: 0.8rem; color: #40FF40; font-weight: bold; text-shadow: 1px 1px 0 #000; letter-spacing: 0.5px}
   .n64-upload-actions { margin-top: 1.5rem; display: flex; gap: 1rem}
   .n64-upload-button { flex: 1; display: flex; align-items: center; justify-content: center; gap: 0.75rem;padding: 1rem 1.5rem; background: #FFD700;color: #000; border: 3px solid #FFA500; font-family: 'Courier New', monospace; font-weight: bold; cursor: pointer;transition: all 0.3s ease; font-size: 0.9rem; letter-spacing: 0.5px; box-shadow: inset 2px 2px 0 rgba(255, 255, 255, 0.3), inset -2px -2px, 0 rgba(0, 0, 0, 0.3), 0 4px 8px rgba(0, 0, 0, 0.5)}
-  .n64-upload-buttonhover:not(:disabled) { background: #FFA500; transform: translateY(-2px); box-shadow: inset 2px 2px 0 rgba(255, 255, 255, 0.3), inset -2px -2px, 0 rgba(0, 0, 0, 0.3), 0 6px 12px rgba(0, 0, 0, 0.7)}
+  .n64-upload-buttonhover:not(disabled) { background: #FFA500; transform: translateY(-2px); box-shadow: inset 2px 2px 0 rgba(255, 255, 255, 0.3), inset -2px -2px, 0 rgba(0, 0, 0, 0.3), 0 6px 12px rgba(0, 0, 0, 0.7)}
   .n64-upload-buttondisabled { opacity: 0.6; cursor:not-allowed; transform: none}
   .n64-clear-button { padding: 1rem; background: #666666; color: #FFF; border: 2px solid #444444; font-family: 'Courier New', monospace; font-weight: bold; cursor: pointer;transition: all 0.2s ease; font-size: 0.8rem; letter-spacing: 0.5px; box-shadow: inset 1px 1px 0 rgba(255, 255, 255, 0.2), inset -1px -1px, 0 rgba(0, 0, 0, 0.3)}
   .n64-clear-buttonhover { background: #777777; transform: translateY(-1px)}

@@ -295,7 +295,7 @@ import { X } from "lucide-svelte";;
  flex-shrink: 0;
  }
 
- .close-btn:hover, not(:disabled) {
+ .close-btn:hover, not(disabled) {
  background: #f8f9fa; color: #495057;
  }
 
@@ -338,7 +338,7 @@ import { X } from "lucide-svelte";;
  border-color: #dee2e6;
  }
 
- .cancel-btn:hover, not(:disabled) {
+ .cancel-btn:hover, not(disabled) {
  background: #f8f9fa; color: #495057;
  }
 
@@ -346,7 +346,7 @@ import { X } from "lucide-svelte";;
  background: #007bff; color: white;
  }
 
- .confirm-btn:hover, not(:disabled) {
+ .confirm-btn:hover, not(disabled) {
  background: #0056b3;
  }
 

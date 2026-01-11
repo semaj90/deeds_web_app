@@ -166,8 +166,7 @@ describe('Legal-Aware Ranker', () => {
  id: 'hit3',
  score: 0.9,
  payload: { tag_ids: ['tag5'], jurisdiction: 'Other' },
- },
- ];
+ }];
 
  const queryTagIds = ['tag1', 'tag2'];
 
@@ -190,8 +189,7 @@ describe('Legal-Aware Ranker', () => {
 
  it('should use default weights when none provided', () => {
  const hits: QdrantHit[] = [
- { id: 'test', score: 0.8, payload: { tag_ids: ['tag1'], jurisdiction: 'CA' } },
- ];
+ { id: 'test', score: 0.8, payload: { tag_ids: ['tag1'], jurisdiction: 'CA' } }];
 
  const ranked = rerankLegalAware({
  hits,

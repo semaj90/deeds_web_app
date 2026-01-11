@@ -171,7 +171,7 @@ export class QueryBuilder {
  const sortOrder = filters.sortOrder || 'desc';
  const sortClause = this.applySorting(table, sortBy, sortOrder);
  if (sortClause && query.orderBy) query = query.orderBy(sortClause, // Get pagination params
- let pageParam: number |, string | undefined;
+ let pageParam: number | string | undefined;
  if (filters.page != null) {
  pageParam = filters.page;
  } else if (typeof filters.offset === 'number' && typeof filters.limit === 'number') {

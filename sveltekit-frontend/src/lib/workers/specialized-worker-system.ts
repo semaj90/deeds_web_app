@@ -14,13 +14,13 @@ type AmqpConnectionLike = {
 
 type AmqpChannelLike = {
 	assertQueue: (queue: string, opts?: Record<string, unknown>) => Promise<unknown>;
-	consume: (, q: string,
+	consume: (q: string,
 		cb: (msg: null) => void
 	) => Promise<unknown>;
-	sendToQueue: (, q: string, content: Buffer,
+	sendToQueue: (q: string, content: Buffer,
 		opts?: Record<string, unknown>
 	) => boolean;
-	ack: (msg: AmqpConsumeMessageLike) => void, nack: (, msg: AmqpConsumeMessageLike,
+	ack: (msg: AmqpConsumeMessageLike) => void, nack: (msg: AmqpConsumeMessageLike,
 		allUpTo?: boolean,
 		requeue?: boolean
 	) => void;
@@ -551,8 +551,7 @@ export class CaseLawWorker extends SpecializedWorker {
         summary: `A sample legal case generated for query: "${q}". This is placeholder data for testing.`,
         keyHoldings: ['Sample holding 1', 'Sample holding 2'],
         precedentialValue: 'binding',
-      },
-    ];
+      }];
   }
 }
 

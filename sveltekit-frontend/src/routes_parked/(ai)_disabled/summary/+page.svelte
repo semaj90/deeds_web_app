@@ -61,8 +61,7 @@ https://svelte.dev/e/js_parse_error -->
  evidence: [
  { id: '1', type: 'digital', title: 'Email Communications' },
  { id: '2', type: 'document', title: 'Financial Records' },
- { id: '3', type: 'photo', title: 'Crime Scene Photos' },
- ],
+ { id: '3', type: 'photo', title: 'Crime Scene Photos' }],
  status: 'active',
  };
  };

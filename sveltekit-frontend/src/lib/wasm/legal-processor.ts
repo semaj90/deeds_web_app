@@ -433,8 +433,7 @@ export class WasmLegalProcessor {
  'regulation',
  'court',
  'judge',
- 'law',
- ];
+ 'law'];
  const words = text.toLowerCase().split(/\s+/);
  const legalCount = words.filter((w) => legalTerms.includes(w)).length;
  return legalCount / words.length;

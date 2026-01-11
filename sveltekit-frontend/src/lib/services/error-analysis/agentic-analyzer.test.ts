@@ -75,8 +75,7 @@ describe('AgenticAnalyzer - Property-Based Tests (Task 10.1)', () => {
  code: 'const, y: string = 456;',
  errorType: 'type-mismatch',
  similarity: 0.95,
- },
- ];
+ }];
 
  const prompt = await analyzer.generatePrompt(error, patterns);
 
@@ -121,8 +120,7 @@ describe('AgenticAnalyzer - Property-Based Tests (Task 10.1)', () => {
  code: 'const, z: boolean = 0;',
  errorType: 'type-mismatch',
  similarity: 0.88,
- },
- ];
+ }];
 
  const prompt = await analyzer.generatePrompt(error, patterns);
 
@@ -209,8 +207,7 @@ The variable is assigned a number but declared as string.`,
  { text: '0.5', expected: 0.5 },
  { text: '1.5', expected: 1 },
  { text: '0', expected: 0 },
- { text: '1', expected: 1 },
- ];
+ { text: '1', expected: 1 }];
 
  for (const { text: expected } of testCases) {
  const response: LLMResponse = {
@@ -398,8 +395,7 @@ type-mismatch, undefined-variable, unused-variable, missing-return`,
  code: 'const, x: string = 123;',
  errorType: 'type-mismatch',
  similarity: 0.95,
- },
- ];
+ }];
 
  const prompt1 = await analyzer.generatePrompt(error, patterns);
  const prompt2 = await analyzer.generatePrompt(error, patterns);

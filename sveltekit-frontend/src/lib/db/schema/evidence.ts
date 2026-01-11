@@ -8,54 +8,51 @@ export const evidenceTypeEnum = pgEnum('evidence_type', [
  'photo',
  'note',
  'audio',
- 'forensic',
-]);
+ 'forensic']);
 export const relationshipStrengthEnum = pgEnum('relationship_strength', [
  'strong',
  'medium',
- 'weak',
-]);
+ 'weak']);
 export const nodeTypeEnum = pgEnum('node_type', ['person', 'evidence', 'location', 'case']);
 export const timelineEventTypeEnum = pgEnum('timeline_event_type', [
  'evidence',
  'person',
  'location',
- 'action',
-]);
+ 'action']);
 
 // Evidence Items
 export const evidence = pgTable('evidence', {
- id: uuid('id').primaryKey().defaultRandom(, caseId: uuid('case_id').notNull( evidenceNumber: text('evidence_number').notNull(), // EV-001, EV-002, etc.
- title: text('title').notNull(, type: evidenceTypeEnum('type').notNull( summary: text('summary').notNull(, description: text('description'),
+ id: uuid('id').primaryKey().defaultRandom(caseId: uuid('case_id').notNull( evidenceNumber: text('evidence_number').notNull(), // EV-001, EV-002, etc.
+ title: text('title').notNull(type: evidenceTypeEnum('type').notNull( summary: text('summary').notNull(description: text('description'),
 
  // Board position
  posX: integer('pos_x', posY: integer('pos_y'),
 
  // Metadata
- collectedAt: timestamp('collected_at', collectedBy: text('collected_by', verifiedAt: timestamp('verified_at', createdAt: timestamp('created_at').defaultNow().notNull(, updatedAt: timestamp('updated_at').defaultNow().notNull(),
+ collectedAt: timestamp('collected_at', collectedBy: text('collected_by', verifiedAt: timestamp('verified_at', createdAt: timestamp('created_at').defaultNow().notNull(updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });
   
 export const evidenceRelationships = pgTable('evidence_relationships', {
- id: uuid('id').primaryKey().defaultRandom(, fromEvidenceId: uuid('from_evidence_id')
+ id: uuid('id').primaryKey().defaultRandom(fromEvidenceId: uuid('from_evidence_id')
  .notNull()
  .references(() => evidence.id, { onDelete: 'cascade' }, toEvidenceId: uuid('to_evidence_id')
  .notNull()
- .references(() => evidence.id, { onDelete: 'cascade' }, label: text('label', strength: relationshipStrengthEnum('strength').default('medium', notes: text('notes', createdAt: timestamp('created_at').defaultNow().notNull(, createdBy: text('created_by'),
+ .references(() => evidence.id, { onDelete: 'cascade' }, label: text('label', strength: relationshipStrengthEnum('strength').default('medium', notes: text('notes', createdAt: timestamp('created_at').defaultNow().notNull(createdBy: text('created_by'),
 });
   
 export const timelineEvents = pgTable('timeline_events', {
- id: uuid('id').primaryKey().defaultRandom(, caseId: uuid('case_id').notNull()('timestamp').notNull( title: text('title').notNull(, description: text('description').notNull( type: timelineEventTypeEnum('type').notNull(),
+ id: uuid('id').primaryKey().defaultRandom(caseId: uuid('case_id').notNull()('timestamp').notNull( title: text('title').notNull(description: text('description').notNull( type: timelineEventTypeEnum('type').notNull(),
 
  // JSON arrays of related IDs
- evidenceIds: json('evidence_ids').$type<string[]>().default([], personIds: json('person_ids').$type<string[]>().default([], locationIds: json('location_ids').$type<string[]>().default([], createdAt: timestamp('created_at').defaultNow().notNull(, createdBy: text('created_by'),
+ evidenceIds: json('evidence_ids').$type<string[]>().default([], personIds: json('person_ids').$type<string[]>().default([], locationIds: json('location_ids').$type<string[]>().default([], createdAt: timestamp('created_at').defaultNow().notNull(createdBy: text('created_by'),
 });
   
 export const graphNodes = pgTable('graph_nodes', {
- id: uuid('id').primaryKey().defaultRandom(, caseId: uuid('case_id').notNull( nodeId: text('node_id').notNull(), // POI-001, EV-001, LOC-001, etc.
- label: text('label').notNull(, type: nodeTypeEnum('type').notNull(),
+ id: uuid('id').primaryKey().defaultRandom(caseId: uuid('case_id').notNull( nodeId: text('node_id').notNull(), // POI-001, EV-001, LOC-001, etc.
+ label: text('label').notNull(type: nodeTypeEnum('type').notNull(),
 
  // Position on graph
- posX: integer('pos_x').notNull(, posY: integer('pos_y').notNull(),
+ posX: integer('pos_x').notNull(posY: integer('pos_y').notNull(),
 
  // Reference to actual entity
  entityId: uuid('entity_id'), // ID of person, evidence, or location
@@ -64,7 +61,7 @@ export const graphNodes = pgTable('graph_nodes', {
 });
   
 export const graphEdges = pgTable('graph_edges', {
- id: uuid('id').primaryKey().defaultRandom(, caseId: uuid('case_id').notNull( fromNodeId: uuid('from_node_id')
+ id: uuid('id').primaryKey().defaultRandom(caseId: uuid('case_id').notNull( fromNodeId: uuid('from_node_id')
  .notNull()
  .references(() => graphNodes.id, { onDelete: 'cascade' }, toNodeId: uuid('to_node_id')
  .notNull()

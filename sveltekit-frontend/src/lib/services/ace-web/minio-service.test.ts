@@ -145,8 +145,7 @@ describe('MinIOService', () => {
       const docId = 'doc-456';
       const chunks = [
         { text: 'Chunk 1 content', metadata: { index: 0 } },
-        { text: 'Chunk 2 content', metadata: { index: 1 } },
-      ];
+        { text: 'Chunk 2 content', metadata: { index: 1 } }];
 
       const key = await service.storeChunks(docId, chunks);
 

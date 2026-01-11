@@ -47,7 +47,7 @@ export const phase89Tools = {
 				const proc = spawn(pythonPath, [scriptPath], {
 					env: {
 						...process.env,
-						PHASE89_EPS: eps.toString(, PHASE89_MIN_SAMPLES: minSamples.toString( PHASE89_BATCH_SIZE: batchSize.toString()
+						PHASE89_EPS: eps.toString(PHASE89_MIN_SAMPLES: minSamples.toString( PHASE89_BATCH_SIZE: batchSize.toString()
 					}
 				});
 

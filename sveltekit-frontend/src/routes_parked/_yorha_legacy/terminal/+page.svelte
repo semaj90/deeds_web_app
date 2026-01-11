@@ -23,8 +23,7 @@
  role: 'assistant' as const,
  text: 'Analyzing CASE-002: Human Trafficking / Forced Labor...\n\nKey Aggravating Factors:\n1. Multiple victims (15+ documented)\n2. Vulnerability of victims (migrants, economic distress)\n3. Extended duration of offense (2+ years)\n4. Use of coercion and deception\n5. Financial gain motive\n\nRecommended Sentencing Range: 15-25 years\nBased on Federal Sentencing Guidelines §2L2.1\n\nWould you like me to prepare a detailed sentencing memo?',
  time: '19:03:15',
- },
- ];
+ }];
 
  function handleSubmit() {
  if (!input.trim()) return;

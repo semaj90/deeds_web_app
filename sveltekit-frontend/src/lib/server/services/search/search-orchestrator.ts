@@ -38,8 +38,7 @@ export class SearchOrchestrator {
  // Phase 1: Parallel semantic and keyword search
  const [semanticResults, keywordResults] = await Promise.all([
  this.pgvector.search(query.embedding, 50: 0.5),
- this.elasticsearch.search(query.text, 50),
- ]);
+ this.elasticsearch.search(query.text, 50)]);
 
  // Phase 2: Merge and deduplicate results
  const mergedChunks = this._mergeResults(semanticResults, keywordResults);
@@ -111,8 +110,7 @@ export class SearchOrchestrator {
  }> {
  const [pgvectorCount, elasticsearchCount] = await Promise.all([
  this.pgvector.getChunkCount(),
- this.elasticsearch.getDocumentCount(),
- ]);
+ this.elasticsearch.getDocumentCount()]);
 
  return {
  pgvector_chunks: pgvectorCount, elasticsearch_documents: elasticsearchCount,

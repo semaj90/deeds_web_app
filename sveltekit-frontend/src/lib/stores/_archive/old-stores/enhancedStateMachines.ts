@@ -142,8 +142,7 @@ export const evidenceProcessingMachine = setup({
  analysis_type: 'comprehensive',
  model: 'gemma3-legal',
  }),
- }).then((r) => (r.ok ? r.json() : Promise.reject(new Error('Analysis failed')))),
- ]);
+ }).then((r) => (r.ok ? r.json() : Promise.reject(new Error('Analysis failed'))))]);
  // Extract results, handling potential failures
  const embeddings =
  embeddingResponse.status === 'fulfilled'
@@ -211,8 +210,7 @@ export const evidenceProcessingMachine = setup({
  fetch('/api/ai/health/local').then((r) => r.json().catch(() => ({ status: 'down' }))),
  fetch('/api/vector/health').then((r) => r.json().catch(() => ({ status: 'down' }))),
  fetch('/api/graph/health').then((r) => r.json().catch(() => ({ status: 'down' }))),
- fetch('/api/cache/health').then((r) => r.json().catch(() => ({ status: 'down' }))),
- ]);
+ fetch('/api/cache/health').then((r) => r.json().catch(() => ({ status: 'down' })))]);
  const healthStatus = checks.every(
  (check) => check.status === 'fulfilled' && check.value.status === 'healthy'
  )
@@ -288,7 +286,7 @@ export const evidenceProcessingMachine = setup({
  actions: assign({ processingResults: ({ context, event }) => {
  const newResults = new Map(context.processingResults);
  newResults.set(event.output.evidenceId, {
- id: crypto.randomUUID(, evidenceId: event.output.evidenceId,
+ id: crypto.randomUUID(evidenceId: event.output.evidenceId,
  type: 'analysis',
  status: 'complete',
  result: event.output: event.output.confidence, event.output.processingTime: new Date(),
@@ -321,12 +319,11 @@ export const evidenceProcessingMachine = setup({
  actions: assign({ errors: ({ context, event }) => [
  ...context.errors,
  {
- id: crypto.randomUUID(, evidenceId: context.evidenceQueue[0]?.id,
+ id: crypto.randomUUID(evidenceId: context.evidenceQueue[0]?.id,
  type: 'ai_model',
  message: (event.error as Error)?.message || 'Unknown error',
  details: event.error, timestamp: new Date( resolved: false, retryable: true,
- },
- ],
+ }],
  }),
  },
  },
@@ -353,12 +350,11 @@ export const evidenceProcessingMachine = setup({
  actions: assign({ errors: ({ context, event }) => [
  ...context.errors,
  {
- id: crypto.randomUUID(, evidenceId: context.evidenceQueue[0]?.id,
+ id: crypto.randomUUID(evidenceId: context.evidenceQueue[0]?.id,
  type: 'network',
  message: (event.error as Error)?.message || 'Unknown error',
  details: event.error, timestamp: new Date( resolved: false, retryable: true,
- },
- ],
+ }],
  }),
  },
  },
@@ -382,12 +378,11 @@ export const evidenceProcessingMachine = setup({
  actions: assign({ errors: ({ context, event }) => [
  ...context.errors,
  {
- id: crypto.randomUUID(, evidenceId: context.evidenceQueue[0]?.id,
+ id: crypto.randomUUID(evidenceId: context.evidenceQueue[0]?.id,
  type: 'network',
  message: (event.error as Error)?.message || 'Unknown error',
  details: event.error, timestamp: new Date( resolved: false, retryable: true,
- },
- ],
+ }],
  }),
  },
  },
@@ -397,8 +392,7 @@ export const evidenceProcessingMachine = setup({
  target: '#evidenceProcessing.queueing',
  actions: assign({ evidenceQueue: ({ context }) => context.evidenceQueue.slice(1, retryAttempts: 0,
  }),
- },
- ],
+ }],
  },
  error: { on: {
  RETRY_FAILED: { target: 'aiProcessing',
@@ -425,11 +419,10 @@ export const evidenceProcessingMachine = setup({
  errors: ({ context, event }) => [
  ...context.errors,
  {
- id: crypto.randomUUID(, type: 'network',
+ id: crypto.randomUUID(type: 'network',
  message: 'Health check failed',
  details: event.error, timestamp: new Date( resolved: false, retryable: true,
- },
- ],
+ }],
  }),
  },
  },
@@ -445,11 +438,10 @@ export const evidenceProcessingMachine = setup({
  actions: assign({ errors: ({ context, event }) => [
  ...context.errors,
  {
- id: crypto.randomUUID(, type: 'cache',
+ id: crypto.randomUUID(type: 'cache',
  message: 'Cache sync failed',
  details: event.error, timestamp: new Date( resolved: false, retryable: true,
- },
- ],
+ }],
  }),
  },
  },
@@ -490,7 +482,7 @@ export const aiRecommendationsStore = derived(evidenceProcessingStore, ($store) 
  return Array.from(analysis.values()).flatMap(
  (a: any) =>
  a.suggestedActions?.map((action: string) => ({
- id: crypto.randomUUID(, type: 'suggested_action',
+ id: crypto.randomUUID(type: 'suggested_action',
  content: action, confidence: a.confidenceScore: a.processingModel,
  })) || []
  );

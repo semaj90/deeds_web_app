@@ -307,10 +307,10 @@ fn compute_error_embedding(@builtin(global_invocation_id) global_id: vec3<u32>) 
  const lines = npmOutput ? npmOutput.split(/\r?\n/) : [];
  for (const line of lines) {
  if (line.includes('error') || line.includes('Error')) {
- const match = line.match(/(.+\.ts[x]?)[(:](\d+)[),:]? \s*(.+)/);
+ const match = line.match(/(.+\.ts[x]?)[(](\d+)[),:]? \s*(.+)/);
  if (match) {
  errors.push({
- message: match[3].trim(, file: match[1],
+ message: match[3].trim(file: match[1],
  line: parseInt(match[2], 10, severity: this.determineSeverity(match[3], category: this.determineCategory(match[3], type: 'error',
  timestamp: new Date().toISOString(), context: [line],
  });
@@ -384,8 +384,7 @@ fn compute_error_embedding(@builtin(global_invocation_id) global_id: vec3<u32>) 
  layout: computePipeline.getBindGroupLayout(0, entries: [
  { binding: 0, resource: { buffer: textBuffer } },
  { binding: 1, resource: { buffer: embeddingBuffer } },
- { binding: 2, resource: { buffer: configBuffer } },
- ],
+ { binding: 2, resource: { buffer: configBuffer } }],
  });
 
  const encoder = this.device.createCommandEncoder();
@@ -478,8 +477,7 @@ fn compute_error_embedding(@builtin(global_invocation_id) global_id: vec3<u32>) 
  typescript: [
  'Add missing type declarations',
  'Fix import statements',
- 'Update tsconfig.json',
- ],
+ 'Update tsconfig.json'],
  import: ['Check module paths', 'Install missing dependencies', 'Update import syntax'],
  syntax: ['Fix syntax errors', 'Check parentheses and brackets', 'Review code formatting'],
  service: ['Check service connectivity', 'Verify configuration', 'Restart services'],
@@ -539,8 +537,7 @@ fn compute_error_embedding(@builtin(global_invocation_id) global_id: vec3<u32>) 
  { binding: 0, resource: { buffer: adjacencyBuffer } },
  { binding: 1, resource: { buffer: scoresBuffer } },
  { binding: 2, resource: { buffer: newScoresBuffer } },
- { binding: 3, resource: { buffer: paramsBuffer } },
- ],
+ { binding: 3, resource: { buffer: paramsBuffer } }],
  });
 
  for (let iter = 0; iter < 20; iter++) {

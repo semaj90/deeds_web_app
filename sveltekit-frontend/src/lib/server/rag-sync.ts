@@ -39,12 +39,11 @@ async function safeUpdateEvidenceFile(evidenceId: string, fields: Record<string,
  if (entries.length === 0) return;
 
  const sets = entries.map(([k], i) => `${k} = $${i + 1}`).join(', ');
- const values = entries.map(([, v]) => v);
+ const values = entries.map(([v]) => v);
 
  await sql.unsafe(`UPDATE evidence_files SET ${sets} WHERE id = $${entries.length + 1}`, [
  ...values,
- evidenceId,
- ]);
+ evidenceId]);
 }
 
 /**
@@ -221,8 +220,7 @@ export async function addEvidenceToRagIndex(
  {
  id: chunk.id,
  payload,
- },
- ],
+ }],
  wait: true,
  });
   

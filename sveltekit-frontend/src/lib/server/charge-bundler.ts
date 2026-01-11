@@ -25,8 +25,7 @@ const penaltyPatterns = {
  'trafficking',
  'assault with weapon',
  'child abuse',
- 'sexual assault',
- ],
+ 'sexual assault'],
  wobbler: [
  'dui injury',
  'child endangerment',
@@ -36,8 +35,7 @@ const penaltyPatterns = {
  'fraud',
  'embezzlement',
  'stalking',
- 'harassment',
- ],
+ 'harassment'],
  misdemeanor: [
  'resisting arrest',
  'disorderly conduct',
@@ -46,8 +44,7 @@ const penaltyPatterns = {
  'drunk in public',
  'simple assault',
  'petty theft',
- 'harassment',
- ],
+ 'harassment'],
  infraction: ['traffic violation', 'parking', 'noise complaint', 'minor offense'],
 };
 
@@ -62,8 +59,7 @@ const victimPatterns = {
  'endangerment',
  'abuse',
  'neglect',
- 'molestation',
- ],
+ 'molestation'],
  elder: ['elder', 'elderly', 'senior', 'aged', 'dependent adult', 'nursing home'],
  spouse: ['spouse', 'partner', 'domestic', 'intimate', 'family violence', 'dv'],
  disabled: ['disabled', 'disability', 'vulnerable', 'incapacitated', 'dependent'],
@@ -96,8 +92,7 @@ const bundlePatterns: Record<string, BundledCharge[]> = {
  title: 'Resisting Arrest',
  reason: 'Common companion - arrest resistance',
  confidence: 0.5, frequency: 0.3,
- },
- ],
+ }],
  '211': [
  // Robbery
  {
@@ -123,8 +118,7 @@ const bundlePatterns: Record<string, BundledCharge[]> = {
  title: 'Personal Use of Firearm',
  reason: 'Enhancement - weapon allegation',
  confidence: 0.8, frequency: 0.6,
- },
- ],
+ }],
  '23153': [
  // DUI Causing Injury
  {
@@ -150,8 +144,7 @@ const bundlePatterns: Record<string, BundledCharge[]> = {
  title: 'Great Bodily Injury Enhancement',
  reason: 'Enhancement - serious injury',
  confidence: 0.75, frequency: 0.5,
- },
- ],
+ }],
 };
 
 export function inferPenaltyLevel(query: string): string {

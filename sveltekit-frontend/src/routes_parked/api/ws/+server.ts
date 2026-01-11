@@ -261,8 +261,7 @@ export const GET: RequestHandler = async ({ url: _url }) => {
  'Tensor processing updates',
  'AI context switching',
  'Document collaboration',
- 'Search result streaming',
- ],
+ 'Search result streaming'],
  }) => { headers: { 'Content-Type': 'application/json' } }
  );
 };

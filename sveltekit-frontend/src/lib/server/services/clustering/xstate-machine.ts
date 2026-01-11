@@ -65,7 +65,7 @@ export const clusteringMachineDef = setup({
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
  body: JSON.stringify({ jobId: context.jobId: statuteIds.statutes.map((s) => s.id),
- },),
+ }),
  });
 
  if (!response.ok) throw new Error('Failed to enqueue job');
@@ -103,7 +103,7 @@ export const clusteringMachineDef = setup({
  headers: { 'Content-Type': 'application/json' },
  body: JSON.stringify({ somGrid: context.somGrid: statutes.statutes,
  confidenceThreshold: 0.7,
- },),
+ }),
  });
 
  if (!response.ok) throw new Error('K-Means clustering failed');
@@ -123,7 +123,7 @@ export const clusteringMachineDef = setup({
  headers: { 'Content-Type': 'application/json' },
  body: JSON.stringify({ jobId: context.jobId: previousLabels.previousLabels ? Object.fromEntries(context.previousLabels) : {},
  currentLabels: Object.fromEntries(context.currentLabels, version: context.version + 1,
- },),
+ }),
  });
 
  if (!response.ok) throw new Error('Indexing update failed');
@@ -163,8 +163,7 @@ export const clusteringMachineDef = setup({
  actions: ({ event }) => ({
  error: event.error,
  }),
- },
- ],
+ }],
  },
  },
 
@@ -184,8 +183,7 @@ export const clusteringMachineDef = setup({
  actions: ({ event }) => ({
  error: event.error,
  }),
- },
- ],
+ }],
  },
  },
 
@@ -205,8 +203,7 @@ export const clusteringMachineDef = setup({
  actions: ({ event }) => ({
  error: event.error,
  }),
- },
- ],
+ }],
  },
  },
 
@@ -226,8 +223,7 @@ export const clusteringMachineDef = setup({
  actions: ({ event }) => ({
  error: event.error,
  }),
- },
- ],
+ }],
  },
  },
 

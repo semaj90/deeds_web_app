@@ -341,7 +341,7 @@ export class FeatureErrorHandler {
  */
 export function createFeatureError(
  errorType: FeatureErrorType,
- feature: 'errorBrain' | 'legalAi' |, message,
+ feature: 'errorBrain' | 'legalAi' | message,
  details?: Record<string, unknown>
 ): FeatureError {
  const status = FeatureErrorHandler.getStatusForErrorType(errorType);
@@ -360,7 +360,7 @@ export function handleFeatureError(error: FeatureError): Response {
  */
 export function createErrorResponse(
  errorType: FeatureErrorType,
- feature: 'errorBrain' | 'legalAi' |, message,
+ feature: 'errorBrain' | 'legalAi' | message,
  details?: Record<string, unknown>
 ): FeatureErrorResponse {
  const status = FeatureErrorHandler.getStatusForErrorType(errorType);

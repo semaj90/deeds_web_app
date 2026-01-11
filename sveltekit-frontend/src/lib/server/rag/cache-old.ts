@@ -381,7 +381,7 @@ export function extractKeywords(data: any): string[] {
 
  // Split by common delimiters
  return data
- .split(/[,;|\n]/)
+ .split(/[;|\n]/)
  .map((s) => s.trim())
  .filter(Boolean);
  }

@@ -48,8 +48,7 @@ export const actions: Actions = {
  'image/png',
  'image/jpeg',
  'image/tiff',
- 'application/x-tiff',
- ];
+ 'application/x-tiff'];
 
  if (file.size > maxSize) {
  throw error(400, 'File size exceeds 50MB limit');

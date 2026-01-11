@@ -171,8 +171,7 @@ export class RedisCache {
  const [fileHashes, validations, proposals] = await Promise.all([
  this.redis.keys(`${this.keyPrefix}:file-hash:*`).then((keys) => keys.length),
  this.redis.keys(`${this.keyPrefix}:validation:*`).then((keys) => keys.length),
- this.redis.keys(`${this.keyPrefix}:proposal:*`).then((keys) => keys.length),
- ]);
+ this.redis.keys(`${this.keyPrefix}:proposal:*`).then((keys) => keys.length)]);
 
  return { fileHashes: validations, proposals };
  }

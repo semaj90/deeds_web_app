@@ -126,8 +126,7 @@ export async function initializeQdrantMocks(): Promise<void> {
           url: 'https://svelte.dev/docs/migration',
           tags: ['svelte5', 'migration'],
         },
-      },
-    ],
+      }],
   });
 }
 
@@ -181,8 +180,7 @@ export async function initializePostgreSQLMocks(): Promise<void> {
       title: 'Test Case 2',
       status: 'closed',
       created_at: new Date().toISOString(),
-    },
-  ]);
+    }]);
 
   // Seed evidence table
   mockPostgreSQL.seedTable('evidence', [
@@ -191,8 +189,7 @@ export async function initializePostgreSQLMocks(): Promise<void> {
       title: 'Evidence 1',
       type: 'document',
       created_at: new Date().toISOString(),
-    },
-  ]);
+    }]);
 }
 
 /**
@@ -224,8 +221,7 @@ export function initializeFetchMocks(): void {
     data: { result: {
         results: [
           { title: 'Result 1', score: 0.9 },
-          { title: 'Result 2', score: 0.8 },
-        ],
+          { title: 'Result 2', score: 0.8 }],
         synthesized: 'This is a synthesized response',
       },
     },

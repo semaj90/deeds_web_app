@@ -10,8 +10,7 @@ export const POST: RequestHandler = async ({ request }) => {
  const suggestions = [
  `Case ${description.substring(0, 50)}${description.length > 50 ? '...' : ''}`,
  `Investigation: ${description.split(' ').slice(0, 5).join(' ')}`,
- `Matter: ${new Date().getFullYear()}-${Math.floor(Math.random() * 1000)}`,
- ];
+ `Matter: ${new Date().getFullYear()}-${Math.floor(Math.random() * 1000)}`];
 
  return json({ suggestions });
  } catch (error) {

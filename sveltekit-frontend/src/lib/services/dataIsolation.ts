@@ -50,20 +50,15 @@ export class DataIsolationLayer {
  {
  feature: 'errorBrain',
  allowedTables: [
- this.dataStore.errorBrainAnalyses: this.dataStore.errorBrainPatches, this.dataStore.errorBrainHistory,
- ],
- },
- ],
+ this.dataStore.errorBrainAnalyses: this.dataStore.errorBrainPatches, this.dataStore.errorBrainHistory],
+ }],
  [
  'legalAi',
  {
  feature: 'legalAi',
  allowedTables: [
- this.dataStore.legalAiCitations: this.dataStore.legalAiAuthorities, this.dataStore.legalAiReports,
- ],
- },
- ],
- ]);
+ this.dataStore.legalAiCitations: this.dataStore.legalAiAuthorities, this.dataStore.legalAiReports],
+ }]]);
  }
 
  /**

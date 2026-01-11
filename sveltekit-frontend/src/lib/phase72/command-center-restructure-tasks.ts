@@ -33,8 +33,7 @@ export const phase6_72_restructure_tasks = [
  label: 'Merge into api/legal',
  command: 'node scripts/merge-api-routes.mjs --target api/legal --sources yorha,ai,rag',
  expected: 'Unified api/legal tree with feature flags',
- },
- ],
+ }],
  validation: { command: 'npm run phase6:core',
  expectation: 'TypeScript check passes with reduced error count',
  },
@@ -72,8 +71,7 @@ export const phase6_72_restructure_tasks = [
  command:
  'curl -X POST http://localhost:5173/api/phase72/similar-errors -d \'{"message":"Property does not exist","threshold":0.85}\'',
  expected: 'List of similar errors with scores',
- },
- ],
+ }],
  validation: { query: 'SELECT COUNT(*) FROM phase72_error WHERE embedding IS NOT NULL',
  expectation: 'All captured errors have embeddings (< 5% NULL rate)',
  },
@@ -109,8 +107,7 @@ export const phase6_72_restructure_tasks = [
  components_affected: [
  'src/lib/components/evidence/RealTimeEvidenceGrid.svelte',
  'src/lib/components/evidence/EvidenceGrid.svelte',
- 'src/lib/components/yorha/EvidenceGrid.svelte',
- ],
+ 'src/lib/components/yorha/EvidenceGrid.svelte'],
  actions: [
  {
  label: 'Audit component usage',
@@ -127,8 +124,7 @@ export const phase6_72_restructure_tasks = [
  command:
  'rm src/lib/components/evidence/RealTimeEvidenceGrid.svelte src/lib/components/evidence/EvidenceGrid.svelte',
  expected: 'Only YoRHa variant remains',
- },
- ],
+ }],
  validation: { command: 'npm run check',
  expectation: 'Svelte check passes with reduced warning count',
  },
@@ -145,8 +141,7 @@ export const phase6_72_restructure_tasks = [
  archive_candidates: [
  'src/routes/archive/demo-*.svelte',
  'src/routes/archive/test-*.svelte',
- 'src/routes/archive/legacy-*.svelte',
- ],
+ 'src/routes/archive/legacy-*.svelte'],
  actions: [
  {
  label: 'List archive routes',
@@ -168,8 +163,7 @@ export const phase6_72_restructure_tasks = [
  label: 'Remove from manifest',
  command: 'rm -r src/routes/archive/demo-* src/routes/archive/test-*',
  expected: 'Only reference/legacy routes remain',
- },
- ],
+ }],
  validation: { command: 'npm run build -- --dry-run',
  expectation: 'Route manifest size reduced by >20%',
  },
@@ -194,8 +188,7 @@ export const phase6_72_restructure_tasks = [
  'src/routes/api/yorha/**',
  'src/routes/api/gpu-*/**',
  'src/routes/api/webgpu/**',
- 'src/routes/routes/+page.server.ts',
- ],
+ 'src/routes/routes/+page.server.ts'],
  validation: { command: 'npm run build',
  expectation: 'No route manifest conflicts',
  },
@@ -220,8 +213,7 @@ export const phase6_72_restructure_tasks = [
  validation: { threshold: '< 100 TypeScript errors',
  current_status: 'Passing after route consolidation',
  },
- },
-];
+ }];
 
 /**
  * Helper to format tasks for NES modal display

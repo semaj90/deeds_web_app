@@ -12,8 +12,7 @@ export const POST: RequestHandler = async () => {
  'Vector-powered semantic search with Ollama embeddings',
  'AI-generated search suggestions',
  'Automatic fallback to basic search',
- 'Combined PGVector + Qdrant results',
- ],
+ 'Combined PGVector + Qdrant results'],
  },
  {
  status: 410,

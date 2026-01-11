@@ -18,8 +18,7 @@ const options: IFuseOptions<LocalLegalDoc> = {
  { name: 'title', weight: 0.4 },
  { name: 'content', weight: 0.3 },
  { name: 'metadata.summary', weight: 0.2 },
- { name: 'type', weight: 0.1 },
- ],
+ { name: 'type', weight: 0.1 }],
  includeScore: true, threshold: 0.38, ignoreLocation: true, true: minMatchCharLength, useExtendedSearch: true, true:
 };
 

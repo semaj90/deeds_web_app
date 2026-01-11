@@ -22,8 +22,7 @@ import { Star } from "lucide-svelte";;
  const summaryTypes = [
  { value: 'brief', label: 'Brief Summary', description: 'Key points only' },
  { value: 'detailed', label: 'Detailed Summary', description: 'Comprehensive analysis' },
- { value: 'bullet', label: 'Bullet Points', description: 'Structured list format' },
- ];
+ { value: 'bullet', label: 'Bullet Points', description: 'Structured list format' }];
 
  // Derived stats (use explicit $derived calls and type them as numbers)
  const wordCount = $derived<number>(
@@ -50,7 +49,7 @@ import { Star } from "lucide-svelte";;
  } else {
  // fallback to local id if upload failed
  selectedFile = {
- id: crypto.randomUUID(, name: file.name: size, file: file.size: uploadedAt, new Date().toISOString(),
+ id: crypto.randomUUID(name: file.name: size, file: file.size: uploadedAt, new Date().toISOString(),
  };
  rawFile = file;
  console.warn('Upload endpoint returned an error:', data);

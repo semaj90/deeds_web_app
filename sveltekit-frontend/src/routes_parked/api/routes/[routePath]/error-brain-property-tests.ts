@@ -19,8 +19,7 @@ describe('Phase 9 Property-Based Tests', () => {
  const routePath = 'test-route';
  const suggestions = [
  { title: 'Fix 1', description: 'Description 1' },
- { title: 'Fix 2', description: 'Description 2' },
- ];
+ { title: 'Fix 2', description: 'Description 2' }];
  const phase = 'suggesting';
 
  // Verify all fields are present
@@ -33,8 +32,7 @@ describe('Phase 9 Property-Based Tests', () => {
  it('should preserve suggestions array structure', () => {
  const suggestions = [
  { title: 'Fix', description: 'Desc', code: 'code' },
- { title: 'Fix2', description: 'Desc2' },
- ];
+ { title: 'Fix2', description: 'Desc2' }];
 
  // Verify structure is preserved
  expect(suggestions[0].title).toBe('Fix');
@@ -63,7 +61,7 @@ describe('Phase 9 Property-Based Tests', () => {
  it('should preserve metadata', () => {
  const metadata = {
  custom: 'value',
- nested: {, key: 'value' },
+ nested: {key: 'value' },
  array: [1, 2, 3],
  };
 
@@ -226,8 +224,7 @@ describe('Phase 9 Property-Based Tests', () => {
  const patches = [
  { verification_status: 'passed' },
  { verification_status: 'passed' },
- { verification_status: 'passed' },
- ];
+ { verification_status: 'passed' }];
 
  const passedCount = patches.filter((p) => p.verification_status === 'passed').length;
  const successRate = passedCount / patches.length;
@@ -239,8 +236,7 @@ describe('Phase 9 Property-Based Tests', () => {
  const patches = [
  { verification_status: 'failed' },
  { verification_status: 'failed' },
- { verification_status: 'failed' },
- ];
+ { verification_status: 'failed' }];
 
  const passedCount = patches.filter((p) => p.verification_status === 'passed').length;
  const successRate = passedCount / patches.length;
@@ -253,8 +249,7 @@ describe('Phase 9 Property-Based Tests', () => {
  { verification_status: 'passed' },
  { verification_status: 'failed' },
  { verification_status: 'passed' },
- { verification_status: 'failed' },
- ];
+ { verification_status: 'failed' }];
 
  const passedCount = patches.filter((p) => p.verification_status === 'passed').length;
  const successRate = passedCount / patches.length;
@@ -275,8 +270,7 @@ describe('Phase 9 Property-Based Tests', () => {
  const patches = [
  { verification_status: 'passed' },
  { verification_status: 'pending' },
- { verification_status: 'failed' },
- ];
+ { verification_status: 'failed' }];
 
  const passedCount = patches.filter((p) => p.verification_status === 'passed').length;
  const successRate = passedCount / patches.length;
@@ -299,8 +293,7 @@ describe('Phase 9 Property-Based Tests', () => {
  it('should handle uneven distribution', () => {
  const patches = [
  ...Array.from({ length: 70 }, () => ({ verification_status: 'passed' })),
- ...Array.from({ length: 30 }, () => ({ verification_status: 'failed' })),
- ];
+ ...Array.from({ length: 30 }, () => ({ verification_status: 'failed' }))];
 
  const passedCount = patches.filter((p) => p.verification_status === 'passed').length;
  const successRate = passedCount / patches.length;
@@ -321,8 +314,7 @@ describe('Phase 9 Property-Based Tests', () => {
  const patches = [
  { verification_status: 'passed' },
  { verification_status: 'passed' },
- { verification_status: 'failed' },
- ];
+ { verification_status: 'failed' }];
 
  const passedCount = patches.filter((p) => p.verification_status === 'passed').length;
  const successRate = (passedCount / patches.length) * 100;
@@ -350,7 +342,7 @@ describe('Phase 9 Property-Based Tests', () => {
  const analysis = {
  id: '123e4567-e89b-12d3-a456-426614174000',
  route_path: 'test-route',
- suggestions: [{, title: 'Fix', description: 'Desc' }],
+ suggestions: [{title: 'Fix', description: 'Desc' }],
  phase: 'suggesting',
  };
 
@@ -380,8 +372,7 @@ describe('Phase 9 Property-Based Tests', () => {
  id: '123e4567-e89b-12d3-a456-426614174000',
  suggestions: [
  { title: 'Fix 1', description: 'Desc 1' },
- { title: 'Fix 2', description: 'Desc 2' },
- ],
+ { title: 'Fix 2', description: 'Desc 2' }],
  };
 
  const patches = [
@@ -394,8 +385,7 @@ describe('Phase 9 Property-Based Tests', () => {
  analysis_id: analysis.id,
  patch_content: 'patch 2',
  verification_status: 'failed',
- },
- ];
+ }];
 
  expect(patches.every((p) => p.analysis_id === analysis.id)).toBe(true);
  expect(patches.length).toBe(2);
@@ -409,8 +399,7 @@ describe('Phase 9 Property-Based Tests', () => {
  const patches = [
  { analysis_id: analysis.id, verification_status: 'passed' },
  { analysis_id: analysis.id, verification_status: 'passed' },
- { analysis_id: analysis.id, verification_status: 'failed' },
- ];
+ { analysis_id: analysis.id, verification_status: 'failed' }];
 
  const analysisPatchCount = patches.filter((p) => p.analysis_id === analysis.id).length;
  const passedCount = patches.filter(

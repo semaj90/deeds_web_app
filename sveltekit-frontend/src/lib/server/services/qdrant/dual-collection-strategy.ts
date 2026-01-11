@@ -60,7 +60,7 @@ export class DualQdrantStrategy {
  * Upsert point to both collections
  */
  async upsertPoint(
- pointId: string |, number: embedding, DualEmbedding: QdrantPayload
+ pointId: string | number: embedding, DualEmbedding: QdrantPayload
  ): Promise<void> {
  // Upsert to 768d collection
  await this.client.upsert(this.collection768, {
@@ -68,8 +68,7 @@ export class DualQdrantStrategy {
  {
  id: pointId, vector: embedding.full768,
  payload,
- },
- ],
+ }],
  });
   
  await this.client.upsert(this.collection256, {
@@ -77,8 +76,7 @@ export class DualQdrantStrategy {
  {
  id: pointId, vector: embedding.small256,
  payload,
- },
- ],
+ }],
  });
  }
 
@@ -99,8 +97,7 @@ export class DualQdrantStrategy {
 
  await Promise.all([
  this.client.upsert(this.collection768, { points: points768 }),
- this.client.upsert(this.collection256, { points: points256 }),
- ]);
+ this.client.upsert(this.collection256, { points: points256 })]);
  }
 
  /**
@@ -134,8 +131,7 @@ export class DualQdrantStrategy {
  async searchHybrid(query: DualEmbedding, limit: number = 10, filter?: any): Promise<any[]> {
  const [accurate, fast] = await Promise.all([
  this.searchAccurate(query, limit, filter),
- this.searchFast(query, limit, filter),
- ]);
+ this.searchFast(query, limit, filter)]);
 
  // Merge results, preferring 768d scores
  const merged = new Map<string | number, any>();
@@ -180,8 +176,7 @@ export class DualQdrantStrategy {
  key: 'kmeans_label',
  match: { value: clusterLabel,
  },
- },
- ],
+ }],
  };
 
  return await this.searchAccurate(
@@ -194,7 +189,7 @@ export class DualQdrantStrategy {
  /**
  * Update payload for point in both collections
  */
- async updatePayload(pointId: string |, number: Partial<QdrantPayload>): Promise<void> {
+ async updatePayload(pointId: string | number: Partial<QdrantPayload>): Promise<void> {
  await Promise.all([
  this.client.setPayload(this.collection768, {
  points_selector: { ids: [pointId],
@@ -205,8 +200,7 @@ export class DualQdrantStrategy {
  points_selector: { ids: [pointId],
  },
  payload,
- }),
- ]);
+ })]);
  }
 
  /**
@@ -221,8 +215,7 @@ export class DualQdrantStrategy {
  this.client.delete(this.collection256, {
  points_selector: { ids: [pointId],
  },
- }),
- ]);
+ })]);
  }
 
  /**
@@ -232,8 +225,7 @@ export class DualQdrantStrategy {
  }> {
  const [stats768, stats256] = await Promise.all([
  this.client.getCollection(this.collection768),
- this.client.getCollection(this.collection256),
- ]);
+ this.client.getCollection(this.collection256)]);
 
  return {
  collection768: stats768, collection256: stats256,

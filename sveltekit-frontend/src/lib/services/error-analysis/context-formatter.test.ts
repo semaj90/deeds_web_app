@@ -57,8 +57,7 @@ describe('ContextFormatter - Property-Based Tests (Task 8.1)', () => {
  code: 'const, x: string = 123;',
  errorType: 'type-mismatch',
  similarity: 0.95,
- },
- ];
+ }];
 
  const context = await formatter.formatErrorContext(error, patterns);
 
@@ -153,8 +152,7 @@ Change the type annotation from string to number to match the assigned value.`;
  code: 'const, y: number = "hello";',
  errorType: 'type-mismatch',
  similarity: 0.92,
- },
- ];
+ }];
 
  const context = await formatter.formatErrorContext(error, patterns);
 
@@ -210,8 +208,7 @@ const x = 123;
 \`\`\`
 
 ## Explanation
-This is the fix.`,
- ];
+This is the fix.`];
 
  for (const response of responses) {
  const parsed = await formatter.parseResponse(response);
@@ -315,8 +312,7 @@ Some notes here.`;
  code: 'const, x: string = 123;',
  errorType: 'type-mismatch',
  similarity: 0.95,
- },
- ];
+ }];
 
  const context1 = await formatter.formatErrorContext(error, patterns);
  const context2 = await formatter.formatErrorContext(error, patterns);

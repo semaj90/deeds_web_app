@@ -30,8 +30,7 @@ export async function extractTextFromImage(
  // Clean up temp files
  await Promise.all([
  fs.unlink(tempFile).catch(() => {}),
- fs.unlink(`${outputFile}.txt`).catch(() => {}),
- ]);
+ fs.unlink(`${outputFile}.txt`).catch(() => {})]);
 
  return { text: text.trim() };
  } catch (error) {
@@ -40,8 +39,7 @@ export async function extractTextFromImage(
  // Clean up temp files on error
  await Promise.all([
  fs.unlink(tempFile).catch(() => {}),
- fs.unlink(`${outputFile}.txt`).catch(() => {}),
- ]);
+ fs.unlink(`${outputFile}.txt`).catch(() => {})]);
 
     return {
       text: '',

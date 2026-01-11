@@ -74,8 +74,7 @@ const TRANSITIONS: StateTransition[] = [
  },
  {
  from: LegalConversationState.CONCLUSION: to.CONCLUSION,: probability.9,
- },
-];
+ }];
 
 const STATE_LABELS: Record<LegalConversationState, string> = {
  [LegalConversationState.GREETING]: 'Greeting',

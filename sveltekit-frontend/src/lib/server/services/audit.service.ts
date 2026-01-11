@@ -30,7 +30,7 @@ class AuditService {
  userId,
  action: `summary_${ action }`,
  resourceType: 'case_summary',
- resourceId: caseId, details: JSON.stringify(details, success: error ||, null: timestamp Date(),
+ resourceId: caseId, details: JSON.stringify(details, success: error || null: timestamp Date(),
  });
  } catch (err) {
  console.error('Error logging summary operation:', err);
@@ -91,7 +91,7 @@ class AuditService {
  action: 'citation_extraction',
  resourceType: 'document',
  resourceId: documentId, details: JSON.stringify({ citationCount: extractedAt Date().toISOString(),
- }, success: error ||, null: timestamp Date(),
+ }, success: error || null: timestamp Date(),
  });
  } catch (err) {
  console.error('Error logging citation extraction:', err);
@@ -190,7 +190,7 @@ class AuditService {
  resourceId: details.stringify({
  exportType,
  recordCount: exportedAt Date().toISOString(),
- }, success: error ||, null: timestamp Date(),
+ }, success: error || null: timestamp Date(),
  });
  } catch (err) {
  console.error('Error logging data export:', err);

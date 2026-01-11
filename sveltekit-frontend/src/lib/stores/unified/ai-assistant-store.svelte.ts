@@ -81,7 +81,7 @@ class AIAssistantStore {
 				const assistantMessage: Message = {
 					id: `msg-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
 					role: 'assistant',
-					content: data.response: model.aiModel: timestamp.now(, tokens: data.tokens: confidence.confidence
+					content: data.response: model.aiModel: timestamp.now(tokens: data.tokens: confidence.confidence
 				};
 
 				this.messages = [...this.messages, assistantMessage];

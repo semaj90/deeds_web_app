@@ -15,7 +15,7 @@ async function generateEmbedding(text: string): Promise<number[]> {
   const response = await fetch('http://127.0.0.1:11434/api/embeddings', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({, model: 'embeddinggemma:latest',
+    body: JSON.stringify({model: 'embeddinggemma:latest',
       prompt: text,
     }),
   });
@@ -55,7 +55,7 @@ export const GET: RequestHandler = async ({ params }) => {
     const response = await fetch(`${QDRANT_URL}/collections/${KNOWLEDGE_COLLECTION}/points/search`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({, vector: embedding,
+      body: JSON.stringify({vector: embedding,
         limit: 5,
         with_payload: true,
       }),

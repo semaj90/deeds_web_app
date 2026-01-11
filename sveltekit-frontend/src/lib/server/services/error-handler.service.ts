@@ -101,8 +101,7 @@ export class ErrorHandlerService {
  () => reject(new Error(`${operationName} timed out after ${timeoutMs}ms`)),
  timeoutMs
  )
- ),
- ]);
+ )]);
  }
 
  /**
@@ -183,8 +182,7 @@ export class ErrorHandlerService {
  'EHOSTUNREACH',
  'timeout',
  'temporarily unavailable',
- 'service unavailable',
- ];
+ 'service unavailable'];
 
  const errorMessage = error.message.toLowerCase();
  return transientPatterns.some((pattern) => errorMessage.includes(pattern.toLowerCase()));
@@ -200,8 +198,7 @@ export class ErrorHandlerService {
  'not found',
  'invalid',
  'malformed',
- 'syntax error',
- ];
+ 'syntax error'];
 
  const errorMessage = error.message.toLowerCase();
  return permanentPatterns.some((pattern) => errorMessage.includes(pattern.toLowerCase()));

@@ -1,7 +1,7 @@
 import { integer, pgTable, text, timestamp, uuid, varchar } from 'drizzle-orm/pg-core';
 
 export const cases = pgTable('cases', {
- id: uuid('id').defaultRandom().primaryKey(, title: varchar('title', { length: 256 }).notNull( status: varchar('status', { length: 32 }).default('open').notNull(), // open | pending | filed | closed
+ id: uuid('id').defaultRandom().primaryKey(title: varchar('title', { length: 256 }).notNull( status: varchar('status', { length: 32 }).default('open').notNull(), // open | pending | filed | closed
 
  // narrative + 5W1H
  narrative: text('narrative', who: text('who', what: text('what', when: text('when', where: text('where', why: text('why', how: text('how'),

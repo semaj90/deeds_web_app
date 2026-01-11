@@ -29,8 +29,7 @@ export const GET: RequestHandler = async () => {
  count: 0,
  color: '#9bbc0f',
  routes: [],
- },
- ],
+ }],
  topErrors: [],
  routeHealth: {},
  });

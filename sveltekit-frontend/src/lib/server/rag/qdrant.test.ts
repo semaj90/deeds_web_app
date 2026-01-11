@@ -81,8 +81,7 @@ describe('Qdrant Operations', () => {
  id,
  vector,
  payload: { test: true },
- },
- ];
+ }];
 
  if (vector.length !== 768) {
  // Wrong dimensions should be handled gracefully
@@ -155,10 +154,8 @@ describe('Qdrant Operations', () => {
  {
  must: [
  { key: 'jurisdiction', match: { value: 'US-FED' } },
- { key: 'tag_ids', match: { any: ['tag1', 'tag2'] } },
- ],
- },
- ];
+ { key: 'tag_ids', match: { any: ['tag1', 'tag2'] } }],
+ }];
 
  for (const filter of testFilters) {
  try {

@@ -199,8 +199,7 @@ class YoRhaLegalMCPServer {
  query: { type: 'string' },
  },
  },
- },
- ],
+ }],
  };
  });
   

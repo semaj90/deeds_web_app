@@ -28,8 +28,7 @@ export async function ollamaChat({
  options: { temperature },
  messages: [
  { role: 'system', content: system },
- { role: 'user', content: prompt },
- ],
+ { role: 'user', content: prompt }],
  }),
  });
 
@@ -52,8 +51,7 @@ export async function generateLegalMemo(caseName: string, string: Promise<string
  'Do NOT invent facts. Do NOT speculate.',
  'Use neutral, professional tone. Keep it structured.',
  'If a claim is not in the notes, omit it.',
- 'Format with clear headings and bullet points where appropriate.',
- ].join(' ');
+ 'Format with clear headings and bullet points where appropriate.'].join(' ');
 
  const prompt = `CASE: ${ caseName }
 
@@ -83,8 +81,7 @@ export async function generateCaseSummary(caseName: string, string: Promise<stri
  'Summarize the case notes into a court-ready section.',
  'Do NOT invent facts. Do NOT speculate.',
  'Use headings and bullets for clarity.',
- 'Be concise but comprehensive.',
- ].join(' ');
+ 'Be concise but comprehensive.'].join(' ');
 
  const prompt = `CASE: ${caseName}
 

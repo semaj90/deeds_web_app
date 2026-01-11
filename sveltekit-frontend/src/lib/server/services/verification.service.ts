@@ -75,8 +75,7 @@ export class VerificationService {
  '.wy.gov',
  '.vt.gov',
  '.wv.gov',
- '.dc.gov',
- ];
+ '.dc.gov'];
 
  /**
  * Check if a source URL is verified
@@ -274,8 +273,7 @@ Use only for context, not charging authority.`;
  /must\s+charge/i,
  /recommend\s+charging/i,
  /infer\s+guilt/i,
- /estimate\s+sentence/i,
- ];
+ /estimate\s+sentence/i];
 
  for (const pattern of prohibitedPatterns) {
  if (pattern.test(response)) {

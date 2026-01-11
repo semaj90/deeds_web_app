@@ -342,8 +342,7 @@ export const appActions = {
  appActions.loadEvidenceStats(),
  appActions.loadPOIs({ limit: 20 }),
  appActions.loadSystemMetrics(),
- appActions.loadGPUMetrics(),
- ]);
+ appActions.loadGPUMetrics()]);
  } catch (error) {
  console.error('Failed to initialize app:', error);
  } finally {

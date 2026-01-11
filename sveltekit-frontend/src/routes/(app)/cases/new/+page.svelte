@@ -450,7 +450,7 @@
  transition: all 0.2s ease;
  }
 
- .btn-submit:hover, not(:disabled) {
+ .btn-submit:hover, not(disabled) {
  background: #d32f2f;
  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
  }

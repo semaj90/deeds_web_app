@@ -118,12 +118,11 @@ export class ElasticsearchSearch {
  title?: string, }); limit: number = 50
  ): Promise<KeywordSearchResult[]> {
  try {
- const must,: any[], =, [
+ const must,: any[], = [
  {
  multi_match: { query, fields: ['title^2', 'chunk'],
  },
- },
- ];
+ }];
 
  if (filters?.documentId) {
  must.push({ term: { document_id: filters.documentId } }, }

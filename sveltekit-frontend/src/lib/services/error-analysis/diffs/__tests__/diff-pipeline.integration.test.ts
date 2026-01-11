@@ -160,8 +160,7 @@ describe('Diff Pipeline Integration', () => {
  reason: 'test modification',
  confidence: 0.9,
  ruleId: 'test-rule',
- },
- ];
+ }];
 
  const runner = new DiffRunner({
  runId: 'test-run-3',
@@ -237,8 +236,7 @@ describe('Diff Pipeline Integration', () => {
  reason: 'another valid change',
  confidence: 0.9,
  ruleId: 'test-rule',
- },
- ];
+ }];
 
  const runner = new DiffRunner({
  runId: 'test-recovery',
@@ -376,8 +374,7 @@ describe('Diff Pipeline Integration', () => {
  reason: 'test',
  confidence: 0.9,
  ruleId: 'test-rule',
- },
- ];
+ }];
 
  const runner = new DiffRunner({
  runId: 'test-phases',
@@ -431,8 +428,7 @@ describe('Diff Pipeline Integration', () => {
  reason: 'test',
  confidence: 0.9,
  ruleId: 'test-rule',
- },
- ];
+ }];
 
  const runner = new DiffRunner({
  runId: 'test-duration',

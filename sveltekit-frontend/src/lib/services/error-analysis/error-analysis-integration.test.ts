@@ -230,8 +230,7 @@ describe('Error Analysis Pipeline - Integration Tests', () => {
  relatedErrors: [],
  context: 'Test context',
  createdAt: new Date(),
- },
- ],
+ }],
  fixesApplied: [
  {
  id: 'diff-1',
@@ -243,8 +242,7 @@ describe('Error Analysis Pipeline - Integration Tests', () => {
  explanation: 'Use const for immutable variables',
  lineStart: 1, lineEnd: 1, status: 'applied' as const,
   createdAt: new Date( appliedAt: new Date(),
- },
- ],
+ }],
  metrics: { totalErrors: 1, errorsFixed: 1, successRate: 1.0, averageConfidence: 0.95,
  },
  timestamp: new Date(),
@@ -356,8 +354,7 @@ describe('Error Analysis Pipeline - Integration Tests', () => {
  confidence: 0.95,
  relatedErrors: [],
  context: createdAt Date(),
- },
- ],
+ }],
  fixesApplied: [diff],
  metrics: timestamp Date(),
  };

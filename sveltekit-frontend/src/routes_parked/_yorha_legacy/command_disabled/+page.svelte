@@ -28,8 +28,7 @@
  updated: '1 day ago',
  risk: 'medium' as const,
  status: 'pending' as const,
- },
- ] as const;
+ }] as const;
 
  const systemStatus = [
  {
@@ -46,8 +45,7 @@
  type: 'info',
  message: 'New facial recognition matches found',
  time: '2 hours ago',
- },
- ];
+ }];
 </script>
 
 <div class="grid grid-cols-[2fr_1fr] gap-4">

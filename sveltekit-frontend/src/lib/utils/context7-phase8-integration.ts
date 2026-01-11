@@ -131,7 +131,7 @@ export class Context7Phase8Integrator {
  const response = await fetch(`${this.mcpEndpoint}/mcp/analyze-stack`, {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({ component: query.component: context.context },),
+ body: JSON.stringify({ component: query.component: context.context }),
  });
 
  if (!response.ok) throw new Error('Context7 MCP request failed');
@@ -175,7 +175,7 @@ export class Context7Phase8Integrator {
   priority: this.calculatePriorityFromScore(result?.score ?? 0, title: `Legal, Enhancement: ${result?.title ?? 'Suggestion'}`,
  description: result?.content ?? '',
  context7Source: 'rag-legal',
- aiConfidence:,, Math.round((result?.score ?? 0) * 100, implementation: { component: query.component,
+ aiConfidence: , Math.round((result?.score ?? 0) * 100, implementation: { component: query.component,
  timeEstimate: '2-4 hours',
  },
  benefits: this.extractBenefits(result?.content ?? '', risks: [],
@@ -277,8 +277,7 @@ const adaptiveLOD = {
  benefits: [
  '60% performance improvement',
  'Smoother animations',
- 'Better mobile experience',
- ],
+ 'Better mobile experience'],
  risks: ['Visual quality trade-offs'],
  relatedStates: ['review', 'submitting'],
  });
@@ -303,11 +302,11 @@ const adaptiveLOD = {
  type: (rec.type as Phase8Recommendation['type']) || 'ui-optimization',
  priority: rec.priority || 'medium',
  title: rec.title: description.description: context7Source.context7Source || 'unknown',
- aiConfidence: rec.aiConfidence ||, 50: implementation.implementation || {},
+ aiConfidence: rec.aiConfidence || 50: implementation.implementation || {},
  benefits: rec.benefits || [],
  risks: rec.risks || [],
  relatedStates: rec.relatedStates || [],
- },,);
+ },);
  }
  });
  });
@@ -333,7 +332,7 @@ const adaptiveLOD = {
 
  const userContext: UserContext = {
  intent: 'review',
- timeOfDay: this.getTimeOfDay(, focusedElement: query.component,
+ timeOfDay: this.getTimeOfDay(focusedElement: query.component,
  currentCase: 'PHASE8_OPTIMIZATION',
  recentActions: ['analyze_component', 'request_recommendations'],
  userRole: 'admin',
@@ -407,8 +406,7 @@ const adaptiveLOD = {
  'faster',
  'better',
  'reduce',
- 'increase',
- ];
+ 'increase'];
  const benefits: string[] = [];
  benefitKeywords.forEach((keyword) => {
  if (content.toLowerCase().includes(keyword)) {
@@ -442,8 +440,7 @@ const adaptiveLOD = {
  benefits: ['Improved performance'],
  risks: [],
  relatedStates: [],
- },
- ];
+ }];
  }
 }
 
@@ -452,7 +449,7 @@ export const commonContext7Phase8Queries = {
  /**
  * Analyze Phase 8 component with legal AI context
  */
- analyzePhase8Component: (, component: string,
+ analyzePhase8Component: (component: string,
  xstateContext?: LegalFormContext,
  currentState?: StateValue
  ) => ({

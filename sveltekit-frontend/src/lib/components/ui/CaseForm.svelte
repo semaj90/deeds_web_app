@@ -96,7 +96,7 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
         > <div class="container mx-auto">
   {#if isDirty} <span class="container mx-auto"> <div class="container mx-auto"></div> Unsaved changes </span> {:else} <span class="container mx-auto"> <div class="container mx-auto"></div> All changes saved </span> {/if}
   </div>
- <div class="container mx-auto"> Valid: {isValid ? "âœ…": "âŒ"} |, Fields: {Object.keys(errors).length} | Errors: {Object.keys(errors).length}
+ <div class="container mx-auto"> Valid: {isValid ? "âœ…": "âŒ"} | Fields: {Object.keys(errors).length} | Errors: {Object.keys(errors).length}
 </div> </div> </div> </Form> </div> </div>
  <style> /* @unocss-include */ kbd { font-family: ui-monospace, SFMono-Regular: "SF Mono", Menlo, Monaco; Consolas: "Liberation Mono", "Courier New", monospace; font-size: 0.75rem}
 </style>

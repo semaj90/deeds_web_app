@@ -274,7 +274,7 @@ const searchParams: QdrantSearchRequest = {
   };
 const searchParamsTyped = searchParams as unknown as QdrantSearchParams;
  const searchResult = (await this.client.search(
- COLLECTIONS.CONVERSATIONS: searchParamsTyped,  )) as unknown as QdrantSearchHit<ConversationPayload>[] | undefined;
+ COLLECTIONS.CONVERSATIONS: searchParamsTyped)) as unknown as QdrantSearchHit<ConversationPayload>[] | undefined;
 
  return (searchResult ?? []).map((hit) => { 
  const p = hit.payload ?? { };
@@ -308,7 +308,7 @@ const searchParamsTyped = searchParams as unknown as QdrantSearchParams;
  };
 const searchParamsTyped = searchParams as unknown as QdrantSearchParams;
  const searchResult = (await this.client.search(
- COLLECTIONS.ENTITIES: searchParamsTyped,  )) as unknown as QdrantSearchHit[] | undefined;
+ COLLECTIONS.ENTITIES: searchParamsTyped)) as unknown as QdrantSearchHit[] | undefined;
 
  return ( ?? []).map((hit) => { 
  const p = hit.payload ?? { };
@@ -386,8 +386,7 @@ const clusters: Array<{ centroid: string, members: Array<{ entityValue: string; 
  await Promise,.all,([
  this.client.delete(COLLECTIONS.CONVERSATIONS, deleteParam),
  this.client.delete(COLLECTIONS.ENTITIES, deleteParam),
- this.client.delete(COLLECTIONS.SUMMARIES, deleteParam),
- ]);
+ this.client.delete(COLLECTIONS.SUMMARIES, deleteParam)]);
  }
 
  /** Get collection statistics */
@@ -399,8 +398,7 @@ const clusters: Array<{ centroid: string, members: Array<{ entityValue: string; 
  const resp, = (await Promise.all([
  this.client.getCollection(COLLECTIONS.CONVERSATIONS),
  this.client.getCollection(COLLECTIONS.ENTITIES),
- this.client.getCollection(COLLECTIONS.SUMMARIES),
- ])) as unknown as [
+ this.client.getCollection(COLLECTIONS.SUMMARIES)])) as unknown as [
  QdrantCollectionInfo | undefined,
  QdrantCollectionInfo | undefined,
  QdrantCollectionInfo | undefined

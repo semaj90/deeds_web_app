@@ -76,8 +76,7 @@ async function processSummaryJob(payload: JobPayload): Promise<void> {
  errorHandlerService.executeWithRetry(
  () => ragService.retrieveCaseLaw(chargeList),
  'Retrieve case law'
- ),
- ]);
+ )]);
 
  await jobQueueService.updateJobStatus(jobId, 'processing', 40);
 

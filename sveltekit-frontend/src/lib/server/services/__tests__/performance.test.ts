@@ -141,8 +141,7 @@ describe('Performance Tests', () => {
  const queries = [
  { query: 'negligence', jurisdiction: 'CA' },
  { query: 'contract', jurisdiction: 'NY' },
- { query: 'property', jurisdiction: 'TX' },
- ];
+ { query: 'property', jurisdiction: 'TX' }];
 
  vi.mocked(cacheService.getOrSet).mockResolvedValue([]);
 

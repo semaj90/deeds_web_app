@@ -214,7 +214,7 @@
  }
 
  .loading {
- text-align: center;, color: #9ca3af;
+ text-align: center; color: #9ca3af;
  padding: 2rem;
  }
 
@@ -247,7 +247,7 @@
  }
 
  .badges {
- display: flex;, gap: 0.5rem;
+ display: flex; gap: 0.5rem;
  flex-wrap: wrap;
  }
 
@@ -255,20 +255,20 @@
  padding: 0.5rem 1rem;
  border-radius: 0.375rem;
  font-size: 0.875rem;
- font-weight: 600;, color: #ffffff;
+ font-weight: 600; color: #ffffff;
  text-transform: capitalize;
  }
 
  .header-actions {
- display: flex;, gap: 1rem;
+ display: flex; gap: 1rem;
  }
 
  .btn-secondary {
  padding: 0.75rem 1.5rem;
- background: #333;, color: #ffffff;
+ background: #333; color: #ffffff;
  text-decoration: none;
  border-radius: 0.375rem;
- font-weight: 600;, transition: background-color 0.2s;
+ font-weight: 600; transition: background-color 0.2s;
  }
 
  .btn-secondary:hover {
@@ -276,18 +276,18 @@
  }
 
  .tabs {
- display: flex;, gap: 1rem;
+ display: flex; gap: 1rem;
  margin-bottom: 2rem;
  border-bottom: 1px solid #333;
  }
 
  .tab-button {
  padding: 0.75rem 1.5rem;
- background: transparent;, color: #9ca3af;
+ background: transparent; color: #9ca3af;
  border: none;
  border-bottom: 2px solid transparent;
  cursor: pointer;
- font-weight: 600;, transition: all 0.2s;
+ font-weight: 600; transition: all 0.2s;
  }
 
  .tab-button.active {
@@ -300,7 +300,7 @@
  }
 
  .tab-content {
- background: #1a1a2e;, border: 1px solid #333;
+ background: #1a1a2e; border: 1px solid #333;
  border-radius: 0.5rem; padding: 2rem;
  }
 
@@ -327,24 +327,24 @@
  }
 
  .detail-item p {
- color: #ffffff;, margin: 0;
+ color: #ffffff; margin: 0;
  }
 
  .associates-list {
  display: flex;
- flex-direction: column;, gap: 1rem;
+ flex-direction: column; gap: 1rem;
  }
 
  .associate-item {
  display: flex;
  justify-content: space-between;
- align-items: center;, padding: 1rem;
- background: #0f0f23;, border: 1px solid #333;
+ align-items: center; padding: 1rem;
+ background: #0f0f23; border: 1px solid #333;
  border-radius: 0.375rem;
  }
 
  .associate-info h4 {
- color: #ffffff;, margin: 0 0 0.25rem 0;
+ color: #ffffff; margin: 0 0 0.25rem 0;
  }
 
  .relationship {
@@ -360,10 +360,10 @@
 
  .btn-remove {
  padding: 0.5rem 1rem;
- background: #7f1d1d;, color: #fecaca;
+ background: #7f1d1d; color: #fecaca;
  border: 1px solid #dc2626;
  border-radius: 0.25rem; cursor: pointer;
- font-weight: 600;, transition: background-color 0.2s;
+ font-weight: 600; transition: background-color 0.2s;
  }
 
  .btn-remove:hover {
@@ -373,6 +373,6 @@
  .empty-message,
  .placeholder {
  color: #9ca3af;
- text-align: center;, padding: 2rem;
+ text-align: center; padding: 2rem;
  }
 </style>

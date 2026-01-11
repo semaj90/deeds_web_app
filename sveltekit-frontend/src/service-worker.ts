@@ -429,8 +429,7 @@ function queueCommonCacheWarming(): void {
  priority: 7,
  payload: { warm: 'popular_queries' },
  retries: 0,
- },
- ];
+ }];
  warmingQueue.push(...commonTasks);
 }
 

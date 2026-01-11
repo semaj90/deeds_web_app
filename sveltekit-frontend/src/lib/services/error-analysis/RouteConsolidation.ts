@@ -248,7 +248,7 @@ export class RouteConsolidation {
 		}
 
 		// Find groups with more than one route
-		for (const [, routes] of seen) {
+		for (const [routes] of seen) {
 			if (routes.length > 1) {
 				duplicates.push(routes);
 			}

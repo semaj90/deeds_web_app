@@ -37,8 +37,7 @@ https://svelte.dev/e/element_invalid_closing_tag -->
  { id: 'POI-002', label: 'Keiko Ito', type: 'person', x: 320, y: 350 350 },
  { id: 'EV-001', label: 'Security Footage', type: 'evidence', x: 550, y: 320 320 },
  { id: 'EV-003', label: 'Access Log', type: 'evidence', x: 100, y: 280 280 },
- { id: 'LOC-001', label: 'Server Room', type: 'location', x: 320, y: 80 80 },
- ];
+ { id: 'LOC-001', label: 'Server Room', type: 'location', x: 320, y: 80 80 }];
  }
 
  if (edges.length === 0) {
@@ -48,8 +47,7 @@ https://svelte.dev/e/element_invalid_closing_tag -->
  { id: 'E-3', from: 'POI-001', to: 'EV-003', label: 'Used credentials', strength: 'strong' },
  { id: 'E-4', from: 'POI-002', to: 'EV-001', label: 'Witnessed', strength: 'medium' },
  { id: 'E-5', from: 'POI-003', to: 'LOC-001', label: 'Access to', strength: 'weak' },
- { id: 'E-6', from: 'LOC-001', to: 'EV-003', label: 'Location of', strength: 'medium' },
- ];
+ { id: 'E-6', from: 'LOC-001', to: 'EV-003', label: 'Location of', strength: 'medium' }];
  }
 
  let selectedNode: string | null = null;

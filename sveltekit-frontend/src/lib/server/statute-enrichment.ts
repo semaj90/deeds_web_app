@@ -55,8 +55,7 @@ const statuteDatabase: Record<string, StatuteEnrichment> = {
  title: 'Resisting Arrest',
  reason: 'Common companion - arrest resistance',
  frequency: 0.3,
- },
- ],
+ }],
  precedents: [
  {
  caseId: 'People v. Castillo',
@@ -71,8 +70,7 @@ const statuteDatabase: Record<string, StatuteEnrichment> = {
  year: 2015,
  court: 'CA Court of Appeal',
  relevance: 0.88,
- },
- ],
+ }],
  },
  '211': { citation: '211 PC',
  title: 'Robbery',
@@ -107,8 +105,7 @@ const statuteDatabase: Record<string, StatuteEnrichment> = {
  title: 'Personal Use of Firearm',
  reason: 'Enhancement - weapon allegation',
  frequency: 0.6,
- },
- ],
+ }],
  precedents: [
  {
  caseId: 'People v. Lara',
@@ -116,8 +113,7 @@ const statuteDatabase: Record<string, StatuteEnrichment> = {
  year: 2017,
  court: 'CA Supreme',
  relevance: 0.96,
- },
- ],
+ }],
  },
  '23153': { citation: '23153 VC',
  title: 'DUI Causing Injury',
@@ -151,8 +147,7 @@ const statuteDatabase: Record<string, StatuteEnrichment> = {
  title: 'Great Bodily Injury Enhancement',
  reason: 'Enhancement - serious injury',
  frequency: 0.5,
- },
- ],
+ }],
  precedents: [
  {
  caseId: 'People v. Timms',
@@ -160,8 +155,7 @@ const statuteDatabase: Record<string, StatuteEnrichment> = {
  year: 2007,
  court: 'CA Supreme',
  relevance: 0.94,
- },
- ],
+ }],
  },
  '148': { citation: '148 PC',
  title: 'Resisting Arrest',
@@ -183,8 +177,7 @@ const statuteDatabase: Record<string, StatuteEnrichment> = {
  title: 'Conspiracy',
  reason: 'Enhancement - group resistance',
  frequency: 0.2,
- },
- ],
+ }],
  precedents: [
  {
  caseId: 'People v. Castillo',
@@ -192,8 +185,7 @@ const statuteDatabase: Record<string, StatuteEnrichment> = {
  year: 2014,
  court: 'CA Court of Appeal',
  relevance: 0.9,
- },
- ],
+ }],
  },
 };
 

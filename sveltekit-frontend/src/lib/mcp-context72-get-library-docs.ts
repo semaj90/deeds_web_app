@@ -33,8 +33,7 @@ export async function getLibraryDocs(libraryName: string): Promise<LibraryDocsRe
         version: '1.0.0',
         description: `Documentation for ${ libraryName } (stub)`,
         url: `https://npmjs.com/package/${ libraryName }`,
-      },
-    ],
+      }],
     cached: false,
     timestamp: new Date(),
   };

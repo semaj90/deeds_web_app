@@ -142,8 +142,7 @@ describe('ErrorHandlerService', () => {
  new Error('ECONNREFUSED'),
  new Error('ECONNRESET'),
  new Error('timeout'),
- new Error('service unavailable'),
- ];
+ new Error('service unavailable')];
 
  transientErrors.forEach((error) => {
  expect(errorHandlerService.isTransientError(error)).toBe(true);
@@ -154,8 +153,7 @@ describe('ErrorHandlerService', () => {
  const permanentErrors = [
  new Error('unauthorized'),
  new Error('not found'),
- new Error('invalid request'),
- ];
+ new Error('invalid request')];
 
  permanentErrors.forEach((error) => {
  expect(errorHandlerService.isTransientError(error)).toBe(false);
@@ -169,8 +167,7 @@ describe('ErrorHandlerService', () => {
  new Error('unauthorized'),
  new Error('forbidden'),
  new Error('not found'),
- new Error('invalid request'),
- ];
+ new Error('invalid request')];
 
  permanentErrors.forEach((error) => {
  expect(errorHandlerService.isPermanentError(error)).toBe(true);
@@ -181,8 +178,7 @@ describe('ErrorHandlerService', () => {
  const transientErrors = [
  new Error('ECONNREFUSED'),
  new Error('timeout'),
- new Error('service unavailable'),
- ];
+ new Error('service unavailable')];
 
  transientErrors.forEach((error) => {
  expect(errorHandlerService.isPermanentError(error)).toBe(false);

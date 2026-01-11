@@ -23,7 +23,7 @@ interface AmqplibModule {
 type Channel = {
  assertExchange: (name: string, 
   type: string, options?: Record<string, unknown>) => Promise<void>;
- publish: (, exchange: string, 
+ publish: (exchange: string, 
   routingKey: string,
  content: Uint8Array | ArrayBuffer | Buffer
  ) => boolean;
@@ -32,18 +32,18 @@ type Channel = {
  queue?: string,
  options?: Record<string, unknown>
  ) => Promise<{ queue: string; messageCount: number; consumerCount: number }>;
- bindQueue: (, queue: string, 
+ bindQueue: (queue: string, 
   source: string,
  pattern: string,
  args?: Record<string, unknown>
  ) => Promise<void>;
- consume: (, queue: string, 
+ consume: (queue: string, 
   onMessage: (msg: null) => void,
  options?: Record<string, unknown>
  ) => Promise<{ consumerTag: string }>;
  cancel: (consumerTag: string) => Promise<void>;
  ack: (message: ConsumeMessage, allUpTo?: boolean) => void;
- deleteQueue?: (, queue: string,
+ deleteQueue?: (queue: string,
  options?: Record<string, unknown>
  ) => Promise<{ messageCount: number }>;
 };

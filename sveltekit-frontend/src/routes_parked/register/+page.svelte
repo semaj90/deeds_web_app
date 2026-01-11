@@ -14,7 +14,7 @@ https://svelte.dev/e/style_duplicate -->
 
  // Define the base Zod schema for client validation
  const baseRegisterSchema = z.object({
- email: z.string().email('Invalid email address', password: z.string().min(8, 'Password must be at least 8 characters', confirmPassword: z.string(, terms: z.boolean()
+ email: z.string().email('Invalid email address', password: z.string().min(8, 'Password must be at least 8 characters', confirmPassword: z.string(terms: z.boolean()
  }).refine(data => data.password === data.confirmPassword, {
  message: 'Passwords do not match',
  path: ['confirmPassword']
@@ -377,7 +377,7 @@ https://svelte.dev/e/style_duplicate -->
  border-color: #007bff;
  }
 
- .btn-primary:hover, not(:disabled) {
+ .btn-primary:hover, not(disabled) {
  background: #0056b3;
  border-color: #0056b3;
  }

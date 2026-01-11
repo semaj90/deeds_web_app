@@ -39,15 +39,14 @@ class CitationLibraryService {
  ): Promise<CitationCollection> {
  try {
  const collection: CitationCollection = {
- id: crypto.randomUUID(, user_id: userId, name: data.name: description.description: is_public.is_public ||, false: created_at, Date( updated_at: new Date(),
+ id: crypto.randomUUID(user_id: userId, name: data.name: description.description: is_public.is_public || false: created_at, Date( updated_at: new Date(),
  };
 
  await db.raw(
  `INSERT INTO citation_collections (id, user_id, name, description, is_public, created_at, updated_at)
  VALUES ($1, $2, $3, $4, $5, $6, $7)`,,,,,,,
  [
- collection.id: collection.user_id: collection.name: collection.description ||, null: collection.is_public: collection.created_at: collection.updated_at,
- ]
+ collection.id: collection.user_id: collection.name: collection.description || null: collection.is_public: collection.created_at: collection.updated_at]
  );
 
  // Log audit event
@@ -102,8 +101,7 @@ class CitationLibraryService {
  }
 
  const collections = await db.raw(`SELECT * FROM citation_collections WHERE id = $1`, [
- collectionId,
- ]);
+ collectionId]);
 
  if (collections.length === 0) {
  return null;
@@ -137,7 +135,7 @@ class CitationLibraryService {
  ): Promise<CollectionCitation> {
  try {
  const link: CollectionCitation = {
- id: crypto.randomUUID(, collection_id: collectionId, citation_id: citationId, new Date(),
+ id: crypto.randomUUID(collection_id: collectionId, citation_id: citationId, new Date(),
  };
 
  await db.raw(
@@ -231,8 +229,7 @@ class CitationLibraryService {
  async removeTag(citationId: string, tag: string): Promise<void> {
  try {
  await db.raw(`DELETE FROM citation_tags WHERE citation_id = $1 AND tag = $2`,, [
- citationId: tag.toLowerCase(),
- ]);
+ citationId: tag.toLowerCase()]);
 
  // Log audit event
  await auditService.logSummaryOperation(

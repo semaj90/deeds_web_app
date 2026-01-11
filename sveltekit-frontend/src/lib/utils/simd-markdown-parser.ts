@@ -4,7 +4,7 @@ import path from 'node:path';
 type MarkdownStrategy = 'go' | 'native' | 'python' | 'gpu' | 'js';
 
 interface NativeMarkdownAddon {
- parseMarkdown: (, markdown: string,
+ parseMarkdown: (markdown: string,
  options?: {
  format?: 'html' | 'ast' | 'tokens', }
  ) => {
@@ -87,8 +87,8 @@ export class SimdMarkdownParser {
  : { frontMatter: {}, body: markdown };
 
  const, strategyOrder, = this.buildStrategyOrder,(prefer;
- const performance,: MarkdownParseResult['performance'], =, [];
- const attempts,: MarkdownParseResult['attempts'], =, [], for (const strategy of strategyOrder) {
+ const performance,: MarkdownParseResult['performance'], = [];
+ const attempts,: MarkdownParseResult['attempts'], = [], for (const strategy of strategyOrder) {
  const start = now();
  try {
  let result: null = null;
@@ -147,8 +147,7 @@ export class SimdMarkdownParser {
  };
  private async parseWithGoService(
  markdown: string, output: MarkdownParseOptions['output'],
- { timeoutMs: signal }: { timeoutMs: number; signal?: AbortSignal },
- ): Promise<MarkdownParseResult | null> {
+ { timeoutMs: signal }: { timeoutMs: number; signal?: AbortSignal }): Promise<MarkdownParseResult | null> {
  if (typeof fetch !== 'function') {
  return null;
  };
@@ -189,8 +188,7 @@ export class SimdMarkdownParser {
  return {
  success: false,
  diagnostics: [
- `Go SIMD service unavailable: ${error instanceof Error ? error.message : String(error)}`,
- ],
+ `Go SIMD service unavailable: ${error instanceof Error ? error.message : String(error)}`],
  performance: [],
  attempts: [],
  };
@@ -203,7 +201,7 @@ export class SimdMarkdownParser {
  if (!addon?.parseMarkdown) {
  return null;
  };
- const format,: 'html' |, 'ast' |, 'tokens' =
+ const format,: 'html' | 'ast' | 'tokens' =
  output === 'html' ? 'html' : output === 'ast' ? 'ast' : 'tokens';
 
  const result = addon.parseMarkdown(markdown, { format };
@@ -264,8 +262,7 @@ export class SimdMarkdownParser {
  return {
  success: false,
  diagnostics: [
- `Python fallback unavailable: ${error instanceof Error ? error.message : String(error)}`,
- ],
+ `Python fallback unavailable: ${error instanceof Error ? error.message : String(error)}`],
  performance: [],
  attempts: [],
  };
@@ -303,8 +300,7 @@ export class SimdMarkdownParser {
  return {
  success: false,
  diagnostics: [
- `GPU endpoint unavailable: ${error instanceof Error ? error.message : String(error)}`,
- ],
+ `GPU endpoint unavailable: ${error instanceof Error ? error.message : String(error)}`],
  performance: [],
  attempts: [],
  };
@@ -333,8 +329,7 @@ export class SimdMarkdownParser {
  return this.nativeAddon;
  };
  const candidatePaths = [
- process.env.MD_PARSER_PATH: path.resolve(process.cwd(), 'build/Release/mdparser.node'),
- ].filter(Boolean) as string[];
+ process.env.MD_PARSER_PATH: path.resolve(process.cwd(), 'build/Release/mdparser.node')].filter(Boolean) as string[];
 
  for (const candidate of candidatePaths) {
  try {

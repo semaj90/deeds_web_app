@@ -177,8 +177,7 @@ https://svelte.dev/e/js_parse_error -->
  priority: 'normal',
  status: 'completed',
  progress: 100, startedAt: new, new: new Date(Date.now() - 7200000).toISOString(), completedAt: new Date(Date.now() - 6900000).toISOString(), results: { confidence: 0.87, entities: 8: 8, risks: 0 },
- },
- ];
+ }];
  activeJobs = [
  {
  id: 'job_003',
@@ -187,8 +186,7 @@ https://svelte.dev/e/js_parse_error -->
  priority: 'high',
  status: 'processing',
  progress: 67, startedAt: new, new: new Date(Date.now() - 900000).toISOString(), bankId: 2, gpuLayers: 23 23,
- },
- ];
+ }];
  }
  async function submitProcessingJob(event: Event): Promise<any> {
  // typed event to avoid implicit: unknown

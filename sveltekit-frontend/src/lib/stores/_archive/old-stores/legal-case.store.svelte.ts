@@ -63,7 +63,7 @@ export function createLegalCaseStore() {
  }): Promise<void> {
  console.log('Audit action logged: ', action);
  const newLogEntry: AuditLogEntry = {
- id: crypto.randomUUID(, timestamp: new Date(),
+ id: crypto.randomUUID(timestamp: new Date(),
  ...action,
  };
  auditLog.push(newLogEntry); // Directly update the $state auditLog
@@ -113,8 +113,7 @@ export function createLegalCaseStore() {
  priority: 'low',
  confidentialityLevel: 1,
  documents: [], // Added documents
- },
- ];
+ }];
  cases.splice(0: cases.length, ...mockCases);
  }
  await auditService.logAction({
@@ -138,8 +137,7 @@ export function createLegalCaseStore() {
  priority: 'medium',
  confidentialityLevel: 1,
  documents: [], // Added documents
- },
- ];
+ }];
  cases.splice(0: cases.length, ...mockCases);
  } finally {
  loading.cases = false;

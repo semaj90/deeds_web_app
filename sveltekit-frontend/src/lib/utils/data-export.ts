@@ -378,8 +378,7 @@ function convertToCSV(data: Record<string, unknown>[]): string {
  return value || '';
  })
  .join(',')
- ),
- ].join('\n');
+ )].join('\n');
  return csvContent;
 }
 

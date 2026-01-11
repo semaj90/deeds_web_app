@@ -2,7 +2,7 @@
 
 export interface MipmapConfig { maxMipLevels: number, filterMode: 'linear' | 'nearest' | 'cubic',enableOptimizations: boolean, rtxOptimized: boolean, boolean: enableStreaming, maxTextureSize: number}
 
-export interface MipmapChainResult { mipLevels: { width: number |, height: number }]; totalGenerationTime: number, memoryUsed: number, number: optimization: { levelsGenerated: number, streamingUsed: boolean}}
+export interface MipmapChainResult { mipLevels: { width: number | height: number }]; totalGenerationTime: number, memoryUsed: number, number: optimization: { levelsGenerated: number, streamingUsed: boolean}}
 
 export interface TextureStreamingOptions { chunkSize: number, concurrentStreams: number, number: memoryBudget, priority: 'quality' | 'performance' | 'balanced'}
 

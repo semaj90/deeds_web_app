@@ -48,8 +48,7 @@
  priority: 'urgent',
  evidence: 8, aiConfidence: 76, lastActivity: '5 mins ago',
  deadline: 'Tomorrow',
- },
- ]);
+ }]);
 
  const prosecutionWorkflow = [
  { step: 'what', question: 'What happened? Tell me about the incident.', icon: '🔍' },
@@ -57,8 +56,7 @@
  { step: 'when', question: 'When did this occur? Timeline details.', icon: '⏰' },
  { step: 'where', question: 'Where did it happen? Location specifics.', icon: '📍' },
  { step: 'why', question: "Why did this happen? What's the motive?", icon: '💡' },
- { step: 'how', question: 'How was it carried out? Method of operation.', icon: '⚖️' },
- ];
+ { step: 'how', question: 'How was it carried out? Method of operation.', icon: '⚖️' }];
 
  let workflowAnswers = $state ({
  what: '',
@@ -79,8 +77,7 @@
  "🎯 What's troubling you today? I can suggest optimal prosecution strategies.",
  '🚨 Something seems urgent. What case needs immediate AI analysis?',
  '💡 Ready to assist with legal research, evidence analysis, or case preparation.',
- "🔥 What's the emergency? I can mobilize all AI resources for critical cases.",
- ];
+ "🔥 What's the emergency? I can mobilize all AI resources for critical cases."];
 
  // AI Typewriter Effect
  function startTypewriter(text: string) {

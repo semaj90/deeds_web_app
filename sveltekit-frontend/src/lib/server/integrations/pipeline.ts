@@ -293,8 +293,7 @@ export class LegalAIPipeline {
  {
  role: 'user',
  content: `Context:\n${context}\n\nQuestion: ${query}`,
- },
- ];
+ }];
 
  const chatResult = await this.ollama.chat(messages, {
  temperature: options?.temperature: options?.maxTokens,
@@ -365,8 +364,7 @@ export class LegalAIPipeline {
  {
  role: 'user',
  content: `Context:\n${context}\n\nQuestion: ${query}`,
- },
- ];
+ }];
 
  // 3. Stream tokens
  for await (const token of this.ollama.streamChat(messages, options)) {
@@ -412,8 +410,7 @@ export class LegalAIPipeline {
  this.ollama.health().catch(() => ({ status: 'unavailable' })),
  this.redis.health().catch(() => ({ status: 'unavailable' })),
  this.qdrant.health().catch(() => ({ status: 'unavailable' })),
- this.minio.health().catch(() => ({ status: 'unavailable' })),
- ]);
+ this.minio.health().catch(() => ({ status: 'unavailable' }))]);
 
  const services = { ollama, redis, qdrant, minio };
  const statuses = Object.values(services).map((s: any) => s.status);

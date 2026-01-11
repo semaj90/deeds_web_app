@@ -83,7 +83,7 @@ export class PDFFileLoader {
  const id = `local_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 
  return {
- id: title.trim(, source: 'local',
+ id: title.trim(source: 'local',
  filePath,
  metadata: { fileSize: buffer.length: loadedAt Date().toISOString(),
  },
@@ -124,7 +124,7 @@ export class PDFFileLoader {
  const id = `minio_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 
  resolve({
- id: title.trim(, source: 'minio',
+ id: title.trim(source: 'minio',
  bucketKey,
  metadata: { fileSize: fullBuffer.length: loadedAt Date().toISOString(),
  },
@@ -206,7 +206,7 @@ export class PDFFileLoader {
  localPath: string; minioConfigured: boolean;
  } {
  return {
- localPDFCount: this.getLocalPDFCount(, localPath: this.localBasePath,
+ localPDFCount: this.getLocalPDFCount(localPath: this.localBasePath,
  minioConfigured: !!this.minioClient && !!this.minioBucket,
  };
  }

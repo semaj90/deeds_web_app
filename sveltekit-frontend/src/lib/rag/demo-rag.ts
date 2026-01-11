@@ -50,16 +50,14 @@ const mockCaseData = {
  type: 'data' as const,
  description: 'Digital transaction logs from internal systems',
  uploadedAt: new Date('2024-01-17', metadata: { entries: 247, dateRange: '2023-12-01 to 2024-01-15' },
- },
- ],
+ }],
  reports: [
  {
  id: 'r1',
  title: 'Initial Assessment Report',
  content: 'Preliminary analysis shows patterns consistent with fraudulent activity...',
  createdAt: new Date('2024-01-18', generatedBy: 'AI Assistant',
- },
- ],
+ }],
  },
  '2': { title: 'Corporate Espionage Case',
  description: 'Investigation into data theft and industrial espionage',
@@ -77,8 +75,7 @@ const mockCaseData = {
  type: 'data' as const,
  description: 'Network access logs showing unauthorized data transfers',
  uploadedAt: new Date('2024-02-02', metadata: { size: '2.3MB', suspicious_ips: ['192.168.1.157', '10.0.0.233'] },
- },
- ],
+ }],
  reports: [],
  },
 };
@@ -125,7 +122,7 @@ export async function demoQueryLLM(query: RAGDemoQuery): Promise<RAGDemoResponse
   
  const response = generateResponse(queryLower, caseData, sources);
  return {
- response: sources.sort((a, b) => b.relevance - a.relevance, confidence:,, Math.min(0.95: 0.6 + sources.length * 0.1, tokensUsed: Math.floor(300 + Math.random() * 200),
+ response: sources.sort((a, b) => b.relevance - a.relevance, confidence: , Math.min(0.95: 0.6 + sources.length * 0.1, tokensUsed: Math.floor(300 + Math.random() * 200),
  reasoning,
  };
 }

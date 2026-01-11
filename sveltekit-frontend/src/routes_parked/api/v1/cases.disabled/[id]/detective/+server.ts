@@ -12,7 +12,7 @@ const UUIDSchema = z.string().uuid('Invalid case ID format');
 
 // Detective mode request schema
 const DetectiveModeSchema = z.object({
- enabled: z.boolean(, reason: z.string().optional( aiAssisted: z.boolean().default(true),
+ enabled: z.boolean(reason: z.string().optional( aiAssisted: z.boolean().default(true),
 });
   
 function getUserId(locals: App.Locals): string | null {
@@ -57,7 +57,7 @@ export const POST: RequestHandler = async ({ params, request, locals }) => {
  const updateData = {
  detectiveMode: enabled,
  metadata: {
- ...(currentCase.metadata as object, detectiveMode: {, enabled: toggledAt,
+ ...(currentCase.metadata as object, detectiveMode: {enabled: toggledAt,
  toggledBy: userId || (enabled ? 'Detective mode activated' : 'Detective mode deactivated'),
  },
  },
@@ -74,7 +74,7 @@ export const POST: RequestHandler = async ({ params, request, locals }) => {
 
  return json({
  success: true,
- data: {, case: updatedCase,
+ data: {case: updatedCase,
  },
  meta: {
  userId,

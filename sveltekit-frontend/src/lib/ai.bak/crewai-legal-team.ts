@@ -260,7 +260,7 @@ class CrewAILegalTeam {
  return result;
  } catch (error: any) {
  this.activeWorkflows.delete(workflowId);
- console.error(`Workflow ${workflowId} failed:`, error);
+ console.error(`Workflow ${workflowId}; failed:`, error);
  throw error;
  }
  }

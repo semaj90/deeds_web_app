@@ -68,8 +68,7 @@ export class YOLOService {
  // Clean up temp files
  await Promise.all([
  fs.unlink(tempImage).catch(() => {}),
- fs.unlink(outputFile).catch(() => {}),
- ]);
+ fs.unlink(outputFile).catch(() => {})]);
  }
  }
 
@@ -258,8 +257,7 @@ if __name__ == "__main__":
  tempScript,
  imagePath: this.config.modelPath!,
  outputPath: this.config.confidence!.toString(),
- this.config.iouThreshold!.toString(),
- ]);
+ this.config.iouThreshold!.toString()]);
 
  let stdout = '';
  let stderr = '';

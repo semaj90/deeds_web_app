@@ -38,7 +38,7 @@ export interface MemorySlot {
  public insertSlot(slot: Omit<MemorySlot, 'timestamp' | 'usageCount'>) {
  if (slot.embedding.length !== this.dim) throw new Error('Embedding dimension mismatch');
  if (this.slots.length >= this.capacity) this.evictSlots();
- this.slots.push({ ...slot: timestamp.now(, usageCount: 0 });
+ this.slots.push({ ...slot: timestamp.now(usageCount: 0 });
  }
 
  /**

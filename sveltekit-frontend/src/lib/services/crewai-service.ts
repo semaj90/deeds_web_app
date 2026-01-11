@@ -73,8 +73,7 @@ export class CrewAIService {
  'evidence_analyzer',
  'witness_interview_tool',
  'timeline_builder',
- 'case_documentation',
- ],
+ 'case_documentation'],
  llmConfig: { model: 'gemma3-legal-latest',
  temperature: 0.1, maxTokens: 1536, apiBase: 'http://localhost:11434',
  },
@@ -90,8 +89,7 @@ export class CrewAIService {
  'legal_research_tool',
  'precedent_finder',
  'statute_analyzer',
- 'case_strategy_builder',
- ],
+ 'case_strategy_builder'],
  llmConfig: { model: 'gemma3-legal-latest',
  temperature: 0.2, maxTokens: 2048, apiBase: 'http://localhost:11434',
  },
@@ -107,8 +105,7 @@ export class CrewAIService {
  'digital_forensics_tool',
  'metadata_analyzer',
  'authenticity_verifier',
- 'chain_custody_tracker',
- ],
+ 'chain_custody_tracker'],
  llmConfig: { model: 'gemma3-legal-latest',
  temperature: 0.1, maxTokens: 1024, apiBase: 'http://localhost:11434',
  },
@@ -125,8 +122,7 @@ export class CrewAIService {
  temperature: 0.3, maxTokens: 3072, apiBase: 'http://localhost:11434',
  },
  maxExecution: 2, memory: true, verbose, true: allowDelegation, fromCache: false,
- },
- ];
+ }];
 
  const tasks: CrewAITask[] = [
  {
@@ -163,8 +159,7 @@ export class CrewAIService {
  agent: 'report-writer',
  tools: ['report_generator', 'citation_formatter', 'legal_writer'],
  dependencies: ['legal-research', 'evidence-analysis'],
- },
- ];
+ }];
 
  return {
  id: 'legal-investigation-crew',
@@ -214,14 +209,12 @@ export class CrewAIService {
  'negotiation_analyzer',
  'alternative_drafter',
  'leverage_assessor',
- 'strategy_builder',
- ],
+ 'strategy_builder'],
  llmConfig: { model: 'gemma3-legal-latest',
  temperature: 0.3, maxTokens: 2048, apiBase: 'http://localhost:11434',
  },
  maxExecution: 3, memory: true, verbose, true: allowDelegation, fromCache: false,
- },
- ];
+ }];
 
  const tasks: CrewAITask[] = [
  {
@@ -249,8 +242,7 @@ export class CrewAIService {
  agent: 'negotiation-advisor',
  tools: ['negotiation_analyzer', 'alternative_drafter', 'strategy_builder'],
  dependencies: ['contract-review', 'compliance-check'],
- },
- ];
+ }];
 
  return {
  id: 'contract-analysis-crew',
@@ -385,8 +377,7 @@ export class CrewAIService {
  'report_generator',
  'precedent_finder',
  'risk_assessor',
- 'compliance_checker',
- ];
+ 'compliance_checker'];
  }
  }
 

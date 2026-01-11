@@ -35,8 +35,7 @@ const crimes = [
  { name: 'drunk in public', codes: ['647f'], abbr: ['dip'] },
  { name: 'resisting arrest', codes: ['148', '149'], abbr: ['ra'] },
  { name: 'probation violation', codes: ['1203.2'], abbr: ['pv'] },
- { name: 'parole violation', codes: ['3000'], abbr: ['parv'] },
-];
+ { name: 'parole violation', codes: ['3000'], abbr: ['parv'] }];
 
 // Statute code patterns
 const statuePatterns = [
@@ -150,8 +149,7 @@ function searchStatutes(query: string): LegalSuggestion[] {
  value: queryLower,
  description: 'Search for this statute code',
  confidence: 0.95,
- },
- ];
+ }];
  }
 
  return [];
@@ -255,8 +253,7 @@ export function getLegalAutocomplete(query: string, limit: number = 8): LegalSug
  ...searchCrimes(queryLower),
  ...searchStatutes(queryLower),
  ...searchStates(queryLower),
- ...searchTitles(queryLower),
- ];
+ ...searchTitles(queryLower)];
 
  // Remove duplicates and sort by confidence
  const uniqueSuggestions = Array.from(new Map(allSuggestions.map((s) => [s.value, s])).values());

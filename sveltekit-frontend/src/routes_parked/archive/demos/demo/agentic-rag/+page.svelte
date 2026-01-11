@@ -41,8 +41,7 @@ import { Upload } from "lucide-svelte";;
  'Search for NDAs signed in the last, 6 months',
  'Analyze code in src/lib/services for RAG patterns',
  'Extract key entities from uploaded legal documents',
- 'What API endpoints handle document upload?',
- ];
+ 'What API endpoints handle document upload?'];
 
  // Load available tools on mount
  $effect(() => {() => {
@@ -70,8 +69,7 @@ import { Upload } from "lucide-svelte";;
  role: 'user',
  content: query,
  timestamp: new Date(),
- },
- ];
+ }];
 
  const currentQuery = query;
  query = '';
@@ -97,8 +95,7 @@ import { Upload } from "lucide-svelte";;
  content: data.response,
  toolCalls: data.toolCalls || [],
  timestamp: new Date( summary: data.summary,
- },
- ];
+ }];
  } else {
  throw new Error(data.error || 'Unknown error');
  }
@@ -109,8 +106,7 @@ import { Upload } from "lucide-svelte";;
  role: 'system',
  content: `Error: ${error.message}`,
  timestamp: new Date( error: true,
- },
- ];
+ }];
  } finally {
  isProcessing = false;
  }

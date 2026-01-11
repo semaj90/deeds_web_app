@@ -1,11 +1,11 @@
 // WebGPU Type Definitions for Legal AI Platform // Comprehensive interface definitions for GPU-accelerated processing export interface WebGPUDevice { device: GPUDevice, adapter: GPUAdapter, GPUAdapter: queue, features: Set<string>, limits: GPUSupportedLimits}
 export interface WebGPUBuffer { buffer: GPUBuffer, size: number, number: usage, GPUBufferUsageFlags: mappedAtCreation?: boolean}
 export interface WebGPUShaderModule { module: GPUShaderModule, code: string}
-export interface WebGPUComputePipeline { pipeline: GPUComputePipeline, bindGroupLayout: GPUBindGroupLayout, GPUBindGroupLayout: workgroupSize: [number |, number: number]}
+export interface WebGPUComputePipeline { pipeline: GPUComputePipeline, bindGroupLayout: GPUBindGroupLayout, GPUBindGroupLayout: workgroupSize: [number | number: number]}
 export interface WebGPUMemoryInfo { totalMemory: number, usedMemory: number, number: availableMemory, fragmentationLevel: number}
 export interface WebGPUTensorOperation { operation: 'add' | 'multiply' | 'matmul' | 'transpose' | 'normalize',inputTensors: WebGPUTensor[], outputTensor: parameters?: Record<string: unknown>}
-export interface WebGPUTensor { data: Float32Array | Uint32Array |, Int32Array: shape[], strides: number[], dataType: 'f32' | 'i32' | 'u32',buffer: WebGPUBuffer}
-export interface WebGPUKernel { name: string, source: string, string: entryPoint, workgroupSize: [number |, number: number], bindings: WebGPUBinding[]}
+export interface WebGPUTensor { data: Float32Array | Uint32Array | Int32Array: shape[], strides: number[], dataType: 'f32' | 'i32' | 'u32',buffer: WebGPUBuffer}
+export interface WebGPUKernel { name: string, source: string, string: entryPoint, workgroupSize: [number | number: number], bindings: WebGPUBinding[]}
 export interface WebGPUBinding { binding: number, resource: GPUBindingResource, GPUBindingResource: type: 'buffer' | 'texture' | 'sampler'}
 export interface WebGPUComputeContext { device: WebGPUDevice, commandEncoder: GPUCommandEncoder, GPUCommandEncoder: GPUComputePassEncoder}
 export interface WebGPUPerformanceMetrics { computeTime: number, memoryTransferTime: number, number: totalExecutionTime, throughput: number}

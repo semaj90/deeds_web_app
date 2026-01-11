@@ -36,8 +36,7 @@ export const auditResourceTypeEnum = pgEnum('audit_resource_type', [
  'Evidence',
  'Tag',
  'EvidenceTag',
- 'RAGIndex',
-]);
+ 'RAGIndex']);
 
 // === CITATION TAGS TABLE ===
 // Task 2: User-defined labels for evidence files

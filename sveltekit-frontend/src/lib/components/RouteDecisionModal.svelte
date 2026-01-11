@@ -277,7 +277,7 @@
 		border-color: var(--yorha-crimson);
 	}
 
-	.btn-submit:hover, not(:disabled) {
+	.btn-submit:hover, not(disabled) {
 		background: #d32f2f;
 		border-color: #d32f2f;
 	}

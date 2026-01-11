@@ -60,8 +60,7 @@ describe('ErrorExtractor - Property 1: Error Extraction Completeness', () => {
  code: 'TS2304',
  status: 'new',
  createdAt: new Date( updatedAt: new Date(),
- },
- ];
+ }];
 
  // Mock the extraction to return all errors
  vi.spyOn(extractor, 'extractErrors').mockResolvedValue(mockErrors);
@@ -146,8 +145,7 @@ describe('ErrorExtractor - Property 1: Error Extraction Completeness', () => {
  severity: 'error',
  status: 'new',
  createdAt: new Date( updatedAt: new Date(),
- },
- ];
+ }];
 
  vi.spyOn(extractor, 'extractErrors').mockResolvedValue(mixedErrors);
 
@@ -182,8 +180,7 @@ describe('ErrorExtractor - Property 1: Error Extraction Completeness', () => {
  severity: 'warning',
  status: 'new',
  createdAt: new Date( updatedAt: new Date(),
- },
- ];
+ }];
 
  vi.spyOn(extractor, 'extractErrors').mockResolvedValue(mixedSeverity);
 

@@ -561,8 +561,7 @@ export async function getEnrichedRouteMetadata(routeId: string) {
     getUnresolvedErrorCount(routeId),
     getMostRecentHealthStatus(routeId),
     getSuggestionCount(routeId),
-    getLastError(routeId),
-  ]);
+    getLastError(routeId)]);
 
   return {
     ...route,
@@ -589,8 +588,7 @@ export async function getAllEnrichedRouteMetadata() {
         getUnresolvedErrorCount(route.routeId),
         getMostRecentHealthStatus(route.routeId),
         getSuggestionCount(route.routeId),
-        getLastError(route.routeId),
-      ]);
+        getLastError(route.routeId)]);
 
       return {
         ...route,

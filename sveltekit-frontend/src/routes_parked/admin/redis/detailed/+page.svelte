@@ -134,8 +134,7 @@ https://svelte.dev/e/js_parse_error -->
  // Fallback insights
 // REMOVED: evidenceInsights = [
  { id: 'insight-001', label: 'Anomaly detected in network logs', summary: 'Unusual data transfer patterns identified.' },
-// REMOVED: { id: 'insight-002', label: 'Facial recognition match', summary: 'Subject identified in surveillance footage.' },
- ];
+// REMOVED: { id: 'insight-002', label: 'Facial recognition match', summary: 'Subject identified in surveillance footage.' }];
 // REMOVED: }
  }
 // REMOVED:

@@ -93,11 +93,9 @@ export class ClientEmbeddingGemma {
 
  // Create tensors
  const inputIdsTensor = new ort.Tensor('int64', encoded.input_ids, [
- 1, encoded.input_ids.length,
- ]);
+ 1, encoded.input_ids.length]);
  const attentionMaskTensor = new ort.Tensor('int64', encoded.attention_mask, [
- 1, encoded.attention_mask.length,
- ]);
+ 1, encoded.attention_mask.length]);
 
  // Run inference
  const feeds = {

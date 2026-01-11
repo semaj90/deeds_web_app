@@ -43,8 +43,7 @@ const DEFAULT_CATEGORIES: Context7CategoryAnalysisItem[] = [
     estimated_fixes: 9,
     multicore_analysis: { context: 'Dead styles and selector drift',
     },
-  },
-];
+  }];
 
 export async function analyzeCurrentErrors(): Promise<Context7ErrorAnalysisResult> {
   // Simulate async processing delay
@@ -62,8 +61,7 @@ export async function analyzeCurrentErrors(): Promise<Context7ErrorAnalysisResul
       'Prioritize Svelte 5 migration errors first',
       'Refactor non-reactive locals to $state or derived stores',
       'Normalize component prop naming consistency',
-      'Purge unused CSS to reduce bundle size',
-    ],
+      'Purge unused CSS to reduce bundle size'],
   };
 }
 

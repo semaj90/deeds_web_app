@@ -108,8 +108,7 @@ function createDocumentProgressStore() {
  stage,
  message,
  recoverable,
- },
- ],
+ }],
  }));
  },
 

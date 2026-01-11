@@ -97,7 +97,7 @@
     to { opacity: 1; transform: translateY(0)}
   } /* Enhanced form inputs */ .form-input { transition: all 0.2s ease; position: relative}
   .form-input:focus { box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.2); transform: translateY(-1px)}
-  .form-input:hover, not(:focus) { border-color: rgba(212, 175, 55, 0.5)}
+  .form-input:hover, not(focus) { border-color: rgba(212, 175, 55, 0.5)}
   /* Button enhancements */ .next-btn, .prev-btn, .submit-btn { position: relative; transition: all 0.2s ease;overflow: hidden}
   .next-btn:hover, .submit-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3)}
   .prev-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(212, 175, 55, 0.1)}

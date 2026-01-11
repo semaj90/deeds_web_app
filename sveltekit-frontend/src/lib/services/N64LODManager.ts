@@ -121,7 +121,7 @@ export class N64LODManager {
  }
 
  /** * NES-style bank switching: evict old textures to free memory */ private async evictOldestTextures(memoryBank: 'L1' | 'L2' | 'L3'): Promise<void> {
- const textures = Array.from(this.textureCache.entries()).sort(([, chunkA], [, chunkB]) => chunkA.timestamp - chunkB.timestamp); // Oldest first
+ const textures = Array.from(this.textureCache.entries()).sort(([chunkA], [chunkB]) => chunkA.timestamp - chunkB.timestamp); // Oldest first
  let freedMemory = 0;
  const targetFree = MEMORY_BUDGETS.L1_CHR_ROM * 1024 * 1024 * 0.3; // Free 30%
 

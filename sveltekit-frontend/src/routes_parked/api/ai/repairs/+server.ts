@@ -41,8 +41,7 @@ export const GET: RequestHandler = async ({ url }) => {
  {
  key: 'confidence',
  range: { gte: minConfidence },
- },
- ],
+ }],
  },
  with_payload: true, with_vector: false, fromCache: false,
  });

@@ -89,7 +89,7 @@
  <div class="bg-slate-800/50 border border-slate-700 rounded-xl p-6">
  <h2 class="text-xl font-semibold text-white mb-4">Tag Distribution</h2>
  <div class="space-y-2 max-h-96 overflow-y-auto">
- {#each Object.entries(tagCounts).sort(([,a], [,b]) => (b as number) - (a as number)) as [tag, count]}
+ {#each Object.entries(tagCounts).sort(([a], [b]) => (b as number) - (a as number)) as [tag, count]}
  <div class="flex items-center justify-between bg-slate-900/50 border border-slate-700 rounded-lg p-3">
  <span class="font-mono text-sm text-slate-300">{tag}</span>
  <div class="flex items-center gap-3">

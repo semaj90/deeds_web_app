@@ -7,7 +7,7 @@ import type { RequestHandler } from './$types.js';
 export const GET: RequestHandler = async ({ params }) => {
  try {
  const caseData = await db.query.cases.findFirst({
- where: eq(cases.id, params.caseId, with: {, persons: true, evidence: true,
+ where: eq(cases.id, params.caseId, with: {persons: true, evidence: true,
  reports: true,
  },
  });

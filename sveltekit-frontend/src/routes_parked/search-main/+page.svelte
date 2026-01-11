@@ -232,7 +232,7 @@
 		transition: background 0.2s;
 	}
 
-	.search-bar button:hover, not(:disabled) {
+	.search-bar button:hover, not(disabled) {
 		background: #6b2a2a;
 	}
 

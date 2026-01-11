@@ -218,7 +218,7 @@ export class DiffStorage extends BaseService implements IDiffStorage {
  details?: Record<string, any>
  ): void {
  const entry: DiffHistoryEntry = {
- id: this.generateId(, diffId: action Date(),
+ id: this.generateId(diffId: action Date(),
  details,
  };
 

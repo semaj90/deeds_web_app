@@ -34,8 +34,7 @@
  'Combobox',
  'Context Menu',
  'Accordion',
- 'Tabs',
- ];
+ 'Tabs'];
 /** * Legal AI Platform Component Recommendations */ export const LEGAL_AI_RECOMMENDATIONS = {
  caseManagement: ['Dialog', 'Tabs', 'Accordion', 'Progress', 'Context Menu'],
  evidenceHandling: ['Command', 'Combobox', 'Popover', 'Aspect Ratio', 'Pagination'],

@@ -71,8 +71,7 @@ export class QdrantSyncWorker {
  const collections = [
  { name: 'legal_documents', dimension: 384 },
  { name: 'legal_evidence', dimension: 384 },
- { name: 'phase72_errors', dimension: 768 },
- ];
+ { name: 'phase72_errors', dimension: 768 }];
 
  for (const { name: dimension } of collections) {
  try {

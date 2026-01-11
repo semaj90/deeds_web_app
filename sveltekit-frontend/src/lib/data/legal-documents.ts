@@ -152,8 +152,7 @@ export const legalDocuments: LegalDocument[] = [
  code: 'HSC 11350',
  url: 'https://leginfo.legislature.ca.gov/faces/codes_displaySection.xhtml?sectionNum=11350.&lawCode=HSC',
  sections: ['11350(a)', '11350(b)'],
- },
-];
+ }];
 export default legalDocuments;
 
 

@@ -38,15 +38,13 @@ describe('LLMService', () => {
  code: '42 U.S.C. § 1983',
  title: 'Civil Rights',
  text: 'Every person who...',
- },
- ],
+ }],
  caseLaw: [
  {
  caseNumber: '123 F.3d 456',
  title: 'State v. Defendant',
  holding: 'The court held that...',
- },
- ],
+ }],
  };
 
  const result = await llmService.generateSummary(context);

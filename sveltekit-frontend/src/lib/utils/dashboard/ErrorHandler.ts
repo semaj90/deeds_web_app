@@ -121,8 +121,7 @@ export class DashboardErrorHandler {
  'percent',
  'eta',
  'details',
- 'timestamp',
- ];
+ 'timestamp'];
  for (const field of requiredFields) {
  if (!(field in event)) {
  return { valid: false, error: `Missing required field: ${field}` };

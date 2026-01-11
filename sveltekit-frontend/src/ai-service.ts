@@ -482,7 +482,7 @@ Format your response as JSON with the structure:
     return matches
       ? matches.flatMap((m) =>
           m
-            .split(/[,;/]/)
+            .split(/[;/]/)
             .map((t) => t.trim().toLowerCase())
             .filter(Boolean)
         )
@@ -495,7 +495,7 @@ Format your response as JSON with the structure:
     return matches
       ? matches.flatMap((m) =>
           m
-            .split(/[,;/]/)
+            .split(/[;/]/)
             .map((t) => t.trim())
             .filter(Boolean)
         )
@@ -508,7 +508,7 @@ Format your response as JSON with the structure:
     return matches
       ? matches.flatMap((m) =>
           m
-            .split(/[,;/]/)
+            .split(/[;/]/)
             .map((t) => t.trim())
             .filter(Boolean)
         )

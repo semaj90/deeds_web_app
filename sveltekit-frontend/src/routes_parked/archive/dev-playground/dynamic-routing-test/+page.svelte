@@ -29,8 +29,7 @@ https://svelte.dev/e/js_parse_error -->
  { id: 'persons', label: 'Persons of Interest', description: 'Manage and analyze individuals related to cases.' },
  { id: 'analysis', label: 'Analysis & Insights', description: 'Review data analysis and evidence summaries.' },
  { id: 'evidence', label: 'Evidence Locker', description: 'Secure storage and management of digital evidence.' },
- { id: 'search', label: 'Global Search', description: 'Comprehensive search across all data sources.' },
- ]);
+ { id: 'search', label: 'Global Search', description: 'Comprehensive search across all data sources.' }]);
 
  let evidenceInsights = $state([]);
  let recentCases = $state([]);
@@ -137,8 +136,7 @@ https://svelte.dev/e/js_parse_error -->
  // Fallback insights
  evidenceInsights = [
  { id: 'insight-001', label: 'Anomaly detected in network logs', summary: 'Unusual data transfer patterns identified.' },
- { id: 'insight-002', label: 'Facial recognition match', summary: 'Subject identified in surveillance footage.' },
- ];
+ { id: 'insight-002', label: 'Facial recognition match', summary: 'Subject identified in surveillance footage.' }];
  }
  }
 

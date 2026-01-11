@@ -177,8 +177,7 @@ https://svelte.dev/e/js_parse_error -->
           canvasPosition: null,
           uploadedBy: '1',
           uploadedAt: new Date( updatedAt: new Date(),
-        },
-      ];
+        }];
     } catch (err) {
       console.error('Failed to load demo data:', err);
       error = 'Failed to load demo data';

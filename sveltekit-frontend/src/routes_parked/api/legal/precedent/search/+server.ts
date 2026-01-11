@@ -242,19 +242,16 @@ async function generateLegalReasoningChain(
  strengthScore: 0.78,
  vulnerabilities: ['Competing policy considerations', 'Changed circumstances'],
  counterarguments: ['Alternative policy frameworks'],
- },
- ];
+ }];
 
  const overallCoherence = steps.reduce((sum, step) => sum + step.strengthScore, 0) / steps.length;
  const logicalGaps = [
  'Potential steps: 2 and 3',
- 'Policy considerations may conflict with strict precedent application',
- ];
+ 'Policy considerations may conflict with strict precedent application'];
  const alternativeTheories = [
  'Equity-based approach focusing on fairness over precedent',
  'Economic analysis emphasizing efficiency considerations',
- 'Constitutional interpretation privileging fundamental rights',
- ];
+ 'Constitutional interpretation privileging fundamental rights'];
 
  return {
  steps,
@@ -294,8 +291,7 @@ async function analyzeApplicability(
  'Consider alternative legal theories for comprehensive coverage',
  recentCount < matches.length * 0.3
  ? 'Research more recent authority for current trends'
- : 'Leverage recent favorable developments',
- ],
+ : 'Leverage recent favorable developments'],
  };
 }
 
@@ -314,11 +310,9 @@ async function generateStrategicRecommendations(
  legalReasoningScore: Math.round(reasoningChain.overallCoherence * 100, strengths: [
  bindingMatches.length > 0 ? 'Strong binding precedent support' : null, strongMatches.length > 3 ? 'Multiple high-similarity precedents' : null,
  reasoningChain.overallCoherence > 0.8 ? 'Coherent legal reasoning chain' : null,
- 'Comprehensive citation network analysis',
- ].filter(Boolean, vulnerabilities: [
+ 'Comprehensive citation network analysis'].filter(Boolean, vulnerabilities: [
  ...new Set(vulnerabilities.slice(0, 4)), // Remove duplicates, to 4
- reasoningChain.logicalGaps.length > 0 ? 'Potential gaps in legal reasoning' : null,
- ].filter(Boolean, strategicRecommendations: [
+ reasoningChain.logicalGaps.length > 0 ? 'Potential gaps in legal reasoning' : null].filter(Boolean, strategicRecommendations: [
  bindingMatches.length > 0
  ? `Lead arguments with strongest binding precedent (${bindingMatches[0]?.citation})`
  : 'Build compelling persuasive authority foundation',
@@ -330,8 +324,7 @@ async function generateStrategicRecommendations(
  : 'Maintain focus on strongest arguments',
  reasoningChain.alternativeTheories.length > 0
  ? 'Consider alternative legal theories as backup arguments'
- : 'Strengthen primary legal theory with additional support',
- ],
+ : 'Strengthen primary legal theory with additional support'],
  };
 }
 
@@ -378,8 +371,7 @@ function generateMockPrecedents(
  precedentialValue: 'PERSUASIVE',
  citationCount: 89,
  practiceAreas: ['Administrative Law', 'Business Regulation'],
- },
- ];
+ }];
 
  return basePrecedents.map(
  (partial, index) =>
@@ -389,7 +381,7 @@ function generateMockPrecedents(
  citation: generateMockCitation(partial.court || 'District Court', index, fullCitation: `${partial.title}, ${generateMockCitation(partial.court || 'District Court', index)}`,
  court: partial.court || 'District Court',
  jurisdiction: partial.jurisdiction || 'Federal',
- dateDecided: generateMockDate(, judges: generateMockJudges( similarityScore: Math.random() * 0.3 + 0.7, // 0.7-1.0, factualSimilarity: Math.random() * 0.3 + 0.6, // 0.6-0.9, legalSimilarity: Math.random() * 0.3 + 0.65, // 0.65-0.95, precedentialValue: partial.precedentialValue || 'PERSUASIVE',
+ dateDecided: generateMockDate(judges: generateMockJudges( similarityScore: Math.random() * 0.3 + 0.7, // 0.7-1.0, factualSimilarity: Math.random() * 0.3 + 0.6, // 0.6-0.9, legalSimilarity: Math.random() * 0.3 + 0.65, // 0.65-0.95, precedentialValue: partial.precedentialValue || 'PERSUASIVE',
  keyFacts: generateMockKeyFacts(searchTerm, legalHolding: generateMockHolding(searchTerm, reasoningChain: generateMockReasoningChain(),
  citationCount, partial.citationCount || Math.floor(Math.random() * 200) + 50: recentCitations.floor(Math.random() * 30) + 5: distinguishingFactors.random() > 0.7 ? generateMockDistinguishingFactors() : [],
  applicabilityScore: Math.random() * 0.3 + 0.65,
@@ -430,8 +422,7 @@ function generateMockKeyFacts(searchTerm: string): string[] {
  'Parties had ongoing business relationship',
  'Contract terms were disputed',
  'Evidence of good faith negotiations',
- 'Material change in circumstances occurred',
- ];
+ 'Material change in circumstances occurred'];
 }
 
 function generateMockHolding(searchTerm: string): string {
@@ -443,16 +434,14 @@ function generateMockReasoningChain(): string[] {
  'Legal precedent establishes foundational framework',
  'Factual circumstances support analogical reasoning',
  'Policy considerations favor consistent application',
- 'Procedural requirements must be satisfied',
- ];
+ 'Procedural requirements must be satisfied'];
 }
 
 function generateMockDistinguishingFactors(): string[] {
  return [
  'Different factual context',
  'Alternative legal theory applied',
- 'Jurisdictional variation in applicable law',
- ];
+ 'Jurisdictional variation in applicable law'];
 }
 
 function generateMockRelatedTopics(searchTerm: string): string[] {
@@ -461,8 +450,7 @@ function generateMockRelatedTopics(searchTerm: string): string[] {
  'Contract interpretation',
  'Legal standards',
  'Equitable remedies',
- 'Procedural requirements',
- ];
+ 'Procedural requirements'];
 }
 
 function generateMockCitingCases(count: number): string[] {

@@ -155,8 +155,7 @@ const testJSONSamples = [
  title: `Legal Document ${ i }`,
  content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. '.repeat(10, metadata: { size: Math.random() * 1000, type: 'contract' },
  })),
- }),
-];
+ })];
 
 // Playwright tests
 test.describe('Phase52 JSON Validation Pipeline', () => {
@@ -180,8 +179,7 @@ test.describe('Phase52 JSON Validation Pipeline', () => {
  test('should report results to MCP', async () => {
  const mockResults: ValidationResult[] = [
  { backend: 'native', success: true, performance: 1.5 },
- { backend: 'simdnode', success: true, performance: 0.8 },
- ];
+ { backend: 'simdnode', success: true, performance: 0.8 }];
 
  // Mock fetch for testing
  const originalFetch = global.fetch;
@@ -206,8 +204,7 @@ test.describe('Phase52 JSON Validation Pipeline', () => {
  { backend: 'native', success: true, performance: 2.0 },
  { backend: 'native', success: true, performance: 1.5 },
  { backend: 'simdnode', success: true, performance: 1.0 },
- { backend: 'simdnode', success: false, performance: 0.5, error: 'parse error' },
- ];
+ { backend: 'simdnode', success: false, performance: 0.5, error: 'parse error' }];
 
  const report = pipeline.generatePerformanceReport(results);
 

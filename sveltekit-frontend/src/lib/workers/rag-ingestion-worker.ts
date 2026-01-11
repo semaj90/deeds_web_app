@@ -345,7 +345,7 @@ class RAGIngestionWorker {
  ) {
  await (
  svc as {
- updateEvidenceGraph: (, meta: { id: string; summary: string; caseId?: string | null },
+ updateEvidenceGraph: (meta: { id: string; summary: string; caseId?: string | null },
  entities: Array<{ name: string; type?: string | null }>,
  edges: unknown[]
  ) => Promise<void>;

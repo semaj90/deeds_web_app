@@ -167,8 +167,7 @@ export class WebGPUSIMDAccelerator {
                 : Promise.resolve([] as AccelerationResult[]),
             batches.standard.length > 0
                 ? this.standardBatchProcess(batches.standard, mode)
-                : Promise.resolve([] as AccelerationResult[]),
-        ];
+                : Promise.resolve([] as AccelerationResult[])];
 
         const batchResults = await Promise.all(batchPromises);
         const flatResults = batchResults.flat();
@@ -218,8 +217,7 @@ export class WebGPUSIMDAccelerator {
                 layout: bindGroupLayout,
                 entries: [
                     { binding: 0, resource: { buffer: inputBuffer } },
-                    { binding: 1, resource: { buffer: outputBuffer } },
-                ],
+                    { binding: 1, resource: { buffer: outputBuffer } }],
             });
 
             const commandEncoder = this.device.createCommandEncoder();
@@ -501,8 +499,7 @@ export class WebGPUSIMDAccelerator {
                 'WebGPU_Compute',
                 'SIMD_Multi_Backend',
                 'Redis_Cache',
-                'Standard_JSON',
-            ],
+                'Standard_JSON'],
         };
     }
 

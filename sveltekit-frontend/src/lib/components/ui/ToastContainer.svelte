@@ -7,8 +7,7 @@
       'nes-container',
       t?.type === 'success' ? 'is-success' : '',
       t?.type === 'error' ? 'is-error' : '',
-      t?.type === 'info' ? 'is-primary' : '',
-    ]
+      t?.type === 'info' ? 'is-primary' : '']
       .filter(Boolean)
       .join(' ');
   }

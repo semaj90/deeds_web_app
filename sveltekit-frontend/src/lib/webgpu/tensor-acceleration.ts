@@ -350,8 +350,7 @@ export class WebGPUTensorAccelerator {
  { binding: 2, resource: { buffer: dotProductsElemBuffer } },
  { binding: 3, resource: { buffer: normASqElemBuffer } },
  { binding: 4, resource: { buffer: normBSqElemBuffer } },
- { binding: 5, resource: { buffer: paramsBufferElem } },
- ],
+ { binding: 5, resource: { buffer: paramsBufferElem } }],
  });
 
  const commandEncoder1 = this.device.createCommandEncoder();
@@ -399,8 +398,7 @@ export class WebGPUTensorAccelerator {
  entries: [
  { binding: 0, resource: { buffer: dotProductsElemBuffer } },
  { binding: 1, resource: { buffer: dotProductSumBuffer } },
- { binding: 2, resource: { buffer: paramsBufferReduce } },
- ],
+ { binding: 2, resource: { buffer: paramsBufferReduce } }],
  });
  const computePass2_1 = commandEncoder2.beginComputePass();
  computePass2_1.setPipeline(reduceSumPipeline);
@@ -414,8 +412,7 @@ export class WebGPUTensorAccelerator {
  entries: [
  { binding: 0, resource: { buffer: normASqElemBuffer } },
  { binding: 1, resource: { buffer: normASqSumBuffer } },
- { binding: 2, resource: { buffer: paramsBufferReduce } },
- ],
+ { binding: 2, resource: { buffer: paramsBufferReduce } }],
  });
  const computePass2_2 = commandEncoder2.beginComputePass();
  computePass2_2.setPipeline(reduceSumPipeline);
@@ -429,8 +426,7 @@ export class WebGPUTensorAccelerator {
  entries: [
  { binding: 0, resource: { buffer: normBSqElemBuffer } },
  { binding: 1, resource: { buffer: normBSqSumBuffer } },
- { binding: 2, resource: { buffer: paramsBufferReduce } },
- ],
+ { binding: 2, resource: { buffer: paramsBufferReduce } }],
  });
  const computePass2_3 = commandEncoder2.beginComputePass();
  computePass2_3.setPipeline(reduceSumPipeline);
@@ -460,8 +456,7 @@ export class WebGPUTensorAccelerator {
  await Promise.all([
  stagingBufferDot.mapAsync(GPUMapMode.READ),
  stagingBufferNormA.mapAsync(GPUMapMode.READ),
- stagingBufferNormB.mapAsync(GPUMapMode.READ),
- ]);
+ stagingBufferNormB.mapAsync(GPUMapMode.READ)]);
 
  dotProductSum = new Float32Array(stagingBufferDot.getMappedRange())[0];
  normASqSum = new Float32Array(stagingBufferNormA.getMappedRange())[0];
@@ -746,8 +741,7 @@ export class WebGPUTensorAccelerator {
  { binding: 0, resource: { buffer: tokensBuffer } },
  { binding: 1, resource: { buffer: weightsBuffer } },
  { binding: 2, resource: { buffer: outputBuffer } },
- { binding: 3, resource: { buffer: paramsBuffer } },
- ],
+ { binding: 3, resource: { buffer: paramsBuffer } }],
  });
 
  const commandEncoder = this.device.createCommandEncoder();

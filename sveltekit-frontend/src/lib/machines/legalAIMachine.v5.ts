@@ -246,8 +246,7 @@ export const legalAIMachine = createMachine(
  try {
  const [clusterStatusResponse, serviceHealthResponse] = await Promise.all([
  productionServiceClient.makeRequest('/api/system/cluster-status', { method: 'GET' }),
- productionServiceClient.makeRequest('/api/system/service-health', { method: 'GET' }),
- ]);
+ productionServiceClient.makeRequest('/api/system/service-health', { method: 'GET' })]);
 
  const clusterResp = clusterStatusResponse as ServiceResponse<LooseObject>;
  const serviceResp = serviceHealthResponse as ServiceResponse<LooseObject[]>;
@@ -329,8 +328,7 @@ export const legalAIMachine = createMachine(
  permissions: ((data.permissions as string[]) ?? [
  'read: cases',
  'write: cases',
- 'ai: query',
- ]) as string[],
+ 'ai: query']) as string[],
  };
  } else {
  throw new Error(response.error || 'Authentication failed');

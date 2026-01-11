@@ -13,7 +13,7 @@ export const GET: RequestHandler = async ({ url }) => {
  switch (action) {
  case 'status':
  return json({
- ready: await startupFlagService.isReady( summary: startupFlagService.getServiceSummary(, timestamp: Date.now(),
+ ready: await startupFlagService.isReady( summary: startupFlagService.getServiceSummary(timestamp: Date.now(),
  });
  case 'health': {
  const summary: StartupServiceSummary = startupFlagService.getServiceSummary();

@@ -25,8 +25,7 @@ describe('Phase 9 Integration Tests', () => {
  title: 'Add type annotation',
  description: 'Add missing type annotation',
  code: 'const, value: string = "test";',
- },
- ],
+ }],
  selected_suggestion_index: 0,
  phase: 'suggesting',
  error_message: 'Import not found',
@@ -94,7 +93,7 @@ describe('Phase 9 Integration Tests', () => {
  const analysis = {
  id: analysisId,
  route_path: 'test-route',
- suggestions: [{, title: 'Fix', description: 'Desc' }],
+ suggestions: [{title: 'Fix', description: 'Desc' }],
  phase: 'suggesting',
  };
 
@@ -129,8 +128,7 @@ describe('Phase 9 Integration Tests', () => {
  id: analysisId,
  suggestions: [
  { title: 'Fix 1', description: 'Desc 1' },
- { title: 'Fix 2', description: 'Desc 2' },
- ],
+ { title: 'Fix 2', description: 'Desc 2' }],
  };
 
  const patches = [
@@ -151,8 +149,7 @@ describe('Phase 9 Integration Tests', () => {
  analysis_id: analysisId,
  patch_content: 'patch 3',
  verification_status: 'pending',
- },
- ] as const;
+ }] as const;
 
  // Verify all patches link to analysis
  expect(patches.every((p) => p.analysis_id === analysisId)).toBe(true);
@@ -174,8 +171,7 @@ describe('Phase 9 Integration Tests', () => {
  const patches = [
  { analysis_id: analysisId, verification_status: 'passed' },
  { analysis_id: analysisId, verification_status: 'passed' },
- { analysis_id: analysisId, verification_status: 'failed' },
- ];
+ { analysis_id: analysisId, verification_status: 'failed' }];
 
  const analysisPatchCount = patches.filter((p) => p.analysis_id === analysisId).length;
  const passedCount = patches.filter(
@@ -245,7 +241,7 @@ describe('Phase 9 Integration Tests', () => {
  const originalAnalysis = {
  id: '123e4567-e89b-12d3-a456-426614174000',
  route_path: 'test-route',
- suggestions: [{, title: 'Fix', description: 'Desc' }],
+ suggestions: [{title: 'Fix', description: 'Desc' }],
  phase: 'suggesting',
  created_at: new Date().toISOString(),
  };
@@ -289,8 +285,7 @@ describe('Phase 9 Integration Tests', () => {
  const patches = [
  { analysis_id: analysisId },
  { analysis_id: analysisId },
- { analysis_id: analysisId },
- ];
+ { analysis_id: analysisId }];
 
  // All patches should reference the same analysis
  expect(patches.every((p) => p.analysis_id === analysis.id)).toBe(true);
@@ -322,8 +317,7 @@ describe('Phase 9 Integration Tests', () => {
  const analyses = [
  { id: '1', created_at: new Date('2025-01-01').toISOString() },
  { id: '2', created_at: new Date('2025-01-02').toISOString() },
- { id: '3', created_at: new Date('2025-01-03').toISOString() },
- ] as const;
+ { id: '3', created_at: new Date('2025-01-03').toISOString() }] as const;
 
  // Sort by created_at descending (most recent first)
  const sorted = [...analyses].sort(
@@ -366,8 +360,7 @@ describe('Phase 9 Integration Tests', () => {
  id: '323e4567-e89b-12d3-a456-426614174000',
  route_path: routePath,
  phase: 'verifying',
- },
- ] as const;
+ }] as const;
 
  // All should have same route path
  expect(analyses.every((a) => a.route_path === routePath)).toBe(true);

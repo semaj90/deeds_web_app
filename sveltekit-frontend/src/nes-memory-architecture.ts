@@ -368,8 +368,8 @@ export class NESMemoryArchitecture {
 		try {
 			const documents = Array.from(bank.documents.entries());
 			documents.sort((a, b) => {
-				const [, docA] = a;
-				const [, docB] = b;
+				const [docA] = a;
+				const [docB] = b;
 				if (docA.priority !== docB.priority) {
 					return docA.priority - docB.priority;
 				}
@@ -456,7 +456,7 @@ export class NESMemoryArchitecture {
 	}
 
 	private optimizeMemoryLayout(): void {
-		for (const [, bank] of this.memoryBanks) {
+		for (const [bank] of this.memoryBanks) {
 			if (bank.documents.size === 0) continue;
 
 			const documents = Array.from(bank.documents.values());

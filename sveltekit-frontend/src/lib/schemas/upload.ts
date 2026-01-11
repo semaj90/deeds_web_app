@@ -6,8 +6,7 @@ const ALLOWED_FILE_TYPES = [
  'image/png',
  'image/webp',
  'image/gif',
- 'application/pdf',
-];
+ 'application/pdf'];
 
 export const uploadSchema = z.object({
  file: z

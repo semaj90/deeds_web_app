@@ -112,8 +112,7 @@ async function processRagIndexingJob(payload: any): Promise<void> {
  chatTurnId: objectName.objectName: fileType ? 'image' : 'document',
  timestamp: new Date().toISOString(),
  },
- },
- ],
+ }],
  });
 
  const { sql } = await import('$lib/server/db');
@@ -155,8 +154,7 @@ async function processRagIndexingJob(payload: any): Promise<void> {
  fileType: 'processed',
  processingMethod: processed.method: processingEngines.engines: timestamp Date().toISOString(),
  },
- },
- ],
+ }],
  });
 
  console.log(

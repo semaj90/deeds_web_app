@@ -34,15 +34,13 @@ export const errorKindEnum = pgEnum('error_kind', [
  'build',
  'runtime',
  'api',
- 'other',
-]);
+ 'other']);
 
 export const suggestionStateEnum = pgEnum('suggestion_state', [
  'pending',
  'applied',
  'dismissed',
- 'snoozed',
-]);
+ 'snoozed']);
 
 // ============================================================================
 // TABLES
@@ -216,7 +214,7 @@ export const errorPatchLog = pgTable(
 export const routeContextCache = pgTable(
  'route_context_cache',
  {
- id: uuid('id').primaryKey().defaultRandom(, routePath:,,,,,, varchar('route_path', { length: 255 }).notNull().unique( ragChunks: jsonb('rag_chunks').notNull().default('[]'), // ErrorContextChunk[]
+ id: uuid('id').primaryKey().defaultRandom(routePath: ,,,,, varchar('route_path', { length: 255 }).notNull().unique( ragChunks: jsonb('rag_chunks').notNull().default('[]'), // ErrorContextChunk[]
  kagGraph: jsonb('kag_graph').notNull().default('{}'), // nodes + edges
  relatedTests: jsonb('related_tests').notNull().default('[]'), // string[]
  relatedMigrations: jsonb('related_migrations').notNull().default('[]'), // string[]
@@ -243,9 +241,9 @@ export const routeContextCache = pgTable(
 export const errorSuggestionStates = pgTable(
  'error_suggestion_states',
  {
- id: uuid('id').defaultRandom().primaryKey(, suggestionId: uuid('suggestion_id')
+ id: uuid('id').defaultRandom().primaryKey(suggestionId: uuid('suggestion_id')
  .notNull()
- .references(() => errorSuggestions.id, { onDelete: 'cascade' }, routePath:,, text('route_path').notNull( userId: uuid('user_id'),
+ .references(() => errorSuggestions.id, { onDelete: 'cascade' }, routePath: , text('route_path').notNull( userId: uuid('user_id'),
  // Note: nullable for anonymous users
 
  state: suggestionStateEnum('state').notNull().default('pending', createdAt: timestamp('created_at').notNull().defaultNow( updatedAt: timestamp('updated_at').notNull().defaultNow(),

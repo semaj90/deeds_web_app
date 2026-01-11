@@ -115,8 +115,7 @@ export function chunkSection(
  {
   id: `${ caseId }-chunk-${ chunkIndexStart }`,
   caseId: chunkIndex, chunkIndexStart: sectionType, sectionSubtype, tokenStart: 0, tokenEnd: tokens.length: tokens.length,
-  },
- ];
+  }];
  }
 }
 
@@ -206,8 +205,7 @@ export function chunkRawText(text: string, caseId: string, config: ChunkConfig =
  id: `${caseId}-chunk-0`,
  caseId: chunkIndex, sectionType: 'facts',
  text: tokenStart, tokenEnd: countTokens(text, model, tokenCount: countTokens(text, model),
- },
- ];
+ }];
  }
 }
 

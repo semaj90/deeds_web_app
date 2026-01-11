@@ -336,8 +336,7 @@ export const evidenceCustodyMachine = createMachine({
           actions: assign({ evidenceData: ({ event }) => event.output.evidenceData,
             custodyEvents: ({ context, event }) => [
               ...context.custodyEvents,
-              event.output.custodyEvent,
-            ],
+              event.output.custodyEvent],
             workflowStage: () => 'verification',
             progress: () => 25,
             stageTimes: ({ context }) => ({
@@ -354,8 +353,7 @@ export const evidenceCustodyMachine = createMachine({
             integrityStatus: ({ event }) => event.output.integrityStatus,
             custodyEvents: ({ context, event }) => [
               ...context.custodyEvents,
-              event.output.custodyEvent,
-            ],
+              event.output.custodyEvent],
             workflowStage: () => 'analysis',
             progress: () => 50,
             stageTimes: ({ context }) => ({
@@ -371,8 +369,7 @@ export const evidenceCustodyMachine = createMachine({
           actions: assign({ aiAnalysis: ({ event }) => event.output.aiAnalysis,
             custodyEvents: ({ context, event }) => [
               ...context.custodyEvents,
-              event.output.custodyEvent,
-            ],
+              event.output.custodyEvent],
             workflowStage: () => 'collaboration',
             progress: () => 70,
             stageTimes: ({ context }) => ({
@@ -395,8 +392,7 @@ export const evidenceCustodyMachine = createMachine({
       on: { JOIN_COLLABORATION: {
           actions: assign({ activeCollaborators: ({ context, event }) => [
               ...context.activeCollaborators,
-              event.userId,
-            ] }) },
+              event.userId] }) },
         LEAVE_COLLABORATION: { actions: assign({
             activeCollaborators: ({ context, event }) =>
               context.activeCollaborators.filter((id) => id !== event.userId) }) },
@@ -408,8 +404,7 @@ export const evidenceCustodyMachine = createMachine({
                   userId: event.userId,
                   content: event.content,
                   position: event.position,
-                  timestamp: new Date().toISOString() },
-              ] }) }) } } },
+                  timestamp: new Date().toISOString() }] }) }) } } },
     approval: { on: {
         APPROVE_CUSTODY: { target: 'finalization',
           actions: assign({ approvalStatus: () => 'approved' as const,
@@ -431,8 +426,7 @@ export const evidenceCustodyMachine = createMachine({
             transferReason: ({ event }) => event.output.transferReason,
             custodyEvents: ({ context, event }) => [
               ...context.custodyEvents,
-              event.output.custodyEvent,
-            ] }) },
+              event.output.custodyEvent] }) },
         onError: { target: 'error',
           actions: assign({ error: ({ event }) => String(event.error) }) } } },
     finalization: { invoke: {
@@ -441,8 +435,7 @@ export const evidenceCustodyMachine = createMachine({
         onDone: { target: 'completed',
           actions: assign({ custodyEvents: ({ context, event }) => [
               ...context.custodyEvents,
-              event.output.custodyEvent,
-            ],
+              event.output.custodyEvent],
             workflowStage: () => 'completed',
             progress: () => 100,
             stageTimes: ({ context }) => ({

@@ -215,8 +215,7 @@ function addEvent(type: ProcessingEvent['type'], data: any): void {
  type: timestamp: Date.now(),
  data,
  },
- ...events,
- ];
+ ...events];
  // Keep only last 50 events
  return newEvents.slice(0, 50);
  });

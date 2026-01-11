@@ -238,8 +238,7 @@ export class ErrorBrainAPI extends BaseService {
  'knowledge-base-learning',
  'audit-trail',
  'progress-tracking',
- 'ace-context',
- ];
+ 'ace-context'];
 
  if (!validFlags.includes(flag)) {
  return {

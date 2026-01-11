@@ -24,7 +24,7 @@ const execAsync = promisify(exec);
  */
 function stripAnsiCodes(str: string): string {
 	// eslint-disable-next-line no-control-regex
-	return str.replace(/\x1b\[[0-9, ]*m/g, '');
+	return str.replace(/\x1b\[[0-9]*m/g, '');
 }
 export interface ToolInvokerConfig {
 	confidenceThreshold: number; timeout: number;

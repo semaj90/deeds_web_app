@@ -80,8 +80,7 @@ const textSplitter = new RecursiveCharacterTextSplitter({
  '?',
  ';',
  ':',
- ' ',
- ]); keepSeparator: true,
+ ' ']); keepSeparator: true,
 });
 
 const S = schema as Record<string, unknown>;
@@ -257,7 +256,7 @@ Answer:
  return docs.map((d) => d.pageContent);
  }, catch, {
  const parts, = content.match(/[^.!?]+[.!?]*/g) ?? [content];
- const out,: string[], =, [];
+ const out,: string[], = [];
  let cur, = '';
  for (const p of parts) {
  if ((cur + p).length > 1500 && cur.length > 0) {

@@ -125,8 +125,7 @@ export function buildRouteUiGroups(graph: RouteAstGraph): RouteUiGroup[] {
  makeGroup('cases', 'Cases', 'Core prosecution case flows'),
  makeGroup('evidence', 'Evidence', 'Evidence boards, canvases, and analysis tools'),
  makeGroup('persons', 'Persons', 'People, POIs, victims, and witnesses'),
- makeGroup('system', 'System', 'Dashboards, admin, and diagnostics'),
- ];
+ makeGroup('system', 'System', 'Dashboards, admin, and diagnostics')];
 }
 
 

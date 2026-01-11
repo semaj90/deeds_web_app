@@ -24,8 +24,7 @@ export const POST: RequestHandler = async () => {
  'Real-time WebSocket streaming of AI analysis',
  'Auto-tag extraction from AI output',
  'Workflow progress tracking (6 stages)',
- 'Automatic fallback to TypeScript when Python unavailable',
- ],
+ 'Automatic fallback to TypeScript when Python unavailable'],
  },
  { status: 410, headers: { 'X-Deprecated': 'true', 'X-Migrate-To': 'POST /api/v2/evidence' } }
  );

@@ -23,8 +23,7 @@ export const GET: RequestHandler = async ({ url }) => {
  title: 'Stub: Gather more evidence',
  priority: 'low',
  confidence: 0.4,
- },
- ] as const;
+ }] as const;
 
  return json({
  data,

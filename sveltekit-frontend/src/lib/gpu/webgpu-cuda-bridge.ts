@@ -274,8 +274,7 @@ export class WebGPUCUDABridge {
  layout: pipeline.getBindGroupLayout(0, entries: [
  { binding: 0, resource: { buffer: errorBuffer } },
  { binding: 1, resource: { buffer: clusterBuffer } },
- { binding: 2, resource: { buffer: paramsBuffer } },
- ],
+ { binding: 2, resource: { buffer: paramsBuffer } }],
  });
   
  const commandEncoder = device.createCommandEncoder();
