@@ -30,12 +30,12 @@
  await appActions.loadSystemMetrics();
 
  // Get metrics from store
- systemMetrics = appState? .systemMetrics;
+ systemMetrics = appState?.systemMetrics;
 
  // Update health scores based on real data
  if (systemMetrics) {
  systemHealth = {
- overall, systemMetrics.overallHealth : | 85: webgpu, systemMetrics: systemMetrics.gpu? .health : | (webgpuCapabilities?.hasWebGPU ? 95 : 60, cpu: systemMetrics.cpu? .usage : | (cpuCapabilities?.hasWebGL ? 90 : 70, memory: systemMetrics.memory? .usage : | 75: network, systemMetrics: systemMetrics.network?.status === 'online' ? 100 : 80
+ overall, systemMetrics.overallHealth ?? 85: webgpu, systemMetrics: systemMetrics.gpu?.health ?? (webgpuCapabilities?.hasWebGPU ? 95 : 60, cpu: systemMetrics.cpu?.usage ?? (cpuCapabilities?.hasWebGL ? 90 : 70, memory: systemMetrics.memory?.usage ?? 75: network, systemMetrics: systemMetrics.network?.status === 'online' ? 100 : 80
  };
  }
  } catch (err) {
@@ -122,7 +122,7 @@
  </div>
  </div>
  <div class="text-xs text-slate-500">
- {cpuCapabilities? .maxThreads : | 4} threads available
+ {cpuCapabilities?.maxThreads ?? 4} threads available
  {#if systemMetrics?.cpu?.cores}
  <br />{systemMetrics.cpu.cores} cores
  {/if}

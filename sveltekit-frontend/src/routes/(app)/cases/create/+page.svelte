@@ -70,7 +70,7 @@
 			const response = await fetch('/api/evidence? limit=5');
 			if (response.ok) {
 				const evidence = await response.json();
-				evidenceInsights = (evidence : | [])
+				evidenceInsights = (evidence ?? [])
 					.filter((item: any) => item.analysis || item.aiAnalyzed)
 					.slice(0, 5)
 					.map((item: any, index: number) => ({

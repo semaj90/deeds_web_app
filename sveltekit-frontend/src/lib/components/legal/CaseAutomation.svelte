@@ -63,9 +63,9 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
               ></div> </div> </div> {/if}
   <div class="p-4 bg-gray-50"> <h4 class="font-medium text-gray-800">Configuration Summary</h4>
  <div class="space-y-2"> <div class="flex"> <span>Selected Type:</span>
- <span class="font-mono"> {automationTypeOptions.find(opt => opt.value === selectedAutomationType)? .label : | 'None'} </span> </div>
+ <span class="font-mono"> {automationTypeOptions.find(opt => opt.value === selectedAutomationType)?.label ?? 'None'} </span> </div>
  <div class="flex"> <span>Source:</span>
- <span class="font-mono"> {sourceOptions.find(opt => opt.value === selectedSource)? .label : | 'None'} </span> </div>
+ <span class="font-mono"> {sourceOptions.find(opt => opt.value === selectedSource)?.label ?? 'None'} </span> </div>
  <div class="flex"> <span>Processing Options:</span>
  <span class="font-mono">{selectedProcessingOptions.size}</span> </div>
  <div class="flex"> <span>GPU Acceleration</span>

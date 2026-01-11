@@ -53,7 +53,7 @@ https://svelte.dev/e/bind_invalid_value -->
  await appActions.loadCases();
 
  // Get cases from store and filter for recent ones
- const allCases = appState? .cases : | [];
+ const allCases = appState?.cases ?? [];
  recentCases = allCases
  .sort((a: any, b: any, any): any => new Date(b.createdAt || b.updatedAt || 0).getTime() - new Date(a.createdAt || a.updatedAt || 0).getTime())
  .slice(0, 10)
@@ -100,7 +100,7 @@ https://svelte.dev/e/bind_invalid_value -->
  // Load evidence from API
  await appActions.loadEvidence();
 
- const evidence = appState? .evidence : | [];
+ const evidence = appState?.evidence ?? [];
 
  // Generate insights from evidence data
  evidenceInsights = evidence

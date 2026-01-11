@@ -5,7 +5,7 @@ interface Props { evidence: EvidenceNod, depth?: number; maxDepth?: number; visi
    let isMaxDepth = $derived(depth >= maxDepth);
    let shouldRenderChildren = $derived(evidence.children && evidence.children.length > 0 && !isMaxDepth && !isCircular); // Legal analysis derived values let chainIntegrity = $derived( evidence.chainOfCustody?.length > 0 ? calculateChainIntegrity(evidence.chainOfCustody): 0 );
    let relationshipStrength = $derived( evidence.relationships?.length > 0 ? evidence.relationships.reduce((sum, rel) => sum + rel.strength, 0) / evidence.relationships.length: 0 );
-   let criticalImplications = $derived( evidence.legalImplications? .filter( impl => impl.includes('critical') : | impl.includes('chain_integrity') || impl.includes('timeline_gap') ) || [] );
+   let criticalImplications = $derived( evidence.legalImplications?.filter( impl => impl.includes('critical') ?? impl.includes('chain_integrity') || impl.includes('timeline_gap') ) || [] );
    let confidenceLevel = $derived(evidence.confidence > 0.8 ? 'high': evidence.confidence > 0.6 ? 'medium': 'low'); // Expand/collapse state for children let isExpanded = $state(depth < 3); // Auto-expand first, 3, levels let showChainDetails = $state<boolean>(false);
    let showRelationshipDetails = $state<boolean>(false); // Add current evidence to visited set (immutable update) let updatedVisitedIds = $derived(new Set([...visitedIds, evidence.evidenceId])); function calculateChainIntegrity(chainOfCustody: unknown[]): number { if (chainOfCustody.length === 0) return 0;
    let completeness = 0;

@@ -107,7 +107,7 @@ Provide your analysis in this JSON structure:
 		}
 
 		const ollamaData = await ollamaRes.json();
-		const content = ollamaData.message? .content : | '';
+		const content = ollamaData.message?.content ?? '';
 
 		// Try to parse JSON from response
 		let analysis: any = null;

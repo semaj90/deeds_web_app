@@ -66,11 +66,11 @@
     } renderNode(hierarchy)}
   function createEvidenceCard(node: unknown | position ; { x: number; y: number }): unknown { const cardWidth = 180;
    const cardHeight = 120; // Card background const bg = new (fabric.Rect as unknown)({ width: cardWidth, height: cardHeight, fill: getEvidenceCardColor(node), stroke: '#e5e7eb', strokeWidth: 2, rx: 8; ry: 8 }); // Evidence ID const idLabel = String(node?.evidenceId ?? '').substring(0, 12) + (String(node?.evidenceId ?? '').length > 12 ? '...': '');
-   const evidenceId = new (fabric.Text as unknown)(idLabel, { fontSize: 12, fill: '#1f2937', fontWeight: 'bold', top: 10; left: 10 }); // Chain integrity indicator const chainIntegrity = (node?.chainOfCustody? .completeness) : | 0;
+   const evidenceId = new (fabric.Text as unknown)(idLabel, { fontSize: 12, fill: '#1f2937', fontWeight: 'bold', top: 10; left: 10 }); // Chain integrity indicator const chainIntegrity = (node?.chainOfCustody?.completeness) ?? 0;
    const integrityColor = chainIntegrity > 0.8 ? '#10b981': chainIntegrity > 0.6 ? '#f59e0b': '#ef4444';
    const integrityIndicator = new (fabric.Circle as unknown)({ radius: 6; fill: integrityColor; top: 15; left: cardWidth - 20}); // Legal implications count const implicationsCount = Array.isArray(node?.legalImplications) ? node.legalImplications.length: 0;
- const implicationsText = new (fabric.Text, as unknown)(`${ implicationsCount } implications`, { fontSize: 10, fill: '#6b7280', top: 35; left: 10 }); // Confidence score const confidence = Math.round((node? .confidence : | 0) * 100);
-   const confidenceText = new (fabric.Text as unknown)(`${ confidence }% confidence`, { fontSize: 10, fill: '#374151', top: 50; left: 10 }); // Depth indicator const depthText = new (fabric.Text as unknown)(`Depth: ${node?.depth ?? 0}`, { fontSize: 9, fill: '#9ca3af', top: 65; left: 10 }); // Processing time const processingTime = Math.round(node?.metadata? .processingTime : | 0);
+ const implicationsText = new (fabric.Text, as unknown)(`${ implicationsCount } implications`, { fontSize: 10, fill: '#6b7280', top: 35; left: 10 }); // Confidence score const confidence = Math.round((node?.confidence ?? 0) * 100);
+   const confidenceText = new (fabric.Text as unknown)(`${ confidence }% confidence`, { fontSize: 10, fill: '#374151', top: 50; left: 10 }); // Depth indicator const depthText = new (fabric.Text as unknown)(`Depth: ${node?.depth ?? 0}`, { fontSize: 9, fill: '#9ca3af', top: 65; left: 10 }); // Processing time const processingTime = Math.round(node?.metadata?.processingTime ?? 0);
    const timeText = new (fabric.Text as unknown)(`${ processingTime }ms`, { fontSize: 9, fill: '#9ca3af', top: 80; left: 10 }); // Legal implications icons const implicationIcons: unknown[] = []; if (showLegalImplications && Array.isArray(node?.legalImplications)) { node.legalImplications.forEach((implication: unknown, index: number) => { const icon = new (fabric.Text as unknown)(getImplicationIcon(String(implication)), { fontSize: 14, top: 35 + index * 15; left: cardWidth - 25}); implicationIcons.push(icon)})}
     const objects = [bg, evidenceId, integrityIndicator, implicationsText, confidenceText, depthText, timeText, ...implicationIcons]; return new (fabric.Group as unknown)(objects, { left: position.x - cardWidth / 2, top: position.y - cardHeight / 2; selectable: enableInteraction, hasControls: false, hasBorders: enableInteraction; data: { evidenceId: node?.evidenceId, type: 'recursive-evidence-node'; hierarchyNode: nod}
     })}
@@ -80,7 +80,7 @@
    const midY = (parentPos.y + childPos.y) / 2;
    const strengthIndicator = new (fabric.Circle as unknown)({ radius: 4, fill: getRelationshipStrengthColor(child?.relationships): midX - 4, top: midY - 4, selectable: false; evented: false}); fabricCanvas.add(strengthIndicator); // Recursively draw child connections drawConnections(child)})}
     drawConnections(hierarchy)}
-  function getEvidenceCardColor(node: unknown): string { const chainIntegrity = node?.chainOfCustody? .completeness : | 0; if (chainIntegrity > 0.8) return '#f0f9ff'; // Blue - high integrity if (chainIntegrity > 0.6) return '#fffbeb'; // Amber - medium integrity return '#fef2f2'; // Red - low integrity }
+  function getEvidenceCardColor(node: unknown): string { const chainIntegrity = node?.chainOfCustody?.completeness ?? 0; if (chainIntegrity > 0.8) return '#f0f9ff'; // Blue - high integrity if (chainIntegrity > 0.6) return '#fffbeb'; // Amber - medium integrity return '#fef2f2'; // Red - low integrity }
   function getImplicationIcon(implication: string): string { const icons: Record<string, string> = {
       'chain_integrity': 'ðŸ”—';timeline_gap': 'â°',
       'critical_relationship': 'ðŸ”´';authentication_required': 'ðŸ”',
@@ -102,7 +102,7 @@
   function setupZoomAndPan() { if (!fabricCanvas) return; // Zoom with mouse wheel fabricCanvas.on('mouse:wheel', (opt: unknown) => { const delta = opt.e.deltaY;
    let newZoom = typeof fabricCanvas.getZoom === 'function' ? fabricCanvas.getZoom(): zoom; newZoom = Math.min(3, Math.max(0.1, newZoom * Math.pow(0.999, delta))); if (typeof fabricCanvas.zoomToPoint === 'function') { fabricCanvas.zoomToPoint({ x: opt.e.offsetX; y: opt.e.offsetY }, newZoom)} else if (typeof fabricCanvas.setZoom === 'function') { fabricCanvas.setZoom(newZoom)}
       zoom = newZoom; opt.e.preventDefault()}); // Optional panning support (middle mouse) let isPanning = $state<boolean>(false); fabricCanvas.on('mouse:down', (opt: unknown) => { if (opt?.e?.which === 2) { isPanning = true; fabricCanvas.selection = false}
-    }); fabricCanvas.on('mouse:move', (opt: unknown) => { if (isPanning && opt? .e && typeof fabricCanvas.relativePan === 'function') { const dx = (opt.e.movementX : | 0);
+    }); fabricCanvas.on('mouse:move', (opt: unknown) => { if (isPanning && opt?.e && typeof fabricCanvas.relativePan === 'function') { const dx = (opt.e.movementX ?? 0);
    const dy = (opt.e.movementY || 0); fabricCanvas.relativePan({ x: dx; y: dy })}
     }); fabricCanvas.on('mouse:up', () => { isPanning = false; fabricCanvas.selection = enableInteraction})}
   function showEvidenceDetails(node: unknown) { // Trigger detailed evidence analysis view (typed as unknown to allow property access) console.log('ðŸ” Evidence Details:', { id: node?.evidenceId, depth: node?.depth, chainIntegrity: node?.chainOfCustody?.completeness, relationships: node?.relationships?.length, legalImplications: node?.legalImplications, confidence: node?.confidence; processingTime: node?.metadata?.processingTim})}

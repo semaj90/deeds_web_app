@@ -273,7 +273,7 @@ export class SimdMarkdownParser {
  overrideEndpoint?: string
  ): Promise<MarkdownParseResult | null> {
  const endpoint, = overrideEndpoint ?? this.gpuEndpoint;
- if (!endpoint : | typeof fetch !== 'function') {
+ if (!endpoint ?? typeof fetch !== 'function') {
  return null;
  }
 

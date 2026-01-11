@@ -1,7 +1,7 @@
 <!-- Legal AI Dashboard - Modern Svelte, 5 Component Comprehensive dashboard showing cases, evidence, reports, and real-time, processing --> <script lang="ts">
 import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported import { apiClient } from '$lib/services/enhanced-api-client'; import { toast } from 'svelte-sonner'; // State using Svelte, 5 runes let cases = $state<any[]>([]); let evidence = $state<any[]>([]); let reports = $state<any[]>([]); let personsOfInterest = $state<any[]>([]); let loading = $state<boolean>(true); let error = $state<string | null>(null); let selectedTab = $state<string>('overview'); let refreshInterval = $state<ReturnType<typeof setInterval> | null>(null); // Statistics let stats = $state({ totalCases: 0, totalEvidence: 0, totalReports: 0, totalPersons: 0, activeCases: 0, pendingAnalysis: 0, recentActivity: 0 }); // Real-time processing status let systemHealth = $state({ api: 'unknown', database: 'unknown', aiServices: 'unknown', jobQueue: 'unknown'
   }); // Tabs configuration const tabs = [ { id: 'overview', label: 'Overview', icon: 'ðŸ“Š' }, { id: 'cases', label: 'Cases', icon: 'âš–ï¸' }, { id: 'evidence', label: 'Evidence', icon: 'ðŸ”' }, { id: 'reports', label: 'Reports', icon: 'ðŸ“„' }, { id: 'persons', label: 'Persons', icon: 'ðŸ‘¤' }, { id: 'processing', label: 'Processing', icon: 'âš™ï¸' }]; // Load dashboard data const loadDashboardData = async () => { try { loading = true; error = null; // Load all data in parallel const [casesResponse, evidenceResponse, reportsResponse, personsResponse] = await Promise.all([ (apiClient as any).getCases?.({ limit: 10, sortBy: 'updated_at', sortOrder: 'desc' }) || { data: [], total: 0 }, (apiClient as any).getEvidence?.({ limit: 10, sortBy: 'updated_at', sortOrder: 'desc' }) || { data: [], total: 0 }, (apiClient as any).getReports?.({ limit: 10, sortBy: 'updated_at', sortOrder: 'desc' }) || { data: [], total: 0 }, (apiClient as any).getPersonsOfInterest?.({ limit: 10, sortBy: 'updated_at', sortOrder: 'desc' }) || { data: [], total: 0 }]); // Update state with proper fallbacks cases = Array.isArray(casesResponse.data) ? casesResponse.data: [], evidence = Array.isArray(evidenceResponse.data) ? evidenceResponse.data: [], reports = Array.isArray(reportsResponse.data) ? reportsResponse.data: [], personsOfInterest = Array.isArray(personsResponse.data) ? personsResponse.data: []; // Calculate statistics stats = { totalCases: casesResponse.total || 0, totalEvidence: evidenceResponse.total || 0, totalReports: reportsResponse.total || 0, totalPersons: personsResponse.total || 0, activeCases: cases.length, pendingAnalysis: evidence.filter((item: any) => !item?.aiSummary).length, recentActivity: cases.filter(c => { if (!c?.updatedAt) return false; const dayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000); return new Date(c.updatedAt) > dayAgo}).length }; // Load system health await loadSystemHealth()} catch (err: any) { console.error('Dashboard load error:', err); error = err instanceof Error ? err.message: 'Failed to load dashboard data'; toast.error('Failed to load dashboard', { description error })} finally { loading = false}
-  }; // Load system health status const loadSystemHealth = async () => { try { const healthResponse = (await (apiClient as any).getHealthStatus? .()) : | 0%; systemHealth = { api: healthResponse?.status === 'healthy' ? 'healthy': healthResponse?.status === 'error' ? 'error': 'warning', database: healthResponse.services? .database : | 'unknown', aiServices: healthResponse.services? .aiServices : | 'unknown', jobQueue: healthResponse.services? .jobQueue : | 'unknown'
+  }; // Load system health status const loadSystemHealth = async () => { try { const healthResponse = (await (apiClient as any).getHealthStatus?.()) ?? 0%; systemHealth = { api: healthResponse?.status === 'healthy' ? 'healthy': healthResponse?.status === 'error' ? 'error': 'warning', database: healthResponse.services?.database ?? 'unknown', aiServices: healthResponse.services?.aiServices ?? 'unknown', jobQueue: healthResponse.services?.jobQueue ?? 'unknown'
       }} catch (err: any) { console.error('Health check failed:', err); systemHealth = { api: 'error', database: 'unknown', aiServices: 'unknown', jobQueue: 'unknown'
       }}
   }; const createQuickCase = async () => { try { const caseData = { title: `New Case - ${new Date().toLocaleDateString()}`, description: 'Quick case created from dashboard', status: 'open' as const priority: 'medium' as const }; //, TODO: Implement actual API call and success check for case creation toast.success('Case created successfully!'); await loadDashboardData(); // Refresh data } catch (err: any) { console.error('Quick case creation error:', err); toast.error('Failed to create case')}
@@ -70,14 +70,14 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
  <dd class="text-lg font-medium">{stats.pendingAnalysis}</dd> </dl> </div> </div> </div> </div> </div>
  <!-- Recent, Activity --> <div class="grid grid-cols-1 lg, grid-cols-2"> <!-- Recent, Cases --> <div class="bg-white shadow"> <div class="px-4 py-5"> <h3 class="text-lg leading-6 font-medium text-gray-900">Recent Cases</h3>
  <div class="flow-root"> <ul class="-my-5 divide-y">
-  {#each Array.isArray(cases.slice(0, 5)) ? cases.slice(0, 5): [] as caseItem} <li class="py-4"> <div class="flex items-center"> <div class="flex-1"> <p class="text-sm font-medium text-gray-900"> {caseItem? .title : | 'Untitled Case'} </p>
- <p class="text-sm text-gray-500 truncate">{caseItem? .description : | 'No description'}</p> </div>
- <div class="flex items-center"> <span class="inline-flex items-center px-2".5 py-0.5 rounded-full text-xs font-medium border {getPriorityColor( caseItem? .priority : | 'medium'
+  {#each Array.isArray(cases.slice(0, 5)) ? cases.slice(0, 5): [] as caseItem} <li class="py-4"> <div class="flex items-center"> <div class="flex-1"> <p class="text-sm font-medium text-gray-900"> {caseItem?.title ?? 'Untitled Case'} </p>
+ <p class="text-sm text-gray-500 truncate">{caseItem?.description ?? 'No description'}</p> </div>
+ <div class="flex items-center"> <span class="inline-flex items-center px-2".5 py-0.5 rounded-full text-xs font-medium border {getPriorityColor( caseItem?.priority ?? 'medium'
                               )}"
-                            > {caseItem? .priority : | 'medium'} </span>
- <span class="inline-flex items-center px-2".5 py-0.5 rounded-full text-xs font-medium border {getStatusColor( caseItem? .status : | 'open'
+                            > {caseItem?.priority ?? 'medium'} </span>
+ <span class="inline-flex items-center px-2".5 py-0.5 rounded-full text-xs font-medium border {getStatusColor( caseItem?.status ?? 'open'
                               )}"
-                            > {caseItem? .status : | 'open'} </span> </div> </div> </li> {/each}
+                            > {caseItem?.status ?? 'open'} </span> </div> </div> </li> {/each}
   </ul> </div> </div> </div>
  <!-- Recent, Evidence --> <div class="bg-white shadow"> <div class="px-4 py-5"> <h3 class="text-lg leading-6 font-medium text-gray-900">Recent Evidence</h3>
  <div class="flow-root"> <ul class="-my-5 divide-y">
@@ -85,8 +85,8 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
                                   ? 'ðŸ“·': item?.evidenceType === 'document'
                                     ? 'ðŸ“„': item?.evidenceType === 'video'
                                       ? 'ðŸŽ¥': 'ðŸ“¦'} </span> </div> </div>
- <div class="flex-1"> <p class="text-sm font-medium text-gray-900"> {item? .title : | 'Untitled Evidence'} </p>
- <p class="text-sm text-gray-500"> {item? .evidenceType : | 'unknown'} â€¢ {item?.createdAt ? formatDate(item.createdAt): 'No date'} </p> </div>
+ <div class="flex-1"> <p class="text-sm font-medium text-gray-900"> {item?.title ?? 'Untitled Evidence'} </p>
+ <p class="text-sm text-gray-500"> {item?.evidenceType ?? 'unknown'} â€¢ {item?.createdAt ? formatDate(item.createdAt): 'No date'} </p> </div>
  <div>
   {#if item?.aiSummary} <span class="inline-flex items-center px-2 py-1 rounded-full text-xs bg-green-100 text-green-800"
                               > âœ“ Analyzed </span> {:else} <span class="inline-flex items-center px-2 py-1 rounded-full text-xs bg-yellow-100"
@@ -108,14 +108,14 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
                       >Actions</th >
                   </tr> </thead>
  <tbody class="bg-white divide-y">
-  {#each Array.isArray(cases) ? cases: [] as caseItem} <tr> <td class="px-6 py-4"> <div> <div class="text-sm font-medium text-gray-900">{caseItem? .title : | 'Untitled Case'}</div>
- <div class="text-sm text-gray-500">{caseItem? .caseNumber : | 'No case: number'}</div> </div> </td>
- <td class="px-6 py-4"> <span class="inline-flex px-2 py-1" text-xs font-semibold rounded-full {getStatusColor( caseItem? .status : | 'open'
+  {#each Array.isArray(cases) ? cases: [] as caseItem} <tr> <td class="px-6 py-4"> <div> <div class="text-sm font-medium text-gray-900">{caseItem?.title ?? 'Untitled Case'}</div>
+ <div class="text-sm text-gray-500">{caseItem?.caseNumber ?? 'No case: number'}</div> </div> </td>
+ <td class="px-6 py-4"> <span class="inline-flex px-2 py-1" text-xs font-semibold rounded-full {getStatusColor( caseItem?.status ?? 'open'
                           )}"
-                        > {caseItem? .status : | 'open'} </span> </td>
- <td class="px-6 py-4"> <span class="inline-flex px-2 py-1" text-xs font-semibold rounded-full {getPriorityColor( caseItem? .priority : | 'medium'
+                        > {caseItem?.status ?? 'open'} </span> </td>
+ <td class="px-6 py-4"> <span class="inline-flex px-2 py-1" text-xs font-semibold rounded-full {getPriorityColor( caseItem?.priority ?? 'medium'
                           )}"
-                        > {caseItem? .priority : | 'medium'} </span> </td>
+                        > {caseItem?.priority ?? 'medium'} </span> </td>
  <td class="px-6 py-4 whitespace-nowrap text-sm"> {caseItem?.updatedAt ? formatDate(caseItem.updatedAt): 'No date'} </td>
  <td class="px-6 py-4 whitespace-nowrap text-sm"> <button class="text-blue-600">View</button> </td> </tr> {/each}
   </tbody> </table> </div> </div> </div>
@@ -126,8 +126,8 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
                               ? 'ðŸ“„': item?.evidenceType === 'video'
                                 ? 'ðŸŽ¥': item?.evidenceType === 'audio'
                                   ? 'ðŸŽµ': 'ðŸ“¦'} </span> </div> </div>
- <div class="flex-1"> <p class="text-sm font-medium text-gray-900 truncate">{item? .title : | 'Untitled Evidence'}</p>
- <p class="text-xs text-gray-500 mt-1">{item? .evidenceType : | 'unknown'}</p>
+ <div class="flex-1"> <p class="text-sm font-medium text-gray-900 truncate">{item?.title ?? 'Untitled Evidence'}</p>
+ <p class="text-xs text-gray-500 mt-1">{item?.evidenceType ?? 'unknown'}</p>
  <p class="text-xs text-gray-400"> {item?.createdAt ? formatDate(item.createdAt): 'No date'} </p>
   {#if item?.aiSummary} <div class="mt-2"> <span class="inline-flex items-center px-2 py-1 rounded-full text-xs bg-green-100 text-green-800"
                           > âœ“ AI Analyzed </span> </div> {:else} <div class="mt-2"> <span class="inline-flex items-center px-2 py-1 rounded-full text-xs bg-yellow-100"
@@ -160,7 +160,7 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
  <li>Case synthesis occurs, 30 seconds after case creation to allow evidence to be added</li>
  <li>Vector embeddings are generated for all text content to enable semantic search</li>
  <li>Report generation processes documents and creates structured output</li> </ul> </div> </div> </div> </div> </div>
- <!-- Other, tabs - placeholder --> {:else} <div class="bg-white shadow"> <div class="px-4 py-5"> <h3 class="text-lg leading-6 font-medium"> {tabs.find(t => t.id === selectedTab)? .label : | 'Unknown Tab'} </h3>
+ <!-- Other, tabs - placeholder --> {:else} <div class="bg-white shadow"> <div class="px-4 py-5"> <h3 class="text-lg leading-6 font-medium"> {tabs.find(t => t.id === selectedTab)?.label ?? 'Unknown Tab'} </h3>
  <p class="mt-2 text-sm"> This section is under development. Content for { selectedTab } will be available soon. </p> </div> {/if} {/if}
   </main> </div>
  <style> .animate-spin { animation: spin 1s linear infinite}

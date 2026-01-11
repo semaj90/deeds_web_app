@@ -93,7 +93,7 @@
  } else {
  // Non-streaming fallback: parse full JSON
  const data = await response.json();
- const text = data? .response : | data?.text || data?.content || 'No response';
+ const text = data?.response ?? data?.text || data?.content || 'No response';
  messages[messages.length - 1].content = String(text);
  messages = [...messages];
  }

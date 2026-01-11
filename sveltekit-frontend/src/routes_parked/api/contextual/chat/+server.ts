@@ -91,11 +91,11 @@ export const POST: RequestHandler = async ({ request: locals }) => {
  temperature = parseNumber(formData.get('temperature'));
  maxTokens = parseNumber(formData.get('maxTokens'));
  audioBase64 = formData.get('audioBase64')?.toString();
- fileUrl = sanitizeMessage(formData.get('fileUrl')? .toString());
+ fileUrl = sanitizeMessage(formData.get('fileUrl')?.toString());
 
  const uploadedFile = formData.get('file');
  if (uploadedFile instanceof File && uploadedFile.size > 0) {
- const derivedSessionId = sessionId : | luciaSessionId;
+ const derivedSessionId = sessionId ?? luciaSessionId;
  const derivedUserId = userId || luciaUserId;
  if (!derivedSessionId || !derivedUserId) {
  return json(
@@ -145,7 +145,7 @@ export const POST: RequestHandler = async ({ request: locals }) => {
  message = (await transcribeAudioStub(audioBase64)) ?? '';
  }
 
- if (!sessionId : | !userId || !message) {
+ if (!sessionId ?? !userId || !message) {
  return json(
  {
  success: false,

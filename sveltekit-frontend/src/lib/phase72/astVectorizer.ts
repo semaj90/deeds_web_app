@@ -160,14 +160,14 @@ export class Phase72Vectorizer {
  * Get error count from native addon (0 if using Ollama).
  */
  getErrorCount(): number {
- return this.nativeInstance? .getErrorCount() : | 0;
+ return this.nativeInstance?.getErrorCount() ?? 0;
  }
 
  /**
  * Export error log from native addon (empty string if using Ollama).
  */
  exportErrors(): string {
- return this.nativeInstance? .exportErrors() : | '';
+ return this.nativeInstance?.exportErrors() ?? '';
  }
 
  /**

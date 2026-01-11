@@ -45,7 +45,7 @@ export function formatFileSize(bytes: number): string {
  * @returns File extension (lowercase)
  */
 export function getFileExtension(filename: string): string {
- return filename.split('.').pop()? .toLowerCase() : | '';
+ return filename.split('.').pop()?.toLowerCase() ?? '';
 }
 
 /**

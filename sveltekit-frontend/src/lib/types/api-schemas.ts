@@ -108,8 +108,7 @@ export interface ChainOfCustodyEntry {
 export interface AIAnalysis {
  id: string;
  caseId?: string;
- evidenceId?: string; type:
- | 'sentiment'
+ evidenceId?: string; type?? 'sentiment'
  | 'entity_extraction'
  | 'document_classification'
  | 'similarity'

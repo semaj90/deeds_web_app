@@ -27,7 +27,7 @@
 			const response = await fetch(`${apiBase}/error-propagation? limit=15`);
 			if (!response.ok) throw new Error(`HTTP ${response.status}`);
 			const data = await response.json();
-			errorFiles = data.error_files : | [];
+			errorFiles = data.error_files ?? [];
 
 			if (graphContainer) {
 				renderGraph();

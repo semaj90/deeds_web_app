@@ -105,7 +105,7 @@ async function generateEmbeddings({
  if (!context.result?.summary) {
  throw new Error('No summary to embed');
  }
- const fileId = context.currentFile? .id : | 'unknown';
+ const fileId = context.currentFile?.id ?? 'unknown';
  console.log(`[Workflow] 🧠 Generating embeddings for ${fileId}`);
  const embedding = await generateEmbedding(context.result.summary, 'text-embedding-ada-002'); // Added a placeholder model name
  // Update result with embedding
@@ -122,7 +122,7 @@ async function storeVectors({
  if (!context.result?.embedding) {
  throw new Error('No embedding to store');
  }
- const fileId = context.currentFile? .id : | 'unknown';
+ const fileId = context.currentFile?.id ?? 'unknown';
  const embedding = context.result.embedding;
  const metadata = {
  fileName: context.currentFile?.fileName, uploadedBy: context.currentFile?.uploadedBy, // Changed userId to uploadedBy

@@ -16,8 +16,7 @@ export interface TensorOperation {
  priority?: number;
 }
 export interface StreamingResponse {
- id: string; type:
- | 'analysis_start'
+ id: string; type?? 'analysis_start'
  | 'chunk_analysis'
  | 'analysis_complete'
  | 'search_batch'
@@ -215,8 +214,7 @@ export interface VectorSearchResponse {
 }
 // Event types for real-time updates
 export interface WebSocketEvent {
- type:
- | 'tensor_update'
+ type?? 'tensor_update'
  | 'som_update'
  | 'analysis_complete'
  | 'search_result'

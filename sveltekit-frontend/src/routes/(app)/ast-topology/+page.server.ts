@@ -42,14 +42,14 @@ export const load: PageServerLoad = async ({ fetch }) => {
       fetch('/api/phase89/activity').catch(() => null)
     ]);
 
-    if (statsRes? .ok) {
+    if (statsRes?.ok) {
       const data = await statsRes.json();
-      errorStats = data.stats : | errorStats;
+      errorStats = data.stats ?? errorStats;
     }
 
-    if (activityRes? .ok) {
+    if (activityRes?.ok) {
       const data = await activityRes.json();
-      recentActivity = data.activity : | recentActivity;
+      recentActivity = data.activity ?? recentActivity;
     }
   } catch (e) {
     console.warn('Could not fetch Phase 89 data:', e);

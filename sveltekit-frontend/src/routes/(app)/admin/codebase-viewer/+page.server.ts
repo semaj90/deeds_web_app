@@ -23,7 +23,7 @@ export const load: PageServerLoad = async () => {
 			return {
 				name: col.name,
 				pointsCount: info.points_count || 0,
-				vectorSize: info.config?.params?.vectors? .size : | 0,
+				vectorSize: info.config?.params?.vectors?.size ?? 0,
 				status: info.status
 			};
 		})

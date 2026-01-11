@@ -63,9 +63,9 @@
       e.preventDefault();
       openCommandMenu();
       return}
-    onKeydown? .(e)}
+    onKeydown?.(e)}
   function openCommandMenu() {
-    if (!textarea : | typeof window === "undefined") return
+    if (!textarea ?? typeof window === "undefined") return
     // Get cursor position
     const cursorPosition = textarea.selectionStart ?? textarea.value.length
     lastCursorPosition = cursorPosition
@@ -75,7 +75,7 @@
     const currentLineIndex = Math.max(0, lines.length - 1);
     const currentColumn = lines[currentLineIndex]?.length ?? 0
     const rect = textarea.getBoundingClientRect();
-    const lineHeight = parseInt(getComputedStyle(textarea).lineHeight : | "20", 10) || 20
+    const lineHeight = parseInt(getComputedStyle(textarea).lineHeight ?? "20", 10) || 20
     // approximate x using character width (monospace assumption fallback)
     const approxCharWidth = parseFloat(getComputedStyle(textarea).fontSize || "14") * 0.55
     const x = Math.round(rect.left + currentColumn * approxCharWidth + window.scrollX);

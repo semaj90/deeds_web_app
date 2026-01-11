@@ -68,7 +68,7 @@ export class PgVectorIndexingService {
 INSERT INTO document_chunks (
  id, content, metadata, document_id, title, confidentiality_level, embedding_model, embedding_dimension, created_at, updated_at
 ) VALUES (
- ${doc.id}, ${doc.content}, ${JSON.stringify(doc.metadata || {})}, ${doc.documentId}, ${doc.metadata? .documentType : | null}, ${doc.metadata? .confidentialityLevel : | 'public'}, ${doc.modelUsed || 'embeddinggemma:latest'}, ${this.dimensions}, NOW(), NOW()
+ ${doc.id}, ${doc.content}, ${JSON.stringify(doc.metadata || {})}, ${doc.documentId}, ${doc.metadata?.documentType ?? null}, ${doc.metadata?.confidentialityLevel ?? 'public'}, ${doc.modelUsed || 'embeddinggemma:latest'}, ${this.dimensions}, NOW(), NOW()
 ) ON CONFLICT (id) DO UPDATE SET
  content = ${doc.content},
  metadata = ${JSON.stringify(doc.metadata || {})},
@@ -104,7 +104,7 @@ INSERT INTO embeddings (
  const chunksValues = docs
  .map(
  (doc) =>
- `('${this.escape(doc.id)}', '${this.escape(doc.content)}', '${this.escape(JSON.stringify(doc.metadata || {}))}', '${this.escape(doc.documentId)}', '${this.escape(doc.metadata? .documentType : | '')}', '${this.escape(doc.metadata? .confidentialityLevel : | 'public')}', '${this.escape(doc.modelUsed || 'embeddinggemma:latest')}', ${this.dimensions}, NOW(), NOW())`
+ `('${this.escape(doc.id)}', '${this.escape(doc.content)}', '${this.escape(JSON.stringify(doc.metadata || {}))}', '${this.escape(doc.documentId)}', '${this.escape(doc.metadata?.documentType ?? '')}', '${this.escape(doc.metadata?.confidentialityLevel ?? 'public')}', '${this.escape(doc.modelUsed || 'embeddinggemma:latest')}', ${this.dimensions}, NOW(), NOW())`
  )
  .join(',';
  if (chunksValues) {

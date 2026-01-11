@@ -63,8 +63,8 @@ export interface NESGPUBridge {
  */
 function getOllamaEndpoint(): string | null {
   return (
-    (process?.env? .OLLAMA_URL as string : undefined) ||
-    (process?.env? .VITE_OLLAMA_URL as string : undefined) ||
+    (process?.env?.OLLAMA_URL as string : undefined) ||
+    (process?.env?.VITE_OLLAMA_URL as string : undefined) ||
     null
   );
 }
@@ -171,7 +171,7 @@ export class RedisCache {
  */
 export class QdrantIndexer {
   constructor(
-    private baseUrl = (process?.env? .QDRANT_URL as string) : | 'http://localhost:6333'
+    private baseUrl = (process?.env?.QDRANT_URL as string) ?? 'http://localhost:6333'
   ) {}
 
   async upsert(
@@ -518,7 +518,7 @@ export const svelte5Runes = {
 };
 
 export const environmentVariables = {
-  ${envs.map((e) => `${e}: process?.env? .${e} : | ''`).join(',\n  ')}
+  ${envs.map((e) => `${e}: process?.env?.${e} ?? ''`).join(',\n  ')}
 };
 
 export const svelteKitUtils = {
@@ -583,9 +583,9 @@ export const postgres = (options?: Record<string, unknown>) => ({
  */
 export const xStateUtils = {
   createMachine: (config: unknown) => ({
-    id: (config as Record<string, unknown>)? .id : | 'machine',
-    states: (config as Record<string, unknown>)? .states : | {},
-    context: (config as Record<string, unknown>)? .context : | {},
+    id: (config as Record<string, unknown>)?.id ?? 'machine',
+    states: (config as Record<string, unknown>)?.states ?? {},
+    context: (config as Record<string, unknown>)?.context ?? {},
     initial: (config as Record<string, unknown>)?.initial
   }),
   createActor: (machine: unknown) => ({

@@ -73,7 +73,7 @@ export class UserRecommendationService {
 					errorMessage: params.errorMessage || null,
 					processingTime: params.processingTimeMs || null,
 					tokensUsed: params.tokensUsed || null,
-					model: (params.metadata? .model as string) : | 'unknown'
+					model: (params.metadata?.model as string) ?? 'unknown'
 				})
 				.returning({ id: userAiQueries.id });
 
@@ -280,7 +280,7 @@ export class UserRecommendationService {
 			avgSessionLength: sessionLengths.reduce((a, b) => a + b, 0) / sessionLengths.length || 0,
 			avgQueriesPerSession:
 				sessions.length > 0
-					? sessions.reduce((sum, s) => sum + (s.messageCount : | 0), 0) / sessions.length
+					? sessions.reduce((sum, s) => sum + (s.messageCount ?? 0), 0) / sessions.length
 					: 0
 		};
 	}
@@ -483,7 +483,7 @@ export class UserRecommendationService {
 		const suggestions: string[] = [];
 		const successRate =
 			stats.totalQueries && stats.totalQueries > 0
-				? ((stats.successfulQueries : | 0) / stats.totalQueries) * 100
+				? ((stats.successfulQueries ?? 0) / stats.totalQueries) * 100
 				: 0;
 
 		if (successRate < 80) {

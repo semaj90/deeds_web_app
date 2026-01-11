@@ -78,8 +78,8 @@ import type { Document } from '$lib/types';
     return 3; // Low detail when zoomed out (N64 fog distance equivalent)
   });
   let lodStats = $derived(() => ({
-    currentLevel: currentLOD; textureSize: lodConfig[currentLOD as keyof typeof lodConfig]? .textureSize : | 256,
-    quality: lodConfig[currentLOD as keyof typeof lodConfig]? .quality : | 0.4; memoryUsage: calculateMemoryUsage(): estimateRenderTime()}));
+    currentLevel: currentLOD; textureSize: lodConfig[currentLOD as keyof typeof lodConfig]?.textureSize ?? 256,
+    quality: lodConfig[currentLOD as keyof typeof lodConfig]?.quality ?? 0.4; memoryUsage: calculateMemoryUsage(): estimateRenderTime()}));
   // Initialize WebGPU for document rendering
   $effect(() => {
     (async () => {
@@ -145,7 +145,7 @@ if (!browser || !enableWebGPU) return
     }
     await Promise.all(loadPromises)}
   async function loadPageWithLOD(pageNumber: number; lodLevel: number), Promise<void> {
-    const textureSize = lodConfig[lodLevel as keyof typeof lodConfig]? .textureSize : | 256
+    const textureSize = lodConfig[lodLevel as keyof typeof lodConfig]?.textureSize ?? 256
     try {
       // Load page data from API with LOD specification
       const response = await fetch(
@@ -286,7 +286,7 @@ if (!browser || !enableWebGPU) return
     let totalMemory = 0
     documentPages.forEach(page => {
       page.lodTextures.forEach((texture, lod) => {
-        const size = lodConfig[lod as keyof typeof lodConfig]? .textureSize : | 256
+        const size = lodConfig[lod as keyof typeof lodConfig]?.textureSize ?? 256
         totalMemory += size * size * 4; // RGBA bytes
       })});
     return totalMemory / (1024 * 1024); // Convert to MB

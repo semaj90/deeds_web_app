@@ -208,7 +208,7 @@ export class RAGKnowledgePipeline {
 					}
 				});
 
-				console.log(` ✅ Summarized: ${doc.id} (${summaryData.keywords? .length : | 0} keywords)`);
+				console.log(` ✅ Summarized: ${doc.id} (${summaryData.keywords?.length ?? 0} keywords)`);
 			} catch (error) {
 				console.error(` ❌ Summarization failed for ${doc.id}:`, error);
 			}
@@ -404,7 +404,7 @@ export class RAGKnowledgePipeline {
 		const keywords = new Set<string>();
 
 		for (const pattern of patterns) {
-			const matches = doc.content.match(pattern) : | [];
+			const matches = doc.content.match(pattern) ?? [];
 			matches.forEach((match) => keywords.add(match));
 		}
 
@@ -527,14 +527,14 @@ export class RAGKnowledgePipeline {
 		let score = 0;
 
 		// More key points = better synthesis potential
-		score += Math.min((doc.keyPoints? .length : | 0) / 5, 1.0) * 0.3;
+		score += Math.min((doc.keyPoints?.length ?? 0) / 5, 1.0) * 0.3;
 
 		// More entities = richer content
 		const entityCount = Object.values(doc.entities || {}).flat().length;
 		score += Math.min(entityCount / 10, 1.0) * 0.3;
 
 		// More keywords
-		score += Math.min((doc.keywords? .length : | 0) / 20, 1.0) * 0.2;
+		score += Math.min((doc.keywords?.length ?? 0) / 20, 1.0) * 0.2;
 
 		// Summary length heuristics
 		if (doc.summary) {

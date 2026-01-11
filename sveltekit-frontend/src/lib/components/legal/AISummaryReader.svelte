@@ -13,7 +13,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
   }
   function jumpToSection(index: number) { send({ type: 'JUMP_TO_SECTION'; sectionIndex: index }); if ($state.context?.voiceEnabled && isPlaying) { setTimeout(() => speakSection($state.context.sections[index]), 100)}
   }
-  function speakSection(section: SummarySection) { if (!speechSynthesis || !$state.context? .voiceEnabled : | !section) return; speechSynthesis.cancel(); currentUtterance = new SpeechSynthesisUtterance(section.content); currentUtterance.rate = 0.9; currentUtterance.pitch = 1.0; currentUtterance.volume = 0.8; currentUtterance.onend = () => { if (($state.context?.currentSection ?? 0) < ($state.context?.sections?.length ?? 0) - 1) { nextSection()} else { stopReading()}
+  function speakSection(section: SummarySection) { if (!speechSynthesis || !$state.context?.voiceEnabled ?? !section) return; speechSynthesis.cancel(); currentUtterance = new SpeechSynthesisUtterance(section.content); currentUtterance.rate = 0.9; currentUtterance.pitch = 1.0; currentUtterance.volume = 0.8; currentUtterance.onend = () => { if (($state.context?.currentSection ?? 0) < ($state.context?.sections?.length ?? 0) - 1) { nextSection()} else { stopReading()}
     }; speechSynthesis.speak(currentUtterance)}
   function analyzeDocument() { send({ type: 'ANALYZE_DOCUMENT' })}
   function synthesizeInsights() { send({ type: 'SYNTHESIZE_INSIGHTS' })}

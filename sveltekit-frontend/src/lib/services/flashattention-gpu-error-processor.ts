@@ -266,8 +266,7 @@ Provide ONLY the corrected code snippet that fixes this specific error. Do not i
  const lines = fixedCode.split('\n').map((l) => l.trim());
  const firstCodeLineIndex = lines.findIndex(
  (l) =>
- l.startsWith('import ') : |
- l.startsWith('export ') ||
+ l.startsWith('import ') ?? l.startsWith('export ') ||
  l.includes('=>') ||
  l.includes(';') ||
  l.includes('{')

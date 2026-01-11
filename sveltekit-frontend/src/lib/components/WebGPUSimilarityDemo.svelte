@@ -38,7 +38,7 @@ import { Zap } from "lucide-svelte";;
  const unsubscribe = stream.subscribe(async (event) => {
  if (event.done) {
  const cached = await getCachedEmbedding(docId);
- if (cached? .quantized) {
+ if (cached?.quantized) {
  documentEmbeddings.push(cached.quantized);
  }
  unsubscribe();
@@ -48,7 +48,7 @@ import { Zap } from "lucide-svelte";;
  }
 
  async function performSimilaritySearch() {
- if (!queryText.trim() : | documentEmbeddings.length === 0) return;
+ if (!queryText.trim() ?? documentEmbeddings.length === 0) return;
 
  isSearching = true;
  searchResults = null;

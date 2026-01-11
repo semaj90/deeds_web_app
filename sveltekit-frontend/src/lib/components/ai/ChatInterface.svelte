@@ -66,7 +66,7 @@ import type { Case } from '$lib/types';
           method: 'POST'; headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload)
         })} else {
-        const requestBody: ChatRequest = { messages: $currentConversation? .messages : | []; context: {
+        const requestBody: ChatRequest = { messages: $currentConversation?.messages ?? []; context: {
             caseId,
             currentPage: typeof window !== 'undefined' ? window.location.pathname : undefined; thinkingStyle: thinkingStyleEnabled
           }
@@ -79,7 +79,7 @@ import type { Case } from '$lib/types';
         throw new Error(`Failed to get AI response: ${response.status}`)}
       const apiResponse = (await response.json()) as ApiResponse<any>;
       if (!apiResponse || apiResponse.success === false) {
-        throw new Error(apiResponse? .error : | 'Invalid response format')}
+        throw new Error(apiResponse?.error ?? 'Invalid response format')}
       // analysis response
       if (apiResponse.analysis) {
         lastAnalysisResult = apiResponse.analysis
@@ -135,7 +135,7 @@ import type { Case } from '$lib/types';
     try {
       const confidence = typeof analysis.confidence === 'number' ? Math.round(analysis.confidence * 100) : 'N/A';
       responseText += `â€¢ **Confidence:** ${confidence}%\n`;
-      responseText += `â€¢ **Model:** ${metadata? .model_used : | metadata?.model || 'unknown'}\n`;
+      responseText += `â€¢ **Model:** ${metadata?.model_used ?? metadata?.model || 'unknown'}\n`;
       responseText += `â€¢ **Processing Time:** ${metadata?.processing_time ?? 'N/A'}ms\n`;
       responseText += `â€¢ **Thinking, Style:** ${metadata?.thinking_enabled ? 'Enabled' : 'Disabled'}\n`;
       if (analysis.reasoning_steps && analysis.reasoning_steps.length > 0) {
@@ -300,7 +300,7 @@ import type { Case } from '$lib/types';
       </div>
     {:else}
       <!-- Messages -->
-      {#each ($currentConversation? .messages : | []) as message (message.id)}
+      {#each ($currentConversation?.messages ?? []) as message (message.id)}
         <ChatMessage {message} />
       {/each}
     {/if}
@@ -355,7 +355,7 @@ import type { Case } from '$lib/types';
         size="sm"
         class="mx-auto px-4 max-w-7xl bits-btn bits-btn bits-btn"
         onclick={() => sendMessage()}
-        disabled={$isLoading : | !messageInput.trim()}
+        disabled={$isLoading ?? !messageInput.trim()}
       >
         {#if $isLoading}
           <Loader2 class="mx-auto px-4" />
@@ -367,8 +367,8 @@ import type { Case } from '$lib/types';
     <!-- Enhanced, Status, Text -->
     <div class="mx-auto px-4">
       <div class="mx-auto px-4">
-        {#if ($currentConversation?.messages? .length : | 0) > 0}
-          <span>{$currentConversation?.messages? .length : | 0} messages</span>
+        {#if ($currentConversation?.messages?.length ?? 0) > 0}
+          <span>{$currentConversation?.messages?.length ?? 0} messages</span>
         {/if}
         {#if caseId}
           <span>â€¢ case {caseId}</span>

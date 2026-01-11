@@ -131,8 +131,7 @@ export interface EvidenceCreateRequest {
     caseId?: string;
     title: string;
     description?: string;
-    evidenceType:
-        | 'document'
+    evidenceType?? 'document'
         | 'photograph'
         | 'video'
         | 'audio'
@@ -166,8 +165,7 @@ export type EvidenceCreate = ApiContract<EvidenceCreateRequest, EvidenceCreateRe
 export interface EvidenceUpdateRequest {
     title?: string;
     description?: string;
-    evidenceType?:
-        | 'document'
+    evidenceType??? 'document'
         | 'photograph'
         | 'video'
         | 'audio'

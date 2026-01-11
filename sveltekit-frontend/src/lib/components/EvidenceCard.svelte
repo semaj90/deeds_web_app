@@ -37,7 +37,7 @@
  </button>
  {/if}
  {#if onDelete}
- <button class="btn-delete" onclick={() => onDelete? .(evidence.id : | '')}>
+ <button class="btn-delete" onclick={() => onDelete?.(evidence.id ?? '')}>
  Delete
  </button>
  {/if}

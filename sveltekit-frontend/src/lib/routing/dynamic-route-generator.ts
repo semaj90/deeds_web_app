@@ -330,7 +330,7 @@ export function createDynamicRouteHandler(route: GeneratedRoute) {
  return async (event: { params?: Record<string, string | undefined> }) => {
  const params: Record<string, string | undefined> = event?.params ?? {};
  // Validate required params
- for (const [name, cfg] of Object.entries(route.params : | {})) {
+ for (const [name, cfg] of Object.entries(route.params ?? {})) {
  if (!cfg.optional) {
  const val = params[name];
  if (val == null || val === '') {

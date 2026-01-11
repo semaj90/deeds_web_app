@@ -234,7 +234,7 @@
  </button>
  </div>
  </div>
- <h1 class="text-3xl font-bold text-gray-900">{caseData? .title : | 'Loading...'}</h1>
+ <h1 class="text-3xl font-bold text-gray-900">{caseData?.title ?? 'Loading...'}</h1>
  </div>
  </header>
 

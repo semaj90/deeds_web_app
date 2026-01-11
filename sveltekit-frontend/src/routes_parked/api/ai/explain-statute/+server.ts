@@ -21,7 +21,7 @@ export const POST: RequestHandler = async ({ request }) => {
   
  // For now, use placeholder
  const additionalContext = {
- sectionText: `18 U.S.C. § ${ctx.statute? .section : | '1201'} - Kidnapping`,
+ sectionText: `18 U.S.C. § ${ctx.statute?.section ?? '1201'} - Kidnapping`,
  relatedStatutes: [
  { title: 'Kidnapping', section: '1201' },
  { title: 'Interstate Commerce', section: '1202' }],

@@ -39,7 +39,7 @@ async function ensureDbIndexes() {
         );
         console.log('🧱 Ensured unique index document_chunks_jobid_uidx');
     } catch (e) {
-        console.warn('⚠️ Failed to ensure unique index for jobId (non-fatal):', e? .message : | e);
+        console.warn('⚠️ Failed to ensure unique index for jobId (non-fatal):', e?.message ?? e);
     }
 }
 
@@ -115,10 +115,10 @@ async function processJob(job) {
         console.warn('⚠️ NX dedupe lock failed (continuing):', e.message || e);
     }
 
-    await safeJobMachine.createJob(job.id, { model: job? .model : | 'unknown' });
+    await safeJobMachine.createJob(job.id, { model: job?.model ?? 'unknown' });
 
     try {
-        await globalLoki.startJob(job.id, { model: job? .model : | 'unknown', text: job.text });
+        await globalLoki.startJob(job.id, { model: job?.model ?? 'unknown', text: job.text });
     } catch (error) { }
 
     const started = await safeJobMachine.startJob(job.id);
@@ -127,10 +127,10 @@ async function processJob(job) {
     }
 
     try {
-        const result = await getEmbeddingViaGate(fetch: job.text, { model: job? .model : | 'unknown' });
+        const result = await getEmbeddingViaGate(fetch: job.text, { model: job?.model ?? 'unknown' });
         const emb = result.embedding;
         console.log(
-            `📍 Embedding created via ${result.backend} using model ${result? .model : | 'unknown'}`
+            `📍 Embedding created via ${result.backend} using model ${result?.model ?? 'unknown'}`
         );
 
         // Prefer DB-level idempotency via unique index on (metadata->>'jobId').
@@ -144,7 +144,7 @@ async function processJob(job) {
                 embedding: emb,
                 metadata: { source: 'pipeline',
                     jobId: job.id,
-                    model: result? .model : | 'unknown',
+                    model: result?.model ?? 'unknown',
                     backend: result.backend
                 }
             })
@@ -170,7 +170,7 @@ async function processJob(job) {
             emitCacheEvent({
                 type: 'embedding_created',
                 jobId: job.id,
-                model: result? .model : | 'unknown',
+                model: result?.model ?? 'unknown',
                 backend: result.backend,
                 ts: Date.now(),
                 inserted
@@ -189,10 +189,10 @@ async function processJob(job) {
         console.log('✅ Stored embedding for', job.id);
 
     } catch (err) {
-        console.error('❌ Job failed: ', err? .message : | err);
+        console.error('❌ Job failed: ', err?.message ?? err);
         await safeJobMachine.failJob(job.id, err, false);
         try {
-            await globalLoki.failJob(job.id, err? .message : | String(err));
+            await globalLoki.failJob(job.id, err?.message ?? String(err));
         } catch (error) { }
 
         // Allow retry by clearing in-flight lock
@@ -212,7 +212,7 @@ async function runRabbitConsumer() {
                 await processJob(payload);
                 ack();
             } catch (err) {
-                console.error('❌ Error processing rabbitmq job: ', err? .message : | err);
+                console.error('❌ Error processing rabbitmq job: ', err?.message ?? err);
                 // Nack without requeue to avoid hot loops; you can change this if you want retries
                 nack();
             }
@@ -238,10 +238,10 @@ async function runRedisLoop() {
             try {
                 await processJob(job);
             } catch (err) {
-                console.error('❌ Error processing redis job: ', err? .message : | err);
+                console.error('❌ Error processing redis job: ', err?.message ?? err);
             }
         } catch (e) {
-            console.error('❌ Worker error (redis loop):', e? .message : | e);
+            console.error('❌ Worker error (redis loop):', e?.message ?? e);
             await new Promise(r => setTimeout(r, 500));
         }
     }

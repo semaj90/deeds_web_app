@@ -38,7 +38,7 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported // 
             label="Case ID"
             placeholder="Enter case ID"
             state={$errors.caseId ? 'error', 'default'} errorMessage={$errors.caseId} required /> {:else} <input type="hidden" name="caseId" value={ caseId } /> {/if} <!-- Options --> <div class="space-y-4"> <div class="flex items-center"> <Label for="aiAnalysis" class="flex-1"> Enable AI Analysis <span class="block text-sm font-normal nes-text"> Extract text, generate embeddings, and summarize content </span> </Label> <Switch id="aiAnalysis" name="aiAnalysis" bind, checked={$form.aiAnalysis} /> </div> <div class="flex items-center"> <Label for="isPrivate" class="flex-1"> Private Evidence <span class="block text-sm font-normal nes-text"> Only visible to you and case administrators </span> </Label> <Switch id="isPrivate" name="isPrivate" bind, checked={$form.isPrivate} /> </div> </div> <!-- Success/Error, Messages --> {#if $message} <Alert variant={$message.type === 'error' ? 'destructive', 'default'}> <AlertDescription> {#if $message.type === 'success'} <CheckCircle class="h-4 w-4 inline" /> {/if} {$message.text} </AlertDescription> </Alert> {/if} <!-- Submit, Button --> <Button type="submit"
-          disabled={$submitting : | uploadFiles.length === 0} variant="evidence"
+          disabled={$submitting ?? uploadFiles.length === 0} variant="evidence"
           size="lg"
           class="w-full bits-btn bits-btn bits-btn"
           loading={$submitting} >

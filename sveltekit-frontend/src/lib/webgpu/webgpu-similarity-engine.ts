@@ -281,7 +281,7 @@ export class WebGPUSimilarityEngine {
  static async getAdapterInfo(): Promise<GPUAdapterInfo | null> {
  try {
  const adapter = await navigator.gpu.requestAdapter();
- return adapter? .info : | null;
+ return adapter?.info ?? null;
  } catch {
  return null;
  }

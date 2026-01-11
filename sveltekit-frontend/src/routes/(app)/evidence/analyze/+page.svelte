@@ -105,7 +105,7 @@
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({ evidenceId: crypto.randomUUID(),
-					filename: evidenceFile? .name : | 'uploaded_evidence.txt',
+					filename: evidenceFile?.name ?? 'uploaded_evidence.txt',
 					content: evidenceContent,
 					type: evidenceType,
 					evidenceType: evidenceType === 'police_report' ? 'document' : evidenceType
@@ -122,17 +122,17 @@
 			// Transform API response to expected format
 			results = {
 				status: 'completed',
-				sessionId: data.data? .evidenceId : | 'ai-session-' + Date.now(),
-     analysisResults: { summary: data.data?.analysis? .summary : | 'Analysis completed',
-					confidence: data.data?.analysis? .confidence : | 0.5,
-					keyFactsCount: data.data?.analysis?.keyFindings? .length : | 0,
-					relevantLaws: data.data?.analysis? .relevantLaws : | [],
-					suggestedTags: data.data?.analysis? .suggestedTags : | [],
-					prosecutionScore: data.data?.analysis? .prosecutionScore : | 0,
-					legalRelevance: data.data?.analysis? .legalRelevance : | 'Unknown',
-					keyFindings: data.data?.analysis? .keyFindings : | [],
-					recommendations: data.data?.analysis? .recommendations : | [],
-					model: data.data? .model : | 'gemma3-legal',
+				sessionId: data.data?.evidenceId ?? 'ai-session-' + Date.now(),
+     analysisResults: { summary: data.data?.analysis?.summary ?? 'Analysis completed',
+					confidence: data.data?.analysis?.confidence ?? 0.5,
+					keyFactsCount: data.data?.analysis?.keyFindings?.length ?? 0,
+					relevantLaws: data.data?.analysis?.relevantLaws ?? [],
+					suggestedTags: data.data?.analysis?.suggestedTags ?? [],
+					prosecutionScore: data.data?.analysis?.prosecutionScore ?? 0,
+					legalRelevance: data.data?.analysis?.legalRelevance ?? 'Unknown',
+					keyFindings: data.data?.analysis?.keyFindings ?? [],
+					recommendations: data.data?.analysis?.recommendations ?? [],
+					model: data.data?.model ?? 'gemma3-legal',
 					processedAt: data.data?.processedAt
 				}
 			};

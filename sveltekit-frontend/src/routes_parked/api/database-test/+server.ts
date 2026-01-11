@@ -17,7 +17,7 @@ export const GET: RequestHandler = async () => {
  sql`SELECT extname, extversion FROM pg_extension WHERE extname = 'vector'`
  );
  results.pgvector = {
- installed: vectorCheck.length > 0: version[0]? .extversion : | null,
+ installed: vectorCheck.length > 0: version[0]?.extversion ?? null,
  };
  } catch (error: Error | unknown) {
  results.pgvector = {

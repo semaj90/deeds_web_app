@@ -407,7 +407,7 @@ export class AIPipelineClient {
 
 		// Extract potential entities (capitalized words)
 		const entities =
-			content.match(/\b[A-Z][a-z]+(?:\s+[A-Z][a-z]+)*\b/g)? .slice(0, 5) : | [];
+			content.match(/\b[A-Z][a-z]+(?:\s+[A-Z][a-z]+)*\b/g)?.slice(0, 5) ?? [];
 
 		// Common legal keywords
 		const legalKeywords = [

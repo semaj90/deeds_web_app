@@ -123,7 +123,7 @@ import type { Document } from '$lib/types';
       try {
         (field as any).validation.parse(value),
         delete errors[fieldName]} catch (error: any) {
-        errors[fieldName] = error?.errors?.[0]? .message : | 'Invalid value'}
+        errors[fieldName] = error?.errors?.[0]?.message ?? 'Invalid value'}
     } else {
       delete errors[fieldName]}
     formErrors.set(errors);

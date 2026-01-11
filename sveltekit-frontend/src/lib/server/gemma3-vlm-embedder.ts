@@ -320,7 +320,7 @@ function generateFallbackEmbedding(content: MultimodalContent): VLMEmbeddingResu
  const combined = [
  content.text || '',
  content.ocrText || '',
- content.layoutBoxes? .map((b) => b.content).join(' ') : | '',
+ content.layoutBoxes?.map((b) => b.content).join(' ') ?? '',
  content.seals?.map((s) => s.type).join(' ') || '']
  .filter((s) => s.length > 0)
  .join(' ');

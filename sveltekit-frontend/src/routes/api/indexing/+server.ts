@@ -510,11 +510,11 @@ export const GET: RequestHandler = async ({ url }) => {
     return json({
       success: true,
       collections: { codebase: {
-          points_count: codebaseCollection? .points_count : | 0,
-          vectors_size: codebaseCollection?.config?.params?.vectors? .size : | 768
+          points_count: codebaseCollection?.points_count ?? 0,
+          vectors_size: codebaseCollection?.config?.params?.vectors?.size ?? 768
         },
-        errors: { points_count: errorsCollection? .points_count : | 0,
-          vectors_size: errorsCollection?.config?.params?.vectors? .size : | 768
+        errors: { points_count: errorsCollection?.points_count ?? 0,
+          vectors_size: errorsCollection?.config?.params?.vectors?.size ?? 768
         }
       },
       timestamp: new Date().toISOString()

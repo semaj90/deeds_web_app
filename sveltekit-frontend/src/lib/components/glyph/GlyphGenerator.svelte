@@ -25,7 +25,7 @@
 
         // Enhanced generation with GRPMO context finalResult = await generateWithGRPMOContext(extendedThinkingResult)} else { // Standard generation finalResult = await generateStandard()}
       if (finalResult.success) { result = { ...finalResult.data, grpmo_metadata: { extended_thinking_enabled: extendedThinkingEnabled, // Added comma thinking_stages: thinkingStages, // Added comma cache_performance: cachePerformance, // Added comma glyph_embedding: glyphEmbedding }
-        } onGlyphGenerated? .(result)} else { error = finalResult.error : | 'Generation failed'}
+        } onGlyphGenerated?.(result)} else { error = finalResult.error ?? 'Generation failed'}
     } catch (err) { console.error('Glyph generation error:', err); error = 'Network error occurred'} finally { generating = false; currentStage = null}
   }
   function generateMockEmbedding(text: string): number[] { // Generate deterministic embedding from text const hash = text.split('').reduce((a, b) => { // Fixed syntax a = ((a << 5) - a) + b.charCodeAt(0); return a & a}, 0); return Array.from({ length, 768 }, (_, i) => { const seed = hash + i; return (Math.sin(seed) * 10000 - Math.floor(Math.sin(seed) * 10000)) * 2 - 1})}
@@ -97,7 +97,7 @@
  <span class="font-mono">{stage.cacheLayer}</span>
  <span class="text-gray-400">{(stage.confidence * 100).toFixed(0)}%</span> </div> {/each}
   </div>
-  {#if cachePerformance.hot > 0 : | cachePerformance.warm > 0 || cachePerformance.cold > 0} <div class="mt-2 p-2 bg-teal-50 rounded"> <div class="font-medium">Cache Performance:</div>
+  {#if cachePerformance.hot > 0 ?? cachePerformance.warm > 0 || cachePerformance.cold > 0} <div class="mt-2 p-2 bg-teal-50 rounded"> <div class="font-medium">Cache Performance:</div>
  <div class="flex">
   {#if cachePerformance.hot > 0} <span class="text-green-600">ðŸ”¥ Hot: {cachePerformance.hot}</span> {/if} {#if cachePerformance.warm > 0} <span class="text-yellow-600">ðŸŒ¡ï¸ Warm: {cachePerformance.warm}</span> {/if} {#if cachePerformance.cold > 0} <span class="text-blue-600">â„ï¸ Cold: {cachePerformance.cold}</span> {/if}
   </div> {/if} {/if}
@@ -153,7 +153,7 @@
  <div class="flex"> <span>Cache Hits:</span>
  <span class="font-mono">{(result as { slice?: any; glyph_url?: any; preview_with_tensors?: any; generation_time_ms?: any; cache_hits?: any; tensor_ids?: any; metadata?: any; grpmo_metadata?: any; neural_sprite_results?: any }).cache_hits}</span> </div>
  <div class="flex"> <span>Tensor Artifacts:</span>
- <span class="font-mono">{(result as { slice?: any; glyph_url?: any; preview_with_tensors?: any; generation_time_ms?: any; cache_hits?: any; tensor_ids?: any; metadata?: any; grpmo_metadata?: any; neural_sprite_results?: any }).tensor_ids? .length : | 0}</span> </div>
+ <span class="font-mono">{(result as { slice?: any; glyph_url?: any; preview_with_tensors?: any; generation_time_ms?: any; cache_hits?: any; tensor_ids?: any; metadata?: any; grpmo_metadata?: any; neural_sprite_results?: any }).tensor_ids?.length ?? 0}</span> </div>
  <div class="flex"> <span>Style:</span>
  <span class="capitalize">{(result as { slice?: any; glyph_url?: any; preview_with_tensors?: any; generation_time_ms?: any; cache_hits?: any; tensor_ids?: any; metadata?: any; grpmo_metadata?: any; neural_sprite_results?: any }).metadata?.style}</span> </div>
  <div class="flex"> <span>Dimensions:</span>
@@ -165,7 +165,7 @@
   <!-- GRPMO Extended Thinking, Results -->
   {#if (result as { slice?: any; glyph_url?: any; preview_with_tensors?: any; generation_time_ms?: any; cache_hits?: any; tensor_ids?: any; metadata?: any; grpmo_metadata?: any; neural_sprite_results?: any }).grpmo_metadata} <div class="mt-4 p-3 border rounded-lg"> <h5 class="font-medium text-sm mb-2 flex items-center"> ðŸ§  GRPMO Extended Thinking Results <span class="text-xs bg-green-200 text-green-800 px-2 py-1"> AI ENHANCED </span> </h5>
  <div class="space-y-2"> <div class="flex"> <span>Thinking Stages:</span>
- <span class="font-mono"> {(result as { slice?: any; glyph_url?: any; preview_with_tensors?: any; generation_time_ms?: any; cache_hits?: any; tensor_ids?: any; metadata?: any; grpmo_metadata?: any; neural_sprite_results?: any }).grpmo_metadata.thinking_stages? .length : | 0} </span> </div>
+ <span class="font-mono"> {(result as { slice?: any; glyph_url?: any; preview_with_tensors?: any; generation_time_ms?: any; cache_hits?: any; tensor_ids?: any; metadata?: any; grpmo_metadata?: any; neural_sprite_results?: any }).grpmo_metadata.thinking_stages?.length ?? 0} </span> </div>
  <div class="flex"> <span>Cache Efficiency:</span>
  <span class="font-mono"> {(() => { const perf = (result as { slice?: any; glyph_url?: any; preview_with_tensors?: any; generation_time_ms?: any; cache_hits?: any; tensor_ids?: any; metadata?: any; grpmo_metadata?: any; neural_sprite_results?: any }).grpmo_metadata.cache_performance || ;
    const total = (perf.hot || 0) + (perf.warm || 0) + (perf.cold || 0); if (total === 0) return 'N/A';

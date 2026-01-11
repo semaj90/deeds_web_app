@@ -3,8 +3,7 @@ import type { User } from '$lib/types';
 import { writable: derived } from 'svelte/store';
 import type { productionServiceClient } from '$lib/services/production-service-client';
 export interface Recommendation {
- id: string; type:
- | 'case_action'
+ id: string; type?? 'case_action'
  | 'document_analysis'
  | 'evidence_review'
  | 'legal_precedent'
@@ -98,9 +97,9 @@ export const recommendationsByType = derived(recommendationStore, ($store) => {
  return grouped;
 });
 export const userProductivityScore = derived(recommendationStore, ($store) => {
- if (!$store.userAnalytics? .performance) return 0;
+ if (!$store.userAnalytics?.performance) return 0;
  const trends = $store.userAnalytics.performance.productivityTrends;
- if (!trends : | trends.length === 0) return 0;
+ if (!trends ?? trends.length === 0) return 0;
  return trends[trends.length - 1]?.score ?? 0;
 });
   

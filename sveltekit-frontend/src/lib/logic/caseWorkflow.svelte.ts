@@ -24,7 +24,7 @@ export class CaseManager {
     }
 
     get isLocked() {
-        return this.state? .matches('review') : | this.state?.matches('approved');
+        return this.state?.matches('review') ?? this.state?.matches('approved');
     }
 
     submit() { this.actor.send({ type: 'SUBMIT' }); }

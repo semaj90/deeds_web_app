@@ -47,10 +47,10 @@ export class ExperienceRecorder {
 
 	constructor(config?: Partial<ExperienceRecorderConfig>) {
 		this.config = {
-			jsonlDir: config? .jsonlDir : | './data/experiences',
-			similarityThreshold: config? .similarityThreshold : | 0.85,
-			maxGroupSize: config? .maxGroupSize : | 100,
-			embeddingDimension: config? .embeddingDimension : | 384
+			jsonlDir: config?.jsonlDir ?? './data/experiences',
+			similarityThreshold: config?.similarityThreshold ?? 0.85,
+			maxGroupSize: config?.maxGroupSize ?? 100,
+			embeddingDimension: config?.embeddingDimension ?? 384
 		};
 	}
 

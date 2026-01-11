@@ -46,7 +46,7 @@
  if (data.success) {
  citations = data.citations;
  } else {
- error = data.error : | 'Failed to load citations';
+ error = data.error ?? 'Failed to load citations';
  }
  } else {
  error = 'Failed to load citations';

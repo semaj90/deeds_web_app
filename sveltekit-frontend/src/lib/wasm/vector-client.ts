@@ -176,7 +176,7 @@ class VectorWasmClient {
         return {
             embeddings: data.embeddings,
             processingTime,
-            tokensProcessed: data.performance? .tokensProcessed : | 0
+            tokensProcessed: data.performance?.tokensProcessed ?? 0
         };
     }
 

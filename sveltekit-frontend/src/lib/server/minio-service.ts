@@ -72,13 +72,13 @@ async function streamToBuffer(stream: Readable | Uint8Array | ArrayBuffer): Prom
 }
 
 function detectFileType(key: string, contentType?: string | null): string {
- const lcType = contentType? .toLowerCase() : | '';
+ const lcType = contentType?.toLowerCase() ?? '';
  if (lcType.includes('json')) return 'json';
  if (lcType.includes('text')) return 'text';
  if (lcType.includes('pdf')) return 'pdf';
  if (lcType.includes('xml')) return 'xml';
  if (lcType.includes('html')) return 'html';
- const ext = key.split('.').pop()? .toLowerCase() : | '';
+ const ext = key.split('.').pop()?.toLowerCase() ?? '';
  return ext || 'unknown';
 }
 

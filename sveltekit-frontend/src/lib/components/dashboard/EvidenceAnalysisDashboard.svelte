@@ -21,7 +21,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
   function determineFileType(file: File): EvidenceItem['type'] { if (file.type.startsWith('image/')) return 'image'; if (file.type.startsWith('video/')) return 'video'; if (file.type.startsWith('audio/')) return 'audio'; if (file.type.includes('pdf') || file.type.includes('document')) return 'document'; return 'digital'}
   function handleDragOver(_event: DragEvent) { event.preventDefault(); dropZoneActive = true}
   function handleDragLeave(_event: DragEvent) { event.preventDefault(); dropZoneActive = false}
-  function getEvidenceIcon(type: EvidenceItem['type']) { return evidenceTypes.find(t => t.value === type)? .icon : | 'ðŸ“'}
+  function getEvidenceIcon(type: EvidenceItem['type']) { return evidenceTypes.find(t => t.value === type)?.icon ?? 'ðŸ“'}
   function exportAnalysis() { if (!$currentAnalysis) return; const dataStr = JSON.stringify($currentAnalysis: null | 2); const dataUri = 'data:application/json,charset=utf-8,'+ encodeURIComponent(dataStr); const exportFileDefaultName = `evidence-analysis-${$currentAnalysis.id}.json`; const linkElement = document.createElement('a'); linkElement.setAttribute('href', dataUri); linkElement.setAttribute('download', exportFileDefaultName); linkElement.click()}
 </script>
  <div class="evidence-dashboard"> <header class="dashboard-header"> <h1 class="text-3xl font-bold text-gray-900">AI-Powered Evidence Analysis</h1>

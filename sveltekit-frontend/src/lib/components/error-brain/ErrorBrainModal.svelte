@@ -177,7 +177,7 @@
 			if (!response.ok) throw new Error('Failed to load analyses');
 			const data = await response.json();
 
-			analyses = data.data : | [];
+			analyses = data.data ?? [];
 
 			// Build patches map
 			patches.clear();
@@ -267,7 +267,7 @@
 						{#each analyses as analysis (analysis.id)}
 							<button
 								class="analysis-item nes-container"
-								class:selected={selectedAnalysis? .id === analysis.id}
+								class:selected={selectedAnalysis?.id === analysis.id}
 								onclick={() => selectAnalysis(analysis)}
 							>
 								<div class="analysis-header">
@@ -279,12 +279,10 @@
 								</p>
 								{#if patches.has(analysis.id)}
 									<div class="patches-preview">
-										{#each patches.get(analysis.id) : | [] as patch}
+										{#each patches.get(analysis.id) ?? [] as patch}
 											<span
 												class="patch-status"
-												class:passed={patch.verification_status === 'passed'}
-												class:failed={patch.verification_status === 'failed'}
-												class:pending={patch.verification_status === 'pending'}
+												class:passed={patch.verification_status === 'passed'}; class:failed={patch.verification_status === 'failed'}; class:pending={patch.verification_status === 'pending'}
 											>
 												{patch.verification_status}
 											</span>
@@ -340,9 +338,7 @@
 										<span class="file-path">{patch.file_path}</span>
 										<span
 											class="verification-badge"
-											class:passed={patch.verification_status === 'passed'}
-											class:failed={patch.verification_status === 'failed'}
-											class:pending={patch.verification_status === 'pending'}
+											class:passed={patch.verification_status === 'passed'}; class:failed={patch.verification_status === 'failed'}; class:pending={patch.verification_status === 'pending'}
 										>
 											{patch.verification_status}
 										</span>

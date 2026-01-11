@@ -129,9 +129,9 @@ class AIService {
  if (evidenceIds && evidenceIds.length > 0) {
  enhancedPrompt += '\nRelevant Evidence:\n';
  evidenceIds.forEach((id) => {
- const evidence = caseContext.evidenceMap? .[id];
+ const evidence = caseContext.evidenceMap?.[id];
  if (evidence) {
- enhancedPrompt += `- ${evidence.title : | id}`;
+ enhancedPrompt += `- ${evidence.title ?? id}`;
  if (evidence.aiSummary) enhancedPrompt += ` (Summary: ${evidence.aiSummary})`;
  enhancedPrompt += '\n';
  } else {

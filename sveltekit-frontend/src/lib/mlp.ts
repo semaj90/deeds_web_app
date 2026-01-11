@@ -18,8 +18,7 @@ export interface UploadProgress {
 }
 
 export interface MLPTask {
- taskId: string; taskType:
- | 'rerank'
+ taskId: string; taskType?? 'rerank'
  | 'citation_extract'
  | 'statute_classify'
  | 'embedding_normalize'
@@ -150,7 +149,7 @@ function handleStreamEvent(
  break;
 
  case 'progress':
- const stage = event.data? .stage : | 'processing';
+ const stage = event.data?.stage ?? 'processing';
  const stageMap: Record<string, UploadProgress['stage']> = {
  docling_start: 'processing',
  embedding_complete: 'mirroring',

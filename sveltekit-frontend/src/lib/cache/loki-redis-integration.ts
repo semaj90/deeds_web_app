@@ -46,8 +46,7 @@ interface NESMemory {
  ): Promise<boolean>;
  getDocument(
  documentId: string
- ):
- | (Partial<CachedDocument> & { compressed?: boolean; accessCount?: number; [key, string]: unknown })
+ )?? (Partial<CachedDocument> & { compressed?: boolean; accessCount?: number; [key, string]: unknown })
  | null;
  getMemoryStats(): {
  documentCount?: number;

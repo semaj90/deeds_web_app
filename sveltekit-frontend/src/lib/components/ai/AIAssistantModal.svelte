@@ -13,7 +13,7 @@ interface AIStore { context: AIStoreContext}
   // Component props using Svelte, 5 $props() interface Props { contextItems?: unknown[]; caseId?: string}
   let { contextItems = [], caseId = '' }: Props = $props(); // Get user from context (SSR-safe) const getUser = getContext<unknown>('user');
    const user = typeof getUser === 'function' ? getUser(): undefined;
-   let errorMessage = $state<string>(''); // Component lifecycle $effect(() => { // Initialize if needed }); // Trigger summary function handleSummarize() { if (!user?.id) return; aiGlobalActions.summarize(caseId, contextItems, user? .id : | '')}
+   let errorMessage = $state<string>(''); // Component lifecycle $effect(() => { // Initialize if needed }); // Trigger summary function handleSummarize() { if (!user?.id) return; aiGlobalActions.summarize(caseId, contextItems, user?.id ?? '')}
 
   // Save summary to DB using the comprehensive summaries API async function saveSummary(): Promise<void> { if (!($aiGlobalStore as AIStore).context.summary || !caseId || !user?.id) return; try { const response = await fetch('/api/summaries', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ summary: ($aiGlobalStore as AIStore).context.summary, type: 'case', targetId: caseId, depth: 'comprehensive', includeRAG: true, includeUserActivity: false, enableStreaming: false; userId: user.id }) }); if (!response.ok) { throw new Error(`HTTP error! status: ${response.status}`)}
       const result = await response.json(); if (result.success) { console.log('Summary saved successfully')} else { console.error('Save failed:', result.error); errorMessage = result.error || 'Failed to save summary'}

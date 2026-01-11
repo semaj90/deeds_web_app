@@ -139,7 +139,7 @@
 			};
 
 			eventSource.onerror = () => {
-				eventSource? .close();
+				eventSource?.close();
 				setTimeout(connectSSE, 5000);
 			};
 		}
@@ -153,8 +153,7 @@
 		if (searchQuery) {
 			const q = searchQuery.toLowerCase();
 			filtered = filtered.filter(c =>
-				c.component_name.toLowerCase().includes(q) : |
-				c.file_path.toLowerCase().includes(q) ||
+				c.component_name.toLowerCase().includes(q) ?? c.file_path.toLowerCase().includes(q) ||
 				c.feature_tags.some(t => t.toLowerCase().includes(q))
 			);
 		}

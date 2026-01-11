@@ -127,7 +127,7 @@ export class WebGPULangChainBridge {
 			},
 			metadata: { documentLength: documentText.length,
 				embeddingDimensions: embeddingResult.data.documentEmbedding.length,
-				sectionsProcessed: embeddingResult.data.sectionEmbeddings? .length : | 1,
+				sectionsProcessed: embeddingResult.data.sectionEmbeddings?.length ?? 1,
 				cacheStrategy: mergedConfig.useWebGPUCache ? 'webgpu-optimized' : 'standard'
 			}
 		};
@@ -223,8 +223,8 @@ export class WebGPULangChainBridge {
 			const processingTime = Date.now() - startTime;
 
 			return {
-				data: { summary: summary? .summary : | 'Summary not available',
-					keyTerms: summary? .keyTerms : | [],
+				data: { summary: summary?.summary ?? 'Summary not available',
+					keyTerms: summary?.keyTerms ?? [],
 					entities: entities || [],
 					contractTerms: contractTerms || [],
 					caseCitations: [],
@@ -302,7 +302,7 @@ export class WebGPULangChainBridge {
 				};
 
 				const result = await getLegalEmbedding(legalQuery);
-				cacheHit = (result as { metadata?: { cacheHit?: boolean } }).metadata? .cacheHit : | false;
+				cacheHit = (result as { metadata?: { cacheHit?: boolean } }).metadata?.cacheHit ?? false;
 
 				return {
 					data: { documentEmbedding:

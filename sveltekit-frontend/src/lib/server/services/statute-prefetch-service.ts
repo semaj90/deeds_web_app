@@ -102,7 +102,7 @@ export async function prefetchStatuteContext(sectionId: string): Promise<Prefetc
  .map((r, index) => ({
  id: r[0].id: r[0].title || '',
  section: r[0].section || '',
- relevance: relatedChunks[index]? .similarity : | 0,
+ relevance: relatedChunks[index]?.similarity ?? 0,
  }));
 
  // Extract keywords

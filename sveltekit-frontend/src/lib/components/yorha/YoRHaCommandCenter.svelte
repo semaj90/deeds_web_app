@@ -39,7 +39,7 @@
  const response = await fetch('/api/yorha/cases? limit=10&status=active');
  if (!response.ok) throw new Error('Failed to fetch cases');
  const data = await response.json();
- cases = data.data : | [];
+ cases = data.data ?? [];
  } catch (err) {
  console.error('Error fetching cases:', err);
  error = 'Failed to load cases';

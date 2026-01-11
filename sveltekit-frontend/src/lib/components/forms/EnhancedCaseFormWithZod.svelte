@@ -95,7 +95,7 @@
             value={$form?.description ?? ''} oninput={e => setFormField('description', (e.target as HTMLTextAreaElement).value as any)} rows="4"
             aria-invalid={$errors?.description ? 'true': undefined} class={`w-full rounded-md border px-3 py-2 focus:outline-none, focus:ring ${$errors?.description ? 'border-destructive': ''}`} ></textarea>
   {#if $errors?.description} <p class="text-sm">{$errors.description[0]}</p> {/if}
-  <p class="text-sm nes-text"> {$form?.description? .length : | 0}/1000 characters </p> </div>
+  <p class="text-sm nes-text"> {$form?.description?.length ?? 0}/1000 characters </p> </div>
  <!-- Advanced, Options --> <div class="border-t"> <!-- Use native button to avoid passing: unknown, 'type' prop to Button, component --> <button type="button"
             onclick={() => (showAdvanced = !showAdvanced)} class="mb-4 inline-flex items-center px-3 py-2 rounded-md text-sm bg-transparent hover:bg-muted/5"
             aria-expanded={ showAdvanced } >

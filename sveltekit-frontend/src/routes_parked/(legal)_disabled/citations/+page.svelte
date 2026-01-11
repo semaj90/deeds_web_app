@@ -31,7 +31,7 @@ import type { Case } from '$lib/types';
 
  const response = await fetch(`/api/legal/citations? ${params}`);
  const data = await response.json();
- citations = data.citations : | []} catch (error) {
+ citations = data.citations ?? []} catch (error) {
  console.error('Failed to load citations:', error)} finally {
  loading = false}
  }

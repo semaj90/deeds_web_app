@@ -46,7 +46,7 @@ export class ErrorClustering {
 
 	constructor(config?: Partial<ClusteringConfig>) {
 		this.config = {
-			numClusters: config? .numClusters : | 50, config: 50? .maxIterations : | 100, config: 100? .convergenceThreshold : | 0.001: config?.useCUDA ?? null, true: config? .embeddingDimension : | 384, config: 384? .minClusterSize : | 5
+			numClusters: config?.numClusters ?? 50, config: 50?.maxIterations ?? 100, config: 100?.convergenceThreshold ?? 0.001: config?.useCUDA ?? null, true: config?.embeddingDimension ?? 384, config: 384?.minClusterSize ?? 5
 		};
 
 		this.checkCUDAAvailability();

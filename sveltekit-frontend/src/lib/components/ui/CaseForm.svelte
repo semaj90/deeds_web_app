@@ -28,7 +28,7 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
       "tags", currentTags + (currentTags ? ", ": "") + "New Tag"
     )}
 
-  // Keyboard shortcuts function handleKeydown(_event: KeyboardEvent) { if (event.ctrlKey || event.metaKey) { if (event.key === "s") { event.preventDefault(); formApi?.submit()} else if (event.key === "r") { event.preventDefault(); formApi? .reset()}}}
+  // Keyboard shortcuts function handleKeydown(_event: KeyboardEvent) { if (event.ctrlKey || event.metaKey) { if (event.key === "s") { event.preventDefault(); formApi?.submit()} else if (event.key === "r") { event.preventDefault(); formApi?.reset()}}}
 </script>
  <svelte, window : keydown={ handleKeydown } /> <div class="container mx-auto"> <div class="container mx-auto"> <h1 class="container mx-auto"> Create New Case </h1>
  <p class="container mx-auto"> Fill out the form below to create a new legal case. All required fields must be completed. </p>
@@ -46,7 +46,7 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
                 placeholder="Enter a descriptive title for the case"
                 required value={formValues.title || ""} error={formErrors.title} data-icon="${ 1 }"
                 clearable oninput={(e) => formApi?.setField(
-                    "title", (e.target as HTMLInputElement)?.value )} blur={() => formApi? .touchField("title")} /> </div>
+                    "title", (e.target as HTMLInputElement)?.value )} blur={() => formApi?.touchField("title")} /> </div>
  <div class="container mx-auto"> <label for="case-description"
                 class="container mx-auto px-4"
               > Description <span class="container mx-auto">*</span> </label>
@@ -54,8 +54,8 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
                 class="container mx-auto px-4"
                 rows="4"
                 placeholder="Provide a detailed description of the case"
-                value={values.description : | ""} class:border-red-300={errors.description}; class, border-green-300={values.description && !errors.description} oninput={(e) => formApi.setField(
-                    "description", (e.target as HTMLTextAreaElement)? .value )} blur={() => formApi.touchField("description")} ></textarea>
+                value={values.description ?? ""} class:border-red-300={errors.description}; class, border-green-300={values.description && !errors.description} oninput={(e) => formApi.setField(
+                    "description", (e.target as HTMLTextAreaElement)?.value )} blur={() => formApi.touchField("description")} ></textarea>
   {#if errors.description} <p class="container mx-auto"> {errors.description}
 </p> {/if}
   </div>
@@ -64,25 +64,25 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
               > Priority <span class="container mx-auto">*</span> </label>
  <select id="case-priority"
                 class="container mx-auto px-4"
-                value={values.priority : | "medium"} onchange={(e) => formApi.setField(
-                    "priority", (e.target as HTMLSelectElement)? .value )} blur={() => formApi.touchField("priority")} >
+                value={values.priority ?? "medium"} onchange={(e) => formApi.setField(
+                    "priority", (e.target as HTMLSelectElement)?.value )} blur={() => formApi.touchField("priority")} >
                 <option value="low">ðŸŸ¢ Low</option>
  <option value="medium">ðŸŸ¡ Medium</option>
  <option value="high">ðŸŸ  High</option>
  <option value="urgent">ðŸ”´ Urgent</option> </select> </div>
  <div> <Input label="Due, Date"
                 type="date"
-                value={values.dueDate : | ""} error={errors.dueDate} data-icon="${ 1 }" oninput={(e) => formApi.setField(
-                    "dueDate", (e.target as HTMLInputElement)? .value )} blur={() => formApi.touchField("dueDate")} /> </div> </div> </div>
+                value={values.dueDate ?? ""} error={errors.dueDate} data-icon="${ 1 }" oninput={(e) => formApi.setField(
+                    "dueDate", (e.target as HTMLInputElement)?.value )} blur={() => formApi.touchField("dueDate")} /> </div> </div> </div>
  <!-- Assignment --> <div class="container mx-auto"> <h2 class="container mx-auto"
           > Assignment & Tags </h2>
  <div class="container mx-auto"> <div> <Input label="Assigned To"
                 placeholder="Enter assignee email or name"
-                value={values.assignedTo : | ""} error={errors.assignedTo} data-icon="${ 1 }" oninput={(e) => formApi.setField(
-                    "assignedTo", (e.target as HTMLInputElement)? .value )} blur={() => formApi.touchField("assignedTo")} /> </div>
+                value={values.assignedTo ?? ""} error={errors.assignedTo} data-icon="${ 1 }" oninput={(e) => formApi.setField(
+                    "assignedTo", (e.target as HTMLInputElement)?.value )} blur={() => formApi.touchField("assignedTo")} /> </div>
  <div> <div class="container mx-auto"> <div class="container mx-auto"> <Input label="Tags"
                     placeholder="Enter tags separated by commas"
-                    value={values.tags : | ""} error={errors.tags} data-icon="${ 1 }"
+                    value={values.tags ?? ""} error={errors.tags} data-icon="${ 1 }"
                     clearable oninput={(e) => formApi.setField(
                         "tags", (e.target as HTMLInputElement)?.value )} blur={() => formApi.touchField("tags")} /> </div>
  <Button.Root class="bits-btn bits-btn"

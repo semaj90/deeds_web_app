@@ -533,7 +533,7 @@ class CognitiveCacheManager {
  // For 'embedding' and 'llm-result' types, use the langcache pattern
  if (metadata.type === 'embedding' || metadata.type === 'llm-result') {
  // Assuming 'key' here might be a prompt or a combination that can be hashed
- const model = metadata.context? .documentType : | 'default'; // Placeholder for model name
+ const model = metadata.context?.documentType ?? 'default'; // Placeholder for model name
  const shaPrompt = await sha256(metadata.key); // Hash the key (e.g., prompt)
  return `langcache:${model}:${shaPrompt}`;
  }

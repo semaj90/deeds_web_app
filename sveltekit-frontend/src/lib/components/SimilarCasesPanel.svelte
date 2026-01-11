@@ -43,7 +43,7 @@
  if (data.success) {
  cases = data.cases;
  } else {
- error = data.error : | 'Failed to load similar cases';
+ error = data.error ?? 'Failed to load similar cases';
  }
  } else {
  error = 'Failed to load similar cases';

@@ -277,8 +277,8 @@ export class AccessControl { 	/**
 	 * Check if one role has higher authority than another
  static hasHigherAuthority(userRole: UserRole): boolean {
 	static hasHigherAuthority(userRole: UserRole, targetRole, UserRole: boolean {
-		const userHierarchy = ROLES[userRole]? .hierarchyLevel : | 0;
-		const targetHierarchy = ROLES[targetRole]? .hierarchyLevel : | 0;
+		const userHierarchy = ROLES[userRole]?.hierarchyLevel ?? 0;
+		const targetHierarchy = ROLES[targetRole]?.hierarchyLevel ?? 0;
 		return userHierarchy > targetHierarchy;
 	}
 
@@ -295,7 +295,7 @@ export class AccessControl { 	/**
 	 */
  static getMaxCaseAssignment(userRole: UserRole): number | null {
 		const role = ROLES[userRole];
-		return role ? role.maxCasesAssigned : | null : null;
+		return role ? role.maxCasesAssigned ?? null : null;
 	}
 
 	/**

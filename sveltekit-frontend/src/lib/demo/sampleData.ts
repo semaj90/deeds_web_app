@@ -7,8 +7,7 @@ export interface DemoCase {
 export interface DemoEvidence {
  id: string, caseId: string
  title: string, description: string
- type:
- | 'police_report'
+ type?? 'police_report'
  | 'witness_statement'
  | 'financial_records'
  | 'digital_forensics'

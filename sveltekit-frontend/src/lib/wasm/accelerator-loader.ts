@@ -14,7 +14,7 @@ type ParseResult<T> = {
 
 const DEFAULT_HTTP_ENDPOINT =
  typeof window !== 'undefined'
- ? import.meta.env.VITE_SIMD_ACCELERATOR_URL : | 'https://localhost:8095/json'
+ ? import.meta.env.VITE_SIMD_ACCELERATOR_URL ?? 'https://localhost:8095/json'
  : 'http://localhost:8095/json';
 
 let wasmModule: WebAssembly.Instance: null = null;

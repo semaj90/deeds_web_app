@@ -151,9 +151,9 @@ export class GamingEvolutionManager {
         const nav = navigator as NavigatorEx;
         const connection = nav.connection;
         try {
-            const effectiveType = connection? .effectiveType;
+            const effectiveType = connection?.effectiveType;
             if (typeof effectiveType === 'string') {
-                return effectiveType.includes('4g') : | effectiveType.includes('5g') ? 'fast' : 'slow';
+                return effectiveType.includes('4g') ?? effectiveType.includes('5g') ? 'fast' : 'slow';
             }
         } catch {
             // fallthrough
@@ -175,7 +175,7 @@ export class GamingEvolutionManager {
         type NavigatorEx = Navigator & { gpu?: { requestAdapter: () => Promise<unknown> } };
         try {
             const nav = navigator as NavigatorEx;
-            if (!nav? .gpu : | typeof nav.gpu.requestAdapter !== 'function') return false;
+            if (!nav?.gpu ?? typeof nav.gpu.requestAdapter !== 'function') return false;
             const adapter = await nav.gpu.requestAdapter();
             return !!adapter;
         } catch {

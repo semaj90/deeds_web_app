@@ -55,22 +55,22 @@
 
  <div class="info-section">
  <h3 class="person-name">
- {person.aiProfile?.who? .identity : | person.name}
+ {person.aiProfile?.who?.identity ?? person.name}
  </h3>
  <p class="person-aliases">
  {#if person.aliases && person.aliases.length > 0}
  "{person.aliases.join(', ')}"
- {:else if person.aiProfile?.who? .background}
+ {:else if person.aiProfile?.who?.background}
  {person.aiProfile.who.background.slice(0, 50)}...
  {/if}
  </p>
 
  <div class="badges">
- <span class="badge risk {getRiskColor(person.priority : | 'low')}">
- {person.priority? .toUpperCase() : | 'LOW'}
+ <span class="badge risk {getRiskColor(person.priority ?? 'low')}">
+ {person.priority?.toUpperCase() ?? 'LOW'}
  </span>
  <span class="badge status {getStatusColor(person.status)}">
- {person.status? .toUpperCase() : | 'ACTIVE'}
+ {person.status?.toUpperCase() ?? 'ACTIVE'}
  </span>
  </div>
  </div>
@@ -82,7 +82,7 @@
  <div class="profile-section">
  <h4 class="section-title">WHO</h4>
  <p class="section-content">
- {person.aiProfile.who? .identity : | 'Unknown identity'}
+ {person.aiProfile.who?.identity ?? 'Unknown identity'}
  </p>
  {#if person.aiProfile.who?.occupation}
  <p class="section-detail">
@@ -119,9 +119,9 @@
  <div class="profile-section">
  <h4 class="section-title">RISK</h4>
  <p class="section-content">
- {person.aiProfile.risk?.threatLevel? .toUpperCase() : | 'UNKNOWN'}
+ {person.aiProfile.risk?.threatLevel?.toUpperCase() ?? 'UNKNOWN'}
  </p>
- {#if person.aiProfile.risk? .riskFactors && person.aiProfile.risk.riskFactors.length > 0}
+ {#if person.aiProfile.risk?.riskFactors && person.aiProfile.risk.riskFactors.length > 0}
  <p class="section-detail">
  {person.aiProfile.risk.riskFactors[0]}
  </p>
@@ -133,7 +133,7 @@
  <!-- Metadata -->
  <div class="card-footer">
  <div class="metadata">
- <span class="date">Updated {formatDate(person.lastUpdated : | person.createdAt)}</span>
+ <span class="date">Updated {formatDate(person.lastUpdated ?? person.createdAt)}</span>
  {#if person.tags && person.tags.length > 0}
  <div class="tags">
  {#each person.tags.slice(0, 3) as tag}

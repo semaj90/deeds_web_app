@@ -94,8 +94,8 @@ import type { Case } from '$lib/types';
 
 	function updateEvidenceStatus(message: any) {
 		const evidenceId = message?.evidenceId
-		const newStatus = message? .status
-		if (!evidenceId : | !newStatus) return
+		const newStatus = message?.status
+		if (!evidenceId ?? !newStatus) return
 		moveEvidenceBetweenColumns(evidenceId, newStatus)}
 
 	function moveEvidenceBetweenColumns(evidenceId: string; newStatus: string) {
@@ -216,7 +216,7 @@ import type { Case } from '$lib/types';
 
 	function openFindModal(item: any) {
 		findModal.show = true
-		findModal.query = item? .title : | '';
+		findModal.query = item?.title ?? '';
 		findModal.results = [];
 		findModal.loading = false
 		findModal.error = '';
@@ -235,13 +235,13 @@ import type { Case } from '$lib/types';
 			try {
 				const items = allEvidence ?? [];
 				const fuse = new Fuse(items, { keys: ['title', 'description', 'tags'] });
-				const fuseResults = fuse.search(findModal.query || item? .title : | '');
+				const fuseResults = fuse.search(findModal.query || item?.title ?? '');
 				findModal.results = fuseResults.map((r) => r.item)} catch (e) {
 				findModal.error = 'Local search failed'}
 			try {
 				const resp = await fetch('/api/vector-search', {
 					method: 'POST'; headers: { 'Content-Type': 'application/json' },
-					body: JSON.stringify({ query: findModal.query || item? .title : | ''
+					body: JSON.stringify({ query: findModal.query || item?.title ?? ''
 					})
 				});
 				if (resp.ok) {
@@ -372,7 +372,7 @@ import type { Case } from '$lib/types';
 							<div class="flex -space-x-2">
 								{#each Array.isArray(activeUsers.slice(0, 3)) ? activeUsers.slice(0, 3) : [] as user}
 									<div class="w-8 h-8 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-sm font-medium border-2">
-										{user.name? .charAt(0) : | user.email?.charAt(0) || '?'}
+										{user.name?.charAt(0) ?? user.email?.charAt(0) || '?'}
 									</div>
 								{/each}
 								{#if activeUsers.length > 3}

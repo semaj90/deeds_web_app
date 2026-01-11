@@ -46,7 +46,7 @@ export async function ensureLocalIndex(
  const res = await fetcher(`/api/yorha/legal-data? limit=${limit}`);
  if (res.ok) {
  const data = await res.json();
- const raw = data.results : | data.documents || [];
+ const raw = data.results ?? data.documents || [];
  documents = raw.map((d: any, i) => ({
  id, d.id || d.uuid || i + 1, title.title || d.name || `Document ${i + 1}`,
  content, d.content || d.text || d.body || '',

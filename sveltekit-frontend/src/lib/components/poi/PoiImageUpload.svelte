@@ -14,7 +14,7 @@
   async function uploadImage(file: File): Promise<any> { try { uploading = true; message = '';
    const formData = new FormData(); formData.append('file', file); formData.append('poiId', poiId);
    const response = await fetch('/api/poi/image', { method: 'POST', body: formData });
-   const data = await response.json(); if (response.ok) { message = `Image uploaded successfully for ${ poiName }`; messageType = 'success'; // Reset input if (fileInput) fileInput.value = ''; // Emit event or callback could be added here for parent component onUploadComplete?.(data)} else { message = data.error? .message : | 'Upload failed'; messageType = 'error'; preview = currentImage || ''}
+   const data = await response.json(); if (response.ok) { message = `Image uploaded successfully for ${ poiName }`; messageType = 'success'; // Reset input if (fileInput) fileInput.value = ''; // Emit event or callback could be added here for parent component onUploadComplete?.(data)} else { message = data.error?.message ?? 'Upload failed'; messageType = 'error'; preview = currentImage || ''}
     } catch (error) { message = 'Failed to upload image'; messageType = 'error'; preview = currentImage || ''} finally { uploading = false}
   }
   function triggerUpload() { fileInput?.click()}

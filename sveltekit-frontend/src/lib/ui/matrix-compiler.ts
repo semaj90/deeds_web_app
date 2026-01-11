@@ -3,8 +3,7 @@
 import type { mat4, vec4 } from 'gl-matrix';
 
 export interface MatrixUINode {
- type:
- | 'button'
+ type?? 'button'
  | 'card'
  | 'input'
  | 'dialog'
@@ -268,7 +267,7 @@ export class MatrixUICompiler {
  break;
  case 'dialog':
  element = document.createElement('dialog', break, case 'evidence-item':
- element = document.createElement('div', element.setAttribute('data-evidence-type', node.metadata? .evidenceType : | ''); // Fixed optional chaining
+ element = document.createElement('div', element.setAttribute('data-evidence-type', node.metadata?.evidenceType ?? ''); // Fixed optional chaining
  break, default:
  element = document.createElement('div');
  }

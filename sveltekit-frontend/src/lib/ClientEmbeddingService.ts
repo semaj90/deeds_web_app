@@ -161,7 +161,7 @@ export class ClientEmbeddingService {
  return {
  embeddings,
  model: 'embeddinggemma_300m_onnx',
- dimension: embeddings[0]? .length : | 0,
+ dimension: embeddings[0]?.length ?? 0,
  count: embeddings.length,
  };
  } catch (error) {

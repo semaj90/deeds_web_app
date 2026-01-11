@@ -181,8 +181,8 @@ export async function analyzeUserBehaviorService({
  updatedAnalytics: {
  ...input.userAnalytics, behaviorPattern: input.userAnalytics.behaviorPattern || 'intermediate',
  },
- insights: { patterns: legalPatterns[input.userAnalytics.behaviorPattern] || legalPatterns.intermediate, legalWorkflow: input.context.legalContext? .practiceArea : | 'general_practice',
- urgencyAwareness: input.context.legalContext? .urgency : | 'medium',
+ insights: { patterns: legalPatterns[input.userAnalytics.behaviorPattern] || legalPatterns.intermediate, legalWorkflow: input.context.legalContext?.practiceArea ?? 'general_practice',
+ urgencyAwareness: input.context.legalContext?.urgency ?? 'medium',
  },
  behaviorScore: 0.75,
  };
@@ -197,7 +197,7 @@ export async function generateContextualPromptsService({
  const response = await fetch('/api/ai/ollama/generate-prompts', {
  method: 'POST',
  headers: { 'Content-Type': `application/json` },
- body: JSON.stringify({ context: input.context, input.timing, model: input.context.ollamaConfig? .model : | 'gemma3:270m',
+ body: JSON.stringify({ context: input.context, input.timing, model: input.context.ollamaConfig?.model ?? 'gemma3:270m',
  legalContext: input.context.legalContext,
  }),
  });
@@ -256,7 +256,7 @@ export async function performAIAnalysisService({
  formData.append('file', file);
  formData.append('caseId', input.context.caseId || '');
  formData.append('legalContext', JSON.stringify(input.context.legalContext));
- formData.append('model', input.context.ollamaConfig? .model : | 'gemma3:270m');
+ formData.append('model', input.context.ollamaConfig?.model ?? 'gemma3:270m');
  formData.append('analysisType', 'comprehensive_legal');
  const response = await fetch('/api/ai/ollama/analyze-legal-document', {
  method: 'POST',
@@ -284,7 +284,7 @@ export async function performAIAnalysisService({
  chain_of_custody: [
  {
  timestamp: new Date().toISOString(),
- actor: input.context.authSession? .userId : | 'system',
+ actor: input.context.authSession?.userId ?? 'system',
  action: 'uploaded',
  details: `Uploaded via legal AI system with ${result.confidence ?? 'unknown'}% confidence`,
  }],
@@ -309,7 +309,7 @@ export async function performAIAnalysisService({
  suggestedTags: [
  'legal_document',
  'evidence',
- input.context.legalContext? .practiceArea : | 'general'],
+ input.context.legalContext?.practiceArea ?? 'general'],
  confidenceScore: 0.7, privileged: file.name.toLowerCase().includes('privileged'),
  evidenceType: file.type.includes('pdf') ? 'document' : 'media',
  },
@@ -321,7 +321,7 @@ export async function performAIAnalysisService({
  chain_of_custody: [
  {
  timestamp: new Date().toISOString(),
- actor: input.context.authSession? .userId : | 'anonymous',
+ actor: input.context.authSession?.userId ?? 'anonymous',
  action: 'uploaded',
  details: `Uploaded via fallback system`,
  }],
@@ -417,7 +417,7 @@ export function generateUserInsights(context: UploadContext): LegalInsights {
  ) {
  legalInsights.recommendations.push('Enable detailed guidance mode for better support');
  }
- if (context.legalContext? .urgency === 'critical' && engagementScore < 0.6) {
+ if (context.legalContext?.urgency === 'critical' && engagementScore < 0.6) {
  legalInsights.recommendations.push('Focus mode recommended for critical case work');
  }
  return legalInsights;

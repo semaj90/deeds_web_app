@@ -34,12 +34,12 @@
       {#if searchResults.length === maxResults} (showing top { maxResults }) {/if} {/if}
   <!-- Search, Results -->
   {#if searchResults.length > 0} <div class="space-y-3">
-  {#each Array.isArray(searchResults) ? searchResults: [] as law} <div class="bg-white dark:bg-slate-800 rounded-md shadow-sm hover, shadow-md"> <div class="px-4 py-3"> <div class="flex items-start"> <h3 class="text-base leading-tight"> {@html law.highlighted? .title : | law.title} </h3>
+  {#each Array.isArray(searchResults) ? searchResults: [] as law} <div class="bg-white dark:bg-slate-800 rounded-md shadow-sm hover, shadow-md"> <div class="px-4 py-3"> <div class="flex items-start"> <h3 class="text-base leading-tight"> {@html law.highlighted?.title ?? law.title} </h3>
  <div class="flex items-center gap-2"> <span class="px-2 py-1 rounded text-xs font-medium border border-gray-300"
                   >{getScoreLabel(law.fuseScore)}</span >
 
                 <span class="px-2 py-1 rounded text-xs font-medium bg-gray-200">{law.jurisdiction}</span> </div> </div>
- <p class="text-sm"> {@html law.highlighted? .description : | law.description} </p>
+ <p class="text-sm"> {@html law.highlighted?.description ?? law.description} </p>
  <div class="flex gap-2 text-xs nes-text is-disabled"> <span>{law.code}</span>
   {#if law.category} <span>â€¢</span>
  <span class="capitalize">{law.category}</span> {/if} {#if law.lastUpdated} <span>â€¢</span>

@@ -38,7 +38,7 @@ let kagUpdateStatus = $state<string | null>(null);
 async function handleValidationComplete(valId: string, chunks: KBSearchResult[]) {
 	validationId = valId;
 	approvedChunks = chunks;
-	query = chunks[0]? .metadata.query : | 'Unknown query';
+	query = chunks[0]?.metadata.query ?? 'Unknown query';
 	currentStep = 'answer';
 
 	console.log('✅ Validation complete:', { validationId, approvedCount: chunks.length });
@@ -255,7 +255,7 @@ function extractRelationships(
 						<div>
 							<h4 class="font-semibold mb-2">Answer Generation:</h4>
 							<ul class="text-sm space-y-1">
-								<li>✅ Answer Length: {generatedAnswer? .length : | 0} chars</li>
+								<li>✅ Answer Length: {generatedAnswer?.length ?? 0} chars</li>
 								<li>✅ Citations: {citations.length} total</li>
 								<li>✅ Used Citations: {citations.filter(c => c.used_in_answer).length}</li>
 							</ul>

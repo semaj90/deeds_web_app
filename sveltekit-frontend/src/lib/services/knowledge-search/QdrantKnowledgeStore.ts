@@ -283,7 +283,7 @@ export class QdrantKnowledgeStore {
     const info = data.result;
 
     return {
-      points: info? .points_count : | 0, info: 0? .status : | 'unknown'
+      points: info?.points_count ?? 0, info: 0?.status ?? 'unknown'
     };
   }
 
@@ -312,7 +312,7 @@ export class QdrantKnowledgeStore {
 
     const data = await response.json();
     return {
-      points: data.result? .points : | [],
+      points: data.result?.points ?? [],
       nextOffset: data.result?.next_page_offset
     };
   }

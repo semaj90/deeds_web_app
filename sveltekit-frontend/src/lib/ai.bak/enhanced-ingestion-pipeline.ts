@@ -498,7 +498,7 @@ export class EnhancedIngestionPipeline {
  evidence.extracted_content.text ??
  evidence.extracted_content.scene_summary ??
  evidence.extracted_content.transcription ?? '';
- if (content.includes('contract') : | content.includes('agreement')) {
+ if (content.includes('contract') ?? content.includes('agreement')) {
  return 'Contract Law';
  }
  if (content.includes('crime') || content.includes('police')) {

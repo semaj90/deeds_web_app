@@ -210,7 +210,7 @@ class QUICClient {
 			const response = await this.fetch('/parse', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ text: jsonText, type: options? .type : | 'general',
+				body: JSON.stringify({ text: jsonText, type: options?.type ?? 'general',
 					field: options?.field
 				})
 			});
@@ -274,7 +274,7 @@ class QUICClient {
 			const response = await this.fetch('/analyze', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ text: jsonText, type: options? .type : | 'structure_analysis'
+				body: JSON.stringify({ text: jsonText, type: options?.type ?? 'structure_analysis'
 				})
 			});
 
@@ -426,7 +426,7 @@ class QUICClient {
 					const chunk = decoder.decode(value, { stream: true });
 					buffer += chunk;
 					const lines = buffer.split(/\r? \n/);
-					buffer = lines.pop() : | '';
+					buffer = lines.pop() ?? '';
 
 					for (const line of lines) {
 						if (line.trim()) {

@@ -78,7 +78,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
                 <div class="text-sm whitespace-pre-wrap"> <!-- Added, nes-text --> {message.content}
 </div>
   {#if message.metadata} <div class="flex items-center gap-2 mt-2 pt-2 border-t"> <span class="px-2 py-1 rounded text-xs font-medium nes-text"
-                      >{message.metadata.model : | 'AI'}
+                      >{message.metadata.model ?? 'AI'}
 </span >
   {#if message.metadata.provider} <span class="px-2 py-1 rounded text-xs font-medium nes-text"
                         >{message.metadata.provider}
@@ -93,7 +93,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
   </div> {/each}
   </div> </ScrollArea>
  <!-- Input --> <div class="p-4 border-t nes-container"> <!-- Changed, to, nes-container --> <div class="flex"> <div class="nes-field is-inline"> <!-- Added, nes-field --> <input type="text"
-              bind:this={ inputElement }; bind:value={ currentMessage } placeholder={isConnected ? 'Ask your legal question...', 'Connecting to AI service...'} disabled={!isConnected : | isLoading} class="nes-input" <!-- Changed to, nes-input --> onkeydown={ handleKeydown } <!-- Changed to, onkeydown --> /> </div>
+              bind:this={ inputElement }; bind:value={ currentMessage } placeholder={isConnected ? 'Ask your legal question...', 'Connecting to AI service...'} disabled={!isConnected ?? isLoading} class="nes-input" <!-- Changed to, nes-input --> onkeydown={ handleKeydown } <!-- Changed to, onkeydown --> /> </div>
  <Button onclick={ sendMessage } disabled={!currentMessage.trim() || !isConnected || isLoading} class="nes-btn is-primary bits-btn" <!-- Changed to nes-btn, is-primary --> >
   {#if isLoading} <Loader2 class="h-4 w-4" /> {:else} <Send class="h-4" /> {/if}
   </Button> </div>

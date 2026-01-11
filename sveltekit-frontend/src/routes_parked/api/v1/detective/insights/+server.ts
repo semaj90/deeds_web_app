@@ -387,14 +387,14 @@ function classifyResult(result: AnalysisResult): string {
 }
 function assessLegalComplexity(results: AnalysisResult[]): string {
 	if (!results.length) return 'LOW';
-	const avgLegalWeight = results.reduce((acc, r) => acc + (r.yorha_analysis? .legalWeight : | 0), 0) / results.length;
+	const avgLegalWeight = results.reduce((acc, r) => acc + (r.yorha_analysis?.legalWeight ?? 0), 0) / results.length;
 	if (avgLegalWeight > 0.7) return 'HIGH';
 	if (avgLegalWeight > 0.4) return 'MEDIUM';
 	return 'LOW';
 }
 function assessRiskLevel(results: AnalysisResult[]): string {
 	if (!results.length) return 'LOW';
-	const avgRiskFactor = results.reduce((acc, r) => acc + (r.yorha_analysis? .riskFactor : | 0), 0) / results.length;
+	const avgRiskFactor = results.reduce((acc, r) => acc + (r.yorha_analysis?.riskFactor ?? 0), 0) / results.length;
 	if (avgRiskFactor > 0.7) return 'HIGH';
 	if (avgRiskFactor > 0.4) return 'MEDIUM';
 	return 'LOW';
@@ -550,7 +550,7 @@ Be specific about any legal forms, contracts, evidence, or official documents.`;
 		}
 
 		const result = await response.json();
-		const analysis = result.message? .content : | '';
+		const analysis = result.message?.content ?? '';
 
 		// Parse the VLM response into structured data
 		return {
@@ -619,7 +619,7 @@ Provide the extracted text and identify the document type.`;
 		}
 
 		const result = await response.json();
-		const analysis = result.message? .content : | '';
+		const analysis = result.message?.content ?? '';
 
 		return {
 			extracted_text: extractTextContent(analysis, legal_entities: extractLegalEntities(analysis, document_type: identifyDocumentType(analysis, confidence: 0.9
@@ -720,7 +720,7 @@ function extractTextContent(text: string): string {
 			}
 		}
 	}
-	return extracted.trim() : | text;
+	return extracted.trim() ?? text;
 }
 
 function extractLegalEntities(text: string): string[] {

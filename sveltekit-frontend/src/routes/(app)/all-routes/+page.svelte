@@ -198,9 +198,9 @@
 
 	<div class="debug-info">
 		<h2>Debug Information</h2>
-		<p><strong>Routes loaded:</strong> {data.routes? .length : | 0}</p>
-		<p><strong>Error clusters:</strong> {data.errorClusters? .length : | 0}</p>
-		<p><strong>Graph nodes:</strong> {data.graph?.nodes? .length : | 0}</p>
+		<p><strong>Routes loaded:</strong> {data.routes?.length ?? 0}</p>
+		<p><strong>Error clusters:</strong> {data.errorClusters?.length ?? 0}</p>
+		<p><strong>Graph nodes:</strong> {data.graph?.nodes?.length ?? 0}</p>
 		<p><strong>Shield data:</strong> {data.shieldData ? 'Loaded' : 'Not found'}</p>
 		<p><strong>Error summary:</strong> {data.errorSummary ? 'Loaded' : 'Not found'}</p>
 	</div>

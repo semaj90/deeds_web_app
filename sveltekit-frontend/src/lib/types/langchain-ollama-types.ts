@@ -225,8 +225,7 @@ export interface LegalDocumentMetadata {
 }
 
 export interface Party {
- name: string; role:
- | 'plaintiff'
+ name: string; role?? 'plaintiff'
  | 'defendant'
  | 'petitioner'
  | 'respondent'
@@ -1530,8 +1529,7 @@ export interface SearchQuery {
 }
 
 export interface SearchFilter {
- field: string; operator:
- | 'eq'
+ field: string; operator?? 'eq'
  | 'ne'
  | 'in'
  | 'nin'

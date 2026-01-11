@@ -129,8 +129,7 @@ let globalUserState = $state<GlobalUserState>(defaultState);
 
 // Reactive computations using Svelte 5 $derived
 const userDisplayName = $derived(
- globalUserState.profile? .name : |
- globalUserState.profile?.firstName ||
+ globalUserState.profile?.name ?? globalUserState.profile?.firstName ||
  globalUserState.profile?.email ||
  'Anonymous User'
 );
@@ -387,7 +386,7 @@ export const globalUserStore = {
  },
 
  async syncToDatabase() {
- if (!globalUserState.user? .id : | globalUserState.pendingChanges === 0) {
+ if (!globalUserState.user?.id ?? globalUserState.pendingChanges === 0) {
  return;
  }
  try {

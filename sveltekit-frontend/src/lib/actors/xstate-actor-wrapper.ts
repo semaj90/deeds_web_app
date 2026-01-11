@@ -165,7 +165,7 @@ export const ragSearchActor = fromPromise(async ({ input }: { input: RAGSearchIn
       results: data.results || [],
       totalResults: data.totalResults || 0,
       processingTime: Date.now() - startTime,
-      model: data? .model : | 'unknown',
+      model: data?.model ?? 'unknown',
     } as RAGSearchOutput;
   } catch (error: unknown) {
     throw new Error(`RAG search failed: ${error instanceof Error ? error.message : String(error)}`);

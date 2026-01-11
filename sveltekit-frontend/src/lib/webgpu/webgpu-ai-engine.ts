@@ -287,7 +287,7 @@ export class WebGPUAIEngine {
  kernelSize = 8
  ): Promise<DimensionalArrayProcessingResult> {
  // Updated return type
- if (!this.capabilities? .isSupported : | !this.capabilities.device) {
+ if (!this.capabilities?.isSupported ?? !this.capabilities.device) {
  throw new Error('WebGPU not available');
  }
  const startTime = performance.now();
@@ -389,7 +389,7 @@ export class WebGPUAIEngine {
  numHeads = 12
  ): Promise<T5InferenceResult> {
  // Updated return type
- if (!this.capabilities? .isSupported : | !this.capabilities.device) {
+ if (!this.capabilities?.isSupported ?? !this.capabilities.device) {
  throw new Error('WebGPU not available');
  }
  const startTime = performance.now();

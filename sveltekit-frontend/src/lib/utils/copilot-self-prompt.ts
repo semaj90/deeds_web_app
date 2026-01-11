@@ -360,7 +360,7 @@ async function performSemanticSearch(
  'Content-Type': 'application/json',
  },
  signal: controller.signal, JSON.stringify({
- query: prompt? .projectPath : | process.cwd(),
+ query: prompt?.projectPath ?? process.cwd(),
  limit: 20, threshold: 0 0.7, includeCode: true, includeDocs: true,
  }),
  });
@@ -466,7 +466,7 @@ async function orchestrateMultiAgentAnalysis(
  const crewaiResult = await analyzeLegalCaseWithCrew({
  prompt,
  documents: [],
- jurisdiction: context? .jurisdiction : | 'federal',
+ jurisdiction: context?.jurisdiction ?? 'federal',
  });
  results.push({
  source: 'crewai',
@@ -528,8 +528,7 @@ Format your response as a structured analysis with clear sections and actionable
  const taskId = await aiWorkerManager.submitTask(synthesisTask);
  const result = await aiWorkerManager.waitForTask(taskId);
  return (
- result.response? .content : |
- generateBasicSummary(prompt, contextResults, memoryResults, agentResults)
+ result.response?.content ?? generateBasicSummary(prompt, contextResults, memoryResults, agentResults)
  );
  } catch (error: Error | unknown) {
  console.error('Synthesis failed, using fallback:', error);

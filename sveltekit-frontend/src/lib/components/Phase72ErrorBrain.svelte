@@ -49,7 +49,7 @@
 			const response = await fetch(`/api/phase72/errors? ${params}`);
 			const data = await response.json();
 
-			errors = data.errors : | [];
+			errors = data.errors ?? [];
 			stats = data.stats || null;
 		} catch (err) {
 			console.error('Failed to load errors:', err);
@@ -69,7 +69,7 @@
 
 				// Show cluster summary if available
 				if (data.cluster_summary) {
-					aiSuggestion = `**Cluster Analysis:**\n${data.cluster_summary.summary}\n\n**Suggested Fixes:**\n${data.cluster_summary.suggested_fixes? .join('\n') : | 'None'}`;
+					aiSuggestion = `**Cluster Analysis:**\n${data.cluster_summary.summary}\n\n**Suggested Fixes:**\n${data.cluster_summary.suggested_fixes?.join('\n') ?? 'None'}`;
 				}
 			}
 		} catch (err) {

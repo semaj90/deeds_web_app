@@ -8,7 +8,7 @@
 
     // Save form state on unmount if (formIntegration) { // Access form data from the data store using get() to avoid $ syntax conflict formStatePersistence.save(get(formIntegration.form.form))}
   }); // Enhanced form submission with PostgreSQL-first worker integration async function handleEnhancedSubmit(formData: Record<string, any>): Promise<any> { console.log('ðŸš€ Enhanced case creation starting:', formData); try { // call the API with the form data (cast as unknown to avoid strict mismatch) const caseResponse = await enhancedCaseAPI.createCase(formData as unknown);
- if (!caseResponse || !caseResponse.success) { throw new Error(caseResponse? .error : | 'Failed to create case')}
+ if (!caseResponse || !caseResponse.success) { throw new Error(caseResponse?.error ?? 'Failed to create case')}
       const createdCase = caseResponse.data; console.log('âœ… Case created successfully with enhanced API:', createdCase); return createdCase} catch (error) { console.error('âŒ Enhanced case creation failed:', error); throw error}
   }
 

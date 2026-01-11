@@ -197,20 +197,20 @@ export async function phase90_search_errors(
   const queryLower = query.toLowerCase();
   const filtered = results.points
     .filter(p => {
-      const msg = (p.payload? .message as string : | '').toLowerCase();
-      const file = (p.payload? .filePath as string : | '').toLowerCase();
+      const msg = (p.payload?.message as string ?? '').toLowerCase();
+      const file = (p.payload?.filePath as string ?? '').toLowerCase();
       return msg.includes(queryLower) || file.includes(queryLower);
     })
     .slice(0, topK);
 
   return filtered.map(p => ({
     score: 1.0,
-    message: p.payload? .message as string : | '',
-    file: p.payload? .filePath as string : | '',
-    code: p.payload? .errorCode as string : | 'UNKNOWN',
-    line: p.payload? .line as number : | 0,
-    clusterId: p.payload? .cluster_id as number : | -1,
-    tech: p.payload? .tech as string[] : | []
+    message: p.payload?.message as string ?? '',
+    file: p.payload?.filePath as string ?? '',
+    code: p.payload?.errorCode as string ?? 'UNKNOWN',
+    line: p.payload?.line as number ?? 0,
+    clusterId: p.payload?.cluster_id as number ?? -1,
+    tech: p.payload?.tech as string[] ?? []
   }));
 }
 
@@ -239,8 +239,8 @@ export async function phase90_get_cluster(clusterId: number): Promise<ClusterInf
     const files: Record<string, number> = {};
 
     for (const e of errors.points) {
-      const code = e.payload? .errorCode as string : | 'UNKNOWN';
-      const file = e.payload? .filePath as string : | '';
+      const code = e.payload?.errorCode as string ?? 'UNKNOWN';
+      const file = e.payload?.filePath as string ?? '';
       codes[code] = (codes[code] || 0) + 1;
       files[file] = (files[file] || 0) + 1;
     }
@@ -260,9 +260,9 @@ export async function phase90_get_cluster(clusterId: number): Promise<ClusterInf
 
   return {
     clusterId,
-    errorCount: cluster.payload? .error_count as number : | 0,
-    topCodes: cluster.payload? .top_codes as string[] : | [],
-    topFiles: cluster.payload? .top_files as string[] : | [],
+    errorCount: cluster.payload?.error_count as number ?? 0,
+    topCodes: cluster.payload?.top_codes as string[] ?? [],
+    topFiles: cluster.payload?.top_files as string[] ?? [],
     summary: cluster.payload?.summary as string
   };
 }
@@ -277,9 +277,9 @@ export async function phase90_get_fix_order(): Promise<{ clusterId: number; erro
   });
 
   const clusters = results.points.map(p => ({
-    clusterId: p.payload? .cluster_id as number : | 0,
-    errorCount: p.payload? .error_count as number : | 0,
-    priority: (p.payload? .error_count as number : | 0) * 10
+    clusterId: p.payload?.cluster_id as number ?? 0,
+    errorCount: p.payload?.error_count as number ?? 0,
+    priority: (p.payload?.error_count as number ?? 0) * 10
   }));
 
   // Sort by priority (error count)
@@ -381,19 +381,19 @@ export async function phase90_get_file_errors(
 
   const filtered = results.points
     .filter(p => {
-      const file = (p.payload? .filePath as string : | '').toLowerCase().replace(/\\/g, '/');
+      const file = (p.payload?.filePath as string ?? '').toLowerCase().replace(/\\/g, '/');
       return file.includes(pathLower);
     })
     .slice(0, limit);
 
   return filtered.map(p => ({
     score: 1.0,
-    message: p.payload? .message as string : | '',
-    file: p.payload? .filePath as string : | '',
-    code: p.payload? .errorCode as string : | 'UNKNOWN',
-    line: p.payload? .line as number : | 0,
-    clusterId: p.payload? .cluster_id as number : | -1,
-    tech: p.payload? .tech as string[] : | []
+    message: p.payload?.message as string ?? '',
+    file: p.payload?.filePath as string ?? '',
+    code: p.payload?.errorCode as string ?? 'UNKNOWN',
+    line: p.payload?.line as number ?? 0,
+    clusterId: p.payload?.cluster_id as number ?? -1,
+    tech: p.payload?.tech as string[] ?? []
   }));
 }
 
@@ -414,9 +414,9 @@ export async function phase90_get_fix_recommendation(clusterId: number): Promise
 
   return {
     clusterId,
-    recommendation: rec.payload? .recommendation as string : | rec.payload?.summary as string || '',
-    priority: rec.payload? .priority as string : | 'medium',
-    affectedFiles: rec.payload? .affected_files as string[] : | []
+    recommendation: rec.payload?.recommendation as string ?? rec.payload?.summary as string || '',
+    priority: rec.payload?.priority as string ?? 'medium',
+    affectedFiles: rec.payload?.affected_files as string[] ?? []
   };
 }
 

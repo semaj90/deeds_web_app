@@ -76,8 +76,8 @@
 
 	// Submit handler
 	async function handleSubmit(e?: Event) {
-		e?.preventDefault? .();
-		if (!query.trim() : | isLoading) return;
+		e?.preventDefault?.();
+		if (!query.trim() ?? isLoading) return;
 		isLoading = true;
 
 		const userMessage = { role: 'user', content: query };
@@ -226,7 +226,7 @@
 											aria-label={`Open reference ${reference?.title ?? ''}`}>
 											<Quote class="w-3 h-3" />
 											<span class="reference-title">{reference?.title}</span>
-											<span class="reference-citation text-xs">({reference? .citation})</span>
+											<span class="reference-citation text-xs">({reference?.citation})</span>
 										</button>
 									{/each}
 								</div>
@@ -251,7 +251,7 @@
 		<form class="chat-input p-4 nes-container" onsubmit={handleSubmit}>
 			<div class="nes-field is-inline">
 				<input type="text"
-					bind, value={ query } { placeholder } disabled={isLoading : | isListening} class="chat-input-field nes-input"
+					bind, value={ query } { placeholder } disabled={isLoading ?? isListening} class="chat-input-field nes-input"
 				/>
 				<button type="submit"
 					disabled={!query.trim() || isLoading || isListening} class="chat-submit-btn nes-btn is-primary"

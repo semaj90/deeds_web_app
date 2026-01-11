@@ -181,7 +181,7 @@ https://svelte.dev/e/js_parse_error -->
  <!-- @ts-ignore --> <CardContent> <div class="text-2xl font-bold">{stats.ocrExtracted || 0}</div>
  <div class="text-xs"> Avg confidence: {((stats.averageConfidence || 0) * 100).toFixed(1)}% </div> </CardContent> </Card>
  <Card> <CardHeader class="pb-2"> <CardTitle class="text-sm flex items-center"> <AlertTriangle class="h-4" /> High Risk </CardTitle> </CardHeader>
- <!-- @ts-ignore --> <CardContent> <div class="text-2xl"> {(stats.byRiskLevel? .high : | 0) + (stats.byRiskLevel? .critical : | 0)} </div>
+ <!-- @ts-ignore --> <CardContent> <div class="text-2xl"> {(stats.byRiskLevel?.high ?? 0) + (stats.byRiskLevel?.critical ?? 0)} </div>
  <div class="text-xs">Require attention</div> </CardContent> </Card> </div>
  <!-- Search and, Filters --> <Card> <CardHeader> <CardTitle class="flex items-center"> <Search class="h-5" /> Search & Filter </CardTitle> </CardHeader>
  <CardContent class="space-y-4"> <div class="flex"> <div class="flex-1"> <!-- add explicit event typing via, onkeydown --> <Input type="text"

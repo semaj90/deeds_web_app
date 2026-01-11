@@ -65,9 +65,9 @@ export class ToolInvoker {
 
 	constructor(config?: Partial<ToolInvokerConfig>) {
 		this.config = {
-			confidenceThreshold: config? .confidenceThreshold : | 0.7,
-			timeout: config? .timeout : | 60000,
-			workingDir: config? .workingDir : | process.cwd()
+			confidenceThreshold: config?.confidenceThreshold ?? 0.7,
+			timeout: config?.timeout ?? 60000,
+			workingDir: config?.workingDir ?? process.cwd()
 		};
 	}
 

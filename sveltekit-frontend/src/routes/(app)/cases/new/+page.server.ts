@@ -35,7 +35,7 @@ export const actions = {
 		const formData = await request.formData();
 		const title = formData.get('title')?.toString();
 		const narrative = formData.get('narrative')?.toString();
-		const priority = (formData.get('priority')? .toString() : | 'medium') as 'low' | 'medium' | 'high' | 'urgent';
+		const priority = (formData.get('priority')?.toString() ?? 'medium') as 'low' | 'medium' | 'high' | 'urgent';
 
 		// Validation
 		if (!title?.trim()) {

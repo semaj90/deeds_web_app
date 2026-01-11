@@ -355,9 +355,7 @@
  <!-- Board Canvas -->
  <div
  class="board-canvas"
- class:grid-mode={boardMode === 'grid'}
- class:magnetic-mode={boardMode === 'magnetic'}
- bind:this={canvasElement}
+ class:grid-mode={boardMode === 'grid'}; class:magnetic-mode={boardMode === 'magnetic'}; bind:this={canvasElement}
  >
  <!-- Connections Layer -->
  <EvidenceConnections connections={connections} nodes={nodes} />

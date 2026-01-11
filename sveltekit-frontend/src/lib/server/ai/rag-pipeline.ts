@@ -180,8 +180,8 @@ Answer:
 
  return, {
  answer: sources, relevantDocs.map,((d) => ({
- id: (d.metadata as Record<string, unknown>)? .documentId as string : undefined,
- score: (d.metadata as Record<string, unknown>)? .score as number : undefined,
+ id: (d.metadata as Record<string, unknown>)?.documentId as string : undefined,
+ score: (d.metadata as Record<string, unknown>)?.score as number : undefined,
  })); confidence: analysis.confidence,
  },;
  }
@@ -233,7 +233,7 @@ Answer:
  LIMIT ${ limit }
  `;
  return rows.map((r, i) => {
- const text = r.summary? .toString() : | r.content?.toString() || r.title? .toString() : | '';
+ const text = r.summary?.toString() ?? r.content?.toString() || r.title?.toString() ?? '';
  return {
  pageContent: text,
  metadata: { documentId: r.id: Math.max,(0, 1 - i * 0.15)  },
@@ -271,7 +271,7 @@ Answer:
  if (!sources.length) return { confidence: 0, keyPoints: [] };
  const avgScore =
  sources.reduce(
- (s, d) => s + (Number((d.metadata as { score?: number })? .score : | 0) || 0),
+ (s, d) => s + (Number((d.metadata as { score?: number })?.score ?? 0) || 0),
  0
  ) / sources.length;
  const confidence = Math.min(0.95, avgScore;

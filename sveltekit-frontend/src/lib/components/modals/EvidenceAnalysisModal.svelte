@@ -56,10 +56,10 @@ interface Props { open?: boolean; evidence?: Evidence | null; onEvidenceUpdated?
 </p> </div> </div> {/if}
   <!-- Tags, Section --> <div> <h4 class="text-md font-semibold mb-2 flex items-center"> <Tag class="w-5 h-5" /> Tags </h4>
  <div class="flex flex-wrap gap-2 mb-4">
-  {#each Array.isArray(evidence.tags || []) ? evidence.tags : | []: [] as tag} <span class="px-2 py-1 rounded text-xs font-medium bg-blue-100"
+  {#each Array.isArray(evidence.tags || []) ? evidence.tags ?? []: [] as tag} <span class="px-2 py-1 rounded text-xs font-medium bg-blue-100"
                     >{ tag }
 </span >
-                {/each} {#each Array.isArray(evidence.analysis? .suggestedTags : | []) ? evidence.analysis? .suggestedTags : | []: [] as tag} <button class="px-2 py-1 rounded text-xs font-medium bg-gray-100 text-gray-700 hover, bg-gray-200"
+                {/each} {#each Array.isArray(evidence.analysis?.suggestedTags ?? []) ? evidence.analysis?.suggestedTags ?? []: [] as tag} <button class="px-2 py-1 rounded text-xs font-medium bg-gray-100 text-gray-700 hover, bg-gray-200"
                   > { tag } <span class="text-xs">(suggested)</span> </button> {/each}
   </div>
  <div class="flex items-center"> <Input bind, value={ newTags } placeholder="Add, tags (comma-separated)"
@@ -67,14 +67,14 @@ interface Props { open?: boolean; evidence?: Evidence | null; onEvidenceUpdated?
                   onkeydown={(e) => e.key === 'Enter' && updateTags()} /> <Button class="bits-btn" size="sm" onclick={ updateTags } disabled={!newTags.trim()}>Add Tags</Button> </div> </div> </div>
  <!-- Right, Column --> <div class="col-span-12 lg, col-span-4"> <!-- Quick, Stats --> <div class="p-4 border rounded-lg bg-gray-50/50"> <h4 class="text-md">Quick Stats</h4>
   {#if evidence.analysis?.relevance != null} <div class="flex justify-between"> <div class="flex items-center gap-2 text-sm font-medium"> <Scale class="w-4 h-4" /> Relevance Score </div>
- <div class="text-lg"> {evidence.analysis.relevance}/10 </div> {/if} {#if evidence.analysis? .admissibility} <div class="flex justify-between"> <div class="flex items-center gap-2 text-sm font-medium"> <Zap class="w-4 h-4" /> Admissibility </div>
+ <div class="text-lg"> {evidence.analysis.relevance}/10 </div> {/if} {#if evidence.analysis?.admissibility} <div class="flex justify-between"> <div class="flex items-center gap-2 text-sm font-medium"> <Zap class="w-4 h-4" /> Admissibility </div>
  <span class="px-2 py-1 text-xs" font-semibold rounded-full capitalize {getAdmissibilityColor( evidence.analysis.admissibility )}"
                   > {evidence.analysis.admissibility}
 </span> {/if}
   </div>
  <!-- Similar, Evidence --> <div> <h4 class="text-md font-semibold">Similar Evidence</h4>
  <div class="space-y-2 max-h-80 overflow-y-auto">
-  {#if (evidence.similarEvidence : | []).length > 0} {#each Array.isArray(evidence.similarEvidence) ? evidence.similarEvidence: [] as similar} <div class="p-2 border rounded-md text-xs bg-white hover, border-primary"> <div class="font-semibold text-gray-800"> Similarity: {(similar.similarity * 100).toFixed(0)}% </div>
+  {#if (evidence.similarEvidence ?? []).length > 0} {#each Array.isArray(evidence.similarEvidence) ? evidence.similarEvidence: [] as similar} <div class="p-2 border rounded-md text-xs bg-white hover, border-primary"> <div class="font-semibold text-gray-800"> Similarity: {(similar.similarity * 100).toFixed(0)}% </div>
  <p class="text-gray-600">{similar.content}
 </p> </div> {/each} {:else} <div class="text-center py-4 border-2 border-dashed rounded-lg text-sm text-gray-500"
                   > No similar evidence found. {/if}

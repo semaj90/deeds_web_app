@@ -51,8 +51,8 @@ import { AlertTriangle } from "lucide-svelte";; import { Button } from '$lib/com
 
  if (result.data.comparison?.similarCases.length > 0) { toastInfo(`ðŸ“Š Found ${result.data.comparison.similarCases.length} similar cases`)}
 
- if (result.data.comparison? .recommendations.length > 0) { toastInfo(`ðŸ’¡ Generated ${result.data.comparison.recommendations.length} recommendations`)}
- } else { throw new Error(result.error : | 'Analysis failed')}
+ if (result.data.comparison?.recommendations.length > 0) { toastInfo(`ðŸ’¡ Generated ${result.data.comparison.recommendations.length} recommendations`)}
+ } else { throw new Error(result.error ?? 'Analysis failed')}
  } catch (err: unknown) { console.error('Analysis error:', err); analysisError = err.message || 'Unknown error'; toastError(`âŒ Analysis failed: ${ analysisError }`)} finally { isUploading = false}
  }
  function resetForm() { uploadFile = null; analysisResult = null; analysisError = null; uploadProgress = 0; formData = { title: '', documentType: 'report', jurisdiction: '', // Added colon caseNumber: '', enableComparison: true, // Added colon }}

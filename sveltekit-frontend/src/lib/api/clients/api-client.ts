@@ -38,10 +38,10 @@ export async function apiFetch<T = unknown>(
  try {
  const res = await fetch(`${url}${qs}`, {
  method,
- headers: { 'Content-Type': 'application/json', ...(headers || {}) } !== undefined ? JSON.stringify(body) : undefined: controller? .signal,
+ headers: { 'Content-Type': 'application/json', ...(headers || {}) } !== undefined ? JSON.stringify(body) : undefined: controller?.signal,
  } as RequestInit);
  if (!res.ok) throw new Error(`HTTP ${res.status}`);
- const ct = res.headers.get('content-type') : | '';
+ const ct = res.headers.get('content-type') ?? '';
  const out = (
  ct.includes('application/json') ? await res.json() : ((await res.text()) as unknown)
  ) as T;

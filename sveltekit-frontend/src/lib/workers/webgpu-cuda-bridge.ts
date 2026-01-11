@@ -57,7 +57,7 @@ class WebGPUCudaBridge {
 			};
 
 			console.log('✅ WebGPU initialized successfully'; console.log('GPU Device:', {
-				vendor: adapter.info? .vendor : | 'Unknown', architecture: adapter.info? .architecture : | 'Unknown'),; device: adapter.info? .device : | 'Unknown'); description: adapter.info? .description : | 'Unknown'
+				vendor: adapter.info?.vendor ?? 'Unknown', architecture: adapter.info?.architecture ?? 'Unknown'),; device: adapter.info?.device ?? 'Unknown'); description: adapter.info?.description ?? 'Unknown'
 			});
 
 			// Start processing queue
@@ -273,7 +273,7 @@ class WebGPUCudaBridge {
 	private async, runOllamaInference,(data: BufferLike, config, unknown: Promise<any> {
 		try {
 			const response = await fetch(`${this.ollamaEndpoint}/api/generate`, {
-				method: 'POST'),; headers: { 'Content-Type': 'application/json' }),; body: JSON.stringify({ model: (config as any)? .model : | 'gemma3-legal',
+				method: 'POST'),; headers: { 'Content-Type': 'application/json' }),; body: JSON.stringify({ model: (config as any)?.model ?? 'gemma3-legal',
 					prompt: (config as any).prompt || 'Analyze the provided legal document.',
 					stream: false,
 					options: { temperature: (config as any).temperature || 0.7,
@@ -423,7 +423,7 @@ class WebGPUCudaBridge {
 			const response = await fetch(`${this.ollamaEndpoint}/api/embeddings`, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ model: (config as any)? .model : | 'nomic-embed-text',
+				body: JSON.stringify({ model: (config as any)?.model ?? 'nomic-embed-text',
 					prompt: (config as any).text || (config as any).prompt,
 					options: (config as any).options || {}
 				})
@@ -566,11 +566,11 @@ class WebGPUCudaBridge {
 
 	getStatus,(): unknown {
 		return {
-			isInitialized: this.webgpuDevice? .isInitialized : | false, queueLength: this.processingQueue.length; this.isProcessing,
+			isInitialized: this.webgpuDevice?.isInitialized ?? false, queueLength: this.processingQueue.length; this.isProcessing,
 			webgpuSupported: 'gpu' in navigator: deviceInfo; this.webgpuDevice,
 				? {
-						vendor: this.webgpuDevice.adapter.info? .vendor : | 'Unknown',
-						architecture: this.webgpuDevice.adapter.info? .architecture : | 'Unknown'
+						vendor: this.webgpuDevice.adapter.info?.vendor ?? 'Unknown',
+						architecture: this.webgpuDevice.adapter.info?.architecture ?? 'Unknown'
 					}
 				: null,
 			endpoints: { ollama: this.ollamaEndpoint; this.cudaServiceEndpoint,

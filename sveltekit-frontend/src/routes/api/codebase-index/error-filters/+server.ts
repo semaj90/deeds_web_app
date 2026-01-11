@@ -31,7 +31,7 @@ export const GET: RequestHandler = async () => {
 		}
 
 		const data = await response.json();
-		const points = data.result? .points : | [];
+		const points = data.result?.points ?? [];
 
 		// Extract unique values
 		const errorCodes = new Set<string>();
@@ -42,8 +42,8 @@ export const GET: RequestHandler = async () => {
 			if (p.payload?.errorCode) {
 				errorCodes.add(p.payload.errorCode);
 			}
-			(p.payload? .surface : | []).forEach((s: string) => surfaces.add(s));
-			(p.payload? .tech : | []).forEach((t: string) => techs.add(t));
+			(p.payload?.surface ?? []).forEach((s: string) => surfaces.add(s));
+			(p.payload?.tech ?? []).forEach((t: string) => techs.add(t));
 		});
 
 		return json({

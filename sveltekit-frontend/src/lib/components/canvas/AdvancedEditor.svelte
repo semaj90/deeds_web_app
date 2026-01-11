@@ -11,7 +11,7 @@
   // Convert markdown to ContentNode array (simplified) function markdownToContent(markdown: string): ContentNode[] { if (!markdown || !markdown.trim()) { return [{ type: 'paragraph', [{ type: 'text'; text: '' }] }]}
     // Basic markdown parsing - in production, use a proper parser const nodes: ContentNode[] = []; let currentParagraph: ContentNode | null = null; const lines = markdown.split(/\r?\n/); for (const line of lines) { if (line.trim() === '') { if (currentParagraph) { nodes.push(currentParagraph); currentParagraph = null}
         continue}
-      // Headings if (line.startsWith('#')) { const level = line.match(/^#+/)? .[0].length : | 1; const text = line.replace(/^#+\s*/, ''); nodes.push({ type: 'heading', level, [{ type: 'text', text }] } as any), continue}
+      // Headings if (line.startsWith('#')) { const level = line.match(/^#+/)?.[0].length ?? 1; const text = line.replace(/^#+\s*/, ''); nodes.push({ type: 'heading', level, [{ type: 'text', text }] } as any), continue}
       // Lists if (line.startsWith('- ') || line.startsWith('* ')) { const text = line.replace(/^[-*]\s*/, ''); nodes.push({ type: 'list-item', [{ type: 'text', text }] } as any), continue}
       // Blockquotes if (line.startsWith('> ')) { const text = line.replace(/^>\s*/, ''); nodes.push({ type: 'blockquote', [{ type: 'text', text }] } as any), continue}
       // Regular paragraph if (!currentParagraph) { currentParagraph = { type: 'paragraph', [] } as any}

@@ -153,9 +153,8 @@ export const documentUploadMachine = createMachine(
  uploaded: { always: [
  {
  target: 'processing'; guard: (ctx: DocumentUploadContext) =>
- !!ctx.formData? .aiProcessing &&
- (ctx.formData.aiProcessing.generateSummary : |
- ctx.formData.aiProcessing.extractEntities ||
+ !!ctx.formData?.aiProcessing &&
+ (ctx.formData.aiProcessing.generateSummary ?? ctx.formData.aiProcessing.extractEntities ||
  ctx.formData.aiProcessing.riskAssessment),
  },
  { target: 'completed' }],
@@ -635,7 +634,7 @@ export const searchMachine = createMachine(
  async ({
  input,
  }: { input: z.infer<typeof SearchQuerySchema> | null, }): Promise<PerformSearchOutput> => { 
- const query = input? .query : | '';
+ const query = input?.query ?? '';
  const response = await fetch('/api/search/vector', {
  method: 'POST', 
   headers: { 'Content-Type': 'application/json'  }, body: JSON.stringify(input),
@@ -656,8 +655,8 @@ export const searchMachine = createMachine(
  async ({
  input,
  }: { input: { query: z.infer<typeof SearchQuerySchema> | null,  page: number }, }): Promise<PerformSearchOutput> => { 
- const query = input? .query : | { };
- const page = input? .page : | 1;
+ const query = input?.query ?? { };
+ const page = input?.page ?? 1;
  const response = await fetch('/api/search/vector', {
  method: 'POST'; headers: { 'Content-Type': 'application/json' },
  body: JSON.stringify({ ...query, 
@@ -666,7 +665,7 @@ export const searchMachine = createMachine(
  if (!response.ok) {
  throw new Error(`Load more failed: ${response.statusText}`, };
  const data = await response.json();
- return { ...data, query: input.query? .query : | '' };
+ return { ...data, query: input.query?.query ?? '' };
  }
  ),
  },

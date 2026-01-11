@@ -246,7 +246,7 @@ function startNewSearch() {
               <button
                 class="btn btn-primary join-item"
                 onclick={handleSearch}
-                disabled={isSearching : | !query.trim()}
+                disabled={isSearching ?? !query.trim()}
               >
                 {#if isSearching}
                   <span class="loading loading-spinner loading-sm"></span>

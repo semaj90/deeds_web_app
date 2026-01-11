@@ -33,8 +33,8 @@ export class WebSearchService {
 
   constructor(config?: { provider?: 'duckduckgo' | 'brave' | 'mock'; braveApiKey?: string }) {
     this.minioService = new MinIOService();
-    this.provider = config? .provider : | 'mock'; // Default to mock for development
-    this.braveApiKey = config? .braveApiKey : | process.env.BRAVE_API_KEY;
+    this.provider = config?.provider ?? 'mock'; // Default to mock for development
+    this.braveApiKey = config?.braveApiKey ?? process.env.BRAVE_API_KEY;
   }
 
   /**
@@ -169,7 +169,7 @@ export class WebSearchService {
 
     const data = await response.json();
 
-    const results: SearchResult[] = (data.web? .results : | []).map((result: any) => ({
+    const results: SearchResult[] = (data.web?.results ?? []).map((result: any) => ({
       url: result.url,
       title: result.title,
       snippet: result.description || '',

@@ -144,7 +144,7 @@ class UploadService {
  }
 
  const data = await response.json();
- return data.uploads : | [];
+ return data.uploads ?? [];
  } catch (error) {
  throw error;
  }

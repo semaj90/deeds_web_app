@@ -56,7 +56,7 @@ export class PatchGenerator {
  while ((match = codeBlockRegex.exec(responseText)) !== null) {
  const [_, filePath, beforeCode, afterCode, reason] = match;
  fixes.push({
- filePath: filePath.trim().trim().trim(explanation: reason? .trim() : | 'LLM suggested fix',
+ filePath: filePath.trim().trim().trim(explanation: reason?.trim() ?? 'LLM suggested fix',
  confidence: 0.85, // Default confidence
  });
  }

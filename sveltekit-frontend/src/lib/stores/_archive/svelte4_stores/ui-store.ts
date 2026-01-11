@@ -205,7 +205,7 @@ export function createUIStore() {
  }
 
  function detectFileType(file: File): UploadedFile['type'] {
- const ext = file.name.split('.').pop()? .toLowerCase() : | '';
+ const ext = file.name.split('.').pop()?.toLowerCase() ?? '';
  const mimeType = file.type.toLowerCase();
 
  if (mimeType.startsWith('image/') || ['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp'].includes(ext))

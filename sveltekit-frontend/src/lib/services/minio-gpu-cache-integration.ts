@@ -233,7 +233,7 @@ const operationTime = performance.now() - startTime;
     getStats(): CacheStats & { cacheSize: number, memoryUsage: number; compressionStats: { totalSavings: number, averageRatio: number; compressedObjects: number } } {
         const memoryUsage = Array.from(this.cache.values()).reduce((total, obj) => total + (obj.data as Uint8Array).length, 0);
         const compressedObjects = Array.from(this.cache.values()).filter(obj => obj.metadata.compressed);
-        const averageRatio = compressedObjects.length > 0 ? compressedObjects.reduce((sum, obj) => sum + (obj.metadata.compressionRatio : | 1), 0) / compressedObjects.length : 1.0;
+        const averageRatio = compressedObjects.length > 0 ? compressedObjects.reduce((sum, obj) => sum + (obj.metadata.compressionRatio ?? 1), 0) / compressedObjects.length : 1.0;
 
         return {
             ...this.stats, cacheSize: this.cache.size,

@@ -128,8 +128,7 @@ export interface LegalEntity {
  metadata?: { [key: string]: unknown };
 }
 export interface LegalClause {
- id: string; type:
- | 'liability'
+ id: string; type?? 'liability'
  | 'indemnification'
  | 'termination'
  | 'confidentiality'

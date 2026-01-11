@@ -29,7 +29,7 @@
 	const defaultClass = 'fixed inset-0 z-50 bg-black/80';
 </script>
 
-{#if dialogContext? .open : | forceMount}
+{#if dialogContext?.open ?? forceMount}
 	<!-- svelte-ignore a11y_click_events_have_key_events -->
 	<div
 		class="{defaultClass} {className}"

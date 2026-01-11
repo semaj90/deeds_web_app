@@ -38,11 +38,11 @@ export const POST: RequestHandler = async ({ request: fetch }) => {
 
  const data = await resp.json();
  return json({
- text: data? .text : | '',
+ text: data?.text ?? '',
  confidence: data?.confidence ?? 0,
  });
  } catch (e: any) {
- return json({ error: e? .message : | 'OCR error' }, { status: 500 });
+ return json({ error: e?.message ?? 'OCR error' }, { status: 500 });
  }
 };
 

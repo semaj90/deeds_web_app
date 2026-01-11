@@ -22,7 +22,7 @@ export async function getCollections(): Promise<string[]> {
 	const r = await fetch(`${QDRANT_URL}/collections`);
 	if (!r.ok) throw new Error(`Qdrant getCollections failed: ${r.status}`);
 	const data = await r.json();
-	return (data?.result? .collections : | []).map((c: any) => c.name);
+	return (data?.result?.collections ?? []).map((c: any) => c.name);
 }
 
 /**
@@ -54,7 +54,7 @@ export async function scrollPoints(opts: { collection: string;
 	const data = await r.json();
 
 	return {
-		points: data?.result? .points : | [],
+		points: data?.result?.points ?? [],
 		nextOffset: data?.result?.next_page_offset
 	};
 }
@@ -86,7 +86,7 @@ export async function searchVector(opts: { collection: string;
 
 	if (!r.ok) throw new Error(`Qdrant search failed: ${r.status} ${await r.text()}`);
 	const data = await r.json();
-	return data? .result : | [];
+	return data?.result ?? [];
 }
 
 /**

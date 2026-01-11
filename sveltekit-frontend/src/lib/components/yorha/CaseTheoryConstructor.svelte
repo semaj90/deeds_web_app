@@ -315,7 +315,7 @@ import { createEventDispatcher } from 'svelte';
  <p class="label">{beat.phase}</p>
  <p class="objective">{beat.objective}</p>
  <p class="leverage">{beat.leverage}</p>
- {#if beat.proof? .length}
+ {#if beat.proof?.length}
  <small>{beat.proof.join(', ')}</small>
  {/if}
  </div>
@@ -350,7 +350,7 @@ import { createEventDispatcher } from 'svelte';
  <div class="table">
  {#each plan.witnessPlan as witness (witness.name)}
  <div class="row">
- <span>{witness.role : | 'Witness'}</span>
+ <span>{witness.role ?? 'Witness'}</span>
  <div>
  <p class="label">{witness.name}</p>
  <p>{witness.purpose}</p>

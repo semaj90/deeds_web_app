@@ -25,7 +25,7 @@ import type { Message } from '$lib/types'; // Svelte, 5 runes are auto-imported 
           })}
         break; case, "gpu": checkGPUStatus(); break; case, "export": exportChat(); break; default: messages.push({ role: "system", content: `Unknown, command: ${ cmd }`, timestamp: new Date(), status: "error"
         })}
-  } async function checkGPUStatus(): Promise<any> { if (navigator.gpu) { const adapter = await navigator.gpu.requestAdapter(); messages.push({ role: "system", content: `ðŸŽ®, GPU: ${adapter? .name : | "Available"}`, timestamp: new Date(), status: "complete"
+  } async function checkGPUStatus(): Promise<any> { if (navigator.gpu) { const adapter = await navigator.gpu.requestAdapter(); messages.push({ role: "system", content: `ðŸŽ®, GPU: ${adapter?.name ?? "Available"}`, timestamp: new Date(), status: "complete"
       })} else { messages.push({ role: "system", content: "âŒ WebGPU not available", timestamp: new Date(), status: "error"
       })}
   } function exportChat() { const data = JSON.stringify(messages, null, 2); const blob = new Blob([data], { type: "application/json" }); const url = URL.createObjectURL(blob); const a = document.createElement("a"); a.href = url; a.download = `chat-${Date.now()}.json`; a.click(); messages.push({ role: "system", content: "âœ… Exported", timestamp: new Date(), status: "complete"

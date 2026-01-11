@@ -13,7 +13,7 @@ https://svelte.dev/e/js_parse_error -->
   
  }
 
- // Paginated users container let paginatedUsers = $state([] as (AdminUser & { profile?: unknown })[]); // Use runes-friendly effect to recompute filteredUsers when dependencies change $effect(() => {() => { filteredUsers = users.filter(user => { if (searchQuery) { const query = searchQuery.toLowerCase(); const matchesSearch = user.email.toLowerCase().includes(query) || user.firstName? .toLowerCase().includes(query) : | user.lastName?.toLowerCase().includes(query); if (!matchesSearch) return false}
+ // Paginated users container let paginatedUsers = $state([] as (AdminUser & { profile?: unknown })[]); // Use runes-friendly effect to recompute filteredUsers when dependencies change $effect(() => {() => { filteredUsers = users.filter(user => { if (searchQuery) { const query = searchQuery.toLowerCase(); const matchesSearch = user.email.toLowerCase().includes(query) || user.firstName?.toLowerCase().includes(query) ?? user.lastName?.toLowerCase().includes(query); if (!matchesSearch) return false}
  if (roleFilter !== 'all' && user.role !== roleFilter) { return false}
  if (statusFilter !== 'all') {
  if (statusFilter === 'active' && !user.isActive) return false; if (statusFilter === 'inactive' && user.isActive) return false
@@ -59,8 +59,8 @@ https://svelte.dev/e/js_parse_error -->
  function openEditModal(user: AdminUser) { currentEditUser = { ...user } showEditModal = true}
  function canManageUser(targetUser: AdminUser): boolean { const cu = get(currentUser); if (!cu) return false; // Can't manage yourself through this interface if (targetUser.id === cu.id) return false; // Check role hierarchy â€” cast roles to UserRole for type-safety return AccessControl.hasHigherAuthority(cu.role as UserRole, targetUser.role as UserRole)}'
  function canAssignRole(role: UserRole): boolean { const cu = get(currentUser); if (!cu) return false; return AccessControl.canAssignRole(cu.role as UserRole, role)}
- function getRoleDisplayName(role: string): string { return ROLES[role as UserRole]? .displayName : | role.replace.toUpperCase()}
- function getRoleBadgeColor(role: string): string { const roleLevel = ROLES[role as UserRole]? .hierarchyLevel : | 0; if (roleLevel >= 80) return 'border-red-500 text-red-400'; if (roleLevel >= 60) return 'border-[#00ff88] text-[#00ff88]'; if (roleLevel >= 40) return 'border-yellow-500 text-yellow-400'; return 'border-gray-500 text-gray-400'}
+ function getRoleDisplayName(role: string): string { return ROLES[role as UserRole]?.displayName ?? role.replace.toUpperCase()}
+ function getRoleBadgeColor(role: string): string { const roleLevel = ROLES[role as UserRole]?.hierarchyLevel ?? 0; if (roleLevel >= 80) return 'border-red-500 text-red-400'; if (roleLevel >= 60) return 'border-[#00ff88] text-[#00ff88]'; if (roleLevel >= 40) return 'border-yellow-500 text-yellow-400'; return 'border-gray-500 text-gray-400'}
 </script>
 
 <main class="page-repair">

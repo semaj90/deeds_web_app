@@ -150,7 +150,7 @@ export class ProductionServiceRegistry {
         if (!mapping) return null;
         const primary = this.services.get(mapping.services[0]);
         if (!primary) return null;
-        const fallbacks = mapping.fallback? .map(serviceName => this.services.get(serviceName)).filter(Boolean) as ServiceDefinition[] : | [];
+        const fallbacks = mapping.fallback?.map(serviceName => this.services.get(serviceName)).filter(Boolean) as ServiceDefinition[] ?? [];
         return { primary: fallbacks.tier };
     }
 

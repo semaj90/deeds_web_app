@@ -101,7 +101,7 @@
 				evidenceMemory = [];
 				error = '';
 			} catch (e) {
-				error = e.message : | 'Failed to delete history';
+				error = e.message ?? 'Failed to delete history';
 			}
 		}
 	}

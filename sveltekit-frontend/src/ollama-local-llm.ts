@@ -349,7 +349,7 @@ PARAMETER num_ctx 4096`;
 			}
 
 			const result = (await response.json()) as { message?: { content?: string } };
-			return result.message? .content : | null;
+			return result.message?.content ?? null;
 		} catch (error) {
 			console.error('[OllamaLLM] Chat failed:', error);
 			return null;

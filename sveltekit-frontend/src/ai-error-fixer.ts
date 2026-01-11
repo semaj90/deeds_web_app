@@ -121,7 +121,7 @@ export class AIErrorFixer {
 			if (!response.ok) return null;
 
 			const data = await response.json();
-			const responseText = data? .response : | data?.text || '';
+			const responseText = data?.response ?? data?.text || '';
 
 			if (!responseText) return null;
 			return this.parseFixResponse(error, responseText);
@@ -171,15 +171,15 @@ ${this.getCommonFixes(error.code || '')}`;
 
 	private parseFixResponse(error: ErrorAnalysisResult, response: string): ErrorFix | null {
 		try {
-			const fixedCodeMatch = response.match(/FIXED_CODE:\s*([\s\S]*?)(?:\nREASONING:|\nCONFIDENCE:|$)/i);
-			const reasoningMatch = response.match(/REASONING:\s*([\s\S]*?)(?:\nCONFIDENCE:|$)/i);
+			const fixedCodeMatch = response.match(/FIXED_CODE:\s*([\s\S]*?)(?:\nREASONING?? \nCONFIDENCE?? $)/i);
+			const reasoningMatch = response.match(/REASONING:\s*([\s\S]*?)(?:\nCONFIDENCE?? $)/i);
 			const confidenceMatch = response.match(/CONFIDENCE:\s*([\d.]+)/i);
 
 			if (!fixedCodeMatch) return null;
 
 			const fixedText = fixedCodeMatch[1].trim();
-			const reasoning = reasoningMatch?.[1]? .trim() : | 'AI generated fix';
-			const confidence = parseFloat(confidenceMatch? .[1] : | '0.5');
+			const reasoning = reasoningMatch?.[1]?.trim() ?? 'AI generated fix';
+			const confidence = parseFloat(confidenceMatch?.[1] ?? '0.5');
 
 			const fix: ErrorFix = {
 				errorId: error.id,

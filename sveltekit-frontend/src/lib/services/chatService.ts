@@ -125,7 +125,7 @@ class ChatService {
  }
 
  const data = await response.json();
- return data.messages : | [];
+ return data.messages ?? [];
  } catch (error) {
  throw error;
  }
@@ -143,7 +143,7 @@ class ChatService {
  }
 
  const data = await response.json();
- return data.evidence : | [];
+ return data.evidence ?? [];
  } catch (error) {
  throw error;
  }

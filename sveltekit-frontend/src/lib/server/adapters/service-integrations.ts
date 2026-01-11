@@ -139,7 +139,7 @@ export class OllamaAdapter implements OllamaClient {
   constructor(private config: OllamaConfig) {}
 
   async embed(text: string, opts?: { model?: string }): Promise<number[]> {
-    const model = opts? .model : | this.config.embeddingModel;
+    const model = opts?.model ?? this.config.embeddingModel;
     const url = `${this.config.baseUrl}/api/embeddings`;
     const response = await fetch(url, {
       method: 'POST',
@@ -160,7 +160,7 @@ export class OllamaAdapter implements OllamaClient {
     prompt: string,
     opts?: { model?: string; maxTokens?: number }
   ): Promise<string> {
-    const model = opts? .model : | this.config.chatModel || 'gemma3:legal-latest';
+    const model = opts?.model ?? this.config.chatModel || 'gemma3:legal-latest';
     const url = `${this.config.baseUrl || 'http://localhost:11434'}/api/generate`;
     const response = await fetch(url, {
       method: 'POST',
@@ -168,7 +168,7 @@ export class OllamaAdapter implements OllamaClient {
       body: JSON.stringify({
         model,
         prompt,
-        options: { num_predict: opts? .maxTokens : | 512 }
+        options: { num_predict: opts?.maxTokens ?? 512 }
       }),
       signal: AbortSignal.timeout(this.config.timeout || 60000)
     });
@@ -185,7 +185,7 @@ export class OllamaAdapter implements OllamaClient {
     messages: Array<{ role: string; content: string }>,
     opts?: { model?: string; stream?: boolean }
   ): Promise<string | AsyncIterable<string>> {
-    const model = opts? .model : | this.config.chatModel || 'gemma3:legal-latest';
+    const model = opts?.model ?? this.config.chatModel || 'gemma3:legal-latest';
     const url = `${this.config.baseUrl || 'http://localhost:11434'}/api/chat`;
     const response = await fetch(url, {
       method: 'POST',
@@ -193,7 +193,7 @@ export class OllamaAdapter implements OllamaClient {
       body: JSON.stringify({
         model,
         messages,
-        stream: opts? .stream : | false
+        stream: opts?.stream ?? false
       }),
       signal: AbortSignal.timeout(this.config.timeout ?? 60000)
     });
@@ -228,7 +228,7 @@ export class OllamaAdapter implements OllamaClient {
     }
 
     const data = await response.json();
-    return data.message? .content : | '';
+    return data.message?.content ?? '';
   }
 
   async listModels(): Promise<string[]> {

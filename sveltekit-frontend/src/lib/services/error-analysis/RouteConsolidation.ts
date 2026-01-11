@@ -46,9 +46,9 @@ export class RouteConsolidation {
 
 	constructor(config?: Partial<RouteConsolidationConfig>) {
 		this.config = {
-			routesDir: config? .routesDir : | './src/routes',
-			ignorePatterns: config? .ignorePatterns : | ['__parked', 'node_modules', '.svelte-kit'],
-			similarityThreshold: config? .similarityThreshold : | 0.8
+			routesDir: config?.routesDir ?? './src/routes',
+			ignorePatterns: config?.ignorePatterns ?? ['__parked', 'node_modules', '.svelte-kit'],
+			similarityThreshold: config?.similarityThreshold ?? 0.8
 		};
 	}
 

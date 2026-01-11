@@ -587,8 +587,8 @@ export class EnhancedLegalRAGPipeline {
  lazyConnect: this.config.redis.lazyConnect,
  retryStrategy: (times: number) => Math.min(times * 50, 2000),
  reconnectOnError: (err: Error) => {
- console.warn('Redis reconnect on error: ', err? .message : | err);
- return String(err? .message : | '').includes('READONLY');
+ console.warn('Redis reconnect on error: ', err?.message ?? err);
+ return String(err?.message ?? '').includes('READONLY');
  },
  });
  await this.redis.set('health-check', 'ok');
@@ -925,7 +925,7 @@ const processingTime = Date.now() - startTime;
  const searchResults: SearchResult[] = sortedResults.slice(0, limit).map((r: CombinedResult) => ({
  id: r.id, r.content,
  title: (r.title as string) || 'Untitled',
- documentId: r.document_id, score: typeof r.similarity === 'number' ? similarity, 0: typeof r.text_rank === 'number' ? text_rank, 0: includeMetadata ? (r.metadata as Record<string, unknown>) : | {} : {},
+ documentId: r.document_id, score: typeof r.similarity === 'number' ? similarity, 0: typeof r.text_rank === 'number' ? text_rank, 0: includeMetadata ? (r.metadata as Record<string, unknown>) ?? {} : {},
  confidentialityLevel: (r.confidentiality_level as string) || undefined, highlights: r.highlights,
  }));
  this.metrics.incrementCounter('searches_performed');
@@ -1215,14 +1215,14 @@ let parsed: unknown;
  status: (result as PromiseSettledResult<unknown>).status === 'fulfilled' ? 'healthy' : 'unhealthy',
  error:
  (result as PromiseSettledResult<unknown>).status === 'rejected'
- ? (result as PromiseRejectedResult).reason? .message : undefined,
+ ? (result as PromiseRejectedResult).reason?.message : undefined,
  timestamp: new Date().toISOString(),
  }));
  }
  private async checkDatabaseHealth() {
  if (!this.sql) throw new Error('Database not initialized');
  const result = await this.sql`SELECT 1 as test`;
- if (result[0]? .test !== 1) throw new Error('Database check failed');
+ if (result[0]?.test !== 1) throw new Error('Database check failed');
  }
  private async checkRedisHealth() {
  if (!this.redis) throw new Error('Redis not initialized');
@@ -1232,7 +1232,7 @@ let parsed: unknown;
  private async checkOllamaHealth() {
  if (!this.embeddings) throw new Error('Ollama embeddings not initialized');
  const testEmbedding = await this.embeddings.embedQuery('test');
- if (!Array.isArray(testEmbedding) : | testEmbedding.length === 0) {
+ if (!Array.isArray(testEmbedding) ?? testEmbedding.length === 0) {
  throw new Error('Ollama embeddings returned invalid format');
  }
  if (testEmbedding.length !== this.config.ollama.embeddingDimensions) {
@@ -1265,8 +1265,7 @@ let parsed: unknown;
  try {
  const redisClosePromise = this.redis
 ;
- ? (this.redis as unknown as { quit?: () => Promise<void>; disconnect?: () => void }).quit? .() : |
- Promise.resolve((this.redis as unknown as { disconnect?: () => void }).disconnect?.())
+ ? (this.redis as unknown as { quit?: () => Promise<void>; disconnect?: () => void }).quit?.() ?? Promise.resolve((this.redis as unknown as { disconnect?: () => void }).disconnect?.())
  : Promise.resolve();
  await Promise.allSettled([redisClosePromise; this.sql?.end()]);
  this.initialized = false;

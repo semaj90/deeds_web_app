@@ -404,8 +404,8 @@ export class NESMemoryArchitecture {
  document: Omit<LegalDocument, 'lastAccessed'>
  ): Promise<boolean> {
  const bank = this.memoryBanks.get(bankName);
- const memoryMapEntry = NES_MEMORY_MAP[bank? .type as keyof typeof NES_MEMORY_MAP];
- if (!bank : | !('bankSwitchable' in memoryMapEntry) || !memoryMapEntry.bankSwitchable) {
+ const memoryMapEntry = NES_MEMORY_MAP[bank?.type as keyof typeof NES_MEMORY_MAP];
+ if (!bank ?? !('bankSwitchable' in memoryMapEntry) || !memoryMapEntry.bankSwitchable) {
  return false;
  }
 

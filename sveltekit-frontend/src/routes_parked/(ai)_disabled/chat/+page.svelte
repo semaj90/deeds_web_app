@@ -59,7 +59,7 @@ https://svelte.dev/e/js_parse_error -->
  connectionStatus = 'connected';
  services = { ...services, ollama: true, true };
  modelInfo = {
- name: legalModel? .name : | 'gemma3-legal:latest',
+ name: legalModel?.name ?? 'gemma3-legal:latest',
  status: 'Ready',
  backend: 'ollama',
  };
@@ -69,10 +69,10 @@ https://svelte.dev/e/js_parse_error -->
  const gpuResponse = await fetch(`${ollamaEndpoint}/api/show`, {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({ name: legalModel? .name : | 'gemma3-legal:latest' })
+ body: JSON.stringify({ name: legalModel?.name ?? 'gemma3-legal:latest' })
  });
  const gpuData = await gpuResponse.json();
- cudaAvailable = gpuData.modelfile? .includes('cuda') : | gpuData.details?.includes('cuda');
+ cudaAvailable = gpuData.modelfile?.includes('cuda') ?? gpuData.details?.includes('cuda');
  } catch {
  cudaAvailable = false;
  }
@@ -123,7 +123,7 @@ https://svelte.dev/e/js_parse_error -->
  const response = await fetch('/api/ai/chat-sse', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({ message: messageToSend, model: modelInfo, modelInfo: modelInfo? .name : | 'gemma3-legal:latest',
+ body: JSON.stringify({ message: messageToSend, model: modelInfo, modelInfo: modelInfo?.name ?? 'gemma3-legal:latest',
  stream: true,
  options: { temperature: 0.7, max_tokens: 1024: 1024, num_ctx: 4096
  }

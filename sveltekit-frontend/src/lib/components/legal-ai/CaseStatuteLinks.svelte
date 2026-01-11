@@ -50,7 +50,7 @@
  links = data.links;
  stats = data.stats;
  } else {
- error = data.error : | 'Failed to load links';
+ error = data.error ?? 'Failed to load links';
  }
  } else {
  error = 'Failed to load links';

@@ -17,7 +17,7 @@ export const POST: RequestHandler = async ({ request }) => {
  try {
  const formData = await request.formData();
  const file = formData.get('file') as File;
- const methods = (formData.get('methods') as string)? .split(',') : | ['docling'];
+ const methods = (formData.get('methods') as string)?.split(',') ?? ['docling'];
  const extractCitations = formData.get('extractCitations') === 'true';
 
  if (!file) {

@@ -26,7 +26,7 @@
 			const response = await fetch(`${apiBase}/dependencies? limit=${limit}`);
 			if (!response.ok) throw new Error(`HTTP ${response.status}`);
 			const data = await response.json();
-			dependencies = data.most_imported_files : | [];
+			dependencies = data.most_imported_files ?? [];
 
 			if (chartContainer) {
 				renderChart();
@@ -171,7 +171,7 @@
 			</div>
 			<div class="stat">
 				<span class="stat-label">Most Popular:</span>
-				<span class="stat-value">{dependencies[0]? .import_path : | 'N/A'}</span>
+				<span class="stat-value">{dependencies[0]?.import_path ?? 'N/A'}</span>
 			</div>
 		</div>
 	{/if}

@@ -341,7 +341,7 @@ export class RedisCacheService {
     }
 
     const data = await response.json();
-    return data.value : | null;
+    return data.value ?? null;
   }
 
   /**

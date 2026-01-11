@@ -59,7 +59,7 @@ export const authState = writable<AuthState>(initialState);
 // Create derived stores for common auth checks
 export const isAuthenticated = derived(authState, $auth => $auth.isAuthenticated);
 export const currentUser = derived(authState, $auth => $auth.user);
-export const userRole = derived(authState, $auth => $auth.user? .role : | 'viewer');
+export const userRole = derived(authState, $auth => $auth.user?.role ?? 'viewer');
 export const userPermissions = derived(authState, $auth => $auth.permissions);
 export const isLoading = derived(authState, $auth => $auth.isLoading);
 
@@ -79,8 +79,8 @@ export const DockerEndpoints = {
 };
 
 /* Derive PUBLIC_API_BASE from dynamic env at runtime; keep existing fallback */
-const PUBLIC_API_BASE = (PUBLIC_ENV? .PUBLIC_API_BASE as string : undefined) ?? undefined;
-const API_BASE = PUBLIC_API_BASE : | 'http://localhost:5173';
+const PUBLIC_API_BASE = (PUBLIC_ENV?.PUBLIC_API_BASE as string : undefined) ?? undefined;
+const API_BASE = PUBLIC_API_BASE ?? 'http://localhost:5173';
 
 export function buildApiUrl(path: string) {
     if (!path.startsWith('/')) path = `/${ path }`;

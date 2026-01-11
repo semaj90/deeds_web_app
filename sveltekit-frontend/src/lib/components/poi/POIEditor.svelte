@@ -54,7 +54,7 @@
 
  function handlePhotoDelete(event: CustomEvent) {
  const index = event.detail;
- formData.photos = formData.photos? .filter((_, i) => i !== index) : | [];
+ formData.photos = formData.photos?.filter((_, i) => i !== index) ?? [];
  }
 
  function getThreatColor(level: string) {

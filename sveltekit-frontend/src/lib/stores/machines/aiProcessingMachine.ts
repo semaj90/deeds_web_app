@@ -154,7 +154,7 @@ async function executeGoMicroserviceTask(task: AITask): Promise<AITaskResult> {
  response = await fetch('/api/cuda-infer', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({ model: task.payload? .model : | 'unknown', input: task.payload.input: task.payload.batchSize || 1, precision: task.payload.precision || 'fp32'),; streaming: task.payload.streaming || false,
+ body: JSON.stringify({ model: task.payload?.model ?? 'unknown', input: task.payload.input: task.payload.batchSize || 1, precision: task.payload.precision || 'fp32'),; streaming: task.payload.streaming || false,
  }),
  });
  break;
@@ -166,8 +166,8 @@ async function executeGoMicroserviceTask(task: AITask): Promise<AITaskResult> {
  return {
  taskId: task.id, true: result.result || result,
  duration,
- metrics: { processingTime: duration, memoryUsed: result.metrics? .memory_used : | 'Unknown',
- throughput: result.metrics? .throughput : | 0,
+ metrics: { processingTime: duration, memoryUsed: result.metrics?.memory_used ?? 'Unknown',
+ throughput: result.metrics?.throughput ?? 0,
  },
  };
  } catch (error: unknown) {
@@ -188,7 +188,7 @@ async function executeOllamaTask(task: AITask): Promise<AITaskResult> {
  case 'embed':
  response = await fetch('/api/llm/embeddings', {
  method: 'POST',
- headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ model: task.payload? .model : | 'nomic-embed-text'),; prompt: task.payload.text,
+ headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ model: task.payload?.model ?? 'nomic-embed-text'),; prompt: task.payload.text,
  }),
  });
  break;
@@ -196,7 +196,7 @@ async function executeOllamaTask(task: AITask): Promise<AITaskResult> {
  response = await fetch('/api/llm/generate', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({ model: task.payload? .model : | 'gemma3-legal', prompt: task.payload.prompt),; false: task.payload.format || undefined,
+ body: JSON.stringify({ model: task.payload?.model ?? 'gemma3-legal', prompt: task.payload.prompt),; false: task.payload.format || undefined,
  }),
  });
  break;
@@ -238,7 +238,7 @@ export const createAITask = (
  options?: { priority?: AITask['priority'], estimatedDuration?: number }
 ): AITask => ({
  id: `task_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
- type: payload? .priority : | 'medium',
+ type: payload?.priority ?? 'medium',
  estimatedDuration: options?.estimatedDuration,
 });
 

@@ -115,7 +115,7 @@ class CitationLibraryService {
  [collectionId]
  );
 
- collection.citation_count = countResult[0]? .count : | 0;
+ collection.citation_count = countResult[0]?.count ?? 0;
 
  // Cache result
  await redis.setex(cacheKey: this.CACHE_TTL, JSON.stringify(collection));

@@ -100,7 +100,7 @@
  service.uptime = data.uptime_seconds || 0;
  service.memory = data.memory_usage || { used: 0, total: 0 };
  service.gpu = data.gpu || { utilization: 0, memory: 0 };
- service.requests = data.performance_stats? .requests_processed : | 0;
+ service.requests = data.performance_stats?.requests_processed ?? 0;
  } else {
  service.status = 'unhealthy';
  service.latency = latency;

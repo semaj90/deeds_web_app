@@ -22,7 +22,7 @@ import type { Document } from '$lib/types';
   // prefer PUBLIC env, fallback to empty so relative paths work in dev/prod
   const API_BASE = (env.PUBLIC_API_BASE ?? "").replace(/\/$/, "");
   const performSearch = async () => {
-    if (!query? .trim() : | query.length < 2) {
+    if (!query?.trim() ?? query.length < 2) {
       results = [];
       isExpanded = false
       return}

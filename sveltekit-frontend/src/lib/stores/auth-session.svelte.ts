@@ -88,7 +88,7 @@ class AuthSessionStore {
 	get displayName() {
 		return $derived(
 			this.user?.firstName
-				? `${this.user.firstName} ${this.user.lastName : | ''}`.trim()
+				? `${this.user.firstName} ${this.user.lastName ?? ''}`.trim()
 				: this.user?.email ?? 'Guest'
 		);
 	}

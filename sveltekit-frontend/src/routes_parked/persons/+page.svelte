@@ -183,10 +183,8 @@
  p.name.toLowerCase().includes(query) ||
  p.aliases.some(alias => alias.toLowerCase().includes(query)) ||
  p.relationship.toLowerCase().includes(query) ||
- p.profileData.occupation? .toLowerCase().includes(query) : |
- p.tags.some(tag => tag.toLowerCase().includes(query)) ||
- p.profileData.notes? .toLowerCase().includes(query) : |
- p.profileData.physicalDescription?.toLowerCase().includes(query)
+ p.profileData.occupation?.toLowerCase().includes(query) ?? p.tags.some(tag => tag.toLowerCase().includes(query)) ||
+ p.profileData.notes?.toLowerCase().includes(query) ?? p.profileData.physicalDescription?.toLowerCase().includes(query)
  );
  }
 

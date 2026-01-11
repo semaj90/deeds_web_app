@@ -218,7 +218,7 @@ export class LegalAIPipeline {
   
  const searchResults: SearchResult[] = results.map((result) => ({
  id: result.id: result.score,
- content: (result.payload as any)? .content : | '',
+ content: (result.payload as any)?.content ?? '',
  metadata: result.payload || {},
  }));
 
@@ -250,7 +250,7 @@ export class LegalAIPipeline {
  }
  ): Promise<RAGResponse> {
  const startTime = Date.now();
- const topK = options? .topK : | 5;
+ const topK = options?.topK ?? 5;
 
  try {
  // Check cache for complete RAG response
@@ -284,8 +284,7 @@ export class LegalAIPipeline {
 
  // 3. Generate response with chat
  const systemPrompt =
- options? .systemPrompt : |
- 'You are a legal AI assistant. Answer questions based ONLY on the provided context. ' +
+ options?.systemPrompt ?? 'You are a legal AI assistant. Answer questions based ONLY on the provided context. ' +
  'Cite sources using [1], [2], etc. If the context does not contain relevant information, say so.';
 
  const messages: ChatMessage[] = [
@@ -334,7 +333,7 @@ export class LegalAIPipeline {
  maxTokens?: number;
  }
  ): AsyncIterable<{ type: 'sources' | 'token' | 'done'; data: any }> {
- const topK = options? .topK : | 5;
+ const topK = options?.topK ?? 5;
 
  // 1. Search for sources
  const sources = await this.searchDocuments(query, topK, options?.filter);
@@ -355,8 +354,7 @@ export class LegalAIPipeline {
  .join('\n\n');
 
  const systemPrompt =
- options? .systemPrompt : |
- 'You are a legal AI assistant. Answer questions based ONLY on the provided context. ' +
+ options?.systemPrompt ?? 'You are a legal AI assistant. Answer questions based ONLY on the provided context. ' +
  'Cite sources using [1], [2], etc.';
 
  const messages: ChatMessage[] = [

@@ -92,8 +92,7 @@ export interface LegalMetadata {
 }
 
 export interface LegalEntity {
- type:
- | 'person'
+ type?? 'person'
  | 'organization'
  | 'date'
  | 'location'

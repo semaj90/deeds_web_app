@@ -49,7 +49,7 @@ https://svelte.dev/e/attribute_invalid_event_handler -->
  if (data.success) {
  cases = data.cases;
  } else {
- error = data.error : | 'Failed to load cases';
+ error = data.error ?? 'Failed to load cases';
  }
  } else {
  error = 'Failed to load cases';

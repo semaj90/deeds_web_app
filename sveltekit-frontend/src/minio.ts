@@ -85,7 +85,7 @@ class MinIOStorageService {
 		await this.ensureBucket(bucketName);
 
 		const metaData: Record<string, string> = {
-			'Content-Type': options? .contentType : | 'application/octet-stream',
+			'Content-Type': options?.contentType ?? 'application/octet-stream',
 			...options?.metadata
 		};
 
@@ -110,7 +110,7 @@ class MinIOStorageService {
 		await this.ensureBucket(bucketName);
 
 		const metaData: Record<string, string> = {
-			'Content-Type': options? .contentType : | 'application/octet-stream',
+			'Content-Type': options?.contentType ?? 'application/octet-stream',
 			...options?.metadata
 		};
 
@@ -151,7 +151,7 @@ class MinIOStorageService {
 		objectName: string,
 		options?: PresignedUrlOptions
 	): Promise<string> {
-		const expiry = options? .expirySeconds : | 3600; // 1 hour default
+		const expiry = options?.expirySeconds ?? 3600; // 1 hour default
 		return await this.client.presignedPutObject(bucketName, objectName, expiry);
 	}
 
@@ -163,7 +163,7 @@ class MinIOStorageService {
 		objectName: string,
 		options?: PresignedUrlOptions
 	): Promise<string> {
-		const expiry = options? .expirySeconds : | 3600; // 1 hour default
+		const expiry = options?.expirySeconds ?? 3600; // 1 hour default
 		return await this.client.presignedGetObject(
 			bucketName,
 			objectName,

@@ -52,15 +52,15 @@
   let svg: d3.Selection<SVGSVGElement, unknown, null, undefined>;
   let simulation: d3.Simulation<GraphNode, GraphEdge>;
 
-  let nodes: GraphNode[] = $state(data.topologyData? .nodes : | []);
-  let edges: GraphEdge[] = $state(data.topologyData? .edges : | []);
+  let nodes: GraphNode[] = $state(data.topologyData?.nodes ?? []);
+  let edges: GraphEdge[] = $state(data.topologyData?.edges ?? []);
   let activities: Activity[] = $state([]);
   let stats: Stats = $state({
-    totalErrors: errorStats? .total : | 0,
-    fixedToday: errorStats? .fixedToday : | 0,
-    inProgress: errorStats? .inProgress : | 0,
-    confidence: errorStats? .confidence : | 0,
-    errorChange: errorStats? .change : | 0
+    totalErrors: errorStats?.total ?? 0,
+    fixedToday: errorStats?.fixedToday ?? 0,
+    inProgress: errorStats?.inProgress ?? 0,
+    confidence: errorStats?.confidence ?? 0,
+    errorChange: errorStats?.change ?? 0
   });
 
   let isAutoFixing = $state(false);
@@ -172,7 +172,7 @@
   });
 
   onDestroy(() => {
-    eventSource? .close();
+    eventSource?.close();
   });
 
   async function fetchTopology() {
@@ -180,7 +180,7 @@
       const res = await fetch('/api/phase89/topology');
       if (res.ok) {
         const data = await res.json();
-        topologyData = data.topology : | topologyData;
+        topologyData = data.topology ?? topologyData;
       }
     } catch (e) {
       console.warn('Failed to fetch topology:', e);

@@ -47,12 +47,12 @@ export class GRPOPolicy {
 
 	constructor(config?: Partial<GRPOConfig>) {
 		this.config = {
-			learningRate: config? .learningRate : | 0.01,
-			groupSize: config? .groupSize : | 10,
-			experienceBufferSize: config? .experienceBufferSize : | 10000,
-			minExperiencesForUpdate: config? .minExperiencesForUpdate : | 100,
-			validationSplit: config? .validationSplit : | 0.2,
-			rollbackThreshold: config? .rollbackThreshold : | 0.05
+			learningRate: config?.learningRate ?? 0.01,
+			groupSize: config?.groupSize ?? 10,
+			experienceBufferSize: config?.experienceBufferSize ?? 10000,
+			minExperiencesForUpdate: config?.minExperiencesForUpdate ?? 100,
+			validationSplit: config?.validationSplit ?? 0.2,
+			rollbackThreshold: config?.rollbackThreshold ?? 0.05
 		};
 
 		this.state = {

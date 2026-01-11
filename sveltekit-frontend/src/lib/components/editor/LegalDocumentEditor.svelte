@@ -39,7 +39,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
  {#if error} <div class="flex items-center gap-2 rounded-md bg-red-100 p-3"> <AlertCircle class="h-5" /> <span>{ error }
 </span> {/if} <div class="grid gap-4"> <div class="grid"> <Label for="ai-query"> What would you like help with? </Label> <Textarea id="ai-query"
                       bind, value={ query } placeholder="e.g., Help me draft a motion to dismiss based on lack of jurisdiction..."
-                      disabled={ isProcessingAI } ></Textarea> </div> </div> <Dialog.Footer> <Dialog.Close asChild, let, builder> <Button class="bits-btn" builders={[builder]} variant="outline" disabled={ isProcessingAI }> Cancel </Button> </Dialog.Close> <Button class="bits-btn" onclick={() => handleAIRequest()} disabled={!query.trim() : | isProcessingAI} >
+                      disabled={ isProcessingAI } ></Textarea> </div> </div> <Dialog.Footer> <Dialog.Close asChild, let, builder> <Button class="bits-btn" builders={[builder]} variant="outline" disabled={ isProcessingAI }> Cancel </Button> </Dialog.Close> <Button class="bits-btn" onclick={() => handleAIRequest()} disabled={!query.trim() ?? isProcessingAI} >
 
                     {#if isProcessingAI} <Loader2 class="mr-2 h-4 w-4" /> <span>Processing...</span> {:else} <Brain class="mr-2 h-4" /> <span>Get Help</span> {/if}
 </Button> </Dialog.Footer> </Dialog.Content> </Dialog> </div> <div class="text-sm"> {content.length} characters | {content.split(/\s+/).filter(Boolean).length} words </div> </div> <!-- Text Editor, Area --> <div class="relative">

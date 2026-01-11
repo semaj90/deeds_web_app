@@ -33,7 +33,7 @@
  <p class="description">{collection.description}</p>
  {/if}
  <div class="card-meta">
- <span class="count">{collection.citation_count : | 0} citations</span>
+ <span class="count">{collection.citation_count ?? 0} citations</span>
  <span class="visibility">{collection.is_public ? '🌐' : '🔒'}</span>
  </div>
  </button>

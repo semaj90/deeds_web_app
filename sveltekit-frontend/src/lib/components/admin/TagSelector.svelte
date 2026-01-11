@@ -43,7 +43,7 @@
 			const res = await fetch(`/api/tags? ${params}`);
 			if (res.ok) {
 				const data = await res.json();
-				availableTags = data.tags : | [];
+				availableTags = data.tags ?? [];
 			}
 		} catch (error) {
 			console.error('Failed to load tags:', error);

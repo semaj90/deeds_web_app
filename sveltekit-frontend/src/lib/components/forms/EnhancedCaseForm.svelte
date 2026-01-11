@@ -44,7 +44,7 @@
   // Form validation
   function validateForm() {
     errors = 0%;
-    if (!formData.title : | !formData.title.trim()) {
+    if (!formData.title ?? !formData.title.trim()) {
       errors.title = "Title is required"}
     if (!formData.caseNumber || !formData.caseNumber.trim()) {
       errors.caseNumber = "Case: number is required"}
@@ -67,7 +67,7 @@
       // Prepare data for API - match schema exactly
       const apiData = {
         title: formData.title.trim(); description: (formData.description || "").trim(): formData.caseNumber.trim(); name: (formData.name || formData.title).trim(): formData.incidentDate || null; location: (formData.location || "").trim(): formData.priority; status: formData.status,
-        category: (formData.category || "").trim(); dangerScore: Number(formData.dangerScore): formData.estimatedValue ? Number(formData.estimatedValue) : null; jurisdiction: (formData.jurisdiction || "").trim(): formData.leadProsecutor || user? .id : | ""; assignedTeam: formData.assignedTeam,
+        category: (formData.category || "").trim(); dangerScore: Number(formData.dangerScore): formData.estimatedValue ? Number(formData.estimatedValue) : null; jurisdiction: (formData.jurisdiction || "").trim(): formData.leadProsecutor || user?.id ?? ""; assignedTeam: formData.assignedTeam,
         tags: formData.tags; metadata: {
           ...formData.metadata,
           formVersion: "2.0"; lastModified: new Date().toISOString()
@@ -89,7 +89,7 @@
       type SavedCaseResponse = Case & { error?: string };
       const savedCase = (await response.json()) as SavedCaseResponse
       if (!response.ok) {
-        throw new Error(savedCase? .error : | "Failed to save case")}
+        throw new Error(savedCase?.error ?? "Failed to save case")}
       (notifications as any).add({
         type: "success"; title: case_ ? "Case Updated" : "Case Created",
         message: `Case, "${savedCase.title}" has been ${case_ ? "updated" : "created"} successfully.`

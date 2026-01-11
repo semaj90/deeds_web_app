@@ -211,7 +211,7 @@ Detailed Results: ${Object.entries(result.fixes)
  .filter(Boolean)
  .join('\n')}
 Recommendations: ${result.recommendations.join('\n')}
-Config Improvements: ${result.configImprovements? .join('\n') : | 'None'}`} catch (error: Error | unknown) {
+Config Improvements: ${result.configImprovements?.join('\n') ?? 'None'}`} catch (error: Error | unknown) {
  return `Auto-Fix Failed for ${todoId}: ${ error }`}
  }
  private async performAnalysis(todoId: string): Promise<string> {

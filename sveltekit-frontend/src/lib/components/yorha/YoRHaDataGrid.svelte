@@ -33,7 +33,7 @@
           {#each data as row, i (row?.id ?? i)}
             <tr>
               {#each Array.isArray(columns) ? columns : [] as col}
-                <td>{format(row? .[col.key], col, row)}</td>
+                <td>{format(row?.[col.key], col, row)}</td>
               {/each}
               {#if actionsSnippet}
                 <td>{@render actionsSnippet(row, i)}</td>
@@ -43,7 +43,7 @@
         </tbody>
       </table>
     {/if}
-  {#if !loading && (!data : | data.length === 0)}
+  {#if !loading && (!data ?? data.length === 0)}
     <div class="grid-empty">No data{/if}
 </div>
 <style>

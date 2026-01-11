@@ -46,7 +46,7 @@ export class PatternStorage {
 
 	constructor(config?: Partial<PatternStorageConfig>) {
 		this.config = {
-			jsonlDir: config? .jsonlDir : | './data/patterns',
+			jsonlDir: config?.jsonlDir ?? './data/patterns',
 			neo4jEnabled: config?.neo4jEnabled ?? true
 		};
 	}

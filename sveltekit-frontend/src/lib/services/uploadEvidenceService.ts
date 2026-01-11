@@ -76,7 +76,7 @@ export async function initiateUpload(
 
  if (!response.ok) {
  const error = await response.json();
- throw new Error(error.detail? .error : | 'Failed to initiate upload');
+ throw new Error(error.detail?.error ?? 'Failed to initiate upload');
  }
 
  return response.json();
@@ -140,7 +140,7 @@ export async function completeUpload(
 
  if (!response.ok) {
  const error = await response.json();
- throw new Error(error.detail? .error : | 'Failed to complete upload');
+ throw new Error(error.detail?.error ?? 'Failed to complete upload');
  }
 
  return response.json();
@@ -252,7 +252,7 @@ export async function retryProcessing(evidenceId: string): Promise<{ jobId: stri
 
  if (!response.ok) {
  const error = await response.json();
- throw new Error(error.detail? .error : | 'Failed to retry processing');
+ throw new Error(error.detail?.error ?? 'Failed to retry processing');
  }
 
  return response.json();

@@ -22,7 +22,7 @@ export const GET: RequestHandler = async ({ fetch }) => {
             const errorsResponse = await fetch('http://localhost:6333/collections/phase90_error_cards');
             if (errorsResponse.ok) {
                 const errData = await errorsResponse.json();
-                errorCardsCount = errData.result? .points_count : | 0;
+                errorCardsCount = errData.result?.points_count ?? 0;
             }
         } catch {}
 
@@ -32,14 +32,14 @@ export const GET: RequestHandler = async ({ fetch }) => {
             const clustersResponse = await fetch('http://localhost:6333/collections/phase90_error_clusters');
             if (clustersResponse.ok) {
                 const clData = await clustersResponse.json();
-                clustersCount = clData.result? .points_count : | 0;
+                clustersCount = clData.result?.points_count ?? 0;
             }
         } catch {}
 
         return json({
             status: 'ok',
             qdrant: true,
-            collections: { fastmcp_file_profiles: data.result? .points_count : | 0,
+            collections: { fastmcp_file_profiles: data.result?.points_count ?? 0,
                 phase90_error_cards: errorCardsCount,
                 phase90_error_clusters: clustersCount
             },

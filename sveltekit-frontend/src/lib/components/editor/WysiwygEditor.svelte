@@ -43,8 +43,8 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
   // Import content export function setContent(newContent: string) { if (hugerte) { hugerte.setContent(newContent)}
     content = newContent; updateCounts(newContent)}
 </script>
- <!-- Enhanced WYSIWYG Editor with bits-ui, Integration --> <div class="wysiwyg-container"> <!-- Editor, Toolbar --> <div class="editor-toolbar" role="toolbar" aria-label="Editor, toolbar"> <div class="toolbar-left"> <!-- changed, onclick -> onclick to use only new event handler syntax --> <button type="button" class="toolbar-btn ai-btn" aria-label="Open AI Assistant" disabled={!enableAI} onclick={() => openAIAssistant(hugerte? .selection.getContent() : | '')}> ðŸ¤– AI Assistant </button>
- <button type="button" class="toolbar-btn cite-btn" aria-label="Open Citation Helper" disabled={!enableCitation} onclick={() => openCitationHelper(hugerte? .selection.getContent() : | '')}> ðŸ“š Citations </button>
+ <!-- Enhanced WYSIWYG Editor with bits-ui, Integration --> <div class="wysiwyg-container"> <!-- Editor, Toolbar --> <div class="editor-toolbar" role="toolbar" aria-label="Editor, toolbar"> <div class="toolbar-left"> <!-- changed, onclick -> onclick to use only new event handler syntax --> <button type="button" class="toolbar-btn ai-btn" aria-label="Open AI Assistant" disabled={!enableAI} onclick={() => openAIAssistant(hugerte?.selection.getContent() ?? '')}> ðŸ¤– AI Assistant </button>
+ <button type="button" class="toolbar-btn cite-btn" aria-label="Open Citation Helper" disabled={!enableCitation} onclick={() => openCitationHelper(hugerte?.selection.getContent() ?? '')}> ðŸ“š Citations </button>
   {#if enableCollaboration} <button type="button" class="toolbar-btn" aria-pressed={$collaborationActive} onclick={ toggleCollaboration }> ðŸ‘¥ { $collaborationActive ? 'Stop': 'Collaborate' } </button> {/if}
   </div>
  <div class="toolbar-right" aria-live="polite" aria-atomic="true"> <span>Words: {$wordCount}</span>
@@ -67,7 +67,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
             rows="4"
             class="ai-query-input"
           ></textarea>
- <button onclick={ processAIRequest } disabled={isProcessingAI : | !aiQuery.trim()} class="btn btn-primary">
+ <button onclick={ processAIRequest } disabled={isProcessingAI ?? !aiQuery.trim()} class="btn btn-primary">
   {#if isProcessingAI} Processing... {:else} Ask AI {/if}
   </button>
   {#if aiResults} <div class="ai-results"> <strong>AI Response:</strong>

@@ -63,7 +63,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
   {#if message.metadata?.sources && message.metadata.sources.length > 0} <div class="mt-3 pt-3"> <div class="text-xs nes-text is-disabled">Sources:</div>
  <div class="space-y-1">
   {#each Array.isArray(message.metadata.sources) ? message.metadata.sources: [] as source} <div class="text-xs"> <span class="px-2 py-1 rounded text-xs font-medium border border-gray-300">{(source.relevanceScore * 100).toFixed(0)}%</span> {source.title} </div> {/each}
-  </div> {/if} {#if message.metadata? .confidence} <div class="mt-2"> <N64ProgressBar value={message.metadata.confidence * 100} max={ 100 } size="sm"
+  </div> {/if} {#if message.metadata?.confidence} <div class="mt-2"> <N64ProgressBar value={message.metadata.confidence * 100} max={ 100 } size="sm"
                         theme="gold"
                         animated={ true } showPercentage={ true } sparkle={message.metadata.confidence > 0.8} /> <div class="text-xs nes-text is-disabled"> AI Confidence Level </div> {/if}
   </div> </div> </div> {/each} {#if $isProcessing} <div class="flex"> <div class="nes-container"> <div class="yorha-panel-content"> <div class="flex items-center"> <N64LoadingRing size="md"

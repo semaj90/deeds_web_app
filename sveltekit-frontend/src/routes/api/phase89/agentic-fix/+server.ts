@@ -84,7 +84,7 @@ Analyze and provide fix recommendations.`;
 
 **Analyzed:** ${timestamp}
 **Files:** ${file_paths.length}
-**Tags:** ${context.tags? .join(', ') : | 'none'}
+**Tags:** ${context.tags?.join(', ') ?? 'none'}
 
 **Summary:** ${context.summary}
 

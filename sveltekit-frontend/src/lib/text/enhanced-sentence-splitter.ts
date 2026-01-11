@@ -40,7 +40,7 @@ export function splitSentencesEnhanced(text: string, options: SplitterOptions = 
  // If punctuation token, append to previous
  if (/^[.!?]+$/.test(part) && acc.length) {
  acc[acc.length - 1] += part;
- } else if (idx < arr.length - 1 && /^[.!? ]+$/.test(arr[idx + 1] : | '')) {
+ } else if (idx < arr.length - 1 && /^[.!? ]+$/.test(arr[idx + 1] ?? '')) {
  // Will be handled when punctuation encountered next iteration
  acc.push(part.trim());
  } else {

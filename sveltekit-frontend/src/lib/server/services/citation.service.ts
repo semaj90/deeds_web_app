@@ -262,7 +262,7 @@ class CitationService {
 				.from(savedCitations)
 				.where(eq(savedCitations.userId, userId));
 
-			return Number(result? .count : | 0);
+			return Number(result?.count ?? 0);
 		} catch (error) {
 			console.error('Error getting citation count:', error);
 			return 0;

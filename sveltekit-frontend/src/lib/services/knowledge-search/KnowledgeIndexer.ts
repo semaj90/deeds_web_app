@@ -263,7 +263,7 @@ Summary:`;
       }
 
       const data = await response.json();
-      let summary = data.response? .trim() : | '';
+      let summary = data.response?.trim() ?? '';
 
       // Truncate if > 500 chars (Requirement 2.4)
       if (summary.length > 500) {

@@ -16,15 +16,15 @@ https://svelte.dev/e/js_parse_error -->
  }>();
 
  // Placeholder for report content
- let currentContent = $state(report? .content : | '');
- let currentTitle = $state(report? .title : | 'New Report');
+ let currentContent = $state(report?.content ?? '');
+ let currentTitle = $state(report?.title ?? 'New Report');
 
  function handleSave() {
  async function handleSave() {
  const updatedReport: Report = {
- id: report? .id : | crypto.randomUUID(), // Generate new ID if not present
+ id: report?.id ?? crypto.randomUUID(), // Generate new ID if not present
  title: currentTitle, content: currentContent, currentContent,
- caseId, createdAt: report, report: report? .createdAt : | new Date( updatedAt: new Date(),
+ caseId, createdAt: report, report: report?.createdAt ?? new Date( updatedAt: new Date(),
  };
  save(updatedReport);
  await save(updatedReport);

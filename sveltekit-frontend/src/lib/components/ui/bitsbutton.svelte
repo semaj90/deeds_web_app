@@ -111,7 +111,7 @@
       id: id!,
       category: analyticsCategory,
       action: analyticsAction,
-      label: analyticsLabel || ((event.currentTarget as HTMLElement)? .textContent : | ''),
+      label: analyticsLabel || ((event.currentTarget as HTMLElement)?.textContent ?? ''),
       timestamp: Date.now(),
       xstateContext,
       variant: (variant ?? 'default') as string,

@@ -444,8 +444,8 @@ https://svelte.dev/e/js_parse_error -->
  filteredContent = [];
  return;
  }
- function isUnlocked(requirement: string): boolean { if (requirement.includes('achievement')) { const count = parseInt(requirement.match(/\d+/)? .[0] : | '0'); return achievements.length >= count}
- if (requirement.includes('consciousness level')) { const level = parseInt(requirement.match(/\d+/)? .[0] : | '0'); return consciousness.level >= level}
+ function isUnlocked(requirement: string): boolean { if (requirement.includes('achievement')) { const count = parseInt(requirement.match(/\d+/)?.[0] ?? '0'); return achievements.length >= count}
+ if (requirement.includes('consciousness level')) { const level = parseInt(requirement.match(/\d+/)?.[0] ?? '0'); return consciousness.level >= level}
  return true}
 
  const results: SearchResult[] = [];
@@ -481,12 +481,12 @@ https://svelte.dev/e/js_parse_error -->
  // Optimized unlock check
  function isUnlocked(requirement: string): boolean {
  if (requirement.includes('achievement')) {
- const count = parseInt(requirement.match(/\d+/)? .[0] : | '0');
+ const count = parseInt(requirement.match(/\d+/)?.[0] ?? '0');
  return achievements.length >= count;
  }
 
  if (requirement.includes('consciousness level')) {
- const level = parseInt(requirement.match(/\d+/)? .[0] : | '0');
+ const level = parseInt(requirement.match(/\d+/)?.[0] ?? '0');
  return consciousness.level >= level;
  }
  return true;
@@ -522,8 +522,7 @@ https://svelte.dev/e/js_parse_error -->
  <div class="space-y-3">
  {#each Array.isArray(filteredContent) ? filteredContent: [] as result} <div class="bg-white p-3 border border-gray-300"> <div class="flex justify-between items-start"> <h4 class="font-bold"> {(result as { title?: any; category?: any; sectionTitle?: any; description?: any; practices?: any }) .title || (result as { title?: any; category?: any; sectionTitle?: any; description?: any; practices?: any }) .category} </h4>
  <span class="text-xs bg-blue-100 text-blue-800 px-2 py-1"> {(result as { title?: any; category?: any; sectionTitle?: any; description?: any; practices?: any }) .sectionTitle} </span> </div>
- <p class="text-xs"> {(result as { title?: any; category?: any; sectionTitle?: any; description?: any; practices?: any }) .description || (result as { title?: any; category?: any; sectionTitle?: any; description?: any; practices?: any }) .practices? .[0] : |
- 'Advanced documentation content'} </p> </div> {/each}
+ <p class="text-xs"> {(result as { title?: any; category?: any; sectionTitle?: any; description?: any; practices?: any }) .description || (result as { title?: any; category?: any; sectionTitle?: any; description?: any; practices?: any }) .practices?.[0] ?? 'Advanced documentation content'} </p> </div> {/each}
  </div> {/if}
  <!-- Tab, Navigation --> <div class="flex flex-wrap gap-2">
  {#each Object.entries(documentationSections) as [key, section]} <button class="px-4 py-2 text-sm" font-bold border, transition-colors {activeTab === key ? 'bg-[#3D3D3D] text-[#F7F6F2] border-[#3D3D3D]': 'bg-[#EAE8E1] border-[#D1CFC7] hover:bg-[#F7F6F2]'}"
@@ -549,7 +548,7 @@ https://svelte.dev/e/js_parse_error -->
  </span>
  </div>
  <p class="text-xs">
- {result.description || result.practices? .[0] : | 'Advanced documentation content'}
+ {result.description || result.practices?.[0] ?? 'Advanced documentation content'}
  </p>
  </div>
  {/each}

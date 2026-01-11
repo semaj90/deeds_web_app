@@ -115,7 +115,7 @@ import type { User } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
  <span>
   {#if message.type === "ai" && message.confidence !== undefined} {@const SvelteComponent = getConfidenceIcon(message.confidence)} <div class={getConfidenceColor(message.confidence)}> <SvelteComponent /> <span>{Math.round(message.confidence * 100)}%</span> {/if}
   </span> </div>
- <div> <p>{message.content} {#if message.type === "ai" && isLoading && conversation[conversation.length-1]? .id === message.id} <span class="blinking-cursor"> : </span> {/if}
+ <div> <p>{message.content} {#if message.type === "ai" && isLoading && conversation[conversation.length-1]?.id === message.id} <span class="blinking-cursor"> : </span> {/if}
   </p>
   {#if message.type === "ai" && message.content && enableVoiceOutput} <button type="button"
                 aria-label="Listen to AI response"

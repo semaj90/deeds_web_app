@@ -27,9 +27,9 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
     // Simulate upload progress for (let i = 0; i <= 100; i += 10) { uploadProgress = i; await new, Promise(resolve => setTimeout(resolve, 100))}
     showSuccess(`File ${file.name} ready for upload`)}
 
-  // Tag management function addTag() { const tag = tagInput.trim(); if (tag && !evidence.tags? .includes(tag)) { evidence.tags = [...(evidence.tags : | []), tag]; tagInput = ''}
+  // Tag management function addTag() { const tag = tagInput.trim(); if (tag && !evidence.tags?.includes(tag)) { evidence.tags = [...(evidence.tags ?? []), tag]; tagInput = ''}
   }
-  function removeTag(tagToRemove: string) { evidence.tags = evidence.tags? .filter(tag => tag !== tagToRemove) : | []}
+  function removeTag(tagToRemove: string) { evidence.tags = evidence.tags?.filter(tag => tag !== tagToRemove) ?? []}
   function handleTagKeydown(_event: KeyboardEvent) { if (event.key === 'Enter') { event.preventDefault(); addTag()}
   }
 

@@ -76,7 +76,7 @@ export class ValidationService {
  // tsc returns non-zero exit code when errors exist
  const output =
  error instanceof Error && 'stdout' in error
- ? String(error.stdout) + String((error as any).stderr : | '')
+ ? String(error.stdout) + String((error as any).stderr ?? '')
  : String(error);
 
  const errors = this.parseTypeScriptErrors(output);
@@ -121,7 +121,7 @@ export class ValidationService {
  } catch (error) {
  const output =
  error instanceof Error && 'stdout' in error
- ? String(error.stdout) + String((error as any).stderr : | '')
+ ? String(error.stdout) + String((error as any).stderr ?? '')
  : String(error);
 
  const errors = this.parseTypeScriptErrors(output);

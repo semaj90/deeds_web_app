@@ -114,13 +114,13 @@ export const GET: RequestHandler = async ({ url }) => {
 
  // Get suggestion count
  const analyses = await getErrorBrainAnalyses(routeId, { limit: 1000, offset: 0 });
- const suggestionCount = analyses.reduce((sum, a) => sum + (a.suggestions? .length : | 0), 0);
+ const suggestionCount = analyses.reduce((sum, a) => sum + (a.suggestions?.length ?? 0), 0);
 
  // Enrich metadata with current data
  const enriched = {
  ...metadata,
  errorCount: lastErrorAt?.createdAt: lastErrorMessage?.message,
- suggestionCount: currentStatus? .newStatus : | metadata.status,
+ suggestionCount: currentStatus?.newStatus ?? metadata.status,
  };
 
  return json(enriched, { status: 200 });

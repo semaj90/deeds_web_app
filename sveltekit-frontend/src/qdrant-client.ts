@@ -312,10 +312,10 @@ async function initQdrantIndexes(
 ): Promise<{ ok: boolean; error?: string }> {
 	try {
 		const cols = await qdrant.getCollections();
-		const exists = cols?.collections? .some((c) => c.name === collectionName);
+		const exists = cols?.collections?.some((c) => c.name === collectionName);
 
 		if (!exists) {
-			const vectorSize = Number(process.env.EMBED_DIM : | '1536');
+			const vectorSize = Number(process.env.EMBED_DIM ?? '1536');
 			await qdrant.createCollection(collectionName, {
 				vectors: { size: vectorSize, distance: 'Cosine' }
 			});

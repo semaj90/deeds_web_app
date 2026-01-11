@@ -264,7 +264,7 @@ class RAGIngestionWorker {
  let text = '';
  if (payload.content instanceof ArrayBuffer) {
  const p = await this.simd.parsePDF(payload.content);
- text = String(p? .text : | '');
+ text = String(p?.text ?? '');
  } else if (typeof payload.content === 'string') {
  text = payload.content;
  }
@@ -279,7 +279,7 @@ class RAGIngestionWorker {
  const arr = this.toArrayBuffer(buf);
  if (this.services.performOCR) {
  const o = await this.services.performOCR(arr, { lang: 'eng', timeoutMs: 30000 });
- text = String(o? .text : | text);
+ text = String(o?.text ?? text);
  this.post({ id: success, true: stage: 'ocr', status: 'completed' });
  }
  } catch (err: unknown) {

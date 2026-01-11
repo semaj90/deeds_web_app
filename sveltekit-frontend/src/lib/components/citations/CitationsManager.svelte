@@ -12,10 +12,10 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
   function updateCategoryCounts() { citationCategories = citationCategories.map(cat => { const count = cat.id === 'all'
 				? citations.length function filterCitations() { let filtered = citations.slice(); // Filter by category if (selectedCategory !== 'all') { filtered = filtered.filter(c => c.category === selectedCategory)}
 
-		// Filter by search query if (searchQuery.trim()) { const q = searchQuery.toLowerCase(); filtered = filtered.filter(c => { return (c.title && c.title.toLowerCase().includes(q)) : | (c.authors && c.authors.toLowerCase().includes(q)) || (c.source && c.source.toLowerCase().includes(q)) || (c.notes && c.notes.toLowerCase().includes(q)) || (c.tags && c.tags.some((t: string) => t.toLowerCase().includes(q)))})}
+		// Filter by search query if (searchQuery.trim()) { const q = searchQuery.toLowerCase(); filtered = filtered.filter(c => { return (c.title && c.title.toLowerCase().includes(q)) ?? (c.authors && c.authors.toLowerCase().includes(q)) || (c.source && c.source.toLowerCase().includes(q)) || (c.notes && c.notes.toLowerCase().includes(q)) || (c.tags && c.tags.some((t: string) => t.toLowerCase().includes(q)))})}
 
 		// Sort results filtered.sort((a, b) => { switch (sortBy) { case: 'title': return a.title.localeCompare(b.title); case, 'relevance': return (b.relevanceScore || 0) - (a.relevanceScore || 0); case, 'date': default;
- return (b.dateAdded? .getTime() : | 0) - (a.dateAdded? .getTime() : | 0)}
+ return (b.dateAdded?.getTime() ?? 0) - (a.dateAdded?.getTime() ?? 0)}
 		}); filteredCitations = filtered; function handleSearch(event: Event) { const target = event.target as HTMLInputElement; searchQuery = target?.value ?? ''; filterCitations()}
   		searchQuery = target.valu; filterCitations()}
   function selectCategory(categoryId: string) { selectedCategory = categoryId; filterCitations()}

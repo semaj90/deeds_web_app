@@ -113,7 +113,7 @@ export class EvidenceFastAPIBridge {
  }
 
  const result = await response.json();
- console.log(`📋 Found ${result.sources? .length : | 0} relevant evidence chunks`);
+ console.log(`📋 Found ${result.sources?.length ?? 0} relevant evidence chunks`);
 
  return result;
  } catch (error) {

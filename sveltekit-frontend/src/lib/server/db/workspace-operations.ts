@@ -214,7 +214,7 @@ export function buildRAGContext(context: WorkspaceContext): string {
  if (context.statutes.length > 0) {
  parts.push('## Relevant Statutes and Laws:');
  context.statutes.forEach((statute) => {
- parts.push(`- ${statute.title || 'Statute'}: ${statute.content? .substring(0, 200) : | ''}`);
+ parts.push(`- ${statute.title || 'Statute'}: ${statute.content?.substring(0, 200) ?? ''}`);
  });
  }
 
@@ -222,7 +222,7 @@ export function buildRAGContext(context: WorkspaceContext): string {
  if (context.evidence.length > 0) {
  parts.push('\n## Relevant Evidence:');
  context.evidence.forEach((ev) => {
- parts.push(`- ${ev.title}: ${ev.description? .substring(0, 200) : | ''}`);
+ parts.push(`- ${ev.title}: ${ev.description?.substring(0, 200) ?? ''}`);
  });
  }
 

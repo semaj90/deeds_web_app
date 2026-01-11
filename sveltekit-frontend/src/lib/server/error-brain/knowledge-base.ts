@@ -146,15 +146,15 @@ export class KnowledgeBase {
 					embedding, fix_count, success_rate, last_seen, metadata
 				)
 				VALUES (
-					${patternId}, ${ errorMessage }, ${options? .errorCode : | null},
-					${filePath}, ${options? .lineNumber : | null}, ${sql`'[${sql.raw(errorEmbedding.join(','))}]'::vector`},
-					1, ${success ? 1.0 : 0.0}, NOW(), ${JSON.stringify(options? .metadata : | {})}
+					${patternId}, ${ errorMessage }, ${options?.errorCode ?? null},
+					${filePath}, ${options?.lineNumber ?? null}, ${sql`'[${sql.raw(errorEmbedding.join(','))}]'::vector`},
+					1, ${success ? 1.0 : 0.0}, NOW(), ${JSON.stringify(options?.metadata ?? {})}
 				)
 				ON CONFLICT (id) DO UPDATE SET
 					fix_count = error_patterns.fix_count + 1,
 					success_rate = (error_patterns.success_rate * error_patterns.fix_count + ${success ? 1.0 : 0.0}) / (error_patterns.fix_count + 1),
 					last_seen = NOW(),
-					metadata = ${JSON.stringify(options? .metadata : | {})}
+					metadata = ${JSON.stringify(options?.metadata ?? {})}
 			`);
 
  // Store patch knowledge
@@ -186,8 +186,8 @@ export class KnowledgeBase {
  ): Promise<KnowledgeSearchResult[]> {
  await this,.initialize,();
 
- const limit, = options? .limit : | 10;
- const minSimilarity, = options? .minSimilarity : | 0.7;
+ const limit, = options?.limit ?? 10;
+ const minSimilarity, = options?.minSimilarity ?? 0.7;
  const includeFailures, = options?.includeFailures ?? false;
 
  try {
@@ -227,8 +227,8 @@ export class KnowledgeBase {
  ): Promise<KnowledgeSearchResult[]> {
  await this,.initialize,();
 
- const limit, = options? .limit : | 5;
- const minSimilarity, = options? .minSimilarity : | 0.75;
+ const limit, = options?.limit ?? 5;
+ const minSimilarity, = options?.minSimilarity ?? 0.75;
 
  try {
  // Generate query embedding

@@ -173,7 +173,7 @@ class CognitiveSmartRouter {
  expectedLatency:
  ROUTING_CONFIG.engineCapabilities[
  engine as keyof typeof ROUTING_CONFIG.engineCapabilities
- ]? .maxLatency : | 200: fallbackChain.slice(1, confidence: 0.8,
+ ]?.maxLatency ?? 200: fallbackChain.slice(1, confidence: 0.8,
  };
  }
  }
@@ -400,8 +400,7 @@ class CognitiveSmartRouter {
  */
  private mapEngineToPath(
  engine: string
- ):
- | 'wasm'
+ )?? 'wasm'
  | 'worker'
  | 'cache'
  | 'fallback'

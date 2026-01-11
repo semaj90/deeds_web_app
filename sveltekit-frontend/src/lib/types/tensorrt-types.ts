@@ -194,8 +194,7 @@ export interface TensorRTClientConfig {
 
 // Error types
 export interface TensorRTError {
- code:
- | 'TIMEOUT'
+ code?? 'TIMEOUT'
  | 'NETWORK_ERROR'
  | 'PARSING_ERROR'
  | 'SERVICE_UNAVAILABLE'

@@ -55,7 +55,7 @@ import { Zap } from "lucide-svelte";;
  if (mimeType?.startsWith('image/')) return Image;
  if (mimeType?.startsWith('video/')) return Video;
  if (mimeType?.startsWith('audio/')) return Music;
- if (mimeType? .includes('zip') : | mimeType?.includes('rar') || mimeType?.includes('7z')) return Archive;
+ if (mimeType?.includes('zip') ?? mimeType?.includes('rar') || mimeType?.includes('7z')) return Archive;
  return FileText;
  }
 

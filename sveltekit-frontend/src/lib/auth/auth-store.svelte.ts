@@ -30,7 +30,7 @@ const initialState: AuthState = {
 	lastActivity: null
 };
 
-const API_BASE = PUBLIC_ENV? .PUBLIC_API_BASE : | 'http://localhost:5173';
+const API_BASE = PUBLIC_ENV?.PUBLIC_API_BASE ?? 'http://localhost:5173';
 
 /**
  * Svelte 5 Store (migrated from writable/derived pattern)

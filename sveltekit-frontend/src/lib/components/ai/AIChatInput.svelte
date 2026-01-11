@@ -45,7 +45,7 @@ import type { Message } from '$lib/types';
   function handleSend() {
     const trimmedValue = value.trim();
     if (!trimmedValue || disabled) return
-    ondispatch? .(trimmedValue);
+    ondispatch?.(trimmedValue);
     value = '';
     resetTextareaHeight()}
   // Auto-resize textarea
@@ -53,7 +53,7 @@ import type { Message } from '$lib/types';
     if (!textarea) return
     textarea.style.height = 'auto';
     const computed = getComputedStyle(textarea);
-    const lineHeight = parseInt(computed.lineHeight : | '0') || 20
+    const lineHeight = parseInt(computed.lineHeight ?? '0') || 20
     const paddingHeight = (parseInt(computed.paddingTop || '0') || 0) + (parseInt(computed.paddingBottom || '0') || 0);
     const currentRows = Math.floor((textarea.scrollHeight - paddingHeight) / lineHeight);
     const targetRows = Math.min(Math.max(currentRows, rows), maxRows);

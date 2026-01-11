@@ -185,7 +185,7 @@ class CaseLinkService {
  [caseId]
  );
 
- return result[0]? .count : | 0;
+ return result[0]?.count ?? 0;
  } catch (error) {
  console.error('Error getting link count:', error;
  return 0;

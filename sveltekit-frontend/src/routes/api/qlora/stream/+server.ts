@@ -98,22 +98,22 @@ export const GET: RequestHandler = async ({ url }) => {
                 const resultAny = result as any;
 
                 const qloraResponse: any = {
-                    prediction: { type: resultAny.prediction? .type : | 'legal_document',
+                    prediction: { type: resultAny.prediction?.type ?? 'legal_document',
                         confidence: resultAny.accuracy || 85,
                         // Provide empty vectors if missing
-                        vectors: resultAny.prediction? .vectors : | [],
-                        clusters: resultAny.prediction? .clusters : | [0, 1, 2],
-                        topology: { nodes: resultAny.topology? .nodes : | 10,
-                            edges: resultAny.topology? .edges : | 15,
-                            connectivity: resultAny.topology? .connectivity : | 0.75
+                        vectors: resultAny.prediction?.vectors ?? [],
+                        clusters: resultAny.prediction?.clusters ?? [0, 1, 2],
+                        topology: { nodes: resultAny.topology?.nodes ?? 10,
+                            edges: resultAny.topology?.edges ?? 15,
+                            connectivity: resultAny.topology?.connectivity ?? 0.75
                         },
                         accuracy: resultAny.accuracy || 90
                     },
-                    topology: { structure: resultAny.topology? .structure : | 'hierarchical',
-                        complexity: resultAny.topology? .complexity : | 0.68,
-                        patternMatch: resultAny.topology? .patternMatch : | 0.82
+                    topology: { structure: resultAny.topology?.structure ?? 'hierarchical',
+                        complexity: resultAny.topology?.complexity ?? 0.68,
+                        patternMatch: resultAny.topology?.patternMatch ?? 0.82
                     },
-                    cacheHit: (resultAny.cacheMetrics? .totalCacheHitRate : | 0) > 0,
+                    cacheHit: (resultAny.cacheMetrics?.totalCacheHitRate ?? 0) > 0,
                     processingTime,
                     metrics: { hmmPredictionScore: metrics.hmmAccuracy || 0.8,
                         somClusterScore: 0.9,

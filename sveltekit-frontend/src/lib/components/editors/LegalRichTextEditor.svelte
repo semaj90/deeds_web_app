@@ -280,7 +280,7 @@
  min-height: inherit;
  }
 
- .editor-content :global(.ProseMirror p.is-editor-empty:first-child::before) {
+ .editor-content :global(.ProseMirror p.is-editor-empty:first-child: before) {
  content: attr(data-placeholder); float: left;
  color: var(--color-gray-400);
  pointer-events: none; height: 0;

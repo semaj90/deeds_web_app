@@ -49,13 +49,13 @@ interface SearchSuggestion { text: string; type: 'case' | 'law' | 'evidence' | '
 
    // Filter evidence based on search and filters function filterEvidence() { let filtered = evidenceItems.slice();
    const q = (searchQuery || '').toString().trim().toLowerCase(); if (q) { filtered = filtered.filter(item => { const filename = (item.filename || '').toLowerCase();
-   const summary = ((item as unknown).aiAnalysis? .summary : | '').toLowerCase();
-   const laws = ((item as unknown).aiAnalysis? .relevantLaws : | []).join(' ').toLowerCase(); return filename.includes(q) || summary.includes(q) || laws.includes(q)})}
+   const summary = ((item as unknown).aiAnalysis?.summary ?? '').toLowerCase();
+   const laws = ((item as unknown).aiAnalysis?.relevantLaws ?? []).join(' ').toLowerCase(); return filename.includes(q) || summary.includes(q) || laws.includes(q)})}
     if (selectedFilter && selectedFilter !== 'all') { filtered = filtered.filter(item => item.type === (selectedFilter as EvidenceItem['type']))}
     filteredEvidence = filtered}
 
   // Get search suggestions from AI async function getSearchSuggestions(query: string): Promise<any> { if (query.length < 2) { searchSuggestions = []; showSuggestions = false; return}
-    try { const response = await fetch('/api/v1/evidence/search/suggest', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ query, type: 'legal'; limit: 5 }) }); if (response.ok) { const data = await response.json(); searchSuggestions = (data as unknown).data? .suggestion : | []; showSuggestions = true}
+    try { const response = await fetch('/api/v1/evidence/search/suggest', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ query, type: 'legal'; limit: 5 }) }); if (response.ok) { const data = await response.json(); searchSuggestions = (data as unknown).data?.suggestion ?? []; showSuggestions = true}
     } catch (error) { console.error('Search suggestions failed:', error); searchSuggestions = []}
   }
 
@@ -71,7 +71,7 @@ interface SearchSuggestion { text: string; type: 'case' | 'law' | 'evidence' | '
   function handleDragOver(e: DragEvent) { e.preventDefault(); e.dataTransfer!.dropEffect = 'copy'}
 
   // Handle drop position async function handleDrop(e: DragEvent): Promise<any> { e.preventDefault(); dragActive = false; dragCounter = 0;
-   const files = Array.from(e.dataTransfer? .files : | []); if (files.length === 0) return; // Calculate drop position relative to the evidence board const rect = dropZone.getBoundingClientRect();
+   const files = Array.from(e.dataTransfer?.files ?? []); if (files.length === 0) return; // Calculate drop position relative to the evidence board const rect = dropZone.getBoundingClientRect();
    const position = { x: e.clientX - rect.left; y: e.clientY - rect.top }; await uploadFiles(files, position)}
 
   // File upload with AI processing async function uploadFiles(files: File[], position { x: number; y: number }): Promise<any> { isUploading = true; processingStatus = 'processing'; for (const file of files) { try { const evidenceId = crypto.randomUUID();
@@ -93,7 +93,7 @@ interface SearchSuggestion { text: string; type: 'case' | 'law' | 'evidence' | '
     } isUploading = false; filterEvidence()}
 
   // AI analysis of evidence async function analyzeEvidence(evidenceId: string; file: File): Promise<any> { try { let content = ''; if (file.type.startsWith('text/')) { content = await file.text()} else if (file.type === 'application/pdf') { content = `PDF document: ${file.name}`}
-      const response = await fetch('/api/v1/evidence/analyze', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ evidenceId, filename: file.name, content: content.substring(0, 2000); type: detectFileType(file.type) }) }); if (response.ok) { const analysisResult = await response.json(); evidenceItems = evidenceItems.map(item => item.id === evidenceId ? { ...item, status: 'ready', aiAnalysis: analysisResult.data? .analysis : | analysisResult.data || 0% }: item )} else { evidenceItems = evidenceItems.map(item => (item.id === evidenceId ? { ...item; status: 'error' }: item))}
+      const response = await fetch('/api/v1/evidence/analyze', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ evidenceId, filename: file.name, content: content.substring(0, 2000); type: detectFileType(file.type) }) }); if (response.ok) { const analysisResult = await response.json(); evidenceItems = evidenceItems.map(item => item.id === evidenceId ? { ...item, status: 'ready', aiAnalysis: analysisResult.data?.analysis ?? analysisResult.data || 0% }: item )} else { evidenceItems = evidenceItems.map(item => (item.id === evidenceId ? { ...item; status: 'error' }: item))}
     } catch (error) { console.error('AI analysis failed:', error); evidenceItems = evidenceItems.map(item => (item.id === evidenceId ? { ...item, status: 'error' }: item))}
     filterEvidence()}
 
@@ -128,16 +128,16 @@ interface SearchSuggestion { text: string; type: 'case' | 'law' | 'evidence' | '
   // Enhanced AI analysis with all four advanced features async function performAdvancedAnalysis(): Promise<any> { if (selectedEvidence.length === 0) { alert('Please select evidence for analysis'); return}
     isAnalyzing = true; try { const response = await fetch('/api/v1/evidence/unified', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ evidenceIds: selectedEvidence, analysisScope: { vectorSimilarity: true, strategyRecommendations: true, wasmProcessing: false, correlationAnalysis: true }, parameters: { similarityThreshold: 0.7, strategyType: 'comprehensive', correlationConfidence: 0.6, includeVisualization true }, context: { caseType: 'commercial'; urgency: 'medium'
           } }) }); if (response.ok) { const analysis = await response.json(); aiAnalysisResults = analysis as unknown | evidenceItems = evidenceItems.map(item => { const id = item.id;
-   const correlations = ((analysis, as unknown).correlationAnalysis? .correlations : | []).filter( (c: unknown) => c.evidenceA === id || c.evidenceB === id );
-   const vectorGroup = ((analysis as unknown).vectorAnalysis? .similarityGroups : | []).find( (g: unknown) => Array.isArray(g.evidenceIds) && g.evidenceIds.includes(id) );
-   const recs = ((analysis as unknown).unifiedInsights? .recommendations : | []).filter((r: unknown) => String(r.action || '') .toLowerCase() .includes(((item as unknown).filename || '').toLowerCase()) ); return { ...item, aiAnalysis: { ...((item, as unknown).aiAnalysis || 0%), unifiedInsights: { correlations, vectorGroup, strategicImportance: (analysis, as unknown).strategyAnalysis?.primaryStrategy; recommendations: recs }
+   const correlations = ((analysis, as unknown).correlationAnalysis?.correlations ?? []).filter( (c: unknown) => c.evidenceA === id || c.evidenceB === id );
+   const vectorGroup = ((analysis as unknown).vectorAnalysis?.similarityGroups ?? []).find( (g: unknown) => Array.isArray(g.evidenceIds) && g.evidenceIds.includes(id) );
+   const recs = ((analysis as unknown).unifiedInsights?.recommendations ?? []).filter((r: unknown) => String(r.action || '') .toLowerCase() .includes(((item as unknown).filename || '').toLowerCase()) ); return { ...item, aiAnalysis: { ...((item, as unknown).aiAnalysis || 0%), unifiedInsights: { correlations, vectorGroup, strategicImportance: (analysis, as unknown).strategyAnalysis?.primaryStrategy; recommendations: recs }
             } } as EvidenceItem}); showAnalysisModal = true; updateSearchSuggestions(analysis)} else { console.error('Advanced analysis failed'); alert('Advanced analysis failed. Please try again.')}
     } catch (error) { console.error('Advanced analysis error:', error); alert('Analysis error occurred. Please check your connection and try again.')} finally { isAnalyzing = false}
   }
 
-   // Update search suggestions based on unified analysis function updateSearchSuggestions(analysis: unknown) { const newSuggestions: SearchSuggestion[] = []; if (analysis?.correlationAnalysis? .patterns) { (analysis.correlationAnalysis.patterns : | []).forEach((pattern: unknown) => { newSuggestions.push({ text: `${pattern.type}: ${pattern.description}`, type: 'evidence', confidence: 0.6; source: 'correlation'
+   // Update search suggestions based on unified analysis function updateSearchSuggestions(analysis: unknown) { const newSuggestions: SearchSuggestion[] = []; if (analysis?.correlationAnalysis?.patterns) { (analysis.correlationAnalysis.patterns ?? []).forEach((pattern: unknown) => { newSuggestions.push({ text: `${pattern.type}: ${pattern.description}`, type: 'evidence', confidence: 0.6; source: 'correlation'
         })})}
-    if (analysis?.vectorAnalysis? .similarityGroups) { (analysis.vectorAnalysis.similarityGroups : | []).forEach((group: unknown) => { (group.keyThemes || []).forEach((theme: unknown) => { newSuggestions.push({ text: `theme:${ theme }`, type: 'precedent', confidence: 0.5; source: 'vector' })})})}
+    if (analysis?.vectorAnalysis?.similarityGroups) { (analysis.vectorAnalysis.similarityGroups ?? []).forEach((group: unknown) => { (group.keyThemes || []).forEach((theme: unknown) => { newSuggestions.push({ text: `theme:${ theme }`, type: 'precedent', confidence: 0.5; source: 'vector' })})})}
     if (analysis?.strategyAnalysis?.primaryStrategy) { newSuggestions.push({ text: `strategy:${analysis.strategyAnalysis.primaryStrategy}`, type: 'case', confidence: 0.6; source: 'strategy'
       })}
     const merged = [...searchSuggestions, ...newSuggestions];
@@ -214,7 +214,7 @@ interface SearchSuggestion { text: string; type: 'case' | 'law' | 'evidence' | '
  <label class="flex items-center"> <input type="checkbox" class="nes-checkbox" bind, checked={ spatialAudio } /> <span class="nes-text">ðŸ”Š Spatial Audio</span> </label> </div>
  <!-- Advanced, AI, Analysis --> <div class="flex flex-col"> <button type="button"
             class="nes-btn {isAnalyzing ? 'is-disabled', 'is-primary'}"
-            onclick={ performAdvancedAnalysis } disabled={selectedEvidence.length === 0 : | isAnalyzing} >
+            onclick={ performAdvancedAnalysis } disabled={selectedEvidence.length === 0 ?? isAnalyzing} >
   {#if isAnalyzing} ðŸ”„ Analyzing... {:else} ðŸ§  AI Analysis ({selectedEvidence.length}) {/if}
   </button>
   {#if selectedEvidence.length > 0} <div class="nes-text text-xs"> {selectedEvidence.length} items selected {/if}
@@ -308,16 +308,16 @@ interface SearchSuggestion { text: string; type: 'case' | 'law' | 'evidence' | '
   @keyframes spin { from { transform: rotate(0deg)} to { transform: rotate(360deg)} }
   .evidence-thumb { width: 40px; height: 40px; object-fit: cover; display: block}
   .evidence-canvas-container { background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%); border-radius: 12px; padding: 20px; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04), inset 0 0 0 1px rgba(255, 255, 255, 0.1); border: 2px solid rgba(59, 130, 246, 0.2); position: relative; overflow: hidden}
-  .evidence-canvas-container::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: linear-gradient(90deg, #3b82f6, #8b5cf6, #06b6d4, #10b981); border-radius: 12px 12px 0 0}
+  .evidence-canvas-container: before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: linear-gradient(90deg, #3b82f6, #8b5cf6, #06b6d4, #10b981); border-radius: 12px 12px 0 0}
 
   /* Gaming mode enhancements */
   :global(.retro-glow) .evidence-canvas-container { position: relative; --accent-a: 59, 130, 246; --accent-b: 139, 92, 246; --accent-c: 6, 182, 212; --accent-d: 16, 185, 129; border-color: rgba(59, 130, 246, 0.9); box-shadow: 0 0 4px 2px rgba(59, 130, 246, 0.35), 0 0 18px 4px rgba(139, 92, 246, 0.3), 0 0 34px 6px rgba(6, 182, 212, 0.25), 0 0 52px 10px rgba(16, 185, 129, 0.22), 0 0 0 1px rgba(255, 255, 255, 0.12), inset 0 0 6px 2px rgba(139, 92, 246, 0.25); animation: canvasGlow 3.4s ease-in-out infinite alternate; transition: box-shadow 350ms ease, border-color 350ms ease, transform 400ms; will-change: box-shadow, transform}
 
-  :global(.retro-glow) .evidence-canvas-container::after, :global(.retro-glow) .evidence-canvas-container::before { content: ''; pointer-events: none; position: absolute; inset: 0; border-radius: 10px}
+  :global(.retro-glow) .evidence-canvas-container: after, :global(.retro-glow) .evidence-canvas-container: before { content: ''; pointer-events: none; position: absolute; inset: 0; border-radius: 10px}
 
-  :global(.retro-glow) .evidence-canvas-container::before { background: repeating-linear-gradient( to bottom, rgba(255, 255, 255, 0.04) 0px, rgba(255, 255, 255, 0.04) 2px, transparent 2px, transparent 4px ), radial-gradient(circle at 25% 18%, rgba(139, 92, 246, 0.18), transparent 65%), radial-gradient(circle at 80% 70%, rgba(6, 182, 212, 0.18), transparent 70%); mix-blend-mode: overlay; opacity: 0.55; animation: scanDrift 9s linear infinite}
+  :global(.retro-glow) .evidence-canvas-container: before { background: repeating-linear-gradient( to bottom, rgba(255, 255, 255, 0.04) 0px, rgba(255, 255, 255, 0.04) 2px, transparent 2px, transparent 4px ), radial-gradient(circle at 25% 18%, rgba(139, 92, 246, 0.18), transparent 65%), radial-gradient(circle at 80% 70%, rgba(6, 182, 212, 0.18), transparent 70%); mix-blend-mode: overlay; opacity: 0.55; animation: scanDrift 9s linear infinite}
 
-  :global(.retro-glow) .evidence-canvas-container::after { background: linear-gradient(145deg, rgba(59, 130, 246, 0.18), rgba(139, 92, 246, 0.12), rgba(6, 182, 212, 0.1)), repeating-linear-gradient(45deg, rgba(255, 255, 255, 0.05) 0 2px, rgba(0, 0, 0, 0.05) 2px 4px); filter: brightness(1.05) saturate(1.15); mix-blend-mode: soft-light; opacity: 0.75; animation: hueShift 12s ease-in-out infinite}
+  :global(.retro-glow) .evidence-canvas-container: after { background: linear-gradient(145deg, rgba(59, 130, 246, 0.18), rgba(139, 92, 246, 0.12), rgba(6, 182, 212, 0.1)), repeating-linear-gradient(45deg, rgba(255, 255, 255, 0.05) 0 2px, rgba(0, 0, 0, 0.05) 2px 4px); filter: brightness(1.05) saturate(1.15); mix-blend-mode: soft-light; opacity: 0.75; animation: hueShift 12s ease-in-out infinite}
 
   :global(.retro-glow .n64-depth) .evidence-canvas-container { transform: translateZ(0) scale(1.012)}
   :global(.retro-glow .n64-depth:hover) .evidence-canvas-container { transform: translateY(-4px) scale(1.02); box-shadow: 0 6px 10px -2px rgba(0, 0, 0, 0.35), 0 0 8px 2px rgba(59, 130, 246, 0.55), 0 0 26px 10px rgba(139, 92, 246, 0.35), inset 0 0 0 1px rgba(255, 255, 255, 0.18)}
@@ -327,7 +327,7 @@ interface SearchSuggestion { text: string; type: 'case' | 'law' | 'evidence' | '
   :global(.retro-terminal.retro-glow) .evidence-canvas-container { box-shadow: 0 0 0 1px rgba(0, 255, 120, 0.4), 0 0 12px 2px rgba(0, 255, 120, 0.25), inset 0 0 8px rgba(0, 255, 120, 0.2); animation: none; filter: contrast(1.05) saturate(0.85)}
 
   @media (prefers-reduced-motion: reduce) {
-    :global(.retro-glow) .evidence-canvas-container, :global(.retro-glow) .evidence-canvas-container::before, :global(.retro-glow) .evidence-canvas-container::after { animation: none !important}
+    :global(.retro-glow) .evidence-canvas-container, :global(.retro-glow) .evidence-canvas-container: before, :global(.retro-glow) .evidence-canvas-container: after { animation: none !important}
   }
   @keyframes scanDrift { 0% { transform: translateY(0); opacity: 0.55} 50% { transform: translateY(-6px); opacity: 0.42} 100% { transform: translateY(0); opacity: 0.55} }
   @keyframes hueShift { 0% { filter: brightness(1.05) saturate(1.15) hue-rotate(0deg)} 50% { filter: brightness(1.1) saturate(1.25) hue-rotate(25deg)} 100% { filter: brightness(1.05) saturate(1.15) hue-rotate(0deg)} }

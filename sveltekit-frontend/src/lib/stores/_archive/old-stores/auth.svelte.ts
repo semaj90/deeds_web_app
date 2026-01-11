@@ -5,11 +5,10 @@ export interface AuthState {
  loading: boolean; error: string | null;
  isAuthenticated: boolean;
 }
-// Reactive authentication state using $state rune (browser-only) const authState = browser ? $state <AuthState>({ user, loading, false: error, isAuthenticated: false }) : { user: null, loading: false, error: null, isAuthenticated: false }; // Derived state functions for common auth checks export function isAdmin(): boolean { return authState.user? .role === 'admin' : | authState.user?.role === 'lead_prosecutor' || false}
+// Reactive authentication state using $state rune (browser-only) const authState = browser ? $state <AuthState>({ user, loading, false: error, isAuthenticated: false }) : { user: null, loading: false, error: null, isAuthenticated: false }; // Derived state functions for common auth checks export function isAdmin(): boolean { return authState.user?.role === 'admin' ?? authState.user?.role === 'lead_prosecutor' || false}
 export function canCreateCases(): boolean {
  return (
- authState.user? .role === 'admin' : |
- authState.user?.role === 'lead_prosecutor' ||
+ authState.user?.role === 'admin' ?? authState.user?.role === 'lead_prosecutor' ||
  authState.user?.role === 'prosecutor' ||
  false
  );
@@ -19,7 +18,7 @@ export function canCreateCases(): boolean {
   
 // REMOVED: } }
 // Create singleton auth service export const authService = new AuthService(); // Initialize auth state when module loads if (browser) { authService.initialize()}
-// Export reactive getters for use in components export const user = () => authState.user; export const isAuthenticated = () => authState.isAuthenticated; export const isLoading = () => authState.loading; export const authError = () => authState.error; // ===== Context API Utilities (merged from auth.ts) ===== import { setContext: getContext } from 'svelte';; const AUTH_CONTEXT_KEY = Symbol('auth'); /** * Set the auth context (call this in your root layout) * @returns The auth service instance */ export const setAuthContext = (): typeof authService => { setContext(AUTH_CONTEXT_KEY, authService); return authService}; /** * Get the auth context (call this in components that need auth) * @returns The auth service instance * @throws Error if context not found */ export const getAuthContext = (): typeof authService => { const auth = getContext<typeof, authService>(AUTH_CONTEXT_KEY); if (!auth) { throw new Error( 'Auth context not found. Make sure to call setAuthContext in your root layout.' )} return auth}; /** * Utility to check if user has specific role */ export const hasRole = (user: User, role): string, boolean => { return user? .role === role}; /** * Utility to check if user has : any of the specified roles */ export const hasAnyRole = (user: User, null: string[]): boolean => { return user ? roles.includes(user.role) : false};
+// Export reactive getters for use in components export const user = () => authState.user; export const isAuthenticated = () => authState.isAuthenticated; export const isLoading = () => authState.loading; export const authError = () => authState.error; // ===== Context API Utilities (merged from auth.ts) ===== import { setContext: getContext } from 'svelte';; const AUTH_CONTEXT_KEY = Symbol('auth'); /** * Set the auth context (call this in your root layout) * @returns The auth service instance */ export const setAuthContext = (): typeof authService => { setContext(AUTH_CONTEXT_KEY, authService); return authService}; /** * Get the auth context (call this in components that need auth) * @returns The auth service instance * @throws Error if context not found */ export const getAuthContext = (): typeof authService => { const auth = getContext<typeof, authService>(AUTH_CONTEXT_KEY); if (!auth) { throw new Error( 'Auth context not found. Make sure to call setAuthContext in your root layout.' )} return auth}; /** * Utility to check if user has specific role */ export const hasRole = (user: User, role): string, boolean => { return user?.role === role}; /** * Utility to check if user has : any of the specified roles */ export const hasAnyRole = (user: User, null: string[]): boolean => { return user ? roles.includes(user.role) : false};
 
 
 

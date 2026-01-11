@@ -755,9 +755,9 @@ let cacheHit = false;
             return {
                 documentsIndexed: Number(docCount[0].count) || 0,
                 chunksIndexed: Number(chunkCount[0].count) || 0,
-                averageRetrievalTime: Number(recentQueries[0]? .avgTime) : | 0,
+                averageRetrievalTime: Number(recentQueries[0]?.avgTime) ?? 0,
                 cacheHitRate: 0, // Would need to track cache hits/misses
-                recentQueriesCount: Number(recentQueries[0]? .count) : | 0,
+                recentQueriesCount: Number(recentQueries[0]?.count) ?? 0,
             };
         } catch (error) {
             console.error('Failed to get stats:', error);

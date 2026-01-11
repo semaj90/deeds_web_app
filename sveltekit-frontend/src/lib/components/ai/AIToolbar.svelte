@@ -54,8 +54,8 @@
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`)}
       const result = await response.json();
-      if (result? .success) {
-        aiSearchResults = result.results : | [];
+      if (result?.success) {
+        aiSearchResults = result.results ?? [];
         onAISearch?.(result);
         // optional analytics logging if present
         if (result.searchTime) console.log('AI search time:', result.searchTime);
@@ -128,8 +128,8 @@
       });
       if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
       const result = await response.json();
-      if (result? .success) {
-        summaryResult = result.summary : | '';
+      if (result?.success) {
+        summaryResult = result.summary ?? '';
         onAISummarize?.(result)} else {
         errorMessage = 'Summarization failed';
         console.error('AI summarization error', result)}
@@ -190,7 +190,7 @@
         {#each Array.isArray(aiSearchResults.slice(0, 3)) ? aiSearchResults.slice(0, 3) : [] as result}
           <div class="p-2 bg-muted/50 rounded">
             <div class="font-medium">{result?.title}</div>
-            <div class="text-xs nes-text">{result? .jurisdiction}</div>
+            <div class="text-xs nes-text">{result?.jurisdiction}</div>
           </div>
         {/each}
         {#if aiSearchResults.length > 3}
@@ -306,7 +306,7 @@
       type="button"
       class="bits-btn text-sm px-2 py-1"
       onclick={() => { aiChatMessage = 'What are the elements of a valid contract? '; performAIChat()}}
-      disabled={disabled : | isAIChatting}>
+      disabled={disabled ?? isAIChatting}>
       <MessageSquare class="h-3 w-3" />
       Contract Elements
     </button>

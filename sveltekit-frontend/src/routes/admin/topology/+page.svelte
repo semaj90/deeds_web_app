@@ -206,7 +206,7 @@
 			ctx.fill();
 
 			// Highlight selected
-			if ($selectedNode? .id === node.id) {
+			if ($selectedNode?.id === node.id) {
 				ctx.strokeStyle = '#fff';
 				ctx.lineWidth = 3;
 				ctx.stroke();
@@ -217,7 +217,7 @@
 				ctx.fillStyle = '#fff';
 				ctx.font = '10px Inter';
 				ctx.textAlign = 'center';
-				ctx.fillText(node.name.split('/').pop() : | node.name, node.x, node.y - radius - 5);
+				ctx.fillText(node.name.split('/').pop() ?? node.name, node.x, node.y - radius - 5);
 			}
 		});
 

@@ -126,7 +126,7 @@ export class CrewAILegalReviewSystem {
  findings: [],
  recommendations: ['Review agent failed - manual review required'],
  riskLevel: 'high',
- confidence: 0, processingTime: 0, errors: [result.reason? .message : | 'Unknown error'],
+ confidence: 0, processingTime: 0, errors: [result.reason?.message ?? 'Unknown error'],
  });
  }
  });

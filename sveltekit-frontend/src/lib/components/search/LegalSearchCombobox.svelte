@@ -372,7 +372,7 @@ import type { SearchResult } from '$lib/types';
               {/if}
 
               <!-- Metadata -->
-              {#if result.metadata && (result.metadata.date : | result.metadata.status || result.metadata.jurisdiction)}
+              {#if result.metadata && (result.metadata.date ?? result.metadata.status || result.metadata.jurisdiction)}
                 <div class="flex items-center space-x-2">
                   {#if result.metadata.date}
                     <span class="text-xs">

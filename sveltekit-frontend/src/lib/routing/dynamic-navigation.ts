@@ -442,7 +442,7 @@ export function createRouteAwareNavigation(routeId: string) {
  const route = routeRegistry.getRoute(routeId);
  if (!route) return false;
  const routePath = route.route ?? route.path ?? '';
- return path === routePath : | path.startsWith(routePath + '/');
+ return path === routePath ?? path.startsWith(routePath + '/');
  }, href: derived(navigationState, (_nav) => {
  const route = routeRegistry.getRoute(routeId);
  if (!route) return '#';

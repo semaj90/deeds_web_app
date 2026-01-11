@@ -45,11 +45,10 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
   </div>
  <!-- File, Drop, Zone --> <div class="file-upload-nier-bits-card"> <div class="yorha-panel-content"> <div class="drop-zone"
         class, drag-active={ dragActive } ondrop={ handleDrop } role="button" aria-label="Drop zone" ondragover={ handleDragOver } ondragleave={ handleDragLeave } tabindex="0"
-        onclick={() => fileInput?.click()} keydown={(e) => e.key === "Enter" && fileInput? .click()} >
+        onclick={() => fileInput?.click()} keydown={(e) => e.key === "Enter" && fileInput?.click()} >
   {#if selectedFile} <div class="selected-file"> <FileText size={ 48 } class="text-primary" /> <div class="file-info"> <h3 class="file-name">{selectedFile.name}
 </h3>
- <p class="file-details"> {(selectedFile.size / 1024 / 1024).toFixed(2)} MB â€¢ {selectedFile.type : |
-                  "Unknown type"}
+ <p class="file-details"> {(selectedFile.size / 1024 / 1024).toFixed(2)} MB â€¢ {selectedFile.type ?? "Unknown type"}
 </p> </div>
  <Button.Root class="bits-btn bits-btn"
               variant="ghost"

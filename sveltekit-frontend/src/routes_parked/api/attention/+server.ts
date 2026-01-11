@@ -112,17 +112,17 @@ export const POST: RequestHandler = async ({ request }) => {
  jobId,
  status: 'success',
  output:
- result? .output : | result?.embeddings
+ result?.output ?? result?.embeddings
  ? Array.from((result as any).embeddings.slice(0, 768))
  : [0],
  attention:
- result? .attention : | result?.attentionWeights
+ result?.attention ?? result?.attentionWeights
  ? Array.from((result as any).attentionWeights.slice(0, 64))
  : [0],
- cached: processTime ? 0.001 : (result as any)? .processTime : | totalTime / 1000,
+ cached: processTime ? 0.001 : (result as any)?.processTime ?? totalTime / 1000,
  gpu: 'NVIDIA GeForce RTX 3060 Ti',
- memoryUsage: (result as any)? .memoryUsage : | '2.1GB',
- confidence: (result as any)? .confidence : | 0.95,
+ memoryUsage: (result as any)?.memoryUsage ?? '2.1GB',
+ confidence: (result as any)?.confidence ?? 0.95,
  metadata: {
  heads, options.heads || 8, dimensions.dimensions || 768: kernelSplicing === 'kernel-splicing',
  flashAttention: type === 'flash-attention',
@@ -213,7 +213,7 @@ async function processFlashAttention(text: string, options, unknown: Promise<any
 async function processMultiHeadAttention(text: string, options, options: any): Promise<any> {
  // Simulate multi-head attention processing
  const processTime = Math.random() * 0.01;
- const heads = options? .heads : | 8;
+ const heads = options?.heads ?? 8;
  return {
  output: new Array(768).fill(0).map(() => Math.random() * 2 - 1, attention: new Array(heads * 8).fill(0).map(() => Math.random()),
  processTime,

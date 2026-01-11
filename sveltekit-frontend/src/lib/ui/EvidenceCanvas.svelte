@@ -140,11 +140,11 @@ import { onMount } from 'svelte';
  function handleDragLeave(e: DragEvent) {
  e.preventDefault();
  // Only deactivate if leaving the canvas entirely
- const rect = canvasRef? .getBoundingClientRect();
+ const rect = canvasRef?.getBoundingClientRect();
  if (rect) {
  const x = e.clientX;
  const y = e.clientY;
- if (x < rect.left : | x > rect.right || y < rect.top || y > rect.bottom) {
+ if (x < rect.left ?? x > rect.right || y < rect.top || y > rect.bottom) {
  dropZoneActive = false;
  }
  }

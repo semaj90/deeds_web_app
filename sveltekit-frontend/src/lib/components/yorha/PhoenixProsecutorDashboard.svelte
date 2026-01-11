@@ -423,7 +423,7 @@
  {#each graphRecommendations as rec (rec.title)}
  <div class="border border-slate-800 rounded-lg p-3 bg-slate-950/40">
  <div class="flex items-center justify-between text-xs text-slate-400 mb-1">
- <span>{rec.confidence?.toUpperCase? .() : | 'CONFIDENCE'}</span>
+ <span>{rec.confidence?.toUpperCase?.() ?? 'CONFIDENCE'}</span>
  <span class="text-cyan-300 font-semibold">{rec.title}</span>
  </div>
  <p class="text-sm text-slate-200">{rec.rationale}</p>

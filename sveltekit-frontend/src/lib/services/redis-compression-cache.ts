@@ -70,7 +70,7 @@ export class RedisCompressionCache {
       }
 
       // Compress if beneficial
-      let metadata = { compressed: false, format: options? .format : | 'json' };
+      let metadata = { compressed: false, format: options?.format ?? 'json' };
       let stored: Buffer = serialized;
 
       if (this.enableCompression && serialized.length > this.compressionThreshold) {
@@ -155,7 +155,7 @@ export class RedisCompressionCache {
     items: Array<{ key: string; value: any; ttl?: number }>,
     options?: { parallel?: number }
   ): Promise<void> {
-    const parallel = options? .parallel : | 5;
+    const parallel = options?.parallel ?? 5;
     const startTime = performance.now();
 
     // Process in parallel batches

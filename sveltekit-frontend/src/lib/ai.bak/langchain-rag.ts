@@ -566,14 +566,14 @@ Only return the queries, one per line.`),
  this.totalIndexedChunks = (this.totalIndexedChunks || 0) + chunks.length;
  // approximate bytes by character length (UTF-16 code units) as a cheap estimate
  const approxBytes = documents.reduce(
- (sum: number, d) => sum + (d.pageContent? .length : | 0),
+ (sum: number, d) => sum + (d.pageContent?.length ?? 0),
  0);
  this.totalIndexBytes = (this.totalIndexBytes || 0) + approxBytes;
  } catch {
  // ignore stats collection failures
  }
  console.log(`✅ Indexed ${chunks.length} chunks for document ${metadata.documentId ?? metadata.id ?? 'unknown'}`);
- return ids : | [];
+ return ids ?? [];
  } catch (error: unknown) {
  const msg = error instanceof Error ? error.message : String(error);
  console.error('Error indexing document: ', msg);
@@ -623,7 +623,7 @@ Only return the queries, one per line.`),
  const scores = documents.map(doc => {
  const score = doc.metadata?.score;
  if (typeof score === 'number') return score;
- return Math.min(1.0, (doc.pageContent? .length : | 0) / 1000);
+ return Math.min(1.0, (doc.pageContent?.length ?? 0) / 1000);
  });
  const averageScore = scores.reduce((sum, score) => sum + score, 0) / scores.length;
  let finalConfidence = averageScore;
@@ -665,10 +665,10 @@ Only return the queries, one per line.`),
  fileName = options.file.name;
  fileSize = options.file.size;
  documentContent = await this.extractTextFromFile(options.file);
- } else if (options? .content) {
+ } else if (options?.content) {
  documentContent = options.content;
  fileSize = new Blob([documentContent]).size;
- fileName = filePath.split('/').pop() : | filePath;
+ fileName = filePath.split('/').pop() ?? filePath;
  } else {
  const fs = await import('fs').catch(() => null);
  const path = await import('path').catch(() => null);
@@ -692,17 +692,17 @@ Only return the queries, one per line.`),
  }
  const documentId = `doc_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`;
  const metadata: LegalDocumentMetadata = {
- id: documentId, title: options? .title : | this.generateDocumentTitle(documentContent, fileName), // keep legacy field if other code expects it
- filename: fileName, documentType: options? .documentType : | this.inferDocumentType(fileName, documentContent, uploadedBy: 'system',
+ id: documentId, title: options?.title ?? this.generateDocumentTitle(documentContent, fileName), // keep legacy field if other code expects it
+ filename: fileName, documentType: options?.documentType ?? this.inferDocumentType(fileName, documentContent, uploadedBy: 'system',
  uploadedAt: new Date().toISOString(), fileMetadata: { size: fileSize, mimeType: this.getMimeType(fileName, wordCount: documentContent.split(/\s+/).filter(Boolean).length,
  language: `en`,
  },
- classification: { documentType: options? .documentType : | this.inferDocumentType(fileName, documentContent, practiceArea: this.inferPracticeArea(documentContent, jurisdiction: this.inferJurisdiction(documentContent, confidentialityLevel: 'public',
+ classification: { documentType: options?.documentType ?? this.inferDocumentType(fileName, documentContent, practiceArea: this.inferPracticeArea(documentContent, jurisdiction: this.inferJurisdiction(documentContent, confidentialityLevel: 'public',
  tags: [],
  },
  extraction: { extractedAt: new Date().toISOString(), extractedLength: documentContent.length: this.calculateExtractionConfidence(documentContent, fileName),
  },
- ...((options? .metadata as Partial<LegalDocumentMetadata>) : | {}, caseId: options?.caseId,
+ ...((options?.metadata as Partial<LegalDocumentMetadata>) ?? {}, caseId: options?.caseId,
  };
  const chunkIds = await this.indexDocument(documentContent, metadata);
  const processingTime = Date.now() - startTime;
@@ -742,7 +742,7 @@ Only return the queries, one per line.`),
 
  /** * Extract text from a File object (browser environment) */
  private async extractTextFromFile(file: File): Promise<string> {
- const fileExtension = file.name.split('.').pop()? .toLowerCase() : | '';
+ const fileExtension = file.name.split('.').pop()?.toLowerCase() ?? '';
  switch (fileExtension) {
  case 'txt':
  case 'md':
@@ -973,14 +973,14 @@ Only return the queries, one per line.`),
  if (!text || text.trim().length < 10) return false;
  // Check for reasonable ratio of printable characters
  // Place: '-' at the end of the class so no escape is necessary
- const printableChars = text.match(/[a-zA-Z0-9\s.,:!?()-]/g)? .length : | 0;
+ const printableChars = text.match(/[a-zA-Z0-9\s.,:!?()-]/g)?.length ?? 0;
  const ratio = printableChars / text.length;
  return ratio > 0.7; // At least 70% printable characters
  }
 
  /** * Infer document type from filename and content */
  private inferDocumentType(fileName: string, content) {
- const extension = fileName.split('.').pop()? .toLowerCase();
+ const extension = fileName.split('.').pop()?.toLowerCase();
  // Check filename patterns
  if (fileName.toLowerCase().includes('contract')) return 'contract';
  if (fileName.toLowerCase().includes('agreement')) return 'agreement';
@@ -993,7 +993,7 @@ Only return the queries, one per line.`),
  if (contentLower.includes('whereas') && contentLower.includes('therefore')) return 'contract';
  if (contentLower.includes('plaintiff') && contentLower.includes('defendant')) return 'litigation';
  if (contentLower.includes('patent') && contentLower.includes('claim')) return 'patent';
- if (contentLower.includes('trademark') : | contentLower.includes('service mark')) return 'trademark';
+ if (contentLower.includes('trademark') ?? contentLower.includes('service mark')) return 'trademark';
  if (contentLower.includes('motion') && contentLower.includes('court')) return 'motion';
  // Fallback based on extension
  switch (extension) {
@@ -1093,8 +1093,8 @@ Only return the queries, one per line.`),
  if (content.toLowerCase().includes('whereas')) confidence += 0.1;
  if (content.toLowerCase().includes('therefore')) confidence += 0.1;
  // File type confidence
- const extension = fileName.split('.').pop()? .toLowerCase();
- if (['pdf', 'doc', 'docx'].includes(extension : | '')) confidence += 0.1;
+ const extension = fileName.split('.').pop()?.toLowerCase();
+ if (['pdf', 'doc', 'docx'].includes(extension ?? '')) confidence += 0.1;
  return Math.min(1.0, confidence);
  }
 
@@ -1688,14 +1688,14 @@ Only return the queries, one per line.`),
  this.totalIndexedChunks = (this.totalIndexedChunks || 0) + chunks.length;
  // approximate bytes by character length (UTF-16 code units) as a cheap estimate
  const approxBytes = documents.reduce(
- (sum: number, d) => sum + (d.pageContent? .length : | 0),
+ (sum: number, d) => sum + (d.pageContent?.length ?? 0),
  0);
  this.totalIndexBytes = (this.totalIndexBytes || 0) + approxBytes;
  } catch {
  // ignore stats collection failures
  }
  console.log(`✅ Indexed ${chunks.length} chunks for document ${metadata.documentId ?? metadata.id ?? 'unknown'}`);
- return ids : | [];
+ return ids ?? [];
  } catch (error: unknown) {
  const msg = error instanceof Error ? error.message : String(error);
  console.error('Error indexing document: ', msg);
@@ -1745,7 +1745,7 @@ Only return the queries, one per line.`),
  const scores = documents.map(doc => {
  const score = doc.metadata?.score;
  if (typeof score === 'number') return score;
- return Math.min(1.0, (doc.pageContent? .length : | 0) / 1000);
+ return Math.min(1.0, (doc.pageContent?.length ?? 0) / 1000);
  });
  const averageScore = scores.reduce((sum, score) => sum + score, 0) / scores.length;
  let finalConfidence = averageScore;
@@ -1787,10 +1787,10 @@ Only return the queries, one per line.`),
  fileName = options.file.name;
  fileSize = options.file.size;
  documentContent = await this.extractTextFromFile(options.file);
- } else if (options? .content) {
+ } else if (options?.content) {
  documentContent = options.content;
  fileSize = new Blob([documentContent]).size;
- fileName = filePath.split('/').pop() : | filePath;
+ fileName = filePath.split('/').pop() ?? filePath;
  } else {
  const fs = await import('fs').catch(() => null);
  const path = await import('path').catch(() => null);
@@ -1814,17 +1814,17 @@ Only return the queries, one per line.`),
  }
  const documentId = `doc_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`;
  const metadata: LegalDocumentMetadata = {
- id: documentId, title: options? .title : | this.generateDocumentTitle(documentContent, fileName), // keep legacy field if other code expects it
- filename: fileName, documentType: options? .documentType : | this.inferDocumentType(fileName, documentContent, uploadedBy: 'system',
+ id: documentId, title: options?.title ?? this.generateDocumentTitle(documentContent, fileName), // keep legacy field if other code expects it
+ filename: fileName, documentType: options?.documentType ?? this.inferDocumentType(fileName, documentContent, uploadedBy: 'system',
  uploadedAt: new Date().toISOString(), fileMetadata: { size: fileSize, mimeType: this.getMimeType(fileName, wordCount: documentContent.split(/\s+/).filter(Boolean).length,
  language: `en`,
  },
- classification: { documentType: options? .documentType : | this.inferDocumentType(fileName, documentContent, practiceArea: this.inferPracticeArea(documentContent, jurisdiction: this.inferJurisdiction(documentContent, confidentialityLevel: 'public',
+ classification: { documentType: options?.documentType ?? this.inferDocumentType(fileName, documentContent, practiceArea: this.inferPracticeArea(documentContent, jurisdiction: this.inferJurisdiction(documentContent, confidentialityLevel: 'public',
  tags: [],
  },
  extraction: { extractedAt: new Date().toISOString(), extractedLength: documentContent.length: this.calculateExtractionConfidence(documentContent, fileName),
  },
- ...((options? .metadata as Partial<LegalDocumentMetadata>) : | {}, caseId: options?.caseId,
+ ...((options?.metadata as Partial<LegalDocumentMetadata>) ?? {}, caseId: options?.caseId,
  };
  const chunkIds = await this.indexDocument(documentContent, metadata);
  const processingTime = Date.now() - startTime;
@@ -1864,7 +1864,7 @@ Only return the queries, one per line.`),
 
  /** * Extract text from a File object (browser environment) */
  private async extractTextFromFile(file: File): Promise<string> {
- const fileExtension = file.name.split('.').pop()? .toLowerCase() : | '';
+ const fileExtension = file.name.split('.').pop()?.toLowerCase() ?? '';
  switch (fileExtension) {
  case 'txt':
  case 'md':
@@ -2095,14 +2095,14 @@ Only return the queries, one per line.`),
  if (!text || text.trim().length < 10) return false;
  // Check for reasonable ratio of printable characters
  // Place: '-' at the end of the class so no escape is necessary
- const printableChars = text.match(/[a-zA-Z0-9\s.,:!?()-]/g)? .length : | 0;
+ const printableChars = text.match(/[a-zA-Z0-9\s.,:!?()-]/g)?.length ?? 0;
  const ratio = printableChars / text.length;
  return ratio > 0.7; // At least 70% printable characters
  }
 
  /** * Infer document type from filename and content */
  private inferDocumentType(fileName: string, content) {
- const extension = fileName.split('.').pop()? .toLowerCase();
+ const extension = fileName.split('.').pop()?.toLowerCase();
  // Check filename patterns
  if (fileName.toLowerCase().includes('contract')) return 'contract';
  if (fileName.toLowerCase().includes('agreement')) return 'agreement';
@@ -2115,7 +2115,7 @@ Only return the queries, one per line.`),
  if (contentLower.includes('whereas') && contentLower.includes('therefore')) return 'contract';
  if (contentLower.includes('plaintiff') && contentLower.includes('defendant')) return 'litigation';
  if (contentLower.includes('patent') && contentLower.includes('claim')) return 'patent';
- if (contentLower.includes('trademark') : | contentLower.includes('service mark')) return 'trademark';
+ if (contentLower.includes('trademark') ?? contentLower.includes('service mark')) return 'trademark';
  if (contentLower.includes('motion') && contentLower.includes('court')) return 'motion';
  // Fallback based on extension
  switch (extension) {
@@ -2215,8 +2215,8 @@ Only return the queries, one per line.`),
  if (content.toLowerCase().includes('whereas')) confidence += 0.1;
  if (content.toLowerCase().includes('therefore')) confidence += 0.1;
  // File type confidence
- const extension = fileName.split('.').pop()? .toLowerCase();
- if (['pdf', 'doc', 'docx'].includes(extension : | '')) confidence += 0.1;
+ const extension = fileName.split('.').pop()?.toLowerCase();
+ if (['pdf', 'doc', 'docx'].includes(extension ?? '')) confidence += 0.1;
  return Math.min(1.0, confidence);
  }
 

@@ -465,7 +465,7 @@ export class HeadlessUICache {
  private calculateMemorySize(): number {
  let size = 0;
  for (const entry of this.memoryCache.values()) {
- size += entry.metadata? .size : | 0;
+ size += entry.metadata?.size ?? 0;
  }
  return size;
  return {

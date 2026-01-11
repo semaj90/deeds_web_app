@@ -59,7 +59,7 @@
  const firstName = input.firstName ?? input.given_name ?? input.first_name;
  const lastName = input.lastName ?? input.family_name ?? input.last_name;
  const email = input.email ?? input.emailAddress ?? input.email_address;
- // compute the combined name first to avoid mixing '?? ' and ' : |' in one expression
+ // compute the combined name first to avoid mixing '?? ' and ' ?? ' in one expression
  const computedName = `${firstName ?? ''} ${lastName ?? ''}`.trim();
  const name = input.name ?? (computedName ? computedName : email);
  return {
@@ -147,12 +147,12 @@
 
  const displayName = $derived(() => {
  const first = profileForm.firstName?.trim();
- const last = profileForm.lastName? .trim();
- if (first : | last) return [first, last].filter(Boolean).join(' ');
+ const last = profileForm.lastName?.trim();
+ if (first ?? last) return [first, last].filter(Boolean).join(' ');
  return user?.name ?? user?.email ?? 'Profile';
  });
 
- const profileLoaded = $derived(() => Boolean(user? .email : | profileForm.email));
+ const profileLoaded = $derived(() => Boolean(user?.email ?? profileForm.email));
  const totalChunks = $derived(
  () =>
  ragSummary?.results?.reduce(

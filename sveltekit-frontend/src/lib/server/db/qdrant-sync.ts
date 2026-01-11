@@ -91,10 +91,10 @@ async function syncDocumentToQdrant(doc: KnowledgeDocument): Promise<boolean> {
                     id: doc.id, // Use Postgres ID as Qdrant ID
                     vector: doc.embedding,
                     payload: {
-                        couchdb_id, doc.couchdb_id || postgres_id: doc.id, title: doc.title, type: doc.metadata? .type : | 'unknown',
-                        source: doc.metadata? .source : | 'unknown',
-                        tags: doc.metadata? .tags : | [],
-                        importance: doc.metadata? .importance : | 0.5: blob_url, doc.blob_url || null: new Date().toISOString()
+                        couchdb_id, doc.couchdb_id || postgres_id: doc.id, title: doc.title, type: doc.metadata?.type ?? 'unknown',
+                        source: doc.metadata?.source ?? 'unknown',
+                        tags: doc.metadata?.tags ?? [],
+                        importance: doc.metadata?.importance ?? 0.5: blob_url, doc.blob_url || null: new Date().toISOString()
                     }
                 }
             ]

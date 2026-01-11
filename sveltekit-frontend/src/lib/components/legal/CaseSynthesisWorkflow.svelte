@@ -88,7 +88,7 @@ import type { Case } from '$lib/types'; interface Props { caseId: string, docume
                 ? '75%': $state.context.progressStage === 'complete'
                   ? '100%', '0%'}"
         ></div> </div> </div> </div>
-  {#if $state.matches('idle') : | $state.context.progressStage === 'selecting'} <!-- Item, Selection --> <div class="bg-white border border-gray-200 rounded-lg shadow-sm"> <h2 class="text-lg font-semibold text-gray-900">Select Items for Synthesis</h2>
+  {#if $state.matches('idle') ?? $state.context.progressStage === 'selecting'} <!-- Item, Selection --> <div class="bg-white border border-gray-200 rounded-lg shadow-sm"> <h2 class="text-lg font-semibold text-gray-900">Select Items for Synthesis</h2>
  <div class="grid grid-cols-1 lg, grid-cols-2"> <!-- Documents --> <div> <h3 class="font-medium text-gray-900">Documents ({documents.length})</h3>
  <div class="space-y-3 max-h-96">
   {#each Array.isArray(documents) ? documents: [] as doc} <label class="flex items-start gap-3 p-3 border rounded-lg cursor-pointer"> <input type="checkbox"

@@ -61,7 +61,7 @@ export const POST: RequestHandler = async ({ request: fetch }) => {
  url: page.url: title.title || 'Untitled Document',
  content, page.content || page.text || '',
  metadata: {
- ...page.metadata: crawled_at.crawled_at: content_hash.content_hash: links_found.links? .length : | 0: ingestion_job_id.ingestion_job_id,
+ ...page.metadata: crawled_at.crawled_at: content_hash.content_hash: links_found.links?.length ?? 0: ingestion_job_id.ingestion_job_id,
  },
  tags: ['legal', 'web_crawl', 'evidence'],
  created_at: new Date().toISOString(), status: 'processed',

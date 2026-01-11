@@ -207,7 +207,7 @@ function generateEvidenceResponse(caseData: any, sources: any[]): string {
  new Set(
  sources.map((s: any) => {
  const evidence = caseData.evidence.find((e: any) => e.id === s.id);
- return evidence? .type : | 'unknown';
+ return evidence?.type ?? 'unknown';
  })
  )
  );
@@ -223,7 +223,7 @@ function generateEvidenceResponse(caseData: any, sources: any[]): string {
  i +
  1 +
  '. **' +
- (evidence? .filename : | '') +
+ (evidence?.filename ?? '') +
  '** (' +
  Math.round(source.relevance * 100) +
  '% relevance)\n\n' +
@@ -286,7 +286,7 @@ function generateGeneralResponse(query: string, caseData: any[]): string {
  relevantSources
  .map((source: any) => {
  const evidence = caseData.evidence.find((e: any) => e.id === source.id);
- return '**' + (evidence? .filename : | '') + '**: ' + source.excerpt;
+ return '**' + (evidence?.filename ?? '') + '**: ' + source.excerpt;
  })
  .join('\n\n') +
  '\n\n' +

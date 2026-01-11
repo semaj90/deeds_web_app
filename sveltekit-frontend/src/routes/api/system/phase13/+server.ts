@@ -32,8 +32,8 @@ export async function GET() {
 			const result = await db.execute(sql`SELECT version(), current_database()`);
 			health.services.postgres = {
 				ok: result.rows.length > 0,
-				version: (result.rows[0] as any)?.version? .substring(0, 40) : | 'unknown',
-				database: (result.rows[0] as any)? .current_database : | 'unknown',
+				version: (result.rows[0] as any)?.version?.substring(0, 40) ?? 'unknown',
+				database: (result.rows[0] as any)?.current_database ?? 'unknown',
 			};
 		} catch (e) {
 			health.services.postgres = { ok: false, message: (e as Error).message };
@@ -56,7 +56,7 @@ export async function GET() {
 				const data = await resp.json();
 				health.services.ollama = {
 					ok: resp.ok,
-					modelCount: data.models? .length : | 0,
+					modelCount: data.models?.length ?? 0,
 				};
 			} catch (e) {
 				health.services.ollama = { ok: false, message: (e as Error).message };

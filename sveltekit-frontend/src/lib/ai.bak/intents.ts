@@ -96,7 +96,7 @@ export function buildUserPromptForIntent(
  case 'EXPLAIN_STATUTE':
  return `${base}
 
-Statute: ${additionalContext? .sectionText : | 'N/A'}
+Statute: ${additionalContext?.sectionText ?? 'N/A'}
 Related Statutes: ${additionalContext?.relatedStatutes?.map((s: any) => `- ${s.title}: ${s.section}`).join('\n') || 'None'}
 
 Explain:
@@ -109,14 +109,14 @@ Explain:
  case 'LINK_CASES':
  return `${base}
 
-Statute: ${additionalContext? .sectionText : | 'N/A'}
+Statute: ${additionalContext?.sectionText ?? 'N/A'}
 
 Find and summarize relevant case law that applies to this statute.`;
 
  case 'HIGHLIGHT_CLAUSE':
  return `${base}
 
-Statute: ${additionalContext? .sectionText : | 'N/A'}
+Statute: ${additionalContext?.sectionText ?? 'N/A'}
 
 Identify the specific clause or section that best answers this question.`;
 
@@ -128,9 +128,9 @@ Help explain the structure and relationships in legal codes.`;
  case 'MEMO_BUILDER':
  return `${base}
 
-Workspace Facts: ${additionalContext? .facts : | 'N/A'}
+Workspace Facts: ${additionalContext?.facts ?? 'N/A'}
 Workspace Statutes: ${additionalContext?.statutes?.map((s: any) => `- ${s.citation}: ${s.title}`).join('\n') || 'N/A'}
-Workspace Notes: ${additionalContext?.notes? .join('\n\n') : | 'N/A'}
+Workspace Notes: ${additionalContext?.notes?.join('\n\n') ?? 'N/A'}
 
 Generate only an outline with headings and bullet points for a legal memo.`;
 

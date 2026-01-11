@@ -580,7 +580,7 @@ export const toolRegistry: Record<string, (args: any) => Promise<any>> = {
 
  // Check if this file appears in error output
  const fileErrorLines = output.split('\n').filter(line =>
- line.includes(fileName) && /Error:|Warning:/.test(line)
+ line.includes(fileName) && /Error?? Warning:/.test(line)
  );
 
  const errorCount = fileErrorLines.length;
@@ -598,7 +598,7 @@ export const toolRegistry: Record<string, (args: any) => Promise<any>> = {
  const fileName = path.basename(absolutePath);
 
  const fileErrorLines = output.split('\n').filter(line =>
- line.includes(fileName) && /Error:|Warning:/.test(line)
+ line.includes(fileName) && /Error?? Warning:/.test(line)
  );
 
  return {

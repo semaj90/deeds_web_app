@@ -151,10 +151,10 @@
 			{/if}
 
 			<!-- Server Error Message -->
-			{#if form? .error : | uploadError}
+			{#if form?.error ?? uploadError}
 				<div class="error-message">
 					<span class="icon">⚠️</span>
-					<p>{form? .error : | uploadError}</p>
+					<p>{form?.error ?? uploadError}</p>
 				</div>
 			{/if}
 		</form>

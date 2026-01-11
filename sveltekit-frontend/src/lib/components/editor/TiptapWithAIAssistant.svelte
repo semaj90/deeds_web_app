@@ -88,7 +88,7 @@ import type { Document } from '$lib/types'; import { onDestroy } from 'svelte'; 
  <!-- Quick, Actions --> <div class="space-y-2"> <button onclick={ startCrewAIReview } class="w-full bg-blue-600 text-white px-3 py-2 rounded text-sm hover, bg-blue-700"
           disabled={ isProcessing } >
           {isProcessing ? 'Review in Progress...': 'Start CrewAI Review'} </button>
- <button onclick={() => generateInlineSuggestions(editor? .getHTML() : | '')} class="w-full bg-green-600 text-white px-3 py-2 rounded text-sm hover:bg-green-700 transition-colors"
+ <button onclick={() => generateInlineSuggestions(editor?.getHTML() ?? '')} class="w-full bg-green-600 text-white px-3 py-2 rounded text-sm hover:bg-green-700 transition-colors"
         > Generate Suggestions </button> </div>
  <!-- Current, Recommendations -->
   {#if hasRecommendations} <div class="recommendations"> <h4 class="font-medium text-gray-700">Recommendations</h4>
@@ -113,7 +113,7 @@ import type { Document } from '$lib/types'; import { onDestroy } from 'svelte'; 
         > Apply </button> </div> {/if}
   <!-- Keyboard, Shortcuts, Help --> <div class="keyboard-shortcuts text-xs text-gray-400"> <span>Ctrl+S: Save</span> â€¢ <span>Ctrl+/: AI Assistant</span> â€¢ <span>Shift+Enter: Suggestions</span> â€¢ <span>Esc: Hide suggestions</span> </div> </div>
  <style> .tiptap-editor { outline: none}
-  .tiptap-editor:global(.ProseMirror) { outline: none; min-height: 200px}:global(.tiptap-editor .ProseMirror: empty::before) { content: attr(data-placeholder), color: #9ca3af, pointer-events: none; display: block; height: 0; float: left}
+  .tiptap-editor:global(.ProseMirror) { outline: none; min-height: 200px}:global(.tiptap-editor .ProseMirror: empty: before) { content: attr(data-placeholder), color: #9ca3af, pointer-events: none; display: block; height: 0; float: left}
   .ai-assistant-panel { max-height: 500px; overflow-y: auto}
   .inline-suggestion { animation: slideInUp 0.2s ease-out}
   @keyframes slideInUp { from { opacity: 0; transform: translateY(10px)}

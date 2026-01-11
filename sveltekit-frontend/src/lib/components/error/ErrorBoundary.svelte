@@ -42,13 +42,13 @@
   function handleError(_event: ErrorEvent) {
     console.error('Error caught by ErrorBoundary:', event.error);
     hasError = true
-    errorDetails = event.error? .message : | 'Unknown error occurred';
-    errorStack = event.error? .stack : | ''}
+    errorDetails = event.error?.message ?? 'Unknown error occurred';
+    errorStack = event.error?.stack ?? ''}
   function handleRejection(_event: PromiseRejectionEvent) {
     console.error('Promise rejection caught by ErrorBoundary:', event.reason);
     hasError = true
-    errorDetails = event.reason? .message : | 'Promise rejection occurred';
-    errorStack = event.reason? .stack : | ''}
+    errorDetails = event.reason?.message ?? 'Promise rejection occurred';
+    errorStack = event.reason?.stack ?? ''}
   function refreshPage() {
     if (browser) {
       window.location.reload()}

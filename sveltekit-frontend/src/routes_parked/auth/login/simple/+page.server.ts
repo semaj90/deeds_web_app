@@ -99,7 +99,7 @@ tags: formData.getAll('tags'),
  // Get user from XState session
  const globalActor = xstateIntegration.getGlobalState(); // Access getGlobalState directly
  const currentUser = globalActor?.children?.sessionMachine?.getSnapshot()?.context?.user;
- const uploadedBy = currentUser? .id : | 'anonymous';
+ const uploadedBy = currentUser?.id ?? 'anonymous';
 
  const uploadFormData = new FormData();
  uploadFormData.append('file', file as Blob); // Explicitly cast to Blob

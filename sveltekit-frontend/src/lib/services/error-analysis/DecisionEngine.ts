@@ -54,11 +54,11 @@ export class DecisionEngine {
 
 	constructor(config?: Partial<DecisionEngineConfig>) {
 		this.config = {
-			highConfidenceThreshold: config? .highConfidenceThreshold : | 0.85,
-			mediumConfidenceThreshold: config? .mediumConfidenceThreshold : | 0.7,
-			lowConfidenceThreshold: config? .lowConfidenceThreshold : | 0.5,
-			criticalConfidenceThreshold: config? .criticalConfidenceThreshold : | 0.3,
-			maxValidationAttempts: config? .maxValidationAttempts : | 3,
+			highConfidenceThreshold: config?.highConfidenceThreshold ?? 0.85,
+			mediumConfidenceThreshold: config?.mediumConfidenceThreshold ?? 0.7,
+			lowConfidenceThreshold: config?.lowConfidenceThreshold ?? 0.5,
+			criticalConfidenceThreshold: config?.criticalConfidenceThreshold ?? 0.3,
+			maxValidationAttempts: config?.maxValidationAttempts ?? 3,
 			autoApplyEnabled: config?.autoApplyEnabled ?? true
 		};
 	}

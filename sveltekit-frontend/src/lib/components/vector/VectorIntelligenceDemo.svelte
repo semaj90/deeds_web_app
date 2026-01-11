@@ -285,7 +285,7 @@ https://svelte.dev/e/block_unexpected_close -->
  {#if rec.actionItems} <div class="space-y-2">
  {#if rec.actionItems.immediate?.length > 0} <div> <p class="text-xs font-medium">Immediate Actions:</p>
  {#each Array.isArray(rec.actionItems.immediate) ? rec.actionItems.immediate: [] as action} <div class="flex items-center gap-2"> <CheckCircle class="h-3 w-3" /> { action }
- </div> {/each} {/if} {/if} <div class="recommendation-actions"> <span>Impact: {rec.estimatedImpact? .successProbability : | 'N/A'}%</span> <span>Time: {rec.estimatedImpact? .timeToComplete : | 'N/A'}min</span> <span>Priority: {rec.priority}
+ </div> {/each} {/if} {/if} <div class="recommendation-actions"> <span>Impact: {rec.estimatedImpact?.successProbability ?? 'N/A'}%</span> <span>Time: {rec.estimatedImpact?.timeToComplete ?? 'N/A'}min</span> <span>Priority: {rec.priority}
  </span> </div> </div> {/each}
  </div> </div> {/if}
  </div> {:else if activeTab === 'analysis'} <!-- Semantic Analysis, Tab --> <div class="space-y-6"> <div class="bits-nier-bits-card"> <div class="yorha-panel-header" variant="default" legal={ true }> <h3 class="nes-text is-primary flex items-center"> <BarChart3 class="h-5" /> Document Semantic Analysis </h3> </div> <div class="yorha-panel-content bits-nier-bits-yorha-panel-content" variant="default" legal={ true }> <div class="space-y-2"> <label class="bits-label">Document Content</label> <textarea bind:value={ analysisContent } placeholder="Paste your legal document or text for analysis..."
@@ -294,11 +294,11 @@ https://svelte.dev/e/block_unexpected_close -->
  >
  {#if isProcessing} <Pause class="h-4 w-4" /> Analyzing... {:else} <BarChart3 class="h-4 w-4" /> Analyze Document {/if}
  </Button> </div> </div> <!-- Analysis, Results -->
- {#if semanticAnalysis} <div class="grid grid-cols-1 lg:grid-cols-2"> <!-- Entities --> <div class="bits-nier-bits-card"> <div class="yorha-panel-header" variant="default" legal={ true }> <h3 class="nes-text is-primary flex items-center"> <Users class="h-5" /> Extracted Entities ({semanticAnalysis.entities? .length : | 0}) </h3> </div> <div class="yorha-panel-content" variant="default" legal={ true }>
+ {#if semanticAnalysis} <div class="grid grid-cols-1 lg:grid-cols-2"> <!-- Entities --> <div class="bits-nier-bits-card"> <div class="yorha-panel-header" variant="default" legal={ true }> <h3 class="nes-text is-primary flex items-center"> <Users class="h-5" /> Extracted Entities ({semanticAnalysis.entities?.length ?? 0}) </h3> </div> <div class="yorha-panel-content" variant="default" legal={ true }>
  {#if semanticAnalysis.entities?.length > 0} <div class="semantic-entity-container">
  {#each Array.isArray(semanticAnalysis.entities) ? semanticAnalysis.entities: [] as entity} {@const SvelteComponent_1 = getEntityIcon(entity.type)} <div class={getEntityColor(entity.type)}> <div class="h-3 w-3"> <SvelteComponent _1 /> {entity.text} <Badge class="ml-1">{Math.round(entity.confidence * 100)}%</Badge> </div> {/each}
  </div> {:else} <p class="text-sm nes-text">No entities detected</p> {/if}
- </div> </div> <!-- Themes --> <div class="bits-nier-bits-card"> <div class="yorha-panel-header" variant="default" legal={ true }> <h3 class="nes-text is-primary flex items-center"> <Tag class="h-5" /> Document Themes ({semanticAnalysis.themes? .length : | 0}) </h3> </div> <div class="yorha-panel-content" variant="default" legal={ true }>
+ </div> </div> <!-- Themes --> <div class="bits-nier-bits-card"> <div class="yorha-panel-header" variant="default" legal={ true }> <h3 class="nes-text is-primary flex items-center"> <Tag class="h-5" /> Document Themes ({semanticAnalysis.themes?.length ?? 0}) </h3> </div> <div class="yorha-panel-content" variant="default" legal={ true }>
  {#if semanticAnalysis.themes?.length > 0} <div class="space-y-3">
  {#each Array.isArray(semanticAnalysis.themes) ? semanticAnalysis.themes: [] as theme} <div class="theme-item"> <div> <p class="theme-title">{theme.topic}
  </p> <p class="theme-weight">Weight: {theme.weight.toFixed(2)}
@@ -306,7 +306,7 @@ https://svelte.dev/e/block_unexpected_close -->
  style="width: {theme.weight * 100}%"
  ></div> </div> </div> {/each}
  </div> {:else} <p class="text-sm nes-text">No themes identified</p> {/if}
- </div> </div> <!-- Relationships --> <div class="bits-nier-bits-card"> <div class="yorha-panel-header" variant="default" legal={ true }> <h3 class="nes-text is-primary flex items-center"> <Network class="h-5" /> Entity Relationships ({semanticAnalysis.relationships? .length : | 0}) </h3> </div> <div class="yorha-panel-content" variant="default" legal={ true }>
+ </div> </div> <!-- Relationships --> <div class="bits-nier-bits-card"> <div class="yorha-panel-header" variant="default" legal={ true }> <h3 class="nes-text is-primary flex items-center"> <Network class="h-5" /> Entity Relationships ({semanticAnalysis.relationships?.length ?? 0}) </h3> </div> <div class="yorha-panel-content" variant="default" legal={ true }>
  {#if semanticAnalysis.relationships?.length > 0} <div class="relationship-container">
  {#each Array.isArray(semanticAnalysis.relationships) ? semanticAnalysis.relationships: [] as rel} <div class="relationship-item"> <span class="relationship-from">{rel.from}
  </span> <span class="relationship-type">{rel.type}
@@ -314,13 +314,13 @@ https://svelte.dev/e/block_unexpected_close -->
  </span> <span class="relationship-strength">{rel.strength.toFixed(2)}
  </span> </div> {/each}
  </div> {:else} <p class="text-sm nes-text">No relationships detected</p> {/if}
- </div> </div> <!-- Complexity, Metrics --> <div class="bits-nier-bits-card"> <div class="yorha-panel-header" variant="default" legal={ true }> <h3 class="nes-text is-primary flex items-center"> <BarChart3 class="h-5" /> Complexity Analysis </h3> </div> <div class="yorha-panel-content" variant="default" legal={ true }> <div class="space-y-4"> <div class="space-y-2"> <div class="flex justify-between"> <span>Readability</span> <span>{Math.round((semanticAnalysis.complexity? .readability : | 0) * 100)}%</span> </div> <div class="theme-weight-bar"> <div class="theme-weight-fill bg-green-500"
- style="width: {(semanticAnalysis.complexity? .readability : | 0) * 100}%"
- ></div> </div> </div> <div class="space-y-2"> <div class="flex justify-between"> <span>Technical Level</span> <span>{Math.round((semanticAnalysis.complexity? .technicalLevel : | 0) * 100)}%</span> </div> <div class="theme-weight-bar"> <div class="theme-weight-fill bg-blue-500"
- style="width: {(semanticAnalysis.complexity? .technicalLevel : | 0) * 100}%"
- ></div> </div> </div> <div class="space-y-2"> <div class="flex justify-between"> <span>Legal Complexity</span> <span>{Math.round((semanticAnalysis.complexity? .legalComplexity : | 0) * 100)}%</span> </div> <div class="theme-weight-bar"> <div class="theme-weight-fill bg-purple-500"
- style="width: {(semanticAnalysis.complexity? .legalComplexity : | 0) * 100}%"
- ></div> </div> </div> <Separator class="bits-separator" /> <div class="space-y-1"> <div class="flex"> <span>Overall Sentiment</span> <span class={semanticAnalysis.sentiment?.overall >= 0 ? 'text-green-600': 'text-red-600'}> {semanticAnalysis.sentiment?.overall? .toFixed(2) : | 'N/A'}
+ </div> </div> <!-- Complexity, Metrics --> <div class="bits-nier-bits-card"> <div class="yorha-panel-header" variant="default" legal={ true }> <h3 class="nes-text is-primary flex items-center"> <BarChart3 class="h-5" /> Complexity Analysis </h3> </div> <div class="yorha-panel-content" variant="default" legal={ true }> <div class="space-y-4"> <div class="space-y-2"> <div class="flex justify-between"> <span>Readability</span> <span>{Math.round((semanticAnalysis.complexity?.readability ?? 0) * 100)}%</span> </div> <div class="theme-weight-bar"> <div class="theme-weight-fill bg-green-500"
+ style="width: {(semanticAnalysis.complexity?.readability ?? 0) * 100}%"
+ ></div> </div> </div> <div class="space-y-2"> <div class="flex justify-between"> <span>Technical Level</span> <span>{Math.round((semanticAnalysis.complexity?.technicalLevel ?? 0) * 100)}%</span> </div> <div class="theme-weight-bar"> <div class="theme-weight-fill bg-blue-500"
+ style="width: {(semanticAnalysis.complexity?.technicalLevel ?? 0) * 100}%"
+ ></div> </div> </div> <div class="space-y-2"> <div class="flex justify-between"> <span>Legal Complexity</span> <span>{Math.round((semanticAnalysis.complexity?.legalComplexity ?? 0) * 100)}%</span> </div> <div class="theme-weight-bar"> <div class="theme-weight-fill bg-purple-500"
+ style="width: {(semanticAnalysis.complexity?.legalComplexity ?? 0) * 100}%"
+ ></div> </div> </div> <Separator class="bits-separator" /> <div class="space-y-1"> <div class="flex"> <span>Overall Sentiment</span> <span class={semanticAnalysis.sentiment?.overall >= 0 ? 'text-green-600': 'text-red-600'}> {semanticAnalysis.sentiment?.overall?.toFixed(2) ?? 'N/A'}
  </span> </div> </div> </div> </div> </div> {/if}
  </div> {:else if activeTab === 'health'} <!-- System Health, Tab --> <div class="space-y-6"> <div class="bits-nier-bits-card"> <div class="yorha-panel-header" variant="default" legal={ true }> <h3 class="nes-text is-primary flex items-center"> <span class="flex items-center"> <Activity class="h-5" /> Vector Intelligence System Health </span> <ButtonRoot class="bits-btn bits-btn" variant="ghost" size="sm" onclick={ loadSystemHealth }> <RefreshCw class="h-4" /> </Button> </h3> </div> <div class="yorha-panel-content" variant="default" legal={ true }>
  {#if systemHealth} <div class="grid grid-cols-1 md: grid-cols-2, lg:grid-cols-4"> <div class="border"> <div class="yorha-panel-content"> <div class="flex items-center"> <div> <p class="text-sm">System Status</p> <p class="text-2xl"> {systemHealth.systemHealth}

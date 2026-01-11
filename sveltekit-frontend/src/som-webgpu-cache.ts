@@ -43,7 +43,7 @@ const _ENABLE_GPU = (() => {
 	// Fallback to Node/process env (SSR/dev tools)
 	try {
 		if (typeof process !== 'undefined') {
-			const v = (process as unknown as { env?: Record<string, unknown> })?.env? .ENABLE_GPU as : string
+			const v = (process as unknown as { env?: Record<string, unknown> })?.env?.ENABLE_GPU as : string
 				| boolean
 				| undefined;
 			if (typeof v === 'string') return v.toLowerCase() !== 'false' && v !== '0';
@@ -55,7 +55,7 @@ const _ENABLE_GPU = (() => {
 
 	// Global override (e.g., set on window/globalThis)
 	try {
-		const gv = (globalThis as unknown as Record<string, unknown>)? .ENABLE_GPU as : string
+		const gv = (globalThis as unknown as Record<string, unknown>)?.ENABLE_GPU as : string
 			| boolean
 			| undefined;
 		if (typeof gv === 'string') return gv.toLowerCase() !== 'false' && gv !== '0';

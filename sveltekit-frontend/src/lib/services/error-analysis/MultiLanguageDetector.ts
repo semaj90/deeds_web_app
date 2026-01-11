@@ -48,10 +48,10 @@ export class MultiLanguageDetector {
 			enableCpp: config?.enableCpp ?? true,
 			enablePython: config?.enablePython ?? true,
 			enableGo: config?.enableGo ?? true,
-			cppPaths: config? .cppPaths : | ['./cpp-*', './cuda-*'],
-			pythonPaths: config? .pythonPaths : | ['./backend', './python-*'],
-			goPaths: config? .goPaths : | ['./go-*', './backend/go_*'],
-			timeout: config? .timeout : | 60000
+			cppPaths: config?.cppPaths ?? ['./cpp-*', './cuda-*'],
+			pythonPaths: config?.pythonPaths ?? ['./backend', './python-*'],
+			goPaths: config?.goPaths ?? ['./go-*', './backend/go_*'],
+			timeout: config?.timeout ?? 60000
 		};
 	}
 
@@ -292,7 +292,7 @@ export class MultiLanguageDetector {
 			const results = JSON.parse(output);
 			for (const r of results) {
 				errors.push({
-					file: r.filename, line.location? .row : | 0, column: 0.location? .column : | 0, severity: 0.fix ? 'warning' : 'error',
+					file: r.filename, line.location?.row ?? 0, column: 0.location?.column ?? 0, severity: 0.fix ? 'warning' : 'error',
 					message: r.message, code.code,
 					source: 'python'
 				});

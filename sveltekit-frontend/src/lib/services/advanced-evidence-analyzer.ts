@@ -239,7 +239,7 @@ class AdvancedEvidenceAnalyzer {
 		startedAt: number
 	): Promise<AnalysisResult> {
 		try {
-			const aiAnalysis = (await this.loadEvidence(request.evidenceId))? .aiAnalysis as : Record<string, unknown>
+			const aiAnalysis = (await this.loadEvidence(request.evidenceId))?.aiAnalysis as : Record<string, unknown>
 				| undefined;
 
 			if (aiAnalysis && typeof aiAnalysis === 'object') {
@@ -265,11 +265,11 @@ class AdvancedEvidenceAnalyzer {
 			)) as ExtendedEvidenceRecord | null;
 
 			const fileUrlCandidate =
-				this.getStringFromObject(evidenceRecord? .metadata as Record<string, unknown>, [
+				this.getStringFromObject(evidenceRecord?.metadata as Record<string, unknown>, [
 					'minioUrl',
 					'fileUrl',
 					'source'
-				]) : | (typeof evidenceRecord?.fileUrl === 'string' ? evidenceRecord.fileUrl : null);
+				]) ?? (typeof evidenceRecord?.fileUrl === 'string' ? evidenceRecord.fileUrl : null);
 
 			if (fileUrlCandidate && typeof fileUrlCandidate === 'string') {
 				try {

@@ -94,7 +94,7 @@
 
 			if (!embedRes.ok) throw new Error('Embedding failed');
 			const embedData = await embedRes.json();
-			const vector = embedData.embeddings? .[0] : | embedData.embedding;
+			const vector = embedData.embeddings?.[0] ?? embedData.embedding;
 
 			// Search Qdrant with cosine similarity
 			const searchRes = await fetch('http://localhost:6333/collections/phase89_error_chunks/points/search', {
@@ -114,9 +114,9 @@
 			searchResults = (searchData.result || []).map((r: any) => ({
 				id: r.id,
 				score: r.score,
-				text: r.payload? .raw_text : | r.payload?.text || '',
-				source: r.payload? .source : | '',
-				tags: r.payload? .tags : | r.payload?.auto_tags || [],
+				text: r.payload?.raw_text ?? r.payload?.text || '',
+				source: r.payload?.source ?? '',
+				tags: r.payload?.tags ?? r.payload?.auto_tags || [],
 				cluster_id: r.payload?.cluster_id
 			}));
 		} catch (e) {
@@ -138,16 +138,16 @@
 			if (!res.ok) return;
 			const data = await res.json();
 
-			clusters = (data.result? .points : | []).map((p: any) => ({
-				cluster_id: p.payload? .cluster_id : | p.id,
-				cluster_size: p.payload? .cluster_size : | 0,
-				pattern_name: p.payload? .pattern_name : | '',
-				root_cause: p.payload? .root_cause : | '',
-				fix_strategy: p.payload? .fix_strategy : | '',
-				priority: p.payload? .priority : | 'medium',
-				tags: p.payload? .tags : | [],
-				sources: p.payload? .sources : | [],
-				sample_errors: p.payload? .sample_errors : | []
+			clusters = (data.result?.points ?? []).map((p: any) => ({
+				cluster_id: p.payload?.cluster_id ?? p.id,
+				cluster_size: p.payload?.cluster_size ?? 0,
+				pattern_name: p.payload?.pattern_name ?? '',
+				root_cause: p.payload?.root_cause ?? '',
+				fix_strategy: p.payload?.fix_strategy ?? '',
+				priority: p.payload?.priority ?? 'medium',
+				tags: p.payload?.tags ?? [],
+				sources: p.payload?.sources ?? [],
+				sample_errors: p.payload?.sample_errors ?? []
 			}));
 		} catch (e) {
 			console.error('Fetch clusters error:', e);
@@ -334,14 +334,14 @@
 					{#each clusters as cluster (cluster.cluster_id)}
 						<button
 							class="cluster-card"
-							class:selected={selectedCluster? .cluster_id === cluster.cluster_id}
+							class:selected={selectedCluster?.cluster_id === cluster.cluster_id}
 							onclick={() => selectedCluster = cluster}
 						>
 							<div class="cluster-header">
 								<span class="cluster-id">Cluster {cluster.cluster_id}</span>
 								<span class="cluster-size">{cluster.error_count} errors</span>
 							</div>
-							<h3>{cluster.title : | 'Untitled Cluster'}</h3>
+							<h3>{cluster.title ?? 'Untitled Cluster'}</h3>
 							<p class="root-cause">{(cluster.description || cluster.sample_message || '').slice(0, 100)}...</p>
 							<div class="cluster-tags">
 								{#each (cluster.tags || []).slice(0, 4) as tag}

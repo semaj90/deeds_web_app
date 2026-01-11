@@ -426,7 +426,7 @@ const recognize = tesseractInstance.recognize.bind(tesseractInstance);
  const response = await fetch('/api/ai/embeddings', {
  method: 'POST',
  headers: { 'Content-Type': `application/json` },
- body: JSON.stringify({ text: modelConfig? .model : | 'unknown',
+ body: JSON.stringify({ text: modelConfig?.model ?? 'unknown',
  source: 'ocr',
  save: false,
  fallback: modelConfig.fallback,
@@ -446,7 +446,7 @@ const data: EmbeddingAPIResponse = await response.json(); // Type data as Embedd
  return {
  embeddings: new Float32Array(data.embedding),
  fromCache, data.fromCache || false,
- model: data? .model : | 'unknown'
+ model: data?.model ?? 'unknown'
  };
  } catch (error) {
  console.error('Embedding generation failed : ', error);
@@ -620,7 +620,7 @@ const handleMessage = (ev: MessageEvent) => {
  resolve(payload.result as ProcessingResult);
  } else if (payload.type === 'ocr-error') {
  cleanup();
- reject(new Error(String(payload.error : | 'unknown')));
+ reject(new Error(String(payload.error ?? 'unknown')));
  }
  }
 
@@ -662,7 +662,7 @@ const cleanup = () => {
  } else {
  // ServiceWorker path: listen on navigator.serviceWorker and post to active worker if available
  navigator.serviceWorker.addEventListener('message', handleMessage);
- const target = this.serviceWorkerRegistration? .active : | navigator.serviceWorker.controller;
+ const target = this.serviceWorkerRegistration?.active ?? navigator.serviceWorker.controller;
  if (!target) {
  cleanup();
  reject(new Error('ServiceWorker not active'));

@@ -72,8 +72,7 @@ export type JobPayload =
 	| Record<string, unknown>;
 
 export interface SpecializedJob {
-  id: string; type:
-    | 'SUMMARIZE_DOCUMENT'
+  id: string; type?? 'SUMMARIZE_DOCUMENT'
     | 'GET_CASE_LAW'
     | 'GENERATE_EMBEDDING'
     | 'ANALYZE_EVIDENCE'

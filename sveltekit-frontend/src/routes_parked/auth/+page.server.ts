@@ -55,7 +55,7 @@ export const actions: Actions = {
  if (!validation.success) {
  const errors = validation.error.errors;
  return fail(400, {
- error: errors[0]? .message : | 'Registration validation failed',
+ error: errors[0]?.message ?? 'Registration validation failed',
  });
  }
 
@@ -80,7 +80,7 @@ export const actions: Actions = {
  if (!validation.success) {
  const errors = validation.error.errors;
  return fail(400, {
- error: errors[0]? .message : | 'Login validation failed',
+ error: errors[0]?.message ?? 'Login validation failed',
  });
  }
 

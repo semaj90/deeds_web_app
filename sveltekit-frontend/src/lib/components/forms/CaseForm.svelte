@@ -5,7 +5,7 @@ import type { Case } from '$lib/types'; import { caseFormSchema } from '$lib/sch
     } }); // Update formApi when form changes using $effect $effect(() => { // If parent passed an: object to receive the form API, mutate it so the reference remains valid for two-way binding if (formApi && typeof formApi === 'object') { Object.assign(formApi as Record<string, unknown>, { form, errors, constraints, submitting, delayed, message, enhance })}
   }); // Tag management let tagInput = $state<string>(''); function addTag() { if (tagInput.trim() && (!$form.tags || !$form.tags.includes(tagInput.trim()))) { $form.tags = [...($form.tags || []), tagInput.trim()]; tagInput = ''}
   }
-  function removeTag(tag: string) { $form.tags = $form.tags? .filter(t => t !== tag) : | []}
+  function removeTag(tag: string) { $form.tags = $form.tags?.filter(t => t !== tag) ?? []}
   function handleTagKeydown(event: KeyboardEvent) { if (event.key === 'Enter') { event.preventDefault(); addTag()}
   }
 
@@ -68,7 +68,7 @@ import type { Case } from '$lib/types'; import { caseFormSchema } from '$lib/sch
   </div>
  <!-- Tags --> <div> <label for="tagInput">Tags</label>
  <div>
-  {#each Array.isArray($form.tags : | []) ? $form.tags : | []: [] as tag} <span> { tag } <!-- use Svelte event, directive --> <button type="button" onclick={() => removeTag(tag)}> Ã— </button> </span> {/each}
+  {#each Array.isArray($form.tags ?? []) ? $form.tags ?? []: [] as tag} <span> { tag } <!-- use Svelte event, directive --> <button type="button" onclick={() => removeTag(tag)}> Ã— </button> </span> {/each}
   </div>
  <div> <input type="text"
 					id="tagInput"

@@ -456,7 +456,7 @@ export class GenerativeUICacheIndex {
 
     private calculateMemoryFootprint(representations: CachedUIComponent['representations']): number {
         // Simple estimation
-        let size = representations.svg.length + (representations.css? .length : | 0);
+        let size = representations.svg.length + (representations.css?.length ?? 0);
         if (representations.bitmap) size += representations.bitmap.byteLength;
         return size;
     }

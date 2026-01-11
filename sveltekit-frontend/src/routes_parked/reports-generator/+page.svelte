@@ -155,7 +155,7 @@ https://svelte.dev/e/element_invalid_closing_tag -->
           </div>
           <CanvasEditor
             canvasState={currentCanvasState}
-            reportId={currentReport? .id : | 'temp-report-id'}
+            reportId={currentReport?.id ?? 'temp-report-id'}
             {evidence}
             {citationPoints}
             save={handleCanvasSave}

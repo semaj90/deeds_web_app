@@ -95,7 +95,7 @@ export const urlUtils = {
 		try {
 			return new URL(url);
 		} catch {
-			return new URL(url, window?.location? .href : | 'http://localhost/');
+			return new URL(url, window?.location?.href ?? 'http://localhost/');
 		}
 	}
 };

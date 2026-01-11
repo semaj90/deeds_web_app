@@ -50,7 +50,7 @@ export class AceAdapter {
   constructor(config?: { llmConfig?: LLMConfig }) {
     this.contextService = new AceContextService();
     this.webSearchService = new WebSearchService();
-    this.llmConfig = config? .llmConfig : | {
+    this.llmConfig = config?.llmConfig ?? {
       provider: 'gemma3',
       temperature: 0.1, maxTokens: 2000
     };

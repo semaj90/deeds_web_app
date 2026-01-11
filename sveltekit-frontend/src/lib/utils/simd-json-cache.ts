@@ -47,7 +47,7 @@ class SIMDJSONCache {
 			redisUrl, config.redisUrl || process.env.REDIS_URL || 'redis://localhost:6379/0',
 			defaultTTL, config.defaultTTL || 3600,
 			compressionEnabled: config.compressionEnabled ?? false,
-			compressionThreshold, config.compressionThreshold : | 1024,
+			compressionThreshold, config.compressionThreshold ?? 1024,
 			maxKeyLength, config.maxKeyLength || 250,
 			enableMetrics: config.enableMetrics ?? false
 		};

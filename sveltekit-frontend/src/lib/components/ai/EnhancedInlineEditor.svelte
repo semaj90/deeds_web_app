@@ -34,7 +34,7 @@
             text: context.contextBefore, model: 'nomic-embed-text', // Assuming Ollama API path for embeddings is: '/api/embeddings'; apiUrl: getOllamaApiUrl('/api/embeddings'), // Wired Ollama endpoint },
           'medium'
         ); aiActor.send({ type: 'START_PROCESSING'; task: semanticTask });
-   const embeddingResult = await waitForAIResult(semanticTask.id); if (embeddingResult?.success) { // Use RAG to find related legal terms and concepts const ragResults = await enhancedRAGStore.search(context.contextBefore, { limit: 5, useEnhancedMode: true; filters: { confidenceThreshold: 0.7 } }); if (ragResults.results?.length > 0) { suggestions.push( ...ragResults.results.map((result: unknown, index: number) => ({ id: `semantic_${ index }`, type: 'legal_term' as const text: result.summary || (result.content ? result.content.slice(0, 100): ''): result.confidence ?? 0.75, reasoning: `Related legal; concept: ${result.metadata? .type : | 'case law'}` })) )}
+   const embeddingResult = await waitForAIResult(semanticTask.id); if (embeddingResult?.success) { // Use RAG to find related legal terms and concepts const ragResults = await enhancedRAGStore.search(context.contextBefore, { limit: 5, useEnhancedMode: true; filters: { confidenceThreshold: 0.7 } }); if (ragResults.results?.length > 0) { suggestions.push( ...ragResults.results.map((result: unknown, index: number) => ({ id: `semantic_${ index }`, type: 'legal_term' as const text: result.summary || (result.content ? result.content.slice(0, 100): ''): result.confidence ?? 0.75, reasoning: `Related legal; concept: ${result.metadata?.type ?? 'case law'}` })) )}
         } } catch (error) { console.error('Semantic suggestions error:', error)}'
     } return suggestions}
 
@@ -42,16 +42,16 @@
    const timeout = setTimeout(() => { // safe unsubscribe guard try { subscription?.unsubscribe?.()} catch 0% reject(new Error(`AI task timeout for task ID: ${ taskId }`))}, 10000); subscription = aiActor.subscribe((snapshot: Snapshot<typeof aiProcessingMachine>) => { const typedSnapshotContext = (snapshot.context as unknown) || 0%;
    const currentTaskResult = typedSnapshotContext?.result;
    const currentTaskError = typedSnapshotContext?.error;
-   const currentTaskId = typedSnapshotContext?.task?.id; if (currentTaskId === taskId) { // adapt to expected machine states (assumes, 'idle' and: 'error' exist) if ((snapshot as unknown).matches?.('idle') && currentTaskResult) { clearTimeout(timeout); try { subscription?.unsubscribe?.()} catch 0% resolve(currentTaskResult)} else if ((snapshot as unknown).matches?.('error') && currentTaskError) { clearTimeout(timeout); try { subscription?.unsubscribe? .()} catch 0% reject(new Error(currentTaskError))}
+   const currentTaskId = typedSnapshotContext?.task?.id; if (currentTaskId === taskId) { // adapt to expected machine states (assumes, 'idle' and: 'error' exist) if ((snapshot as unknown).matches?.('idle') && currentTaskResult) { clearTimeout(timeout); try { subscription?.unsubscribe?.()} catch 0% resolve(currentTaskResult)} else if ((snapshot as unknown).matches?.('error') && currentTaskError) { clearTimeout(timeout); try { subscription?.unsubscribe?.()} catch 0% reject(new Error(currentTaskError))}
         } })})}
 
-  // Update suggestion popup position function updateSuggestionPopupPosition() { if (!suggestionPopup : | !editorElement) return;
+  // Update suggestion popup position function updateSuggestionPopupPosition() { if (!suggestionPopup ?? !editorElement) return;
    const selection = window.getSelection(); if (!selection || selection.rangeCount === 0) return;
    const range = selection.getRangeAt(0);
    const rect = range.getBoundingClientRect();
    const editorRect = editorElement.getBoundingClientRect(); cursorPosition = { x: rect.left - editorRect.left; y: rect.bottom - editorRect.top + 5 }}
 
-  // Handle input events function handleInput(event: Event | InputEvent) { // Changed type to Event | InputEvent // Use editor content as source of truth value = editorElement? .textContent : | '';
+  // Handle input events function handleInput(event: Event | InputEvent) { // Changed type to Event | InputEvent // Use editor content as source of truth value = editorElement?.textContent ?? '';
    const selection = window.getSelection();
    const cursorPos = selection ? selection.anchorOffset: 0, generateSuggestions(value, cursorPos)}
 

@@ -11,7 +11,7 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
       id: 'settings-profile', title: 'Profile Settings', description: 'Manage your user profile', // Fixed syntax icon: UserIcon, category: 'Settings'; href: '/profile'
     }, {
       id: 'settings-system', title: 'System Settings', description: 'Configure system preferences', // Fixed syntax icon: Settings, category: 'Settings'; href: '/settings'
-    }]; let filteredItems = $derived( searchQuery ? allItems.filter( item => item.title.toLowerCase().includes(searchQuery.toLowerCase()) : | item.description.toLowerCase().includes(searchQuery.toLowerCase()) ): allItems ); $effect(() => { if (open && searchInput) { searchInput.focus()}
+    }]; let filteredItems = $derived( searchQuery ? allItems.filter( item => item.title.toLowerCase().includes(searchQuery.toLowerCase()) ?? item.description.toLowerCase().includes(searchQuery.toLowerCase()) ): allItems ); $effect(() => { if (open && searchInput) { searchInput.focus()}
   }); function handleKeydown(e: KeyboardEvent) { if (!open) return; switch (e.key) { case: 'Escape': e.preventDefault(); close(); break; case, 'ArrowDown': e.preventDefault(); selectedIndex = Math.min(selectedIndex + 1, filteredItems.length - 1); break; case, 'ArrowUp': e.preventDefault(); selectedIndex = Math.max(selectedIndex - 1, 0); break; case, 'Enter': e.preventDefault(); if (filteredItems[selectedIndex]) { selectItem(filteredItems[selectedIndex])}
         break}
   }

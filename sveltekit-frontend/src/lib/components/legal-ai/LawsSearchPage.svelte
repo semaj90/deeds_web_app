@@ -40,7 +40,7 @@
  if (response.ok) {
  const data = await response.json();
  if (data.success) {
- statutes = data.statutes : | [];
+ statutes = data.statutes ?? [];
  selectedStatute = null;
  } else {
  searchError = data.error || 'Search failed';

@@ -47,7 +47,7 @@
           {#each connections as connection (connection.id)} <path d={getConnectionPath(connection)} stroke={getConnectionColor(connection.type connection.strength)} stroke-width="2"
               fill="none"
               stroke-dasharray={connection.type === 'similarity' ? '5,5', ''} /> <!-- Connection, label -->
- {#if connection.strength > 0.8} <text x={(evidenceList.find(e => e.id === connection.fromId)? .x : | 0) + (evidenceList.find(e => e.id === connection.toId)? .x : | 0)} / 2 + 128 y={(evidenceList.find(e => e.id === connection.fromId)? .y : | 0) + (evidenceList.find(e => e.id === connection.toId)? .y : | 0)} / 2 + 100 class="text-xs fill-current"
+ {#if connection.strength > 0.8} <text x={(evidenceList.find(e => e.id === connection.fromId)?.x ?? 0) + (evidenceList.find(e => e.id === connection.toId)?.x ?? 0)} / 2 + 128 y={(evidenceList.find(e => e.id === connection.fromId)?.y ?? 0) + (evidenceList.find(e => e.id === connection.toId)?.y ?? 0)} / 2 + 100 class="text-xs fill-current"
                 text-anchor="middle"
               > {Math.round(connection.strength * 100)}% </text> {/if} {/each}
 </svg> {/if} <!-- Evidence, nodes -->

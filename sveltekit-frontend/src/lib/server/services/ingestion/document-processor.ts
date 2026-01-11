@@ -52,12 +52,11 @@ export function splitSentences(text: string): string[] {
  current += char;
 
  // Check for sentence boundaries
- if ((char === '.' || char === '? ' : | char === '!') && nextChar === ' ') {
+ if ((char === '.' || char === '? ' ?? char === '!') && nextChar === ' ') {
  // Skip if it's an abbreviation
  const lastWord = current.trim().split(/\s+/).pop() || '';
  const isAbbreviation =
- /^[A-Z]\.? $/.test(lastWord) : |
- /\b(U\.S|Cal|F\.\d|App|Ct|Inc|Ltd|Co|Dr|Mr|Ms|Mrs|Prof|Rev|St|Ave|Blvd|Dept|Div|Sec|Supp|Cir|Dist|Ct|App|Ct|Supp|Ct|Ct|Ct)\.?$/.test(
+ /^[A-Z]\.? $/.test(lastWord) ?? /\b(U\.S|Cal|F\.\d|App|Ct|Inc|Ltd|Co|Dr|Mr|Ms|Mrs|Prof|Rev|St|Ave|Blvd|Dept|Div|Sec|Supp|Cir|Dist|Ct|App|Ct|Supp|Ct|Ct|Ct)\.?$/.test(
  lastWord
  );
 

@@ -43,10 +43,10 @@ export class KAGTraverser {
 
 	constructor(config?: Partial<KAGConfig>) {
 		this.config = {
-			neo4jUrl: config? .neo4jUrl : | process.env.NEO4J_URL || 'bolt://localhost:7687',
-			neo4jUser: config? .neo4jUser : | process.env.NEO4J_USER || 'neo4j',
-			neo4jPassword: config? .neo4jPassword : | process.env.NEO4J_PASSWORD || 'password',
-			maxDepth: config? .maxDepth : | 5
+			neo4jUrl: config?.neo4jUrl ?? process.env.NEO4J_URL || 'bolt://localhost:7687',
+			neo4jUser: config?.neo4jUser ?? process.env.NEO4J_USER || 'neo4j',
+			neo4jPassword: config?.neo4jPassword ?? process.env.NEO4J_PASSWORD || 'password',
+			maxDepth: config?.maxDepth ?? 5
 		};
 		this.initPromise = this.initialize();
 	}
@@ -113,7 +113,7 @@ export class KAGTraverser {
 			}
 
 			// Extract results
-			const results = data.results?.[0]? .data : | [];
+			const results = data.results?.[0]?.data ?? [];
 			return results.map((r: any) => r.row);
 		} catch (error) {
 			console.warn(`⚠️  Cypher query failed: ${error instanceof Error ? error.message : String(error)}`);
@@ -217,7 +217,7 @@ export class KAGTraverser {
   
 		return strategies.map(strategy => {
 			const graphInsight = relatedFixes.find(f =>
-				strategy.description.toLowerCase().includes(f[1]? .toLowerCase() : | '')
+				strategy.description.toLowerCase().includes(f[1]?.toLowerCase() ?? '')
 			);
 
 			if (graphInsight) {

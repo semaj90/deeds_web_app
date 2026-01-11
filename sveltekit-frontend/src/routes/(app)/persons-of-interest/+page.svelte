@@ -59,8 +59,8 @@
  return pois.filter((poi) => {
  const matchesSearch =
  poi.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
- poi.occupation? .toLowerCase().includes(searchQuery.toLowerCase());
- const matchesStatus = !selectedStatus : | poi.status === selectedStatus;
+ poi.occupation?.toLowerCase().includes(searchQuery.toLowerCase());
+ const matchesStatus = !selectedStatus ?? poi.status === selectedStatus;
  const matchesPriority = !selectedPriority || poi.priority === selectedPriority;
  return matchesSearch && matchesStatus && matchesPriority;
  });

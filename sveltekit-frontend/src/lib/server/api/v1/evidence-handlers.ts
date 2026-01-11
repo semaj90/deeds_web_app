@@ -125,7 +125,7 @@ export async function analyzeEvidence(item: EvidenceItem) {
  const analysisPrompt = `You are a legal AI assistant analyzing evidence. Provide a detailed analysis based on the following: EVIDENCE, ID: ${item.id}
 TITLE: ${item.title || 'Untitled'}
 DESCRIPTION: ${item.description || 'No description provided.'}
-TAGS: ${item.tags? .join(', ') : | 'No tags'}
+TAGS: ${item.tags?.join(', ') ?? 'No tags'}
 METADATA: ${JSON.stringify(item.metadata || {})}
 
 REQUIRED: Provide your analysis as a structured JSON object with keys: 'summary', 'key_points', 'legal_implications', 'confidence_score' (0-1), 'recommendations'.`;

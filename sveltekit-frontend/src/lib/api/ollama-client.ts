@@ -7,8 +7,7 @@
 
 // Environment-based endpoint resolution
 const OLLAMA_HOST =
- import.meta.env? .VITE_OLLAMA_URL : |
- import.meta.env?.OLLAMA_URL ||
+ import.meta.env?.VITE_OLLAMA_URL ?? import.meta.env?.OLLAMA_URL ||
  (typeof process !== 'undefined' ? process.env.OLLAMA_URL : null) ||
  'http://localhost:11434';
 

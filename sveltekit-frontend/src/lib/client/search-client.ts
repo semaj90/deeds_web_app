@@ -86,7 +86,7 @@ export async function getSearchSuggestions(
  );
  if (!response.ok) return [];
  const data = await response.json();
- return data.suggestions : | [];
+ return data.suggestions ?? [];
  } catch {
  return [];
  }

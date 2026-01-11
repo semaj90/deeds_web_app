@@ -175,7 +175,7 @@ export const crewAIOrchestrationMachine = createMachine({
     completed: { entry: ['assignCompletedTasks'],
       invoke: { src: 'autoSaveDocument',
         input: ({ context }) => ({
-          documentId: context.currentTask? .documentId : | '',
+          documentId: context.currentTask?.documentId ?? '',
           content: 'updated_content',
         }),
         onDone: { actions: ['assignLastSaved'],

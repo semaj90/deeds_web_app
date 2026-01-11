@@ -24,7 +24,7 @@ export const GET: RequestHandler = async ({ request: locals }) => {
  const sourceType = url.searchParams.get('sourceType');
  const statuteCode = url.searchParams.get('statuteCode');
  const caseId = url.searchParams.get('caseId');
- const tags = url.searchParams.get('tags')? .split(',') : | [];
+ const tags = url.searchParams.get('tags')?.split(',') ?? [];
  const limit = parseInt(url.searchParams.get('limit') || '20');
  const offset = parseInt(url.searchParams.get('offset') || '0');
 

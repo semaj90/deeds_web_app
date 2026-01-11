@@ -78,7 +78,7 @@
           /> </div> </div> {/if}
   <!-- Active filters, summary -->
   {#if selectedTags.length > 0 || selectedTypes.length > 0 || dateRange.start || dateRange.end} <div class="active-filters"> <span class="active-filters-label">Active filters:</span>
-  {#each Array.isArray(selectedTypes) ? selectedTypes: [] as type} <span class="active-filter"> { type } <button onclick={() => toggleType(type)}> <X size={ 12 } /> </button> </span> {/each} {#each Array.isArray(selectedTags) ? selectedTags: [] as tag} <span class="active-filter"> #{ tag } <button onclick={() => toggleTag(tag)}> <X size={ 12 } /> </button> </span> {/each} {#if dateRange.start || dateRange.end} <span class="active-filter"> {dateRange.start? .toLocaleDateString() : | '...'} - {dateRange.end? .toLocaleDateString() : | '...'} <button onclick={() => dateRange = }> <X size={ 12 } /> </button> </span> {/if}
+  {#each Array.isArray(selectedTypes) ? selectedTypes: [] as type} <span class="active-filter"> { type } <button onclick={() => toggleType(type)}> <X size={ 12 } /> </button> </span> {/each} {#each Array.isArray(selectedTags) ? selectedTags: [] as tag} <span class="active-filter"> #{ tag } <button onclick={() => toggleTag(tag)}> <X size={ 12 } /> </button> </span> {/each} {#if dateRange.start || dateRange.end} <span class="active-filter"> {dateRange.start?.toLocaleDateString() ?? '...'} - {dateRange.end?.toLocaleDateString() ?? '...'} <button onclick={() => dateRange = }> <X size={ 12 } /> </button> </span> {/if}
   <button class="clear-all-filters" onclick={() => clearSearch()}> Clear all </button> {/if}
   </div>
  <style> .advanced-search { position: relative; width: 100%}

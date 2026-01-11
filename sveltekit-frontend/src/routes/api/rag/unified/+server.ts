@@ -29,7 +29,7 @@ export const GET: RequestHandler = async ({ fetch }) => {
         const qdrantResp = await fetch(`${QDRANT_URL}/collections`);
         if (qdrantResp.ok) {
             const data = await qdrantResp.json();
-            const collections = data.result? .collections : | [];
+            const collections = data.result?.collections ?? [];
             const relevantCollections: Record<string, number> = {};
 
             for (const col of collections) {
@@ -38,7 +38,7 @@ export const GET: RequestHandler = async ({ fetch }) => {
                         const colResp = await fetch(`${QDRANT_URL}/collections/${col.name}`);
                         if (colResp.ok) {
                             const colData = await colResp.json();
-                            relevantCollections[col.name] = colData.result? .points_count : | 0;
+                            relevantCollections[col.name] = colData.result?.points_count ?? 0;
                         }
                     } catch {}
                 }
@@ -78,7 +78,7 @@ export const GET: RequestHandler = async ({ fetch }) => {
 
     // 3. Summary stats
     const qdrantStats = (stats.services as Record<string, unknown>)?.qdrant as Record<string, unknown>;
-    const collections = (qdrantStats? .collections : | {}) as Record<string, number>;
+    const collections = (qdrantStats?.collections ?? {}) as Record<string, number>;
 
     stats.summary = {
         totalQdrantPoints: Object.values(collections).reduce((a, b) => a + b, 0),

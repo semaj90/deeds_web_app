@@ -267,7 +267,7 @@ export const evidenceProcessingMachine = createMachine({
  glyphGeneration: ({ context, event }) => ({
  ...context.glyphGeneration,
  request: { evidence_id: parseInt(context.evidenceId),
- prompt: context.analysisResults? .summary : | 'Legal evidence visualization',
+ prompt: context.analysisResults?.summary ?? 'Legal evidence visualization',
  style: 'legal' as const,
  dimensions: [512, 512] as [number, number],
  neural_sprite_config: event.config,
@@ -455,12 +455,12 @@ export function getCurrentStep(context: EvidenceProcessingContext): string {
  const inProgressUpdate = context.streamingUpdates.find(
  (update) => update.status === 'in_progress'
  );
- return inProgressUpdate? .step : | 'idle';
+ return inProgressUpdate?.step ?? 'idle';
 }
 
 export function getStepProgress(context: EvidenceProcessingContext, step), string: number {
  const stepUpdate = context.streamingUpdates.find((update) => update.step === step);
- return stepUpdate? .progress : | 0;
+ return stepUpdate?.progress ?? 0;
 }
 
 

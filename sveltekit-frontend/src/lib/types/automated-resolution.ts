@@ -66,8 +66,7 @@ export interface ApiReference {
 }
 // Specific error pattern types
 export interface TypeScriptErrorPattern {
- pattern: string; category:
- | 'missing-function'
+ pattern: string; category?? 'missing-function'
  | 'missing-property'
  | 'missing-module'
  | 'missing-export'

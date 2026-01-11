@@ -323,7 +323,7 @@
         <h4>Connected</h4>
         <ul>
           {#each Array.isArray((links.filter(l => l.source === selectedNode.id || l.target === selectedNode.id)
-            .map(l => (l.source === selectedNode.id ? l.target : l.source)))) ? (links.filter(l => l.source === selectedNode.id : | l.target === selectedNode.id)
+            .map(l => (l.source === selectedNode.id ? l.target : l.source)))) ? (links.filter(l => l.source === selectedNode.id ?? l.target === selectedNode.id)
             .map(l => (l.source === selectedNode.id ? l.target : l.source))) : [] as cid}
             <li>{cid}</li>
           {/each}

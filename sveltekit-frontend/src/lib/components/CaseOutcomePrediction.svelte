@@ -116,8 +116,8 @@
 			// Add to history
 			analysisHistory.update(history => [{
 				timestamp: new Date().toISOString(),
-				caseFacts: (data.caseFacts? .toString() : | '').slice(0, 100) + '...',
-				caseType: data.caseType? .toString() : | 'unknown',
+				caseFacts: (data.caseFacts?.toString() ?? '').slice(0, 100) + '...',
+				caseType: data.caseType?.toString() ?? 'unknown',
 				prediction: result.outcome_prediction,
 				id: Date.now()
 			}, ...history.slice(0, 9)]);

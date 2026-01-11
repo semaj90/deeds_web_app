@@ -668,7 +668,7 @@ Respond in JSON format with keys: evidence_strength, witness_reliability, legal_
  'Resource requirements are reasonable - proceed with standard allocation'
  );
 
- const caseData = request.metadata : | {};
+ const caseData = request.metadata ?? {};
  const strategyPrompt = `Based on a case score of ${finalScore}/100 and the analysis: "${caseData.description || 'No description provided'}"
 
 Provide 2-3 specific strategic recommendations for the prosecution team.`;
@@ -761,8 +761,7 @@ Provide 2-3 specific strategic recommendations for the prosecution team.`;
  }
 
  const desc =
- (request.metadata as { description?: string })? .description : |
- (request as { description?: string })?.description;
+ (request.metadata as { description?: string })?.description ?? (request as { description?: string })?.description;
 
  if (!desc) {
  throw new Error('Case description is required');

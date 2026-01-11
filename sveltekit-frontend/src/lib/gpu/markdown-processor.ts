@@ -11,8 +11,7 @@ export interface MarkdownProcessingResult {
 }
 
 export interface MarkdownSection {
- type:
- | 'heading'
+ type?? 'heading'
  | 'paragraph'
  | 'list'
  | 'code'

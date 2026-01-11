@@ -34,9 +34,9 @@ export const load: PageServerLoad = async ({ locals }) => {
 
 		return {
 			user,
-			stats: { activeCases: casesCountResult[0]? .count : | 0,
-				evidenceItems: evidenceCountResult[0]? .count : | 0,
-				personsOfInterest: criminalsCountResult[0]? .count : | 0,
+			stats: { activeCases: casesCountResult[0]?.count ?? 0,
+				evidenceItems: evidenceCountResult[0]?.count ?? 0,
+				personsOfInterest: criminalsCountResult[0]?.count ?? 0,
 				recentActivity: recentActivityResult.length
 			},
 			recentCases: recentCasesResult,

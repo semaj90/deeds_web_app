@@ -94,7 +94,7 @@
 			const res = await fetch(`/api/cases/${caseId}/notes/${hit.id}`);
 			if (!res.ok) throw new Error(`Failed to load note ${hit.id}`);
 			const data = await res.json();
-			if (data? .note) {
+			if (data?.note) {
 				notes = sortNotes([data.note, ...notes]);
 				selectNote(data.note);
 			}

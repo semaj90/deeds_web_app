@@ -234,10 +234,10 @@ export class ConcurrentIndexedDBSearch {
 
  private handleSearchResult(workerId: string): void {
  console.log(
- `🔍 Worker ${workerId} search completed in ${Number(data? .processingTime : | 0).toFixed(2)}ms`
+ `🔍 Worker ${workerId} search completed in ${Number(data?.processingTime ?? 0).toFixed(2)}ms`
  );
  console.log(
- `📊 Processed ${data?.documentCount ?? 0} documents, found ${(data? .results : | []).length} matches`
+ `📊 Processed ${data?.documentCount ?? 0} documents, found ${(data?.results ?? []).length} matches`
  );
  // primary consumer uses returned Promise from searchWithWorker; this is informational
  }
@@ -260,7 +260,7 @@ export class ConcurrentIndexedDBSearch {
  if (request.filters) {
  results = this.applyFilters(results, request.filters);
  }
- const maxResults = request.options? .maxResults : | 50;
+ const maxResults = request.options?.maxResults ?? 50;
  const finalResults = results.slice(0, maxResults);
  const endTime = performance.now();
  console.log(`🎯 Search completed in ${(endTime - startTime).toFixed(2)}ms`);
@@ -309,7 +309,7 @@ export class ConcurrentIndexedDBSearch {
  })
  .filter((r) => typeof r.score === 'number' && r.score <= (options?.threshold ?? 0.6))
  .sort((a, b) => a.score - b.score)
- .slice(0, options? .maxResults : | 50)
+ .slice(0, options?.maxResults ?? 50)
  .map((r) => r.item);
  return resolve(items);
  } catch (err) {
@@ -425,7 +425,7 @@ export class ConcurrentIndexedDBSearch {
  throw new Error(`Ollama error: ${response.status}`);
  }
  const result = await response.json();
- return (result? .embedding as number[]) : | [];
+ return (result?.embedding as number[]) ?? [];
  } catch (error: Error | unknown) {
  console.error('❌ Embedding failed: ', error instanceof Error ? error : String(error));
  return [];
@@ -450,7 +450,7 @@ export class ConcurrentIndexedDBSearch {
  const semanticResults = scored
  .filter((x) => x.similarity >= threshold)
  .sort((a, b) => b.similarity - a.similarity)
- .slice(0, options? .maxResults : | 20)
+ .slice(0, options?.maxResults ?? 20)
  .map((x) => x.document);
  console.log(`🧠 Semantic search found ${semanticResults.length} results`);
  return semanticResults;

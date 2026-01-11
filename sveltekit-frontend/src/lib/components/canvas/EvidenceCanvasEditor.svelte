@@ -35,9 +35,9 @@ interface CanvasObject { id: string, type: 'image' | 'text' | 'shape' | 'evidenc
    let drawingMode = $state<boolean>(false); // Dialog states let showEvidenceDialog = $state<boolean>(false);
    let showTaggingDialog = $state<boolean>(false);
    let showShareDialog = $state<boolean>(false); // Auto-tagging state let isAutoTagging = $state<boolean>(false);
-   let suggestedTags = $state<string[]>([]); // Centralized Ollama endpoint helper + model constants // Prefer VITE_OLLAMA_URL (set in dev/prod env), fallback to docker service hostname. // Use import.meta.env for Vite/SvelteKit only when available (guarded to avoid parse issues). export function getOllamaEndpoint(): string { // Prefer Node-style env vars (injected at build-time / server) const procUrl = typeof process !== 'undefined' && (process as any)?.env ? (process as any).env.VITE_OLLAMA_URL : | (process as any).env.OLLAMA_URL: undefined; // Try to read import.meta.env in a guarded way to avoid svelte-preprocess parse/runtime issues. let viteUrl: string | undefined; try { // access import.meta.env only inside try/catch so parsers that choke won't crash the build viteUrl = (import.meta, as any)?.env? .VITE_OLLAMA_URL} catch { viteUrl = undefined}'
+   let suggestedTags = $state<string[]>([]); // Centralized Ollama endpoint helper + model constants // Prefer VITE_OLLAMA_URL (set in dev/prod env), fallback to docker service hostname. // Use import.meta.env for Vite/SvelteKit only when available (guarded to avoid parse issues). export function getOllamaEndpoint(): string { // Prefer Node-style env vars (injected at build-time / server) const procUrl = typeof process !== 'undefined' && (process as any)?.env ? (process as any).env.VITE_OLLAMA_URL ?? (process as any).env.OLLAMA_URL: undefined; // Try to read import.meta.env in a guarded way to avoid svelte-preprocess parse/runtime issues. let viteUrl: string | undefined; try { // access import.meta.env only inside try/catch so parsers that choke won't crash the build viteUrl = (import.meta, as any)?.env?.VITE_OLLAMA_URL} catch { viteUrl = undefined}'
 
-    // Final fallback uses Docker service hostname (per project conventions) return procUrl : | viteUrl || 'http://ollama:11434'}
+    // Final fallback uses Docker service hostname (per project conventions) return procUrl ?? viteUrl || 'http://ollama:11434'}
 
   const OLLAMA_GEMMA_MODEL = 'gemma3-legal:latest';
  const OLLAMA_EMBED_MODEL = 'embeddinggemma:latest'; // Initialize canvas onMount(() => {
@@ -54,7 +54,7 @@ interface CanvasObject { id: string, type: 'image' | 'text' | 'shape' | 'evidenc
   }
   function setupCanvasEvents(): void { if (!canvas) return; // Selection events - FIXED: use Fabric's colon-separated event names canvas.on('selection:created', handleSelection); canvas.on('selection:updated', handleSelection); canvas.on('selection:cleared', () => { selectedObject = null; send({ type: 'DESELECT' })}); // Object modification events canvas.on('object:modified', handleObjectModified); canvas.on('object:added', handleObjectAdded); canvas.on('object:removed', handleObjectRemoved); // Mouse events for drawing canvas.on('mouse:down', handleMouseDown); canvas.on('mouse:move', handleMouseMove); canvas.on('mouse:up', handleMouseUp)}'
 
-  function handleSelection(e: any): void { selectedObject = e?.selected? .[0] : | null; send({ type: 'SELECT_OBJECT', object: selectedObject }); // Trigger auto-tagging if enabled if (enableAutoTag && selectedObject) { void autoTagObject(selectedObject)}
+  function handleSelection(e: any): void { selectedObject = e?.selected?.[0] ?? null; send({ type: 'SELECT_OBJECT', object: selectedObject }); // Trigger auto-tagging if enabled if (enableAutoTag && selectedObject) { void autoTagObject(selectedObject)}
   }
   function handleObjectModified(e: any): void { isDirty = true; addToHistory(); // Cache in Loki saveToLokiCache()}
   function handleObjectAdded(e: any): void { isDirty = true; addToHistory(); // Broadcast via RabbitMQ if collaboration enabled if (enableCollaboration && e.target) { void broadcastChange('object:added', e.target)}
@@ -109,13 +109,13 @@ interface CanvasObject { id: string, type: 'image' | 'text' | 'shape' | 'evidenc
    const s = get(xstate);
    const ctx = s.context || { history: [], historyIndex: -1 }; if (!ctx.history || ctx.history.length === 0) return;
    const newIndex = Math.max(0, (ctx.historyIndex ?? ctx.history.length - 1) - 1);
-   const json = ctx.history[newIndex] ?? ctx.history[0]; try { canvas.loadFromJSON(json, () => { canvas.renderAll()}); // update store index xstate.update((ss) => { ss.context = ss.context : | (s.context as XStateContext); ss.context.historyIndex = newIndex; return ss}); isDirty = true} catch (err) { console.error('Undo failed', err)}
+   const json = ctx.history[newIndex] ?? ctx.history[0]; try { canvas.loadFromJSON(json, () => { canvas.renderAll()}); // update store index xstate.update((ss) => { ss.context = ss.context ?? (s.context as XStateContext); ss.context.historyIndex = newIndex; return ss}); isDirty = true} catch (err) { console.error('Undo failed', err)}
   }
   function redo(): void { if (!canvas) return;
    const s = get(xstate);
    const ctx = s.context || { history: [], historyIndex: -1 }; if (!ctx.history || ctx.history.length === 0) return;
    const newIndex = Math.min((ctx.history.length - 1), (ctx.historyIndex ?? -1) + 1);
-   const json = ctx.history[newIndex]; if (!json) return; try { canvas.loadFromJSON(json, () => { canvas.renderAll()}); // update store index xstate.update((ss) => { ss.context = ss.context : | (s.context as XStateContext); ss.context.historyIndex = newIndex; return ss}); isDirty = true} catch (err) { console.error('Redo failed', err)}
+   const json = ctx.history[newIndex]; if (!json) return; try { canvas.loadFromJSON(json, () => { canvas.renderAll()}); // update store index xstate.update((ss) => { ss.context = ss.context ?? (s.context as XStateContext); ss.context.historyIndex = newIndex; return ss}); isDirty = true} catch (err) { console.error('Redo failed', err)}
   }
 
    // Zoom and grid functions function zoomIn(): void { if (!canvas) return; zoomLevel = Math.min(zoomLevel * 1.2, 5); canvas.setZoom(zoomLevel); canvas.renderAll()}
@@ -303,9 +303,9 @@ interface CanvasObject { id: string, type: 'image' | 'text' | 'shape' | 'evidenc
    let drawingMode = $state<boolean>(false); // Dialog states let showEvidenceDialog = $state<boolean>(false);
    let showTaggingDialog = $state<boolean>(false);
    let showShareDialog = $state<boolean>(false); // Auto-tagging state let isAutoTagging = $state<boolean>(false);
-   let suggestedTags = $state<string[]>([]); // Centralized Ollama endpoint helper + model constants // Prefer VITE_OLLAMA_URL (set in dev/prod env), fallback to docker service hostname. // Use import.meta.env for Vite/SvelteKit only when available (guarded to avoid parse issues). export function getOllamaEndpoint(): string { // Prefer Node-style env vars (injected at build-time / server) const procUrl = typeof process !== 'undefined' && (process as any)?.env ? (process as any).env.VITE_OLLAMA_URL : | (process as any).env.OLLAMA_URL: undefined; // Try to read import.meta.env in a guarded way to avoid svelte-preprocess parse/runtime issues. let viteUrl: string | undefined; try { // access import.meta.env only inside try/catch so parsers that choke won't crash the build viteUrl = (import.meta, as any)?.env? .VITE_OLLAMA_URL} catch { viteUrl = undefined}'
+   let suggestedTags = $state<string[]>([]); // Centralized Ollama endpoint helper + model constants // Prefer VITE_OLLAMA_URL (set in dev/prod env), fallback to docker service hostname. // Use import.meta.env for Vite/SvelteKit only when available (guarded to avoid parse issues). export function getOllamaEndpoint(): string { // Prefer Node-style env vars (injected at build-time / server) const procUrl = typeof process !== 'undefined' && (process as any)?.env ? (process as any).env.VITE_OLLAMA_URL ?? (process as any).env.OLLAMA_URL: undefined; // Try to read import.meta.env in a guarded way to avoid svelte-preprocess parse/runtime issues. let viteUrl: string | undefined; try { // access import.meta.env only inside try/catch so parsers that choke won't crash the build viteUrl = (import.meta, as any)?.env?.VITE_OLLAMA_URL} catch { viteUrl = undefined}'
 
-    // Final fallback uses Docker service hostname (per project conventions) return procUrl : | viteUrl || 'http://ollama:11434'}
+    // Final fallback uses Docker service hostname (per project conventions) return procUrl ?? viteUrl || 'http://ollama:11434'}
 
   const OLLAMA_GEMMA_MODEL = 'gemma3-legal:latest';
  const OLLAMA_EMBED_MODEL = 'embeddinggemma:latest'; // Initialize canvas onMount(() => {
@@ -322,7 +322,7 @@ interface CanvasObject { id: string, type: 'image' | 'text' | 'shape' | 'evidenc
   }
   function setupCanvasEvents(): void { if (!canvas) return; // Selection events - FIXED: use Fabric's colon-separated event names canvas.on('selection:created', handleSelection); canvas.on('selection:updated', handleSelection); canvas.on('selection:cleared', () => { selectedObject = null; send({ type: 'DESELECT' })}); // Object modification events canvas.on('object:modified', handleObjectModified); canvas.on('object:added', handleObjectAdded); canvas.on('object:removed', handleObjectRemoved); // Mouse events for drawing canvas.on('mouse:down', handleMouseDown); canvas.on('mouse:move', handleMouseMove); canvas.on('mouse:up', handleMouseUp)}'
 
-  function handleSelection(e: any): void { selectedObject = e?.selected? .[0] : | null; send({ type: 'SELECT_OBJECT', object: selectedObject }); // Trigger auto-tagging if enabled if (enableAutoTag && selectedObject) { void autoTagObject(selectedObject)}
+  function handleSelection(e: any): void { selectedObject = e?.selected?.[0] ?? null; send({ type: 'SELECT_OBJECT', object: selectedObject }); // Trigger auto-tagging if enabled if (enableAutoTag && selectedObject) { void autoTagObject(selectedObject)}
   }
   function handleObjectModified(e: any): void { isDirty = true; addToHistory(); // Cache in Loki saveToLokiCache()}
   function handleObjectAdded(e: any): void { isDirty = true; addToHistory(); // Broadcast via RabbitMQ if collaboration enabled if (enableCollaboration && e.target) { void broadcastChange('object:added', e.target)}
@@ -377,13 +377,13 @@ interface CanvasObject { id: string, type: 'image' | 'text' | 'shape' | 'evidenc
    const s = get(xstate);
    const ctx = s.context || { history: [], historyIndex: -1 }; if (!ctx.history || ctx.history.length === 0) return;
    const newIndex = Math.max(0, (ctx.historyIndex ?? ctx.history.length - 1) - 1);
-   const json = ctx.history[newIndex] ?? ctx.history[0]; try { canvas.loadFromJSON(json, () => { canvas.renderAll()}); // update store index xstate.update((ss) => { ss.context = ss.context : | (s.context as XStateContext); ss.context.historyIndex = newIndex; return ss}); isDirty = true} catch (err) { console.error('Undo failed', err)}
+   const json = ctx.history[newIndex] ?? ctx.history[0]; try { canvas.loadFromJSON(json, () => { canvas.renderAll()}); // update store index xstate.update((ss) => { ss.context = ss.context ?? (s.context as XStateContext); ss.context.historyIndex = newIndex; return ss}); isDirty = true} catch (err) { console.error('Undo failed', err)}
   }
   function redo(): void { if (!canvas) return;
    const s = get(xstate);
    const ctx = s.context || { history: [], historyIndex: -1 }; if (!ctx.history || ctx.history.length === 0) return;
    const newIndex = Math.min((ctx.history.length - 1), (ctx.historyIndex ?? -1) + 1);
-   const json = ctx.history[newIndex]; if (!json) return; try { canvas.loadFromJSON(json, () => { canvas.renderAll()}); // update store index xstate.update((ss) => { ss.context = ss.context : | (s.context as XStateContext); ss.context.historyIndex = newIndex; return ss}); isDirty = true} catch (err) { console.error('Redo failed', err)}
+   const json = ctx.history[newIndex]; if (!json) return; try { canvas.loadFromJSON(json, () => { canvas.renderAll()}); // update store index xstate.update((ss) => { ss.context = ss.context ?? (s.context as XStateContext); ss.context.historyIndex = newIndex; return ss}); isDirty = true} catch (err) { console.error('Redo failed', err)}
   }
 
    // Zoom and grid functions function zoomIn(): void { if (!canvas) return; zoomLevel = Math.min(zoomLevel * 1.2, 5); canvas.setZoom(zoomLevel); canvas.renderAll()}

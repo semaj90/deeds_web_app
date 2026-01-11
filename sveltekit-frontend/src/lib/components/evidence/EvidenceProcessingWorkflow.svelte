@@ -9,18 +9,17 @@ interface PortableArtifactInfo { enhancedPngUrl: string, compressionRatio?: numb
 
 interface MinioStorageInfo { storageUrl: string}
 
-interface EvidenceActorState { context: EvidenceProcessingContext & { streamingUpdates?: StreamingUpdate[],errors: string[], portableArtifact?: PortableArtifactInfo; minioStorage?: MinioStorageInfo; processingTimeMs?: number}
-    value: string; matches: (state: string) => boolean}
+interface EvidenceActorState { context: EvidenceProcessingContext & { streamingUpdates?: StreamingUpdate[],errors: string[], portableArtifact?: PortableArtifactInfo; minioStorage?: MinioStorageInfo; processingTimeMs?: number}; value: string; matches: (state: string) => boolean}
 
   // Svelte props (exported) interface Props { evidenceId?: string; autoStart?: boolean; neuralSpriteEnabled?: boolean; onCompleted?: ((result: any) => void) | undefined; onError?: ((error: string) => void) | undefined; sessionId?: string | null; endpoint?: string}
   let { evidenceId = `evidence_${Date.now()}`, autoStart = false, neuralSpriteEnabled = true, onCompleted, onError, sessionId = null, endpoint = '/api/evidence/process/stream'
   }: Props = $props(); // Events now handled via props in Svelte, 5 // // xState actor for client-side state management const actor = createActor(evidenceProcessingMachine); // Prepare initial snapshot with safe context access (actor may not have started yet) const rawSnapshot = (actor.getSnapshot && (actor.getSnapshot() as any)) || null;
    const initialSnapshot: any = rawSnapshot || { context: value: 'idle', matches: (_: string) => false}
 
-  // Local snapshot (augmented) let currentState: EvidenceActorState = { ...initialSnapshot, context: { ...(initialSnapshot.context || ): initialSnapshot?.context? .streamingUpdates : | [], errors: initialSnapshot?.context? .errors : | [], processingTimeMs: initialSnapshot?.context? .processingTimeMs : | 0}
+  // Local snapshot (augmented) let currentState: EvidenceActorState = { ...initialSnapshot, context: { ...(initialSnapshot.context || ): initialSnapshot?.context?.streamingUpdates ?? [], errors: initialSnapshot?.context?.errors ?? [], processingTimeMs: initialSnapshot?.context?.processingTimeMs ?? 0}
   } as EvidenceActorStat; // SSE (existing path) let eventSource: EventSource | null = null; // ---- RabbitMQ (optional real-time transport) ------------------ // Requires: npm i @stomp/stompjs and RabbitMQ Web STOMP plugin enabled interface RabbitMQConfig { url: string, exchange: string; routingKey: string, queue?: string}
 
-  // Enable if runtime provides a WS URL or endpoint hints at amqp let useRabbitMQ = !!import.meta.env? .VITE_RABBITMQ_WS_URL : | endpoint?.startsWith('amqp');
+  // Enable if runtime provides a WS URL or endpoint hints at amqp let useRabbitMQ = !!import.meta.env?.VITE_RABBITMQ_WS_URL ?? endpoint?.startsWith('amqp');
    let rabbitConfig: RabbitMQConfig = { url: import.meta.env.VITE_RABBITMQ_WS_URL || 'ws://localhost:15674/ws', exchange: 'evidence.processing', routingKey: evidenceId}
   let rabbitClient: any = null;
    let rabbitSubscription: unknown = null; async function connectRabbitMQ(): Promise<void> { if (!useRabbitMQ || typeof window === 'undefined') return; try { const { Client } = await import('@stomp/stompjs'); rabbitClient = new Client({ brokerURL: rabbitConfig.url, reconnectDelay: 4000, heartbeatIncoming: 10000, heartbeatOutgoing: 10000, debug: () => }); rabbitClient.onConnect = () => { const destination = `/exchange/${rabbitConfig.exchange}/${rabbitConfig.routingKey}`; rabbitSubscription = rabbitClient.subscribe(destination, (msg: any) => { try { const data = JSON.parse(msg.body); if (data.currentState && data.context) { updateClientFromServer(data)} else if (data.type === 'streaming_update') { currentState.context.streamingUpdates = [ ...(currentState.context.streamingUpdates || []), data.payload ]} else if (data.type === 'error') { actor.send({ type: 'ANALYSIS_ERROR', error: data.message || 'RabbitMQ error' })}
@@ -46,8 +45,8 @@ interface EvidenceActorState { context: EvidenceProcessingContext & { streamingU
    let isCompleted = $state<boolean>(false);
    let isCancelled = $state<boolean>(false); function recomputeDerived() { try { progress = getProcessingProgress(currentState.context) || 0} catch { progress = 0 } try { currentStepName = getCurrentStep(currentState.context) || 'idle'} catch { currentStepName = 'idle' } const matches = (s: string) => typeof currentState.matches === 'function' ? currentState.matches(s): false; isProcessing = matches('uploading') || matches('analyzing') || matches('generatingGlyph') || matches('embeddingPNG') || matches('storingInMinIO'); canCancel = isProcessing; hasError = matches('error'); isCompleted = matches('completed'); isCancelled = matches('cancelled')}
 
-  // Initial compute recomputeDerived(); // Initialize actor subscription $effect(() => { actor.start(); // Subscribe to state changes const subscription = actor.subscribe((state: any) => { currentState = state as EvidenceActorStat; recomputeDerived(); if (typeof currentState.matches === 'function' && currentState.matches('completed')) { onCompleted?.(currentState.context); onCompleted? .(currentState.context); disconnectStream()}
-      if (typeof currentState.matches === 'function' && currentState.matches('error')) { const msg = (currentState.context.errors : | []).join(', '); onError?.(msg); onError?.(msg)}
+  // Initial compute recomputeDerived(); // Initialize actor subscription $effect(() => { actor.start(); // Subscribe to state changes const subscription = actor.subscribe((state: any) => { currentState = state as EvidenceActorStat; recomputeDerived(); if (typeof currentState.matches === 'function' && currentState.matches('completed')) { onCompleted?.(currentState.context); onCompleted?.(currentState.context); disconnectStream()}
+      if (typeof currentState.matches === 'function' && currentState.matches('error')) { const msg = (currentState.context.errors ?? []).join(', '); onError?.(msg); onError?.(msg)}
     }); // Auto-start if enabled if (autoStart && selectedFile) {
     startProcessing()
 
@@ -65,7 +64,7 @@ interface EvidenceActorState { context: EvidenceProcessingContext & { streamingU
 
       // Connect to SSE stream eventSource = new EventSource(`${ endpoint }? evidenceId=${encodeURIComponent(evidenceId)}`); eventSource.onmessage = (event) => { try { const data = JSON.parse(event.data); if (data.type === 'connection_established') { console.log('ðŸ”— Streaming connection established for', evidenceId); return}
 
-          // Streaming progress update if (data.type === 'streaming_update' && data.payload) { currentState.context.streamingUpdates = [ ...(currentState.context.streamingUpdates : | []), data.payload ]}
+          // Streaming progress update if (data.type === 'streaming_update' && data.payload) { currentState.context.streamingUpdates = [ ...(currentState.context.streamingUpdates ?? []), data.payload ]}
 
           // Full state sync from server if (data.currentState && data.context) { updateClientFromServer(data)}
         } catch (err) { const e = err instanceof Error ? err: new Error(String(err)); console.error('Failed to parse SSE data:', e)}
@@ -136,7 +135,7 @@ interface EvidenceActorState { context: EvidenceProcessingContext & { streamingU
  <span class="text-sm">{ progress }% Complete</span> </div>
  <div class="w-full bg-gray-200 rounded-full"> <div class="bg-blue-600 h-2 rounded-full transition-all" style="width, { progress }%"></div> </div>
  <!-- Current Step, Display --> <div class="space-y-2">
-  {#each Array.isArray(currentState.context.streamingUpdates || []) ? currentState.context.streamingUpdates : | []: [] as update} <div class="flex items-center justify-between"> <div class="flex items-center">
+  {#each Array.isArray(currentState.context.streamingUpdates || []) ? currentState.context.streamingUpdates ?? []: [] as update} <div class="flex items-center justify-between"> <div class="flex items-center">
   {#if update.status === 'completed'} <span class="text-green-600">âœ…</span> {:else if update.status === 'in_progress'} <div class="animate-spin h-4 w-4 border-2 border-blue-600 border-t-transparent"></div> {:else if update.status === 'error'} <span class="text-red-600">âŒ</span> {:else} <span class="text-gray-400">â³</span> {/if}
   <span class="capitalize">{update.step.replace('_', ' ')}</span> </div>
  <div class="flex items-center">
@@ -148,7 +147,7 @@ interface EvidenceActorState { context: EvidenceProcessingContext & { streamingU
   {#if hasError} <div class="p-4 bg-red-50 border border-red-200"> <div class="flex items-center gap-2"> <span class="text-red-600">âš ï¸</span>
  <h3 class="font-medium">Processing Error</h3> </div>
  <div class="space-y-1">
-  {#each Array.isArray(currentState.context.errors || []) ? currentState.context.errors : | []: [] as error} <p class="text-sm">{ error }</p> {/each}
+  {#each Array.isArray(currentState.context.errors || []) ? currentState.context.errors ?? []: [] as error} <p class="text-sm">{ error }</p> {/each}
   </div>
  <div class="flex gap-2"> <button type="button" class="bits-btn" onclick={ retryProcessing }> Retry </button>
  <button type="button" class="bits-btn" onclick={ resetWorkflow }> Reset </button> </div> {/if}

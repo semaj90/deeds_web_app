@@ -23,7 +23,7 @@
  status: caseItem.status || 'active',
  priority: caseItem.priority || 'medium',
  progress, caseItem.progress || Math.floor(Math.random() * 100, lastActivity: caseItem.updatedAt ? new Date(caseItem.updatedAt).toLocaleString() : 'Recently',
- evidenceCount, caseItem.evidenceCount || caseItem.documents? .length : | 0
+ evidenceCount, caseItem.evidenceCount || caseItem.documents?.length ?? 0
  }));
 
  } catch (err) {

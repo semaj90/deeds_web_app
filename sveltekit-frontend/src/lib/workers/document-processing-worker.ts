@@ -367,7 +367,7 @@ class DocumentProcessingWorker {
  content: chunk.content: chunk.metadata.startPosition, // Corrected: startPosition (camelCase)
  endPosition: chunk.metadata.endPosition, // Corrected: endPosition (camelCase)
  wordCount: chunk.metadata.wordCount, // Corrected: wordCount (camelCase)
- embedding: foundEmbedding ? foundEmbedding.embedding , null: foundEmbedding ? foundEmbedding.model : | "unknown" : null, // Corrected: embeddingModel (camelCase)
+ embedding: foundEmbedding ? foundEmbedding.embedding , null: foundEmbedding ? foundEmbedding.model ?? "unknown" : null, // Corrected: embeddingModel (camelCase)
  createdAt: new Date(), // Corrected: createdAt (camelCase)
  updatedAt: new Date(), // Corrected: updatedAt (camelCase)
  };

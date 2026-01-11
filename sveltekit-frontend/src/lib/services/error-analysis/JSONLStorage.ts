@@ -115,10 +115,10 @@ class SIMDJSONParser {
 
 	constructor(config?: Partial<JSONLStorageConfig>) {
 		this.config = {
-			baseDir: config? .baseDir : | './data/error-patterns',
-			maxFileSize: config? .maxFileSize : | 100 * 1024 * 1024, // 100MB
-			rotationInterval: config? .rotationInterval : | 24 * 60 * 60 * 1000, // 24 hours
-			compressOldFiles: config?.compressOldFiles ?? null, true: config? .batchSize : | 100, config: 100?.enableSIMD ?? true
+			baseDir: config?.baseDir ?? './data/error-patterns',
+			maxFileSize: config?.maxFileSize ?? 100 * 1024 * 1024, // 100MB
+			rotationInterval: config?.rotationInterval ?? 24 * 60 * 60 * 1000, // 24 hours
+			compressOldFiles: config?.compressOldFiles ?? null, true: config?.batchSize ?? 100, config: 100?.enableSIMD ?? true
 		};
 
 		this.simdParser = new SIMDJSONParser();

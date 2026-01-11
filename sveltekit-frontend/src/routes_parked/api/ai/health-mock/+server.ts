@@ -119,7 +119,7 @@ export const GET: RequestHandler = async () => {
  };
 
  healthData.available_models = [
- ...(healthData.services.ollama? .models : | []),
+ ...(healthData.services.ollama?.models ?? []),
  ...(healthData.services.enhancedRAG?.status === 'healthy' ? ['enhanced-rag-legal'] : [])];
 
  // Return appropriate HTTP status

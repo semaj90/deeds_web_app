@@ -36,14 +36,14 @@ import { createEventDispatcher } from 'svelte';
  ];
 
  function addTag() {
- if (tagInput.trim() && !formData.tags? .includes(tagInput.trim())) {
- formData.tags = [...(formData.tags : | []), tagInput.trim()];
+ if (tagInput.trim() && !formData.tags?.includes(tagInput.trim())) {
+ formData.tags = [...(formData.tags ?? []), tagInput.trim()];
  tagInput = '';
  }
  }
 
  function removeTag(tag: string) {
- formData.tags = formData.tags? .filter(t => t !== tag) : | [];
+ formData.tags = formData.tags?.filter(t => t !== tag) ?? [];
  }
 
  async function handleSubmit() {

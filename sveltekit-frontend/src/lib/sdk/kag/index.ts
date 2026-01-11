@@ -164,7 +164,7 @@ export class KAGClient {
 			const source = subgraph.entities.find(e => e.id === rel.source);
 			const target = subgraph.entities.find(e => e.id === rel.target);
 			lines.push(
-				`- ${source? .type : | 'Unknown'} --[${rel.type}]--> ${target? .type : | 'Unknown'}`
+				`- ${source?.type ?? 'Unknown'} --[${rel.type}]--> ${target?.type ?? 'Unknown'}`
 			);
 		}
 

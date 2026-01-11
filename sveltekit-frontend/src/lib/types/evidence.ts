@@ -40,8 +40,7 @@ export interface Evidence {
  thumbnailUrl?: string; // From EvidenceItem
 
  // Processing status and metadata
- processingStatus:
- | 'pending'
+ processingStatus?? 'pending'
  | 'processing'
  | 'completed'
  | 'failed'

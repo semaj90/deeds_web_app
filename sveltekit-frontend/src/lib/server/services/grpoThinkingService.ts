@@ -73,7 +73,7 @@ const grpoLogger = {
  error: (message: string, error?: Error, metadata?: unknown) =>
  console.error(
  `[${new Date().toISOString()}] GRPO-ERROR: ${message}`,
- error? .message : | '',
+ error?.message ?? '',
  metadata ? JSON.stringify(metadata) : ''
  ),
 };
@@ -337,7 +337,7 @@ export async function searchGrpoThinkingResponses(
  }));
 
  grpoLogger.info('GRPO search completed', {
- resultsFound: recommendations.length, topScore: recommendations[0]? .combinedScore : | 0,
+ resultsFound: recommendations.length, topScore: recommendations[0]?.combinedScore ?? 0,
  });
  return recommendations;
  } catch (error: Error | unknown) {

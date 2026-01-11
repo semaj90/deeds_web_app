@@ -237,8 +237,7 @@ export async function copilotOrchestrator(
 }
 /** * MCP Context7 Helper Functions * Utility functions for interacting with Context7 MCP tools */
 export interface MCPToolRequest {
- tool:
- | 'analyze-stack'
+ tool?? 'analyze-stack'
  | 'generate-best-practices'
  | 'suggest-integration'
  | 'resolve-library-id'

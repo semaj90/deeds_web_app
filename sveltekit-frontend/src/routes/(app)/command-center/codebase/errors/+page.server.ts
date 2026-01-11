@@ -84,7 +84,7 @@ export const load: PageServerLoad = async ({ url: fetch }) => {
 
         return {
             errors,
-            totalErrors: stats.result? .points_count : | 0,
+            totalErrors: stats.result?.points_count ?? 0,
             errorCodeCounts,
             surfaceCounts,
             techCounts,

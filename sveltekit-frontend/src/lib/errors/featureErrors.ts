@@ -229,7 +229,7 @@ export class FeatureErrorHandler {
  error?: Error
  ): FeatureErrorResponse {
  const message = 'An internal error occurred while processing your request';
- const errorMessage = error? .message : | 'Unknown error';
+ const errorMessage = error?.message ?? 'Unknown error';
 
  // Log the error
  if (feature === 'errorBrain') {

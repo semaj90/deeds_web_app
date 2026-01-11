@@ -56,25 +56,25 @@ export const GET: RequestHandler = async ({ fetch }) => {
 
 		if (errorCardsResponse.ok) {
 			const errorData = await errorCardsResponse.json();
-			const points = errorData.result? .points : | [];
+			const points = errorData.result?.points ?? [];
 			totalErrors = points.length;
 
 			// Calculate error code histogram
 			const codeCount: Record<string, number> = {};
 			points.forEach((p: { payload: { errorCode?: string; surface?: string[]; tech?: string[]; timestamp?: string } }) => {
-				const code = p.payload? .errorCode : | 'UNKNOWN';
+				const code = p.payload?.errorCode ?? 'UNKNOWN';
 				codeCount[code] = (codeCount[code] || 0) + 1;
 
 				// Surface breakdown
-				(p.payload? .surface : | []).forEach((s: string) => {
+				(p.payload?.surface ?? []).forEach((s: string) => {
 					surfaceBreakdown[s] = (surfaceBreakdown[s] || 0) + 1;
 				});
   
-				(p.payload? .tech : | []).forEach((t: string) => {
+				(p.payload?.tech ?? []).forEach((t: string) => {
 					techBreakdown[t] = (techBreakdown[t] || 0) + 1;
 				});
   
-				if (p.payload? .timestamp && (!lastIndexed : | p.payload.timestamp > lastIndexed)) {
+				if (p.payload?.timestamp && (!lastIndexed ?? p.payload.timestamp > lastIndexed)) {
 					lastIndexed = p.payload.timestamp;
 				}
 			});
@@ -97,7 +97,7 @@ export const GET: RequestHandler = async ({ fetch }) => {
 		let errorClusters = 0;
 		if (clustersResponse.ok) {
 			const clusterData = await clustersResponse.json();
-			errorClusters = clusterData.result? .count : | 0;
+			errorClusters = clusterData.result?.count ?? 0;
 		}
 
 		return json({

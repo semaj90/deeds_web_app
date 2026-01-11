@@ -46,7 +46,7 @@ export async function loadShortcutsFromAI(
  neo4jContext: any = {}
 ): Promise<any> {
  // Try cache first (avoid redundant backend calls)
- const cacheKey = `shortcuts: ${userContext? .userId : | 'anon'}`;
+ const cacheKey = `shortcuts: ${userContext?.userId ?? 'anon'}`;
  let aiShortcuts: Shortcut[] | null = await advancedCache.get<Shortcut[]>(cacheKey);
 
  if (!aiShortcuts) {
@@ -88,7 +88,7 @@ export async function refreshShortcuts(
  userContext: any = {},
  neo4jContext: any = {}
 ): Promise<any> {
- await advancedCache.invalidateByTags([`shortcuts: ${userContext? .userId : | 'anon'}`]);
+ await advancedCache.invalidateByTags([`shortcuts: ${userContext?.userId ?? 'anon'}`]);
  await loadShortcutsFromAI(userContext, neo4jContext);
 }
 

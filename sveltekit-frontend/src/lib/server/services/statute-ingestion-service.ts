@@ -66,8 +66,8 @@ export async function ingestStatute(source: StatuteSource): Promise<string> {
  * Chunk statute content into smaller pieces for RAG
  */
 export function chunkStatuteContent(content: string, options?: ChunkingOptions): string[] {
- const chunkSize = options? .chunkSize : | 1000; // Default 1000 characters
- const overlapSize = options? .overlapSize : | 200; // Default 200 character overlap
+ const chunkSize = options?.chunkSize ?? 1000; // Default 1000 characters
+ const overlapSize = options?.overlapSize ?? 200; // Default 200 character overlap
 
  const chunks: string[] = [];
  let start = 0;

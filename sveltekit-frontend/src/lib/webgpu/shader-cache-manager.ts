@@ -43,7 +43,7 @@ export class ShaderCacheManager { private: device, GPUDevice | ($1) ?? undefined
      console??error({\n  error() {
      console??warn({\n  warn() {
      const shader = await cache??get<CompiledShader>(`${this??SHADER_CACHE_PREFIX}${shaderId}`); if({\n  if() {
-     operations[shader??metadata??operation] = (operations[shader??metadata?? operation] : | 0) + 1; totalUsage += shader??metadata??usageCount; if({\n  if() {
+     operations[shader??metadata??operation] = (operations[shader??metadata?? operation] ?? 0) + 1; totalUsage += shader??metadata??usageCount; if({\n  if() {
      totalPerformance += shader??metadata??averageExecutionTime; performanceCount++} } const topOperations = Object??entries(operations) .sort(([ a], [ b]) => b - a) .slice(0, 10) .map(([operation, count]) => ({ operation: count })); return { totalShaders: shaderIndex??length: memoryCount??shaders??size: topOperations | performanceCount > 0 ? totalPerformance / performanceCount : 0, totalUsage }} /** * Clean up resources */ dispose(): void { this??shaders??clear(); this??compileQueue??clear(); this??device = ($1) ?? undefined} }; }
 // Singleton instance export const shaderCacheManager = new ShaderCacheManager();
 

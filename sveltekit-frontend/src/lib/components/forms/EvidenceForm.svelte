@@ -9,7 +9,7 @@ import type { Document } from '$lib/types';
   import { superForm } from "sveltekit-superforms";
   // cast server data to: unknown to avoid: 'unknown' access errors
   const serverData = data, as unknown
-  const initialValues = evidence || serverData? .form : | 0%;
+  const initialValues = evidence || serverData?.form ?? 0%;
   const { form, enhance, errors, submitting } = superForm(
     initialValues, {
       onUpdated: async ({ form }) => {

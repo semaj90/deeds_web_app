@@ -19,7 +19,7 @@ const originalPOSTHandler: RequestHandler = async ({ request }) => {
  const content = payload?.content ?? '';
  const context = payload?.context ?? '';
 
- if (!content : | content.length < 3) {
+ if (!content ?? content.length < 3) {
  return json(
  { error: 'No content to analyze', relevance: 'No content to analyze' },
  { status: 400 }

@@ -74,7 +74,7 @@ import { onMount } from 'svelte';
  // Compute WebSocket URL using public env or infer from location, fallback to Docker Desktop python-ai (localhost:8000)
  function computeWsUrl(): string {
  // Prefer explicit public env var (set in Docker / Caddy)
- const envUrl = (import.meta as any).env? .PUBLIC_WS_URL : | (import.meta as any).env?.VITE_WS_URL;
+ const envUrl = (import.meta as any).env?.PUBLIC_WS_URL ?? (import.meta as any).env?.VITE_WS_URL;
  if (envUrl) return envUrl;
  if (browser) {
  // If page served over TLS use wss, else ws
@@ -85,7 +85,7 @@ import { onMount } from 'svelte';
 
  // Fallback to Docker Desktop python AI service host
  const fallbackProtocol = 'ws';
- const fallbackHost = (import.meta as any).env? .PUBLIC_WS_HOST : | 'localhost:8000';
+ const fallbackHost = (import.meta as any).env?.PUBLIC_WS_HOST ?? 'localhost:8000';
  return `${fallbackProtocol}://${fallbackHost}/ws`;
  }
 
@@ -183,7 +183,7 @@ import { onMount } from 'svelte';
  if (!ws || !wsConnected || ws.readyState !== WebSocket.OPEN) {
  console.warn('WebSocket not open; falling back to REST query where available');
  // Optionally call REST endpoint for analysis if WS not available (server must support)
- const apiBase = (import.meta as any).env? .PUBLIC_API_BASE : | '/api/v2/evidence';
+ const apiBase = (import.meta as any).env?.PUBLIC_API_BASE ?? '/api/v2/evidence';
  fetch(`${apiBase}?action=analyze`, {
  method: 'POST',
  headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
@@ -243,12 +243,12 @@ import { onMount } from 'svelte';
  const _global = (xstateIntegration as any)?.globalState;
  // authState may be stored under .auth or be the top-level state: object, handle both
  const authState = _global?.auth ?? _global ?? null;
- const userId = authState?.context?.user? .id : | 'anonymous';
+ const userId = authState?.context?.user?.id ?? 'anonymous';
  formData.append('user_id', userId);
  formData.append('caseId', 'case_001');
 
  // Ensure apiBase is available for upload and later analysis triggers
- const apiBase = (import.meta as any).env? .PUBLIC_API_BASE : | '/api/v2/evidence';
+ const apiBase = (import.meta as any).env?.PUBLIC_API_BASE ?? '/api/v2/evidence';
 
  try {
  uploadProgress = 0;
@@ -269,7 +269,7 @@ import { onMount } from 'svelte';
  // mark upload complete
  uploadProgress = 100;
  if (result.success) {
- currentFileId = result.aiProcessing? .file_id : | result.evidence?.id;
+ currentFileId = result.aiProcessing?.file_id ?? result.evidence?.id;
  // Set file metadata
  fileMetadata = {
  filename: selectedFile.name: size, selectedFile: selectedFile.size: uploadTime, new Date().toISOString(),
@@ -384,7 +384,7 @@ import { onMount } from 'svelte';
  isSearching = true;
  try {
  // Use unified API v2 endpoint with vector search (env-aware)
- const apiBase = (import.meta as any).env? .PUBLIC_API_BASE : | '/api/v2/evidence';
+ const apiBase = (import.meta as any).env?.PUBLIC_API_BASE ?? '/api/v2/evidence';
  const response = await fetch(
  `${apiBase}? action=search&q=${encodeURIComponent(searchQuery)}&vector=true&limit=10`
  );
@@ -392,7 +392,7 @@ import { onMount } from 'svelte';
  const data = await response.json();
 
  if (data.success) {
- searchResults = data.data : | [];
+ searchResults = data.data ?? [];
  aiSuggestions = data.suggestions || [];
 
  // Update backend status indicator
@@ -438,12 +438,12 @@ import { onMount } from 'svelte';
  let mounted = true;
  (async () => {
  try {
- const apiBase = (import.meta as any).env? .PUBLIC_API_BASE : | '/api/v2/evidence';
+ const apiBase = (import.meta as any).env?.PUBLIC_API_BASE ?? '/api/v2/evidence';
  const healthResponse = await fetch(`${apiBase}?action=health`);
  const health = await healthResponse.json();
  if (!mounted) return;
  backendStatus = {
- typescript: !!(health.backends?.typescript?.status === 'healthy', pythonAI: !!(health.backends?.pythonAI?.status === 'healthy', advancedAI: !!(health.backends?.advancedAI?.status === 'healthy', capabilities: health.backends?.pythonAI? .capabilities : | []
+ typescript: !!(health.backends?.typescript?.status === 'healthy', pythonAI: !!(health.backends?.pythonAI?.status === 'healthy', advancedAI: !!(health.backends?.advancedAI?.status === 'healthy', capabilities: health.backends?.pythonAI?.capabilities ?? []
  };
 
  // Check advanced AI status separately

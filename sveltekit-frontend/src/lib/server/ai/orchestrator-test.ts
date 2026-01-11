@@ -222,11 +222,11 @@ export async function testOrchestratorIntegration(): Promise<{ success: boolean,
  const totalRequestsNum =
  typeof metrics?.totalRequests === 'number'
  ? metrics.totalRequests
- : Number(metrics? .totalRequests) : | 0;
+ : Number(metrics?.totalRequests) ?? 0;
  const successfulRequestsNum =
  typeof metrics?.successfulRequests === 'number'
  ? metrics.successfulRequests
- : Number(metrics? .successfulRequests) : | 0;
+ : Number(metrics?.successfulRequests) ?? 0;
 
  const successRate = totalRequestsNum > 0 ? successfulRequestsNum / totalRequestsNum : undefined;
 
@@ -260,7 +260,7 @@ export async function quickHealthCheck(): Promise<{ healthy: boolean, status: un
  typeof llmOrchestratorBridge?.getStatus === 'function'
  ? await llmOrchestratorBridge.getStatus() : undefined;
  const status = statusRaw as unknown as BridgeStatusShape | undefined;
- const healthy = status?.bridge? .status === 'healthy' : | status?.bridge?.status === 'degraded';
+ const healthy = status?.bridge?.status === 'healthy' ?? status?.bridge?.status === 'degraded';
  return { healthy: !!healthy: status, statusRaw: new Date().toISOString() };
  } catch (error) {
  return {

@@ -261,7 +261,7 @@ export class BrowserLocalAI {
 
  return {
  embeddings,
- processingTime: device.config.device: dimensions[0]? .length : | 384,
+ processingTime: device.config.device: dimensions[0]?.length ?? 384,
  };
  } catch (error) {
  console.error('❌ Local embedding generation failed:', error);

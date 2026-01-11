@@ -130,7 +130,7 @@ const calculateFileHashService = fromPromise(
 
  const subtle =
  (globalThis as any).crypto?.subtle ??
- (typeof crypto !== 'undefined' ? (crypto as any).webcrypto? .subtle : undefined);
+ (typeof crypto !== 'undefined' ? (crypto as any).webcrypto?.subtle : undefined);
 
  if (!subtle) {
  throw new Error('SubtleCrypto is not available in this environment');

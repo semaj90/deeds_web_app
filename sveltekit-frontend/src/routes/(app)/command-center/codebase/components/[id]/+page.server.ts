@@ -48,7 +48,7 @@ export const load: PageServerLoad = async ({ params, fetch }) => {
         }
 
         const data = await response.json();
-        const profile = data.result? .payload : | null;
+        const profile = data.result?.payload ?? null;
 
         // Fetch related errors for this file
         let relatedErrors: Array<Record<string, unknown>> = [];

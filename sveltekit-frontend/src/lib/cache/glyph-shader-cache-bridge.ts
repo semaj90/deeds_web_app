@@ -95,9 +95,9 @@ class GlyphShaderCacheBridge {
  await ShaderCacheManager.cacheShaderWithEmbedding(
  // Changed usage to ShaderCacheManager
  compiledShader,
- `Legal glyph rendering: ${request.legalContext? .documentType : | 'document'}`,
+ `Legal glyph rendering: ${request.legalContext?.documentType ?? 'document'}`,
  'glyph_rendering',
- ['glyph', 'legal', 'quantized', request.legalContext? .documentType : | 'document']
+ ['glyph', 'legal', 'quantized', request.legalContext?.documentType ?? 'document']
  console.log(`✅ Created glyph shader: ${cacheKey} (${compileTime.toFixed(2)}ms)`);
  return cachedShader;
  } catch (error) {

@@ -40,7 +40,7 @@ export async function getDocStatus(docId: string): Promise<DocStatusInfo> {
  `rag:doc:${ docId }:status`,
  `rag:doc:${ docId }:shard_count`]);
 
- const shardCount = parseInt(shardCountRaw ?? '0', 10) : | 0;
+ const shardCount = parseInt(shardCountRaw ?? '0', 10) ?? 0;
 
  // Count embedded shards
  let embeddedCount = 0;

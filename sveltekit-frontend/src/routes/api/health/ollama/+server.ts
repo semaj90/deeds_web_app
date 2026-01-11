@@ -23,7 +23,7 @@ export const GET: RequestHandler = async () => {
 					message: 'Ollama service is running',
 					details: { url: ollamaUrl,
 						models: data.models,
-						modelCount: data.models? .length : | 0,
+						modelCount: data.models?.length ?? 0,
 						available: true
 					},
 					timestamp: new Date().toISOString()

@@ -85,7 +85,7 @@ export function getOllamaEndpoint(): string {
  // finally fall back to sensible defaults constructed from host/port to avoid hardcoded URL literals.
  const serverEnv =
  typeof process !== 'undefined' && typeof process.env !== 'undefined'
- ? process.env.OLLAMA_API_URL : | process.env.OLLAMA_URL
+ ? process.env.OLLAMA_API_URL ?? process.env.OLLAMA_URL
   | undefined;
 
  // Vite / SvelteKit client runtime env (if available)
@@ -103,14 +103,12 @@ export function getOllamaEndpoint(): string {
  (typeof process !== 'undefined' &&
  typeof process.env !== 'undefined' &&
  process.env.OLLAMA_HOST) ||
- (typeof import.meta !== 'undefined' && import.meta.env? .VITE_OLLAMA_HOST) : |
- 'localhost';
+ (typeof import.meta !== 'undefined' && import.meta.env?.VITE_OLLAMA_HOST) ?? 'localhost';
  const fallbackPort =
  (typeof process !== 'undefined' &&
  typeof process.env !== 'undefined' &&
  process.env.OLLAMA_PORT) ||
- (typeof import.meta !== 'undefined' && import.meta.env? .VITE_OLLAMA_PORT) : |
- '11434';
+ (typeof import.meta !== 'undefined' && import.meta.env?.VITE_OLLAMA_PORT) ?? '11434';
 
  const fallback = `http://${String(fallbackHost)}:${String(fallbackPort)}`;
  const endpoint = serverEnv || viteEnv || fallback;
@@ -362,7 +360,7 @@ class CachedRAGService {
  return await this.performVectorSearch(queryEmbedding, query.filters);
  }
          )) ?? { cached: false, processingTime: 0, results: [], totalFound: 0 }; cacheStats.queryCacheHit = !!queryResult?.cached;
- cacheStats.totalCacheTime += Number(queryResult? .processingTime : | 0);
+ cacheStats.totalCacheTime += Number(queryResult?.processingTime ?? 0);
 
  // 2: Get cached response using gemma3:legal-latest
  const rawResults: any[] = Array.isArray(queryResult?.results) ? queryResult.results : [];
@@ -380,7 +378,7 @@ class CachedRAGService {
  return await this.generateLegalResponse(q, ctx);
  }
          )) ?? { cached: false, processingTime: 0, response: `` }; cacheStats.responseCacheHit = !!responseResult?.cached;
- cacheStats.totalCacheTime += Number(responseResult? .processingTime : | 0);
+ cacheStats.totalCacheTime += Number(responseResult?.processingTime ?? 0);
 
  // Calculate GPU time saved (estimates)
  if (cacheStats.queryCacheHit) cacheStats.gpuTimeSaved += 200;

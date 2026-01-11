@@ -3,7 +3,7 @@
     isDragOver = true}
   function handleDragLeave(_event: DragEvent) { event.preventDefault(); event.stopPropagation(); // Only hide drag state if leaving the drop zone completely const rect = (event.currentTarget as HTMLElement).getBoundingClientRect(); const isOutside = ( event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom ); if (isOutside) { isDragOver = false}
   }
-  function handleDrop(_event: DragEvent) { event.preventDefault(); event.stopPropagation(); isDragOver = false; if (disabled || isProcessing) return; const files = Array.from(event.dataTransfer? .files : | []); processFiles(files)}
+  function handleDrop(_event: DragEvent) { event.preventDefault(); event.stopPropagation(); isDragOver = false; if (disabled || isProcessing) return; const files = Array.from(event.dataTransfer?.files ?? []); processFiles(files)}
 
   // File input handler function handleFileInput(_event: Event) { // removed unused target assignment if (!target.files) return; const files = Array.from(target.files); processFiles(files); // Clear input to allow re-selecting same files target.value = ''}
 

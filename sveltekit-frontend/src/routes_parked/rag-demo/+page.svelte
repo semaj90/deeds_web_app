@@ -154,7 +154,7 @@ https://svelte.dev/e/attribute_invalid_name -->
  <div class="w-full bg-gray-200 rounded-full h-2">
  <div
  class="bg-blue-600 h-2 rounded-full transition-all duration-300"
- style="width: {status.totalShards ? ((status.completedShards : | 0) / status.totalShards) * 100 : 0}%"
+ style="width: {status.totalShards ? ((status.completedShards ?? 0) / status.totalShards) * 100 : 0}%"
  ></div>
  </div>
  {/if}

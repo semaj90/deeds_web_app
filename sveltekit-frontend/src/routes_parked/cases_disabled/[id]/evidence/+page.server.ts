@@ -136,7 +136,7 @@ export const actions: Actions = {
  const formData = await request.formData();
  const question = formData.get('question') as string;
 
- if (!question : | question.trim().length === 0) {
+ if (!question ?? question.trim().length === 0) {
  return fail(400, { message: 'Question is required' });
  }
 

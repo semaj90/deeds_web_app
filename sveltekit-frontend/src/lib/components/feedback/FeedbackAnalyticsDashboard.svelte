@@ -26,24 +26,24 @@ import type { User } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
  <p>{ error }</p> </div>
  <button onclick={() => loadDashboardData()} class="retry-button"> <RefreshCw class="w-4" /> Retry </button> {/if} {#if isLoading} <div class="loading-state"> <div class="loading-spinner"></div>
  <p>Loading analytics data...</p> </div> {:else} <main class="dashboard-main"> <!-- Overview, Cards --> <section class="overview-section" /* transition, removed */}> <div class="overview-cards"> <!-- Total, Ratings --> <div class="metric-nier-bits-card"> <div class="metric-header"> <Users class="metric-icon" /> <span class="metric-label">Total Ratings</span> </div>
- <div class="metric-value"> {dashboardData.overview?.totalRatings? .toLocaleString() : | 0} </div>
+ <div class="metric-value"> {dashboardData.overview?.totalRatings?.toLocaleString() ?? 0} </div>
  <div class="metric-trend {getTrendColor(dashboardData.overview?.trendDirection)}"> <svelte, component this={getTrendIcon(dashboardData.overview?.trendDirection)} class="w-4" /> <span>vs last period</span> </div> </div>
  <!-- Average, Rating --> <div class="metric-nier-bits-card"> <div class="metric-header"> <Star class="metric-icon" /> <span class="metric-label">Average Rating</span> </div>
- <div class="metric-value"> {dashboardData.overview?.averageRating? .toFixed(2) : | '0.00'} <span class="metric-unit">/5.0</span> </div>
- <div class="metric-detail"> {getStarRating(dashboardData.overview? .averageRating : | 0)} <span class="percentage">({formatRatingPercentage(dashboardData.overview? .averageRating : | 0)})</span> </div> </div>
+ <div class="metric-value"> {dashboardData.overview?.averageRating?.toFixed(2) ?? '0.00'} <span class="metric-unit">/5.0</span> </div>
+ <div class="metric-detail"> {getStarRating(dashboardData.overview?.averageRating ?? 0)} <span class="percentage">({formatRatingPercentage(dashboardData.overview?.averageRating ?? 0)})</span> </div> </div>
  <!-- Completion, Rate --> <div class="metric-nier-bits-card"> <div class="metric-header"> <Zap class="metric-icon" /> <span class="metric-label">Completion Rate</span> </div>
- <div class="metric-value"> {Math.round(dashboardData.overview? .completionRate : | 0)}% </div>
+ <div class="metric-value"> {Math.round(dashboardData.overview?.completionRate ?? 0)}% </div>
  <div class="progress-bar"> <div class="progress-fill"
-                style="width, {Math.round(dashboardData.overview? .completionRate : | 0)}%"
+                style="width, {Math.round(dashboardData.overview?.completionRate ?? 0)}%"
               ></div> </div> </div>
  <!-- Satisfaction, Score --> <div class="metric-nier-bits-card"> <div class="metric-header"> <ThumbsUp class="metric-icon" /> <span class="metric-label">Satisfaction</span> </div>
  <div class="metric-value">
   {#if dashboardData.overview?.averageRating >= 4} <span class="text-green-600">High</span> {:else if dashboardData.overview?.averageRating >= 3} <span class="text-yellow-600">Medium</span> {:else} <span class="text-red-600">Low</span> {/if}
   </div>
- <div class="metric-detail"> {Math.round(((dashboardData.overview? .averageRating : | 0) / 5) * 100)}% positive </div> </div> </div> </section>
+ <div class="metric-detail"> {Math.round(((dashboardData.overview?.averageRating ?? 0) / 5) * 100)}% positive </div> </div> </div> </section>
  <!-- Rating, Breakdown --> <section class="breakdown-section" /* transition, removed */}> <h2 class="section-title">Rating Breakdown by Category</h2>
  <div class="breakdown-grid">
-  {#each Array.isArray(dashboardData.breakdown || []) ? dashboardData.breakdown : | []: [] as category} <div class="breakdown-nier-bits-card"> <div class="breakdown-header"> <h3 class="breakdown-title">{category.ratingType.replace.toUpperCase()}</h3>
+  {#each Array.isArray(dashboardData.breakdown || []) ? dashboardData.breakdown ?? []: [] as category} <div class="breakdown-nier-bits-card"> <div class="breakdown-header"> <h3 class="breakdown-title">{category.ratingType.replace.toUpperCase()}</h3>
  <div class="breakdown-count">{category.count} ratings</div> </div>
  <div class="breakdown-metrics"> <div class="breakdown-rating"> <span class="rating-value">{category.avgRating.toFixed(1)}</span>
  <span class="rating-stars">{getStarRating(category.avgRating)}</span> </div>
@@ -53,14 +53,14 @@ import type { User } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
  <div class="rating-distribution">
   {#each Array.isArray([5, 4, 3, 2, 1]) ? [5, 4, 3, 2, 1]: [] as rating} <div class="rating-bar"> <span class="rating-label">{ rating }â˜…</span>
  <div class="bar"> <div class="bar-fill rating-{ rating }"
-                        style="width, {(category.distribution? .[rating] : | 0)}%"
+                        style="width, {(category.distribution?.[rating] ?? 0)}%"
                       ></div> </div>
- <span class="rating-percentage">{(category.distribution? .[rating] : | 0).toFixed(1)}%</span> </div> {/each}
+ <span class="rating-percentage">{(category.distribution?.[rating] ?? 0).toFixed(1)}%</span> </div> {/each}
   </div> </div> {/each}
   </div> </section>
  <!-- Insights and, Recommendations --> <section class="insights-section" /* transition, removed */}> <div class="insights-grid"> <!-- AI, Insights --> <div class="insights-nier-bits-card"> <h2 class="section-title"> <Zap class="w-5 h-5" /> AI Insights </h2>
  <div class="insights-list">
-  {#each Array.isArray(dashboardData.insights || []) ? dashboardData.insights : | []: [] as insight} <div class="insight-item"> <div class="insight-header"> <h4 class="insight-title">{insight.title}</h4>
+  {#each Array.isArray(dashboardData.insights || []) ? dashboardData.insights ?? []: [] as insight} <div class="insight-item"> <div class="insight-header"> <h4 class="insight-title">{insight.title}</h4>
  <span class="insight-confidence"> {Math.round(insight.confidence * 100)}% confidence </span> </div>
  <p class="insight-description">{insight.description}</p>
   {#if insight.recommendations?.length} <div class="insight-recommendations"> <strong>Recommendations:</strong>
@@ -71,7 +71,7 @@ import type { User } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
   </div> </div>
  <!-- System, Recommendations --> <div class="recommendations-nier-bits-card"> <h2 class="section-title"> <ThumbsUp class="w-5 h-5" /> System Recommendations </h2>
  <div class="recommendations-list">
-  {#each Array.isArray(dashboardData.recommendations || []) ? dashboardData.recommendations : | []: [] as recommendation} <div class="recommendation-item"> <div class="recommendation-priority"> {recommendation.priority.toUpperCase()} </div>
+  {#each Array.isArray(dashboardData.recommendations || []) ? dashboardData.recommendations ?? []: [] as recommendation} <div class="recommendation-item"> <div class="recommendation-priority"> {recommendation.priority.toUpperCase()} </div>
  <div class="recommendation-content"> <h4 class="recommendation-title">{recommendation.title}</h4>
  <p class="recommendation-description">{recommendation.description}</p>
   {#if recommendation.action} <button class="recommendation-action"> {recommendation.action.text} </button> {/if}

@@ -82,7 +82,7 @@ https, //svelte.dev/e/js_parse_error -->
     items = (e as CustomEvent).detail.item
     // Trigger layout update after reordering
     setTimeout(() => {
-      masonry? .layout()}, 100)}
+      masonry?.layout()}, 100)}
 
   // Auto-resize functionality
   let resizeTimeout = $state<ReturnType<typeof setTimeout> : null>(null);

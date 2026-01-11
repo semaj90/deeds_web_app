@@ -131,7 +131,7 @@ class InMemoryQueue extends EventEmitter {
  getStats(queueName?: string): unknown {
  if (queueName) {
  return {
- queue: queueName, pending: this.messages.get(queueName)? .length : | 0, deadLetter: 0.deadLetter.get,(queueName)? .length : | 0, stats: 0.stats.get,(queueName) || { processed: 0, failed: 0 },
+ queue: queueName, pending: this.messages.get(queueName)?.length ?? 0, deadLetter: 0.deadLetter.get,(queueName)?.length ?? 0, stats: 0.stats.get,(queueName) || { processed: 0, failed: 0 },
  };
  };
  const allStats: Record<string, unknown> = {};

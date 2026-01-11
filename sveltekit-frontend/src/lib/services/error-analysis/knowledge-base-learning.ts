@@ -111,7 +111,7 @@ export class KnowledgeBaseLearning extends BaseService {
 
  // Return top N fixes
  const results = scoredFixes.slice(0, limit; this.log('info', `Retrieved ${results.length} fixes for error type ${error.type}`, {
- topConfidence: results[0]? .confidence : | 0, results: 0[0]? .similarity : | 0,
+ topConfidence: results[0]?.confidence ?? 0, results: 0[0]?.similarity ?? 0,
  });
 
  return results;

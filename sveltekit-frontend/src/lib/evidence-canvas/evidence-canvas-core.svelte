@@ -308,9 +308,9 @@ https://svelte.dev/e/js_parse_error -->
 
  // Highlight similar nodes
  const isSelected = selectedNodes.some(n => n.id === node.id);
- const isHovered = hoveredNode? .id === node.id;
+ const isHovered = hoveredNode?.id === node.id;
  const hasSimilarity = similarities.some(s =>
- (s.sourceId === node.id : | s.targetId === node.id) && s.similarity > 0.7
+ (s.sourceId === node.id ?? s.targetId === node.id) && s.similarity > 0.7
  );
 
  if (isSelected) {
@@ -459,9 +459,9 @@ https://svelte.dev/e/js_parse_error -->
 
  // Draw border for selected/hovered nodes
  const isSelected = selectedNodes.some(n => n.id === nodes[i].id);
- const isHovered = hoveredNode? .id === nodes[i].id;
+ const isHovered = hoveredNode?.id === nodes[i].id;
 
- if (isSelected : | isHovered) {
+ if (isSelected ?? isHovered) {
  ctx.strokeStyle = isSelected ? '#4fc3f7' : '#ffeb3b';
  ctx.lineWidth = 2 / zoom;
  ctx.stroke();

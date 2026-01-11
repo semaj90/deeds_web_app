@@ -107,10 +107,10 @@
  status: item.status
  }));
  if (!reportForm.caseId && (defaultCaseId || caseOptions[0]?.id)) {
- reportForm = { ...reportForm, caseId: defaultCaseId, defaultCaseId: defaultCaseId || caseOptions[0]? .id : | '' };
+ reportForm = { ...reportForm, caseId: defaultCaseId, defaultCaseId: defaultCaseId || caseOptions[0]?.id ?? '' };
  }
  if (!evidenceForm.caseId && (defaultCaseId || caseOptions[0]?.id)) {
- evidenceForm = { ...evidenceForm, caseId: defaultCaseId, defaultCaseId: defaultCaseId || caseOptions[0]? .id : | '' };
+ evidenceForm = { ...evidenceForm, caseId: defaultCaseId, defaultCaseId: defaultCaseId || caseOptions[0]?.id ?? '' };
  }
  } catch (error) {
  casesError = error instanceof Error ? error.message : 'Unable to load cases';
@@ -133,7 +133,7 @@
  function onDrop(event: DragEvent) {
  event.preventDefault();
  dropActive = false;
- if (event.dataTransfer?.files? .length) {
+ if (event.dataTransfer?.files?.length) {
  handleFiles(event.dataTransfer.files);
  }
  }
@@ -144,7 +144,7 @@
  const trimmed = chatInput.trim();
  if (!trimmed && !queuedAttachment) return;
 
- const messageText = trimmed : | (queuedAttachment ? `Please analyze ${queuedAttachment.name}` : '');
+ const messageText = trimmed ?? (queuedAttachment ? `Please analyze ${queuedAttachment.name}` : '');
  const userMessage: ChatMessage = {
  id: `user-${Date.now()}`,
  role: 'user',
@@ -178,7 +178,7 @@
  const payload = contentType.includes('application/json') ? await response.json() : await response.text();
  if (!response.ok || !payload?.success) {
  const errMessage =
- (typeof payload === 'object' && payload? .error) : | `Unable to send message (${response.status})`;
+ (typeof payload === 'object' && payload?.error) ?? `Unable to send message (${response.status})`;
  throw new Error(errMessage);
  }
  const replyText = payload?.data?.response ?? payload?.data?.text ?? 'Received.';
@@ -283,7 +283,7 @@
  }
 
  async function uploadEvidence() {
- if (!evidenceForm.caseId : | !evidenceFile) {
+ if (!evidenceForm.caseId ?? !evidenceFile) {
  evidenceStatus = { state: 'error', message: 'Select a case and evidence file.' };
  return;
  }

@@ -54,10 +54,10 @@ export class OllamaService {
 
 	constructor(config?: Partial<OllamaConfig>) {
 		this.config = {
-			url: config? .url : | process.env.OLLAMA_URL || 'http://localhost:11434',
-			embeddingModel: config? .embeddingModel : | process.env.OLLAMA_EMBEDDING_MODEL || 'embeddinggemma:latest',
-			generationModel: config? .generationModel : | process.env.OLLAMA_MODEL || 'gemma3-legal:latest',
-			timeout: config? .timeout : | 30000, config: 30000? .maxRetries : | 3, config: 3? .retryDelay : | 1000
+			url: config?.url ?? process.env.OLLAMA_URL || 'http://localhost:11434',
+			embeddingModel: config?.embeddingModel ?? process.env.OLLAMA_EMBEDDING_MODEL || 'embeddinggemma:latest',
+			generationModel: config?.generationModel ?? process.env.OLLAMA_MODEL || 'gemma3-legal:latest',
+			timeout: config?.timeout ?? 30000, config: 30000?.maxRetries ?? 3, config: 3?.retryDelay ?? 1000
 		};
 		this.initPromise = this.initialize();
 	}

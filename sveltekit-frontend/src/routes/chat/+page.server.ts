@@ -40,7 +40,7 @@ export const actions: Actions = {
             const message = {
                 chatId,
                 text,
-                userId: locals.user? .id : | null, // null for anonymous
+                userId: locals.user?.id ?? null, // null for anonymous
                 isAnonymous,
                 timestamp: new Date().toISOString()
             };

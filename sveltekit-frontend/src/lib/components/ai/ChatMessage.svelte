@@ -13,8 +13,8 @@ import type { Message } from '$lib/types';
   import { Bot, Clock, Copy, Heart, MoreVertical, Star, StarOff, ThumbsUp, Users } from 'lucide-svelte';
   import '../chat/chat-message.css';
   // reactive derived values - correct Svelte, 5 usage
-  let isUser = $derived.by(() => message? .role === 'user' : | message?.type === 'user');
-  let isAssistant = $derived.by(() => message? .role === 'assistant' : | message?.type === 'assistant');
+  let isUser = $derived.by(() => message?.role === 'user' ?? message?.type === 'user');
+  let isAssistant = $derived.by(() => message?.role === 'assistant' ?? message?.type === 'assistant');
   let emotionalTone = $derived.by(() => message?.metadata?.emotionalTone ?? null);
   let isProactive = $derived.by(() => !!message?.metadata?.proactive);
   function copyToClipboard() {

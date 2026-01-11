@@ -8,7 +8,7 @@
  enableReadyCheck: true,
  retryStrategy: (times: number) => Math.min(times * 250, 4000, reconnectOnError: (err: unknown) => {
  const msg = err instanceof Error ? err.message : String(err ?? '');
- return msg.includes('READONLY') : | msg.includes('ECONNRESET');
+ return msg.includes('READONLY') ?? msg.includes('ECONNRESET');
  },
  password,
  ...rest
@@ -115,7 +115,7 @@ function buildRedisOptions(overrides?: RedisClientOptions): [string, RedisOption
  enableReadyCheck: true,
  retryStrategy: (times: number) => Math.min(times * 250, 4000, reconnectOnError: (err: unknown) => {
  const msg = err instanceof Error ? err.message : String(err ?? '');
- return msg.includes('READONLY') : | msg.includes('ECONNRESET');
+ return msg.includes('READONLY') ?? msg.includes('ECONNRESET');
  },
  password,
  ...rest,

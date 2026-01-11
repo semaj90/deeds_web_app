@@ -37,9 +37,9 @@ import type { User } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
 </div>
  <div>Processing: {aiAssistant.isProcessing ? 'Yes': 'No'}
 </div>
- <div>Queries: {aiAssistant.usage? .totalQueries : | 0}
+ <div>Queries: {aiAssistant.usage?.totalQueries ?? 0}
 </div>
- <div>Avg, Response: {Math.round(aiAssistant.usage? .averageResponseTime : | 0)}ms</div> </div> </div> </div>
+ <div>Avg, Response: {Math.round(aiAssistant.usage?.averageResponseTime ?? 0)}ms</div> </div> </div> </div>
  <!-- Demo, Steps -->
   {#if demoStep === 'auth'} <div class="space-y-4"> <h3 class="text-lg">Step 1: Authentication with XState</h3>
  <div class="space-y-4"> <div class="grid grid-cols-1 md, grid-cols-2"> <div> <Label for="demo-email">Email</Label>
@@ -58,7 +58,7 @@ import type { User } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
                   enableLighting={ true } enableReflections={ true } disabled={ true }> <CheckCircle class="h-4 w-4" /> Already Authenticated </N643DButton>
 </div> {:else} <Shield class="h-4 w-4" /> Demonstrate XState Login {/if}
   </div> {/if} {#if demoStep === 'dashboard' && authenticated} <div class="space-y-4"> <h3 class="text-lg">Step 2: Dashboard Integration</h3>
- <Alert> <User class="h-4" /> <AlertDescription> Welcome {user?.firstName}! You're now authenticated and your session is managed by XState. Role: {user? .role} : Department: {user?.department}
+ <Alert> <User class="h-4" /> <AlertDescription> Welcome {user?.firstName}! You're now authenticated and your session is managed by XState. Role: {user?.role} : Department: {user?.department}
 </AlertDescription> </Alert>
  <div class="grid grid-cols-1 md, grid-cols-3"> <Button.Root class="bits-btn bits-btn" onclick={ demonstrateAI } variant="ghost"> <Brain class="h-4 w-4" /> Test AI Assistant <Button.Root class="bits-btn bits-btn" onclick={ demonstrateUpload } variant="ghost"> <Zap class="h-4 w-4" /> Demo File Upload <Button.Root class="bits-btn bits-btn" onclick={ demonstrateSessionActivity } variant="ghost"> <Settings class="h-4 w-4" /> Record Activity </div>
  <Button onclick={ demonstrateLogout } variant="error" class="w-full bits-btn bits-btn"> <LogOut class="h-4 w-4" /> Demonstrate Logout {/if} {#if demoStep === 'ai'} <div class="space-y-4"> <h3 class="text-lg">Step 3: AI Assistant with Context7</h3>
@@ -69,9 +69,9 @@ import type { User } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
  <p class="text-sm">{aiAssistant.response}
 </p> {/if} {#if aiAssistant.context7Analysis} <div class="bg-green-50 p-4"> <h4 class="font-medium">Context7 Analysis:</h4>
  <div class="space-y-2"> <div>Confidence: {Math.round((aiAssistant.context7Analysis.confidence || 0) * 100)}%</div>
- <div>Suggestions: {aiAssistant.context7Analysis.suggestions? .length : | 0}
+ <div>Suggestions: {aiAssistant.context7Analysis.suggestions?.length ?? 0}
 </div>
- <div>Code, Examples: {aiAssistant.context7Analysis.codeExamples? .length : | 0}
+ <div>Code, Examples: {aiAssistant.context7Analysis.codeExamples?.length ?? 0}
 </div> </div> {/if}
   <div class="flex"> <Button.Root class="bits-btn bits-btn" onclick={() => demoStep = 'dashboard'} variant="ghost"> Back to Dashboard <Button.Root class="bits-btn bits-btn" onclick={ demonstrateLogout } variant="error"> <LogOut class="h-4 w-4" /> Complete Demo </div> </div> {/if}
   <!-- Session, Information -->
@@ -80,7 +80,7 @@ import type { User } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
  <span class="px-2 py-1 rounded text-xs font-medium border border-gray-300 text-gray-700">{session.securityLevel || 'standard'}
 </span> </div>
  <div> <div class="font-medium">Permissions</div>
- <div>{session.permissions? .length : | 0} granted</div> </div>
+ <div>{session.permissions?.length ?? 0} granted</div> </div>
  <div> <div class="font-medium">Last Activity</div>
  <div>{session.lastActivity ? new Date(session.lastActivity).toLocaleTimeString(): 'N/A'}
 </div> </div>

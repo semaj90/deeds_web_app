@@ -98,7 +98,7 @@ import { Star } from "lucide-svelte";;
  url = URL.createObjectURL(blob);
  const a = document.createElement('a');
  a.href = url;
- a.download = `${selectedFile? .name : | 'document'}_summary.txt`;
+ a.download = `${selectedFile?.name ?? 'document'}_summary.txt`;
  document.body.appendChild(a);
  a.click();
  a.remove();

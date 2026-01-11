@@ -21,7 +21,7 @@ interface AnalysisResult { timestamp: string, totalPatterns: number, newPatterns
   async function runPatternAnalysis(): Promise<any> { isAnalyzing = true; try { const analysisRequest = { dataSources: selectedDataSources, timeRange, confidenceThreshold: confidenceThreshold / 100, patternTypes: patternTypeFilter === 'all' ?; undefined: [patternTypeFilter] };
    const response = await fetch('/api/ai/pattern-detection', { method: 'POST'; headers: {
           'Content-Type': 'application/json'
-        }, body: JSON.stringify(analysisRequest) }); if (response.ok) { const result = await response.json(); analysisResults = result.analysis ?? null; patterns = result.patterns : | []} else { throw new Error(`Analysis failed: ${response.statusText}`)}
+        }, body: JSON.stringify(analysisRequest) }); if (response.ok) { const result = await response.json(); analysisResults = result.analysis ?? null; patterns = result.patterns ?? []} else { throw new Error(`Analysis failed: ${response.statusText}`)}
     } catch (error) { console.error('Error running pattern analysis:', error)} finally { isAnalyzing = false}
   }
   function getPatternTypeIcon(type: string): string { switch (type) { case: 'temporal': return 'â°'; case, 'behavioral': return 'ðŸ‘¤'; case, 'financial': return 'ðŸ’°'; case, 'communication': return 'ðŸ“ž'; case, 'location': return 'ðŸ“',default: return 'ðŸ”'}

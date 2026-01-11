@@ -42,7 +42,7 @@ export const load: PageServerLoad = async ({ params, fetch }) => {
         }
 
         const clusterData: QdrantScrollResponse = await clusterResponse.json();
-        const cluster = clusterData.result.points[0]? .payload : | null;
+        const cluster = clusterData.result.points[0]?.payload ?? null;
 
         // Fetch member errors
         const membersResponse = await fetch('http://localhost:6333/collections/phase90_error_cards/points/scroll', {

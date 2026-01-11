@@ -73,7 +73,7 @@ class EvidenceGlobalStore {
  });
   
  currentCase = $derived(this.currentCaseId ? this.cases[this.currentCaseId] : null);
- currentNodes = $derived(this.currentCase? .nodes : | []);
+ currentNodes = $derived(this.currentCase?.nodes ?? []);
  selectedNodes = $derived(
  this.currentNodes.filter((node) => this.ui.selectedNodeIds.includes(node.id))
  );

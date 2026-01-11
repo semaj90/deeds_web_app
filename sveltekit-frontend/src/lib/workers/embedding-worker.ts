@@ -200,9 +200,9 @@ export async function generateEmbeddings(
 ): Promise<BatchEmbeddingResult> {
 	return getEmbeddingWorker().processEmbeddings({
 		texts,
-		batchSize: options? .batchSize : | 32,
-		model: options? .model : | 'nomic-embed-text',
-		dimensions: options? .dimensions : | 384,
+		batchSize: options?.batchSize ?? 32,
+		model: options?.model ?? 'nomic-embed-text',
+		dimensions: options?.dimensions ?? 384,
 	});
 }
 
@@ -212,9 +212,9 @@ export async function chunkDocument(
 ): Promise<DocumentChunk[]> {
 	return getEmbeddingWorker().processChunking({
 		content,
-		chunkSize: options? .chunkSize : | 512,
-		overlap: options? .overlap : | 64,
-		metadata: options? .metadata : | {},
+		chunkSize: options?.chunkSize ?? 512,
+		overlap: options?.overlap ?? 64,
+		metadata: options?.metadata ?? {},
 	});
 }
 
@@ -226,8 +226,8 @@ export async function findSimilar(
 	return getEmbeddingWorker().processSimilarity({
 		queryEmbedding,
 		targetEmbeddings,
-		threshold: options? .threshold : | 0.7,
-		maxResults: options? .maxResults : | 10,
+		threshold: options?.threshold ?? 0.7,
+		maxResults: options?.maxResults ?? 10,
 	});
 }
 

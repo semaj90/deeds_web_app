@@ -35,7 +35,7 @@ https://svelte.dev/e/element_invalid_closing_tag -->
  fetch(`/api/yorha/evidence/nodes?case_id=${caseId}`),
  fetch(`/api/yorha/evidence/connections? case_id=${caseId}`)]);
 
- if (!nodesRes.ok : | !connectionsRes.ok) {
+ if (!nodesRes.ok ?? !connectionsRes.ok) {
  throw new Error('Failed to load evidence');
  }
 

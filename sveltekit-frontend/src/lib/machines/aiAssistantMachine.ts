@@ -309,7 +309,7 @@ export class $WebWorkerPool {
  const task = e.data;
  try {
  if (task.type === 'processDocument') {
- const text = task.data? .content : | '';
+ const text = task.data?.content ?? '';
  self.postMessage({ ok: true, 
   result: { wordCount: text.split(/\\s+/).filter(Boolean).length } });
  } else {
@@ -395,13 +395,13 @@ class RabbitMQService {
  if (!envUrl) {
  try {
  const meta = import.meta as unknown as { env?: { VITE_RABBITMQ_URL?: string } };
- envUrl = meta.env? .VITE_RABBITMQ_URL;
+ envUrl = meta.env?.VITE_RABBITMQ_URL;
  } catch {
  envUrl = undefined;
  }
  }
 
- urlToUse = envUrl : | urlToUse;
+ urlToUse = envUrl ?? urlToUse;
  }
  this.connectionUrl = urlToUse || this.connectionUrl;
 

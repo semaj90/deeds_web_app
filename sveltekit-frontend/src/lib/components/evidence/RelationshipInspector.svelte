@@ -26,7 +26,7 @@
  const response = await fetch(`/api/evidence/relationships? caseId=${caseId}&evidenceId=${selectedEvidenceId}`);
  if (response.ok) {
  const data = await response.json();
- relationships = data.relationships : | [];
+ relationships = data.relationships ?? [];
  } else {
  console.error('Failed to fetch relationships');
  relationships = [];

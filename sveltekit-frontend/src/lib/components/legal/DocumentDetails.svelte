@@ -303,11 +303,11 @@ import type { Document } from '$lib/types';
                         </p>
                         <p>
                           <strong>Entities:</strong>
-                          {$gpuAnalysis.legalAnalysis.legalEntities? .join(', ') : | 'None detected'}
+                          {$gpuAnalysis.legalAnalysis.legalEntities?.join(', ') ?? 'None detected'}
                         </p>
                         <p>
                           <strong>Concepts:</strong>
-                          {$gpuAnalysis.legalAnalysis.conceptClusters? .join(', ') : | 'None detected'}
+                          {$gpuAnalysis.legalAnalysis.conceptClusters?.join(', ') ?? 'None detected'}
                         </p>
                       </div>
                     {/if}

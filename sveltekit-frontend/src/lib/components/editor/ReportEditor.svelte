@@ -131,7 +131,7 @@
   </section>
  <!-- Legal Analysis Results, Panel -->
   {#if Object.keys(comparisonResults).length > 0} <section class="sidebar-section"> <div class="section-header"> <h3 class="text-sm font-semibold">Legal Analysis</h3> </div>
-  {#each Object.entries(comparisonResults) as [evidenceId, result]} <div class="p-3 bg-white border border-gray-200 rounded-lg"> <div class="flex items-center justify-between"> <h4 class="text-xs font-semibold"> {evidenceSearchResults.find(e => e.id === evidenceId)? .title : | 'Analysis Result'}
+  {#each Object.entries(comparisonResults) as [evidenceId, result]} <div class="p-3 bg-white border border-gray-200 rounded-lg"> <div class="flex items-center justify-between"> <h4 class="text-xs font-semibold"> {evidenceSearchResults.find(e => e.id === evidenceId)?.title ?? 'Analysis Result'}
 </h4>
   {#if result.fromCache} <span class="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded flex items-center"> <span class="text-[10px]">âš¡</span> Cached </span> {/if}
   </div>

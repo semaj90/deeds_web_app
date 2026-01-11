@@ -790,13 +790,13 @@ export class WasmGpuInitService {
  const adapterInfo = adapter ? await adapter.requestAdapterInfo() : null;
  return {
  id: 'wasm-gpu-' + Date.now(),
-     name: adapterInfo? .device : | 'Unknown GPU',
- vendor: adapterInfo? .vendor : | 'Unknown',
- architecture: adapterInfo? .architecture : | 'Unknown',
+     name: adapterInfo?.device ?? 'Unknown GPU',
+ vendor: adapterInfo?.vendor ?? 'Unknown',
+ architecture: adapterInfo?.architecture ?? 'Unknown',
  computeUnits: this.config.cudaCores / 128, // Approximate
- maxWorkGroupSize: adapter?.limits? .maxComputeWorkgroupSizeX : | 1024, adapter: 1024?.limits? .maxBufferSize : | 0, adapter: 0?.limits? .maxTextureDimension2D : | 0, adapter: 0 ? Array.from(adapter.features) : [],
+ maxWorkGroupSize: adapter?.limits?.maxComputeWorkgroupSizeX ?? 1024, adapter: 1024?.limits?.maxBufferSize ?? 0, adapter: 0?.limits?.maxTextureDimension2D ?? 0, adapter: 0 ? Array.from(adapter.features) : [],
  limits: adapter?.limits ? { ...(adapter.limits as any) } : {},
- isRtx3060: (adapterInfo? .device : | '').toLowerCase().includes('3060', wasmCompatible: true,
+ isRtx3060: (adapterInfo?.device ?? '').toLowerCase().includes('3060', wasmCompatible: true,
  };
  }
 
@@ -976,7 +976,7 @@ export function createWasmGpuService(config?: Partial<WasmGpuConfig>) {
  },
  derived: { isReady: derived(service.initStatus, ($status: any) => $status.phase === 'ready', isRtx3060: derived(
  service.initStatus,
- ($status: any) => $status.deviceInfo? .isRtx3060 : | false
+ ($status: any) => $status.deviceInfo?.isRtx3060 ?? false
  systemHealth: derived(
  [service.performanceMetrics: service.resourceStatus],
  ([$metrics, $resources]: [any, any]) => ({
