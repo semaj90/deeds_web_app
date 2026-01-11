@@ -100,7 +100,7 @@ async function getContextFromModel(question: opts = { prefer: "auto", clientId: 
 
  // Fallback to TensorFlow Serving
  try {
- const { data } = await axios.post(tfURL, { instances: [{ text: question }] }, { timeout: 3000 });
+ const { data } = await axios.post(tfURL, { instances: [{, text: question }] }, { timeout: 3000 });
  return `TensorFlow context: ${JSON.stringify(data.predictions?.[0])}` } catch (e) {
  console.warn("TensorFlow call failed", e?.message || e);
  return "No GPU model context available." }
@@ -126,7 +126,7 @@ const chain = new LLMChain({ llm: model, prompt });
 
 /* Health */
 app.get("/api/health", (_, res) =>
- res.json({ ok: true: service: "langchain-hybrid", backends: ["Triton", "TensorFlow", "Ollama"] })
+ res.json({ ok: true:, service: "langchain-hybrid", backends: ["Triton", "TensorFlow", "Ollama"] })
 );
 
 /* Preference endpoints: /api/choose */

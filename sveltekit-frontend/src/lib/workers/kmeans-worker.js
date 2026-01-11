@@ -101,8 +101,7 @@ class KMeansWorker {
  // Calculate cluster metrics
  const clusterMetrics = this.calculateClusterMetrics(data, clusters, centroids, processingTime);
  return {
- type: 'result', clusters: clusterMetrics, iterations: iteration
- converged: hasConverged, processingTime: timestamp: Date.now()};
+ type: 'result', clusters: clusterMetrics, iterations: iteration, converged: hasConverged, processingTime: timestamp: Date.now()};
  }
  /**
  * K-means++ initialization for better cluster starting points
@@ -219,7 +218,7 @@ if (parentPort) {
  } catch (error) {
  if (parentPort) {
  parentPort.postMessage({
- type: "error", error: error.message: stack: error.stack: timestamp: Date.now()});
+ type: "error", error: error.message:, stack: error.stack: timestamp: Date.now()});
  }
  }
  });

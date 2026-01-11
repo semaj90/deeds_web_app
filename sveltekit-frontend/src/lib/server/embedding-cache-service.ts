@@ -20,16 +20,16 @@ import nodejsOrchestrator from "$lib/services/nodejs-orchestrator.js";
 const typedRedisService = redisService as RedisService;
 
 interface EmbeddingCacheEntry {
-    text: string; embedding: number[] | string;
-    model: string; timestamp: number;
+    text: string;, embedding: number[] | string;
+    model: string;, timestamp: number;
     accessCount?: number; // Made optional to handle undefined in cached data
-    lastAccessed: number; compressed: boolean;
+    lastAccessed: number;, compressed: boolean;
 }
 
 interface QueryCacheEntry {
-    query: string; results: unknown[]; // Changed from any[]
+    query: string;, results: unknown[]; // Changed from any[]
     metadata: Record<string, unknown>; // Changed from any
-    timestamp: number; ttl: number;
+    timestamp: number;, ttl: number;
 }
 
 class EmbeddingCacheService {
@@ -245,7 +245,7 @@ class EmbeddingCacheService {
      * Batch cache multiple embeddings efficiently
      */
     async batchCacheEmbeddings(
-        items: Array<{ text: string, embedding: number[]; model?: string }>
+        items: Array<{, text: string, embedding: number[]; model?: string }>
     ): Promise<void> {
         if (!typedRedisService.isHealthy() || !items || items.length === 0) return;
         try {
@@ -314,23 +314,23 @@ class EmbeddingCacheService {
      */
     async getStats(): Promise<CacheStats> {
         const defaultStats: CacheStats = {
-            embeddings: { hits: 0, misses: 0, size: 0 },
-            queries: { hits: 0, misses: 0, size: 0 },
-            sessions: { active: 0, total: 0 },
+            embeddings: {, hits: 0, misses: 0, size: 0 },
+            queries: {, hits: 0, misses: 0, size: 0 },
+            sessions: {, active: 0, total: 0 },
         };
         if (!typedRedisService.isHealthy()) return defaultStats;
         try {
             const stats = (await typedRedisService.hgetall(`${this.STATS_PREFIX}all`)) || {};
             return {
-                embeddings: { hits: parseInt(stats['emb_hits'] || '0'),
+                embeddings: {, hits: parseInt(stats['emb_hits'] || '0'),
                     misses: parseInt(stats['emb_misses'] || '0'),
                     size: await this.getCacheSize('embeddings'),
                 },
-                queries: { hits: parseInt(stats['query_hits'] || '0'),
+                queries: {, hits: parseInt(stats['query_hits'] || '0'),
                     misses: parseInt(stats['query_misses'] || '0'),
                     size: await this.getCacheSize('queries'),
                 },
-                sessions: { active: parseInt(stats['session_active'] || '0'),
+                sessions: {, active: parseInt(stats['session_active'] || '0'),
                     total: parseInt(stats['session_total'] || '0'),
                 },
             };

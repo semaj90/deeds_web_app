@@ -2,9 +2,9 @@ import { env } from '$lib/env';
 import { Client } from 'minio';
 
 export interface MinioS3ClientConfig {
-  endPoint: string; port: number;
-  useSSL: boolean; accessKey: string;
-  secretKey: string; bucket: string;
+  endPoint: string;, port: number;
+  useSSL: boolean;, accessKey: string;
+  secretKey: string;, bucket: string;
 }
 
 export function getMinioConfig(): MinioS3ClientConfig {
@@ -51,7 +51,7 @@ export class MinIOService {
     }
   }
 
-  async uploadFile(file: File, userId: string): Promise<{ bucket: string; key: string; url: string }> {
+  async uploadFile(file: File, userId: string): Promise<{, bucket: string; key: string;, url: string }> {
     try {
       await this.ensureBucketExists();
 
@@ -85,7 +85,7 @@ export class MinIOService {
     });
   }
 
-  async getTextContent(key: string): Promise<{ content: string; metadata: Record<string, unknown> }> {
+  async getTextContent(key: string): Promise<{, content: string; metadata: Record<string, unknown> }> {
     const buffer = await this.getObjectBuffer(key);
     return {
       content: buffer.toString('utf-8'),
@@ -94,7 +94,7 @@ export class MinIOService {
   }
 
   // Static helpers for direct usage
-  static async getTextContentFromUrl(url: string): Promise<{ content: string; metadata: Record<string, unknown> } | null> {
+  static async getTextContentFromUrl(url: string): Promise<{, content: string; metadata: Record<string, unknown> } | null> {
     try {
       const service = new MinIOService();
       const key = MinIOService.extractKeyFromUrl(url, service.bucket);

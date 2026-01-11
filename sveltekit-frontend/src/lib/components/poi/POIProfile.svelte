@@ -13,7 +13,7 @@
  fetch("/api/persons/summary", {
  method: "POST",
  headers: { "Content-Type": "application/json" },
- body: JSON.stringify({ text: `${person.name} - ${person.modusOperandi} - Associates: ${person.knownAssociates.join(", ")}` })
+ body: JSON.stringify({, text: `${person.name} - ${person.modusOperandi} - Associates: ${person.knownAssociates.join(", ")}` })
  })
  .then(res => res.json())
  .then(data => aiSummary = data.summary)

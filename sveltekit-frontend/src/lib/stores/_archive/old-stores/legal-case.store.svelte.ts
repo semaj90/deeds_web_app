@@ -2,31 +2,31 @@ import crypto from 'crypto'; // Added import for crypto
 
 // Legal Case Store - Svelte 5 Runes Implementation. Types are imported from $lib/types.
 export interface User {
- id: string; role: string;
+ id: string;, role: string;
  clearanceLevel: number;
 }
 
 export interface LegalCase {
- id: string; title: string;
+ id: string;, title: string;
  caseNumber: string;
- description?: string; status: 'active' | 'pending' | 'closed' | 'archived';
+ description?: string;, status: 'active' | 'pending' | 'closed' | 'archived';
  priority: 'low' | 'medium' | 'high' | 'critical';
  confidentialityLevel: number;
  documents?: LegalDocument[]; // Added documents property
 }
 export interface LegalDocument {
- id: string; name: string;
- type: string; caseId: string; // Added caseId property
+ id: string;, name: string;
+ type: string;, caseId: string; // Added caseId property
 }
 export interface AIInsights {
  findings?: any[];
- riskAssessment?: { score: number | string };
+ riskAssessment?: {, score: number | string };
  complianceChecks?: any[];
 }
 export interface AuditLogEntry {
- id: string; type: string;
- entityType: string; entityId: string;
- userId: string; timestamp: Date;
+ id: string;, type: string;
+ entityType: string;, entityId: string;
+ userId: string;, timestamp: Date;
  details?: any;
 }
 // Mock audit service class (removed, integrated into store)
@@ -56,8 +56,8 @@ export function createLegalCaseStore() {
  });
   
  const auditService = {
- async logAction(action: { type: string;
- entityType: string; entityId: string;
+ async logAction(action: {, type: string;
+ entityType: string;, entityId: string;
  userId: string;
  details?: any;
  }): Promise<void> {
@@ -92,7 +92,7 @@ export function createLegalCaseStore() {
  status: 'active',
  priority: 'high',
  confidentialityLevel: 1,
- documents: [{ id: 'doc1', name: 'Contract A', type: 'contract', caseId: '1' }], // Added documents
+ documents: [{, id: 'doc1', name: 'Contract A', type: 'contract', caseId: '1' }], // Added documents
  },
  {
  id: '2',
@@ -121,7 +121,7 @@ export function createLegalCaseStore() {
  entityType: 'CASE',
  entityId: 'bulk',
  userId: currentUser?.id ?? 'unknown',
- details: { count: cases.length },
+ details: {, count: cases.length },
  });
  } catch (error: any) {
  console.error('Failed to load cases: ', error);
@@ -177,7 +177,7 @@ export function createLegalCaseStore() {
  type: 'CASE_ANALYSIS_COMPLETED',
  entityType: 'CASE',
  entityId: caseId, userId: currentUser?.id ?? 'unknown',
- details: { insightCount: insights.findings?.length ?? 0, riskScore: insights.riskAssessment?.score,
+ details: {, insightCount: insights.findings?.length ?? 0, riskScore: insights.riskAssessment?.score,
  },
  });
  } catch (error: any) {
@@ -186,7 +186,7 @@ export function createLegalCaseStore() {
  type: 'CASE_ANALYSIS_FAILED',
  entityType: 'CASE',
  entityId: caseId, userId: currentUser?.id ?? 'unknown',
- details: { error: error.message },
+ details: {, error: error.message },
  });
  throw error;
  } finally {
@@ -215,7 +215,7 @@ export function createLegalCaseStore() {
  type: 'DOCUMENT_ANALYSIS_COMPLETED',
  entityType: 'DOCUMENT',
  entityId: documentId, userId: currentUser?.id ?? 'unknown',
- details: { complianceScore: insights.complianceChecks?.length ?? 0, riskLevel: insights.riskAssessment?.score, // Changed from 'level' to 'score'
+ details: {, complianceScore: insights.complianceChecks?.length ?? 0, riskLevel: insights.riskAssessment?.score, // Changed from 'level' to 'score'
  },
  });
  } catch (error: any) {
@@ -224,7 +224,7 @@ export function createLegalCaseStore() {
  type: 'DOCUMENT_ANALYSIS_FAILED',
  entityType: 'DOCUMENT',
  entityId: documentId, userId: currentUser?.id ?? 'unknown',
- details: { error: error.message },
+ details: {, error: error.message },
  });
  throw error;
  } finally {
@@ -244,7 +244,7 @@ export function createLegalCaseStore() {
  await fetch(`/api/cases/${caseId}`, {
  method: 'PATCH',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({ status: newStatus }),
+ body: JSON.stringify({, status: newStatus }),
  });
  await auditService.logAction({
  type: 'CASE_STATUS_UPDATED',

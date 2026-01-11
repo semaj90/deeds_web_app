@@ -6,7 +6,7 @@
 import type { Snippet } from 'svelte';
 
 interface SelectOption {
-	value: string; label: string;
+	value: string;, label: string;
 	disabled?: boolean;
 }
 
@@ -53,7 +53,7 @@ const baseClasses = `
 	rounded-lg
 	cursor-pointer
 	transition-all duration-150
-	hover: border-blue-500, focus:outline-none focus: ring-2, focus:ring-blue-500 focus: border-blue-500, disabled:opacity-50 disabled:cursor-not-allowed
+	hover: border-blue-500, focus: outline-none, focus: ring-2, focus: ring-blue-500, focus: border-blue-500, disabled: opacity-50, disabled:cursor-not-allowed
 `.replace(/\s+/g, ' ').trim();
 
 const dropdownClasses = `
@@ -202,9 +202,9 @@ function handleBlur() {
 
 <style>
 	.sr-only {
-		position: absolute; width: 1px;
-		height: 1px; padding: 0;
-		margin: -1px; overflow: hidden;
+		position: absolute;, width: 1px;
+		height: 1px;, padding: 0;
+		margin: -1px;, overflow: hidden;
 		clip: rect(0, 0, 0, 0);
 		white-space: nowrap;
 		border-width: 0;

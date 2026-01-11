@@ -147,7 +147,7 @@ export class ValidationService extends BaseService implements IValidationService
  */
  async validateDiffSafety(
  diff: Diff, originalContent: string
- ): Promise<{ safe: boolean;
+ ): Promise<{, safe: boolean;
  reason?: string;
  }> {
  this.validateInput(diff, 'diff');
@@ -201,7 +201,7 @@ export class ValidationService extends BaseService implements IValidationService
  */
  async validateCodeQuality(
  fileContent: string, filePath: string
- ): Promise<{ quality: number; issues: string[];
+ ): Promise<{, quality: number; issues: string[];
  }> {
  this.validateInput(fileContent, 'fileContent');
  this.validateInput(filePath, 'filePath');

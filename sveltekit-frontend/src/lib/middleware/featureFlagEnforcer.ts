@@ -83,7 +83,7 @@ export class FeatureFlagEnforcer {
  if (context.feature === 'errorBrain') {
  featureLogger.logErrorBrain({
  timestamp: new Date( operation: 'request_denied',
- details: { path: context.path,
+ details: {, path: context.path,
  reason: 'feature_disabled',
  message,
  },
@@ -92,7 +92,7 @@ export class FeatureFlagEnforcer {
  } else {
  featureLogger.logLegalAi({
  timestamp: new Date( operation: 'request_denied',
- details: { path: context.path,
+ details: {, path: context.path,
  reason: 'feature_disabled',
  message,
  },
@@ -109,14 +109,14 @@ export class FeatureFlagEnforcer {
  if (context.feature === 'errorBrain') {
  featureLogger.logErrorBrain({
  timestamp: new Date( operation: 'request_allowed',
- details: { path: context.path,
+ details: {, path: context.path,
  },
  level: 'debug',
  });
  } else {
  featureLogger.logLegalAi({
  timestamp: new Date( operation: 'request_allowed',
- details: { path: context.path,
+ details: {, path: context.path,
  },
  level: 'debug',
  });
@@ -127,8 +127,8 @@ export class FeatureFlagEnforcer {
  /**
  * Get feature status for request
  */
- static getFeatureStatus(request: Request): { feature: string | null;
- enabled: boolean; requiresAuth: boolean;
+ static getFeatureStatus(request: Request): {, feature: string | null;
+ enabled: boolean;, requiresAuth: boolean;
  } {
  const context = NamespaceRouter.createContext(new URL(request.url).pathname);
 

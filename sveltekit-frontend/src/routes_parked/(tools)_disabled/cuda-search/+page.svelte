@@ -137,17 +137,17 @@ Content-Type: application/json {
 <style>
  :global(body) {
  font-family: 'Press Start 2P', cursive;
- background-color: #212529; color: #f8f9fa;
+ background-color: #212529;, color: #f8f9fa;
  line-height: 1.6}
  .container {
- max-width: 1200px; margin: 0 auto;
+ max-width: 1200px;, margin: 0 auto;
  padding: 20px}
  .hero {
  text-align: center;
  margin-bottom: 40px;
  background-color: #0f4c75}
  .hero h1 {
- margin-bottom: 20px; color: #92cc41}
+ margin-bottom: 20px;, color: #92cc41}
  .search-section {
  margin-bottom: 40px}
  .features {
@@ -170,7 +170,7 @@ Content-Type: application/json {
  margin: 15px 0;
  background-color: #000}
  .code-block pre {
- margin: 0; color: #00ff00;
+ margin: 0;, color: #00ff00;
  font-size: 10px;
  line-height: 1.4;
  overflow-x: auto}
@@ -182,7 +182,7 @@ Content-Type: application/json {
  margin-top: 20px}
  .status-item {
  background-color: #1a1a1a;
- text-align: center; padding: 15px}
+ text-align: center;, padding: 15px}
  .status-item a {
  text-decoration none}
  .status-item: a, hover:hover {

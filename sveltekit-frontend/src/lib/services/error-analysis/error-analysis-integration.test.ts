@@ -243,7 +243,7 @@ describe('Error Analysis Pipeline - Integration Tests', () => {
  lineStart: 1, lineEnd: 1, status: 'applied' as const,
   createdAt: new Date( appliedAt: new Date(),
  }],
- metrics: { totalErrors: 1, errorsFixed: 1, successRate: 1.0, averageConfidence: 0.95,
+ metrics: {, totalErrors: 1, errorsFixed: 1, successRate: 1.0, averageConfidence: 0.95,
  },
  timestamp: new Date(),
  };
@@ -268,7 +268,7 @@ describe('Error Analysis Pipeline - Integration Tests', () => {
  sessionId,
  errorAnalysis: [],
  fixesApplied: [],
- metrics: { totalErrors: 10, errorsFixed: 5, successRate: 0.5, averageConfidence: 0.8,
+ metrics: {, totalErrors: 10, errorsFixed: 5, successRate: 0.5, averageConfidence: 0.8,
  },
  timestamp: new Date(),
  };

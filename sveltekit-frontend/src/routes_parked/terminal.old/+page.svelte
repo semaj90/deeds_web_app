@@ -3,9 +3,9 @@
  import { onMount } from 'svelte';
 
  interface Query {
- id: string; query: string;
- response: string; timestamp: Date;
- functionCalls: Array<{ name: string; result: any }>;
+ id: string;, query: string;
+ response: string;, timestamp: Date;
+ functionCalls: Array<{, name: string; result: any }>;
  }
 
  let caseId: string = $state('');

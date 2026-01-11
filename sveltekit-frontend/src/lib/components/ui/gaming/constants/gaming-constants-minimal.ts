@@ -27,16 +27,16 @@ export const GAMING_BREAKPOINTS = {
 
 // Gaming Era Specifications
 export const GAMING_ERA_SPECS = {
-  '8bit': { maxColors: 64,
+  '8bit': {, maxColors: 64,
     totalColors: 512,
-    resolution: { width: 256,
+    resolution: {, width: 256,
       height: 240,
       maxWidth: 512,
       maxHeight: 480
     },
     framerate: 60,
     pixelPerfect: true,
-    somClustering: { enabled: true,
+    somClustering: {, enabled: true,
       gridSize: [16, 16],
       learningRate: 0.1,
       neighborhoodRadius: 2,
@@ -44,16 +44,16 @@ export const GAMING_ERA_SPECS = {
       compressionRatio: 4.0
     }
   },
-  '16bit': { maxColors: 256,
+  '16bit': {, maxColors: 256,
     totalColors: 32768,
-    resolution: { width: 320,
+    resolution: {, width: 320,
       height: 224,
       maxWidth: 640,
       maxHeight: 448
     },
     framerate: 60,
     pixelPerfect: false,
-    somClustering: { enabled: true,
+    somClustering: {, enabled: true,
       gridSize: [32, 32],
       learningRate: 0.05,
       neighborhoodRadius: 3,
@@ -61,16 +61,16 @@ export const GAMING_ERA_SPECS = {
       compressionRatio: 6.0
     }
   },
-  'n64': { maxColors: 16777216,
+  'n64': {, maxColors: 16777216,
     totalColors: 16777216,
-    resolution: { width: 640,
+    resolution: {, width: 640,
       height: 480,
       maxWidth: 1280,
       maxHeight: 720
     },
     framerate: 30,
     pixelPerfect: false,
-    somClustering: { enabled: true,
+    somClustering: {, enabled: true,
       gridSize: [64, 64],
       learningRate: 0.01,
       neighborhoodRadius: 4,
@@ -84,7 +84,7 @@ export const GAMING_ERA_SPECS = {
 
 // N64 Texture Presets
 export const N64_TEXTURE_PRESETS = {
-  lowPoly: { textureQuality: 'low' as const,
+  lowPoly: {, textureQuality: 'low' as const,
     enableBilinearFiltering: false,
     enableTrilinearFiltering: false,
     anisotropicLevel: 1 as const,
@@ -93,7 +93,7 @@ export const N64_TEXTURE_PRESETS = {
     enableShadows: false,
     maxTextureSize: 256 as const
   },
-  balanced: { textureQuality: 'medium' as const,
+  balanced: {, textureQuality: 'medium' as const,
     enableBilinearFiltering: true,
     enableTrilinearFiltering: false,
     anisotropicLevel: 4 as const,
@@ -102,7 +102,7 @@ export const N64_TEXTURE_PRESETS = {
     enableShadows: true,
     maxTextureSize: 512 as const
   },
-  highQuality: { textureQuality: 'high' as const,
+  highQuality: {, textureQuality: 'high' as const,
     enableBilinearFiltering: true,
     enableTrilinearFiltering: true,
     anisotropicLevel: 16 as const,

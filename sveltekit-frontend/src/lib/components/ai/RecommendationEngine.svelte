@@ -1,30 +1,30 @@
 <!-- Recommendation Engine Interface AI-powered recommendations using Enhanced-Bits UI, components --> <script lang="ts"> import { Card, CardHeader, CardTitle, CardContent, CardDescription, CardFooter } from '$lib/components/ui/enhanced-bits'; import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '$lib/components/ui/dialog';
-import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported import { onMount } from 'svelte'; // Card components removed - using native HTML elements import * as Dialog from '$lib/components/ui/Dialog.svelte'; import  Button  from "$lib/components/ui/enhanced-bits.svelte"; // Recommendation state let recommendations = $state<Recommendation[]>([]); let selectedRecommendation = $state<Recommendation | null>(null); let isGenerating = $state<boolean>(false); let showRecommendationDetails = $state<boolean>(false); let contextData = $state<ContextData | null>(null); // Filters and controls let categoryFilter = $state<'all' | 'strategy' | 'evidence' | 'legal_research' | 'next_action'>('all'); let priorityFilter = $state<'all' | 'high' | 'medium' | 'low'>('all'); let confidenceThreshold = $state<number>(60); let contextType = $state<'case' | 'evidence' | 'investigation' | 'general'>('case'); let contextId = $state<string>(''); interface Recommendation { id: string, title: string, description: string, category: 'strategy' | 'evidence' | 'legal_research' | 'next_action' | 'risk_mitigation',priority: 'high' | 'medium' | 'low',confidence: number, impact: number, effort: number, timeframe: 'immediate' | 'short_term' | 'medium_term' | 'long_term',rationale: string, steps: ActionStep[], resources: Resource[], risks: Risk[], alternatives: Alternative[], dependencies: string[], success_metrics: SuccessMetric[], estimated_completion: string; tags: string[]}
-  interface ActionStep { id: string, description: string, order: number, estimated_duration: string, required_resources: string[]; dependencies: string[], completion_criteria: string}
-  interface Resource { type: 'person' | 'document' | 'tool' | 'external_service',name: string, description: string; availability: 'available' | 'limited' | 'unavailable'; cost?: number}
-  interface Risk { description: string, probability: number, impact: number; mitigation: string}
-  interface Alternative { title: string, description: string, pros: string[], cons: string[]; confidence: number}
-  interface SuccessMetric { name: string; target: string, measurement_method: string}
-  interface ContextData { type: string, id: string; metadata: { [key: string]: unknown }; entities: string[], current_status: string; constraints: string[]}
+import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported import { onMount } from 'svelte'; // Card components removed - using native HTML elements import * as Dialog from '$lib/components/ui/Dialog.svelte'; import  Button  from "$lib/components/ui/enhanced-bits.svelte"; // Recommendation state let recommendations = $state<Recommendation[]>([]); let selectedRecommendation = $state<Recommendation | null>(null); let isGenerating = $state<boolean>(false); let showRecommendationDetails = $state<boolean>(false); let contextData = $state<ContextData | null>(null); // Filters and controls let categoryFilter = $state<'all' | 'strategy' | 'evidence' | 'legal_research' | 'next_action'>('all'); let priorityFilter = $state<'all' | 'high' | 'medium' | 'low'>('all'); let confidenceThreshold = $state<number>(60); let contextType = $state<'case' | 'evidence' | 'investigation' | 'general'>('case'); let contextId = $state<string>(''); interface Recommendation { id: string, title: string, description: string, category: 'strategy' | 'evidence' | 'legal_research' | 'next_action' | 'risk_mitigation',priority: 'high' | 'medium' | 'low',confidence: number, impact: number, effort: number, timeframe: 'immediate' | 'short_term' | 'medium_term' | 'long_term',rationale: string, steps: ActionStep[], resources: Resource[], risks: Risk[], alternatives: Alternative[], dependencies: string[], success_metrics: SuccessMetric[], estimated_completion: string;, tags: string[]}
+  interface ActionStep { id: string, description: string, order: number, estimated_duration: string, required_resources: string[];, dependencies: string[], completion_criteria: string}
+  interface Resource { type: 'person' | 'document' | 'tool' | 'external_service',name: string, description: string;, availability: 'available' | 'limited' | 'unavailable'; cost?: number}
+  interface Risk { description: string, probability: number, impact: number;, mitigation: string}
+  interface Alternative { title: string, description: string, pros: string[], cons: string[];, confidence: number}
+  interface SuccessMetric { name: string;, target: string, measurement_method: string}
+  interface ContextData { type: string, id: string;, metadata: { [key: string]: unknown }; entities: string[], current_status: string;, constraints: string[]}
   $effect(() => { loadExistingRecommendations(); loadContextData()});
-  async function loadExistingRecommendations(): Promise<any> { try { // Use new integrated legal recommendation engine const response = await fetch(`http://localhost:8095/api/v1/cases`, { method: 'GET'; headers: {
+  async function loadExistingRecommendations(): Promise<any> { try { // Use new integrated legal recommendation engine const response = await fetch(`http://localhost:8095/api/v1/cases`, { method: 'GET';, headers: {
           'Content-Type': 'application/json'
         } }); if ((response as { ok?: unknown; json?: unknown; statusText?: unknown }).ok) { const data = await (response as { ok?: unknown; json?: unknown; statusText?: unknown }).json(); recommendations = (data as { recommendations?: unknown; context?: unknown }).recommendations || []}
     } catch (error) { console.error('Error loading recommendations:', error)}
   }
-  async function loadContextData(): Promise<any> { if (!contextId) return; try { const response = await fetch(`/api/ai/recommendations/context?type=${ contextType }&id=${ contextId }`, { method: 'GET'; headers: {
+  async function loadContextData(): Promise<any> { if (!contextId) return; try { const response = await fetch(`/api/ai/recommendations/context?type=${ contextType }&id=${ contextId }`, { method: 'GET';, headers: {
           'Content-Type': 'application/json'
         } }); if ((response as { ok?: unknown; json?: unknown; statusText?: unknown }).ok) { const data = await (response as { ok?: unknown; json?: unknown; statusText?: unknown }).json(); contextData = (data as { recommendations?: unknown; context?: unknown }).context}
     } catch (error) { console.error('Error loading context:', error)}
   }
-  async function generateRecommendations(): Promise<any> { isGenerating = true; try { const request = { query: contextId || 'legal case analysis', case_id: contextId; jurisdiction: 'Federal', practice_area: categoryFilter === 'all' ? 'Contract Law': categoryFilter; limit: 10 }
-      const response = await fetch('http://localhost:8095/api/v1/recommend', { method: 'POST'; headers: {
+  async function generateRecommendations(): Promise<any> { isGenerating = true; try { const request = { query: contextId || 'legal case analysis', case_id: contextId;, jurisdiction: 'Federal', practice_area: categoryFilter === 'all' ? 'Contract Law': categoryFilter;, limit: 10 }
+      const response = await fetch('http://localhost:8095/api/v1/recommend', { method: 'POST';, headers: {
           'Content-Type': 'application/json'
-        }, body: JSON.stringify(request)}); if ((response as { ok?: unknown; json?: unknown; statusText?: unknown }).ok) { const result = await (response as { ok?: unknown; json?: unknown; statusText?: unknown }).json(); // Transform legal recommendation format to our component format const legalRecs = (result as { recommendations?: unknown }).recommendations || []; recommendations = legalRecs.map((rec: unknown) => ({ id: rec.case_id || rec.id, title: rec.title, description rec.summary || rec.description, category: 'legal_research', priority: rec.relevance > 0.9 ? 'high': rec.relevance > 0.7 ? 'medium': 'low', confidence: Math.round(rec.relevance * 100): Math.round(rec.relevance * 100): Math.round((1 - rec.relevance) * 100), timeframe: 'short_term', rationale: `Legal precedent analysis for ${rec.practice_area} case`, steps: [{ id: '1', description: 'Review case details and legal precedents', order: 1, estimated_duration: '2-3 hours', required_resources: ['Legal database access']; dependencies: [], completion_criteria: 'Case analysis completed'
+        }, body: JSON.stringify(request)}); if ((response as { ok?: unknown; json?: unknown; statusText?: unknown }).ok) { const result = await (response as { ok?: unknown; json?: unknown; statusText?: unknown }).json(); // Transform legal recommendation format to our component format const legalRecs = (result as { recommendations?: unknown }).recommendations || []; recommendations = legalRecs.map((rec: unknown) => ({ id: rec.case_id || rec.id, title: rec.title, description rec.summary || rec.description, category: 'legal_research', priority: rec.relevance > 0.9 ? 'high': rec.relevance > 0.7 ? 'medium': 'low', confidence: Math.round(rec.relevance * 100): Math.round(rec.relevance * 100): Math.round((1 - rec.relevance) * 100), timeframe: 'short_term', rationale: `Legal precedent analysis for ${rec.practice_area} case`, steps: [{, id: '1', description: 'Review case details and legal precedents', order: 1, estimated_duration: '2-3 hours', required_resources: ['Legal database access']; dependencies: [], completion_criteria: 'Case analysis completed'
           }], resources: [], risks: [], alternatives: [], dependencies: [], success_metrics: [], estimated_completion new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(); tags: [rec.jurisdiction, rec.practice_area].filter(Boolean)}))} else { throw new Error(`Generation failed: ${(response as { ok?: unknown; json?: unknown; statusText?: unknown }).statusText}`)}
     } catch (error) { console.error('Error generating recommendations:', error)} finally { isGenerating = false}
   }
-  async function applyRecommendation(recommendationId: string): Promise<any> { try { // Get detailed case information from legal recommendation engine const response = await fetch(`http://localhost:8095/api/v1/cases/${ recommendationId }`, { method: 'GET'; headers: {
+  async function applyRecommendation(recommendationId: string): Promise<any> { try { // Get detailed case information from legal recommendation engine const response = await fetch(`http://localhost:8095/api/v1/cases/${ recommendationId }`, { method: 'GET';, headers: {
           'Content-Type': 'application/json'
         } }); if ((response as { ok?: unknown; json?: unknown; statusText?: unknown }).ok) { const caseDetail = await (response as { ok?: unknown; json?: unknown; statusText?: unknown }).json(); console.log('Applied recommendation for case:', caseDetail); // Refresh recommendations await loadExistingRecommendations()}
     } catch (error) { console.error('Error applying recommendation', error)}
@@ -40,7 +40,7 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
 
     // Apply priority filter if (priorityFilter !== 'all') { filtered = filtered.filter(rec => rec.priority === priorityFilter)}
 
-    // Apply confidence threshold filtered = filtered.filter(rec => rec.confidence >= confidenceThreshold); // Sort by priority and confidence filtered.sort((a, b) => { const priorityOrder = { high: 3, medium: 2; low: 1 } const priorityDiff = priorityOrder[b.priority] - priorityOrder[a.priority]; if (priorityDiff !== 0) return priorityDiff; return b.confidence - a.confidenc}); return filtered}); function openRecommendationDetails(recommendation Recommendation) { selectedRecommendation = recommendatio; showRecommendationDetails = true}
+    // Apply confidence threshold filtered = filtered.filter(rec => rec.confidence >= confidenceThreshold); // Sort by priority and confidence filtered.sort((a, b) => { const priorityOrder = { high: 3, medium: 2;, low: 1 } const priorityDiff = priorityOrder[b.priority] - priorityOrder[a.priority]; if (priorityDiff !== 0) return priorityDiff; return b.confidence - a.confidenc}); return filtered}); function openRecommendationDetails(recommendation Recommendation) { selectedRecommendation = recommendatio; showRecommendationDetails = true}
   function calculateRiskScore(risks: Risk[]): number { if (risks.length === 0) return 0; return risks.reduce((sum, risk) => sum + (risk.probability * risk.impact), 0) / risks.length}
 </script>
  <svelte, head> <title>AI Recommendations - Legal AI Platform</title> </svelte, head>
@@ -214,94 +214,94 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
  <div class="dialog-actions"> <button class="nes-btn" variant="ghost" onclick={() => showRecommendationDetails = false}> Close </button>
  <button class="nes-btn" onclick={() => applyRecommendation(selectedRecommendation.id)}> Apply Recommendation </button> {/if}
   </Dialog.Content> </Dialog>
- <style> .recommendation-engine { max-width: 1400px; margin: 0 auto;padding: 2rem; font-family: system-ui, -apple-system, sans-serif}
+ <style> .recommendation-engine { max-width: 1400px;, margin: 0 auto;padding: 2rem; font-family: system-ui, -apple-system, sans-serif}
   .engine-header { display: flex; justify-content: space-betweenn; align-items: flex-start; margin-bottom: 2rem; padding-bottom: 1rem; border-bottom: 1px solid #e2e8f0}
-  .engine-title { font-size: 2rem; font-weight: 700; color: #1e293b;margin: 0}
-  .engine-subtitle { color: #64748b; margin: 0.5rem, 0 0 0}
-  .controls-section { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 2rem; padding: 1.5rem;background: #f8fafc; border-radius: 0.5rem}
+  .engine-title { font-size: 2rem; font-weight: 700;, color: #1e293b;margin: 0}
+  .engine-subtitle { color: #64748b;, margin: 0.5rem, 0 0 0}
+  .controls-section { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 2rem;, padding: 1.5rem;background: #f8fafc; border-radius: 0.5rem}
   .context-section h3, .filters-section h3 { margin: 0, 0 1rem 0; color: #374151; font-size: 1.125rem}
-  .context-controls, .filter-controls { display: flex; flex-direction: column; gap: 1rem}
-  .control-group { display: flex; flex-direction: column; gap: 0.5rem}
-  .control-group label { font-size: 0.875rem; font-weight: 500; color: #374151}
-  .control-select, .control-input { padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 0.375rem; font-size: 0.875rem}
+  .context-controls, .filter-controls { display: flex; flex-direction: column;, gap: 1rem}
+  .control-group { display: flex; flex-direction: column;, gap: 0.5rem}
+  .control-group label { font-size: 0.875rem; font-weight: 500;, color: #374151}
+  .control-select, .control-input { padding: 0.5rem;, border: 1px solid #d1d5db; border-radius: 0.375rem; font-size: 0.875rem}
   .control-range { width: 100%}
-  .context-preview { display: flex; gap: 1rem, margin-top: 1rem; padding: 0.75rem; background: white; border-radius: 0.375rem; border: 1px solid #e5e7eb}
-  .context-status, .context-entities { font-size: 0.75rem; padding: 0.25rem 0.5rem; border-radius: 0.25rem; background: #f3f4f6; color: #374151}
+  .context-preview { display: flex;, gap: 1rem, margin-top: 1rem;, padding: 0.75rem; background: white; border-radius: 0.375rem;, border: 1px solid #e5e7eb}
+  .context-status, .context-entities { font-size: 0.75rem;, padding: 0.25rem 0.5rem; border-radius: 0.25rem;, background: #f3f4f6; color: #374151}
   .recommendations-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(450px, 1fr)); gap: 1.5rem}
-  .recommendation-card { border: 1px solid #e2e8f0; border-radius: 0.5rem; overflow: hidden;transition: box-shadow 0.2}
+  .recommendation-card { border: 1px solid #e2e8f0; border-radius: 0.5rem;, overflow: hidden;transition: box-shadow 0.2}
   .recommendation-card:hover { box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1)}
-  .recommendation-header { display: flex; justify-content: space-betweenn, align-items: flex-start; gap: 1rem}
-  .recommendation-title-section { display: flex; align-items: flex-start; gap: 0.75rem;flex: 1 }
+  .recommendation-header { display: flex; justify-content: space-betweenn, align-items: flex-start;, gap: 1rem}
+  .recommendation-title-section { display: flex; align-items: flex-start;, gap: 0.75rem;flex: 1 }
   .recommendation-icon { font-size: 1.5rem; margin-top: 0.25rem}
   .recommendation-title { margin: 0, 0 0.5rem 0}
-  .recommendation-badges { display: flex; gap: 0.5rem; flex-wrap}
-  .category-badge, .timeframe-badge { padding: 0.25rem 0.5rem; border-radius: 0.25rem; font-size: 0.75rem, font-weight: 600; border: 1px solid; text-transform: capitaliz}
-  .recommendation-metrics { display: flex; flex-direction: column, align-items: flex-end; gap: 0.25rem}
+  .recommendation-badges { display: flex;, gap: 0.5rem; flex-wrap}
+  .category-badge, .timeframe-badge { padding: 0.25rem 0.5rem; border-radius: 0.25rem; font-size: 0.75rem, font-weight: 600;, border: 1px solid; text-transform: capitaliz}
+  .recommendation-metrics { display: flex; flex-direction: column, align-items: flex-end;, gap: 0.25rem}
   .priority-indicator { font-size: 0.75rem; font-weight: 700}
-  .confidence-score { font-size: 1.125rem; font-weight: 600; color: #374151}
+  .confidence-score { font-size: 1.125rem; font-weight: 600;, color: #374151}
   .recommendation-description { margin: 0.5rem, 0 0 0; color: #64748b}
-  .stat-grid { display: flex; flex-direction: column; gap: 0.75rem; margin-bottom: 1rem}
-  .stat { display: flex; align-items: center; gap: 0.75rem}
+  .stat-grid { display: flex; flex-direction: column;, gap: 0.75rem; margin-bottom: 1rem}
+  .stat { display: flex; align-items: center;, gap: 0.75rem}
   .stat-label { font-size: 0.75rem, color: #64748b; min-width: 60px}
-  .stat-bar { flex: 1; height: 0.5rem; background: #e2e8f0; border-radius: 0.25rem; overflow: hidden}
-  .stat-fill { height: 100%; transition: width 0.3}
-  .stat-fill.impact { background: #10b981 } .stat-fill.effort { background: #f59e0b } .stat-fill.risk { background: #ef4444 } .stat-value { font-size: 0.75rem; font-weight: 600; color: #374151; min-width: 40px; text-align: right}
+  .stat-bar { flex: 1;, height: 0.5rem; background: #e2e8f0; border-radius: 0.25rem;, overflow: hidden}
+  .stat-fill { height: 100%;, transition: width 0.3}
+  .stat-fill.impact { background: #10b981 } .stat-fill.effort { background: #f59e0b } .stat-fill.risk { background: #ef4444 } .stat-value { font-size: 0.75rem; font-weight: 600;, color: #374151; min-width: 40px; text-align: right}
   .recommendation-preview { margin-bottom: 1rem}
-  .steps-preview h4 { margin: 0, 0 0.5rem 0; font-size: 0.875rem; color: #374151}
-  .steps-list { list-style: none; padding: 0; margin: 0; counter-reset: step-counter}
-  .step-item { counter-increment: step-counter; padding: 0.5rem 0; font-size: 0.75rem; color: #64748b; position: relative; padding-left: 1.5rem}
-  .step-item: before { content: counter(step-counter); position: absolute;left: 0; top: 0.5rem; width: 1rem; height: 1rem; background: #e5e7eb; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.625rem, font-weight: 600; color: #374151}
+  .steps-preview h4 { margin: 0, 0 0.5rem 0; font-size: 0.875rem;, color: #374151}
+  .steps-list { list-style: none;, padding: 0; margin: 0; counter-reset: step-counter}
+  .step-item { counter-increment: step-counter;, padding: 0.5rem 0; font-size: 0.75rem;, color: #64748b; position: relative; padding-left: 1.5rem}
+  .step-item: before { content: counter(step-counter);, position: absolute;left: 0;, top: 0.5rem; width: 1rem;, height: 1rem; background: #e5e7eb; border-radius: 50%;, display: flex; align-items: center; justify-content: center; font-size: 0.625rem, font-weight: 600;, color: #374151}
   .step-more { padding: 0.5rem 0; font-size: 0.75rem, color: #9ca3af; font-style: italic}
   .completion-estimate { display: flex; justify-content: space-betweenn; align-items: center; margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px solid #f1f5f9}
-  .estimate-label { font-size: 0.75rem; color: #64748b}
-  .estimate-value { font-size: 0.75rem; font-weight: 600; color: #374151}
-  .recommendation-tags { display: flex; flex-wrap: wrap; gap: 0.25rem; margin-top: 0.75rem}
-  .tag { padding: 0.125rem 0.375rem; background: #f1f5f9; border-radius: 0.25rem, font-size: 0.625rem; color: #475569}
+  .estimate-label { font-size: 0.75rem;, color: #64748b}
+  .estimate-value { font-size: 0.75rem; font-weight: 600;, color: #374151}
+  .recommendation-tags { display: flex; flex-wrap: wrap;, gap: 0.25rem; margin-top: 0.75rem}
+  .tag { padding: 0.125rem 0.375rem; background: #f1f5f9; border-radius: 0.25rem, font-size: 0.625rem;, color: #475569}
   .tag-more { padding: 0.125rem 0.375rem; background: #f8fafc; border-radius: 0.25rem, font-size: 0.625rem, color: #9ca3af; font-style: italic}
-  .card-actions { display: flex; gap: 0.5rem; justify-content: flex-end}
-  .loading-state, .empty-state { grid-column: 1 / -1; text-align: center; padding: 3rem; color: #64748b}
-  .loading-spinner { width: 2rem; height: 2rem; border: 2px solid #e2e8f0; border-top: 2px solid #3b82f6; border-radius: 50%; animation: spin 1s linear infinite;margin: 0 auto 1rem}
+  .card-actions { display: flex;, gap: 0.5rem; justify-content: flex-end}
+  .loading-state, .empty-state { grid-column: 1 / -1; text-align: center;, padding: 3rem; color: #64748b}
+  .loading-spinner { width: 2rem;, height: 2rem; border: 2px solid #e2e8f0; border-top: 2px solid #3b82f6; border-radius: 50%;, animation: spin 1s linear infinite;margin: 0 auto 1rem}
   .loading-detail { font-size: 0.875rem; margin-top: 0.5rem}
   @keyframes spin { to { transform: rotate(360deg) } }
   /* Dialog Styles */ .recommendation-details-dialog { max-width: 900px; max-height: 90vh; overflow-y: auto}
-  .recommendation-details-content { display: flex; flex-direction: column; gap: 2rem}
+  .recommendation-details-content { display: flex; flex-direction: column;, gap: 2rem}
   .recommendation-overview { padding: 1.5rem, background: #f8fafc; border-radius: 0.5rem}
   .overview-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-bottom: 1.5rem}
-  .overview-metric { display: flex; flex-direction: column; gap: 0.25rem; text-align: center}
+  .overview-metric { display: flex; flex-direction: column;, gap: 0.25rem; text-align: center}
   .overview-label { font-size: 0.75rem, color: #64748b; text-transform: uppercase; font-weight: 500}
-  .overview-value { font-size: 1rem; font-weight: 600; color: #374151}
+  .overview-value { font-size: 1rem; font-weight: 600;, color: #374151}
   .rationale-section h4 { margin: 0, 0 0.5rem 0; color: #374151}
   .rationale-section p { margin: 0, color: #64748b; line-height: 1.6}
-  .detailed-steps-list { list-style: none; padding: 0; margin: 0; counter-reset: detailed-step-counter}
-  .detailed-step { counter-increment: detailed-step-counter; margin-bottom: 1.5rem; padding: 1rem;border: 1px solid #e5e7eb; border-radius: 0.375rem; background: #fafafa}
+  .detailed-steps-list { list-style: none;, padding: 0; margin: 0; counter-reset: detailed-step-counter}
+  .detailed-step { counter-increment: detailed-step-counter; margin-bottom: 1.5rem;, padding: 1rem;border: 1px solid #e5e7eb; border-radius: 0.375rem;, background: #fafafa}
   .detailed-step h4 { margin: 0, 0 0.75rem 0; color: #374151}
-  .step-details p { margin: 0.5rem 0; font-size: 0.875rem; color: #64748b}
+  .step-details p { margin: 0.5rem 0; font-size: 0.875rem;, color: #64748b}
   .resources-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem}
-  .resource-card { padding: 1rem; border: 1px solid #e5e7eb; border-radius: 0.375rem; background: #fafafa}
+  .resource-card { padding: 1rem;, border: 1px solid #e5e7eb; border-radius: 0.375rem;, background: #fafafa}
   .resource-card h4 { margin: 0, 0 0.5rem 0; color: #374151}
-  .resource-type .resource-description { margin: 0.25rem 0; font-size: 0.75rem; color: #6b7280}
+  .resource-type .resource-description { margin: 0.25rem 0; font-size: 0.75rem;, color: #6b7280}
   .resource-status { display: flex; justify-content: space-betweenn; align-items: center; margin-top: 0.5rem}
-  .availability-available { color: #10b981 } .availability-limited { color: #f59e0b } .availability-unavailable { color: #ef4444 } .resource-cost { font-weight: 600; color: #374151}
-  .risks-list { display: flex; flex-direction: column; gap: 1rem}
-  .risk-item { padding: 1rem; border: 1px solid #fecaca; border-radius: 0.375rem; background: #fef2f2}
+  .availability-available { color: #10b981 } .availability-limited { color: #f59e0b } .availability-unavailable { color: #ef4444 } .resource-cost { font-weight: 600;, color: #374151}
+  .risks-list { display: flex; flex-direction: column;, gap: 1rem}
+  .risk-item { padding: 1rem;, border: 1px solid #fecaca; border-radius: 0.375rem;, background: #fef2f2}
   .risk-header { display: flex; justify-content: space-betweenn; align-items: center; margin-bottom: 0.5rem}
-  .risk-description { font-weight: 500; color: #374151}
-  .risk-score { font-size: 0.75rem; color: #6b7280}
-  .risk-mitigation { margin: 0; font-size: 0.875rem; color: #64748b}
-  .alternatives-list { display: flex; flex-direction: column; gap: 1.5rem}
-  .alternative-item { padding: 1rem; border: 1px solid #e5e7eb; border-radius: 0.375rem; background: #fafafa}
+  .risk-description { font-weight: 500;, color: #374151}
+  .risk-score { font-size: 0.75rem;, color: #6b7280}
+  .risk-mitigation { margin: 0; font-size: 0.875rem;, color: #64748b}
+  .alternatives-list { display: flex; flex-direction: column;, gap: 1.5rem}
+  .alternative-item { padding: 1rem;, border: 1px solid #e5e7eb; border-radius: 0.375rem;, background: #fafafa}
   .alternative-item h4 { margin: 0, 0 0.5rem 0; color: #374151}
   .alternative-item > p { margin: 0, 0 1rem 0; color: #64748b}
   .pros-cons { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem}
-  .pros h5, .cons h5 { margin: 0, 0 0.5rem 0; font-size: 0.875rem; color: #374151}
+  .pros h5, .cons h5 { margin: 0, 0 0.5rem 0; font-size: 0.875rem;, color: #374151}
   .pros ul, .cons ul { margin: 0; padding-left: 1rem}
   .pros li, .cons li { font-size: 0.75rem, color: #64748b; margin-bottom: 0.25rem}
   .metrics-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem}
-  .metric-item { padding: 1rem; border: 1px solid #dbeaf; border-radius: 0.375rem; background: #eff6ff}
+  .metric-item { padding: 1rem;, border: 1px solid #dbeaf; border-radius: 0.375rem;, background: #eff6ff}
   .metric-item h4 { margin: 0, 0 0.5rem 0; color: #374151}
-  .metric-item p { margin: 0.25rem 0; font-size: 0.75rem; color: #64748b}
-  .dialog-actions { display: flex; gap: 0.5rem; justify-content: flex-end; margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid #e2e8f0}
-  @media (max-width: 768px) { .engine-header { flex-direction: column; gap: 1rem}
+  .metric-item p { margin: 0.25rem 0; font-size: 0.75rem;, color: #64748b}
+  .dialog-actions { display: flex;, gap: 0.5rem; justify-content: flex-end; margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid #e2e8f0}
+  @media (max-width: 768px) { .engine-header { flex-direction: column;, gap: 1rem}
     .controls-section { grid-template-columns: 1fr}
     .recommendations-grid { grid-template-columns: 1fr}
     .overview-grid { grid-template-columns: repeat(2, 1fr)}

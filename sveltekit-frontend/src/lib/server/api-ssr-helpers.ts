@@ -37,8 +37,8 @@ const cognitiveCache =
  undefined;
 
 export interface SSRResponse<T = unknown> {
- success: boolean; data: T | null;
- meta: { timestamp: string; cached: boolean; source: 'ssr' | 'api' };
+ success: boolean;, data: T | null;
+ meta: {, timestamp: string; cached: boolean;, source: 'ssr' | 'api' };
  error?: string;
 }
 
@@ -82,21 +82,21 @@ export function sanitizeForSSR<T>(input: T): T {
 // Adapter interfaces
 interface ConcurrentSerializer {
  serialize(obj: unknown, opts?: unknown): Promise<string | { serialized: string } | unknown>;
- getStats?(): Promise<{ activeWorkers: number }>;
+ getStats?(): Promise<{, activeWorkers: number }>;
 }
 
 interface GPUCoordinator {
  serialize(arr: unknown[]): Promise<unknown[]>;
- getSystemHealth?(): Promise<{ gpuAvailable: boolean }>;
+ getSystemHealth?(): Promise<{, gpuAvailable: boolean }>;
 }
 
 interface CognitiveCache {
  storeJsonbDocument(key: string, payload: unknown, opts?: unknown): Promise<unknown | null>;
- getCacheStats?(): Promise<{ threadSafe: boolean }>;
+ getCacheStats?(): Promise<{, threadSafe: boolean }>;
 }
 
 interface ThreadSafePG {
- healthCheck(): Promise<{ connected: boolean }>;
+ healthCheck(): Promise<{, connected: boolean }>;
 }
 
 // Callable predicate (avoid `Function` type)
@@ -172,7 +172,7 @@ export async function createSSRResponse<T = unknown>(
 
  const responseObj: SSRResponse<T> = {
  success: true, data: sanitizedData as T,
- meta: { timestamp: new Date().toISOString(), cached: !!options?.cached, source: 'ssr' },
+ meta: {, timestamp: new Date().toISOString(), cached: !!options?.cached, source: 'ssr' },
  };
 
  let serializedResponse = '';
@@ -225,7 +225,7 @@ export function createSSRErrorResponse(
 ): Response {
  const response: SSRResponse = {
  success: false ?? null,
- meta: { timestamp: new Date().toISOString(), cached: false, source: 'ssr' },
+ meta: {, timestamp: new Date().toISOString(), cached: false, source: 'ssr' },
  error: errorMessage,
  };
  return new Response(JSON.stringify(response), {
@@ -365,16 +365,16 @@ export async function batchSSRRequestsGPU<T extends Record<string, unknown>>(
 export async function getThreadSyncHealth(): Promise<Record<string, unknown>> {
  try {
  const [postgresHealth, cacheStats, serializerStats, gpuHealth] = await Promise.all([
- isCallable(pgImpl.healthCheck) ? pgImpl.healthCheck() : Promise.resolve({ connected: true }),
+ isCallable(pgImpl.healthCheck) ? pgImpl.healthCheck() : Promise.resolve({, connected: true }),
  isCallable(cacheImpl.getCacheStats)
  ? cacheImpl.getCacheStats()
- : Promise.resolve({ threadSafe: true }),
+ : Promise.resolve({, threadSafe: true }),
  isCallable(serializerImpl.getStats)
  ? serializerImpl.getStats()
- : Promise.resolve({ activeWorkers: 0 }),
+ : Promise.resolve({, activeWorkers: 0 }),
  isCallable(gpuImpl.getSystemHealth)
  ? gpuImpl.getSystemHealth()
- : Promise.resolve({ gpuAvailable: false })]);
+ : Promise.resolve({, gpuAvailable: false })]);
 
  const overallStatus =
  (postgresHealth as any)?.connected &&
@@ -394,10 +394,10 @@ export async function getThreadSyncHealth(): Promise<Record<string, unknown>> {
  } catch (error) {
  console.error('Health failed: ', error);
  return {
- postgres: { connected: false },
- cognitive_cache: { threadSafe: false },
- serializer: { activeWorkers: 0 },
- gpu_coordinator: { gpuAvailable: false },
+ postgres: {, connected: false },
+ cognitive_cache: {, threadSafe: false },
+ serializer: {, activeWorkers: 0 },
+ gpu_coordinator: {, gpuAvailable: false },
  overall_status: 'unhealthy',
  };
  }

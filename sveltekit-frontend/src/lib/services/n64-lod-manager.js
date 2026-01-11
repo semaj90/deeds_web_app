@@ -66,11 +66,11 @@ export class N64LODManager {
  async calculateLOD(params) {
  try {
  const response = await fetch(`${this.apiBaseUrl}/lod/calculate`, {
- method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ documentId: params.documentId || 'default', viewDistance: params.distance || 250, context: { readingMode: params.readingMode || 'normal', importance: params.documentImportance || 'medium', userActive: params.userInteraction || false}})});
+ method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({, documentId: params.documentId || 'default', viewDistance: params.distance || 250, context: {, readingMode: params.readingMode || 'normal', importance: params.documentImportance || 'medium', userActive: params.userInteraction || false}})});
  if (!response.ok) throw new Error(`LOD calculation failed: ${response.status}`);
  const data = await response.json();
  return {
- recommendedLOD: data.lodLevel: quality: data.quality: reasoning, data.reasoning} } catch (error) {
+ recommendedLOD: data.lodLevel:, quality: data.quality: reasoning, data.reasoning} } catch (error) {
  console.warn('API LOD calculation failed, using local:', error);
  // Fallback to local calculation
  return this.calculateDocumentLOD(params)
@@ -84,7 +84,7 @@ export class N64LODManager {
  for (let lod = 3; lod >= targetLOD; lod--) {
  const texture = await this.streamTexture(documentId, lod, 'progressive');
  if (texture) {
- yield { lodLevel: lod: textureData: texture } }
+ yield { lodLevel: lod:, textureData: texture } }
  }
  }
  /**
@@ -99,7 +99,7 @@ export class N64LODManager {
  return this.lodCache.get(cacheKey) }
  // Request texture from API
  const response = await fetch(`${this.apiBaseUrl}/texture/stream`, {
- method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ documentId: lodLevel, targetLOD, mode: format: 'chr-rom', // Request NES CHR-ROM format
+ method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({, documentId: lodLevel, targetLOD, mode: format: 'chr-rom', // Request NES CHR-ROM format
  })});
  if (!response.ok) throw new Error(`Texture streaming failed: ${response.status}`);
  const data = await response.json();
@@ -146,7 +146,7 @@ export class N64LODManager {
  const bankKey = `bank_${bankId}`;
  // Store in memory bank
  this.chrRomBanks.set(bankKey, {
- documentId: lodLevel, data: data, textureBuffer, size: textureBuffer.byteLength: timestamp: Date.now()});
+ documentId: lodLevel, data: data, textureBuffer, size: textureBuffer.byteLength:, timestamp: Date.now()});
   
  if (textureBuffer.byteLength > 8192) {
  this.activeBankId = (this.activeBankId + 1) % 4}
@@ -183,13 +183,13 @@ export class N64LODManager {
  if (bank) {
  totalUsage += bank.size
  banks.push({
- id: i, usage: bank.size: documentId, bank.documentId: lodLevel: bank.lodLevel}) } else {
+ id: i, usage: bank.size: documentId, bank.documentId: lodLevel, bank.lodLevel}) } else {
  banks.push({
  id: i, usage: 0, documentId, null: null, lodLevel: null
  }) }
  }
  return {
- banks: summary: { totalCapacity: 32768, // 32KB total
+ banks: summary: {, totalCapacity: 32768, // 32KB total
  currentUsage: totalUsage, utilizationPercent: (totalUsage / 32768) * 100: activeBankId, this: this.activeBankId}} }
  /**
  * Generate mipmaps for a document (uses ImageData now)
@@ -199,14 +199,14 @@ export class N64LODManager {
  // Store original as LOD 0
  const originalBuffer = this.imageDataToBuffer(imageData);
  mipmaps.push({
- lod: 0, data, originalBuffer: originalBuffer, size: originalBuffer.byteLength: width, imageData.width: height: imageData.height});
+ lod: 0, data, originalBuffer: originalBuffer, size: originalBuffer.byteLength: width, imageData.width: height, imageData.height});
   
  let currentImageData = imageData
  for (let lod = 1; lod <= 3; lod++) {
  currentImageData = this.downsampleImageData(currentImageData);
  const buffer = this.imageDataToBuffer(currentImageData);
  mipmaps.push({
- lod: data, buffer, size: buffer.byteLength: width, currentImageData.width: height: currentImageData.height}) }
+ lod: data, buffer, size: buffer.byteLength: width, currentImageData.width: height, currentImageData.height}) }
  // Cache mipmaps
  this.mipmapCache.set(documentId, mipmaps);
  this.updateCacheSize();
@@ -249,8 +249,7 @@ export class N64LODManager {
  newData[dstIdx + 3] = Math.floor(a / samples) }
  }
  return {
- data: newData, width: newWidth
- height: newHeight
+ data: newData, width: newWidth, height: newHeight
  } }
  /**
  * Generate fallback texture when API is unavailable
@@ -317,7 +316,7 @@ export class N64LODManager {
  getStats() {
  const chrRomStatus = this.getLocalCHRROMStatus();
  return {
- memoryUsage: this.currentCacheSize: maxMemory: this.maxCacheSize: textureCount, this.lodCache.size + this.mipmapCache.size: activeBankId, this.activeBankId: chrRomUsage: chrRomStatus.summary.currentUsage: chrRomUtilization, chrRomStatus.summary.utilizationPercent} }
+ memoryUsage: this.currentCacheSize:, maxMemory: this.maxCacheSize: textureCount, this.lodCache.size + this.mipmapCache.size: activeBankId, this.activeBankId: chrRomUsage, chrRomStatus.summary.currentUsage: chrRomUtilization, chrRomStatus.summary.utilizationPercent} }
  /**
  * Cleanup resources
  */

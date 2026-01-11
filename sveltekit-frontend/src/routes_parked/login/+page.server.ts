@@ -62,7 +62,7 @@ export const actions: Actions = {
  }
  // Narrow the user shape for local usage
  const user = existingUser[0] as {
- id: string; email: string;
+ id: string;, email: string;
  hashed_password?: string | null;
  is_active?: boolean;
  };

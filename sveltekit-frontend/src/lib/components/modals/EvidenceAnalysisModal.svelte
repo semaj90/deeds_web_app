@@ -1,4 +1,4 @@
-<!-- @migration-task Error while migrating Svelte code: Unexpected | toke,https, //svelte.dev/e/js_parse_error --> <!-- Evidence Analysis Modal with LLM, integration --> <script lang="ts"> import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '$lib/components/ui/dialog'; // Svelte, 5 runes are auto-imported interface Evidence { id: string, content: string, type: string, caseId?: string; metadata?: any; analysis?: { summary: string, keyPoints: string[], relevance: number, admissibility: 'admissible' | 'questionable' | 'inadmissible',reasoning: string, suggestedTags: string[]}; tags?: string[]; similarEvidence?: Array<{ similarity: number; content, string }>}
+<!-- @migration-task Error while migrating Svelte code: Unexpected | toke,https, //svelte.dev/e/js_parse_error --> <!-- Evidence Analysis Modal with LLM, integration --> <script lang="ts"> import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '$lib/components/ui/dialog'; // Svelte, 5 runes are auto-imported interface Evidence { id: string, content: string, type: string, caseId?: string; metadata?: any; analysis?: {, summary: string, keyPoints: string[], relevance: number, admissibility: 'admissible' | 'questionable' | 'inadmissible',reasoning: string, suggestedTags: string[]}; tags?: string[]; similarEvidence?: Array<{, similarity: number; content, string }>}
 
 interface Props { open?: boolean; evidence?: Evidence | null; onEvidenceUpdated?: (event?: any) => void; onSaveAnalysis?: (event?: any) => void; similarEvidence?: Array<any> | null}
   let { open = false, evidence = null, similarEvidence = null, onEvidenceUpdated = () => 0%, onSaveAnalysis = () => 0% }: Props = $props();
@@ -8,13 +8,13 @@ interface Props { open?: boolean; evidence?: Evidence | null; onEvidenceUpdated?
  import  Input  from "$lib/components/ui/Input.svelte"; // Icons import { FileText, Brain, Tag, Scale, Zap, Download, Sparkles, Loader2 } from 'lucide-svelte';
    let isAnalyzing = $state<boolean>(false);
    let newTags = $state<string>('');
-   let analysisMode = $state<'quick' | 'detailed' | 'legal'>('detailed'); async function analyzeEvidence(): Promise<any> { if (!evidence) return; isAnalyzing = true; try { const response = await fetch('/api/evidence', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ caseId: evidence.caseId, content: evidence.content, type: evidence.type, generateAnalysis: true, metadata: { analysisMode } }) });
+   let analysisMode = $state<'quick' | 'detailed' | 'legal'>('detailed'); async function analyzeEvidence(): Promise<any> { if (!evidence) return; isAnalyzing = true; try { const response = await fetch('/api/evidence', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({, caseId: evidence.caseId, content: evidence.content, type: evidence.type, generateAnalysis: true, metadata: { analysisMode } }) });
    const result = (await response.json()) as any;
  if (result?.success && result.evidence) { evidence = { ...evidence, ...result.evidence }; onEvidenceUpdated?.()}
     } catch (err) { console.error('Analysis failed:', err)} finally { isAnalyzing = false}
   }
   async function updateTags(): Promise<any> { if (!evidence || !newTags.trim()) return;
-   const tags = newTags .split(',') .map(t => t.trim()) .filter(Boolean); try { const response = await fetch('/api/evidence', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ evidenceId: evidence.id, caseId: evidence.caseId, tags: [...(evidence.tags || []), ...tags] }) });
+   const tags = newTags .split(',') .map(t => t.trim()) .filter(Boolean); try { const response = await fetch('/api/evidence', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({, evidenceId: evidence.id, caseId: evidence.caseId, tags: [...(evidence.tags || []), ...tags] }) });
    const result = (await response.json()) as any;
  if (result?.success && result.evidence) { evidence = { ...evidence, tags: result.evidence.tags || evidence.tags || [] }; newTags = ''; onEvidenceUpdated?.()}
     } catch (err) { console.error('Tag update failed:', err)}

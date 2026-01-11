@@ -4,20 +4,20 @@ import type { Document } from '$lib/types';
 import { getAuthHeaders } from './auth-service.js';
 
 export interface LegalCase {
- id: string; title: string;
- description?: string; status: 'active' | 'closed' | 'pending' | 'archived';
+ id: string;, title: string;
+ description?: string;, status: 'active' | 'closed' | 'pending' | 'archived';
  priority: 'low' | 'medium' | 'high' | 'critical';
- practiceArea: string; clientId: string; clientName: string; assignedLawyers: string[]; createdAt: string; updatedAt: string;
+ practiceArea: string;, clientId: string; clientName: string;, assignedLawyers: string[]; createdAt: string;, updatedAt: string;
  dueDate?: string;
- estimatedValue?: number; riskLevel: 'low' | 'medium' | 'high' | 'critical';
- tags: string[]; documents: CaseDocument[];
+ estimatedValue?: number;, riskLevel: 'low' | 'medium' | 'high' | 'critical';
+ tags: string[];, documents: CaseDocument[];
  metadata?: { [key: string]: any };
 }
 
 export interface CaseDocument {
- id: string; caseId: string; filename: string; type: 'contract' | 'evidence' | 'brief' | 'correspondence' | 'other';
- uploadedAt: string; uploadedBy: string; size: number; processingStatus: 'pending' | 'processing' | 'completed' | 'failed';
- aiAnalysisCompleted: boolean; tags: string[] }
+ id: string;, caseId: string; filename: string;, type: 'contract' | 'evidence' | 'brief' | 'correspondence' | 'other';
+ uploadedAt: string;, uploadedBy: string; size: number;, processingStatus: 'pending' | 'processing' | 'completed' | 'failed';
+ aiAnalysisCompleted: boolean;, tags: string[] }
 
 export interface CaseListOptions {
  status?: LegalCase['status'];
@@ -33,7 +33,7 @@ export interface CaseListOptions {
 
 export interface CreateCaseData {
  title: string;
- description?: string; practiceArea: string; clientId: string;
+ description?: string;, practiceArea: string; clientId: string;
  priority?: LegalCase['priority'];
  dueDate?: string;
  estimatedValue?: number;
@@ -53,7 +53,7 @@ export interface UpdateCaseData {
 }
 
 export interface CaseListResponse {
- cases: LegalCase[]; total: number; limit: number; offset: number; hasMore: boolean }
+ cases: LegalCase[];, total: number; limit: number;, offset: number; hasMore: boolean }
 
 // Core Case Management Functions
 export async function listCases(options, CaseListOptions = {}): Promise<CaseListResponse> {

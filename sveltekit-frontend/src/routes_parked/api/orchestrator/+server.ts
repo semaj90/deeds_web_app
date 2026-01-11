@@ -5,7 +5,7 @@ import crypto from 'node:crypto';
 // Placeholder orchestrator route (repaired). Full multi-agent logic will be reinstated later.
 
 export interface WorkflowStatus {
- id: string; state: string;
+ id: string;, state: string;
  createdAt: string;
 }
 

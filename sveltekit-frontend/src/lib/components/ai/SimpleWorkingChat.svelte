@@ -31,7 +31,7 @@
       const response = await fetch('/api/chat-test', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ messages: [{ role: 'user', content: 'Connection test' }]
+        body: JSON.stringify({, messages: [{ role: 'user', content: 'Connection test' }]
         })
       });
       if (response.ok) {
@@ -57,7 +57,7 @@
       const response = await fetch('/api/chat-test', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ messages: [{ role: 'user', content: currentInput }]
+        body: JSON.stringify({, messages: [{ role: 'user', content: currentInput }]
         })
       });
       const data = await response.json();

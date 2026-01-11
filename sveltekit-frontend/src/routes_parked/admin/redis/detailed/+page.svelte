@@ -27,9 +27,9 @@ https://svelte.dev/e/js_parse_error -->
 
 // REMOVED: const sections = $state([
  { id: 'command-center', label: 'Command Center', description: 'Overview of active operations and system status.' },
-// REMOVED: { id: 'persons', label: 'Persons of Interest', description: 'Manage and analyze individuals related to cases.' },
+// REMOVED: {, id: 'persons', label: 'Persons of Interest', description: 'Manage and analyze individuals related to cases.' },
  { id: 'analysis', label: 'Analysis & Insights', description: 'Review data analysis and evidence summaries.' },
-// REMOVED: { id: 'evidence', label: 'Evidence Locker', description: 'Secure storage and management of digital evidence.' },
+// REMOVED: {, id: 'evidence', label: 'Evidence Locker', description: 'Secure storage and management of digital evidence.' },
  { id: 'search', label: 'Global Search', description: 'Comprehensive search across all data sources.' },
 // REMOVED: ]);
 
@@ -71,7 +71,7 @@ https://svelte.dev/e/js_parse_error -->
 
 // REMOVED: // Fallback to mock data
  recentCases = [
-// REMOVED: { id: 'case-001',
+// REMOVED: {, id: 'case-001',
 // REMOVED: title: 'Project Chimera',
  caseNumber: '2024-001',
 // REMOVED: priority: 'high',
@@ -80,7 +80,7 @@ https://svelte.dev/e/js_parse_error -->
  createdAt: new Date().toISOString(),
 // REMOVED: status: 'active'
  },
-// REMOVED: { id: 'case-002',
+// REMOVED: {, id: 'case-002',
 // REMOVED: title: 'Network Intrusion',
  caseNumber: '2024-002',
 // REMOVED: priority: 'medium',
@@ -121,7 +121,7 @@ https://svelte.dev/e/js_parse_error -->
  label: 'Anomaly detected in network logs',
 // REMOVED: summary: 'Unusual data transfer patterns identified.'
  },
-// REMOVED: { id: 'insight-gen-002',
+// REMOVED: {, id: 'insight-gen-002',
 // REMOVED: label: 'Facial recognition match',
  summary: 'Subject identified in surveillance footage.'
 // REMOVED: }
@@ -134,7 +134,7 @@ https://svelte.dev/e/js_parse_error -->
  // Fallback insights
 // REMOVED: evidenceInsights = [
  { id: 'insight-001', label: 'Anomaly detected in network logs', summary: 'Unusual data transfer patterns identified.' },
-// REMOVED: { id: 'insight-002', label: 'Facial recognition match', summary: 'Subject identified in surveillance footage.' }];
+// REMOVED: {, id: 'insight-002', label: 'Facial recognition match', summary: 'Subject identified in surveillance footage.' }];
 // REMOVED: }
  }
 // REMOVED:
@@ -340,7 +340,7 @@ https://svelte.dev/e/js_parse_error -->
  data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0
  data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2
  data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2
- data-[state=open]: slide-in-from-top-[48%], sm:rounded-lg md:w-full"
+ data-[state=open]: slide-in-from-top-[48%], sm: rounded-lg, md:w-full"
  >
  <div class="space-y-4">
  <h2 class="text-xl font-semibold text-slate-100">Create New Case</h2>
@@ -405,7 +405,7 @@ https://svelte.dev/e/js_parse_error -->
  </div>
  </form>
  <Close
- class="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover: opacity-100, focus:outline-none focus: ring-2, focus:ring-ring focus: ring-offset-2, disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground"
+ class="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover: opacity-100, focus: outline-none, focus: ring-2, focus: ring-ring, focus: ring-offset-2, disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground"
  >
  <svg
  xmlns="http://www.w3.org/2000/svg"

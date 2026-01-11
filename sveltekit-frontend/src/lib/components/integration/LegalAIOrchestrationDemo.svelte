@@ -33,11 +33,11 @@ Shows complete workflow from user input to AI-powered results -->
 
  // Demo data for quick testing
  const demoData = {
- legalResearch: { query: 'breach of contract damages in commercial agreements',
+ legalResearch: {, query: 'breach of contract damages in commercial agreements',
  jurisdiction: 'federal',
  userRole: 'attorney'
  },
- documentProcessing: { content: `PURCHASE AGREEMENT
+ documentProcessing: {, content: `PURCHASE AGREEMENT
 This Purchase Agreement ("Agreement") is entered into on [DATE], between ABC Corporation ("Buyer") and XYZ Ltd ("Seller").
 1. PURCHASE PRICE: The total purchase price shall be $500,000.
 2. DELIVERY: Seller agrees to deliver the goods within 30 days of contract execution.
@@ -46,7 +46,7 @@ This Purchase Agreement ("Agreement") is entered into on [DATE], between ABC Cor
 [Additional standard terms and conditions...]`,
  documentType: 'contract'
  },
- caseCreation: { title: 'Smith v. Johnson Contract Dispute',
+ caseCreation: {, title: 'Smith v. Johnson Contract Dispute',
  description: 'Commercial contract dispute involving breach of delivery terms and damages claim. Client seeks recovery of $75,000 in damages plus attorney fees.',
  caseType: 'civil'
  }

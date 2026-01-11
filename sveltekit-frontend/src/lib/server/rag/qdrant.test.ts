@@ -80,7 +80,7 @@ describe('Qdrant Operations', () => {
  {
  id,
  vector,
- payload: { test: true },
+ payload: {, test: true },
  }];
 
  if (vector.length !== 768) {
@@ -149,12 +149,12 @@ describe('Qdrant Operations', () => {
 
  const testFilters = [
  undefined,
- { must: [{ key: 'jurisdiction', match: { value: 'CA' } }] },
- { must: [{ key: 'case_id', match: { value: 'test-case-123' } }] },
+ { must: [{, key: 'jurisdiction', match: {, value: 'CA' } }] },
+ { must: [{, key: 'case_id', match: {, value: 'test-case-123' } }] },
  {
  must: [
- { key: 'jurisdiction', match: { value: 'US-FED' } },
- { key: 'tag_ids', match: { any: ['tag1', 'tag2'] } }],
+ { key: 'jurisdiction', match: {, value: 'US-FED' } },
+ { key: 'tag_ids', match: {, any: ['tag1', 'tag2'] } }],
  }];
 
  for (const filter of testFilters) {
@@ -196,7 +196,7 @@ describe('Qdrant Operations', () => {
  // Test with invalid point structure
  try {
  await qdrantUpsert({
- points: [{ id: '', vector: [], payload: {} }],
+ points: [{, id: '', vector: [], payload: {} }],
  wait: true,
  });
  } catch (error) {

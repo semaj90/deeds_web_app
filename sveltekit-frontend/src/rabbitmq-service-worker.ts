@@ -270,7 +270,7 @@ export class RabbitMQServiceWorker {
 				caseId: getString(msg, 'caseId'),
 				evidenceId: getString(msg, 'evidenceId'),
 				analysisComplete: true,
-				insights: { confidence: 0.85,
+				insights: {, confidence: 0.85,
 					keyEntities: ['contract', 'signature', 'date'],
 					summary: 'Legal document analysis completed'
 				}

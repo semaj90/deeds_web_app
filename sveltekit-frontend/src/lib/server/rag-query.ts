@@ -28,8 +28,8 @@ const SCORE_THRESHOLD = 0.5;
  * RAG Query Response Shape
  */
 export interface RagQueryResponse {
-    contextText: string; citations: Array<{
-        id: string; source: string;
+    contextText: string;, citations: Array<{
+        id: string;, source: string;
         score: number;
         matchedTags?: string[];
     }>;
@@ -44,7 +44,7 @@ export interface RagQueryResponse {
  * @param opts.jurisdiction - Optional jurisdiction to filter results (CA, NY, TX, Fed-US, Other)
  * @returns Context text and citations
  */
-export async function getContextFromRag(opts: { query: string;
+export async function getContextFromRag(opts: {, query: string;
     caseId?: string | null;
     tags?: string[] | null;
     jurisdiction?: string | null;
@@ -63,7 +63,7 @@ export async function getContextFromRag(opts: { query: string;
         if (caseId) {
             filterConditions.push({
                 key: 'case_id',
-                match: { value: caseId },
+                match: {, value: caseId },
             });
             console.log(`[RAG] Filtering by case_id: ${caseId}`);
         }
@@ -71,7 +71,7 @@ export async function getContextFromRag(opts: { query: string;
         if (jurisdiction) {
             filterConditions.push({
                 key: 'jurisdiction',
-                match: { value: jurisdiction },
+                match: {, value: jurisdiction },
             });
             console.log(`[RAG] Filtering by jurisdiction: ${jurisdiction}`);
         }
@@ -80,7 +80,7 @@ export async function getContextFromRag(opts: { query: string;
             // Filter: results must have at least one of the specified tags
             filterConditions.push({
                 key: 'tags',
-                match: { any: tags },
+                match: {, any: tags },
             });
             console.log(`[RAG] Filtering by tags: ${tags.join(', ')}`);
         }
@@ -105,7 +105,7 @@ export async function getContextFromRag(opts: { query: string;
         console.log(`[RAG] Found ${results.length} results`);
 
         // 4. Extract context and citations with tag-based weighting
-        const citations: Array<{ id: string; source: string; score: number; matchedTags?: string[] }> =
+        const citations: Array<{, id: string; source: string;, score: number; matchedTags?: string[] }> =
             [];
         const contextChunks: string[] = [];
 
@@ -181,10 +181,10 @@ export async function getContextFromRag(opts: { query: string;
 /**
  * Health check: Verify Qdrant collection exists and is accessible
  */
-export async function checkRagHealth(): Promise<{ healthy: boolean;
+export async function checkRagHealth(): Promise<{, healthy: boolean;
     message: string;
-    collectionInfo?: { name: string;
-        pointsCount: number; vectorSize: number;
+    collectionInfo?: {, name: string;
+        pointsCount: number;, vectorSize: number;
     };
 }> {
     try {
@@ -215,7 +215,7 @@ export async function checkRagHealth(): Promise<{ healthy: boolean;
         return {
             healthy: true,
             message: `Collection "${COLLECTION_NAME}" is healthy`,
-            collectionInfo: { name: COLLECTION_NAME,
+            collectionInfo: {, name: COLLECTION_NAME,
                 pointsCount: collectionInfo.points_count || 0,
                 vectorSize,
             },

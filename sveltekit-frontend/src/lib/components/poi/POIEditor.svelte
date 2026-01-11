@@ -13,14 +13,14 @@
  import POIPhotoGrid from './POIPhotoGrid.svelte';
 
  interface POI {
- name: string; alias: string;
- threatLevel: string; photos: any[];
+ name: string;, alias: string;
+ threatLevel: string;, photos: any[];
  notes: string;
  }
 
  interface Props {
  poi?: POI;
- isNew?: boolean; onSave: (data: POI) => void;
+ isNew?: boolean;, onSave: (data: POI) => void;
  onCancel: () => void;
  onUploadPhoto: () => void;
  onViewPhoto: (photo: any) => void;
@@ -108,7 +108,7 @@
  {formData.threatLevel === 'low' ? 'Low Risk' : formData.threatLevel === 'medium' ? 'Medium Risk' : formData.threatLevel === 'high' ? 'High Risk' : 'Critical Risk'}
  </span>
  </div>
- <select bind:value={formData.threatLevel} class="w-full px-3 py-2 border border-gray-300 rounded-md focus: outline-none, focus:ring-2 focus:ring-blue-500">
+ <select bind:value={formData.threatLevel} class="w-full px-3 py-2 border border-gray-300 rounded-md focus: outline-none, focus: ring-2, focus:ring-blue-500">
  <option value="low">Low Risk</option>
  <option value="medium">Medium Risk</option>
  <option value="high">High Risk</option>

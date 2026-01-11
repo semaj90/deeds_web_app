@@ -19,7 +19,7 @@
  // Example of how you might derive classes based on variant/size
  // This is a simplified example; a real UI library would have more sophisticated class logic.
  const baseClasses =
- 'inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible: ring-offset-2, disabled:pointer-events-none disabled:opacity-50';
+ 'inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible: ring-offset-2, disabled: pointer-events-none, disabled:opacity-50';
 
  const variantClasses = $derived(() => {
  switch (variant) {
@@ -32,7 +32,7 @@
  case 'ghost':
  return 'hover: bg-accent, hover:text-accent-foreground';
  case 'link':
- return 'text-primary underline-offset-4 hover: underline'; default:
+ return 'text-primary underline-offset-4 hover: underline';, default:
  return 'bg-primary text-primary-foreground hover:bg-primary/90';
  }
  });

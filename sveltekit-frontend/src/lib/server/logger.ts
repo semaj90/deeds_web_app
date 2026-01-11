@@ -2,9 +2,9 @@ import { RedisClientType } from 'redis';
 import { formatErrorResponse } from './errors.js';
 let _redis: null = null; // Changed type to RedisClientType
 // Redis client initialization removed - module not found
-export async function logStructuredError(payload: { source: string;
+export async function logStructuredError(payload: {, source: string;
  level: 'error' | 'warn' | 'info';
- event: string; message: string;
+ event: string;, message: string;
  error?: unknown;
  context?: Record<string, unknown>;
 }): Promise<void> {
@@ -35,7 +35,7 @@ export async function logStructuredError(payload: { source: string;
  const errorToCapture =
  payload.error instanceof Error ? payload.error : new Error(payload.message);
  captureException(errorToCapture, {
- extra: { source: payload.source,
+ extra: {, source: payload.source,
  event: payload.event,
  context: payload.context,
  originalPayload: payload,
@@ -57,7 +57,7 @@ export async function captureAndFormat(error: any): Promise<any> {
  } catch {
  return {
  success: false,
- error: { message: 'An unexpected error occurred', code: 'UNKNOWN_ERROR', status: 500 },
+ error: {, message: 'An unexpected error occurred', code: 'UNKNOWN_ERROR', status: 500 },
  };
  }
 }

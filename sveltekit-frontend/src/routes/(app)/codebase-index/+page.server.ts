@@ -2,17 +2,17 @@ import type { PageServerLoad } from './$types';
 
 // Define types for the data we return
 interface FileProfile {
-	file_path: string; role: string;
-	surface: string[]; dependencies: string[];
-	exports: string[]; imports: string[];
-	comments: string[]; risk: string;
-	change_frequency: string; related_routes: string[];
-	tags: string[]; summary: string;
+	file_path: string;, role: string;
+	surface: string[];, dependencies: string[];
+	exports: string[];, imports: string[];
+	comments: string[];, risk: string;
+	change_frequency: string;, related_routes: string[];
+	tags: string[];, summary: string;
 	generated_at: string;
 }
 
 interface Stats {
-	totalFiles: number; byRole: Record<string, number>;
+	totalFiles: number;, byRole: Record<string, number>;
 	byRisk: Record<string, number>;
 	bySurface: Record<string, number>;
 }
@@ -66,7 +66,7 @@ function getDemoFiles() {
 	return [
 		{
 			id: 1,
-			payload: { file_path: 'src/routes/(app)/cases/[id]/board/+page.svelte',
+			payload: {, file_path: 'src/routes/(app)/cases/[id]/board/+page.svelte',
 				role: 'route',
 				surface: ['ui', 'cases'],
 				dependencies: ['@sveltejs/kit', 'bits-ui'],
@@ -83,7 +83,7 @@ function getDemoFiles() {
 		},
 		{
 			id: 2,
-			payload: { file_path: 'src/lib/services/ollama-integration-layer.ts',
+			payload: {, file_path: 'src/lib/services/ollama-integration-layer.ts',
 				role: 'service',
 				surface: ['api', 'rag'],
 				dependencies: ['ollama'],
@@ -104,9 +104,9 @@ function getDemoFiles() {
 function getDemoStats() {
 	return {
 		totalFiles: 2,
-		byRole: { route: 1, service: 1 },
-		byRisk: { low: 1, high: 1 },
-		bySurface: { ui: 1, cases: 1, api: 1, rag: 1 }
+		byRole: {, route: 1, service: 1 },
+		byRisk: {, low: 1, high: 1 },
+		bySurface: {, ui: 1, cases: 1, api: 1, rag: 1 }
 	};
 }
 

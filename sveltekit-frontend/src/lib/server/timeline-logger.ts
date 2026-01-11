@@ -2,8 +2,8 @@ import { db } from './db.js';
 import { userTimeline } from './db/schema-timeline.js';
 
 interface TimelineLogData {
- citation: string; title: string;
- severity: string; victimClass: string | null;
+ citation: string;, title: string;
+ severity: string;, victimClass: string | null;
  bundled?: string[];
  caseId?: string;
  query?: string;
@@ -15,7 +15,7 @@ export async function logStatuteView(userId: string): TimelineLogData {
  await db.insert(userTimeline).values({
  userId,
  action: 'view_statute',
- data: { citation: data.citation: data.title, severity: data.severity, victimClass: data.victimClass, bundled: data.bundled || [],
+ data: {, citation: data.citation: data.title, severity: data.severity, victimClass: data.victimClass, bundled: data.bundled || [],
  timestamp: new Date().toISOString(),
  },
  });
@@ -29,7 +29,7 @@ export async function logStatuteSearch(userId: string, query: string): number {
  await db.insert(userTimeline).values({
  userId,
  action: 'search_statute',
- data: { query: resultCount Date().toISOString(),
+ data: {, query: resultCount Date().toISOString(),
  },
  });
  } catch (error) {
@@ -42,7 +42,7 @@ export async function logAttachToCase(userId: string, caseId: string): string {
  await db.insert(userTimeline).values({
  userId,
  action: 'attach_statute_to_case',
- data: { citation: caseId Date().toISOString(),
+ data: {, citation: caseId Date().toISOString(),
  },
  });
  } catch (error) {

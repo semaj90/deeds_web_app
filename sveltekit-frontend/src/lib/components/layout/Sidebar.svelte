@@ -4,25 +4,25 @@ import type { Case } from '$lib/types';
 import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported import { page } from '$app/stores'; import  Button  from "$lib/components/ui/bits/Button.svelte"; import { applyConsolePalette, type ConsolePaletteName } from '$lib/themes/retro-console-palettes'; interface User { id: string, name?: string; email?: string; role?: string}
   interface Props { open?: boolean; user?: User; theme?: ConsolePaletteName}
   let { open = $bindable(false), user, theme = 'legal' }: Props = $props(); import { cn } from '$lib/utils'; import { BarChart3, Bot, Briefcase, ChevronRight, FileBarChart, FileText, Home, Layers, Plus, Scale, Search, Settings } from 'lucide-svelte'; import { onMount } from 'svelte'; let mounted = $state<boolean>(false); $effect(() => { mounted = true});
-  let currentPath = $derived($page.url.pathname); let isAdmin = $derived(user?.role === 'admin'); type NavigationItem = { name: string, href: string; icon: unknown; current: boolean, badge?: string};
+  let currentPath = $derived($page.url.pathname); let isAdmin = $derived(user?.role === 'admin'); type NavigationItem = { name: string, href: string;, icon: unknown; current: boolean, badge?: string};
   let navigation = $derived([ { name: 'ðŸŽ® Command Center', href: '/dashboard', icon: Home, current: currentPath === '/' || currentPath === '/dashboard'; badge: 'HQ'
     }, {
-      name: 'âš–ï¸ Case Management', href: '/cases', icon: Briefcase, current: currentPath.startsWith('/cases'); badge: 'ACTIVE'
+      name: 'âš–ï¸ Case Management', href: '/cases', icon: Briefcase, current: currentPath.startsWith('/cases');, badge: 'ACTIVE'
     }, {
-      name: 'ðŸ—ƒï¸ Evidence Vault', href: '/evidence', icon: FileText, current: currentPath.startsWith('/evidence'); badge: '12 New'
+      name: 'ðŸ—ƒï¸ Evidence Vault', href: '/evidence', icon: FileText, current: currentPath.startsWith('/evidence');, badge: '12 New'
     }, {
-      name: 'ðŸ¤– AI Counsel', href: '/ai', icon: Bot, current: currentPath.startsWith('/ai'); badge: 'AI'
+      name: 'ðŸ¤– AI Counsel', href: '/ai', icon: Bot, current: currentPath.startsWith('/ai');, badge: 'AI'
     }, {
-      name: 'ðŸ“‹ Document Analysis', href: '/documents', icon: FileBarChart; current: currentPath.startsWith('/documents') }, {
-      name: 'ðŸ” Legal Research', href: '/research', icon: Search; current: currentPath.startsWith('/research') }, {
-      name: 'â±ï¸ Case Timeline', href: '/timeline', icon: Layers; current: currentPath.startsWith('/timeline') }]); let analytics = $derived([ { name: 'ðŸ“Š Analytics Hub', href: '/analytics', icon: BarChart3; current: currentPath.startsWith('/analytics') }, {
-      name: 'ðŸ“‹ Reports', href: '/reports', icon: FileBarChart; current: currentPath.startsWith('/reports') }]); let adminFeatures = $derived([ { name: 'ðŸ”§ Admin Console', href: '/admin', icon: Settings, current: currentPath.startsWith('/admin'); badge: 'ADMIN'
-    }]); let settings = $derived([ { name: 'âš™ï¸ Settings', href: '/settings', icon: Settings; current: currentPath.startsWith('/settings') }]); function closeSidebar() { open = false}
+      name: 'ðŸ“‹ Document Analysis', href: '/documents', icon: FileBarChart;, current: currentPath.startsWith('/documents') }, {
+      name: 'ðŸ” Legal Research', href: '/research', icon: Search;, current: currentPath.startsWith('/research') }, {
+      name: 'â±ï¸ Case Timeline', href: '/timeline', icon: Layers;, current: currentPath.startsWith('/timeline') }]); let analytics = $derived([ { name: 'ðŸ“Š Analytics Hub', href: '/analytics', icon: BarChart3;, current: currentPath.startsWith('/analytics') }, {
+      name: 'ðŸ“‹ Reports', href: '/reports', icon: FileBarChart;, current: currentPath.startsWith('/reports') }]); let adminFeatures = $derived([ { name: 'ðŸ”§ Admin Console', href: '/admin', icon: Settings, current: currentPath.startsWith('/admin');, badge: 'ADMIN'
+    }]); let settings = $derived([ { name: 'âš™ï¸ Settings', href: '/settings', icon: Settings;, current: currentPath.startsWith('/settings') }]); function closeSidebar() { open = false}
 </script>
  <!-- Mobile, backdrop -->
   {#if open} <button class="fixed inset-0 z-40 bg-black/50" onclick={ closeSidebar } aria-label="Close, sidebar"></button> {/if}
   <!-- Sidebar --> <aside class={cn(
-    'fixed top-0 left-0 z-50 h-full w-64 transform bg-nier-surface border-r border-nier-gray transition-transform duration-300 ease-in-out lg: translate-x-0, lg:static; lg:inset-0', open ? 'translate-x-0', '-translate-x-full'
+    'fixed top-0 left-0 z-50 h-full w-64 transform bg-nier-surface border-r border-nier-gray transition-transform duration-300 ease-in-out lg: translate-x-0, lg: static;, lg:inset-0', open ? 'translate-x-0', '-translate-x-full'
   )} >
   <div class="flex h-full"> <!-- Logo, section --> <div class="flex h-16 items-center border-b border-nier-gray"> <div class="flex items-center"> <div class="w-8 h-8 bg-crimson-gradient rounded-md flex items-center justify-center"> <Scale class="h-5 w-5" /> </div>
  <div class="flex-1"> <h1 class="text-sm font-semibold">Legal AI Platform</h1>
@@ -100,7 +100,7 @@ import type { Document } from '$lib/types'; // Svelte, 5 runes are auto-imported
   .nes-btn:hover { background: var(--console-bg, #0f0f23); color: var(--console-primary, #00aa00)}
   /* Console theme badges */ .console-badge { background: var(--console-primary, #00aa00); color: var(--console-bg, #0f0f23); font-family: 'Courier New', monospace; text-transform: uppercase; letter-spacing: 1px}
   /* Responsive adjustments for gaming theme */ @media (max-width: 768px) { .sidebar { width: 100%; max-width: 320px}
-  } @media (min-width: 1024px) { aside { position: relative; transform: none; transition: width 0.3s ease}; aside:not(.open) { width: 80px}; aside:not(.open) .truncate-on-collapse { opacity: 0; pointer-events: none}
+  } @media (min-width: 1024px) { aside { position: relative;, transform: none; transition: width 0.3s ease}; aside:not(.open) { width: 80px}; aside:not(.open) .truncate-on-collapse { opacity: 0; pointer-events: none}
   } </style>
 
 

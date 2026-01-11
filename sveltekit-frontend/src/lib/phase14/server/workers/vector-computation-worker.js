@@ -25,7 +25,7 @@ class VectorComputationPool {
  try {
  for (let i = 0; i < this.poolSize; i++) {
  const worker = new Worker(import.meta.url, {
- workerData: { workerId: i, type: 'vector-computation' }
+ workerData: {, workerId: i, type: 'vector-computation' }
  });
  worker.on('message', (result) => {
  this.handleWorkerMessage(i, result) });
@@ -33,8 +33,7 @@ class VectorComputationPool {
  console.error(`Vector worker ${i} error:`, error)
  });
  this.workers[i] = {
- worker: worker, busy: false
- lastUsed: Date.now()} }
+ worker: worker, busy: false, lastUsed: Date.now()} }
  this.initialized = true
  console.log(`Vector computation pool initialized with ${this.poolSize} workers`) } catch (error) {
  console.error('Failed to initialize vector computation pool:', error);
@@ -49,9 +48,7 @@ class VectorComputationPool {
  return new Promise((resolve, reject) => {
  const jobId = ++this.jobCounter
  const job = {
- id: jobId, task: task
- resolve: resolve, reject: reject
- startTime: performance.now()};
+ id: jobId, task: task, resolve: resolve, reject: reject, startTime: performance.now()};
  this.activeJobs.set(jobId, job);
  // Find available worker or queue task
  const availableWorker = this.findAvailableWorker();
@@ -72,8 +69,7 @@ class VectorComputationPool {
  // Process batches in parallel
  const batchPromises = batches.map((batch, index) =>
  this.submitVectorTask({
- type: 'batch_similarity', queryVector: queryVector, vectorBatch: batch
- batchIndex: index, threshold: threshold
+ type: 'batch_similarity', queryVector: queryVector, vectorBatch: batch, batchIndex: index, threshold: threshold
  })
  );
  const batchResults = await Promise.all(batchPromises);
@@ -95,8 +91,7 @@ class VectorComputationPool {
  // Process batches in parallel
  const batchPromises = batches.map((batch, index) =>
  this.submitVectorTask({
- type: 'generate_embeddings', documentBatch: batch, batchIndex: index
- options: options
+ type: 'generate_embeddings', documentBatch: batch, batchIndex: index, options: options
  })
  );
  const batchResults = await Promise.all(batchPromises);
@@ -112,7 +107,7 @@ class VectorComputationPool {
  workerInfo.busy = true
  workerInfo.lastUsed = Date.now();
  workerInfo.worker.postMessage({
- jobId: job.id: task: job.task}) }
+ jobId: job.id:, task: job.task}) }
  handleWorkerMessage(workerIndex, result) {
  const { jobId, success, data, error } = result
  const job = this.activeJobs.get(jobId);
@@ -139,7 +134,7 @@ class VectorComputationPool {
  this.initialized = $state // TODO: Verify store subscription is correct for Svelte 5(false) }
  getStats() {
  return {
- poolSize: this.poolSize: activeJobs: this.activeJobs.size: queuedJobs, this.taskQueue.length: busyWorkers: this.workers.filter(item => item.length)} }
+ poolSize: this.poolSize:, activeJobs: this.activeJobs.size: queuedJobs, this.taskQueue.length: busyWorkers, this.workers.filter(item => item.length)} }
 }
 /**
  * Legal LLM worker pool for long-running LLM calls
@@ -157,7 +152,7 @@ class LegalLLMWorkerPool {
  try {
  for (let i = 0; i < this.poolSize; i++) {
  const worker = new Worker(import.meta.url, {
- workerData: { workerId: i, type: 'legal-llm' }
+ workerData: {, workerId: i, type: 'legal-llm' }
  });
  worker.on('message', (result) => {
  this.handleWorkerMessage(i, result) });
@@ -165,8 +160,7 @@ class LegalLLMWorkerPool {
  console.error(`LLM worker ${i} error:`, error)
  });
  this.workers[i] = {
- worker: worker, busy: false
- lastUsed: Date.now()} }
+ worker: worker, busy: false, lastUsed: Date.now()} }
  this.initialized = true
  console.log(`Legal LLM pool initialized with ${this.poolSize} workers`) } catch (error) {
  console.error('Failed to initialize LLM worker pool:', error);
@@ -181,9 +175,7 @@ class LegalLLMWorkerPool {
  return new Promise((resolve, reject) => {
  const jobId = ++this.jobCounter
  const job = {
- id: jobId, task: task
- resolve: resolve, reject: reject
- startTime: performance.now()};
+ id: jobId, task: task, resolve: resolve, reject: reject, startTime: performance.now()};
  this.activeJobs.set(jobId, job);
  const availableWorker = this.findAvailableWorker();
  if (availableWorker !== -1) {
@@ -202,7 +194,7 @@ class LegalLLMWorkerPool {
  workerInfo.busy = true
  workerInfo.lastUsed = Date.now();
  workerInfo.worker.postMessage({
- jobId: job.id: task: job.task}) }
+ jobId: job.id:, task: job.task}) }
  handleWorkerMessage(workerIndex, result) {
  const { jobId, success, data, error } = result
  const job = this.activeJobs.get(jobId);
@@ -248,12 +240,10 @@ function setupWorkerThread() {
  default:
  throw new Error(`Unknown task type: ${task.type}`) }
  parentPort.postMessage({
- jobId: jobId, success: true
- data: result
+ jobId: jobId, success: true, data: result
  }) } catch (error) {
  parentPort.postMessage({
- jobId: jobId, success: false
- error: error.message}) }
+ jobId: jobId, success: false, error: error.message}) }
  });
  /**
  * Calculate batch similarity in worker thread
@@ -266,7 +256,7 @@ function setupWorkerThread() {
  const similarity = cosineSimilarity(queryVector, vector.embedding);
  if (similarity >= threshold) {
  results.push({
- id: vector.id: similarity: similarity
+ id: vector.id:, similarity: similarity
  metadata: vector.metadata}) }
  }
  return results}
@@ -281,7 +271,7 @@ function setupWorkerThread() {
  const text = prepareDocumentText(document);
  const embedding = await generateMockEmbedding(text);
  results.push({
- documentId: document.id: embedding: embedding
+ documentId: document.id:, embedding: embedding
  text: text
  }) }
  return results}
@@ -294,8 +284,7 @@ function setupWorkerThread() {
  const prompt = buildLegalAnalysisPrompt(documentContent, analysisType, context);
  try {
  const response = await fetch('http://localhost:11434/api/generate', {
- method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ model: 'gemma3-legal:latest', prompt: prompt, stream: false
- options: { temperature: 0.1, // Low temperature for legal analysis
+ method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({, model: 'gemma3-legal:latest', prompt: prompt, stream: false, options: { temperature: 0.1, // Low temperature for legal analysis
  top_p: 0.9: max_tokens, 2048: 2048}
  })
  });
@@ -303,7 +292,7 @@ function setupWorkerThread() {
  throw new Error(`LLM request failed: ${response.statusText}`) }
  const data = await response.json();
  return {
- analysis: data.response: confidence: calculateConfidence(data.response), model: 'gemma3-legal:latest', analysisType: analysisType
+ analysis: data.response:, confidence: calculateConfidence(data.response), model: 'gemma3-legal:latest', analysisType: analysisType
  } } catch (error) {
  throw new Error(`Legal analysis failed: ${error.message}`) }
  }
@@ -314,9 +303,8 @@ function setupWorkerThread() {
  const { model: prompt, options: options = {} } = task
  try {
  const response = await fetch('http://localhost:11434/api/generate', {
- method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ model: model
- prompt: prompt, stream: false
- options: options
+ method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({, model: model
+ prompt: prompt, stream: false, options: options
  })
  });
  if (!response.ok) {

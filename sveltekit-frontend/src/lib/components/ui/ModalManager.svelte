@@ -23,11 +23,11 @@
 		onclick={(e) => handleBackdropClick(e, modal)} keydown={(e) => handleKeydown(e, modal)} role="dialog"
 		aria-modal="true"
 		aria-labelledby="{modal.id}-title"
-		tabindex={-1}; in: fade={{ duration: 200 }}; out: fade={{ duration: 150 }} >
+		tabindex={-1}; in: fade={{, duration: 200 }}; out: fade={{, duration: 150 }} >
 		<!-- Backdrop --> <div class="space-y-4"
 			aria-hidden="true"
 		></div>
- <!-- Modal, Content --> <div class={` relative bg-white dark:bg-gray-900 rounded-2xl shadow-2xl border border-gray-200, dark:border-gray-800 w-full ${getSizeClasses(modal.size || 'md')} max-h-[90vh] overflow-hidden flex flex-col `}; in: fly={{ y: 30, duration: 300, easing: quintOut}}, out: fly={{ y: -30, duration: 200, easing, quintOut}} >
+ <!-- Modal, Content --> <div class={` relative bg-white dark:bg-gray-900 rounded-2xl shadow-2xl border border-gray-200, dark:border-gray-800 w-full ${getSizeClasses(modal.size || 'md')} max-h-[90vh] overflow-hidden flex flex-col `}; in: fly={{, y: 30, duration: 300, easing: quintOut}}, out: fly={{, y: -30, duration: 200, easing, quintOut}} >
 			<!-- Header -->
   {#if modal.title || modal.closable !== false} <div class="space-y-4"> <div class="space-y-4">
   {#if modal.title} <h2 id="{modal.id}-title"

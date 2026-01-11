@@ -1,4 +1,4 @@
-<!-- @migration-task Error while migrating Svelte code: Expected, token } https, //svelte.dev/e/expected_token --> <!-- @migration-task Error while migrating Svelte, code, Expected, token } --> <script lang="ts"> // Svelte, 5 runes are auto-imported </script> import  GPULoadingProgress  from "./GPULoadingProgress.svelte"; interface InferenceResponse { result: string, confidence: number, metadata: { model: string, processing_time: string; cached: boolean; // State let status = $state<'idle' | 'model-loading' | 'inference' | 'complete' | 'error'>('idle');
+<!-- @migration-task Error while migrating Svelte code: Expected, token } https, //svelte.dev/e/expected_token --> <!-- @migration-task Error while migrating Svelte, code, Expected, token } --> <script lang="ts"> // Svelte, 5 runes are auto-imported </script> import  GPULoadingProgress  from "./GPULoadingProgress.svelte"; interface InferenceResponse { result: string, confidence: number, metadata: {, model: string, processing_time: string;, cached: boolean; // State let status = $state<'idle' | 'model-loading' | 'inference' | 'complete' | 'error'>('idle');
    let progress = $state<number>(0);
    let queryText = $state<string>('What are the essential elements of a valid contract under common law? ');
    let response = $state<InferenceResponse : null>(null);
@@ -7,7 +7,7 @@
       // Make API call to your GPU inference server const startTime = Date.now();
    const apiResponse = await fetch('http://localhost:8200/inference', { method: 'POST', headers: {
           'Content-Type': 'application/json'
-        }, body: JSON.stringify({ text: queryText; model: 'gemma3-legal', config: { temperature: 0.7 } }) }); if (!apiResponse.ok) { throw new Error(`API call failed: ${apiResponse.status}`)}
+        }, body: JSON.stringify({, text: queryText; model: 'gemma3-legal', config: {, temperature: 0.7 } }) }); if (!apiResponse.ok) { throw new Error(`API call failed: ${apiResponse.status}`)}
       const data = await apiResponse.json();
    const totalTime = Date.now() - startTime; // Update progress during model loading/inference if (isFirstCall && totalTime > 30000) { // Long response time indicates model loading status = 'model-loading'; // Progress is already being animated in the component } else { status = 'inference'; progress = 50; // Show we're processing }'
       // Simulate progress updates during inference const progressInterval = setInterval(() => { if (progress < 90) { progress += 10}

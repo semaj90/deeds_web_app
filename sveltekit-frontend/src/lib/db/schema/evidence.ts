@@ -22,8 +22,8 @@ export const timelineEventTypeEnum = pgEnum('timeline_event_type', [
 
 // Evidence Items
 export const evidence = pgTable('evidence', {
- id: uuid('id').primaryKey().defaultRandom(caseId: uuid('case_id').notNull( evidenceNumber: text('evidence_number').notNull(), // EV-001, EV-002, etc.
- title: text('title').notNull(type: evidenceTypeEnum('type').notNull( summary: text('summary').notNull(description: text('description'),
+ id: uuid('id').primaryKey().defaultRandom(caseId: uuid('case_id').notNull(, evidenceNumber: text('evidence_number').notNull(), // EV-001, EV-002, etc.
+ title: text('title').notNull(type: evidenceTypeEnum('type').notNull(, summary: text('summary').notNull(description: text('description'),
 
  // Board position
  posX: integer('pos_x', posY: integer('pos_y'),
@@ -41,14 +41,14 @@ export const evidenceRelationships = pgTable('evidence_relationships', {
 });
   
 export const timelineEvents = pgTable('timeline_events', {
- id: uuid('id').primaryKey().defaultRandom(caseId: uuid('case_id').notNull()('timestamp').notNull( title: text('title').notNull(description: text('description').notNull( type: timelineEventTypeEnum('type').notNull(),
+ id: uuid('id').primaryKey().defaultRandom(caseId: uuid('case_id').notNull()('timestamp').notNull(, title: text('title').notNull(description: text('description').notNull(, type: timelineEventTypeEnum('type').notNull(),
 
  // JSON arrays of related IDs
  evidenceIds: json('evidence_ids').$type<string[]>().default([], personIds: json('person_ids').$type<string[]>().default([], locationIds: json('location_ids').$type<string[]>().default([], createdAt: timestamp('created_at').defaultNow().notNull(createdBy: text('created_by'),
 });
   
 export const graphNodes = pgTable('graph_nodes', {
- id: uuid('id').primaryKey().defaultRandom(caseId: uuid('case_id').notNull( nodeId: text('node_id').notNull(), // POI-001, EV-001, LOC-001, etc.
+ id: uuid('id').primaryKey().defaultRandom(caseId: uuid('case_id').notNull(, nodeId: text('node_id').notNull(), // POI-001, EV-001, LOC-001, etc.
  label: text('label').notNull(type: nodeTypeEnum('type').notNull(),
 
  // Position on graph
@@ -61,7 +61,7 @@ export const graphNodes = pgTable('graph_nodes', {
 });
   
 export const graphEdges = pgTable('graph_edges', {
- id: uuid('id').primaryKey().defaultRandom(caseId: uuid('case_id').notNull( fromNodeId: uuid('from_node_id')
+ id: uuid('id').primaryKey().defaultRandom(caseId: uuid('case_id').notNull(, fromNodeId: uuid('from_node_id')
  .notNull()
  .references(() => graphNodes.id, { onDelete: 'cascade' }, toNodeId: uuid('to_node_id')
  .notNull()

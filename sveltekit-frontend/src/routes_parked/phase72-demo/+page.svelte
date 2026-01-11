@@ -24,7 +24,7 @@
  title: 'John Smith Testimony',
  content: 'Witness observed the contract signing on March 15, 2023',
  x: 100, y: 100, size: 25,
- metadata: { date: '2023-03-15',
+ metadata: {, date: '2023-03-15',
  credibility: 0.9,
  source: 'deposition'
  }
@@ -35,7 +35,7 @@
  title: 'Service Agreement Contract',
  content: 'Master service agreement between parties dated January 1, 2023',
  x: 300, y: 150, size: 25,
- metadata: { date: '2023-01-01',
+ metadata: {, date: '2023-01-01',
  type: 'contract',
  pages: 15
  }
@@ -46,7 +46,7 @@
  title: 'Email Correspondence',
  content: 'Email chain discussing contract terms and amendments',
  x: 200, y: 300, size: 20,
- metadata: { date: '2023-02-10',
+ metadata: {, date: '2023-02-10',
  sender: 'john.doe@company.com',
  recipients: ['jane.smith@lawfirm.com']
  }
@@ -57,7 +57,7 @@
  title: 'Financial Expert Report',
  content: 'Analysis of contract valuation and breach damages',
  x: 400, y: 250, size: 22,
- metadata: { date: '2023-06-01',
+ metadata: {, date: '2023-06-01',
  expert: 'Dr. Sarah Johnson',
  qualifications: 'CPA, MBA'
  }
@@ -68,7 +68,7 @@
  title: 'Signed Contract Copy',
  content: 'Physical copy of signed contract with wet signatures',
  x: 150, y: 400, size: 20,
- metadata: { date: '2023-01-15',
+ metadata: {, date: '2023-01-15',
  location: 'stored in evidence room',
  condition: 'good'
  }
@@ -82,7 +82,7 @@
  target: 'document_001',
  type: 'supports',
  weight: 0.9,
- metadata: { relationship: 'observed signing',
+ metadata: {, relationship: 'observed signing',
  strength: 'strong'
  }
  },
@@ -91,7 +91,7 @@
  target: 'document_001',
  type: 'references',
  weight: 0.7,
- metadata: { relationship: 'discusses terms',
+ metadata: {, relationship: 'discusses terms',
  strength: 'moderate'
  }
  },
@@ -100,7 +100,7 @@
  target: 'document_001',
  type: 'analyzes',
  weight: 0.95,
- metadata: { relationship: 'valuation analysis',
+ metadata: {, relationship: 'valuation analysis',
  strength: 'very strong'
  }
  },
@@ -109,7 +109,7 @@
  target: 'document_001',
  type: 'corroborates',
  weight: 0.85,
- metadata: { relationship: 'physical evidence',
+ metadata: {, relationship: 'physical evidence',
  strength: 'strong'
  }
  },
@@ -118,7 +118,7 @@
  target: 'email_001',
  type: 'communicated',
  weight: 0.6,
- metadata: { relationship: 'email exchange',
+ metadata: {, relationship: 'email exchange',
  strength: 'moderate'
  }
  }
@@ -199,8 +199,8 @@
 
 <style>
  .demo-container {
- height: 100vh; display: flex;
- flex-direction: column; background: #1a1a1a;
+ height: 100vh;, display: flex;
+ flex-direction: column;, background: #1a1a1a;
  color: #ffffff;
  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
  }
@@ -220,12 +220,12 @@
  }
 
  .demo-header p {
- margin: 0; color: #cccccc;
+ margin: 0;, color: #cccccc;
  font-size: 1.1rem;
  }
 
  .demo-controls {
- display: flex; gap: 2rem;
+ display: flex;, gap: 2rem;
  padding: 1.5rem 2rem;
  background: #2a2a2a;
  border-bottom: 1px solid #444;
@@ -234,7 +234,7 @@
 
  .control-group {
  display: flex;
- flex-direction: column; gap: 0.5rem;
+ flex-direction: column;, gap: 0.5rem;
  }
 
  .control-group label {
@@ -244,9 +244,9 @@
  }
 
  .control-group select {
- padding: 0.5rem; background: #333;
+ padding: 0.5rem;, background: #333;
  border: 1px solid #555;
- border-radius: 4px; color: #ffffff;
+ border-radius: 4px;, color: #ffffff;
  font-size: 0.9rem;
  min-width: 150px;
  }
@@ -267,7 +267,7 @@
  }
 
  .demo-info li {
- margin-bottom: 0.5rem; color: #cccccc;
+ margin-bottom: 0.5rem;, color: #cccccc;
  line-height: 1.4;
  }
 
@@ -276,11 +276,11 @@
  }
 
  .canvas-section {
- flex: 1; position: relative;
+ flex: 1;, position: relative;
  }
 
  .demo-footer {
- background: #2a2a2a; padding: 1.5rem 2rem;
+ background: #2a2a2a;, padding: 1.5rem 2rem;
  border-top: 1px solid #444;
  text-align: center;
  }
@@ -293,7 +293,7 @@
 
  .demo-footer a {
  color: #4fc3f7;
- text-decoration: none; margin: 0 1rem;
+ text-decoration: none;, margin: 0 1rem;
  }
 
  .demo-footer a:hover {
@@ -302,7 +302,7 @@
 
  @media (max-width: 768px) {
  .demo-controls {
- flex-direction: column; gap: 1rem;
+ flex-direction: column;, gap: 1rem;
  }
 
  .demo-header h1 {

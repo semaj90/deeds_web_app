@@ -1,14 +1,14 @@
 import type { assign, createMachine, fromPromise } from 'xstate';
 
 export interface AutoTagContext {
- selectedNode: any; aiTags: any;
+ selectedNode: any;, aiTags: any;
  error: string | null;
  retryCount: number;
 }
 
 export type AutoTagEvent =
- | { type: 'DROP_FILE'; node: any }
- | { type: 'SELECT_NODE'; node: any }
+ | { type: 'DROP_FILE';, node: any }
+ | { type: 'SELECT_NODE';, node: any }
  | { type: 'RETRY' }
  | { type: 'RESET' };
 
@@ -16,57 +16,57 @@ export const autoTaggingMachine = createMachine(
  {
  id: 'autoTagging',
  initial: 'idle',
- context: { selectedNode: null,
+ context: {, selectedNode: null,
  aiTags: null,
  error: null,
  retryCount: 0,
  } as AutoTagContext,
- states: { idle: {
- on: { DROP_FILE: {
+ states: {, idle: {
+ on: {, DROP_FILE: {
  target: 'processing',
- actions: assign({ selectedNode: ({ event }) => event.node,
+ actions: assign({, selectedNode: ({ event }) => event.node,
  error: null,
  retryCount: 0,
  }),
  },
- SELECT_NODE: { actions: assign({
+ SELECT_NODE: {, actions: assign({
  selectedNode: ({ event }) => event.node,
  }),
  },
  },
  },
- processing: { invoke: {
+ processing: {, invoke: {
  id: 'callAITagging',
  src: 'tagWithAI',
  input: ({ context }) => ({
  content: context.selectedNode?.content,
  fileName: context.selectedNode?.name,
  fileType: context.selectedNode?.type,
- }, onDone: { target: 'complete',
- actions: assign({ aiTags: ({ event }) => event.output,
+ }, onDone: {, target: 'complete',
+ actions: assign({, aiTags: ({ event }) => event.output,
  error: null,
  }),
  },
- onError: { target: 'error',
- actions: assign({ error: ({ event }, { event: any }) => event.data?.message ?? 'AI tagging failed',
+ onError: {, target: 'error',
+ actions: assign({, error: ({ event }, { event: any }) => event.data?.message ?? 'AI tagging failed',
  retryCount: ({ context }) => context.retryCount + 1,
  }),
  },
  },
  },
- complete: { on: {
- DROP_FILE: { target: 'processing',
- actions: assign({ selectedNode: ({ event }) => event.node,
+ complete: {, on: {
+ DROP_FILE: {, target: 'processing',
+ actions: assign({, selectedNode: ({ event }) => event.node,
  error: null,
  retryCount: 0,
  }),
  },
- SELECT_NODE: { actions: assign({
+ SELECT_NODE: {, actions: assign({
  selectedNode: ({ event }) => event.node,
  }),
  },
- RESET: { target: 'idle',
- actions: assign({ selectedNode: null,
+ RESET: {, target: 'idle',
+ actions: assign({, selectedNode: null,
  aiTags: null,
  error: null,
  retryCount: 0,
@@ -74,18 +74,18 @@ export const autoTaggingMachine = createMachine(
  },
  },
  },
- error: { on: {
- RETRY: { target: 'processing',
+ error: {, on: {
+ RETRY: {, target: 'processing',
  guard: ({ context }) => context.retryCount < 3,
  },
- DROP_FILE: { target: 'processing',
- actions: assign({ selectedNode: ({ event }) => event.node,
+ DROP_FILE: {, target: 'processing',
+ actions: assign({, selectedNode: ({ event }) => event.node,
  error: null,
  retryCount: 0,
  }),
  },
- RESET: { target: 'idle',
- actions: assign({ selectedNode: null,
+ RESET: {, target: 'idle',
+ actions: assign({, selectedNode: null,
  aiTags: null,
  error: null,
  retryCount: 0,
@@ -96,13 +96,13 @@ export const autoTaggingMachine = createMachine(
  },
  },
  {
- actors: { tagWithAI: fromPromise(async ({ input }, { input: any }) => {
+ actors: {, tagWithAI: fromPromise(async ({ input }, { input: any }) => {
  const response = await fetch('/api/ai/tag', {
  method: 'POST',
  headers: {
  'Content-Type': 'application/json',
  },
- body: JSON.stringify({ content: input.content,
+ body: JSON.stringify({, content: input.content,
  fileName: input.fileName,
  fileType: input.fileType,
  }),

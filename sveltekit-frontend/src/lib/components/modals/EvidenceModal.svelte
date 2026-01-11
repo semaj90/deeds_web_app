@@ -17,8 +17,8 @@ https, //svelte.dev/e/attribute_invalid_name -->
   // Props
   let { item,
     open = $bindable(false)
-   }: { item: {
-      jsonData: { title: string, description: string
+   }: {, item: {
+      jsonData: {, title: string, description: string
         tags?: string[];
         tagsString?: string
         type?: string}
@@ -39,7 +39,7 @@ https, //svelte.dev/e/attribute_invalid_name -->
     id: 'evidence',
     initial: 'view',
     context: { item },
-    states: { view: { on { EDIT: 'edit' } },
+    states: {, view: { on { EDIT: 'edit' } },
       edit: { on { SAVE: 'view', CANCEL: 'view' } }
     }
   });

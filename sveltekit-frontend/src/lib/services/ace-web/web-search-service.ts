@@ -8,8 +8,8 @@ import { MinIOService } from './minio-service.js';
 import { createHash } from 'crypto';
 
 export interface SearchResult {
-  url: string; title: string;
-  snippet: string; domain: string;
+  url: string;, title: string;
+  snippet: string;, domain: string;
   publishedDate?: string;
 }
 
@@ -21,8 +21,8 @@ export interface SearchOptions {
 }
 
 export interface SearchSnapshot {
-  query: string; results: SearchResult[];
-  timestamp: string; provider: string;
+  query: string;, results: SearchResult[];
+  timestamp: string;, provider: string;
   totalResults: number;
 }
 

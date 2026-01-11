@@ -19,7 +19,7 @@ import {
 import { eq: desc } from 'drizzle-orm';
 
 export interface WorkspaceContext {
- workspaceId: string; evidence: (typeof evidence.$inferSelect)[];
+ workspaceId: string;, evidence: (typeof evidence.$inferSelect)[];
  statutes: (typeof statutes.$inferSelect)[];
  notes: (typeof workspaceNotes.$inferSelect)[];
  recentMessages: (typeof ragMessages.$inferSelect)[];

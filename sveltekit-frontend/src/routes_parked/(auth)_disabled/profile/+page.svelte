@@ -44,8 +44,8 @@
  };
 
  type ProfileStats = {
- totalCases: number; openCases: number;
- closedCases: number; totalEvidence: number;
+ totalCases: number;, openCases: number;
+ closedCases: number;, totalEvidence: number;
  personsOfInterest: number;
  };
 
@@ -100,7 +100,7 @@
  });
  let isSaving = $state <boolean>(false);
  let isHydrating = $state <boolean>(!initialUser);
- let feedback = $state <{ text: string; intent: 'success' | 'error' | 'info' | null }>({
+ let feedback = $state <{ text: string;, intent: 'success' | 'error' | 'info' | null }>({
  text: '',
  intent: null,
  });
@@ -257,7 +257,7 @@
  }
 
  // Extracted reusable function for updating the user profile via API
- async function updateUserProfileApi(body: { firstName: string | null;
+ async function updateUserProfileApi(body: {, firstName: string | null;
  lastName: string | null;
  email: string;
  }) {
@@ -408,8 +408,8 @@
 
 <style>
  .stat-card {
- background: #ffffff; border: 1px solid #e5e7eb;
- border-radius: 12px; padding: 16px;
+ background: #ffffff;, border: 1px solid #e5e7eb;
+ border-radius: 12px;, padding: 16px;
  text-align: center;
  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08);
  transition:
@@ -422,28 +422,28 @@
  }
  .stat-value {
  font-size: 1.6rem;
- font-weight: 600; color: #111827;
+ font-weight: 600;, color: #111827;
  }
  .stat-label {
  margin-top: 4px;
  font-size: 0.75rem;
  text-transform: uppercase;
- letter-spacing: 0.08em; color: #6b7280;
+ letter-spacing: 0.08em;, color: #6b7280;
  }
  .rag-stat {
  background: rgba(3, 105, 161, 0.08);
  border: 1px solid rgba(3, 105, 161, 0.2);
- border-radius: 10px; padding: 16px;
+ border-radius: 10px;, padding: 16px;
  text-align: center;
  }
  .rag-stat .stat-value {
- font-size: 1.45rem; color: #0369a1;
+ font-size: 1.45rem;, color: #0369a1;
  font-weight: 600;
  }
  .rag-stat .stat-label {
  font-size: 0.75rem;
  text-transform: uppercase;
- letter-spacing: 0.06em; color: #0c4a6e;
+ letter-spacing: 0.06em;, color: #0c4a6e;
  }
  @media (prefers-color-scheme: dark) {
  .stat-card {

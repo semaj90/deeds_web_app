@@ -4,8 +4,8 @@
  import { onMount } from 'svelte';
 
  interface Props {
- evidenceId: string; fileName: string;
- documentType: string; confidence: number;
+ evidenceId: string;, fileName: string;
+ documentType: string;, confidence: number;
  metadata: Record<string, unknown>;
  onGenerateSummary: () => void;
  onReject: () => void;

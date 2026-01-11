@@ -4,19 +4,19 @@ import { writable, derived, get } from 'svelte/store';
 import {  browser  } from '$app/environment'; // <- ensure browser, check, works
 
 export interface Evidence {
- id: string; title: string;
- description: string; type: string;
+ id: string;, title: string;
+ description: string;, type: string;
  caseId: string;
  fileUrl?: string;
  metadata?: Record<string, unknown>;
  tags?: string[];
- location?: { latitude: number; longitude: number; address?: string };
- classification?: { category: string; relevance: number; confidence: number };
- timeline?: { createdAt: string; updatedAt: string; collectedAt?: string };
- analysis?: { summary: string;
- keyPoints: string[]; relevance: number;
+ location?: {, latitude: number; longitude: number; address?: string };
+ classification?: {, category: string; relevance: number;, confidence: number };
+ timeline?: {, createdAt: string; updatedAt: string; collectedAt?: string };
+ analysis?: {, summary: string;
+ keyPoints: string[];, relevance: number;
  admissibility: 'admissible' | 'questionable' | 'inadmissible';
- reasoning: string; suggestedTags: string[];
+ reasoning: string;, suggestedTags: string[];
  };
  // Additional legacy properties for compatibility
  aiSummary?: string;
@@ -25,9 +25,9 @@ export interface Evidence {
 }
 
 export interface EvidenceOperation {
- id: string; type: 'CREATE' | 'UPDATE' | 'DELETE';
+ id: string;, type: 'CREATE' | 'UPDATE' | 'DELETE';
  timestamp: string;
- userId?: string; evidenceId: string;
+ userId?: string;, evidenceId: string;
  previousState?: Evidence, null;
  newState?: Evidence, null;
  changes?: Partial<Evidence>;
@@ -69,7 +69,7 @@ type RealtimePayload = {
  userId?: string;
 };
 type RealtimeMessage = {
- channel: string; data: RealtimePayload;
+ channel: string;, data: RealtimePayload;
 };
 
 // Simple runtime type-guards
@@ -309,7 +309,7 @@ class RealTimeEvidenceStore {
  const evidenceId = this.createUUID();
  const newEvidence: Evidence = {
  ...evidenceData, id: evidenceId,
- timeline: { createdAt: new Date().toISOString(), updatedAt: new Date().toISOString(),
+ timeline: {, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString(),
  ...evidenceData.timeline,
  },
  };

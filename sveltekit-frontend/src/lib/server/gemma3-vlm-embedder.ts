@@ -7,21 +7,21 @@
 import { generateText } from './ollama-service.js';
 
 export interface VLMEmbeddingResult {
- embedding: number[]; modality: 'text' | 'vision' | 'layout' | 'multimodal';
- confidence: number; metadata: {
- model: string; quantization: string;
- dimension: number; processingTimeMs: number;
+ embedding: number[];, modality: 'text' | 'vision' | 'layout' | 'multimodal';
+ confidence: number;, metadata: {
+ model: string;, quantization: string;
+ dimension: number;, processingTimeMs: number;
  };
 }
 
 export interface MultimodalContent {
  text?: string;
  imageBase64?: string;
- layoutBoxes?: Array<{ type: string; // 'header', 'body', 'table', 'figure', 'footer', bbox: [number, number, number, number]; // [x1, y1, x2, y2]
+ layoutBoxes?: Array<{, type: string; // 'header', 'body', 'table', 'figure', 'footer', bbox: [number, number, number, number]; // [x1, y1, x2, y2]
  content: string;
  }>;
  ocrText?: string;
- seals?: Array<{ type: string; // 'notary', 'signature', 'stamp', confidence: number; bbox: [number, number, number, number];
+ seals?: Array<{, type: string; // 'notary', 'signature', 'stamp', confidence: number;, bbox: [number, number, number, number];
  }>;
 }
 
@@ -60,7 +60,7 @@ export async function generateVLMEmbedding(
  embedding,
  modality: 'multimodal',
  confidence: 0.9,
- metadata: { model: VLM_MODEL,
+ metadata: {, model: VLM_MODEL,
  quantization: 'hybrid_int8_nf4',
  dimension: EMBEDDING_DIMENSION, processingTimeMs: processingTime,
  },
@@ -84,7 +84,7 @@ export async function generateTextEmbedding(text: string): Promise<VLMEmbeddingR
  const response = await fetch(`${OLLAMA_ENDPOINT}/api/embeddings`, {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({ model: 'embeddinggemma:latest',
+ body: JSON.stringify({, model: 'embeddinggemma:latest',
  prompt: text,
  }, signal: AbortSignal.timeout(30000),
  });
@@ -105,7 +105,7 @@ export async function generateTextEmbedding(text: string): Promise<VLMEmbeddingR
  embedding: paddedEmbedding,
  modality: 'text',
  confidence: 0.95,
- metadata: { model: 'embeddinggemma:latest',
+ metadata: {, model: 'embeddinggemma:latest',
  quantization: 'fp16',
  dimension: EMBEDDING_DIMENSION, processingTimeMs: processingTime,
  },
@@ -138,7 +138,7 @@ Provide a comprehensive description that captures the visual essence of the docu
  const response = await fetch(`${OLLAMA_ENDPOINT}/api/generate`, {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({ model: 'gemma3-vision:latest',
+ body: JSON.stringify({, model: 'gemma3-vision:latest',
  prompt,
  images: [imageBase64],
  stream: false,
@@ -156,7 +156,7 @@ Provide a comprehensive description that captures the visual essence of the docu
  const embeddingResponse = await fetch(`${OLLAMA_ENDPOINT}/api/embeddings`, {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({ model: 'embeddinggemma:latest',
+ body: JSON.stringify({, model: 'embeddinggemma:latest',
  prompt: visionDescription,
  }, signal: AbortSignal.timeout(30000),
  });
@@ -174,7 +174,7 @@ Provide a comprehensive description that captures the visual essence of the docu
  embedding,
  modality: 'vision',
  confidence: 0.85,
- metadata: { model: VLM_MODEL,
+ metadata: {, model: VLM_MODEL,
  quantization: 'int8_vision_tower',
  dimension: EMBEDDING_DIMENSION, processingTimeMs: processingTime,
  },
@@ -332,7 +332,7 @@ function generateFallbackEmbedding(content: MultimodalContent): VLMEmbeddingResu
  embedding,
  modality: 'multimodal',
  confidence: 0.5,
- metadata: { model: 'fallback',
+ metadata: {, model: 'fallback',
  quantization: 'none',
  dimension: EMBEDDING_DIMENSION, processingTimeMs: processingTime,
  },
@@ -367,7 +367,7 @@ export async function generateVLMEmbeddingsBatch(
 export function getVLMMetadata() {
  return {
  model: VLM_MODEL, embeddingDimension: EMBEDDING_DIMENSION,
- quantization: { visionTower: 'INT8 TensorRT',
+ quantization: {, visionTower: 'INT8 TensorRT',
  textTower: 'NF4 LoRA',
  multimodalFusion: 'FP16',
  },

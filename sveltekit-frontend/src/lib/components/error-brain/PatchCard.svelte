@@ -4,9 +4,9 @@
  import { Card, CardHeader, CardTitle, CardContent } from '$lib/components/ui/enhanced-bits';
 
  interface Props {
- id: number; filePath: string;
- diffText: string; reason: string;
- confidence: number; applied: boolean;
+ id: number;, filePath: string;
+ diffText: string;, reason: string;
+ confidence: number;, applied: boolean;
  appliedAt?: Date | null;
  createdAt: Date;
  onApply?: (id: number) => void;

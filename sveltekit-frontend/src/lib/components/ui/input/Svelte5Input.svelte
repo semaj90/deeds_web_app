@@ -95,8 +95,7 @@ let variantClasses = $derived({
 	default: `
 		bg-slate-800 text-white
 		border-2 border-slate-600
-		hover: border-slate-500, focus:border-blue-500 focus: ring-2, focus:ring-blue-500/20
-		placeholder:text-slate-400
+		hover: border-slate-500, focus: border-blue-500, focus: ring-2, focus: ring-blue-500/20, placeholder:text-slate-400
 	`,
 	nes: `
 		bg-slate-900 text-white
@@ -107,8 +106,7 @@ let variantClasses = $derived({
 	ghost: `
 		bg-transparent text-white
 		border-b-2 border-slate-600
-		hover: border-slate-500, focus:border-blue-500
-		placeholder:text-slate-400
+		hover: border-slate-500, focus: border-blue-500, placeholder:text-slate-400
 		rounded-none
 	`
 }[variant].replace(/\s+/g, ' ').trim());

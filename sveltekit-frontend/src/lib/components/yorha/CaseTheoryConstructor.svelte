@@ -10,13 +10,13 @@ import { createEventDispatcher } from 'svelte';
  // Migrated from createEventDispatcher to callback props;
 
  type FormState = {
- caseName: string; caseId: string;
- summary: string; objectives: string;
- charges: string; keyFacts: string;
- contestedFacts: string; defenseAngles: string;
- narrativeBeats: string; keyEvidence: string;
- witnessNotes: string; legalIssues: string;
- tone: string; audience: string;
+ caseName: string;, caseId: string;
+ summary: string;, objectives: string;
+ charges: string;, keyFacts: string;
+ contestedFacts: string;, defenseAngles: string;
+ narrativeBeats: string;, keyEvidence: string;
+ witnessNotes: string;, legalIssues: string;
+ tone: string;, audience: string;
  deliverables: Record<string, boolean>;
  };
 
@@ -35,13 +35,13 @@ import { createEventDispatcher } from 'svelte';
  legalIssues: '',
  tone: 'trial-ready, confident, ethical',
  audience: 'jury + judge',
- deliverables: { closingOutline: true, storyAngles: true true,
+ deliverables: {, closingOutline: true, storyAngles: true true,
  juryFocus: true, investigativeGaps: false, false,
  pressTalkingPoints: false
  }
  });
 
- const dispatch = createEventDispatcher<{ generated: { plan: CaseTheoryPlan } }>();
+ const dispatch = createEventDispatcher<{ generated: {, plan: CaseTheoryPlan } }>();
 
  let isSubmitting = $state(false);
  let plan = $state <CaseTheoryPlan: null>(null);
@@ -441,9 +441,9 @@ import { createEventDispatcher } from 'svelte';
 
 <style>
  .case-theory-wrapper {
- min-height: 100vh; padding: 1.5rem;
+ min-height: 100vh;, padding: 1.5rem;
  display: flex;
- flex-direction: column; gap: 1.5rem;
+ flex-direction: column;, gap: 1.5rem;
  background: radial-gradient(circle at top, #0f172a, #020617);
  color: #e2e8f0;
  }
@@ -473,24 +473,24 @@ import { createEventDispatcher } from 'svelte';
 
  .stack {
  display: flex;
- flex-direction: column; gap: 1.25rem;
+ flex-direction: column;, gap: 1.25rem;
  }
 
  .card {
- border-radius: 1rem; padding: 1.25rem;
+ border-radius: 1rem;, padding: 1.25rem;
  border: 1px solid rgba(148, 163, 184, 0.25);
  display: flex;
- flex-direction: column; gap: 1rem;
+ flex-direction: column;, gap: 1rem;
  }
 
  .card h3 {
- margin: 0; color: #e0f2fe;
+ margin: 0;, color: #e0f2fe;
  }
 
  label {
  display: flex;
- flex-direction: column; gap: 0.35rem;
- font-size: 0.85rem; color: #cbd5f5;
+ flex-direction: column;, gap: 0.35rem;
+ font-size: 0.85rem;, color: #cbd5f5;
  }
 
  textarea,
@@ -508,28 +508,28 @@ import { createEventDispatcher } from 'svelte';
 
  .deliverables {
  display: flex;
- flex-wrap: wrap; gap: 0.75rem;
+ flex-wrap: wrap;, gap: 0.75rem;
  }
 
  .deliverable-chip {
  display: inline-flex;
- align-items: center; gap: 0.5rem;
+ align-items: center;, gap: 0.5rem;
  padding: 0.4rem 0.8rem;
  background: rgba(255, 255, 255, 0.05);
- border-radius: 999px; border: 1px dashed rgba(148, 163, 184, 0.4);
+ border-radius: 999px;, border: 1px dashed rgba(148, 163, 184, 0.4);
  cursor: pointer;
  font-size: 0.85rem;
  }
 
  .results {
- border-radius: 1rem; padding: 1.25rem;
+ border-radius: 1rem;, padding: 1.25rem;
  border: 1px solid rgba(59, 130, 246, 0.35);
  background: rgba(2, 6, 23, 0.85);
  }
 
  .results-stack {
  display: flex;
- flex-direction: column; gap: 1.25rem;
+ flex-direction: column;, gap: 1.25rem;
  }
 
  .results h3,
@@ -539,59 +539,59 @@ import { createEventDispatcher } from 'svelte';
  }
 
  .frame {
- margin-top: 0.5rem; padding: 0.75rem;
- border-radius: 0.75rem; background: rgba(15, 23, 42, 0.7);
+ margin-top: 0.5rem;, padding: 0.75rem;
+ border-radius: 0.75rem;, background: rgba(15, 23, 42, 0.7);
  border: 1px solid rgba(148, 163, 184, 0.25);
  }
 
  .pillars {
  display: flex;
- flex-direction: column; gap: 0.75rem;
+ flex-direction: column;, gap: 0.75rem;
  }
 
  .pillar {
  padding: 0.75rem;
- border-radius: 0.75rem; background: rgba(15, 23, 42, 0.8);
+ border-radius: 0.75rem;, background: rgba(15, 23, 42, 0.8);
  border: 1px solid rgba(148, 163, 184, 0.25);
  }
 
  .pillar .label {
- font-weight: 600; color: #bae6fd;
+ font-weight: 600;, color: #bae6fd;
  margin-bottom: 0.25rem;
  }
 
  .pillar ul {
  margin: 0.35rem 0 0;
- padding-left: 1.1rem; color: #cbd5f5;
+ padding-left: 1.1rem;, color: #cbd5f5;
  }
 
  .chips {
  display: flex;
- flex-wrap: wrap; gap: 0.5rem;
+ flex-wrap: wrap;, gap: 0.5rem;
  }
 
  .chips span {
  padding: 0.25rem 0.75rem;
- border-radius: 999px; background: rgba(14, 165, 233, 0.12);
+ border-radius: 999px;, background: rgba(14, 165, 233, 0.12);
  border: 1px solid rgba(14, 165, 233, 0.35);
  font-size: 0.8rem;
  }
 
  .beats {
  display: flex;
- flex-direction: column; gap: 0.75rem;
+ flex-direction: column;, gap: 0.75rem;
  }
 
  .beat {
  padding: 0.75rem;
- border-radius: 0.75rem; background: rgba(15, 23, 42, 0.8);
+ border-radius: 0.75rem;, background: rgba(15, 23, 42, 0.8);
  border: 1px solid rgba(148, 163, 184, 0.25);
  }
 
  .beat .label {
  text-transform: uppercase;
  font-size: 0.7rem;
- letter-spacing: 0.08em; color: #facc15;
+ letter-spacing: 0.08em;, color: #facc15;
  }
 
  .beat .objective {
@@ -605,23 +605,23 @@ import { createEventDispatcher } from 'svelte';
 
  .table {
  display: flex;
- flex-direction: column; gap: 0.65rem;
+ flex-direction: column;, gap: 0.65rem;
  }
 
  .row {
- display: flex; gap: 0.75rem;
+ display: flex;, gap: 0.75rem;
  padding: 0.65rem;
- border-radius: 0.75rem; background: rgba(15, 23, 42, 0.85);
+ border-radius: 0.75rem;, background: rgba(15, 23, 42, 0.85);
  border: 1px solid rgba(148, 163, 184, 0.2);
  }
 
  .row span {
- font-size: 0.85rem; color: #f8fafc;
+ font-size: 0.85rem;, color: #f8fafc;
  min-width: 70px;
  }
 
  .row .label {
- font-weight: 600; color: #bae6fd;
+ font-weight: 600;, color: #bae6fd;
  }
 
  .severity {
@@ -642,51 +642,51 @@ import { createEventDispatcher } from 'svelte';
 
  .list {
  margin: 0;
- padding-left: 1.25rem; color: #cbd5f5;
+ padding-left: 1.25rem;, color: #cbd5f5;
  display: flex;
- flex-direction: column; gap: 0.35rem;
+ flex-direction: column;, gap: 0.35rem;
  }
 
  .deliverable-output {
  display: flex;
- flex-direction: column; gap: 0.75rem;
+ flex-direction: column;, gap: 0.75rem;
  }
 
  .deliverable-output article {
  padding: 0.75rem;
- border-radius: 0.75rem; background: rgba(15, 23, 42, 0.8);
+ border-radius: 0.75rem;, background: rgba(15, 23, 42, 0.8);
  border: 1px solid rgba(148, 163, 184, 0.2);
  }
 
  .deliverable-output .label {
  text-transform: uppercase;
  font-size: 0.7rem;
- letter-spacing: 0.08em; color: #a5b4fc;
+ letter-spacing: 0.08em;, color: #a5b4fc;
  margin-bottom: 0.35rem;
  }
 
  .results-actions {
- display: flex; gap: 1rem;
+ display: flex;, gap: 1rem;
  align-items: center;
  }
 
  .results pre {
  max-height: 220px;
- overflow-y: auto; background: rgba(15, 23, 42, 0.8);
+ overflow-y: auto;, background: rgba(15, 23, 42, 0.8);
  padding: 0.75rem;
- border-radius: 0.75rem; border: 1px solid rgba(148, 163, 184, 0.25);
+ border-radius: 0.75rem;, border: 1px solid rgba(148, 163, 184, 0.25);
  }
 
  .placeholder {
- min-height: 400px; display: flex;
+ min-height: 400px;, display: flex;
  flex-direction: column;
  align-items: center;
- justify-content: center; gap: 0.5rem;
+ justify-content: center;, gap: 0.5rem;
  text-align: center;
  }
 
  .emoji {
- font-size: 2.75rem; margin: 0;
+ font-size: 2.75rem;, margin: 0;
  }
 
  .error-text {

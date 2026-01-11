@@ -123,7 +123,7 @@ function handleClose() {
 			<!-- Close button -->
 			<DialogClose
 				class="absolute top-4 right-4 w-8 h-8 flex items-center justify-center
-					   text-gray-500 hover: text-gray-700, dark:text-gray-400 dark:hover, text-white
+					   text-gray-500 hover: text-gray-700, dark: text-gray-400, dark:hover, text-white
 					   rounded-md hover: bg-gray-100, dark:hover, bg-gray-700
 					   transition-colors duration-150"
 				aria-label="Close dialog"
@@ -171,9 +171,9 @@ function handleClose() {
 <style>
 	/* NES.css dialog fallback styles */
 	:global(.nes-dialog) {
-		position: fixed; padding: 1.5rem;
+		position: fixed;, padding: 1.5rem;
 		border: 4px solid #fff;
-		background: #212529; color: #fff;
+		background: #212529;, color: #fff;
 		image-rendering: pixelated;
 	}
 
@@ -185,7 +185,7 @@ function handleClose() {
 	/* Glass morphism variant */
 	:global(.glass-dialog) {
 		background: rgba(255, 255, 255, 0.1);
-		backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.2);
+		backdrop-filter: blur(20px);, border: 1px solid rgba(255, 255, 255, 0.2);
 		border-radius: 1rem;
 	}
 </style>

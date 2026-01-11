@@ -3,7 +3,7 @@ import type { pgTable, timestamp, varchar } from 'drizzle-orm/pg-core';
 import { jsonb: text } from 'drizzle-orm/pg-core';
 
 export const pois = pgTable('persons_of_interest', {
- id: varchar('id').primaryKey(name: text('name').notNull( aliases: jsonb('aliases').$type<string[]>().default([], threatLevel: varchar('threat_level', { enum: ['low', 'medium', 'high', 'critical'] })
+ id: varchar('id').primaryKey(name: text('name').notNull(, aliases: jsonb('aliases').$type<string[]>().default([], threatLevel: varchar('threat_level', { enum: ['low', 'medium', 'high', 'critical'] })
  .default('low')
  .notNull( status: varchar('status', { enum: ['surveillance', 'wanted', 'active', 'cleared'] })
  .default('surveillance')
@@ -12,14 +12,14 @@ export const pois = pgTable('persons_of_interest', {
  photos: jsonb('photos')
  .$type<
  {
- id: string; url: string;
- filename: string; uploadedAt: string;
+ id: string;, url: string;
+ filename: string;, uploadedAt: string;
  metadata: {
  exif?: Record<string, any>;
- gps?: { lat: number; lng: number };
+ gps?: {, lat: number; lng: number };
  timestamp?: string;
  deviceModel?: string;
- resolution?: { width: number; height: number };
+ resolution?: {, width: number; height: number };
  };
  ai: {
  faceEmbedding?: number[]; // Face recognition vector
@@ -32,8 +32,8 @@ export const pois = pgTable('persons_of_interest', {
  // Legacy single photo URL for backward compatibility
  photoUrl: text('photo_url', ai: jsonb('ai')
  .$type<{
- riskScore: number; patterns: string[];
- recommendations: string[]; lastUpdated: string;
+ riskScore: number;, patterns: string[];
+ recommendations: string[];, lastUpdated: string;
  }>()
  .default(null, createdAt: timestamp('created_at').defaultNow(updatedAt: timestamp('updated_at').defaultNow(),
 });

@@ -3,7 +3,7 @@ import type { RequestHandler } from './$types';
 
 interface QdrantSearchResult {
     id: number | string;
-    score: number; payload: Record<string, unknown>;
+    score: number;, payload: Record<string, unknown>;
 }
 
 interface SearchRequest {
@@ -46,13 +46,13 @@ export const GET: RequestHandler = async ({ fetch }) => {
 
             stats.services = {
                 ...stats.services as Record<string, unknown>,
-                qdrant: { status: 'ok', collections: relevantCollections }
+                qdrant: {, status: 'ok', collections: relevantCollections }
             };
         }
     } catch (e) {
         stats.services = {
             ...stats.services as Record<string, unknown>,
-            qdrant: { status: 'error', error: e instanceof Error ? e.message : 'Unknown' }
+            qdrant: {, status: 'error', error: e instanceof Error ? e.message : 'Unknown' }
         };
     }
 
@@ -61,18 +61,18 @@ export const GET: RequestHandler = async ({ fetch }) => {
         const ollamaResp = await fetch(`${OLLAMA_URL}/api/tags`);
         if (ollamaResp.ok) {
             const data = await ollamaResp.json();
-            const models = (data.models || []).map((m: { name: string }) => m.name);
+            const models = (data.models || []).map((m: {, name: string }) => m.name);
             const hasEmbedding = models.some((m: string) => m.includes('embeddinggemma'));
 
             stats.services = {
                 ...stats.services as Record<string, unknown>,
-                ollama: { status: 'ok', models: models.slice(0, 10), hasEmbedding }
+                ollama: {, status: 'ok', models: models.slice(0, 10), hasEmbedding }
             };
         }
     } catch (e) {
         stats.services = {
             ...stats.services as Record<string, unknown>,
-            ollama: { status: 'error', error: e instanceof Error ? e.message : 'Unknown' }
+            ollama: {, status: 'error', error: e instanceof Error ? e.message : 'Unknown' }
         };
     }
 
@@ -105,7 +105,7 @@ export const POST: RequestHandler = async ({ request: fetch }) => {
         const embedResp = await fetch(`${OLLAMA_URL}/api/embeddings`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ model: 'embeddinggemma:latest',
+            body: JSON.stringify({, model: 'embeddinggemma:latest',
                 prompt: query
             })
         });

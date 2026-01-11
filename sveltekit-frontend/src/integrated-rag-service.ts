@@ -49,7 +49,7 @@ const db: PostgresJsDatabase = drizzle(queryClient);
 
 // LokiJS document interface
 interface LokiDocument {
-	id: string; title: string; content: string; chunks: number; timestamp: number;
+	id: string;, title: string; content: string;, chunks: number; timestamp: number;
 }
 
 // LokiJS in-memory database
@@ -71,7 +71,7 @@ interface MetadataMap {
 }
 
 export interface SearchResult {
-	content: string; similarity: number; metadata: MetadataMap;
+	content: string;, similarity: number; metadata: MetadataMap;
 }
 
 interface QdrantPayload {
@@ -82,7 +82,7 @@ interface QdrantPayload {
 }
 
 interface QdrantHit {
-	id: string; vector: number[]; score: number; payload: QdrantPayload;
+	id: string;, vector: number[]; score: number;, payload: QdrantPayload;
 }
 
 /**
@@ -133,18 +133,18 @@ export async function initializeIntegratedRAG(): Promise<void> {
 
 			try {
 				const collectionsRes = await qdrantClient.getCollections();
-				const collections = (collectionsRes as { collections?: { name: string }[] })?.collections ?? [];
+				const collections = (collectionsRes as { collections?: {, name: string }[] })?.collections ?? [];
 				const exists = collections.some((c) => c?.name === 'legal-documents');
 
 				if (!exists) {
 					await qdrantClient.createCollection('legal-documents', {
-						vectors: { size: 768, distance: 'Cosine' }
+						vectors: {, size: 768, distance: 'Cosine' }
 					});
 				}
 			} catch {
 				try {
 					await qdrantClient.createCollection('legal-documents', {
-						vectors: { size: 768, distance: 'Cosine' }
+						vectors: {, size: 768, distance: 'Cosine' }
 					});
 				} catch (err) {
 					console.warn('Qdrant collection creation failed', err);
@@ -173,7 +173,7 @@ async function generateEmbedding(text: string): Promise<number[]> {
 		const response = await fetch(`${OLLAMA_URL}/api/embeddings`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({ model: 'embeddinggemma:latest',
+			body: JSON.stringify({, model: 'embeddinggemma:latest',
 				prompt: text
 			})
 		});
@@ -197,7 +197,7 @@ async function generateEmbedding(text: string): Promise<number[]> {
 export async function processDocument(
 	file: File,
 	content: string
-): Promise<{ documentId: string; filename: string; chunks: number; qdrantStored: boolean; cudaUsed: boolean;
+): Promise<{, documentId: string; filename: string;, chunks: number; qdrantStored: boolean;, cudaUsed: boolean;
 }> {
 	await initializeIntegratedRAG();
 
@@ -261,7 +261,7 @@ export async function processDocument(
 			const points = chunks.map((chunk, i) => ({
 				id: i,
 				vector: embeddings[i],
-				payload: { content: chunk,
+				payload: {, content: chunk,
 					filename,
 					chunkIndex: i,
 					tags: autoTagContent(chunk)
@@ -340,7 +340,7 @@ export async function searchSimilarDocuments(
 			results = (qdrantResults as QdrantHit[]).map((r) => ({
 				content: r.payload.content,
 				similarity: r.score,
-				metadata: { source_file: r.payload.filename,
+				metadata: {, source_file: r.payload.filename,
 					chunkIndex: r.payload.chunkIndex,
 					tags: r.payload.tags
 				}
@@ -367,7 +367,7 @@ export async function searchSimilarDocuments(
 
 		results = (
 			pgResults.rows as Array<{
-				content_text: string; similarity: number; metadata: MetadataMap;
+				content_text: string;, similarity: number; metadata: MetadataMap;
 			}>
 		).map((r) => ({
 			content: r.content_text,
@@ -395,7 +395,7 @@ export async function getDocumentRecommendations(
 	return searchSimilarDocuments(doc.content.slice(0, 500), limit);
 }
 
-export async function getSystemHealth(): Promise<{ database: boolean; redis: boolean; minio: boolean; qdrant: boolean; cuda: boolean; loki: number; fuse: boolean;
+export async function getSystemHealth(): Promise<{, database: boolean; redis: boolean;, minio: boolean; qdrant: boolean;, cuda: boolean; loki: number;, fuse: boolean;
 }> {
 	await initializeIntegratedRAG();
 

@@ -11,16 +11,16 @@ import path from 'node:path';
 
 /** Raw TypeScript diagnostic from compiler */
 export interface TSDiagnostic {
- file: string; line: number;
- column: number; code: number;
- message: string; category: 'error' | 'warning';
+ file: string;, line: number;
+ column: number;, code: number;
+ message: string;, category: 'error' | 'warning';
 }
 
 /** Parsed error with fix context */
 export interface ErrorRecord {
- file: string; line: number;
- column: number; code: number;
- message: string; category: 'error' | 'warning';
+ file: string;, line: number;
+ column: number;, code: number;
+ message: string;, category: 'error' | 'warning';
  /** Original line content */
  originalLine: string;
  /** Line before (if exists) */
@@ -104,7 +104,7 @@ export function enrichWithContext(diagnostics: TSDiagnostic[], string: ErrorReco
 
  records.push({
  ...diag, originalLine: lines[idx] || '',
- lineBefore: idx > 0 ? lines[idx - 1] : undefined: idx < lines.length - 1 ? lines[idx + 1] : undefined,
+ lineBefore: idx > 0 ? lines[idx - 1] : undefined, idx < lines.length - 1 ? lines[idx + 1] : undefined,
  });
  } catch {
  // File read failed - include without context

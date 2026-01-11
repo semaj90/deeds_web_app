@@ -96,18 +96,18 @@ let { placeholder = 'Search statutes by code or title...', isLoading = false } =
 <style>
  .statute-search-bar {
  display: flex;
- flex-direction: column; gap: 1rem;
+ flex-direction: column;, gap: 1rem;
  padding: 1.5rem;
  background-color: #f5f1e8;
- border-radius: 8px; border: 2px solid #d4a574;
+ border-radius: 8px;, border: 2px solid #d4a574;
  }
 
  .search-input-group {
- display: flex; gap: 0.5rem;
+ display: flex;, gap: 0.5rem;
  }
 
  .search-input {
- flex: 1; padding: 0.75rem 1rem;
+ flex: 1;, padding: 0.75rem 1rem;
  border: 1px solid #d4a574;
  border-radius: 4px;
  font-size: 1rem;
@@ -122,15 +122,15 @@ let { placeholder = 'Search statutes by code or title...', isLoading = false } =
  }
 
  .search-input:disabled {
- background-color: #e0d5c7; color: #999;
+ background-color: #e0d5c7;, color: #999;
  }
 
  .search-btn {
  padding: 0.75rem 1.5rem;
- background-color: #8b4513; color: #f5f1e8;
+ background-color: #8b4513;, color: #f5f1e8;
  border: none;
  border-radius: 4px;
- font-weight: 600; cursor: pointer;
+ font-weight: 600;, cursor: pointer;
  transition: all 0.2s;
  }
 
@@ -139,41 +139,41 @@ let { placeholder = 'Search statutes by code or title...', isLoading = false } =
  }
 
  .search-btn:disabled {
- opacity: 0.6; cursor:not-allowed;
+ opacity: 0.6;, cursor:not-allowed;
  }
 
  .filters {
- display: flex; gap: 1rem;
+ display: flex;, gap: 1rem;
  flex-wrap: wrap;
  align-items: flex-end;
  }
 
  .filter-group {
  display: flex;
- flex-direction: column; gap: 0.25rem;
+ flex-direction: column;, gap: 0.25rem;
  }
 
  .filter-group label {
  font-size: 0.8rem;
- font-weight: 600; color: #666;
+ font-weight: 600;, color: #666;
  }
 
  .filter-group select {
- padding: 0.5rem; border: 1px solid #d4a574;
+ padding: 0.5rem;, border: 1px solid #d4a574;
  border-radius: 4px;
  font-size: 0.85rem;
- background-color: white; cursor: pointer;
+ background-color: white;, cursor: pointer;
  }
 
  .filter-group select:disabled {
- background-color: #e0d5c7; color: #999;
+ background-color: #e0d5c7;, color: #999;
  }
 
  .clear-btn {
  padding: 0.5rem 1rem;
- background-color: #e0d5c7; border: 1px solid #d4a574;
+ background-color: #e0d5c7;, border: 1px solid #d4a574;
  border-radius: 4px;
- font-size: 0.85rem; cursor: pointer;
+ font-size: 0.85rem;, cursor: pointer;
  transition: all 0.2s;
  }
 
@@ -182,7 +182,7 @@ let { placeholder = 'Search statutes by code or title...', isLoading = false } =
  }
 
  .clear-btn:disabled {
- opacity: 0.6; cursor:not-allowed;
+ opacity: 0.6;, cursor:not-allowed;
  }
 </style>
 

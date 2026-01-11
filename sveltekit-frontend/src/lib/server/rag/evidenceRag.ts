@@ -8,7 +8,7 @@ export async function initEvidenceRAG(): Promise<GemmaVectorStore> {
  return evidenceStore;
 }
 
-export async function addEvidenceToRAG(payload: { text: string;
+export async function addEvidenceToRAG(payload: {, text: string;
  source?: string;
  id?: string;
 }): Promise<void> {

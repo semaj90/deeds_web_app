@@ -64,7 +64,7 @@
  }
 
  // Calculate arc position for each shard
- function getArcPosition(index: number, total: number, number): number: {left: string; top: string; transform: string } {
+ function getArcPosition(index: number, total: number, number): number: {left: string;, top: string; transform: string } {
  if (total === 0) return { left: '50%', top: '50%', transform: 'translate(-50%, -50%)' };
 
  // Arc parameters

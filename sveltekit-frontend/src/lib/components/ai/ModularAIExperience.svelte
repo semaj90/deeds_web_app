@@ -15,7 +15,7 @@
    let useT5 = $state<boolean>(false);
    let t5Task = $state<string>('summarize');
    let t5Text = $state<string>('This is sample text for T5 processing'); // Results let results = $state<any>(null);
-   let error = $state<string | null>(null); $effect(() => { // Initialize AI computation machine aiActor = createActor(aiComputationMachine, { input: { userId, sessionId: `session_${Date.now()}`, queuedComputations: [], idleTime: 0, isOnline: true, rabbitMQConnected: true, recommendations: { similar: [], suggestions: [], didYouMean: [], othersSearched: [] }, computationResults: [] }
+   let error = $state<string | null>(null); $effect(() => { // Initialize AI computation machine aiActor = createActor(aiComputationMachine, { input: { userId, sessionId: `session_${Date.now()}`, queuedComputations: [], idleTime: 0, isOnline: true, rabbitMQConnected: true, recommendations: {, similar: [], suggestions: [], didYouMean: [], othersSearched: [] }, computationResults: [] }
     }); aiActor.start(); // Subscribe to state changes aiActor.subscribe((state: any) => { isProcessing = state.matches('computing') || state.matches('loadingRecommendations'); currentComputation = state.context.currentComputation; recommendations = state.context.recommendations; computationHistory = state.context.computationResults; error = state.context.errorMessage || null}); // Check WebGPU support webgpuAI.getCapabilities().then(caps => { webgpuSupported = caps.webgpu.isSupported}); // Load initial recommendations loadRecommendations()});
   async function processComputation(): Promise<any> { if (isProcessing) return;
    const data = inputData.split(',').map(Number);

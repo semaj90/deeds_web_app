@@ -35,12 +35,12 @@
 	.admin-layout {
 		display: grid;
 		grid-template-columns: 240px 1fr;
-		height: 100vh; background: #0d0d0f; overflow: hidden;
+		height: 100vh;, background: #0d0d0f; overflow: hidden;
 	}
 
 	.admin-main {
 		display: flex;
-		flex-direction: column; height: 100vh; overflow: hidden;
+		flex-direction: column;, height: 100vh; overflow: hidden;
 	}
 
 	.admin-header {
@@ -51,24 +51,24 @@
 	}
 
 	.header-content {
-		max-width: 1400px; margin: 0 auto;
+		max-width: 1400px;, margin: 0 auto;
 	}
 
 	.admin-header h1 {
 		margin: 0 0 0.5rem 0;
 		font-size: 1.75rem;
-		font-weight: 600; color: #ddd;
+		font-weight: 600;, color: #ddd;
 		letter-spacing: -0.5px;
 	}
 
 	.subtitle {
 		margin: 0;
-		font-size: 0.9rem; color: #999;
+		font-size: 0.9rem;, color: #999;
 	}
 
 	.admin-content {
-		flex: 1; overflow: auto; padding: 2rem;
-		max-width: 1400px; margin: 0 auto;
+		flex: 1;, overflow: auto; padding: 2rem;
+		max-width: 1400px;, margin: 0 auto;
 		width: 100%;
 	}
 

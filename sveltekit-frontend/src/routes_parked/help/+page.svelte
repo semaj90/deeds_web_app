@@ -28,18 +28,18 @@ https://svelte.dev/e/element_invalid_closing_tag -->
  import { Brain } from "lucide-svelte";
 
  interface HelpArticle {
- id: string; title: string;
- category: string; content: string;
- tags: string[]; lastUpdated: string;
- helpful?: number; description: string;
- duration: string; popularity: number;
+ id: string;, title: string;
+ category: string;, content: string;
+ tags: string[];, lastUpdated: string;
+ helpful?: number;, description: string;
+ duration: string;, popularity: number;
  type: string;
  }
 
  interface SearchResult {
- id: string; title: string;
- content: string; score: number;
- category: string; reasoning: string;
+ id: string;, title: string;
+ content: string;, score: number;
+ category: string;, reasoning: string;
  }
 
  // Help state
@@ -433,7 +433,7 @@ Build on previous responses:
  const response = await fetch('/api/help/search', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({ query: searchQuery, category:activeCategory
+ body: JSON.stringify({, query: searchQuery, category:activeCategory
  })
  });
 
@@ -492,7 +492,7 @@ Build on previous responses:
  <input
  type="text"
  placeholder="Search help articles..."
- class="w-full pl-12 pr-32 py-4 rounded-lg border-0 text-gray-900 text-lg focus: ring-2, focus:ring-white focus: ring-opacity-50", bind:value={searchQuery}
+ class="w-full pl-12 pr-32 py-4 rounded-lg border-0 text-gray-900 text-lg focus: ring-2, focus: ring-white, focus: ring-opacity-50", bind:value={searchQuery}
  />
  <button
  onclick={ toggleSearchMode }

@@ -26,7 +26,7 @@ export const POST: RequestHandler = async ({ request }) => {
 
 		return json({
 			success: result.success,
-			result: { version: result.version,
+			result: {, version: result.version,
 				message: result.message,
 				validationScore: result.validationScore,
 				rollback: result.rollback
@@ -54,7 +54,7 @@ export const GET: RequestHandler = async () => {
 
 		return json({
 			success: true,
-			pipeline: { status: pipeline.getStatus(),
+			pipeline: {, status: pipeline.getStatus(),
 				stats: pipeline.getStats()
 			},
 			experiences: recorder.getStats()

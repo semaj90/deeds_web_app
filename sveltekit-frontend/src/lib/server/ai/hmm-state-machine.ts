@@ -12,7 +12,7 @@ export enum LegalConversationState {
 }
 
 interface StateTransition {
- from: LegalConversationState, to: LegalConversationState; probability: number;
+ from: LegalConversationState, to: LegalConversationState;, probability: number;
 };
 const TRANSITIONS: StateTransition[] = [
  {
@@ -88,44 +88,44 @@ const STATE_LABELS: Record<LegalConversationState, string> = {
 };
 const STATE_ACTIONS: Record<
  LegalConversationState,
- { action: string, description: string; requiredContext: string[], durationMs: number }
+ { action: string, description: string;, requiredContext: string[], durationMs: number }
 > = {
- [LegalConversationState.GREETING]: { action: 'greet_user',
+ [LegalConversationState.GREETING]: {, action: 'greet_user',
  description: 'Acknowledge the user and set expectations.',
  requiredContext: [],
  durationMs: 2_000,
  },
- [LegalConversationState.CASE_INQUIRY]: { action: 'gather_case_details',
+ [LegalConversationState.CASE_INQUIRY]: {, action: 'gather_case_details',
  description: 'Ask for missing case metadata before analysis.',
  requiredContext: ['case_number', 'jurisdiction', 'parties'],
  durationMs: 5_000,
  },
- [LegalConversationState.DOCUMENT_ANALYSIS]: { action: 'review_documents',
+ [LegalConversationState.DOCUMENT_ANALYSIS]: {, action: 'review_documents',
  description: 'Inspect uploaded evidence and produce summaries.',
  requiredContext: ['document_list'],
  durationMs: 8_000,
  },
- [LegalConversationState.LEGAL_RESEARCH]: { action: 'perform_research',
+ [LegalConversationState.LEGAL_RESEARCH]: {, action: 'perform_research',
  description: 'Run precedent search and retrieve relevant citations.',
  requiredContext: ['issues', 'statutes'],
  durationMs: 12_000,
  },
- [LegalConversationState.RISK_ASSESSMENT]: { action: 'assess_risk',
+ [LegalConversationState.RISK_ASSESSMENT]: {, action: 'assess_risk',
  description: 'Score case outcomes and identify blockers.',
  requiredContext: ['risk_matrix'],
  durationMs: 6_000,
  },
- [LegalConversationState.RECOMMENDATION]: { action: 'deliver_recommendations',
+ [LegalConversationState.RECOMMENDATION]: {, action: 'deliver_recommendations',
  description: 'Summarize findings and suggest next steps.',
  requiredContext: ['summary', 'actions'],
  durationMs: 4_000,
  },
- [LegalConversationState.FOLLOW_UP]: { action: 'plan_follow_up',
+ [LegalConversationState.FOLLOW_UP]: {, action: 'plan_follow_up',
  description: 'Schedule follow ups or gather additional data.',
  requiredContext: ['schedule', 'tasks'],
  durationMs: 3_000,
  },
- [LegalConversationState.CONCLUSION]: { action: 'close_session',
+ [LegalConversationState.CONCLUSION]: {, action: 'close_session',
  description: 'Close the loop and archive the session context.',
  requiredContext: [],
  durationMs: 2_000,
@@ -141,7 +141,7 @@ export class HMMStateMachine {
  list.push(transition; this.transitionsByState.set(transition.from, list, }
  }
 
- updateState(previous: HMMState); ConversationTurn: HMMState {
+ updateState(previous: HMMState);, ConversationTurn: HMMState {
  const inferredState = this.inferStateFromIntent(turn.intent, turn.userMessage;
  const candidateTransitions = this.transitionsByState.get(previous.currentState) ?? [];
  const matchedTransition = candidateTransitions.find((t) => t.to === inferredState);
@@ -152,13 +152,13 @@ export class HMMStateMachine {
  return {
  currentState: inferredState,
  transitionProb,
- emissionProb: pattern.slice(-4); stateHistory: history,
+ emissionProb: pattern.slice(-4);, stateHistory: history,
  };
  }
 
  predictNextState(
  currentState: number, history: ConversationTurn[]
- ): { nextState: number, probability: number; predictions: NextStepPrediction[];
+ ): {, nextState: number, probability: number;, predictions: NextStepPrediction[];
  } {
  const transitions = this.transitionsByState.get(currentState as LegalConversationState) ?? [];
  if (transitions.length === 0) {
@@ -183,7 +183,7 @@ export class HMMStateMachine {
  return STATE_LABELS[state as LegalConversationState] ?? 'Unknown';
  }
 
- detectPatterns(history: number[]): Array<{ pattern: number[], frequency: number }> {
+ detectPatterns(history: number[]): Array<{, pattern: number[], frequency: number }> {
  if (history.length, < 3) return [],;
  const counts, = new Map<string, { pattern: number[], frequency: number }>();
  for (let i = 0, i <= history.length - 3, i += 1) {

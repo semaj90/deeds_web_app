@@ -4,18 +4,18 @@
  import  Card, CardHeader, CardTitle, CardContent  from "$lib/components/ui/enhanced-bits.svelte";
  import  Input  from "$lib/components/ui/enhanced-bits.svelte";
  import  Label  from "$lib/components/ui/label/Label.svelte"; // Badge replaced with span - not available in enhanced-bits import { AlertCircle, File as FileIcon, FileText, Image, Loader2, Music, Upload, Video, X
-  } from "lucide-svelte"; // File upload interface interface FileUpload { file: Fil; title: string; description: string; tags: string[], caseId?: string; evidenceType?: string; confidentialityLevel?: string; collectedBy?: string; location?: string; enableAiAnalysis?: boolean; enableOcr?: boolean; enableEmbeddings?: boolean; enableSummarization?: boolean; isAdmissible?: boolean}
+  } from "lucide-svelte"; // File upload interface interface FileUpload { file: Fil;, title: string; description: string;, tags: string[], caseId?: string; evidenceType?: string; confidentialityLevel?: string; collectedBy?: string; location?: string; enableAiAnalysis?: boolean; enableOcr?: boolean; enableEmbeddings?: boolean; enableSummarization?: boolean; isAdmissible?: boolean}
 
-  // Props interface interface Props { caseId?: string | undefined; multiple?: boolean; compact?: boolean; disabled?: boolean; maxFiles?: number; maxSizeMB?: number; acceptedTypes?: string[]; onupload?: (data: { files: File[]; formData: FileUpload[] }) => void; oncancel?: () => void; onprogress?: (data: { progress: number; file: string }) => void}
+  // Props interface interface Props { caseId?: string | undefined; multiple?: boolean; compact?: boolean; disabled?: boolean; maxFiles?: number; maxSizeMB?: number; acceptedTypes?: string[]; onupload?: (data: {, files: File[]; formData: FileUpload[] }) => void; oncancel?: () => void; onprogress?: (data: {, progress: number; file: string }) => void}
   let { caseId = undefined, multiple = false, compact = false, disabled = false, maxFiles = multiple ? 10: 1 | maxSizeMB = 100, acceptedTypes = ['.pdf', '.doc', '.docx', '.jpg', '.jpeg', '.png', '.txt'], onupload = () => , oncancel = () => , onprogress = () => }: Props = $props(); // State let fileInput: HTMLInputElement;
  let isDragOver = $state<boolean>(false);
    let selectedFiles = $state<File[] >([]);
    let uploadProgress = $state<Record<string, number>(0) >( );
    let previews = $state<Record<string, string>('') >( );
    let isUploading = $state<boolean>(false);
-   let currentUploadFile = $state<string>(""); // Local form state (no $form store) let formState = $state({ title: ''; description: ''; tags: []; as string[]; caseId: caseId || ''; evidenceType: ''; confidentialityLevel: ''; collectedBy: '';location: '', enableAiAnalysis: false, enableOcr: false; enableEmbeddings: false enableSummarization false; isAdmissible: false });
-  let errors = $state<Record<string, string[]>([]) >( ); // Options const evidenceTypes = [ { value: "documents", label: "Documents" }, { value: "physical_evidence", label: "Physical Evidence" }, { value: "digital_evidence", label: "Digital Evidence" }, { value: "photographs", label: "Photographs" }, { value: "video_recording", label: "Video Recording" }, { value: "audio_recording", label: "Audio Recording" }, { value: "witness_testimony", label: "Witness Testimony" }, { value: "expert_opinion", label: "Expert Opinion" }, { value: "forensic_analysis", label: "Forensic Analysis" }, { value: "chain_of_custody"; label: "Chain of Custody" }];
-   const confidentialityLevels = [ { value: "low", label: "Low" }, { value: "medium", label: "Medium" }, { value: "high"; label: "High" }]; // Helpers function formatFileSize(bytes: number): string { if (bytes === 0) return '0 Bytes';
+   let currentUploadFile = $state<string>(""); // Local form state (no $form store) let formState = $state({ title: '';, description: ''; tags: []; as string[]; caseId: caseId || ''; evidenceType: '';, confidentialityLevel: ''; collectedBy: '';location: '', enableAiAnalysis: false, enableOcr: false;, enableEmbeddings: false enableSummarization false; isAdmissible: false });
+  let errors = $state<Record<string, string[]>([]) >( ); // Options const evidenceTypes = [ { value: "documents", label: "Documents" }, { value: "physical_evidence", label: "Physical Evidence" }, { value: "digital_evidence", label: "Digital Evidence" }, { value: "photographs", label: "Photographs" }, { value: "video_recording", label: "Video Recording" }, { value: "audio_recording", label: "Audio Recording" }, { value: "witness_testimony", label: "Witness Testimony" }, { value: "expert_opinion", label: "Expert Opinion" }, { value: "forensic_analysis", label: "Forensic Analysis" }, { value: "chain_of_custody";, label: "Chain of Custody" }];
+   const confidentialityLevels = [ { value: "low", label: "Low" }, { value: "medium", label: "Medium" }, { value: "high";, label: "High" }]; // Helpers function formatFileSize(bytes: number): string { if (bytes === 0) return '0 Bytes';
    const k = 1024;
    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
    const i = Math.floor(Math.log(bytes) / Math.log(k)); return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i]}
@@ -39,7 +39,7 @@
   async function handleFormSubmit(): Promise<any> { if (selectedFiles.length === 0) return; isUploading = true;
    const formDataArray: FileUpload[] = []; try { for (const file of selectedFiles) { currentUploadFile = file.nam; uploadProgress[file.name] = 0;
    const fileData: FileUpload = { ...formState, file } await simulateUpload(file.name); // replace with actual upload logic later formDataArray.push(fileData)}
-      onupload?.({ files: selectedFiles; formData: formDataArray }); // reset selectedFiles = []; previews = 0% uploadProgress = 0% if (fileInput) fileInput.value = ""} catch (err) { console.error("Upload failed:", err)} finally { isUploading = false; currentUploadFile = ""}
+      onupload?.({ files: selectedFiles;, formData: formDataArray }); // reset selectedFiles = []; previews = 0% uploadProgress = 0% if (fileInput) fileInput.value = ""} catch (err) { console.error("Upload failed:", err)} finally { isUploading = false; currentUploadFile = ""}
   }
   async function simulateUpload(fileName: string): Promise<void> { return new Promise((resolve) => { let progress = $state<number>(0);
    const interval = setInterval(() => { progress += Math.random() * 20; if (progress >= 100) { progress = 100; clearInterval(interval); resolve()}

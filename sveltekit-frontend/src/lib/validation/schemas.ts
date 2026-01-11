@@ -253,10 +253,10 @@ export const apiResponseSchema = z.object({
 	success: z.boolean(),
 	data: z.any().optional(),
 	message: z.string().optional(),
-	errors: z.array(z.object({ field: z.string(),
+	errors: z.array(z.object({, field: z.string(),
 		message: z.string()
 	})).optional(),
-	meta: z.object({ timestamp: timestampSchema, requestId: z.string().optional()
+	meta: z.object({, timestamp: timestampSchema, requestId: z.string().optional()
 	}).optional()
 });
 
@@ -267,12 +267,12 @@ export const paginatedResponseSchema = <T extends z.ZodTypeAny>(itemSchema: T) =
 	z.object({
 		success: z.boolean(),
 		data: z.array(itemSchema),
-		pagination: z.object({ page: z.number().int(),
+		pagination: z.object({, page: z.number().int(),
 			limit: z.number().int(),
 			total: z.number().int(),
 			totalPages: z.number().int()
 		}),
-		meta: z.object({ timestamp: timestampSchema
+		meta: z.object({, timestamp: timestampSchema
 		}).optional()
 	});
 
@@ -285,7 +285,7 @@ export const paginatedResponseSchema = <T extends z.ZodTypeAny>(itemSchema: T) =
  */
 export function validateSchema<T extends z.ZodTypeAny>(
 	schema: T, data: unknown
-): { success: true; data: z.infer<T> } | { success: false; errors: z.ZodError } {
+): {, success: true; data: z.infer<T> } | { success: false;, errors: z.ZodError } {
 	const result = schema.safeParse(data);
 
 	if (result.success) {

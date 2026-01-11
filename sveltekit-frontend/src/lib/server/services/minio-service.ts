@@ -10,7 +10,7 @@ export class MinIOService {
  */
  static async getTextContent(
  minioUrl: string
- ): Promise<{ content: string; metadata: Record<string, unknown> }> {
+ ): Promise<{, content: string; metadata: Record<string, unknown> }> {
  console.log(`[MinIOService] Attempting to fetch content from: ${ minioUrl }`);
  // Simulate fetching content from MinIO
  // In a real scenario, you would use a MinIO client library here.

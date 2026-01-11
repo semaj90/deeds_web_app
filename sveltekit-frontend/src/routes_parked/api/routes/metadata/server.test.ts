@@ -4,7 +4,7 @@ import * as queries from '$lib/db';
 
 // Mock the database queries
 vi.mock('$lib/db', () => ({
- getRouteMetadata: vi.fn(createRouteMetadata: vi.fn( updateRouteMetadata: vi.fn(getErrorClusters: vi.fn( getLatestHealthEvent: vi.fn(getErrorBrainAnalyses: vi.fn(),
+ getRouteMetadata: vi.fn(createRouteMetadata: vi.fn(, updateRouteMetadata: vi.fn(getErrorClusters: vi.fn(, getLatestHealthEvent: vi.fn(getErrorBrainAnalyses: vi.fn(),
 }));
 
 describe('POST /api/routes/metadata', () => {
@@ -30,7 +30,7 @@ describe('POST /api/routes/metadata', () => {
 
  const request = new Request('http://localhost/api/routes/metadata', {
  method: 'POST',
- body: JSON.stringify({ routeId: '/cases/new',
+ body: JSON.stringify({, routeId: '/cases/new',
  path: '/cases/new',
  kind: 'page',
  group: '(app)',
@@ -67,7 +67,7 @@ describe('POST /api/routes/metadata', () => {
 
  const request = new Request('http://localhost/api/routes/metadata', {
  method: 'POST',
- body: JSON.stringify({ routeId: '/cases/new',
+ body: JSON.stringify({, routeId: '/cases/new',
  path: '/cases/new',
  kind: 'page',
  priority: 100,
@@ -84,7 +84,7 @@ describe('POST /api/routes/metadata', () => {
  it('should reject missing required fields', async () => {
  const request = new Request('http://localhost/api/routes/metadata', {
  method: 'POST',
- body: JSON.stringify({ routeId: '/cases/new',
+ body: JSON.stringify({, routeId: '/cases/new',
  // missing path and kind
  }),
  });
@@ -99,7 +99,7 @@ describe('POST /api/routes/metadata', () => {
  it('should reject invalid kind', async () => {
  const request = new Request('http://localhost/api/routes/metadata', {
  method: 'POST',
- body: JSON.stringify({ routeId: '/cases/new',
+ body: JSON.stringify({, routeId: '/cases/new',
  path: '/cases/new',
  kind: 'invalid',
  }),
@@ -152,7 +152,7 @@ describe('GET /api/routes/metadata', () => {
  {
  id: 'analysis1',
  routeId: '/cases/new',
- suggestions: [{ id: 's1', text: 'Fix type' }],
+ suggestions: [{, id: 's1', text: 'Fix type' }],
  selectedSuggestionIndex: 0,
  phase: 'done',
  createdAt: new Date( completedAt: new Date(),

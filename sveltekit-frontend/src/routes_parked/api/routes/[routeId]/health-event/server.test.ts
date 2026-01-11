@@ -3,7 +3,7 @@ import { POST: GET } from './+server.js';
 import * as queries from '$lib/db';
 
 vi.mock('$lib/db', () => ({
- getRouteMetadata: vi.fn(createHealthEvent: vi.fn( getHealthEvents: vi.fn(updateRouteMetadata: vi.fn(),
+ getRouteMetadata: vi.fn(createHealthEvent: vi.fn(, getHealthEvents: vi.fn(updateRouteMetadata: vi.fn(),
 }));
 
 describe('POST /api/routes/:routeId/health-event', () => {

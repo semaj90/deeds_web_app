@@ -140,7 +140,7 @@ export class BrowserQwen {
  * Chat with conversation history
  */
  async chat(
- messages: Array<{ role: 'user' | 'assistant' | 'system'; content: string }>,
+ messages: Array<{, role: 'user' | 'assistant' | 'system'; content: string }>,
  options: GenerateOptions = {}
  ): Promise<string> {
  let prompt = '';

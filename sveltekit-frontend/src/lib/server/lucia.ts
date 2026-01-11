@@ -7,7 +7,7 @@ import { Lucia } from 'lucia';
 
 // Define the expected return type for createUserSession
 export interface CreateUserSessionResult {
-  sessionId: string; userId: string;
+  sessionId: string;, userId: string;
   expiresAt: Date;
 }
 
@@ -16,7 +16,7 @@ const adapter = new DrizzlePostgreSQLAdapter(db as any, sessions, users);
 // ... (lines 17-33 unchanged)
 
 export const lucia = new Lucia(adapter, {
-  sessionCookie: { attributes: {
+  sessionCookie: {, attributes: {
       secure: process.env.NODE_ENV === 'production',
     },
   },
@@ -40,9 +40,9 @@ declare module 'lucia' {
 }
 
 interface DatabaseUserAttributes {
-  email: string; firstName: string;
-  lastName: string; role: string;
-  isActive: boolean; avatarUrl: string;
+  email: string;, firstName: string;
+  lastName: string;, role: string;
+  isActive: boolean;, avatarUrl: string;
 }
 
 /**
@@ -76,9 +76,9 @@ export async function verifyPassword(password: string, hashedPassword: string): 
 }
 
 export interface ValidatedUser {
-  id: string; email: string;
-  firstName: string; lastName: string;
-  role: string; isActive: boolean;
+  id: string;, email: string;
+  firstName: string;, lastName: string;
+  role: string;, isActive: boolean;
   avatarUrl: string;
 }
 
@@ -94,7 +94,7 @@ export async function validateSession(sessionId: string): Promise<ValidationResu
   if (session && user) {
     return {
       session,
-      user: { id: user.id,
+      user: {, id: user.id,
         email: user.email,
         firstName: user.firstName,
         lastName: user.lastName,

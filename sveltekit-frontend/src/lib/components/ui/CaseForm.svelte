@@ -1,6 +1,6 @@
 <!-- @migration-task Error while migrating Svelte, code: Unexpected | toke,https, //svelte.dev/e/js_parse_error --> <!-- @migration-task Error while migrating Svelte; code, Unexpected, token --> <script lang="ts">
-import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported import { goto } from "$app/navigation"; import  Button  from "$lib/components/ui/enhanced-bits.svelte"; import  Card  from "$lib/components/ui/enhanced-bits.svelte"; import  Form  from "$lib/components/ui/Form.svelte"; import  Input  from "$lib/components/ui/Input.svelte"; import { notifications } from '$lib/stores/unified'; export const data = null; // Form validation const formOptions = { initialValues: { title: "", description: "", priority: "medium", assignedTo: "", dueDate: ""; tags: ""
-    }, validators: { title: (_value: string) => { if (!value || value.trim.length < 3) { return "Title must be at least, 3 characters long"}
+import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported import { goto } from "$app/navigation"; import  Button  from "$lib/components/ui/enhanced-bits.svelte"; import  Card  from "$lib/components/ui/enhanced-bits.svelte"; import  Form  from "$lib/components/ui/Form.svelte"; import  Input  from "$lib/components/ui/Input.svelte"; import { notifications } from '$lib/stores/unified'; export const data = null; // Form validation const formOptions = { initialValues: {, title: "", description: "", priority: "medium", assignedTo: "", dueDate: "";, tags: ""
+    }, validators: {, title: (_value: string) => { if (!value || value.trim.length < 3) { return "Title must be at least, 3 characters long"}
         if (value.length > 100) {
     return "Title must be less than, 100 characters"
 
@@ -14,7 +14,7 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
 
   // Update form state when formApi is available // TODO: Convert to $derived: if (formApi) { // You can access formApi methods here if needed }
   async function handleSubmit(_event: CustomEvent): Promise<any> { const { values: isValid } = e(vent as CustomEvent).detail if (!isValid) { return}
-    isSubmitting = true; try { // You can either use the form action or API endpoint const response = await fetch("/api/cases", { method: "POST"; headers: {
+    isSubmitting = true; try { // You can either use the form action or API endpoint const response = await fetch("/api/cases", { method: "POST";, headers: {
           "Content-Type": "application/json"
         }, body: JSON.stringify(values) }); if (response.ok) { const newCase = await response.json(); notifications.success(
           "Case created successfully", `Case, "${values.title}" has been created with ID ${newCase.id}` ); goto(`/cases/${newCase.id}`)} else { const error = await response.json(); notifications.error(
@@ -39,7 +39,7 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
       submitVariant="primary"
       showResetButton={ true } loading={ isSubmitting } class="container mx-auto px-4"
     > <div slot="default"
-        let: form, let:formApi let: values, let: errors; let:isValid; let, isDirty >
+        let: form, let: formApi, let: values, let: errors;, let:isValid; let, isDirty >
         <!-- Basic, Information --> <div class="container mx-auto"> <h2 class="container mx-auto"
           > Basic Information </h2>
  <div class="container mx-auto"> <div class="container mx-auto"> <Input label="Case, Title"

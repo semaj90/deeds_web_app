@@ -2,10 +2,10 @@
  import { goto } from '$app/navigation';
 
  export interface Case {
- id: string; title: string;
+ id: string;, title: string;
  status: 'active' | 'closed';
- createdAt: string; updatedAt: string;
- evidence: Array<{ id: string; status: string }>;
+ createdAt: string;, updatedAt: string;
+ evidence: Array<{, id: string; status: string }>;
  }
 
  let { isLoading = false, cases = [] } = $props<{

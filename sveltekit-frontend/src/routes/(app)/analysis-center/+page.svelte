@@ -2,7 +2,7 @@
   import { enhance } from '$app/forms';
   import type { PageData } from './$types';
 
- let { data }: { data: PageData } = $props();
+ let { data }: {, data: PageData } = $props();
 
  let analysisQuery = $state('');
  let analysisResults: any[] = $state([]);
@@ -215,15 +215,15 @@
 <style>
  .analysis-center {
  background: linear-gradient(135deg, #0d1117, #161b22);
- min-height: 100vh; color: #f0f6fc;
+ min-height: 100vh;, color: #f0f6fc;
  font-family: 'JetBrains Mono', monospace;
  position: relative;
  }
 
  .analysis-center::before {
- content: ''; position: fixed;
- top: 0; left: 0;
- width: 100%; height: 100%;
+ content: '';, position: fixed;
+ top: 0;, left: 0;
+ width: 100%;, height: 100%;
  background:
  linear-gradient(90deg, rgba(16, 185, 129, 0.1) 1px, transparent 1px),
  linear-gradient(rgba(16, 185, 129, 0.1) 1px, transparent 1px);
@@ -242,7 +242,7 @@
  .header-title h1 {
  color: #10b981;
  font-family: 'Press Start 2P', cursive;
- font-size: 2rem; margin: 0;
+ font-size: 2rem;, margin: 0;
  text-shadow: 0 0 10px rgba(16, 185, 129, 0.5);
  }
 
@@ -258,12 +258,12 @@
  }
 
  .status-indicator.active {
- background: #10b981; color: #0d1117;
+ background: #10b981;, color: #0d1117;
  box-shadow: 0 0 10px rgba(16, 185, 129, 0.3);
  }
 
  .status-indicator.inactive {
- background: #6b7280; color: #f9fafb;
+ background: #6b7280;, color: #f9fafb;
  }
 
  .analysis-controls {
@@ -271,17 +271,17 @@
  }
 
  .mode-selector {
- display: flex; gap: 0.5rem;
+ display: flex;, gap: 0.5rem;
  }
 
  .mode-btn {
  display: flex;
- align-items: center; gap: 0.5rem;
+ align-items: center;, gap: 0.5rem;
  padding: 0.75rem 1rem;
  background: rgba(30, 41, 59, 0.8);
  border: 1px solid #6b7280;
  color: #f0f6fc;
- border-radius: 8px; cursor: pointer;
+ border-radius: 8px;, cursor: pointer;
  transition: all 0.3s ease;
  }
 
@@ -299,7 +299,7 @@
  .analysis-layout {
  display: grid;
  grid-template-columns: 1fr 1fr 300px;
- gap: 1rem; height: calc(100vh - 140px);
+ gap: 1rem;, height: calc(100vh - 140px);
  padding: 1rem;
  }
 
@@ -308,7 +308,7 @@
  .evidence-panel {
  background: rgba(13, 17, 23, 0.9);
  border: 2px solid #10b981;
- border-radius: 8px; padding: 1rem;
+ border-radius: 8px;, padding: 1rem;
  box-shadow: 0 4px 20px rgba(16, 185, 129, 0.1);
  }
 
@@ -317,7 +317,7 @@
  .evidence-header h2 {
  color: #10b981;
  font-family: 'Press Start 2P', cursive;
- font-size: 1rem; margin: 0 0 1rem 0;
+ font-size: 1rem;, margin: 0 0 1rem 0;
  text-shadow: 0 0 5px rgba(16, 185, 129, 0.3);
  }
 
@@ -329,9 +329,9 @@
 
  .analysis-input {
  width: 100%;
- min-height: 120px; background: rgba(30, 41, 59, 0.8);
+ min-height: 120px;, background: rgba(30, 41, 59, 0.8);
  border: 1px solid #6b7280;
- border-radius: 4px; color: #f0f6fc;
+ border-radius: 4px;, color: #f0f6fc;
  padding: 0.75rem;
  font-family: 'JetBrains Mono', monospace;
  resize: vertical;
@@ -345,11 +345,11 @@
 
  .analyze-btn {
  width: 100%;
- margin-top: 1rem; padding: 0.75rem;
+ margin-top: 1rem;, padding: 0.75rem;
  background: linear-gradient(90deg, #10b981, #34d399);
  border: none;
- border-radius: 4px; color: #0d1117;
- font-weight: bold; cursor: pointer;
+ border-radius: 4px;, color: #0d1117;
+ font-weight: bold;, cursor: pointer;
  transition: all 0.3s ease;
  }
 
@@ -359,7 +359,7 @@
  }
 
  .analyze-btn:disabled {
- opacity: 0.6; cursor:not-allowed;
+ opacity: 0.6;, cursor:not-allowed;
  }
 
  .analyze-btn.analyzing {
@@ -367,10 +367,10 @@
  }
 
  .loading-spinner {
- display: inline-block; width: 16px;
- height: 16px; border: 2px solid #0d1117;
+ display: inline-block;, width: 16px;
+ height: 16px;, border: 2px solid #0d1117;
  border-radius: 50%;
- border-top-color: transparent; animation: spin 1s ease-in-out infinite;
+ border-top-color: transparent;, animation: spin 1s ease-in-out infinite;
  margin-right: 0.5rem;
  }
 
@@ -386,7 +386,7 @@
  .result-card {
  background: rgba(30, 41, 59, 0.5);
  border: 1px solid #6b7280;
- border-radius: 8px; padding: 1rem;
+ border-radius: 8px;, padding: 1rem;
  margin-bottom: 1rem;
  }
 
@@ -398,7 +398,7 @@
  }
 
  .result-meta {
- display: flex; gap: 1rem;
+ display: flex;, gap: 1rem;
  font-size: 0.75rem;
  }
 
@@ -431,18 +431,18 @@
  .correlations h4 {
  color: #10b981;
  font-family: 'Press Start 2P', cursive;
- font-size: 0.75rem; margin: 0 0 0.5rem 0;
+ font-size: 0.75rem;, margin: 0 0 0.5rem 0;
  }
 
  .correlation-list {
  display: flex;
- flex-direction: column; gap: 0.5rem;
+ flex-direction: column;, gap: 0.5rem;
  }
 
  .correlation-item {
  display: flex;
- align-items: center; gap: 0.5rem;
- padding: 0.5rem; background: rgba(16, 185, 129, 0.1);
+ align-items: center;, gap: 0.5rem;
+ padding: 0.5rem;, background: rgba(16, 185, 129, 0.1);
  border-radius: 4px;
  font-size: 0.75rem;
  }
@@ -453,7 +453,7 @@
  }
 
  .evidence-title {
- color: #f0f6fc; flex: 1;
+ color: #f0f6fc;, flex: 1;
  }
 
  .correlation-strength {
@@ -473,8 +473,8 @@
  .evidence-item {
  background: rgba(30, 41, 59, 0.5);
  border: 1px solid #6b7280;
- border-radius: 8px; padding: 1rem;
- margin-bottom: 0.75rem; cursor: pointer;
+ border-radius: 8px;, padding: 1rem;
+ margin-bottom: 0.75rem;, cursor: pointer;
  transition: all 0.3s ease;
  }
 
@@ -515,7 +515,7 @@
 
  .evidence-tags {
  display: flex;
- flex-wrap: wrap; gap: 0.25rem;
+ flex-wrap: wrap;, gap: 0.25rem;
  margin-bottom: 0.5rem;
  }
 

@@ -7,7 +7,7 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported // 
   function approveWorkflow() { custodyActor.send({ type: 'APPROVE_CUSTODY' } as EvidenceCustodyEvent)}
   function rejectWorkflow() { const reason = prompt('Please provide a reason for rejection'); if (reason) { custodyActor.send({ type: 'REJECT_CUSTODY', reason } as EvidenceCustodyEvent)}
   }
-  function startCustodyTransfer() { if (transferReason.trim()) { custodyActor.send({ type: 'TRANSFER_CUSTODY', newCustodian: userId; reason: transferReason } as EvidenceCustodyEvent); showTransferDialog = false; transferReason = ''}
+  function startCustodyTransfer() { if (transferReason.trim()) { custodyActor.send({ type: 'TRANSFER_CUSTODY', newCustodian: userId;, reason: transferReason } as EvidenceCustodyEvent); showTransferDialog = false; transferReason = ''}
   }
   function joinCollaboration() { custodyActor.send({ type: 'JOIN_COLLABORATION', userId; role: 'investigator'
     } as EvidenceCustodyEvent); isCollaborationExpanded = true}
@@ -90,8 +90,8 @@ import type { Case } from '$lib/types'; // Svelte, 5 runes are auto-imported // 
   </div>
  <style> .evidence-custody-flow { min-height: 100vh}
   /* Custom animations for state transitions */ .workflow-transition { animation: fadeInUp 0.3s ease-out}
-  @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px)}
-    to { opacity: 1; transform: translateY(0)}
+  @keyframes fadeInUp { from { opacity: 0;, transform: translateY(20px)}
+    to { opacity: 1;, transform: translateY(0)}
   }
 </style>
 

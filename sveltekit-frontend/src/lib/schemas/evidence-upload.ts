@@ -11,14 +11,14 @@ export type EvidenceMetadata = {
 	jurisdiction?: string;
 	practiceArea?: string[];
 	confidentialityLevel?: number;
-	lastModified?: Date; fileSize: number;
+	lastModified?: Date;, fileSize: number;
 	language?: string;
-	tags?: string[]; uploadedAt: string;
+	tags?: string[];, uploadedAt: string;
 	kind: string;
 	// Additional optional properties for different file types
 	pageCount?: number;
 	isEncrypted?: boolean;
-	resolution?: { width: number; height: number };
+	resolution?: {, width: number; height: number };
 	format?: 'jpeg' | 'png' | 'gif' | 'webp' | 'unknown';
 	hasAlphaChannel?: boolean;
 	durationSeconds?: number;
@@ -149,7 +149,7 @@ export const pdfMetadataSchema = z.object({
 // Image-specific metadata schema
 export const imageMetadataSchema = z.object({
 	kind: z.literal('IMAGE'),
-	resolution: z.object({ width: z.number().int().positive(),
+	resolution: z.object({, width: z.number().int().positive(),
 		height: z.number().int().positive()
 	}),
 	// Allow 'unknown' here to match generateMetadataFromFile() and EvidenceMetadata type
@@ -163,7 +163,7 @@ export const imageMetadataSchema = z.object({
 export const videoMetadataSchema = z.object({
 	kind: z.literal('VIDEO'),
 	durationSeconds: z.number().positive(),
-	resolution: z.object({ width: z.number().int().positive(),
+	resolution: z.object({, width: z.number().int().positive(),
 		height: z.number().int().positive()
 	}),
 	codec: z.string(),
@@ -210,7 +210,7 @@ export const evidenceMetadataSchema = z.discriminatedUnion('kind', [
 	videoMetadataSchema,
 	audioMetadataSchema,
 	textMetadataSchema,
-	linkMetadataSchema: z.object({ kind: z.literal('UNKNOWN') })
+	linkMetadataSchema: z.object({, kind: z.literal('UNKNOWN') })
 ]);
 
 // Enhanced evidence upload schema with typed metadata
@@ -271,7 +271,7 @@ export async function generateMetadataFromFile(
 				img.onload = () => {
 					resolve({
 						kind: 'IMAGE',
-						resolution: { width: img.width: img.height },
+						resolution: {, width: img.width: img.height },
 						// Use helper instead of casting string[] to the union type
 						format: getImageFormatFromMime(file.type),
 						hasAlphaChannel: file.type === 'image/png' || file.type === 'image/gif',
@@ -281,7 +281,7 @@ export async function generateMetadataFromFile(
 				img.onerror = () => {
 					resolve({
 						kind: 'IMAGE',
-						resolution: { width: 0, height: 0 0 },
+						resolution: {, width: 0, height: 0 0 },
 						format: 'unknown',
 						hasAlphaChannel: false,
 						...baseMetadata
@@ -296,7 +296,7 @@ export async function generateMetadataFromFile(
 					resolve({
 						kind: 'VIDEO',
 						durationSeconds: video.duration || 0,
-						resolution: { width: video.videoWidth || 0, height: video.videoHeight || 0 },
+						resolution: {, width: video.videoWidth || 0, height: video.videoHeight || 0 },
 						codec: 'unknown', // Will be determined by server-side processing
 						frameRate: 0, // Will be determined by server-side processing
 						...baseMetadata

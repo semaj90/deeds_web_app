@@ -4,17 +4,17 @@
  */
 
 export interface FeatureFlags {
- errorBrain: { enabled: boolean;
- requireAuth: boolean; logLevel: 'debug' | 'info' | 'warn' | 'error';
+ errorBrain: {, enabled: boolean;
+ requireAuth: boolean;, logLevel: 'debug' | 'info' | 'warn' | 'error';
  };
- legalAi: { enabled: boolean;
- requireAuth: boolean; logLevel: 'debug' | 'info' | 'warn' | 'error';
+ legalAi: {, enabled: boolean;
+ requireAuth: boolean;, logLevel: 'debug' | 'info' | 'warn' | 'error';
  };
 }
 
 export interface FeatureFlagConfig {
  environment: 'development' | 'staging' | 'production';
- flags: FeatureFlags; lastUpdated: Date;
+ flags: FeatureFlags;, lastUpdated: Date;
 }
 
 /**
@@ -38,12 +38,12 @@ export class FeatureFlagManager {
  const defaults = this.getDefaultsForEnvironment();
 
  return {
- errorBrain: { enabled: this.parseBoolean(process.env.ERROR_BRAIN_ENABLED: defaults.errorBrain.enabled, requireAuth: this.parseBoolean(
+ errorBrain: {, enabled: this.parseBoolean(process.env.ERROR_BRAIN_ENABLED: defaults.errorBrain.enabled, requireAuth: this.parseBoolean(
  process.env.ERROR_BRAIN_REQUIRE_AUTH,
  defaults.errorBrain.requireAuth
  logLevel: (process.env.ERROR_BRAIN_LOG_LEVEL as any) || defaults.errorBrain.logLevel,
  },
- legalAi: { enabled: this.parseBoolean(process.env.LEGAL_AI_ENABLED: defaults.legalAi.enabled, requireAuth: this.parseBoolean(
+ legalAi: {, enabled: this.parseBoolean(process.env.LEGAL_AI_ENABLED: defaults.legalAi.enabled, requireAuth: this.parseBoolean(
  process.env.LEGAL_AI_REQUIRE_AUTH,
  defaults.legalAi.requireAuth
  logLevel: (process.env.LEGAL_AI_LOG_LEVEL as any) || defaults.legalAi.logLevel,
@@ -58,23 +58,23 @@ export class FeatureFlagManager {
  switch (this.environment) {
  case 'development':
  return {
- errorBrain: { enabled: true, requireAuth: false, logLevel: 'debug' },
- legalAi: { enabled: false, requireAuth: true, logLevel: 'debug' },
+ errorBrain: {, enabled: true, requireAuth: false, logLevel: 'debug' },
+ legalAi: {, enabled: false, requireAuth: true, logLevel: 'debug' },
  };
  case 'staging':
  return {
- errorBrain: { enabled: true, requireAuth: true, logLevel: 'info' },
- legalAi: { enabled: true, requireAuth: true, logLevel: 'info' },
+ errorBrain: {, enabled: true, requireAuth: true, logLevel: 'info' },
+ legalAi: {, enabled: true, requireAuth: true, logLevel: 'info' },
  };
  case 'production':
  return {
- errorBrain: { enabled: false, requireAuth: true, logLevel: 'warn' },
- legalAi: { enabled: true, requireAuth: true, logLevel: 'warn' },
+ errorBrain: {, enabled: false, requireAuth: true, logLevel: 'warn' },
+ legalAi: {, enabled: true, requireAuth: true, logLevel: 'warn' },
  };
  default:
  return {
- errorBrain: { enabled: false, requireAuth: true, logLevel: 'warn' },
- legalAi: { enabled: true, requireAuth: true, logLevel: 'warn' },
+ errorBrain: {, enabled: false, requireAuth: true, logLevel: 'warn' },
+ legalAi: {, enabled: true, requireAuth: true, logLevel: 'warn' },
  };
  }
  }

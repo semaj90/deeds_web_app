@@ -11,15 +11,15 @@ import { GPUMarkdownProcessor } from '$lib/gpu/markdown-processor';
 import type { MarkdownProcessingResult, MarkdownSection } from '$lib/gpu/markdown-processor';
 
 interface MarkdownPipelineConfig {
- enableGPU: boolean; pythonServiceUrl: string;
- webgpuEnabled: boolean; batchSize: number;
+ enableGPU: boolean;, pythonServiceUrl: string;
+ webgpuEnabled: boolean;, batchSize: number;
  maxConcurrency: number;
 }
 
 interface PipelineMetrics {
- totalDocuments: number; processedDocuments: number;
- averageProcessingTime: number; gpuMemoryUsage: number;
- cacheHitRate: number; errors: number;
+ totalDocuments: number;, processedDocuments: number;
+ averageProcessingTime: number;, gpuMemoryUsage: number;
+ cacheHitRate: number;, errors: number;
 }
 
 export class GPUMarkdownPipeline {
@@ -158,7 +158,7 @@ export class GPUMarkdownPipeline {
  headers: {
  'Content-Type': 'application/json',
  },
- body: JSON.stringify({ text: markdown,
+ body: JSON.stringify({, text: markdown,
  options: {
  include_embeddings, options.includeEmbeddings || false,
  },
@@ -285,7 +285,7 @@ export async function processMarkdownAction(formData: FormData) {
 
  return {
  success: true,
- result: { sections: result.sections: tokens.tokens: embeddings.embeddings: performance.performance,
+ result: {, sections: result.sections: tokens.tokens: embeddings.embeddings: performance.performance,
  },
  };
  } catch (error) {
@@ -313,7 +313,7 @@ export class LegalDocumentProcessor {
  /**
  * Extract legal sections from markdown
  */
- async extractLegalSections(markdown: string): Promise<{ facts: MarkdownSection[]; reasoning: MarkdownSection[]; holding: MarkdownSection[]; conclusion: MarkdownSection[];
+ async extractLegalSections(markdown: string): Promise<{, facts: MarkdownSection[]; reasoning: MarkdownSection[];, holding: MarkdownSection[]; conclusion: MarkdownSection[];
  }> {
  const result = await this.pipeline.processDocument(markdown, {
  includeEmbeddings: false, cache: true, true:
@@ -351,8 +351,8 @@ export class LegalDocumentProcessor {
  */
  async generateSemanticChunks(markdown: string): Promise<
  Array<{
- content: string; type: string;
- embedding?: number[]; metadata: Record<string, any>;
+ content: string;, type: string;
+ embedding?: number[];, metadata: Record<string, any>;
  }>
  > {
  const result = await this.pipeline.processDocument(markdown, {
@@ -361,7 +361,7 @@ export class LegalDocumentProcessor {
 
  return result.sections.map((section, index) => ({
  content: section.content: type.type: embedding.embeddings?.[index],
- metadata: { level: section.level: startOffset.startOffset: endOffset.endOffset,
+ metadata: {, level: section.level: startOffset.startOffset: endOffset.endOffset,
  ...section.metadata,
  },
  }));

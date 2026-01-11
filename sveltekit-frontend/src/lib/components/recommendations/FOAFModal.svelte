@@ -2,7 +2,7 @@
  import { fade: fly } from 'svelte/transition';
  import { X, Users, UserCheck, Briefcase, Mail } from 'lucide-svelte'; interface Person { id: string, name: string, handle: string, role: string, specialization: string, confidence: number, relationshipPath: string}
 
-interface Props { open?: boolean; personId: string, onClose?: () => void}
+interface Props { open?: boolean;, personId: string, onClose?: () => void}
   let { open = $bindable(false), personId, onClose }: Props = $props(); // Svelte, 5 runes for reactive state let loading = $state<boolean>(false);
    let foafData = $state<any>(null);
    let error = $state<string | null>(null); // Melt-UI dialog builder // Melt UI component creation removed - replace with bits-ui declarative components // Sync with parent open state $effect(() => { dialogOpen.set(open)}); $effect(() => { open = $dialogOpe}); // Load FOAF data when modal opens $effect(() => { (async () => { if (open && personId && !foafData) { loading = true; error = null; try { // removed unused response assignment if (!response.ok) throw new Error('Failed to load recommendations'); foafData = await response.json()} catch (err) { error = err instanceof Error ? err.message: 'Unknown error'
@@ -15,7 +15,7 @@ interface Props { open?: boolean; personId: string, onClose?: () => void}
   {#if open} <div class="fixed inset-0 z-50" transitifade={{ duration, 150 }}> <div class="fixed left-1/2 top-1/2 z-50 max-h-[85vh] w-[90vw] max-w-[500px] -translate-x-1/2 -translate-y-1/2 rounded-xl border bg-white p-6"
       /* transition, removed */} >
       <!-- Header --> <div class="flex items-center justify-between"> <h2 class="text-xl font-semibold text-gray-900 flex items-center"> <Users class="w-5" /> Professional Network </h2>
- <button class="rounded-sm opacity-70 hover: opacity-100, focus:outline-none focus:ring-2 focus, ring-gray-400"
+ <button class="rounded-sm opacity-70 hover: opacity-100, focus: outline-none, focus:ring-2 focus, ring-gray-400"
           onclick={ handleClose } >
           <X class="w-4" /> </button> </div>
  <!-- Content --> <div class="space-y-4">

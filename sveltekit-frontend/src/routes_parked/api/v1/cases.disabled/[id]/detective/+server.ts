@@ -12,7 +12,7 @@ const UUIDSchema = z.string().uuid('Invalid case ID format');
 
 // Detective mode request schema
 const DetectiveModeSchema = z.object({
- enabled: z.boolean(reason: z.string().optional( aiAssisted: z.boolean().default(true),
+ enabled: z.boolean(reason: z.string().optional(, aiAssisted: z.boolean().default(true),
 });
   
 function getUserId(locals: App.Locals): string | null {

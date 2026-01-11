@@ -86,7 +86,7 @@
 <style>
  .ai-tab {
  display: flex;
- flex-direction: column; height: 100%;
+ flex-direction: column;, height: 100%;
  }
 
  .ai-header {
@@ -95,7 +95,7 @@
  }
 
  .quick-actions {
- display: flex; gap: 0.5rem;
+ display: flex;, gap: 0.5rem;
  padding: 1rem;
  border-bottom: 1px solid #e5e7eb;
  overflow-x: auto;
@@ -103,21 +103,21 @@
 
  .quick-actions button {
  padding: 0.5rem 1rem;
- white-space: nowrap; border: 1px solid #d1d5db;
- border-radius: 4px; background: white;
+ white-space: nowrap;, border: 1px solid #d1d5db;
+ border-radius: 4px;, background: white;
  cursor: pointer;
  font-size: 0.875rem;
  }
 
  .messages {
  flex: 1;
- overflow-y: auto; padding: 1rem;
+ overflow-y: auto;, padding: 1rem;
  display: flex;
- flex-direction: column; gap: 1rem;
+ flex-direction: column;, gap: 1rem;
  }
 
  .message {
- display: flex; gap: 0.5rem;
+ display: flex;, gap: 0.5rem;
  }
 
  .message.user {
@@ -125,39 +125,39 @@
  }
 
  .message.user .content {
- background: #3b82f6; color: white;
+ background: #3b82f6;, color: white;
  padding: 0.75rem;
  border-radius: 4px;
  max-width: 80%;
  }
 
  .message.assistant .content {
- background: #f3f4f6; padding: 0.75rem;
+ background: #f3f4f6;, padding: 0.75rem;
  border-radius: 4px;
  max-width: 80%;
  }
 
  .input-area {
- display: flex; gap: 0.5rem;
+ display: flex;, gap: 0.5rem;
  padding: 1rem;
  border-top: 1px solid #e5e7eb;
  }
 
  .input-area input {
- flex: 1; padding: 0.5rem;
+ flex: 1;, padding: 0.5rem;
  border: 1px solid #d1d5db;
  border-radius: 4px;
  }
 
  .input-area button {
  padding: 0.5rem 1rem;
- background: #3b82f6; color: white;
+ background: #3b82f6;, color: white;
  border: none;
- border-radius: 4px; cursor: pointer;
+ border-radius: 4px;, cursor: pointer;
  }
 
  .input-area button:disabled {
- opacity: 0.5; cursor:not-allowed;
+ opacity: 0.5;, cursor:not-allowed;
  }
 
  .typing {

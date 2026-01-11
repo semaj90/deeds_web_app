@@ -28,7 +28,7 @@
         {@render children()}
       {/if}
       <button
-        class="absolute top-2 right-2 text-gray-400 hover: text-gray-700, focus:outline-none focus: ring-2, focus:ring-blue-500 focus: ring-offset-2", use:accessibleClick={{ handler: onClose, label, 'Close dialog' }}>âœ•</button
+        class="absolute top-2 right-2 text-gray-400 hover: text-gray-700, focus: outline-none, focus: ring-2, focus: ring-blue-500, focus: ring-offset-2", use: accessibleClick={{, handler: onClose, label, 'Close dialog' }}>âœ•</button
       >
     </div>
   {/if}

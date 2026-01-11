@@ -1,8 +1,8 @@
 <script lang="ts">
  interface Query {
- id: string; query: string;
- response: string; timestamp: Date;
- functionCalls: Array<{ name: string; result: any }>;
+ id: string;, query: string;
+ response: string;, timestamp: Date;
+ functionCalls: Array<{, name: string; result: any }>;
  }
 
  interface Props {
@@ -109,7 +109,7 @@
  <button
  onclick={handleSubmit}
  disabled={isLoading || !inputValue.trim()}
- class="px-3 py-1 bg-black border border-[#00FF00] text-[#00FF00] font-mono text-xs hover: bg-[#00FF00], hover:text-black disabled: opacity-50, disabled:cursor-not-allowed transition"
+ class="px-3 py-1 bg-black border border-[#00FF00] text-[#00FF00] font-mono text-xs hover: bg-[#00FF00], hover: text-black, disabled: opacity-50, disabled:cursor-not-allowed transition"
  >
  SEND
  </button>

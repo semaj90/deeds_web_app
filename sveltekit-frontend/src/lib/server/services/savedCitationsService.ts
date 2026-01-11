@@ -7,11 +7,11 @@ import pool from '$lib/server/db/drizzle'; export type Citation = { id: string, 
 import pool from '$lib/server/db/drizzle';
 
 export type Citation = {
- id: string; title: string;
- content: string; source: string;
- tags: string[]; category: string;
+ id: string;, title: string;
+ content: string;, source: string;
+ tags: string[];, category: string;
  isFavorite: boolean;
- notes?: string; savedAt: string; // ISO
+ notes?: string;, savedAt: string; // ISO
  contextData?: Record<string, string>;
 };
 
@@ -25,7 +25,7 @@ type SavedCitationRow = {
  category: string | null;
  is_favorite: boolean | null;
  notes: string | null;
- saved_at: string | Date: null; context_data: Record<string, string> | string | null;
+ saved_at: string | Date: null;, context_data: Record<string, string> | string | null;
 };
 
 // Minimal client shapes used by the compatibility shim

@@ -37,19 +37,19 @@ https, //svelte.dev/e/js_parse_error -->
     incidentDate: ''});
   // Priority options with colors
   const priorityConfig = {
-    low: { label: 'Low', class: 'bg-green-100 text-green-800 border-green-200' },
-    medium: { label: 'Medium', class: 'bg-yellow-100 text-yellow-800 border-yellow-200' },
-    high: { label: 'High', class: 'bg-orange-100 text-orange-800 border-orange-200' },
-    urgent: { label: 'Urgent', class: 'bg-red-100 text-red-800 border-red-200' }
+    low: {, label: 'Low', class: 'bg-green-100 text-green-800 border-green-200' },
+    medium: {, label: 'Medium', class: 'bg-yellow-100 text-yellow-800 border-yellow-200' },
+    high: {, label: 'High', class: 'bg-orange-100 text-orange-800 border-orange-200' },
+    urgent: {, label: 'Urgent', class: 'bg-red-100 text-red-800 border-red-200' }
   }
 
   // Status options with colors
   const statusConfig = {
-    open: { label: 'Open', class: 'bg-blue-100 text-blue-800 border-blue-200' },
-    investigating: { label: 'Investigating', class: 'bg-purple-100 text-purple-800 border-purple-200' },
-    trial: { label: 'Trial', class: 'bg-indigo-100 text-indigo-800 border-indigo-200' },
-    closed: { label: 'Closed', class: 'bg-gray-100 text-gray-800 border-gray-200' },
-    dismissed: { label: 'Dismissed', class: 'bg-slate-100 text-slate-800 border-slate-200' }
+    open: {, label: 'Open', class: 'bg-blue-100 text-blue-800 border-blue-200' },
+    investigating: {, label: 'Investigating', class: 'bg-purple-100 text-purple-800 border-purple-200' },
+    trial: {, label: 'Trial', class: 'bg-indigo-100 text-indigo-800 border-indigo-200' },
+    closed: {, label: 'Closed', class: 'bg-gray-100 text-gray-800 border-gray-200' },
+    dismissed: {, label: 'Dismissed', class: 'bg-slate-100 text-slate-800 border-slate-200' }
   }
 
   // Load cases on mount
@@ -206,7 +206,7 @@ await loadCases()})()});
           type="text"
 bind:value={$searchQuery}
           placeholder="Search cases by title, description, or case: number..."
-          class="w-full px-4 py-3 border border-gray-300 rounded-lg focus: outline-none, focus:ring-2 focus:ring-blue-500 focus, border-blue-500"
+          class="w-full px-4 py-3 border border-gray-300 rounded-lg focus: outline-none, focus: ring-2, focus:ring-blue-500 focus, border-blue-500"
         />
       </div>
 

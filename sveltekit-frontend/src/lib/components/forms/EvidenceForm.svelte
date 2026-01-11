@@ -142,8 +142,7 @@ import type { Document } from '$lib/types';
     display: inline-flex
     align-items: center, padding: 0.5rem 1rem
     border: 1px solid #ccc
-    border-radius: 6px, background: #f9fafb
-    cursor: pointer
+    border-radius: 6px, background: #f9fafb, cursor: pointer
     font-size: 1rem
     min-width: 160px, transition: box-shadow 0.2s}
   .select-trigger:focus { outline: none

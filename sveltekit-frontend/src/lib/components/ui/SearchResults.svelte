@@ -8,10 +8,10 @@
  */
 
  interface SearchResult {
- id: string; title: string;
- url: string; snippet: string;
+ id: string;, title: string;
+ url: string;, snippet: string;
  source: string;
- favicon?: string; relevance: number;
+ favicon?: string;, relevance: number;
  timestamp?: Date;
  }
 
@@ -106,22 +106,22 @@
 <style>
  .search-results {
  display: flex;
- flex-direction: column; gap: 1rem;
+ flex-direction: column;, gap: 1rem;
  }
 
  .loading-state {
  display: flex;
  flex-direction: column;
  align-items: center;
- justify-content: center; padding: 2rem;
+ justify-content: center;, padding: 2rem;
  gap: 1rem;
  }
 
  .spinner {
- width: 32px; height: 32px;
+ width: 32px;, height: 32px;
  border: 3px solid var(--yorha-border, #4a4a4a);
  border-top-color: var(--yorha-accent, #c8a84b);
- border-radius: 50%; animation: spin 0.8s linear infinite;
+ border-radius: 50%;, animation: spin 0.8s linear infinite;
  }
 
  @keyframes spin {
@@ -137,12 +137,12 @@
  display: flex;
  flex-direction: column;
  align-items: center;
- justify-content: center; padding: 2rem;
- gap: 0.5rem; color: var(--yorha-text-muted, #888);
+ justify-content: center;, padding: 2rem;
+ gap: 0.5rem;, color: var(--yorha-text-muted, #888);
  }
 
  .empty-icon {
- font-size: 2rem; opacity: 0.5;
+ font-size: 2rem;, opacity: 0.5;
  }
 
  .empty-state p {
@@ -156,28 +156,28 @@
  .results-header {
  display: flex;
  justify-content: space-between;
- align-items: center; padding: 0.75rem 0;
+ align-items: center;, padding: 0.75rem 0;
  border-bottom: 1px solid var(--yorha-border, #4a4a4a);
  }
 
  .results-header h3 {
  margin: 0;
- font-size: 1rem; color: var(--yorha-text, #d4d4d4);
+ font-size: 1rem;, color: var(--yorha-text, #d4d4d4);
  }
 
  .result-count {
- font-size: 0.8rem; color: var(--yorha-text-muted, #888);
+ font-size: 0.8rem;, color: var(--yorha-text-muted, #888);
  }
 
  .results-list {
  display: flex;
- flex-direction: column; gap: 0.75rem;
+ flex-direction: column;, gap: 0.75rem;
  }
 
  .result-item {
- padding: 1rem; background: var(--yorha-bg-secondary, #2a2a2a);
+ padding: 1rem;, background: var(--yorha-bg-secondary, #2a2a2a);
  border: 1px solid var(--yorha-border, #4a4a4a);
- border-radius: 4px; cursor: pointer;
+ border-radius: 4px;, cursor: pointer;
  transition: all 0.2s;
  }
 
@@ -195,16 +195,16 @@
 
  .result-source {
  display: flex;
- align-items: center; gap: 0.5rem;
+ align-items: center;, gap: 0.5rem;
  }
 
  .favicon {
- width: 16px; height: 16px;
+ width: 16px;, height: 16px;
  border-radius: 2px;
  }
 
  .domain {
- font-size: 0.8rem; color: var(--yorha-text-muted, #888);
+ font-size: 0.8rem;, color: var(--yorha-text-muted, #888);
  }
 
  .relevance-badge {
@@ -219,13 +219,13 @@
  .result-title {
  margin: 0 0 0.5rem;
  font-size: 0.95rem;
- font-weight: 500; color: var(--yorha-text, #d4d4d4);
+ font-weight: 500;, color: var(--yorha-text, #d4d4d4);
  line-height: 1.4;
  }
 
  .result-snippet {
  margin: 0 0 0.5rem;
- font-size: 0.85rem; color: var(--yorha-text-muted, #888);
+ font-size: 0.85rem;, color: var(--yorha-text-muted, #888);
  line-height: 1.5;
  }
 
@@ -233,13 +233,13 @@
  display: flex;
  justify-content: space-between;
  align-items: center;
- font-size: 0.75rem; color: var(--yorha-text-muted, #888);
+ font-size: 0.75rem;, color: var(--yorha-text-muted, #888);
  }
 
  .result-url {
  overflow: hidden;
  text-overflow: ellipsis;
- white-space: nowrap; flex: 1;
+ white-space: nowrap;, flex: 1;
  }
 
  .result-time {

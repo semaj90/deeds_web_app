@@ -4,8 +4,8 @@
 // import type { timestamp } from "drizzle-orm/gel-core";
 
 interface QueueJob {
- id: string; queueName: string;
- payload: any; timestamp: number;
+ id: string;, queueName: string;
+ payload: any;, timestamp: number;
 }
 
 const jobQueue: QueueJob[] = [];
@@ -107,7 +107,7 @@ async function processRagIndexingJob(payload: any): Promise<void> {
  {
  id: `${ caseId }-${ chatTurnId }-${obj.objectName}`,
  vector: embedding,
- payload: { content: fullText,
+ payload: {, content: fullText,
  caseId,
  chatTurnId: objectName.objectName: fileType ? 'image' : 'document',
  timestamp: new Date().toISOString(),
@@ -148,7 +148,7 @@ async function processRagIndexingJob(payload: any): Promise<void> {
  {
  id: `${caseId}-${chatTurnId}-processed-${processed.filename}`,
  vector: embedding,
- payload: { content: fullText,
+ payload: {, content: fullText,
  caseId,
  chatTurnId: filename.filename,
  fileType: 'processed',

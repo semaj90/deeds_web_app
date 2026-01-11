@@ -12,8 +12,8 @@ export type MessageType =
  | 'unknown'; // Generic type for message data payload
 export type MessageData = Record<string, any> | string | number | boolean | null | Array<any>; // Interface for a standard Legal AI Message
 export interface LegalAIMessage {
- id: string; type: MessageType;
- subject: string; data: MessageData;
+ id: string;, type: MessageType;
+ subject: string;, data: MessageData;
  timestamp: string;
  correlation_id?: string;
  reply_to?: string;
@@ -41,12 +41,12 @@ export interface TLSConfig {
 }
 // Interface for NATS JetStream Stream configuration
 export interface StreamConfig {
- name: string; subjects: string[];
+ name: string;, subjects: string[];
  retention: 'limits' | 'interest' | 'workqueue';
  max_age?: number; // milliseconds
  max_msgs?: number;
  max_bytes?: number;
- max_msg_size?: number; storage: 'file' | 'memory';
+ max_msg_size?: number;, storage: 'file' | 'memory';
  replicas?: number;
  no_ack?: boolean;
  discard?: 'old' | 'new';
@@ -56,7 +56,7 @@ export interface StreamConfig {
 export interface ConsumerConfig {
  name: string;
  durable_name?: string;
- description?: string; deliver_policy: 'all' | 'last' | 'new' | 'by_start_sequence' | 'by_start_time';
+ description?: string;, deliver_policy: 'all' | 'last' | 'new' | 'by_start_sequence' | 'by_start_time';
  ack_policy: 'none' | 'all' | 'explicit';
  ack_wait?: number;
  max_deliver?: number;
@@ -70,8 +70,8 @@ export interface ConsumerConfig {
  idle_heartbeat?: number;
 } // Connection Status Types
 export interface NATSConnectionStatus {
- connected: boolean; server: string;
- client_id: string; connected_at: string;
+ connected: boolean;, server: string;
+ client_id: string;, connected_at: string;
  last_error?: string;
  reconnect_count?: number;
  bytes_in?: number;
@@ -80,9 +80,9 @@ export interface NATSConnectionStatus {
  msgs_out?: number;
 }
 export interface ConnectionInfo {
- server_id: string; server_name: string;
- version: string; protocol: number;
- max_payload: number; client_id: number;
+ server_id: string;, server_name: string;
+ version: string;, protocol: number;
+ max_payload: number;, client_id: number;
  client_ip?: string;
  nonce?: string;
  cluster?: string;
@@ -102,45 +102,45 @@ export interface SubscriptionOptions {
 }
 export interface Subscription {
  subject: string;
- queue_group?: string; sid: number;
+ queue_group?: string;, sid: number;
  received: number;
- max?: number; pending_msgs: number;
- pending_bytes: number; delivered: number;
+ max?: number;, pending_msgs: number;
+ pending_bytes: number;, delivered: number;
  dropped: number;
 } // Message Processing Types
 export interface MessageBatch {
- messages: LegalAIMessage[]; batch_id: string;
- created_at: string; total_size_bytes: number;
+ messages: LegalAIMessage[];, batch_id: string;
+ created_at: string;, total_size_bytes: number;
 }
 export interface ProcessingResult {
- success: boolean; processed_count: number;
- error_count: number; processing_time_ms: number;
+ success: boolean;, processed_count: number;
+ error_count: number;, processing_time_ms: number;
  errors?: ProcessingError[];
 }
 export interface ProcessingError {
- message_id: string; error_type: string;
- error_message: string; retry_count: number;
+ message_id: string;, error_type: string;
+ error_message: string;, retry_count: number;
  max_retries: number;
  next_retry_at?: string;
 } // Metrics and Monitoring Types
 export interface MessageMetrics {
- messages_published: number; messages_received: number;
- bytes_sent: number; bytes_received: number;
- active_subscriptions: number; active_streams: number;
- connection_uptime: number; last_message_time: string | null;
+ messages_published: number;, messages_received: number;
+ bytes_sent: number;, bytes_received: number;
+ active_subscriptions: number;, active_streams: number;
+ connection_uptime: number;, last_message_time: string | null;
  error_count: number;
 }
 export interface PerformanceMetrics {
- throughput: { messages_per_second: number;
- bytes_per_second: number; peak_messages_per_second: number;
+ throughput: {, messages_per_second: number;
+ bytes_per_second: number;, peak_messages_per_second: number;
  peak_bytes_per_second: number;
  };
- latency: { avg_publish_latency_ms: number;
- avg_delivery_latency_ms: number; p95_publish_latency_ms: number;
+ latency: {, avg_publish_latency_ms: number;
+ avg_delivery_latency_ms: number;, p95_publish_latency_ms: number;
  p95_delivery_latency_ms: number;
  };
- reliability: { success_rate: number;
- retry_rate: number; duplicate_rate: number;
+ reliability: {, success_rate: number;
+ retry_rate: number;, duplicate_rate: number;
  loss_rate: number;
  };
 }
@@ -162,17 +162,17 @@ export interface SystemHealthEventData {
  occurred_at?: string;
 } // Stream Processing Types
 export interface StreamInfo {
- config: StreamConfig; state: StreamState;
+ config: StreamConfig;, state: StreamState;
  cluster?: ClusterInfo;
  mirror?: MirrorInfo;
  sources?: SourceInfo[];
 }
 export interface StreamState {
- messages: number; bytes: number;
- first_seq: number; first_ts: string;
- last_seq: number; last_ts: string;
- num_subjects: number; num_deleted: number;
- lost?: LostStreamData; consumers: number;
+ messages: number;, bytes: number;
+ first_seq: number;, first_ts: string;
+ last_seq: number;, last_ts: string;
+ num_subjects: number;, num_deleted: number;
+ lost?: LostStreamData;, consumers: number;
 }
 export interface ClusterInfo {
  name?: string;
@@ -180,17 +180,17 @@ export interface ClusterInfo {
  replicas?: PeerInfo[];
 }
 export interface PeerInfo {
- name: string; current: boolean;
- offline?: boolean; active: number;
+ name: string;, current: boolean;
+ offline?: boolean;, active: number;
  lag?: number;
 }
 export interface MirrorInfo {
- name: string; lag: number;
+ name: string;, lag: number;
  active: number;
  external?: ExternalStream;
 }
 export interface SourceInfo {
- name: string; lag: number;
+ name: string;, lag: number;
  active: number;
  external?: ExternalStream;
 }
@@ -199,22 +199,22 @@ export interface ExternalStream {
  deliver?: string;
 }
 export interface LostStreamData {
- msgs?: number[]; bytes: number;
+ msgs?: number[];, bytes: number;
 }
 export interface ConsumerInfo {
- stream_name: string; name: string;
- config: ConsumerConfig; created: string;
- delivered: DeliveryInfo; ack_floor: DeliveryInfo;
- num_ack_pending: number; num_redelivered: number;
- num_waiting: number; num_pending: number;
+ stream_name: string;, name: string;
+ config: ConsumerConfig;, created: string;
+ delivered: DeliveryInfo;, ack_floor: DeliveryInfo;
+ num_ack_pending: number;, num_redelivered: number;
+ num_waiting: number;, num_pending: number;
  cluster?: ClusterInfo;
 }
 export interface DeliveryInfo {
- consumer_seq: number; stream_seq: number;
+ consumer_seq: number;, stream_seq: number;
  last_active?: string;
 } // Event Types
 export interface NATSEvent {
- type: NATSEventType; timestamp: string;
+ type: NATSEventType;, timestamp: string;
  data: MessageData;
 }
 export type NATSEventType =
@@ -232,18 +232,18 @@ export type NATSEventType =
  | 'consumer_created'
  | 'consumer_deleted'; // Legal AI Specific Types
 export interface CaseEventData {
- case_id: string; case_number: string;
- title: string; status: 'open' | 'in_progress' | 'closed' | 'archived';
- assigned_to: string[]; priority: 'low' | 'normal' | 'high' | 'urgent';
+ case_id: string;, case_number: string;
+ title: string;, status: 'open' | 'in_progress' | 'closed' | 'archived';
+ assigned_to: string[];, priority: 'low' | 'normal' | 'high' | 'urgent';
  created_by: string;
  updated_by?: string;
  metadata?: Record<string, unknown>;
 }
 export interface DocumentEventData {
  document_id: string;
- case_id?: string; filename: string;
- file_type: string; file_size: number;
- checksum: string; storage_path: string;
+ case_id?: string;, filename: string;
+ file_type: string;, file_size: number;
+ checksum: string;, storage_path: string;
  processing_status: 'uploaded' | 'processing' | 'processed' | 'indexed' | 'failed';
  extracted_text?: string;
  metadata?: Record<string, unknown>;
@@ -256,15 +256,15 @@ export interface AIAnalysisEventData {
  | 'entity_extraction'
  | 'sentiment'
  | 'risk_assessment';
- model_used: string; confidence_score: number;
+ model_used: string;, confidence_score: number;
  results: Record<string, unknown> | Array<unknown> | string | number | boolean | null;
  processing_time_ms: number;
  gpu_used?: boolean;
  error_message?: string;
 }
 export interface ChatEventData {
- message_id: string; session_id: string;
- user_id: string; message_type: 'user' | 'assistant' | 'system';
+ message_id: string;, session_id: string;
+ user_id: string;, message_type: 'user' | 'assistant' | 'system';
  content: string;
  context?: MessageData | Record<string, unknown>;
  attachments?: string[];
@@ -272,8 +272,8 @@ export interface ChatEventData {
  streaming_complete?: boolean;
 }
 export interface SearchEventData {
- query_id: string; user_id: string;
- query_text: string; search_type: 'cases' | 'documents' | 'legal_precedents' | 'full_text' | 'semantic';
+ query_id: string;, user_id: string;
+ query_text: string;, search_type: 'cases' | 'documents' | 'legal_precedents' | 'full_text' | 'semantic';
  filters?: SearchFilters;
  results?: SearchResult[];
  total_results?: number;
@@ -282,30 +282,30 @@ export interface SearchEventData {
 export interface SearchFilters {
  case_ids?: string[];
  document_types?: string[];
- date_range?: { from: string; to?: string };
+ date_range?: {, from: string; to?: string };
  priority?: string[];
  status?: string[];
  assigned_to?: string[];
 }
 export interface SearchResult {
- id: string; type: 'case' | 'document' | 'precedent';
- title: string; relevance_score: number;
+ id: string;, type: 'case' | 'document' | 'precedent';
+ title: string;, relevance_score: number;
  snippet?: string;
  metadata?: Record<string, unknown>;
 } // Queue and Work Distribution Types
 export interface WorkQueue {
- name: string; stream_name: string;
- consumer_name: string; max_workers: number;
- current_workers: number; pending_messages: number;
- processing_messages: number; completed_messages: number;
+ name: string;, stream_name: string;
+ consumer_name: string;, max_workers: number;
+ current_workers: number;, pending_messages: number;
+ processing_messages: number;, completed_messages: number;
  failed_messages: number;
 }
 export interface WorkItem {
- id: string; queue_name: string;
- payload: MessageData; priority: number;
+ id: string;, queue_name: string;
+ payload: MessageData;, priority: number;
  created_at: string;
  started_at?: string;
- completed_at?: string; retry_count: number;
+ completed_at?: string;, retry_count: number;
  max_retries: number;
  error_message?: string;
  worker_id?: string;
@@ -351,23 +351,23 @@ export interface APIError {
  description?: string;
 } // Monitoring and Analytics
 export interface MessageFlow {
- subject: string; source: string;
- destination: string; message_count: number;
- bytes_transferred: number; avg_latency_ms: number;
- error_rate: number; last_activity: string;
+ subject: string;, source: string;
+ destination: string;, message_count: number;
+ bytes_transferred: number;, avg_latency_ms: number;
+ error_rate: number;, last_activity: string;
 }
 export interface SubjectMetrics {
- subject: string; messages_published: number;
- messages_consumed: number; bytes_published: number;
- bytes_consumed: number; active_publishers: number;
- active_consumers: number; last_published: string | null;
+ subject: string;, messages_published: number;
+ messages_consumed: number;, bytes_published: number;
+ bytes_consumed: number;, active_publishers: number;
+ active_consumers: number;, last_published: string | null;
  last_consumed: string | null;
 }
 export interface ConnectionMetrics {
- client_connections: number; total_connections: number;
- bytes_in: number; bytes_out: number;
- msgs_in: number; msgs_out: number;
- slow_consumers: number; subscriptions: number;
+ client_connections: number;, total_connections: number;
+ bytes_in: number;, bytes_out: number;
+ msgs_in: number;, msgs_out: number;
+ slow_consumers: number;, subscriptions: number;
 } // Export utility types
 export type SubjectPattern = string;
 export type QueueGroup = string;

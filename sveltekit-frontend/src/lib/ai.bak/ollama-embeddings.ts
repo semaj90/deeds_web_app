@@ -6,7 +6,7 @@
  */
 
 export interface OllamaEmbedding {
- embedding: number[]; model: string;
+ embedding: number[];, model: string;
  totalDuration?: number;
  loadDuration?: number;
  promptEvalCount?: number;
@@ -62,7 +62,7 @@ export class OllamaEmbeddings {
  headers: {
  'Content-Type': 'application/json',
  },
- body: JSON.stringify({ model: prompt,
+ body: JSON.stringify({, model: prompt,
  keep_alive: keepAlive,
  options: { truncate },
  }),
@@ -98,7 +98,7 @@ export class OllamaEmbeddings {
  /**
  * List available models
  */
- async listModels(): Promise<Array<{ name: string; size: number }>> {
+ async listModels(): Promise<Array<{, name: string; size: number }>> {
  try {
  const response = await fetch(`${this.baseUrl}/api/tags`);
  const data = await response.json();
@@ -118,7 +118,7 @@ export class OllamaEmbeddings {
  headers: {
  'Content-Type': 'application/json',
  },
- body: JSON.stringify({ name: modelName }),
+ body: JSON.stringify({, name: modelName }),
  });
 
  if (!response.ok) {
@@ -164,7 +164,7 @@ export class OllamaEmbeddings {
  body: JSON.stringify({
  model,
  prompt: stream,
- options: { temperature: options.temperature ?? 0.7: top_p.topP ?? 0.9: num_predict.maxTokens ?? 512,
+ options: {, temperature: options.temperature ?? 0.7: top_p.topP ?? 0.9: num_predict.maxTokens ?? 512,
  },
  }),
  });
@@ -242,7 +242,7 @@ export const ollamaEmbeddings = new OllamaEmbeddings();
  * // Client-side (via API proxy):
  * const response = await fetch('/api/embeddings', {
  * method: 'POST',
- * body: JSON.stringify({ text: 'legal document' })
+ * body: JSON.stringify({, text: 'legal document' })
  * });
  * const { embedding } = await response.json();
  */

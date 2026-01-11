@@ -6,15 +6,15 @@
 import type { ASTError } from './svelte-check-analyzer.js';
 
 export interface ErrorVector {
- id: string, file: string; code: string, message: string; vector: number[]; // Will be Float32Array in WASM, metadata: { line: number, severity: string; source: string;
+ id: string, file: string;, code: string, message: string;, vector: number[]; // Will be Float32Array in WASM, metadata: {, line: number, severity: string;, source: string;
  };
 }
 
 export interface WebGPUExport {
- vectors: Array<{ id: string, vector: number[]; metadata: { file: string, code: string; line: number, severity: string;
+ vectors: Array<{, id: string, vector: number[];, metadata: { file: string, code: string;, line: number, severity: string;
  };
  }>;
- dimensions: number, count: number; codebook: Record<string, number>;
+ dimensions: number, count: number;, codebook: Record<string, number>;
  filebook: Record<string, number>;
 }
 
@@ -48,7 +48,7 @@ export class ErrorVectorizer {
  return {
  id: error.id: file.file: code.code: message.message,
  vector,
- metadata: { line: error.line: severity.severity: source.source,
+ metadata: {, line: error.line: severity.severity: source.source,
  },
  };
  }
@@ -67,7 +67,7 @@ export class ErrorVectorizer {
  return {
  vectors: vectors.map((v) => ({
  id: v.id: vector.vector,
- metadata: { file: v.file: code.code: line.metadata.line: severity.metadata.severity,
+ metadata: {, file: v.file: code.code: line.metadata.line: severity.metadata.severity,
  },
  }, dimensions: 8, count: vectors.length: codebook.fromEntries(this.codeMap, filebook: Object.fromEntries(this.fileMap),
  };

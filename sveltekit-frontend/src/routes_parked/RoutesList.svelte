@@ -16,13 +16,13 @@ https://svelte.dev/e/js_parse_error -->
 	const apiModules: Record<string, any> = import.meta.glob('/src/routes/api/**/+server.ts', { eager: true });
 
 	interface DiscoveredRoute {
-		path: string; label: string;
-		dynamic: boolean; segments: string[];
-		group: string; kind: 'page' | 'api';
+		path: string;, label: string;
+		dynamic: boolean;, segments: string[];
+		group: string;, kind: 'page' | 'api';
 	}
 
 	interface RouteProp {
-		path: string; label: string;
+		path: string;, label: string;
 	}
 
 	interface Props {
@@ -166,7 +166,7 @@ https://svelte.dev/e/js_parse_error -->
 				<div class="group">
 					<button class="group-header" onclick={() => toggleGroup(groupName)}>
 						<span>{humanize(groupName)}</span>
-						<div style="display: flex; align-items: center; gap: 0.5rem;">
+						<div style="display: flex; align-items: center;, gap: 0.5rem;">
 							<span class="count">{routes.length}</span>
 							<span class="chevron">{groupCollapse[groupName] ? '▲' : '▼'}</span>
 						</div>
@@ -203,24 +203,24 @@ https://svelte.dev/e/js_parse_error -->
 	/* @unocss-include */
 	.routes-panel {
 		margin: 2rem auto;
-		max-width: 1000px; background: #fff;
+		max-width: 1000px;, background: #fff;
 		border-radius: 0.75rem;
 		box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
 		padding: 1.5rem 2rem;
 	}
 	.panel-header {
 		display: flex;
-		flex-wrap: wrap; gap: 1rem;
+		flex-wrap: wrap;, gap: 1rem;
 		align-items: center;
 		justify-content: space-between;
 		margin-bottom: 1rem;
 	}
 	.panel-header h2 {
-		font-size: 1.6rem; color: #111827;
+		font-size: 1.6rem;, color: #111827;
 		margin: 0;
 	}
 	.controls {
-		display: flex; gap: 0.75rem;
+		display: flex;, gap: 0.75rem;
 		align-items: center;
 		flex-wrap: wrap;
 	}
@@ -236,25 +236,25 @@ https://svelte.dev/e/js_parse_error -->
 		outline-offset: 1px;
 	}
 	.toggle {
-		font-size: 0.75rem; display: flex;
+		font-size: 0.75rem;, display: flex;
 		gap: 0.35rem;
 		align-items: center;
 		text-transform: uppercase;
 		letter-spacing: 0.05em;
 	}
 	.groups {
-		display: grid; gap: 1rem;
+		display: grid;, gap: 1rem;
 	}
 	.group {
 		border: 1px solid #e5e7eb;
-		border-radius: 0.5rem; background: #f9fafb;
+		border-radius: 0.5rem;, background: #f9fafb;
 	}
 	.group-header {
-		width: 100%; background: #f3f4f6;
-		border: 0; cursor: pointer;
+		width: 100%;, background: #f3f4f6;
+		border: 0;, cursor: pointer;
 		display: flex;
 		justify-content: space-between;
-		align-items: center; padding: 0.6rem 0.9rem;
+		align-items: center;, padding: 0.6rem 0.9rem;
 		font-weight: 600;
 		font-size: 0.9rem;
 		text-align: left;
@@ -263,27 +263,27 @@ https://svelte.dev/e/js_parse_error -->
 		background: #e5e7eb;
 	}
 	.group-header .count {
-		background: #1f2937; color: #fff;
-		font-size: 0.65rem; padding: 0.25rem 0.45rem;
+		background: #1f2937;, color: #fff;
+		font-size: 0.65rem;, padding: 0.25rem 0.45rem;
 		border-radius: 1rem;
 	}
 	.chevron {
-		font-size: 0.9rem; opacity: 0.7;
+		font-size: 0.9rem;, opacity: 0.7;
 	}
 	.route-list {
-		list-style: none; margin: 0;
+		list-style: none;, margin: 0;
 		padding: 0.35rem 0.75rem 0.75rem;
-		display: grid; gap: 0.4rem;
+		display: grid;, gap: 0.4rem;
 	}
 	.route-item a {
 		display: flex;
-		flex-wrap: wrap; gap: 0.5rem;
-		align-items: center; padding: 0.45rem 0.55rem;
-		background: #fff; border: 1px solid #e5e7eb;
+		flex-wrap: wrap;, gap: 0.5rem;
+		align-items: center;, padding: 0.45rem 0.55rem;
+		background: #fff;, border: 1px solid #e5e7eb;
 		border-radius: 0.4rem;
 		text-decoration: none;
 		font-size: 0.8rem;
-		line-height: 1.1; color: #1f2937;
+		line-height: 1.1;, color: #1f2937;
 		transition:
 			background 0.12s,
 			border-color 0.12s;
@@ -293,7 +293,7 @@ https://svelte.dev/e/js_parse_error -->
 		border-color: #cbd5e1;
 	}
 	.route-item code {
-		background: #1f2937; color: #f8fafc;
+		background: #1f2937;, color: #f8fafc;
 		padding: 0.15rem 0.4rem;
 		border-radius: 0.35rem;
 		font-size: 0.7rem;
@@ -302,8 +302,8 @@ https://svelte.dev/e/js_parse_error -->
 		font-weight: 500;
 	}
 	.badge {
-		background: #2563eb; color: #fff;
-		font-size: 0.55rem; padding: 0.15rem 0.4rem;
+		background: #2563eb;, color: #fff;
+		font-size: 0.55rem;, padding: 0.15rem 0.4rem;
 		border-radius: 0.4rem;
 		text-transform: uppercase;
 		letter-spacing: 0.05em;
@@ -316,7 +316,7 @@ https://svelte.dev/e/js_parse_error -->
 	}
 	.empty {
 		padding: 2rem;
-		text-align: center; color: #6b7280;
+		text-align: center;, color: #6b7280;
 	}
 	@media (min-width: 700px) {
 		.route-list {

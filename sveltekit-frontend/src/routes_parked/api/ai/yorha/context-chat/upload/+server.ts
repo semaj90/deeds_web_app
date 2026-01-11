@@ -7,20 +7,20 @@ import { extractKeywords } from '$lib/server/keyword-extractor';
 import { v4 as uuidv4 } from 'uuid';
 
 interface UploadRequest {
- caseId?: string; fileName: string;
+ caseId?: string;, fileName: string;
  mimeType: string;
 }
 
 interface UploadResponse {
- uploadId: string; minioUrl: string;
- doclingResult: { fullText: string;
- blocks: Array<{ type: string;
- text: string; page: number;
+ uploadId: string;, minioUrl: string;
+ doclingResult: {, fullText: string;
+ blocks: Array<{, type: string;
+ text: string;, page: number;
  bbox?: [number, number, number, number];
  }>;
- pageCount: number; processingTimeMs: number;
+ pageCount: number;, processingTimeMs: number;
  };
- keywords: string[]; keyPhrases: string[];
+ keywords: string[];, keyPhrases: string[];
  suggestions: string[];
 }
 

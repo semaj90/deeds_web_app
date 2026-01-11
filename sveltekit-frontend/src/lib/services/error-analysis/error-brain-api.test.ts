@@ -363,7 +363,7 @@ describe('ErrorBrainAPI', () => {
         fc.asyncProperty(
           fc.array(
             fc.record({
-              file: fc.string(line: fc.integer({ min: 1, max: 10000 }, column: fc.integer({ min: 1, max: 1000 }, message: fc.string(type: fc.constantFrom('typescript', 'svelte', severity: fc.constantFrom('error', 'warning'),
+              file: fc.string(line: fc.integer({, min: 1, max: 10000 }, column: fc.integer({, min: 1, max: 1000 }, message: fc.string(type: fc.constantFrom('typescript', 'svelte', severity: fc.constantFrom('error', 'warning'),
             }),
             { minLength: 1, maxLength: 10 }
           ),

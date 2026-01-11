@@ -24,8 +24,8 @@ import type { Case } from '$lib/types';
     description?: string, status: 'active' | 'pending' | 'closed' | 'archived',
     priority: 'critical' | 'high' | 'medium' | 'low',created: Date | string
     updated?: Date | string
-    assignee?: { name: string
-      avatar?: string}; stats: { evidence: number, witnesses: number, documents: number}
+    assignee?: {, name: string
+      avatar?: string}; stats: {, evidence: number, witnesses: number, documents: number}
     tags?: string[]
     progress?: number
   }
@@ -209,7 +209,7 @@ import type { Case } from '$lib/types';
   {#if $open}
   <div
     class="nier-panel p-2 min-w-[200px] z-50"
-    transition: scale={{ duration: 200, start, 0.95 }}
+    transition: scale={{, duration: 200, start, 0.95 }}
   >
     <Button class="bits-btn"
       onclick={() => onView(caseData.id)}

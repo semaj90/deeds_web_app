@@ -14,8 +14,8 @@ export interface ErrorMetadataJSON {
     tags?: string[];
     relatedFiles?: string[];
     stackTrace?: string[];
-    buildContext?: { command: string;
-        duration: string; exitCode: string;
+    buildContext?: {, command: string;
+        duration: string;, exitCode: string;
     };
     similarErrors?: string[];
     suggestions?: string[];
@@ -80,9 +80,9 @@ export const errorHistory = pgTable('error_history', {
     errorsBySeverity: jsonb('errors_by_severity').$type<Record<string, number>>(),
     errorsByCategory: jsonb('errors_by_category').$type<Record<string, number>>(),
     errorsBySource: jsonb('errors_by_source').$type<Record<string, number>>(),
-    topErrorCodes: jsonb('top_error_codes').$type<Array<{ code: string; count: number }>>(),
-    topFiles: jsonb('top_files').$type<Array<{ path: string; count: number }>>(),
-    buildMetadata: jsonb('build_metadata').$type<{ command: string; duration: string; exitCode: string; timestamp: string }>(),
+    topErrorCodes: jsonb('top_error_codes').$type<Array<{, code: string; count: number }>>(),
+    topFiles: jsonb('top_files').$type<Array<{, path: string; count: number }>>(),
+    buildMetadata: jsonb('build_metadata').$type<{, command: string; duration: string;, exitCode: string; timestamp: string }>(),
     createdAt: timestamp('created_at', { mode: 'string' }).defaultNow().notNull()
 });
 

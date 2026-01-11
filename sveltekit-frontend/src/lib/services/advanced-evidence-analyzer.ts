@@ -30,17 +30,17 @@ export const EvidenceAnalysisSchema = z.object({
 });
 
 export interface AnalysisResult {
-	type: string; confidence: number;
-	results: unknown; processingTime: number;
-	model: string; timestamp: Date;
+	type: string;, confidence: number;
+	results: unknown;, processingTime: number;
+	model: string;, timestamp: Date;
 }
 
 export interface ComprehensiveAnalysis {
-	evidenceId: string; overallScore: number;
-	analyses: AnalysisResult[]; summary: string;
-	recommendations: string[]; legalImplications: string[];
-	relatedCases: string[]; processingMetrics: {
-		totalTime: number; modelsUsed: string[];
+	evidenceId: string;, overallScore: number;
+	analyses: AnalysisResult[];, summary: string;
+	recommendations: string[];, legalImplications: string[];
+	relatedCases: string[];, processingMetrics: {
+		totalTime: number;, modelsUsed: string[];
 		confidenceAverage: number;
 	};
 }
@@ -95,7 +95,7 @@ class AdvancedEvidenceAnalyzer {
 			recommendations: this.buildRecommendations(sourceText, analyses),
 			legalImplications: this.deriveLegalImplications(sourceText, validated.options),
 			relatedCases: this.deriveRelatedCases(sourceText, validated.options),
-			processingMetrics: { totalTime: Date.now() - startedAt,
+			processingMetrics: {, totalTime: Date.now() - startedAt,
 				modelsUsed: analyses.map((item) => item.model),
 				confidenceAverage: overallScore
 			}
@@ -249,7 +249,7 @@ class AdvancedEvidenceAnalyzer {
 					return {
 						type: 'ocr',
 						confidence: 0.85,
-						results: { text: existingOcr,
+						results: {, text: existingOcr,
 							embedding,
 							engine: 'upstream'
 						},
@@ -287,7 +287,7 @@ class AdvancedEvidenceAnalyzer {
 								return {
 									type: 'ocr',
 									confidence: ocrResult.confidence ?? 0.5,
-									results: { ocr: ocrResult,
+									results: {, ocr: ocrResult,
 										metadata: textResult?.metadata ?? null,
 										embedding
 									},
@@ -304,7 +304,7 @@ class AdvancedEvidenceAnalyzer {
 						return {
 							type: 'ocr',
 							confidence: content ? 0.8 : 0.4,
-							results: { text: content,
+							results: {, text: content,
 								metadata: textResult?.metadata ?? null,
 								embedding
 							},
@@ -327,7 +327,7 @@ class AdvancedEvidenceAnalyzer {
 							return {
 								type: 'ocr',
 								confidence: ocrResult.confidence ?? 0.5,
-								results: { ocr: ocrResult,
+								results: {, ocr: ocrResult,
 									embedding
 								},
 								processingTime: Date.now() - startedAt,
@@ -345,7 +345,7 @@ class AdvancedEvidenceAnalyzer {
 			return {
 				type: 'ocr',
 				confidence: availableText > 0 ? 0.6 : 0.2,
-				results: { message:
+				results: {, message:
 						'OCR not available for this evidence or upstream OCR not present. Returning available textual content only.',
 					charactersAvailable: availableText
 				},
@@ -397,7 +397,7 @@ class AdvancedEvidenceAnalyzer {
 		return keySentences.slice(0, 5);
 	}
 
-	private analyseSentiment(text: string): { sentiment: string; score: number; confidence: number } {
+	private analyseSentiment(text: string): {, sentiment: string; score: number;, confidence: number } {
 		const positiveTerms = ['favorable', 'compliant', 'beneficial', 'support', 'approved'];
 		const negativeTerms = ['breach', 'violation', 'risk', 'penalty', 'liability', 'dispute'];
 
@@ -418,9 +418,9 @@ class AdvancedEvidenceAnalyzer {
 		};
 	}
 
-	private extractEntities(text: string): { parties: string[];
-		locations: string[]; amounts: string[];
-		dates: string[]; confidence: number;
+	private extractEntities(text: string): {, parties: string[];
+		locations: string[];, amounts: string[];
+		dates: string[];, confidence: number;
 	} {
 		const partyMatches = text.match(/\b[A-Z][a-z]+(?:\s+[A-Z][a-z]+){0,2}\b/g) ?? [];
 		const amountMatches = text.match(/\b\$?\d+(?: \d{3})*(?:\.\d{2})?\b/g) ?? [];
@@ -441,7 +441,7 @@ class AdvancedEvidenceAnalyzer {
 	private detectPatterns(
 		text: string,
 		options?: z.infer<typeof EvidenceAnalysisSchema>['options']
-	): { matched: string[]; warnings: string[]; confidence: number } {
+	): {, matched: string[]; warnings: string[];, confidence: number } {
 		const patterns: Record<string, RegExp> = {
 			breachOfContract: /\bbreach\b|\bviolation\b/i,
 			intellectualProperty: /\bpatent\b|\btrademark\b|\bcopyright\b/i,
@@ -470,7 +470,7 @@ class AdvancedEvidenceAnalyzer {
 	private suggestPrecedents(
 		text: string,
 		options?: z.infer<typeof EvidenceAnalysisSchema>['options']
-	): { precedents: string[]; jurisdiction?: string; confidence: number } {
+	): {, precedents: string[]; jurisdiction?: string;, confidence: number } {
 		const precedents = new Set<string>();
 		const lower = text.toLowerCase();
 
@@ -491,7 +491,7 @@ class AdvancedEvidenceAnalyzer {
 		};
 	}
 
-	private buildTimeline(text: string): Array<{ date: string; context: string }> {
+	private buildTimeline(text: string): Array<{, date: string; context: string }> {
 		const datePattern = /\b\d{1,2}[/-]\d{1,2}[/-]\d{2,4}\b|\b\w+\s+\d{1,2},?\s+\d{4}\b/g;
 		const matches = text.match(datePattern) ?? [];
 
@@ -580,7 +580,7 @@ class AdvancedEvidenceAnalyzer {
 		return {
 			type,
 			confidence: 0,
-			results: { error: message },
+			results: {, error: message },
 			processingTime: Date.now() - startedAt,
 			model: 'error',
 			timestamp: new Date()

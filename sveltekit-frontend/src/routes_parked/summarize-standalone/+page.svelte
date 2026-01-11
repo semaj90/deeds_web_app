@@ -121,7 +121,7 @@ Additionally, we recommend exploring settlement negotiations before filing suit,
  const response = await fetch('/api/summarize', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({ text: reportText,
+ body: JSON.stringify({, text: reportText,
  options: {
  summaryLength,
  includeKeyTerms,
@@ -397,7 +397,7 @@ Additionally, we recommend exploring settlement negotiations before filing suit,
 <style>
  /* filepath: c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\routes\summarize-standalone\+page.svelte */
  .summarization-container {
- max-width: 1200px; margin: 0 auto;
+ max-width: 1200px;, margin: 0 auto;
  padding: 2rem;
  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
  }
@@ -409,39 +409,39 @@ Additionally, we recommend exploring settlement negotiations before filing suit,
  }
  .page-header h1 {
  font-size: 2.5rem;
- font-weight: 700; color: #1f2937;
+ font-weight: 700;, color: #1f2937;
  margin: 0;
  }
  .subtitle {
  color: #6b7280;
- font-size: 1.1rem; margin: 0.5rem 0 1.5rem;
+ font-size: 1.1rem;, margin: 0.5rem 0 1.5rem;
  }
  .status-bar {
  display: flex;
  justify-content: space-between;
  align-items: center;
- flex-wrap: wrap; gap: 1rem;
+ flex-wrap: wrap;, gap: 1rem;
  }
  .stats {
- display: flex; gap: 2rem;
- font-size: 0.9rem; color: #6b7280;
+ display: flex;, gap: 2rem;
+ font-size: 0.9rem;, color: #6b7280;
  }
  .actions {
- display: flex; gap: 0.5rem;
+ display: flex;, gap: 0.5rem;
  }
  .tab-navigation {
- display: flex; background: #f9fafb;
- border-radius: 0.5rem; padding: 0.25rem;
+ display: flex;, background: #f9fafb;
+ border-radius: 0.5rem;, padding: 0.25rem;
  margin-bottom: 1.5rem;
  }
  .tab {
- flex: 1; padding: 0.75rem 1rem;
- border: none; background: transparent;
- border-radius: 0.25rem; cursor: pointer;
+ flex: 1;, padding: 0.75rem 1rem;
+ border: none;, background: transparent;
+ border-radius: 0.25rem;, cursor: pointer;
  transition: all 0.2s ease;
  display: flex;
  align-items: center;
- justify-content: center; gap: 0.5rem;
+ justify-content: center;, gap: 0.5rem;
  }
  .tab:hover, not(disabled) {
  background: rgba(59, 130, 246, 0.1);
@@ -452,7 +452,7 @@ Additionally, we recommend exploring settlement negotiations before filing suit,
  font-weight: 600;
  }
  .tab:disabled {
- opacity: 0.5; cursor:not-allowed;
+ opacity: 0.5;, cursor:not-allowed;
  }
  .loading-spinner {
  animation: spin 1s linear infinite;
@@ -480,37 +480,37 @@ Additionally, we recommend exploring settlement negotiations before filing suit,
  .options-grid {
  display: grid;
  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
- gap: 1rem; margin: 1rem 0;
+ gap: 1rem;, margin: 1rem 0;
  }
  .option-group {
  display: flex;
- flex-direction: column; gap: 0.5rem;
+ flex-direction: column;, gap: 0.5rem;
  }
  .checkbox-group {
  flex-direction: row;
  align-items: center;
  }
  .option-group label {
- font-weight: 500; color: #374151;
+ font-weight: 500;, color: #374151;
  }
  .option-group select,
  .option-group input[type='range'] {
- padding: 0.5rem; border: 1px solid #d1d5db;
+ padding: 0.5rem;, border: 1px solid #d1d5db;
  border-radius: 0.25rem;
  }
  .range-value {
- font-size: 0.875rem; color: #6b7280;
+ font-size: 0.875rem;, color: #6b7280;
  }
  .text-input-area {
  position: relative;
  }
  #document-input {
- width: 100%; padding: 1rem;
+ width: 100%;, padding: 1rem;
  border: 2px solid #e5e7eb;
  border-radius: 0.5rem;
  font-family: 'Consolas', 'Monaco', monospace;
  font-size: 0.9rem;
- line-height: 1.5; resize: vertical;
+ line-height: 1.5;, resize: vertical;
  transition: border-color 0.2s ease;
  }
  #document-input:focus {
@@ -525,20 +525,20 @@ Additionally, we recommend exploring settlement negotiations before filing suit,
  .btn {
  padding: 0.5rem 1rem;
  border-radius: 0.25rem;
- font-weight: 500; cursor: pointer;
+ font-weight: 500;, cursor: pointer;
  transition: all 0.2s ease;
  border: none;
- text-decoration: none; display: inline-flex;
- align-items: center; gap: 0.5rem;
+ text-decoration: none;, display: inline-flex;
+ align-items: center;, gap: 0.5rem;
  }
  .btn-primary {
- background: #3b82f6; color: white;
+ background: #3b82f6;, color: white;
  }
  .btn-primary:hover, not(disabled) {
  background: #2563eb;
  }
  .btn-outline {
- background: transparent; border: 1px solid #d1d5db;
+ background: transparent;, border: 1px solid #d1d5db;
  color: #374151;
  }
  .btn-outline:hover, not(disabled) {
@@ -549,17 +549,17 @@ Additionally, we recommend exploring settlement negotiations before filing suit,
  font-size: 1.1rem;
  }
  .btn:disabled {
- opacity: 0.5; cursor:not-allowed;
+ opacity: 0.5;, cursor:not-allowed;
  }
  .processing-status {
- text-align: center; padding: 2rem;
+ text-align: center;, padding: 2rem;
  }
  .processing-steps {
  margin-top: 1.5rem;
  }
  .step {
- padding: 0.75rem; margin: 0.5rem 0;
- border-radius: 0.25rem; transition: all 0.3s ease;
+ padding: 0.75rem;, margin: 0.5rem 0;
+ border-radius: 0.25rem;, transition: all 0.3s ease;
  }
  .step.current {
  background: #dbeafe;
@@ -590,22 +590,22 @@ Additionally, we recommend exploring settlement negotiations before filing suit,
  border-bottom: 1px solid #e5e7eb;
  }
  .summary-content {
- display: grid; gap: 1.5rem;
+ display: grid;, gap: 1.5rem;
  }
  .summary-text {
- background: #f9fafb; padding: 1.5rem;
+ background: #f9fafb;, padding: 1.5rem;
  border-radius: 0.5rem;
  line-height: 1.7;
  white-space: pre-wrap;
  }
  .metadata-panel {
- background: #ffffff; padding: 1rem;
- border-radius: 0.5rem; border: 1px solid #e5e7eb;
+ background: #ffffff;, padding: 1rem;
+ border-radius: 0.5rem;, border: 1px solid #e5e7eb;
  }
  .metadata-grid {
  display: grid;
  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
- gap: 1rem; margin: 1rem 0;
+ gap: 1rem;, margin: 1rem 0;
  }
  .metadata-item {
  font-size: 0.9rem;
@@ -615,11 +615,11 @@ Additionally, we recommend exploring settlement negotiations before filing suit,
  }
  .terms-list {
  display: flex;
- flex-wrap: wrap; gap: 0.5rem;
+ flex-wrap: wrap;, gap: 0.5rem;
  margin-top: 0.5rem;
  }
  .term-tag {
- background: #3b82f6; color: white;
+ background: #3b82f6;, color: white;
  padding: 0.25rem 0.75rem;
  border-radius: 1rem;
  font-size: 0.8rem;
@@ -627,19 +627,19 @@ Additionally, we recommend exploring settlement negotiations before filing suit,
  }
  .error-panel,
  .empty-state {
- text-align: center; padding: 3rem;
+ text-align: center;, padding: 3rem;
  color: #6b7280;
  }
  .error-panel {
- background: #fef2f2; border: 1px solid #fecaca;
+ background: #fef2f2;, border: 1px solid #fecaca;
  border-radius: 0.5rem;
  }
  .error-panel h3 {
  color: #dc2626;
  }
  .risk-analysis {
- background: #fffbeb; border: 1px solid #fed7aa;
- border-radius: 0.5rem; padding: 1.5rem;
+ background: #fffbeb;, border: 1px solid #fed7aa;
+ border-radius: 0.5rem;, padding: 1.5rem;
  }
  .risk-analysis h3 {
  color: #92400c;
@@ -663,14 +663,14 @@ Additionally, we recommend exploring settlement negotiations before filing suit,
  align-items: flex-start;
  }
  .stats {
- flex-direction: column; gap: 0.5rem;
+ flex-direction: column;, gap: 0.5rem;
  }
  .options-grid {
  grid-template-columns: 1fr;
  }
  .result-header {
  flex-direction: column;
- align-items: flex-start; gap: 1rem;
+ align-items: flex-start;, gap: 1rem;
  }
  .metadata-grid {
  grid-template-columns: 1fr;

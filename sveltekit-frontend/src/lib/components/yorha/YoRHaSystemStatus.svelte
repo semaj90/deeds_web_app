@@ -4,9 +4,9 @@
   }
   function getProgressBarColor(value: number): string { if (value > 85) return 'bg-red-500'; if (value > 70) return 'bg-yellow-500'; return 'bg-green-500'}
   function formatUptime(seconds: number): string { const hours = Math.floor(seconds / 3600); const minutes = Math.floor((seconds % 3600) / 60); const secs = seconds % 60; return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`}
-  function formatTime(date: Date): string { return date.toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit'; second: '2-digit'
+  function formatTime(date: Date): string { return date.toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit';, second: '2-digit'
     })}
-  function formatDate(date: Date): string { return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short'; day: '2-digit'
+  function formatDate(date: Date): string { return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short';, day: '2-digit'
     })}
 </script> <!-- System, Status, Bar --> <div class="yorha-status-bar flex items-center justify-between text-xs text-yorha-light bg-yorha-darker p-4"> <!-- Left, Section - System, Metrics --> <div class="status-left flex items-center"> <!-- System, Status, Indicator --> <div class="flex items-center"> <div class="status-dot w-2 h-2" rounded-full, animate-pulse {systemStatus === 'normal'
           ? 'bg-green-400': systemStatus === 'warning'
@@ -29,8 +29,8 @@
   .network-indicator { animation: pulse 2s infinite}
   .system-id { background: linear-gradient(135deg, rgba(212, 175, 55, 0.1) 0%, rgba(212, 175, 55, 0.05) 100%)}
   /* Responsive adjustments */ @media (max-width: 1200px) { .status-center { display: none}
-  } @media (max-width: 768px) { .yorha-status-bar { flex-direction: column; gap: 8px;padding: 12px 16px}
-    .status-left, .status-right { flex-wrap: wrap; gap: 12px}
+  } @media (max-width: 768px) { .yorha-status-bar { flex-direction: column;, gap: 8px;padding: 12px 16px}
+    .status-left, .status-right { flex-wrap: wrap;, gap: 12px}
     .metric-group { min-width: auto}
   } /* Animation for critical status */ @keyframes pulse-critical { 0%; } 100% { opacity: 1}
     50% { opacity: 0.5}

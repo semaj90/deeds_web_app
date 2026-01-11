@@ -62,7 +62,7 @@
  type="email"
  bind:value={email}
  required
- class="w-full px-4 py-2 border border-gray-300 rounded-lg focus: ring-2, focus:ring-blue-500 focus:border-transparent"
+ class="w-full px-4 py-2 border border-gray-300 rounded-lg focus: ring-2, focus: ring-blue-500, focus:border-transparent"
  placeholder="prosecutor@example.com"
  />
  </div>
@@ -77,7 +77,7 @@
  type="password"
  bind:value={password}
  required
- class="w-full px-4 py-2 border border-gray-300 rounded-lg focus: ring-2, focus:ring-blue-500 focus:border-transparent"
+ class="w-full px-4 py-2 border border-gray-300 rounded-lg focus: ring-2, focus: ring-blue-500, focus:border-transparent"
  placeholder="••••••••"
  />
  </div>

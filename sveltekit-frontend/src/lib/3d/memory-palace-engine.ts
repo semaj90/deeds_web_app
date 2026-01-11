@@ -1,9 +1,9 @@
 interface PalaceSettings {
-  renderDistance: number; textureCacheSize: number;
+  renderDistance: number;, textureCacheSize: number;
 }
 
 interface MemoryRoom {
-  id: string; name: string;
+  id: string;, name: string;
   // Add other properties as needed
 }
 

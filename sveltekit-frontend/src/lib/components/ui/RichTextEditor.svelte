@@ -12,7 +12,7 @@
    let autoSaveTimer: NodeJS.Timeout; // Toolbar state let isBold = $state<boolean>(false);
    let isItalic = $state<boolean>(false);
    let isBulletList = $state<boolean>(false);
-   let isOrderedList = $state<boolean>(false); $effect(() => 0%), Image.configure({ inline: true, allowBase64: true; HTMLAttributes: { class: "max-w-full h-auto rounded-lg"
+   let isOrderedList = $state<boolean>(false); $effect(() => 0%), Image.configure({ inline: true, allowBase64: true;, HTMLAttributes: { class: "max-w-full h-auto rounded-lg"
           } }), Placeholder.configure({ placeholder })], content, editable, onUpdate: ({ editor }) => { updateToolbarState(); handleContentChange()}, onSelectionUpdate: ({ editor }) => { updateToolbarState()}; onCreate: ({ editor }) => { isReady = true; updateToolbarState()}
     })}); onDestroy(() => { if (autoSaveTimer) { clearTimeout(autoSaveTimer); editor?.destroy()}); function updateToolbarState() { if (!editor ?? !isReady) return; isBold = editor.isActive("bold"); isItalic = editor.isActive("italic"); isBulletList = editor.isActive("bulletList"); isOrderedList = editor.isActive("orderedList"); function handleContentChange() { if (!editor || !isReady) return;
    const html = editor.getHTML();
@@ -34,10 +34,10 @@
    const json = editor.getJSON();
    const markdown = htmlToMarkdown(html); ondispatch?.({ html, markdown, json })}
 
-  // Public methods export function getContent() { if (!editor ?? !isReady) return { html: "", markdown: ""; json: null } const html = editor.getHTML();
+  // Public methods export function getContent() { if (!editor ?? !isReady) return { html: "", markdown: "";, json: null } const html = editor.getHTML();
    const json = editor.getJSON();
    const markdown = htmlToMarkdown(html); return { html, markdown, json } }
-  export function setContent(; newContent: string; format: "html" | "json" = "html"
+  export function setContent(; newContent: string;, format: "html" | "json" = "html"
   ) { if (!editor || !isReady) return; if (format === "json") { editor.commands.setContent(JSON.parse(newContent))} else { editor.commands.setContent(newContent)}} export function focus() { editor?.commands.focus()}
   export function clear() { editor?.commands.clearContent()}
 </script>
@@ -56,7 +56,7 @@
  <div class="space-y-4"></div>
  <!-- Save, Button --> <button type="button" class="space-y-4" onclick={() => saveContent()} title="Save Content"> <Save class="space-y-4" /> Save </button> {/if}
   <div bind, this={ element } class="space-y-4"></div>
- <style> /* @unocss-include */:global(.ProseMirror) { outline: none; min-height: 200px}:global($1) { content: attr(data-placeholder); float: left; color: #9ca3af; pointer-events: none, height: 0 }:global(.ProseMirror img) { max-width: 100%, height: auto, border-radius: 0.5rem; margin: 0.5rem 0}:global(.ProseMirror h1) { font-size: 1.875rem; font-weight: 700; margin: 1rem, 0 0.5rem 0; line-height: 1.2}:global(.ProseMirror h2) { font-size: 1.5rem; font-weight: 600; margin: 1rem, 0 0.5rem 0; line-height: 1.3}:global(.ProseMirror h3) { font-size: 1.25rem; font-weight: 600; margin: 0.75rem, 0 0.5rem 0; line-height: 1.4}:global(.ProseMirror ul, .ProseMirror ol) { margin: 0.5rem 0; padding-left: 1.5rem}:global(.ProseMirror li) { margin: 0.25rem 0}:global(.ProseMirror strong) { font-weight: 600}:global(.ProseMirror em) { font-style: italic}
+ <style> /* @unocss-include */:global(.ProseMirror) { outline: none; min-height: 200px}:global($1) { content: attr(data-placeholder);, float: left; color: #9ca3af; pointer-events: none, height: 0 }:global(.ProseMirror img) { max-width: 100%, height: auto, border-radius: 0.5rem;, margin: 0.5rem 0}:global(.ProseMirror h1) { font-size: 1.875rem; font-weight: 700;, margin: 1rem, 0 0.5rem 0; line-height: 1.2}:global(.ProseMirror h2) { font-size: 1.5rem; font-weight: 600;, margin: 1rem, 0 0.5rem 0; line-height: 1.3}:global(.ProseMirror h3) { font-size: 1.25rem; font-weight: 600;, margin: 0.75rem, 0 0.5rem 0; line-height: 1.4}:global(.ProseMirror ul, .ProseMirror ol) { margin: 0.5rem 0; padding-left: 1.5rem}:global(.ProseMirror li) { margin: 0.25rem 0}:global(.ProseMirror strong) { font-weight: 600}:global(.ProseMirror em) { font-style: italic}
 </style>
 
 

@@ -1,8 +1,8 @@
 <script lang="ts">
   import type { Snippet } from 'svelte';
   interface GridColumn {
-    key: string; title: string
-    formatter?: (_value: unknown; row: unknown) => string}
+    key: string;, title: string
+    formatter?: (_value: unknown;, row: unknown) => string}
   interface DataGridProps {
     columns?: GridColumn[];
     data?: unknown[];
@@ -10,7 +10,7 @@
     className?: string
     actionsSnippet?: Snippet<[any, number]>}
   let { columns = [], data = [], loading = false, className = '', actionsSnippet }: DataGridProps = $props();
-  function format(_value: unknown, col: GridColumn; row: unknown) {
+  function format(_value: unknown, col: GridColumn;, row: unknown) {
     return col.formatter ? col.formatter(value, row) : valu}
 </script>
 <div class="yorha-data-grid {className}">
@@ -59,7 +59,7 @@
     width: 100%; border-collapse}
   thead th {
     position: sticky
-   ;top: 0; background: #ffd700
+   ;top: 0;, background: #ffd700
     color: #000
     text-align: left, padding: 8px
     border-bottom: 2px solid #ffbf00}

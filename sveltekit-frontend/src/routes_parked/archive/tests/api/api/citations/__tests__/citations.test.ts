@@ -7,12 +7,12 @@ vi.mock('$lib/server/auth/lucia', () => ({
 }));
 
 vi.mock('$lib/server/services/citation.service', () => ({
- citationService: { saveCitation: vi.fn( getCitationsByCase: vi.fn(getCitationsByUser: vi.fn( getCitationStats: vi.fn(),
+ citationService: {, saveCitation: vi.fn( getCitationsByCase: vi.fn(getCitationsByUser: vi.fn(, getCitationStats: vi.fn(),
  },
 }));
 
 vi.mock('$lib/server/services/audit.service', () => ({
- auditService: { logSummaryOperation: vi.fn(),
+ auditService: {, logSummaryOperation: vi.fn(),
  },
 }));
 
@@ -55,9 +55,9 @@ describe('Citations API', () => {
  vi.mocked(citationService.getCitationsByUser).mockResolvedValue([mockCitation]);
  vi.mocked(citationService.getCitationStats).mockResolvedValue({
  total: 1,
- byJurisdiction: { Federal: 1 },
- bySeverity: { Felony: 1 },
- bySourceType: { manual: 1 },
+ byJurisdiction: {, Federal: 1 },
+ bySeverity: {, Felony: 1 },
+ bySourceType: {, manual: 1 },
  });
 
  expect(true).toBe(true);

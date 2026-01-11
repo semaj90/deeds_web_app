@@ -29,9 +29,9 @@ import { createEventDispatcher } from 'svelte';
  /* minimal styling so it's visible in the UI — adjust in your theme */
  textarea {
  width: 100%;
- box-sizing: border-box; padding: 0.5rem;
- font-size: 1rem; border: 1px solid var(--border-color, #ccc);
- border-radius: 4px; background: var(--input-bg, white);
+ box-sizing: border-box;, padding: 0.5rem;
+ font-size: 1rem;, border: 1px solid var(--border-color, #ccc);
+ border-radius: 4px;, background: var(--input-bg, white);
  color: var(--text-color, inherit);
  }
 </style>

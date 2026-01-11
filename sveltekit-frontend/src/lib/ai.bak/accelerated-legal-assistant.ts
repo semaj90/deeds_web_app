@@ -10,10 +10,10 @@ import type { LegalSimilarityResult } from '../webgpu/legal-similarity-compute.j
 
 export interface AcceleratedAnalysisRequest {
  query: string;
- queryEmbedding?: Float32Array; caseDocuments: Array<{ id: string; title: string; content: string; embedding: Float32Array;
+ queryEmbedding?: Float32Array;, caseDocuments: Array<{ id: string;, title: string; content: string;, embedding: Float32Array;
  metadata?: unknown;
  }>;
- evidenceDocuments: Array<{ id: string; title: string; content: string; embedding: Float32Array;
+ evidenceDocuments: Array<{, id: string; title: string;, content: string; embedding: Float32Array;
  metadata?: unknown;
  }>;
  analysisOptions?: {
@@ -27,15 +27,15 @@ export interface AcceleratedAnalysisRequest {
 }
 
 export interface AcceleratedAnalysisResult {
- similarities: LegalSimilarityResult[]; recommendations: Array<{ type: 'case_similarity' | 'evidence_match' | 'risk_assessment' | 'legal_precedent';
- confidence: number; description: string; documentId: string; relevanceScore: number;
+ similarities: LegalSimilarityResult[];, recommendations: Array<{ type: 'case_similarity' | 'evidence_match' | 'risk_assessment' | 'legal_precedent';
+ confidence: number;, description: string; documentId: string;, relevanceScore: number;
  legalImplications?: string[];
  }>;
- riskAssessment: { overallRisk: number; riskFactors: string[]; mitigationStrategies: string[];
+ riskAssessment: {, overallRisk: number; riskFactors: string[];, mitigationStrategies: string[];
  };
- processingMetrics: { totalProcessingTime: number; simdPreprocessingTime: number; webgpuComputeTime: number; vectorsProcessed: number; accelerationUsed: 'cpu' | 'gpu' | 'hybrid';
+ processingMetrics: {, totalProcessingTime: number; simdPreprocessingTime: number;, webgpuComputeTime: number; vectorsProcessed: number;, accelerationUsed: 'cpu' | 'gpu' | 'hybrid';
  };
- nesMemoryOptimizations?: { memoryBankUtilization: number; cacheHitRate: number; patternRecognitionMatches: number;
+ nesMemoryOptimizations?: {, memoryBankUtilization: number; cacheHitRate: number;, patternRecognitionMatches: number;
  };
 }
 
@@ -341,7 +341,7 @@ export async function enhanceAIResponse(
  query: string, caseDocuments: any[],
  evidenceDocuments: any[],
  options?: AcceleratedAnalysisRequest['analysisOptions']
-): Promise<{ enhancedResponse: string; acceleratedResults: AcceleratedAnalysisResult }> {
+): Promise<{, enhancedResponse: string; acceleratedResults: AcceleratedAnalysisResult }> {
  if (!acceleratedLegalAssistant) {
  throw new Error('Accelerated Legal Assistant not available');
  }

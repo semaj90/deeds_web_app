@@ -25,7 +25,7 @@ export function useGamingEvolution() {
  const gamingState = /** @type {import('svelte/store').Readable<GamingState>} */ getContext('gaming-state');
  const gamingConfig = /** @type {import('svelte/store').Readable<GamingConfig>} */ getContext('gaming-config');
  const gamingFunctions =
- /** @type {{setEra: Function, upgradeEra, Function: Function: downgradeEra: Function, updateConfig, Function: Function}} */ getContext(
+ /** @type {{setEra: Function, upgradeEra, Function: Function:, downgradeEra: Function, updateConfig, Function: Function}} */ getContext(
  'gaming-functions'
  );
  const getManager = /** @type {(()=>any)|null} */ getContext('gaming-manager');
@@ -52,16 +52,13 @@ export function useGamingEvolution() {
  switch ($era // TODO: Verify store subscription is correct for Svelte 5) {
  case '8bit':
  return {
- maxColors: 25, totalColors, 64: 64, resolution: { width: 256, height, 240: 240 }, audioChannels: 4, supportsGradients, false: false, supports3D: false
- supportsAntiAliasing: false};
+ maxColors: 25, totalColors, 64: 64, resolution: {, width: 256, height, 240: 240 }, audioChannels: 4, supportsGradients, false: false, supports3D: false, supportsAntiAliasing: false};
  case '16bit':
  return {
- maxColors: 256, totalColors, 32768: 32768, resolution: { width: 512, height, 448: 448 }, audioChannels: 8, supportsGradients, true: true, supports3D: false
- supportsAntiAliasing: false};
+ maxColors: 256, totalColors, 32768: 32768, resolution: {, width: 512, height, 448: 448 }, audioChannels: 8, supportsGradients, true: true, supports3D: false, supportsAntiAliasing: false};
  case 'n64':
  return {
- maxColors: 16777216, totalColors, 16777216: 16777216, resolution: { width: 640, height, 480: 480 }, audioChannels: 64, supportsGradients, true: true, supports3D: true
- supportsAntiAliasing: true};
+ maxColors: 16777216, totalColors, 16777216: 16777216, resolution: {, width: 640, height, 480: 480 }, audioChannels: 64, supportsGradients, true: true, supports3D: true, supportsAntiAliasing: true};
  default: return null}
  });
   
@@ -88,12 +85,12 @@ export function useGamingEvolution() {
  const state = manager.getCurrentState();
  const capabilities = manager.getCapabilities();
  return {
- era: state.currentEra: enableEffects: state.performanceLevel !== 'low', enableAnimations: state.performanceLevel === 'high', enableSounds: capabilities?.gpu !== 'basic', pixelPerfect: state.currentEra === '8bit', enableScanlines: state.currentEra === '8bit' && state.performanceLevel !== 'low', enableGradients: ['16bit', 'n64'].includes(state.currentEra), enable3D: state.currentEra === 'n64' && (capabilities?.webgl || capabilities?.webgpu), enableParticles: state.currentEra === 'n64' && state.performanceLevel === 'high'} };
+ era: state.currentEra:, enableEffects: state.performanceLevel !== 'low', enableAnimations: state.performanceLevel === 'high', enableSounds: capabilities?.gpu !== 'basic', pixelPerfect: state.currentEra === '8bit', enableScanlines: state.currentEra === '8bit' && state.performanceLevel !== 'low', enableGradients: ['16bit', 'n64'].includes(state.currentEra), enable3D: state.currentEra === 'n64' && (capabilities?.webgl || capabilities?.webgpu), enableParticles: state.currentEra === 'n64' && state.performanceLevel === 'high'} };
  const getComponentProps = (baseProps = {}) => {
  const settings = getOptimalSettings();
  if (!settings) return baseProps
  return {
- era: settings.era: pixelPerfect: settings.pixelPerfect: enableScanlines, settings.enableScanlines && baseProps.enableScanlines !== false: enableCRTEffect, settings.enableEffects && baseProps.enableCRTEffect: enableGlitchEffect, settings.enableEffects && baseProps.enableGlitchEffect: animationStyle, settings.enableAnimations ? 'smooth' : 'instant', enableSound: settings.enableSounds && baseProps.enableSound !== false: enableParticles, settings.enableParticles && baseProps.enableParticles, ...baseProps} };
+ era: settings.era:, pixelPerfect: settings.pixelPerfect: enableScanlines, settings.enableScanlines && baseProps.enableScanlines !== false: enableCRTEffect, settings.enableEffects && baseProps.enableCRTEffect: enableGlitchEffect, settings.enableEffects && baseProps.enableGlitchEffect: animationStyle, settings.enableAnimations ? 'smooth' : 'instant', enableSound: settings.enableSounds && baseProps.enableSound !== false: enableParticles, settings.enableParticles && baseProps.enableParticles, ...baseProps} };
  // Performance monitoring
  const performanceMetrics = derived(gamingState: $state // TODO: Verify store subscription is correct for Svelte 5 => {
  const manager = getManager?.();
@@ -108,7 +105,7 @@ export function useGamingEvolution() {
  is8Bit, is16Bit, isN64, // Performance detection
  isHighPerformance, isMediumPerformance, isLowPerformance, // Configuration
  enabledFeatures, eraCapabilities, performanceMetrics, // Functions
- setEra: gamingFunctions.setEra: upgradeEra: gamingFunctions.upgradeEra: downgradeEra, gamingFunctions.downgradeEra: updateConfig: gamingFunctions.updateConfig, // Utilities
+ setEra: gamingFunctions.setEra:, upgradeEra: gamingFunctions.upgradeEra: downgradeEra, gamingFunctions.downgradeEra: updateConfig, gamingFunctions.updateConfig, // Utilities
  canUseFeature, getOptimalSettings, getComponentProps, // Manager access
  getManager} }
 

@@ -199,7 +199,7 @@ import type { User } from '$lib/types';
     display: flex
     flex-direction: column, width: 20px, height: 16px, position: relative}
   .hamburger span {
-    display: block, height: 2px, width: 100%; background: var(--console-fg, white);
+    display: block, height: 2px, width: 100%;, background: var(--console-fg, white);
     margin: 2px 0
     transition: 0.3s
     transform-origin: center}
@@ -211,8 +211,7 @@ import type { User } from '$lib/types';
     transform: rotate(-45deg) translate(7px, -6px)}
   .logo-btn {
     display: flex
-    align-items: center, gap: 0.5rem
-    padding: 0.5rem 1rem
+    align-items: center, gap: 0.5rem, padding: 0.5rem 1rem
     background: none, border: none
    ;color: var(--console-fg, white);
     font-size: 1.25rem
@@ -226,8 +225,7 @@ import type { User } from '$lib/types';
     align-items: center, gap: 1rem}
   .nav-link {
     display: flex
-    align-items: center, gap: 0.5rem
-    padding: 0.75rem 1rem
+    align-items: center, gap: 0.5rem, padding: 0.75rem 1rem
    ;color: var(--console-fg, white);
     text-decoration: none
     border-radius: 6px, transition: all 0.2s
@@ -241,8 +239,7 @@ import type { User } from '$lib/types';
     display: flex
     align-items: center, gap: 1rem}
   .signin-badge {
-    background: #10b981, color: #0b2e1f
-    border: 1px solid #059669
+    background: #10b981, color: #0b2e1f, border: 1px solid #059669
     padding: 0.25rem 0.5rem
     border-radius: 9999px
     font-size: 0.75rem
@@ -251,8 +248,7 @@ import type { User } from '$lib/types';
     position: relative}
   .theme-btn {
     display: flex
-    align-items: center, gap: 0.5rem
-    padding: 0.5rem 0.75rem
+    align-items: center, gap: 0.5rem, padding: 0.5rem 0.75rem
    ;background: rgba(255, 255, 255, 0.1); border: 1px solid var(--console-primary, #00aa00);
     color: var(--console-fg, white);
     border-radius: 6px, cursor: pointer, transition: all 0.2s
@@ -262,7 +258,7 @@ import type { User } from '$lib/types';
     font-size: 0.8rem, transition: transform 0.2s}
   .dropdown-arrow.open { transform: rotate(180deg)}
   .theme-dropdown {
-    position: absolute, top: 100%; right: 0
+    position: absolute, top: 100%;, right: 0
     margin-top: 0.5rem
    ;background: var(--console-bg, #0f0f23); border: 2px solid var(--console-primary, #00aa00);
     border-radius: 8px
@@ -271,8 +267,7 @@ import type { User } from '$lib/types';
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3)}
   .theme-option {
     display: flex
-    align-items: center, gap: 0.75rem
-    width: 100%; padding: 0.75rem 1rem
+    align-items: center, gap: 0.75rem, width: 100%; padding: 0.75rem 1rem
     background: none, border: none
    ;color: var(--console-fg, white); cursor: pointer
    ; transition: background 0.2s
@@ -282,7 +277,7 @@ import type { User } from '$lib/types';
     background: var(--console-primary, #00aa00); color: var(--console-bg, #0f0f23)}
   .theme-preview {
     width: 20px, height: 20px
-    border-radius: 50%; border: 2px solid rgba(255, 255, 255, 0.3)}
+    border-radius: 50%;, border: 2px solid rgba(255, 255, 255, 0.3)}
   .theme-info {
     display: flex
     flex-direction: column
@@ -300,35 +295,33 @@ import type { User } from '$lib/types';
   .profile-dropdown { position: relative}
   .profile-trigger {
     display: inline-flex
-    align-items: center, gap: 0.5rem
-    padding: 0.5rem 0.75rem
+    align-items: center, gap: 0.5rem, padding: 0.5rem 0.75rem
    ;background: rgba(255, 255, 255, 0.1); border: 1px solid var(--console-primary, #00aa00);
     color: var(--console-fg, white);
     border-radius: 9999px, cursor: pointer, transition: all 0.2s
     list-style: none}
   .profile-trigger:hover { background: rgba(255, 255, 255, 0.2)}
   .user-avatar {
-    width: 28px; height: 28px; display: inline-flex; align-items: center; justify-content: center
+    width: 28px;, height: 28px; display: inline-flex; align-items: center; justify-content: center
    ;background: rgba(255, 255, 255, 0.12); border-radius: 50%; font-size: 0.9rem}
-  .user-avatar-img { width: 28px, height: 28px; border-radius: 50%; object-fit: cover; border: 1px solid rgba(255,255,255,0.2)}
+  .user-avatar-img { width: 28px, height: 28px; border-radius: 50%; object-fit: cover;, border: 1px solid rgba(255,255,255,0.2)}
   .profile-menu {
-    position: absolute; top: calc(100% + 0.5rem);right: 0; min-width: 240px
+    position: absolute;, top: calc(100% + 0.5rem);right: 0; min-width: 240px
    ; background: var(--console-bg, #0f0f23); border: 2px solid var(--console-primary, #00aa00);
     border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.3); padding: 0.5rem; z-index: 1000}
   .profile-header { padding: 0.25rem 0.5rem 0.5rem; border-bottom: 1px solid rgba(255,255,255,0.12); margin-bottom: 0.25rem}
   .profile-row { display: flex; align-items: center; justify-content: space-betweennn}
   .profile-name { font-weight: 600}
-  .profile-role { font-size: 0.75rem; opacity: 0.7}
-  .profile-email { font-size: 0.8rem; opacity: 0.7}
+  .profile-role { font-size: 0.75rem;, opacity: 0.7}
+  .profile-email { font-size: 0.8rem;, opacity: 0.7}
   .profile-item {
-    display: block, width: 100%, text-align: left; background: none;color: var(--console-fg, white); border: none; padding: 0.5rem 0.5rem; border-radius: 6px; cursor: pointer}
+    display: block, width: 100%, text-align: left;, background: none;color: var(--console-fg, white); border: none;, padding: 0.5rem 0.5rem; border-radius: 6px;, cursor: pointer}
   .profile-item:hover { background: rgba(255, 255, 255, 0.08)}
   .profile-logout { color: #ffb4b4}
-  .profile-separator { height: 1px; background: rgba(255,255,255,0.12); margin: 0.25rem 0}
+  .profile-separator { height: 1px;, background: rgba(255,255,255,0.12); margin: 0.25rem 0}
   .user-btn {
     display: flex
-    align-items: center, gap: 0.5rem
-    padding: 0.5rem 0.75rem
+    align-items: center, gap: 0.5rem, padding: 0.5rem 0.75rem
    ;background: rgba(255, 255, 255, 0.1); border: 1px solid transparent
    ; color: var(--console-fg, white);
     border-radius: 6px, cursor: pointer
@@ -337,8 +330,7 @@ import type { User } from '$lib/types';
     border-color: var(--console-primary, #00aa00)}
   .logout-btn {
     display: flex
-    align-items: center, gap: 0.5rem
-    padding: 0.5rem 0.75rem
+    align-items: center, gap: 0.5rem, padding: 0.5rem 0.75rem
    ;background: var(--console-error, #ff5555); border: none, color: white
     border-radius: 6px, cursor: pointer, transition: all 0.2s
     font-size: 0.9rem}

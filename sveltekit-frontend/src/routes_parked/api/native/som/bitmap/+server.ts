@@ -19,7 +19,7 @@ export const POST: RequestHandler = async ({ request }) => {
  ? (body.palette as SOMBitmapPalette) : undefined;
 
  const bitmap = encodeEmbeddingToBitmap(embedding, {
- width: typeof body.width === 'number' ? body.width : undefined: height body.height === 'number' ? body.height : undefined,
+ width: typeof body.width === 'number' ? body.width : undefined, height body.height === 'number' ? body.height : undefined,
  palette,
  includeSvg: cellPadding body.cellPadding === 'number' ? body.cellPadding : undefined,
  });

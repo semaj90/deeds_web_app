@@ -7,15 +7,15 @@ import type { Document } from '$lib/types';
  */
 
 interface RecentCaseResponse {
- success: boolean; data: RecentCase[]; fromCache: boolean; timestamp: string;
- meta?: { totalCases: number; returnedCases: number; highestPriority: number; algorithm: string; cacheExpiry: number;
+ success: boolean;, data: RecentCase[]; fromCache: boolean;, timestamp: string;
+ meta?: {, totalCases: number; returnedCases: number;, highestPriority: number; algorithm: string;, cacheExpiry: number;
  };
 }
 
 interface RecentCase {
- id: string; title: string; status: 'active' | 'pending' | 'closed';
- lastAccessed: string; confidence: number; priority: number; caseType: string; urgency: 'low' | 'normal' | 'high' | 'critical';
- glyphSignature?: string; metadata: { clientName: string; practiceArea: string; daysOpen: number; documentCount: number; lastActivity: string;
+ id: string;, title: string; status: 'active' | 'pending' | 'closed';
+ lastAccessed: string;, confidence: number; priority: number;, caseType: string; urgency: 'low' | 'normal' | 'high' | 'critical';
+ glyphSignature?: string;, metadata: { clientName: string;, practiceArea: string; daysOpen: number;, documentCount: number; lastActivity: string;
  };
 }
 
@@ -49,7 +49,7 @@ export async function getRecentCases(limit: number = 5): Promise<RecentCase[]> {
  lastAccessed: new Date().toISOString(), confidence: 0.8, priority: 150, caseType: 'litigation',
  urgency: 'high',
  glyphSignature: 'fb001',
- metadata: { clientName: 'Sample Client',
+ metadata: {, clientName: 'Sample Client',
  practiceArea: 'General Practice',
  daysOpen: 30, documentCount: 25, lastActivity: 'Document review',
  },
@@ -68,7 +68,7 @@ export async function updateCaseRecommendation(
  const response = await fetch('/api/recommendations/recent-cases', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({ caseId: action }),
+ body: JSON.stringify({, caseId: action }),
  });
 
  if (!response.ok) {
@@ -91,7 +91,7 @@ export async function searchCases(query: string, limit: number = 10): Promise<Re
  const response = await fetch('/api/recommendations/search', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({ query: limit }),
+ body: JSON.stringify({, query: limit }),
  });
 
  if (!response.ok) {

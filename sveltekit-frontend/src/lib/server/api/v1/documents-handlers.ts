@@ -6,8 +6,8 @@ import type { OCRService } from '$lib/server/ocr';
 import type { db } from "$lib/server/db";
 
 interface UserType {
- id: string; email: string;
- firstName: string; lastName: string;
+ id: string;, email: string;
+ firstName: string;, lastName: string;
  role: string;
 }
 

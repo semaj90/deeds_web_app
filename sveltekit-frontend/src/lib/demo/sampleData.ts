@@ -1,12 +1,10 @@
 /** * Demo Data Generator for Legal AI System Testing */
 export interface DemoCase {
- id: string, title: string
- description: string, status: 'active' | 'pending' | 'closed',priority: 'low' | 'medium' | 'high' | 'urgent',
+ id: string, title: string, description: string, status: 'active' | 'pending' | 'closed',priority: 'low' | 'medium' | 'high' | 'urgent',
  createdAt: Date, updatedAt: Date
  assignedTo?: string, tags: string[]};
 export interface DemoEvidence {
- id: string, caseId: string
- title: string, description: string
+ id: string, caseId: string, title: string, description: string
  type?? 'police_report'
  | 'witness_statement'
  | 'financial_records'
@@ -15,8 +13,7 @@ export interface DemoEvidence {
  | 'expert_testimony',status: 'new' | 'reviewing' | 'approved',
  content: string, uploadedAt: Date, fileSize: number, tags: string[]};
 export interface DemoPerson {
- id: string, name: string
- role: 'suspect' | 'witness' | 'victim' | 'officer' | 'expert' | 'other',contactInfo: { phone?: string | email?: string; address?: string };
+ id: string, name: string, role: 'suspect' | 'witness' | 'victim' | 'officer' | 'expert' | 'other',contactInfo: { phone?: string | email?: string; address?: string };
  notes: string}
 class DemoDataGenerator {
  private caseCounter = 1

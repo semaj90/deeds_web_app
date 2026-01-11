@@ -52,7 +52,7 @@
   .notification-group {
     position: fixed
 d
-    z-index: 9999; display: flex
+    z-index: 9999;, display: flex
     flex-direction: column
    ;gap: 12px
     pointer-events: none}
@@ -70,7 +70,7 @@ d
     bottom: 20px, left: 20px
     flex-direction: column-rever}
   .notification-group-center {
-    top: 50%; left: 50%;transform: translate(-50%, -50%);
+    top: 50%;, left: 50%;transform: translate(-50%, -50%);
     align-items: center}
   /* Responsive adjustments */
   @media (max-width: 768px) {

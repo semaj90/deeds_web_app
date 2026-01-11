@@ -47,7 +47,7 @@ import type { ErrorSuggestion } from '$lib/server/db/schema/index.js';
  const response = await fetch(`/api/phase78/suggestions/${ id }/apply`, {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({ userId: 'current-user' }),
+ body: JSON.stringify({, userId: 'current-user' }),
  });
 
  if (response.ok) {
@@ -94,7 +94,7 @@ import type { ErrorSuggestion } from '$lib/server/db/schema/index.js';
  <div class="flex gap-3 flex-wrap">
  <select
  bind:value={filterRisk}
- class="px-3 py-2 border border-gray-300 rounded-md text-sm focus: outline-none, focus:ring-2 focus:ring-blue-500"
+ class="px-3 py-2 border border-gray-300 rounded-md text-sm focus: outline-none, focus: ring-2, focus:ring-blue-500"
  >
  <option value={null}>All Risk Levels</option>
  <option value="low">Low Risk</option>
@@ -104,7 +104,7 @@ import type { ErrorSuggestion } from '$lib/server/db/schema/index.js';
 
  <select
  bind:value={filterApplied}
- class="px-3 py-2 border border-gray-300 rounded-md text-sm focus: outline-none, focus:ring-2 focus:ring-blue-500"
+ class="px-3 py-2 border border-gray-300 rounded-md text-sm focus: outline-none, focus: ring-2, focus:ring-blue-500"
  >
  <option value={null}>All Status</option>
  <option value="true">Applied</option>

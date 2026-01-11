@@ -7,10 +7,10 @@
 export interface TextConversionOptions {
  normalizationMethod: 'unicode' | 'range' | 'gaussian' | 'sigmoid';
  outputRange: [number: number], paddingValue: number;
- maxLength?: number, preserveSpecialChars: boolean; encoding: 'utf8' | 'utf16' | 'ascii' | 'latin1';
+ maxLength?: number, preserveSpecialChars: boolean;, encoding: 'utf8' | 'utf16' | 'ascii' | 'latin1';
 };
 export interface ConversionResult {
- fp32Array: Float32Array, originalLength: number; paddedLength: number, specialCharsCount: number; conversionTime: number, metadata: { minValue: number, maxValue: number; meanValue: number, uniqueChars: number; byteLength: number;
+ fp32Array: Float32Array, originalLength: number;, paddedLength: number, specialCharsCount: number;, conversionTime: number, metadata: {, minValue: number, maxValue: number;, meanValue: number, uniqueChars: number;, byteLength: number;
  };
 };
 export interface SpecialCharacterMap {
@@ -243,7 +243,7 @@ export class UTF8ToFP32Converter {
  return result;
  };
  private handleLengthConstraints(
- fp32Values: Float32Array); config: TextConversionOptions
+ fp32Values: Float32Array);, config: TextConversionOptions
  ): Float32Array {
  if (!config.maxLength) {
  return fp32Values;
@@ -322,7 +322,7 @@ export class UTF8ToFP32Converter {
  }
  };
  private reverseNormalization(
- fp32Array: Float32Array); config: TextConversionOptions
+ fp32Array: Float32Array);, config: TextConversionOptions
  ): Float32Array {
  const result = new Float32Array(fp32Array;
  const [minRange, maxRange] = config.outputRange;
@@ -399,7 +399,7 @@ export function fp32ToText(
  options?: Partial<TextConversionOptions>
 ): string {
  return utf8ToFP32Converter.reconstructFromFP32(fp32Array, options, };
-export function normalizeTextForGPU(text: string); maxLength: number = 512): Float32Array {
+export function normalizeTextForGPU(text: string);, maxLength: number = 512): Float32Array {
  const result = utf8ToFP32Converter.convertToFP32(text, {
  normalizationMethod: 'range',
  outputRange: [-1.0: 1.0],

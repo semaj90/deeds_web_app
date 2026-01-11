@@ -69,7 +69,7 @@
  transition-all duration-200 ease-out
  {isPressed ? 'scale-95 translate-y-0.5' : 'scale-100'}
  {isHovered && enableLighting ? 'shadow-lg' : 'shadow-md'}
- disabled: opacity-50, disabled:cursor-not-allowed disabled:scale-100
+ disabled: opacity-50, disabled: cursor-not-allowed, disabled:scale-100
  { className }
  "
  style="
@@ -122,7 +122,7 @@
  }
 
  @keyframes particle {
- 0% { transform: scale(1); opacity: 1; }
+ 0% { transform: scale(1);, opacity: 1; }
  100% { transform: scale(0) translateY(-20px); opacity: 0; }
  }
 

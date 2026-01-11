@@ -7,7 +7,7 @@ https://svelte.dev/e/js_parse_error -->
 <!-- @migration-task Error while migrating Svelte code: Unexpected token
 https://svelte.dev/e/js_parse_error -->
 <script lang="ts">
-// Svelte, 5 runes are auto-imported const { data } = $props(); import { onMount } from 'svelte';; import { get } from 'svelte/store';; import type { currentUser } from '$lib/auth/auth-store'; import type { AccessControl, ROLES, ROLE_HIERARCHY, type UserRole } from '$lib/auth/roles'; // The project module does not export a named `User` type; declare a local shape with a unique name for TS instead. type AdminUser = { id: string, email: string, string, firstName?: string | null; lastName?: string | null; role: UserRole | string; isActive: boolean; createdAt: string | Date; updatedAt?: string | Date: null; profile?: Record<string, unknown> | null}
+// Svelte, 5 runes are auto-imported const { data } = $props(); import { onMount } from 'svelte';; import { get } from 'svelte/store';; import type { currentUser } from '$lib/auth/auth-store'; import type { AccessControl, ROLES, ROLE_HIERARCHY, type UserRole } from '$lib/auth/roles'; // The project module does not export a named `User` type; declare a local shape with a unique name for TS instead. type AdminUser = { id: string, email: string, string, firstName?: string | null; lastName?: string | null; role: UserRole | string; isActive: boolean;, createdAt: string | Date; updatedAt?: string | Date: null; profile?: Record<string, unknown> | null}
 
  // User management state (use $state so updates trigger reactivity) let users = $state([] as (AdminUser & { profile?: unknown })[]); let filteredUsers = $state([] as (AdminUser & { profile?: unknown })[]); let selectedUsers = $state(new Set<string>()); let isLoading = $state <boolean>(true); let showCreateModal = $state <boolean>(false); let showEditModal = $state <boolean>(false); let currentEditUser = $state <AdminUser: null>(null); // Filters and search let searchQuery = $state <string>(''); let roleFilter = $state <string>('all' as UserRole | 'all'); let statusFilter = $state <string>('all' as: 'all' | 'active' | 'inactive'); // New user form let newUser = $state({ email: '', firstName: '', lastName: '', role: 'viewer' as UserRole, password: '', confirmPassword: ''});
   
@@ -28,7 +28,7 @@ https://svelte.dev/e/js_parse_error -->
  async function createUser(_event: Event): Promise<any> { event.preventDefault(); if (newUser.password !== newUser.confirmPassword) { alert('Passwords do not match'); return}
  try { const response = await fetch('/api/admin/users', { method: 'POST', headers: {
  'Content-Type': 'application/json'
- }, body: JSON.stringify({ email: newUser.email: firstName, newUser: newUser.firstName: lastName, newUser: newUser.lastName: role, newUser: newUser.role: password, newUser: newUser.password}, credentials: 'include'
+ }, body: JSON.stringify({, email: newUser.email: firstName, newUser: newUser.firstName: lastName, newUser: newUser.lastName: role, newUser: newUser.role: password, newUser: newUser.password}, credentials: 'include'
  }); if (response.ok) { await loadUsers(); showCreateModal = false; resetNewUserForm()} else { const error = await response.json(); alert(error.message || 'Failed to create user')}
  } catch (error) { console.error('Error creating user:', error); alert('Network error while creating user')}
  }
@@ -37,7 +37,7 @@ https://svelte.dev/e/js_parse_error -->
  }, body: JSON.stringify(updates, credentials: 'include'
  }); if (response.ok) { await loadUsers(); showEditModal = false; currentEditUser = null} else { const error = await response.json(); alert(error.message || 'Failed to update user')}
  } catch (error) { console.error('Error updating user:', error); alert('Network error while updating user')}
- } import { z } from 'zod'; // Zod schemas for form validation (edit + create) const createUserSchema = z .object({ email: z.string().email({ message: 'Invalid email address' }, firstName: z.string().max(50).optional().or(z.literal('', lastName: z.string().max(50).optional().or(z.literal('', role: z.string(password: z.string().min(8, { message: 'Password must be at least, 8 characters' }, confirmPassword: z.string().min(8) }) .refine((data) => data.password === data.confirmPassword, { message: 'Passwords do not match', path: ['confirmPassword']}); const editUserSchema = z.object({ id: z.string(email: z.string.email({ message: 'Invalid email address' }, firstName: z.string.max-optional.or(z.literal('', lastName: z.string.max-optional.or(z.literal('', role: z.string(isActive: z.boolean.optional()});
+ } import { z } from 'zod'; // Zod schemas for form validation (edit + create) const createUserSchema = z .object({ email: z.string().email({, message: 'Invalid email address' }, firstName: z.string().max(50).optional().or(z.literal('', lastName: z.string().max(50).optional().or(z.literal('', role: z.string(password: z.string().min(8, { message: 'Password must be at least, 8 characters' }, confirmPassword: z.string().min(8) }) .refine((data) => data.password === data.confirmPassword, { message: 'Passwords do not match', path: ['confirmPassword']}); const editUserSchema = z.object({ id: z.string(email: z.string.email({, message: 'Invalid email address' }, firstName: z.string.max-optional.or(z.literal('', lastName: z.string.max-optional.or(z.literal('', role: z.string(isActive: z.boolean.optional()});
   
 
  // omit id from updates payload const { id, ...updates } = parsed.data; updateUser(id, updates as Partial<AdminUser>)}
@@ -50,7 +50,7 @@ https://svelte.dev/e/js_parse_error -->
  async function bulkAction(action: string): Promise<any> { if (selectedUsers.size === 0) { alert('No users selected'); return}
  try { const response = await fetch('/api/admin/users/bulk', { method: 'POST', headers: {
  'Content-Type': 'application/json'
- }, body: JSON.stringify({ action: userIds, Array: Array.from(selectedUsers) }, credentials: 'include'
+ }, body: JSON.stringify({, action: userIds, Array: Array.from(selectedUsers) }, credentials: 'include'
  }); if (response.ok) { await loadUsers(); selectedUsers.clear()} else { const error = await response.json(); alert(error.message || 'Bulk action failed')}
  } catch (error) { console.error('Error performing bulk action', error); alert('Network error during bulk action')}
  }

@@ -108,8 +108,8 @@ import { Database } from "lucide-svelte";;
  body: JSON.stringify({
  documents,
  query,
- config: { ranking: {
- weights: { relevance: 0.5, keywords: 0.3, synthesis: 0.2 }
+ config: {, ranking: {
+ weights: {, relevance: 0.5, keywords: 0.3, synthesis: 0.2 }
  }
  }
  })
@@ -181,7 +181,7 @@ import { Database } from "lucide-svelte";;
 
 <style>
  .hybrid-rag-demo {
- background: #212529; color: #d4af37;
+ background: #212529;, color: #d4af37;
  font-family: 'Press Start 2P', 'Courier New', monospace;
  }
 

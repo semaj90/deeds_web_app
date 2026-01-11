@@ -2,12 +2,12 @@
 import { getAuthHeaders } from './auth-service.js';
 
 export interface Note {
- id: string; caseId: string; title: string; content: string; type: 'general' | 'legal_analysis' | 'client_meeting' | 'court_hearing' | 'research';
- tags: string[]; attachments: string[]; // IDs of attachments
- isPrivate: boolean; createdAt: string; updatedAt: string; createdBy: string; lastModifiedBy: string; version: number }
+ id: string;, caseId: string; title: string;, content: string; type: 'general' | 'legal_analysis' | 'client_meeting' | 'court_hearing' | 'research';
+ tags: string[];, attachments: string[]; // IDs of attachments
+ isPrivate: boolean;, createdAt: string; updatedAt: string;, createdBy: string; lastModifiedBy: string;, version: number }
 
 export interface CreateNoteData {
- caseId: string; title: string; content: string; type: Note['type'];
+ caseId: string;, title: string; content: string;, type: Note['type'];
  tags?: string[];
  isPrivate?: boolean }
 
@@ -29,7 +29,7 @@ export interface NoteListOptions {
  sortOrder?: 'asc' | 'desc' }
 
 export interface NoteListResponse {
- notes: Note[]; total: number; limit: number; offset: number; hasMore: boolean }
+ notes: Note[];, total: number; limit: number;, offset: number; hasMore: boolean }
 
 // Core Note Management Functions
 export async function listNotes(options, NoteListOptions = {}): Promise<NoteListResponse> {

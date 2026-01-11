@@ -4,14 +4,14 @@
   // Test actions
   function login() {
     userStore.setUserSession({
-      user: { id: '123',
+      user: {, id: '123',
         email: 'test@example.com',
         firstName: 'Test',
         lastName: 'User',
         role: 'user',
         avatarUrl: null
       },
-      session: { id: 'sess_123',
+      session: {, id: 'sess_123',
         expiresAt: new Date(Date.now() + 3600000).toISOString()
       }
     });

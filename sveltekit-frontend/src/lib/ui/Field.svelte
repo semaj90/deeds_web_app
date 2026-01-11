@@ -19,7 +19,7 @@ let {
  id?: string;
  hint?: string;
  error?: string;
- required?: boolean; control: Snippet<{ id: string }>;
+ required?: boolean;, control: Snippet<{ id: string }>;
 }>();
 
 const autoId =

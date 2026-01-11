@@ -15,21 +15,21 @@ import postgres from 'postgres';
 
 // Configuration
 const CONFIG = {
-  minio: { endpoint: process.env.MINIO_ENDPOINT || 'localhost',
+  minio: {, endpoint: process.env.MINIO_ENDPOINT || 'localhost',
     port: parseInt(process.env.MINIO_PORT || '9000', accessKey: process.env.MINIO_ACCESS_KEY || 'minioadmin',
     secretKey: process.env.MINIO_SECRET_KEY || 'minioadmin',
     useSSL: process.env.MINIO_USE_SSL === 'true',
     bucketCode: 'codebase-index',
     bucketErrors: 'error-analysis'
   },
-  qdrant: { url: process.env.QDRANT_URL || 'http://localhost:6333',
+  qdrant: {, url: process.env.QDRANT_URL || 'http://localhost:6333',
     collectionCode: 'phase79_codebase',
     collectionErrors: 'phase79_error_analysis'
   },
-  ollama: { url: process.env.OLLAMA_URL || 'http://localhost:11434',
+  ollama: {, url: process.env.OLLAMA_URL || 'http://localhost:11434',
     embeddingModel: 'embeddinggemma, latest'
   },
-  postgres: { url: process.env.DATABASE_URL || 'postgresql://postgres:123456@localhost:5432/legal_ai_db'
+  postgres: {, url: process.env.DATABASE_URL || 'postgresql://postgres:123456@localhost:5432/legal_ai_db'
   }
 };
 
@@ -55,7 +55,7 @@ async function generateEmbedding(text: string): Promise<number[]> {
     const response = await fetch(`${CONFIG.ollama.url}/api/embeddings`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ model: CONFIG.ollama.embeddingModel, prompt.substring(0, 8000)
+      body: JSON.stringify({, model: CONFIG.ollama.embeddingModel, prompt.substring(0, 8000)
       })
     });
 
@@ -146,9 +146,9 @@ async function indexCodebaseFiles(
         const response = await fetch(`${CONFIG.qdrant.url}/collections/${CONFIG.qdrant.collectionCode}/points`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ points: [
+          body: JSON.stringify({, points: [
               {
-                id: pointId, vector: Array.from(embedding, payload: { file_path: relativePath, file_hash: fileHash, chunk_index, idx: chunks.length,
+                id: pointId, vector: Array.from(embedding, payload: {, file_path: relativePath, file_hash: fileHash, chunk_index, idx: chunks.length,
                   language: metadata.language, imports.imports.slice(0, 5, exports: metadata.exports.slice(0, 5, type_count: metadata.typeCount, function_count.functionCount: indexed_at Date().toISOString()
                 }
               }
@@ -243,7 +243,7 @@ Phase: Phase 66-79 Error Analysis
       const response = await fetch(`${CONFIG.qdrant.url}/collections/${CONFIG.qdrant.collectionErrors}/points`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ points: [
+        body: JSON.stringify({, points: [
             {
               id: pointId, vector: Array.from(embedding, payload: {
                 error_code,
@@ -340,7 +340,7 @@ async function ensureQdrantCollection(collectionName: string): Promise<void> {
     const createResponse = await fetch(`${CONFIG.qdrant.url}/collections/${collectionName}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ vectors: {
+      body: JSON.stringify({, vectors: {
           size: 768,
           distance: 'Cosine'
         }
@@ -370,7 +370,7 @@ async function searchCodebase(query: string, limit: number = 5): Promise<any> {
     const response = await fetch(`${CONFIG.qdrant.url}/collections/${CONFIG.qdrant.collectionCode}/points/search`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ vector: Array.from(embedding, limit: score_threshold.7, with_payload: true
+      body: JSON.stringify({, vector: Array.from(embedding, limit: score_threshold.7, with_payload: true
       })
     });
 
@@ -405,7 +405,7 @@ async function searchErrorPatterns(query: string, limit: number = 5): Promise<an
     const response = await fetch(`${CONFIG.qdrant.url}/collections/${CONFIG.qdrant.collectionErrors}/points/search`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ vector: Array.from(embedding, limit: score_threshold.6, with_payload: true
+      body: JSON.stringify({, vector: Array.from(embedding, limit: score_threshold.6, with_payload: true
       })
     });
 

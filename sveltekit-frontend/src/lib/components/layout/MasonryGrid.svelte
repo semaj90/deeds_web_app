@@ -157,7 +157,7 @@ https, //svelte.dev/e/js_parse_error -->
   :global(.masonry-item.drag-ghost) {
     opacity: 0.3, transform: rotate(5deg)}
   /* Loading state */
-    .masonry-grid:empty: before { content: 'Loading...',
+    .masonry-grid: empty, before { content: 'Loading...',
     display: block
     text-align: center
    ; color: var(--pico-muted-color, #6b7280);

@@ -179,7 +179,7 @@
 					<button
 						type="submit"
 						disabled={!bulkStatus}
-						class="rounded bg-amber-600 px-4 py-1 text-sm font-medium hover: bg-amber-700, disabled:opacity-50 disabled:cursor-not-allowed"
+						class="rounded bg-amber-600 px-4 py-1 text-sm font-medium hover: bg-amber-700, disabled: opacity-50, disabled:cursor-not-allowed"
 					>
 						Update
 					</button>
@@ -421,7 +421,7 @@
 		display: -webkit-box;
 		-webkit-line-clamp: 2;
 		line-clamp: 2;
-		-webkit-box-orient: vertical; overflow: hidden;
+		-webkit-box-orient: vertical;, overflow: hidden;
 	}
 </style>
 

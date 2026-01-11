@@ -1,67 +1,67 @@
 import type { createMachine, assign, interpret, type Interpreter } from 'xstate';
 
 export interface QueueState {
- id: string; status: 'idle' | 'processing' | 'completed' | 'failed';
+ id: string;, status: 'idle' | 'processing' | 'completed' | 'failed';
  priority: 'low' | 'normal' | 'high' | 'urgent';
- retryCount: number; maxRetries: number;
- createdAt: Date; updatedAt: Date;
+ retryCount: number;, maxRetries: number;
+ createdAt: Date;, updatedAt: Date;
  data: any;
  error?: string;
 }
 
 export interface QueueContext {
- jobs: Map<string: QueueState>; activeJobs: Set<string>;
- maxConcurrency: number; retryDelay: number;
+ jobs: Map<string: QueueState>;, activeJobs: Set<string>;
+ maxConcurrency: number;, retryDelay: number;
 }
 
 export type QueueEvent =
- | { type: 'ADD_JOB'; job: Omit<QueueState, 'status' | 'retryCount' | 'createdAt' | 'updatedAt'> }
- | { type: 'START_JOB'; jobId: string }
- | { type: 'COMPLETE_JOB'; jobId: string; result?: any }
- | { type: 'FAIL_JOB'; jobId: string; error: string }
- | { type: 'RETRY_JOB'; jobId: string }
- | { type: 'CANCEL_JOB'; jobId: string }
+ | { type: 'ADD_JOB';, job: Omit<QueueState, 'status' | 'retryCount' | 'createdAt' | 'updatedAt'> }
+ | { type: 'START_JOB';, jobId: string }
+ | { type: 'COMPLETE_JOB';, jobId: string; result?: any }
+ | { type: 'FAIL_JOB';, jobId: string; error: string }
+ | { type: 'RETRY_JOB';, jobId: string }
+ | { type: 'CANCEL_JOB';, jobId: string }
  | { type: 'PROCESS_QUEUE' }
- | { type: 'SET_CONCURRENCY'; maxConcurrency: number };
+ | { type: 'SET_CONCURRENCY';, maxConcurrency: number };
 
 const queueMachine = createMachine<QueueContext, QueueEvent>(
  {
  id: 'queue',
  initial: 'idle',
- context: { jobs: new Map(),
+ context: {, jobs: new Map(),
      activeJobs: new Set(),
      maxConcurrency: 3, retryDelay: 1000
  },
- states: { idle: {
- on: { ADD_JOB: {
+ states: {, idle: {
+ on: {, ADD_JOB: {
  actions: 'addJob',
  target: 'processing',
  },
  PROCESS_QUEUE: 'processing',
  },
  },
- processing: { entry: 'processQueue',
- on: { ADD_JOB: {
+ processing: {, entry: 'processQueue',
+ on: {, ADD_JOB: {
  actions: 'addJob',
  },
- START_JOB: { actions: 'startJob',
+ START_JOB: {, actions: 'startJob',
  },
- COMPLETE_JOB: { actions: 'completeJob',
+ COMPLETE_JOB: {, actions: 'completeJob',
  },
- FAIL_JOB: { actions: 'failJob',
+ FAIL_JOB: {, actions: 'failJob',
  },
- RETRY_JOB: { actions: 'retryJob',
+ RETRY_JOB: {, actions: 'retryJob',
  },
- CANCEL_JOB: { actions: 'cancelJob',
+ CANCEL_JOB: {, actions: 'cancelJob',
  },
- SET_CONCURRENCY: { actions: 'setConcurrency',
+ SET_CONCURRENCY: {, actions: 'setConcurrency',
  },
  },
  },
  },
  },
  {
- actions: { addJob: assign((context, event) => {
+ actions: {, addJob: assign((context, event) => {
  if (event.type !== 'ADD_JOB') return context;
 
  const job: QueueState = {
@@ -216,11 +216,11 @@ export class XStateQueueManager {
 
 // Legal-specific queue configurations
 export const LEGAL_QUEUE_CONFIGS = {
- documentProcessing: { maxConcurrency: 2, retryDelay: 2000, maxRetries: 3,
+ documentProcessing: {, maxConcurrency: 2, retryDelay: 2000, maxRetries: 3,
  },
- aiAnalysis: { maxConcurrency: 1, retryDelay: 5000, maxRetries: 2,
+ aiAnalysis: {, maxConcurrency: 1, retryDelay: 5000, maxRetries: 2,
  },
- evidenceIngestion: { maxConcurrency: 3, retryDelay: 1000, maxRetries: 5,
+ evidenceIngestion: {, maxConcurrency: 3, retryDelay: 1000, maxRetries: 5,
  },
 } as const;
 

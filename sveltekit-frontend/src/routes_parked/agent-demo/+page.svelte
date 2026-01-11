@@ -6,23 +6,23 @@
 
  // Types
  interface Task {
- id: string; title: string;
- description: string; priority: 'low' | 'medium' | 'high' | 'critical';
- estimatedComplexity: number; type: 'feature' | 'bug' | 'refactor';
+ id: string;, title: string;
+ description: string;, priority: 'low' | 'medium' | 'high' | 'critical';
+ estimatedComplexity: number;, type: 'feature' | 'bug' | 'refactor';
  status: 'pending' | 'in-progress' | 'completed' | 'failed';
  files: string[];
  completedAt?: string;
  }
 
  interface Log {
- id: number; timestamp: string;
- message: string; type: 'info' | 'success' | 'warning' | 'error';
+ id: number;, timestamp: string;
+ message: string;, type: 'info' | 'success' | 'warning' | 'error';
  }
 
  interface Patch {
- id: string; filePath: string;
- description: string; status: 'pending' | 'applied' | 'failed';
- confidence: number; createdAt: string;
+ id: string;, filePath: string;
+ description: string;, status: 'pending' | 'applied' | 'failed';
+ confidence: number;, createdAt: string;
  }
 
  // State
@@ -253,7 +253,7 @@
  </div>
  <div class="flex-1 overflow-auto p-4 space-y-2">
  {#each logs as log (log.id)}
- <div transition: fade={{ duration: 100 }} class="flex items-start space-x-3">
+ <div transition: fade={{, duration: 100 }} class="flex items-start space-x-3">
  <span class="text-slate-600 shrink-0">[{log.timestamp}]</span>
  <span class:text-cyan-400={log.type === 'info'}
  class:text-green-400={log.type === 'success'}

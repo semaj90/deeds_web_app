@@ -5,8 +5,7 @@ import { writable } from "svelte/store";
  */
 // Create the AI commands store
 export const aiCommands = writable({
- current: "", history: [], isProcessing: false, lastResult: null
- error: null
+ current: "", history: [], isProcessing: false, lastResult: null, error: null
 });
   
 export const addCommand = (command: result = null) => {

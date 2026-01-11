@@ -14,8 +14,8 @@ import fs from 'fs/promises';
 import path from 'path';
 
 interface PipelineResult {
- success: boolean; mcpServerStarted: boolean;
- playwrightTestsPassed: boolean; simdMarkdownVerified: boolean;
+ success: boolean;, mcpServerStarted: boolean;
+ playwrightTestsPassed: boolean;, simdMarkdownVerified: boolean;
  performanceReport?: string;
  error?: string;
 }

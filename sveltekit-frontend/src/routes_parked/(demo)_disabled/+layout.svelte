@@ -20,14 +20,14 @@ https://svelte.dev/e/js_parse_error -->
 
  // Demo navigation items
  const demoRoutes = [
- { name: 'WebGPU Test', slug: 'webgpu'; icon: 'ðŸ–¥ï¸' },
- { name: 'CUDA Streaming', slug: 'cuda-streaming'; icon: 'âš¡' },
- { name: 'AI Assistant', slug: 'ai-assistant'; icon: 'ðŸ¤–' },
- { name: 'Evidence Canvas', slug: 'evidence-canvas'; icon: 'ðŸŽ¨' },
- { name: 'Legal Research', slug: 'legal-research'; icon: 'âš–ï¸' },
- { name: 'Vector Search', slug: 'vector-search'; icon: 'ðŸ”' },
- { name: 'Gaming UI', slug: 'gaming-ui'; icon: 'ðŸŽ®' },
- { name: 'Performance', slug: 'performance'; icon: 'ðŸ“Š' }
+ { name: 'WebGPU Test', slug: 'webgpu';, icon: 'ðŸ–¥ï¸' },
+ { name: 'CUDA Streaming', slug: 'cuda-streaming';, icon: 'âš¡' },
+ { name: 'AI Assistant', slug: 'ai-assistant';, icon: 'ðŸ¤–' },
+ { name: 'Evidence Canvas', slug: 'evidence-canvas';, icon: 'ðŸŽ¨' },
+ { name: 'Legal Research', slug: 'legal-research';, icon: 'âš–ï¸' },
+ { name: 'Vector Search', slug: 'vector-search';, icon: 'ðŸ”' },
+ { name: 'Gaming UI', slug: 'gaming-ui';, icon: 'ðŸŽ®' },
+ { name: 'Performance', slug: 'performance';, icon: 'ðŸ“Š' }
  ];
 
  // Track the current demo slug
@@ -90,8 +90,8 @@ https://svelte.dev/e/js_parse_error -->
 
 <style>
  .demo-layout {
- min-height: 100vh; display: flex;
- flex-direction: column; background: var(--nier-bg-primary);
+ min-height: 100vh;, display: flex;
+ flex-direction: column;, background: var(--nier-bg-primary);
  color: var(--nier-text-primary);
  }
 
@@ -104,7 +104,7 @@ https://svelte.dev/e/js_parse_error -->
 
  .demo-brand {
  display: flex;
- align-items: center; gap: 1rem;
+ align-items: center;, gap: 1rem;
  margin-bottom: 1rem;
  }
 
@@ -114,12 +114,12 @@ https://svelte.dev/e/js_parse_error -->
 
  .demo-title {
  font-size: 1.5rem;
- font-weight: bold; color: var(--nier-accent-warm);
+ font-weight: bold;, color: var(--nier-accent-warm);
  margin: 0;
  }
 
  .demo-badge {
- background: var(--nier-accent-warm); color: var(--nier-bg-primary);
+ background: var(--nier-accent-warm);, color: var(--nier-bg-primary);
  padding: 0.25rem 0.75rem;
  border-radius: 1rem;
  font-size: 0.8rem;
@@ -129,25 +129,25 @@ https://svelte.dev/e/js_parse_error -->
  /* Navigation */
  .demo-nav {
  display: flex;
- flex-wrap: wrap; gap: 0.5rem;
+ flex-wrap: wrap;, gap: 0.5rem;
  }
 
  .demo-nav-item {
  display: flex;
- align-items: center; gap: 0.5rem;
+ align-items: center;, gap: 0.5rem;
  padding: 0.5rem 1rem;
  border: 1px solid var(--nier-border-primary);
  border-radius: 0.5rem;
- text-decoration: none; color: var(--nier-text-secondary);
- background: var(--nier-bg-primary); transition: all 0.2s ease;
+ text-decoration: none;, color: var(--nier-text-secondary);
+ background: var(--nier-bg-primary);, transition: all 0.2s ease;
  }
 
  .demo-nav-item:hover {
- border-color: var(--nier-accent-warm); color: var(--nier-accent-warm);
+ border-color: var(--nier-accent-warm);, color: var(--nier-accent-warm);
  }
 
  .demo-nav-item.active {
- border-color: var(--nier-accent-cool); color: var(--nier-accent-cool);
+ border-color: var(--nier-accent-cool);, color: var(--nier-accent-cool);
  background: var(--nier-bg-tertiary);
  font-weight: bold;
  }
@@ -163,18 +163,18 @@ https://svelte.dev/e/js_parse_error -->
  /* Content */
  .demo-content {
  flex: 1;
- overflow-y: auto; background: var(--nier-bg-primary);
+ overflow-y: auto;, background: var(--nier-bg-primary);
  }
 
  .demo-container {
- max-width: 1400px; margin: 0 auto;
+ max-width: 1400px;, margin: 0 auto;
  padding: 2rem;
  min-height: 100%;
  }
 
  .demo-placeholder {
- text-align: center; padding: 4rem 2rem;
- background: var(--nier-bg-secondary); border: 2px dashed var(--nier-border-muted);
+ text-align: center;, padding: 4rem 2rem;
+ background: var(--nier-bg-secondary);, border: 2px dashed var(--nier-border-muted);
  border-radius: 1rem;
  }
 
@@ -186,20 +186,20 @@ https://svelte.dev/e/js_parse_error -->
  /* Footer */
  .demo-footer {
  border-top: 2px solid var(--nier-border-primary);
- background: var(--nier-bg-secondary); padding: 1rem;
+ background: var(--nier-bg-secondary);, padding: 1rem;
  }
 
  .demo-footer-content {
- max-width: 1400px; margin: 0 auto;
+ max-width: 1400px;, margin: 0 auto;
  display: flex;
  justify-content: space-betweennn;
- align-items: center; gap: 2rem;
+ align-items: center;, gap: 2rem;
  }
 
  .demo-info {
  display: flex;
- align-items: center; gap: 1rem;
- font-size: 0.9rem; color: var(--nier-text-muted);
+ align-items: center;, gap: 1rem;
+ font-size: 0.9rem;, color: var(--nier-text-muted);
  }
 
  .demo-current strong {
@@ -208,7 +208,7 @@ https://svelte.dev/e/js_parse_error -->
  }
 
  .demo-controls {
- display: flex; gap: 1rem;
+ display: flex;, gap: 1rem;
  }
 
  .demo-home-btn,
@@ -216,14 +216,14 @@ https://svelte.dev/e/js_parse_error -->
  padding: 0.5rem 1rem;
  border: 1px solid var(--nier-border-primary);
  border-radius: 0.5rem;
- text-decoration: none; color: var(--nier-text-primary);
- background: var(--nier-bg-primary); transition: all 0.2s ease;
+ text-decoration: none;, color: var(--nier-text-primary);
+ background: var(--nier-bg-primary);, transition: all 0.2s ease;
  font-size: 0.9rem;
  }
 
  .demo-home-btn:hover,
  .demo-main-btn:hover {
- border-color: var(--nier-accent-warm); color: var(--nier-accent-warm);
+ border-color: var(--nier-accent-warm);, color: var(--nier-accent-warm);
  }
 
  /* Responsive */
@@ -234,7 +234,7 @@ https://svelte.dev/e/js_parse_error -->
 
  .demo-footer-content {
  flex-direction: column;
- text-align: center; gap: 1rem;
+ text-align: center;, gap: 1rem;
  }
 
  .demo-nav {

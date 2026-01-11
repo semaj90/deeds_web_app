@@ -25,14 +25,14 @@ export interface RouteUiBadge {
 }
 
 export interface RouteUiItem {
- id: string; label: string;
- href: string; file: string;
- group: RouteGroupId; badges: RouteUiBadge[];
+ id: string;, label: string;
+ href: string;, file: string;
+ group: RouteGroupId;, badges: RouteUiBadge[];
 }
 
 export interface RouteUiGroup {
- id: RouteGroupId; label: string;
- description: string; routes: RouteUiItem[];
+ id: RouteGroupId;, label: string;
+ description: string;, routes: RouteUiItem[];
 }
 
 // --- Helpers ---

@@ -12,70 +12,70 @@ export const API_CONFIG = {
 export interface ApiResponse<T> {
  success: boolean;
  data?: T;
- error?: string; timestamp: string;
+ error?: string;, timestamp: string;
  requestId: string;
 }
 
 export interface PaginatedResponse<T> {
- items: T[]; total: number;
- page: number; pageSize: number;
+ items: T[];, total: number;
+ page: number;, pageSize: number;
  hasMore: boolean;
 }
 
 // Case Management API
 export interface Case {
- id: string; title: string;
- description: string; status: 'open' | 'investigating' | 'pending' | 'closed' | 'archived';
+ id: string;, title: string;
+ description: string;, status: 'open' | 'investigating' | 'pending' | 'closed' | 'archived';
  priority: 'low' | 'medium' | 'high' | 'critical';
- createdAt: string; updatedAt: string;
- assignedTo?: string; tags: string[];
- evidenceCount: number; poiCount: number;
+ createdAt: string;, updatedAt: string;
+ assignedTo?: string;, tags: string[];
+ evidenceCount: number;, poiCount: number;
 }
 
 export interface CaseStats {
- total: number; open: number;
- investigating: number; pending: number;
- closed: number; critical: number;
- high: number; medium: number;
+ total: number;, open: number;
+ investigating: number;, pending: number;
+ closed: number;, critical: number;
+ high: number;, medium: number;
  low: number;
 }
 
 // Evidence API
 export interface Evidence {
- id: string; title: string;
- description: string; type: 'document' | 'image' | 'video' | 'audio' | 'other';
+ id: string;, title: string;
+ description: string;, type: 'document' | 'image' | 'video' | 'audio' | 'other';
  status: 'pending' | 'processing' | 'analyzed' | 'archived';
- fileSize: number; mimeType: string;
+ fileSize: number;, mimeType: string;
  uploadedAt: string;
- analyzedAt?: string; tags: string[];
+ analyzedAt?: string;, tags: string[];
  metadata: Record<string, any>;
  caseId?: string;
  confidence?: number;
 }
 
 export interface EvidenceStats {
- total: number; documents: number;
- images: number; videos: number;
- audio: number; pending: number;
- processing: number; analyzed: number;
+ total: number;, documents: number;
+ images: number;, videos: number;
+ audio: number;, pending: number;
+ processing: number;, analyzed: number;
 }
 
 // Person of Interest API
 export interface PersonOfInterest {
- id: string; name: string;
- aliases: string[]; description: string;
+ id: string;, name: string;
+ aliases: string[];, description: string;
  threatLevel: 'low' | 'medium' | 'high' | 'critical';
  status: 'active' | 'inactive' | 'archived';
  createdAt: string;
- lastSeen?: string; associatedCases: string[];
- tags: string[]; metadata: Record<string, any>;
+ lastSeen?: string;, associatedCases: string[];
+ tags: string[];, metadata: Record<string, any>;
 }
 
 // Search API
 export interface SearchResult {
- id: string; title: string;
- content: string; type: 'case' | 'evidence' | 'poi' | 'document';
- relevance: number; tags: string[];
+ id: string;, title: string;
+ content: string;, type: 'case' | 'evidence' | 'poi' | 'document';
+ relevance: number;, tags: string[];
  metadata: Record<string, any>;
 }
 
@@ -90,20 +90,20 @@ export interface SearchFilters {
 
 // System Metrics API
 export interface SystemMetrics {
- cpu: { usage: number;
+ cpu: {, usage: number;
  cores: number;
  temperature?: number;
  };
- memory: { used: number;
- total: number; percentage: number;
+ memory: {, used: number;
+ total: number;, percentage: number;
  };
- gpu?: { usage: number;
- memoryUsed: number; memoryTotal: number;
+ gpu?: {, usage: number;
+ memoryUsed: number;, memoryTotal: number;
  temperature?: number;
  };
  services: {
- [serviceName: string]: { status: 'healthy' | 'degraded' | 'unhealthy';
- uptime: number; responseTime: number;
+ [serviceName: string]: {, status: 'healthy' | 'degraded' | 'unhealthy';
+ uptime: number;, responseTime: number;
  };
  };
  timestamp: string;
@@ -111,8 +111,8 @@ export interface SystemMetrics {
 
 // AI Analysis API
 export interface AnalysisResult {
- id: string; type: 'entity_extraction' | 'sentiment' | 'classification' | 'similarity' | 'summary';
- confidence: number; result: any;
+ id: string;, type: 'entity_extraction' | 'sentiment' | 'classification' | 'similarity' | 'summary';
+ confidence: number;, result: any;
  metadata: Record<string, any>;
  timestamp: string;
 }
@@ -365,7 +365,7 @@ export const aiApi = {
  async chat(
  message: string,
  context?: any
- ): Promise<ApiResponse<{ response: string; confidence: number }>> {
+ ): Promise<ApiResponse<{, response: string; confidence: number }>> {
  return apiClient.post('/api/ai/chat', { message: context });
  },
 };

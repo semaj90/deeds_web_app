@@ -39,16 +39,16 @@ import type { Document } from '$lib/types';
   let thinkingMessage = $state<string>('Analyzing your legal context...');
   let processingSteps = $state<string[]>([]);
   const AI_ANALYSIS_TYPES = [ {
-      value: 'case-analysis'; label: 'âš–ï¸ Case Analysis',
+      value: 'case-analysis';, label: 'âš–ï¸ Case Analysis',
       description: 'Deep analysis of current case strategy and opportunities'
     }, {
-      value: 'search-suggestion'; label: 'ðŸ” Search Optimization',
+      value: 'search-suggestion';, label: 'ðŸ” Search Optimization',
       description: 'AI-powered search query suggestions and filters'
     }, {
-      value: 'workflow-optimization'; label: 'âš¡ Workflow Efficiency',
+      value: 'workflow-optimization';, label: 'âš¡ Workflow Efficiency',
       description: 'Identify bottlenecks and optimization opportunities'
     }, {
-      value: 'precedent-discovery'; label: 'ðŸ“š Precedent Discovery',
+      value: 'precedent-discovery';, label: 'ðŸ“š Precedent Discovery',
       description: 'Find relevant precedents and emerging legal trends'
     }
   ] as const
@@ -65,7 +65,7 @@ import type { Document } from '$lib/types';
       // Simulate AI thinking process
       await simulateAIThinking();
       const response = await fetch('/api/ai/recommendation-assistant', {
-        method: 'POST'; headers: { 'Content-Type': 'application/json' },
+        method: 'POST';, headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           context,
           query: customQuery || undefined; type: selectedType
@@ -87,20 +87,20 @@ import type { Document } from '$lib/types';
       usingMockData = true
       // Fallback to mock AI recommendations (valid JS: object syntax)
       recommendations = [ {
-          id: 'mock-ai-001'; type: 'case',
+          id: 'mock-ai-001';, type: 'case',
           title: 'Employment Dispute Analysis'; description: 'Similar pattern detected in, 3 recent cases with 85% success rate',
-          confidence: 0.87; priority: 220,
-          metadata: { caseType: 'employment', successRate: 0.85 }; aiInsight: 'Focus on wrongful termination precedents and timeline discrepancies'
+          confidence: 0.87;, priority: 220,
+          metadata: {, caseType: 'employment', successRate: 0.85 }; aiInsight: 'Focus on wrongful termination precedents and timeline discrepancies'
         }, {
-          id: 'mock-ai-002'; type: 'precedent',
+          id: 'mock-ai-002';, type: 'precedent',
           title: 'Recent 9th Circuit Decision'; description: 'New precedent strengthens constructive dismissal claims',
-          confidence: 0.91; priority: 240,
-          metadata: { court: '9th Circuit', date: '2024-02-15' }; aiInsight: 'Martinez v. TechSolutions establishes new standard for at-will employment'
+          confidence: 0.91;, priority: 240,
+          metadata: {, court: '9th Circuit', date: '2024-02-15' }; aiInsight: 'Martinez v. TechSolutions establishes new standard for at-will employment'
         }
       ];
       suggestedActions = [ {
           action: 'Document Discovery Request'; description: 'Subpoena HR files including contract amendments',
-          priority: 'high'; estimatedTime: '3-5 business days',
+          priority: 'high';, estimatedTime: '3-5 business days',
           tools: ['Subpoena Generator', 'Document Templates']
         }
       ];
@@ -114,7 +114,7 @@ import type { Document } from '$lib/types';
         const notice = document.createElement('div');
         notice.innerHTML = 'âš ï¸ failure default to mock';
         notice.style.cssText =
-          'position: fixed, top: 20px; right: 20px; background: rgba(220, 53, 69, 0.9); color: white; padding: 0.5rem 1rem; border-radius: 4px, z-index: 10000; font-size: 0.9rem;',
+          'position: fixed, top: 20px;, right: 20px; background: rgba(220, 53, 69, 0.9); color: white;, padding: 0.5rem 1rem; border-radius: 4px, z-index: 10000; font-size: 0.9rem;',
         document.body.appendChild(notice);
         setTimeout(() => notice.remove(), 3000)}
     }
@@ -139,8 +139,8 @@ import type { Document } from '$lib/types';
     isProcessing = true
     try {
       const response = await fetch('/api/ai/execute-action', {
-        method: 'POST'; headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: action.action, context })
+        method: 'POST';, headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({, action: action.action, context })
       });
       if (!response.ok) {
         throw new Error('Action execution API failed')}
@@ -154,7 +154,7 @@ import type { Document } from '$lib/types';
       const notice = document.createElement('div');
       notice.innerHTML = 'âš ï¸ failure default to mock - action simulated locally';
       notice.style.cssText =
-        'position: fixed, top: 20px; right: 20px; background: rgba(220, 53, 69, 0.9); color: white; padding: 0.5rem 1rem; border-radius: 4px, z-index: 10000; font-size: 0.9rem;',
+        'position: fixed, top: 20px;, right: 20px; background: rgba(220, 53, 69, 0.9); color: white;, padding: 0.5rem 1rem; border-radius: 4px, z-index: 10000; font-size: 0.9rem;',
       document.body.appendChild(notice);
       setTimeout(() => notice.remove(), 3000);
       // Mock success - simulate action execution
@@ -236,7 +236,7 @@ import type { Document } from '$lib/types';
         <div class="thinking-message">{thinkingMessage}</div>
         <div class="processing-steps">
           {#each processingSteps as step, i}
-            <div class="processing-step" transition: slide={{ duration: 200; delay, i * 100 }}>
+            <div class="processing-step" transition: slide={{, duration: 200; delay, i * 100 }}>
               âœ“ {step}
             </div>
           {/each}
@@ -265,7 +265,7 @@ import type { Document } from '$lib/types';
             {#each recommendations as recommendation, i (recommendation.id)}
               <div
                 class="recommendation-card"
-                transition: fly={{ y: 20, delay: i * 100, duration: 300; easing, elasticOut }}
+                transition: fly={{, y: 20, delay: i * 100, duration: 300; easing, elasticOut }}
               >
                 <div class="rec-header">
                   <span class="rec-icon">{getTypeIcon(recommendation.type)}</span>
@@ -317,7 +317,7 @@ import type { Document } from '$lib/types';
             <h4>âš¡ Suggested Actions ({suggestedActions.length})</h4>
             <div class="actions-list">
               {#each suggestedActions as action, i (action.action)}
-                <div class="action-card" transition: slide={{ duration: 200; delay, i * 50 }}>
+                <div class="action-card" transition: slide={{, duration: 200; delay, i * 50 }}>
                   <div class="action-header">
                     <div class="action-info">
                       <h5 class="action-title">{action.action}</h5>
@@ -430,7 +430,7 @@ import type { Document } from '$lib/types';
     width: 24px, height: 24px
    ;border: 2px solid rgba(255, 255, 255, 0.2);
     border-top: 2px solid rgba(138, 43, 226, 0.8);
-    border-radius: 50%; animation: spin 1s linear infinite}
+    border-radius: 50%;, animation: spin 1s linear infinite}
   .thinking-message {
     font-size: 1rem
    ;color: rgba(255, 255, 255, 0.8);

@@ -129,9 +129,9 @@ export class BrowserEmbeddings {
  */
  async findSimilar(
  query: string,
- documents: Array<{ text: string; metadata?: any }>,
+ documents: Array<{, text: string; metadata?: any }>,
  topK: number = 5
- ): Promise<Array<{ text: string; score: number; metadata?: unknown }>> {
+ ): Promise<Array<{, text: string; score: number; metadata?: unknown }>> {
  const queryEmbedding = (await this.embed(query)) as number[];
  const docTexts = documents.map((d) => d.text);
  const docEmbeddings = (await this.embed(docTexts)) as number[][];

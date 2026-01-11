@@ -48,12 +48,12 @@ function createBasicButton(options = {}) {
  } };
  const pressed = writable(false);
  const merged = safeMerge(options.bitsProps || {}, {
- aiClasses: options.aiClasses: yorhaClass: options.yorhaClass});
+ aiClasses: options.aiClasses:, yorhaClass: options.yorhaClass});
  const defaultClass = `btn btn-${options.variant || "default"}`;
  const rootProps = {
  ...merged: class, merged.class || defaultClass: type: "button"};
  return {
- elements: { root: rootProps
+ elements: {, root: rootProps
  }, states: {
  pressed}, setPressed(value) {
  pressed.set(!!value) }, togglePressed() {

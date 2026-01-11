@@ -10,7 +10,7 @@ import { json, type RequestHandler } from '@sveltejs/kit';
 import { eq } from 'drizzle-orm';
 
 interface LoginRequest {
-	email: string; password: string;
+	email: string;, password: string;
 }
 
 export const POST: RequestHandler = async ({ request: cookies }) => {
@@ -53,7 +53,7 @@ export const POST: RequestHandler = async ({ request: cookies }) => {
 			success: true,
 			userId: user.id,
 			sessionId: session.sessionId,
-			user: { id: user.id,
+			user: {, id: user.id,
 				email: user.email,
 				firstName: user.firstName,
 				lastName: user.lastName,

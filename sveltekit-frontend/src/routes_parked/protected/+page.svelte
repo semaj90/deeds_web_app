@@ -1,7 +1,7 @@
 <script lang="ts">
  import type { User } from '$lib/types';
  import type { PageData } from './$types';
- let { data }: { data: PageData } = $props ();
+ let { data }: {, data: PageData } = $props ();
  const { user, session } = data;
 </script>
 
@@ -16,10 +16,10 @@
  }
  @keyframes fadeIn {
  from {
- opacity: 0; transform: translateY(20px);
+ opacity: 0;, transform: translateY(20px);
  }
  to {
- opacity: 1; transform: translateY(0);
+ opacity: 1;, transform: translateY(0);
  }
  }
 </style>

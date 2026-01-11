@@ -1573,11 +1573,7 @@ export const legal = ($root // TODO: Verify store subscription is correct for Sv
  switch (message.type) {
  default:
  return 'type: enum value expected';
- case 0: case, 1:
- case 2: case, 3:
- case 4: case, 5:
- case 6: case, 7:
- case 8:
+ case 0: case, 1: case, 2: case, 3: case, 4: case, 5: case, 6: case, 7: case, 8:
  break;
  }
  if (message.tags != null && message.hasOwnProperty('tags')) {
@@ -1609,17 +1605,14 @@ export const legal = ($root // TODO: Verify store subscription is correct for Sv
  switch (message.status) {
  default:
  return 'status: enum value expected';
- case 0: case, 1:
- case 2: case, 3:
- case 4:
+ case 0: case, 1: case, 2: case, 3: case, 4:
  break;
  }
  if (message.securityLevel != null && message.hasOwnProperty('securityLevel'))
  switch (message.securityLevel) {
  default:
  return 'securityLevel: enum value expected';
- case 0: case, 1:
- case 2: case, 3:
+ case 0: case, 1: case, 2: case, 3:
  break;
  }
  return null;
@@ -3092,8 +3085,7 @@ export const legal = ($root // TODO: Verify store subscription is correct for Sv
  switch (message.type) {
  default:
  return 'type: enum value expected';
- case 0: case, 1:
- case 2: case, 3:
+ case 0: case, 1: case, 2: case, 3:
  break;
  }
  return null;
@@ -3422,9 +3414,7 @@ export const legal = ($root // TODO: Verify store subscription is correct for Sv
  switch (message.status) {
  default:
  return 'status: enum value expected';
- case 0: case, 1:
- case 2: case, 3:
- case 4: case, 5:
+ case 0: case, 1: case, 2: case, 3: case, 4: case, 5:
  break;
  }
  if (message.judges != null && message.hasOwnProperty('judges')) {
@@ -3841,9 +3831,7 @@ export const legal = ($root // TODO: Verify store subscription is correct for Sv
  switch (message.type) {
  default:
  return 'type: enum value expected';
- case 0: case, 1:
- case 2: case, 3:
- case 4:
+ case 0: case, 1: case, 2: case, 3: case, 4:
  break;
  }
  if (message.includeEmbeddings != null && message.hasOwnProperty('includeEmbeddings'))
@@ -6458,9 +6446,7 @@ export const legal = ($root // TODO: Verify store subscription is correct for Sv
  switch (message.type) {
  default:
  return 'type: enum value expected';
- case 0: case, 1:
- case 2: case, 3:
- case 4:
+ case 0: case, 1: case, 2: case, 3: case, 4:
  break;
  }
  if (message.attachments != null && message.hasOwnProperty('attachments')) {
@@ -8447,8 +8433,7 @@ export const legal = ($root // TODO: Verify store subscription is correct for Sv
  switch (message.priority) {
  default:
  return 'priority: enum value expected';
- case 0: case, 1:
- case 2: case, 3:
+ case 0: case, 1: case, 2: case, 3:
  break;
  }
  if (message.dueDate != null && message.hasOwnProperty('dueDate')) {
@@ -9094,9 +9079,7 @@ export const legal = ($root // TODO: Verify store subscription is correct for Sv
  switch (message.type) {
  default:
  return 'type: enum value expected';
- case 0: case, 1:
- case 2: case, 3:
- case 4: case, 5:
+ case 0: case, 1: case, 2: case, 3: case, 4: case, 5:
  break;
  }
  if (message.specificQueries != null && message.hasOwnProperty('specificQueries')) {
@@ -9784,9 +9767,7 @@ export const legal = ($root // TODO: Verify store subscription is correct for Sv
  switch (message.type) {
  default:
  return 'type: enum value expected';
- case 0: case, 1:
- case 2: case, 3:
- case 4: case, 5:
+ case 0: case, 1: case, 2: case, 3: case, 4: case, 5:
  break;
  }
  if (message.results != null && message.hasOwnProperty('results')) {
@@ -10204,8 +10185,7 @@ export const legal = ($root // TODO: Verify store subscription is correct for Sv
  switch (message.riskLevel) {
  default:
  return 'riskLevel: enum value expected';
- case 0: case, 1:
- case 2: case, 3:
+ case 0: case, 1: case, 2: case, 3:
  break;
  }
  return null;
@@ -10565,16 +10545,14 @@ export const legal = ($root // TODO: Verify store subscription is correct for Sv
  switch (message.type) {
  default:
  return 'type: enum value expected';
- case 0: case, 1:
- case 2: case, 3:
+ case 0: case, 1: case, 2: case, 3:
  break;
  }
  if (message.priority != null && message.hasOwnProperty('priority'))
  switch (message.priority) {
  default:
  return 'priority: enum value expected';
- case 0: case, 1:
- case 2: case, 3:
+ case 0: case, 1: case, 2: case, 3:
  break;
  }
  if (message.steps != null && message.hasOwnProperty('steps')) {
@@ -12745,9 +12723,7 @@ export const legal = ($root // TODO: Verify store subscription is correct for Sv
  switch (message.status) {
  default:
  return 'status: enum value expected';
- case 0: case, 1:
- case 2: case, 3:
- case 4:
+ case 0: case, 1: case, 2: case, 3: case, 4:
  break;
  }
  if (message.results != null && message.hasOwnProperty('results')) {

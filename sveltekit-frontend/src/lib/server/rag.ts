@@ -24,7 +24,7 @@ export class RAGService {
  const r = await fetch(`http://localhost:11434/api/embed`, {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({ model: 'embeddinggemma:latest', input: q }),
+ body: JSON.stringify({, model: 'embeddinggemma:latest', input: q }),
  });
  const data = await r.json();
  console.log('Ollama response:', JSON.stringify(data).substring(0, 200));

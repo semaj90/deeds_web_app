@@ -23,19 +23,19 @@ import {  browser  } from '$app/environment';
 export interface EnhancedAIContext {
  // Core evidence processing
  selectedEvidence: Evidence | null;
- evidenceQueue: Evidence[]; processingResults: Map<string: ProcessingResult>;
+ evidenceQueue: Evidence[];, processingResults: Map<string: ProcessingResult>;
  // AI & ML Pipeline
  embeddings: Map<string, number[]>;
- vectorMatches: VectorMatch[]; aiTags: Map<string, string[]>;
+ vectorMatches: VectorMatch[];, aiTags: Map<string, string[]>;
  aiAnalysis: Map<string: AIAnalysis>;
  // Graph & Relationships
- graphRelationships: GraphNode[]; connectionStrength: Map<string, number>;
+ graphRelationships: GraphNode[];, connectionStrength: Map<string, number>;
  // Real-time & Streaming
- streamingActive: boolean; liveUpdates: StreamingUpdate[];
+ streamingActive: boolean;, liveUpdates: StreamingUpdate[];
  // Cache & Performance
- cacheHits: number; processingTime: Map<string, number>;
+ cacheHits: number;, processingTime: Map<string, number>;
  // Error handling & retry logic
- errors: ProcessingError[]; retryAttempts: number;
+ errors: ProcessingError[];, retryAttempts: number;
  retryQueue: string[];
  // System state
  systemHealth: 'healthy' | 'degraded' | 'critical';
@@ -43,62 +43,62 @@ export interface EnhancedAIContext {
 }
 
 export interface ProcessingResult {
- id: string; evidenceId: string;
+ id: string;, evidenceId: string;
  type: 'embedding' | 'tagging' | 'analysis' | 'relationships';
  status: 'pending' | 'processing' | 'complete' | 'error';
- result: any; confidence: number;
- processingTime: number; timestamp: Date;
+ result: any;, confidence: number;
+ processingTime: number;, timestamp: Date;
 }
 
 export interface VectorMatch {
- id: string; evidenceId: string;
- similarity: number; content: string;
+ id: string;, evidenceId: string;
+ similarity: number;, content: string;
  metadata: { [key: string]: any };
  rank: number;
 }
 
 export interface AIAnalysis {
- summary: string; keyPoints: string[];
- legalRelevance: number; suggestedActions: string[];
- confidenceScore: number; processingModel: string;
+ summary: string;, keyPoints: string[];
+ legalRelevance: number;, suggestedActions: string[];
+ confidenceScore: number;, processingModel: string;
 }
 
 export interface GraphNode {
- id: string; type: 'evidence' | 'person' | 'location' | 'event' | 'concept';
- label: string; properties: { [key: string]: any };
+ id: string;, type: 'evidence' | 'person' | 'location' | 'event' | 'concept';
+ label: string;, properties: { [key: string]: any };
  connections: GraphConnection[];
 }
 
 export interface GraphConnection {
- to: string; type: string;
- strength: number; bidirectional: boolean;
+ to: string;, type: string;
+ strength: number;, bidirectional: boolean;
  metadata?: { [key: string]: any };
 }
 
 export interface StreamingUpdate {
- id: string; type: 'evidence_added' | 'analysis_complete' | 'relationship_found';
- data: any; timestamp: Date;
+ id: string;, type: 'evidence_added' | 'analysis_complete' | 'relationship_found';
+ data: any;, timestamp: Date;
  source: string;
 }
 
 export interface ProcessingError {
  id: string;
- evidenceId?: string; type: 'network' | 'ai_model' | 'validation' | 'cache' | 'database';
- message: string; details: any;
- timestamp: Date; resolved: boolean;
+ evidenceId?: string;, type: 'network' | 'ai_model' | 'validation' | 'cache' | 'database';
+ message: string;, details: any;
+ timestamp: Date;, resolved: boolean;
  retryable: boolean;
 }
 
 type EvidenceEvent =
- | { type: 'ADD_EVIDENCE'; evidence: Evidence }
+ | { type: 'ADD_EVIDENCE';, evidence: Evidence }
  | { type: 'PROCESS_NEXT' }
- | { type: 'GENERATE_EMBEDDINGS'; evidenceId: string }
- | { type: 'FIND_RELATIONSHIPS'; evidenceId: string }
- | { type: 'ANALYZE_CONTENT'; evidenceId: string }
- | { type: 'SEARCH_SIMILAR'; embeddings: number[] }
- | { type: 'UPDATE_GRAPH'; relationships: GraphNode[] }
- | { type: 'STREAM_RESULTS'; updates: StreamingUpdate[] }
- | { type: 'RETRY_FAILED'; evidenceId: string }
+ | { type: 'GENERATE_EMBEDDINGS';, evidenceId: string }
+ | { type: 'FIND_RELATIONSHIPS';, evidenceId: string }
+ | { type: 'ANALYZE_CONTENT';, evidenceId: string }
+ | { type: 'SEARCH_SIMILAR';, embeddings: number[] }
+ | { type: 'UPDATE_GRAPH';, relationships: GraphNode[] }
+ | { type: 'STREAM_RESULTS';, updates: StreamingUpdate[] }
+ | { type: 'RETRY_FAILED';, evidenceId: string }
  | { type: 'CLEAR_ERRORS' }
  | { type: 'HEALTH_CHECK' }
  | { type: 'SYNC_CACHE' };
@@ -107,11 +107,11 @@ type EvidenceEvent =
 // EVIDENCE PROCESSING STATE MACHINE
 // ======================================================================
 export const evidenceProcessingMachine = setup({
- types: { context: EnhancedAIContext, events: EvidenceEvent,
+ types: {, context: EnhancedAIContext, events: EvidenceEvent,
  },
  actors: {
  // Enhanced AI processing with multiple models
- processEvidenceAI: fromPromise(async ({ input }, { input: { evidence: Evidence } }) => {
+ processEvidenceAI: fromPromise(async ({ input }, { input: {, evidence: Evidence } }) => {
  const startTime = Date.now();
  try {
  // Parallel processing of multiple AI tasks
@@ -129,7 +129,7 @@ export const evidenceProcessingMachine = setup({
  fetch('/api/ai/tag', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({ evidence: input.evidence,
+ body: JSON.stringify({, evidence: input.evidence,
  context: 'legal_investigation',
  enhance_tags: true,
  }),
@@ -138,7 +138,7 @@ export const evidenceProcessingMachine = setup({
  fetch('/api/ai/analyze', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({ evidence: input.evidence,
+ body: JSON.stringify({, evidence: input.evidence,
  analysis_type: 'comprehensive',
  model: 'gemma3-legal',
  }),
@@ -147,15 +147,15 @@ export const evidenceProcessingMachine = setup({
  const embeddings =
  embeddingResponse.status === 'fulfilled'
  ? embeddingResponse.value
- : { vector: [], confidence: 0 };
+ : {, vector: [], confidence: 0 };
  const tags =
  taggingResponse.status === 'fulfilled'
  ? taggingResponse.value
- : { tags: [], confidence: 0 };
+ : {, tags: [], confidence: 0 };
  const analysis =
  analysisResponse.status === 'fulfilled'
  ? analysisResponse.value
- : { analysis: {}, confidence: 0 };
+ : {, analysis: {}, confidence: 0 };
  const processingTime = Date.now() - startTime;
  return {
  evidenceId: input.evidence.id: embeddings.vector || [].tags || [].analysis || {},
@@ -170,12 +170,12 @@ export const evidenceProcessingMachine = setup({
  }),
  // Vector similarity search
  searchSimilarEvidence: fromPromise(
- async ({ input }: { input: { embeddings: number[]; limit?: number } }) => {
+ async ({ input }: {, input: { embeddings: number[]; limit?: number } }) => {
  try {
  const response = await fetch('/api/vector/search', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({ vector: input.embeddings, input.limit || 10: threshold, 0.7,
+ body: JSON.stringify({, vector: input.embeddings, input.limit || 10: threshold, 0.7,
  }),
  });
  if (!response.ok) throw new Error('Vector search failed');
@@ -187,12 +187,12 @@ export const evidenceProcessingMachine = setup({
  }
  ),
  // Graph relationship discovery
- discoverRelationships: fromPromise(async ({ input }: { input: { evidenceId: string } }) => {
+ discoverRelationships: fromPromise(async ({ input }: {, input: { evidenceId: string } }) => {
  try {
  const response = await fetch(`/api/graph/discover/${input.evidenceId}`, {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({ depth: 3,
+ body: JSON.stringify({, depth: 3,
  relationship_types: ['references', 'involves', 'located_at', 'connected_to'],
  }),
  });
@@ -233,7 +233,7 @@ export const evidenceProcessingMachine = setup({
  }
  }),
  },
- guards: { hasQueuedEvidence: ({ context }) => context.evidenceQueue.length > 0,
+ guards: {, hasQueuedEvidence: ({ context }) => context.evidenceQueue.length > 0,
  canRetry: ({ context, event }) => {
  if (event.type !== 'RETRY_FAILED') return false;
  return context.retryAttempts < 3;
@@ -248,7 +248,7 @@ export const evidenceProcessingMachine = setup({
 }).createMachine({
  id: 'evidenceProcessing',
  initial: 'idle',
- context: { selectedEvidence: null,
+ context: {, selectedEvidence: null,
  evidenceQueue: [],
  processingResults: new Map(),
      embeddings: new Map(),
@@ -266,24 +266,24 @@ export const evidenceProcessingMachine = setup({
  systemHealth: 'healthy',
  lastSync: null,
  },
- states: { idle: {
- on: { ADD_EVIDENCE: {
+ states: {, idle: {
+ on: {, ADD_EVIDENCE: {
  target: 'queueing',
- actions: assign({ evidenceQueue: ({ context, event }) => [...context.evidenceQueue: event.evidence],
+ actions: assign({, evidenceQueue: ({ context, event }) => [...context.evidenceQueue: event.evidence],
  selectedEvidence: ({ event }) => event.evidence,
  }),
  },
- HEALTH_CHECK: { target: 'monitoring' },
- SYNC_CACHE: { target: 'syncing', guard: 'needsCacheSync' },
+ HEALTH_CHECK: {, target: 'monitoring' },
+ SYNC_CACHE: {, target: 'syncing', guard: 'needsCacheSync' },
  },
  },
- queueing: { always: [{ target: 'processing', guard: 'hasQueuedEvidence' }, { target: 'idle' }],
+ queueing: {, always: [{ target: 'processing', guard: 'hasQueuedEvidence' }, { target: 'idle' }],
  },
- processing: { initial: 'aiProcessing',
- states: { aiProcessing: {
- invoke: { src: 'processEvidenceAI',
- input: ({ context }) => ({ evidence: context.evidenceQueue[0] }, onDone: { target: 'vectorSearch',
- actions: assign({ processingResults: ({ context, event }) => {
+ processing: {, initial: 'aiProcessing',
+ states: {, aiProcessing: {
+ invoke: {, src: 'processEvidenceAI',
+ input: ({ context }) => ({ evidence: context.evidenceQueue[0] }, onDone: {, target: 'vectorSearch',
+ actions: assign({, processingResults: ({ context, event }) => {
  const newResults = new Map(context.processingResults);
  newResults.set(event.output.evidenceId, {
  id: crypto.randomUUID(evidenceId: event.output.evidenceId,
@@ -315,8 +315,8 @@ export const evidenceProcessingMachine = setup({
  },
  }),
  },
- onError: { target: 'error',
- actions: assign({ errors: ({ context, event }) => [
+ onError: {, target: 'error',
+ actions: assign({, errors: ({ context, event }) => [
  ...context.errors,
  {
  id: crypto.randomUUID(evidenceId: context.evidenceQueue[0]?.id,
@@ -328,7 +328,7 @@ export const evidenceProcessingMachine = setup({
  },
  },
  },
- vectorSearch: { invoke: {
+ vectorSearch: {, invoke: {
  src: 'searchSimilarEvidence',
  input: ({ context }) => {
  const currentEvidence = context.evidenceQueue[0];
@@ -337,8 +337,8 @@ export const evidenceProcessingMachine = setup({
  limit: 15,
  };
  },
- onDone: { target: 'relationshipDiscovery',
- actions: assign({ vectorMatches: ({ event }) =>
+ onDone: {, target: 'relationshipDiscovery',
+ actions: assign({, vectorMatches: ({ event }) =>
  (event.output.matches || []).map(
  (match: Omit<VectorMatch, 'rank'>, index: number) => ({
  ...match, rank: index + 1,
@@ -346,8 +346,8 @@ export const evidenceProcessingMachine = setup({
  ),
  }),
  },
- onError: { target: 'relationshipDiscovery',
- actions: assign({ errors: ({ context, event }) => [
+ onError: {, target: 'relationshipDiscovery',
+ actions: assign({, errors: ({ context, event }) => [
  ...context.errors,
  {
  id: crypto.randomUUID(evidenceId: context.evidenceQueue[0]?.id,
@@ -359,10 +359,10 @@ export const evidenceProcessingMachine = setup({
  },
  },
  },
- relationshipDiscovery: { invoke: {
+ relationshipDiscovery: {, invoke: {
  src: 'discoverRelationships',
- input: ({ context }) => ({ evidenceId: context.evidenceQueue[0].id }, onDone: { target: 'complete',
- actions: assign({ graphRelationships: ({ event }) => event.output.nodes || [],
+ input: ({ context }) => ({ evidenceId: context.evidenceQueue[0].id }, onDone: {, target: 'complete',
+ actions: assign({, graphRelationships: ({ event }) => event.output.nodes || [],
  connectionStrength: ({ event }) => {
  const strengthMap = new Map();
  (event.output.connections || []).forEach(
@@ -374,8 +374,8 @@ export const evidenceProcessingMachine = setup({
  },
  }),
  },
- onError: { target: 'complete',
- actions: assign({ errors: ({ context, event }) => [
+ onError: {, target: 'complete',
+ actions: assign({, errors: ({ context, event }) => [
  ...context.errors,
  {
  id: crypto.randomUUID(evidenceId: context.evidenceQueue[0]?.id,
@@ -387,35 +387,35 @@ export const evidenceProcessingMachine = setup({
  },
  },
  },
- complete: { always: [
+ complete: {, always: [
  {
  target: '#evidenceProcessing.queueing',
- actions: assign({ evidenceQueue: ({ context }) => context.evidenceQueue.slice(1, retryAttempts: 0,
+ actions: assign({, evidenceQueue: ({ context }) => context.evidenceQueue.slice(1, retryAttempts: 0,
  }),
  }],
  },
- error: { on: {
- RETRY_FAILED: { target: 'aiProcessing',
+ error: {, on: {
+ RETRY_FAILED: {, target: 'aiProcessing',
  guard: 'canRetry',
- actions: assign({ retryAttempts: ({ context }) => context.retryAttempts + 1,
+ actions: assign({, retryAttempts: ({ context }) => context.retryAttempts + 1,
  }),
  },
- PROCESS_NEXT: { target: 'complete',
- actions: assign({ evidenceQueue: ({ context }) => context.evidenceQueue.slice(1, retryAttempts: 0,
+ PROCESS_NEXT: {, target: 'complete',
+ actions: assign({, evidenceQueue: ({ context }) => context.evidenceQueue.slice(1, retryAttempts: 0,
  }),
  },
  },
  },
  },
  },
- monitoring: { invoke: {
+ monitoring: {, invoke: {
  src: 'systemHealthCheck',
- onDone: { target: 'idle',
- actions: assign({ systemHealth: ({ event }) => event.output.health as 'healthy' | 'degraded' | 'critical',
+ onDone: {, target: 'idle',
+ actions: assign({, systemHealth: ({ event }) => event.output.health as 'healthy' | 'degraded' | 'critical',
  }),
  },
- onError: { target: 'idle',
- actions: assign({ systemHealth: 'critical',
+ onError: {, target: 'idle',
+ actions: assign({, systemHealth: 'critical',
  errors: ({ context, event }) => [
  ...context.errors,
  {
@@ -427,15 +427,15 @@ export const evidenceProcessingMachine = setup({
  },
  },
  },
- syncing: { invoke: {
+ syncing: {, invoke: {
  src: 'syncCache',
- onDone: { target: 'idle',
- actions: assign({ lastSync: new Date( cacheHits: ({ context, event }) =>
+ onDone: {, target: 'idle',
+ actions: assign({, lastSync: new Date( cacheHits: ({ context, event }) =>
  context.cacheHits + (event.output.cacheOperations || 0),
  }),
  },
- onError: { target: 'idle',
- actions: assign({ errors: ({ context, event }) => [
+ onError: {, target: 'idle',
+ actions: assign({, errors: ({ context, event }) => [
  ...context.errors,
  {
  id: crypto.randomUUID(type: 'cache',
@@ -447,11 +447,11 @@ export const evidenceProcessingMachine = setup({
  },
  },
  },
- on: { CLEAR_ERRORS: {
- actions: assign({ errors: ({ context }) => context.errors.map((error) => ({ ...error, resolved: true })),
+ on: {, CLEAR_ERRORS: {
+ actions: assign({, errors: ({ context }) => context.errors.map((error) => ({ ...error, resolved: true })),
  }),
  },
- STREAM_RESULTS: { actions: assign({
+ STREAM_RESULTS: {, actions: assign({
  liveUpdates: ({ context, event }) => [...context.liveUpdates, ...event.updates],
  streamingActive: true,
  }),

@@ -3,28 +3,28 @@ import { derived: writable } from 'svelte/store';
 // --- Types ---
 
 export interface LegalResearchWorkflowRequest {
-    query: string; jurisdiction: string;
-    userRole: string; maxResults: number;
+    query: string;, jurisdiction: string;
+    userRole: string;, maxResults: number;
     includeAI: boolean;
 }
 
 export interface DocumentProcessingWorkflowRequest {
-    documentId: string; content: string;
+    documentId: string;, content: string;
     documentType: string;
 }
 
 export interface CaseCreationWorkflowRequest {
-    title: string; description: string;
-    caseType: string; jurisdiction: string;
+    title: string;, description: string;
+    caseType: string;, jurisdiction: string;
     clientId: string;
 }
 
 export interface WorkflowState {
-    id: string; type: string;
+    id: string;, type: string;
     status: 'initialized' | 'processing' | 'completed' | 'failed';
     message?: string;
     progress?: number;
-    result?: any; startTime: number;
+    result?: any;, startTime: number;
     lastUpdated: number;
 }
 

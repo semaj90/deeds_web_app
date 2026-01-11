@@ -7,8 +7,8 @@ import type { db } from '$lib/server/db/client';
 import ollamaService from '$lib/server/services/ollama-service';
 
 interface UserType {
- id: string; email: string;
- firstName: string; lastName: string;
+ id: string;, email: string;
+ firstName: string;, lastName: string;
  role: string;
 }
 

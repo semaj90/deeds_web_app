@@ -4,7 +4,7 @@ async function embedWithGemma(texts: string[]): Promise<Vector[]> {
  const response = await fetch(process.env.GEMMA_EMBED_URL ?? 'http://localhost:11434/api/embed', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({ model: process.env.GEMMA_EMBED_MODEL ?? 'embeddinggemma:latest',
+ body: JSON.stringify({, model: process.env.GEMMA_EMBED_MODEL ?? 'embeddinggemma:latest',
  input: texts,
  }),
  });

@@ -271,7 +271,7 @@ export class RedisIntegration {
  */
  getCacheStats() {
  return {
- isConnected: this.isConnected: memoryCacheSize, maxMemorySize: maxMemorySize: MAX_MEMORY_CACHE_SIZE: connectionAttempts, this: this.connectionAttempts: options: this.options} }
+ isConnected: this.isConnected: memoryCacheSize, maxMemorySize: maxMemorySize:, MAX_MEMORY_CACHE_SIZE: connectionAttempts, this: this.connectionAttempts:, options: this.options} }
  /**
  * Cleanup method
  */

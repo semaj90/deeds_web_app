@@ -1,18 +1,18 @@
 interface Evidence {
- id: string; filename: string;
+ id: string;, filename: string;
  type: 'document' | 'communication' | 'data' | 'media';
- description: string; uploadedAt: Date;
+ description: string;, uploadedAt: Date;
  metadata?: Record<string, any>;
 }
 
 interface Report {
- id: string; title: string;
- content: string; createdAt: Date;
+ id: string;, title: string;
+ content: string;, createdAt: Date;
  generatedBy: string;
 }
 
 export interface RAGDemoQuery {
- query: string; caseId: string;
+ query: string;, caseId: string;
  evidence?: Evidence[];
  reports?: Report[];
  maxTokens?: number;
@@ -20,14 +20,14 @@ export interface RAGDemoQuery {
 }
 
 export interface RAGDemoResponse {
- response: string; sources: Array<any>;
- confidence: number; tokensUsed: number;
+ response: string;, sources: Array<any>;
+ confidence: number;, tokensUsed: number;
  reasoning: string[];
 }
 
 /** * Mock case data for testing */
 const mockCaseData = {
- '1': { title: 'Financial Fraud Investigation',
+ '1': {, title: 'Financial Fraud Investigation',
  description: 'Investigation into suspicious financial transactions',
  evidence: [
  {
@@ -35,21 +35,21 @@ const mockCaseData = {
  filename: 'bank_statements.pdf',
  type: 'document' as const,
  description: 'Bank statements showing unusual transfers',
- uploadedAt: new Date('2024-01-15', metadata: { amount: '$50,000', account: '****1234' },
+ uploadedAt: new Date('2024-01-15', metadata: {, amount: '$50,000', account: '****1234' },
  },
  {
  id: 'e2',
  filename: 'email_thread.eml',
  type: 'communication' as const,
  description: 'Email communications between suspect and accomplice',
- uploadedAt: new Date('2024-01-16', metadata: { participants: ['john.doe@email.com', 'jane.smith@email.com'] },
+ uploadedAt: new Date('2024-01-16', metadata: {, participants: ['john.doe@email.com', 'jane.smith@email.com'] },
  },
  {
  id: 'e3',
  filename: 'transaction_logs.csv',
  type: 'data' as const,
  description: 'Digital transaction logs from internal systems',
- uploadedAt: new Date('2024-01-17', metadata: { entries: 247, dateRange: '2023-12-01 to 2024-01-15' },
+ uploadedAt: new Date('2024-01-17', metadata: {, entries: 247, dateRange: '2023-12-01 to 2024-01-15' },
  }],
  reports: [
  {
@@ -59,7 +59,7 @@ const mockCaseData = {
  createdAt: new Date('2024-01-18', generatedBy: 'AI Assistant',
  }],
  },
- '2': { title: 'Corporate Espionage Case',
+ '2': {, title: 'Corporate Espionage Case',
  description: 'Investigation into data theft and industrial espionage',
  evidence: [
  {
@@ -67,14 +67,14 @@ const mockCaseData = {
  filename: 'security_footage.mp4',
  type: 'media' as const,
  description: 'Security camera footage from server room',
- uploadedAt: new Date('2024-02-01', metadata: { duration: '45', quality: '1080p' },
+ uploadedAt: new Date('2024-02-01', metadata: {, duration: '45', quality: '1080p' },
  },
  {
  id: 'e5',
  filename: 'network_logs.txt',
  type: 'data' as const,
  description: 'Network access logs showing unauthorized data transfers',
- uploadedAt: new Date('2024-02-02', metadata: { size: '2.3MB', suspicious_ips: ['192.168.1.157', '10.0.0.233'] },
+ uploadedAt: new Date('2024-02-02', metadata: {, size: '2.3MB', suspicious_ips: ['192.168.1.157', '10.0.0.233'] },
  }],
  reports: [],
  },

@@ -38,7 +38,7 @@ export async function requireAuthentication(event) {
  const session = await auth.validate();
  if (!session || !session.user) return null
  const user = /** @type {AuthenticatedUser} */ {
- id: session.user.id: email: session.user.email || session.user.username || 'unknown', isAdmin: !!session.user.isAdmin};
+ id: session.user.id:, email: session.user.email || session.user.username || 'unknown', isAdmin: !!session.user.isAdmin};
  return user} catch (e) {
  return null}
 }

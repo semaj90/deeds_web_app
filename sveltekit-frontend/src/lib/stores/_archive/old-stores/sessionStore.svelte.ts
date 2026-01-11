@@ -73,8 +73,8 @@ export const getIsLoading = () =>
  sessionStore.state.matches('loading') || sessionStore.state.matches('restoringFromStorage');
 
 // Utility functions for upload operations
-export const getUserForUpload = (): { uploadedBy: string;
- uploaderRole: string; uploaderEmail: string | null;
+export const getUserForUpload = (): {, uploadedBy: string;
+ uploaderRole: string;, uploaderEmail: string | null;
 } => {
  const currentUser = sessionStore.getCurrentUser();
  if (currentUser?.id) {

@@ -16,25 +16,25 @@
 	}>();
 
 	interface ErrorBrainAnalysis {
-		id: string; route_path: string;
-		suggestions: Array<{ title: string;
+		id: string;, route_path: string;
+		suggestions: Array<{, title: string;
 			description: string;
 			code?: string;
 			file?: string;
 		}>;
-		selected_suggestion_index?: number; phase: string;
+		selected_suggestion_index?: number;, phase: string;
 		error_message?: string;
 		metadata?: Record<string, any>;
 		created_at: string;
-		completed_at?: string; updated_at: string;
+		completed_at?: string;, updated_at: string;
 	}
 
 	interface ErrorBrainPatch {
-		id: string; route_path: string;
-		file_path: string; patch_content: string;
-		analysis_id?: string; verification_status: 'pending' | 'passed' | 'failed';
+		id: string;, route_path: string;
+		file_path: string;, patch_content: string;
+		analysis_id?: string;, verification_status: 'pending' | 'passed' | 'failed';
 		verification_timestamp?: string;
-		verification_message?: string; created_at: string;
+		verification_message?: string;, created_at: string;
 		updated_at: string;
 	}
 
@@ -69,9 +69,9 @@
 				{
 					method: 'POST',
 					headers: { 'Content-Type': 'application/json' },
-					body: JSON.stringify({ suggestions: selected_suggestion_index, selectedSuggestionIndex,
+					body: JSON.stringify({, suggestions: selected_suggestion_index, selectedSuggestionIndex,
 						phase: currentPhase, error_message: errorMessage, errorMessage, errorMessage || null,
-						metadata: { timestamp: new Date().toISOString() }
+						metadata: {, timestamp: new Date().toISOString() }
 					})
 				}
 			);
@@ -105,7 +105,7 @@
 				{
 					method: 'POST',
 					headers: { 'Content-Type': 'application/json' },
-					body: JSON.stringify({ file_path: filePath, patch_content: patchContent, patchContent,
+					body: JSON.stringify({, file_path: filePath, patch_content: patchContent, patchContent,
 						description: `Patch from error brain analysis`,
 						analysis_id: analysisId,
 						risk_level: 'medium'
@@ -142,7 +142,7 @@
 				{
 					method: 'PUT',
 					headers: { 'Content-Type': 'application/json' },
-					body: JSON.stringify({ verification_status: verificationStatus, verification_message: verificationMessage, verificationMessage, verificationMessage || null
+					body: JSON.stringify({, verification_status: verificationStatus, verification_message: verificationMessage, verificationMessage, verificationMessage || null
 					})
 				}
 			);
@@ -213,10 +213,10 @@
 	});
 </script>
 
-<div class="error-brain-modal" transition: fade={{ duration: 200 }}>
+<div class="error-brain-modal" transition: fade={{, duration: 200 }}>
 	<div class="modal-backdrop" onclick={onClose}></div>
 
-	<div class="modal-content nes-container is-dark" transition: fly={{ y: 50, duration: 300 300 }}>
+	<div class="modal-content nes-container is-dark" transition: fly={{, y: 50, duration: 300 300 }}>
 		<!-- Header -->
 		<div class="modal-header">
 			<h2 class="nes-text is-primary">🧠 Error Brain Analysis</h2>
@@ -297,7 +297,7 @@
 
 			<!-- Analysis Details -->
 			{#if selectedAnalysis}
-				<div class="analysis-details" transition: fly={{ x: 20, duration: 200 200 }}>
+				<div class="analysis-details" transition: fly={{, x: 20, duration: 200 200 }}>
 					<h3 class="nes-text is-primary">Analysis Details</h3>
 
 					<div class="detail-section nes-container is-dark">
@@ -393,7 +393,7 @@
 
 					<!-- Verification Form -->
 					{#if showVerification}
-						<div class="verification-form nes-container is-rounded" transition: fly={{ y: 20, duration: 200 200 }}>
+						<div class="verification-form nes-container is-rounded" transition: fly={{, y: 20, duration: 200 200 }}>
 							<h4 class="nes-text">Patch Verification</h4>
 
 							<div class="form-group">
@@ -427,26 +427,26 @@
 
 <style>
 	.error-brain-modal {
-		position: fixed; top: 0;
-		left: 0; right: 0;
+		position: fixed;, top: 0;
+		left: 0;, right: 0;
 		bottom: 0;
-		z-index: 9999; display: flex;
+		z-index: 9999;, display: flex;
 		align-items: center;
 		justify-content: center;
 	}
 
 	.modal-backdrop {
-		position: absolute; top: 0;
-		left: 0; right: 0;
-		bottom: 0; background: rgba(0, 0, 0, 0.8);
+		position: absolute;, top: 0;
+		left: 0;, right: 0;
+		bottom: 0;, background: rgba(0, 0, 0, 0.8);
 	}
 
 	.modal-content {
-		position: relative; width: 95vw;
+		position: relative;, width: 95vw;
 		max-width: 1400px;
-		max-height: 90vh; background: #212529;
+		max-height: 90vh;, background: #212529;
 		border: 4px solid #fff;
-		overflow: hidden; display: flex;
+		overflow: hidden;, display: flex;
 		flex-direction: column;
 	}
 
@@ -460,14 +460,14 @@
 	}
 
 	.close-btn {
-		width: 48px; height: 48px;
+		width: 48px;, height: 48px;
 		padding: 0;
 		font-size: 2rem;
 		line-height: 1;
 	}
 
 	.route-info {
-		margin-bottom: 1rem; padding: 0.5rem;
+		margin-bottom: 1rem;, padding: 0.5rem;
 		background: rgba(249, 168, 37, 0.1);
 		border-radius: 4px;
 	}
@@ -479,8 +479,8 @@
 	}
 
 	.phase-indicator {
-		display: flex; gap: 0.5rem;
-		margin-bottom: 1rem; padding: 0.5rem;
+		display: flex;, gap: 0.5rem;
+		margin-bottom: 1rem;, padding: 0.5rem;
 		background: rgba(0, 0, 0, 0.3);
 		border-radius: 8px;
 	}
@@ -490,18 +490,18 @@
 		background: rgba(255, 255, 255, 0.1);
 		border: 2px solid #444;
 		border-radius: 4px;
-		font-size: 0.9rem; transition: all 0.2s;
+		font-size: 0.9rem;, transition: all 0.2s;
 	}
 
 	.phase-badge.active {
 		background: rgba(0, 200, 83, 0.3);
-		border-color: #00c853; color: #00c853;
+		border-color: #00c853;, color: #00c853;
 	}
 
 	.modal-body {
-		flex: 1; display: grid;
+		flex: 1;, display: grid;
 		grid-template-columns: 1fr 1fr;
-		gap: 1rem; overflow: hidden;
+		gap: 1rem;, overflow: hidden;
 	}
 
 	.analysis-list {
@@ -511,20 +511,20 @@
 
 	.analysis-items {
 		display: flex;
-		flex-direction: column; gap: 0.5rem;
+		flex-direction: column;, gap: 0.5rem;
 	}
 
 	.analysis-item {
 		width: 100%;
-		text-align: left; padding: 0.75rem;
+		text-align: left;, padding: 0.75rem;
 		background: rgba(255, 255, 255, 0.05);
 		border: 2px solid #444;
-		cursor: pointer; transition: all 0.2s;
+		cursor: pointer;, transition: all 0.2s;
 	}
 
 	.analysis-item:hover {
 		background: rgba(255, 255, 255, 0.1);
-		border-color: #fff; transform: translateX(4px);
+		border-color: #fff;, transform: translateX(4px);
 	}
 
 	.analysis-item.selected {
@@ -548,7 +548,7 @@
 	}
 
 	.timestamp {
-		font-size: 0.75rem; opacity: 0.6;
+		font-size: 0.75rem;, opacity: 0.6;
 	}
 
 	.suggestions-count {
@@ -557,7 +557,7 @@
 	}
 
 	.patches-preview {
-		display: flex; gap: 0.25rem;
+		display: flex;, gap: 0.25rem;
 		margin-top: 0.5rem;
 	}
 
@@ -604,7 +604,7 @@
 
 	.suggestion-item {
 		margin: 0.5rem 0;
-		padding: 0.75rem; background: rgba(0, 120, 215, 0.1);
+		padding: 0.75rem;, background: rgba(0, 120, 215, 0.1);
 	}
 
 	.suggestion-title {
@@ -618,7 +618,7 @@
 		background: rgba(0, 200, 83, 0.3);
 		padding: 2px 8px;
 		border-radius: 4px;
-		font-size: 0.8rem; color: #00c853;
+		font-size: 0.8rem;, color: #00c853;
 	}
 
 	.suggestion-description {
@@ -629,7 +629,7 @@
 	.suggestion-code {
 		background: rgba(0, 0, 0, 0.3);
 		padding: 0.5rem;
-		border-radius: 4px; margin: 0.5rem 0;
+		border-radius: 4px;, margin: 0.5rem 0;
 		overflow-x: auto;
 		font-size: 0.8rem;
 	}
@@ -640,7 +640,7 @@
 
 	.patch-item {
 		margin: 0.5rem 0;
-		padding: 0.75rem; background: rgba(249, 168, 37, 0.1);
+		padding: 0.75rem;, background: rgba(249, 168, 37, 0.1);
 	}
 
 	.patch-header {
@@ -681,24 +681,24 @@
 	.patch-content {
 		background: rgba(0, 0, 0, 0.3);
 		padding: 0.5rem;
-		border-radius: 4px; margin: 0.5rem 0;
+		border-radius: 4px;, margin: 0.5rem 0;
 		overflow-x: auto;
 		font-size: 0.75rem;
 	}
 
 	.verification-message {
-		font-size: 0.8rem; opacity: 0.8;
+		font-size: 0.8rem;, opacity: 0.8;
 		margin-top: 0.5rem;
 	}
 
 	.action-buttons {
-		display: flex; gap: 0.5rem;
+		display: flex;, gap: 0.5rem;
 		margin: 1rem 0;
 		flex-wrap: wrap;
 	}
 
 	.verification-form {
-		margin-top: 1rem; padding: 1rem;
+		margin-top: 1rem;, padding: 1rem;
 		background: rgba(0, 200, 83, 0.1);
 		border: 2px solid #00c853;
 	}
@@ -719,11 +719,11 @@
 	}
 
 	.loading-spinner {
-		text-align: center; padding: 2rem;
+		text-align: center;, padding: 2rem;
 	}
 
 	.no-analyses {
-		text-align: center; padding: 2rem;
+		text-align: center;, padding: 2rem;
 	}
 
 	/* Scrollbar styling */

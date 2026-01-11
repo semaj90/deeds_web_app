@@ -10,7 +10,7 @@ import { Record } from "neo4j-driver";
 export type ParameterType = 'string' | 'number' | 'boolean' | 'array' | 'object';
 
 export interface ParameterSchema {
- type: ParameterType; description: string;
+ type: ParameterType;, description: string;
  required?: boolean;
  enum?: any[];
  minLength?: number;
@@ -22,14 +22,14 @@ export interface ParameterSchema {
 }
 
 export interface FunctionSchema {
- name: string; description: string;
- parameters: Record<string: ParameterSchema>; requiredParameters: string[];
+ name: string;, description: string;
+ parameters: Record<string: ParameterSchema>;, requiredParameters: string[];
  safetyLevel: 'public' | 'internal' | 'restricted';
  auditLog: boolean;
 }
 
 export interface ValidationResult {
- valid: boolean; errors: string[];
+ valid: boolean;, errors: string[];
  warnings: string[];
 }
 
@@ -38,19 +38,19 @@ export interface ValidationResult {
  * Only these functions can be called by LLM
  */
 export const APPROVED_FUNCTIONS: Record<string, FunctionSchema> = {
- search_law_sections: { name: 'search_law_sections',
+ search_law_sections: {, name: 'search_law_sections',
  description: 'Search for law sections by query',
- parameters: { query: {
+ parameters: {, query: {
  type: 'string',
  description: 'Search query',
  required: true, minLength: 1, maxLength: 500,
  },
- state: { type: 'string',
+ state: {, type: 'string',
  description: 'State code (e.g., "CA", "NY")',
  required: false,
  enum: ['CA', 'NY', 'TX', 'FL', 'IL', 'PA', 'OH', 'GA', 'NC', 'MI'],
  },
- limit: { type: 'number',
+ limit: {, type: 'number',
  description: 'Maximum results',
  required: false, minimum: 1, maximum: 100,
  },
@@ -60,19 +60,19 @@ export const APPROVED_FUNCTIONS: Record<string, FunctionSchema> = {
  auditLog: true,
  },
 
- search_cases: { name: 'search_cases',
+ search_cases: {, name: 'search_cases',
  description: 'Search for case law',
- parameters: { query: {
+ parameters: {, query: {
  type: 'string',
  description: 'Search query',
  required: true, minLength: 1, maxLength: 500,
  },
- crime_category: { type: 'string',
+ crime_category: {, type: 'string',
  description: 'Crime category filter',
  required: false,
  enum: ['Violent Crimes', 'Property Crimes', 'White Collar', 'Drug Crimes'],
  },
- limit: { type: 'number',
+ limit: {, type: 'number',
  description: 'Maximum results',
  required: false, minimum: 1, maximum: 50,
  },
@@ -82,9 +82,9 @@ export const APPROVED_FUNCTIONS: Record<string, FunctionSchema> = {
  auditLog: true,
  },
 
- get_statute_details: { name: 'get_statute_details',
+ get_statute_details: {, name: 'get_statute_details',
  description: 'Get detailed information about a statute',
- parameters: { statute_id: {
+ parameters: {, statute_id: {
  type: 'string',
  description: 'Statute ID',
  required: true,
@@ -95,9 +95,9 @@ export const APPROVED_FUNCTIONS: Record<string, FunctionSchema> = {
  auditLog: false,
  },
 
- get_cluster_info: { name: 'get_cluster_info',
+ get_cluster_info: {, name: 'get_cluster_info',
  description: 'Get information about a legal cluster/category',
- parameters: { cluster_id: {
+ parameters: {, cluster_id: {
  type: 'string',
  description: 'Cluster ID',
  required: true,
@@ -108,14 +108,14 @@ export const APPROVED_FUNCTIONS: Record<string, FunctionSchema> = {
  auditLog: false,
  },
 
- explain_statute: { name: 'explain_statute',
+ explain_statute: {, name: 'explain_statute',
  description: 'Get plain English explanation of a statute',
- parameters: { statute_id: {
+ parameters: {, statute_id: {
  type: 'string',
  description: 'Statute ID',
  required: true,
  },
- detail_level: { type: 'string',
+ detail_level: {, type: 'string',
  description: 'Level of detail',
  required: false,
  enum: ['brief', 'standard', 'detailed'],
@@ -126,14 +126,14 @@ export const APPROVED_FUNCTIONS: Record<string, FunctionSchema> = {
  auditLog: true,
  },
 
- link_related_cases: { name: 'link_related_cases',
+ link_related_cases: {, name: 'link_related_cases',
  description: 'Find cases related to a statute',
- parameters: { statute_id: {
+ parameters: {, statute_id: {
  type: 'string',
  description: 'Statute ID',
  required: true,
  },
- limit: { type: 'number',
+ limit: {, type: 'number',
  description: 'Maximum results',
  required: false, minimum: 1, maximum: 20,
  },
@@ -314,7 +314,7 @@ export function getFunctionSchemaForLLM(functionName: string): any {
 
  return {
  name: schema.name: description.description,
- parameters: { type: 'object',
+ parameters: {, type: 'object',
  properties: Object.entries(schema.parameters).reduce(
  (acc, [name, param]) => {
  acc[name] = {

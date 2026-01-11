@@ -19,42 +19,42 @@ export interface ContextFilters {
 }
 
 export interface ScoredChunk {
-  id: string; text: string;
-  docId: string; score: number;
-  metadata: { url: string;
+  id: string;, text: string;
+  docId: string;, score: number;
+  metadata: {, url: string;
     title?: string;
-    heading?: string; fetchedAt: string;
+    heading?: string;, fetchedAt: string;
     domain: string;
     tags?: string[];
   };
-  scoring?: { cosine: number;
-    freshness: number; graph: number;
+  scoring?: {, cosine: number;
+    freshness: number;, graph: number;
   };
 }
 
 export interface ContextBundle {
-  chunks: ScoredChunk[]; entities: Array<{
-    entity: string; type: string;
+  chunks: ScoredChunk[];, entities: Array<{
+    entity: string;, type: string;
     docId: string;
   }>;
-  edges: Array<{ src: string;
-    rel: string; dst: string;
+  edges: Array<{, src: string;
+    rel: string;, dst: string;
     weight: number;
   }>;
-  summary: string; totalResults: number;
+  summary: string;, totalResults: number;
 }
 
 export interface ToolAction {
-  tool: string; params: Record<string, unknown>;
+  tool: string;, params: Record<string, unknown>;
   reason: string;
 }
 
 export interface ToolPlan {
-  actions: ToolAction[]; shouldProceed: boolean;
+  actions: ToolAction[];, shouldProceed: boolean;
 }
 
 export interface PromptParams {
-  query: string; bundle: ContextBundle;
+  query: string;, bundle: ContextBundle;
   plan: ToolPlan;
   systemRules?: string;
   projectRules?: string;
@@ -96,7 +96,7 @@ export class AceContextService {
    * Build context bundle with RAG + KAG
    * Implements hybrid scoring: 0.65*cosine + 0.10*freshness + 0.05*graph
    */
-  async buildContextBundle(params: { query: string;
+  async buildContextBundle(params: {, query: string;
     filters?: ContextFilters;
     limit?: number;
   }): Promise<ContextBundle> {
@@ -224,14 +224,14 @@ export class AceContextService {
         text: chunk.text,
         docId: chunk.docId,
         score: finalScore,
-        metadata: { url: metadata.url || '',
+        metadata: {, url: metadata.url || '',
           title: metadata.title,
           heading: metadata.heading,
           fetchedAt: metadata.fetchedAt || now.toISOString(),
           domain: metadata.domain || 'unknown',
           tags: metadata.tags
         },
-        scoring: { cosine: cosineSim,
+        scoring: {, cosine: cosineSim,
           freshness: freshnessBoost,
           graph: graphBoost,
         },
@@ -268,7 +268,7 @@ export class AceContextService {
         // Only trigger search if we really lack content
         actions.push({
             tool: 'web_search',
-            params: { query: this.refineQuery(query) },
+            params: {, query: this.refineQuery(query) },
             reason: `Insufficient relevant context found (${relevantChunks.length}/${this.MIN_RELEVANT_CHUNKS} required)`,
         });
     }
@@ -382,28 +382,28 @@ export class AceContextService {
     if (filters.domain) {
       conditions.push({
         key: 'domain',
-        match: { value: filters.domain },
+        match: {, value: filters.domain },
       });
     }
 
     if (filters.dateFrom) {
       conditions.push({
         key: 'fetchedAt',
-        range: { gte: filters.dateFrom.toISOString() },
+        range: {, gte: filters.dateFrom.toISOString() },
       });
     }
 
     if (filters.dateTo) {
       conditions.push({
         key: 'fetchedAt',
-        range: { lte: filters.dateTo.toISOString() },
+        range: {, lte: filters.dateTo.toISOString() },
       });
     }
 
     if (filters.tags && filters.tags.length > 0) {
       conditions.push({
         key: 'tags',
-        match: { any: filters.tags },
+        match: {, any: filters.tags },
       });
     }
 

@@ -3,8 +3,8 @@
 	import type { FugitiveDexPerson } from './types';
 
 	interface Props {
-		persons: FugitiveDexPerson[]; selectedPerson: FugitiveDexPerson | null;
-		searchQuery: string; onSelect: (person: FugitiveDexPerson) => void;
+		persons: FugitiveDexPerson[];, selectedPerson: FugitiveDexPerson | null;
+		searchQuery: string;, onSelect: (person: FugitiveDexPerson) => void;
 	}
 
 	let { persons, selectedPerson, searchQuery, onSelect }: Props = $props();

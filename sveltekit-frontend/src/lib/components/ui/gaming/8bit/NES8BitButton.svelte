@@ -27,11 +27,11 @@
  let isPressed = $state(false);
 
  const variantColors = {
- primary: { bg: '#e4a672', shadow: '#b07a4a', text: '#2d1b0e' },
- secondary: { bg: '#6b7280', shadow: '#4b5563', text: '#ffffff' },
- info: { bg: '#60a5fa', shadow: '#3b82f6', text: '#1e3a5f' },
- warning: { bg: '#fbbf24', shadow: '#d97706', text: '#451a03' },
- danger: { bg: '#f87171', shadow: '#dc2626', text: '#450a0a' }
+ primary: {, bg: '#e4a672', shadow: '#b07a4a', text: '#2d1b0e' },
+ secondary: {, bg: '#6b7280', shadow: '#4b5563', text: '#ffffff' },
+ info: {, bg: '#60a5fa', shadow: '#3b82f6', text: '#1e3a5f' },
+ warning: {, bg: '#fbbf24', shadow: '#d97706', text: '#451a03' },
+ danger: {, bg: '#f87171', shadow: '#dc2626', text: '#450a0a' }
  };
 
  const sizeStyles = {

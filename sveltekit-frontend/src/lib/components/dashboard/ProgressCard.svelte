@@ -127,9 +127,9 @@
 
 <style>
  .progress-card {
- background: var(--beige); border: var(--border-width) solid var(--bronze);
- border-radius: var(--border-radius); padding: var(--space-lg);
- box-shadow: var(--shadow-subtle); transition: all 0.3s ease;
+ background: var(--beige);, border: var(--border-width) solid var(--bronze);
+ border-radius: var(--border-radius);, padding: var(--space-lg);
+ box-shadow: var(--shadow-subtle);, transition: all 0.3s ease;
  }
 
  .progress-card:hover {
@@ -139,7 +139,7 @@
 
  .progress-card-header {
  display: flex;
- align-items: center; gap: var(--space-md);
+ align-items: center;, gap: var(--space-md);
  margin-bottom: var(--space-lg);
  }
 
@@ -151,7 +151,7 @@
  .progress-card-title {
  font-family: var(--font-serif-heading);
  font-size: 1.125rem;
- font-weight: 600; color: var(--noir);
+ font-weight: 600;, color: var(--noir);
  margin: 0;
  }
 
@@ -160,20 +160,20 @@
  }
 
  .progress-status-text {
- font-size: 0.875rem; color: var(--noir);
- margin: 0; opacity: 0.9;
+ font-size: 0.875rem;, color: var(--noir);
+ margin: 0;, opacity: 0.9;
  }
 
  .progress-bar-container {
  background: var(--progress-background);
- border-radius: 2px; height: var(--progress-height);
- overflow: hidden; margin: var(--space-md) 0;
+ border-radius: 2px;, height: var(--progress-height);
+ overflow: hidden;, margin: var(--space-md) 0;
  border: var(--border-width) solid var(--navy);
  }
 
  .progress-bar-fill {
  background: linear-gradient(90deg, var(--bronze), var(--gold-accent));
- height: 100%; transition: width 0.3s ease;
+ height: 100%;, transition: width 0.3s ease;
  border-radius: 2px;
  }
 
@@ -187,24 +187,24 @@
 
  .progress-percentage {
  font-family: var(--font-mono-code);
- font-weight: 600; color: var(--noir);
+ font-weight: 600;, color: var(--noir);
  }
 
  .progress-eta {
- font-family: var(--font-mono-code); color: var(--noir);
+ font-family: var(--font-mono-code);, color: var(--noir);
  opacity: 0.8;
  }
 
  .progress-stage {
  font-family: var(--font-serif-heading);
- font-size: 0.875rem; color: var(--noir);
+ font-size: 0.875rem;, color: var(--noir);
  margin-top: var(--space-md);
  padding-top: var(--space-md);
  border-top: var(--border-width) solid var(--bronze);
  }
 
  .stage-info {
- display: flex; gap: var(--space-sm);
+ display: flex;, gap: var(--space-sm);
  align-items: center;
  }
 
@@ -214,23 +214,23 @@
 
  .stage-page-counter {
  font-family: var(--font-mono-code);
- font-size: 0.75rem; opacity: 0.8;
+ font-size: 0.75rem;, opacity: 0.8;
  }
 
  .progress-details {
  font-family: var(--font-mono-code);
- font-size: 0.75rem; color: var(--noir);
+ font-size: 0.75rem;, color: var(--noir);
  opacity: 0.7;
  margin-top: var(--space-sm);
  }
 
  .progress-complete {
  display: flex;
- align-items: center; gap: var(--space-sm);
- margin-top: var(--space-lg); padding: var(--space-md);
+ align-items: center;, gap: var(--space-sm);
+ margin-top: var(--space-lg);, padding: var(--space-md);
  background: rgba(74, 124, 89, 0.1);
  border: var(--border-width) solid #4a7c59;
- border-radius: var(--border-radius); color: #4a7c59;
+ border-radius: var(--border-radius);, color: #4a7c59;
  font-weight: 600;
  }
 
@@ -257,7 +257,7 @@
  }
 
  .progress-info {
- flex-direction: column; gap: var(--space-sm);
+ flex-direction: column;, gap: var(--space-sm);
  align-items: flex-start;
  }
  }

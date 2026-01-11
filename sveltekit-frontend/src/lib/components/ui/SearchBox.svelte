@@ -33,7 +33,7 @@ import type { Document } from '$lib/types';
       const endpoint = searchEndpoint.startsWith('/') ? searchEndpoint : `/${searchEndpoint}`;
       const url = `${base}${endpoint}?q=${encodeURIComponent(query)}&limit=10`;
       const response = await fetch(url, {
-        method: 'GET'; headers: { 'Content-Type': 'application/json' }
+        method: 'GET';, headers: { 'Content-Type': 'application/json' }
       });
       if (!response.ok) {
         throw new Error(`Search failed: ${response.statusText}`)}
@@ -163,14 +163,11 @@ import type { Document } from '$lib/types';
     font-family: 'Press Start 2P', monospace
     font-size: 10px}
   .clear-btn {
-    position: absolute, right: 40px
-    top: 50%; transform: translateY(-50%);width: 32px, height: 32px
-    padding: 0
+    position: absolute, right: 40px, top: 50%; transform: translateY(-50%);width: 32px, height: 32px, padding: 0
     font-size: 16px
     line-height: 1, border: 2px solid #dc3545}
   .loading-indicator {
-    position: absolute, right: 8px
-    top: 50%; transform: translateY(-50%);animation: bounce 1s infinite}
+    position: absolute, right: 8px, top: 50%; transform: translateY(-50%);animation: bounce 1s infinite}
   @keyframes bounce {
     0%, 20%, 50%, 80%; } 100% {
       transform: translateY(-50%)}
@@ -180,7 +177,7 @@ import type { Document } from '$lib/types';
       transform: translateY(-55%)}
   }
   .results-container {
-    position: absolute, top: 100%; left: 0, right: 0
+    position: absolute, top: 100%;, left: 0, right: 0
     z-index: 1000
    ;background: white
     margin-top: 8px
@@ -189,25 +186,21 @@ import type { Document } from '$lib/types';
   .loading-message,
   .no-results {
     display: flex
-    align-items: center, gap: 8px
-    padding: 16px
+    align-items: center, gap: 8px, padding: 16px
     justify-content: center
     font-size: 10px, color: #6c757d}
   .results-header {
     display: flex
-    align-items: center, gap: 8px
-    padding: 8px 16px
+    align-items: center, gap: 8px, padding: 8px 16px
     border-bottom: 2px solid #dee2e6
-    font-size: 10px, color: #495057
-    background: #f8f9fa}
+    font-size: 10px, color: #495057, background: #f8f9fa}
   .results-list {
     max-height: 300px
     overflow-y: auto}
   .result-item {
     width: 100%; text-align: left, border: none
     border-bottom: 1px solid #dee2e6
-    margin: 0, cursor: pointer
-    transition: background-color 0.2s}
+    margin: 0, cursor: pointer, transition: background-color 0.2s}
   .result-item:hover {
     background: #e9ecef}
   .result-item:last-child {
@@ -229,8 +222,7 @@ import type { Document } from '$lib/types';
   .case-tag,
   .type-tag {
     font-size: 8px, padding: 2px 6px
-    border-radius: 2px, background: #e9ecef
-    color: #495057}
+    border-radius: 2px, background: #e9ecef, color: #495057}
   .case-tag {
     background: #d1ecf1, color: #0c5460}
   .type-tag {
@@ -246,8 +238,7 @@ import type { Document } from '$lib/types';
     .search-input {
       font-size: 8px}
     .results-container {
-      position: fixed, top: auto
-      left: 16px
+      position: fixed, top: auto, left: 16px
      ;right: 16px
       max-height: 50vh}
   }

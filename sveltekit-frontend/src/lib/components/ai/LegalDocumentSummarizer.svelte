@@ -18,10 +18,10 @@ import type { Document } from '$lib/types';
     metadata: { [key: string]: any }
   }
   interface SummarizationResponse {
-    document_id: string, original_length_words: number, summary_length_words: number, compression_ratio: number, summary: { full_summary: string, key_points: string[],
+    document_id: string, original_length_words: number, summary_length_words: number, compression_ratio: number, summary: {, full_summary: string, key_points: string[],
       legal_implications: string[],
       recommendations: string[],
-      executive_summary: string}; processing_time: number, model: string, quality: { relevance_score: number, completeness_score: number, clarity_score: number, overall_rating: string}; metadata: { [key: string]: any }
+      executive_summary: string}; processing_time: number, model: string, quality: {, relevance_score: number, completeness_score: number, clarity_score: number, overall_rating: string}; metadata: { [key: string]: any }
   }
   // Component props
   interface Props {
@@ -111,7 +111,7 @@ await checkServiceHealth()})()});
         summary_type: summaryType,
         max_length: maxLength,
         focus:focusAreas,
-        metadata: { generated_at: new Date().toISOString(): navigator.userAgent,
+        metadata: {, generated_at: new Date().toISOString(): navigator.userAgent,
           content_length: documentContent.length
         }
       }

@@ -1,7 +1,7 @@
 <script lang="ts">
  export interface Stats {
- activeCases: number; pendingEvidence: number;
- approvedEvidence: number; personsOfInterest: number;
+ activeCases: number;, pendingEvidence: number;
+ approvedEvidence: number;, personsOfInterest: number;
  }
 
  let { isLoading = false, stats = {

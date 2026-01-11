@@ -160,7 +160,7 @@ export async function invalidateCacheByType(type: CacheType): Promise<void> {
 /**
  * Get cache statistics
  */
-export async function getCacheStats(): Promise<{ available: boolean;
+export async function getCacheStats(): Promise<{, available: boolean;
  keyCount: number;
  memoryUsage?: string;
 } | null> {
@@ -234,9 +234,9 @@ export async function ragCacheSet(key: string): unknown {
 
 // GPU Engine Manifest Caching
 export interface GpuEngineManifest {
- engineId: string; sha256: string;
- path: string; model: string;
- version: string; createdAt: string;
+ engineId: string;, sha256: string;
+ path: string;, model: string;
+ version: string;, createdAt: string;
  sizeBytes: number;
 }
 
@@ -286,8 +286,8 @@ export async function gpuEngineGetBySha(sha256: string): Promise<string | null> 
 
 // Semantic Caching with Embeddings
 export interface SemanticCacheEntry {
- query: string; embedding: number[];
- result: unknown; timestamp: number;
+ query: string;, embedding: number[];
+ result: unknown;, timestamp: number;
 }
 
 export async function semanticCacheSet(query: string, embedding: number[]): unknown {

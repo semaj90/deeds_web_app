@@ -7,8 +7,8 @@ type MemoryBank = 'INTERNAL_RAM' | 'CHR_ROM' | 'PRG_ROM' | 'SAVE_RAM';
 
 export function withRedisOrchestrator(
  originalHandler: RequestHandler,
- config: { endpointName: string;
- cacheStrategy: CacheStrategy; memoryBank: MemoryBank;
+ config: {, endpointName: string;
+ cacheStrategy: CacheStrategy;, memoryBank: MemoryBank;
  requiresFresh?: boolean;
  }
 ): RequestHandler {

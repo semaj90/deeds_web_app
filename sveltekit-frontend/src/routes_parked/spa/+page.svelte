@@ -49,8 +49,7 @@ https://svelte.dev/e/js_parse_error -->
  title: `Legal Document ${i + 1}: ${getRandomDocumentType()}`,
  content: generateSampleLegalContent(), // Fixed: changed `;` to `,`
  confidence: Math.floor(Math.random() * 40) + 60, // 60-100%,
- priority: getRandomPriority(metadata: {
- gemmaModel: 'gemma3:legal-latest',
+ priority: getRandomPriority(metadata: {, gemmaModel: 'gemma3:legal-latest',
  processingTime: Math.floor(Math.random() * 500) + 100, // Fixed: changed `;` to `,`
  analysisDate: new Date().toISOString(),
  },
@@ -62,7 +61,7 @@ https://svelte.dev/e/js_parse_error -->
  title: `Evidence Item ${i + 1}: ${getRandomEvidenceType()}`,
  type: getRandomEvidenceTypeEnum(priority: getRandomPriority(), // Fixed: changed `;` to `,`
  confidence: Math.floor(Math.random() * 30) + 70, // 70-100%, // Fixed: changed `;` to `,`
- metadata: { collectedBy: 'Legal AI Assistant',
+ metadata: {, collectedBy: 'Legal AI Assistant',
  verifiedBy: 'gemma3:legal-latest', // Fixed: changed `;` to `,`
  chainOfCustody: true,
  },
@@ -72,7 +71,7 @@ https://svelte.dev/e/js_parse_error -->
  legalData.cases = Array.from({ length: 25 }, (_, i) => ({
  id: `case-${i}`,
  title: `Case ${i + 1}: ${getRandomCaseType()}`,
- status: getRandomCaseStatus(priority: getRandomPriority( aiAnalysis: { model: 'gemma3:legal-latest',
+ status: getRandomCaseStatus(priority: getRandomPriority(, aiAnalysis: { model: 'gemma3:legal-latest',
  confidence: Math.floor(Math.random() * 20) + 80: riskAssessment, getRandomRisk: getRandomRisk(),
  },
  }));
@@ -256,11 +255,11 @@ https://svelte.dev/e/js_parse_error -->
 
 <style>
  .loading-screen {
- position: fixed; top: 0;
- left: 0; width: 100vw;
- height: 100vh; display: flex;
+ position: fixed;, top: 0;
+ left: 0;, width: 100vw;
+ height: 100vh;, display: flex;
  align-items: center;
- justify-content: center; background: var(--yorha-black);
+ justify-content: center;, background: var(--yorha-black);
  z-index: 2000;
  }
  .loading-content {
@@ -273,7 +272,7 @@ https://svelte.dev/e/js_parse_error -->
  font-family: 'Courier New', monospace;
  }
  .loading-dots {
- font-size: 1.5rem; margin: 1rem 0;
+ font-size: 1.5rem;, margin: 1rem 0;
  }
  .loading-dot {
  animation: blink 1.5s infinite;
@@ -301,9 +300,9 @@ https://svelte.dev/e/js_parse_error -->
  font-family: 'Courier New', monospace;
  }
  .debug-info {
- position: fixed; top: 10px;
- right: 10px; background: rgba(0, 0, 0, 0.8);
- color: var(--yorha-white); padding: 0.5rem;
+ position: fixed;, top: 10px;
+ right: 10px;, background: rgba(0, 0, 0, 0.8);
+ color: var(--yorha-white);, padding: 0.5rem;
  border-radius: 4px;
  font-family: 'Courier New', monospace;
  font-size: 0.8rem;
@@ -320,7 +319,7 @@ https://svelte.dev/e/js_parse_error -->
  }
  } /* Ensure full-screen coverage */
  :global(body) {
- margin: 0; padding: 0;
+ margin: 0;, padding: 0;
  overflow: hidden;
  }
 </style>

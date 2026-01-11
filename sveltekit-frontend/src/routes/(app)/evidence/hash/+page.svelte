@@ -411,7 +411,7 @@
  </form>
  <button
  type="button"
- class="absolute right-4 top-4 rounded-sm opacity-70 transition-opacity hover: opacity-100, focus:outline-none focus: ring-2, focus:ring-slate-400 focus: ring-offset-2, focus:ring-offset-slate-900"
+ class="absolute right-4 top-4 rounded-sm opacity-70 transition-opacity hover: opacity-100, focus: outline-none, focus: ring-2, focus: ring-slate-400, focus: ring-offset-2, focus:ring-offset-slate-900"
  onclick={ cancelNewCase }
  aria-label="Close"
  >

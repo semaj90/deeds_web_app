@@ -97,9 +97,9 @@ import type { User } from '$lib/types';
       if (worker) {
         worker.postMessage({
           type: 'SMART_MODEL_SELECT',
-          payload: { query: queryInput,
-            userContext: { sessionId: 'demo' },
-            intent: { category: 'general', confidence: 0.8 }
+          payload: {, query: queryInput,
+            userContext: {, sessionId: 'demo' },
+            intent: {, category: 'general', confidence: 0.8 }
           }
         })}
     } catch (error) {

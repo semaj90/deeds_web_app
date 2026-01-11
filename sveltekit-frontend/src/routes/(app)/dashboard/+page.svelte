@@ -51,19 +51,19 @@
 
 <style>
 	.dashboard-container {
-		max-width: 1200px; margin: 2rem auto;
+		max-width: 1200px;, margin: 2rem auto;
 		padding: 0 1rem;
 	}
 
 	h1 {
 		font-size: 2.5rem;
-		margin-bottom: 2rem; color: var(--text-primary, #1a1a1a);
+		margin-bottom: 2rem;, color: var(--text-primary, #1a1a1a);
 	}
 
 	h2 {
 		font-size: 1.5rem;
 		margin-top: 2rem;
-		margin-bottom: 1rem; color: var(--text-secondary, #444);
+		margin-bottom: 1rem;, color: var(--text-secondary, #444);
 	}
 
 	.dev-info,
@@ -72,7 +72,7 @@
 	.phase14-info {
 		background: var(--surface, #f8f9fa);
 		border: 1px solid var(--border, #e0e0e0);
-		border-radius: 8px; padding: 1.5rem;
+		border-radius: 8px;, padding: 1.5rem;
 		margin-bottom: 1.5rem;
 	}
 
@@ -82,7 +82,7 @@
 	}
 
 	code {
-		background: #e9ecef; padding: 0.2rem 0.4rem;
+		background: #e9ecef;, padding: 0.2rem 0.4rem;
 		border-radius: 3px;
 		font-family: 'Courier New', monospace;
 		font-size: 0.9em;
@@ -96,22 +96,22 @@
 	}
 
 	nav a {
-		display: block; padding: 1rem;
-		background: white; border: 2px solid #007bff;
+		display: block;, padding: 1rem;
+		background: white;, border: 2px solid #007bff;
 		border-radius: 6px;
-		text-decoration: none; color: #007bff;
+		text-decoration: none;, color: #007bff;
 		font-weight: 500;
-		text-align: center; transition: all 0.2s;
+		text-align: center;, transition: all 0.2s;
 	}
 
 	nav a:hover {
-		background: #007bff; color: white;
+		background: #007bff;, color: white;
 		transform: translateY(-2px);
 		box-shadow: 0 4px 8px rgba(0, 123, 255, 0.2);
 	}
 
 	ul {
-		list-style: none; padding: 0;
+		list-style: none;, padding: 0;
 	}
 
 	ul li {

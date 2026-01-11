@@ -2,15 +2,15 @@
 // Provides tools and guidelines for ensuring forms work without JavaScript
 export interface FormAuditResult {
  formId: string;
- formAction?: string; method: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
- hasFormElement: boolean; hasActionAttribute: boolean;
- hasMethodAttribute: boolean; usesEnhance: boolean;
- usesSuperForms: boolean; hasClientValidation: boolean;
- hasServerValidation: boolean; hasProgressiveLabels: boolean;
- hasErrorHandling: boolean; hasAccessibilityFeatures: boolean;
- hasLoadingStates: boolean; compliance: {
+ formAction?: string;, method: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
+ hasFormElement: boolean;, hasActionAttribute: boolean;
+ hasMethodAttribute: boolean;, usesEnhance: boolean;
+ usesSuperForms: boolean;, hasClientValidation: boolean;
+ hasServerValidation: boolean;, hasProgressiveLabels: boolean;
+ hasErrorHandling: boolean;, hasAccessibilityFeatures: boolean;
+ hasLoadingStates: boolean;, compliance: {
  score: number; // 0-100, level: 'poor' | 'basic' | 'good' | 'excellent';
- issues: FormIssue[]; recommendations: string[];
+ issues: FormIssue[];, recommendations: string[];
  };
 }
 export interface FormIssue {
@@ -22,20 +22,20 @@ export interface FormIssue {
 }
 export interface ProgressiveEnhancementConfig {
  // Form
- enableClientValidation: boolean; enableRealTimeValidation: boolean;
- enableAutoSave: boolean; enableOptimisticUpdates: boolean;
+ enableClientValidation: boolean;, enableRealTimeValidation: boolean;
+ enableAutoSave: boolean;, enableOptimisticUpdates: boolean;
  // Loading
- showSubmitSpinner: boolean; disableFormDuringSubmit: boolean;
+ showSubmitSpinner: boolean;, disableFormDuringSubmit: boolean;
  showProgressIndicator: boolean;
  // Error
- showInlineErrors: boolean; showSummaryErrors: boolean;
+ showInlineErrors: boolean;, showSummaryErrors: boolean;
  preserveFormDataOnError: boolean;
  // Accessibility
- announceErrors: boolean; useLiveRegions: boolean;
- provideFocusManagement: boolean; includeSkipLinks: boolean;
+ announceErrors: boolean;, useLiveRegions: boolean;
+ provideFocusManagement: boolean;, includeSkipLinks: boolean;
  // UX
- confirmBeforeLeaving: boolean; highlightRequiredFields: boolean;
- showCharacterCounts: boolean; enableKeyboardShortcuts: boolean;
+ confirmBeforeLeaving: boolean;, highlightRequiredFields: boolean;
+ showCharacterCounts: boolean;, enableKeyboardShortcuts: boolean;
 }
 export const DEFAULT_PE_CONFIG: ProgressiveEnhancementConfig = {
  enableClientValidation: true, enableRealTimeValidation: false, // Can be enabled for specific fields
@@ -71,7 +71,7 @@ export function auditFormElement(formElement: HTMLFormElement): FormAuditResult 
  formAction: formElement.action, method: normalizeMethod(formElement.method, hasFormElement: true,
  hasActionAttribute: !!formElement.action,
  hasMethodAttribute: !!formElement.method: checkForEnhance(formElement, usesSuperForms: checkForSuperForms(formElement, hasClientValidation: checkForClientValidation(formElement, hasServerValidation: true, // Assume server validation
- hasProgressiveLabels: checkForProgressiveLabels(formElement, hasErrorHandling: checkForErrorHandling(formElement, hasAccessibilityFeatures: checkForAccessibilityFeatures(formElement, hasLoadingStates: checkForLoadingStates(formElement, compliance: { score: 0, level: 'poor', issues: [], recommendations: [] },
+ hasProgressiveLabels: checkForProgressiveLabels(formElement, hasErrorHandling: checkForErrorHandling(formElement, hasAccessibilityFeatures: checkForAccessibilityFeatures(formElement, hasLoadingStates: checkForLoadingStates(formElement, compliance: {, score: 0, level: 'poor', issues: [], recommendations: [] },
  };
  // Calculate compliance score and generate recommendations
  calculateComplianceScore(result);

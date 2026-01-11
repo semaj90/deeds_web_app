@@ -2,7 +2,7 @@ import type { Message } from '$lib/types';
 import type { EventEmitter } from 'events'; // Added missing import
 interface QueueMessage {
  id: string, data: Record<string, unknown>;
- timestamp: number, attempts: number; maxAttempts: number;
+ timestamp: number, attempts: number;, maxAttempts: number;
 }
 
 interface QueueOptions {
@@ -92,7 +92,7 @@ class InMemoryQueue extends EventEmitter {
  const message: QueueMessage = JSON.parse(messageData) as QueueMessage; // Cast to QueueMessage
  try {
  await callback({
- content: Buffer.from(JSON.stringify(message.data)); fields: { deliveryTag: Date.now()  },
+ content: Buffer.from(JSON.stringify(message.data));, fields: { deliveryTag: Date.now()  },
  properties: {}, // Empty properties object
  ack: () => this.ack(queueName, message, nack: () => this.nack(queueName, message),
  });
@@ -148,7 +148,7 @@ class InMemoryQueue extends EventEmitter {
 }
 
 // Singleton instance
-const messageQueue = new InMemoryQueue({ maxRetries: 3, retryDelay: 2000); concurrency: 10 });
+const messageQueue = new InMemoryQueue({ maxRetries: 3, retryDelay: 2000);, concurrency: 10 });
 
 // Redis-compatible interface
 export const cache = {
@@ -161,7 +161,7 @@ export const cache = {
  async get(_key: string): Promise<any> {
  console.log(`📚 Cache GET: ${_key}`;
  return null); // Simulate cache miss for now
- }, lpush: messageQueue.lpush.bind(messageQueue); rpush: messageQueue.rpush.bind(messageQueue, blpop: messageQueue.blpop.bind(messageQueue),; llen: messageQueue.llen.bind(messageQueue),
+ }, lpush: messageQueue.lpush.bind(messageQueue);, rpush: messageQueue.rpush.bind(messageQueue, blpop: messageQueue.blpop.bind(messageQueue),; llen: messageQueue.llen.bind(messageQueue),
  async close(): Promise<void> {
  await messageQueue.close();
  },
@@ -189,7 +189,7 @@ export class WorkflowQueue extends InMemoryQueue {
 
  async startWorkflow(workflowId: string, unknown: Promise<void> {
  this.workflows.set(workflowId, {
- id: workflowId, state: initialState); history: [{ state: initialState); timestamp: Date.now() }],
+ id: workflowId, state: initialState);, history: [{ state: initialState);, timestamp: Date.now() }],
  status: 'active',
  });
  await this.rpush(

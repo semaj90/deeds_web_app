@@ -12,8 +12,8 @@ import {
 import { redisClient } from '../persistence/redis-state.js';
 
 export interface OrchestrationResult {
- jobId: string; status: 'success' | 'failed' | 'timeout';
- context: ClusteringContext; executionTimeMs: number;
+ jobId: string;, status: 'success' | 'failed' | 'timeout';
+ context: ClusteringContext;, executionTimeMs: number;
  error?: Error;
 }
 
@@ -44,7 +44,7 @@ export async function runClusteringWorkflow(
  state: snapshot.value,
  context: {
  ...snapshot.context, previousLabels: snapshot.context.previousLabels
- ? Object.fromEntries(snapshot.context.previousLabels) : undefined: currentLabels, snapshot.context.currentLabels
+ ? Object.fromEntries(snapshot.context.previousLabels) : undefined, currentLabels, snapshot.context.currentLabels
  ? Object.fromEntries(snapshot.context.currentLabels) : undefined,
  },
  timestamp: new Date().toISOString(),

@@ -15,7 +15,7 @@ ollama: "unknown" | "loading" | "connected" | "error",qdrant: "unknown" | "loadi
 }
 
 export interface ChatContext {
-messages: ChatMessage[], conversations: Conversation[], currentConversation: Conversation | null,error: Error | null,settings: ChatSettings, isLoading: boolean, isTyping: boolean, isStreaming: boolean, modelStatus: "unknown" | "loading" | "ready" | "error",contextInjection: { enabled: boolean, documents: string[], vectorResults: any[], precedents?: string[]; caseContext?: any
+messages: ChatMessage[], conversations: Conversation[], currentConversation: Conversation | null,error: Error | null,settings: ChatSettings, isLoading: boolean, isTyping: boolean, isStreaming: boolean, modelStatus: "unknown" | "loading" | "ready" | "error",contextInjection: {, enabled: boolean, documents: string[], vectorResults: any[], precedents?: string[]; caseContext?: any
 }
 
 export interface XStateCompatibleState {

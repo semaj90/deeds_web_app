@@ -1,4 +1,4 @@
-export async function initWebGPUWorker(): Promise<{ device: GPUDevice; runInference: (inputs: Float32Array) => Promise<number[]>;
+export async function initWebGPUWorker(): Promise<{, device: GPUDevice; runInference: (inputs: Float32Array) => Promise<number[]>;
 } | null> {
  // Check for WebGPU support safely
  const nav = globalThis.navigator as (Navigator & { gpu?: GPU }) | undefined;

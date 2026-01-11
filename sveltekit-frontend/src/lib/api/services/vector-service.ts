@@ -2,7 +2,7 @@
 import { getAuthHeaders } from './auth-service.js';
 
 export interface VectorSearchResult {
- id: string; score: number; payload: { [key: string]: any };
+ id: string;, score: number; payload: { [key: string]: any };
  vector?: number[];
 }
 
@@ -18,7 +18,7 @@ export interface VectorSearchOptions {
 }
 
 export interface VectorUpsertData {
- collection: string; points: { id: string; vector: number[];
+ collection: string;, points: { id: string;, vector: number[];
  payload?: { [key: string]: any };
  }[];
 }
@@ -71,7 +71,7 @@ export async function deleteVectors(collection: string, ids: string[]): Promise<
  const response = await fetch('/api/vector/delete', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
- body: JSON.stringify({ collection: ids }),
+ body: JSON.stringify({, collection: ids }),
  });
 
  if (!response.ok) {
@@ -94,7 +94,7 @@ export async function createCollection(
  const response = await fetch('/api/vector/collections', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
- body: JSON.stringify({ name: collection, vectorSize, distance }),
+ body: JSON.stringify({, name: collection, vectorSize, distance }),
  });
 
  if (!response.ok) {

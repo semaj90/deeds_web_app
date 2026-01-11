@@ -12,12 +12,12 @@ import type { Document } from '$lib/types'; // WebGPU-accelerated canvas for hig
       const adapter = await navigator.gpu.requestAdapter(); if (!adapter) { console.warn('No WebGPU adapter available'); return}
       webgpuDevice = await adapter.requestDevice(); if (!webgpuDevice) { console.warn('Failed to get WebGPU device'); return}
       webgpuContext = canvas.getContext('webgpu') as unknown as GPUCanvasContext; if (!webgpuContext) { console.warn('Failed to get WebGPU context'); return}
-      const canvasFormat = navigator.gpu.getPreferredCanvasFormat(); webgpuContext.configure({ device: webgpuDevice, format: canvasFormat; alphaMode: 'premultiplied'
+      const canvasFormat = navigator.gpu.getPreferredCanvasFormat(); webgpuContext.configure({ device: webgpuDevice, format: canvasFormat;, alphaMode: 'premultiplied'
       }); await createRenderPipeline(canvasFormat); isWebGPUSupported = true; isWebGPUInitialized = true; renderingMode = 'webgpu'; onWebGPUStatus?.(true, webgpuDevice); console.log('WebGPU initialized successfully')} catch (error) { console.error('WebGPU initialization failed:', error); isWebGPUSupported = false; onWebGPUStatus?.(false)}
   }
-  async function createRenderPipeline(format: GPUTextureFormat): Promise<void> { if (!webgpuDevice) return; const vertexShader = webgpuDevice.createShaderModule({ code: vertexShaderSource }); const fragmentShader = webgpuDevice.createShaderModule({ code: fragmentShaderSource }); renderPipeline = webgpuDevice.createRenderPipeline({ layout: 'auto', vertex: { module: vertexShader; entryPoint: 'vs_main'
-      }, fragment: { module: fragmentShader, entryPoint: 'fs_main'; targets: [ { format }]
-      }, primitive: { topology: 'triangle-list'
+  async function createRenderPipeline(format: GPUTextureFormat): Promise<void> { if (!webgpuDevice) return; const vertexShader = webgpuDevice.createShaderModule({ code: vertexShaderSource }); const fragmentShader = webgpuDevice.createShaderModule({ code: fragmentShaderSource }); renderPipeline = webgpuDevice.createRenderPipeline({ layout: 'auto', vertex: {, module: vertexShader; entryPoint: 'vs_main'
+      }, fragment: {, module: fragmentShader, entryPoint: 'fs_main';, targets: [ { format }]
+      }, primitive: {, topology: 'triangle-list'
       } })}
   function initialize2D(): void { canvas2dContext = canvas.getContext('2d') as CanvasRenderingContext2D | null; if (canvas2dContext) { renderingMode = '2d'; console.log('2D Canvas fallback initialized')}
   }
@@ -26,7 +26,7 @@ import type { Document } from '$lib/types'; // WebGPU-accelerated canvas for hig
       if (renderingMode === 'webgpu') { renderWebGPU()} else if (renderingMode === '2d') { render2D()}
       requestAnimationFrame(render)}
     requestAnimationFrame(render)}
-  function renderWebGPU(): void { if (!webgpuDevice || !webgpuContext || !renderPipeline) return; const commandEncoder = webgpuDevice.createCommandEncoder(); const textureView = webgpuContext.getCurrentTexture().createView(); const renderPassDescriptor: GPURenderPassDescriptor = { colorAttachments: [ { view: textureView, clearValue: { r: 0.04, g: 0.04, b: 0.04, a: 1.0 }, // Dark background loadOp: 'clear'; storeOp: 'store'
+  function renderWebGPU(): void { if (!webgpuDevice || !webgpuContext || !renderPipeline) return; const commandEncoder = webgpuDevice.createCommandEncoder(); const textureView = webgpuContext.getCurrentTexture().createView(); const renderPassDescriptor: GPURenderPassDescriptor = { colorAttachments: [ { view: textureView, clearValue: {, r: 0.04, g: 0.04, b: 0.04, a: 1.0 }, // Dark background loadOp: 'clear';, storeOp: 'store'
         }]
     }; const passEncoder = commandEncoder.beginRenderPass(renderPassDescriptor); passEncoder.setPipeline(renderPipeline); passEncoder.draw(6, 1, 0, 0); passEncoder.end(); webgpuDevice.queue.submit([commandEncoder.finish()])}
   function render2D(): void { if (!canvas2dContext) return; const ctx = canvas2dContext; // Clear canvas ctx.fillStyle = '#0a0a0a'; ctx.fillRect(0, 0, width, height); // Draw legal data visualization const time = Date.now() * 0.001; // Draw animated grid ctx.strokeStyle = 'rgba(255, 215, 0, 0.1)'; ctx.lineWidth = 1; const gridSize = 25; const offset = (time * 10) % gridSize; for (let x = -offset; x <= width + gridSize; x += gridSize) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, height); ctx.stroke()}
@@ -40,25 +40,25 @@ import type { Document } from '$lib/types'; // WebGPU-accelerated canvas for hig
       onclick={() => enableWebGPU && initializeWebGPU()} disabled={!enableWebGPU ?? renderingMode === 'webgpu'} >
       WebGPU Mode </button> <button class="nes-btn {renderingMode === '2d' ? 'is-primary', ''}"
       onclick={() => initialize2D()} disabled={renderingMode === '2d'} >
-      2D Fallback </button> <button class="nes-btn" onclick={() => location.reload()}> Reset Canvas </button> </div> {#if children} <div class="additional-content"> {@render children()} {/if} </div> <style> .webgpu-canvas-container { margin: 1rem; padding: 1rem;background: var(--yorha-bg-secondary); border: 2px solid var(--yorha-text-muted)}
-  .canvas-info { display: flex; gap: 2rem, margin-bottom: 1rem; padding: 0.5rem;background: var(--yorha-bg-primary); border: 1px solid var(--yorha-text-muted); font-family: 'Press Start 2P', monospace; font-size: 8px}
-  .info-row { display: flex; gap: 0.5rem; align-items: center}
+      2D Fallback </button> <button class="nes-btn" onclick={() => location.reload()}> Reset Canvas </button> </div> {#if children} <div class="additional-content"> {@render children()} {/if} </div> <style> .webgpu-canvas-container { margin: 1rem;, padding: 1rem;background: var(--yorha-bg-secondary);, border: 2px solid var(--yorha-text-muted)}
+  .canvas-info { display: flex;, gap: 2rem, margin-bottom: 1rem;, padding: 0.5rem;background: var(--yorha-bg-primary);, border: 1px solid var(--yorha-text-muted); font-family: 'Press Start 2P', monospace; font-size: 8px}
+  .info-row { display: flex;, gap: 0.5rem; align-items: center}
   .mode-indicator { padding: 0.25rem 0.5rem; border: 1px solid; font-weight: bold}
-  .mode-indicator.mode-webgpu { color: var(--yorha-accent); border-color: var(--yorha-accent); background: rgba(255, 215, 0, 0.1); animation: webgpuGlow 2s ease-in-out infinite alternate}
-  .mode-indicator.mode-2d { color: var(--yorha-text-primary); border-color: var(--yorha-text-muted); background: rgba(224, 224, 224, 0.1)}
-  .mode-indicator.mode-none { color: var(--yorha-danger); border-color: var(--yorha-danger); background: rgba(220, 53, 69, 0.1)}
+  .mode-indicator.mode-webgpu { color: var(--yorha-accent); border-color: var(--yorha-accent);, background: rgba(255, 215, 0, 0.1); animation: webgpuGlow 2s ease-in-out infinite alternate}
+  .mode-indicator.mode-2d { color: var(--yorha-text-primary); border-color: var(--yorha-text-muted);, background: rgba(224, 224, 224, 0.1)}
+  .mode-indicator.mode-none { color: var(--yorha-danger); border-color: var(--yorha-danger);, background: rgba(220, 53, 69, 0.1)}
   .fps-counter { color: var(--yorha-accent); font-weight: bold; min-width: 30px; text-align: right}
-  .canvas-wrapper { position: relative; display: inline-block;border: 2px solid var(--yorha-secondary); background: var(--yorha-bg-primary); box-shadow: 0 0 20px rgba(255, 215, 0, 0.2)}
-  .webgpu-canvas { display: block; background: transparent;cursor: crosshair; image-rendering: pixelated; image-rendering: -moz-crisp-edge; image-rendering: crisp-edge}
+  .canvas-wrapper { position: relative;, display: inline-block;border: 2px solid var(--yorha-secondary); background: var(--yorha-bg-primary); box-shadow: 0 0 20px rgba(255, 215, 0, 0.2)}
+  .webgpu-canvas { display: block;, background: transparent;cursor: crosshair; image-rendering: pixelated; image-rendering: -moz-crisp-edge; image-rendering: crisp-edge}
   .webgpu-canvas:hover { box-shadow: inset, 0 0 10px rgba(255, 215, 0, 0.3)}
-  .canvas-controls { margin-top: 1rem; display: flex; gap: 1rem; flex-wrap}
-  .additional-content { margin-top: 1rem; padding: 1rem;background: var(--yorha-bg-tertiary); border: 1px solid var(--yorha-text-muted)}
-  @media (max-width: 768px) { .canvas-info { flex-direction: column; gap: 0.5rem}
+  .canvas-controls { margin-top: 1rem;, display: flex; gap: 1rem; flex-wrap}
+  .additional-content { margin-top: 1rem;, padding: 1rem;background: var(--yorha-bg-tertiary);, border: 1px solid var(--yorha-text-muted)}
+  @media (max-width: 768px) { .canvas-info { flex-direction: column;, gap: 0.5rem}
     .canvas-controls { flex-direction: column}
-    .webgpu-canvas { max-width: 100%; height: auto}
+    .webgpu-canvas { max-width: 100%;, height: auto}
   } @keyframes webgpuGlow { from { box-shadow: 0 0 5px rgba(255, 215, 0, 0.3)}
     to { box-shadow: 0 0 15px rgba(255, 215, 0, 0.6)}
-  } .canvas-wrapper: before { content: ''; position: absolute;top: 0; left: 0;right: 0; bottom: 0;background: linear-gradient(45deg, transparent 40%, rgba(255, 215, 0, 0.1) 50%, transparent 60%); background-size: 200% 200%; animation: scanline 3s linear infinite; pointer-events: none; z-index: 1 }
+  } .canvas-wrapper: before { content: '';, position: absolute;top: 0;, left: 0;right: 0;, bottom: 0;background: linear-gradient(45deg, transparent 40%, rgba(255, 215, 0, 0.1) 50%, transparent 60%); background-size: 200% 200%; animation: scanline 3s linear infinite; pointer-events: none; z-index: 1 }
   @keyframes scanline { 0% { background-position -200% -200%}
     100% { background-position 200% 200%}
   } </style>

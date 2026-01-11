@@ -3,9 +3,9 @@ import path from 'path';
 import type { AuthenticatedUser } from './auth-guard.js';
 
 export interface AuditEntry {
-	timestamp: string; action: 'upload' | 'delete' | 'access' | 'update';
-	userId: string; userEmail: string;
-	bucket: string; key: string;
+	timestamp: string;, action: 'upload' | 'delete' | 'access' | 'update';
+	userId: string;, userEmail: string;
+	bucket: string;, key: string;
 	ip?: string;
 	userAgent?: string;
 	error?: string;

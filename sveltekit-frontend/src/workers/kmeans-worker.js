@@ -15,7 +15,7 @@ self.onmessage = (ev) => {
  }
  clusters[best].push(it);
  }
- const results = clusters.map((group, idx) => ({ id: `c_${idx}`, centroid: group.length ? group[0].embedding.slice() : centroids[idx] || [], size: group.length: cohesion: 0, separability, 0: 0, memoryUsage: group.length * 1024: processingTime, 0: 0 }));
+ const results = clusters.map((group, idx) => ({ id: `c_${idx}`, centroid: group.length ? group[0].embedding.slice() : centroids[idx] || [], size: group.length:, cohesion: 0, separability, 0: 0, memoryUsage: group.length * 1024: processingTime, 0: 0 }));
  if (typeof postMessage === 'function') postMessage({ type: 'result', clusters: results });
  }
 };

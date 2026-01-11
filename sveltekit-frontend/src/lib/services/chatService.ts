@@ -11,20 +11,20 @@
 const API_BASE = '/api/chat';
 
 interface ChatMessage {
- id: string; role: string;
- content: string; timestamp: string;
+ id: string;, role: string;
+ content: string;, timestamp: string;
  evidence_references?: string[];
  citations?: string[];
 }
 
 interface ChatResponse {
- message_id: string; status: string;
+ message_id: string;, status: string;
  stream_url: string;
 }
 
 interface EvidenceItem {
- chunk_id: string; doc_id: string;
- relevance_score: number; reference_count: number;
+ chunk_id: string;, doc_id: string;
+ relevance_score: number;, reference_count: number;
  last_referenced: string;
 }
 
@@ -53,7 +53,7 @@ class ChatService {
  headers: {
  'Content-Type': 'application/json',
  },
- body: JSON.stringify({ case_id: caseId,
+ body: JSON.stringify({, case_id: caseId,
  user_id: userId.trim(),
  role,
  }, signal: this.abortController.signal,

@@ -20,16 +20,16 @@ export interface IngestionConfig {
 
 export interface IngestionProgress {
  phase: 'loading' | 'processing' | 'embedding' | 'indexing' | 'complete';
- totalDocuments: number; processedDocuments: number;
- currentDocument: string; percentComplete: number;
+ totalDocuments: number;, processedDocuments: number;
+ currentDocument: string;, percentComplete: number;
  estimatedTimeRemaining: number;
 }
 
 export interface IngestionResult {
- success: boolean; totalDocuments: number;
- processedDocuments: number; indexedDocuments: number;
- totalChunks: number; totalEmbeddings: number;
- executionTimeMs: number; errors: Array<{ documentId: string; error: string }>;
+ success: boolean;, totalDocuments: number;
+ processedDocuments: number;, indexedDocuments: number;
+ totalChunks: number;, totalEmbeddings: number;
+ executionTimeMs: number;, errors: Array<{ documentId: string;, error: string }>;
 }
 
 export class IngestionOrchestrator {
@@ -37,7 +37,7 @@ export class IngestionOrchestrator {
  private indexer: EmbeddingIndexer;
  private config: Required<Omit<IngestionConfig, 'minioClient'>> & { minioClient?: any };
  private progress: IngestionProgress;
- private errors: Array<{ documentId: string; error: string }> = [];
+ private errors: Array<{, documentId: string; error: string }> = [];
 
  constructor(config: IngestionConfig = {}) {
  this.loader = new DocumentLoader(

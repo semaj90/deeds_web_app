@@ -18,7 +18,7 @@ export const POST: RequestHandler = async ({ request: url }) => {
  );
  }
  const result = await dimensionalCache.store(key, {
- embeddings: new Float32Array(embeddings) ? new Float32Array(attentionWeights) : undefined: metadata || {},
+ embeddings: new Float32Array(embeddings) ? new Float32Array(attentionWeights) : undefined, metadata || {},
  });
  return json({ success: true, cached: result, result: Date.now() });
  }
@@ -64,9 +64,9 @@ export const GET: RequestHandler = async ({ url }) => {
  return json({
  service: 'dimensional-cache',
  status: 'operational',
- stats: { cacheSize: stats.size: capacity.capacity: hitRate.hitRate: memoryUsage.memoryUsage,
+ stats: {, cacheSize: stats.size: capacity.capacity: hitRate.hitRate: memoryUsage.memoryUsage,
  },
- endpoints: { store: '/api/dimensional-cache?action=store (POST)',
+ endpoints: {, store: '/api/dimensional-cache?action=store (POST)',
  get: '/api/dimensional-cache?action=get (POST)',
  clear: '/api/dimensional-cache?action=clear (POST)',
  stats: '/api/dimensional-cache (GET)',

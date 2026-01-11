@@ -75,19 +75,19 @@ https://svelte.dev/e/js_parse_error -->
 
 <style>
  .public-layout {
- min-height: 100vh; display: flex;
- flex-direction: column; background: var(--console-gradient-main, linear-gradient(135deg, #0f0f23, #1a1a2e));
+ min-height: 100vh;, display: flex;
+ flex-direction: column;, background: var(--console-gradient-main, linear-gradient(135deg, #0f0f23, #1a1a2e));
  color: var(--console-fg, white);
  }
 
  .public-content {
  flex: 1;
- overflow-y: auto; background: var(--console-gradient-main, linear-gradient(135deg, #0f0f23, #1a1a2e));
+ overflow-y: auto;, background: var(--console-gradient-main, linear-gradient(135deg, #0f0f23, #1a1a2e));
  }
 
  .content-container {
  padding: 2rem;
- max-width: 1400px; margin: 0 auto;
+ max-width: 1400px;, margin: 0 auto;
  min-height: 100%;
  }
 
@@ -98,16 +98,16 @@ https://svelte.dev/e/js_parse_error -->
  }
 
  .footer-content {
- max-width: 1400px; margin: 0 auto;
+ max-width: 1400px;, margin: 0 auto;
  padding: 0 2rem;
  display: flex;
  align-items: center;
- justify-content: space-between; gap: 2rem;
+ justify-content: space-between;, gap: 2rem;
  }
 
  .footer-brand {
  display: flex;
- align-items: center; gap: 0.75rem;
+ align-items: center;, gap: 0.75rem;
  }
 
  .footer-icon {
@@ -116,12 +116,12 @@ https://svelte.dev/e/js_parse_error -->
 
  .footer-text {
  font-size: 1.1rem;
- font-weight: 600; color: var(--console-primary, #00aa00);
+ font-weight: 600;, color: var(--console-primary, #00aa00);
  font-family: monospace;
  }
 
  .footer-theme {
- font-size: 0.7rem; padding: 0.25rem 0.5rem;
+ font-size: 0.7rem;, padding: 0.25rem 0.5rem;
  background: var(--console-primary, #00aa00);
  color: var(--console-bg, #0f0f23);
  border-radius: 4px;
@@ -134,7 +134,7 @@ https://svelte.dev/e/js_parse_error -->
  }
 
  .footer-info p {
- margin: 0; color: rgba(255, 255, 255, 0.8);
+ margin: 0;, color: rgba(255, 255, 255, 0.8);
  font-size: 0.9rem;
  }
 
@@ -176,7 +176,7 @@ https://svelte.dev/e/js_parse_error -->
 
  .footer-content {
  flex-direction: column;
- text-align: center; gap: 1rem;
+ text-align: center;, gap: 1rem;
  }
 
  .footer-info {

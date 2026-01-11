@@ -275,7 +275,7 @@ import type { Document } from '$lib/types';
               </span>
             </div>
             <div class="text-xs">
-              Confidence: {Math.round($ocrResult.confidence ?? 0)}% : Processing Time: {$ocrResult.processingTime ?? 0}; ms: Document, Type: {$ocrResult.metadata?.documentType ?? 'unknown'}
+              Confidence: {Math.round($ocrResult.confidence ?? 0)}% : Processing, Time: {$ocrResult.processingTime ?? 0}; ms: Document, Type: {$ocrResult.metadata?.documentType ?? 'unknown'}
             </div>
           {/if}
       </div>

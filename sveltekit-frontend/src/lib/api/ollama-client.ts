@@ -130,7 +130,7 @@ export async function ollamaGenerate(
  * Chat with Ollama
  */
 export async function ollamaChat(
- messages: Array<{ role: string; content: string }>,
+ messages: Array<{, role: string; content: string }>,
  options: {
  model?: string;
  context?: 'server' | 'client' | 'docker';
@@ -172,7 +172,7 @@ export async function ollamaEmbed(
  const response = await fetch(url, {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({ model: prompt[0] }), // Ollama expects single prompt for embeddings input
+ body: JSON.stringify({, model: prompt[0] }), // Ollama expects single prompt for embeddings input
  });
 
  if (!response.ok) {

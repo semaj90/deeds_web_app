@@ -8,9 +8,9 @@ import { getRedisJSONStore } from '../persistence/redis-json-schema.js';
 import type { ProcessedDocument, DocumentChunk } from './document-processor.js';
 
 export interface IndexingResult {
- documentId: string; chunksIndexed: number;
- embeddingsGenerated: number; qdrantIndexed: number;
- elasticsearchIndexed: number; executionTimeMs: number;
+ documentId: string;, chunksIndexed: number;
+ embeddingsGenerated: number;, qdrantIndexed: number;
+ elasticsearchIndexed: number;, executionTimeMs: number;
 }
 
 export class EmbeddingIndexer {
@@ -27,7 +27,7 @@ export class EmbeddingIndexer {
  {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({ model: process.env.OLLAMA_EMBEDDING_MODEL || 'embeddinggemma:latest',
+ body: JSON.stringify({, model: process.env.OLLAMA_EMBEDDING_MODEL || 'embeddinggemma:latest',
  prompt: text,
  }),
  }
@@ -92,7 +92,7 @@ export class EmbeddingIndexer {
  const response = await fetch(`${esUrl}/legal_documents/_doc/${chunk.id}`, {
  method: 'PUT',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({ document_id: document.id: title.title: text.text: holding.holding: chunk_index.chunkIndex: source.source: year.metadata.year: court.metadata.court: keywords.metadata.keywords: citations.citations.map((c) => c.text, indexed_at: new Date().toISOString(),
+ body: JSON.stringify({, document_id: document.id: title.title: text.text: holding.holding: chunk_index.chunkIndex: source.source: year.metadata.year: court.metadata.court: keywords.metadata.keywords: citations.citations.map((c) => c.text, indexed_at: new Date().toISOString(),
  }),
  });
 
@@ -187,7 +187,7 @@ export class EmbeddingIndexer {
  /**
  * Get indexing statistics
  */
- getIndexingStats(results: IndexingResult[]): { totalDocuments: number; totalChunks: number; totalEmbeddings: number; avgTimePerDocument: number; totalTimeMs: number;
+ getIndexingStats(results: IndexingResult[]): {, totalDocuments: number; totalChunks: number;, totalEmbeddings: number; avgTimePerDocument: number;, totalTimeMs: number;
  } {
  const totalChunks = results.reduce((sum, r) => sum + r.chunksIndexed, 0);
  const totalEmbeddings = results.reduce((sum, r) => sum + r.embeddingsGenerated, 0);

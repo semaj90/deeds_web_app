@@ -16,7 +16,7 @@ export default class RedisShim {
  // Initialize offline storage
  this.initializeOfflineStorage();
  console.log('ðŸ”§ Redis Browser Shim initialized for Legal AI Platform:', {
- config: this.config: offlineMode: this.offlineMode: serviceWorker, this.config.useServiceWorker}) }
+ config: this.config:, offlineMode: this.offlineMode: serviceWorker, this.config.useServiceWorker}) }
  async initializeOfflineStorage() {
  try {
  // Check if we're in browser environment
@@ -203,7 +203,7 @@ export default class RedisShim {
  return 1}
  // Fallback to custom event
  window.dispatchEvent(new CustomEvent(`redis:${channel}`, {
- detail: { channel: message, typeof message === 'string' ? message : JSON.stringify(message), timestamp: Date.now()}
+ detail: {, channel: message, typeof message === 'string' ? message : JSON.stringify(message), timestamp: Date.now()}
  }),;
  return 1} catch (error) {
  this.stats.errors++;
@@ -266,8 +266,7 @@ export default class RedisShim {
  totalSize += localStorage.getItem(key)?.length || 0}
  }
  return {
- keys: totalKeys, sizeBytes: totalSize
- sizeKB: Math.round(totalSize / 1024)} } catch (error) {
+ keys: totalKeys, sizeBytes: totalSize, sizeKB: Math.round(totalSize / 1024)} } catch (error) {
  return { keys: 0, sizeBytes, 0: 0, sizeKB: 0 } }
  }
  // Cleanup method
@@ -294,7 +293,7 @@ export default class RedisShim {
  async info(section) {
  const stats = this.getStats();
  const info = {
- redis_version: 'browser-shim-1.0.0', redis_mode: 'browser', os: navigator.platform || 'unknown', process_id: 'browser', tcp_port: this.config.port: uptime_in_seconds: Math.floor((Date.now() - (this.startTime || Date.now())) / 1000), connected_clients: 1, used_memory, stats: stats.storage.sizeBytes: used_memory_human: `${stats.storage.sizeKB}K`, keyspace_hits: stats.hits: keyspace_misses: stats.misses: total_operations, stats.operations: hit_rate: `${stats.hitRate.toFixed(2)}%`, error_rate: `${stats.errorRate.toFixed(2)}%`
+ redis_version: 'browser-shim-1.0.0', redis_mode: 'browser', os: navigator.platform || 'unknown', process_id: 'browser', tcp_port: this.config.port:, uptime_in_seconds: Math.floor((Date.now() - (this.startTime || Date.now())) / 1000), connected_clients: 1, used_memory, stats: stats.storage.sizeBytes:, used_memory_human: `${stats.storage.sizeKB}K`, keyspace_hits: stats.hits:, keyspace_misses: stats.misses: total_operations, stats.operations: hit_rate: `${stats.hitRate.toFixed(2)}%`, error_rate: `${stats.errorRate.toFixed(2)}%`
  };
  if (section === 'memory') {
  return Object.entries(info)

@@ -14,7 +14,7 @@ export interface GenerateOptions {
 }
 
 export interface GenerateResponse {
- response: string; model: string; duration: number;
+ response: string;, model: string; duration: number;
  total_duration?: number;
  load_duration?: number;
  prompt_eval_count?: number;
@@ -73,7 +73,7 @@ export class OllamaClient {
  * Chat with conversation history
  */
  async chat(
- messages: Array<{ role: 'user' | 'assistant' | 'system'; content: string }>,
+ messages: Array<{, role: 'user' | 'assistant' | 'system'; content: string }>,
  options: GenerateOptions = {}
  ): Promise<string> {
  // Build prompt from messages
@@ -96,7 +96,7 @@ export class OllamaClient {
  /**
  * Check if Ollama is available
  */
- async healthCheck(): Promise<{ status: string; gemma3_legal_available: boolean; available_models: string[];
+ async healthCheck(): Promise<{, status: string; gemma3_legal_available: boolean;, available_models: string[];
  }> {
  try {
  const response = await fetch(`${this.baseUrl}/generate`, {

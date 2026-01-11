@@ -19,11 +19,11 @@ type AppDatabase = NodePgDatabase<AppSchema>;
 const db: AppDatabase = untypedDb as unknown as AppDatabase;
 
 export interface UserRating {
-    id: string; userId: string;
-    sessionId: string; interactionId: string;
+    id: string;, userId: string;
+    sessionId: string;, interactionId: string;
     ratingType: 'response_quality' | 'search_relevance' | 'ui_experience' | 'ai_accuracy' | 'performance';
     score: number; // 1-5 scale
-    feedback?: string; context: {
+    feedback?: string;, context: {
         query?: string;
         response?: string;
         responseTime?: number;
@@ -45,19 +45,19 @@ export interface UserRating {
 }
 
 export interface InteractionPattern {
-    userId: string; commonQueries: string[];
-    preferredFeatures: string[]; responseTimeThreshold: number;
-    qualityExpectations: number; learningProgress: {
-        initialAccuracy: number; currentAccuracy: number;
-        improvementRate: number; strongAreas: string[];
+    userId: string;, commonQueries: string[];
+    preferredFeatures: string[];, responseTimeThreshold: number;
+    qualityExpectations: number;, learningProgress: {
+        initialAccuracy: number;, currentAccuracy: number;
+        improvementRate: number;, strongAreas: string[];
         weakAreas: string[];
     };
 }
 
 export interface TrainingDataPoint {
-    input: string; expectedOutput: string;
-    actualOutput: string; userRating: number;
-    corrections?: string; contextTags: string[];
+    input: string;, expectedOutput: string;
+    actualOutput: string;, userRating: number;
+    corrections?: string;, contextTags: string[];
     difficultyLevel: 'beginner' | 'intermediate' | 'expert';
 }
 
@@ -244,7 +244,7 @@ export class FeedbackLoopService {
                     preferredFeatures: [],
                     responseTimeThreshold: 2000, // Default 2 seconds
                     qualityExpectations: this.adaptiveThresholds.get(userRole) || 3.5,
-                    learningProgress: { initialAccuracy: rating.score,
+                    learningProgress: {, initialAccuracy: rating.score,
                         currentAccuracy: rating.score,
                         improvementRate: 0,
                         strongAreas: [],
@@ -476,7 +476,7 @@ export class FeedbackLoopService {
         }
 
         return {
-            suggestedFeatures: pattern.preferredFeatures.slice(0, 5, qualityImprovements: pattern.learningProgress.weakAreas.map(area => `Consider using improved ${area} features`, personalizedSettings: { responseTimeThreshold: pattern.responseTimeThreshold,
+            suggestedFeatures: pattern.preferredFeatures.slice(0, 5, qualityImprovements: pattern.learningProgress.weakAreas.map(area => `Consider using improved ${area} features`, personalizedSettings: {, responseTimeThreshold: pattern.responseTimeThreshold,
                 qualityExpectations: pattern.qualityExpectations,
                 difficultyPreference: pattern.commonQueries.length > 5 ? 'intermediate' : 'beginner'
             }

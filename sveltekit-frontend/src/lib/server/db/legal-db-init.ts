@@ -85,7 +85,7 @@ export async function checkLegalSearchHealth() {
 
  return {
  healthy: allTablesExist,
- tables: { cases: health.cases_exists,
+ tables: {, cases: health.cases_exists,
  crimes: health.crimes_exists,
  case_chunks: health.case_chunks_exists,
  laws: health.laws_exists,

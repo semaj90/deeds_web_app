@@ -74,8 +74,8 @@ import type { User } from, '$lib // TODO: Verify store subscription is correct f
  onclick={ closeSessionModal } class="px-4 py-2 bg-gray-700 text-amber-300 border-2 border-amber-300 hover:bg-gray-600 transition-colors"
  > [CANCEL] </button> <button type="submit"
  disabled={ formLoading } class="px-4 py-2 bg-red-800 text-amber-300 border-2 border-red-500 hover:bg-red-700 transition-colors"
- > {formLoading ? '[REVOKING...]': '[REVOKE SESSION]'} </button> </div> </form> </div> </div> </div> {/if} <style> /* YoRHa cyberpunk aesthetic */:global(body) { background: #000; color: #fbbf24}
- /* Custom scrollbar */ .overflow-y-auto::-webkit-scrollbar, .overflow-x-auto::-webkit-scrollbar { width: 8px; height: 8px}
+ > {formLoading ? '[REVOKING...]': '[REVOKE SESSION]'} </button> </div> </form> </div> </div> </div> {/if} <style> /* YoRHa cyberpunk aesthetic */:global(body) { background: #000;, color: #fbbf24}
+ /* Custom scrollbar */ .overflow-y-auto::-webkit-scrollbar, .overflow-x-auto::-webkit-scrollbar { width: 8px;, height: 8px}
  .overflow-y-auto::-webkit-scrollbar-track, .overflow-x-auto::-webkit-scrollbar-track { background: #1f2937}
  .overflow-y-auto::-webkit-scrollbar-thumb, .overflow-x-auto::-webkit-scrollbar-thumb { background: #fbbf24; border-radius: 4px}
  .overflow-y-auto::-webkit-scrollbar-thumb:hover .overflow-x-auto::-webkit-scrollbar-thumb:hover { background: #f59e0b}

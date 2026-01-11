@@ -1,17 +1,17 @@
 import type { PageServerLoad } from './$types';
 
 interface FileProfile {
-    file_path: string; role: string;
-    surface: string[]; dependencies: string[];
-    exports: string[]; imports: string[];
-    comments: string[]; risk: string;
-    change_frequency: string; related_routes: string[];
-    tags: string[]; summary: string;
-    llm_output: string; generated_at: string;
+    file_path: string;, role: string;
+    surface: string[];, dependencies: string[];
+    exports: string[];, imports: string[];
+    comments: string[];, risk: string;
+    change_frequency: string;, related_routes: string[];
+    tags: string[];, summary: string;
+    llm_output: string;, generated_at: string;
 }
 
 interface QdrantPoint {
-    id: number; payload: FileProfile;
+    id: number;, payload: FileProfile;
 }
 
 export const load: PageServerLoad = async ({ params, fetch }) => {

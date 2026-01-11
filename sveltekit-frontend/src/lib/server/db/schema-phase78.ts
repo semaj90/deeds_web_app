@@ -196,7 +196,7 @@ export const errorPatchLog = pgTable(
  patchedContent: text('patched_content', appliedBy: uuid('applied_by').notNull(), // Lucia user_id
  status: varchar('status', { length: 20 }).notNull().default('applied'), // applied|rolled_back|reverted
  reason: text('reason'), // Why it was applied / reverted
- appliedAt: timestamp('applied_at').notNull().defaultNow( revertedAt: timestamp('reverted_at'),
+ appliedAt: timestamp('applied_at').notNull().defaultNow(, revertedAt: timestamp('reverted_at'),
  },
  (table) => ({
  idxRoutePath: index('idx_patch_log_route').on(table.routePath, idxAppliedBy: index('idx_patch_log_user').on(table.appliedBy, idxStatus: index('idx_patch_log_status').on(table.status, idxAppliedAt: index('idx_patch_log_applied').on(table.appliedAt),
@@ -219,7 +219,7 @@ export const routeContextCache = pgTable(
  relatedTests: jsonb('related_tests').notNull().default('[]'), // string[]
  relatedMigrations: jsonb('related_migrations').notNull().default('[]'), // string[]
  astSnippet: text('ast_snippet'), // Code around the route export
- lastUpdatedAt: timestamp('last_updated_at').notNull().defaultNow( createdAt: timestamp('created_at').notNull().defaultNow(),
+ lastUpdatedAt: timestamp('last_updated_at').notNull().defaultNow(, createdAt: timestamp('created_at').notNull().defaultNow(),
  },
  (table) => ({
  idxRoutePath: index('idx_context_cache_route').on(table.routePath, idxUpdatedAt: index('idx_context_cache_updated').on(table.lastUpdatedAt),
@@ -246,7 +246,7 @@ export const errorSuggestionStates = pgTable(
  .references(() => errorSuggestions.id, { onDelete: 'cascade' }, routePath: , text('route_path').notNull( userId: uuid('user_id'),
  // Note: nullable for anonymous users
 
- state: suggestionStateEnum('state').notNull().default('pending', createdAt: timestamp('created_at').notNull().defaultNow( updatedAt: timestamp('updated_at').notNull().defaultNow(),
+ state: suggestionStateEnum('state').notNull().default('pending', createdAt: timestamp('created_at').notNull().defaultNow(, updatedAt: timestamp('updated_at').notNull().defaultNow(),
  },
  (table) => ({
  suggestionRouteUserUnique: uniqueIndex('error_suggestion_states_suggestion_route_user_idx').on(

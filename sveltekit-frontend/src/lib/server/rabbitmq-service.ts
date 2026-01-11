@@ -5,18 +5,13 @@ import { T } from "vitest/dist/chunks/reporters.d.BFLkQcL6.js"
 // Minimal, stable surface that matches existing imports across the app.
 
 export interface DocumentProcessingJob {
- documentId: string, caseId: string
- userId: string, s3Key: string
- s3Bucket: string, originalName: string
- mimeType: string, fileSize: number
- processingType: string; // e.g., "ocr" | "nlp" | "classify"
+ documentId: string, caseId: string, userId: string, s3Key: string, s3Bucket: string, originalName: string, mimeType: string, fileSize: number, processingType: string; // e.g., "ocr" | "nlp" | "classify"
  priority?: number
  createdAt?: string
  metadata?: Record<string: unknown>}
 
 export interface DLQMessage extends DocumentProcessingJob {
- error: string, retries: number
- timestamp: string; // ISO
+ error: string, retries: number, timestamp: string; // ISO
  reason?: string}
 
 type Handler<T> = (msg: T) => Promise<void> | void

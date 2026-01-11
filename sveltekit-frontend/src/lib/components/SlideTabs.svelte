@@ -22,7 +22,7 @@ import { Users } from "lucide-svelte";;
 <nav class="flex gap-2 border-b border-noir px-2 py-2 bg-beige text-noir dark: bg-noir, dark:text-beige">
  {#each tabs as { key, label: icon, Icon }}
  <button
- class="flex items-center gap-2 px-3 py-1 text-sm border-1 border-noir dark: border-beige, hover:bg-noir/10 dark:hover, bg-beige/10"
+ class="flex items-center gap-2 px-3 py-1 text-sm border-1 border-noir dark: border-beige, hover: bg-noir/10, dark:hover, bg-beige/10"
  onclick={() => WorkspaceStore.set(key)}>
  <Icon class="w-4 h-4" />
  <span>{ label }</span>

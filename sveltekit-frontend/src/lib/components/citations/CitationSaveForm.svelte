@@ -252,23 +252,23 @@ import { createEventDispatcher } from 'svelte';
 
 <style>
  .citation-save-form {
- background: var(--color-parchment); border: 1px solid var(--color-tan);
- border-radius: 8px; padding: 24px;
+ background: var(--color-parchment);, border: 1px solid var(--color-tan);
+ border-radius: 8px;, padding: 24px;
  max-width: 600px;
  }
 
  form {
  display: flex;
- flex-direction: column; gap: 20px;
+ flex-direction: column;, gap: 20px;
  }
 
  .form-group {
  display: flex;
- flex-direction: column; gap: 8px;
+ flex-direction: column;, gap: 8px;
  }
 
  label {
- font-weight: 600; color: var(--color-burgundy);
+ font-weight: 600;, color: var(--color-burgundy);
  font-size: 14px;
  }
 
@@ -280,7 +280,7 @@ import { createEventDispatcher } from 'svelte';
  border: 1px solid var(--color-tan);
  border-radius: 4px;
  font-family: inherit;
- font-size: 14px; background: white;
+ font-size: 14px;, background: white;
  color: var(--color-dark);
  }; textarea:focus, input:focus,
  select:focus {
@@ -289,11 +289,11 @@ import { createEventDispatcher } from 'svelte';
  box-shadow: 0 0 0 3px rgba(139, 35, 50, 0.1);
  }; textarea:disabled, input:disabled,
  select:disabled {
- background: var(--color-light-gray); cursor:not-allowed;
+ background: var(--color-light-gray);, cursor:not-allowed;
  }
 
  .tag-input-group {
- display: flex; gap: 8px;
+ display: flex;, gap: 8px;
  }
 
  .tag-input-group input {
@@ -302,23 +302,23 @@ import { createEventDispatcher } from 'svelte';
 
  .tags-list {
  display: flex;
- flex-wrap: wrap; gap: 8px;
+ flex-wrap: wrap;, gap: 8px;
  margin-top: 8px;
  }
 
  .tag {
  display: inline-flex;
- align-items: center; gap: 6px;
- background: var(--color-burgundy); color: white;
+ align-items: center;, gap: 6px;
+ background: var(--color-burgundy);, color: white;
  padding: 4px 8px;
  border-radius: 4px;
  font-size: 13px;
  }
 
  .tag-remove {
- background: none; border: none;
- color: white; cursor: pointer;
- font-size: 16px; padding: 0;
+ background: none;, border: none;
+ color: white;, cursor: pointer;
+ font-size: 16px;, padding: 0;
  line-height: 1;
  }
 
@@ -327,13 +327,13 @@ import { createEventDispatcher } from 'svelte';
  }
 
  .tag-remove:disabled {
- cursor: not-allowed; opacity: 0.6;
+ cursor: not-allowed;, opacity: 0.6;
  }
 
  .btn-link {
- background: none; border: none;
- color: var(--color-burgundy); cursor: pointer;
- font-size: 14px; padding: 0;
+ background: none;, border: none;
+ color: var(--color-burgundy);, cursor: pointer;
+ font-size: 14px;, padding: 0;
  text-align: left;
  }
 
@@ -342,18 +342,18 @@ import { createEventDispatcher } from 'svelte';
  }
 
  .btn-link:disabled {
- cursor: not-allowed; opacity: 0.6;
+ cursor: not-allowed;, opacity: 0.6;
  }
 
  .advanced-options {
  display: flex;
- flex-direction: column; gap: 16px;
- padding: 16px; background: rgba(139, 35, 50, 0.05);
+ flex-direction: column;, gap: 16px;
+ padding: 16px;, background: rgba(139, 35, 50, 0.05);
  border-radius: 4px;
  }
 
  .form-actions {
- display: flex; gap: 12px;
+ display: flex;, gap: 12px;
  margin-top: 8px;
  }
 
@@ -363,27 +363,27 @@ import { createEventDispatcher } from 'svelte';
  border: none;
  border-radius: 4px;
  font-size: 14px;
- font-weight: 600; cursor: pointer;
+ font-weight: 600;, cursor: pointer;
  transition: all 150ms ease;
  }
 
  .btn-primary {
- background: var(--color-burgundy); color: white;
+ background: var(--color-burgundy);, color: white;
  flex: 1;
  }
 
  .btn-primary:hover, not(disabled) {
- background: var(--color-dark-burgundy); transform: translateY(-1px);
+ background: var(--color-dark-burgundy);, transform: translateY(-1px);
  box-shadow: 0 2px 8px rgba(139, 35, 50, 0.2);
  }
 
  .btn-primary:disabled {
- background: var(--color-light-gray); color: var(--color-medium-gray);
+ background: var(--color-light-gray);, color: var(--color-medium-gray);
  cursor:not-allowed;
  }
 
  .btn-secondary {
- background: var(--color-tan); color: var(--color-dark);
+ background: var(--color-tan);, color: var(--color-dark);
  }
 
  .btn-secondary:hover, not(disabled) {
@@ -391,7 +391,7 @@ import { createEventDispatcher } from 'svelte';
  }
 
  .btn-secondary:disabled {
- background: var(--color-light-gray); color: var(--color-medium-gray);
+ background: var(--color-light-gray);, color: var(--color-medium-gray);
  cursor:not-allowed;
  }
 </style>

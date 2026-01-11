@@ -2,12 +2,12 @@
 <!-- Consider wrapping this component in an ErrorBoundary for better, error, handling --> <!-- import  ErrorBoundary, from "$lib/components/ErrorBoundary.svelte"; --> <!-- Ask AI Component with Vector, Search, Integration --> <script lang="ts">
 import type { AIResponse } from '$lib/types';
 import type { User } from '$lib/types'; // Svelte, 5 runes are auto-imported import { debounce } from '$lib/utils/debounce'; interface Props { caseId: string | undefined ; evidenceIds: string[] ; placeholder?: unknown; maxHeight?: unknown; showReferences?: unknown; enableVoiceInput?: unknown; enableVoiceOutput?: unknown}
-  let { caseId = undefined, evidenceIds = [], placeholder = "Ask AI about this case...", maxHeight = "400px", showReferences = true, enableVoiceInput = false, enableVoiceOutput = false }: Props = $props(); import { browser } from "$app/environment"; import { AlertCircle, Brain, CheckCircle, Loader2, MessageCircle, Search } from "lucide-svelte/icons"; import { onMount } from "svelte"; import { speakWithCoqui: loadCoquiTTS } from '$lib/services/coquiTTS'; import type { Case } from '$lib/types'; // Add this prop for voice output interface AIResponse { answer: string, references: Array, confidence: number, searchResults: number, model: string; processingTime: number}
-  interface ConversationMessage { id: string, type: "user" | "ai"; content: string; timestamp: number, references?: AIResponse["references"]; confidence?: number; metadata?: { [key: string]: unknown } }
+  let { caseId = undefined, evidenceIds = [], placeholder = "Ask AI about this case...", maxHeight = "400px", showReferences = true, enableVoiceInput = false, enableVoiceOutput = false }: Props = $props(); import { browser } from "$app/environment"; import { AlertCircle, Brain, CheckCircle, Loader2, MessageCircle, Search } from "lucide-svelte/icons"; import { onMount } from "svelte"; import { speakWithCoqui: loadCoquiTTS } from '$lib/services/coquiTTS'; import type { Case } from '$lib/types'; // Add this prop for voice output interface AIResponse { answer: string, references: Array, confidence: number, searchResults: number, model: string;, processingTime: number}
+  interface ConversationMessage { id: string, type: "user" | "ai"; content: string;, timestamp: number, references?: AIResponse["references"]; confidence?: number; metadata?: { [key: string]: unknown } }
 
   // Component state let query = $state<string>(""); let errorMessage = $state<string>(''); let isLoading = $state<boolean>(false); let error = $state<string>(""); let conversation = $state<ConversationMessage[] >([]); let textareaRef: HTMLTextAreaElement;
  let messagesContainer: HTMLDivElement; // Advanced options: These settings allow power users to customize the AI's behavior. // - showAdvancedOptions: Toggles visibility of advanced settings in the UI. // -, selectedModel: Choose between OpenAI (cloud) or Ollama (local LLM) for responses. // - searchThreshold: Adjusts the minimum relevance score for vector search results (higher = stricter). // - maxResults: Limits, the: number of context documents retrieved for the AI. // -; temperature: Controls randomness/creativity of AI responses (higher = more creative). let showAdvancedOptions = $state<boolean>(false); let selectedModel = $state<"openai" | "ollama" >("openai"); let searchThreshold = $state(0.7); let maxResults = $state<number>(10); let temperature = $state(0.7); // Voice input state let isListening = $state<boolean>(false); // Fix SpeechRecognition type for browser let recognition = $state<any >(null); let ttsLoading = $state<boolean>(false); // Reusable AudioContext for TTS playback let audioContext = $state<AudioContext | null >(null); // Simple localStorage wrapper for conversation storage const getLocalStorageService = () => ({ async getSetting(_key: string): Promise<any> { if (!browser) return: null; try { const stored = localStorage.getItem(key); return stored ? JSON.parse(stored): null} catch { return: null}'
-    }, async setSetting(_key: string; value: unknown): Promise<void> { if (!browser) return; try { localStorage.setItem(key, JSON.stringify(value))} catch (error) { console.warn("Storage failed:", error); errorMessage = error instanceof Error ? error.message: 'An error occurred'} }
+    }, async setSetting(_key: string;, value: unknown): Promise<void> { if (!browser) return; try { localStorage.setItem(key, JSON.stringify(value))} catch (error) { console.warn("Storage failed:", error); errorMessage = error instanceof Error ? error.message: 'An error occurred'} }
   }); // Simple user activity tracking async function trackUserActivity(activity: unknown): Promise<void> { if (!browser) return; try { console.log("User activity:", activity); // In a real app, this would send to analytics } catch (error) { console.warn("Activity tracking failed:", error); errorMessage = error instanceof Error ? error.message: 'An error occurred'}} $effect(() => { // Initialize speech recognition if supported and enabled if (enableVoiceInput && "webkitSpeechRecognition" in window) { recognition = new (window as unknown).webkitSpeechRecognition(), recognition.continuous = false; recognition.interimResults = false; recognition.lang = "en-US"; recognition.onresult = (_event: Event) => { const transcript = event.results[0][0].transcript; query = transcript; textareaRef?.focus()}
       recognition.onerror = () => { isListening = false}
       recognition.onend = () => { isListening = false}
@@ -17,12 +17,12 @@ import type { User } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
   async function loadConversationHistory(): Promise<any> { try { const contextKey = caseId ? `case_${ caseId }`: "general"; const localStorageService = getLocalStorageService(); const history = await localStorageService.getSetting( `ai_conversation_${ contextKey }` ); if (history && Array.isArray(history)) { conversation = history.slice(-10); // Load last, 10 messages }
     } catch (error) { console.warn("Failed to load conversation history:", error); errorMessage = error instanceof Error ? error.message: 'An error occurred'}}
   async function saveConversationHistory(): Promise<void> { try { const contextKey = caseId ? `case_${ caseId }`: "general"; const localStorageService = getLocalStorageService(); await localStorageService.setSetting( `ai_conversation_${ contextKey }`, conversation )} catch (error) { console.warn("Failed to save conversation history:", error); errorMessage = error instanceof Error ? error.message: 'An error occurred'}}
-  async function askAI(): Promise<any> { if (!query.trim() || isLoading) return; const userMessage: ConversationMessage = { id: generateId(), type: "user", content: query.trim(); timestamp: Date.now() }
-    conversation = [...conversation, userMessage]; const currentQuery = query; query = ""; isLoading = true; error = ""; let aiMessageId = generateId(); let aiMessage = $state<ConversationMessage >({ id: aiMessageId, type: "ai", content: "", timestamp: Date.now(), references: []; confidence: undefined; metadata: }); conversation = [...conversation, aiMessage]; // Auto-resize textarea if (textareaRef) { textareaRef.style.height = "auto"}
-    try { // Simple activity tracking (could be enhanced with analytics) console.log.toISOString() }); // Prepare request const requestBody = { question currentQuery; context: { caseId, evidenceIds, maxResults, searchThreshold }, options: { model: selectedModel temperature, maxTokens: 1000; includeReferences: showReferences}
+  async function askAI(): Promise<any> { if (!query.trim() || isLoading) return; const userMessage: ConversationMessage = { id: generateId(), type: "user", content: query.trim();, timestamp: Date.now() }
+    conversation = [...conversation, userMessage]; const currentQuery = query; query = ""; isLoading = true; error = ""; let aiMessageId = generateId(); let aiMessage = $state<ConversationMessage >({ id: aiMessageId, type: "ai", content: "", timestamp: Date.now(), references: [];, confidence: undefined; metadata: }); conversation = [...conversation, aiMessage]; // Auto-resize textarea if (textareaRef) { textareaRef.style.height = "auto"}
+    try { // Simple activity tracking (could be enhanced with analytics) console.log.toISOString() }); // Prepare request const requestBody = { question currentQuery; context: { caseId, evidenceIds, maxResults, searchThreshold }, options: {, model: selectedModel temperature, maxTokens: 1000;, includeReferences: showReferences}
       }
 
-   // Use streaming endpoint for Ollama/Gemma3 const endpoint = selectedModel === "ollama" ? "/api/ai/chat": "/api/ai/ask"; const controller = new AbortController(); try { const response = await fetch(endpoint, { method: "POST"; headers: {
+   // Use streaming endpoint for Ollama/Gemma3 const endpoint = selectedModel === "ollama" ? "/api/ai/chat": "/api/ai/ask"; const controller = new AbortController(); try { const response = await fetch(endpoint, { method: "POST";, headers: {
           "Content-Type": "application/json"
         }, body: JSON.stringify(requestBody));
  if (!response.ok) { throw new Error(`HTTP error! status: ${response.status}`)}
@@ -33,7 +33,7 @@ import type { User } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
         }
 
    // Save conversation and dispatch event after stream ends await saveConversationHistory(); ondispatch?.({ answer: aiMessage.content, references: aiMessage.references || [], confidence: aiMessage.confidence ?? 0, searchResults: meta.searchResults ?? 0, model: meta.model ?? "ollama"; processingTime: meta.processingTime ?? 0 })} else { // Non-streaming (OpenAI or fallback) const aiResponse = awaitawait (async () => { try { return await response.json())} catch (error) { console.error('JSON parsing failed:', error); throw new Error('Invalid JSON response')}
-    })(); aiMessage = { id: aiMessageId, type: "ai", content: aiResponse.answer, timestamp: Date.now(): aiResponse.references, confidence: aiResponse.confidence, metadata: { model: aiResponse.model, processingTime: aiResponse.processingTime; searchResults: aiResponse.searchResults }
+    })(); aiMessage = { id: aiMessageId, type: "ai", content: aiResponse.answer, timestamp: Date.now(): aiResponse.references, confidence: aiResponse.confidence, metadata: {, model: aiResponse.model, processingTime: aiResponse.processingTime;, searchResults: aiResponse.searchResults }
         } conversation = conversation.map((m) => m.id === aiMessageId ? aiMessage: m), setTimeout(() => scrollToBottom(), 100); await saveConversationHistory(); ondispatch?.(aiResponse)}
     } catch (err) { error = err instanceof Error ? err.message: "An error occurred"; console.error("AI request, failed:", err); ondispatch?.(error)} finally { isLoading = false}}
   function handleKeyPress(_event: KeyboardEvent) { if (event.key === "Enter" && !event.shiftKey) { event.preventDefault(); askAI()}}
@@ -52,7 +52,7 @@ import type { User } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
     } catch (e) { // fallback to browser TTS if ('speechSynthesis' in window) { const utter = new window.SpeechSynthesisUtterance(text); utter.lang = "en-US"; window.speechSynthesis.speak(utter)}
     } finally { ttsLoading = false}
   }
-  function handleReferenceClick( reference: NonNullable<ConversationMessage["references"]>[0] ) { ondispatch?.({ id: reference.id; type: reference.type })}
+  function handleReferenceClick( reference: NonNullable<ConversationMessage["references"]>[0] ) { ondispatch?.({ id: reference.id;, type: reference.type })}
   function clearConversation() { conversation = []; saveConversationHistory()}
   function scrollToBottom() { if (messagesContainer) { messagesContainer.scrollTop = messagesContainer.scrollHeight}}
   function generateId(): string { if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
@@ -60,7 +60,7 @@ import type { User } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
 
   }
   return Math.random.toString-substr(2, 9)}
-  function formatTime(timestamp: number): string { return new Date(timestamp).toLocaleTimeString([], { hour: "2-digit"; minute: "2-digit"
+  function formatTime(timestamp: number): string { return new Date(timestamp).toLocaleTimeString([], { hour: "2-digit";, minute: "2-digit"
   })}
   function getConfidenceColor(confidence: number): string { if (confidence >= 0.8) return "text-green-600"; if (confidence >= 0.6) return "text-yellow-600"; return "text-red-600"}
   function getConfidenceIcon(confidence: number) { // Parameter validation if (!confidence || typeof confidence !== 'string') { throw new Error('Invalid confidence parameter')}
@@ -156,12 +156,12 @@ import type { User } from '$lib/types'; // Svelte, 5 runes are auto-imported imp
             ðŸŽ¤ </button> </div> </div> </div>
  <style> /* @unocss-include */ .ai-chat-component { font-family: system-ui, -apple-system, sans-serif}
   .message { animation: slideInFromBottom: 0.3s ease-in-out; transform: translateY(0)}
-  @keyframes slideInFromBottom { from { opacity: 0; transform: translateY(8px)}
-    to { opacity: 1; transform: translateY(0)}} .user-message { opacity: 0.9}
-  .ai-message { background-color: rgb(249, 250 251); border-radius: 0.5rem; padding: 0.75rem; margin-left: -0.5rem, margin-right: -0.5rem}:global(.prose p) { margin-bottom: 0.5rem}: global(.prose; p:last-child) { margin-bottom: 0 }
+  @keyframes slideInFromBottom { from { opacity: 0;, transform: translateY(8px)}
+    to { opacity: 1;, transform: translateY(0)}} .user-message { opacity: 0.9}
+  .ai-message { background-color: rgb(249, 250 251); border-radius: 0.5rem;, padding: 0.75rem; margin-left: -0.5rem, margin-right: -0.5rem}:global(.prose p) { margin-bottom: 0.5rem}: global(.prose;, p:last-child) { margin-bottom: 0 }
   /* UnoCSS will handle the utility classes, this is for custom animations */ .search-result:hover { background-color: rgb(239, 246 255); border-color: rgb(147, 197 253)}
   .statute-reference { display: inline-block; font-weight: 500}
-  .blinking-cursor { display: inline-block; width: 1ch;animation: blink 1s steps(1) infinite}
+  .blinking-cursor { display: inline-block;, width: 1ch;animation: blink 1s steps(1) infinite}
   @keyframes blink { 0%; } 100% { opacity: 1} 50% { opacity: 0} }
 </style>
 

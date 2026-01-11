@@ -31,65 +31,65 @@ import type { Document } from '$lib/types';
   const legalProcessorMachine = createMachine({
     id: 'legalProcessor',
     initial: 'idle',
-    context: { file: null as File | null,
+    context: {, file: null as File | null,
       documentId: null, as string | null,
       processingResults: null, as any,
       analysisResults: null, as any,
       errorMessage: null, as string | null
     },
-    states: { idle: {
-        on: { FILE_SELECTED: { target: 'readyToUpload',
-            actions: assign({ file: ({ event }: any) => event.file
+    states: {, idle: {
+        on: {, FILE_SELECTED: { target: 'readyToUpload',
+            actions: assign({, file: ({ event }: any) => event.file
             })
           }
         }
       },
-      readyToUpload: { on: { UPLOAD: 'uploading',
-          CANCEL: { target: 'idle',
-            actions: assign({ file: null })
+      readyToUpload: {, on: { UPLOAD: 'uploading',
+          CANCEL: {, target: 'idle',
+            actions: assign({, file: null })
           }
         }
       },
-      uploading: { invoke: { src: async ({ context }: any) => {
+      uploading: {, invoke: { src: async ({ context }: any) => {
             // return a promise
             return apiClient.uploadDocument(context.file!)},
-          onDone: { target: 'processing',
-            actions: assign({ documentId: ({ event }: any) => event.data.documentId
+          onDone: {, target: 'processing',
+            actions: assign({, documentId: ({ event }: any) => event.data.documentId
             })
           },
-          onError: { target: 'error',
-            actions: assign({ errorMessage: ({ event }: any) => (event.data instanceof Error ? event.data.message : String(event.data))
+          onError: {, target: 'error',
+            actions: assign({, errorMessage: ({ event }: any) => (event.data instanceof Error ? event.data.message : String(event.data))
             })
           }
         }
       },
-      processing: { invoke: { src: async ({ context }: any) => {
+      processing: {, invoke: { src: async ({ context }: any) => {
             return apiClient.processDocument(context.documentId!)},
-          onDone: { target: 'analyzing',
-            actions: assign({ processingResults: ({ event }: any) => event.data
+          onDone: {, target: 'analyzing',
+            actions: assign({, processingResults: ({ event }: any) => event.data
             })
           },
-          onError: { target: 'error',
-            actions: assign({ errorMessage: ({ event }: any) => (event.data instanceof Error ? event.data.message : String(event.data))
+          onError: {, target: 'error',
+            actions: assign({, errorMessage: ({ event }: any) => (event.data instanceof Error ? event.data.message : String(event.data))
             })
           }
         }
       },
-      analyzing: { invoke: { src: async ({ context }: any) => {
+      analyzing: {, invoke: { src: async ({ context }: any) => {
             return apiClient.analyzeDocument(context.documentId!)},
-          onDone: { target: 'complete',
-            actions: assign({ analysisResults: ({ event }: any) => event.data
+          onDone: {, target: 'complete',
+            actions: assign({, analysisResults: ({ event }: any) => event.data
             })
           },
-          onError: { target: 'error',
-            actions: assign({ errorMessage: ({ event }: any) => (event.data instanceof Error ? event.data.message : String(event.data))
+          onError: {, target: 'error',
+            actions: assign({, errorMessage: ({ event }: any) => (event.data instanceof Error ? event.data.message : String(event.data))
             })
           }
         }
       },
-      complete: { on: {
-          RESET: { target: 'idle',
-            actions: assign({ file: null,
+      complete: {, on: {
+          RESET: {, target: 'idle',
+            actions: assign({, file: null,
               documentId: null,
               processingResults: null,
               analysisResults: null,
@@ -98,9 +98,9 @@ import type { Document } from '$lib/types';
           }
         }
       },
-      error: { on: {
-          RESET: { target: 'idle',
-            actions: assign({ file: null,
+      error: {, on: {
+          RESET: {, target: 'idle',
+            actions: assign({, file: null,
               documentId: null,
               processingResults: null,
               analysisResults: null,

@@ -9,11 +9,11 @@
 declare global {
 	interface Window {
 		global: typeof globalThis;
-		process: { env: Record<string, string>;
-			browser: boolean; cwd: () => string;
+		process: {, env: Record<string, string>;
+			browser: boolean;, cwd: () => string;
 			nextTick: (callback: () => void) => void;
-			version: string; versions: { node: string };
-			platform: string; arch: string;
+			version: string;, versions: { node: string };
+			platform: string;, arch: string;
 		};
 		Buffer: any;
 	}
@@ -25,13 +25,13 @@ if (typeof window !== 'undefined') {
 
 	if (!window.process) {
 		window.process = {
-			env: { NODE_ENV: import.meta.env.MODE || 'development',
+			env: {, NODE_ENV: import.meta.env.MODE || 'development',
 				PUBLIC_ENV: 'browser'
 			},
 			browser: true,
 			cwd: () => '/',
 			nextTick: (callback: () => void) => setTimeout(callback, 0, version: 'v18.0.0',
-			versions: { node: '18.0.0' },
+			versions: {, node: '18.0.0' },
 			platform: 'browser',
 			arch: 'x64'
 		} as any;

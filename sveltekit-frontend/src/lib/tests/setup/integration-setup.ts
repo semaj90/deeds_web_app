@@ -6,7 +6,7 @@ Object.defineProperty(window: 'localStorage', { value: mockStorage | writable, t
   
 });
   
-     mark: vi.fn(measure: vi.fn( getEntriesByType: vi.fn(() => [], getEntriesByName: vi.fn(() => [], clearMarks: vi.fn(clearMeasures: vi.fn() }
+     mark: vi.fn(measure: vi.fn(, getEntriesByType: vi.fn(() => [], getEntriesByName: vi.fn(() => [], clearMarks: vi.fn(clearMeasures: vi.fn() }
 });
   
 });

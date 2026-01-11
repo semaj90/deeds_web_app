@@ -39,8 +39,7 @@
     grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 0.5rem, margin: 1rem 0}
   .metric {
     display: flex
-    justify-content: space-betweenn, padding: 0.25rem
-    background: white
+    justify-content: space-betweenn, padding: 0.25rem, background: white
     border-radius: 2px}
   .metric label {
     font-weight: bold}

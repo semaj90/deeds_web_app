@@ -18,7 +18,7 @@ import type { ContextBundle, ToolPlan } from './ace-context-service.js';
 
 export interface AceRequest {
   userRequest: string;
-  errorContext?: { message: string; filePath: string; lineNumber: number;
+  errorContext?: {, message: string; filePath: string;, lineNumber: number;
     code?: string;
   };
   systemRules?: string;
@@ -27,11 +27,11 @@ export interface AceRequest {
 }
 
 export interface AceResponse {
-  response: string; context: ContextBundle;
-  toolCalls: Array<{ tool: string; params: Record<string, unknown>;
+  response: string;, context: ContextBundle;
+  toolCalls: Array<{, tool: string; params: Record<string, unknown>;
     reason: string;
   }>;
-  metadata: { sessionId: string; timestamp: string; contextQuality: 'sufficient' | 'stale' | 'insufficient'; webSearchTriggered: boolean; llmProvider: string;
+  metadata: {, sessionId: string; timestamp: string;, contextQuality: 'sufficient' | 'stale' | 'insufficient'; webSearchTriggered: boolean;, llmProvider: string;
   };
 }
 
@@ -200,7 +200,7 @@ export class AceAdapter {
       const response = await fetch('/api/ace/web/ingest', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ urls: searchResults.map((r) => r.url, tags: ['ace', 'auto-ingested', sessionId],
+        body: JSON.stringify({, urls: searchResults.map((r) => r.url, tags: ['ace', 'auto-ingested', sessionId],
           priority: 'high',
         }),
       });
@@ -261,9 +261,9 @@ export class AceAdapter {
     const response = await fetch(`${ollamaUrl}/api/generate`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ model: 'gemma3-legal',
+      body: JSON.stringify({, model: 'gemma3-legal',
         prompt: stream,
-        options: { temperature: num_predict,
+        options: {, temperature: num_predict,
         },
       }),
     });

@@ -44,7 +44,7 @@ export class MinIOService {
     this.client = new S3Client({
       endpoint,
       region,
-      credentials: { accessKeyId: secretAccessKey },
+      credentials: {, accessKeyId: secretAccessKey },
       forcePathStyle: true // Required for MinIO
     });
 
@@ -145,7 +145,7 @@ export class MinIOService {
    */
   async storeChunks(
     docId: string,
-    chunks: Array<{ text: string; metadata: object }>
+    chunks: Array<{, text: string; metadata: object }>
   ): Promise<string> {
     this.validateInput(docId, 'docId');
     if (!Array.isArray(chunks) || chunks.length === 0) {
@@ -402,7 +402,7 @@ export class MinIOService {
     bucket: string,
     prefix: string,
     maxKeys: number = 1000
-  ): Promise<Array<{ key: string; size: number; lastModified: Date }>> {
+  ): Promise<Array<{, key: string; size: number;, lastModified: Date }>> {
     this.validateInput(bucket, 'bucket');
 
     try {

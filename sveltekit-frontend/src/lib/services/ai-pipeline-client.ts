@@ -14,8 +14,8 @@ import type { text } from "stream/consumers";
 
 // Service availability tracking
 export interface ServiceStatus {
-	ollama: boolean; embedding: boolean;
-	qdrant: boolean; rag: boolean;
+	ollama: boolean;, embedding: boolean;
+	qdrant: boolean;, rag: boolean;
 	lastCheck: number;
 }
 
@@ -189,7 +189,7 @@ export class AIPipelineClient {
 	 */
 	async generateEmbedding(
 		text: string
-	): Promise<{ embedding: number[] | null; cached: boolean }> {
+	): Promise<{, embedding: number[] | null; cached: boolean }> {
 		// Check cache first
 		const cacheKey = `${CACHE_KEYS.EMBEDDINGS_CACHE}:${this.hashText(text)}`;
 		const cached = this.storage.get<number[]>(cacheKey);
@@ -236,7 +236,7 @@ export class AIPipelineClient {
 	 */
 	async analyzeDocument(
 		content: string, documentType: string = 'unknown'
-	): Promise<{ analysis: null; cached: boolean }> {
+	): Promise<{, analysis: null; cached: boolean }> {
 		// Check cache
 		const cacheKey = `${CACHE_KEYS.ANALYSIS_CACHE}:${this.hashText(content)}`;
 		const cached = this.storage.get<any>(cacheKey);
@@ -260,7 +260,7 @@ export class AIPipelineClient {
 			const response = await fetch(`${this.baseUrl}/api/ai/analyze`,, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ content: documentType }, signal: AbortSignal.timeout(30000) // 30s timeout
+				body: JSON.stringify({, content: documentType }, signal: AbortSignal.timeout(30000) // 30s timeout
 			});
 
 			if (!response.ok) throw new Error(`HTTP ${response.status}`);
@@ -288,7 +288,7 @@ export class AIPipelineClient {
 	async semanticSearch(
 		query: string,
 		options: { limit?: number; caseId?: string } = {}
-	): Promise<{ results: unknown[]; cached: boolean }> {
+	): Promise<{, results: unknown[]; cached: boolean }> {
 		const cacheKey = `${CACHE_KEYS.SEARCH_CACHE}:${this.hashText(query)}:${options.caseId || 'all'}`;
 		const cached = this.storage.get<any[]>(cacheKey);
 
@@ -332,7 +332,7 @@ export class AIPipelineClient {
 	/**
 	 * Queue operation for retry when offline
 	 */
-	queueOfflineOperation(operation: { type: 'upload' | 'analyze' | 'search';
+	queueOfflineOperation(operation: {, type: 'upload' | 'analyze' | 'search';
 		data: Record<string, unknown>;
 		timestamp: number;
 	}): void {

@@ -8,9 +8,9 @@
  }>();
 
  interface SimilarCase {
- caseId: string; caseNumber: string;
- charges: string[]; outcome: string;
- relevanceScore: number; matchedCharges: string[];
+ caseId: string;, caseNumber: string;
+ charges: string[];, outcome: string;
+ relevanceScore: number;, matchedCharges: string[];
  precedentRank: number;
  }
 
@@ -211,7 +211,7 @@
 <style>
  .similar-cases-panel {
  background-color: white;
- border-radius: 8px; border: 1px solid #e0e0e0;
+ border-radius: 8px;, border: 1px solid #e0e0e0;
  overflow: hidden;
  }
 
@@ -223,22 +223,22 @@
 
  .panel-header h2 {
  margin: 0 0 1rem 0;
- font-size: 1.5rem; color: #1f2937;
+ font-size: 1.5rem;, color: #1f2937;
  }
 
  .controls {
- display: flex; gap: 1.5rem;
+ display: flex;, gap: 1.5rem;
  flex-wrap: wrap;
  }
 
  .control-group {
  display: flex;
- align-items: center; gap: 0.5rem;
+ align-items: center;, gap: 0.5rem;
  }
 
  .control-group label {
  font-size: 0.875rem;
- font-weight: 500; color: #6b7280;
+ font-weight: 500;, color: #6b7280;
  }
 
  .control-group select,
@@ -257,7 +257,7 @@
  }
 
  .relevance-value {
- font-size: 0.875rem; color: #6b7280;
+ font-size: 0.875rem;, color: #6b7280;
  min-width: 40px;
  }
 
@@ -266,14 +266,14 @@
  flex-direction: column;
  align-items: center;
  justify-content: center;
- min-height: 300px; gap: 1rem;
+ min-height: 300px;, gap: 1rem;
  }
 
  .spinner {
- width: 40px; height: 40px;
+ width: 40px;, height: 40px;
  border: 4px solid #e0e0e0;
  border-top-color: #2563eb;
- border-radius: 50%; animation: spin 1s linear infinite;
+ border-radius: 50%;, animation: spin 1s linear infinite;
  }
 
  @keyframes spin {
@@ -284,14 +284,14 @@
 
  .error {
  padding: 2rem;
- text-align: center; color: #dc2626;
+ text-align: center;, color: #dc2626;
  }
 
  .error button {
- margin-top: 1rem; padding: 0.5rem 1rem;
- background-color: #dc2626; color: white;
+ margin-top: 1rem;, padding: 0.5rem 1rem;
+ background-color: #dc2626;, color: white;
  border: none;
- border-radius: 4px; cursor: pointer;
+ border-radius: 4px;, cursor: pointer;
  }
 
  .error button:hover {
@@ -300,18 +300,18 @@
 
  .no-cases {
  padding: 2rem;
- text-align: center; color: #6b7280;
+ text-align: center;, color: #6b7280;
  }
 
  .cases-list {
- padding: 1.5rem; display: grid;
+ padding: 1.5rem;, display: grid;
  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
  gap: 1rem;
  }
 
  .case-card {
  border: 1px solid #e0e0e0;
- border-radius: 8px; overflow: hidden;
+ border-radius: 8px;, overflow: hidden;
  transition: all 0.2s;
  display: flex;
  flex-direction: column;
@@ -325,16 +325,16 @@
  .card-header {
  display: flex;
  justify-content: space-between;
- align-items: center; padding: 1rem;
+ align-items: center;, padding: 1rem;
  background-color: #f9fafb;
  border-bottom: 1px solid #e0e0e0;
  }
 
  .case-number {
- background: none; border: none;
+ background: none;, border: none;
  color: #2563eb;
  font-size: 1rem;
- font-weight: 600; cursor: pointer;
+ font-weight: 600;, cursor: pointer;
  text-decoration: none;
  }
 
@@ -343,30 +343,30 @@
  }
 
  .relevance-badge {
- color: white; padding: 0.25rem 0.75rem;
+ color: white;, padding: 0.25rem 0.75rem;
  border-radius: 20px;
  font-size: 0.875rem;
  font-weight: 600;
  }
 
  .card-content {
- padding: 1rem; flex: 1;
+ padding: 1rem;, flex: 1;
  }
 
  .info-row {
- display: flex; gap: 0.75rem;
+ display: flex;, gap: 0.75rem;
  margin-bottom: 0.75rem;
  align-items: flex-start;
  }
 
  .info-row label {
- font-weight: 600; color: #6b7280;
+ font-weight: 600;, color: #6b7280;
  font-size: 0.875rem;
  min-width: 100px;
  }
 
  .rank-badge {
- background-color: #f3f4f6; color: #1f2937;
+ background-color: #f3f4f6;, color: #1f2937;
  padding: 0.25rem 0.5rem;
  border-radius: 4px;
  font-weight: 600;
@@ -374,7 +374,7 @@
  }
 
  .outcome-badge {
- color: white; padding: 0.25rem 0.75rem;
+ color: white;, padding: 0.25rem 0.75rem;
  border-radius: 4px;
  font-size: 0.875rem;
  font-weight: 500;
@@ -382,11 +382,11 @@
 
  .charges {
  display: flex;
- flex-wrap: wrap; gap: 0.5rem;
+ flex-wrap: wrap;, gap: 0.5rem;
  }
 
  .charge-tag {
- background-color: #eff6ff; color: #1e40af;
+ background-color: #eff6ff;, color: #1e40af;
  padding: 0.25rem 0.5rem;
  border-radius: 4px;
  font-size: 0.75rem;
@@ -395,11 +395,11 @@
 
  .matched-charges {
  display: flex;
- flex-wrap: wrap; gap: 0.5rem;
+ flex-wrap: wrap;, gap: 0.5rem;
  }
 
  .matched-charge-tag {
- background-color: #dcfce7; color: #166534;
+ background-color: #dcfce7;, color: #166534;
  padding: 0.25rem 0.5rem;
  border-radius: 4px;
  font-size: 0.75rem;
@@ -413,12 +413,12 @@
  }
 
  .btn-view {
- width: 100%; padding: 0.5rem;
- background-color: #2563eb; color: white;
+ width: 100%;, padding: 0.5rem;
+ background-color: #2563eb;, color: white;
  border: none;
  border-radius: 4px;
  font-size: 0.875rem;
- font-weight: 500; cursor: pointer;
+ font-weight: 500;, cursor: pointer;
  transition: background-color 0.2s;
  }
 
@@ -430,7 +430,7 @@
  padding: 1rem 1.5rem;
  border-top: 1px solid #e0e0e0;
  background-color: #f9fafb;
- text-align: center; color: #6b7280;
+ text-align: center;, color: #6b7280;
  font-size: 0.875rem;
  }
 </style>

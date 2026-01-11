@@ -50,7 +50,7 @@ export default class MultiTierCache<V = unknown> {
  return typeof expiresAt === 'number' && expiresAt <= this.now();
  }
 
- private loadFromStorage(key: string): { value: V; expiresAt?: number | null } | null {
+ private loadFromStorage(key: string): {, value: V; expiresAt?: number | null } | null {
  if (!this.persistent || !this.hasLocalStorage) return null;
 
  try {

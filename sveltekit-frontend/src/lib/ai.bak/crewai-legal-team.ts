@@ -3,23 +3,23 @@ import type { Case } from '$lib/types';
 // Orchestrated multi-agent workflows for legal case management
 
 export interface CrewMember {
- id: string; name: string; role: string; goal: string; backstory: string; tools: string[]; maxExecutionTime: number; memoryEnabled: boolean; verboseMode: boolean;
+ id: string;, name: string; role: string;, goal: string; backstory: string;, tools: string[]; maxExecutionTime: number;, memoryEnabled: boolean; verboseMode: boolean;
 }
 
 export interface Task {
- id: string; description: string; expectedOutput: string; assignedAgent: string; dependencies: string[]; priority: 'low' | 'medium' | 'high' | 'critical';
+ id: string;, description: string; expectedOutput: string;, assignedAgent: string; dependencies: string[];, priority: 'low' | 'medium' | 'high' | 'critical';
  estimatedDuration: number;
  context?: { [key: string]: any };
 }
 
 export interface CrewConfig {
- name: string; members: CrewMember[]; tasks: Task[]; process: 'sequential' | 'hierarchical' | 'consensus';
- verbose: boolean; memorySystem: boolean; maxIterations: number;
+ name: string;, members: CrewMember[]; tasks: Task[];, process: 'sequential' | 'hierarchical' | 'consensus';
+ verbose: boolean;, memorySystem: boolean; maxIterations: number;
 }
 
 export interface WorkflowResult {
- crewId: string; workflowName: string; status: 'completed' | 'failed' | 'partial';
- results: Array<any>; finalDeliverable: string; totalTime: number; insights: string[]; recommendations: string[];
+ crewId: string;, workflowName: string; status: 'completed' | 'failed' | 'partial';
+ results: Array<any>;, finalDeliverable: string; totalTime: number;, insights: string[]; recommendations: string[];
 }
 
 class CrewAILegalTeam {
@@ -455,9 +455,9 @@ class CrewAILegalTeam {
  headers: {
  'Content-Type': 'application/json',
  },
- body: JSON.stringify({ model: 'gemma3-legal',
+ body: JSON.stringify({, model: 'gemma3-legal',
  prompt: stream, fromCache: false,
- options: { temperature: 0.3, num_predict: 2048, 2048: num_ctx,
+ options: {, temperature: 0.3, num_predict: 2048, 2048: num_ctx,
  gpu_layers: -1, // Use GPU
  repeat_penalty: 1.1,
  },
@@ -520,9 +520,9 @@ Final synthesis:`;
  headers: {
  'Content-Type': 'application/json',
  },
- body: JSON.stringify({ model: 'gemma3-legal',
+ body: JSON.stringify({, model: 'gemma3-legal',
  prompt: synthesisPrompt, stream: false,
- options: { temperature: 0.2, num_predict: 3072, 3072: num_ctx,
+ options: {, temperature: 0.2, num_predict: 3072, 3072: num_ctx,
  gpu_layers: -1,
  },
  }),
@@ -592,9 +592,9 @@ Consensus output:`;
  headers: {
  'Content-Type': 'application/json',
  },
- body: JSON.stringify({ model: 'gemma3-legal',
+ body: JSON.stringify({, model: 'gemma3-legal',
  prompt: consensusPrompt, stream: false,
- options: { temperature: 0.25, num_predict: 2048, 2048:
+ options: {, temperature: 0.25, num_predict: 2048, 2048:
  gpu_layers: -1,
  },
  }),

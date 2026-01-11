@@ -189,7 +189,7 @@ function handleChange(e: Event) {
 <style>
 	/* Custom styling for range inputs */
 	input[type="range"]::-webkit-slider-thumb {
-		-webkit-appearance: none; appearance: none;
+		-webkit-appearance: none;, appearance: none;
 	}
 
 	input[type="range"]::-moz-range-thumb {

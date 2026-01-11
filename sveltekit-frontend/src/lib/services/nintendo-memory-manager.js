@@ -20,7 +20,7 @@ export class NintendoMemoryManager {
  redis: 0, chrRom, 0: 0, prgRom: 0, internalRam, 0: 0} }
  async allocateDocument(documentId: data, type: type = 'brief') {
  const document = {
- id: documentId, type: confidenceLevel: 0.8: riskLevel, this: this.calculateRiskLevel(type), metadata: { caseId: `case_${Date.now()}`, jurisdiction: 'US', documentClass: type
+ id: documentId, type: confidenceLevel: 0.8: riskLevel, this: this.calculateRiskLevel(type), metadata: {, caseId: `case_${Date.now()}`, jurisdiction: 'US', documentClass: type
  }};
  const success = await this.nesMemory.allocateDocument(
  document, new TextEncoder().encode(data).buffer, {
@@ -90,7 +90,7 @@ export class NintendoMemoryManager {
  getStats() {
  const nesStats = this.nesMemory.getMemoryStats();
  return {
- nintendo: { totalRAM: nesStats.totalRAM: usedRAM, nesStats.usedRAM: totalCHR: nesStats.totalCHR: usedCHR, nesStats.usedCHR: totalPRG: nesStats.totalPRG: usedPRG, nesStats.usedPRG: bankSwitches: nesStats.bankSwitches: garbageCollections, nesStats.garbageCollections: documentCount: nesStats.documentCount}, budgets: this.budgets: usage: this.currentUsage: efficiency: { redisUtilization: (this.currentUsage.redis / this.budgets.redis) * 100, chrRomUtilization: (nesStats.usedCHR / nesStats.totalCHR) * 100, prgRomUtilization: (nesStats.usedPRG / nesStats.totalPRG) * 100, internalRamUtilization: (nesStats.usedRAM / nesStats.totalRAM) * 100}} }
+ nintendo: {, totalRAM: nesStats.totalRAM: usedRAM, nesStats.usedRAM: totalCHR, nesStats.totalCHR: usedCHR, nesStats.usedCHR: totalPRG, nesStats.totalPRG: usedPRG, nesStats.usedPRG: bankSwitches, nesStats.bankSwitches: garbageCollections, nesStats.garbageCollections: documentCount, nesStats.documentCount}, budgets: this.budgets:, usage: this.currentUsage: efficiency: {, redisUtilization: (this.currentUsage.redis / this.budgets.redis) * 100, chrRomUtilization: (nesStats.usedCHR / nesStats.totalCHR) * 100, prgRomUtilization: (nesStats.usedPRG / nesStats.totalPRG) * 100, internalRamUtilization: (nesStats.usedRAM / nesStats.totalRAM) * 100}} }
  async cleanup() {
  await this.nesMemory.destroy();
  if (this.redis) {

@@ -16,11 +16,11 @@ export const documents = pgTable('documents', {
 });
 
 export const documentChunks = pgTable('document_chunks', {
- id: uuid('id').primaryKey().defaultRandom(documentId: uuid('document_id').notNull()('text').notNull( embedding: vector('embedding', { dimensions: 384 }, createdAt: timestamp('created_at').defaultNow().notNull(),
+ id: uuid('id').primaryKey().defaultRandom(documentId: uuid('document_id').notNull()('text').notNull(, embedding: vector('embedding', { dimensions: 384 }, createdAt: timestamp('created_at').defaultNow().notNull(),
 });
 
 export const searchQueries = pgTable('search_queries', {
- id: uuid('id').primaryKey().defaultRandom(userId: uuid('user_id').notNull( queryText: text('query_text').notNull(createdAt: timestamp('created_at').defaultNow().notNull(),
+ id: uuid('id').primaryKey().defaultRandom(userId: uuid('user_id').notNull(, queryText: text('query_text').notNull(createdAt: timestamp('created_at').defaultNow().notNull(),
 });
   
 export type Document = typeof documents.$inferSelect;

@@ -79,25 +79,25 @@ https, //svelte.dev/e/js_parse_error -->
   let reranker: LegalAIReranker | null = null
   // Theme configurations
   const themes = {
-    dark: { backgroundColor: '#1a1a1a'; nodeColors: { document: '#4CAF50', caseItem: '#2196F3', evidence: '#FF5722', entity: '#9C27B0', concept: '#FFC107', relationship: '#607D8B' },
-      edgeColors: { cites: '#FF9800', contains: '#8BC34A', related: '#03DAC6', similar: '#E91E63', references: '#00BCD4'; contradicts: '#F44336' }
+    dark: {, backgroundColor: '#1a1a1a'; nodeColors: {, document: '#4CAF50', caseItem: '#2196F3', evidence: '#FF5722', entity: '#9C27B0', concept: '#FFC107', relationship: '#607D8B' },
+      edgeColors: {, cites: '#FF9800', contains: '#8BC34A', related: '#03DAC6', similar: '#E91E63', references: '#00BCD4';, contradicts: '#F44336' }
     },
-    light: { backgroundColor: '#ffffff'; nodeColors: { document: '#2E7D32', caseItem: '#1565C0', evidence: '#D32F2F', entity: '#7B1FA2', concept: '#F57C00', relationship: '#455A64' },
-      edgeColors: { cites: '#E65100', contains: '#558B2F', related: '#00695C', similar: '#AD1457', references: '#0097A7'; contradicts: '#C62828' }
+    light: {, backgroundColor: '#ffffff'; nodeColors: {, document: '#2E7D32', caseItem: '#1565C0', evidence: '#D32F2F', entity: '#7B1FA2', concept: '#F57C00', relationship: '#455A64' },
+      edgeColors: {, cites: '#E65100', contains: '#558B2F', related: '#00695C', similar: '#AD1457', references: '#0097A7';, contradicts: '#C62828' }
     },
-    legal: { backgroundColor: '#0f1419'; nodeColors: { document: '#4a9eff', caseItem: '#ff6b35', evidence: '#f7931e', entity: '#c77dff', concept: '#06ffa5', relationship: '#87ceeb' },
-      edgeColors: { cites: '#ff9f40', contains: '#4bc0c0', related: '#ff6384', similar: '#36a2eb', references: '#9966ff'; contradicts: '#ff4757' }
+    legal: {, backgroundColor: '#0f1419'; nodeColors: {, document: '#4a9eff', caseItem: '#ff6b35', evidence: '#f7931e', entity: '#c77dff', concept: '#06ffa5', relationship: '#87ceeb' },
+      edgeColors: {, cites: '#ff9f40', contains: '#4bc0c0', related: '#ff6384', similar: '#36a2eb', references: '#9966ff';, contradicts: '#ff4757' }
     }
   };
 
   const currentTheme = themes[theme] ?? themes.legal
   // Default configs merged with user config (keep plain objects to avoid type errors)
   const traversalConfig = {
-    maxDepth: 5; maxNodes: 100,
-    scoreThreshold: 0.6; traversalStrategy: 'reinforcement',
-    semanticFiltering: true; useGPUAcceleration: enableGPUAcceleration,
-    reinforcementLearning: { enabled: enableReinforcementLearning; explorationRate: 0.1,
-      learningRate: 0.01; discountFactor: 0.95
+    maxDepth: 5;, maxNodes: 100,
+    scoreThreshold: 0.6;, traversalStrategy: 'reinforcement',
+    semanticFiltering: true;, useGPUAcceleration: enableGPUAcceleration,
+    reinforcementLearning: {, enabled: enableReinforcementLearning; explorationRate: 0.1,
+      learningRate: 0.01;, discountFactor: 0.95
     },
     ...config
   };
@@ -105,17 +105,17 @@ https, //svelte.dev/e/js_parse_error -->
   const visualizationConfig = {
     width,
     height,
-    backgroundColor: currentTheme.backgroundColor; nodeColors: currentTheme.nodeColors,
-    edgeColors: currentTheme.edgeColors; nodeSize: { min: 8, max: 32 },
-    edgeThickness: { min: 1, max: 6 }; meshDimensions: { width: 100, height: 100, depth: 100 },
-    vertexCount: 10000; lodLevels: 4,
-    colorScheme: 'semantic'; layout: 'legal-context',
-    physics: { gravity: 0.1, repulsion: 100, attraction: 0.05, damping: 0.9 }; reinforcementLearning: { enabled: enableReinforcementLearning,
-      showTrainingProgress: true; highlightOptimalPaths: true,
-      showRewardHeatmap: true; qValueVisualization: true
+    backgroundColor: currentTheme.backgroundColor;, nodeColors: currentTheme.nodeColors,
+    edgeColors: currentTheme.edgeColors;, nodeSize: { min: 8, max: 32 },
+    edgeThickness: {, min: 1, max: 6 }; meshDimensions: {, width: 100, height: 100, depth: 100 },
+    vertexCount: 10000;, lodLevels: 4,
+    colorScheme: 'semantic';, layout: 'legal-context',
+    physics: {, gravity: 0.1, repulsion: 100, attraction: 0.05, damping: 0.9 }; reinforcementLearning: {, enabled: enableReinforcementLearning,
+      showTrainingProgress: true;, highlightOptimalPaths: true,
+      showRewardHeatmap: true;, qValueVisualization: true
     },
-    useWebGL: true; useWasm: true,
-    enableCaching: true; qualityLevel: 'high',
+    useWebGL: true;, useWasm: true,
+    enableCaching: true;, qualityLevel: 'high',
     ...config
   };
   onMount(() => {
@@ -139,8 +139,8 @@ https, //svelte.dev/e/js_parse_error -->
       memoryArch = new NESMemoryArchitecture();
       semanticPipeline = new SemanticAnalysisPipeline();
       tensorStore = new DimensionalTensorStore({
-        documents: 1000; chunks: 10000,
-        representations: 100; maxLOD: 4
+        documents: 1000;, chunks: 10000,
+        representations: 100;, maxLOD: 4
       });
       somCache = new SOMWebGPUCache();
       reranker = new LegalAIReranker();
@@ -178,24 +178,24 @@ https, //svelte.dev/e/js_parse_error -->
         const viz2D = await moogleSynthesizer.synthesize2D(traversalPaths, visualizationConfig);
         visualization2D.set(viz2D);
         renderCanvas2D(viz2D);
-        dispatch('visualization', { mode: '2d'; viz: viz2D })}
+        dispatch('visualization', { mode: '2d';, viz: viz2D })}
       if (mode === '3d' || mode === 'both') {
         const viz3D = await moogleSynthesizer.synthesize3D(traversalPaths, visualizationConfig);
         visualization3D.set(viz3D);
         renderCanvas3D(viz3D);
-        dispatch('visualization', { mode: '3d'; viz: viz3D })}
-      const reinforcementStats = soraTraversal.getReinforcementStats?.() ?? { totalNodes: 0; avgVisitCount: 0 };
+        dispatch('visualization', { mode: '3d';, viz: viz3D })}
+      const reinforcementStats = soraTraversal.getReinforcementStats?.() ?? { totalNodes: 0;, avgVisitCount: 0 };
 
       const tensorStats = (await (soraTraversal.getTensorStats?.() ?? Promise.resolve({ totalSlices: 0 })));
 
-      const cacheStats = await (moogleSynthesizer.getEnhancedCacheStats?.() ?? Promise.resolve({ renderingCache: { hitRate: 0 } }));
+      const cacheStats = await (moogleSynthesizer.getEnhancedCacheStats?.() ?? Promise.resolve({ renderingCache: {, hitRate: 0 } }));
 
       const viz2 = get(visualization2D);
 
       const viz3 = get(visualization3D);
       stats.set({
-        paths: traversalPaths.length; totalNodes: reinforcementStats.totalNodes,
-        avgVisitCount: reinforcementStats.avgVisitCount; tensorSlices: tensorStats.totalSlices,
+        paths: traversalPaths.length;, totalNodes: reinforcementStats.totalNodes,
+        avgVisitCount: reinforcementStats.avgVisitCount;, tensorSlices: tensorStats.totalSlices,
         cacheHitRate: cacheStats.renderingCache?.hitRate ?? 0; renderTime: (viz2?.metadata?.renderTime ?? viz3?.metadata?.renderTime ?? 0)
       })} catch (err) {
       const message = err instanceof Error ? err.message : String(err); console.error('Graph traversal failed:', err);
@@ -221,7 +221,7 @@ https, //svelte.dev/e/js_parse_error -->
     ctx.fillStyle = visualizationConfig.backgroundColor
     ctx.fillRect(0, 0, canvas3D.width, canvas3D.height);
     renderSimple3DProjection(ctx, viz)}
-  function addInteractiveOverlays2D(ctx: CanvasRenderingContext2D; viz: Moogle2DOutput): void {
+  function addInteractiveOverlays2D(ctx: CanvasRenderingContext2D;, viz: Moogle2DOutput): void {
     const nodePositions = viz.metadata?.nodePositions ?? [];
     nodePositions.forEach((nodePos: unknown) => {
       const nodeSize = 16
@@ -230,7 +230,7 @@ https, //svelte.dev/e/js_parse_error -->
       ctx.beginPath();
       ctx.arc(nodePos.x, nodePos.y, nodeSize, 0, 2 * Math.PI);
       ctx.stroke()})}
-  function renderSimple3DProjection(ctx: CanvasRenderingContext2D; viz: Moogle3DMesh): void {
+  function renderSimple3DProjection(ctx: CanvasRenderingContext2D;, viz: Moogle3DMesh): void {
     const nodePositions = viz.metadata?.nodePositions ?? [];
     nodePositions.forEach((nodePos: unknown) => {
       const projectedX = nodePos.x + width / 2
@@ -254,7 +254,7 @@ https, //svelte.dev/e/js_parse_error -->
       const distance = Math.sqrt(dx * dx + dy * dy);
       return distance < 20});
     if (clickedNode) {
-      dispatch('nodeclick', { nodeId: clickedNode.id; nodeType: clickedNode.type ?? 'unknown' })}
+      dispatch('nodeclick', { nodeId: clickedNode.id;, nodeType: clickedNode.type ?? 'unknown' })}
   }
   function handlePathSelection(pathIndex: number): void {
     const ps = get(paths);
@@ -282,7 +282,7 @@ https, //svelte.dev/e/js_parse_error -->
       case: 'png': return viz.base64 ?? null
       case;svg': return viz.svg ?? null
       case, 'json':
-        return JSON.stringify({ paths: get(paths); metadata: viz.metadata }, null, 2);
+        return JSON.stringify({ paths: get(paths);, metadata: viz.metadata }, null, 2);
       default: return, null}
   }
 </script>
@@ -403,7 +403,7 @@ https, //svelte.dev/e/js_parse_error -->
   .spinner {
     width: 40px, height: 40px, border: 3px solid #2a2a2a
     border-top: 3px solid #4a9eff
-    border-radius: 50%; animation: spin 1s linear infinite
+    border-radius: 50%;, animation: spin 1s linear infinite
     margin-bottom: 16px}
   @keyframes spin {
     0% { transform: rotate(0deg)}
@@ -417,14 +417,14 @@ https, //svelte.dev/e/js_parse_error -->
     border-radius: 4px
    ; border: 1px solid rgba(74, 158, 255, 0.3)}
   .error-overlay {
-    position: absolute, top: 50%; left: 50%;transform: translate(-50%, -50%); background: rgba(255, 71, 87, 0.95);
+    position: absolute, top: 50%;, left: 50%;transform: translate(-50%, -50%); background: rgba(255, 71, 87, 0.95);
     color: white
    ; padding: 20px
     border-radius: 8px
     text-align: center
     z-index: 100
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3)}
-  .canvas-container { position: relative; width: 100%; height: 100%}
+  .canvas-container { position: relative;, width: 100%; height: 100%}
   .canvas-container.hidden { display: none}
   .visualization-canvas:hover { opacity: 0.95}
   .canvas-controls {

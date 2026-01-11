@@ -10,7 +10,7 @@
  * All auth-related errors inherit from this for consistent handling
  */
 export class AuthError extends Error {
- code: string; status: number;
+ code: string;, status: number;
  context?: Record<string, unknown>;
 
  constructor(
@@ -128,7 +128,7 @@ export function formatErrorResponse(error: any) {
  if (isAuthError(error)) {
  return {
  success: false,
- error: { message: error.message,
+ error: {, message: error.message,
  code: error.code,
  status: error.status,
  ...(error.context && { context: error.context }),
@@ -138,7 +138,7 @@ export function formatErrorResponse(error: any) {
  // Handle unknown errors gracefully
  return {
  success: false,
- error: { message: 'An unexpected error occurred',
+ error: {, message: 'An unexpected error occurred',
  code: 'UNKNOWN_ERROR',
  status: 500,
  },

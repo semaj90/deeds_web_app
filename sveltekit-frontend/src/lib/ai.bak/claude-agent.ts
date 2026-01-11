@@ -10,7 +10,7 @@ export interface ClaudeAgentExecutionInput {
 }
 
 export interface ClaudeAgentExecutionResult {
- output: string; score: number; metadata: { [key: string]: any };
+ output: string;, score: number; metadata: { [key: string]: any };
 }
 
 class ClaudeAgentStub {
@@ -20,7 +20,7 @@ class ClaudeAgentStub {
  output:
  `[ClaudeStub] Response synthesized, for: ${prompt.slice(0, 120)}...` +
  (options?.includeContext7 ? ' (ctx7)' : '', score: 0.72,
- metadata: { simulated: true,
+ metadata: {, simulated: true,
  length: prompt.length,
  includeContext7: !!options?.includeContext7,
  autoFix: !!options?.autoFix,

@@ -5,17 +5,17 @@
 import { writable, derived } from 'svelte/store';
 
 export interface FixAttempt {
-	id: string; errorId: string; strategy: string; originalCode: string; fixedCode: string; confidence: number; applied: boolean; result: 'success' | 'failed' | 'partial';
+	id: string;, errorId: string; strategy: string;, originalCode: string; fixedCode: string;, confidence: number; applied: boolean;, result: 'success' | 'failed' | 'partial';
 	timestamp: Date;
 	llmModel?: string;
 }
 
 export interface ErrorFix {
-	errorId: string; file: string; line: number; originalText: string; fixedText: string; strategy: string; confidence: number; reasoning: string; dependencies: string[]; validated: boolean;
+	errorId: string;, file: string; line: number;, originalText: string; fixedText: string;, strategy: string; confidence: number;, reasoning: string; dependencies: string[];, validated: boolean;
 }
 
 export interface AIFixConfig {
-	model: string; endpoint: string; maxRetries: number; confidenceThreshold: number; batchSize: number; validateFixes: boolean; embeddingModel: string;
+	model: string;, endpoint: string; maxRetries: number;, confidenceThreshold: number; batchSize: number;, validateFixes: boolean; embeddingModel: string;
 }
 
 export interface ErrorAnalysisResult {
@@ -109,9 +109,9 @@ export class AIErrorFixer {
 			const response = await fetch(this.config.endpoint, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ model: this.config.model,
+				body: JSON.stringify({, model: this.config.model,
 					prompt,
-					options: { temperature: 0.1,
+					options: {, temperature: 0.1,
 						top_p: 0.9,
 						max_tokens: 1000
 					}
@@ -251,7 +251,7 @@ ${this.getCommonFixes(error.code || '')}`;
 		this.fixHistory.set(errorId, history);
 	}
 
-	async applyFixes(fixes: ErrorFix[]): Promise<{ applied: number; failed: number; results: unknown[] }> {
+	async applyFixes(fixes: ErrorFix[]): Promise<{, applied: number; failed: number;, results: unknown[] }> {
 		const results: unknown[] = [];
 		let applied = 0;
 		let failed = 0;
@@ -281,12 +281,12 @@ ${this.getCommonFixes(error.code || '')}`;
 		return { applied, failed, results };
 	}
 
-	private async applyFix(fix: ErrorFix): Promise<{ errorId: string; success: boolean; reason?: string }> {
+	private async applyFix(fix: ErrorFix): Promise<{, errorId: string; success: boolean; reason?: string }> {
 		try {
 			const resp = await fetch('/api/files/read', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ file: fix.file })
+				body: JSON.stringify({, file: fix.file })
 			});
 
 			if (!resp.ok) {
@@ -305,7 +305,7 @@ ${this.getCommonFixes(error.code || '')}`;
 			const writeResp = await fetch('/api/files/write', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ file: fix.file, content: lines.join('\n') })
+				body: JSON.stringify({, file: fix.file, content: lines.join('\n') })
 			});
 
 			if (!writeResp.ok) {
@@ -363,7 +363,7 @@ export const errorFixerStore = writable({
 	fixes: [] as ErrorFix[],
 	appliedFixes: 0,
 	failedFixes: 0,
-	stats: { totalAttempts: 0,
+	stats: {, totalAttempts: 0,
 		successfulFixes: 0,
 		failedFixes: 0,
 		averageConfidence: 0,

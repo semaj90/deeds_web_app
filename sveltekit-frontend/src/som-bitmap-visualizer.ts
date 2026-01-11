@@ -19,10 +19,10 @@ export interface SOMBitmapOptions {
 }
 
 export interface SOMBitmapResult {
-	width: number; height: number;
+	width: number;, height: number;
 	heatmap: Float32Array;
 	rgba?: Uint8ClampedArray;
-	palette?: SOMBitmapPalette; checksum: string;
+	palette?: SOMBitmapPalette;, checksum: string;
 	svg?: string;
 	metadata?: {
 		min?: number;
@@ -35,7 +35,7 @@ export interface SOMBitmapResult {
 }
 
 const paletteMap: Record<SOMBitmapPalette, [number, number, number][]> = {
-	grayscale: Array.from({ length: 256 }, (_, i) => [i, i, i] as [number, number, number]),
+	grayscale: Array.from({, length: 256 }, (_, i) => [i, i, i] as [number, number, number]),
 	blueprint: Array.from(
 		{ length: 256 },
 		(_, i) =>

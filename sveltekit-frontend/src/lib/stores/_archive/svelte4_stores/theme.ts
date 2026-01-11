@@ -1,12 +1,12 @@
 import { writable } from 'svelte/store';
 
 export interface YoRHaTheme {
- primary: string; secondary: string;
- accent: string; background: string;
- surface: string; text: string;
- textSecondary: string; border: string;
- success: string; warning: string;
- error: string; info: string;
+ primary: string;, secondary: string;
+ accent: string;, background: string;
+ surface: string;, text: string;
+ textSecondary: string;, border: string;
+ success: string;, warning: string;
+ error: string;, info: string;
 }
 
 export const yorhaTheme: YoRHaTheme = {

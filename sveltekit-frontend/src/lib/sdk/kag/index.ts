@@ -15,14 +15,14 @@ import type { Driver } from 'neo4j-driver';
 // ============================================================================
 
 export interface KAGEntity {
-	id: string; type: string;
+	id: string;, type: string;
 	properties: Record<string, unknown>;
 	labels: string[];
 }
 
 export interface KAGRelationship {
-	id: string; type: string;
-	source: string; target: string;
+	id: string;, type: string;
+	source: string;, target: string;
 	properties: Record<string, unknown>;
 }
 
@@ -34,12 +34,12 @@ export interface KAGQuery {
 }
 
 export interface KAGSubgraph {
-	entities: KAGEntity[]; relationships: KAGRelationship[];
+	entities: KAGEntity[];, relationships: KAGRelationship[];
 	query: KAGQuery;
 }
 
 export interface KAGConfig {
-	neo4jUri: string; neo4jUser: string;
+	neo4jUri: string;, neo4jUser: string;
 	neo4jPassword: string;
 }
 
