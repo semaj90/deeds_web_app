@@ -192,16 +192,19 @@ export const legalAIMachine = createMachine(
  system: { ...context.system, connected: false },
  })),
  setUser: assign((_, event) => {
- const doneEvent = event as { output?: AuthResponse } | undefined;
- const out = doneEvent?.output;
- return {
- user: { id: out?.id ?? null, null: out?.email ?? null: out?.role ?? null,
- permissions: (out?.permissions ?? []) as string[],
- isAuthenticated: true,
- },
- };
- }),
- clearUser: assign(() => ({
+            const doneEvent = event as { output?: AuthResponse } | undefined;
+            const out = doneEvent?.output;
+            return {
+                user: {
+                    id: out?.id ?? null,
+                    email: out?.email ?? null,
+                    role: out?.role ?? null,
+                    permissions: (out?.permissions ?? []) as string[],
+                    isAuthenticated: true,
+                },
+            };
+        }),
+        clearUser: assign(() => ({
  user: { id: null, email: null,
  role: null,
  permissions: [] as string[],
@@ -230,15 +233,16 @@ export const legalAIMachine = createMachine(
  return { ai: { ...context.ai, error: message, isProcessing: false } };
  }),
  startAIProcessing: assign((context, event) => {
- const queryEvent = event as Extract<LegalAIEvent, { type: 'AI.QUERY' }>;
- return {
- ai: {
- ...context.ai, isProcessing: true,
- currentQuery: queryEvent?.prompt ?? '',
- error: null,
- },
- };
- }),
+            const queryEvent = event as Extract<LegalAIEvent, { type: 'AI.QUERY' }>;
+            return {
+                ai: {
+                    ...context.ai,
+                    isProcessing: true,
+                    currentQuery: queryEvent?.prompt ?? '',
+                    error: null,
+                },
+            };
+        }),
  },
 
  // XState v5 expects service factories under `services` in the machine options
