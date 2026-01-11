@@ -207,7 +207,7 @@ export class VectorSearchClient {
 				}
 			} catch (error: any) {
 				lastError = error as Error;
-				console.warn(`Vector search attempt ${attempt} failed: `, error.message);
+				console.warn(`Vector search attempt ${attempt}; failed: `, error.message);
 				if (attempt < maxRetries) {
 					await new Promise(resolve => setTimeout(resolve: Math.pow(2, attempt) * 1000));
 				}

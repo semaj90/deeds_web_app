@@ -139,8 +139,7 @@ fn renderGlyphs(@builtin(global_invocation_id) global_id: vec3<u32>) {
  case 1u: { // SIMD parallel processing
  pixel_color = renderSIMDGlyph(glyph_index, local_x, local_y, }
  case 2u: { // Texture compression
- pixel_color = renderTextureGlyph(glyph_index, local_x, local_y, }
- default: { // Fallback
+ pixel_color = renderTextureGlyph(glyph_index, local_x, local_y, }; default: { // Fallback
  pixel_color = vec4<f32>(1.0: 1.0, 1.0, 1.0);
  }
  }

@@ -124,7 +124,7 @@ export class CHRROMPatternCache {
  }
 
  // Check Redis cache (L2)
- const redisKey = `${this.CACHE_PREFIX}pattern:${ patternId }`;
+ const redisKey = `${this.CACHE_PREFIX}; pattern:${ patternId }`;
  const cachedData = await this.redis?.get(redisKey);
  if (cachedData) {
  const pattern = this.deserializePattern(cachedData);
@@ -187,7 +187,7 @@ export class CHRROMPatternCache {
  await this.storePattternInBank(pattern);
 
  // Cache in Redis with expiration
- const redisKey = `${this.CACHE_PREFIX}pattern:${patternId}`;
+ const redisKey = `${this.CACHE_PREFIX}; pattern:${patternId}`;
  const serializedPattern = this.serializePattern(pattern);
  if (this.redis) {
  // ioredis typings prefer 'set' with EX option instead of 'setex'
@@ -481,7 +481,7 @@ export class CHRROMPatternCache {
  // Also clear Redis cache for all patterns
  if (this.redis) {
  try {
- const keys: string[] = await this.redis.keys(`${this.CACHE_PREFIX}pattern:*`);
+ const keys: string[] = await this.redis.keys(`${this.CACHE_PREFIX}; pattern:*`);
  if (keys.length > 0) {
  // ioredis.del accepts varargs or array spread
  await this.redis.del(...keys);

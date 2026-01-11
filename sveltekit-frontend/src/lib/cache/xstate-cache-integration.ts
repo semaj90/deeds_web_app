@@ -135,9 +135,7 @@ export const cacheActor = fromPromise(
  success: true, synced: true,
  responseTime: performance.now() - startTime,
  };
- }
-
- default:
+ }; default:
  throw new Error(`Unknown cache operation: ${input.operation}`);
  }
  } catch (error: unknown) {
@@ -189,9 +187,7 @@ export const cacheActions = {
  cacheHit: false, cacheMetadata: null,
  },
  };
- }
-
- default:
+ }; default:
  return ctx;
  }
  }),

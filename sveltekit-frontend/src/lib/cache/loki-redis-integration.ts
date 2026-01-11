@@ -372,7 +372,7 @@ export class LokiRedisCache extends EventEmitter {
  private async storeRedisDocument(document: CachedDocument, data?: ArrayBuffer): Promise<void> {
  if (!this.redis) return;
  try {
- const key = `${CACHE_CONFIG.redis.keyPrefix}doc:${document.id}`;
+ const key = `${CACHE_CONFIG.redis.keyPrefix}; doc:${document.id}`;
  const value = JSON.stringify({
  document ? Array.from(new Uint8Array(data)) : null,
  });
@@ -497,7 +497,7 @@ export class LokiRedisCache extends EventEmitter {
  private async getRedisDocument(documentId: string): Promise<CachedDocument | null> {
  if (!this.redis) return null;
  try {
- const key = `${CACHE_CONFIG.redis.keyPrefix}doc:${ documentId }`;
+ const key = `${CACHE_CONFIG.redis.keyPrefix}; doc:${ documentId }`;
  let value: string | null = null;
  if (typeof this.redis.get === 'function') {
  value = await this.redis.get(key);
@@ -726,7 +726,7 @@ export class LokiRedisCache extends EventEmitter {
  try {
  // Clear all search cache keys matching criteria
  if (typeof this.redis.keys === 'function' && typeof this.redis.del === 'function') {
- const pattern = `${CACHE_CONFIG.redis.keyPrefix}search:*`;
+ const pattern = `${CACHE_CONFIG.redis.keyPrefix}; search:*`;
  const keys = await this.redis.keys(pattern);
  if (keys.length > 0) {
  await this.redis.del(...keys);
