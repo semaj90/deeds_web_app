@@ -13,9 +13,7 @@
     // Processing options
     let processingOptions = $state({
         extract_entities: true,
-        analyze_sentiment: true, classify_domain: true
-        generate_embedding: true, find_similar: true
- risk_assessment: true
+        analyze_sentiment: true, classify_domain: true, generate_embedding: true, find_similar: true, risk_assessment: true
     });
     // Check services health on mount
     checkServicesHealth();
@@ -347,8 +345,7 @@
     .status-indicator.offline {
         color: #dc2626}
     .refresh-btn {
-        background: none, border: none
-        cursor: pointer
+        background: none, border: none, cursor: pointer
         font-size: 1rem}
     .step-indicator {
         display: flex
@@ -366,22 +363,18 @@
     .step-number {
         display: flex
         align-items: center
-        justify-content: center, width: 2rem
-        height: 2rem
-        border-radius: 50%; background: currentColor
-        color: white
+        justify-content: center, width: 2rem, height: 2rem
+        border-radius: 50%; background: currentColor, color: white
         font-weight: bold
         font-size: 0.875rem}
     .error-message {
         display: flex
-        align-items: center, gap: 1rem
-        padding: 1rem, background: #fef2f2
+        align-items: center, gap: 1rem, padding: 1rem, background: #fef2f2
         border: 1px solid #fecaca
         border-radius: 0.5rem, color: #dc2626
         margin: 1rem 0}
     .retry-btn {
-        background: #dc2626, color: white
-        border: none, padding: 0.5rem 1rem
+        background: #dc2626, color: white, border: none, padding: 0.5rem 1rem
         border-radius: 0.25rem, cursor: pointer}
     .upload-section {
         background: white
@@ -393,11 +386,9 @@
     .file-input {
         display: none}
     .file-input-label {
-        display: block, padding: 2rem
-        border: 2px dashed #d1d5db
+        display: block, padding: 2rem, border: 2px dashed #d1d5db
         border-radius: 0.5rem
-        text-align: center, cursor: pointer
-        transition: border-color 0.2}
+        text-align: center, cursor: pointer, transition: border-color 0.2}
     .file-input-label:hover {
         border-color: #3b82f6, background: #f8fafc}
     .processing-options {
@@ -409,12 +400,10 @@
         align-items: center, gap: 0.5rem
         margin-bottom: 0.5rem, cursor: pointer}
     .process-btn {
-        background: #3b82f6, color: white
-        border: none, padding: 1rem 2rem
+        background: #3b82f6, color: white, border: none, padding: 1rem 2rem
         border-radius: 0.5rem
         font-size: 1.1rem
-        font-weight: 600, cursor: pointer
-        width: 100%; transition: background 0.2}
+        font-weight: 600, cursor: pointer, width: 100%; transition: background 0.2}
     .process-btn:hover, not(disabled) {
         background: #2563eb}
     .process-btn:disabled {
@@ -528,8 +517,7 @@
     .secondary-btn {
         padding: 1rem 2rem
         border-radius: 0.5rem
-        font-weight: 600, cursor: pointer
-        border: none, transition: all 0.2}
+        font-weight: 600, cursor: pointer, border: none, transition: all 0.2}
     .primary-btn {
         background: #059669, color: white}
     .primary-btn:hover {

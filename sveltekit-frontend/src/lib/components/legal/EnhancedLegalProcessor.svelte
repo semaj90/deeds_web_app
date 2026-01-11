@@ -160,8 +160,7 @@ import type { Document } from '$lib/types';
         if (e.key === 'Enter' || e.key === ' ') {
           e.preventDefault();
           fileInput.click()}
-      }}
-      on: dragover|preventDefault, on:drop|preventDefault={(e: DragEvent) => {
+      }}; on: dragover|preventDefault, on:drop|preventDefault={(e: DragEvent) => {
         if (e.dataTransfer?.files[0]) {
           send({ type: 'FILE_SELECTED', file: e.dataTransfer.files[0] })}
       }}

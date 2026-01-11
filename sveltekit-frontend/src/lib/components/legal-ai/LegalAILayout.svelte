@@ -404,7 +404,7 @@
  font-size: 0.8rem;
  }
 
- .terminal-input::placeholder {
+ .terminal-input: placeholder {
  color: #666;
  }
 

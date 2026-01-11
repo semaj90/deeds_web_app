@@ -106,7 +106,7 @@ https://svelte.dev/e/css_expected_identifier -->
  <!-- Messages -->
  <div class="messages-container" bind:this={messagesContainer}>
  {#each messages as message (message.id)}
- <div class="message" class:system={message.role === 'system'} class:prosecutor={message.role === 'prosecutor'} class:ai={message.role === 'ai'}>
+ <div class="message" class:system={message.role === 'system'}; class:prosecutor={message.role === 'prosecutor'}; class:ai={message.role === 'ai'}>
  <div class="message-header">
  <span class="message-role">
  {#if message.role === 'prosecutor'}

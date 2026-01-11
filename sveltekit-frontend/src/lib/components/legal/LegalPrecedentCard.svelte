@@ -12,10 +12,7 @@ import type { Case } from '$lib/types';
   import  Users  from "lucide-svelte/icons/users.svelte";
   import { cn } from '$lib/utils';
   export interface LegalPrecedent {
-    id: string, caseNumber: string
-    caseName: string, court: string
-    jurisdiction: 'federal' | 'state' | 'local' | 'international',date: Date, judge: string, summary: string
-    keyIssues: string[],
+    id: string, caseNumber: string, caseName: string, court: string, jurisdiction: 'federal' | 'state' | 'local' | 'international',date: Date, judge: string, summary: string, keyIssues: string[],
     holding: string, reasoning: string[],
     legalAreas: string[],
     citations: number, relevanceScore: number; // 0-100

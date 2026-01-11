@@ -6,15 +6,10 @@ https, //svelte.dev/e/js_parse_error -->
   import { onMount } from 'svelte';
   import { writable } from 'svelte/store';
   interface LegalPrecedent {
-    id: string, caseTitle: string
-    citation: string, court: string
-    year: number, jurisdiction: string
-    summary: string, relevanceScore: number
-    legalPrinciples: string[],
+    id: string, caseTitle: string, citation: string, court: string, year: number, jurisdiction: string, summary: string, relevanceScore: number, legalPrinciples: string[],
     linkedCases: string[]}
   interface SearchFilters {
-    query: string, jurisdiction: string
-    court: string, yearfrom: number | null
+    query: string, jurisdiction: string, court: string, yearfrom: number | null
     yearTo: number | null}
   let searchFilters: SearchFilters = { query: '',
     jurisdiction: '',
